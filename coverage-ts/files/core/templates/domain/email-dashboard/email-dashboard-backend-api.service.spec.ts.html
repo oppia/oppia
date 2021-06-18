@@ -1,0 +1,229 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>email-dashboard-backend-api.service.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/domain/email-dashboard/email-dashboard-backend-api.service.spec.ts</td><td class="">92.65%</td><td class="">100%</td><td class="">272</td><td class="">252</td><td class="">20</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for EmailDashboardBackendApiService.
+ */
+
+import { HttpClientTestingModule, HttpTestingController } from
+  &#x27;@angular/common/http/testing&#x27;;
+import { TestBed, fakeAsync, flushMicrotasks } from &#x27;@angular/core/testing&#x27;;
+
+import { EmailDashboardBackendApiService } from
+  &#x27;domain/email-dashboard/email-dashboard-backend-api.service&#x27;;
+import { EmailDashboardQuery } from
+  &#x27;domain/email-dashboard/email-dashboard-query.model&#x27;;
+import { EmailDashboardQueryResults } from
+  &#x27;domain/email-dashboard/email-dashboard-query-results.model&#x27;;
+
+describe(&#x27;Email dashboard backend api service&#x27;, () =&gt; {
+  let httpTestingController: HttpTestingController;
+  let edbas: EmailDashboardBackendApiService;
+  let defaultData = {
+    inactive_in_last_n_days: null,
+    has_not_logged_in_for_n_days: null,
+    created_at_least_n_exps: null,
+    created_fewer_than_n_exps: null,
+    edited_at_least_n_exps: null,
+    edited_fewer_than_n_exps: null
+  };
+
+  beforeEach(() =&gt; {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+
+    httpTestingController = TestBed.get(HttpTestingController);
+    edbas = TestBed.get(EmailDashboardBackendApiService);
+  });
+
+  afterEach(() =&gt; {
+    httpTestingController.verify();
+  });
+
+  it(&#x27;should correctly fetch queries page.&#x27;, fakeAsync(() =&gt; {
+    let backendResponse = {
+      cursor: &#x27;test&#x27;,
+      recent_queries: [
+        {
+          created_on: &#x27;04-06-20 14:34:46&#x27;,
+          status: &#x27;processing&#x27;,
+          submitter_username: &#x27;testUser&#x27;,
+          id: &#x27;buQW4Qhoxpjg&#x27;,
+          num_qualified_users: 0
+        }
+      ]
+    };
+
+    let expectedObject = EmailDashboardQueryResults.createFromBackendDict(
+      backendResponse);
+
+    edbas.fetchQueriesPageAsync(10, &#x27;test&#x27;).then((queryResults) =&gt; {
+      expect(queryResults).toEqual(expectedObject);
+    });
+
+    let req = httpTestingController.expectOne(
+      req =&gt; (/.*?emaildashboarddatahandler?.*/g).test(req.url));
+    expect(req.request.method).toEqual(&#x27;GET&#x27;);
+    req.flush(backendResponse);
+
+    flushMicrotasks();
+  }));
+
+  it(&#x27;should use the rejection handler if the backend request failed.&#x27;,
+    fakeAsync(() =&gt; {
+      var successHandler = jasmine.createSpy(&#x27;success&#x27;);
+      var failHandler = jasmine.createSpy(&#x27;fail&#x27;);
+
+      edbas.fetchQueriesPageAsync(10, &#x27;test&#x27;).then(
+        successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        req =&gt; (/.*?emaildashboarddatahandler?.*/g).test(req.url));
+      expect(req.request.method).toEqual(&#x27;GET&#x27;);
+      req.flush({
+        error: &#x27;Some error in the backend.&#x27;
+      }, {
+        status: 500, statusText: &#x27;Internal Server Error&#x27;
+      });
+
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(&#x27;Some error in the backend.&#x27;);
+    })
+  );
+
+  it(&#x27;should correctly fetch query.&#x27;, fakeAsync(() =&gt; {
+    let backendResponse = {
+      query: {
+        created_on: &#x27;04-06-20 14:34:46&#x27;,
+        status: &#x27;processing&#x27;,
+        submitter_username: &#x27;testUser&#x27;,
+        id: &#x27;buQW4Qhoxpjg&#x27;,
+        num_qualified_users: 0
+      }
+    };
+
+    let expectedObject = EmailDashboardQuery.createFromBackendDict(
+      backendResponse);
+
+    edbas.fetchQueryAsync(&#x27;q1&#x27;).then((query) =&gt; {
+      expect(query).toEqual(expectedObject);
+    });
+
+    let req = httpTestingController.expectOne(
+      req =&gt; (/.*?querystatuscheck?.*/g).test(req.url));
+    expect(req.request.method).toEqual(&#x27;GET&#x27;);
+    req.flush(backendResponse);
+
+    flushMicrotasks();
+  }));
+
+  it(&#x27;should use the rejection handler if the backend request for query failed&#x27;,
+    fakeAsync(() =&gt; {
+      var successHandler = jasmine.createSpy(&#x27;success&#x27;);
+      var failHandler = jasmine.createSpy(&#x27;fail&#x27;);
+
+      edbas.fetchQueryAsync(&#x27;q1&#x27;).then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        req =&gt; (/.*?querystatuscheck?.*/g).test(req.url));
+      expect(req.request.method).toEqual(&#x27;GET&#x27;);
+      req.flush({
+        error: &#x27;Some error in the backend.&#x27;
+      }, {
+        status: 500, statusText: &#x27;Internal Server Error&#x27;
+      });
+
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(&#x27;Some error in the backend.&#x27;);
+    })
+  );
+
+  it(&#x27;should correctly submit query.&#x27;, fakeAsync(() =&gt; {
+    var postData = defaultData;
+    postData.inactive_in_last_n_days = 10;
+
+    let backendResponse = {
+      query: {
+        created_on: &#x27;04-06-20 14:34:46&#x27;,
+        status: &#x27;processing&#x27;,
+        submitter_username: &#x27;testUser&#x27;,
+        id: &#x27;buQW4Qhoxpjg&#x27;,
+        num_qualified_users: 0
+      }
+    };
+
+    let expectedObject = EmailDashboardQuery.createFromBackendDict(
+      backendResponse);
+
+    edbas.submitQueryAsync(postData).then((query) =&gt; {
+      expect(query).toEqual(expectedObject);
+    });
+
+    let req = httpTestingController.expectOne(
+      req =&gt; (/.*?emaildashboarddatahandler?.*/g).test(req.url));
+    expect(req.request.method).toEqual(&#x27;POST&#x27;);
+    req.flush(backendResponse);
+
+    flushMicrotasks();
+  }));
+
+  it(&#x27;should use the rejection handler if the query submission failed.&#x27;,
+    fakeAsync(() =&gt; {
+      var postData = defaultData;
+      postData.inactive_in_last_n_days = 10;
+
+      var successHandler = jasmine.createSpy(&#x27;success&#x27;);
+      var failHandler = jasmine.createSpy(&#x27;fail&#x27;);
+
+      edbas.submitQueryAsync(postData).then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        req =&gt; (/.*?emaildashboarddatahandler?.*/g).test(req.url));
+      expect(req.request.method).toEqual(&#x27;POST&#x27;);
+      req.flush({
+        error: &#x27;Some error in the backend.&#x27;
+      }, {
+        status: 500, statusText: &#x27;Internal Server Error&#x27;
+      });
+
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(&#x27;Some error in the backend.&#x27;);
+    })
+  );
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/domain/email-dashboard/email-dashboard-backend-api.service.spec.ts&quot;,&quot;line&quot;:76,&quot;character&quot;:6,&quot;text&quot;:&quot;req&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/email-dashboard/email-dashboard-backend-api.service.spec.ts&quot;,&quot;line&quot;:76,&quot;character&quot;:55,&quot;text&quot;:&quot;req&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/email-dashboard/email-dashboard-backend-api.service.spec.ts&quot;,&quot;line&quot;:77,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/email-dashboard/email-dashboard-backend-api.service.spec.ts&quot;,&quot;line&quot;:92,&quot;character&quot;:8,&quot;text&quot;:&quot;req&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/email-dashboard/email-dashboard-backend-api.service.spec.ts&quot;,&quot;line&quot;:92,&quot;character&quot;:57,&quot;text&quot;:&quot;req&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/email-dashboard/email-dashboard-backend-api.service.spec.ts&quot;,&quot;line&quot;:93,&quot;character&quot;:17,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/email-dashboard/email-dashboard-backend-api.service.spec.ts&quot;,&quot;line&quot;:126,&quot;character&quot;:6,&quot;text&quot;:&quot;req&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/email-dashboard/email-dashboard-backend-api.service.spec.ts&quot;,&quot;line&quot;:126,&quot;character&quot;:46,&quot;text&quot;:&quot;req&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/email-dashboard/email-dashboard-backend-api.service.spec.ts&quot;,&quot;line&quot;:127,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/email-dashboard/email-dashboard-backend-api.service.spec.ts&quot;,&quot;line&quot;:141,&quot;character&quot;:8,&quot;text&quot;:&quot;req&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/email-dashboard/email-dashboard-backend-api.service.spec.ts&quot;,&quot;line&quot;:141,&quot;character&quot;:48,&quot;text&quot;:&quot;req&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/email-dashboard/email-dashboard-backend-api.service.spec.ts&quot;,&quot;line&quot;:142,&quot;character&quot;:17,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/email-dashboard/email-dashboard-backend-api.service.spec.ts&quot;,&quot;line&quot;:158,&quot;character&quot;:13,&quot;text&quot;:&quot;inactive_in_last_n_days&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/email-dashboard/email-dashboard-backend-api.service.spec.ts&quot;,&quot;line&quot;:178,&quot;character&quot;:6,&quot;text&quot;:&quot;req&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/email-dashboard/email-dashboard-backend-api.service.spec.ts&quot;,&quot;line&quot;:178,&quot;character&quot;:55,&quot;text&quot;:&quot;req&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/email-dashboard/email-dashboard-backend-api.service.spec.ts&quot;,&quot;line&quot;:179,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/email-dashboard/email-dashboard-backend-api.service.spec.ts&quot;,&quot;line&quot;:188,&quot;character&quot;:15,&quot;text&quot;:&quot;inactive_in_last_n_days&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/email-dashboard/email-dashboard-backend-api.service.spec.ts&quot;,&quot;line&quot;:196,&quot;character&quot;:8,&quot;text&quot;:&quot;req&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/email-dashboard/email-dashboard-backend-api.service.spec.ts&quot;,&quot;line&quot;:196,&quot;character&quot;:57,&quot;text&quot;:&quot;req&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/email-dashboard/email-dashboard-backend-api.service.spec.ts&quot;,&quot;line&quot;:197,&quot;character&quot;:17,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:57 GMT</p>
+    </body>
+  </html>
+  

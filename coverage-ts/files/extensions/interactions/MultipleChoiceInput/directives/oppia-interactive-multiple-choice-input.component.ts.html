@@ -1,0 +1,154 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>oppia-interactive-multiple-choice-input.component.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">extensions/interactions/MultipleChoiceInput/directives/oppia-interactive-multiple-choice-input.component.ts</td><td class="">81.88%</td><td class="">100%</td><td class="">149</td><td class="">122</td><td class="">27</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2014 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Component for the MultipleChoiceInput interaction.
+ *
+ * IMPORTANT NOTE: The naming convention for customization args that are passed
+ * into the component is: the name of the parameter, followed by &#x27;With&#x27;,
+ * followed by the name of the arg.
+ */
+
+import { Component, Input, OnInit } from &#x27;@angular/core&#x27;;
+import { downgradeComponent } from &#x27;@angular/upgrade/static&#x27;;
+import { BrowserCheckerService } from &#x27;domain/utilities/browser-checker.service&#x27;;
+import { MultipleChoiceInputCustomizationArgs } from &#x27;interactions/customization-args-defs&#x27;;
+import { InteractionAttributesExtractorService } from &#x27;interactions/interaction-attributes-extractor.service&#x27;;
+import { InteractionRulesService } from &#x27;pages/exploration-player-page/services/answer-classification.service&#x27;;
+import { CurrentInteractionService } from &#x27;pages/exploration-player-page/services/current-interaction.service&#x27;;
+import { MultipleChoiceInputRulesService } from &#x27;./multiple-choice-input-rules.service&#x27;;
+
+@Component({
+  selector: &#x27;oppia-interactive-multiple-choice-input&#x27;,
+  templateUrl: &#x27;./multiple-choice-input-interaction.component.html&#x27;
+})
+export class InteractiveMultipleChoiceInputComponent implements OnInit {
+  @Input() choicesWithValue: string;
+  @Input() showChoicesInShuffledOrderWithValue: string;
+  choices;
+  answer;
+
+  constructor(
+    private browserCheckerService: BrowserCheckerService,
+    private currentInteractionService: CurrentInteractionService,
+    private interactionAttributesExtractorService:
+      InteractionAttributesExtractorService,
+    private multipleChoiceInputRulesService: MultipleChoiceInputRulesService
+  ) { }
+
+  private getAttrs() {
+    return {
+      choicesWithValue: this.choicesWithValue,
+      showChoicesInShuffledOrderWithValue: (
+        this.showChoicesInShuffledOrderWithValue)
+    };
+  }
+
+  private validityCheckFn(): boolean {
+    return this.answer !== null;
+  }
+
+  ngOnInit(): void {
+    const {
+      showChoicesInShuffledOrder,
+      choices
+    } = this.interactionAttributesExtractorService.getValuesFromAttributes(
+      &#x27;MultipleChoiceInput&#x27;,
+      this.getAttrs()
+    ) as MultipleChoiceInputCustomizationArgs;
+
+    var choicesWithIndex = choices.value.map(
+      function(value, originalIndex) {
+        return {originalIndex: originalIndex, value: value.html};
+      }
+    );
+
+    var shuffleChoices = (choices) =&gt; {
+      for (
+        var currentIndex = choices.length - 1;
+        currentIndex &gt;= 0;
+        currentIndex--
+      ) {
+        var temporaryValue = null;
+        var randomIndex = null;
+        randomIndex = Math.floor(Math.random() * (currentIndex + 1));
+        temporaryValue = choices[currentIndex];
+        choices[currentIndex] = choices[randomIndex];
+        choices[randomIndex] = temporaryValue;
+      }
+      return choices;
+    };
+    this.choices = (
+      showChoicesInShuffledOrder ? shuffleChoices(choicesWithIndex) :
+      choicesWithIndex);
+    this.answer = null;
+    this.currentInteractionService.registerCurrentInteraction(
+      () =&gt; this.submitAnswer(), () =&gt; this.validityCheckFn());
+  }
+
+  selectAnswer(event: MouseEvent, answer: string): void {
+    event.preventDefault();
+    if (answer === null) {
+      return;
+    }
+    // Deselect previously selected option.
+    var selectedElement = (
+      document.querySelector(
+        &#x27;button.multiple-choice-option.selected&#x27;));
+    if (selectedElement) {
+      selectedElement.classList.remove(&#x27;selected&#x27;);
+    }
+    // Selected current option.
+    (event.currentTarget as HTMLDivElement).classList.add(&#x27;selected&#x27;);
+    this.answer = parseInt(answer, 10);
+    if (!this.browserCheckerService.isMobileDevice()) {
+      this.submitAnswer();
+    }
+  }
+
+  submitAnswer(): void {
+    if (this.answer === null) {
+      return;
+    }
+    this.currentInteractionService.onSubmit(
+      this.answer as unknown as string,
+      this.multipleChoiceInputRulesService as unknown as InteractionRulesService
+    );
+  }
+}
+
+angular.module(&#x27;oppia&#x27;).directive(
+  &#x27;oppiaInteractiveMultipleChoiceInput&#x27;,
+  downgradeComponent({
+    component: InteractiveMultipleChoiceInputComponent
+  })
+);
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;extensions/interactions/MultipleChoiceInput/directives/oppia-interactive-multiple-choice-input.component.ts&quot;,&quot;line&quot;:38,&quot;character&quot;:2,&quot;text&quot;:&quot;choices&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MultipleChoiceInput/directives/oppia-interactive-multiple-choice-input.component.ts&quot;,&quot;line&quot;:39,&quot;character&quot;:2,&quot;text&quot;:&quot;answer&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MultipleChoiceInput/directives/oppia-interactive-multiple-choice-input.component.ts&quot;,&quot;line&quot;:58,&quot;character&quot;:16,&quot;text&quot;:&quot;answer&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MultipleChoiceInput/directives/oppia-interactive-multiple-choice-input.component.ts&quot;,&quot;line&quot;:65,&quot;character&quot;:8,&quot;text&quot;:&quot;this.interactionAttributesExtractorService.getValuesFromAttributes(\n      &#x27;MultipleChoiceInput&#x27;,\n      this.getAttrs()\n    ) as MultipleChoiceInputCustomizationArgs&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;extensions/interactions/MultipleChoiceInput/directives/oppia-interactive-multiple-choice-input.component.ts&quot;,&quot;line&quot;:76,&quot;character&quot;:26,&quot;text&quot;:&quot;choices&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MultipleChoiceInput/directives/oppia-interactive-multiple-choice-input.component.ts&quot;,&quot;line&quot;:78,&quot;character&quot;:27,&quot;text&quot;:&quot;choices&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MultipleChoiceInput/directives/oppia-interactive-multiple-choice-input.component.ts&quot;,&quot;line&quot;:78,&quot;character&quot;:35,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MultipleChoiceInput/directives/oppia-interactive-multiple-choice-input.component.ts&quot;,&quot;line&quot;:82,&quot;character&quot;:12,&quot;text&quot;:&quot;temporaryValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MultipleChoiceInput/directives/oppia-interactive-multiple-choice-input.component.ts&quot;,&quot;line&quot;:83,&quot;character&quot;:12,&quot;text&quot;:&quot;randomIndex&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MultipleChoiceInput/directives/oppia-interactive-multiple-choice-input.component.ts&quot;,&quot;line&quot;:84,&quot;character&quot;:8,&quot;text&quot;:&quot;randomIndex&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MultipleChoiceInput/directives/oppia-interactive-multiple-choice-input.component.ts&quot;,&quot;line&quot;:85,&quot;character&quot;:8,&quot;text&quot;:&quot;temporaryValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MultipleChoiceInput/directives/oppia-interactive-multiple-choice-input.component.ts&quot;,&quot;line&quot;:85,&quot;character&quot;:25,&quot;text&quot;:&quot;choices&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MultipleChoiceInput/directives/oppia-interactive-multiple-choice-input.component.ts&quot;,&quot;line&quot;:86,&quot;character&quot;:8,&quot;text&quot;:&quot;choices&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MultipleChoiceInput/directives/oppia-interactive-multiple-choice-input.component.ts&quot;,&quot;line&quot;:86,&quot;character&quot;:32,&quot;text&quot;:&quot;choices&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MultipleChoiceInput/directives/oppia-interactive-multiple-choice-input.component.ts&quot;,&quot;line&quot;:86,&quot;character&quot;:40,&quot;text&quot;:&quot;randomIndex&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MultipleChoiceInput/directives/oppia-interactive-multiple-choice-input.component.ts&quot;,&quot;line&quot;:87,&quot;character&quot;:8,&quot;text&quot;:&quot;choices&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MultipleChoiceInput/directives/oppia-interactive-multiple-choice-input.component.ts&quot;,&quot;line&quot;:87,&quot;character&quot;:16,&quot;text&quot;:&quot;randomIndex&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MultipleChoiceInput/directives/oppia-interactive-multiple-choice-input.component.ts&quot;,&quot;line&quot;:87,&quot;character&quot;:31,&quot;text&quot;:&quot;temporaryValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MultipleChoiceInput/directives/oppia-interactive-multiple-choice-input.component.ts&quot;,&quot;line&quot;:89,&quot;character&quot;:13,&quot;text&quot;:&quot;choices&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MultipleChoiceInput/directives/oppia-interactive-multiple-choice-input.component.ts&quot;,&quot;line&quot;:91,&quot;character&quot;:9,&quot;text&quot;:&quot;choices&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MultipleChoiceInput/directives/oppia-interactive-multiple-choice-input.component.ts&quot;,&quot;line&quot;:94,&quot;character&quot;:9,&quot;text&quot;:&quot;answer&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MultipleChoiceInput/directives/oppia-interactive-multiple-choice-input.component.ts&quot;,&quot;line&quot;:112,&quot;character&quot;:5,&quot;text&quot;:&quot;event.currentTarget as HTMLDivElement&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;extensions/interactions/MultipleChoiceInput/directives/oppia-interactive-multiple-choice-input.component.ts&quot;,&quot;line&quot;:113,&quot;character&quot;:9,&quot;text&quot;:&quot;answer&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MultipleChoiceInput/directives/oppia-interactive-multiple-choice-input.component.ts&quot;,&quot;line&quot;:120,&quot;character&quot;:13,&quot;text&quot;:&quot;answer&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MultipleChoiceInput/directives/oppia-interactive-multiple-choice-input.component.ts&quot;,&quot;line&quot;:124,&quot;character&quot;:6,&quot;text&quot;:&quot;this.answer as unknown as string&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;extensions/interactions/MultipleChoiceInput/directives/oppia-interactive-multiple-choice-input.component.ts&quot;,&quot;line&quot;:124,&quot;character&quot;:11,&quot;text&quot;:&quot;answer&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MultipleChoiceInput/directives/oppia-interactive-multiple-choice-input.component.ts&quot;,&quot;line&quot;:125,&quot;character&quot;:6,&quot;text&quot;:&quot;this.multipleChoiceInputRulesService as unknown as InteractionRulesService&quot;,&quot;kind&quot;:3}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:58 GMT</p>
+    </body>
+  </html>
+  

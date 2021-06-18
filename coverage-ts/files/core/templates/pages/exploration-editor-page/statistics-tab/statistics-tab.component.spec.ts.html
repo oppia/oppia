@@ -1,0 +1,296 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>statistics-tab.component.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts</td><td class="">53.77%</td><td class="">100%</td><td class="">318</td><td class="">171</td><td class="">147</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for statisticsTab.
+ */
+
+import { TestBed } from &#x27;@angular/core/testing&#x27;;
+import { ExplorationStatsService } from &#x27;services/exploration-stats.service&#x27;;
+import { StateInteractionStatsService } from
+  &#x27;services/state-interaction-stats.service&#x27;;
+import { StatesObjectFactory } from &#x27;domain/exploration/StatesObjectFactory&#x27;;
+import { AlertsService } from &#x27;services/alerts.service&#x27;;
+import { ComputeGraphService } from &#x27;services/compute-graph.service&#x27;;
+import { HttpClientTestingModule } from &#x27;@angular/common/http/testing&#x27;;
+import { EventEmitter } from &#x27;@angular/core&#x27;;
+import { ReadOnlyExplorationBackendApiService } from
+  &#x27;domain/exploration/read-only-exploration-backend-api.service&#x27;;
+
+class MockRouterService {
+  private refreshStatisticsTabEventEmitter: EventEmitter&lt;void&gt;;
+  get onRefreshStatisticsTab() {
+    return this.refreshStatisticsTabEventEmitter;
+  }
+  set refreshStatisticsTabEmitter(val) {
+    this.refreshStatisticsTabEventEmitter = val;
+  }
+}
+
+describe(&#x27;Statistics Tab Component&#x27;, function() {
+  var ctrl = null;
+  var $q = null;
+  var $rootScope = null;
+  var $scope = null;
+  var $uibModal = null;
+  var alertsService = null;
+  var computeGraphService = null;
+  var explorationStatsService = null;
+  var readOnlyExplorationBackendApiService = null;
+  var stateInteractionStatsService = null;
+  var statesObjectFactory = null;
+  var routerService = null;
+
+  var explorationId = &#x27;exp1&#x27;;
+  var state = {
+    classifier_model_id: &#x27;1&#x27;,
+    content: {
+      content_id: &#x27;content1&#x27;,
+      html: &#x27;This is a html text&#x27;
+    },
+    interaction: {
+      id: &#x27;Continue&#x27;,
+      answer_groups: [{
+        outcome: {
+          dest: &#x27;outcome 1&#x27;,
+          feedback: {
+            content_id: &#x27;content2&#x27;,
+            html: &#x27;&#x27;
+          },
+          labelled_as_correct: true,
+          param_changes: [],
+          refresher_exploration_id: null
+        },
+        rule_specs: [],
+        tagged_skill_misconception_id: &#x27;&#x27;
+      }, {
+        outcome: {
+          dest: &#x27;outcome 2&#x27;,
+          feedback: {
+            content_id: &#x27;content3&#x27;,
+            html: &#x27;&#x27;
+          },
+          labelled_as_correct: true,
+          param_changes: [],
+          refresher_exploration_id: null
+        },
+        rule_specs: [],
+        tagged_skill_misconception_id: &#x27;&#x27;
+      }],
+      confirmed_unclassified_answers: null,
+      customization_args: {
+        buttonText: {
+          value: {
+            content_id: &#x27;ca_buttonText_0&#x27;,
+            unicode_str: &#x27;Continue&#x27;
+          }
+        }
+      },
+      hints: [],
+      solution: {
+        answer_is_exclusive: false,
+        correct_answer: &#x27;This is the correct answer&#x27;,
+        explanation: {
+          content_id: &#x27;content1&#x27;,
+          html: &#x27;This is a html text&#x27;
+        }
+      }
+    },
+    linked_skill_id: null,
+    next_content_id_index: 0,
+    param_changes: [],
+    recorded_voiceovers: {
+      voiceovers_mapping: {}
+    },
+    solicit_answer_details: true,
+    written_translations: {
+      translations_mapping: {}
+    }
+  };
+
+  beforeEach(angular.mock.module(&#x27;oppia&#x27;));
+
+  beforeEach(function() {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+    alertsService = TestBed.get(AlertsService);
+    computeGraphService = TestBed.get(ComputeGraphService);
+    explorationStatsService = TestBed.get(ExplorationStatsService);
+    stateInteractionStatsService = TestBed.get(StateInteractionStatsService);
+    statesObjectFactory = TestBed.get(StatesObjectFactory);
+    routerService = new MockRouterService();
+  });
+
+  beforeEach(angular.mock.module(&#x27;oppia&#x27;, function($provide) {
+    $provide.value(&#x27;ExplorationDataService&#x27;, {
+      explorationId: explorationId
+    });
+    $provide.value(
+      &#x27;ReadOnlyExplorationBackendApiService&#x27;,
+      TestBed.get(ReadOnlyExplorationBackendApiService));
+  }));
+
+  beforeEach(angular.mock.inject(function($injector, $componentController) {
+    $q = $injector.get(&#x27;$q&#x27;);
+    $rootScope = $injector.get(&#x27;$rootScope&#x27;);
+    $uibModal = $injector.get(&#x27;$uibModal&#x27;);
+    readOnlyExplorationBackendApiService = $injector.get(
+      &#x27;ReadOnlyExplorationBackendApiService&#x27;);
+
+    spyOn(
+      readOnlyExplorationBackendApiService, &#x27;loadLatestExplorationAsync&#x27;).and
+      .returnValue($q.resolve({
+        exploration: {
+          init_state_name: &#x27;State1&#x27;,
+          states: {
+            State1: state
+          }
+        }
+      }));
+    spyOn(explorationStatsService, &#x27;getExplorationStatsAsync&#x27;).and.returnValue(
+      $q.resolve({
+        numStarts: 20,
+        numActualStarts: 10,
+        numCompletions: 5,
+      }));
+    spyOn(stateInteractionStatsService, &#x27;computeStatsAsync&#x27;).and.returnValue(
+      $q.resolve({
+        visualizationsInfo: {}
+      }));
+
+    routerService.refreshStatisticsTabEmitter = new EventEmitter();
+    $scope = $rootScope.$new();
+    ctrl = $componentController(&#x27;statisticsTab&#x27;, {
+      $scope: $scope,
+      AlertsService: alertsService,
+      ComputeGraphService: computeGraphService,
+      ExplorationStatsService: explorationStatsService,
+      RouterService: routerService,
+      StateInteractionStatsService: stateInteractionStatsService,
+      StatesObjectFactory: statesObjectFactory
+    });
+    ctrl.$onInit();
+  }));
+
+  afterEach(() =&gt; {
+    ctrl.$onDestroy();
+  });
+
+  it(&#x27;should initialize controller properties after its initialization&#x27;,
+    function() {
+      expect(ctrl.stateStatsModalIsOpen).toBe(false);
+      expect($scope.explorationHasBeenVisited).toBe(false);
+    });
+
+  it(&#x27;should refresh exploration statistics when broadcasting&#x27; +
+    &#x27; refreshStatisticsTab&#x27;, function() {
+    routerService.onRefreshStatisticsTab.emit();
+
+    // Resolve promise.
+    $scope.$apply();
+
+    expect($scope.statsGraphData).toEqual({
+      finalStateIds: [],
+      initStateId: &#x27;State1&#x27;,
+      links: [{
+        source: &#x27;State1&#x27;,
+        target: &#x27;outcome 1&#x27;
+      }, {
+        source: &#x27;State1&#x27;,
+        target: &#x27;outcome 2&#x27;
+      }],
+      nodes: {
+        State1: &#x27;State1&#x27;
+      }
+    });
+    expect($scope.pieChartData).toEqual([
+      [&#x27;Type&#x27;, &#x27;Number&#x27;],
+      [&#x27;Completions&#x27;, 5],
+      [&#x27;Non-Completions&#x27;, 5]
+    ]);
+    expect($scope.numPassersby).toBe(10);
+    expect($scope.explorationHasBeenVisited).toBe(true);
+  });
+
+  it(&#x27;should open state stats modal&#x27;, function() {
+    routerService.onRefreshStatisticsTab.emit();
+
+    // Resolve promise.
+    $scope.$apply();
+
+    spyOn($uibModal, &#x27;open&#x27;).and.callThrough();
+    $scope.onClickStateInStatsGraph(&#x27;State1&#x27;);
+    expect(ctrl.stateStatsModalIsOpen).toBe(true);
+
+    $scope.$apply();
+
+    expect($uibModal.open).toHaveBeenCalled();
+  });
+
+  it(&#x27;should open state stats modal and close it when clicking in stats&#x27; +
+    &#x27; graph&#x27;, function() {
+    routerService.onRefreshStatisticsTab.emit();
+
+    // Resolve promise.
+    $scope.$apply();
+
+    spyOn($uibModal, &#x27;open&#x27;).and.returnValue({
+      result: $q.resolve()
+    });
+    $scope.onClickStateInStatsGraph(&#x27;State1&#x27;);
+    expect(ctrl.stateStatsModalIsOpen).toBe(true);
+    $scope.$apply();
+
+    expect(ctrl.stateStatsModalIsOpen).toBe(false);
+  });
+
+  it(&#x27;should open state stats modal and dismiss it when clicking in&#x27; +
+    &#x27; stats graph&#x27;, function() {
+    routerService.onRefreshStatisticsTab.emit();
+
+    // Resolve promise.
+    $scope.$apply();
+
+    spyOn($uibModal, &#x27;open&#x27;).and.returnValue({
+      result: $q.reject()
+    });
+    spyOn(alertsService, &#x27;clearWarnings&#x27;);
+
+    $scope.onClickStateInStatsGraph(&#x27;State1&#x27;);
+    expect(ctrl.stateStatsModalIsOpen).toBe(true);
+    $scope.$apply();
+
+    expect(alertsService.clearWarnings).toHaveBeenCalled();
+    expect(ctrl.stateStatsModalIsOpen).toBe(false);
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:35,&quot;character&quot;:6,&quot;text&quot;:&quot;refreshStatisticsTabEmitter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:35,&quot;character&quot;:34,&quot;text&quot;:&quot;val&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:41,&quot;character&quot;:6,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:42,&quot;character&quot;:6,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:43,&quot;character&quot;:6,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:44,&quot;character&quot;:6,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:45,&quot;character&quot;:6,&quot;text&quot;:&quot;$uibModal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:46,&quot;character&quot;:6,&quot;text&quot;:&quot;alertsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:47,&quot;character&quot;:6,&quot;text&quot;:&quot;computeGraphService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:48,&quot;character&quot;:6,&quot;text&quot;:&quot;explorationStatsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:49,&quot;character&quot;:6,&quot;text&quot;:&quot;readOnlyExplorationBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:50,&quot;character&quot;:6,&quot;text&quot;:&quot;stateInteractionStatsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:51,&quot;character&quot;:6,&quot;text&quot;:&quot;statesObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:52,&quot;character&quot;:6,&quot;text&quot;:&quot;routerService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:127,&quot;character&quot;:4,&quot;text&quot;:&quot;alertsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:128,&quot;character&quot;:4,&quot;text&quot;:&quot;computeGraphService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:129,&quot;character&quot;:4,&quot;text&quot;:&quot;explorationStatsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:130,&quot;character&quot;:4,&quot;text&quot;:&quot;stateInteractionStatsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:131,&quot;character&quot;:4,&quot;text&quot;:&quot;statesObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:132,&quot;character&quot;:4,&quot;text&quot;:&quot;routerService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:135,&quot;character&quot;:51,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:136,&quot;character&quot;:4,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:136,&quot;character&quot;:13,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:139,&quot;character&quot;:4,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:139,&quot;character&quot;:13,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:144,&quot;character&quot;:42,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:144,&quot;character&quot;:53,&quot;text&quot;:&quot;$componentController&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:145,&quot;character&quot;:4,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:145,&quot;character&quot;:9,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:145,&quot;character&quot;:19,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:146,&quot;character&quot;:4,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:146,&quot;character&quot;:17,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:146,&quot;character&quot;:27,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:147,&quot;character&quot;:4,&quot;text&quot;:&quot;$uibModal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:147,&quot;character&quot;:16,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:147,&quot;character&quot;:26,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:148,&quot;character&quot;:4,&quot;text&quot;:&quot;readOnlyExplorationBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:148,&quot;character&quot;:43,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:148,&quot;character&quot;:53,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:152,&quot;character&quot;:6,&quot;text&quot;:&quot;readOnlyExplorationBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:152,&quot;character&quot;:74,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:153,&quot;character&quot;:19,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:153,&quot;character&quot;:22,&quot;text&quot;:&quot;resolve&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:161,&quot;character&quot;:10,&quot;text&quot;:&quot;explorationStatsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:161,&quot;character&quot;:63,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:162,&quot;character&quot;:6,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:162,&quot;character&quot;:9,&quot;text&quot;:&quot;resolve&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:167,&quot;character&quot;:10,&quot;text&quot;:&quot;stateInteractionStatsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:167,&quot;character&quot;:61,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:168,&quot;character&quot;:6,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:168,&quot;character&quot;:9,&quot;text&quot;:&quot;resolve&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:172,&quot;character&quot;:4,&quot;text&quot;:&quot;routerService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:172,&quot;character&quot;:18,&quot;text&quot;:&quot;refreshStatisticsTabEmitter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:173,&quot;character&quot;:4,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:173,&quot;character&quot;:13,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:173,&quot;character&quot;:24,&quot;text&quot;:&quot;$new&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:174,&quot;character&quot;:4,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:174,&quot;character&quot;:11,&quot;text&quot;:&quot;$componentController&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:175,&quot;character&quot;:6,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:175,&quot;character&quot;:14,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:176,&quot;character&quot;:6,&quot;text&quot;:&quot;AlertsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:176,&quot;character&quot;:21,&quot;text&quot;:&quot;alertsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:177,&quot;character&quot;:6,&quot;text&quot;:&quot;ComputeGraphService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:177,&quot;character&quot;:27,&quot;text&quot;:&quot;computeGraphService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:178,&quot;character&quot;:6,&quot;text&quot;:&quot;ExplorationStatsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:178,&quot;character&quot;:31,&quot;text&quot;:&quot;explorationStatsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:179,&quot;character&quot;:6,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:179,&quot;character&quot;:21,&quot;text&quot;:&quot;routerService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:180,&quot;character&quot;:6,&quot;text&quot;:&quot;StateInteractionStatsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:180,&quot;character&quot;:36,&quot;text&quot;:&quot;stateInteractionStatsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:181,&quot;character&quot;:6,&quot;text&quot;:&quot;StatesObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:181,&quot;character&quot;:27,&quot;text&quot;:&quot;statesObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:183,&quot;character&quot;:4,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:183,&quot;character&quot;:9,&quot;text&quot;:&quot;$onInit&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:187,&quot;character&quot;:4,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:187,&quot;character&quot;:9,&quot;text&quot;:&quot;$onDestroy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:192,&quot;character&quot;:13,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:192,&quot;character&quot;:18,&quot;text&quot;:&quot;stateStatsModalIsOpen&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:193,&quot;character&quot;:13,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:193,&quot;character&quot;:20,&quot;text&quot;:&quot;explorationHasBeenVisited&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:198,&quot;character&quot;:4,&quot;text&quot;:&quot;routerService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:198,&quot;character&quot;:18,&quot;text&quot;:&quot;onRefreshStatisticsTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:198,&quot;character&quot;:41,&quot;text&quot;:&quot;emit&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:201,&quot;character&quot;:4,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:201,&quot;character&quot;:11,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:203,&quot;character&quot;:11,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:203,&quot;character&quot;:18,&quot;text&quot;:&quot;statsGraphData&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:217,&quot;character&quot;:11,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:217,&quot;character&quot;:18,&quot;text&quot;:&quot;pieChartData&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:222,&quot;character&quot;:11,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:222,&quot;character&quot;:18,&quot;text&quot;:&quot;numPassersby&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:223,&quot;character&quot;:11,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:223,&quot;character&quot;:18,&quot;text&quot;:&quot;explorationHasBeenVisited&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:227,&quot;character&quot;:4,&quot;text&quot;:&quot;routerService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:227,&quot;character&quot;:18,&quot;text&quot;:&quot;onRefreshStatisticsTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:227,&quot;character&quot;:41,&quot;text&quot;:&quot;emit&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:230,&quot;character&quot;:4,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:230,&quot;character&quot;:11,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:232,&quot;character&quot;:10,&quot;text&quot;:&quot;$uibModal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:232,&quot;character&quot;:29,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:233,&quot;character&quot;:4,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:233,&quot;character&quot;:11,&quot;text&quot;:&quot;onClickStateInStatsGraph&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:234,&quot;character&quot;:11,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:234,&quot;character&quot;:16,&quot;text&quot;:&quot;stateStatsModalIsOpen&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:236,&quot;character&quot;:4,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:236,&quot;character&quot;:11,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:238,&quot;character&quot;:11,&quot;text&quot;:&quot;$uibModal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:238,&quot;character&quot;:21,&quot;text&quot;:&quot;open&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:243,&quot;character&quot;:4,&quot;text&quot;:&quot;routerService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:243,&quot;character&quot;:18,&quot;text&quot;:&quot;onRefreshStatisticsTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:243,&quot;character&quot;:41,&quot;text&quot;:&quot;emit&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:246,&quot;character&quot;:4,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:246,&quot;character&quot;:11,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:248,&quot;character&quot;:10,&quot;text&quot;:&quot;$uibModal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:248,&quot;character&quot;:29,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:249,&quot;character&quot;:6,&quot;text&quot;:&quot;result&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:249,&quot;character&quot;:14,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:249,&quot;character&quot;:17,&quot;text&quot;:&quot;resolve&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:251,&quot;character&quot;:4,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:251,&quot;character&quot;:11,&quot;text&quot;:&quot;onClickStateInStatsGraph&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:252,&quot;character&quot;:11,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:252,&quot;character&quot;:16,&quot;text&quot;:&quot;stateStatsModalIsOpen&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:253,&quot;character&quot;:4,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:253,&quot;character&quot;:11,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:255,&quot;character&quot;:11,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:255,&quot;character&quot;:16,&quot;text&quot;:&quot;stateStatsModalIsOpen&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:260,&quot;character&quot;:4,&quot;text&quot;:&quot;routerService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:260,&quot;character&quot;:18,&quot;text&quot;:&quot;onRefreshStatisticsTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:260,&quot;character&quot;:41,&quot;text&quot;:&quot;emit&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:263,&quot;character&quot;:4,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:263,&quot;character&quot;:11,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:265,&quot;character&quot;:10,&quot;text&quot;:&quot;$uibModal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:265,&quot;character&quot;:29,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:266,&quot;character&quot;:6,&quot;text&quot;:&quot;result&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:266,&quot;character&quot;:14,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:266,&quot;character&quot;:17,&quot;text&quot;:&quot;reject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:268,&quot;character&quot;:10,&quot;text&quot;:&quot;alertsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:270,&quot;character&quot;:4,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:270,&quot;character&quot;:11,&quot;text&quot;:&quot;onClickStateInStatsGraph&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:271,&quot;character&quot;:11,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:271,&quot;character&quot;:16,&quot;text&quot;:&quot;stateStatsModalIsOpen&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:272,&quot;character&quot;:4,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:272,&quot;character&quot;:11,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:274,&quot;character&quot;:11,&quot;text&quot;:&quot;alertsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:274,&quot;character&quot;:25,&quot;text&quot;:&quot;clearWarnings&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:275,&quot;character&quot;:11,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts&quot;,&quot;line&quot;:275,&quot;character&quot;:16,&quot;text&quot;:&quot;stateStatsModalIsOpen&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:59 GMT</p>
+    </body>
+  </html>
+  

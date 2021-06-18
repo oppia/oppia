@@ -1,0 +1,1015 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>shared.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">extensions/interactions/LogicProof/static/js/shared.ts</td><td class="">44.19%</td><td class="">100%</td><td class="">1378</td><td class="">609</td><td class="">769</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2014 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Components used by both the editor and reader of the
+ *  LogicProof interaction.
+ */
+import logicProofParser from
+  &#x27;interactions/LogicProof/static/js/generatedParser&#x27;;
+
+var logicProofShared = (function() {
+  // Used by parseLineString() to limit the number of possible parsings of a
+  // line (or line template) considered.
+  var MAX_NUM_PARSINGS_PERMITTED = 1000;
+  // Used by assignTypesToExpressionArray() to limit the number of possible
+  // typings of an expression considered.
+  var MAX_NUM_TYPINGS_PERMITTED = 1000;
+
+  // ---- ERROR-HANDLING ----
+
+  // UserErrors have codes that refer to entries in the errorDictionary (which
+  // is either logicProofData.BASE_GENERAL_MESSAGES or
+  // logicProofTeacher.TEACHER_ERROR_MESSAGES), from which a human-readable
+  // message can be constructed.
+  var UserError = function(code, parameters) {
+    this.name = &#x27;UserError&#x27;;
+    this.code = code;
+    this.parameters = parameters || {};
+  };
+
+  // These errors already have messages which are user-readable.
+  var PreRenderedUserError = function(messages, code) {
+    this.name = &#x27;PreRenderedUserError&#x27;;
+    this.messages = messages;
+    this.code = code;
+  };
+  // TODO(Jacob): Make these errors prototype from Error().
+
+  /** Converts a message template into a string to show to the user.
+   * @param messageTemplate: a GeneralMessageTemplate object that determines how
+   * to build the string describing an error.
+   * @param parameterFormats: a dictionary of GeneralMessageParameters, which
+   *        specify the format of the parameter in question (e.g. &#x27;string&#x27;).
+   * @param parameters: a dictionary giving the values of the parameters for
+   *        this particular instance of the message.
+   * @param language: the relevant Language.
+   * @result a user-readable string.
+   */
+  var renderGeneralMessage = function(
+      messageTemplate, parameterFormats, parameters, language) {
+    var message = &#x27;&#x27;;
+    for (var i = 0; i &lt; messageTemplate.length; i++) {
+      if (messageTemplate[i].isFixed) {
+        message += messageTemplate[i].content;
+      } else {
+        var parameterFormat = parameterFormats[
+          messageTemplate[i].content].format;
+        var parameter = parameters[messageTemplate[i].content];
+        switch (parameterFormat) {
+          case &#x27;string&#x27;:
+            message += parameter;
+            break;
+          case &#x27;expression&#x27;:
+            message += displayExpression(parameter, language.operators);
+            break;
+          default:
+            throw new Error(
+              &#x27;Unknown format &#x27; + parameterFormat +
+              &#x27; sent to renderGeneralMessage().&#x27;);
+        }
+      }
+    }
+    return message;
+  };
+
+  /**
+   * @param {UserError} error - a UserError object
+   * @param {object} errorDictionary - a dictionary keyed by error codes for
+   *        each of which it provides a description of possible ways to display
+   *        the error to the user, one of which will be chosen at random.
+   * @param {Language} language - the relevant Language
+   * @return {string} A string to show to the user describing what went wrong.
+   */
+  var renderError = function(error, errorDictionary, language) {
+    if (error.name === &#x27;UserError&#x27;) {
+      if (!errorDictionary.hasOwnProperty(error.code)) {
+        throw new Error(
+          &#x27;Unknown error code &#x27; + error.code + &#x27; sent to renderError().&#x27;);
+      }
+      var messageTemplates = errorDictionary[error.code].templates;
+      var messageTemplate = messageTemplates[
+        Math.floor((Math.random() * messageTemplates.length))];
+      return renderGeneralMessage(
+        messageTemplate, errorDictionary[error.code].parameters,
+        error.parameters, language);
+    } else if (error.name === &#x27;PreRenderedUserError&#x27;) {
+      return error.messages[
+        Math.floor((Math.random() * error.messages.length))];
+    } else {
+      throw error;
+    }
+  };
+
+  // ---- DISPLAY ----
+
+  /**
+   * @param {Expression} expression - an Expression, which is to be displayed
+   * @param {object} operators - provides the symbols keys of the operators so
+   *        that we we know e.g. &#x27;for_all&#x27; should be displayed using &#x27;@&#x27;.
+   * @return {string} A string representing the expression that can be shown to
+   *        the user.
+   */
+  var displayExpression = function(expression, operators) {
+    return displayExpressionHelper(expression, operators, 0);
+  };
+
+  /**
+   * Recursive helper for displayExpression().
+   *
+   * @param {Expression} expression - an Expression, which is to be displayed
+   * @param {object} operators - provides the symbols keys of the operators so
+   *        that we we know e.g. &#x27;for_all&#x27; should be displayed using &#x27;@&#x27;.
+   * @param {int} desirabilityOfBrackets - used internally to determine whether
+   *        to surround the formula with brackets.
+   * @return {string} A string representing the expression.
+   */
+  var displayExpressionHelper = function(
+      expression, operators, desirabilityOfBrackets = 0) {
+    var desirabilityOfBracketsBelow = (
+      expression.top_kind_name === &#x27;binary_connective&#x27; ||
+      expression.top_kind_name === &#x27;binary_relation&#x27; ||
+      expression.top_kind_name === &#x27;binary_function&#x27;
+    ) ? 2 : (
+        expression.top_kind_name === &#x27;unary_connective&#x27; ||
+        expression.top_kind_name === &#x27;quantifier&#x27;
+      ) ? 1 : 0;
+    var processedArguments = [];
+    var processedDummies = [];
+    for (var i = 0; i &lt; expression.arguments.length; i++) {
+      processedArguments.push(
+        displayExpressionHelper(
+          expression.arguments[i], operators, desirabilityOfBracketsBelow));
+    }
+    for (var i = 0; i &lt; expression.dummies.length; i++) {
+      processedDummies.push(
+        displayExpressionHelper(
+          expression.dummies[i], operators, desirabilityOfBracketsBelow));
+    }
+
+    var symbol = (!operators.hasOwnProperty(expression.top_operator_name)) ?
+      expression.top_operator_name :
+      (!operators[expression.top_operator_name].hasOwnProperty(&#x27;symbols&#x27;)) ?
+        expression.top_operator_name :
+        operators[expression.top_operator_name].symbols[0];
+
+    var output = null;
+    if (expression.top_kind_name === &#x27;binary_connective&#x27; ||
+        expression.top_kind_name === &#x27;binary_relation&#x27; ||
+        expression.top_kind_name === &#x27;binary_function&#x27;) {
+      return (
+        desirabilityOfBrackets &gt; 0 ?
+          &#x27;(&#x27; + processedArguments.join(symbol) + &#x27;)&#x27; :
+          processedArguments.join(symbol));
+    } else if (expression.top_kind_name === &#x27;unary_connective&#x27;) {
+      output = symbol + processedArguments[0];
+      return (desirabilityOfBrackets === 2) ? &#x27;(&#x27; + output + &#x27;)&#x27; : output;
+    } else if (expression.top_kind_name === &#x27;quantifier&#x27;) {
+      output = symbol + processedDummies[0] + &#x27;.&#x27; + processedArguments[0];
+      return (desirabilityOfBrackets === 2) ? &#x27;(&#x27; + output + &#x27;)&#x27; : output;
+    } else if (expression.top_kind_name === &#x27;bounded_quantifier&#x27;) {
+      output = symbol + processedArguments[0] + &#x27;.&#x27; + processedArguments[1];
+      return (desirabilityOfBrackets === 2) ? &#x27;(&#x27; + output + &#x27;)&#x27; : output;
+    } else if (expression.top_kind_name === &#x27;prefix_relation&#x27; ||
+        expression.top_kind_name === &#x27;prefix_function&#x27;) {
+      return symbol + &#x27;(&#x27; + processedArguments.join(&#x27;,&#x27;) + &#x27;)&#x27;;
+    } else if (expression.top_kind_name === &#x27;ranged_function&#x27;) {
+      return (
+        symbol + &#x27;{&#x27; + processedArguments[0] + &#x27; | &#x27; + processedArguments[1] +
+        &#x27;}&#x27;);
+    } else if (expression.top_kind_name === &#x27;atom&#x27; ||
+      expression.top_kind_name === &#x27;constant&#x27; ||
+      expression.top_kind_name === &#x27;variable&#x27;) {
+      return symbol;
+    } else {
+      throw new Error(
+        &#x27;Unknown kind &#x27; + expression.top_kind_name +
+        &#x27; sent to displayExpression()&#x27;);
+    }
+  };
+
+  var displayExpressionArray = function(expressionArray, operators) {
+    var processedArray = [];
+    for (var i = 0; i &lt; expressionArray.length; i++) {
+      processedArray.push(
+        displayExpressionHelper(expressionArray[i], operators));
+    }
+    return processedArray.join(&#x27;, &#x27;);
+  };
+
+  // ---- PARSING ----
+
+  /**
+   * This function checks whether the string contains any symbol that occurs
+   * in a member of the symbols key for some operator (these will be
+   * symbols such as ∀, =, &lt;).
+   * @param {string} string - contains the characters we check
+   * @param {object} operators - a dictionary of Operator objects
+   * @param {boolean} isTemplate - denotes that the string represents a line
+   *        template (which may have substitutions) and not just a line.
+   * @return {boolean} true or false
+   */
+  var containsLogicalCharacter = function(string, operators, isTemplate) {
+    var GENERAL_LOGICAL_CHARACTERS = &#x27;(),&#x27;;
+    var TEMPLATE_LOGICAL_CHARACTERS = &#x27;[-&gt;]{|}&#x27;;
+
+    if (containsCharacterFromArray(string, GENERAL_LOGICAL_CHARACTERS)) {
+      return true;
+    }
+    if (isTemplate &amp;&amp;
+        containsCharacterFromArray(string, TEMPLATE_LOGICAL_CHARACTERS)) {
+      return true;
+    }
+
+    for (var key in operators) {
+      if (operators[key].hasOwnProperty(&#x27;symbols&#x27;)) {
+        for (var i = 0; i &lt; operators[key].symbols.length; i++) {
+          // We check each character of a multi-character symbol in turn.
+          for (var j = 0; j &lt; operators[key].symbols[i].length; j++) {
+            if (string.indexOf(operators[key].symbols[i][j]) !== -1) {
+              return true;
+            }
+          }
+        }
+      }
+    }
+    return false;
+  };
+
+  /**
+   * This function strips whitespace from within expressions, whilst using the
+   * whitespace between expressions to split a line into an array of word /
+   * expression strings.
+   *  e.g. &#x27;from p and q we have p ∧ q&#x27; will be converted to [&#x27;from&#x27;, &#x27;p&#x27;,
+   *   &#x27;and&#x27;, &#x27;q&#x27;, &#x27;we&#x27;, &#x27;have&#x27;, &#x27;p∧q&#x27;].
+   * @param {string} inputString - the string from which whitespace is to be
+   *        stripped.
+   * @param {object} operators - a dictionary of the Operator objects usable in
+   *        the line
+   * @param {boolean} isTemplate - denotes that the string represents a line
+   *        template (which may have substitutions) and not just a line.
+   * @return {Array} A non-empty array of words and expressions (as strings).
+   * @throws if the line is blank or contains an unknown character.
+   */
+  var preParseLineString = function(inputString, operators, isTemplate) {
+    // The logical characters that may occur at the start and end of a formula
+    // respectively. The unicode characters are &#x27;for all&#x27; and &#x27;exists&#x27;.
+    var POSSIBLE_START_CHARS = &#x27;({\u2200\u2203~&#x27;;
+    var POSSIBLE_END_CHARS = &#x27;)}]&#x27;;
+
+    var POSSIBLE_NAME_CHARS = (
+      &#x27;abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 _&#x27;);
+
+    var _absorbsSpacesToTheLeft = function(character) {
+      return containsLogicalCharacter(character, operators, isTemplate) &amp;&amp;
+        !containsCharacter(POSSIBLE_START_CHARS, character);
+    };
+    var _absorbsSpacesToTheRight = function(character) {
+      return (
+        containsLogicalCharacter(character, operators, isTemplate) &amp;&amp;
+        !containsCharacter(POSSIBLE_END_CHARS, character)) ||
+        character === &#x27; &#x27;;
+    };
+    var _isLegalCharacter = function(character) {
+      return containsCharacter(POSSIBLE_NAME_CHARS, character) ||
+        containsLogicalCharacter(character, operators, isTemplate);
+    };
+
+    var strippedString = &#x27;&#x27;;
+    for (var i = 0; i &lt; inputString.length; i++) {
+      if (!_isLegalCharacter(inputString[i])) {
+        throw new UserError(&#x27;illegal_symbol&#x27;, {
+          symbol: inputString[i]
+        });
+      }
+      // We keep all non-spaces, and all spaces that are absorbed neither by
+      // characters to their left nor their right.
+      if (inputString[i] !== &#x27; &#x27; ||
+          (i === 0 || !_absorbsSpacesToTheRight(
+            strippedString[strippedString.length - 1])) &amp;&amp;
+          (i === inputString.length - 1 || !_absorbsSpacesToTheLeft(
+            inputString[i + 1]))) {
+        strippedString += inputString[i];
+      }
+    }
+
+    if (strippedString.replace(/ /g, &#x27;&#x27;) === &#x27;&#x27;) {
+      throw new UserError(&#x27;blank_line&#x27;, {});
+    }
+    return strippedString.trim().split(&#x27; &#x27;);
+  };
+
+  /**
+   * @param {string} inputString - written by the user - we will parse it.
+   * @param {object} operators - the relevant operators, which are just needed
+   *        for their symbols so we can identify whether the symbols the user
+   *        is using are legitimate.
+   * @param {object} vocabulary - a dictionary whose keys are phrases such as
+   *        &#x27;have&#x27; whose entries are arrays of possible ways to write each
+   *        phrase, for example [&#x27;have&#x27;, &#x27;we have&#x27;]. We will attempt to match
+   *        sections of the inputString to the ways of writing each phrase.
+   * @param {boolean} isTemplate - if true, we parse the input as a
+   *        LineTemplate; otherwise we parse it as a Line.
+   * @return {*} A LineTemplate.reader_view if isTemplate === true, and a
+   *         ProtoLine if isTemplate === false.
+   * @throws If a section of the string cannot be identified as either a phrase
+   *         or an expression then we throw an error that tries to best identify
+   *         what the user intended and did wrong.
+   */
+  var parseLineString = function(
+      inputString, operators, vocabulary, isTemplate = false) {
+    var unparsedArray = preParseLineString(inputString, operators, isTemplate);
+
+    // We compile all words occurring in the vocabulary, to help us identify
+    // them in lines.
+    var vocabularyWords = [];
+    for (var key in vocabulary) {
+      for (var i = 0; i &lt; vocabulary[key].length; i++) {
+        for (var j = 0; j &lt; vocabulary[key][i].split(&#x27; &#x27;).length; j++) {
+          if (vocabularyWords.indexOf(
+            vocabulary[key][i].split(&#x27; &#x27;)[j]) === -1) {
+            vocabularyWords.push(vocabulary[key][i].split(&#x27; &#x27;)[j]);
+          }
+        }
+      }
+    }
+
+    // The lth entry in this array will contain all parsings of the first
+    // l-many elements of the unparsedArray.
+    var partiallyParsedArrays = [[[]]];
+    for (var i = 1; i &lt;= unparsedArray.length; i++) {
+      partiallyParsedArrays.push([]);
+    }
+
+    for (var i = 0; i &lt; unparsedArray.length; i++) {
+      // We have parsed the first i-many entries in the given unparsedArray,
+      // and will now attempt to parse the next one.
+
+      // This will only occur in pathological cases.
+      if (partiallyParsedArrays[i].length &gt; MAX_NUM_PARSINGS_PERMITTED) {
+        throw new UserError(&#x27;too_many_parsings&#x27;, {});
+      }
+
+      for (var j = i + 1; j &lt;= unparsedArray.length; j++) {
+        for (var key in vocabulary) {
+          for (var k = 0; k &lt; vocabulary[key].length; k++) {
+            if (unparsedArray.slice(i, j).join(&#x27; &#x27;).toLowerCase() ===
+                vocabulary[key][k]) {
+              // We have identified the next (j-i)-many words together form a
+              // phrase in the vocabulary dictionary.
+              for (var l = 0; l &lt; partiallyParsedArrays[i].length; l++) {
+                partiallyParsedArrays[j].push(
+                  partiallyParsedArrays[i][l].concat([{
+                    format: &#x27;phrase&#x27;,
+                    content: key
+                  }])
+                );
+              }
+            }
+          }
+        }
+      }
+
+      // If something is a known word then we do not attempt to parse it as an
+      // expression. This is because any word can be regarded as an expression
+      // (as a single atom) so otherwise we would end up with a large number of
+      // spurious parsings. The exception is single-character words, because
+      // e.g. &#x27;a&#x27; could reasonably be either a word or the name of an atom.
+      if (unparsedArray[i].length === 1 ||
+          vocabularyWords.indexOf(unparsedArray[i].toLowerCase()) === -1) {
+        // We attempt to parse this entry as an expression / expression
+        // template.
+        try {
+          var expression = logicProofParser.parse(
+            unparsedArray[i], isTemplate ? &#x27;expressionTemplate&#x27; : &#x27;expression&#x27;);
+          for (var j = 0; j &lt; partiallyParsedArrays[i].length; j++) {
+            // We do not allow a line to have two expressions in a row. This is
+            // to allow the identification of typos: For example if the user
+            // types &#x27;fron p∧q ...&#x27; then otherwise we would think that both
+            // &#x27;fron&#x27; and &#x27;p∧q&#x27; are expressions. We also do not attempt to
+            // parse a word as an expression if it is a vocabulary word, to
+            // avoid masses of silly attempts to parse the line.
+            if (i === 0 ||
+                partiallyParsedArrays[i][j][
+                  partiallyParsedArrays[i][j].length - 1
+                ].format === &#x27;phrase&#x27;) {
+              partiallyParsedArrays[i + 1].push(
+                partiallyParsedArrays[i][j].concat([{
+                  format: &#x27;expression&#x27;,
+                  content: expression
+                }])
+              );
+            }
+          }
+        } catch (err) {}
+      }
+    }
+
+    if (partiallyParsedArrays[unparsedArray.length].length &gt; 0) {
+      // We have succeeded in fully parsing.
+      return partiallyParsedArrays[unparsedArray.length];
+    } else {
+      // We identify the best attempts.
+      for (var i = unparsedArray.length; i &gt;= 0; i--) {
+        if (partiallyParsedArrays[i].length &gt; 0) {
+          var numEntriesMatched = i;
+          break;
+        }
+      }
+      // We return a description of the problem, based on one of the best
+      // attempts.
+      // NOTE: This is not guaranteed to correctly identify the mistake the
+      // user made. It could do with improvement based on user feedback.
+      // containsLogicalCharacter is used to guess if something is an
+      // expression, but it is not always correct because expressions may
+      // consist only of letters.
+      var bestAttempt = partiallyParsedArrays[numEntriesMatched][0];
+      if (numEntriesMatched === 0 ||
+          bestAttempt[bestAttempt.length - 1].format === &#x27;phrase&#x27;) {
+        var word = unparsedArray[numEntriesMatched];
+        throw (vocabularyWords.indexOf(word) !== -1) ?
+          new UserError(&#x27;unidentified_phrase_starting_at&#x27;, {
+            word: word
+          }) :
+          new UserError(&#x27;unidentified_word&#x27;, {
+            word: word
+          });
+      } else {
+        var word1 = unparsedArray[numEntriesMatched - 1];
+        var word2 = unparsedArray[numEntriesMatched];
+        if (vocabularyWords.indexOf(word1) !== -1) {
+          throw new UserError(&#x27;unidentified_phrase_starting_at&#x27;, {
+            word: word1
+          });
+        } else if (containsLogicalCharacter(word1, operators, isTemplate)) {
+          throw (vocabularyWords.indexOf(word2) !== -1) ?
+            new UserError(&#x27;unidentified_phrase_starting_at&#x27;, {
+              word: word2
+            }) :
+            containsLogicalCharacter(word2, operators, isTemplate) ?
+              new UserError(&#x27;consecutive_expressions&#x27;, {
+                word1: word1,
+                word2: word2
+              }) :
+              new UserError(&#x27;unidentified_word&#x27;, {
+                word: word2
+              });
+        } else {
+          throw (vocabularyWords.indexOf(word2) !== -1) ?
+            new UserError(&#x27;unidentified_phrase_starting_at&#x27;, {
+              word: word2
+            }) :
+            containsLogicalCharacter(word2, operators, isTemplate) ?
+              new UserError(&#x27;unidentified_word&#x27;, {
+                word: word1
+              }) :
+              new UserError(&#x27;unidentified_words&#x27;, {
+                word1: word1,
+                word2: word2
+              });
+        }
+      }
+    }
+  };
+
+  // ---- TYPING ASSIGNMENT ----
+
+  /**
+   * This takes an array of TypingElements and converts it into an array of
+   * types.
+   * @param {Array.&lt;Object&gt;} types - an array of dictionaries of the form {
+   *               type: the name of an available type (&#x27;boolean&#x27; or &#x27;element&#x27;)
+   *               arbitrarily_many: boolean
+   *            }
+   *          where at most one member can have &#x27;arbitrarily_many&#x27; set to
+   *          true, signifying that any number of arguments of this type
+   *          can occur here.
+   * @param {int} desiredLength - the number of entries we would like to have.
+   * @returns {array} an array of types with the right number of entries,
+   *          derived from &#x27;types&#x27;.
+   * @throws if this is not possible.
+   */
+  var instantiateTypingElementArray = function(types, desiredLength) {
+    var listOfTypes = [];
+    for (var i = 0; i &lt; types.length; i++) {
+      listOfTypes.push(types[i].type);
+      if (types[i].arbitrarily_many) {
+        var indexWithArbitrarilyMany = i;
+      }
+    }
+    if (indexWithArbitrarilyMany === undefined) {
+      if (types.length === desiredLength) {
+        return listOfTypes;
+      } else {
+        throw new UserError(&#x27;wrong_num_inputs&#x27;, {
+          num_needed: desiredLength
+        });
+      }
+    } else {
+      var output = [];
+      if (types.length &lt;= desiredLength + 1) {
+        for (var i = 0; i &lt; types.length; i++) {
+          if (i === indexWithArbitrarilyMany) {
+            for (var j = 0; j &lt; desiredLength - types.length + 1; j++) {
+              output.push(listOfTypes[indexWithArbitrarilyMany]);
+            }
+          } else {
+            output.push(listOfTypes[i]);
+          }
+        }
+        return output;
+      } else {
+        throw new UserError(&#x27;not_enough_inputs&#x27;, {
+          num_needed: desiredLength
+        });
+      }
+    }
+  };
+
+  /**
+   * This takes an (untyped) Expression, usually provided by the parser, and
+   * returns a TypedExpression in which types have been added at each level.
+   * @param {Expression} untypedExpression - the expression to be typed
+   * @param {Array} possibleTopTypes - an array of types that the expression as
+   *        a whole could have - each will be tried in turn.
+   * @param {Language} language - the relevant language
+   * @param {Array} newKindsPermitted - an array of kinds (e.g. &#x27;variable&#x27;,
+   *        &#x27;constant&#x27;) of which the user is allowed to create new operators.
+   *        Any operator with a kind not in this list and that does not already
+   *        occur in the language will cause an error.
+   * @param {boolean} permitDuplicateDummyNames - if true the user can write
+   *        e.g. ∀x.p even if x is already in use; if false they cannot.
+   * @return {array} An array of dictionaries of the form: {
+   *           typedExpression: A TypedExpression
+   *           operators: the given language.operatorss together with any new
+   *             operators that occurred in the expression.
+   * @throws If a valid typing cannot be found this function will throw a
+   *         UserError. The parameters of this error will contain an additional
+   *         key &#x27;amountTyped&#x27; that determines where the error occurred. e.g.
+   *         [1,2,0] would indicate that there was a problem at the 0th input
+   *         (dummy or argument) of the 2nd input of the 1st input of this
+   *         expression. We return the typing attempt for which this  value is
+   *         largest (in lexicographic ordering) as this is likely to be closest
+   *         to what the user intended.
+   */
+  var assignTypesToExpression = function(
+      untypedExpression, possibleTopTypes,
+      language, newKindsPermitted = [&#x27;constant&#x27;, &#x27;variable&#x27;],
+      permitDuplicateDummyNames = false) {
+    var operators = language.operators;
+
+    var _attemptTyping = function(topType, typingRule) {
+      if (!operatorIsNew &amp;&amp;
+          untypedExpression.top_kind_name !==
+            operators[untypedExpression.top_operator_name].kind) {
+        throw new UserError(&#x27;wrong_kind&#x27;, {
+          operator: untypedExpression.top_operator_name,
+          expected_kind: operators[untypedExpression.top_operator_name].kind,
+          actual_kind: untypedExpression.top_kind_name,
+          amount_typed: []
+        });
+      }
+      if (topType !== typingRule.output) {
+        throw new UserError(&#x27;wrong_type&#x27;, {
+          operator: untypedExpression.top_operator_name,
+          expected_type: topType,
+          actual_type: typingRule.output,
+          amount_typed: []
+        });
+      }
+
+      var _isNumber = function(n) {
+        return !isNaN(parseFloat(n)) &amp;&amp; isFinite(n);
+      };
+
+      var _isString = function(s) {
+        return s[0] === &#x27;\&#x27;&#x27; &amp;&amp; s[s.length - 1] === &#x27;\&#x27;&#x27;;
+      };
+
+      if (language.types.hasOwnProperty(&#x27;integer&#x27;) &amp;&amp;
+          _isNumber(untypedExpression.top_operator_name) &amp;&amp;
+          untypedExpression.top_kind_name === &#x27;constant&#x27; &amp;&amp;
+          topType !== &#x27;integer&#x27;) {
+        throw new UserError(&#x27;wrong_type&#x27;, {
+          operator: untypedExpression.top_operator_name,
+          expected_type: topType,
+          actual_type: &#x27;integer&#x27;,
+          amount_typed: []
+        });
+      }
+      if (language.types.hasOwnProperty(&#x27;string&#x27;) &amp;&amp;
+          _isString(untypedExpression.top_operator_name) &amp;&amp;
+          untypedExpression.top_kind_name === &#x27;constant&#x27; &amp;&amp;
+          topType !== &#x27;string&#x27;) {
+        throw new UserError(&#x27;wrong_type&#x27;, {
+          operator: untypedExpression.top_operator_name,
+          expected_type: topType,
+          actual_type: &#x27;string&#x27;,
+          amount_typed: []
+        });
+      }
+
+      try {
+        var argumentTypes = instantiateTypingElementArray(
+          typingRule.arguments, untypedExpression.arguments.length);
+      } catch (err) {
+        err.parameters.operator = untypedExpression.top_operator_name;
+        err.parameters.input_category = &#x27;arguments&#x27;;
+        err.parameters.amount_typed = [];
+        throw err;
+      }
+
+      try {
+        var dummyTypes = instantiateTypingElementArray(
+          typingRule.dummies, untypedExpression.dummies.length);
+      } catch (err) {
+        err.parameters.operator = untypedExpression.top_operator_name;
+        err.parameters.input_category = &#x27;dummies&#x27;;
+        err.parameters.amount_typed = [];
+        throw err;
+      }
+      var updatedOperators = {};
+      for (var key in operators) {
+        updatedOperators[key] = operators[key];
+      }
+      if (operatorIsNew) {
+        var _decorateTypes = function(types) {
+          var decoratedTypes = [];
+          for (var k = 0; k &lt; types.length; k++) {
+            decoratedTypes.push({
+              type: types[k],
+              arbitrarily_many: false
+            });
+          }
+          return decoratedTypes;
+        };
+
+        updatedOperators[untypedExpression.top_operator_name] = {
+          kind: untypedExpression.top_kind_name,
+          typing: [{
+            arguments: _decorateTypes(argumentTypes),
+            dummies: _decorateTypes(dummyTypes),
+            output: topType
+          }]
+        };
+      }
+
+      for (var n = 0; n &lt; untypedExpression.dummies.length; n++) {
+        if (!permitDuplicateDummyNames &amp;&amp;
+            updatedOperators.hasOwnProperty(
+              untypedExpression.dummies[n].top_operator_name)) {
+          throw new UserError(&#x27;duplicate_dummy_name&#x27;, {
+            dummy: untypedExpression.dummies[n],
+            expression: untypedExpression,
+            amount_typed: []
+          });
+        } else if (untypedExpression.dummies[n].top_kind_name !== &#x27;variable&#x27;) {
+          // The parser does not currently permit this to happen.
+          throw new UserError(&#x27;dummy_not_variable&#x27;, {
+            dummy: untypedExpression.dummies[n],
+            expression: untypedExpression,
+            amount_typed: []
+          });
+        }
+      }
+
+      return assignTypesToExpressionArray(
+        untypedExpression.dummies.concat(untypedExpression.arguments),
+        dummyTypes.concat(argumentTypes), {
+          operators: updatedOperators,
+          kinds: language.kinds,
+          types: language.types
+        }, newKindsPermitted, permitDuplicateDummyNames,
+        untypedExpression.dummies.length);
+    };
+
+    var operatorIsNew = false;
+    if (!operators.hasOwnProperty(untypedExpression.top_operator_name)) {
+      if (newKindsPermitted.indexOf(untypedExpression.top_kind_name) === -1) {
+        throw new UserError(&#x27;unknown_operator&#x27;, {
+          operator: untypedExpression.top_operator_name,
+          amount_typed: []
+        });
+      } else {
+        operatorIsNew = true;
+      }
+    }
+    var typingRules = (operatorIsNew) ?
+      language.kinds[untypedExpression.top_kind_name].typing :
+      operators[untypedExpression.top_operator_name].typing;
+
+    var results = [];
+    for (var i = 0; i &lt; possibleTopTypes.length; i++) {
+      for (var j = 0; j &lt; typingRules.length; j++) {
+        try {
+          var newAttempts = _attemptTyping(possibleTopTypes[i], typingRules[j]);
+          for (var k = 0; k &lt; newAttempts.length; k++) {
+            var typedDummies = [];
+            for (var l = 0; l &lt; untypedExpression.dummies.length; l++) {
+              typedDummies.push(newAttempts[k].typedArray[l]);
+              // These dummy variables should not be available outside this
+              // part of the untypedExpression.
+              if (!operators.hasOwnProperty(
+                untypedExpression.dummies[l].top_operator_name)) {
+                delete newAttempts[k].operators[
+                  untypedExpression.dummies[l].top_operator_name];
+              }
+            }
+            var typedArguments = [];
+            for (var m = untypedExpression.dummies.length;
+              m &lt; untypedExpression.dummies.length +
+                     untypedExpression.arguments.length;
+              m++) {
+              typedArguments.push(newAttempts[k].typedArray[m]);
+            }
+
+            results.push({
+              typedExpression: {
+                top_operator_name: untypedExpression.top_operator_name,
+                top_kind_name: untypedExpression.top_kind_name,
+                arguments: typedArguments,
+                dummies: typedDummies,
+                type: possibleTopTypes[i]
+              },
+              operators: newAttempts[k].operators
+            });
+          }
+        } catch (err) {
+          if (bestAttemptSoFar !== undefined &amp;&amp;
+              !bestAttemptSoFar.hasOwnProperty(&#x27;parameters&#x27;)) {
+            throw bestAttemptSoFar;
+          }
+          if (bestAttemptSoFar === undefined ||
+              greaterThanInLex(
+                err.parameters.amount_typed,
+                bestAttemptSoFar.parameters.amount_typed)) {
+            var bestAttemptSoFar = err;
+          }
+        }
+      }
+    }
+    if (results.length &gt; 0) {
+      return results;
+    } else {
+      throw bestAttemptSoFar;
+    }
+  };
+
+  /** Companion function to assignTypesToExpression, with the following
+   * modifications:
+   * @param untypedArray: an array of expressions to type
+   *  @param topTypes: an array of types that the expressions in the array must
+   *        have (only one option for each).
+   * @numDummies: the number of elements in the array (from the start) that are
+   *              dummies rather than arguments.
+   * @result: {
+   *            typedArray: an array of TypedExpressions
+   *            operators: the updated list of operators
+   *          }
+   * @raises: as before
+   */
+
+  var assignTypesToExpressionArray = function(
+      untypedArray, topTypes, language,
+      newKindsPermitted = [&#x27;constant&#x27;, &#x27;variable&#x27;], isTemplate = false,
+      numDummies = 0) {
+    var partiallyTypedArrays = [[[]]];
+    var partiallyUpdatedOperators = [[{}]];
+    for (var key in language.operators) {
+      partiallyUpdatedOperators[0][0][key] = language.operators[key];
+    }
+    for (var i = 1; i &lt;= untypedArray.length; i++) {
+      partiallyTypedArrays.push([]);
+      partiallyUpdatedOperators.push([]);
+    }
+
+    for (var i = 0; i &lt; untypedArray.length; i++) {
+      // This will only happen in pathological cases.
+      if (partiallyTypedArrays[i].length &gt; MAX_NUM_TYPINGS_PERMITTED) {
+        throw new UserError(&#x27;too_many_typings&#x27;, {});
+      }
+
+      for (var j = 0; j &lt; partiallyTypedArrays[i].length; j++) {
+        // Dummies are always allowed to have previously unseen names.
+        var newKindsPermittedHere = (i &lt; numDummies) ?
+          newKindsPermitted.concat([&#x27;variable&#x27;]) :
+          newKindsPermitted;
+        try {
+          var newResults = assignTypesToExpression(
+            untypedArray[i], [topTypes[i]], {
+              operators: partiallyUpdatedOperators[i][j],
+              kinds: language.kinds,
+              types: language.types
+            }, newKindsPermittedHere, isTemplate);
+          for (var k = 0; k &lt; newResults.length; k++) {
+            partiallyTypedArrays[i + 1].push(
+              partiallyTypedArrays[i][j].concat([
+                newResults[k].typedExpression]));
+            partiallyUpdatedOperators[i + 1].push(newResults[k].operators);
+          }
+        } catch (err) {
+          if (!err.hasOwnProperty(&#x27;parameters&#x27;)) {
+            throw err;
+          }
+          var amountTyped = [i].concat(err.parameters.amount_typed);
+          if (bestAttemptSoFar === undefined ||
+              greaterThanInLex(
+                amountTyped, bestAttemptSoFar.parameters.amount_typed)) {
+            err.parameters.amount_typed = amountTyped;
+            var bestAttemptSoFar = err;
+          }
+        }
+      }
+    }
+    var fullyTypedArrays = partiallyTypedArrays[untypedArray.length];
+    var fullyUpdatedOperatorss = partiallyUpdatedOperators[
+      untypedArray.length];
+    if (fullyTypedArrays.length &gt; 0) {
+      var result = [];
+      for (var i = 0; i &lt; fullyTypedArrays.length; i++) {
+        result.push({
+          typedArray: fullyTypedArrays[i],
+          operators: fullyUpdatedOperatorss[i]
+        });
+      }
+      return result;
+    } else {
+      throw bestAttemptSoFar;
+    }
+  };
+
+  // ---- UTILITIES ----
+
+  // Expressions with different dummy variables are considered different.
+  var checkExpressionsAreEqual = function(expression1, expression2) {
+    if (expression1.top_kind_name !== expression2.top_kind_name ||
+        expression1.top_operator_name !== expression2.top_operator_name ||
+        expression1.arguments.length !== expression2.arguments.length ||
+        expression1.dummies.length !== expression2.dummies.length) {
+      return false;
+    }
+    if (expression1.hasOwnProperty(&#x27;type&#x27;)) {
+      if (expression1.type !== expression2.type) {
+        return false;
+      }
+    }
+    for (var i = 0;
+      i &lt; expression1.arguments.length + expression1.dummies.length; i++) {
+      if (!checkExpressionsAreEqual(
+        (expression1.arguments.concat(expression1.dummies))[i],
+        (expression2.arguments.concat(expression2.dummies))[i])) {
+        return false;
+      }
+    }
+    return true;
+  };
+
+  var checkExpressionIsInSet = function(expression, set) {
+    for (var i = 0; i &lt; set.length; i++) {
+      if (checkExpressionsAreEqual(expression, set[i])) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  var checkSetsOfExpressionsAreEqual = function(set1, set2) {
+    for (var i = 0; i &lt; set1.length; i++) {
+      if (!checkExpressionIsInSet(set1[i], set2)) {
+        return false;
+      }
+    }
+    for (var i = 0; i &lt; set2.length; i++) {
+      if (!checkExpressionIsInSet(set2[i], set1)) {
+        return false;
+      }
+    }
+    return true;
+  };
+
+  // Returns a list of all the names of operators in an expression. kinds is an
+  // array specifying which kinds of operators to return; if it is not supplied
+  // then all are returned.
+  var getOperatorsFromExpression = function(expression, kinds = null) {
+    var output = getOperatorsFromExpressionArray(
+      expression.arguments.concat(expression.dummies), kinds);
+    return (
+      output.indexOf(expression.top_operator_name) === -1 &amp;&amp;
+      (kinds === null || kinds.indexOf(expression.top_kind_name) !== -1)) ?
+      output.concat([expression.top_operator_name]) :
+      output;
+  };
+
+  var getOperatorsFromExpressionArray = function(array, kinds = null) {
+    var output = [];
+    for (var i = 0; i &lt; array.length; i++) {
+      var newOutput = getOperatorsFromExpression(array[i], kinds);
+      for (var j = 0; j &lt; newOutput.length; j++) {
+        if (output.indexOf(newOutput[j]) === -1) {
+          output = output.concat([newOutput[j]]);
+        }
+      }
+    }
+    return output;
+  };
+
+  // The expression should be typed; returns the type of operator (or throws an
+  // error if not found). Does not check for inconsistent typing.
+  // NOTE: treats dummy variables like free ones.
+  var seekTypeInExpression = function(expression, operator) {
+    return operator === expression.top_operator_name ? expression.type :
+      seekTypeInExpressionArray(
+        expression.arguments.concat(expression.dummies), operator);
+  };
+
+  var seekTypeInExpressionArray = function(array, operator) {
+    for (var i = 0; i &lt; array.length; i++) {
+      try {
+        return seekTypeInExpression(array[i], operator);
+      } catch (err) {}
+    }
+    throw UserError(&#x27;unknown_typing_error&#x27;, {
+      array: array
+    });
+  };
+
+  // Returns whether LHS is larger than RHS in lexicographic ordering.
+  var greaterThanInLex = function(LHS, RHS) {
+    for (var i = 0; i &lt; LHS.length; i++) {
+      if (i &gt;= RHS.length) {
+        return true;
+      } else if (LHS[i] &gt; RHS[i]) {
+        return true;
+      } else if (LHS[i] &lt; RHS[i]) {
+        return false;
+      }
+    }
+    return false;
+  };
+
+  // Checks if the string contains the character.
+  var containsCharacter = function(string, character) {
+    return (string.indexOf(character) !== -1);
+  };
+
+  // Checks if the string contains some character from the array.
+  var containsCharacterFromArray = function(string, array) {
+    for (var i = 0; i &lt; array.length; i++) {
+      if (string.indexOf(array[i]) !== -1) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  return {
+    UserError: UserError,
+    PreRenderedUserError: PreRenderedUserError,
+    renderError: renderError,
+    displayExpression: displayExpression,
+    displayExpressionArray: displayExpressionArray,
+    preParseLineString: preParseLineString,
+    parseLineString: parseLineString,
+    instantiateTypingElementArray: instantiateTypingElementArray,
+    assignTypesToExpression: assignTypesToExpression,
+    assignTypesToExpressionArray: assignTypesToExpressionArray,
+    checkExpressionsAreEqual: checkExpressionsAreEqual,
+    checkExpressionIsInSet: checkExpressionIsInSet,
+    checkSetsOfExpressionsAreEqual: checkSetsOfExpressionsAreEqual,
+    getOperatorsFromExpression: getOperatorsFromExpression,
+    getOperatorsFromExpressionArray: getOperatorsFromExpressionArray,
+    seekTypeInExpression: seekTypeInExpression,
+    greaterThanInLex: greaterThanInLex
+  };
+})();
+
+export default logicProofShared;
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:35,&quot;character&quot;:27,&quot;text&quot;:&quot;code&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:35,&quot;character&quot;:33,&quot;text&quot;:&quot;parameters&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:36,&quot;character&quot;:4,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:36,&quot;character&quot;:9,&quot;text&quot;:&quot;name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:37,&quot;character&quot;:4,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:37,&quot;character&quot;:9,&quot;text&quot;:&quot;code&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:37,&quot;character&quot;:16,&quot;text&quot;:&quot;code&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:38,&quot;character&quot;:4,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:38,&quot;character&quot;:9,&quot;text&quot;:&quot;parameters&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:38,&quot;character&quot;:22,&quot;text&quot;:&quot;parameters&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:42,&quot;character&quot;:38,&quot;text&quot;:&quot;messages&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:42,&quot;character&quot;:48,&quot;text&quot;:&quot;code&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:43,&quot;character&quot;:4,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:43,&quot;character&quot;:9,&quot;text&quot;:&quot;name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:44,&quot;character&quot;:4,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:44,&quot;character&quot;:9,&quot;text&quot;:&quot;messages&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:44,&quot;character&quot;:20,&quot;text&quot;:&quot;messages&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:45,&quot;character&quot;:4,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:45,&quot;character&quot;:9,&quot;text&quot;:&quot;code&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:45,&quot;character&quot;:16,&quot;text&quot;:&quot;code&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:60,&quot;character&quot;:6,&quot;text&quot;:&quot;messageTemplate&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:60,&quot;character&quot;:23,&quot;text&quot;:&quot;parameterFormats&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:60,&quot;character&quot;:41,&quot;text&quot;:&quot;parameters&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:60,&quot;character&quot;:53,&quot;text&quot;:&quot;language&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:62,&quot;character&quot;:24,&quot;text&quot;:&quot;messageTemplate&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:62,&quot;character&quot;:40,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:63,&quot;character&quot;:10,&quot;text&quot;:&quot;messageTemplate&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:63,&quot;character&quot;:29,&quot;text&quot;:&quot;isFixed&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:64,&quot;character&quot;:19,&quot;text&quot;:&quot;messageTemplate&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:64,&quot;character&quot;:38,&quot;text&quot;:&quot;content&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:66,&quot;character&quot;:12,&quot;text&quot;:&quot;parameterFormat&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:66,&quot;character&quot;:30,&quot;text&quot;:&quot;parameterFormats&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:67,&quot;character&quot;:10,&quot;text&quot;:&quot;messageTemplate&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:67,&quot;character&quot;:29,&quot;text&quot;:&quot;content&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:67,&quot;character&quot;:38,&quot;text&quot;:&quot;format&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:68,&quot;character&quot;:12,&quot;text&quot;:&quot;parameter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:68,&quot;character&quot;:24,&quot;text&quot;:&quot;parameters&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:68,&quot;character&quot;:35,&quot;text&quot;:&quot;messageTemplate&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:68,&quot;character&quot;:54,&quot;text&quot;:&quot;content&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:69,&quot;character&quot;:16,&quot;text&quot;:&quot;parameterFormat&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:71,&quot;character&quot;:23,&quot;text&quot;:&quot;parameter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:74,&quot;character&quot;:41,&quot;text&quot;:&quot;parameter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:74,&quot;character&quot;:52,&quot;text&quot;:&quot;language&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:74,&quot;character&quot;:61,&quot;text&quot;:&quot;operators&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:78,&quot;character&quot;:34,&quot;text&quot;:&quot;parameterFormat&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:94,&quot;character&quot;:29,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:94,&quot;character&quot;:36,&quot;text&quot;:&quot;errorDictionary&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:94,&quot;character&quot;:53,&quot;text&quot;:&quot;language&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:95,&quot;character&quot;:8,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:95,&quot;character&quot;:14,&quot;text&quot;:&quot;name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:96,&quot;character&quot;:11,&quot;text&quot;:&quot;errorDictionary&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:96,&quot;character&quot;:42,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:96,&quot;character&quot;:48,&quot;text&quot;:&quot;code&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:98,&quot;character&quot;:34,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:98,&quot;character&quot;:40,&quot;text&quot;:&quot;code&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:100,&quot;character&quot;:10,&quot;text&quot;:&quot;messageTemplates&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:100,&quot;character&quot;:29,&quot;text&quot;:&quot;errorDictionary&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:100,&quot;character&quot;:45,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:100,&quot;character&quot;:51,&quot;text&quot;:&quot;code&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:100,&quot;character&quot;:57,&quot;text&quot;:&quot;templates&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:101,&quot;character&quot;:10,&quot;text&quot;:&quot;messageTemplate&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:101,&quot;character&quot;:28,&quot;text&quot;:&quot;messageTemplates&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:102,&quot;character&quot;:36,&quot;text&quot;:&quot;messageTemplates&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:102,&quot;character&quot;:53,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:104,&quot;character&quot;:8,&quot;text&quot;:&quot;messageTemplate&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:104,&quot;character&quot;:25,&quot;text&quot;:&quot;errorDictionary&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:104,&quot;character&quot;:41,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:104,&quot;character&quot;:47,&quot;text&quot;:&quot;code&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:104,&quot;character&quot;:53,&quot;text&quot;:&quot;parameters&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:105,&quot;character&quot;:8,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:105,&quot;character&quot;:14,&quot;text&quot;:&quot;parameters&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:105,&quot;character&quot;:26,&quot;text&quot;:&quot;language&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:106,&quot;character&quot;:15,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:106,&quot;character&quot;:21,&quot;text&quot;:&quot;name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:107,&quot;character&quot;:13,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:107,&quot;character&quot;:19,&quot;text&quot;:&quot;messages&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:108,&quot;character&quot;:36,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:108,&quot;character&quot;:42,&quot;text&quot;:&quot;messages&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:108,&quot;character&quot;:51,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:110,&quot;character&quot;:12,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:123,&quot;character&quot;:35,&quot;text&quot;:&quot;expression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:123,&quot;character&quot;:47,&quot;text&quot;:&quot;operators&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:124,&quot;character&quot;:35,&quot;text&quot;:&quot;expression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:124,&quot;character&quot;:47,&quot;text&quot;:&quot;operators&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:138,&quot;character&quot;:6,&quot;text&quot;:&quot;expression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:138,&quot;character&quot;:18,&quot;text&quot;:&quot;operators&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:140,&quot;character&quot;:6,&quot;text&quot;:&quot;expression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:140,&quot;character&quot;:17,&quot;text&quot;:&quot;top_kind_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:141,&quot;character&quot;:6,&quot;text&quot;:&quot;expression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:141,&quot;character&quot;:17,&quot;text&quot;:&quot;top_kind_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:142,&quot;character&quot;:6,&quot;text&quot;:&quot;expression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:142,&quot;character&quot;:17,&quot;text&quot;:&quot;top_kind_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:144,&quot;character&quot;:8,&quot;text&quot;:&quot;expression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:144,&quot;character&quot;:19,&quot;text&quot;:&quot;top_kind_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:145,&quot;character&quot;:8,&quot;text&quot;:&quot;expression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:145,&quot;character&quot;:19,&quot;text&quot;:&quot;top_kind_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:147,&quot;character&quot;:8,&quot;text&quot;:&quot;processedArguments&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:148,&quot;character&quot;:8,&quot;text&quot;:&quot;processedDummies&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:149,&quot;character&quot;:24,&quot;text&quot;:&quot;expression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:149,&quot;character&quot;:35,&quot;text&quot;:&quot;arguments&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:149,&quot;character&quot;:45,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:150,&quot;character&quot;:6,&quot;text&quot;:&quot;processedArguments&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:152,&quot;character&quot;:10,&quot;text&quot;:&quot;expression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:152,&quot;character&quot;:21,&quot;text&quot;:&quot;arguments&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:152,&quot;character&quot;:35,&quot;text&quot;:&quot;operators&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:154,&quot;character&quot;:24,&quot;text&quot;:&quot;expression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:154,&quot;character&quot;:35,&quot;text&quot;:&quot;dummies&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:154,&quot;character&quot;:43,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:155,&quot;character&quot;:6,&quot;text&quot;:&quot;processedDummies&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:157,&quot;character&quot;:10,&quot;text&quot;:&quot;expression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:157,&quot;character&quot;:21,&quot;text&quot;:&quot;dummies&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:157,&quot;character&quot;:33,&quot;text&quot;:&quot;operators&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:160,&quot;character&quot;:8,&quot;text&quot;:&quot;symbol&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:160,&quot;character&quot;:19,&quot;text&quot;:&quot;operators&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:160,&quot;character&quot;:44,&quot;text&quot;:&quot;expression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:160,&quot;character&quot;:55,&quot;text&quot;:&quot;top_operator_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:161,&quot;character&quot;:6,&quot;text&quot;:&quot;expression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:161,&quot;character&quot;:17,&quot;text&quot;:&quot;top_operator_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:162,&quot;character&quot;:8,&quot;text&quot;:&quot;operators&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:162,&quot;character&quot;:18,&quot;text&quot;:&quot;expression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:162,&quot;character&quot;:29,&quot;text&quot;:&quot;top_operator_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:163,&quot;character&quot;:8,&quot;text&quot;:&quot;expression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:163,&quot;character&quot;:19,&quot;text&quot;:&quot;top_operator_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:164,&quot;character&quot;:8,&quot;text&quot;:&quot;operators&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:164,&quot;character&quot;:18,&quot;text&quot;:&quot;expression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:164,&quot;character&quot;:29,&quot;text&quot;:&quot;top_operator_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:164,&quot;character&quot;:48,&quot;text&quot;:&quot;symbols&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:166,&quot;character&quot;:8,&quot;text&quot;:&quot;output&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:167,&quot;character&quot;:8,&quot;text&quot;:&quot;expression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:167,&quot;character&quot;:19,&quot;text&quot;:&quot;top_kind_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:168,&quot;character&quot;:8,&quot;text&quot;:&quot;expression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:168,&quot;character&quot;:19,&quot;text&quot;:&quot;top_kind_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:169,&quot;character&quot;:8,&quot;text&quot;:&quot;expression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:169,&quot;character&quot;:19,&quot;text&quot;:&quot;top_kind_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:172,&quot;character&quot;:16,&quot;text&quot;:&quot;processedArguments&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:173,&quot;character&quot;:10,&quot;text&quot;:&quot;processedArguments&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:174,&quot;character&quot;:15,&quot;text&quot;:&quot;expression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:174,&quot;character&quot;:26,&quot;text&quot;:&quot;top_kind_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:175,&quot;character&quot;:6,&quot;text&quot;:&quot;output&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:175,&quot;character&quot;:15,&quot;text&quot;:&quot;symbol&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:175,&quot;character&quot;:24,&quot;text&quot;:&quot;processedArguments&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:176,&quot;character&quot;:52,&quot;text&quot;:&quot;output&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:176,&quot;character&quot;:67,&quot;text&quot;:&quot;output&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:177,&quot;character&quot;:15,&quot;text&quot;:&quot;expression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:177,&quot;character&quot;:26,&quot;text&quot;:&quot;top_kind_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:178,&quot;character&quot;:6,&quot;text&quot;:&quot;output&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:178,&quot;character&quot;:15,&quot;text&quot;:&quot;symbol&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:178,&quot;character&quot;:24,&quot;text&quot;:&quot;processedDummies&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:178,&quot;character&quot;:52,&quot;text&quot;:&quot;processedArguments&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:179,&quot;character&quot;:52,&quot;text&quot;:&quot;output&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:179,&quot;character&quot;:67,&quot;text&quot;:&quot;output&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:180,&quot;character&quot;:15,&quot;text&quot;:&quot;expression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:180,&quot;character&quot;:26,&quot;text&quot;:&quot;top_kind_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:181,&quot;character&quot;:6,&quot;text&quot;:&quot;output&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:181,&quot;character&quot;:15,&quot;text&quot;:&quot;symbol&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:181,&quot;character&quot;:24,&quot;text&quot;:&quot;processedArguments&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:181,&quot;character&quot;:54,&quot;text&quot;:&quot;processedArguments&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:182,&quot;character&quot;:52,&quot;text&quot;:&quot;output&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:182,&quot;character&quot;:67,&quot;text&quot;:&quot;output&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:183,&quot;character&quot;:15,&quot;text&quot;:&quot;expression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:183,&quot;character&quot;:26,&quot;text&quot;:&quot;top_kind_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:184,&quot;character&quot;:8,&quot;text&quot;:&quot;expression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:184,&quot;character&quot;:19,&quot;text&quot;:&quot;top_kind_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:185,&quot;character&quot;:13,&quot;text&quot;:&quot;symbol&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:185,&quot;character&quot;:28,&quot;text&quot;:&quot;processedArguments&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:186,&quot;character&quot;:15,&quot;text&quot;:&quot;expression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:186,&quot;character&quot;:26,&quot;text&quot;:&quot;top_kind_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:188,&quot;character&quot;:8,&quot;text&quot;:&quot;symbol&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:188,&quot;character&quot;:23,&quot;text&quot;:&quot;processedArguments&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:188,&quot;character&quot;:55,&quot;text&quot;:&quot;processedArguments&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:190,&quot;character&quot;:15,&quot;text&quot;:&quot;expression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:190,&quot;character&quot;:26,&quot;text&quot;:&quot;top_kind_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:191,&quot;character&quot;:6,&quot;text&quot;:&quot;expression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:191,&quot;character&quot;:17,&quot;text&quot;:&quot;top_kind_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:192,&quot;character&quot;:6,&quot;text&quot;:&quot;expression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:192,&quot;character&quot;:17,&quot;text&quot;:&quot;top_kind_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:193,&quot;character&quot;:13,&quot;text&quot;:&quot;symbol&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:196,&quot;character&quot;:26,&quot;text&quot;:&quot;expression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:196,&quot;character&quot;:37,&quot;text&quot;:&quot;top_kind_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:201,&quot;character&quot;:40,&quot;text&quot;:&quot;expressionArray&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:201,&quot;character&quot;:57,&quot;text&quot;:&quot;operators&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:202,&quot;character&quot;:8,&quot;text&quot;:&quot;processedArray&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:203,&quot;character&quot;:24,&quot;text&quot;:&quot;expressionArray&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:203,&quot;character&quot;:40,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:204,&quot;character&quot;:6,&quot;text&quot;:&quot;processedArray&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:205,&quot;character&quot;:32,&quot;text&quot;:&quot;expressionArray&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:205,&quot;character&quot;:52,&quot;text&quot;:&quot;operators&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:207,&quot;character&quot;:11,&quot;text&quot;:&quot;processedArray&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:222,&quot;character&quot;:42,&quot;text&quot;:&quot;string&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:222,&quot;character&quot;:50,&quot;text&quot;:&quot;operators&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:222,&quot;character&quot;:61,&quot;text&quot;:&quot;isTemplate&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:226,&quot;character&quot;:35,&quot;text&quot;:&quot;string&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:229,&quot;character&quot;:8,&quot;text&quot;:&quot;isTemplate&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:230,&quot;character&quot;:35,&quot;text&quot;:&quot;string&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:234,&quot;character&quot;:20,&quot;text&quot;:&quot;operators&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:235,&quot;character&quot;:10,&quot;text&quot;:&quot;operators&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:236,&quot;character&quot;:28,&quot;text&quot;:&quot;operators&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:236,&quot;character&quot;:43,&quot;text&quot;:&quot;symbols&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:236,&quot;character&quot;:51,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:238,&quot;character&quot;:30,&quot;text&quot;:&quot;operators&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:238,&quot;character&quot;:45,&quot;text&quot;:&quot;symbols&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:238,&quot;character&quot;:56,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:239,&quot;character&quot;:16,&quot;text&quot;:&quot;string&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:239,&quot;character&quot;:23,&quot;text&quot;:&quot;indexOf&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:239,&quot;character&quot;:31,&quot;text&quot;:&quot;operators&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:239,&quot;character&quot;:46,&quot;text&quot;:&quot;symbols&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:264,&quot;character&quot;:36,&quot;text&quot;:&quot;inputString&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:264,&quot;character&quot;:49,&quot;text&quot;:&quot;operators&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:264,&quot;character&quot;:60,&quot;text&quot;:&quot;isTemplate&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:273,&quot;character&quot;:43,&quot;text&quot;:&quot;character&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:274,&quot;character&quot;:38,&quot;text&quot;:&quot;character&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:274,&quot;character&quot;:49,&quot;text&quot;:&quot;operators&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:274,&quot;character&quot;:60,&quot;text&quot;:&quot;isTemplate&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:275,&quot;character&quot;:49,&quot;text&quot;:&quot;character&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:277,&quot;character&quot;:44,&quot;text&quot;:&quot;character&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:279,&quot;character&quot;:33,&quot;text&quot;:&quot;character&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:279,&quot;character&quot;:44,&quot;text&quot;:&quot;operators&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:279,&quot;character&quot;:55,&quot;text&quot;:&quot;isTemplate&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:280,&quot;character&quot;:47,&quot;text&quot;:&quot;character&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:281,&quot;character&quot;:8,&quot;text&quot;:&quot;character&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:283,&quot;character&quot;:37,&quot;text&quot;:&quot;character&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:284,&quot;character&quot;:52,&quot;text&quot;:&quot;character&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:285,&quot;character&quot;:33,&quot;text&quot;:&quot;character&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:285,&quot;character&quot;:44,&quot;text&quot;:&quot;operators&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:285,&quot;character&quot;:55,&quot;text&quot;:&quot;isTemplate&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:289,&quot;character&quot;:24,&quot;text&quot;:&quot;inputString&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:289,&quot;character&quot;:36,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:290,&quot;character&quot;:29,&quot;text&quot;:&quot;inputString&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:292,&quot;character&quot;:10,&quot;text&quot;:&quot;symbol&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:292,&quot;character&quot;:18,&quot;text&quot;:&quot;inputString&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:297,&quot;character&quot;:10,&quot;text&quot;:&quot;inputString&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:300,&quot;character&quot;:17,&quot;text&quot;:&quot;inputString&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:300,&quot;character&quot;:29,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:301,&quot;character&quot;:12,&quot;text&quot;:&quot;inputString&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:302,&quot;character&quot;:26,&quot;text&quot;:&quot;inputString&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:330,&quot;character&quot;:6,&quot;text&quot;:&quot;inputString&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:330,&quot;character&quot;:19,&quot;text&quot;:&quot;operators&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:330,&quot;character&quot;:30,&quot;text&quot;:&quot;vocabulary&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:331,&quot;character&quot;:43,&quot;text&quot;:&quot;inputString&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:331,&quot;character&quot;:56,&quot;text&quot;:&quot;operators&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:335,&quot;character&quot;:8,&quot;text&quot;:&quot;vocabularyWords&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:336,&quot;character&quot;:20,&quot;text&quot;:&quot;vocabulary&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:337,&quot;character&quot;:26,&quot;text&quot;:&quot;vocabulary&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:337,&quot;character&quot;:42,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:338,&quot;character&quot;:28,&quot;text&quot;:&quot;vocabulary&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:338,&quot;character&quot;:47,&quot;text&quot;:&quot;split&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:338,&quot;character&quot;:58,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:339,&quot;character&quot;:14,&quot;text&quot;:&quot;vocabularyWords&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:340,&quot;character&quot;:12,&quot;text&quot;:&quot;vocabulary&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:340,&quot;character&quot;:31,&quot;text&quot;:&quot;split&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:341,&quot;character&quot;:12,&quot;text&quot;:&quot;vocabularyWords&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:341,&quot;character&quot;:33,&quot;text&quot;:&quot;vocabulary&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:341,&quot;character&quot;:52,&quot;text&quot;:&quot;split&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:349,&quot;character&quot;:8,&quot;text&quot;:&quot;partiallyParsedArrays&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:351,&quot;character&quot;:6,&quot;text&quot;:&quot;partiallyParsedArrays&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:359,&quot;character&quot;:10,&quot;text&quot;:&quot;partiallyParsedArrays&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:364,&quot;character&quot;:24,&quot;text&quot;:&quot;vocabulary&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:365,&quot;character&quot;:30,&quot;text&quot;:&quot;vocabulary&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:365,&quot;character&quot;:46,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:367,&quot;character&quot;:16,&quot;text&quot;:&quot;vocabulary&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:370,&quot;character&quot;:34,&quot;text&quot;:&quot;partiallyParsedArrays&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:371,&quot;character&quot;:16,&quot;text&quot;:&quot;partiallyParsedArrays&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:372,&quot;character&quot;:18,&quot;text&quot;:&quot;partiallyParsedArrays&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:389,&quot;character&quot;:10,&quot;text&quot;:&quot;vocabularyWords&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:395,&quot;character&quot;:30,&quot;text&quot;:&quot;partiallyParsedArrays&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:403,&quot;character&quot;:16,&quot;text&quot;:&quot;partiallyParsedArrays&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:404,&quot;character&quot;:18,&quot;text&quot;:&quot;partiallyParsedArrays&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:405,&quot;character&quot;:18,&quot;text&quot;:&quot;format&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:406,&quot;character&quot;:14,&quot;text&quot;:&quot;partiallyParsedArrays&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:407,&quot;character&quot;:16,&quot;text&quot;:&quot;partiallyParsedArrays&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:414,&quot;character&quot;:17,&quot;text&quot;:&quot;err&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:418,&quot;character&quot;:8,&quot;text&quot;:&quot;partiallyParsedArrays&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:420,&quot;character&quot;:13,&quot;text&quot;:&quot;partiallyParsedArrays&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:424,&quot;character&quot;:12,&quot;text&quot;:&quot;partiallyParsedArrays&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:436,&quot;character&quot;:10,&quot;text&quot;:&quot;bestAttempt&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:436,&quot;character&quot;:24,&quot;text&quot;:&quot;partiallyParsedArrays&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:438,&quot;character&quot;:10,&quot;text&quot;:&quot;bestAttempt&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:438,&quot;character&quot;:22,&quot;text&quot;:&quot;bestAttempt&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:438,&quot;character&quot;:46,&quot;text&quot;:&quot;format&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:440,&quot;character&quot;:15,&quot;text&quot;:&quot;vocabularyWords&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:450,&quot;character&quot;:12,&quot;text&quot;:&quot;vocabularyWords&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:454,&quot;character&quot;:51,&quot;text&quot;:&quot;operators&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:455,&quot;character&quot;:17,&quot;text&quot;:&quot;vocabularyWords&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:459,&quot;character&quot;:44,&quot;text&quot;:&quot;operators&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:468,&quot;character&quot;:17,&quot;text&quot;:&quot;vocabularyWords&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:472,&quot;character&quot;:44,&quot;text&quot;:&quot;operators&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:502,&quot;character&quot;:47,&quot;text&quot;:&quot;types&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:502,&quot;character&quot;:54,&quot;text&quot;:&quot;desiredLength&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:503,&quot;character&quot;:8,&quot;text&quot;:&quot;listOfTypes&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:504,&quot;character&quot;:24,&quot;text&quot;:&quot;types&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:504,&quot;character&quot;:30,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:505,&quot;character&quot;:6,&quot;text&quot;:&quot;listOfTypes&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:505,&quot;character&quot;:23,&quot;text&quot;:&quot;types&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:505,&quot;character&quot;:32,&quot;text&quot;:&quot;type&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:506,&quot;character&quot;:10,&quot;text&quot;:&quot;types&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:506,&quot;character&quot;:19,&quot;text&quot;:&quot;arbitrarily_many&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:511,&quot;character&quot;:10,&quot;text&quot;:&quot;types&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:511,&quot;character&quot;:16,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:511,&quot;character&quot;:27,&quot;text&quot;:&quot;desiredLength&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:512,&quot;character&quot;:15,&quot;text&quot;:&quot;listOfTypes&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:515,&quot;character&quot;:10,&quot;text&quot;:&quot;num_needed&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:515,&quot;character&quot;:22,&quot;text&quot;:&quot;desiredLength&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:519,&quot;character&quot;:10,&quot;text&quot;:&quot;output&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:520,&quot;character&quot;:10,&quot;text&quot;:&quot;types&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:520,&quot;character&quot;:16,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:520,&quot;character&quot;:26,&quot;text&quot;:&quot;desiredLength&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:521,&quot;character&quot;:28,&quot;text&quot;:&quot;types&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:521,&quot;character&quot;:34,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:523,&quot;character&quot;:32,&quot;text&quot;:&quot;desiredLength&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:523,&quot;character&quot;:48,&quot;text&quot;:&quot;types&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:523,&quot;character&quot;:54,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:524,&quot;character&quot;:14,&quot;text&quot;:&quot;output&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:524,&quot;character&quot;:26,&quot;text&quot;:&quot;listOfTypes&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:527,&quot;character&quot;:12,&quot;text&quot;:&quot;output&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:527,&quot;character&quot;:24,&quot;text&quot;:&quot;listOfTypes&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:530,&quot;character&quot;:15,&quot;text&quot;:&quot;output&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:533,&quot;character&quot;:10,&quot;text&quot;:&quot;num_needed&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:533,&quot;character&quot;:22,&quot;text&quot;:&quot;desiredLength&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:566,&quot;character&quot;:6,&quot;text&quot;:&quot;untypedExpression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:566,&quot;character&quot;:25,&quot;text&quot;:&quot;possibleTopTypes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:567,&quot;character&quot;:6,&quot;text&quot;:&quot;language&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:569,&quot;character&quot;:8,&quot;text&quot;:&quot;operators&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:569,&quot;character&quot;:20,&quot;text&quot;:&quot;language&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:569,&quot;character&quot;:29,&quot;text&quot;:&quot;operators&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:571,&quot;character&quot;:34,&quot;text&quot;:&quot;topType&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:571,&quot;character&quot;:43,&quot;text&quot;:&quot;typingRule&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:573,&quot;character&quot;:10,&quot;text&quot;:&quot;untypedExpression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:573,&quot;character&quot;:28,&quot;text&quot;:&quot;top_kind_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:574,&quot;character&quot;:12,&quot;text&quot;:&quot;operators&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:574,&quot;character&quot;:22,&quot;text&quot;:&quot;untypedExpression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:574,&quot;character&quot;:40,&quot;text&quot;:&quot;top_operator_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:574,&quot;character&quot;:59,&quot;text&quot;:&quot;kind&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:576,&quot;character&quot;:10,&quot;text&quot;:&quot;operator&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:576,&quot;character&quot;:20,&quot;text&quot;:&quot;untypedExpression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:576,&quot;character&quot;:38,&quot;text&quot;:&quot;top_operator_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:577,&quot;character&quot;:10,&quot;text&quot;:&quot;expected_kind&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:577,&quot;character&quot;:25,&quot;text&quot;:&quot;operators&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:577,&quot;character&quot;:35,&quot;text&quot;:&quot;untypedExpression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:577,&quot;character&quot;:53,&quot;text&quot;:&quot;top_operator_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:577,&quot;character&quot;:72,&quot;text&quot;:&quot;kind&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:578,&quot;character&quot;:10,&quot;text&quot;:&quot;actual_kind&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:578,&quot;character&quot;:23,&quot;text&quot;:&quot;untypedExpression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:578,&quot;character&quot;:41,&quot;text&quot;:&quot;top_kind_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:582,&quot;character&quot;:10,&quot;text&quot;:&quot;topType&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:582,&quot;character&quot;:22,&quot;text&quot;:&quot;typingRule&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:582,&quot;character&quot;:33,&quot;text&quot;:&quot;output&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:584,&quot;character&quot;:10,&quot;text&quot;:&quot;operator&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:584,&quot;character&quot;:20,&quot;text&quot;:&quot;untypedExpression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:584,&quot;character&quot;:38,&quot;text&quot;:&quot;top_operator_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:585,&quot;character&quot;:10,&quot;text&quot;:&quot;expected_type&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:585,&quot;character&quot;:25,&quot;text&quot;:&quot;topType&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:586,&quot;character&quot;:10,&quot;text&quot;:&quot;actual_type&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:586,&quot;character&quot;:23,&quot;text&quot;:&quot;typingRule&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:586,&quot;character&quot;:34,&quot;text&quot;:&quot;output&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:591,&quot;character&quot;:31,&quot;text&quot;:&quot;n&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:595,&quot;character&quot;:31,&quot;text&quot;:&quot;s&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:596,&quot;character&quot;:15,&quot;text&quot;:&quot;s&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:596,&quot;character&quot;:32,&quot;text&quot;:&quot;s&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:596,&quot;character&quot;:34,&quot;text&quot;:&quot;s&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:596,&quot;character&quot;:36,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:599,&quot;character&quot;:10,&quot;text&quot;:&quot;language&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:599,&quot;character&quot;:19,&quot;text&quot;:&quot;types&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:600,&quot;character&quot;:20,&quot;text&quot;:&quot;untypedExpression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:600,&quot;character&quot;:38,&quot;text&quot;:&quot;top_operator_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:601,&quot;character&quot;:10,&quot;text&quot;:&quot;untypedExpression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:601,&quot;character&quot;:28,&quot;text&quot;:&quot;top_kind_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:602,&quot;character&quot;:10,&quot;text&quot;:&quot;topType&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:604,&quot;character&quot;:10,&quot;text&quot;:&quot;operator&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:604,&quot;character&quot;:20,&quot;text&quot;:&quot;untypedExpression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:604,&quot;character&quot;:38,&quot;text&quot;:&quot;top_operator_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:605,&quot;character&quot;:10,&quot;text&quot;:&quot;expected_type&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:605,&quot;character&quot;:25,&quot;text&quot;:&quot;topType&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:610,&quot;character&quot;:10,&quot;text&quot;:&quot;language&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:610,&quot;character&quot;:19,&quot;text&quot;:&quot;types&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:611,&quot;character&quot;:20,&quot;text&quot;:&quot;untypedExpression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:611,&quot;character&quot;:38,&quot;text&quot;:&quot;top_operator_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:612,&quot;character&quot;:10,&quot;text&quot;:&quot;untypedExpression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:612,&quot;character&quot;:28,&quot;text&quot;:&quot;top_kind_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:613,&quot;character&quot;:10,&quot;text&quot;:&quot;topType&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:615,&quot;character&quot;:10,&quot;text&quot;:&quot;operator&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:615,&quot;character&quot;:20,&quot;text&quot;:&quot;untypedExpression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:615,&quot;character&quot;:38,&quot;text&quot;:&quot;top_operator_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:616,&quot;character&quot;:10,&quot;text&quot;:&quot;expected_type&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:616,&quot;character&quot;:25,&quot;text&quot;:&quot;topType&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:623,&quot;character&quot;:12,&quot;text&quot;:&quot;argumentTypes&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:624,&quot;character&quot;:10,&quot;text&quot;:&quot;typingRule&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:624,&quot;character&quot;:21,&quot;text&quot;:&quot;arguments&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:624,&quot;character&quot;:32,&quot;text&quot;:&quot;untypedExpression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:624,&quot;character&quot;:50,&quot;text&quot;:&quot;arguments&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:624,&quot;character&quot;:60,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:626,&quot;character&quot;:8,&quot;text&quot;:&quot;err&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:626,&quot;character&quot;:12,&quot;text&quot;:&quot;parameters&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:626,&quot;character&quot;:23,&quot;text&quot;:&quot;operator&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:626,&quot;character&quot;:34,&quot;text&quot;:&quot;untypedExpression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:626,&quot;character&quot;:52,&quot;text&quot;:&quot;top_operator_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:627,&quot;character&quot;:8,&quot;text&quot;:&quot;err&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:627,&quot;character&quot;:12,&quot;text&quot;:&quot;parameters&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:627,&quot;character&quot;:23,&quot;text&quot;:&quot;input_category&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:628,&quot;character&quot;:8,&quot;text&quot;:&quot;err&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:628,&quot;character&quot;:12,&quot;text&quot;:&quot;parameters&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:628,&quot;character&quot;:23,&quot;text&quot;:&quot;amount_typed&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:629,&quot;character&quot;:14,&quot;text&quot;:&quot;err&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:625,&quot;character&quot;:15,&quot;text&quot;:&quot;err&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:633,&quot;character&quot;:12,&quot;text&quot;:&quot;dummyTypes&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:634,&quot;character&quot;:10,&quot;text&quot;:&quot;typingRule&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:634,&quot;character&quot;:21,&quot;text&quot;:&quot;dummies&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:634,&quot;character&quot;:30,&quot;text&quot;:&quot;untypedExpression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:634,&quot;character&quot;:48,&quot;text&quot;:&quot;dummies&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:634,&quot;character&quot;:56,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:636,&quot;character&quot;:8,&quot;text&quot;:&quot;err&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:636,&quot;character&quot;:12,&quot;text&quot;:&quot;parameters&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:636,&quot;character&quot;:23,&quot;text&quot;:&quot;operator&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:636,&quot;character&quot;:34,&quot;text&quot;:&quot;untypedExpression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:636,&quot;character&quot;:52,&quot;text&quot;:&quot;top_operator_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:637,&quot;character&quot;:8,&quot;text&quot;:&quot;err&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:637,&quot;character&quot;:12,&quot;text&quot;:&quot;parameters&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:637,&quot;character&quot;:23,&quot;text&quot;:&quot;input_category&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:638,&quot;character&quot;:8,&quot;text&quot;:&quot;err&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:638,&quot;character&quot;:12,&quot;text&quot;:&quot;parameters&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:638,&quot;character&quot;:23,&quot;text&quot;:&quot;amount_typed&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:639,&quot;character&quot;:14,&quot;text&quot;:&quot;err&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:635,&quot;character&quot;:15,&quot;text&quot;:&quot;err&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:642,&quot;character&quot;:22,&quot;text&quot;:&quot;operators&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:643,&quot;character&quot;:32,&quot;text&quot;:&quot;operators&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:646,&quot;character&quot;:38,&quot;text&quot;:&quot;types&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:647,&quot;character&quot;:14,&quot;text&quot;:&quot;decoratedTypes&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:648,&quot;character&quot;:30,&quot;text&quot;:&quot;types&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:648,&quot;character&quot;:36,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:649,&quot;character&quot;:12,&quot;text&quot;:&quot;decoratedTypes&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:650,&quot;character&quot;:14,&quot;text&quot;:&quot;type&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:650,&quot;character&quot;:20,&quot;text&quot;:&quot;types&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:654,&quot;character&quot;:17,&quot;text&quot;:&quot;decoratedTypes&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:657,&quot;character&quot;:25,&quot;text&quot;:&quot;untypedExpression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:657,&quot;character&quot;:43,&quot;text&quot;:&quot;top_operator_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:658,&quot;character&quot;:10,&quot;text&quot;:&quot;kind&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:658,&quot;character&quot;:16,&quot;text&quot;:&quot;untypedExpression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:658,&quot;character&quot;:34,&quot;text&quot;:&quot;top_kind_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:660,&quot;character&quot;:12,&quot;text&quot;:&quot;arguments&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:660,&quot;character&quot;:38,&quot;text&quot;:&quot;argumentTypes&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:661,&quot;character&quot;:12,&quot;text&quot;:&quot;dummies&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:661,&quot;character&quot;:36,&quot;text&quot;:&quot;dummyTypes&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:662,&quot;character&quot;:12,&quot;text&quot;:&quot;output&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:662,&quot;character&quot;:20,&quot;text&quot;:&quot;topType&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:667,&quot;character&quot;:26,&quot;text&quot;:&quot;untypedExpression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:667,&quot;character&quot;:44,&quot;text&quot;:&quot;dummies&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:667,&quot;character&quot;:52,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:670,&quot;character&quot;:14,&quot;text&quot;:&quot;untypedExpression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:670,&quot;character&quot;:32,&quot;text&quot;:&quot;dummies&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:670,&quot;character&quot;:43,&quot;text&quot;:&quot;top_operator_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:672,&quot;character&quot;:12,&quot;text&quot;:&quot;dummy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:672,&quot;character&quot;:19,&quot;text&quot;:&quot;untypedExpression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:672,&quot;character&quot;:37,&quot;text&quot;:&quot;dummies&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:673,&quot;character&quot;:12,&quot;text&quot;:&quot;expression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:673,&quot;character&quot;:24,&quot;text&quot;:&quot;untypedExpression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:676,&quot;character&quot;:19,&quot;text&quot;:&quot;untypedExpression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:676,&quot;character&quot;:37,&quot;text&quot;:&quot;dummies&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:676,&quot;character&quot;:48,&quot;text&quot;:&quot;top_kind_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:679,&quot;character&quot;:12,&quot;text&quot;:&quot;dummy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:679,&quot;character&quot;:19,&quot;text&quot;:&quot;untypedExpression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:679,&quot;character&quot;:37,&quot;text&quot;:&quot;dummies&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:680,&quot;character&quot;:12,&quot;text&quot;:&quot;expression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:680,&quot;character&quot;:24,&quot;text&quot;:&quot;untypedExpression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:687,&quot;character&quot;:8,&quot;text&quot;:&quot;untypedExpression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:687,&quot;character&quot;:26,&quot;text&quot;:&quot;dummies&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:687,&quot;character&quot;:34,&quot;text&quot;:&quot;concat&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:687,&quot;character&quot;:41,&quot;text&quot;:&quot;untypedExpression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:687,&quot;character&quot;:59,&quot;text&quot;:&quot;arguments&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:688,&quot;character&quot;:8,&quot;text&quot;:&quot;dummyTypes&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:688,&quot;character&quot;:26,&quot;text&quot;:&quot;argumentTypes&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:690,&quot;character&quot;:10,&quot;text&quot;:&quot;kinds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:690,&quot;character&quot;:17,&quot;text&quot;:&quot;language&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:690,&quot;character&quot;:26,&quot;text&quot;:&quot;kinds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:691,&quot;character&quot;:10,&quot;text&quot;:&quot;types&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:691,&quot;character&quot;:17,&quot;text&quot;:&quot;language&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:691,&quot;character&quot;:26,&quot;text&quot;:&quot;types&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:693,&quot;character&quot;:8,&quot;text&quot;:&quot;untypedExpression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:693,&quot;character&quot;:26,&quot;text&quot;:&quot;dummies&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:693,&quot;character&quot;:34,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:697,&quot;character&quot;:9,&quot;text&quot;:&quot;operators&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:697,&quot;character&quot;:34,&quot;text&quot;:&quot;untypedExpression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:697,&quot;character&quot;:52,&quot;text&quot;:&quot;top_operator_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:698,&quot;character&quot;:36,&quot;text&quot;:&quot;untypedExpression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:698,&quot;character&quot;:54,&quot;text&quot;:&quot;top_kind_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:700,&quot;character&quot;:10,&quot;text&quot;:&quot;operator&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:700,&quot;character&quot;:20,&quot;text&quot;:&quot;untypedExpression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:700,&quot;character&quot;:38,&quot;text&quot;:&quot;top_operator_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:707,&quot;character&quot;:8,&quot;text&quot;:&quot;typingRules&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:708,&quot;character&quot;:6,&quot;text&quot;:&quot;language&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:708,&quot;character&quot;:15,&quot;text&quot;:&quot;kinds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:708,&quot;character&quot;:21,&quot;text&quot;:&quot;untypedExpression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:708,&quot;character&quot;:39,&quot;text&quot;:&quot;top_kind_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:708,&quot;character&quot;:54,&quot;text&quot;:&quot;typing&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:709,&quot;character&quot;:6,&quot;text&quot;:&quot;operators&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:709,&quot;character&quot;:16,&quot;text&quot;:&quot;untypedExpression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:709,&quot;character&quot;:34,&quot;text&quot;:&quot;top_operator_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:709,&quot;character&quot;:53,&quot;text&quot;:&quot;typing&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:711,&quot;character&quot;:8,&quot;text&quot;:&quot;results&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:712,&quot;character&quot;:24,&quot;text&quot;:&quot;possibleTopTypes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:712,&quot;character&quot;:41,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:713,&quot;character&quot;:26,&quot;text&quot;:&quot;typingRules&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:713,&quot;character&quot;:38,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:715,&quot;character&quot;:14,&quot;text&quot;:&quot;newAttempts&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:715,&quot;character&quot;:43,&quot;text&quot;:&quot;possibleTopTypes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:715,&quot;character&quot;:64,&quot;text&quot;:&quot;typingRules&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:716,&quot;character&quot;:30,&quot;text&quot;:&quot;newAttempts&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:717,&quot;character&quot;:16,&quot;text&quot;:&quot;typedDummies&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:718,&quot;character&quot;:32,&quot;text&quot;:&quot;untypedExpression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:718,&quot;character&quot;:50,&quot;text&quot;:&quot;dummies&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:718,&quot;character&quot;:58,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:719,&quot;character&quot;:14,&quot;text&quot;:&quot;typedDummies&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:719,&quot;character&quot;:32,&quot;text&quot;:&quot;newAttempts&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:719,&quot;character&quot;:47,&quot;text&quot;:&quot;typedArray&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:722,&quot;character&quot;:19,&quot;text&quot;:&quot;operators&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:723,&quot;character&quot;:16,&quot;text&quot;:&quot;untypedExpression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:723,&quot;character&quot;:34,&quot;text&quot;:&quot;dummies&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:723,&quot;character&quot;:45,&quot;text&quot;:&quot;top_operator_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:724,&quot;character&quot;:23,&quot;text&quot;:&quot;newAttempts&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:724,&quot;character&quot;:38,&quot;text&quot;:&quot;operators&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:725,&quot;character&quot;:18,&quot;text&quot;:&quot;untypedExpression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:725,&quot;character&quot;:36,&quot;text&quot;:&quot;dummies&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:725,&quot;character&quot;:47,&quot;text&quot;:&quot;top_operator_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:728,&quot;character&quot;:16,&quot;text&quot;:&quot;typedArguments&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:729,&quot;character&quot;:21,&quot;text&quot;:&quot;m&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:729,&quot;character&quot;:25,&quot;text&quot;:&quot;untypedExpression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:729,&quot;character&quot;:43,&quot;text&quot;:&quot;dummies&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:729,&quot;character&quot;:51,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:730,&quot;character&quot;:14,&quot;text&quot;:&quot;m&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:730,&quot;character&quot;:18,&quot;text&quot;:&quot;untypedExpression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:730,&quot;character&quot;:36,&quot;text&quot;:&quot;dummies&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:730,&quot;character&quot;:44,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:731,&quot;character&quot;:21,&quot;text&quot;:&quot;untypedExpression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:731,&quot;character&quot;:39,&quot;text&quot;:&quot;arguments&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:731,&quot;character&quot;:49,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:732,&quot;character&quot;:14,&quot;text&quot;:&quot;m&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:733,&quot;character&quot;:14,&quot;text&quot;:&quot;typedArguments&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:733,&quot;character&quot;:34,&quot;text&quot;:&quot;newAttempts&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:733,&quot;character&quot;:49,&quot;text&quot;:&quot;typedArray&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:733,&quot;character&quot;:60,&quot;text&quot;:&quot;m&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:736,&quot;character&quot;:12,&quot;text&quot;:&quot;results&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:738,&quot;character&quot;:16,&quot;text&quot;:&quot;top_operator_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:738,&quot;character&quot;:35,&quot;text&quot;:&quot;untypedExpression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:738,&quot;character&quot;:53,&quot;text&quot;:&quot;top_operator_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:739,&quot;character&quot;:16,&quot;text&quot;:&quot;top_kind_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:739,&quot;character&quot;:31,&quot;text&quot;:&quot;untypedExpression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:739,&quot;character&quot;:49,&quot;text&quot;:&quot;top_kind_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:740,&quot;character&quot;:16,&quot;text&quot;:&quot;arguments&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:740,&quot;character&quot;:27,&quot;text&quot;:&quot;typedArguments&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:741,&quot;character&quot;:16,&quot;text&quot;:&quot;dummies&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:741,&quot;character&quot;:25,&quot;text&quot;:&quot;typedDummies&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:742,&quot;character&quot;:16,&quot;text&quot;:&quot;type&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:742,&quot;character&quot;:22,&quot;text&quot;:&quot;possibleTopTypes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:744,&quot;character&quot;:14,&quot;text&quot;:&quot;operators&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:744,&quot;character&quot;:25,&quot;text&quot;:&quot;newAttempts&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:744,&quot;character&quot;:40,&quot;text&quot;:&quot;operators&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:748,&quot;character&quot;:14,&quot;text&quot;:&quot;bestAttemptSoFar&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:749,&quot;character&quot;:15,&quot;text&quot;:&quot;bestAttemptSoFar&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:750,&quot;character&quot;:18,&quot;text&quot;:&quot;bestAttemptSoFar&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:752,&quot;character&quot;:14,&quot;text&quot;:&quot;bestAttemptSoFar&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:754,&quot;character&quot;:16,&quot;text&quot;:&quot;err&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:754,&quot;character&quot;:20,&quot;text&quot;:&quot;parameters&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:754,&quot;character&quot;:31,&quot;text&quot;:&quot;amount_typed&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:755,&quot;character&quot;:16,&quot;text&quot;:&quot;bestAttemptSoFar&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:755,&quot;character&quot;:33,&quot;text&quot;:&quot;parameters&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:755,&quot;character&quot;:44,&quot;text&quot;:&quot;amount_typed&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:756,&quot;character&quot;:16,&quot;text&quot;:&quot;bestAttemptSoFar&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:756,&quot;character&quot;:35,&quot;text&quot;:&quot;err&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:747,&quot;character&quot;:17,&quot;text&quot;:&quot;err&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:761,&quot;character&quot;:8,&quot;text&quot;:&quot;results&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:762,&quot;character&quot;:13,&quot;text&quot;:&quot;results&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:764,&quot;character&quot;:12,&quot;text&quot;:&quot;bestAttemptSoFar&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:783,&quot;character&quot;:6,&quot;text&quot;:&quot;untypedArray&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:783,&quot;character&quot;:20,&quot;text&quot;:&quot;topTypes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:783,&quot;character&quot;:30,&quot;text&quot;:&quot;language&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:786,&quot;character&quot;:8,&quot;text&quot;:&quot;partiallyTypedArrays&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:788,&quot;character&quot;:20,&quot;text&quot;:&quot;language&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:788,&quot;character&quot;:29,&quot;text&quot;:&quot;operators&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:789,&quot;character&quot;:45,&quot;text&quot;:&quot;language&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:789,&quot;character&quot;:54,&quot;text&quot;:&quot;operators&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:791,&quot;character&quot;:25,&quot;text&quot;:&quot;untypedArray&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:791,&quot;character&quot;:38,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:792,&quot;character&quot;:6,&quot;text&quot;:&quot;partiallyTypedArrays&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:796,&quot;character&quot;:24,&quot;text&quot;:&quot;untypedArray&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:796,&quot;character&quot;:37,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:798,&quot;character&quot;:10,&quot;text&quot;:&quot;partiallyTypedArrays&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:802,&quot;character&quot;:26,&quot;text&quot;:&quot;partiallyTypedArrays&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:808,&quot;character&quot;:14,&quot;text&quot;:&quot;newResults&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:809,&quot;character&quot;:12,&quot;text&quot;:&quot;untypedArray&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:809,&quot;character&quot;:30,&quot;text&quot;:&quot;topTypes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:811,&quot;character&quot;:14,&quot;text&quot;:&quot;kinds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:811,&quot;character&quot;:21,&quot;text&quot;:&quot;language&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:811,&quot;character&quot;:30,&quot;text&quot;:&quot;kinds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:812,&quot;character&quot;:14,&quot;text&quot;:&quot;types&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:812,&quot;character&quot;:21,&quot;text&quot;:&quot;language&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:812,&quot;character&quot;:30,&quot;text&quot;:&quot;types&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:814,&quot;character&quot;:30,&quot;text&quot;:&quot;newResults&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:815,&quot;character&quot;:12,&quot;text&quot;:&quot;partiallyTypedArrays&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:816,&quot;character&quot;:14,&quot;text&quot;:&quot;partiallyTypedArrays&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:817,&quot;character&quot;:16,&quot;text&quot;:&quot;newResults&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:817,&quot;character&quot;:30,&quot;text&quot;:&quot;typedExpression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:818,&quot;character&quot;:50,&quot;text&quot;:&quot;newResults&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:818,&quot;character&quot;:64,&quot;text&quot;:&quot;operators&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:821,&quot;character&quot;:15,&quot;text&quot;:&quot;err&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:822,&quot;character&quot;:18,&quot;text&quot;:&quot;err&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:824,&quot;character&quot;:39,&quot;text&quot;:&quot;err&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:824,&quot;character&quot;:43,&quot;text&quot;:&quot;parameters&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:824,&quot;character&quot;:54,&quot;text&quot;:&quot;amount_typed&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:825,&quot;character&quot;:14,&quot;text&quot;:&quot;bestAttemptSoFar&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:827,&quot;character&quot;:29,&quot;text&quot;:&quot;bestAttemptSoFar&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:827,&quot;character&quot;:46,&quot;text&quot;:&quot;parameters&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:827,&quot;character&quot;:57,&quot;text&quot;:&quot;amount_typed&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:828,&quot;character&quot;:12,&quot;text&quot;:&quot;err&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:828,&quot;character&quot;:16,&quot;text&quot;:&quot;parameters&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:828,&quot;character&quot;:27,&quot;text&quot;:&quot;amount_typed&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:829,&quot;character&quot;:16,&quot;text&quot;:&quot;bestAttemptSoFar&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:829,&quot;character&quot;:35,&quot;text&quot;:&quot;err&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:820,&quot;character&quot;:17,&quot;text&quot;:&quot;err&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:834,&quot;character&quot;:8,&quot;text&quot;:&quot;fullyTypedArrays&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:834,&quot;character&quot;:27,&quot;text&quot;:&quot;partiallyTypedArrays&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:834,&quot;character&quot;:48,&quot;text&quot;:&quot;untypedArray&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:834,&quot;character&quot;:61,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:836,&quot;character&quot;:6,&quot;text&quot;:&quot;untypedArray&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:836,&quot;character&quot;:19,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:837,&quot;character&quot;:8,&quot;text&quot;:&quot;fullyTypedArrays&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:838,&quot;character&quot;:10,&quot;text&quot;:&quot;result&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:839,&quot;character&quot;:26,&quot;text&quot;:&quot;fullyTypedArrays&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:840,&quot;character&quot;:8,&quot;text&quot;:&quot;result&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:841,&quot;character&quot;:10,&quot;text&quot;:&quot;typedArray&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:841,&quot;character&quot;:22,&quot;text&quot;:&quot;fullyTypedArrays&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:845,&quot;character&quot;:13,&quot;text&quot;:&quot;result&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:847,&quot;character&quot;:12,&quot;text&quot;:&quot;bestAttemptSoFar&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:854,&quot;character&quot;:42,&quot;text&quot;:&quot;expression1&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:854,&quot;character&quot;:55,&quot;text&quot;:&quot;expression2&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:855,&quot;character&quot;:8,&quot;text&quot;:&quot;expression1&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:855,&quot;character&quot;:20,&quot;text&quot;:&quot;top_kind_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:855,&quot;character&quot;:38,&quot;text&quot;:&quot;expression2&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:855,&quot;character&quot;:50,&quot;text&quot;:&quot;top_kind_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:856,&quot;character&quot;:8,&quot;text&quot;:&quot;expression1&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:856,&quot;character&quot;:20,&quot;text&quot;:&quot;top_operator_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:856,&quot;character&quot;:42,&quot;text&quot;:&quot;expression2&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:856,&quot;character&quot;:54,&quot;text&quot;:&quot;top_operator_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:857,&quot;character&quot;:8,&quot;text&quot;:&quot;expression1&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:857,&quot;character&quot;:20,&quot;text&quot;:&quot;arguments&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:857,&quot;character&quot;:30,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:857,&quot;character&quot;:41,&quot;text&quot;:&quot;expression2&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:857,&quot;character&quot;:53,&quot;text&quot;:&quot;arguments&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:857,&quot;character&quot;:63,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:858,&quot;character&quot;:8,&quot;text&quot;:&quot;expression1&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:858,&quot;character&quot;:20,&quot;text&quot;:&quot;dummies&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:858,&quot;character&quot;:28,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:858,&quot;character&quot;:39,&quot;text&quot;:&quot;expression2&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:858,&quot;character&quot;:51,&quot;text&quot;:&quot;dummies&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:858,&quot;character&quot;:59,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:861,&quot;character&quot;:8,&quot;text&quot;:&quot;expression1&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:862,&quot;character&quot;:10,&quot;text&quot;:&quot;expression1&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:862,&quot;character&quot;:22,&quot;text&quot;:&quot;type&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:862,&quot;character&quot;:31,&quot;text&quot;:&quot;expression2&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:862,&quot;character&quot;:43,&quot;text&quot;:&quot;type&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:867,&quot;character&quot;:10,&quot;text&quot;:&quot;expression1&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:867,&quot;character&quot;:22,&quot;text&quot;:&quot;arguments&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:867,&quot;character&quot;:32,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:867,&quot;character&quot;:41,&quot;text&quot;:&quot;expression1&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:867,&quot;character&quot;:53,&quot;text&quot;:&quot;dummies&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:867,&quot;character&quot;:61,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:869,&quot;character&quot;:9,&quot;text&quot;:&quot;expression1&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:869,&quot;character&quot;:21,&quot;text&quot;:&quot;arguments&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:869,&quot;character&quot;:31,&quot;text&quot;:&quot;concat&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:869,&quot;character&quot;:38,&quot;text&quot;:&quot;expression1&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:869,&quot;character&quot;:50,&quot;text&quot;:&quot;dummies&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:870,&quot;character&quot;:9,&quot;text&quot;:&quot;expression2&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:870,&quot;character&quot;:21,&quot;text&quot;:&quot;arguments&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:870,&quot;character&quot;:31,&quot;text&quot;:&quot;concat&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:870,&quot;character&quot;:38,&quot;text&quot;:&quot;expression2&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:870,&quot;character&quot;:50,&quot;text&quot;:&quot;dummies&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:877,&quot;character&quot;:40,&quot;text&quot;:&quot;expression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:877,&quot;character&quot;:52,&quot;text&quot;:&quot;set&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:878,&quot;character&quot;:24,&quot;text&quot;:&quot;set&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:878,&quot;character&quot;:28,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:879,&quot;character&quot;:35,&quot;text&quot;:&quot;expression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:879,&quot;character&quot;:47,&quot;text&quot;:&quot;set&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:886,&quot;character&quot;:48,&quot;text&quot;:&quot;set1&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:886,&quot;character&quot;:54,&quot;text&quot;:&quot;set2&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:887,&quot;character&quot;:24,&quot;text&quot;:&quot;set1&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:887,&quot;character&quot;:29,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:888,&quot;character&quot;:34,&quot;text&quot;:&quot;set1&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:888,&quot;character&quot;:43,&quot;text&quot;:&quot;set2&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:892,&quot;character&quot;:24,&quot;text&quot;:&quot;set2&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:892,&quot;character&quot;:29,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:893,&quot;character&quot;:34,&quot;text&quot;:&quot;set2&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:893,&quot;character&quot;:43,&quot;text&quot;:&quot;set1&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:903,&quot;character&quot;:44,&quot;text&quot;:&quot;expression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:903,&quot;character&quot;:56,&quot;text&quot;:&quot;kinds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:904,&quot;character&quot;:8,&quot;text&quot;:&quot;output&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:905,&quot;character&quot;:6,&quot;text&quot;:&quot;expression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:905,&quot;character&quot;:17,&quot;text&quot;:&quot;arguments&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:905,&quot;character&quot;:27,&quot;text&quot;:&quot;concat&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:905,&quot;character&quot;:34,&quot;text&quot;:&quot;expression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:905,&quot;character&quot;:45,&quot;text&quot;:&quot;dummies&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:905,&quot;character&quot;:55,&quot;text&quot;:&quot;kinds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:907,&quot;character&quot;:6,&quot;text&quot;:&quot;output&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:907,&quot;character&quot;:21,&quot;text&quot;:&quot;expression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:907,&quot;character&quot;:32,&quot;text&quot;:&quot;top_operator_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:908,&quot;character&quot;:7,&quot;text&quot;:&quot;kinds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:908,&quot;character&quot;:25,&quot;text&quot;:&quot;kinds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:908,&quot;character&quot;:31,&quot;text&quot;:&quot;indexOf&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:908,&quot;character&quot;:39,&quot;text&quot;:&quot;expression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:908,&quot;character&quot;:50,&quot;text&quot;:&quot;top_kind_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:909,&quot;character&quot;:6,&quot;text&quot;:&quot;output&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:909,&quot;character&quot;:21,&quot;text&quot;:&quot;expression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:909,&quot;character&quot;:32,&quot;text&quot;:&quot;top_operator_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:910,&quot;character&quot;:6,&quot;text&quot;:&quot;output&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:913,&quot;character&quot;:49,&quot;text&quot;:&quot;array&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:913,&quot;character&quot;:56,&quot;text&quot;:&quot;kinds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:914,&quot;character&quot;:8,&quot;text&quot;:&quot;output&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:915,&quot;character&quot;:24,&quot;text&quot;:&quot;array&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:915,&quot;character&quot;:30,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:916,&quot;character&quot;:10,&quot;text&quot;:&quot;newOutput&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:916,&quot;character&quot;:49,&quot;text&quot;:&quot;array&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:916,&quot;character&quot;:59,&quot;text&quot;:&quot;kinds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:917,&quot;character&quot;:26,&quot;text&quot;:&quot;newOutput&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:918,&quot;character&quot;:12,&quot;text&quot;:&quot;output&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:918,&quot;character&quot;:27,&quot;text&quot;:&quot;newOutput&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:919,&quot;character&quot;:10,&quot;text&quot;:&quot;output&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:919,&quot;character&quot;:19,&quot;text&quot;:&quot;output&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:919,&quot;character&quot;:34,&quot;text&quot;:&quot;newOutput&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:923,&quot;character&quot;:11,&quot;text&quot;:&quot;output&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:929,&quot;character&quot;:38,&quot;text&quot;:&quot;expression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:929,&quot;character&quot;:50,&quot;text&quot;:&quot;operator&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:930,&quot;character&quot;:11,&quot;text&quot;:&quot;operator&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:930,&quot;character&quot;:24,&quot;text&quot;:&quot;expression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:930,&quot;character&quot;:35,&quot;text&quot;:&quot;top_operator_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:930,&quot;character&quot;:55,&quot;text&quot;:&quot;expression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:930,&quot;character&quot;:66,&quot;text&quot;:&quot;type&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:932,&quot;character&quot;:8,&quot;text&quot;:&quot;expression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:932,&quot;character&quot;:19,&quot;text&quot;:&quot;arguments&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:932,&quot;character&quot;:29,&quot;text&quot;:&quot;concat&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:932,&quot;character&quot;:36,&quot;text&quot;:&quot;expression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:932,&quot;character&quot;:47,&quot;text&quot;:&quot;dummies&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:932,&quot;character&quot;:57,&quot;text&quot;:&quot;operator&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:935,&quot;character&quot;:43,&quot;text&quot;:&quot;array&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:935,&quot;character&quot;:50,&quot;text&quot;:&quot;operator&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:936,&quot;character&quot;:24,&quot;text&quot;:&quot;array&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:936,&quot;character&quot;:30,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:938,&quot;character&quot;:36,&quot;text&quot;:&quot;array&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:938,&quot;character&quot;:46,&quot;text&quot;:&quot;operator&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:939,&quot;character&quot;:15,&quot;text&quot;:&quot;err&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:942,&quot;character&quot;:6,&quot;text&quot;:&quot;array&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:942,&quot;character&quot;:13,&quot;text&quot;:&quot;array&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:947,&quot;character&quot;:34,&quot;text&quot;:&quot;LHS&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:947,&quot;character&quot;:39,&quot;text&quot;:&quot;RHS&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:948,&quot;character&quot;:24,&quot;text&quot;:&quot;LHS&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:948,&quot;character&quot;:28,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:949,&quot;character&quot;:15,&quot;text&quot;:&quot;RHS&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:949,&quot;character&quot;:19,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:951,&quot;character&quot;:17,&quot;text&quot;:&quot;LHS&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:951,&quot;character&quot;:26,&quot;text&quot;:&quot;RHS&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:953,&quot;character&quot;:17,&quot;text&quot;:&quot;LHS&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:953,&quot;character&quot;:26,&quot;text&quot;:&quot;RHS&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:961,&quot;character&quot;:35,&quot;text&quot;:&quot;string&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:961,&quot;character&quot;:43,&quot;text&quot;:&quot;character&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:962,&quot;character&quot;:12,&quot;text&quot;:&quot;string&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:962,&quot;character&quot;:19,&quot;text&quot;:&quot;indexOf&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:962,&quot;character&quot;:27,&quot;text&quot;:&quot;character&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:966,&quot;character&quot;:44,&quot;text&quot;:&quot;string&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:966,&quot;character&quot;:52,&quot;text&quot;:&quot;array&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:967,&quot;character&quot;:24,&quot;text&quot;:&quot;array&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:967,&quot;character&quot;:30,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:968,&quot;character&quot;:10,&quot;text&quot;:&quot;string&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:968,&quot;character&quot;:17,&quot;text&quot;:&quot;indexOf&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/shared.ts&quot;,&quot;line&quot;:968,&quot;character&quot;:25,&quot;text&quot;:&quot;array&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:56 GMT</p>
+    </body>
+  </html>
+  

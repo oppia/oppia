@@ -1,0 +1,271 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>stats-reporting-backend-api.service.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/domain/exploration/stats-reporting-backend-api.service.ts</td><td class="">99.00%</td><td class="">100%</td><td class="">400</td><td class="">396</td><td class="">4</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Backend api service for stats reporting.
+ */
+
+import { downgradeInjectable } from &#x27;@angular/upgrade/static&#x27;;
+import { HttpClient } from &#x27;@angular/common/http&#x27;;
+import { Injectable } from &#x27;@angular/core&#x27;;
+
+import { ContextService } from &#x27;services/context.service&#x27;;
+import { ExplorationPlayerConstants } from
+  &#x27;pages/exploration-player-page/exploration-player-page.constants&#x27;;
+import { UrlInterpolationService } from
+  &#x27;domain/utilities/url-interpolation.service&#x27;;
+
+interface SessionStateStats {
+  &#x27;total_answers_count&#x27;: number;
+  &#x27;useful_feedback_count&#x27;: number;
+  &#x27;total_hit_count&#x27;: number;
+  &#x27;first_hit_count&#x27;: number;
+  &#x27;num_times_solution_viewed&#x27;: number;
+  &#x27;num_completions&#x27;: number;
+}
+
+export interface AggregatedStats {
+  &#x27;num_starts&#x27;: number;
+  &#x27;num_completions&#x27;: number;
+  &#x27;num_actual_starts&#x27;: number;
+  &#x27;state_stats_mapping&#x27;: {
+    [stateName: string]: SessionStateStats
+  };
+}
+
+@Injectable({
+  providedIn: &#x27;root&#x27;
+})
+export class StatsReportingBackendApiService {
+  constructor(
+    private contextService: ContextService,
+    private http: HttpClient,
+    private urlInterpolationService: UrlInterpolationService) {}
+
+  private getFullStatsUrl(
+      urlIdentifier: string, explorationId: string,
+      currentStateName: string, nextExpId: string,
+      previousStateName: string, nextStateName: string): string {
+    try {
+      return this.urlInterpolationService.interpolateUrl(
+        ExplorationPlayerConstants.STATS_REPORTING_URLS[urlIdentifier], {
+          exploration_id: explorationId
+        });
+    } catch (e) {
+      let additionalInfo = (
+        &#x27;\nUndefined exploration id error debug logs:&#x27; +
+        &#x27;\nThe event being recorded: &#x27; + urlIdentifier +
+        &#x27;\nExploration ID: &#x27; + this.contextService.getExplorationId()
+      );
+      if (currentStateName) {
+        additionalInfo += (
+          &#x27;\nCurrent State name: &#x27; + currentStateName);
+      }
+      if (nextExpId) {
+        additionalInfo += (
+          &#x27;\nRefresher exp id: &#x27; + nextExpId);
+      }
+      if (
+        previousStateName &amp;&amp;
+        nextStateName) {
+        additionalInfo += (
+          &#x27;\nOld State name: &#x27; + previousStateName +
+          &#x27;\nNew State name: &#x27; + nextStateName);
+      }
+      e.message += additionalInfo;
+      throw e;
+    }
+  }
+
+  async postsStatsAsync(
+      aggregatedStats: AggregatedStats, expVersion: number,
+      explorationId: string, currentStateName: string, nextExpId: string,
+      previousStateName: string, nextStateName: string): Promise&lt;Object&gt; {
+    return this.http.post(this.getFullStatsUrl(
+      &#x27;STATS_EVENTS&#x27;, explorationId, currentStateName, nextExpId,
+      previousStateName, nextStateName), {
+      aggregated_stats: aggregatedStats,
+      exp_version: expVersion
+    }).toPromise();
+  }
+
+  async recordExpStartedAsync(
+      params: Object, sessionId: string, stateName: string, expVersion: number,
+      explorationId: string, currentStateName: string, nextExpId: string,
+      previousStateName: string, nextStateName: string): Promise&lt;Object&gt; {
+    return this.http.post(this.getFullStatsUrl(
+      &#x27;EXPLORATION_STARTED&#x27;, explorationId, currentStateName, nextExpId,
+      previousStateName, nextStateName), {
+      params: params,
+      session_id: sessionId,
+      state_name: stateName,
+      version: expVersion
+    }).toPromise();
+  }
+
+  async recordStateHitAsync(
+      clientTimeSpentInSecs: number, expVersion: number, newStateName: string,
+      oldParams: Object, sessionId: string,
+      explorationId: string, currentStateName: string, nextExpId: string,
+      previousStateName: string, nextStateName: string): Promise&lt;Object&gt; {
+    return this.http.post(this.getFullStatsUrl(
+      &#x27;STATE_HIT&#x27;, explorationId, currentStateName, nextExpId,
+      previousStateName, nextStateName), {
+      client_time_spent_in_secs: clientTimeSpentInSecs,
+      exploration_version: expVersion,
+      new_state_name: newStateName,
+      old_params: oldParams,
+      session_id: sessionId,
+    }).toPromise();
+  }
+
+  async recordExplorationActuallyStartedAsync(
+      expVersion: number, stateName: string,
+      sessionId: string, explorationId: string, currentStateName: string,
+      nextExpId: string, previousStateName: string,
+      nextStateName: string): Promise&lt;Object&gt; {
+    return this.http.post(this.getFullStatsUrl(
+      &#x27;EXPLORATION_ACTUALLY_STARTED&#x27;, explorationId, currentStateName,
+      nextExpId, previousStateName, nextStateName), {
+      exploration_version: expVersion,
+      state_name: stateName,
+      session_id: sessionId
+    }).toPromise();
+  }
+
+  async recordSolutionHitAsync(
+      timeSpentInStateSecs: number, expVersion: number, stateName: string,
+      sessionId: string, explorationId: string, currentStateName: string,
+      nextExpId: string, previousStateName: string,
+      nextStateName: string): Promise&lt;Object&gt; {
+    return this.http.post(this.getFullStatsUrl(
+      &#x27;SOLUTION_HIT&#x27;, explorationId, currentStateName, nextExpId,
+      previousStateName, nextStateName), {
+      exploration_version: expVersion,
+      state_name: stateName,
+      session_id: sessionId,
+      time_spent_in_state_secs: timeSpentInStateSecs
+    }).toPromise();
+  }
+
+  async recordLeaveForRefresherExpAsync(
+      expVersion: number, refresherExpId: string, stateName: string,
+      sessionId: string, timeSpentInStateSecs: number,
+      explorationId: string, currentStateName: string,
+      nextExpId: string, previousStateName: string,
+      nextStateName: string): Promise&lt;Object&gt; {
+    return this.http.post(this.getFullStatsUrl(
+      &#x27;LEAVE_FOR_REFRESHER_EXP&#x27;, explorationId, currentStateName, nextExpId,
+      previousStateName, nextStateName), {
+      exploration_version: expVersion,
+      refresher_exp_id: refresherExpId,
+      state_name: stateName,
+      session_id: sessionId,
+      time_spent_in_state_secs: timeSpentInStateSecs
+    }).toPromise();
+  }
+
+  async recordStateCompletedAsync(
+      expVersion: number, sessionId: string, stateName: string,
+      timeSpentInStateSecs: number, explorationId: string,
+      currentStateName: string, nextExpId: string, previousStateName: string,
+      nextStateName: string): Promise&lt;Object&gt; {
+    return this.http.post(this.getFullStatsUrl(
+      &#x27;STATE_COMPLETED&#x27;, explorationId, currentStateName, nextExpId,
+      previousStateName, nextStateName), {
+      exp_version: expVersion,
+      state_name: stateName,
+      session_id: sessionId,
+      time_spent_in_state_secs: timeSpentInStateSecs
+    }).toPromise();
+  }
+
+  async recordExplorationCompletedAsync(
+      clientTimeSpentInSecs: number, collectionId: string, params: Object,
+      sessionId: string, stateName: string, version: number,
+      explorationId: string, currentStateName: string, nextExpId: string,
+      previousStateName: string, nextStateName: string): Promise&lt;Object&gt; {
+    return this.http.post(this.getFullStatsUrl(
+      &#x27;EXPLORATION_COMPLETED&#x27;, explorationId, currentStateName, nextExpId,
+      previousStateName, nextStateName), {
+      client_time_spent_in_secs: clientTimeSpentInSecs,
+      collection_id: collectionId,
+      params: params,
+      session_id: sessionId,
+      state_name: stateName,
+      version: version
+    }).toPromise();
+  }
+
+  async recordAnswerSubmittedAsync(
+      answer: string, params: Object, version: number, sessionId: string,
+      clientTimeSpentInSecs: number, oldStateName: string,
+      answerGroupIndex: number, ruleSpecIndex: number,
+      classificationCategorization: string,
+      explorationId: string, currentStateName: string, nextExpId: string,
+      previousStateName: string, nextStateName: string): Promise&lt;Object&gt; {
+    return this.http.post(this.getFullStatsUrl(
+      &#x27;ANSWER_SUBMITTED&#x27;, explorationId, currentStateName, nextExpId,
+      previousStateName, nextStateName), {
+      answer: answer,
+      params: params,
+      version: version,
+      session_id: sessionId,
+      client_time_spent_in_secs: clientTimeSpentInSecs,
+      old_state_name: oldStateName,
+      answer_group_index: answerGroupIndex,
+      rule_spec_index: ruleSpecIndex,
+      classification_categorization: classificationCategorization
+    }).toPromise();
+  }
+
+  async recordMaybeLeaveEventAsync(
+      clientTimeSpentInSecs: number, collectionId: string, params: Object,
+      sessionId: string, stateName: string, version: number,
+      explorationId: string, currentStateName: string, nextExpId: string,
+      previousStateName: string, nextStateName: string): Promise&lt;Object&gt; {
+    return this.http.post(this.getFullStatsUrl(
+      &#x27;EXPLORATION_MAYBE_LEFT&#x27;, explorationId, currentStateName, nextExpId,
+      previousStateName, nextStateName), {
+      client_time_spent_in_secs: clientTimeSpentInSecs,
+      collection_id: collectionId,
+      params: params,
+      session_id: sessionId,
+      state_name: stateName,
+      version: version
+    }).toPromise();
+  }
+}
+
+angular.module(&#x27;oppia&#x27;).factory(
+  &#x27;StatsReportingBackendApiService&#x27;,
+  downgradeInjectable(StatsReportingBackendApiService));
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/domain/exploration/stats-reporting-backend-api.service.ts&quot;,&quot;line&quot;:85,&quot;character&quot;:6,&quot;text&quot;:&quot;e&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/stats-reporting-backend-api.service.ts&quot;,&quot;line&quot;:85,&quot;character&quot;:8,&quot;text&quot;:&quot;message&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/stats-reporting-backend-api.service.ts&quot;,&quot;line&quot;:86,&quot;character&quot;:12,&quot;text&quot;:&quot;e&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/stats-reporting-backend-api.service.ts&quot;,&quot;line&quot;:64,&quot;character&quot;:13,&quot;text&quot;:&quot;e&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:55 GMT</p>
+    </body>
+  </html>
+  

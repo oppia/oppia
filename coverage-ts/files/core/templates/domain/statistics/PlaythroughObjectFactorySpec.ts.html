@@ -1,0 +1,287 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>PlaythroughObjectFactorySpec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">core/templates/domain/statistics/PlaythroughObjectFactorySpec.ts</td><td class="">100.00%</td><td class="">100%</td><td class="">250</td><td class="">250</td><td class="">0</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2018 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for the PlaythroughObjectFactory.
+ */
+
+import { TestBed } from &#x27;@angular/core/testing&#x27;;
+
+import { LearnerActionObjectFactory } from
+  &#x27;domain/statistics/LearnerActionObjectFactory&#x27;;
+import { PlaythroughObjectFactory } from
+  &#x27;domain/statistics/PlaythroughObjectFactory&#x27;;
+
+describe(&#x27;Playthrough Object Factory&#x27;, () =&gt; {
+  let laof: LearnerActionObjectFactory;
+  let pof: PlaythroughObjectFactory;
+
+  beforeEach(() =&gt; {
+    TestBed.configureTestingModule({
+      providers: [PlaythroughObjectFactory]
+    });
+
+    pof = TestBed.get(PlaythroughObjectFactory);
+    laof = TestBed.get(LearnerActionObjectFactory);
+  });
+
+  it(&#x27;should create a new playthrough&#x27;, () =&gt; {
+    let actions = [laof.createNewExplorationStartAction({
+      state_name: {
+        value: &#x27;state&#x27;
+      }
+    })];
+    let playthroughObject = pof.createNewEarlyQuitPlaythrough(
+      &#x27;expId1&#x27;, 1, {
+        state_name: {value: &#x27;state&#x27;},
+        time_spent_in_exp_in_msecs: {value: 30000},
+      }, actions);
+
+    expect(playthroughObject.expId).toEqual(&#x27;expId1&#x27;);
+    expect(playthroughObject.expVersion).toEqual(1);
+    expect(playthroughObject.issueType).toEqual(&#x27;EarlyQuit&#x27;);
+    expect(playthroughObject.issueCustomizationArgs).toEqual({
+      state_name: {value: &#x27;state&#x27;},
+      time_spent_in_exp_in_msecs: {value: 30000}
+    });
+    expect(playthroughObject.actions).toEqual(actions);
+  });
+
+  it(&#x27;should create same objects from backend dict and direct values.&#x27;, () =&gt; {
+    var playthroughDictObject = pof.createFromBackendDict({
+      exp_id: &#x27;expId1&#x27;,
+      exp_version: 1,
+      issue_type: &#x27;CyclicStateTransitions&#x27;,
+      issue_customization_args: {
+        state_names: {
+          value: [&#x27;state1&#x27;, &#x27;state2&#x27;]
+        }
+      },
+      actions: []
+    });
+
+    var playthroughObject = pof.createNewCyclicStateTransitionsPlaythrough(
+      &#x27;expId1&#x27;, 1, {
+        state_names: {
+          value: [&#x27;state1&#x27;, &#x27;state2&#x27;]
+        }
+      }, []);
+
+    expect(playthroughDictObject).toEqual(playthroughObject);
+  });
+
+  it(&#x27;should create a new playthrough from a backend dict&#x27;, () =&gt; {
+    let playthroughObject = pof.createFromBackendDict(
+      {
+        exp_id: &#x27;expId1&#x27;,
+        exp_version: 1,
+        issue_type: &#x27;EarlyQuit&#x27;,
+        issue_customization_args: {
+          state_name: {
+            value: &#x27;state&#x27;
+          },
+          time_spent_in_exp_in_msecs: {
+            value: 1.2
+          }
+        },
+        actions: [{
+          action_type: &#x27;AnswerSubmit&#x27;,
+          action_customization_args: {
+            state_name: {
+              value: &#x27;state&#x27;
+            },
+            dest_state_name: {
+              value: &#x27;dest_state&#x27;
+            },
+            interaction_id: {
+              value: &#x27;interaction_id&#x27;
+            },
+            submitted_answer: {
+              value: &#x27;answer&#x27;
+            },
+            feedback: {
+              value: &#x27;feedback&#x27;
+            },
+            time_spent_state_in_msecs: {
+              value: 2
+            }
+          },
+          schema_version: 1
+        }]
+      }
+    );
+
+    expect(playthroughObject.expId).toEqual(&#x27;expId1&#x27;);
+    expect(playthroughObject.expVersion).toEqual(1);
+    expect(playthroughObject.issueType).toEqual(&#x27;EarlyQuit&#x27;);
+    expect(playthroughObject.issueCustomizationArgs).toEqual({
+      state_name: {
+        value: &#x27;state&#x27;
+      },
+      time_spent_in_exp_in_msecs: {
+        value: 1.2
+      }
+    });
+    expect(playthroughObject.actions).toEqual(
+      [laof.createNewAnswerSubmitAction({
+        state_name: {
+          value: &#x27;state&#x27;
+        },
+        dest_state_name: {
+          value: &#x27;dest_state&#x27;
+        },
+        interaction_id: {
+          value: &#x27;interaction_id&#x27;
+        },
+        submitted_answer: {
+          value: &#x27;answer&#x27;
+        },
+        feedback: {
+          value: &#x27;feedback&#x27;
+        },
+        time_spent_state_in_msecs: {
+          value: 2
+        }
+      })]);
+  });
+
+  it(&#x27;should convert a playthrough to a backend dict&#x27;, () =&gt; {
+    let actions = [laof.createNewAnswerSubmitAction({
+      state_name: {
+        value: &#x27;state&#x27;
+      },
+      dest_state_name: {
+        value: &#x27;dest_state&#x27;
+      },
+      interaction_id: {
+        value: &#x27;interaction_id&#x27;
+      },
+      submitted_answer: {
+        value: &#x27;answer&#x27;
+      },
+      feedback: {
+        value: &#x27;feedback&#x27;
+      },
+      time_spent_state_in_msecs: {
+        value: 2
+      }
+    })];
+    let playthroughObject = pof.createNewEarlyQuitPlaythrough(
+      &#x27;expId1&#x27;, 1, {
+        state_name: {value: &#x27;state&#x27;},
+        time_spent_in_exp_in_msecs: {value: 30000}
+      }, actions);
+
+    let playthroughDict = playthroughObject.toBackendDict();
+    expect(playthroughDict).toEqual({
+      exp_id: &#x27;expId1&#x27;,
+      exp_version: 1,
+      issue_type: &#x27;EarlyQuit&#x27;,
+      issue_customization_args: {
+        state_name: {value: &#x27;state&#x27;},
+        time_spent_in_exp_in_msecs: {value: 30000}
+      },
+      actions: [{
+        action_type: &#x27;AnswerSubmit&#x27;,
+        action_customization_args: {
+          state_name: {
+            value: &#x27;state&#x27;
+          },
+          dest_state_name: {
+            value: &#x27;dest_state&#x27;
+          },
+          interaction_id: {
+            value: &#x27;interaction_id&#x27;
+          },
+          submitted_answer: {
+            value: &#x27;answer&#x27;
+          },
+          feedback: {
+            value: &#x27;feedback&#x27;
+          },
+          time_spent_state_in_msecs: {
+            value: 2
+          }
+        },
+        schema_version: 1
+      }]
+    });
+  });
+
+  it(&#x27;should throw error on invalid backend dict&#x27;, () =&gt; {
+    const playthroughDict = {
+      playthrough_id: &#x27;playthroughId1&#x27;,
+      exp_id: &#x27;expId1&#x27;,
+      exp_version: 1,
+      issue_type: &#x27;InvalidType&#x27;,
+      issue_customization_args: {
+        state_names: {
+          value: [&#x27;state1&#x27;, &#x27;state2&#x27;]
+        }
+      },
+      actions: []
+    };
+
+    // This throws &quot;Type &#x27;string&#x27; is not assignable to type
+    // &#x27;&quot;CyclicStateTransitions&quot;&#x27;.&quot;. We need to suppress this error because
+    // &#x27;playthroughDict&#x27; has an invalid value of &#x27;issue_type&#x27; property. We need
+    // to do that in order to test validations.
+    // @ts-expect-error
+    expect(() =&gt; pof.createFromBackendDict(playthroughDict)).toThrowError(
+      &#x27;Backend dict does not match any known issue type: &#x27; +
+      JSON.stringify(playthroughDict));
+  });
+
+  it(&#x27;should identify the problematic state&#x27;, () =&gt; {
+    let eqPlaythrough = pof.createNewEarlyQuitPlaythrough(
+      &#x27;expId1&#x27;, 1, {
+        state_name: {value: &#x27;state&#x27;},
+        time_spent_in_exp_in_msecs: {value: 30000},
+      }, []);
+    expect(eqPlaythrough.getStateNameWithIssue()).toEqual(&#x27;state&#x27;);
+
+    var misPlaythrough = pof.createNewMultipleIncorrectSubmissionsPlaythrough(
+      &#x27;expId1&#x27;, 1, {
+        state_name: {value: &#x27;state&#x27;},
+        num_times_answered_incorrectly: {value: 10},
+      }, []);
+    expect(misPlaythrough.getStateNameWithIssue()).toEqual(&#x27;state&#x27;);
+
+    var cstPlaythrough = pof.createNewCyclicStateTransitionsPlaythrough(
+      &#x27;expId1&#x27;, 1, {
+        state_names: {
+          value: [&#x27;state1&#x27;, &#x27;state2&#x27;]
+        }
+      }, []);
+    expect(cstPlaythrough.getStateNameWithIssue()).toEqual(&#x27;state2&#x27;);
+  });
+});
+</textarea><pre id="annotations" style="display:none">[]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:57 GMT</p>
+    </body>
+  </html>
+  

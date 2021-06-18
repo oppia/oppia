@@ -1,0 +1,251 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>SkillObjectFactorySpec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/domain/skill/SkillObjectFactorySpec.ts</td><td class="">90.72%</td><td class="">100%</td><td class="">334</td><td class="">303</td><td class="">31</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2018 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for SkillObjectFactory.
+ */
+
+import { TestBed } from &#x27;@angular/core/testing&#x27;;
+
+import { ConceptCardObjectFactory } from
+  &#x27;domain/skill/ConceptCardObjectFactory&#x27;;
+import { MisconceptionObjectFactory } from
+  &#x27;domain/skill/MisconceptionObjectFactory&#x27;;
+import { NormalizeWhitespacePipe } from
+  &#x27;filters/string-utility-filters/normalize-whitespace.pipe&#x27;;
+import { Rubric } from
+  &#x27;domain/skill/rubric.model&#x27;;
+import { SkillObjectFactory } from &#x27;domain/skill/SkillObjectFactory&#x27;;
+import { SubtitledHtml } from
+  &#x27;domain/exploration/subtitled-html.model&#x27;;
+import constants from &#x27;assets/constants&#x27;;
+
+describe(&#x27;Skill object factory&#x27;, () =&gt; {
+  let skillObjectFactory: SkillObjectFactory = null;
+  let conceptCardObjectFactory: ConceptCardObjectFactory = null;
+  let misconceptionObjectFactory: MisconceptionObjectFactory = null;
+  let example1 = null;
+  let example2 = null;
+  let misconceptionDict1 = null;
+  let misconceptionDict2 = null;
+  let rubricDict = null;
+  let skillContentsDict = null;
+  let skillDict = null;
+  let skillDifficulties = null;
+
+  beforeEach(() =&gt; {
+    TestBed.configureTestingModule({
+      providers: [
+        NormalizeWhitespacePipe,
+      ]
+    });
+    conceptCardObjectFactory = TestBed.get(ConceptCardObjectFactory);
+    misconceptionObjectFactory = TestBed.get(MisconceptionObjectFactory);
+    skillDifficulties = constants.SKILL_DIFFICULTIES;
+    skillObjectFactory = TestBed.get(SkillObjectFactory);
+    misconceptionDict1 = {
+      id: &#x27;2&#x27;,
+      name: &#x27;test name&#x27;,
+      notes: &#x27;test notes&#x27;,
+      feedback: &#x27;test feedback&#x27;,
+      must_be_addressed: true
+    };
+
+    misconceptionDict2 = {
+      id: &#x27;4&#x27;,
+      name: &#x27;test name&#x27;,
+      notes: &#x27;test notes&#x27;,
+      feedback: &#x27;test feedback&#x27;,
+      must_be_addressed: false
+    };
+
+    rubricDict = {
+      difficulty: skillDifficulties[0],
+      explanations: [&#x27;explanation&#x27;]
+    };
+
+    example1 = {
+      question: {
+        html: &#x27;worked example question 1&#x27;,
+        content_id: &#x27;worked_example_q_1&#x27;
+      },
+      explanation: {
+        html: &#x27;worked example explanation 1&#x27;,
+        content_id: &#x27;worked_example_e_1&#x27;
+      }
+    };
+    example2 = {
+      question: {
+        html: &#x27;worked example question 1&#x27;,
+        content_id: &#x27;worked_example_q_1&#x27;
+      },
+      explanation: {
+        html: &#x27;worked example explanation 1&#x27;,
+        content_id: &#x27;worked_example_e_1&#x27;
+      }
+    };
+
+
+    skillContentsDict = {
+      explanation: {
+        html: &#x27;test explanation&#x27;,
+        content_id: &#x27;explanation&#x27;,
+      },
+      worked_examples: [example1, example2],
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          explanation: {},
+          worked_example_1: {},
+          worked_example_2: {}
+        }
+      }
+    };
+    skillDict = {
+      id: &#x27;1&#x27;,
+      description: &#x27;test description&#x27;,
+      misconceptions: [misconceptionDict1, misconceptionDict2],
+      rubrics: [rubricDict],
+      skill_contents: skillContentsDict,
+      language_code: &#x27;en&#x27;,
+      version: 3,
+      next_misconception_id: 6,
+      superseding_skill_id: &#x27;2&#x27;,
+      all_questions_merged: false,
+      prerequisite_skill_ids: [&#x27;skill_1&#x27;]
+    };
+  });
+
+  it(&#x27;should create a new skill from a backend dictionary&#x27;, () =&gt; {
+    let skill = skillObjectFactory.createFromBackendDict(skillDict);
+    expect(skill.getId()).toEqual(&#x27;1&#x27;);
+    expect(skill.getDescription()).toEqual(&#x27;test description&#x27;);
+    expect(skill.getMisconceptions()).toEqual(
+      [misconceptionObjectFactory.createFromBackendDict(
+        misconceptionDict1),
+      misconceptionObjectFactory.createFromBackendDict(
+        misconceptionDict2)]);
+    expect(skill.getRubrics()).toEqual([
+      Rubric.createFromBackendDict(rubricDict)]);
+    expect(skill.getConceptCard()).toEqual(
+      conceptCardObjectFactory.createFromBackendDict(skillContentsDict));
+    expect(skill.getLanguageCode()).toEqual(&#x27;en&#x27;);
+    expect(skill.getVersion()).toEqual(3);
+    expect(skill.getSupersedingSkillId()).toEqual(&#x27;2&#x27;);
+    expect(skill.getAllQuestionsMerged()).toEqual(false);
+    expect(skill.getPrerequisiteSkillIds()).toEqual([&#x27;skill_1&#x27;]);
+  });
+
+  it(&#x27;should find misconception by id&#x27;, () =&gt; {
+    let skill = skillObjectFactory.createFromBackendDict(skillDict);
+    expect(skill.findMisconceptionById(&#x27;4&#x27;)).toEqual(
+      misconceptionObjectFactory.createFromBackendDict(misconceptionDict2));
+  });
+
+  it(&#x27;should delete a misconception given its id&#x27;, () =&gt; {
+    let skill = skillObjectFactory.createFromBackendDict(skillDict);
+    skill.deleteMisconception(&#x27;2&#x27;);
+    expect(skill.getMisconceptions()).toEqual(
+      [misconceptionObjectFactory.createFromBackendDict(
+        misconceptionDict2)]);
+  });
+
+  it(&#x27;should throw validation errors&#x27;, () =&gt; {
+    let skill = skillObjectFactory.createFromBackendDict(skillDict);
+    skill.getConceptCard().setExplanation(
+      SubtitledHtml.createDefault(&#x27;&#x27;, &#x27;review_material&#x27;));
+    expect(skill.getValidationIssues()).toEqual([
+      &#x27;There should be review material in the concept card.&#x27;,
+      &#x27;All 3 difficulties (Easy, Medium and Hard) should be addressed &#x27; +
+      &#x27;in rubrics.&#x27;
+    ]);
+  });
+
+  it(&#x27;should add/update a rubric given difficulty&#x27;, () =&gt; {
+    let skill = skillObjectFactory.createFromBackendDict(skillDict);
+    expect(skill.getRubrics()[0].getExplanations()).toEqual([&#x27;explanation&#x27;]);
+    expect(skill.getRubrics().length).toEqual(1);
+
+    skill.updateRubricForDifficulty(
+      skillDifficulties[0], [&#x27;new explanation 1&#x27;, &#x27;new explanation 2&#x27;]);
+    expect(skill.getRubrics()[0].getExplanations()).toEqual([
+      &#x27;new explanation 1&#x27;, &#x27;new explanation 2&#x27;]);
+
+    skill.updateRubricForDifficulty(skillDifficulties[1], [&#x27;explanation 2&#x27;]);
+    expect(skill.getRubrics().length).toEqual(2);
+    expect(skill.getRubrics()[1].getExplanations()).toEqual([&#x27;explanation 2&#x27;]);
+
+    expect(() =&gt; {
+      skill.updateRubricForDifficulty(&#x27;invalid difficulty&#x27;, [&#x27;explanation 2&#x27;]);
+    }).toThrowError(&#x27;Invalid difficulty value passed&#x27;);
+  });
+
+  it(&#x27;should get the correct next misconception id&#x27;, () =&gt; {
+    let skill = skillObjectFactory.createFromBackendDict(skillDict);
+    expect(skill.getNextMisconceptionId()).toEqual(6);
+    skill.deleteMisconception(&#x27;4&#x27;);
+    expect(skill.getNextMisconceptionId()).toEqual(6);
+
+    var misconceptionToAdd1 = misconceptionObjectFactory
+      .createFromBackendDict({
+        id: JSON.stringify(skill.getNextMisconceptionId()),
+        name: &#x27;test name&#x27;,
+        notes: &#x27;test notes&#x27;,
+        feedback: &#x27;test feedback&#x27;,
+        must_be_addressed: true
+      });
+
+    skill.appendMisconception(misconceptionToAdd1);
+    expect(skill.getNextMisconceptionId()).toEqual(7);
+    skill.deleteMisconception(&#x27;6&#x27;);
+    expect(skill.getNextMisconceptionId()).toEqual(7);
+  });
+
+  it(&#x27;should convert to a backend dictionary&#x27;, () =&gt; {
+    let skill = skillObjectFactory.createFromBackendDict(skillDict);
+    expect(skill.toBackendDict()).toEqual(skillDict);
+  });
+
+  it(&#x27;should be able to create an interstitial skill&#x27;, () =&gt; {
+    let skill = skillObjectFactory.createInterstitialSkill();
+    expect(skill.getId()).toEqual(null);
+    expect(skill.getDescription()).toEqual(&#x27;Skill description loading&#x27;);
+    expect(skill.getMisconceptions()).toEqual([]);
+    expect(skill.getRubrics()).toEqual([]);
+    expect(skill.getConceptCard()).toEqual(
+      conceptCardObjectFactory.createInterstitialConceptCard());
+    expect(skill.getLanguageCode()).toEqual(&#x27;en&#x27;);
+    expect(skill.getVersion()).toEqual(1);
+    expect(skill.getSupersedingSkillId()).toEqual(null);
+    expect(skill.getAllQuestionsMerged()).toEqual(false);
+    expect(skill.getPrerequisiteSkillIds()).toEqual([]);
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/domain/skill/SkillObjectFactorySpec.ts&quot;,&quot;line&quot;:37,&quot;character&quot;:6,&quot;text&quot;:&quot;example1&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/SkillObjectFactorySpec.ts&quot;,&quot;line&quot;:38,&quot;character&quot;:6,&quot;text&quot;:&quot;example2&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/SkillObjectFactorySpec.ts&quot;,&quot;line&quot;:39,&quot;character&quot;:6,&quot;text&quot;:&quot;misconceptionDict1&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/SkillObjectFactorySpec.ts&quot;,&quot;line&quot;:40,&quot;character&quot;:6,&quot;text&quot;:&quot;misconceptionDict2&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/SkillObjectFactorySpec.ts&quot;,&quot;line&quot;:41,&quot;character&quot;:6,&quot;text&quot;:&quot;rubricDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/SkillObjectFactorySpec.ts&quot;,&quot;line&quot;:42,&quot;character&quot;:6,&quot;text&quot;:&quot;skillContentsDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/SkillObjectFactorySpec.ts&quot;,&quot;line&quot;:43,&quot;character&quot;:6,&quot;text&quot;:&quot;skillDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/SkillObjectFactorySpec.ts&quot;,&quot;line&quot;:44,&quot;character&quot;:6,&quot;text&quot;:&quot;skillDifficulties&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/SkillObjectFactorySpec.ts&quot;,&quot;line&quot;:54,&quot;character&quot;:4,&quot;text&quot;:&quot;skillDifficulties&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/SkillObjectFactorySpec.ts&quot;,&quot;line&quot;:56,&quot;character&quot;:4,&quot;text&quot;:&quot;misconceptionDict1&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/SkillObjectFactorySpec.ts&quot;,&quot;line&quot;:64,&quot;character&quot;:4,&quot;text&quot;:&quot;misconceptionDict2&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/SkillObjectFactorySpec.ts&quot;,&quot;line&quot;:72,&quot;character&quot;:4,&quot;text&quot;:&quot;rubricDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/SkillObjectFactorySpec.ts&quot;,&quot;line&quot;:73,&quot;character&quot;:6,&quot;text&quot;:&quot;difficulty&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/SkillObjectFactorySpec.ts&quot;,&quot;line&quot;:73,&quot;character&quot;:18,&quot;text&quot;:&quot;skillDifficulties&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/SkillObjectFactorySpec.ts&quot;,&quot;line&quot;:77,&quot;character&quot;:4,&quot;text&quot;:&quot;example1&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/SkillObjectFactorySpec.ts&quot;,&quot;line&quot;:87,&quot;character&quot;:4,&quot;text&quot;:&quot;example2&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/SkillObjectFactorySpec.ts&quot;,&quot;line&quot;:99,&quot;character&quot;:4,&quot;text&quot;:&quot;skillContentsDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/SkillObjectFactorySpec.ts&quot;,&quot;line&quot;:104,&quot;character&quot;:6,&quot;text&quot;:&quot;worked_examples&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/skill/SkillObjectFactorySpec.ts&quot;,&quot;line&quot;:104,&quot;character&quot;:24,&quot;text&quot;:&quot;example1&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/SkillObjectFactorySpec.ts&quot;,&quot;line&quot;:104,&quot;character&quot;:34,&quot;text&quot;:&quot;example2&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/SkillObjectFactorySpec.ts&quot;,&quot;line&quot;:113,&quot;character&quot;:4,&quot;text&quot;:&quot;skillDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/SkillObjectFactorySpec.ts&quot;,&quot;line&quot;:116,&quot;character&quot;:6,&quot;text&quot;:&quot;misconceptions&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/skill/SkillObjectFactorySpec.ts&quot;,&quot;line&quot;:116,&quot;character&quot;:23,&quot;text&quot;:&quot;misconceptionDict1&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/SkillObjectFactorySpec.ts&quot;,&quot;line&quot;:116,&quot;character&quot;:43,&quot;text&quot;:&quot;misconceptionDict2&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/SkillObjectFactorySpec.ts&quot;,&quot;line&quot;:117,&quot;character&quot;:6,&quot;text&quot;:&quot;rubrics&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/skill/SkillObjectFactorySpec.ts&quot;,&quot;line&quot;:117,&quot;character&quot;:16,&quot;text&quot;:&quot;rubricDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/SkillObjectFactorySpec.ts&quot;,&quot;line&quot;:118,&quot;character&quot;:6,&quot;text&quot;:&quot;skill_contents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/SkillObjectFactorySpec.ts&quot;,&quot;line&quot;:118,&quot;character&quot;:22,&quot;text&quot;:&quot;skillContentsDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/SkillObjectFactorySpec.ts&quot;,&quot;line&quot;:179,&quot;character&quot;:6,&quot;text&quot;:&quot;skillDifficulties&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/SkillObjectFactorySpec.ts&quot;,&quot;line&quot;:183,&quot;character&quot;:36,&quot;text&quot;:&quot;skillDifficulties&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/SkillObjectFactorySpec.ts&quot;,&quot;line&quot;:215,&quot;character&quot;:42,&quot;text&quot;:&quot;skillDict&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:57 GMT</p>
+    </body>
+  </html>
+  

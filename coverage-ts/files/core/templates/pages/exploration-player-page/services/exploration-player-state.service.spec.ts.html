@@ -1,0 +1,554 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>exploration-player-state.service.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/exploration-player-page/services/exploration-player-state.service.spec.ts</td><td class="">97.98%</td><td class="">100%</td><td class="">794</td><td class="">778</td><td class="">16</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2021 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for ExplorationPlayerStateService.
+ */
+
+import { HttpClientTestingModule } from &#x27;@angular/common/http/testing&#x27;;
+import { fakeAsync, TestBed, tick, waitForAsync } from &#x27;@angular/core/testing&#x27;;
+import { EditableExplorationBackendApiService }
+  from &#x27;domain/exploration/editable-exploration-backend-api.service&#x27;;
+import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService }
+  from &#x27;domain/exploration/read-only-exploration-backend-api.service&#x27;;
+import { PretestQuestionBackendApiService }
+  from &#x27;domain/question/pretest-question-backend-api.service&#x27;;
+import { QuestionBackendApiService } from &#x27;domain/question/question-backend-api.service&#x27;;
+import { QuestionBackendDict } from &#x27;domain/question/QuestionObjectFactory&#x27;;
+import { ContextService } from &#x27;services/context.service&#x27;;
+import { UrlService } from &#x27;services/contextual/url.service&#x27;;
+import { ExplorationFeatures, ExplorationFeaturesBackendApiService }
+  from &#x27;services/exploration-features-backend-api.service&#x27;;
+import { ExplorationFeaturesService } from &#x27;services/exploration-features.service&#x27;;
+import { PlaythroughService } from &#x27;services/playthrough.service&#x27;;
+import { ExplorationPlayerConstants } from &#x27;../exploration-player-page.constants&#x27;;
+import { ExplorationEngineService } from &#x27;./exploration-engine.service&#x27;;
+import { ExplorationPlayerStateService } from &#x27;./exploration-player-state.service&#x27;;
+import { NumberAttemptsService } from &#x27;./number-attempts.service&#x27;;
+import { PlayerCorrectnessFeedbackEnabledService }
+  from &#x27;./player-correctness-feedback-enabled.service&#x27;;
+import { PlayerTranscriptService } from &#x27;./player-transcript.service&#x27;;
+import { QuestionPlayerEngineService } from &#x27;./question-player-engine.service&#x27;;
+import { StatsReportingService } from &#x27;./stats-reporting.service&#x27;;
+
+describe(&#x27;Exploration Player State Service&#x27;, () =&gt; {
+  let explorationPlayerStateService: ExplorationPlayerStateService;
+  let playerTranscriptService: PlayerTranscriptService;
+  let statsReportingService: StatsReportingService;
+  let playthroughService: PlaythroughService;
+  let playerCorrectnessFeedbackEnabledService:
+    PlayerCorrectnessFeedbackEnabledService;
+  let explorationEngineService: ExplorationEngineService;
+  let questionPlayerEngineService: QuestionPlayerEngineService;
+  let editableExplorationBackendApiService:
+    EditableExplorationBackendApiService;
+  let explorationFeaturesBackendApiService:
+  ExplorationFeaturesBackendApiService;
+  let explorationFeaturesService: ExplorationFeaturesService;
+  let numberAttemptsService: NumberAttemptsService;
+  let questionBackendApiService: QuestionBackendApiService;
+  let pretestQuestionBackendApiService:
+    PretestQuestionBackendApiService;
+  let urlService: UrlService;
+
+  let returnDict = {
+    can_edit: true,
+    exploration: {
+      init_state_name: &#x27;state_name&#x27;,
+      param_changes: [],
+      param_specs: {},
+      states: {},
+      title: &#x27;&#x27;,
+      language_code: &#x27;&#x27;,
+      objective: &#x27;&#x27;,
+      correctness_feedback_enabled: false
+    },
+    exploration_id: &#x27;test_id&#x27;,
+    is_logged_in: true,
+    session_id: &#x27;test_session&#x27;,
+    version: 1,
+    preferred_audio_language_code: &#x27;en&#x27;,
+    preferred_language_codes: [],
+    auto_tts_enabled: false,
+    correctness_feedback_enabled: true,
+    record_playthrough_probability: 1
+  };
+
+  let questionBackendDict: QuestionBackendDict = {
+    id: &#x27;&#x27;,
+    question_state_data: null,
+    question_state_data_schema_version: 2,
+    language_code: &#x27;&#x27;,
+    version: 1,
+    linked_skill_ids: [],
+    inapplicable_skill_misconception_ids: []
+  };
+
+  class MockContextService {
+    isInExplorationEditorPage(): boolean {
+      return false;
+    }
+
+    isInQuestionPlayerMode(): boolean {
+      return false;
+    }
+
+    getExplorationId(): string {
+      return &#x27;123&#x27;;
+    }
+  }
+
+  class MockReadOnlyExplorationBackendApiService {
+    async loadLatestExplorationAsync(explorationId: string):
+    Promise&lt;FetchExplorationBackendResponse&gt; {
+      return Promise.resolve(returnDict);
+    }
+
+    async loadExplorationAsync(explorationId: string, version: number):
+    Promise&lt;FetchExplorationBackendResponse&gt; {
+      return Promise.resolve(returnDict);
+    }
+  }
+
+  beforeEach(waitForAsync(() =&gt; {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [
+        ExplorationPlayerStateService,
+        PlayerTranscriptService,
+        StatsReportingService,
+        {
+          provide: ContextService,
+          useClass: MockContextService
+        },
+        UrlService,
+        {
+          provide: ReadOnlyExplorationBackendApiService,
+          useClass: MockReadOnlyExplorationBackendApiService
+        }
+      ]
+    }).compileComponents();
+  }));
+
+  beforeEach(() =&gt; {
+    explorationPlayerStateService = TestBed
+      .inject(ExplorationPlayerStateService);
+    playerTranscriptService = TestBed.inject(PlayerTranscriptService);
+    playerTranscriptService = (playerTranscriptService as unknown) as
+      jasmine.SpyObj&lt;PlayerTranscriptService&gt;;
+    statsReportingService = TestBed.inject(StatsReportingService);
+    statsReportingService = (statsReportingService as unknown) as
+      jasmine.SpyObj&lt;StatsReportingService&gt;;
+    playthroughService = TestBed.inject(PlaythroughService);
+    playthroughService = (playthroughService as unknown) as
+      jasmine.SpyObj&lt;PlaythroughService&gt;;
+    playerCorrectnessFeedbackEnabledService = TestBed.inject(
+      PlayerCorrectnessFeedbackEnabledService);
+    playerCorrectnessFeedbackEnabledService = (
+      playerCorrectnessFeedbackEnabledService as unknown) as
+      jasmine.SpyObj&lt;PlayerCorrectnessFeedbackEnabledService&gt;;
+    explorationEngineService = TestBed.inject(ExplorationEngineService);
+    explorationEngineService = (explorationEngineService as unknown) as
+      jasmine.SpyObj&lt;ExplorationEngineService&gt;;
+    questionPlayerEngineService = TestBed.inject(QuestionPlayerEngineService);
+    questionPlayerEngineService = (questionPlayerEngineService as unknown) as
+      jasmine.SpyObj&lt;QuestionPlayerEngineService&gt;;
+    editableExplorationBackendApiService = TestBed.inject(
+      EditableExplorationBackendApiService);
+    editableExplorationBackendApiService = (
+      editableExplorationBackendApiService as unknown) as
+      jasmine.SpyObj&lt;EditableExplorationBackendApiService&gt;;
+    explorationFeaturesBackendApiService = TestBed.inject(
+      ExplorationFeaturesBackendApiService);
+    explorationFeaturesBackendApiService = (
+      explorationFeaturesBackendApiService as unknown) as
+      jasmine.SpyObj&lt;ExplorationFeaturesBackendApiService&gt;;
+    explorationFeaturesService = TestBed.inject(ExplorationFeaturesService);
+    explorationFeaturesService = (
+      explorationFeaturesService as unknown) as
+      jasmine.SpyObj&lt;ExplorationFeaturesService&gt;;
+    numberAttemptsService = TestBed.inject(NumberAttemptsService);
+    numberAttemptsService = (
+      numberAttemptsService as unknown) as
+      jasmine.SpyObj&lt;NumberAttemptsService&gt;;
+    questionBackendApiService = TestBed.inject(QuestionBackendApiService);
+    questionBackendApiService = (
+      questionBackendApiService as unknown) as
+      jasmine.SpyObj&lt;QuestionBackendApiService&gt;;
+    pretestQuestionBackendApiService = TestBed.inject(
+      PretestQuestionBackendApiService);
+    pretestQuestionBackendApiService = (
+      pretestQuestionBackendApiService as unknown) as
+      jasmine.SpyObj&lt;PretestQuestionBackendApiService&gt;;
+    urlService = (TestBed.inject(UrlService) as unknown) as
+      jasmine.SpyObj&lt;UrlService&gt;;
+  });
+
+  it(&#x27;should properly initialize player&#x27;, () =&gt; {
+    spyOn(playerTranscriptService, &#x27;init&#x27;);
+    spyOn(explorationPlayerStateService, &#x27;initExplorationPreviewPlayer&#x27;);
+    let callback = () =&gt; {};
+
+    explorationPlayerStateService.editorPreviewMode = true;
+    explorationPlayerStateService.initializePlayer(callback);
+    expect(playerTranscriptService.init).toHaveBeenCalled();
+    expect(explorationPlayerStateService.initExplorationPreviewPlayer)
+      .toHaveBeenCalledWith(callback);
+    explorationPlayerStateService.editorPreviewMode = false;
+    explorationPlayerStateService.initializePlayer(callback);
+    expect(playerTranscriptService.init).toHaveBeenCalled();
+    expect(explorationPlayerStateService.initExplorationPreviewPlayer)
+      .toHaveBeenCalledWith(callback);
+  });
+
+  it(&#x27;should initialize exploration services&#x27;, () =&gt; {
+    spyOn(statsReportingService, &#x27;initSession&#x27;);
+    spyOn(playthroughService, &#x27;initSession&#x27;);
+    spyOn(playerCorrectnessFeedbackEnabledService, &#x27;init&#x27;);
+    spyOn(explorationEngineService, &#x27;init&#x27;);
+
+    explorationPlayerStateService.initializeExplorationServices(
+      returnDict, false, () =&gt; {});
+
+    expect(statsReportingService.initSession).toHaveBeenCalled();
+    expect(playthroughService.initSession).toHaveBeenCalled();
+    expect(playerCorrectnessFeedbackEnabledService.init).toHaveBeenCalled();
+    expect(explorationEngineService.init).toHaveBeenCalled();
+  });
+
+  it(&#x27;should initialize pretest services&#x27;, () =&gt; {
+    spyOn(playerCorrectnessFeedbackEnabledService, &#x27;init&#x27;);
+    spyOn(questionPlayerEngineService, &#x27;init&#x27;);
+    let pretestQuestionDicts = [];
+    let callback = () =&gt; {};
+
+    explorationPlayerStateService.initializePretestServices(
+      pretestQuestionDicts, callback);
+    expect(playerCorrectnessFeedbackEnabledService.init)
+      .toHaveBeenCalledWith(true);
+    expect(questionPlayerEngineService.init).toHaveBeenCalled();
+  });
+
+  it(&#x27;should initialize question player services&#x27;, () =&gt; {
+    spyOn(playerCorrectnessFeedbackEnabledService, &#x27;init&#x27;);
+    spyOn(questionPlayerEngineService, &#x27;init&#x27;);
+    let questions = [];
+    let successCallback = () =&gt; {};
+    let errorCallback = () =&gt; {};
+
+    explorationPlayerStateService.initializeQuestionPlayerServices(
+      questions, successCallback, errorCallback);
+
+    expect(playerCorrectnessFeedbackEnabledService.init)
+      .toHaveBeenCalledWith(true);
+    expect(questionPlayerEngineService.init).toHaveBeenCalledWith(
+      questions, successCallback, errorCallback);
+  });
+
+  it(&#x27;should set exploration mode&#x27;, () =&gt; {
+    explorationPlayerStateService.setExplorationMode();
+    expect(explorationPlayerStateService.explorationMode).toEqual(
+      ExplorationPlayerConstants
+        .EXPLORATION_MODE.EXPLORATION);
+    expect(explorationPlayerStateService.currentEngineService)
+      .toEqual(explorationEngineService);
+  });
+
+  it(&#x27;should set pretest mode&#x27;, () =&gt; {
+    explorationPlayerStateService.setPretestMode();
+    expect(explorationPlayerStateService.explorationMode).toEqual(
+      ExplorationPlayerConstants
+        .EXPLORATION_MODE.PRETEST);
+    expect(explorationPlayerStateService.currentEngineService)
+      .toEqual(questionPlayerEngineService);
+  });
+
+  it(&#x27;should set question player mode&#x27;, () =&gt; {
+    explorationPlayerStateService.setQuestionPlayerMode();
+    expect(explorationPlayerStateService.explorationMode).toEqual(
+      ExplorationPlayerConstants
+        .EXPLORATION_MODE.QUESTION_PLAYER);
+    expect(explorationPlayerStateService.currentEngineService)
+      .toEqual(questionPlayerEngineService);
+  });
+
+  it(&#x27;should set story chapter mode&#x27;, () =&gt; {
+    explorationPlayerStateService.setStoryChapterMode();
+    expect(explorationPlayerStateService.explorationMode).toEqual(
+      ExplorationPlayerConstants
+        .EXPLORATION_MODE.STORY_CHAPTER);
+    expect(explorationPlayerStateService.currentEngineService)
+      .toEqual(explorationEngineService);
+  });
+
+  it(&#x27;should init exploration preview player&#x27;, fakeAsync(() =&gt; {
+    spyOn(explorationPlayerStateService, &#x27;setExplorationMode&#x27;);
+    spyOn(
+      editableExplorationBackendApiService, &#x27;fetchApplyDraftExplorationAsync&#x27;)
+      .and.returnValue(Promise.resolve({
+        correctness_feedback_enabled: false,
+        draft_changes: [],
+        is_version_of_draft_valid: true,
+        init_state_name: &#x27;&#x27;,
+        param_changes: [],
+        param_specs: null,
+        states: null,
+        title: &#x27;&#x27;,
+        language_code: &#x27;&#x27;
+      }));
+    spyOn(explorationFeaturesBackendApiService, &#x27;fetchExplorationFeaturesAsync&#x27;)
+      .and.returnValue(Promise.resolve({
+        isExplorationWhitelisted: true,
+        alwaysAskLearnersForAnswerDetails: false
+      }));
+    spyOn(explorationFeaturesService, &#x27;init&#x27;);
+    spyOn(explorationEngineService, &#x27;init&#x27;);
+    spyOn(playerCorrectnessFeedbackEnabledService, &#x27;init&#x27;);
+    spyOn(numberAttemptsService, &#x27;reset&#x27;);
+
+    explorationPlayerStateService.initExplorationPreviewPlayer(() =&gt; {});
+    tick();
+
+    expect(explorationFeaturesService.init).toHaveBeenCalled();
+    expect(explorationEngineService.init).toHaveBeenCalled();
+    expect(playerCorrectnessFeedbackEnabledService.init).toHaveBeenCalled();
+    expect(numberAttemptsService.reset).toHaveBeenCalled();
+  }));
+
+  it(&#x27;should init question player&#x27;, fakeAsync(() =&gt; {
+    spyOn(explorationPlayerStateService, &#x27;setQuestionPlayerMode&#x27;);
+    spyOn(questionBackendApiService, &#x27;fetchQuestionsAsync&#x27;)
+      .and.returnValue(Promise.resolve([questionBackendDict]));
+    spyOn(explorationPlayerStateService.onTotalQuestionsReceived, &#x27;emit&#x27;);
+    spyOn(explorationPlayerStateService, &#x27;initializeQuestionPlayerServices&#x27;);
+
+    let successCallback = () =&gt; {};
+    let errorCallback = () =&gt; {};
+    explorationPlayerStateService.initQuestionPlayer({
+      skillList: [],
+      questionCount: 1,
+      questionsSortedByDifficulty: true
+    }, successCallback, errorCallback);
+    tick();
+
+    expect(
+      explorationPlayerStateService
+        .onTotalQuestionsReceived.emit)
+      .toHaveBeenCalled();
+    expect(explorationPlayerStateService.initializeQuestionPlayerServices)
+      .toHaveBeenCalled();
+  }));
+
+  it(&#x27;should init exploration player&#x27;, fakeAsync(() =&gt; {
+    let explorationFeatures: ExplorationFeatures = {
+      isExplorationWhitelisted: true,
+      alwaysAskLearnersForAnswerDetails: false
+    };
+    spyOn(explorationFeaturesBackendApiService, &#x27;fetchExplorationFeaturesAsync&#x27;)
+      .and.returnValue(Promise.resolve(explorationFeatures));
+    spyOn(pretestQuestionBackendApiService, &#x27;fetchPretestQuestionsAsync&#x27;)
+      .and.returnValue(Promise.resolve([questionBackendDict]));
+    spyOn(explorationFeaturesService, &#x27;init&#x27;);
+    spyOn(explorationPlayerStateService, &#x27;initializePretestServices&#x27;);
+    spyOn(explorationPlayerStateService, &#x27;setPretestMode&#x27;);
+    spyOn(explorationPlayerStateService, &#x27;initializeExplorationServices&#x27;);
+
+    let successCallback = () =&gt; {};
+    explorationPlayerStateService.initExplorationPlayer(successCallback);
+    tick();
+    expect(explorationFeaturesService.init).toHaveBeenCalled();
+    expect(explorationPlayerStateService.setPretestMode).toHaveBeenCalled();
+    expect(explorationPlayerStateService.initializeExplorationServices)
+      .toHaveBeenCalled();
+    expect(explorationPlayerStateService.initializePretestServices)
+      .toHaveBeenCalled();
+  }));
+
+  it(&#x27;should init exploration player without pretests&#x27;, fakeAsync(() =&gt; {
+    let explorationFeatures: ExplorationFeatures = {
+      isExplorationWhitelisted: true,
+      alwaysAskLearnersForAnswerDetails: false
+    };
+    spyOn(explorationFeaturesBackendApiService, &#x27;fetchExplorationFeaturesAsync&#x27;)
+      .and.returnValue(Promise.resolve(explorationFeatures));
+    spyOn(pretestQuestionBackendApiService, &#x27;fetchPretestQuestionsAsync&#x27;)
+      .and.returnValue(Promise.resolve([]));
+    spyOn(explorationFeaturesService, &#x27;init&#x27;);
+    spyOn(explorationPlayerStateService, &#x27;setExplorationMode&#x27;);
+    spyOn(explorationPlayerStateService, &#x27;initializeExplorationServices&#x27;);
+
+    let successCallback = () =&gt; {};
+    explorationPlayerStateService.initExplorationPlayer(successCallback);
+    tick();
+    expect(explorationPlayerStateService.setExplorationMode).toHaveBeenCalled();
+    expect(explorationPlayerStateService.initializeExplorationServices)
+      .toHaveBeenCalled();
+  }));
+
+  it(&#x27;should init exploration player with story chapter mode&#x27;, fakeAsync(() =&gt; {
+    let explorationFeatures: ExplorationFeatures = {
+      isExplorationWhitelisted: true,
+      alwaysAskLearnersForAnswerDetails: false
+    };
+    spyOn(urlService, &#x27;getUrlParams&#x27;).and.returnValue({
+      story_url_fragment: &#x27;fragment&#x27;,
+      node_id: &#x27;id&#x27;
+    });
+    spyOn(
+      explorationFeaturesBackendApiService, &#x27;fetchExplorationFeaturesAsync&#x27;)
+      .and.returnValue(Promise.resolve(explorationFeatures));
+    spyOn(pretestQuestionBackendApiService, &#x27;fetchPretestQuestionsAsync&#x27;)
+      .and.returnValue(Promise.resolve([]));
+    spyOn(explorationFeaturesService, &#x27;init&#x27;);
+    spyOn(explorationPlayerStateService, &#x27;setStoryChapterMode&#x27;);
+    spyOn(explorationPlayerStateService, &#x27;initializeExplorationServices&#x27;);
+
+    let successCallback = () =&gt; {};
+    explorationPlayerStateService.initExplorationPlayer(successCallback);
+    tick();
+    expect(explorationPlayerStateService.setStoryChapterMode)
+      .toHaveBeenCalled();
+    expect(explorationPlayerStateService.initializeExplorationServices)
+      .toHaveBeenCalled();
+  }));
+
+  it(&#x27;should intialize question player&#x27;, () =&gt; {
+    spyOn(playerTranscriptService, &#x27;init&#x27;);
+    spyOn(explorationPlayerStateService, &#x27;initQuestionPlayer&#x27;);
+    let successCallback = () =&gt; {};
+    let errorCallback = () =&gt; {};
+    explorationPlayerStateService.initializeQuestionPlayer({
+      skillList: [],
+      questionCount: 1,
+      questionsSortedByDifficulty: true
+    }, successCallback, errorCallback);
+  });
+
+  it(&#x27;should get current engine service&#x27;, () =&gt; {
+    explorationPlayerStateService.setExplorationMode();
+    expect(explorationPlayerStateService.getCurrentEngineService())
+      .toEqual(explorationPlayerStateService.currentEngineService);
+  });
+
+  it(&#x27;should tell if is in pretest mode&#x27;, () =&gt; {
+    explorationPlayerStateService.setPretestMode();
+    expect(explorationPlayerStateService.isInPretestMode()).toBeTrue();
+  });
+
+  it(&#x27;should tell if is in question mode&#x27;, () =&gt; {
+    explorationPlayerStateService.setQuestionPlayerMode();
+    expect(explorationPlayerStateService.isInQuestionMode()).toBeTrue();
+  });
+
+  it(&#x27;should tell if is in question player mode&#x27;, () =&gt; {
+    explorationPlayerStateService.setQuestionPlayerMode();
+    expect(explorationPlayerStateService.isInQuestionPlayerMode()).toBeTrue();
+  });
+
+  it(&#x27;should tell if in story chapter mode&#x27;, () =&gt; {
+    explorationPlayerStateService.setStoryChapterMode();
+    expect(explorationPlayerStateService.isInStoryChapterMode()).toBeTrue();
+  });
+
+  it(&#x27;should move to exploration&#x27;, () =&gt; {
+    spyOn(explorationEngineService, &#x27;moveToExploration&#x27;);
+    spyOn(explorationPlayerStateService, &#x27;setStoryChapterMode&#x27;);
+    spyOn(urlService, &#x27;getUrlParams&#x27;).and.returnValue({
+      story_url_fragment: &#x27;fragment&#x27;,
+      node_id: &#x27;id&#x27;
+    });
+    let callback = () =&gt; {};
+    explorationPlayerStateService.moveToExploration(callback);
+
+    expect(explorationPlayerStateService.setStoryChapterMode)
+      .toHaveBeenCalled();
+    expect(explorationEngineService.moveToExploration).toHaveBeenCalled();
+  });
+
+  it(&#x27;should move to exploration with chapter mode&#x27;, () =&gt; {
+    spyOn(explorationEngineService, &#x27;moveToExploration&#x27;);
+    let callback = () =&gt; {};
+    explorationPlayerStateService.moveToExploration(callback);
+    expect(explorationEngineService.moveToExploration).toHaveBeenCalled();
+  });
+
+  it(&#x27;should get language code&#x27;, () =&gt; {
+    let languageCode: string = &#x27;test_lang_code&#x27;;
+    spyOn(explorationEngineService, &#x27;getLanguageCode&#x27;)
+      .and.returnValue(languageCode);
+    explorationPlayerStateService.setExplorationMode();
+    expect(explorationPlayerStateService.getLanguageCode())
+      .toEqual(languageCode);
+  });
+
+  it(&#x27;should record new card added&#x27;, () =&gt; {
+    explorationPlayerStateService.setExplorationMode();
+    spyOn(explorationEngineService, &#x27;recordNewCardAdded&#x27;);
+    explorationPlayerStateService.recordNewCardAdded();
+    expect(explorationEngineService.recordNewCardAdded).toHaveBeenCalled();
+  });
+
+  it(&#x27;should test getters&#x27;, () =&gt; {
+    expect(explorationPlayerStateService.onTotalQuestionsReceived)
+      .toBeDefined();
+    expect(explorationPlayerStateService.onPlayerStateChange).toBeDefined();
+    expect(explorationPlayerStateService.onOppiaFeedbackAvailable)
+      .toBeDefined();
+  });
+
+  it(&#x27;should set exploration version from url if the url&#x27; +
+    &#x27;has exploration context when initialized&#x27;, () =&gt; {
+    // Here exploration context consists of &#x27;explore&#x27;, &#x27;create&#x27;,
+    // &#x27;skill_editor&#x27; and &#x27;embed&#x27;.
+    spyOn(urlService, &#x27;getPathname&#x27;)
+      .and.returnValue(&#x27;/create/in/path/name&#x27;);
+    spyOn(urlService, &#x27;getExplorationVersionFromUrl&#x27;)
+      .and.returnValue(2);
+
+    explorationPlayerStateService.version = null;
+
+    explorationPlayerStateService.init();
+    expect(explorationPlayerStateService.version).toBe(2);
+  });
+
+  it(&#x27;should set exploration version to default value if the url&#x27; +
+    &#x27;does not have exploration context when initialized&#x27;, () =&gt; {
+    // Here default value is 1.
+    spyOn(urlService, &#x27;getPathname&#x27;)
+      .and.returnValue(&#x27;/create_is_not/in/path/name&#x27;);
+
+    explorationPlayerStateService.version = null;
+
+    explorationPlayerStateService.init();
+    expect(explorationPlayerStateService.version).toBe(1);
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/exploration-player-state.service.spec.ts&quot;,&quot;line&quot;:147,&quot;character&quot;:30,&quot;text&quot;:&quot;(playerTranscriptService as unknown) as\n      jasmine.SpyObj&lt;PlayerTranscriptService&gt;&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/exploration-player-state.service.spec.ts&quot;,&quot;line&quot;:150,&quot;character&quot;:28,&quot;text&quot;:&quot;(statsReportingService as unknown) as\n      jasmine.SpyObj&lt;StatsReportingService&gt;&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/exploration-player-state.service.spec.ts&quot;,&quot;line&quot;:153,&quot;character&quot;:25,&quot;text&quot;:&quot;(playthroughService as unknown) as\n      jasmine.SpyObj&lt;PlaythroughService&gt;&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/exploration-player-state.service.spec.ts&quot;,&quot;line&quot;:157,&quot;character&quot;:46,&quot;text&quot;:&quot;(\n      playerCorrectnessFeedbackEnabledService as unknown) as\n      jasmine.SpyObj&lt;PlayerCorrectnessFeedbackEnabledService&gt;&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/exploration-player-state.service.spec.ts&quot;,&quot;line&quot;:161,&quot;character&quot;:31,&quot;text&quot;:&quot;(explorationEngineService as unknown) as\n      jasmine.SpyObj&lt;ExplorationEngineService&gt;&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/exploration-player-state.service.spec.ts&quot;,&quot;line&quot;:164,&quot;character&quot;:34,&quot;text&quot;:&quot;(questionPlayerEngineService as unknown) as\n      jasmine.SpyObj&lt;QuestionPlayerEngineService&gt;&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/exploration-player-state.service.spec.ts&quot;,&quot;line&quot;:168,&quot;character&quot;:43,&quot;text&quot;:&quot;(\n      editableExplorationBackendApiService as unknown) as\n      jasmine.SpyObj&lt;EditableExplorationBackendApiService&gt;&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/exploration-player-state.service.spec.ts&quot;,&quot;line&quot;:173,&quot;character&quot;:43,&quot;text&quot;:&quot;(\n      explorationFeaturesBackendApiService as unknown) as\n      jasmine.SpyObj&lt;ExplorationFeaturesBackendApiService&gt;&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/exploration-player-state.service.spec.ts&quot;,&quot;line&quot;:177,&quot;character&quot;:33,&quot;text&quot;:&quot;(\n      explorationFeaturesService as unknown) as\n      jasmine.SpyObj&lt;ExplorationFeaturesService&gt;&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/exploration-player-state.service.spec.ts&quot;,&quot;line&quot;:181,&quot;character&quot;:28,&quot;text&quot;:&quot;(\n      numberAttemptsService as unknown) as\n      jasmine.SpyObj&lt;NumberAttemptsService&gt;&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/exploration-player-state.service.spec.ts&quot;,&quot;line&quot;:185,&quot;character&quot;:32,&quot;text&quot;:&quot;(\n      questionBackendApiService as unknown) as\n      jasmine.SpyObj&lt;QuestionBackendApiService&gt;&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/exploration-player-state.service.spec.ts&quot;,&quot;line&quot;:190,&quot;character&quot;:39,&quot;text&quot;:&quot;(\n      pretestQuestionBackendApiService as unknown) as\n      jasmine.SpyObj&lt;PretestQuestionBackendApiService&gt;&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/exploration-player-state.service.spec.ts&quot;,&quot;line&quot;:193,&quot;character&quot;:17,&quot;text&quot;:&quot;(TestBed.inject(UrlService) as unknown) as\n      jasmine.SpyObj&lt;UrlService&gt;&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/exploration-player-state.service.spec.ts&quot;,&quot;line&quot;:232,&quot;character&quot;:8,&quot;text&quot;:&quot;pretestQuestionDicts&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/exploration-player-state.service.spec.ts&quot;,&quot;line&quot;:245,&quot;character&quot;:8,&quot;text&quot;:&quot;questions&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/exploration-player-state.service.spec.ts&quot;,&quot;line&quot;:255,&quot;character&quot;:6,&quot;text&quot;:&quot;questions&quot;,&quot;kind&quot;:2}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:59 GMT</p>
+    </body>
+  </html>
+  

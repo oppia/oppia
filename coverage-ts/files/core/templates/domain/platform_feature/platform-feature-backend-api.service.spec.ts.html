@@ -1,0 +1,123 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>platform-feature-backend-api.service.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/domain/platform_feature/platform-feature-backend-api.service.spec.ts</td><td class="">96.99%</td><td class="">100%</td><td class="">133</td><td class="">129</td><td class="">4</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for PlatformFeatureBackendApiService.
+ */
+
+import { HttpClientTestingModule, HttpTestingController } from
+  &#x27;@angular/common/http/testing&#x27;;
+import { TestBed, fakeAsync, flushMicrotasks } from &#x27;@angular/core/testing&#x27;;
+
+import { PlatformFeatureBackendApiService } from
+  &#x27;domain/platform_feature/platform-feature-backend-api.service&#x27;;
+import { PlatformFeatureDomainConstants } from
+  &#x27;domain/platform_feature/platform-feature-domain.constants&#x27;;
+import { ClientContext } from &#x27;domain/platform_feature/client-context.model&#x27;;
+import { FeatureStatusSummary } from &#x27;domain/platform_feature/feature-status-summary.model&#x27;;
+
+describe(&#x27;PlatformFeatureBackendApiService&#x27;, () =&gt; {
+  let httpTestingController: HttpTestingController;
+  let platformFeatureBackendApiService: PlatformFeatureBackendApiService;
+
+  beforeEach(() =&gt; {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+
+    platformFeatureBackendApiService = TestBed.get(
+      PlatformFeatureBackendApiService);
+    httpTestingController = TestBed.get(HttpTestingController);
+  });
+
+  afterEach(() =&gt; {
+    httpTestingController.verify();
+  });
+
+  describe(&#x27;.fetchFeatureFlags&#x27;, () =&gt; {
+    it(&#x27;should correctly fetch feature flags&#x27;,
+      fakeAsync(() =&gt; {
+        const successHandler = jasmine.createSpy(&#x27;success&#x27;);
+        const failHandler = jasmine.createSpy(&#x27;fail&#x27;);
+
+        const context = ClientContext.create(&#x27;Web&#x27;, &#x27;Chrome&#x27;);
+        const contextDict = context.toBackendDict();
+        const responseDict = {
+          feature_a: true,
+          feature_b: false,
+        };
+
+        platformFeatureBackendApiService.fetchFeatureFlags(context)
+          .then(successHandler, failHandler);
+
+        flushMicrotasks();
+
+        const url = PlatformFeatureDomainConstants
+          .PLATFORM_FEATURES_EVALUATION_HANDLER_URL;
+        const urlWithParams = url + &#x27;?&#x27; +
+          Object.entries(contextDict).map(([k, v]) =&gt; `${k}=${v}`).join(&#x27;&amp;&#x27;);
+        httpTestingController.expectOne(urlWithParams).flush(responseDict);
+
+        flushMicrotasks();
+        expect(successHandler).toHaveBeenCalledWith(
+          FeatureStatusSummary.createFromBackendDict(responseDict)
+        );
+        expect(failHandler).not.toHaveBeenCalled();
+      })
+    );
+
+    it(&#x27;should reject if the request fails&#x27;, fakeAsync(() =&gt; {
+      const successHandler = jasmine.createSpy(&#x27;success&#x27;);
+      const failHandler = jasmine.createSpy(&#x27;fail&#x27;);
+
+      const context = ClientContext.create(&#x27;Web&#x27;, &#x27;Chrome&#x27;);
+      const contextDict = context.toBackendDict();
+
+      platformFeatureBackendApiService.fetchFeatureFlags(context)
+        .then(successHandler, failHandler);
+
+      flushMicrotasks();
+
+      const url = PlatformFeatureDomainConstants
+        .PLATFORM_FEATURES_EVALUATION_HANDLER_URL;
+      const urlWithParams = url + &#x27;?&#x27; +
+        Object.entries(contextDict).map(([k, v]) =&gt; `${k}=${v}`).join(&#x27;&amp;&#x27;);
+      httpTestingController
+        .expectOne(urlWithParams)
+        .error(new ErrorEvent(&#x27;Error&#x27;));
+
+      flushMicrotasks();
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalled();
+    }));
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/domain/platform_feature/platform-feature-backend-api.service.spec.ts&quot;,&quot;line&quot;:68,&quot;character&quot;:47,&quot;text&quot;:&quot;v&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/platform_feature/platform-feature-backend-api.service.spec.ts&quot;,&quot;line&quot;:68,&quot;character&quot;:62,&quot;text&quot;:&quot;v&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/platform_feature/platform-feature-backend-api.service.spec.ts&quot;,&quot;line&quot;:94,&quot;character&quot;:45,&quot;text&quot;:&quot;v&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/platform_feature/platform-feature-backend-api.service.spec.ts&quot;,&quot;line&quot;:94,&quot;character&quot;:60,&quot;text&quot;:&quot;v&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:57 GMT</p>
+    </body>
+  </html>
+  

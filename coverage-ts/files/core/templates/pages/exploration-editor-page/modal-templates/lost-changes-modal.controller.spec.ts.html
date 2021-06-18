@@ -1,0 +1,91 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>lost-changes-modal.controller.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/exploration-editor-page/modal-templates/lost-changes-modal.controller.spec.ts</td><td class="">55.26%</td><td class="">100%</td><td class="">76</td><td class="">42</td><td class="">34</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for LostChangesModalController.
+ */
+
+import { LostChangeObjectFactory } from
+  &#x27;domain/exploration/LostChangeObjectFactory&#x27;;
+import { TestBed } from &#x27;@angular/core/testing&#x27;;
+import { UtilsService } from &#x27;services/utils.service&#x27;;
+
+describe(&#x27;Lost Changes Modal Controller&#x27;, () =&gt; {
+  let $scope = null;
+  let $uibModalInstance = null;
+  let $log = null;
+  let logSpy = null;
+  const explorationId = &#x27;0&#x27;;
+  const lostChanges = [{
+    cmd: &#x27;add_state&#x27;,
+    state_name: &#x27;State name&#x27;,
+  }];
+
+  beforeEach(function() {
+    TestBed.configureTestingModule({
+      providers: [
+        UtilsService
+      ]
+    });
+  });
+
+  beforeEach(angular.mock.module(&#x27;oppia&#x27;, ($provide) =&gt; {
+    $provide.value(&#x27;LostChangeObjectFactory&#x27;, TestBed.get(
+      LostChangeObjectFactory));
+  }));
+
+  beforeEach(angular.mock.inject(($injector, $controller) =&gt; {
+    $log = $injector.get(&#x27;$log&#x27;);
+
+    logSpy = spyOn($log, &#x27;error&#x27;).and.callThrough();
+
+    $uibModalInstance = jasmine.createSpyObj(
+      &#x27;$uibModalInstance&#x27;, [&#x27;close&#x27;, &#x27;dismiss&#x27;]);
+
+    const $rootScope = $injector.get(&#x27;$rootScope&#x27;);
+    $scope = $rootScope.$new();
+    $controller(
+      &#x27;LostChangesModalController&#x27;, {
+        $scope: $scope,
+        $uibModalInstance: $uibModalInstance,
+        explorationId: explorationId,
+        lostChanges: lostChanges
+      });
+  }));
+
+  it(&#x27;should evaluates lostChanges when controller is initialized&#x27;, () =&gt; {
+    expect($scope.lostChanges[0].cmd).toBe(&#x27;add_state&#x27;);
+    expect($scope.lostChanges[0].stateName).toBe(&#x27;State name&#x27;);
+    expect(logSpy).toHaveBeenCalledWith(
+      &#x27;Lost changes: &#x27; + JSON.stringify(lostChanges));
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/lost-changes-modal.controller.spec.ts&quot;,&quot;line&quot;:24,&quot;character&quot;:6,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/lost-changes-modal.controller.spec.ts&quot;,&quot;line&quot;:25,&quot;character&quot;:6,&quot;text&quot;:&quot;$uibModalInstance&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/lost-changes-modal.controller.spec.ts&quot;,&quot;line&quot;:26,&quot;character&quot;:6,&quot;text&quot;:&quot;$log&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/lost-changes-modal.controller.spec.ts&quot;,&quot;line&quot;:27,&quot;character&quot;:6,&quot;text&quot;:&quot;logSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/lost-changes-modal.controller.spec.ts&quot;,&quot;line&quot;:42,&quot;character&quot;:43,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/lost-changes-modal.controller.spec.ts&quot;,&quot;line&quot;:43,&quot;character&quot;:4,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/lost-changes-modal.controller.spec.ts&quot;,&quot;line&quot;:43,&quot;character&quot;:13,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/lost-changes-modal.controller.spec.ts&quot;,&quot;line&quot;:47,&quot;character&quot;:34,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/lost-changes-modal.controller.spec.ts&quot;,&quot;line&quot;:47,&quot;character&quot;:45,&quot;text&quot;:&quot;$controller&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/lost-changes-modal.controller.spec.ts&quot;,&quot;line&quot;:48,&quot;character&quot;:4,&quot;text&quot;:&quot;$log&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/lost-changes-modal.controller.spec.ts&quot;,&quot;line&quot;:48,&quot;character&quot;:11,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/lost-changes-modal.controller.spec.ts&quot;,&quot;line&quot;:48,&quot;character&quot;:21,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/lost-changes-modal.controller.spec.ts&quot;,&quot;line&quot;:50,&quot;character&quot;:4,&quot;text&quot;:&quot;logSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/lost-changes-modal.controller.spec.ts&quot;,&quot;line&quot;:50,&quot;character&quot;:19,&quot;text&quot;:&quot;$log&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/lost-changes-modal.controller.spec.ts&quot;,&quot;line&quot;:50,&quot;character&quot;:34,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/lost-changes-modal.controller.spec.ts&quot;,&quot;line&quot;:52,&quot;character&quot;:4,&quot;text&quot;:&quot;$uibModalInstance&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/lost-changes-modal.controller.spec.ts&quot;,&quot;line&quot;:55,&quot;character&quot;:10,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/lost-changes-modal.controller.spec.ts&quot;,&quot;line&quot;:55,&quot;character&quot;:23,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/lost-changes-modal.controller.spec.ts&quot;,&quot;line&quot;:55,&quot;character&quot;:33,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/lost-changes-modal.controller.spec.ts&quot;,&quot;line&quot;:56,&quot;character&quot;:4,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/lost-changes-modal.controller.spec.ts&quot;,&quot;line&quot;:56,&quot;character&quot;:13,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/lost-changes-modal.controller.spec.ts&quot;,&quot;line&quot;:56,&quot;character&quot;:24,&quot;text&quot;:&quot;$new&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/lost-changes-modal.controller.spec.ts&quot;,&quot;line&quot;:57,&quot;character&quot;:4,&quot;text&quot;:&quot;$controller&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/lost-changes-modal.controller.spec.ts&quot;,&quot;line&quot;:59,&quot;character&quot;:8,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/lost-changes-modal.controller.spec.ts&quot;,&quot;line&quot;:59,&quot;character&quot;:16,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/lost-changes-modal.controller.spec.ts&quot;,&quot;line&quot;:60,&quot;character&quot;:8,&quot;text&quot;:&quot;$uibModalInstance&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/lost-changes-modal.controller.spec.ts&quot;,&quot;line&quot;:60,&quot;character&quot;:27,&quot;text&quot;:&quot;$uibModalInstance&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/lost-changes-modal.controller.spec.ts&quot;,&quot;line&quot;:67,&quot;character&quot;:11,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/lost-changes-modal.controller.spec.ts&quot;,&quot;line&quot;:67,&quot;character&quot;:18,&quot;text&quot;:&quot;lostChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/lost-changes-modal.controller.spec.ts&quot;,&quot;line&quot;:67,&quot;character&quot;:33,&quot;text&quot;:&quot;cmd&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/lost-changes-modal.controller.spec.ts&quot;,&quot;line&quot;:68,&quot;character&quot;:11,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/lost-changes-modal.controller.spec.ts&quot;,&quot;line&quot;:68,&quot;character&quot;:18,&quot;text&quot;:&quot;lostChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/lost-changes-modal.controller.spec.ts&quot;,&quot;line&quot;:68,&quot;character&quot;:33,&quot;text&quot;:&quot;stateName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/lost-changes-modal.controller.spec.ts&quot;,&quot;line&quot;:69,&quot;character&quot;:11,&quot;text&quot;:&quot;logSpy&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:59 GMT</p>
+    </body>
+  </html>
+  

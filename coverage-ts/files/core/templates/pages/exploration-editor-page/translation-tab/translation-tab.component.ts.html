@@ -1,0 +1,361 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>translation-tab.component.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts</td><td class="">40.00%</td><td class="">100%</td><td class="">265</td><td class="">106</td><td class="">159</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2018 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Component for the translation tab.
+ */
+
+require(
+  &#x27;components/common-layout-directives/common-elements/&#x27; +
+  &#x27;attribution-guide.component.ts&#x27;);
+require(
+  &#x27;pages/exploration-editor-page/translation-tab/state-translation/&#x27; +
+  &#x27;state-translation.component.ts&#x27;);
+require(
+  &#x27;pages/exploration-editor-page/translation-tab/modal-templates/&#x27; +
+  &#x27;welcome-translation-modal.controller.ts&#x27;);
+require(
+  &#x27;pages/exploration-editor-page/translation-tab/&#x27; +
+  &#x27;state-translation-status-graph/state-translation-status-graph.component.ts&#x27;);
+require(
+  &#x27;pages/exploration-editor-page/translation-tab/translator-overview/&#x27; +
+  &#x27;translator-overview.component.ts&#x27;);
+
+require(&#x27;domain/utilities/url-interpolation.service.ts&#x27;);
+require(&#x27;pages/exploration-editor-page/services/exploration-data.service.ts&#x27;);
+require(&#x27;pages/exploration-editor-page/services/exploration-states.service.ts&#x27;);
+require(
+  &#x27;pages/exploration-editor-page/services/&#x27; +
+  &#x27;state-tutorial-first-time.service.ts&#x27;);
+require(
+  &#x27;pages/exploration-editor-page/services/&#x27; +
+  &#x27;user-exploration-permissions.service.ts&#x27;);
+require(
+  &#x27;components/state-editor/state-editor-properties-services/&#x27; +
+  &#x27;state-editor.service.ts&#x27;);
+require(
+  &#x27;components/state-editor/state-editor-properties-services/&#x27; +
+  &#x27;state-property.service.ts&#x27;);
+require(
+  &#x27;components/state-editor/state-editor-properties-services/&#x27; +
+  &#x27;state-recorded-voiceovers.service.ts&#x27;);
+require(&#x27;services/context.service.ts&#x27;);
+require(&#x27;services/editability.service.ts&#x27;);
+require(&#x27;pages/admin-page/services/admin-router.service.ts&#x27;);
+
+import { Subscription } from &#x27;rxjs&#x27;;
+
+angular.module(&#x27;oppia&#x27;).component(&#x27;translationTab&#x27;, {
+  template: require(&#x27;./translation-tab.component.html&#x27;),
+  controller: [
+    &#x27;$scope&#x27;, &#x27;$templateCache&#x27;, &#x27;$uibModal&#x27;,
+    &#x27;ContextService&#x27;, &#x27;EditabilityService&#x27;, &#x27;ExplorationStatesService&#x27;,
+    &#x27;LoaderService&#x27;, &#x27;RouterService&#x27;, &#x27;SiteAnalyticsService&#x27;,
+    &#x27;StateEditorService&#x27;, &#x27;StateRecordedVoiceoversService&#x27;,
+    &#x27;StateTutorialFirstTimeService&#x27;, &#x27;StateWrittenTranslationsService&#x27;,
+    &#x27;TranslationTabActiveModeService&#x27;, &#x27;UrlInterpolationService&#x27;,
+    &#x27;UserExplorationPermissionsService&#x27;,
+    function(
+        $scope, $templateCache, $uibModal,
+        ContextService, EditabilityService, ExplorationStatesService,
+        LoaderService, RouterService, SiteAnalyticsService,
+        StateEditorService, StateRecordedVoiceoversService,
+        StateTutorialFirstTimeService, StateWrittenTranslationsService,
+        TranslationTabActiveModeService, UrlInterpolationService,
+        UserExplorationPermissionsService) {
+      var ctrl = this;
+      ctrl.directiveSubscriptions = new Subscription();
+      var _ID_TUTORIAL_TRANSLATION_LANGUAGE =
+        &#x27;#tutorialTranslationLanguage&#x27;;
+      var _ID_TUTORIAL_TRANSLATION_STATE = &#x27;#tutorialTranslationState&#x27;;
+      var _ID_TUTORIAL_TRANSLATION_OVERVIEW = (
+        &#x27;#tutorialTranslationOverview&#x27;);
+      // Replace the ng-joyride template with one that uses
+      // &lt;[...]&gt; interpolators instead of/ {{...}} interpolators.
+      var ngJoyrideTemplate = (
+        $templateCache.get(&#x27;ng-joyride-title-tplv1.html&#x27;));
+      ngJoyrideTemplate = ngJoyrideTemplate.replace(
+        /\{\{/g, &#x27;&lt;[&#x27;).replace(/\}\}/g, &#x27;]&gt;&#x27;);
+
+      $scope.initTranslationTab = function() {
+        StateTutorialFirstTimeService.initTranslation(
+          ContextService.getExplorationId());
+        var stateName = StateEditorService.getActiveStateName();
+        StateRecordedVoiceoversService.init(
+          stateName, ExplorationStatesService.getRecordedVoiceoversMemento(
+            stateName));
+        StateWrittenTranslationsService.init(
+          stateName, ExplorationStatesService.getWrittenTranslationsMemento(
+            stateName));
+        $scope.showTranslationTabSubDirectives = true;
+        TranslationTabActiveModeService.activateVoiceoverMode();
+        LoaderService.hideLoadingScreen();
+
+        if (EditabilityService.inTutorialMode()) {
+          $scope.startTutorial();
+        }
+      };
+
+      $scope.leaveTutorial = function() {
+        EditabilityService.onEndTutorial();
+        $scope.$apply();
+        StateTutorialFirstTimeService.markTranslationTutorialFinished();
+        $scope.tutorialInProgress = false;
+      };
+
+      $scope.onFinishTutorial = function() {
+        $scope.leaveTutorial();
+      };
+
+      $scope.onSkipTutorial = function() {
+        $scope.leaveTutorial();
+      };
+
+      var permissions = null;
+      $scope.startTutorial = function() {
+        if (permissions === null) {
+          return;
+        }
+        if (permissions.canVoiceover) {
+          $scope.tutorialInProgress = true;
+        }
+      };
+
+      $scope.showWelcomeTranslationModal = function() {
+        $uibModal.open({
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            &#x27;/pages/exploration-editor-page/translation-tab/&#x27; +
+            &#x27;modal-templates/welcome-translation-modal.template.html&#x27;),
+          backdrop: true,
+          controller: &#x27;WelcomeTranslationModalController&#x27;,
+          windowClass: &#x27;oppia-welcome-modal&#x27;
+        }).result.then(function(explorationId) {
+          SiteAnalyticsService.registerAcceptTutorialModalEvent(
+            explorationId);
+          $scope.startTutorial();
+        }, function(explorationId) {
+          SiteAnalyticsService.registerDeclineTutorialModalEvent(
+            explorationId);
+          StateTutorialFirstTimeService.markTranslationTutorialFinished();
+        });
+      };
+
+      ctrl.$onInit = function() {
+        LoaderService.showLoadingScreen(&#x27;Loading&#x27;);
+        $scope.isTranslationTabBusy = false;
+        $scope.showTranslationTabSubDirectives = false;
+        $scope.tutorialInProgress = false;
+        ctrl.directiveSubscriptions.add(
+          RouterService.onRefreshTranslationTab.subscribe(
+            () =&gt; {
+              $scope.initTranslationTab();
+            }
+          )
+        );
+        // Toggles the translation tab tutorial on/off.
+        $scope.TRANSLATION_TUTORIAL_OPTIONS = [{
+          type: &#x27;title&#x27;,
+          heading: &#x27;Translations In Oppia&#x27;,
+          text: (
+            &#x27;Hello, welcome to the Translation Tab! &#x27; +
+            &#x27;This tour will walk you through the translation page. &#x27; +
+            &#x27;Hit the &quot;Next&quot; button to begin.&#x27;)
+        }, {
+          type: &#x27;function&#x27;,
+          fn: function(isGoingForward) {
+            $(&#x27;html, body&#x27;).animate({
+              scrollTop: (isGoingForward ? 0 : 20)
+            }, 1000);
+          }
+        }, {
+          type: &#x27;element&#x27;,
+          selector: _ID_TUTORIAL_TRANSLATION_LANGUAGE,
+          heading: &#x27;Choose Language&#x27;,
+          text: (
+            &#x27;Start your translation by choosing the language that &#x27; +
+            &#x27;you want to translate to.&#x27;),
+          placement: &#x27;bottom&#x27;
+        }, {
+          type: &#x27;function&#x27;,
+          fn: function(isGoingForward) {
+            var idToScrollTo = (
+              isGoingForward ? _ID_TUTORIAL_TRANSLATION_OVERVIEW :
+              _ID_TUTORIAL_TRANSLATION_LANGUAGE);
+            $(&#x27;html, body&#x27;).animate({
+              scrollTop: angular.element(idToScrollTo).offset().top - 200
+            }, 1000);
+          }
+        }, {
+          type: &#x27;element&#x27;,
+          selector: _ID_TUTORIAL_TRANSLATION_OVERVIEW,
+          heading: &#x27;Choose a Card to Translate&#x27;,
+          text: (
+            &#x27;Then, choose a card from the exploration overview by &#x27; +
+            &#x27;clicking on the card. The selected card will have &#x27; +
+            &#x27;a bold border. Cards with missing translations are &#x27; +
+            &#x27;coloured yellow or red. These are good places to start.&#x27;),
+          placement: &#x27;left&#x27;
+        }, {
+          type: &#x27;function&#x27;,
+          fn: function(isGoingForward) {
+            var idToScrollTo = (
+              isGoingForward ? _ID_TUTORIAL_TRANSLATION_STATE :
+              _ID_TUTORIAL_TRANSLATION_OVERVIEW);
+            $(&#x27;html, body&#x27;).animate({
+              scrollTop: angular.element(idToScrollTo).offset().top - 200
+            }, 1000);
+          }
+        }, {
+          type: &#x27;element&#x27;,
+          selector: _ID_TUTORIAL_TRANSLATION_STATE,
+          heading: &#x27;Choose a Part of the Card to Translate&#x27;,
+          text: (
+            &#x27;&lt;p&gt;Next, choose a part of the lesson card to translate. This &#x27; +
+            &#x27;menu at the top lists all the translatable parts &#x27; +
+            &#x27;of the card. Within each tab, multiple sections may be &#x27; +
+            &#x27;available for translating.&lt;/p&gt;&#x27;),
+          placement: &#x27;bottom&#x27;
+        }, {
+          type: &#x27;function&#x27;,
+          fn: function(isGoingForward) {
+            $(&#x27;html, body&#x27;).animate({
+              scrollTop: (isGoingForward ? 0 : 20)
+            }, 1000);
+          }
+        }, {
+          type: &#x27;title&#x27;,
+          heading: &#x27;Recording Audio&#x27;,
+          text: (
+            &#x27;&lt;p&gt;To create audio translations in Oppia, &#x27; +
+            &#x27;we recommend using the &#x27; +
+            &#x27;&lt;i class=&quot;material-icons&quot; style=&quot;color:#009688&quot; &gt;&#x27; +
+            &#x27;&amp;#xE2C6;&lt;/i&gt;&#x27; +
+            &#x27;button to &lt;b&gt;upload&lt;/b&gt; audio files from your computer.&lt;/p&gt;&#x27; +
+            &#x27;&lt;p&gt;You can also record via your browser, but that may lead to &#x27; +
+            &#x27;degraded audio quality. If you would like to do so anyway, &#x27; +
+            &#x27;simply follow these 3 steps:&lt;/p&gt;&#x27; +
+            &#x27;&lt;ol&gt;&#x27; +
+            &#x27;  &lt;li&gt;&#x27; +
+            &#x27;    To start &lt;b&gt;recording&lt;/b&gt;, click the &#x27; +
+            &#x27;    &lt;i class=&quot;material-icons&quot; style=&quot;color:#009688&quot;&gt;&#x27; +
+            &#x27;    mic&lt;/i&gt; button. &#x27; +
+            &#x27;    If the browser pops up a message asking if you’d &#x27; +
+            &#x27;    like to record audio, accept it. &#x27; +
+            &#x27;  &lt;/li&gt;&#x27; +
+            &#x27;  &lt;li&gt;&#x27; +
+            &#x27;    When you are ready to end the recording, click &#x27; +
+            &#x27;    &lt;i class=&quot;material-icons&quot; style=&quot;color:#009688&quot;&gt;&#x27; +
+            &#x27;    &amp;#xE047;&lt;/i&gt; to &lt;b&gt;stop&lt;/b&gt;. &#x27; +
+            &#x27;  &lt;/li&gt;&#x27; +
+            &#x27;  &lt;li&gt;&#x27; +
+            &#x27;    Hit the &lt;b&gt;save&lt;/b&gt; &lt;i class=&quot;material-icons&quot;&#x27; +
+            &#x27;    style=&quot;color:#009688&quot; &gt; &amp;#xE161;&lt;/i&gt; button &#x27; +
+            &#x27;    to confirm the recording.&#x27; +
+            &#x27;  &lt;/li&gt;&#x27; +
+            &#x27;&lt;/ol&gt;&#x27;)
+        }, {
+          type: &#x27;function&#x27;,
+          fn: function(isGoingForward) {
+            $(&#x27;html, body&#x27;).animate({
+              scrollTop: (isGoingForward ? 0 : 20)
+            }, 1000);
+          }
+        }, {
+          type: &#x27;title&#x27;,
+          heading: &#x27;Re-record/Re-upload audio&#x27;,
+          text: (
+            &#x27;&lt;p&gt;The audio recording also has options related &#x27; +
+            &#x27;to updating and deleting translations.&lt;/p&gt;&#x27; +
+            &#x27;&lt;ul&gt;&#x27; +
+            &#x27;  &lt;li&gt;&#x27; +
+            &#x27;    To revert and cancel any unsaved translation(s),&#x27; +
+            &#x27;    click the &#x27; +
+            &#x27;    &lt;i class=&quot;material-icons&quot; style=&quot;color:#009688&quot;&gt;&#x27; +
+            &#x27;    &amp;#xE5C9;&lt;/i&gt; button.&#x27; +
+            &#x27;  &lt;/li&gt;&#x27; +
+            &#x27;  &lt;li&gt;&#x27; +
+            &#x27;    To play the audio, click the &#x27; +
+            &#x27;    &lt;i class=&quot;material-icons&quot; style=&quot;color:#009688&quot; &gt;&#x27; +
+            &#x27;    &amp;#xE039;&lt;/i&gt; button. &#x27; +
+            &#x27;  &lt;/li&gt;&#x27; +
+            &#x27;  &lt;li&gt;&#x27; +
+            &#x27;    To do retakes, click the &#x27; +
+            &#x27;    &lt;i class=&quot;material-icons&quot; style=&quot;color:#009688&quot;&gt;&#x27; +
+            &#x27;    &amp;#xE028;&lt;/i&gt; button. &#x27; +
+            &#x27;  &lt;/li&gt;&#x27; +
+            &#x27;  &lt;li&gt;&#x27; +
+            &#x27;    To delete a recording, click the &#x27; +
+            &#x27;    &lt;i class=&quot;material-icons&quot; style=&quot;color:#009688&quot;&gt;&#x27; +
+            &#x27;    &amp;#xE872;&lt;/i&gt; button. &#x27; +
+            &#x27;  &lt;/li&gt;&#x27; +
+            &#x27;&lt;/ul&gt;&#x27;)
+        }, {
+          type: &#x27;function&#x27;,
+          fn: function(isGoingForward) {
+            $(&#x27;html, body&#x27;).animate({
+              scrollTop: (isGoingForward ? 0 : 20)
+            }, 1000);
+          }
+        }, {
+          type: &#x27;title&#x27;,
+          heading: &#x27;Tutorial Complete&#x27;,
+          text: (
+            &#x27;&lt;p&gt;&#x27; +
+            &#x27;Now, you are ready to begin adding translations &#x27; +
+            &#x27;to your explorations! &#x27; +
+            &#x27;This marks the end of this tour. &#x27; +
+            &#x27;Remember to save your progress periodically using &#x27; +
+            &#x27;the save button in the navigation bar at the top: &#x27; +
+            &#x27;&lt;button class=&quot;btn btn-success&quot; disabled&gt;&#x27; +
+            &#x27;&lt;i class=&quot;material-icons&quot; &gt;&amp;#xE161;&#x27; +
+            &#x27;&lt;/i&gt;&lt;/button&gt;.&lt;br&gt; &#x27; +
+            &#x27;Thank you for making this lesson more accessible &#x27; +
+            &#x27;for non-native speakers!&#x27;)
+        }];
+        $templateCache.put(
+          &#x27;ng-joyride-title-tplv1.html&#x27;, ngJoyrideTemplate);
+        UserExplorationPermissionsService.getPermissionsAsync()
+          .then(function(explorationPermissions) {
+            permissions = explorationPermissions;
+          });
+        ctrl.directiveSubscriptions.add(
+          // eslint-disable-next-line max-len
+          StateTutorialFirstTimeService.onEnterTranslationForTheFirstTime.subscribe(
+            () =&gt; $scope.showWelcomeTranslationModal()
+          )
+        );
+      };
+      ctrl.$onDestroy = function() {
+        ctrl.directiveSubscriptions.unsubscribe();
+      };
+    }]
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:69,&quot;character&quot;:8,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:69,&quot;character&quot;:16,&quot;text&quot;:&quot;$templateCache&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:69,&quot;character&quot;:32,&quot;text&quot;:&quot;$uibModal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:70,&quot;character&quot;:8,&quot;text&quot;:&quot;ContextService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:70,&quot;character&quot;:24,&quot;text&quot;:&quot;EditabilityService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:70,&quot;character&quot;:44,&quot;text&quot;:&quot;ExplorationStatesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:71,&quot;character&quot;:8,&quot;text&quot;:&quot;LoaderService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:71,&quot;character&quot;:23,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:71,&quot;character&quot;:38,&quot;text&quot;:&quot;SiteAnalyticsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:72,&quot;character&quot;:8,&quot;text&quot;:&quot;StateEditorService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:72,&quot;character&quot;:28,&quot;text&quot;:&quot;StateRecordedVoiceoversService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:73,&quot;character&quot;:8,&quot;text&quot;:&quot;StateTutorialFirstTimeService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:73,&quot;character&quot;:39,&quot;text&quot;:&quot;StateWrittenTranslationsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:74,&quot;character&quot;:8,&quot;text&quot;:&quot;TranslationTabActiveModeService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:74,&quot;character&quot;:41,&quot;text&quot;:&quot;UrlInterpolationService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:75,&quot;character&quot;:8,&quot;text&quot;:&quot;UserExplorationPermissionsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:76,&quot;character&quot;:10,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:76,&quot;character&quot;:17,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:77,&quot;character&quot;:6,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:77,&quot;character&quot;:11,&quot;text&quot;:&quot;directiveSubscriptions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:85,&quot;character&quot;:10,&quot;text&quot;:&quot;ngJoyrideTemplate&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:86,&quot;character&quot;:8,&quot;text&quot;:&quot;$templateCache&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:86,&quot;character&quot;:23,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:87,&quot;character&quot;:6,&quot;text&quot;:&quot;ngJoyrideTemplate&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:87,&quot;character&quot;:26,&quot;text&quot;:&quot;ngJoyrideTemplate&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:87,&quot;character&quot;:44,&quot;text&quot;:&quot;replace&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:88,&quot;character&quot;:23,&quot;text&quot;:&quot;replace&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:90,&quot;character&quot;:6,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:90,&quot;character&quot;:13,&quot;text&quot;:&quot;initTranslationTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:91,&quot;character&quot;:8,&quot;text&quot;:&quot;StateTutorialFirstTimeService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:91,&quot;character&quot;:38,&quot;text&quot;:&quot;initTranslation&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:92,&quot;character&quot;:10,&quot;text&quot;:&quot;ContextService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:92,&quot;character&quot;:25,&quot;text&quot;:&quot;getExplorationId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:93,&quot;character&quot;:12,&quot;text&quot;:&quot;stateName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:93,&quot;character&quot;:24,&quot;text&quot;:&quot;StateEditorService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:93,&quot;character&quot;:43,&quot;text&quot;:&quot;getActiveStateName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:94,&quot;character&quot;:8,&quot;text&quot;:&quot;StateRecordedVoiceoversService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:94,&quot;character&quot;:39,&quot;text&quot;:&quot;init&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:95,&quot;character&quot;:10,&quot;text&quot;:&quot;stateName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:95,&quot;character&quot;:21,&quot;text&quot;:&quot;ExplorationStatesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:95,&quot;character&quot;:46,&quot;text&quot;:&quot;getRecordedVoiceoversMemento&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:96,&quot;character&quot;:12,&quot;text&quot;:&quot;stateName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:97,&quot;character&quot;:8,&quot;text&quot;:&quot;StateWrittenTranslationsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:97,&quot;character&quot;:40,&quot;text&quot;:&quot;init&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:98,&quot;character&quot;:10,&quot;text&quot;:&quot;stateName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:98,&quot;character&quot;:21,&quot;text&quot;:&quot;ExplorationStatesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:98,&quot;character&quot;:46,&quot;text&quot;:&quot;getWrittenTranslationsMemento&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:99,&quot;character&quot;:12,&quot;text&quot;:&quot;stateName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:100,&quot;character&quot;:8,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:100,&quot;character&quot;:15,&quot;text&quot;:&quot;showTranslationTabSubDirectives&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:101,&quot;character&quot;:8,&quot;text&quot;:&quot;TranslationTabActiveModeService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:101,&quot;character&quot;:40,&quot;text&quot;:&quot;activateVoiceoverMode&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:102,&quot;character&quot;:8,&quot;text&quot;:&quot;LoaderService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:102,&quot;character&quot;:22,&quot;text&quot;:&quot;hideLoadingScreen&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:104,&quot;character&quot;:12,&quot;text&quot;:&quot;EditabilityService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:104,&quot;character&quot;:31,&quot;text&quot;:&quot;inTutorialMode&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:105,&quot;character&quot;:10,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:105,&quot;character&quot;:17,&quot;text&quot;:&quot;startTutorial&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:109,&quot;character&quot;:6,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:109,&quot;character&quot;:13,&quot;text&quot;:&quot;leaveTutorial&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:110,&quot;character&quot;:8,&quot;text&quot;:&quot;EditabilityService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:110,&quot;character&quot;:27,&quot;text&quot;:&quot;onEndTutorial&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:111,&quot;character&quot;:8,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:111,&quot;character&quot;:15,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:112,&quot;character&quot;:8,&quot;text&quot;:&quot;StateTutorialFirstTimeService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:112,&quot;character&quot;:38,&quot;text&quot;:&quot;markTranslationTutorialFinished&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:113,&quot;character&quot;:8,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:113,&quot;character&quot;:15,&quot;text&quot;:&quot;tutorialInProgress&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:116,&quot;character&quot;:6,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:116,&quot;character&quot;:13,&quot;text&quot;:&quot;onFinishTutorial&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:117,&quot;character&quot;:8,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:117,&quot;character&quot;:15,&quot;text&quot;:&quot;leaveTutorial&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:120,&quot;character&quot;:6,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:120,&quot;character&quot;:13,&quot;text&quot;:&quot;onSkipTutorial&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:121,&quot;character&quot;:8,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:121,&quot;character&quot;:15,&quot;text&quot;:&quot;leaveTutorial&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:124,&quot;character&quot;:10,&quot;text&quot;:&quot;permissions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:125,&quot;character&quot;:6,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:125,&quot;character&quot;:13,&quot;text&quot;:&quot;startTutorial&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:126,&quot;character&quot;:12,&quot;text&quot;:&quot;permissions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:129,&quot;character&quot;:12,&quot;text&quot;:&quot;permissions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:129,&quot;character&quot;:24,&quot;text&quot;:&quot;canVoiceover&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:130,&quot;character&quot;:10,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:130,&quot;character&quot;:17,&quot;text&quot;:&quot;tutorialInProgress&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:134,&quot;character&quot;:6,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:134,&quot;character&quot;:13,&quot;text&quot;:&quot;showWelcomeTranslationModal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:135,&quot;character&quot;:8,&quot;text&quot;:&quot;$uibModal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:135,&quot;character&quot;:18,&quot;text&quot;:&quot;open&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:136,&quot;character&quot;:10,&quot;text&quot;:&quot;templateUrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:136,&quot;character&quot;:23,&quot;text&quot;:&quot;UrlInterpolationService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:136,&quot;character&quot;:47,&quot;text&quot;:&quot;getDirectiveTemplateUrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:142,&quot;character&quot;:11,&quot;text&quot;:&quot;result&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:142,&quot;character&quot;:18,&quot;text&quot;:&quot;then&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:142,&quot;character&quot;:32,&quot;text&quot;:&quot;explorationId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:143,&quot;character&quot;:10,&quot;text&quot;:&quot;SiteAnalyticsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:143,&quot;character&quot;:31,&quot;text&quot;:&quot;registerAcceptTutorialModalEvent&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:144,&quot;character&quot;:12,&quot;text&quot;:&quot;explorationId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:145,&quot;character&quot;:10,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:145,&quot;character&quot;:17,&quot;text&quot;:&quot;startTutorial&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:146,&quot;character&quot;:20,&quot;text&quot;:&quot;explorationId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:147,&quot;character&quot;:10,&quot;text&quot;:&quot;SiteAnalyticsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:147,&quot;character&quot;:31,&quot;text&quot;:&quot;registerDeclineTutorialModalEvent&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:148,&quot;character&quot;:12,&quot;text&quot;:&quot;explorationId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:149,&quot;character&quot;:10,&quot;text&quot;:&quot;StateTutorialFirstTimeService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:149,&quot;character&quot;:40,&quot;text&quot;:&quot;markTranslationTutorialFinished&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:153,&quot;character&quot;:6,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:153,&quot;character&quot;:11,&quot;text&quot;:&quot;$onInit&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:154,&quot;character&quot;:8,&quot;text&quot;:&quot;LoaderService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:154,&quot;character&quot;:22,&quot;text&quot;:&quot;showLoadingScreen&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:155,&quot;character&quot;:8,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:155,&quot;character&quot;:15,&quot;text&quot;:&quot;isTranslationTabBusy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:156,&quot;character&quot;:8,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:156,&quot;character&quot;:15,&quot;text&quot;:&quot;showTranslationTabSubDirectives&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:157,&quot;character&quot;:8,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:157,&quot;character&quot;:15,&quot;text&quot;:&quot;tutorialInProgress&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:158,&quot;character&quot;:8,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:158,&quot;character&quot;:13,&quot;text&quot;:&quot;directiveSubscriptions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:158,&quot;character&quot;:36,&quot;text&quot;:&quot;add&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:159,&quot;character&quot;:10,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:159,&quot;character&quot;:24,&quot;text&quot;:&quot;onRefreshTranslationTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:159,&quot;character&quot;:48,&quot;text&quot;:&quot;subscribe&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:161,&quot;character&quot;:14,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:161,&quot;character&quot;:21,&quot;text&quot;:&quot;initTranslationTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:166,&quot;character&quot;:8,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:166,&quot;character&quot;:15,&quot;text&quot;:&quot;TRANSLATION_TUTORIAL_OPTIONS&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:175,&quot;character&quot;:23,&quot;text&quot;:&quot;isGoingForward&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:177,&quot;character&quot;:26,&quot;text&quot;:&quot;isGoingForward&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:190,&quot;character&quot;:23,&quot;text&quot;:&quot;isGoingForward&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:192,&quot;character&quot;:14,&quot;text&quot;:&quot;isGoingForward&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:210,&quot;character&quot;:23,&quot;text&quot;:&quot;isGoingForward&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:212,&quot;character&quot;:14,&quot;text&quot;:&quot;isGoingForward&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:230,&quot;character&quot;:23,&quot;text&quot;:&quot;isGoingForward&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:232,&quot;character&quot;:26,&quot;text&quot;:&quot;isGoingForward&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:268,&quot;character&quot;:23,&quot;text&quot;:&quot;isGoingForward&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:270,&quot;character&quot;:26,&quot;text&quot;:&quot;isGoingForward&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:304,&quot;character&quot;:23,&quot;text&quot;:&quot;isGoingForward&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:306,&quot;character&quot;:26,&quot;text&quot;:&quot;isGoingForward&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:325,&quot;character&quot;:8,&quot;text&quot;:&quot;$templateCache&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:325,&quot;character&quot;:23,&quot;text&quot;:&quot;put&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:326,&quot;character&quot;:41,&quot;text&quot;:&quot;ngJoyrideTemplate&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:327,&quot;character&quot;:8,&quot;text&quot;:&quot;UserExplorationPermissionsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:327,&quot;character&quot;:42,&quot;text&quot;:&quot;getPermissionsAsync&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:328,&quot;character&quot;:11,&quot;text&quot;:&quot;then&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:328,&quot;character&quot;:25,&quot;text&quot;:&quot;explorationPermissions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:329,&quot;character&quot;:12,&quot;text&quot;:&quot;permissions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:329,&quot;character&quot;:26,&quot;text&quot;:&quot;explorationPermissions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:331,&quot;character&quot;:8,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:331,&quot;character&quot;:13,&quot;text&quot;:&quot;directiveSubscriptions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:331,&quot;character&quot;:36,&quot;text&quot;:&quot;add&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:333,&quot;character&quot;:10,&quot;text&quot;:&quot;StateTutorialFirstTimeService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:333,&quot;character&quot;:40,&quot;text&quot;:&quot;onEnterTranslationForTheFirstTime&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:333,&quot;character&quot;:74,&quot;text&quot;:&quot;subscribe&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:334,&quot;character&quot;:18,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:334,&quot;character&quot;:25,&quot;text&quot;:&quot;showWelcomeTranslationModal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:338,&quot;character&quot;:6,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:338,&quot;character&quot;:11,&quot;text&quot;:&quot;$onDestroy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:339,&quot;character&quot;:8,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:339,&quot;character&quot;:13,&quot;text&quot;:&quot;directiveSubscriptions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.ts&quot;,&quot;line&quot;:339,&quot;character&quot;:36,&quot;text&quot;:&quot;unsubscribe&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:59 GMT</p>
+    </body>
+  </html>
+  

@@ -1,0 +1,221 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>oppia-noninteractive-image.component.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">extensions/rich_text_components/Image/directives/oppia-noninteractive-image.component.ts</td><td class="">96.36%</td><td class="">100%</td><td class="">247</td><td class="">238</td><td class="">9</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2014 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Directive for the Image rich-text component.
+ *
+ * IMPORTANT NOTE: The naming convention for customization args that are passed
+ * into the directive is: the name of the parameter, followed by &#x27;With&#x27;,
+ * followed by the name of the arg.
+ *
+ * All of the RTE components follow this pattern of updateView and ngOnChanges.
+ * This is because these are also web-components (So basically, we can create
+ * this component using document.createElement). CKEditor creates instances of
+ * these on the fly and runs ngOnInit before we can set the @Input properties.
+ * When the input properties are not set, we get errors in the console.
+ * The `if` condition in update view prevents that from happening.
+ * The `if` condition in the updateView and ngOnChanges might look like the
+ * literal opposite but that&#x27;s not the case. We know from the previous
+ * statements above that the if condition in the updateView is for preventing
+ * the code to run until all the values needed for successful execution are
+ * present. The if condition in ngOnChanges is to optimize the re-runs of
+ * updateView and only re-run when a property we care about has changed in
+ * value.
+ */
+
+import { Component, Input, OnChanges, OnInit, SimpleChanges } from &#x27;@angular/core&#x27;;
+import { UrlInterpolationService } from &#x27;domain/utilities/url-interpolation.service&#x27;;
+import { ImageDimensions, ImagePreloaderService } from &#x27;pages/exploration-player-page/services/image-preloader.service&#x27;;
+import { AssetsBackendApiService } from &#x27;services/assets-backend-api.service&#x27;;
+import { ContextService } from &#x27;services/context.service&#x27;;
+import { HtmlEscaperService } from &#x27;services/html-escaper.service&#x27;;
+import { ImageLocalStorageService } from &#x27;services/image-local-storage.service&#x27;;
+import { AppConstants } from &#x27;app.constants&#x27;;
+import { downgradeComponent } from &#x27;@angular/upgrade/static&#x27;;
+import { SvgSanitizerService } from &#x27;services/svg-sanitizer.service&#x27;;
+import { SafeResourceUrl } from &#x27;@angular/platform-browser&#x27;;
+
+interface Dimension {
+  height: string;
+  width: string;
+}
+@Component({
+  selector: &#x27;oppia-noninteractive-image&#x27;,
+  templateUrl: &#x27;./image.component.html&#x27;,
+  styleUrls: []
+})
+export class NoninteractiveImage implements OnInit, OnChanges {
+  @Input() filepathWithValue: string;
+  @Input() altWithValue: string = &#x27;&#x27;;
+  @Input() captionWithValue: string = &#x27;&#x27;;
+  filepath: string;
+  imageUrl: SafeResourceUrl | string = &#x27;&#x27;;
+  imageAltText: string = &#x27;&#x27;;
+  imageCaption: string = &#x27;&#x27;;
+  loadingIndicatorUrl;
+  isLoadingIndicatorShown: boolean = false;
+  isTryAgainShown: boolean = false;
+  dimensions: ImageDimensions;
+  imageContainerStyle: Dimension;
+  loadingIndicatorStyle: Dimension;
+  constructor(
+    private assetsBackendApiService: AssetsBackendApiService,
+    private contextService: ContextService,
+    private htmlEscaperService: HtmlEscaperService,
+    private imageLocalStorageService: ImageLocalStorageService,
+    private imagePreloaderService: ImagePreloaderService,
+    private urlInterpolationService: UrlInterpolationService,
+    private svgSanitizerService: SvgSanitizerService
+  ) {}
+
+  private _updateViewOnNewImage(): void {
+    if (
+      !this.filepathWithValue || !this.altWithValue || !this.captionWithValue
+    ) {
+      return;
+    }
+    this.filepath = this.htmlEscaperService.escapedJsonToObj(
+      this.filepathWithValue) as string;
+    if (!this.filepath) {
+      return;
+    }
+    this.loadingIndicatorUrl = this.urlInterpolationService.getStaticImageUrl(
+      AppConstants.LOADING_INDICATOR_URL);
+    this.dimensions = this.imagePreloaderService.getDimensionsOfImage(
+      this.filepath);
+    this.imageContainerStyle = {
+      height: this.dimensions.height + &#x27;px&#x27;,
+      width: this.dimensions.width + &#x27;px&#x27;
+    };
+    // If viewing a concept card in the exploration player, don&#x27;t use the
+    // preloader service. Since, in that service, the image file names are
+    // extracted from the state contents to be preloaded, but when
+    // viewing a concept, the names are not available until the link is
+    // clicked, at which point an API call is done to get the skill
+    // details. So, the image file name will not be available to the
+    // preloader service beforehand.
+    if (
+      this.imagePreloaderService.inExplorationPlayer() &amp;&amp;
+      this.contextService.getEntityType() !== AppConstants.ENTITY_TYPE.SKILL
+    ) {
+      const loadingIndicatorSize = this.dimensions.height &lt; 124 ? 24 : 120;
+      this.loadingIndicatorStyle = {
+        height: loadingIndicatorSize + &#x27;px&#x27;,
+        width: loadingIndicatorSize + &#x27;px&#x27;
+      };
+
+      this.loadImage();
+    } else {
+      // This is the case when user is not in the exploration player. We
+      // don&#x27;t have loading indicator or try again for showing images in
+      // this case. So we directly assign the url to the imageUrl.
+      try {
+        // For IMAGE_SAVE_DESTINATION_LOCAL_STORAGE mode we first try to
+        // fetch images through the storage and if it doesn&#x27;t exist we try
+        // fetching it through server.
+        // This is required for the translation suggestion as there can be
+        // target entity&#x27;s images in the translatable content which needs
+        // to be fetched from the server.
+        if (
+          this.contextService.getImageSaveDestination() ===
+                AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE &amp;&amp; (
+            this.imageLocalStorageService.isInStorage(this.filepath))) {
+          const base64Url = this.imageLocalStorageService.getRawImageData(
+            this.filepath);
+          const mimeType = base64Url.split(&#x27;;&#x27;)[0];
+          if (mimeType === &#x27;data:image/svg+xml&#x27;) {
+            this.imageUrl = this.svgSanitizerService.getTrustedSvgResourceUrl(
+              base64Url);
+          } else {
+            this.imageUrl = base64Url;
+          }
+        } else {
+          this.imageUrl = this.assetsBackendApiService.getImageUrlForPreview(
+            this.contextService.getEntityType(),
+            this.contextService.getEntityId(),
+            this.filepath);
+        }
+      } catch (e) {
+        const additionalInfo = (
+          &#x27;\nEntity type: &#x27; + this.contextService.getEntityType() +
+          &#x27;\nEntity ID: &#x27; + this.contextService.getEntityId() +
+          &#x27;\nFilepath: &#x27; + this.filepath);
+        e.message += additionalInfo;
+        throw e;
+      }
+
+      this.imageCaption = &#x27;&#x27;;
+      if (this.captionWithValue) {
+        this.imageCaption = this.htmlEscaperService.escapedJsonToObj(
+          this.captionWithValue) as string;
+      }
+      this.imageAltText = &#x27;&#x27;;
+      if (this.altWithValue) {
+        this.imageAltText = this.htmlEscaperService.escapedJsonToObj(
+          this.altWithValue) as string;
+      }
+    }
+  }
+
+  ngOnInit(): void {
+    this._updateViewOnNewImage();
+  }
+
+  loadImage(): void {
+    this.isLoadingIndicatorShown = true;
+    this.isTryAgainShown = false;
+    this.imagePreloaderService.getImageUrlAsync(
+      this.filepath).then(objectUrl =&gt; {
+      this.isTryAgainShown = false;
+      this.isLoadingIndicatorShown = false;
+      this.imageUrl = objectUrl;
+    }, () =&gt; {
+      this.isTryAgainShown = true;
+      this.isLoadingIndicatorShown = false;
+    });
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (
+      changes.filepathWithValue ||
+      changes.altWithValue ||
+      changes.captionWithValue
+    ) {
+      this._updateViewOnNewImage();
+    }
+  }
+}
+
+angular.module(&#x27;oppia&#x27;).directive(&#x27;oppiaNoninteractiveImage&#x27;,
+  downgradeComponent({
+    component: NoninteractiveImage
+  }) as angular.IDirectiveFactory);
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;extensions/rich_text_components/Image/directives/oppia-noninteractive-image.component.ts&quot;,&quot;line&quot;:65,&quot;character&quot;:2,&quot;text&quot;:&quot;loadingIndicatorUrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Image/directives/oppia-noninteractive-image.component.ts&quot;,&quot;line&quot;:87,&quot;character&quot;:20,&quot;text&quot;:&quot;this.htmlEscaperService.escapedJsonToObj(\n      this.filepathWithValue) as string&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;extensions/rich_text_components/Image/directives/oppia-noninteractive-image.component.ts&quot;,&quot;line&quot;:92,&quot;character&quot;:9,&quot;text&quot;:&quot;loadingIndicatorUrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Image/directives/oppia-noninteractive-image.component.ts&quot;,&quot;line&quot;:153,&quot;character&quot;:8,&quot;text&quot;:&quot;e&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Image/directives/oppia-noninteractive-image.component.ts&quot;,&quot;line&quot;:153,&quot;character&quot;:10,&quot;text&quot;:&quot;message&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Image/directives/oppia-noninteractive-image.component.ts&quot;,&quot;line&quot;:154,&quot;character&quot;:14,&quot;text&quot;:&quot;e&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Image/directives/oppia-noninteractive-image.component.ts&quot;,&quot;line&quot;:148,&quot;character&quot;:15,&quot;text&quot;:&quot;e&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Image/directives/oppia-noninteractive-image.component.ts&quot;,&quot;line&quot;:159,&quot;character&quot;:28,&quot;text&quot;:&quot;this.htmlEscaperService.escapedJsonToObj(\n          this.captionWithValue) as string&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;extensions/rich_text_components/Image/directives/oppia-noninteractive-image.component.ts&quot;,&quot;line&quot;:164,&quot;character&quot;:28,&quot;text&quot;:&quot;this.htmlEscaperService.escapedJsonToObj(\n          this.altWithValue) as string&quot;,&quot;kind&quot;:3}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:54 GMT</p>
+    </body>
+  </html>
+  

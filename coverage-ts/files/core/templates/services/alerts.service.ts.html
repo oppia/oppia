@@ -1,0 +1,191 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>alerts.service.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">core/templates/services/alerts.service.ts</td><td class="">100.00%</td><td class="">100%</td><td class="">159</td><td class="">159</td><td class="">0</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2016 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Factory for handling warnings and info messages.
+ */
+
+import { Injectable } from &#x27;@angular/core&#x27;;
+import { downgradeInjectable } from &#x27;@angular/upgrade/static&#x27;;
+
+import { LoggerService } from &#x27;services/contextual/logger.service&#x27;;
+
+export interface Warning {
+  type: string;
+  content: string;
+}
+
+export interface Message {
+    type: string;
+    content: string;
+    timeout: number;
+}
+
+@Injectable({
+  providedIn: &#x27;root&#x27;
+})
+export class AlertsService {
+  /**
+   * Each element in each of the arrays here is an object with two keys:
+   *   - type:  a string specifying the type of message or warning.
+   *            Possible types - &quot;warning&quot;, &quot;info&quot; or &quot;success&quot;.
+   *   - content: a string containing the warning or message.
+   */
+
+  // TODO(#8472): Remove static when migration is complete.
+  // Until then, we need to use static so that the two instances of the service
+  // created by our hybrid app (one for Angular, the other for AngularJS) can
+  // refer to the same objects.
+  private static warnings: Warning[] = [];
+  get warnings(): Warning[] {
+    return AlertsService.warnings;
+  }
+  private static messages: Message[] = [];
+  get messages(): Message[] {
+    return AlertsService.messages;
+  }
+
+  // This is to prevent infinite loops.
+  MAX_TOTAL_WARNINGS: number = 10;
+  MAX_TOTAL_MESSAGES: number = 10;
+
+  constructor(private log: LoggerService) {
+    // Since warnings and messages are static, clearing them in the constructor
+    // retain &quot;instance-like&quot; behavior.
+    this.clearWarnings();
+    this.clearMessages();
+  }
+
+  /**
+   * Adds a warning message.
+   * @param {string} warning - The warning message to display.
+   */
+  addWarning(warning: string): void {
+    this.log.error(warning);
+    if (this.warnings.length &gt;= this.MAX_TOTAL_WARNINGS) {
+      return;
+    }
+    this.warnings.push({
+      type: &#x27;warning&#x27;,
+      content: warning
+    });
+  }
+
+  /**
+   * Adds a warning in the same way as addWarning(), except it also throws an
+   * exception to cause a hard failure in the frontend.
+   * @param {string} warning - The warning message to display.
+   */
+  fatalWarning(warning: string): void {
+    this.addWarning(warning);
+    throw new Error(warning);
+  }
+
+  /**
+   * Deletes the warning from the warnings list.
+   * @param {Object} warningToDelete - The warning message to be deleted.
+   */
+  deleteWarning(warningToDelete: Warning): void {
+    const filteredWarnings = (
+      this.warnings.filter(w =&gt; w.content !== warningToDelete.content));
+    this.warnings.splice(0, this.warnings.length, ...filteredWarnings);
+  }
+
+  /**
+   * Clears all warnings.
+   */
+  clearWarnings(): void {
+    this.warnings.splice(0, this.warnings.length);
+  }
+
+  /**
+   * Adds a message, can be info messages or success messages.
+   * @param {string} type - Type of message
+   * @param {string} message - Message content
+   * @param {number|undefined} timeoutMilliseconds - Timeout for the toast.
+   */
+  addMessage(type: string, message: string, timeoutMilliseconds: number): void {
+    if (this.messages.length &gt;= this.MAX_TOTAL_MESSAGES) {
+      return;
+    }
+    this.messages.push({
+      type: type,
+      content: message,
+      timeout: timeoutMilliseconds
+    });
+  }
+
+  /**
+   * Deletes the message from the messages list.
+   * @param {Object} messageToDelete - Message to be deleted.
+   */
+  deleteMessage(messageToDelete: Message): void {
+    const isMessageToKeep = (m: Message) =&gt; (
+      m.type !== messageToDelete.type || m.content !== messageToDelete.content);
+    const filteredMessages = this.messages.filter(isMessageToKeep);
+    this.messages.splice(0, this.messages.length, ...filteredMessages);
+  }
+
+  /**
+   * Adds an info message.
+   * @param {string} message - Info message to display.
+   * @param {number|undefined} timeoutMilliseconds - Timeout for the toast.
+   */
+  addInfoMessage(message: string, timeoutMilliseconds?: number): void {
+    if (timeoutMilliseconds === undefined) {
+      timeoutMilliseconds = 1500;
+    }
+    this.addMessage(&#x27;info&#x27;, message, timeoutMilliseconds);
+  }
+
+  /**
+   * Adds a success message.
+   * @param {string} message - Success message to display
+   * @param {number|undefined} timeoutMilliseconds - Timeout for the toast.
+   */
+  addSuccessMessage(message: string, timeoutMilliseconds?: number): void {
+    if (timeoutMilliseconds === undefined) {
+      timeoutMilliseconds = 1500;
+    }
+    this.addMessage(&#x27;success&#x27;, message, timeoutMilliseconds);
+  }
+
+  /**
+   * Clears all messages.
+   */
+  clearMessages(): void {
+    this.messages.splice(0, this.messages.length);
+  }
+}
+
+angular.module(&#x27;oppia&#x27;).factory(
+  &#x27;AlertsService&#x27;, downgradeInjectable(AlertsService));
+</textarea><pre id="annotations" style="display:none">[]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:54 GMT</p>
+    </body>
+  </html>
+  

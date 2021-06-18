@@ -1,0 +1,214 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>oppia-interactive-interactive-map.component.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">extensions/interactions/InteractiveMap/directives/oppia-interactive-interactive-map.component.ts</td><td class="">94.76%</td><td class="">100%</td><td class="">248</td><td class="">235</td><td class="">13</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2014 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Component for the InteractiveMap interaction.
+ *
+ * IMPORTANT NOTE: The naming convention for customization args that are passed
+ * into the component is: the name of the parameter, followed by &#x27;With&#x27;,
+ * followed by the name of the arg.
+ */
+
+import { Component, Input, OnDestroy, OnInit } from &#x27;@angular/core&#x27;;
+import { BrowserCheckerService } from &#x27;domain/utilities/browser-checker.service&#x27;;
+import { UrlInterpolationService } from &#x27;domain/utilities/url-interpolation.service&#x27;;
+import { InteractiveMapCustomizationArgs } from &#x27;interactions/customization-args-defs&#x27;;
+import { InteractionAttributesExtractorService } from &#x27;interactions/interaction-attributes-extractor.service&#x27;;
+import { CurrentInteractionService } from &#x27;pages/exploration-player-page/services/current-interaction.service&#x27;;
+import { PlayerPositionService } from &#x27;pages/exploration-player-page/services/player-position.service&#x27;;
+import { Subscription } from &#x27;rxjs&#x27;;
+import { InteractiveMapRulesService } from &#x27;./interactive-map-rules.service&#x27;;
+import { icon, LatLng, latLng, LeafletMouseEvent, marker, TileLayer, tileLayer } from &#x27;leaflet&#x27;;
+import { InteractionRulesService } from &#x27;pages/exploration-player-page/services/answer-classification.service&#x27;;
+import { downgradeComponent } from &#x27;@angular/upgrade/static&#x27;;
+
+@Component({
+  selector: &#x27;oppia-interactive-interactive-map&#x27;,
+  templateUrl: &#x27;./interactive-map-interaction.component.html&#x27;
+})
+export class InteractiveInteractiveMapComponent implements OnInit, OnDestroy {
+  @Input() lastAnswer;
+  @Input() latitudeWithValue: string;
+  @Input() longitudeWithValue: string;
+  @Input() zoomWithValue: string;
+  private _attribution = &#x27;© &lt;a href=&quot;https://www.openstreetmap.org/copyright&quot;&gt;OpenStreetMap&lt;/a&gt; contributors&#x27;;
+  private _optionsUrl = &#x27;http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png&#x27;;
+  optionsSpec = {
+    layers: [{ url: this._optionsUrl, attribution: this._attribution }],
+    zoom: 0
+  };
+  directiveSubscriptions = new Subscription();
+  coords: [number, number];
+  zoomLevel: number;
+  overlayStyle: {
+    &#x27;background-color&#x27;?: string;
+    opacity?: number;
+    &#x27;z-index&#x27;?: number;
+  };
+  zoom: number;
+  interactionIsActive: boolean;
+  mapMarkers;
+  mapOptions: {center: LatLng; layers: TileLayer[]; zoom: number};
+
+  constructor(
+    private browserCheckerService: BrowserCheckerService,
+    private currentInteractionService: CurrentInteractionService,
+    private interactionAttributesExtractorService:
+     InteractionAttributesExtractorService,
+    private interactiveMapRulesService: InteractiveMapRulesService,
+    private playerPositionService: PlayerPositionService,
+    private urlInterpolationService: UrlInterpolationService
+  ) { }
+
+  ngOnInit(): void {
+    this.directiveSubscriptions.add(
+      this.playerPositionService.onNewCardAvailable.subscribe(
+        () =&gt; {
+          this.interactionIsActive = false;
+          this.setOverlay();
+        }
+      )
+    );
+
+    const { latitude, longitude, zoom } = (
+      this.interactionAttributesExtractorService.getValuesFromAttributes(
+        &#x27;InteractiveMap&#x27;,
+        this._getArgs()
+      ) as InteractiveMapCustomizationArgs
+    );
+    this.coords = [latitude.value, longitude.value];
+    if (latitude.value === undefined || longitude.value === undefined) {
+      this.coords = [0, 0];
+    }
+    this.zoom = zoom.value;
+    this.zoomLevel = parseInt(this.zoom + &#x27;&#x27;, 10) || 0;
+    this.interactionIsActive = (this.lastAnswer === null);
+    this.mapOptions = {
+      layers: [tileLayer(
+        this.optionsSpec.layers[0].url,
+        { attribution: this.optionsSpec.layers[0].attribution }
+      )],
+      zoom: this.zoomLevel,
+      center: latLng([this.coords[0], this.coords[1]])
+    };
+    if (!this.interactionIsActive) {
+      this._changeMarkerPosition(
+        this.lastAnswer[0], this.lastAnswer[1]);
+    }
+  }
+
+  private _getArgs() {
+    return {
+      latitudeWithValue: this.latitudeWithValue,
+      longitudeWithValue: this.longitudeWithValue,
+      zoomWithValue: this.zoomWithValue
+    };
+  }
+
+  private _changeMarkerPosition(lat, lng) {
+    const newMarker = marker(
+      [lat, lng],
+      {
+        icon: icon({
+          iconUrl: this.urlInterpolationService.getExtensionResourceUrl(
+            &#x27;/interactions/InteractiveMap/static/marker-icon.png&#x27;),
+          // The size of the icon image in pixels.
+          iconSize: [25, 41],
+          // The coordinates of the &quot;tip&quot; of the icon.
+          iconAnchor: [12, 41],
+          shadowUrl: this.urlInterpolationService.getExtensionResourceUrl(
+            &#x27;/interactions/InteractiveMap/static/marker-shadow.png&#x27;),
+          // The size of the shadow image in pixels.
+          shadowSize: [41, 41],
+          // The coordinates of the &quot;tip&quot; of the shadow.
+          shadowAnchor: [13, 41],
+          // The URL to a retina sized version of the icon image.
+          // Used for Retina screen devices.
+          iconRetinaUrl: this.urlInterpolationService.getExtensionResourceUrl(
+            &#x27;/interactions/InteractiveMap/static/marker-icon-2x.png&#x27;),
+          shadowRetinaUrl: (
+            this.urlInterpolationService.getExtensionResourceUrl(
+              &#x27;/interactions/InteractiveMap/static/marker-shadow.png&#x27;))
+        })
+      }
+    );
+    this.mapMarkers = newMarker;
+  }
+
+  leafletClick(e: LeafletMouseEvent): void {
+    if (this.interactionIsActive) {
+      const newLat = e.latlng.lat;
+      const newLng = e.latlng.lng;
+      this._changeMarkerPosition(newLat, newLng);
+      this.currentInteractionService.onSubmit(
+        [newLat, newLng] as unknown as string,
+        this.interactiveMapRulesService as unknown as InteractionRulesService
+      );
+    }
+  }
+
+  leafletMouseOver(): void {
+    if (!this.interactionIsActive) {
+      this.setOverlay();
+    }
+  }
+
+  leafletMouseOut(): void {
+    if (!this.interactionIsActive) {
+      this.hideOverlay();
+    }
+  }
+
+  setOverlay(): void {
+    this.overlayStyle = {
+      &#x27;background-color&#x27;: &#x27;#fff&#x27;,
+      opacity: 0.5,
+      &#x27;z-index&#x27;: 1001
+    };
+  }
+
+  hideOverlay(): void {
+    this.overlayStyle = {
+      &#x27;background-color&#x27;: &#x27;#fff&#x27;
+    };
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
+  }
+}
+
+angular.module(&#x27;oppia&#x27;).directive(
+  &#x27;oppiaInteractiveInteractiveMap&#x27;,
+  downgradeComponent({
+    component: InteractiveInteractiveMapComponent
+  }));
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;extensions/interactions/InteractiveMap/directives/oppia-interactive-interactive-map.component.ts&quot;,&quot;line&quot;:40,&quot;character&quot;:11,&quot;text&quot;:&quot;lastAnswer&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/InteractiveMap/directives/oppia-interactive-interactive-map.component.ts&quot;,&quot;line&quot;:60,&quot;character&quot;:2,&quot;text&quot;:&quot;mapMarkers&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/InteractiveMap/directives/oppia-interactive-interactive-map.component.ts&quot;,&quot;line&quot;:84,&quot;character&quot;:6,&quot;text&quot;:&quot;this.interactionAttributesExtractorService.getValuesFromAttributes(\n        &#x27;InteractiveMap&#x27;,\n        this._getArgs()\n      ) as InteractiveMapCustomizationArgs&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;extensions/interactions/InteractiveMap/directives/oppia-interactive-interactive-map.component.ts&quot;,&quot;line&quot;:95,&quot;character&quot;:37,&quot;text&quot;:&quot;lastAnswer&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/InteractiveMap/directives/oppia-interactive-interactive-map.component.ts&quot;,&quot;line&quot;:106,&quot;character&quot;:13,&quot;text&quot;:&quot;lastAnswer&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/InteractiveMap/directives/oppia-interactive-interactive-map.component.ts&quot;,&quot;line&quot;:106,&quot;character&quot;:33,&quot;text&quot;:&quot;lastAnswer&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/InteractiveMap/directives/oppia-interactive-interactive-map.component.ts&quot;,&quot;line&quot;:118,&quot;character&quot;:32,&quot;text&quot;:&quot;lat&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/InteractiveMap/directives/oppia-interactive-interactive-map.component.ts&quot;,&quot;line&quot;:118,&quot;character&quot;:37,&quot;text&quot;:&quot;lng&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/InteractiveMap/directives/oppia-interactive-interactive-map.component.ts&quot;,&quot;line&quot;:119,&quot;character&quot;:10,&quot;text&quot;:&quot;newMarker&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/InteractiveMap/directives/oppia-interactive-interactive-map.component.ts&quot;,&quot;line&quot;:145,&quot;character&quot;:9,&quot;text&quot;:&quot;mapMarkers&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/InteractiveMap/directives/oppia-interactive-interactive-map.component.ts&quot;,&quot;line&quot;:145,&quot;character&quot;:22,&quot;text&quot;:&quot;newMarker&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/InteractiveMap/directives/oppia-interactive-interactive-map.component.ts&quot;,&quot;line&quot;:154,&quot;character&quot;:8,&quot;text&quot;:&quot;[newLat, newLng] as unknown as string&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;extensions/interactions/InteractiveMap/directives/oppia-interactive-interactive-map.component.ts&quot;,&quot;line&quot;:155,&quot;character&quot;:8,&quot;text&quot;:&quot;this.interactiveMapRulesService as unknown as InteractionRulesService&quot;,&quot;kind&quot;:3}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:58 GMT</p>
+    </body>
+  </html>
+  

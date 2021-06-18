@@ -1,0 +1,501 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>story-viewer-page.component.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/story-viewer-page/story-viewer-page.component.spec.ts</td><td class="">93.10%</td><td class="">100%</td><td class="">536</td><td class="">499</td><td class="">37</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for storyViewerPage.
+ */
+
+import { TestBed, fakeAsync, flushMicrotasks } from &#x27;@angular/core/testing&#x27;;
+import { HttpClientTestingModule, HttpTestingController } from &#x27;@angular/common/http/testing&#x27;;
+import { StoryNode } from &#x27;domain/story/story-node.model&#x27;;
+import { StoryPlaythrough, StoryPlaythroughBackendDict } from &#x27;domain/story_viewer/story-playthrough.model&#x27;;
+import { StoryViewerPageComponent } from &#x27;./story-viewer-page.component&#x27;;
+import { NO_ERRORS_SCHEMA } from &#x27;@angular/core&#x27;;
+import { UserService } from &#x27;services/user.service&#x27;;
+import { StoryViewerBackendApiService } from &#x27;domain/story_viewer/story-viewer-backend-api.service&#x27;;
+import { AlertsService } from &#x27;services/alerts.service&#x27;;
+import { AssetsBackendApiService } from &#x27;services/assets-backend-api.service&#x27;;
+import { UrlService } from &#x27;services/contextual/url.service&#x27;;
+import { PageTitleService } from &#x27;services/page-title.service&#x27;;
+import { UserInfo } from &#x27;domain/user/user-info.model&#x27;;
+import { WindowRef } from &#x27;services/contextual/window-ref.service&#x27;;
+import { MockTranslatePipe } from &#x27;tests/unit-test-utils&#x27;;
+
+
+class MockAssetsBackendApiService {
+  getThumbnailUrlForPreview() {
+    return &#x27;thumbnail-url&#x27;;
+  }
+}
+
+describe(&#x27;Story Viewer Page component&#x27;, () =&gt; {
+  let httpTestingController = null;
+  let component: StoryViewerPageComponent;
+  let alertsService = null;
+  let assetsBackendApiService: AssetsBackendApiService;
+  let storyViewerBackendApiService: StoryViewerBackendApiService;
+  let urlService: UrlService = null;
+  let userService: UserService = null;
+  let pageTitleService = null;
+  let windowRef: WindowRef;
+  let _samplePlaythroughObject = null;
+  const UserInfoObject = {
+    is_moderator: false,
+    is_admin: false,
+    is_super_admin: false,
+    is_topic_manager: false,
+    can_create_collections: true,
+    preferred_site_language_code: null,
+    username: &#x27;tester&#x27;,
+    email: &#x27;test@test.com&#x27;,
+    user_is_logged_in: false
+  };
+
+  beforeEach(fakeAsync(() =&gt; {
+    TestBed.configureTestingModule({
+      declarations: [StoryViewerPageComponent, MockTranslatePipe],
+      imports: [HttpClientTestingModule],
+      providers: [
+        {
+          provide: assetsBackendApiService,
+          useClass: MockAssetsBackendApiService
+        }
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
+    httpTestingController = TestBed.get(HttpTestingController);
+    pageTitleService = TestBed.get(PageTitleService);
+    assetsBackendApiService = TestBed.get(AssetsBackendApiService);
+    urlService = TestBed.get(UrlService);
+    userService = TestBed.get(UserService);
+    alertsService = TestBed.get(AlertsService);
+    storyViewerBackendApiService = TestBed.get(StoryViewerBackendApiService);
+    windowRef = TestBed.get(WindowRef);
+    let fixture = TestBed.createComponent(StoryViewerPageComponent);
+    component = fixture.componentInstance;
+    spyOnProperty(windowRef, &#x27;nativeWindow&#x27;).and.returnValue({
+      location: {
+        reload: ()=&gt;{},
+        href: &#x27;/home&#x27;
+      }
+    });
+  }));
+
+  beforeEach(() =&gt; {
+    spyOn(assetsBackendApiService, &#x27;getThumbnailUrlForPreview&#x27;).and
+      .returnValue(&#x27;thumbnail-url&#x27;);
+    spyOn(userService, &#x27;getUserInfoAsync&#x27;).and.returnValue(Promise.resolve(
+      UserInfo.createFromBackendDict(UserInfoObject))
+    );
+  });
+
+  beforeEach(() =&gt; {
+    var firstSampleReadOnlyStoryNodeBackendDict = {
+      id: &#x27;node_1&#x27;,
+      description: &#x27;description&#x27;,
+      title: &#x27;Title 1&#x27;,
+      prerequisite_skill_ids: [],
+      acquired_skill_ids: [],
+      destination_node_ids: [&#x27;node_2&#x27;],
+      outline: &#x27;Outline&#x27;,
+      exploration_id: &#x27;exp_id&#x27;,
+      outline_is_finalized: false,
+      exp_summary_dict: {
+        title: &#x27;Title&#x27;,
+        status: &#x27;private&#x27;,
+        last_updated_msec: 1591296737470.528,
+        community_owned: false,
+        objective: &#x27;Test Objective&#x27;,
+        id: &#x27;44LKoKLlIbGe&#x27;,
+        num_views: 0,
+        thumbnail_icon_url: &#x27;/subjects/Algebra.svg&#x27;,
+        human_readable_contributors_summary: {},
+        language_code: &#x27;en&#x27;,
+        thumbnail_bg_color: &#x27;#cd672b&#x27;,
+        created_on_msec: 1591296635736.666,
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0
+        },
+        tags: [],
+        activity_type: &#x27;exploration&#x27;,
+        category: &#x27;Algebra&#x27;
+      },
+      completed: true,
+      thumbnail_bg_color: &#x27;#bb8b2f&#x27;,
+      thumbnail_filename: &#x27;filename&#x27;
+    };
+    var secondSampleReadOnlyStoryNodeBackendDict = {
+      id: &#x27;node_2&#x27;,
+      description: &#x27;description&#x27;,
+      title: &#x27;Title 2&#x27;,
+      prerequisite_skill_ids: [],
+      acquired_skill_ids: [],
+      destination_node_ids: [&#x27;node_3&#x27;],
+      outline: &#x27;Outline&#x27;,
+      exploration_id: &#x27;exp_id&#x27;,
+      outline_is_finalized: false,
+      exp_summary_dict: {
+        title: &#x27;Title&#x27;,
+        status: &#x27;private&#x27;,
+        last_updated_msec: 1591296737470.528,
+        community_owned: false,
+        objective: &#x27;Test Objective&#x27;,
+        id: &#x27;44LKoKLlIbGe&#x27;,
+        num_views: 0,
+        thumbnail_icon_url: &#x27;/subjects/Algebra.svg&#x27;,
+        human_readable_contributors_summary: {},
+        language_code: &#x27;en&#x27;,
+        thumbnail_bg_color: &#x27;#cd672b&#x27;,
+        created_on_msec: 1591296635736.666,
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0
+        },
+        tags: [],
+        activity_type: &#x27;exploration&#x27;,
+        category: &#x27;Algebra&#x27;
+      },
+      completed: false,
+      thumbnail_bg_color: &#x27;#bb8b2f&#x27;,
+      thumbnail_filename: &#x27;filename&#x27;,
+    };
+    var storyPlaythroughBackendObject = {
+      story_id: &#x27;qwerty&#x27;,
+      story_nodes: [
+        firstSampleReadOnlyStoryNodeBackendDict,
+        secondSampleReadOnlyStoryNodeBackendDict],
+      story_title: &#x27;Story&#x27;,
+      story_description: &#x27;Description&#x27;,
+      topic_name: &#x27;Topic 1&#x27;,
+      meta_tag_content: &#x27;Story meta tag content&#x27;
+    };
+    _samplePlaythroughObject =
+      StoryPlaythrough.createFromBackendDict(
+        storyPlaythroughBackendObject);
+  });
+
+  afterEach(() =&gt; {
+    httpTestingController.verify();
+  });
+
+
+  it(&#x27;should get complete exploration url when clicking on svg element&#x27;,
+    () =&gt; {
+      spyOn(urlService, &#x27;getTopicUrlFragmentFromLearnerUrl&#x27;).and.returnValue(
+        &#x27;topic&#x27;);
+      spyOn(urlService, &#x27;getClassroomUrlFragmentFromLearnerUrl&#x27;)
+        .and.returnValue(&#x27;math&#x27;);
+      spyOn(
+        urlService, &#x27;getStoryUrlFragmentFromLearnerUrl&#x27;).and.returnValue(
+        &#x27;story&#x27;);
+      let node = StoryNode.createFromIdAndTitle(
+        &#x27;1&#x27;, &#x27;Story node title&#x27;);
+      expect(component.getExplorationUrl(node)).toBe(
+        &#x27;/explore/null?topic_url_fragment=topic&amp;&#x27; +
+        &#x27;classroom_url_fragment=math&amp;story_url_fragment=story&amp;&#x27; +
+        &#x27;node_id=1&#x27;);
+    });
+
+  it(&#x27;should get complete image path corresponding to a given&#x27; +
+    &#x27; relative path&#x27;, () =&gt; {
+    let imagePath = &#x27;/path/to/image.png&#x27;;
+    expect(component.getStaticImageUrl(imagePath)).toBe(
+      &#x27;/assets/images/path/to/image.png&#x27;);
+  });
+
+  it(&#x27;should not show story\&#x27;s chapters when story has no chapters&#x27;,
+    () =&gt; {
+      spyOn(urlService, &#x27;getTopicUrlFragmentFromLearnerUrl&#x27;).and.returnValue(
+        &#x27;topic&#x27;);
+      spyOn(urlService, &#x27;getClassroomUrlFragmentFromLearnerUrl&#x27;)
+        .and.returnValue(&#x27;math&#x27;);
+      spyOn(
+        urlService, &#x27;getStoryUrlFragmentFromLearnerUrl&#x27;).and.returnValue(
+        &#x27;story&#x27;);
+      spyOn(
+        storyViewerBackendApiService, &#x27;fetchStoryDataAsync&#x27;).and.returnValue(
+        Promise.resolve(StoryPlaythrough.createFromBackendDict({
+          story_nodes: [],
+          story_title: &#x27;Story Title 1&#x27;,
+          story_description: &#x27;Story Description 1&#x27;,
+          topic_name: &#x27;topic_1&#x27;,
+        } as StoryPlaythroughBackendDict)));
+
+      component.ngOnInit();
+
+      expect(component.showChapters()).toBeFalse();
+    });
+
+  it(&#x27;should show story\&#x27;s chapters when story has chapters&#x27;,
+    () =&gt; {
+      component.storyPlaythroughObject = {
+        id: &#x27;1&#x27;,
+        nodes: [],
+        title: &#x27;title&#x27;,
+        description: &#x27;description&#x27;,
+        topicName: &#x27;topic_name&#x27;,
+        metaTagContent: &#x27;this is meta tag content&#x27;,
+        getInitialNode() {
+          return null;
+        },
+        getStoryNodeCount(): number {
+          return 2;
+        },
+        getStoryNodes() {
+          return null;
+        },
+        hasFinishedStory() {
+          return null;
+        },
+        getNextPendingNodeId(): string {
+          return null;
+        },
+        hasStartedStory(): boolean {
+          return null;
+        },
+        getStoryId(): string {
+          return this.id;
+        },
+        getMetaTagContent(): string {
+          return this.metaTagContent;
+        }
+      };
+      spyOn(urlService, &#x27;getTopicUrlFragmentFromLearnerUrl&#x27;).and.returnValue(
+        &#x27;topic&#x27;);
+      spyOn(urlService, &#x27;getClassroomUrlFragmentFromLearnerUrl&#x27;)
+        .and.returnValue(&#x27;math&#x27;);
+      spyOn(
+        urlService, &#x27;getStoryUrlFragmentFromLearnerUrl&#x27;).and.returnValue(
+        &#x27;story&#x27;);
+      spyOn(
+        storyViewerBackendApiService, &#x27;fetchStoryDataAsync&#x27;).and.returnValue(
+        Promise.resolve(_samplePlaythroughObject));
+
+      expect(
+        _samplePlaythroughObject.getStoryNodes()[0].getId()).toEqual(&#x27;node_1&#x27;);
+      expect(
+        _samplePlaythroughObject.getStoryNodes()[1].getId()).toEqual(&#x27;node_2&#x27;);
+
+      expect(component.showChapters()).toBeTrue();
+    });
+
+  it(&#x27;should sign in correctly&#x27;, fakeAsync(() =&gt; {
+    spyOn(userService, &#x27;getLoginUrlAsync&#x27;).and.resolveTo(&#x27;/home&#x27;);
+    component.signIn();
+    flushMicrotasks();
+    expect(windowRef.nativeWindow.location.href).toBe(&#x27;/home&#x27;);
+  }));
+
+  it(&#x27;should refresh page if login url is not provided when login button is&#x27; +
+  &#x27; clicked&#x27;, fakeAsync(() =&gt; {
+    const reloadSpy = spyOn(windowRef.nativeWindow.location, &#x27;reload&#x27;);
+    spyOn(userService, &#x27;getLoginUrlAsync&#x27;)
+      .and.resolveTo(null);
+    component.signIn();
+    flushMicrotasks();
+
+    expect(reloadSpy).toHaveBeenCalled();
+  }));
+
+  it(&#x27;should show warnings when fetching story data fails&#x27;,
+    fakeAsync(() =&gt; {
+      spyOn(urlService, &#x27;getClassroomUrlFragmentFromLearnerUrl&#x27;)
+        .and.returnValue(&#x27;math&#x27;);
+      spyOn(urlService, &#x27;getTopicUrlFragmentFromLearnerUrl&#x27;).and.returnValue(
+        &#x27;topic&#x27;);
+      spyOn(
+        urlService, &#x27;getStoryUrlFragmentFromLearnerUrl&#x27;).and.returnValue(
+        &#x27;story&#x27;);
+      spyOn(
+        storyViewerBackendApiService, &#x27;fetchStoryDataAsync&#x27;).and.returnValue(
+        Promise.reject(
+          {
+            status: 404
+          }));
+      spyOn(alertsService, &#x27;addWarning&#x27;).and.callThrough();
+      component.ngOnInit();
+      flushMicrotasks();
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
+        &#x27;Failed to get dashboard data&#x27;);
+    }));
+
+  it(&#x27;should get path icon parameters after story data is loaded&#x27;,
+    fakeAsync(() =&gt; {
+      spyOn(urlService, &#x27;getTopicUrlFragmentFromLearnerUrl&#x27;).and.returnValue(
+        &#x27;topic&#x27;);
+      spyOn(urlService, &#x27;getClassroomUrlFragmentFromLearnerUrl&#x27;)
+        .and.returnValue(&#x27;math&#x27;);
+      spyOn(
+        urlService, &#x27;getStoryUrlFragmentFromLearnerUrl&#x27;).and.returnValue(
+        &#x27;story&#x27;);
+      spyOn(
+        storyViewerBackendApiService, &#x27;fetchStoryDataAsync&#x27;).and.returnValue(
+        Promise.resolve(_samplePlaythroughObject));
+
+      spyOn(pageTitleService, &#x27;setPageTitle&#x27;).and.callThrough();
+      spyOn(pageTitleService, &#x27;updateMetaTag&#x27;).and.callThrough();
+      component.ngOnInit();
+
+      flushMicrotasks();
+
+      expect(pageTitleService.setPageTitle).toHaveBeenCalledWith(
+        &#x27;Learn Topic 1 | Story | Oppia&#x27;);
+      expect(pageTitleService.updateMetaTag).toHaveBeenCalledWith(
+        &#x27;Story meta tag content&#x27;);
+      expect(component.pathIconParameters).toEqual([{
+        thumbnailIconUrl: &#x27;thumbnail-url&#x27;,
+        left: &#x27;225px&#x27;,
+        top: &#x27;35px&#x27;,
+        thumbnailBgColor: &#x27;#bb8b2f&#x27;
+      }, {
+        thumbnailIconUrl: &#x27;thumbnail-url&#x27;,
+        left: &#x27;225px&#x27;,
+        top: &#x27;35px&#x27;,
+        thumbnailBgColor: &#x27;#bb8b2f&#x27; }]);
+    }));
+
+  it(&#x27;should place empty values if Filename and BgColor are null&#x27;,
+    fakeAsync(() =&gt; {
+      var firstSampleReadOnlyStoryNodeBackendDict = {
+        id: &#x27;node_1&#x27;,
+        description: &#x27;description&#x27;,
+        title: &#x27;Title 1&#x27;,
+        prerequisite_skill_ids: [],
+        acquired_skill_ids: [],
+        destination_node_ids: [&#x27;node_2&#x27;],
+        outline: &#x27;Outline&#x27;,
+        exploration_id: &#x27;exp_id&#x27;,
+        outline_is_finalized: false,
+        exp_summary_dict: {
+          title: &#x27;Title&#x27;,
+          status: &#x27;private&#x27;,
+          last_updated_msec: 1591296737470.528,
+          community_owned: false,
+          objective: &#x27;Test Objective&#x27;,
+          id: &#x27;44LKoKLlIbGe&#x27;,
+          num_views: 0,
+          thumbnail_icon_url: &#x27;/subjects/Algebra.svg&#x27;,
+          human_readable_contributors_summary: {},
+          language_code: &#x27;en&#x27;,
+          thumbnail_bg_color: &#x27;#cd672b&#x27;,
+          created_on_msec: 1591296635736.666,
+          ratings: {
+            1: 0,
+            2: 0,
+            3: 0,
+            4: 0,
+            5: 0
+          },
+          tags: [],
+          activity_type: &#x27;exploration&#x27;,
+          category: &#x27;Algebra&#x27;
+        },
+        completed: true,
+        thumbnail_bg_color: &#x27;#bb8b2f&#x27;,
+        thumbnail_filename: null
+      };
+      var secondSampleReadOnlyStoryNodeBackendDict = {
+        id: &#x27;node_2&#x27;,
+        description: &#x27;description&#x27;,
+        title: &#x27;Title 2&#x27;,
+        prerequisite_skill_ids: [],
+        acquired_skill_ids: [],
+        destination_node_ids: [&#x27;node_3&#x27;],
+        outline: &#x27;Outline&#x27;,
+        exploration_id: &#x27;exp_id&#x27;,
+        outline_is_finalized: false,
+        exp_summary_dict: {
+          title: &#x27;Title&#x27;,
+          status: &#x27;private&#x27;,
+          last_updated_msec: 1591296737470.528,
+          community_owned: false,
+          objective: &#x27;Test Objective&#x27;,
+          id: &#x27;44LKoKLlIbGe&#x27;,
+          num_views: 0,
+          thumbnail_icon_url: &#x27;/subjects/Algebra.svg&#x27;,
+          human_readable_contributors_summary: {},
+          language_code: &#x27;en&#x27;,
+          thumbnail_bg_color: &#x27;#cd672b&#x27;,
+          created_on_msec: 1591296635736.666,
+          ratings: {
+            1: 0,
+            2: 0,
+            3: 0,
+            4: 0,
+            5: 0
+          },
+          tags: [],
+          activity_type: &#x27;exploration&#x27;,
+          category: &#x27;Algebra&#x27;
+        },
+        completed: false,
+        thumbnail_bg_color: &#x27;#bb8b2f&#x27;,
+        thumbnail_filename: null,
+      };
+
+      var storyPlaythroughBackendObject = {
+        story_id: &#x27;qwerty&#x27;,
+        story_nodes: [
+          firstSampleReadOnlyStoryNodeBackendDict,
+          secondSampleReadOnlyStoryNodeBackendDict
+        ],
+        story_title: &#x27;Story&#x27;,
+        story_description: &#x27;Description&#x27;,
+        topic_name: &#x27;Topic 1&#x27;,
+        meta_tag_content: &#x27;Story meta tag content&#x27;
+      };
+      _samplePlaythroughObject =
+      StoryPlaythrough.createFromBackendDict(
+        storyPlaythroughBackendObject);
+      spyOn(urlService, &#x27;getClassroomUrlFragmentFromLearnerUrl&#x27;)
+        .and.returnValue(&#x27;math&#x27;);
+      spyOn(urlService, &#x27;getTopicUrlFragmentFromLearnerUrl&#x27;).and.returnValue(
+        &#x27;topic&#x27;);
+      spyOn(
+        urlService, &#x27;getStoryUrlFragmentFromLearnerUrl&#x27;).and.returnValue(
+        &#x27;story&#x27;);
+      spyOn(
+        storyViewerBackendApiService, &#x27;fetchStoryDataAsync&#x27;).and.returnValue(
+        Promise.resolve(_samplePlaythroughObject));
+      component.ngOnInit();
+      flushMicrotasks();
+      expect(component.thumbnailFilename === &#x27;&#x27;);
+      expect(component.iconUrl === &#x27;&#x27;);
+    }));
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/story-viewer-page/story-viewer-page.component.spec.ts&quot;,&quot;line&quot;:42,&quot;character&quot;:6,&quot;text&quot;:&quot;httpTestingController&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-viewer-page/story-viewer-page.component.spec.ts&quot;,&quot;line&quot;:44,&quot;character&quot;:6,&quot;text&quot;:&quot;alertsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-viewer-page/story-viewer-page.component.spec.ts&quot;,&quot;line&quot;:49,&quot;character&quot;:6,&quot;text&quot;:&quot;pageTitleService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-viewer-page/story-viewer-page.component.spec.ts&quot;,&quot;line&quot;:51,&quot;character&quot;:6,&quot;text&quot;:&quot;_samplePlaythroughObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-viewer-page/story-viewer-page.component.spec.ts&quot;,&quot;line&quot;:76,&quot;character&quot;:4,&quot;text&quot;:&quot;httpTestingController&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-viewer-page/story-viewer-page.component.spec.ts&quot;,&quot;line&quot;:77,&quot;character&quot;:4,&quot;text&quot;:&quot;pageTitleService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-viewer-page/story-viewer-page.component.spec.ts&quot;,&quot;line&quot;:81,&quot;character&quot;:4,&quot;text&quot;:&quot;alertsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-viewer-page/story-viewer-page.component.spec.ts&quot;,&quot;line&quot;:189,&quot;character&quot;:4,&quot;text&quot;:&quot;_samplePlaythroughObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-viewer-page/story-viewer-page.component.spec.ts&quot;,&quot;line&quot;:195,&quot;character&quot;:4,&quot;text&quot;:&quot;httpTestingController&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-viewer-page/story-viewer-page.component.spec.ts&quot;,&quot;line&quot;:195,&quot;character&quot;:26,&quot;text&quot;:&quot;verify&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-viewer-page/story-viewer-page.component.spec.ts&quot;,&quot;line&quot;:234,&quot;character&quot;:63,&quot;text&quot;:&quot;{\n          story_nodes: [],\n          story_title: &#x27;Story Title 1&#x27;,\n          story_description: &#x27;Story Description 1&#x27;,\n          topic_name: &#x27;topic_1&#x27;,\n        } as StoryPlaythroughBackendDict&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;core/templates/pages/story-viewer-page/story-viewer-page.component.spec.ts&quot;,&quot;line&quot;:274,&quot;character&quot;:17,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-viewer-page/story-viewer-page.component.spec.ts&quot;,&quot;line&quot;:274,&quot;character&quot;:22,&quot;text&quot;:&quot;id&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-viewer-page/story-viewer-page.component.spec.ts&quot;,&quot;line&quot;:277,&quot;character&quot;:17,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-viewer-page/story-viewer-page.component.spec.ts&quot;,&quot;line&quot;:277,&quot;character&quot;:22,&quot;text&quot;:&quot;metaTagContent&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-viewer-page/story-viewer-page.component.spec.ts&quot;,&quot;line&quot;:289,&quot;character&quot;:24,&quot;text&quot;:&quot;_samplePlaythroughObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-viewer-page/story-viewer-page.component.spec.ts&quot;,&quot;line&quot;:292,&quot;character&quot;:8,&quot;text&quot;:&quot;_samplePlaythroughObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-viewer-page/story-viewer-page.component.spec.ts&quot;,&quot;line&quot;:292,&quot;character&quot;:33,&quot;text&quot;:&quot;getStoryNodes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-viewer-page/story-viewer-page.component.spec.ts&quot;,&quot;line&quot;:292,&quot;character&quot;:52,&quot;text&quot;:&quot;getId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-viewer-page/story-viewer-page.component.spec.ts&quot;,&quot;line&quot;:294,&quot;character&quot;:8,&quot;text&quot;:&quot;_samplePlaythroughObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-viewer-page/story-viewer-page.component.spec.ts&quot;,&quot;line&quot;:294,&quot;character&quot;:33,&quot;text&quot;:&quot;getStoryNodes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-viewer-page/story-viewer-page.component.spec.ts&quot;,&quot;line&quot;:294,&quot;character&quot;:52,&quot;text&quot;:&quot;getId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-viewer-page/story-viewer-page.component.spec.ts&quot;,&quot;line&quot;:332,&quot;character&quot;:12,&quot;text&quot;:&quot;alertsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-viewer-page/story-viewer-page.component.spec.ts&quot;,&quot;line&quot;:332,&quot;character&quot;:41,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/story-viewer-page/story-viewer-page.component.spec.ts&quot;,&quot;line&quot;:335,&quot;character&quot;:13,&quot;text&quot;:&quot;alertsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-viewer-page/story-viewer-page.component.spec.ts&quot;,&quot;line&quot;:335,&quot;character&quot;:27,&quot;text&quot;:&quot;addWarning&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-viewer-page/story-viewer-page.component.spec.ts&quot;,&quot;line&quot;:350,&quot;character&quot;:24,&quot;text&quot;:&quot;_samplePlaythroughObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-viewer-page/story-viewer-page.component.spec.ts&quot;,&quot;line&quot;:352,&quot;character&quot;:12,&quot;text&quot;:&quot;pageTitleService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-viewer-page/story-viewer-page.component.spec.ts&quot;,&quot;line&quot;:352,&quot;character&quot;:46,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/story-viewer-page/story-viewer-page.component.spec.ts&quot;,&quot;line&quot;:353,&quot;character&quot;:12,&quot;text&quot;:&quot;pageTitleService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-viewer-page/story-viewer-page.component.spec.ts&quot;,&quot;line&quot;:353,&quot;character&quot;:47,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/story-viewer-page/story-viewer-page.component.spec.ts&quot;,&quot;line&quot;:358,&quot;character&quot;:13,&quot;text&quot;:&quot;pageTitleService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-viewer-page/story-viewer-page.component.spec.ts&quot;,&quot;line&quot;:358,&quot;character&quot;:30,&quot;text&quot;:&quot;setPageTitle&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-viewer-page/story-viewer-page.component.spec.ts&quot;,&quot;line&quot;:360,&quot;character&quot;:13,&quot;text&quot;:&quot;pageTitleService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-viewer-page/story-viewer-page.component.spec.ts&quot;,&quot;line&quot;:360,&quot;character&quot;:30,&quot;text&quot;:&quot;updateMetaTag&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-viewer-page/story-viewer-page.component.spec.ts&quot;,&quot;line&quot;:464,&quot;character&quot;:6,&quot;text&quot;:&quot;_samplePlaythroughObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-viewer-page/story-viewer-page.component.spec.ts&quot;,&quot;line&quot;:476,&quot;character&quot;:24,&quot;text&quot;:&quot;_samplePlaythroughObject&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:58 GMT</p>
+    </body>
+  </html>
+  

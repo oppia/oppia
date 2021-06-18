@@ -1,0 +1,107 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>protractor.js</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">extensions/interactions/AlgebraicExpressionInput/protractor.js</td><td class="">62.28%</td><td class="">100%</td><td class="">114</td><td class="">71</td><td class="">43</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview End-to-end testing utilities for Algebraic Expression Input
+ * interaction
+ */
+
+var action = require(process.cwd() + &#x27;/core/tests/protractor_utils/action.js&#x27;);
+var objects = require(process.cwd() + &#x27;/extensions/objects/protractor.js&#x27;);
+var waitFor = require(
+  process.cwd() + &#x27;/core/tests/protractor_utils/waitFor.js&#x27;);
+
+var customizeInteraction = async function(elem, customLetters) {
+  await waitFor.presenceOf(elem.element(by.css(
+    &#x27;.protractor-test-custom-letters-div&#x27;)),
+  &#x27;The custom letters div took too long to load.&#x27;);
+  for (let letter of customLetters) {
+    if (letter.match(/[a-z]/)) {
+      await action.click(&#x27;Math OSK Tab&#x27;, elem.element(by.buttonText(&#x27;abc&#x27;)));
+    } else {
+      await action.click(&#x27;Math OSK Tab&#x27;, elem.element(by.buttonText(&#x27;αβγ&#x27;)));
+    }
+    await action.click(&#x27;Math OSK Letter&#x27;, elem.element(by.buttonText(letter)));
+  }
+};
+
+var expectInteractionDetailsToMatch = async function(elem) {
+  expect(
+    await elem.element(by.tagName(
+      &#x27;oppia-interactive-algebraic-expression-input&#x27;)).isPresent()
+  ).toBe(true);
+  // Testing editor&#x27;s value in default state.
+  expect(
+    await objects.MathEditor(elem.element(by.tagName(
+      &#x27;oppia-interactive-algebraic-expression-input&#x27;))).getValue()
+  ).toBe(&#x27;\\color{grey}{\\text{\\small{Type an expression here.}}}&#x27;);
+};
+
+var submitAnswer = async function(elem, answer) {
+  await objects.MathEditor(elem.element(by.tagName(
+    &#x27;oppia-interactive-algebraic-expression-input&#x27;))).setValue(answer);
+  await element(by.css(&#x27;.protractor-test-submit-answer-button&#x27;)).click();
+};
+
+var answerObjectType = &#x27;AlgebraicExpression&#x27;;
+
+var testSuite = [{
+  interactionArguments: [[&#x27;a&#x27;, &#x27;b&#x27;]],
+  ruleArguments: [&#x27;MatchesExactlyWith&#x27;, &#x27;((a+b))^(2)&#x27;],
+  expectedInteractionDetails: [],
+  wrongAnswers: [&#x27;(a-b)^2&#x27;, &#x27;(a-b)^3&#x27;, &#x27;a^2+2*a*b+b^2&#x27;],
+  correctAnswers: [&#x27;(a+b)^2&#x27;, &#x27;(b+a)^2&#x27;, &#x27;(a+b)*(a+b)&#x27;]
+}, {
+  interactionArguments: [[&#x27;x&#x27;, &#x27;z&#x27;]],
+  ruleArguments: [&#x27;MatchesExactlyWith&#x27;, &#x27;((x^2)-x)/z&#x27;],
+  expectedInteractionDetails: [],
+  wrongAnswers: [&#x27;((x^3)-x)/z&#x27;, &#x27;x(x-1)/z&#x27;, &#x27;((x^2)/z)-x/z&#x27;],
+  correctAnswers: [&#x27;((x^2)-x)/z&#x27;, &#x27;((x*x)-x)*z^(-1)&#x27;]
+}, {
+  interactionArguments: [[&#x27;π&#x27;, &#x27;r&#x27;]],
+  ruleArguments: [&#x27;IsEquivalentTo&#x27;, &#x27;pi*r^2&#x27;],
+  expectedInteractionDetails: [],
+  wrongAnswers: [&#x27;pi*r&#x27;, &#x27;pi*r*2&#x27;, &#x27;pi&#x27;, &#x27;pi/r^2&#x27;],
+  correctAnswers: [&#x27;pi*r^2&#x27;, &#x27;pi*r*r&#x27;, &#x27;(pi*r^3)/(2*r-r)&#x27;]
+}, {
+  interactionArguments: [[&#x27;x&#x27;]],
+  ruleArguments: [&#x27;IsEquivalentTo&#x27;, &#x27;(9*x^2)-6*x+1&#x27;],
+  expectedInteractionDetails: [],
+  wrongAnswers: [&#x27;sqrt((3x-1)^(2))&#x27;, &#x27;9*(x)^(2)-6*x-1&#x27;, &#x27;((3*x-1))^(4)&#x27;],
+  correctAnswers: [&#x27;(9*x^2)-6*x+1&#x27;, &#x27;(1-3x)^(2)&#x27;]
+}];
+
+exports.customizeInteraction = customizeInteraction;
+exports.expectInteractionDetailsToMatch = expectInteractionDetailsToMatch;
+exports.submitAnswer = submitAnswer;
+exports.answerObjectType = answerObjectType;
+exports.testSuite = testSuite;
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;extensions/interactions/AlgebraicExpressionInput/protractor.js&quot;,&quot;line&quot;:19,&quot;character&quot;:4,&quot;text&quot;:&quot;action&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/AlgebraicExpressionInput/protractor.js&quot;,&quot;line&quot;:20,&quot;character&quot;:4,&quot;text&quot;:&quot;objects&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/AlgebraicExpressionInput/protractor.js&quot;,&quot;line&quot;:21,&quot;character&quot;:4,&quot;text&quot;:&quot;waitFor&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/AlgebraicExpressionInput/protractor.js&quot;,&quot;line&quot;:24,&quot;character&quot;:42,&quot;text&quot;:&quot;elem&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/AlgebraicExpressionInput/protractor.js&quot;,&quot;line&quot;:24,&quot;character&quot;:48,&quot;text&quot;:&quot;customLetters&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/AlgebraicExpressionInput/protractor.js&quot;,&quot;line&quot;:25,&quot;character&quot;:8,&quot;text&quot;:&quot;waitFor&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/AlgebraicExpressionInput/protractor.js&quot;,&quot;line&quot;:25,&quot;character&quot;:16,&quot;text&quot;:&quot;presenceOf&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/AlgebraicExpressionInput/protractor.js&quot;,&quot;line&quot;:25,&quot;character&quot;:27,&quot;text&quot;:&quot;elem&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/AlgebraicExpressionInput/protractor.js&quot;,&quot;line&quot;:25,&quot;character&quot;:32,&quot;text&quot;:&quot;element&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/AlgebraicExpressionInput/protractor.js&quot;,&quot;line&quot;:28,&quot;character&quot;:11,&quot;text&quot;:&quot;letter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/AlgebraicExpressionInput/protractor.js&quot;,&quot;line&quot;:29,&quot;character&quot;:8,&quot;text&quot;:&quot;letter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/AlgebraicExpressionInput/protractor.js&quot;,&quot;line&quot;:29,&quot;character&quot;:15,&quot;text&quot;:&quot;match&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/AlgebraicExpressionInput/protractor.js&quot;,&quot;line&quot;:30,&quot;character&quot;:12,&quot;text&quot;:&quot;action&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/AlgebraicExpressionInput/protractor.js&quot;,&quot;line&quot;:30,&quot;character&quot;:19,&quot;text&quot;:&quot;click&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/AlgebraicExpressionInput/protractor.js&quot;,&quot;line&quot;:30,&quot;character&quot;:41,&quot;text&quot;:&quot;elem&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/AlgebraicExpressionInput/protractor.js&quot;,&quot;line&quot;:30,&quot;character&quot;:46,&quot;text&quot;:&quot;element&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/AlgebraicExpressionInput/protractor.js&quot;,&quot;line&quot;:32,&quot;character&quot;:12,&quot;text&quot;:&quot;action&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/AlgebraicExpressionInput/protractor.js&quot;,&quot;line&quot;:32,&quot;character&quot;:19,&quot;text&quot;:&quot;click&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/AlgebraicExpressionInput/protractor.js&quot;,&quot;line&quot;:32,&quot;character&quot;:41,&quot;text&quot;:&quot;elem&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/AlgebraicExpressionInput/protractor.js&quot;,&quot;line&quot;:32,&quot;character&quot;:46,&quot;text&quot;:&quot;element&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/AlgebraicExpressionInput/protractor.js&quot;,&quot;line&quot;:34,&quot;character&quot;:10,&quot;text&quot;:&quot;action&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/AlgebraicExpressionInput/protractor.js&quot;,&quot;line&quot;:34,&quot;character&quot;:17,&quot;text&quot;:&quot;click&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/AlgebraicExpressionInput/protractor.js&quot;,&quot;line&quot;:34,&quot;character&quot;:42,&quot;text&quot;:&quot;elem&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/AlgebraicExpressionInput/protractor.js&quot;,&quot;line&quot;:34,&quot;character&quot;:47,&quot;text&quot;:&quot;element&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/AlgebraicExpressionInput/protractor.js&quot;,&quot;line&quot;:34,&quot;character&quot;:69,&quot;text&quot;:&quot;letter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/AlgebraicExpressionInput/protractor.js&quot;,&quot;line&quot;:28,&quot;character&quot;:21,&quot;text&quot;:&quot;customLetters&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/AlgebraicExpressionInput/protractor.js&quot;,&quot;line&quot;:38,&quot;character&quot;:53,&quot;text&quot;:&quot;elem&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/AlgebraicExpressionInput/protractor.js&quot;,&quot;line&quot;:40,&quot;character&quot;:10,&quot;text&quot;:&quot;elem&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/AlgebraicExpressionInput/protractor.js&quot;,&quot;line&quot;:40,&quot;character&quot;:15,&quot;text&quot;:&quot;element&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/AlgebraicExpressionInput/protractor.js&quot;,&quot;line&quot;:41,&quot;character&quot;:55,&quot;text&quot;:&quot;isPresent&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/AlgebraicExpressionInput/protractor.js&quot;,&quot;line&quot;:45,&quot;character&quot;:10,&quot;text&quot;:&quot;objects&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/AlgebraicExpressionInput/protractor.js&quot;,&quot;line&quot;:45,&quot;character&quot;:18,&quot;text&quot;:&quot;MathEditor&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/AlgebraicExpressionInput/protractor.js&quot;,&quot;line&quot;:45,&quot;character&quot;:29,&quot;text&quot;:&quot;elem&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/AlgebraicExpressionInput/protractor.js&quot;,&quot;line&quot;:45,&quot;character&quot;:34,&quot;text&quot;:&quot;element&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/AlgebraicExpressionInput/protractor.js&quot;,&quot;line&quot;:46,&quot;character&quot;:56,&quot;text&quot;:&quot;getValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/AlgebraicExpressionInput/protractor.js&quot;,&quot;line&quot;:50,&quot;character&quot;:34,&quot;text&quot;:&quot;elem&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/AlgebraicExpressionInput/protractor.js&quot;,&quot;line&quot;:50,&quot;character&quot;:40,&quot;text&quot;:&quot;answer&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/AlgebraicExpressionInput/protractor.js&quot;,&quot;line&quot;:51,&quot;character&quot;:8,&quot;text&quot;:&quot;objects&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/AlgebraicExpressionInput/protractor.js&quot;,&quot;line&quot;:51,&quot;character&quot;:16,&quot;text&quot;:&quot;MathEditor&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/AlgebraicExpressionInput/protractor.js&quot;,&quot;line&quot;:51,&quot;character&quot;:27,&quot;text&quot;:&quot;elem&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/AlgebraicExpressionInput/protractor.js&quot;,&quot;line&quot;:51,&quot;character&quot;:32,&quot;text&quot;:&quot;element&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/AlgebraicExpressionInput/protractor.js&quot;,&quot;line&quot;:52,&quot;character&quot;:54,&quot;text&quot;:&quot;setValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/AlgebraicExpressionInput/protractor.js&quot;,&quot;line&quot;:52,&quot;character&quot;:63,&quot;text&quot;:&quot;answer&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:44:00 GMT</p>
+    </body>
+  </html>
+  

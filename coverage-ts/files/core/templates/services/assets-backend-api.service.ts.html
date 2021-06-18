@@ -1,0 +1,261 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>assets-backend-api.service.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/services/assets-backend-api.service.ts</td><td class="">98.36%</td><td class="">100%</td><td class="">366</td><td class="">360</td><td class="">6</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Service to serve as the interface for fetching and uploading
+ * assets from Google Cloud Storage.
+ */
+
+import { HttpClient } from &#x27;@angular/common/http&#x27;;
+import { Injectable } from &#x27;@angular/core&#x27;;
+import { downgradeInjectable } from &#x27;@angular/upgrade/static&#x27;;
+
+import { AppConstants } from &#x27;app.constants&#x27;;
+import { AudioFile } from &#x27;domain/utilities/audio-file.model&#x27;;
+import { FileDownloadRequest } from &#x27;domain/utilities/file-download-request.model&#x27;;
+import { ImageFile } from &#x27;domain/utilities/image-file.model&#x27;;
+import { UrlInterpolationService } from &#x27;domain/utilities/url-interpolation.service&#x27;;
+import { CsrfTokenService } from &#x27;services/csrf-token.service&#x27;;
+
+interface SaveAudioResponse {
+  &#x27;filename&#x27;: string;
+  &#x27;duration_secs&#x27;: number;
+}
+
+interface SaveImageResponse {
+  &#x27;filename&#x27;: string;
+}
+
+@Injectable({
+  providedIn: &#x27;root&#x27;
+})
+export class AssetsBackendApiService {
+  private readonly downloadUrlTemplate: string;
+
+  /** List of audio files that have been requested but have not returned. */
+  private audioFileDownloadRequests: FileDownloadRequest[] = [];
+  /** List of image files that have been requested but have not returned. */
+  private imageFileDownloadRequests: FileDownloadRequest[] = [];
+  /** Map from asset filename to asset blob. */
+  private assetsCache: Map&lt;string, Blob&gt; = new Map();
+
+  constructor(
+      private csrfTokenService: CsrfTokenService,
+      private http: HttpClient,
+      private urlInterpolationService: UrlInterpolationService) {
+    let urlPrefix = &#x27;/assetsdevhandler&#x27;;
+    if (!AssetsBackendApiService.EMULATOR_MODE) {
+      urlPrefix = (
+        &#x27;https://storage.googleapis.com/&#x27; +
+        AssetsBackendApiService.GCS_RESOURCE_BUCKET_NAME
+      );
+    }
+    this.downloadUrlTemplate = (
+      urlPrefix + &#x27;/&lt;entity_type&gt;/&lt;entity_id&gt;/assets/&lt;asset_type&gt;/&lt;filename&gt;&#x27;);
+  }
+
+  static get EMULATOR_MODE(): boolean {
+    return AppConstants.EMULATOR_MODE;
+  }
+  static get GCS_RESOURCE_BUCKET_NAME(): string {
+    return AppConstants.GCS_RESOURCE_BUCKET_NAME;
+  }
+
+  async loadAudio(explorationId: string, filename: string): Promise&lt;AudioFile&gt; {
+    if (this.isCached(filename)) {
+      return new AudioFile(filename, this.assetsCache.get(filename));
+    }
+    return this.fetchFile(
+      AppConstants.ENTITY_TYPE.EXPLORATION, explorationId, filename,
+      AppConstants.ASSET_TYPE_AUDIO);
+  }
+
+  async loadImage(
+      entityType: string, entityId: string,
+      filename: string): Promise&lt;ImageFile&gt; {
+    if (this.isCached(filename)) {
+      return new ImageFile(filename, this.assetsCache.get(filename));
+    }
+    return this.fetchFile(
+      entityType, entityId, filename, AppConstants.ASSET_TYPE_IMAGE);
+  }
+
+  async saveAudio(
+      explorationId: string, filename: string,
+      rawAssetData: Blob): Promise&lt;SaveAudioResponse&gt; {
+    const form = new FormData();
+    form.append(&#x27;raw_audio_file&#x27;, rawAssetData);
+    form.append(&#x27;payload&#x27;, JSON.stringify({filename}));
+    form.append(&#x27;csrf_token&#x27;, await this.csrfTokenService.getTokenAsync());
+    try {
+      return await this.http.post&lt;SaveAudioResponse&gt;(
+        this.getAudioUploadUrl(explorationId), form).toPromise();
+    } catch (reason) {
+      return Promise.reject(reason.error);
+    }
+  }
+
+  async saveMathExpresionImage(
+      resampledFile: Blob, filename: string, entityType: string,
+      entityId: string): Promise&lt;SaveImageResponse&gt; {
+    const form = new FormData();
+    form.append(&#x27;image&#x27;, resampledFile);
+    form.append(
+      &#x27;payload&#x27;, JSON.stringify({filename, filename_prefix: &#x27;image&#x27;}));
+    form.append(&#x27;csrf_token&#x27;, await this.csrfTokenService.getTokenAsync());
+    try {
+      return await this.http.post&lt;SaveImageResponse&gt;(
+        this.getImageUploadUrl(entityType, entityId), form).toPromise();
+    } catch (reason) {
+      return Promise.reject(reason.error);
+    }
+  }
+
+  isCached(filename: string): boolean {
+    return this.assetsCache.has(filename);
+  }
+
+  abortAllCurrentAudioDownloads(): void {
+    this.abortAllCurrentDownloads(AppConstants.ASSET_TYPE_AUDIO);
+  }
+
+  abortAllCurrentImageDownloads(): void {
+    this.abortAllCurrentDownloads(AppConstants.ASSET_TYPE_IMAGE);
+  }
+
+  getAssetsFilesCurrentlyBeingRequested(): (
+    {[assetType: string]: readonly FileDownloadRequest[]}) {
+    return {
+      [AppConstants.ASSET_TYPE_AUDIO]: this.audioFileDownloadRequests,
+      [AppConstants.ASSET_TYPE_IMAGE]: this.imageFileDownloadRequests,
+    };
+  }
+
+  getAudioDownloadUrl(
+      entityType: string, entityId: string, filename: string): string {
+    return this.getDownloadUrl(
+      entityType, entityId, filename, AppConstants.ASSET_TYPE_AUDIO);
+  }
+
+  getImageUrlForPreview(
+      entityType: string, entityId: string, filename: string): string {
+    return this.getDownloadUrl(
+      entityType, entityId, filename, AppConstants.ASSET_TYPE_IMAGE);
+  }
+
+  getThumbnailUrlForPreview(
+      entityType: string, entityId: string, filename: string): string {
+    return this.getDownloadUrl(
+      entityType, entityId, filename, AppConstants.ASSET_TYPE_THUMBNAIL);
+  }
+
+  private getDownloadUrl(
+      entityType: string, entityId: string, filename: string,
+      assetType: string): string {
+    return this.urlInterpolationService.interpolateUrl(
+      this.downloadUrlTemplate, {
+        entity_type: entityType,
+        entity_id: entityId,
+        asset_type: assetType,
+        filename: filename,
+      });
+  }
+
+  private getFileDownloadRequestsByAssetType(
+      assetType: string): FileDownloadRequest[] {
+    if (assetType === AppConstants.ASSET_TYPE_AUDIO) {
+      return this.audioFileDownloadRequests;
+    } else {
+      return this.imageFileDownloadRequests;
+    }
+  }
+
+  private async fetchFile(
+      entityType: string, entityId: string, filename: string,
+      assetType: string): Promise&lt;AudioFile | ImageFile&gt; {
+    let onResolve: (_: Blob) =&gt; void;
+    let onReject: () =&gt; void;
+    const blobPromise = new Promise&lt;Blob&gt;((resolve, reject) =&gt; {
+      onResolve = resolve;
+      onReject = reject;
+    });
+
+    const subscription = this.http.get(
+      this.getDownloadUrl(entityType, entityId, filename, assetType), {
+        responseType: &#x27;blob&#x27;
+      }).subscribe(onResolve, onReject);
+
+    const fileDownloadRequests = (
+      this.getFileDownloadRequestsByAssetType(assetType));
+    fileDownloadRequests.push(new FileDownloadRequest(filename, subscription));
+
+    try {
+      const blob = await blobPromise;
+      this.assetsCache.set(filename, blob);
+      if (assetType === AppConstants.ASSET_TYPE_AUDIO) {
+        return new AudioFile(filename, blob);
+      } else {
+        return new ImageFile(filename, blob);
+      }
+    } catch {
+      return Promise.reject(filename);
+    } finally {
+      const i = fileDownloadRequests.findIndex(r =&gt; r.filename === filename);
+      if (i !== -1) {
+        fileDownloadRequests.splice(i, 1);
+      }
+    }
+  }
+
+  private abortAllCurrentDownloads(assetType: string): void {
+    const fileDownloadRequests = (
+      this.getFileDownloadRequestsByAssetType(assetType));
+    fileDownloadRequests.forEach(r =&gt; r.subscription.unsubscribe());
+    fileDownloadRequests.length = 0;
+  }
+
+  private getAudioUploadUrl(explorationId: string): string {
+    return this.urlInterpolationService.interpolateUrl(
+      AppConstants.AUDIO_UPLOAD_URL_TEMPLATE, {
+        exploration_id: explorationId
+      });
+  }
+
+  private getImageUploadUrl(entityType: string, entityId: string): string {
+    return this.urlInterpolationService.interpolateUrl(
+      AppConstants.IMAGE_UPLOAD_URL_TEMPLATE,
+      { entity_type: entityType, entity_id: entityId });
+  }
+}
+
+angular.module(&#x27;oppia&#x27;).factory(
+  &#x27;AssetsBackendApiService&#x27;, downgradeInjectable(AssetsBackendApiService));
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/services/assets-backend-api.service.ts&quot;,&quot;line&quot;:104,&quot;character&quot;:28,&quot;text&quot;:&quot;reason&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/assets-backend-api.service.ts&quot;,&quot;line&quot;:104,&quot;character&quot;:35,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/assets-backend-api.service.ts&quot;,&quot;line&quot;:103,&quot;character&quot;:13,&quot;text&quot;:&quot;reason&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/assets-backend-api.service.ts&quot;,&quot;line&quot;:120,&quot;character&quot;:28,&quot;text&quot;:&quot;reason&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/assets-backend-api.service.ts&quot;,&quot;line&quot;:120,&quot;character&quot;:35,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/assets-backend-api.service.ts&quot;,&quot;line&quot;:119,&quot;character&quot;:13,&quot;text&quot;:&quot;reason&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:54 GMT</p>
+    </body>
+  </html>
+  

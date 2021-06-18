@@ -1,0 +1,504 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>training-modal.controller.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts</td><td class="">57.73%</td><td class="">100%</td><td class="">537</td><td class="">310</td><td class="">227</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2016 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for TrainingModalController.
+ */
+
+import { importAllAngularServices } from &#x27;tests/unit-test-utils&#x27;;
+
+describe(&#x27;Training Modal Controller&#x27;, function() {
+  var $rootScope = null;
+  var $scope = null;
+  var $uibModalInstance;
+  var callbackSpy = jasmine.createSpy(&#x27;callback&#x27;);
+  var StateEditorService = null;
+  var ExplorationStatesService = null;
+  var StateInteractionIdService = null;
+  var ResponsesService = null;
+  var InteractionObjectFactory = null;
+
+  beforeEach(angular.mock.module(&#x27;oppia&#x27;));
+
+  importAllAngularServices();
+
+  beforeEach(angular.mock.module(function($provide) {
+    $provide.value(&#x27;ExplorationDataService&#x27;, {
+      explorationId: 0,
+      autosaveChangeListAsync: function() {},
+      discardDraftAsync: function() {}
+    });
+  }));
+
+  beforeEach(angular.mock.inject(function($injector) {
+    $rootScope = $injector.get(&#x27;$rootScope&#x27;);
+    StateEditorService = $injector.get(&#x27;StateEditorService&#x27;);
+    ExplorationStatesService = $injector.get(&#x27;ExplorationStatesService&#x27;);
+    StateInteractionIdService = $injector.get(&#x27;StateInteractionIdService&#x27;);
+    ResponsesService = $injector.get(&#x27;ResponsesService&#x27;);
+    InteractionObjectFactory = $injector.get(&#x27;InteractionObjectFactory&#x27;);
+  }));
+
+  describe(&#x27;when answer group index is equal to response answer groups count&#x27;,
+    function() {
+      beforeEach(angular.mock.inject(function($injector, $controller) {
+        callbackSpy = jasmine.createSpy(&#x27;callback&#x27;);
+        $uibModalInstance = jasmine.createSpyObj([&#x27;close&#x27;, &#x27;dismiss&#x27;]);
+        ExplorationStatesService.init({
+          Init: {
+            content: {
+              content_id: &#x27;&#x27;,
+              html: &#x27;&#x27;
+            },
+            recorded_voiceovers: {
+              voiceovers_mapping: {},
+            },
+            param_changes: [],
+            interaction: {
+              id: &#x27;TextInput&#x27;,
+              answer_groups: [{
+                rule_specs: [],
+                outcome: {
+                  dest: &#x27;&#x27;,
+                  feedback: {
+                    content_id: &#x27;&#x27;,
+                    html: &#x27;&#x27;,
+                  }
+                },
+                training_data: [&#x27;Not the answer&#x27;]
+              }, {
+                rule_specs: [],
+                outcome: {
+                  dest: &#x27;&#x27;,
+                  feedback: {
+                    content_id: &#x27;&#x27;,
+                    html: &#x27;&#x27;,
+                  }
+                },
+                training_data: [&#x27;This is the answer&#x27;]
+              }],
+              customization_args: {
+                placeholder: {
+                  value: {
+                    content_id: &#x27;ca_placeholder_0&#x27;,
+                    unicode_str: &#x27;&#x27;
+                  }
+                },
+                rows: { value: 1 }
+              },
+              default_outcome: {
+                dest: &#x27;&#x27;,
+                feedback: {
+                  content_id: &#x27;&#x27;,
+                  html: &#x27;&#x27;,
+                },
+              },
+              hints: [],
+            },
+            written_translations: {
+              translations_mapping: {},
+            }
+          },
+        });
+        StateEditorService.activeStateName = &#x27;Init&#x27;;
+        StateInteractionIdService.init(&#x27;Init&#x27;, &#x27;TextInput&#x27;);
+        ResponsesService.init(InteractionObjectFactory.createFromBackendDict({
+          id: &#x27;TextInput&#x27;,
+          answer_groups: [{
+            outcome: {
+              dest: &#x27;Init&#x27;,
+              feedback: {
+                content_id: &#x27;&#x27;,
+                html: &#x27;&#x27;
+              },
+            },
+            training_data: [&#x27;This is the answer&#x27;],
+            rule_specs: [],
+          }],
+          customization_args: {
+            placeholder: {
+              value: {
+                content_id: &#x27;ca_placeholder_0&#x27;,
+                unicode_str: &#x27;&#x27;
+              }
+            },
+            rows: { value: 1 }
+          },
+          default_outcome: {
+            dest: &#x27;Init&#x27;,
+            feedback: {
+              content_id: &#x27;&#x27;,
+              html: &#x27;&#x27;,
+            }
+          },
+          hints: [],
+          confirmed_unclassified_answers: []
+        }));
+
+        $scope = $rootScope.$new();
+        $controller(&#x27;TrainingModalController&#x27;, {
+          $scope: $scope,
+          $injector: $injector,
+          $uibModalInstance: $uibModalInstance,
+          unhandledAnswer: &#x27;This is the answer&#x27;,
+          finishTrainingCallback: callbackSpy
+        });
+      }));
+
+      it(&#x27;should click on confirm button&#x27;, function() {
+        var answerGroups = (
+          ExplorationStatesService.getInteractionAnswerGroupsMemento(&#x27;Init&#x27;));
+        var defaultOutcome = (
+          ExplorationStatesService.getInteractionDefaultOutcomeMemento(
+            &#x27;Init&#x27;));
+
+        expect(answerGroups[0].outcome.dest).toBe(&#x27;&#x27;);
+        expect(answerGroups[0].trainingData).toEqual(
+          [&#x27;Not the answer&#x27;]);
+        expect(answerGroups[1].outcome.dest).toBe(&#x27;&#x27;);
+        expect(answerGroups[1].trainingData).toEqual(
+          [&#x27;This is the answer&#x27;]);
+        expect(defaultOutcome.dest).toBe(&#x27;&#x27;);
+
+        $scope.onConfirm();
+        expect($uibModalInstance.close).toHaveBeenCalled();
+        expect(callbackSpy).toHaveBeenCalled();
+
+        var updatedAnswerGroups = (
+          ExplorationStatesService.getInteractionAnswerGroupsMemento(&#x27;Init&#x27;));
+        var updatedDefaultOutcome = (
+          ExplorationStatesService.getInteractionDefaultOutcomeMemento(
+            &#x27;Init&#x27;));
+
+        expect(updatedAnswerGroups[0].outcome.dest).toBe(&#x27;Init&#x27;);
+        expect(updatedAnswerGroups[0].trainingData).toEqual([]);
+        expect(updatedDefaultOutcome.dest).toBe(&#x27;Init&#x27;);
+      });
+
+      it(&#x27;should exit training modal&#x27;, function() {
+        $scope.exitTrainer();
+        expect($uibModalInstance.close).toHaveBeenCalled();
+      });
+    });
+
+  describe(&#x27;when anwer group index is greater than response answer groups&#x27; +
+    &#x27; count&#x27;, function() {
+    var $scope = null;
+    var $uibModalInstance;
+    var callbackSpy = jasmine.createSpy(&#x27;callback&#x27;);
+    var StateEditorService = null;
+    var ExplorationStatesService = null;
+    var StateInteractionIdService = null;
+    var ResponsesService = null;
+    var InteractionObjectFactory = null;
+
+    beforeEach(angular.mock.inject(function($injector, $controller) {
+      var $rootScope = $injector.get(&#x27;$rootScope&#x27;);
+      StateEditorService = $injector.get(&#x27;StateEditorService&#x27;);
+      ExplorationStatesService = $injector.get(&#x27;ExplorationStatesService&#x27;);
+      StateInteractionIdService = $injector.get(&#x27;StateInteractionIdService&#x27;);
+      ResponsesService = $injector.get(&#x27;ResponsesService&#x27;);
+      InteractionObjectFactory = $injector.get(&#x27;InteractionObjectFactory&#x27;);
+
+      $uibModalInstance = jasmine.createSpyObj([&#x27;close&#x27;, &#x27;dismiss&#x27;]);
+      ExplorationStatesService.init({
+        Init: {
+          content: {
+            content_id: &#x27;&#x27;,
+            html: &#x27;&#x27;
+          },
+          recorded_voiceovers: {
+            voiceovers_mapping: {},
+          },
+          param_changes: [],
+          interaction: {
+            answer_groups: [{
+              outcome: {
+                dest: &#x27;&#x27;,
+                feedback: {
+                  content_id: &#x27;&#x27;,
+                  html: &#x27;&#x27;,
+                }
+              },
+              training_data: [&#x27;Not the answer&#x27;],
+              rule_specs: [],
+            }, {
+              outcome: {
+                dest: &#x27;&#x27;,
+                feedback: {
+                  content_id: &#x27;&#x27;,
+                  html: &#x27;&#x27;,
+                },
+              },
+              training_data: [&#x27;Answer&#x27;],
+              rule_specs: [],
+            }, {
+              outcome: {
+                dest: &#x27;&#x27;,
+                feedback: {
+                  content_id: &#x27;&#x27;,
+                  html: &#x27;&#x27;,
+                }
+              },
+              training_data: [&#x27;This is the answer&#x27;],
+              rule_specs: [],
+            }],
+            customization_args: {
+              placeholder: {
+                value: {
+                  content_id: &#x27;ca_placeholder_0&#x27;,
+                  unicode_str: &#x27;Type your answer here.&#x27;
+                }
+              },
+              rows: { value: 1 }
+            },
+            default_outcome: {
+              dest: &#x27;&#x27;,
+              feedback: {
+                content_id: &#x27;&#x27;,
+                html: &#x27;&#x27;,
+              }
+            },
+            hints: [],
+            id: &#x27;TextInput&#x27;
+          },
+          written_translations: {
+            translations_mapping: {},
+          }
+        },
+      });
+      StateEditorService.activeStateName = &#x27;Init&#x27;;
+      StateInteractionIdService.init(&#x27;Init&#x27;, &#x27;TextInput&#x27;);
+      ResponsesService.init(InteractionObjectFactory.createFromBackendDict({
+        id: &#x27;TextInput&#x27;,
+        answer_groups: [{
+          outcome: {
+            dest: &#x27;Init&#x27;,
+            feedback: {
+              content_id: &#x27;&#x27;,
+              html: &#x27;&#x27;
+            },
+          },
+          training_data: [&#x27;This is the answer&#x27;],
+          rule_specs: [],
+        }],
+        customization_args: {
+          placeholder: {
+            value: {
+              content_id: &#x27;ca_placeholder_0&#x27;,
+              unicode_str: &#x27;&#x27;
+            }
+          },
+          rows: { value: 1 }
+        },
+        default_outcome: {
+          dest: &#x27;Init&#x27;,
+          feedback: {
+            content_id: &#x27;&#x27;,
+            html: &#x27;&#x27;,
+          }
+        },
+        hints: [],
+        confirmed_unclassified_answers: []
+      }));
+      $scope = $rootScope.$new();
+      $controller(&#x27;TrainingModalController&#x27;, {
+        $scope: $scope,
+        $injector: $injector,
+        $uibModalInstance: $uibModalInstance,
+        unhandledAnswer: &#x27;This is the answer&#x27;,
+        finishTrainingCallback: callbackSpy
+      });
+    }));
+
+    it(&#x27;should click on confirm button&#x27;, function() {
+      var answerGroups = (
+        ExplorationStatesService.getInteractionAnswerGroupsMemento(&#x27;Init&#x27;));
+      expect(answerGroups[0].trainingData).toEqual([&#x27;Not the answer&#x27;]);
+      expect(answerGroups[1].trainingData).toEqual([&#x27;Answer&#x27;]);
+      expect(answerGroups[2].trainingData).toEqual([&#x27;This is the answer&#x27;]);
+
+      $scope.onConfirm();
+      expect($uibModalInstance.close).toHaveBeenCalled();
+
+      var upgatedAnswerGroups = (
+        ExplorationStatesService.getInteractionAnswerGroupsMemento(&#x27;Init&#x27;));
+      expect(upgatedAnswerGroups[0].trainingData).toEqual([]);
+      expect(upgatedAnswerGroups[1].trainingData).toEqual(
+        [&#x27;This is the answer&#x27;]);
+      expect(upgatedAnswerGroups[2]).toBeUndefined();
+    });
+
+    it(&#x27;should exit training modal&#x27;, function() {
+      $scope.exitTrainer();
+      expect($uibModalInstance.close).toHaveBeenCalled();
+    });
+  });
+
+  describe(&#x27;when anwer group index is less than response answer groups count&#x27;,
+    function() {
+      beforeEach(angular.mock.inject(function($injector, $controller) {
+        var $rootScope = $injector.get(&#x27;$rootScope&#x27;);
+        StateEditorService = $injector.get(&#x27;StateEditorService&#x27;);
+        ExplorationStatesService = $injector.get(&#x27;ExplorationStatesService&#x27;);
+        StateInteractionIdService = $injector.get(&#x27;StateInteractionIdService&#x27;);
+        ResponsesService = $injector.get(&#x27;ResponsesService&#x27;);
+        InteractionObjectFactory = $injector.get(&#x27;InteractionObjectFactory&#x27;);
+
+        $uibModalInstance = jasmine.createSpyObj([&#x27;close&#x27;, &#x27;dismiss&#x27;]);
+        ExplorationStatesService.init({
+          Init: {
+            content: {
+              content_id: &#x27;&#x27;,
+              html: &#x27;&#x27;
+            },
+            recorded_voiceovers: {
+              voiceovers_mapping: {},
+            },
+            param_changes: [],
+            interaction: {
+              answer_groups: [{
+                rule_specs: [],
+                outcome: {
+                  dest: &#x27;&#x27;,
+                  feedback: {
+                    content_id: &#x27;&#x27;,
+                    html: &#x27;&#x27;,
+                  },
+                },
+                training_data: [&#x27;&#x27;]
+              }],
+              customization_args: {
+                placeholder: {
+                  value: {
+                    content_id: &#x27;ca_placeholder_0&#x27;,
+                    unicode_str: &#x27;&#x27;
+                  }
+                },
+                rows: { value: 1 }
+              },
+              default_outcome: {
+                dest: &#x27;&#x27;,
+                feedback: {
+                  content_id: &#x27;&#x27;,
+                  html: &#x27;&#x27;,
+                },
+              },
+              hints: [],
+              id: &#x27;TextInput&#x27;,
+            },
+            written_translations: {
+              translations_mapping: {},
+            }
+          },
+        });
+        StateEditorService.activeStateName = &#x27;Init&#x27;;
+        StateInteractionIdService.init(&#x27;Init&#x27;, &#x27;TextInput&#x27;);
+        ResponsesService.init(InteractionObjectFactory.createFromBackendDict({
+          id: &#x27;TextInput&#x27;,
+          answer_groups: [{
+            outcome: {
+              dest: &#x27;Init&#x27;,
+              feedback: {
+                content_id: &#x27;&#x27;,
+                html: &#x27;&#x27;
+              },
+            },
+            rule_specs: [],
+            training_data: []
+          }, {
+            outcome: {
+              dest: &#x27;Hola&#x27;,
+              feedback: {
+                content_id: &#x27;&#x27;,
+                html: &#x27;&#x27;
+              },
+            },
+            rule_specs: [],
+            training_data: []
+          }],
+          default_outcome: {
+            dest: &#x27;Hola&#x27;,
+            feedback: {
+              content_id: &#x27;&#x27;,
+              html: &#x27;&#x27;,
+            },
+          },
+          confirmed_unclassified_answers: [],
+          customization_args: {
+            rows: {
+              value: true
+            },
+            placeholder: {
+              value: {
+                content_id: &#x27;ca_placeholder_0&#x27;,
+                unicode_str: &#x27;&#x27;
+              }
+            }
+          },
+          hints: [],
+        }));
+        $scope = $rootScope.$new();
+        $controller(&#x27;TrainingModalController&#x27;, {
+          $scope: $scope,
+          $injector: $injector,
+          $uibModalInstance: $uibModalInstance,
+          unhandledAnswer: &#x27;This is the answer&#x27;,
+          finishTrainingCallback: callbackSpy
+        });
+      }));
+
+      it(&#x27;should click on confirm button&#x27;, function() {
+        var answerGroups = (
+          ExplorationStatesService.getInteractionAnswerGroupsMemento(&#x27;Init&#x27;));
+
+        expect(answerGroups[0].trainingData).toEqual([&#x27;&#x27;]);
+        expect(answerGroups[1]).toBeUndefined();
+
+        $scope.onConfirm();
+        expect($uibModalInstance.close).toHaveBeenCalled();
+        expect(callbackSpy).toHaveBeenCalled();
+
+        var upgatedAnswerGroups = (
+          ExplorationStatesService.getInteractionAnswerGroupsMemento(&#x27;Init&#x27;));
+
+        expect(upgatedAnswerGroups[0].trainingData).toEqual([]);
+        expect(upgatedAnswerGroups[1].trainingData).toEqual(
+          [&#x27;This is the answer&#x27;]);
+      });
+
+      it(&#x27;should exit training modal&#x27;, function() {
+        $scope.exitTrainer();
+        expect($uibModalInstance.close).toHaveBeenCalled();
+      });
+    });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:21,&quot;character&quot;:6,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:22,&quot;character&quot;:6,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:23,&quot;character&quot;:6,&quot;text&quot;:&quot;$uibModalInstance&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:25,&quot;character&quot;:6,&quot;text&quot;:&quot;StateEditorService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:26,&quot;character&quot;:6,&quot;text&quot;:&quot;ExplorationStatesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:27,&quot;character&quot;:6,&quot;text&quot;:&quot;StateInteractionIdService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:28,&quot;character&quot;:6,&quot;text&quot;:&quot;ResponsesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:29,&quot;character&quot;:6,&quot;text&quot;:&quot;InteractionObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:35,&quot;character&quot;:42,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:36,&quot;character&quot;:4,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:36,&quot;character&quot;:13,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:43,&quot;character&quot;:42,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:44,&quot;character&quot;:4,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:44,&quot;character&quot;:17,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:44,&quot;character&quot;:27,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:45,&quot;character&quot;:4,&quot;text&quot;:&quot;StateEditorService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:45,&quot;character&quot;:25,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:45,&quot;character&quot;:35,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:46,&quot;character&quot;:4,&quot;text&quot;:&quot;ExplorationStatesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:46,&quot;character&quot;:31,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:46,&quot;character&quot;:41,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:47,&quot;character&quot;:4,&quot;text&quot;:&quot;StateInteractionIdService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:47,&quot;character&quot;:32,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:47,&quot;character&quot;:42,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:48,&quot;character&quot;:4,&quot;text&quot;:&quot;ResponsesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:48,&quot;character&quot;:23,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:48,&quot;character&quot;:33,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:49,&quot;character&quot;:4,&quot;text&quot;:&quot;InteractionObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:49,&quot;character&quot;:31,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:49,&quot;character&quot;:41,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:54,&quot;character&quot;:46,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:54,&quot;character&quot;:57,&quot;text&quot;:&quot;$controller&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:56,&quot;character&quot;:8,&quot;text&quot;:&quot;$uibModalInstance&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:57,&quot;character&quot;:8,&quot;text&quot;:&quot;ExplorationStatesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:57,&quot;character&quot;:33,&quot;text&quot;:&quot;init&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:113,&quot;character&quot;:8,&quot;text&quot;:&quot;StateEditorService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:113,&quot;character&quot;:27,&quot;text&quot;:&quot;activeStateName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:114,&quot;character&quot;:8,&quot;text&quot;:&quot;StateInteractionIdService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:114,&quot;character&quot;:34,&quot;text&quot;:&quot;init&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:115,&quot;character&quot;:8,&quot;text&quot;:&quot;ResponsesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:115,&quot;character&quot;:25,&quot;text&quot;:&quot;init&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:115,&quot;character&quot;:30,&quot;text&quot;:&quot;InteractionObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:115,&quot;character&quot;:55,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:148,&quot;character&quot;:8,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:148,&quot;character&quot;:17,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:148,&quot;character&quot;:28,&quot;text&quot;:&quot;$new&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:149,&quot;character&quot;:8,&quot;text&quot;:&quot;$controller&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:150,&quot;character&quot;:10,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:150,&quot;character&quot;:18,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:151,&quot;character&quot;:10,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:151,&quot;character&quot;:21,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:152,&quot;character&quot;:10,&quot;text&quot;:&quot;$uibModalInstance&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:152,&quot;character&quot;:29,&quot;text&quot;:&quot;$uibModalInstance&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:159,&quot;character&quot;:12,&quot;text&quot;:&quot;answerGroups&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:160,&quot;character&quot;:10,&quot;text&quot;:&quot;ExplorationStatesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:160,&quot;character&quot;:35,&quot;text&quot;:&quot;getInteractionAnswerGroupsMemento&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:161,&quot;character&quot;:12,&quot;text&quot;:&quot;defaultOutcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:162,&quot;character&quot;:10,&quot;text&quot;:&quot;ExplorationStatesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:162,&quot;character&quot;:35,&quot;text&quot;:&quot;getInteractionDefaultOutcomeMemento&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:165,&quot;character&quot;:15,&quot;text&quot;:&quot;answerGroups&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:165,&quot;character&quot;:31,&quot;text&quot;:&quot;outcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:165,&quot;character&quot;:39,&quot;text&quot;:&quot;dest&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:166,&quot;character&quot;:15,&quot;text&quot;:&quot;answerGroups&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:166,&quot;character&quot;:31,&quot;text&quot;:&quot;trainingData&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:168,&quot;character&quot;:15,&quot;text&quot;:&quot;answerGroups&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:168,&quot;character&quot;:31,&quot;text&quot;:&quot;outcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:168,&quot;character&quot;:39,&quot;text&quot;:&quot;dest&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:169,&quot;character&quot;:15,&quot;text&quot;:&quot;answerGroups&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:169,&quot;character&quot;:31,&quot;text&quot;:&quot;trainingData&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:171,&quot;character&quot;:15,&quot;text&quot;:&quot;defaultOutcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:171,&quot;character&quot;:30,&quot;text&quot;:&quot;dest&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:173,&quot;character&quot;:8,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:173,&quot;character&quot;:15,&quot;text&quot;:&quot;onConfirm&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:174,&quot;character&quot;:15,&quot;text&quot;:&quot;$uibModalInstance&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:174,&quot;character&quot;:33,&quot;text&quot;:&quot;close&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:177,&quot;character&quot;:12,&quot;text&quot;:&quot;updatedAnswerGroups&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:178,&quot;character&quot;:10,&quot;text&quot;:&quot;ExplorationStatesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:178,&quot;character&quot;:35,&quot;text&quot;:&quot;getInteractionAnswerGroupsMemento&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:179,&quot;character&quot;:12,&quot;text&quot;:&quot;updatedDefaultOutcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:180,&quot;character&quot;:10,&quot;text&quot;:&quot;ExplorationStatesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:180,&quot;character&quot;:35,&quot;text&quot;:&quot;getInteractionDefaultOutcomeMemento&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:183,&quot;character&quot;:15,&quot;text&quot;:&quot;updatedAnswerGroups&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:183,&quot;character&quot;:38,&quot;text&quot;:&quot;outcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:183,&quot;character&quot;:46,&quot;text&quot;:&quot;dest&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:184,&quot;character&quot;:15,&quot;text&quot;:&quot;updatedAnswerGroups&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:184,&quot;character&quot;:38,&quot;text&quot;:&quot;trainingData&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:185,&quot;character&quot;:15,&quot;text&quot;:&quot;updatedDefaultOutcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:185,&quot;character&quot;:37,&quot;text&quot;:&quot;dest&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:189,&quot;character&quot;:8,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:189,&quot;character&quot;:15,&quot;text&quot;:&quot;exitTrainer&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:190,&quot;character&quot;:15,&quot;text&quot;:&quot;$uibModalInstance&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:190,&quot;character&quot;:33,&quot;text&quot;:&quot;close&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:196,&quot;character&quot;:8,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:197,&quot;character&quot;:8,&quot;text&quot;:&quot;$uibModalInstance&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:199,&quot;character&quot;:8,&quot;text&quot;:&quot;StateEditorService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:200,&quot;character&quot;:8,&quot;text&quot;:&quot;ExplorationStatesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:201,&quot;character&quot;:8,&quot;text&quot;:&quot;StateInteractionIdService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:202,&quot;character&quot;:8,&quot;text&quot;:&quot;ResponsesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:203,&quot;character&quot;:8,&quot;text&quot;:&quot;InteractionObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:205,&quot;character&quot;:44,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:205,&quot;character&quot;:55,&quot;text&quot;:&quot;$controller&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:206,&quot;character&quot;:10,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:206,&quot;character&quot;:23,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:206,&quot;character&quot;:33,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:207,&quot;character&quot;:6,&quot;text&quot;:&quot;StateEditorService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:207,&quot;character&quot;:27,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:207,&quot;character&quot;:37,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:208,&quot;character&quot;:6,&quot;text&quot;:&quot;ExplorationStatesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:208,&quot;character&quot;:33,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:208,&quot;character&quot;:43,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:209,&quot;character&quot;:6,&quot;text&quot;:&quot;StateInteractionIdService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:209,&quot;character&quot;:34,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:209,&quot;character&quot;:44,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:210,&quot;character&quot;:6,&quot;text&quot;:&quot;ResponsesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:210,&quot;character&quot;:25,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:210,&quot;character&quot;:35,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:211,&quot;character&quot;:6,&quot;text&quot;:&quot;InteractionObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:211,&quot;character&quot;:33,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:211,&quot;character&quot;:43,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:213,&quot;character&quot;:6,&quot;text&quot;:&quot;$uibModalInstance&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:214,&quot;character&quot;:6,&quot;text&quot;:&quot;ExplorationStatesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:214,&quot;character&quot;:31,&quot;text&quot;:&quot;init&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:280,&quot;character&quot;:6,&quot;text&quot;:&quot;StateEditorService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:280,&quot;character&quot;:25,&quot;text&quot;:&quot;activeStateName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:281,&quot;character&quot;:6,&quot;text&quot;:&quot;StateInteractionIdService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:281,&quot;character&quot;:32,&quot;text&quot;:&quot;init&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:282,&quot;character&quot;:6,&quot;text&quot;:&quot;ResponsesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:282,&quot;character&quot;:23,&quot;text&quot;:&quot;init&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:282,&quot;character&quot;:28,&quot;text&quot;:&quot;InteractionObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:282,&quot;character&quot;:53,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:314,&quot;character&quot;:6,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:314,&quot;character&quot;:15,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:314,&quot;character&quot;:26,&quot;text&quot;:&quot;$new&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:315,&quot;character&quot;:6,&quot;text&quot;:&quot;$controller&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:316,&quot;character&quot;:8,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:316,&quot;character&quot;:16,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:317,&quot;character&quot;:8,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:317,&quot;character&quot;:19,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:318,&quot;character&quot;:8,&quot;text&quot;:&quot;$uibModalInstance&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:318,&quot;character&quot;:27,&quot;text&quot;:&quot;$uibModalInstance&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:325,&quot;character&quot;:10,&quot;text&quot;:&quot;answerGroups&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:326,&quot;character&quot;:8,&quot;text&quot;:&quot;ExplorationStatesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:326,&quot;character&quot;:33,&quot;text&quot;:&quot;getInteractionAnswerGroupsMemento&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:327,&quot;character&quot;:13,&quot;text&quot;:&quot;answerGroups&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:327,&quot;character&quot;:29,&quot;text&quot;:&quot;trainingData&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:328,&quot;character&quot;:13,&quot;text&quot;:&quot;answerGroups&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:328,&quot;character&quot;:29,&quot;text&quot;:&quot;trainingData&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:329,&quot;character&quot;:13,&quot;text&quot;:&quot;answerGroups&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:329,&quot;character&quot;:29,&quot;text&quot;:&quot;trainingData&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:331,&quot;character&quot;:6,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:331,&quot;character&quot;:13,&quot;text&quot;:&quot;onConfirm&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:332,&quot;character&quot;:13,&quot;text&quot;:&quot;$uibModalInstance&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:332,&quot;character&quot;:31,&quot;text&quot;:&quot;close&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:334,&quot;character&quot;:10,&quot;text&quot;:&quot;upgatedAnswerGroups&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:335,&quot;character&quot;:8,&quot;text&quot;:&quot;ExplorationStatesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:335,&quot;character&quot;:33,&quot;text&quot;:&quot;getInteractionAnswerGroupsMemento&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:336,&quot;character&quot;:13,&quot;text&quot;:&quot;upgatedAnswerGroups&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:336,&quot;character&quot;:36,&quot;text&quot;:&quot;trainingData&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:337,&quot;character&quot;:13,&quot;text&quot;:&quot;upgatedAnswerGroups&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:337,&quot;character&quot;:36,&quot;text&quot;:&quot;trainingData&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:339,&quot;character&quot;:13,&quot;text&quot;:&quot;upgatedAnswerGroups&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:343,&quot;character&quot;:6,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:343,&quot;character&quot;:13,&quot;text&quot;:&quot;exitTrainer&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:344,&quot;character&quot;:13,&quot;text&quot;:&quot;$uibModalInstance&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:344,&quot;character&quot;:31,&quot;text&quot;:&quot;close&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:350,&quot;character&quot;:46,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:350,&quot;character&quot;:57,&quot;text&quot;:&quot;$controller&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:351,&quot;character&quot;:12,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:351,&quot;character&quot;:25,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:351,&quot;character&quot;:35,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:352,&quot;character&quot;:8,&quot;text&quot;:&quot;StateEditorService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:352,&quot;character&quot;:29,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:352,&quot;character&quot;:39,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:353,&quot;character&quot;:8,&quot;text&quot;:&quot;ExplorationStatesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:353,&quot;character&quot;:35,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:353,&quot;character&quot;:45,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:354,&quot;character&quot;:8,&quot;text&quot;:&quot;StateInteractionIdService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:354,&quot;character&quot;:36,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:354,&quot;character&quot;:46,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:355,&quot;character&quot;:8,&quot;text&quot;:&quot;ResponsesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:355,&quot;character&quot;:27,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:355,&quot;character&quot;:37,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:356,&quot;character&quot;:8,&quot;text&quot;:&quot;InteractionObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:356,&quot;character&quot;:35,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:356,&quot;character&quot;:45,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:358,&quot;character&quot;:8,&quot;text&quot;:&quot;$uibModalInstance&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:359,&quot;character&quot;:8,&quot;text&quot;:&quot;ExplorationStatesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:359,&quot;character&quot;:33,&quot;text&quot;:&quot;init&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:405,&quot;character&quot;:8,&quot;text&quot;:&quot;StateEditorService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:405,&quot;character&quot;:27,&quot;text&quot;:&quot;activeStateName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:406,&quot;character&quot;:8,&quot;text&quot;:&quot;StateInteractionIdService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:406,&quot;character&quot;:34,&quot;text&quot;:&quot;init&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:407,&quot;character&quot;:8,&quot;text&quot;:&quot;ResponsesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:407,&quot;character&quot;:25,&quot;text&quot;:&quot;init&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:407,&quot;character&quot;:30,&quot;text&quot;:&quot;InteractionObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:407,&quot;character&quot;:55,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:451,&quot;character&quot;:8,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:451,&quot;character&quot;:17,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:451,&quot;character&quot;:28,&quot;text&quot;:&quot;$new&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:452,&quot;character&quot;:8,&quot;text&quot;:&quot;$controller&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:453,&quot;character&quot;:10,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:453,&quot;character&quot;:18,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:454,&quot;character&quot;:10,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:454,&quot;character&quot;:21,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:455,&quot;character&quot;:10,&quot;text&quot;:&quot;$uibModalInstance&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:455,&quot;character&quot;:29,&quot;text&quot;:&quot;$uibModalInstance&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:462,&quot;character&quot;:12,&quot;text&quot;:&quot;answerGroups&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:463,&quot;character&quot;:10,&quot;text&quot;:&quot;ExplorationStatesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:463,&quot;character&quot;:35,&quot;text&quot;:&quot;getInteractionAnswerGroupsMemento&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:465,&quot;character&quot;:15,&quot;text&quot;:&quot;answerGroups&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:465,&quot;character&quot;:31,&quot;text&quot;:&quot;trainingData&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:466,&quot;character&quot;:15,&quot;text&quot;:&quot;answerGroups&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:468,&quot;character&quot;:8,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:468,&quot;character&quot;:15,&quot;text&quot;:&quot;onConfirm&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:469,&quot;character&quot;:15,&quot;text&quot;:&quot;$uibModalInstance&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:469,&quot;character&quot;:33,&quot;text&quot;:&quot;close&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:472,&quot;character&quot;:12,&quot;text&quot;:&quot;upgatedAnswerGroups&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:473,&quot;character&quot;:10,&quot;text&quot;:&quot;ExplorationStatesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:473,&quot;character&quot;:35,&quot;text&quot;:&quot;getInteractionAnswerGroupsMemento&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:475,&quot;character&quot;:15,&quot;text&quot;:&quot;upgatedAnswerGroups&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:475,&quot;character&quot;:38,&quot;text&quot;:&quot;trainingData&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:476,&quot;character&quot;:15,&quot;text&quot;:&quot;upgatedAnswerGroups&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:476,&quot;character&quot;:38,&quot;text&quot;:&quot;trainingData&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:481,&quot;character&quot;:8,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:481,&quot;character&quot;:15,&quot;text&quot;:&quot;exitTrainer&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:482,&quot;character&quot;:15,&quot;text&quot;:&quot;$uibModalInstance&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.controller.spec.ts&quot;,&quot;line&quot;:482,&quot;character&quot;:33,&quot;text&quot;:&quot;close&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:59 GMT</p>
+    </body>
+  </html>
+  

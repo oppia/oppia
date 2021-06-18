@@ -1,0 +1,205 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>question-validation.service.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/services/question-validation.service.spec.ts</td><td class="">85.00%</td><td class="">100%</td><td class="">180</td><td class="">153</td><td class="">27</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2021 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for QuestionValidationService.
+ */
+
+import { TestBed } from &#x27;@angular/core/testing&#x27;;
+import { StateEditorService } from &#x27;components/state-editor/state-editor-properties-services/state-editor.service&#x27;;
+import { QuestionObjectFactory } from &#x27;domain/question/QuestionObjectFactory&#x27;;
+import { MisconceptionObjectFactory } from &#x27;domain/skill/MisconceptionObjectFactory&#x27;;
+import { QuestionValidationService } from &#x27;./question-validation.service&#x27;;
+
+describe(&#x27;Question Validation Service&#x27;, () =&gt; {
+  let misconceptionObjectFactory: MisconceptionObjectFactory;
+  let mockMisconceptionObject;
+  let mockQuestionDict;
+  let questionObjectFactory: QuestionObjectFactory;
+  let qvs: QuestionValidationService;
+  let ses;
+
+  beforeEach(() =&gt; {
+    misconceptionObjectFactory = TestBed.inject(MisconceptionObjectFactory);
+    qvs = TestBed.inject(QuestionValidationService);
+    ses = TestBed.inject(StateEditorService);
+    questionObjectFactory = TestBed.inject(QuestionObjectFactory);
+    spyOn(ses, &#x27;isCurrentSolutionValid&#x27;).and.returnValue(true);
+  });
+
+  beforeEach(() =&gt; {
+    mockQuestionDict = {
+      id: &#x27;question_1&#x27;,
+      question_state_data: {
+        content: {
+          html: &#x27;Question 1&#x27;,
+          content_id: &#x27;content_1&#x27;
+        },
+        interaction: {
+          answer_groups: [{
+            outcome: {
+              dest: &#x27;outcome 1&#x27;,
+              feedback: {
+                content_id: &#x27;content_5&#x27;,
+                html: &#x27;&#x27;
+              },
+              labelled_as_correct: true,
+              param_changes: [],
+              refresher_exploration_id: null
+            },
+            rule_specs: [{
+              rule_type: &#x27;Equals&#x27;,
+              inputs: {x: 10}
+            }],
+            tagged_skill_misconception_id: null
+          }, {
+            outcome: {
+              dest: &#x27;outcome 1&#x27;,
+              feedback: {
+                content_id: &#x27;content_5&#x27;,
+                html: &#x27;&#x27;
+              },
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null
+            },
+            rule_specs: [{
+              rule_type: &#x27;Equals&#x27;,
+              inputs: {x: 10}
+            }],
+            tagged_skill_misconception_id: &#x27;abc-1&#x27;
+          }],
+          confirmed_unclassified_answers: [],
+          customization_args: {
+            placeholder: {
+              value: {
+                content_id: &#x27;ca_placeholder_0&#x27;,
+                unicode_str: &#x27;&#x27;
+              }
+            },
+            rows: { value: 1 }
+          },
+          default_outcome: {
+            dest: null,
+            feedback: {
+              html: &#x27;Correct Answer&#x27;,
+              content_id: &#x27;content_2&#x27;
+            },
+            param_changes: [],
+            labelled_as_correct: false
+          },
+          hints: [
+            {
+              hint_content: {
+                html: &#x27;Hint 1&#x27;,
+                content_id: &#x27;content_3&#x27;
+              }
+            }
+          ],
+          solution: {
+            correct_answer: &#x27;This is the correct answer&#x27;,
+            answer_is_exclusive: false,
+            explanation: {
+              html: &#x27;Solution explanation&#x27;,
+              content_id: &#x27;content_4&#x27;
+            }
+          },
+          id: &#x27;TextInput&#x27;
+        },
+        param_changes: [],
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content_1: {},
+            content_2: {},
+            content_3: {},
+            content_4: {},
+            content_5: {}
+          }
+        },
+        written_translations: {
+          translations_mapping: {
+            content_1: {},
+            content_2: {},
+            content_3: {},
+            content_4: {},
+            content_5: {}
+          }
+        },
+        solicit_answer_details: false
+      },
+      language_code: &#x27;en&#x27;,
+      version: 1,
+      linked_skill_ids: [&#x27;abc&#x27;],
+      inapplicable_skill_misconception_ids: [&#x27;abc-2&#x27;]
+    };
+    mockMisconceptionObject = {
+      abc: [
+        misconceptionObjectFactory.create(
+          &#x27;1&#x27;, &#x27;misc1&#x27;, &#x27;notes1&#x27;, &#x27;feedback1&#x27;, true),
+        misconceptionObjectFactory.create(
+          &#x27;2&#x27;, &#x27;misc2&#x27;, &#x27;notes2&#x27;, &#x27;feedback1&#x27;, false)
+      ]
+    };
+  });
+
+  it(&#x27;should return false if question validation fails&#x27;, () =&gt; {
+    let interaction = mockQuestionDict.question_state_data.interaction;
+    interaction.answer_groups[0].outcome.labelled_as_correct = false;
+    expect(
+      qvs.isQuestionValid(
+        questionObjectFactory.createFromBackendDict(mockQuestionDict),
+        mockMisconceptionObject)).toBeFalse();
+  });
+
+  it(&#x27;should return false if misconceptions are not addressed&#x27;, () =&gt; {
+    let interaction = mockQuestionDict.question_state_data.interaction;
+    interaction.answer_groups[1].tagged_skill_misconception_id = null;
+    expect(
+      qvs.isQuestionValid(
+        questionObjectFactory.createFromBackendDict(mockQuestionDict),
+        mockMisconceptionObject)).toBeFalse();
+  });
+
+  it(&#x27;should return false if solution is invalid&#x27;, () =&gt; {
+    ses.isCurrentSolutionValid.and.returnValue(false);
+    expect(
+      qvs.isQuestionValid(
+        questionObjectFactory.createFromBackendDict(mockQuestionDict),
+        mockMisconceptionObject)).toBeFalse();
+  });
+
+  it(&#x27;should return true if validation is successful&#x27;, () =&gt; {
+    let question = questionObjectFactory.createFromBackendDict(
+      mockQuestionDict);
+    expect(qvs.isQuestionValid(question, mockMisconceptionObject)).toBeTrue();
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/services/question-validation.service.spec.ts&quot;,&quot;line&quot;:26,&quot;character&quot;:6,&quot;text&quot;:&quot;mockMisconceptionObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/question-validation.service.spec.ts&quot;,&quot;line&quot;:27,&quot;character&quot;:6,&quot;text&quot;:&quot;mockQuestionDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/question-validation.service.spec.ts&quot;,&quot;line&quot;:30,&quot;character&quot;:6,&quot;text&quot;:&quot;ses&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/question-validation.service.spec.ts&quot;,&quot;line&quot;:35,&quot;character&quot;:4,&quot;text&quot;:&quot;ses&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/question-validation.service.spec.ts&quot;,&quot;line&quot;:37,&quot;character&quot;:10,&quot;text&quot;:&quot;ses&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/question-validation.service.spec.ts&quot;,&quot;line&quot;:37,&quot;character&quot;:41,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/services/question-validation.service.spec.ts&quot;,&quot;line&quot;:41,&quot;character&quot;:4,&quot;text&quot;:&quot;mockQuestionDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/question-validation.service.spec.ts&quot;,&quot;line&quot;:145,&quot;character&quot;:4,&quot;text&quot;:&quot;mockMisconceptionObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/question-validation.service.spec.ts&quot;,&quot;line&quot;:156,&quot;character&quot;:8,&quot;text&quot;:&quot;interaction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/question-validation.service.spec.ts&quot;,&quot;line&quot;:156,&quot;character&quot;:22,&quot;text&quot;:&quot;mockQuestionDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/question-validation.service.spec.ts&quot;,&quot;line&quot;:156,&quot;character&quot;:39,&quot;text&quot;:&quot;question_state_data&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/question-validation.service.spec.ts&quot;,&quot;line&quot;:156,&quot;character&quot;:59,&quot;text&quot;:&quot;interaction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/question-validation.service.spec.ts&quot;,&quot;line&quot;:157,&quot;character&quot;:4,&quot;text&quot;:&quot;interaction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/question-validation.service.spec.ts&quot;,&quot;line&quot;:157,&quot;character&quot;:16,&quot;text&quot;:&quot;answer_groups&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/question-validation.service.spec.ts&quot;,&quot;line&quot;:157,&quot;character&quot;:33,&quot;text&quot;:&quot;outcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/question-validation.service.spec.ts&quot;,&quot;line&quot;:157,&quot;character&quot;:41,&quot;text&quot;:&quot;labelled_as_correct&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/question-validation.service.spec.ts&quot;,&quot;line&quot;:165,&quot;character&quot;:8,&quot;text&quot;:&quot;interaction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/question-validation.service.spec.ts&quot;,&quot;line&quot;:165,&quot;character&quot;:22,&quot;text&quot;:&quot;mockQuestionDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/question-validation.service.spec.ts&quot;,&quot;line&quot;:165,&quot;character&quot;:39,&quot;text&quot;:&quot;question_state_data&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/question-validation.service.spec.ts&quot;,&quot;line&quot;:165,&quot;character&quot;:59,&quot;text&quot;:&quot;interaction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/question-validation.service.spec.ts&quot;,&quot;line&quot;:166,&quot;character&quot;:4,&quot;text&quot;:&quot;interaction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/question-validation.service.spec.ts&quot;,&quot;line&quot;:166,&quot;character&quot;:16,&quot;text&quot;:&quot;answer_groups&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/question-validation.service.spec.ts&quot;,&quot;line&quot;:166,&quot;character&quot;:33,&quot;text&quot;:&quot;tagged_skill_misconception_id&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/question-validation.service.spec.ts&quot;,&quot;line&quot;:174,&quot;character&quot;:4,&quot;text&quot;:&quot;ses&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/question-validation.service.spec.ts&quot;,&quot;line&quot;:174,&quot;character&quot;:8,&quot;text&quot;:&quot;isCurrentSolutionValid&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/question-validation.service.spec.ts&quot;,&quot;line&quot;:174,&quot;character&quot;:31,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/question-validation.service.spec.ts&quot;,&quot;line&quot;:174,&quot;character&quot;:35,&quot;text&quot;:&quot;returnValue&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:56 GMT</p>
+    </body>
+  </html>
+  

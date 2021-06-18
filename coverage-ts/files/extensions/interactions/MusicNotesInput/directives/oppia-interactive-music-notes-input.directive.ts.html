@@ -1,0 +1,898 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>oppia-interactive-music-notes-input.directive.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts</td><td class="">77.73%</td><td class="">100%</td><td class="">1055</td><td class="">820</td><td class="">235</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2014 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Directives for the MusicNotesInput interaction.
+ *
+ * IMPORTANT NOTE: The naming convention for customization args that are passed
+ * into the directive is: the name of the parameter, followed by &#x27;With&#x27;,
+ * followed by the name of the arg.
+ */
+
+require(&#x27;domain/utilities/url-interpolation.service.ts&#x27;);
+require(&#x27;interactions/interactions-extension.constants.ajs.ts&#x27;);
+require(
+  &#x27;interactions/MusicNotesInput/directives/music-notes-input-rules.service.ts&#x27;);
+require(
+  &#x27;interactions/MusicNotesInput/directives/&#x27; +
+  &#x27;music-phrase-player.service.ts&#x27;);
+require(
+  &#x27;pages/exploration-player-page/services/current-interaction.service.ts&#x27;);
+require(&#x27;services/alerts.service.ts&#x27;);
+require(&#x27;services/contextual/window-dimensions.service.ts&#x27;);
+require(
+  &#x27;interactions/interaction-attributes-extractor.service.ts&#x27;);
+require(&#x27;pages/exploration-player-page/services/player-position.service.ts&#x27;);
+
+import { Subscription } from &#x27;rxjs&#x27;;
+
+interface MusicNote {
+  baseNoteMidiNumber: number;
+  offset: number;
+  noteId: string;
+  noteStart: {
+    num: number;
+    den: number;
+  };
+}
+
+interface InteractiveMusicNotesInputCustomScope extends ng.IScope {
+  CONTAINER_HEIGHT?: number;
+  CONTAINER_WIDTH?: number;
+  HORIZONTAL_GRID_SPACING?: number;
+  SOUNDFONT_URL?: string;
+  VERTICAL_GRID_SPACING?: number;
+  _addNoteToNoteSequence?: ((note: MusicNote) =&gt; void);
+  _currentNoteId?: number;
+  _removeNotesFromNoteSequenceWithId?: ((noteId: string) =&gt; void);
+  _sortNoteSequence?: (() =&gt; void);
+  clearSequence?: (() =&gt; void);
+  directiveSubscriptions?: Subscription;
+  generateNoteId?: (() =&gt; string);
+  getLastAnswer?: (() =&gt; string);
+  init?: (() =&gt; void);
+  initialSequence?: string;
+  interactionIsActive?: boolean;
+  noteSequence?: {
+    note: MusicNote
+  }[];
+  playCurrentSequence?: (() =&gt; void);
+  playSequenceToGuess?: (() =&gt; void);
+  reinitStaff?: (() =&gt; void);
+  sequenceToGuess?: Object[];
+  staffBottom?: number;
+  staffTop?: number;
+  submitAnswer?: (() =&gt; void);
+  topPositionForCenterOfTopStaffLine?: number;
+}
+
+
+angular.module(&#x27;oppia&#x27;).directive(&#x27;oppiaInteractiveMusicNotesInput&#x27;, [
+  &#x27;$timeout&#x27;, &#x27;AlertsService&#x27;, &#x27;CurrentInteractionService&#x27;,
+  &#x27;InteractionAttributesExtractorService&#x27;, &#x27;MusicNotesInputRulesService&#x27;,
+  &#x27;MusicPhrasePlayerService&#x27;, &#x27;PlayerPositionService&#x27;,
+  &#x27;NOTE_NAMES_TO_MIDI_VALUES&#x27;,
+  function(
+      $timeout, AlertsService, CurrentInteractionService,
+      InteractionAttributesExtractorService, MusicNotesInputRulesService,
+      MusicPhrasePlayerService, PlayerPositionService,
+      NOTE_NAMES_TO_MIDI_VALUES) {
+    return {
+      restrict: &#x27;E&#x27;,
+      scope: {
+        getLastAnswer: &#x27;&amp;lastAnswer&#x27;,
+      },
+      template: require(&#x27;./music-notes-input-interaction.directive.html&#x27;),
+      link: function(
+          scope: InteractiveMusicNotesInputCustomScope, element, attrs) {
+        // This is needed in order for the scope to be retrievable during Karma
+        // unit testing. See http://stackoverflow.com/a/29833832 for more
+        // details.
+        element[0].getControllerScope = function() {
+          return scope;
+        };
+
+        scope.SOUNDFONT_URL =
+        &#x27;/third_party/static/midi-js-c26ebb/examples/soundfont/&#x27;;
+
+        const {
+          sequenceToGuess,
+          initialSequence
+        } = InteractionAttributesExtractorService.getValuesFromAttributes(
+          &#x27;MusicNotesInput&#x27;, attrs);
+
+        scope.sequenceToGuess = sequenceToGuess;
+
+        scope.interactionIsActive = (scope.getLastAnswer() === null);
+
+        scope.initialSequence = scope.interactionIsActive ?
+          initialSequence :
+          scope.getLastAnswer();
+
+        scope.directiveSubscriptions = new Subscription();
+
+        scope.directiveSubscriptions.add(
+          PlayerPositionService.onNewCardAvailable.subscribe(() =&gt; {
+            scope.interactionIsActive = false;
+            scope.initialSequence = scope.getLastAnswer();
+            scope.reinitStaff();
+          })
+        );
+
+        /**
+         * A note Object has a baseNoteMidiNumber and an offset property. For
+         * example, C#4 would be -&gt; note = {baseNoteMidiNumber: 61, offset: 1};
+         *
+         * A readableNote Object has a readableNoteName property. For example,
+         * Gb5 would be -&gt; readableNote = {readableNoteName: &#x27;Gb5&#x27;};
+         */
+
+        /**
+         * Array to hold the notes placed on staff. Notes are represented as
+         * objects with two keys: baseNoteMidiNumber and offset. The
+         * baseNoteMidiNumber is an integer value denoting the MIDI number of
+         * the staff-line the note is on, and the offset is either -1, 0 or 1,
+         * denoting a flat, natural or sharp respectively.
+         */
+        scope.noteSequence = [];
+        scope._addNoteToNoteSequence = function(note) {
+          scope.noteSequence.push({
+            note: note
+          });
+        };
+        // Remove a specific note with given noteId from noteSequence. If given
+        // noteId is not in noteSequence, nothing will be removed.
+        scope._removeNotesFromNoteSequenceWithId = function(noteId) {
+          for (var i = 0; i &lt; scope.noteSequence.length; i++) {
+            if (scope.noteSequence[i].note.noteId === noteId) {
+              scope.noteSequence.splice(i, 1);
+            }
+          }
+        };
+        // Sorts noteSequence elements according to the return value of the
+        // compareNoteStarts function.
+        scope._sortNoteSequence = function() {
+          scope.noteSequence.sort(compareNoteStarts);
+        };
+
+        /**
+         * Counter to create unique id for each note dropped on staff.
+         */
+        scope._currentNoteId = 0;
+        scope.generateNoteId = function() {
+          scope._currentNoteId += 1;
+          return &#x27;note_id_&#x27; + (scope._currentNoteId - 1);
+        };
+
+        var NOTE_TYPE_NATURAL = 0;
+        // TODO(wagnerdmike): More notes types will be added to NOTE_TYPES.
+        var NOTE_TYPES = [NOTE_TYPE_NATURAL];
+
+        var NOTES_ON_LINES = [&#x27;E4&#x27;, &#x27;G4&#x27;, &#x27;B4&#x27;, &#x27;D5&#x27;, &#x27;F5&#x27;];
+        var LEDGER_LINE_NOTES = [&#x27;C4&#x27;, &#x27;A5&#x27;];
+
+        var verticalGridKeys = [
+          81, 79, 77, 76, 74, 72, 71, 69, 67, 65, 64, 62, 60
+        ];
+
+        // Highest number of notes that can fit on the staff at any given time.
+        var MAXIMUM_NOTES_POSSIBLE = 8;
+
+        var staffContainerElt = element.find(&#x27;.oppia-music-input-staff&#x27;);
+
+        // Staff has to be reinitialized every time that the staff is resized or
+        // displayed. The staffContainerElt and all subsequent measurements
+        // must be recalculated in order for the grid to work properly.
+        scope.reinitStaff = function() {
+          $(&#x27;.oppia-music-input-valid-note-area&#x27;).css(&#x27;visibility&#x27;, &#x27;hidden&#x27;);
+          $timeout(function() {
+            $(&#x27;.oppia-music-input-valid-note-area&#x27;).css(
+              &#x27;visibility&#x27;, &#x27;visible&#x27;);
+            scope.init();
+          }, 20);
+        };
+
+        // Creates draggable notes and droppable staff.
+        scope.init = function() {
+          scope.CONTAINER_WIDTH = staffContainerElt.width();
+          scope.CONTAINER_HEIGHT = 0.2 * scope.CONTAINER_WIDTH;
+
+          // The grid rectangle dimensions defining the grid which the notes
+          // fall on.
+          scope.HORIZONTAL_GRID_SPACING = scope.CONTAINER_WIDTH /
+            (MAXIMUM_NOTES_POSSIBLE + 1);
+
+          scope.VERTICAL_GRID_SPACING = scope.CONTAINER_HEIGHT /
+            verticalGridKeys.length;
+
+          clearNotesFromStaff();
+          initPalette();
+
+          clearDroppableStaff();
+          buildDroppableStaff();
+
+          repaintNotes();
+        };
+
+        // Initial notes are placed on the staff at the
+        // start of the exploration and can be removed by the learner.
+        var initializeNoteSequence = function(initialNotesToAdd) {
+          for (var i = 0; i &lt; initialNotesToAdd.length; i++) {
+            var { baseNoteMidiNumber, offset } = (
+              _convertReadableNoteToNote(initialNotesToAdd[i]));
+            var initialNote = {
+              baseNoteMidiNumber: baseNoteMidiNumber,
+              offset: offset,
+              noteId: scope.generateNoteId(),
+              noteStart: {
+                num: i,
+                den: 1
+              }
+            };
+            scope._addNoteToNoteSequence(initialNote);
+          }
+        };
+
+        // Removes all notes from staff.
+        var clearNotesFromStaff = function() {
+          element.find(&#x27;.oppia-music-input-note-choices div&#x27;).remove();
+        };
+
+        // Removes all droppable staff lines.
+        var clearDroppableStaff = function() {
+          element.find(&#x27;.oppia-music-input-staff div&#x27;).remove();
+        };
+
+        // Returns an Object containing the baseNoteMidiValues (81, 79, 77...)
+        // as keys and the vertical positions of the staff lines as values.
+        var getStaffLinePositions = function() {
+          var staffLinePositionsArray = [];
+          var staffLinePositions = {};
+          element.find(
+            &#x27;.oppia-music-input-staff div.oppia-music-staff-position&#x27;).each(
+            function() {
+              staffLinePositionsArray.push($(this).position().top);
+            });
+          for (var i = 0; i &lt; staffLinePositionsArray.length; i++) {
+            staffLinePositions[verticalGridKeys[i]] = (
+              staffLinePositionsArray[i]);
+          }
+          return staffLinePositions;
+        };
+
+        // Creates the notes and helper-clone notes for the noteChoices div.
+        var initPalette = function() {
+          var noteChoicesDiv = element.find(&#x27;.oppia-music-input-note-choices&#x27;);
+          var validNoteArea = element.find(
+            &#x27;.oppia-music-input-valid-note-area&#x27;);
+          for (var i = 0; i &lt; NOTE_TYPES.length; i++) {
+            var innerDiv = $(&#x27;&lt;div&gt;&lt;/div&gt;&#x27;)
+              .data(&#x27;noteType&#x27;, NOTE_TYPES[i])
+              .addClass(function(index, currentClassName) {
+                var addedClass = null;
+                if ($(this).data(&#x27;noteType&#x27;) === NOTE_TYPE_NATURAL) {
+                  addedClass = &#x27;oppia-music-input-natural-note&#x27;;
+                  $(this).addClass(&#x27;oppia-music-input-natural-note&#x27;);
+                }
+                return addedClass;
+              });
+            if (scope.interactionIsActive) {
+              innerDiv.draggable({
+                // Keeps note from being placed on top of the clef.
+                containment: validNoteArea,
+                cursor: &#x27;pointer&#x27;,
+                helper: &#x27;clone&#x27;,
+                stack: &#x27;.oppia-music-input-note-choices div&#x27;,
+                grid: [scope.HORIZONTAL_GRID_SPACING, 1],
+                stop: function(evt, ui) {
+                  if (!isCloneOffStaff($(ui.helper))) {
+                    // This makes the helper clone a new draggable note.
+                    $(ui.helper)
+                    // Retains original note type (e.g. natural, flat, sharp).
+                      .data(&#x27;noteType&#x27;, $(this).data(&#x27;noteType&#x27;))
+                      .draggable({
+                      // The leftPosBeforeDrag helps with the sorting of user
+                      // sequence.
+                        start: function() {
+                          $(this).data(
+                            &#x27;leftPosBeforeDrag&#x27;, $(this).position().left);
+                        },
+                        containment: &#x27;.oppia-music-input-valid-note-area&#x27;,
+                        cursor: &#x27;pointer&#x27;,
+                        grid: [scope.HORIZONTAL_GRID_SPACING, 1],
+                        // Stops helper clone from being cloned again.
+                        helper: &#x27;original&#x27;,
+                        stack: &#x27;.oppia-music-input-note-choices div&#x27;,
+                        tolerance: &#x27;intersect&#x27;,
+                        revert: function() {
+                          var draggableOptions = $(this);
+                          // If note is out of droppable or off staff,
+                          // remove it.
+                          if (isCloneOffStaff(draggableOptions)) {
+                            scope._removeNotesFromNoteSequenceWithId(
+                              draggableOptions.data(&#x27;noteId&#x27;));
+                            scope._sortNoteSequence();
+                            draggableOptions.remove();
+                          }
+                        }
+                      });
+                  }
+                }
+              });
+            }
+            noteChoicesDiv.append(innerDiv);
+          }
+        };
+
+        var repaintNotes = function() {
+          var noteChoicesDiv = element.find(&#x27;.oppia-music-input-note-choices&#x27;);
+
+          for (var i = 0; i &lt; scope.noteSequence.length; i++) {
+            var innerDiv = $(&#x27;&lt;div&gt;&lt;/div&gt;&#x27;)
+              .data(&#x27;noteType&#x27;, NOTE_TYPE_NATURAL)
+              .data(&#x27;noteId&#x27;, scope.noteSequence[i].note.noteId)
+              .addClass(&#x27;oppia-music-input-natural-note&#x27;)
+              .addClass(&#x27;oppia-music-input-on-staff&#x27;)
+              // Position notes horizontally by their noteStart positions and
+              // vertically by the midi value they hold.
+              .css({
+                top:
+                  getVerticalPosition(
+                    scope.noteSequence[i].note.baseNoteMidiNumber) -
+                  scope.VERTICAL_GRID_SPACING / 2.0,
+                left:
+                  getHorizontalPosition(getNoteStartAsFloat(
+                    scope.noteSequence[i].note)),
+                position: &#x27;absolute&#x27;
+              });
+            if (scope.interactionIsActive) {
+              innerDiv.draggable({
+                // Keeps note from being placed on top of the clef.
+                containment: &#x27;.oppia-music-input-valid-note-area&#x27;,
+                cursor: &#x27;pointer&#x27;,
+                stack: &#x27;.oppia-music-input-note-choices div&#x27;,
+                grid: [scope.HORIZONTAL_GRID_SPACING, 1],
+                start: function() {
+                  $(this).data(&#x27;leftPosBeforeDrag&#x27;, $(this).position().left);
+                },
+                revert: function() {
+                  var draggableOptions = $(this);
+                  // If note is out of droppable or off staff, remove it.
+                  if (isCloneOffStaff(draggableOptions)) {
+                    scope._removeNotesFromNoteSequenceWithId(
+                      draggableOptions.data(&#x27;noteId&#x27;));
+                    scope._sortNoteSequence();
+                    draggableOptions.remove();
+                  }
+                }
+              });
+            }
+            noteChoicesDiv.append(innerDiv);
+          }
+          repaintLedgerLines();
+        };
+
+        // Creates a staff of droppable lines.
+        var buildDroppableStaff = function() {
+          var lineValues = Object.keys(NOTE_NAMES_TO_MIDI_VALUES);
+          for (var i = 0; i &lt; lineValues.length; i++) {
+            var staffLineDiv = $(&#x27;&lt;div&gt;&lt;/div&gt;&#x27;)
+              .addClass(&#x27;oppia-music-staff-position&#x27;)
+              .css(&#x27;height&#x27;, scope.VERTICAL_GRID_SPACING)
+              .data(&#x27;lineValue&#x27;, lineValues[i])
+              .droppable({
+                accept: &#x27;.oppia-music-input-note-choices div&#x27;,
+                // Over and out are used to remove helper clone if
+                // note is not placed on staff.
+                over: function(evt, ui) {
+                  var lineValue = $(evt.target).data(&#x27;lineValue&#x27;);
+
+                  // Draws a ledger-line when note is hovering over staff-line.
+                  if (isLedgerLineNote(lineValue)) {
+                    // Position of current dropped note.
+                    var leftPos = ui.helper.position().left;
+                    var topPos = $(evt.target).position().top;
+                    var noteId = $(ui.helper).data(&#x27;noteId&#x27;);
+                    if (noteId === undefined) {
+                      noteId = scope.generateNoteId();
+                      $(ui.helper).data(&#x27;noteId&#x27;, noteId);
+                    }
+                    drawLedgerLine(topPos, leftPos);
+                  }
+                },
+                out: function() {
+                  // Removes a ledger line when note is dragged out of
+                  // droppable.
+                  $(&#x27;.oppia-music-input-ledger-line&#x27;).last().hide();
+                },
+                hoverClass: &#x27;oppia-music-input-hovered&#x27;,
+                // Handles note drops and appends new note to noteSequence.
+                drop: function(evt, ui) {
+                  // Makes helper clone not disappear when dropped on staff.
+                  $.ui.ddmanager.current.cancelHelperRemoval = true;
+
+                  $(&#x27;.oppia-music-input-ledger-line&#x27;).last().hide();
+
+                  // Previous position of note or undefined.
+                  var startPos = $(ui.helper).data(&#x27;leftPosBeforeDrag&#x27;);
+
+                  // Position of current dropped note.
+                  var leftPos = ui.helper.position().left;
+                  var topPos = $(evt.target).position().top;
+
+                  // The staff line&#x27;s value.
+                  var lineValue = $(this).data(&#x27;lineValue&#x27;);
+                  var noteType = ui.draggable.data(&#x27;noteType&#x27;);
+
+                  // A note that is dragged from noteChoices box
+                  // has an undefined noteId. This sets the id.
+                  // Otherwise, the note has an id.
+                  var noteId = $(ui.helper).data(&#x27;noteId&#x27;);
+                  if (noteId === undefined) {
+                    noteId = scope.generateNoteId();
+                    $(ui.helper).data(&#x27;noteId&#x27;, noteId);
+                  }
+
+                  // Creates a note object.
+                  var note = {
+                    baseNoteMidiNumber: NOTE_NAMES_TO_MIDI_VALUES[lineValue],
+                    offset: parseInt(noteType, 10),
+                    noteId: noteId,
+                    noteStart: null
+                  };
+
+                  // When a note is moved, its previous state must be removed
+                  // from the noteSequence. Otherwise, the sequence would
+                  // erroneously hold notes that have been moved to other
+                  // positions. Also this allows an on-staff note&#x27;s position
+                  // to be freed up if it is moved.
+                  scope._removeNotesFromNoteSequenceWithId(note.noteId);
+
+                  // Makes sure that a note can move vertically on it&#x27;s
+                  // position.
+                  if (startPos !== leftPos) {
+                    // Moves the note to the next available spot on the staff.
+                    // If the staff is full, note is moved off staff,
+                    // and thus removed.
+                    while (checkIfNotePositionTaken(leftPos)) {
+                      leftPos += scope.HORIZONTAL_GRID_SPACING;
+                    }
+                    $(ui.helper).css({
+                      top: topPos,
+                      left: leftPos
+                    });
+
+                    if (Math.floor(leftPos) &gt; Math.floor(
+                      getHorizontalPosition(MAXIMUM_NOTES_POSSIBLE - 1))) {
+                      $(ui.helper).remove();
+                      repaintLedgerLines();
+                      return;
+                    }
+                  }
+
+                  // Adjusts note so it is right on top of the staff line by
+                  // calculating half of the VERTICAL_GRID_SPACING and
+                  // subtracting that from its current top Position.
+                  $(ui.helper).css({
+                    top: topPos - (scope.VERTICAL_GRID_SPACING / 2.0)
+                  });
+
+                  // Add noteStart property to note object.
+                  if (getNoteStartFromLeftPos(leftPos) !== undefined) {
+                    note.noteStart =
+                      getNoteStartFromLeftPos(leftPos).note.noteStart;
+                  } else {
+                    repaintLedgerLines();
+                    return;
+                  }
+
+                  scope._addNoteToNoteSequence(note);
+                  scope._sortNoteSequence();
+
+                  // Sounds the note when it is dropped onto staff.
+                  playSequence([[_convertNoteToMidiPitch(note)]]);
+                  $(ui.helper).addClass(&#x27;oppia-music-input-on-staff&#x27;);
+
+                  repaintLedgerLines();
+                }
+              });
+
+            element.find(&#x27;.oppia-music-input-staff&#x27;).append(staffLineDiv);
+
+            if (i === 0) {
+              scope.topPositionForCenterOfTopStaffLine =
+                $(staffLineDiv).position().top + scope.VERTICAL_GRID_SPACING;
+            }
+
+            var noteName = lineValues[i];
+
+            // Check if noteName is a valid staff line and if so, paint staff
+            // line.
+            if (NOTES_ON_LINES.indexOf(noteName) !== -1) {
+              staffLineDiv.append(
+                $(&#x27;&lt;div&gt;&lt;/div&gt;&#x27;)
+                  // Positions and centers the staff line directly on top of its
+                  // associated droppable.
+                  .css(&#x27;margin-top&#x27;, scope.VERTICAL_GRID_SPACING / 2.5)
+                  .addClass(&#x27;oppia-music-staff-line&#x27;)
+              );
+            }
+          }
+        };
+
+        // When compareNoteStarts(a, b) returns less than 0, a is less than b.
+        // When compareNoteStarts(a, b) returns 0, a is equal to b.
+        // When compareNoteStarts(a, b) returns greater than 0, a is greater
+        //   than b.
+        var compareNoteStarts = function(a, b) {
+          if (a.note.noteStart &amp;&amp; b.note.noteStart) {
+            return (
+              a.note.noteStart.num * b.note.noteStart.den -
+              a.note.noteStart.den * b.note.noteStart.num) /
+              (a.note.noteStart.den * b.note.noteStart.den);
+          }
+        };
+
+        // If a note position is taken, return true,
+        // otherwise the position is available.
+        var checkIfNotePositionTaken = function(leftPos) {
+          if (getNoteStartFromLeftPos(leftPos)) {
+            var newNoteToCheck = getNoteStartFromLeftPos(leftPos);
+            if (newNoteToCheck.note.noteStart !== undefined) {
+              for (var i = 0; i &lt; scope.noteSequence.length; i++) {
+                var noteComparison = compareNoteStarts(
+                  scope.noteSequence[i], newNoteToCheck);
+                if (noteComparison === 0) {
+                  return true;
+                }
+              }
+              return false;
+            }
+          }
+          return false;
+        };
+
+        // Converts a note&#x27;s leftPosition to a noteStart object by checking if
+        // leftPos is close to available horizontal grid position. If there is
+        // not a close match, return undefined.
+        var getNoteStartFromLeftPos = function(leftPos) {
+          for (var i = 0; i &lt; MAXIMUM_NOTES_POSSIBLE; i++) {
+            // If the difference between leftPos and a horizontalGrid Position
+            // is less than 2, then they are close enough to set a position.
+            // This gives some wiggle room for rounding differences.
+            if (Math.abs(leftPos - getHorizontalPosition(i)) &lt; 2) {
+              var note = {
+                noteStart: {
+                  num: i,
+                  den: 1
+                }
+              };
+              return {
+                note: note
+              };
+            }
+          }
+          return undefined;
+        };
+
+        var getNoteStartAsFloat = function(note) {
+          return note.noteStart.num / note.noteStart.den;
+        };
+
+        // Clear noteSequence values and remove all notes
+        // and Ledger Lines from the staff.
+        scope.clearSequence = function() {
+          scope.noteSequence = [];
+          element.find(&#x27;.oppia-music-input-on-staff&#x27;).remove();
+          element.find(&#x27;.oppia-music-input-ledger-line&#x27;).remove();
+        };
+
+        // Converts the midiValue of a droppable line that a note is on
+        // into a top position.
+        var getVerticalPosition = function(baseNoteMidiNumber) {
+          return getStaffLinePositions()[baseNoteMidiNumber];
+        };
+
+        /**
+         * Gets a horizontal grid position based on the position of note-choices
+         * div. &#x27;.oppia-music-input-note-choices div:first-child&#x27; (the note that
+         * gets cloned to create all other subsequent notes) is the last
+         * horizontal position, so to determine the others values, we multiply
+         * the MAXIMUM_NOTES_POSSIBLE that will fit on the staff by the
+         * scope.HORIZONTAL_GRID_SPACING and subtract that from the last
+         * Horizontal Position value and return the result.
+         */
+        var getHorizontalPosition = function(noteStartAsFloat) {
+          var lastHorizontalPositionOffset = element.find(
+            &#x27;.oppia-music-input-note-choices div:first-child&#x27;).position().left;
+          var leftOffset =
+            lastHorizontalPositionOffset - (
+              (MAXIMUM_NOTES_POSSIBLE - 1) * scope.HORIZONTAL_GRID_SPACING);
+          return leftOffset + (
+            noteStartAsFloat * scope.HORIZONTAL_GRID_SPACING);
+        };
+
+        var isCloneOffStaff = function(helperClone) {
+          return (!(
+            helperClone.position().top &gt; scope.staffTop &amp;&amp;
+            helperClone.position().top &lt; scope.staffBottom));
+        };
+
+        var isLedgerLineNote = function(lineValue) {
+          return LEDGER_LINE_NOTES.indexOf(lineValue) !== -1;
+        };
+
+        var drawLedgerLine = function(topPos, leftPos) {
+          var ledgerLineDiv = $(&#x27;&lt;div&gt;&lt;/div&gt;&#x27;)
+            .addClass(
+              &#x27;oppia-music-input-ledger-line oppia-music-input-natural-note&#x27;)
+            .droppable({
+              accept: &#x27;.oppia-music-input-note-choices div&#x27;,
+              // When a ledgerLine note is moved out of its droppable,
+              // remove ledger line.
+              out: function() {
+                $(this).hide();
+              },
+              hoverClass: &#x27;oppia-music-input-hovered&#x27;,
+              containment: &#x27;.oppia-music-input-valid-note-area&#x27;
+            })
+            // Adjust ledger line to be centered with the note.
+            .css({
+              left: leftPos - 1,
+              // 0.4 is a little less than half to allow for the height of the
+              // ledger line when considering its placement.
+              top: topPos + scope.VERTICAL_GRID_SPACING * 0.4
+            });
+
+          element.find(&#x27;.oppia-music-input-staff&#x27;).append(ledgerLineDiv);
+        };
+
+        var repaintLedgerLines = function() {
+          for (var i = 0; i &lt; scope.noteSequence.length; i++) {
+            var note = scope.noteSequence[i].note;
+            var lineValue = _getCorrespondingNoteName(note.baseNoteMidiNumber);
+            if (isLedgerLineNote(lineValue)) {
+              drawLedgerLine(
+                getVerticalPosition(note.baseNoteMidiNumber),
+                getHorizontalPosition(getNoteStartAsFloat(note))
+              );
+            }
+          }
+        };
+
+        var _getCorrespondingNoteName = function(midiNumber) {
+          var correspondingNoteName = null;
+          for (var noteName in NOTE_NAMES_TO_MIDI_VALUES) {
+            if (NOTE_NAMES_TO_MIDI_VALUES[noteName] === midiNumber) {
+              correspondingNoteName = noteName;
+              break;
+            }
+          }
+          if (correspondingNoteName === null) {
+            console.error(&#x27;Invalid MIDI pitch: &#x27; + midiNumber);
+          }
+          return correspondingNoteName;
+        };
+
+        /*
+         * Returns a note object with a readable note name, such as Eb5, A5 or
+         * F#4, given a note object with baseNoteMidiNumber and sharp/flat
+         * offset properties. For example, if note.baseNoteMidiNumber = 64 and
+         * note.offset = -1, this will return {&#x27;readableNoteName&#x27;: &#x27;Eb4&#x27;}
+         * (since 64 is the baseNoteMidiNumber for &#x27;E&#x27;, and -1 indicates a
+         * flat).
+         */
+        var _convertNoteToReadableNote = function(note) {
+          if (note.offset !== -1 &amp;&amp; note.offset !== 0 &amp;&amp; note.offset !== 1) {
+            console.error(&#x27;Invalid note offset: &#x27; + note.offset);
+          }
+
+          var correspondingNoteName =
+            _getCorrespondingNoteName(note.baseNoteMidiNumber);
+
+          var accidental = (
+            note.offset === 1 ? &#x27;#&#x27; : note.offset === 0 ? &#x27;&#x27; : &#x27;b&#x27;);
+
+          return {
+            readableNoteName:
+              correspondingNoteName[0] + accidental + correspondingNoteName[1]
+          };
+        };
+
+        /*
+         * Returns a note object with a baseNoteMidiNumber and an
+         * offset property, given a note object with a readableNoteName
+         * property. For example, if note.readableNoteName = &#x27;Eb4&#x27; this will
+         * return {&#x27;baseNoteMidiNumber&#x27;: 64, &#x27;offset&#x27;: -1} (since 64 is the
+         * baseNoteMidiNumber for &#x27;E&#x27;, and -1 indicates a flat).
+         */
+        var _convertReadableNoteToNote = function(readableNote) {
+          var readableNoteName = readableNote.readableNoteName;
+          if (readableNoteName.length === 2) {
+            // This is a natural note.
+            return {
+              baseNoteMidiNumber: NOTE_NAMES_TO_MIDI_VALUES[readableNoteName],
+              offset: 0
+            };
+          } else if (readableNoteName.length === 3) {
+            // This is a note with an accidental.
+            var offset = (readableNoteName[1] === &#x27;#&#x27;) ? 1 :
+              (readableNoteName[1] === &#x27;b&#x27;) ? -1 : null;
+            if (offset === null) {
+              console.error(&#x27;Invalid readable note: &#x27; + readableNoteName);
+            }
+
+            return {
+              baseNoteMidiNumber: NOTE_NAMES_TO_MIDI_VALUES[
+                readableNoteName[0] + readableNoteName[2]],
+              offset: offset
+            };
+          } else {
+            // This is not a valid readableNote.
+            console.error(&#x27;Invalid readable note: &#x27; + readableNote);
+          }
+        };
+
+        // For each note in a sequence, add a noteDuration property.
+        // TODO(wagnerdmike): - Add more options for note durations.
+        var _makeAllNotesHaveDurationOne = function(noteArray) {
+          for (var i = 0; i &lt; noteArray.length; i++) {
+            noteArray[i].noteDuration = {
+              num: 1,
+              den: 1
+            };
+          }
+          return noteArray;
+        };
+
+        scope.submitAnswer = function() {
+          var readableSequence = [];
+          for (var i = 0; i &lt; scope.noteSequence.length; i++) {
+            readableSequence.push(
+              _convertNoteToReadableNote(scope.noteSequence[i].note));
+          }
+          readableSequence = _makeAllNotesHaveDurationOne(readableSequence);
+          CurrentInteractionService.onSubmit(
+            readableSequence, MusicNotesInputRulesService);
+        };
+
+        CurrentInteractionService.registerCurrentInteraction(
+          scope.submitAnswer, null);
+
+        /** *****************************************************************
+         * Functions involving MIDI playback.
+         ******************************************************************/
+
+        scope.playSequenceToGuess = function() {
+          var noteSequenceToGuess = [];
+          for (var i = 0; i &lt; scope.sequenceToGuess.length; i++) {
+            noteSequenceToGuess.push(
+              _convertReadableNoteToNote(
+                scope.sequenceToGuess[i]));
+          }
+          playSequence(convertSequenceToGuessToMidiSequence(
+            noteSequenceToGuess));
+        };
+
+        scope.playCurrentSequence = function() {
+          playSequence(convertNoteSequenceToMidiSequence(scope.noteSequence));
+        };
+
+        // Takes an input &gt; 0, converts to a noteStart object and returns a
+        // float representation of the noteStart position.
+        var getNoteStart = function(noteIndex) {
+          return getNoteStartAsFloat({
+            noteStart: {
+              num: noteIndex,
+              den: 1
+            }
+          });
+        };
+
+        // Input is a midiSequence, which is an array of arrays, in the form of
+        // [[72], [62], [67, 71, 74]]. An inner array with more than one value
+        // is treated like a chord and all its values are played back
+        // simultaneously.
+        var playSequence = function(midiSequence) {
+          // TODO(#7892): Move this check to music-phrase-player.service.ts
+          // once AlertsService has been successfully migrated.
+          if (window.AudioContext || window.Audio) {
+            var notes = [];
+            for (var i = 0; i &lt; midiSequence.length; i++) {
+              for (var j = 0; j &lt; midiSequence[i].length; j++) {
+                notes.push({
+                  midiValue: midiSequence[i][j],
+                  duration: 1.0,
+                  start: getNoteStart(i)
+                });
+              }
+            }
+
+            MusicPhrasePlayerService.playMusicPhrase(notes);
+          } else {
+            AlertsService.addWarning(
+              &#x27;MIDI audio is not supported in your browser.&#x27;);
+          }
+        };
+
+        // A MIDI pitch is the baseNoteMidiNumber of the note plus the offset.
+        var _convertNoteToMidiPitch = function(note) {
+          return note.baseNoteMidiNumber + note.offset;
+        };
+
+        // Return the MIDI value for each note in the sequence.
+        // TODO(wagnerdmike): - Add chord functionality.
+        var convertSequenceToGuessToMidiSequence = function(sequence) {
+          var midiSequence = [];
+          for (var i = 0; i &lt; sequence.length; i++) {
+            if (sequence[i].hasOwnProperty(&#x27;baseNoteMidiNumber&#x27;)) {
+              midiSequence.push([_convertNoteToMidiPitch(sequence[i])]);
+            } else {
+              console.error(&#x27;Invalid note: &#x27; + sequence[i]);
+            }
+          }
+          return midiSequence;
+        };
+
+        // Return the MIDI value for each note in the sequence.
+        // TODO(wagnerdmike): - Add chord functionality.
+        var convertNoteSequenceToMidiSequence = function(sequence) {
+          var midiSequence = [];
+          for (var i = 0; i &lt; sequence.length; i++) {
+            if (sequence[i].hasOwnProperty(&#x27;note&#x27;)) {
+              // Single note.
+              midiSequence.push([_convertNoteToMidiPitch(sequence[i].note)]);
+            } else {
+              console.error(&#x27;Invalid note: &#x27; + sequence[i]);
+            }
+          }
+          return midiSequence;
+        };
+
+        // Initialization code.
+
+        initializeNoteSequence(scope.initialSequence);
+        scope.init();
+
+        // Sets grid positions, displays the staff and note,
+        // and then initializes the view after staff has loaded.
+        $(document).ready(function() {
+          scope.reinitStaff();
+        });
+
+        scope.$on(&#x27;$destroy&#x27;, function() {
+          scope.directiveSubscriptions.unsubscribe();
+        });
+      }
+    };
+  }
+]);
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:86,&quot;character&quot;:6,&quot;text&quot;:&quot;$timeout&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:86,&quot;character&quot;:16,&quot;text&quot;:&quot;AlertsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:86,&quot;character&quot;:31,&quot;text&quot;:&quot;CurrentInteractionService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:87,&quot;character&quot;:6,&quot;text&quot;:&quot;InteractionAttributesExtractorService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:87,&quot;character&quot;:45,&quot;text&quot;:&quot;MusicNotesInputRulesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:88,&quot;character&quot;:6,&quot;text&quot;:&quot;MusicPhrasePlayerService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:88,&quot;character&quot;:32,&quot;text&quot;:&quot;PlayerPositionService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:89,&quot;character&quot;:6,&quot;text&quot;:&quot;NOTE_NAMES_TO_MIDI_VALUES&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:109,&quot;character&quot;:10,&quot;text&quot;:&quot;sequenceToGuess&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:110,&quot;character&quot;:10,&quot;text&quot;:&quot;initialSequence&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:111,&quot;character&quot;:12,&quot;text&quot;:&quot;InteractionAttributesExtractorService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:111,&quot;character&quot;:50,&quot;text&quot;:&quot;getValuesFromAttributes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:125,&quot;character&quot;:10,&quot;text&quot;:&quot;PlayerPositionService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:125,&quot;character&quot;:32,&quot;text&quot;:&quot;onNewCardAvailable&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:125,&quot;character&quot;:51,&quot;text&quot;:&quot;subscribe&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:198,&quot;character&quot;:10,&quot;text&quot;:&quot;$timeout&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:229,&quot;character&quot;:46,&quot;text&quot;:&quot;initialNotesToAdd&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:230,&quot;character&quot;:30,&quot;text&quot;:&quot;initialNotesToAdd&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:230,&quot;character&quot;:48,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:231,&quot;character&quot;:18,&quot;text&quot;:&quot;baseNoteMidiNumber&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:232,&quot;character&quot;:41,&quot;text&quot;:&quot;initialNotesToAdd&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:234,&quot;character&quot;:14,&quot;text&quot;:&quot;baseNoteMidiNumber&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:234,&quot;character&quot;:34,&quot;text&quot;:&quot;baseNoteMidiNumber&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:259,&quot;character&quot;:14,&quot;text&quot;:&quot;staffLinePositionsArray&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:264,&quot;character&quot;:14,&quot;text&quot;:&quot;staffLinePositionsArray&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:266,&quot;character&quot;:30,&quot;text&quot;:&quot;staffLinePositionsArray&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:268,&quot;character&quot;:14,&quot;text&quot;:&quot;staffLinePositionsArray&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:282,&quot;character&quot;:20,&quot;text&quot;:&quot;addedClass&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:284,&quot;character&quot;:18,&quot;text&quot;:&quot;addedClass&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:302,&quot;character&quot;:42,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:307,&quot;character&quot;:28,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:308,&quot;character&quot;:51,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:318,&quot;character&quot;:30,&quot;text&quot;:&quot;draggableOptions&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:318,&quot;character&quot;:51,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:321,&quot;character&quot;:46,&quot;text&quot;:&quot;draggableOptions&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:323,&quot;character&quot;:30,&quot;text&quot;:&quot;draggableOptions&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:325,&quot;character&quot;:28,&quot;text&quot;:&quot;draggableOptions&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:366,&quot;character&quot;:20,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:366,&quot;character&quot;:54,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:369,&quot;character&quot;:22,&quot;text&quot;:&quot;draggableOptions&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:369,&quot;character&quot;:43,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:371,&quot;character&quot;:38,&quot;text&quot;:&quot;draggableOptions&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:373,&quot;character&quot;:22,&quot;text&quot;:&quot;draggableOptions&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:375,&quot;character&quot;:20,&quot;text&quot;:&quot;draggableOptions&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:398,&quot;character&quot;:22,&quot;text&quot;:&quot;lineValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:401,&quot;character&quot;:39,&quot;text&quot;:&quot;lineValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:405,&quot;character&quot;:24,&quot;text&quot;:&quot;noteId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:406,&quot;character&quot;:24,&quot;text&quot;:&quot;noteId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:407,&quot;character&quot;:22,&quot;text&quot;:&quot;noteId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:408,&quot;character&quot;:50,&quot;text&quot;:&quot;noteId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:427,&quot;character&quot;:22,&quot;text&quot;:&quot;startPos&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:434,&quot;character&quot;:22,&quot;text&quot;:&quot;lineValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:434,&quot;character&quot;:36,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:435,&quot;character&quot;:22,&quot;text&quot;:&quot;noteType&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:440,&quot;character&quot;:22,&quot;text&quot;:&quot;noteId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:441,&quot;character&quot;:22,&quot;text&quot;:&quot;noteId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:442,&quot;character&quot;:20,&quot;text&quot;:&quot;noteId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:443,&quot;character&quot;:48,&quot;text&quot;:&quot;noteId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:448,&quot;character&quot;:20,&quot;text&quot;:&quot;baseNoteMidiNumber&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:448,&quot;character&quot;:40,&quot;text&quot;:&quot;NOTE_NAMES_TO_MIDI_VALUES&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:448,&quot;character&quot;:66,&quot;text&quot;:&quot;lineValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:450,&quot;character&quot;:20,&quot;text&quot;:&quot;noteId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:450,&quot;character&quot;:28,&quot;text&quot;:&quot;noteId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:459,&quot;character&quot;:64,&quot;text&quot;:&quot;noteId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:463,&quot;character&quot;:22,&quot;text&quot;:&quot;startPos&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:492,&quot;character&quot;:25,&quot;text&quot;:&quot;noteStart&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:537,&quot;character&quot;:41,&quot;text&quot;:&quot;a&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:537,&quot;character&quot;:44,&quot;text&quot;:&quot;b&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:538,&quot;character&quot;:14,&quot;text&quot;:&quot;a&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:538,&quot;character&quot;:16,&quot;text&quot;:&quot;note&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:538,&quot;character&quot;:21,&quot;text&quot;:&quot;noteStart&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:538,&quot;character&quot;:34,&quot;text&quot;:&quot;b&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:538,&quot;character&quot;:36,&quot;text&quot;:&quot;note&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:538,&quot;character&quot;:41,&quot;text&quot;:&quot;noteStart&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:540,&quot;character&quot;:14,&quot;text&quot;:&quot;a&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:540,&quot;character&quot;:16,&quot;text&quot;:&quot;note&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:540,&quot;character&quot;:21,&quot;text&quot;:&quot;noteStart&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:540,&quot;character&quot;:31,&quot;text&quot;:&quot;num&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:540,&quot;character&quot;:37,&quot;text&quot;:&quot;b&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:540,&quot;character&quot;:39,&quot;text&quot;:&quot;note&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:540,&quot;character&quot;:44,&quot;text&quot;:&quot;noteStart&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:540,&quot;character&quot;:54,&quot;text&quot;:&quot;den&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:541,&quot;character&quot;:14,&quot;text&quot;:&quot;a&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:541,&quot;character&quot;:16,&quot;text&quot;:&quot;note&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:541,&quot;character&quot;:21,&quot;text&quot;:&quot;noteStart&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:541,&quot;character&quot;:31,&quot;text&quot;:&quot;den&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:541,&quot;character&quot;:37,&quot;text&quot;:&quot;b&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:541,&quot;character&quot;:39,&quot;text&quot;:&quot;note&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:541,&quot;character&quot;:44,&quot;text&quot;:&quot;noteStart&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:541,&quot;character&quot;:54,&quot;text&quot;:&quot;num&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:542,&quot;character&quot;:15,&quot;text&quot;:&quot;a&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:542,&quot;character&quot;:17,&quot;text&quot;:&quot;note&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:542,&quot;character&quot;:22,&quot;text&quot;:&quot;noteStart&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:542,&quot;character&quot;:32,&quot;text&quot;:&quot;den&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:542,&quot;character&quot;:38,&quot;text&quot;:&quot;b&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:542,&quot;character&quot;:40,&quot;text&quot;:&quot;note&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:542,&quot;character&quot;:45,&quot;text&quot;:&quot;noteStart&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:542,&quot;character&quot;:55,&quot;text&quot;:&quot;den&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:548,&quot;character&quot;:48,&quot;text&quot;:&quot;leftPos&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:549,&quot;character&quot;:38,&quot;text&quot;:&quot;leftPos&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:550,&quot;character&quot;:57,&quot;text&quot;:&quot;leftPos&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:568,&quot;character&quot;:47,&quot;text&quot;:&quot;leftPos&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:573,&quot;character&quot;:25,&quot;text&quot;:&quot;leftPos&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:588,&quot;character&quot;:43,&quot;text&quot;:&quot;note&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:589,&quot;character&quot;:17,&quot;text&quot;:&quot;note&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:589,&quot;character&quot;:22,&quot;text&quot;:&quot;noteStart&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:589,&quot;character&quot;:32,&quot;text&quot;:&quot;num&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:589,&quot;character&quot;:38,&quot;text&quot;:&quot;note&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:589,&quot;character&quot;:43,&quot;text&quot;:&quot;noteStart&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:589,&quot;character&quot;:53,&quot;text&quot;:&quot;den&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:602,&quot;character&quot;:43,&quot;text&quot;:&quot;baseNoteMidiNumber&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:603,&quot;character&quot;:41,&quot;text&quot;:&quot;baseNoteMidiNumber&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:615,&quot;character&quot;:45,&quot;text&quot;:&quot;noteStartAsFloat&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:622,&quot;character&quot;:12,&quot;text&quot;:&quot;noteStartAsFloat&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:625,&quot;character&quot;:39,&quot;text&quot;:&quot;helperClone&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:627,&quot;character&quot;:12,&quot;text&quot;:&quot;helperClone&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:627,&quot;character&quot;:24,&quot;text&quot;:&quot;position&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:627,&quot;character&quot;:35,&quot;text&quot;:&quot;top&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:628,&quot;character&quot;:12,&quot;text&quot;:&quot;helperClone&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:628,&quot;character&quot;:24,&quot;text&quot;:&quot;position&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:628,&quot;character&quot;:35,&quot;text&quot;:&quot;top&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:631,&quot;character&quot;:40,&quot;text&quot;:&quot;lineValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:635,&quot;character&quot;:38,&quot;text&quot;:&quot;topPos&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:635,&quot;character&quot;:46,&quot;text&quot;:&quot;leftPos&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:644,&quot;character&quot;:18,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:651,&quot;character&quot;:20,&quot;text&quot;:&quot;leftPos&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:654,&quot;character&quot;:19,&quot;text&quot;:&quot;topPos&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:663,&quot;character&quot;:16,&quot;text&quot;:&quot;lineValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:664,&quot;character&quot;:33,&quot;text&quot;:&quot;lineValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:673,&quot;character&quot;:49,&quot;text&quot;:&quot;midiNumber&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:674,&quot;character&quot;:14,&quot;text&quot;:&quot;correspondingNoteName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:675,&quot;character&quot;:31,&quot;text&quot;:&quot;NOTE_NAMES_TO_MIDI_VALUES&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:676,&quot;character&quot;:16,&quot;text&quot;:&quot;NOTE_NAMES_TO_MIDI_VALUES&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:676,&quot;character&quot;:56,&quot;text&quot;:&quot;midiNumber&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:677,&quot;character&quot;:14,&quot;text&quot;:&quot;correspondingNoteName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:681,&quot;character&quot;:14,&quot;text&quot;:&quot;correspondingNoteName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:682,&quot;character&quot;:51,&quot;text&quot;:&quot;midiNumber&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:684,&quot;character&quot;:17,&quot;text&quot;:&quot;correspondingNoteName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:695,&quot;character&quot;:50,&quot;text&quot;:&quot;note&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:696,&quot;character&quot;:14,&quot;text&quot;:&quot;note&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:696,&quot;character&quot;:19,&quot;text&quot;:&quot;offset&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:696,&quot;character&quot;:36,&quot;text&quot;:&quot;note&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:696,&quot;character&quot;:41,&quot;text&quot;:&quot;offset&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:696,&quot;character&quot;:57,&quot;text&quot;:&quot;note&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:696,&quot;character&quot;:62,&quot;text&quot;:&quot;offset&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:697,&quot;character&quot;:52,&quot;text&quot;:&quot;note&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:697,&quot;character&quot;:57,&quot;text&quot;:&quot;offset&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:700,&quot;character&quot;:14,&quot;text&quot;:&quot;correspondingNoteName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:701,&quot;character&quot;:38,&quot;text&quot;:&quot;note&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:701,&quot;character&quot;:43,&quot;text&quot;:&quot;baseNoteMidiNumber&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:704,&quot;character&quot;:12,&quot;text&quot;:&quot;note&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:704,&quot;character&quot;:17,&quot;text&quot;:&quot;offset&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:704,&quot;character&quot;:38,&quot;text&quot;:&quot;note&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:704,&quot;character&quot;:43,&quot;text&quot;:&quot;offset&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:708,&quot;character&quot;:14,&quot;text&quot;:&quot;correspondingNoteName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:708,&quot;character&quot;:54,&quot;text&quot;:&quot;correspondingNoteName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:719,&quot;character&quot;:50,&quot;text&quot;:&quot;readableNote&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:720,&quot;character&quot;:14,&quot;text&quot;:&quot;readableNoteName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:720,&quot;character&quot;:33,&quot;text&quot;:&quot;readableNote&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:720,&quot;character&quot;:46,&quot;text&quot;:&quot;readableNoteName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:721,&quot;character&quot;:14,&quot;text&quot;:&quot;readableNoteName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:721,&quot;character&quot;:31,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:724,&quot;character&quot;:14,&quot;text&quot;:&quot;baseNoteMidiNumber&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:724,&quot;character&quot;:34,&quot;text&quot;:&quot;NOTE_NAMES_TO_MIDI_VALUES&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:724,&quot;character&quot;:60,&quot;text&quot;:&quot;readableNoteName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:727,&quot;character&quot;:21,&quot;text&quot;:&quot;readableNoteName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:727,&quot;character&quot;:38,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:729,&quot;character&quot;:26,&quot;text&quot;:&quot;readableNoteName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:730,&quot;character&quot;:15,&quot;text&quot;:&quot;readableNoteName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:732,&quot;character&quot;:56,&quot;text&quot;:&quot;readableNoteName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:736,&quot;character&quot;:14,&quot;text&quot;:&quot;baseNoteMidiNumber&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:736,&quot;character&quot;:34,&quot;text&quot;:&quot;NOTE_NAMES_TO_MIDI_VALUES&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:737,&quot;character&quot;:16,&quot;text&quot;:&quot;readableNoteName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:737,&quot;character&quot;:38,&quot;text&quot;:&quot;readableNoteName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:742,&quot;character&quot;:54,&quot;text&quot;:&quot;readableNote&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:748,&quot;character&quot;:52,&quot;text&quot;:&quot;noteArray&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:749,&quot;character&quot;:30,&quot;text&quot;:&quot;noteArray&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:749,&quot;character&quot;:40,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:750,&quot;character&quot;:12,&quot;text&quot;:&quot;noteArray&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:750,&quot;character&quot;:25,&quot;text&quot;:&quot;noteDuration&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:755,&quot;character&quot;:17,&quot;text&quot;:&quot;noteArray&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:759,&quot;character&quot;:14,&quot;text&quot;:&quot;readableSequence&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:761,&quot;character&quot;:12,&quot;text&quot;:&quot;readableSequence&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:764,&quot;character&quot;:10,&quot;text&quot;:&quot;readableSequence&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:764,&quot;character&quot;:58,&quot;text&quot;:&quot;readableSequence&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:765,&quot;character&quot;:10,&quot;text&quot;:&quot;CurrentInteractionService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:765,&quot;character&quot;:36,&quot;text&quot;:&quot;onSubmit&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:766,&quot;character&quot;:12,&quot;text&quot;:&quot;readableSequence&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:766,&quot;character&quot;:30,&quot;text&quot;:&quot;MusicNotesInputRulesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:769,&quot;character&quot;:8,&quot;text&quot;:&quot;CurrentInteractionService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:769,&quot;character&quot;:34,&quot;text&quot;:&quot;registerCurrentInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:777,&quot;character&quot;:14,&quot;text&quot;:&quot;noteSequenceToGuess&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:779,&quot;character&quot;:12,&quot;text&quot;:&quot;noteSequenceToGuess&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:784,&quot;character&quot;:12,&quot;text&quot;:&quot;noteSequenceToGuess&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:793,&quot;character&quot;:36,&quot;text&quot;:&quot;noteIndex&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:796,&quot;character&quot;:14,&quot;text&quot;:&quot;num&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:796,&quot;character&quot;:19,&quot;text&quot;:&quot;noteIndex&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:806,&quot;character&quot;:36,&quot;text&quot;:&quot;midiSequence&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:810,&quot;character&quot;:16,&quot;text&quot;:&quot;notes&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:811,&quot;character&quot;:32,&quot;text&quot;:&quot;midiSequence&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:811,&quot;character&quot;:45,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:812,&quot;character&quot;:34,&quot;text&quot;:&quot;midiSequence&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:812,&quot;character&quot;:50,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:813,&quot;character&quot;:16,&quot;text&quot;:&quot;notes&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:814,&quot;character&quot;:18,&quot;text&quot;:&quot;midiValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:814,&quot;character&quot;:29,&quot;text&quot;:&quot;midiSequence&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:821,&quot;character&quot;:12,&quot;text&quot;:&quot;MusicPhrasePlayerService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:821,&quot;character&quot;:37,&quot;text&quot;:&quot;playMusicPhrase&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:821,&quot;character&quot;:53,&quot;text&quot;:&quot;notes&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:823,&quot;character&quot;:12,&quot;text&quot;:&quot;AlertsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:823,&quot;character&quot;:26,&quot;text&quot;:&quot;addWarning&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:829,&quot;character&quot;:47,&quot;text&quot;:&quot;note&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:830,&quot;character&quot;:17,&quot;text&quot;:&quot;note&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:830,&quot;character&quot;:22,&quot;text&quot;:&quot;baseNoteMidiNumber&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:830,&quot;character&quot;:43,&quot;text&quot;:&quot;note&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:830,&quot;character&quot;:48,&quot;text&quot;:&quot;offset&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:835,&quot;character&quot;:60,&quot;text&quot;:&quot;sequence&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:836,&quot;character&quot;:14,&quot;text&quot;:&quot;midiSequence&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:837,&quot;character&quot;:30,&quot;text&quot;:&quot;sequence&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:837,&quot;character&quot;:39,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:838,&quot;character&quot;:16,&quot;text&quot;:&quot;sequence&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:839,&quot;character&quot;:14,&quot;text&quot;:&quot;midiSequence&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:839,&quot;character&quot;:57,&quot;text&quot;:&quot;sequence&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:841,&quot;character&quot;:47,&quot;text&quot;:&quot;sequence&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:844,&quot;character&quot;:17,&quot;text&quot;:&quot;midiSequence&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:849,&quot;character&quot;:57,&quot;text&quot;:&quot;sequence&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:850,&quot;character&quot;:14,&quot;text&quot;:&quot;midiSequence&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:851,&quot;character&quot;:30,&quot;text&quot;:&quot;sequence&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:851,&quot;character&quot;:39,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:852,&quot;character&quot;:16,&quot;text&quot;:&quot;sequence&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:854,&quot;character&quot;:14,&quot;text&quot;:&quot;midiSequence&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:854,&quot;character&quot;:57,&quot;text&quot;:&quot;sequence&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:854,&quot;character&quot;:69,&quot;text&quot;:&quot;note&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:856,&quot;character&quot;:47,&quot;text&quot;:&quot;sequence&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.directive.ts&quot;,&quot;line&quot;:859,&quot;character&quot;:17,&quot;text&quot;:&quot;midiSequence&quot;,&quot;kind&quot;:2}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:44:00 GMT</p>
+    </body>
+  </html>
+  

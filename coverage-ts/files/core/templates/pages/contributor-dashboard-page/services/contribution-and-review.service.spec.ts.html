@@ -1,0 +1,126 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>contribution-and-review.service.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts</td><td class="">39.39%</td><td class="">100%</td><td class="">99</td><td class="">39</td><td class="">60</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2018 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Tests that the contribution-and-review service is working as
+ * expected.
+ */
+
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// UserService.ts is upgraded to Angular 8.
+import { UpgradedServices } from &#x27;services/UpgradedServices&#x27;;
+// ^^^ This block is to be removed.
+
+require(
+  &#x27;pages/contributor-dashboard-page/services/&#x27; +
+  &#x27;contribution-and-review.service.ts&#x27;);
+
+describe(&#x27;ContributionAndReviewService&#x27;, function() {
+  var ContributionAndReviewService, $httpBackend;
+  var suggestion1;
+  var opportunityDict1;
+  var mockSuggestionsBackendObject;
+  var expectedSuggestionDict;
+  var onSuccess;
+
+  beforeEach(angular.mock.module(&#x27;oppia&#x27;));
+  beforeEach(angular.mock.module(&#x27;oppia&#x27;, function($provide) {
+    var ugs = new UpgradedServices();
+    for (const [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
+
+  beforeEach(angular.mock.inject(function($injector) {
+    ContributionAndReviewService = $injector.get(
+      &#x27;ContributionAndReviewService&#x27;);
+    $httpBackend = $injector.get(&#x27;$httpBackend&#x27;);
+
+    suggestion1 = {
+      suggestion_id: &#x27;suggestion_id_1&#x27;,
+      target_id: &#x27;skill_id_1&#x27;,
+    };
+    opportunityDict1 = {
+      skill_id: &#x27;skill_id_1&#x27;,
+      skill_description: &#x27;skill_description_1&#x27;,
+    };
+    mockSuggestionsBackendObject = {
+      suggestions: [
+        suggestion1
+      ],
+      target_id_to_opportunity_dict: {
+        skill_id_1: opportunityDict1,
+      },
+    };
+    expectedSuggestionDict = {
+      suggestion: suggestion1,
+      details: opportunityDict1,
+    };
+  }));
+
+  afterEach(function() {
+    $httpBackend.verifyNoOutstandingExpectation();
+    $httpBackend.verifyNoOutstandingRequest();
+  });
+
+  describe(&#x27;getUserCreatedQuestionSuggestionsAsync&#x27;, function() {
+    it(&#x27;should return available question suggestions and opportunity details&#x27;,
+      function() {
+        $httpBackend.expect(
+          &#x27;GET&#x27;, &#x27;/getsubmittedsuggestions/skill/add_question&#x27;).respond(
+          200, mockSuggestionsBackendObject);
+
+        ContributionAndReviewService.getUserCreatedQuestionSuggestionsAsync(
+        ).then(function(suggestionIdToSuggestions) {
+          expect(suggestionIdToSuggestions.suggestion_id_1).toEqual(
+            expectedSuggestionDict);
+        });
+        $httpBackend.flush();
+      });
+  });
+
+  describe(&#x27;getReviewableQuestionSuggestionsAsync&#x27;, function() {
+    it(&#x27;should return available question suggestions and opportunity details&#x27;,
+      function() {
+        $httpBackend.expect(
+          &#x27;GET&#x27;, &#x27;/getreviewablesuggestions/skill/add_question&#x27;).respond(
+          200, mockSuggestionsBackendObject);
+
+        ContributionAndReviewService.getReviewableQuestionSuggestionsAsync(
+          onSuccess).then(function(suggestionIdToSuggestions) {
+          expect(suggestionIdToSuggestions.suggestion_id_1).toEqual(
+            expectedSuggestionDict);
+        });
+        $httpBackend.flush();
+      });
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:29,&quot;character&quot;:6,&quot;text&quot;:&quot;ContributionAndReviewService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:29,&quot;character&quot;:36,&quot;text&quot;:&quot;$httpBackend&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:30,&quot;character&quot;:6,&quot;text&quot;:&quot;suggestion1&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:31,&quot;character&quot;:6,&quot;text&quot;:&quot;opportunityDict1&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:32,&quot;character&quot;:6,&quot;text&quot;:&quot;mockSuggestionsBackendObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:33,&quot;character&quot;:6,&quot;text&quot;:&quot;expectedSuggestionDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:34,&quot;character&quot;:6,&quot;text&quot;:&quot;onSuccess&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:37,&quot;character&quot;:51,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:40,&quot;character&quot;:6,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:40,&quot;character&quot;:15,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:44,&quot;character&quot;:42,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:45,&quot;character&quot;:4,&quot;text&quot;:&quot;ContributionAndReviewService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:45,&quot;character&quot;:35,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:45,&quot;character&quot;:45,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:47,&quot;character&quot;:4,&quot;text&quot;:&quot;$httpBackend&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:47,&quot;character&quot;:19,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:47,&quot;character&quot;:29,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:49,&quot;character&quot;:4,&quot;text&quot;:&quot;suggestion1&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:53,&quot;character&quot;:4,&quot;text&quot;:&quot;opportunityDict1&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:57,&quot;character&quot;:4,&quot;text&quot;:&quot;mockSuggestionsBackendObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:58,&quot;character&quot;:6,&quot;text&quot;:&quot;suggestions&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:59,&quot;character&quot;:8,&quot;text&quot;:&quot;suggestion1&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:62,&quot;character&quot;:8,&quot;text&quot;:&quot;skill_id_1&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:62,&quot;character&quot;:20,&quot;text&quot;:&quot;opportunityDict1&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:65,&quot;character&quot;:4,&quot;text&quot;:&quot;expectedSuggestionDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:66,&quot;character&quot;:6,&quot;text&quot;:&quot;suggestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:66,&quot;character&quot;:18,&quot;text&quot;:&quot;suggestion1&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:67,&quot;character&quot;:6,&quot;text&quot;:&quot;details&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:67,&quot;character&quot;:15,&quot;text&quot;:&quot;opportunityDict1&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:72,&quot;character&quot;:4,&quot;text&quot;:&quot;$httpBackend&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:72,&quot;character&quot;:17,&quot;text&quot;:&quot;verifyNoOutstandingExpectation&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:73,&quot;character&quot;:4,&quot;text&quot;:&quot;$httpBackend&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:73,&quot;character&quot;:17,&quot;text&quot;:&quot;verifyNoOutstandingRequest&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:79,&quot;character&quot;:8,&quot;text&quot;:&quot;$httpBackend&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:79,&quot;character&quot;:21,&quot;text&quot;:&quot;expect&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:80,&quot;character&quot;:64,&quot;text&quot;:&quot;respond&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:81,&quot;character&quot;:15,&quot;text&quot;:&quot;mockSuggestionsBackendObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:83,&quot;character&quot;:8,&quot;text&quot;:&quot;ContributionAndReviewService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:83,&quot;character&quot;:37,&quot;text&quot;:&quot;getUserCreatedQuestionSuggestionsAsync&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:84,&quot;character&quot;:10,&quot;text&quot;:&quot;then&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:84,&quot;character&quot;:24,&quot;text&quot;:&quot;suggestionIdToSuggestions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:85,&quot;character&quot;:17,&quot;text&quot;:&quot;suggestionIdToSuggestions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:85,&quot;character&quot;:43,&quot;text&quot;:&quot;suggestion_id_1&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:86,&quot;character&quot;:12,&quot;text&quot;:&quot;expectedSuggestionDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:88,&quot;character&quot;:8,&quot;text&quot;:&quot;$httpBackend&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:88,&quot;character&quot;:21,&quot;text&quot;:&quot;flush&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:95,&quot;character&quot;:8,&quot;text&quot;:&quot;$httpBackend&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:95,&quot;character&quot;:21,&quot;text&quot;:&quot;expect&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:96,&quot;character&quot;:65,&quot;text&quot;:&quot;respond&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:97,&quot;character&quot;:15,&quot;text&quot;:&quot;mockSuggestionsBackendObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:99,&quot;character&quot;:8,&quot;text&quot;:&quot;ContributionAndReviewService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:99,&quot;character&quot;:37,&quot;text&quot;:&quot;getReviewableQuestionSuggestionsAsync&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:100,&quot;character&quot;:10,&quot;text&quot;:&quot;onSuccess&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:100,&quot;character&quot;:21,&quot;text&quot;:&quot;then&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:100,&quot;character&quot;:35,&quot;text&quot;:&quot;suggestionIdToSuggestions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:101,&quot;character&quot;:17,&quot;text&quot;:&quot;suggestionIdToSuggestions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:101,&quot;character&quot;:43,&quot;text&quot;:&quot;suggestion_id_1&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:102,&quot;character&quot;:12,&quot;text&quot;:&quot;expectedSuggestionDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:104,&quot;character&quot;:8,&quot;text&quot;:&quot;$httpBackend&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts&quot;,&quot;line&quot;:104,&quot;character&quot;:21,&quot;text&quot;:&quot;flush&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:59 GMT</p>
+    </body>
+  </html>
+  

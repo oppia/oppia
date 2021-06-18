@@ -1,0 +1,156 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>classifier-data-backend-api.service.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/services/classifier-data-backend-api.service.ts</td><td class="">95.89%</td><td class="">100%</td><td class="">146</td><td class="">140</td><td class="">6</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Service to serve as the interface for fetching classifier
+ * data file name from backend.
+ */
+
+import { HttpClient } from &#x27;@angular/common/http&#x27;;
+import { Injectable } from &#x27;@angular/core&#x27;;
+import { downgradeInjectable } from &#x27;@angular/upgrade/static&#x27;;
+
+import { Buffer } from &#x27;buffer&#x27;;
+import { unzipSync } from &#x27;zlib&#x27;;
+
+import { AppConstants } from &#x27;app.constants&#x27;;
+import { Classifier } from &#x27;domain/classifier/classifier.model&#x27;;
+import { UrlInterpolationService } from &#x27;domain/utilities/url-interpolation.service&#x27;;
+
+interface ClassifierMetaDataBackendDict {
+  &#x27;algorithm_id&#x27;: string,
+  &#x27;algorithm_version&#x27;: number,
+  &#x27;gcs_filename&#x27;: string;
+}
+
+export interface ClassifierMetaData {
+  algorithmId: string,
+  algorithmVersion: number,
+  filename: string,
+}
+
+@Injectable({
+  providedIn: &#x27;root&#x27;
+})
+export class ClassifierDataBackendApiService {
+  private readonly classifierDataDownloadUrlTemplate: string;
+
+  constructor(
+      private http: HttpClient,
+      private urlInterpolationService: UrlInterpolationService) {
+    if (
+      !ClassifierDataBackendApiService.DEV_MODE &amp;&amp;
+      !ClassifierDataBackendApiService.GCS_RESOURCE_BUCKET_NAME) {
+      throw new Error(&#x27;GCS_RESOURCE_BUCKET_NAME is not set in prod.&#x27;);
+    }
+
+    const urlPrefix = ClassifierDataBackendApiService.DEV_MODE ?
+      &#x27;/_ah/gcs/&#x27; : &#x27;https://storage.googleapis.com/&#x27;;
+    this.classifierDataDownloadUrlTemplate = (
+      urlPrefix + ClassifierDataBackendApiService.GCS_RESOURCE_BUCKET_NAME +
+      &#x27;/&lt;entity_type&gt;/&lt;entity_id&gt;/assets/&lt;filename&gt;&#x27;);
+  }
+
+  static get DEV_MODE(): boolean {
+    return AppConstants.DEV_MODE;
+  }
+
+  static get GCS_RESOURCE_BUCKET_NAME(): string {
+    return AppConstants.GCS_RESOURCE_BUCKET_NAME;
+  }
+
+  private _getDownloadUrl(
+      entityType: string, entityId: string, filename: string): string {
+    return this.urlInterpolationService.interpolateUrl(
+      this.classifierDataDownloadUrlTemplate, {
+        entity_type: entityType,
+        entity_id: entityId,
+        filename: filename,
+      });
+  }
+
+  private async getClassifierMetadataAsync(
+      explorationId: string, explorationVersion: number,
+      stateName: string): Promise&lt;ClassifierMetaData&gt; {
+    return new Promise((resolve, reject) =&gt; {
+      this.http.get&lt;ClassifierMetaDataBackendDict&gt;(
+        &#x27;/ml/trainedclassifierhandler&#x27;, {
+          params: {
+            exploration_id: explorationId,
+            exploration_version: explorationVersion.toString(),
+            state_name: stateName
+          },
+          responseType: &#x27;json&#x27;
+        }).toPromise().then(response =&gt; {
+        resolve({
+          algorithmId: response.algorithm_id,
+          algorithmVersion: response.algorithm_version,
+          filename: response.gcs_filename
+        });
+      }, errorResponse =&gt; {
+        reject(errorResponse);
+      });
+    });
+  }
+
+  async getClassifierDataAsync(
+      explorationId: string, explorationVersion: number,
+      stateName: string): Promise&lt;Classifier&gt; {
+    return new Promise((resolve, reject) =&gt; {
+      this.getClassifierMetadataAsync(
+        explorationId, explorationVersion, stateName).then(
+        response =&gt; {
+          let classifierMetaData = response;
+          this.http.get(
+            this._getDownloadUrl(
+              AppConstants.ENTITY_TYPE.EXPLORATION, explorationId,
+              response.filename), {
+              responseType: &#x27;arraybuffer&#x27;
+            }).toPromise().then(response =&gt; {
+            resolve(new Classifier(
+              classifierMetaData.algorithmId,
+              unzipSync(Buffer.from(response)),
+              classifierMetaData.algorithmVersion
+            ));
+          }, classifierErrorResponse =&gt; {
+            reject(classifierErrorResponse);
+          });
+        }, classifierMetadataErrorResponse =&gt; {
+          reject(classifierMetadataErrorResponse);
+        });
+    });
+  }
+}
+
+angular.module(&#x27;oppia&#x27;).factory(
+  &#x27;ClassifierDataBackendApiService&#x27;,
+  downgradeInjectable(ClassifierDataBackendApiService));
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/services/classifier-data-backend-api.service.ts&quot;,&quot;line&quot;:100,&quot;character&quot;:9,&quot;text&quot;:&quot;errorResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/classifier-data-backend-api.service.ts&quot;,&quot;line&quot;:101,&quot;character&quot;:15,&quot;text&quot;:&quot;errorResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/classifier-data-backend-api.service.ts&quot;,&quot;line&quot;:125,&quot;character&quot;:13,&quot;text&quot;:&quot;classifierErrorResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/classifier-data-backend-api.service.ts&quot;,&quot;line&quot;:126,&quot;character&quot;:19,&quot;text&quot;:&quot;classifierErrorResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/classifier-data-backend-api.service.ts&quot;,&quot;line&quot;:128,&quot;character&quot;:11,&quot;text&quot;:&quot;classifierMetadataErrorResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/classifier-data-backend-api.service.ts&quot;,&quot;line&quot;:129,&quot;character&quot;:17,&quot;text&quot;:&quot;classifierMetadataErrorResponse&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:55 GMT</p>
+    </body>
+  </html>
+  

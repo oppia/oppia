@@ -431,11 +431,33 @@ angular.module('oppia').factory('ExplorationStatesService', [
           stateName, 'card_is_checkpoint', newCardIsCheckpoint);
       },
       getWrittenTranslationsMemento: function(stateName) {
-        return getStatePropertyMemento(stateName, 'written_translations');
+        return _states.getState(stateName).writtenTranslations;
       },
-      saveWrittenTranslations: function(stateName, newWrittenTranslations) {
-        saveStateProperty(
-          stateName, 'written_translations', newWrittenTranslations);
+      saveWrittenTranslation: function(
+          contentId, dataFormat, languageCode, stateName, translationHtml) {
+        ChangeListService.addWrittenTranslation(
+          contentId, dataFormat, languageCode, stateName, translationHtml);
+        let stateData = _states.getState(stateName);
+        if (stateData.writtenTranslations.hasWrittenTranslation(
+          contentId, languageCode)) {
+          stateData.writtenTranslations.updateWrittenTranslation(
+            contentId, languageCode, translationHtml);
+        } else {
+          stateData.writtenTranslations.addWrittenTranslation(
+            contentId, languageCode, dataFormat, translationHtml);
+        }
+        _states.setState(stateName, angular.copy(stateData));
+      },
+      markWrittenTranslationsAsNeedingUpdate: function(contentId, stateName) {
+        ChangeListService.markTranslationsAsNeedingUpdate(contentId, stateName);
+        let stateData = _states.getState(stateName);
+        const translationMapping = (
+          stateData.writtenTranslations.translationsMapping[contentId]);
+        for (const languageCode in translationMapping) {
+          stateData.writtenTranslations.translationsMapping[contentId][
+            languageCode].markAsNeedingUpdate();
+        }
+        _states.setState(stateName, angular.copy(stateData));
       },
       isInitialized: function() {
         return _states !== null;

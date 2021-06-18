@@ -1,0 +1,772 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>creator-dashboard-page.component.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts</td><td class="">60.97%</td><td class="">100%</td><td class="">994</td><td class="">606</td><td class="">388</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for creator dashboard page component.
+ */
+
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// creator-dashboard-page.component.ts is upgraded to Angular 8.
+import { CollectionSummary, CollectionSummaryBackendDict } from &#x27;domain/collection/collection-summary.model&#x27;;
+import { CreatorDashboardStats } from &#x27;domain/creator_dashboard/creator-dashboard-stats.model&#x27;;
+import { CreatorExplorationSummary } from &#x27;domain/summary/creator-exploration-summary.model&#x27;;
+import { ProfileSummary } from &#x27;domain/user/profile-summary.model&#x27;;
+import { Suggestion } from &#x27;domain/suggestion/suggestion.model&#x27;;
+import { ThreadMessage } from &#x27;domain/feedback_message/ThreadMessage.model&#x27;;
+import { importAllAngularServices } from &#x27;tests/unit-test-utils&#x27;;
+
+require(&#x27;pages/creator-dashboard-page/creator-dashboard-page.component.ts&#x27;);
+
+var _getSuggestionThreads = (
+    feedbackDicts, suggestionDicts, suggestionsService,
+    suggestionThreadObjectFactory) =&gt; {
+  var numberOfSuggestions = feedbackDicts.length;
+  var suggestionThreads = [];
+
+  for (var i = 0; i &lt; numberOfSuggestions; i++) {
+    for (var j = 0; j &lt; numberOfSuggestions; j++) {
+      var suggestionThreadId = suggestionsService
+        .getThreadIdFromSuggestionBackendDict(suggestionDicts[j]);
+      var threadDict = feedbackDicts[i];
+      if (threadDict.thread_id === suggestionThreadId) {
+        var suggestionThread = (
+          suggestionThreadObjectFactory.createFromBackendDicts(
+            threadDict, suggestionDicts[j]));
+        suggestionThreads.push(suggestionThread);
+      }
+    }
+  }
+
+  return suggestionThreads;
+};
+
+describe(&#x27;Creator dashboard controller&#x27;, () =&gt; {
+  var ctrl = null;
+  var $httpBackend = null;
+  var $q = null;
+  var $rootScope = null;
+  var $window = null;
+  var AlertsService = null;
+  var CreatorDashboardBackendApiService = null;
+  var CsrfService = null;
+  var feedbackThreadObjectFactory = null;
+  var SuggestionModalForCreatorDashboardService = null;
+  var suggestionsService = null;
+  var SuggestionThreadObjectFactory = null;
+  var UserService = null;
+  var explorationCreationService = null;
+  var userInfo = {
+    canCreateCollections: () =&gt; true
+  };
+
+  importAllAngularServices();
+
+  beforeEach(angular.mock.inject(($injector, $componentController) =&gt; {
+    $httpBackend = $injector.get(&#x27;$httpBackend&#x27;);
+    $q = $injector.get(&#x27;$q&#x27;);
+    $rootScope = $injector.get(&#x27;$rootScope&#x27;);
+    $window = $injector.get(&#x27;$window&#x27;);
+
+    AlertsService = $injector.get(&#x27;AlertsService&#x27;);
+    CreatorDashboardBackendApiService = $injector.get(
+      &#x27;CreatorDashboardBackendApiService&#x27;);
+    CsrfService = $injector.get(&#x27;CsrfTokenService&#x27;);
+    feedbackThreadObjectFactory = $injector.get(
+      &#x27;FeedbackThreadObjectFactory&#x27;);
+    SuggestionModalForCreatorDashboardService = $injector.get(
+      &#x27;SuggestionModalForCreatorDashboardService&#x27;);
+    suggestionsService = $injector.get(
+      &#x27;SuggestionsService&#x27;);
+    explorationCreationService = $injector.get(&#x27;ExplorationCreationService&#x27;);
+    SuggestionThreadObjectFactory = $injector.get(
+      &#x27;SuggestionThreadObjectFactory&#x27;);
+    UserService = $injector.get(&#x27;UserService&#x27;);
+
+    spyOn(CsrfService, &#x27;getTokenAsync&#x27;).and.returnValue(
+      $q.resolve(&#x27;sample-csrf-token&#x27;));
+
+    ctrl = $componentController(&#x27;creatorDashboardPage&#x27;);
+
+    // This approach was choosen because spyOn() doesn&#x27;t work on properties
+    // that doesn&#x27;t have a get access type.
+    // Without this approach the test will fail because it&#x27;ll throw
+    // &#x27;Property innerWidth does not have access type get&#x27; error.
+    // eslint-disable-next-line max-len
+    // ref: https://developer.mozilla.org/pt-BR/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty
+    // ref: https://github.com/jasmine/jasmine/issues/1415
+    Object.defineProperty($window, &#x27;innerWidth&#x27;, {
+      get: () =&gt; undefined,
+      set: () =&gt; {}
+    });
+  }));
+
+  it(&#x27;should get the correct exploration editor page URL corresponding to a&#x27; +
+    &#x27; given exploration ID&#x27;, function() {
+    var explorationId = &#x27;1&#x27;;
+    expect(ctrl.getExplorationUrl(explorationId)).toBe(
+      &#x27;/create/&#x27; + explorationId);
+  });
+
+  it(&#x27;should get the correct collection editor page URL corresponding to a&#x27; +
+    &#x27; given collection ID&#x27;, function() {
+    var collectionId = &#x27;1&#x27;;
+    expect(ctrl.getCollectionUrl(collectionId)).toBe(
+      &#x27;/collection_editor/create/&#x27; + collectionId);
+  });
+
+  it(&#x27;should get username popover event type according to username length&#x27;,
+    function() {
+      expect(ctrl.showUsernamePopover(&#x27;abcdefghijk&#x27;)).toBe(&#x27;mouseenter&#x27;);
+      expect(ctrl.showUsernamePopover(&#x27;abc&#x27;)).toBe(&#x27;none&#x27;);
+    });
+
+  it(&#x27;should get complete thumbail icon path corresponding to a given&#x27; +
+    &#x27; relative path&#x27;, function() {
+    expect(ctrl.getCompleteThumbnailIconUrl(&#x27;/path/to/icon.png&#x27;)).toBe(
+      &#x27;/assets/images/path/to/icon.png&#x27;);
+  });
+
+  it(&#x27;should create new exploration when clicked on CREATE&#x27; +
+   &#x27; EXPLORATION button&#x27;, function() {
+    spyOn(
+      explorationCreationService, &#x27;createNewExploration&#x27;);
+    ctrl.createNewExploration();
+    expect(
+      explorationCreationService.createNewExploration).toHaveBeenCalled();
+  });
+
+  describe(&#x27;when fetching dashboard successfully and on explorations tab&#x27;,
+    function() {
+      var dashboardData = {
+        explorations_list: [
+          {
+            human_readable_contributors_summary: {
+              username: {
+                num_commits: 3
+              }
+            },
+            category: &#x27;Algebra&#x27;,
+            community_owned: false,
+            tags: [],
+            title: &#x27;Testing Exploration&#x27;,
+            created_on_msec: 1593786508029.501,
+            num_total_threads: 0,
+            num_views: 1,
+            last_updated_msec: 1593786607552.753,
+            status: &#x27;public&#x27;,
+            num_open_threads: 0,
+            thumbnail_icon_url: &#x27;/subjects/Algebra.svg&#x27;,
+            language_code: &#x27;en&#x27;,
+            objective: &#x27;To test exploration recommendations&#x27;,
+            id: &#x27;hi27Jix1QGbT&#x27;,
+            thumbnail_bg_color: &#x27;#cd672b&#x27;,
+            activity_type: &#x27;exploration&#x27;,
+            ratings: {
+              1: 0,
+              2: 0,
+              3: 0,
+              4: 0,
+              5: 0
+            }
+          }
+        ],
+        collections_list: [],
+        subscribers_list: [],
+        dashboard_stats: {
+          average_ratings: null,
+          num_ratings: 0,
+          total_open_feedback: 0,
+          total_plays: 10
+        },
+        last_week_stats: {
+          average_ratings: null,
+          num_ratings: 0,
+          total_open_feedback: 0,
+          total_plays: 5
+        },
+        display_preference: &#x27;card&#x27;,
+        threads_for_created_suggestions_list: [{
+          status: &#x27;&#x27;,
+          subject: &#x27;&#x27;,
+          summary: &#x27;&#x27;,
+          original_author_username: &#x27;&#x27;,
+          last_updated_msecs: 0,
+          message_count: &#x27;&#x27;,
+          thread_id: &#x27;exp1&#x27;,
+          last_nonempty_message_author: &#x27;&#x27;,
+          last_nonempty_message_text: &#x27;&#x27;,
+        }],
+        created_suggestions_list: [{
+          suggestion_type: &#x27;edit_exploration_state_content&#x27;,
+          suggestion_id: &#x27;exp1&#x27;,
+          target_type: &#x27;&#x27;,
+          target_id: &#x27;&#x27;,
+          status: &#x27;&#x27;,
+          author_name: &#x27;&#x27;,
+          change: {
+            state_name: &#x27;&#x27;,
+            new_value: { html: &#x27;&#x27;},
+            old_value: { html: &#x27;&#x27;},
+          },
+          last_updated_msecs: 0
+        }, {
+          suggestion_type: &#x27;edit_exploration_state_content&#x27;,
+          suggestion_id: &#x27;exp2&#x27;,
+          target_type: &#x27;&#x27;,
+          target_id: &#x27;&#x27;,
+          status: &#x27;&#x27;,
+          author_name: &#x27;&#x27;,
+          change: {
+            state_name: &#x27;&#x27;,
+            new_value: { html: &#x27;&#x27;},
+            old_value: { html: &#x27;&#x27;},
+          },
+          last_updated_msecs: 0
+        }],
+        threads_for_suggestions_to_review_list: [{
+          status: &#x27;&#x27;,
+          subject: &#x27;&#x27;,
+          summary: &#x27;&#x27;,
+          original_author_username: &#x27;&#x27;,
+          last_updated_msecs: 0,
+          message_count: &#x27;&#x27;,
+          thread_id: &#x27;exp2&#x27;,
+          last_nonempty_message_author: &#x27;&#x27;,
+          last_nonempty_message_text: &#x27;&#x27;,
+        }],
+        suggestions_to_review_list: [{
+          suggestion_type: &#x27;edit_exploration_state_content&#x27;,
+          suggestion_id: &#x27;exp2&#x27;,
+          target_type: &#x27;&#x27;,
+          target_id: &#x27;&#x27;,
+          status: &#x27;&#x27;,
+          author_name: &#x27;&#x27;,
+          change: {
+            state_name: &#x27;&#x27;,
+            new_value: { html: &#x27;&#x27;},
+            old_value: { html: &#x27;&#x27;},
+          },
+          last_updated_msecs: 0
+        }, {
+          suggestion_type: &#x27;edit_exploration_state_content&#x27;,
+          suggestion_id: &#x27;exp1&#x27;,
+          target_type: &#x27;&#x27;,
+          target_id: &#x27;&#x27;,
+          status: &#x27;&#x27;,
+          author_name: &#x27;&#x27;,
+          change: {
+            state_name: &#x27;&#x27;,
+            new_value: { html: &#x27;&#x27;},
+            old_value: { html: &#x27;&#x27;},
+          },
+          last_updated_msecs: 0
+        }]
+      };
+
+      beforeEach(function() {
+        spyOn(CreatorDashboardBackendApiService, &#x27;fetchDashboardDataAsync&#x27;)
+          .and.returnValue($q.resolve({
+            dashboardStats: CreatorDashboardStats
+              .createFromBackendDict(dashboardData.dashboard_stats),
+            // Because lastWeekStats may be null.
+            lastWeekStats: dashboardData.last_week_stats ? (
+              CreatorDashboardStats
+                .createFromBackendDict(dashboardData.last_week_stats)) : null,
+            displayPreference: dashboardData.display_preference,
+            subscribersList: dashboardData.subscribers_list.map(
+              subscriber =&gt; ProfileSummary
+                .createFromSubscriberBackendDict(subscriber)),
+            threadsForCreatedSuggestionsList: (
+              dashboardData.threads_for_created_suggestions_list.map(
+                feedbackThread =&gt; feedbackThreadObjectFactory
+                  .createFromBackendDict(feedbackThread))),
+            threadsForSuggestionsToReviewList: (
+              dashboardData.threads_for_suggestions_to_review_list.map(
+                feedbackThread =&gt; feedbackThreadObjectFactory
+                  .createFromBackendDict(feedbackThread))),
+            createdSuggestionsList: (
+              dashboardData.created_suggestions_list.map(
+                suggestionDict =&gt; Suggestion.createFromBackendDict(
+                  suggestionDict
+                ))),
+            suggestionsToReviewList: (
+              dashboardData.suggestions_to_review_list.map(
+                suggestionDict =&gt; Suggestion.createFromBackendDict(
+                  suggestionDict
+                ))),
+            createdSuggestionThreadsList: _getSuggestionThreads(
+              dashboardData.threads_for_created_suggestions_list,
+              dashboardData.created_suggestions_list,
+              suggestionsService,
+              SuggestionThreadObjectFactory),
+            suggestionThreadsToReviewList: _getSuggestionThreads(
+              dashboardData.threads_for_suggestions_to_review_list,
+              dashboardData.suggestions_to_review_list,
+              suggestionsService,
+              SuggestionThreadObjectFactory),
+            explorationsList: dashboardData.explorations_list.map(
+              expSummary =&gt; CreatorExplorationSummary
+                .createFromBackendDict(expSummary)),
+            collectionsList: dashboardData.collections_list.map(
+              collectionSummary =&gt; CollectionSummary
+                .createFromBackendDict(collectionSummary))
+          }));
+        spyOn(UserService, &#x27;getUserInfoAsync&#x27;).and.returnValue(
+          $q.resolve(userInfo));
+
+        ctrl.$onInit();
+        $rootScope.$apply();
+      });
+
+      it(&#x27;should evaluate dashboard data retrieved from backend&#x27;, function() {
+        var suggestionThreadObject = (
+          SuggestionThreadObjectFactory.createFromBackendDicts(
+            dashboardData.threads_for_created_suggestions_list[0],
+            dashboardData.created_suggestions_list[0]));
+        var suggestionToReviewObject = (
+          SuggestionThreadObjectFactory.createFromBackendDicts(
+            dashboardData.threads_for_suggestions_to_review_list[0],
+            dashboardData.suggestions_to_review_list[0]));
+
+        expect(ctrl.canCreateCollections).toBe(true);
+        expect(ctrl.mySuggestionsList).toEqual([suggestionThreadObject]);
+        expect(ctrl.suggestionsToReviewList).toEqual(
+          [suggestionToReviewObject]);
+        expect(ctrl.relativeChangeInTotalPlays).toBe(5);
+      });
+
+      it(&#x27;should change active tab name when creator clicks on a new tab&#x27;,
+        function() {
+          expect(ctrl.activeTab).toBe(&#x27;myExplorations&#x27;);
+          ctrl.setActiveTab(&#x27;suggestions&#x27;);
+          expect(ctrl.activeTab).toBe(&#x27;suggestions&#x27;);
+        });
+
+      it(&#x27;should save the exploration format view in the backend when creator&#x27; +
+        &#x27; changes the format view&#x27;, function() {
+        $httpBackend.expect(&#x27;POST&#x27;, &#x27;/creatordashboardhandler/data&#x27;)
+          .respond(200);
+        ctrl.setMyExplorationsView(&#x27;a&#x27;);
+        $httpBackend.flush();
+
+        expect(ctrl.myExplorationsView).toBe(&#x27;a&#x27;);
+      });
+
+      it(&#x27;should reverse the sort order of explorations when the creator&#x27; +
+        &#x27; re-selects the current sorting type&#x27;, function() {
+        expect(ctrl.isCurrentSortDescending).toBe(true);
+        expect(ctrl.currentSortType).toBe(&#x27;numOpenThreads&#x27;);
+        ctrl.setExplorationsSortingOptions(&#x27;numOpenThreads&#x27;);
+        expect(ctrl.isCurrentSortDescending).toBe(false);
+      });
+
+      it(&#x27;should update the exploration sort order based on the&#x27; +
+        &#x27; option chosen by the creator&#x27;, function() {
+        ctrl.setExplorationsSortingOptions(&#x27;new_open&#x27;);
+        expect(ctrl.currentSortType).toBe(&#x27;new_open&#x27;);
+      });
+
+      it(&#x27;should reverse the sort order of subscriptions when the creator&#x27; +
+        &#x27; re-selects the current sorting type&#x27;, function() {
+        expect(ctrl.isCurrentSubscriptionSortDescending).toBe(true);
+        expect(ctrl.currentSubscribersSortType).toBe(&#x27;username&#x27;);
+        ctrl.setSubscriptionSortingOptions(&#x27;username&#x27;);
+        expect(ctrl.isCurrentSubscriptionSortDescending).toBe(false);
+      });
+
+      it(&#x27;should update the subscription sort order based on the&#x27; +
+        &#x27; option chosen by the creator&#x27;, function() {
+        ctrl.setSubscriptionSortingOptions(&#x27;new_subscriber&#x27;);
+        expect(ctrl.currentSubscribersSortType).toBe(&#x27;new_subscriber&#x27;);
+      });
+
+      it(&#x27;should sort subscription list by username&#x27;, function() {
+        var entity = {
+          username: &#x27;username&#x27;
+        };
+        expect(ctrl.currentSubscribersSortType).toBe(&#x27;username&#x27;);
+        expect(ctrl.sortSubscriptionFunction(entity)).toBe(
+          &#x27;username&#x27;);
+      });
+
+      it(&#x27;should not sort subscription list by impact given empty object&#x27;,
+        function() {
+          ctrl.setSubscriptionSortingOptions(&#x27;impact&#x27;);
+          expect(ctrl.currentSubscribersSortType).toBe(&#x27;impact&#x27;);
+          expect(ctrl.sortSubscriptionFunction({})).toBe(0);
+        });
+
+      it(&#x27;should sort exploration list by untitled explorations when title&#x27; +
+        &#x27; is not provided and exploration is private&#x27;, function() {
+        expect(ctrl.currentSortType).toBe(&#x27;numOpenThreads&#x27;);
+        ctrl.setExplorationsSortingOptions(&#x27;title&#x27;);
+        expect(ctrl.currentSortType).toBe(&#x27;title&#x27;);
+
+        expect(ctrl.sortByFunction({
+          title: &#x27;&#x27;,
+          status: &#x27;private&#x27;
+        })).toBe(&#x27;Untitled&#x27;);
+      });
+
+      it(&#x27;should not sort exploration list by rating when providing&#x27; +
+        &#x27; a empty object&#x27;, function() {
+        ctrl.setExplorationsSortingOptions(&#x27;ratings&#x27;);
+        expect(ctrl.currentSortType).toBe(&#x27;ratings&#x27;);
+
+        expect(ctrl.sortByFunction({})).toBe(0);
+      });
+
+      it(&#x27;should sort exploration list by last updated when last updated&#x27; +
+        &#x27; value is provided&#x27;, function() {
+        ctrl.setExplorationsSortingOptions(&#x27;lastUpdatedMsec&#x27;);
+        expect(ctrl.currentSortType).toBe(&#x27;lastUpdatedMsec&#x27;);
+
+        expect(ctrl.sortByFunction({
+          lastUpdatedMsec: 1
+        })).toBe(1);
+      });
+
+      it(&#x27;should not sort exploration list by options that is not last update&#x27; +
+        &#x27; when trying to sort by number of views&#x27;, function() {
+        ctrl.setExplorationsSortingOptions(&#x27;numViews&#x27;);
+        expect(ctrl.currentSortType).toBe(&#x27;numViews&#x27;);
+
+        expect(ctrl.sortByFunction({
+          numViews: &#x27;&#x27;,
+          status: &#x27;private&#x27;
+        })).toBe(0);
+      });
+
+      it(&#x27;should update exploration view and publish text on resizing page&#x27;,
+        function() {
+          var innerWidthSpy = spyOnProperty($window, &#x27;innerWidth&#x27;);
+          $httpBackend.expect(&#x27;POST&#x27;, &#x27;/creatordashboardhandler/data&#x27;).respond(
+            200);
+          ctrl.setMyExplorationsView(&#x27;list&#x27;);
+          $httpBackend.flush();
+
+          expect(ctrl.myExplorationsView).toBe(&#x27;list&#x27;);
+
+          innerWidthSpy.and.callFake(() =&gt; 480);
+          $rootScope.$apply();
+          angular.element($window).triggerHandler(&#x27;resize&#x27;);
+
+          expect(ctrl.myExplorationsView).toBe(&#x27;card&#x27;);
+          expect(ctrl.publishText).toBe(
+            &#x27;Publish the exploration to receive statistics.&#x27;);
+
+          innerWidthSpy.and.callFake(() =&gt; 768);
+          $rootScope.$apply();
+          angular.element($window).triggerHandler(&#x27;resize&#x27;);
+
+          expect(ctrl.myExplorationsView).toBe(&#x27;list&#x27;);
+          expect(ctrl.publishText).toBe(
+            &#x27;This exploration is private. Publish it to receive statistics.&#x27;);
+        });
+
+      it(&#x27;should set active thread from my suggestions list when changing&#x27; +
+        &#x27; active thread&#x27;, function() {
+        var threadId = &#x27;exp1&#x27;;
+        var messages = [{
+          author_username: &#x27;&#x27;,
+          created_on_msecs: 0,
+          entity_type: &#x27;&#x27;,
+          entity_id: &#x27;&#x27;,
+          message_id: 0,
+          text: &#x27;&#x27;,
+          updated_status: &#x27;&#x27;,
+          updated_subject: &#x27;&#x27;,
+        }];
+        var suggestionThreadObject = (
+          SuggestionThreadObjectFactory.createFromBackendDicts(
+            dashboardData.threads_for_created_suggestions_list[0],
+            dashboardData.created_suggestions_list[0]));
+        suggestionThreadObject.setMessages(messages.map(m =&gt; (
+          ThreadMessage.createFromBackendDict(m))));
+
+        $httpBackend.expect(&#x27;GET&#x27;, &#x27;/threadhandler/&#x27; + threadId).respond({
+          messages: messages
+        });
+        ctrl.setActiveThread(threadId);
+        $httpBackend.flush();
+
+        expect(ctrl.activeThread).toEqual(suggestionThreadObject);
+        expect(ctrl.canReviewActiveThread).toBe(false);
+      });
+
+      it(&#x27;should set active thread from suggestions to review list&#x27; +
+        &#x27; when cleaning active thread&#x27;, function() {
+        var threadId = &#x27;exp2&#x27;;
+        var suggestionToReviewObject = (
+          SuggestionThreadObjectFactory.createFromBackendDicts(
+            dashboardData.threads_for_suggestions_to_review_list[0],
+            dashboardData.suggestions_to_review_list[0]));
+
+        ctrl.clearActiveThread();
+
+        $httpBackend.expect(&#x27;GET&#x27;, &#x27;/threadhandler/&#x27; + threadId).respond(404);
+        ctrl.setActiveThread(threadId);
+        $httpBackend.flush();
+
+        expect(ctrl.activeThread).toEqual(suggestionToReviewObject);
+        expect(ctrl.canReviewActiveThread).toBe(true);
+      });
+
+      it(&#x27;should open suggestion modal when clicking on show suggestion modal&#x27;,
+        function() {
+          var threadId = &#x27;exp1&#x27;;
+
+          $httpBackend.expect(&#x27;GET&#x27;, &#x27;/threadhandler/&#x27; + threadId).respond(404);
+          ctrl.setActiveThread(threadId);
+          $httpBackend.flush();
+
+          // Method showSuggestionModal is mocked otherwise using its original
+          // implementation will throw an error: &#x27;appendTo element not found.
+          // Make sure that the element passed is in DOM.&#x27;
+          // This error does not happen often and it&#x27;s related to the usage of
+          // angular.element in above specs.
+          spyOn(
+            SuggestionModalForCreatorDashboardService, &#x27;showSuggestionModal&#x27;)
+            .and.callFake(() =&gt; {});
+          ctrl.showSuggestionModal();
+
+          expect(SuggestionModalForCreatorDashboardService.showSuggestionModal)
+            .toHaveBeenCalled();
+        });
+    });
+
+  describe(&#x27;when on collections tab&#x27;, function() {
+    var dashboardData = {
+      explorations_list: [],
+      collections_list: [{
+        last_updated: 1591296737470.528,
+        community_owned: false,
+        objective: &#x27;Test Objective&#x27;,
+        id: &#x27;44LKoKLlIbGe&#x27;,
+        thumbnail_icon_url: &#x27;/subjects/Algebra.svg&#x27;,
+        language_code: &#x27;en&#x27;,
+        thumbnail_bg_color: &#x27;#cd672b&#x27;,
+        created_on: 1591296635736.666,
+        status: &#x27;public&#x27;,
+        category: &#x27;Algebra&#x27;,
+        title: &#x27;Test Title&#x27;,
+        node_count: 0
+      }],
+      subscribers_list: [],
+      dashboard_stats: {
+        average_ratings: null,
+        num_ratings: 0,
+        total_open_feedback: 0,
+        total_plays: 10
+      },
+      last_week_stats: null,
+      display_preference: [],
+      threads_for_created_suggestions_list: [],
+      created_suggestions_list: [],
+      threads_for_suggestions_to_review_list: [],
+      suggestions_to_review_list: []
+    };
+
+    beforeEach(function() {
+      spyOn(CreatorDashboardBackendApiService, &#x27;fetchDashboardDataAsync&#x27;)
+        .and.returnValue($q.resolve({
+          dashboardStats: CreatorDashboardStats
+            .createFromBackendDict(dashboardData.dashboard_stats),
+          // Because lastWeekStats may be null.
+          lastWeekStats: dashboardData.last_week_stats ? (
+            CreatorDashboardStats
+              .createFromBackendDict(dashboardData.last_week_stats)) : null,
+          displayPreference: dashboardData.display_preference,
+          subscribersList: dashboardData.subscribers_list.map(
+            subscriber =&gt; ProfileSummary
+              .createFromSubscriberBackendDict(subscriber)),
+          threadsForCreatedSuggestionsList: (
+            dashboardData.threads_for_created_suggestions_list.map(
+              feedbackThread =&gt; feedbackThreadObjectFactory
+                .createFromBackendDict(feedbackThread))),
+          threadsForSuggestionsToReviewList: (
+            dashboardData.threads_for_suggestions_to_review_list.map(
+              feedbackThread =&gt; feedbackThreadObjectFactory
+                .createFromBackendDict(feedbackThread))),
+          createdSuggestionsList: (
+            dashboardData.created_suggestions_list.map(
+              suggestionDict =&gt; Suggestion.createFromBackendDict(
+                suggestionDict
+              ))),
+          suggestionsToReviewList: (
+            dashboardData.suggestions_to_review_list.map(
+              suggestionDict =&gt; Suggestion.createFromBackendDict(
+                suggestionDict
+              ))),
+          createdSuggestionThreadsList: _getSuggestionThreads(
+            dashboardData.threads_for_created_suggestions_list,
+            dashboardData.created_suggestions_list,
+            suggestionsService,
+            SuggestionThreadObjectFactory),
+          suggestionThreadsToReviewList: _getSuggestionThreads(
+            dashboardData.threads_for_suggestions_to_review_list,
+            dashboardData.suggestions_to_review_list,
+            suggestionsService,
+            SuggestionThreadObjectFactory),
+          explorationsList: dashboardData.explorations_list.map(
+            expSummary =&gt; CreatorExplorationSummary
+              .createFromBackendDict(expSummary)),
+          collectionsList: dashboardData.collections_list.map(
+            (collectionSummary: unknown) =&gt; CollectionSummary
+              .createFromBackendDict(
+                collectionSummary as CollectionSummaryBackendDict))
+        }));
+
+      ctrl.$onInit();
+      $rootScope.$apply();
+    });
+
+    it(&#x27;should evaluate active tab&#x27;, function() {
+      expect(ctrl.activeTab).toBe(&#x27;myCollections&#x27;);
+    });
+  });
+
+  describe(&#x27;when on suggestions tab&#x27;, function() {
+    var dashboardData = {
+      explorations_list: [],
+      collections_list: [],
+      subscribers_list: [],
+      dashboard_stats: {
+        average_ratings: null,
+        num_ratings: 0,
+        total_open_feedback: 0,
+        total_plays: 10
+      },
+      last_week_stats: null,
+      display_preference: &#x27;&#x27;,
+      threads_for_created_suggestions_list: [{
+        status: &#x27;&#x27;,
+        subject: &#x27;&#x27;,
+        summary: &#x27;&#x27;,
+        original_author_username: &#x27;&#x27;,
+        last_updated_msecs: 0,
+        message_count: &#x27;&#x27;,
+        thread_id: &#x27;exp1&#x27;,
+        last_nonempty_message_author: &#x27;&#x27;,
+        last_nonempty_message_text: &#x27;&#x27;,
+      }],
+      created_suggestions_list: [{
+        suggestion_type: &#x27;testing&#x27;,
+        suggestion_id: &#x27;exp1&#x27;,
+        target_type: &#x27;&#x27;,
+        target_id: &#x27;&#x27;,
+        status: &#x27;&#x27;,
+        author_name: &#x27;&#x27;,
+        change: {
+          state_name: &#x27;&#x27;,
+          new_value: { html: &#x27;&#x27;},
+          old_value: { html: &#x27;&#x27;},
+        },
+        last_updated_msecs: 0
+      }],
+      threads_for_suggestions_to_review_list: [],
+      suggestions_to_review_list: []
+    };
+
+    beforeEach(function() {
+      spyOn(CreatorDashboardBackendApiService, &#x27;fetchDashboardDataAsync&#x27;)
+        .and.returnValue($q.resolve({
+          dashboardStats: CreatorDashboardStats
+            .createFromBackendDict(dashboardData.dashboard_stats),
+          // Because lastWeekStats may be null.
+          lastWeekStats: dashboardData.last_week_stats ? (
+            CreatorDashboardStats
+              .createFromBackendDict(dashboardData.last_week_stats)) : null,
+          displayPreference: dashboardData.display_preference,
+          subscribersList: dashboardData.subscribers_list.map(
+            subscriber =&gt; ProfileSummary
+              .createFromSubscriberBackendDict(subscriber)),
+          threadsForCreatedSuggestionsList: (
+            dashboardData.threads_for_created_suggestions_list.map(
+              feedbackThread =&gt; feedbackThreadObjectFactory
+                .createFromBackendDict(feedbackThread))),
+          threadsForSuggestionsToReviewList: (
+            dashboardData.threads_for_suggestions_to_review_list.map(
+              feedbackThread =&gt; feedbackThreadObjectFactory
+                .createFromBackendDict(feedbackThread))),
+          createdSuggestionsList: (
+            dashboardData.created_suggestions_list.map(
+              suggestionDict =&gt; Suggestion.createFromBackendDict(
+                suggestionDict
+              ))),
+          suggestionsToReviewList: (
+            dashboardData.suggestions_to_review_list.map(
+              suggestionDict =&gt; Suggestion.createFromBackendDict(
+                suggestionDict
+              ))),
+          createdSuggestionThreadsList: _getSuggestionThreads(
+            dashboardData.threads_for_created_suggestions_list,
+            dashboardData.created_suggestions_list,
+            suggestionsService,
+            SuggestionThreadObjectFactory),
+          suggestionThreadsToReviewList: _getSuggestionThreads(
+            dashboardData.threads_for_suggestions_to_review_list,
+            dashboardData.suggestions_to_review_list,
+            suggestionsService,
+            SuggestionThreadObjectFactory),
+          explorationsList: dashboardData.explorations_list.map(
+            expSummary =&gt; CreatorExplorationSummary
+              .createFromBackendDict(expSummary)),
+          collectionsList: dashboardData.collections_list.map(
+            collectionSummary =&gt; CollectionSummary
+              .createFromBackendDict(collectionSummary))
+        }));
+
+      ctrl.$onInit();
+      $rootScope.$apply();
+    });
+
+    it(&#x27;should evaluate active tab&#x27;, function() {
+      expect(ctrl.activeTab).toBe(&#x27;suggestions&#x27;);
+    });
+  });
+
+  describe(&#x27;when fetching dashboard fails&#x27;, function() {
+    it(&#x27;should use reject handler&#x27;, function() {
+      spyOn(CreatorDashboardBackendApiService, &#x27;fetchDashboardDataAsync&#x27;)
+        .and.returnValue($q.reject({
+          status: 404
+        }));
+      spyOn(AlertsService, &#x27;addWarning&#x27;).and.callThrough();
+
+      ctrl.$onInit();
+      $rootScope.$apply();
+      expect(AlertsService.addWarning).toHaveBeenCalledWith(
+        &#x27;Failed to get dashboard data&#x27;);
+    });
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:31,&quot;character&quot;:4,&quot;text&quot;:&quot;feedbackDicts&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:31,&quot;character&quot;:19,&quot;text&quot;:&quot;suggestionDicts&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:31,&quot;character&quot;:36,&quot;text&quot;:&quot;suggestionsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:32,&quot;character&quot;:4,&quot;text&quot;:&quot;suggestionThreadObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:33,&quot;character&quot;:6,&quot;text&quot;:&quot;numberOfSuggestions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:33,&quot;character&quot;:28,&quot;text&quot;:&quot;feedbackDicts&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:33,&quot;character&quot;:42,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:34,&quot;character&quot;:6,&quot;text&quot;:&quot;suggestionThreads&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:36,&quot;character&quot;:22,&quot;text&quot;:&quot;numberOfSuggestions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:37,&quot;character&quot;:24,&quot;text&quot;:&quot;numberOfSuggestions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:38,&quot;character&quot;:10,&quot;text&quot;:&quot;suggestionThreadId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:38,&quot;character&quot;:31,&quot;text&quot;:&quot;suggestionsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:39,&quot;character&quot;:9,&quot;text&quot;:&quot;getThreadIdFromSuggestionBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:39,&quot;character&quot;:46,&quot;text&quot;:&quot;suggestionDicts&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:40,&quot;character&quot;:10,&quot;text&quot;:&quot;threadDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:40,&quot;character&quot;:23,&quot;text&quot;:&quot;feedbackDicts&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:41,&quot;character&quot;:10,&quot;text&quot;:&quot;threadDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:41,&quot;character&quot;:21,&quot;text&quot;:&quot;thread_id&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:41,&quot;character&quot;:35,&quot;text&quot;:&quot;suggestionThreadId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:42,&quot;character&quot;:12,&quot;text&quot;:&quot;suggestionThread&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:43,&quot;character&quot;:10,&quot;text&quot;:&quot;suggestionThreadObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:43,&quot;character&quot;:40,&quot;text&quot;:&quot;createFromBackendDicts&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:44,&quot;character&quot;:12,&quot;text&quot;:&quot;threadDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:44,&quot;character&quot;:24,&quot;text&quot;:&quot;suggestionDicts&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:45,&quot;character&quot;:8,&quot;text&quot;:&quot;suggestionThreads&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:45,&quot;character&quot;:31,&quot;text&quot;:&quot;suggestionThread&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:50,&quot;character&quot;:9,&quot;text&quot;:&quot;suggestionThreads&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:54,&quot;character&quot;:6,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:55,&quot;character&quot;:6,&quot;text&quot;:&quot;$httpBackend&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:56,&quot;character&quot;:6,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:57,&quot;character&quot;:6,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:58,&quot;character&quot;:6,&quot;text&quot;:&quot;$window&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:59,&quot;character&quot;:6,&quot;text&quot;:&quot;AlertsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:60,&quot;character&quot;:6,&quot;text&quot;:&quot;CreatorDashboardBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:61,&quot;character&quot;:6,&quot;text&quot;:&quot;CsrfService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:62,&quot;character&quot;:6,&quot;text&quot;:&quot;feedbackThreadObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:63,&quot;character&quot;:6,&quot;text&quot;:&quot;SuggestionModalForCreatorDashboardService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:64,&quot;character&quot;:6,&quot;text&quot;:&quot;suggestionsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:65,&quot;character&quot;:6,&quot;text&quot;:&quot;SuggestionThreadObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:66,&quot;character&quot;:6,&quot;text&quot;:&quot;UserService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:67,&quot;character&quot;:6,&quot;text&quot;:&quot;explorationCreationService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:74,&quot;character&quot;:34,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:74,&quot;character&quot;:45,&quot;text&quot;:&quot;$componentController&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:75,&quot;character&quot;:4,&quot;text&quot;:&quot;$httpBackend&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:75,&quot;character&quot;:19,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:75,&quot;character&quot;:29,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:76,&quot;character&quot;:4,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:76,&quot;character&quot;:9,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:76,&quot;character&quot;:19,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:77,&quot;character&quot;:4,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:77,&quot;character&quot;:17,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:77,&quot;character&quot;:27,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:78,&quot;character&quot;:4,&quot;text&quot;:&quot;$window&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:78,&quot;character&quot;:14,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:78,&quot;character&quot;:24,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:80,&quot;character&quot;:4,&quot;text&quot;:&quot;AlertsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:80,&quot;character&quot;:20,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:80,&quot;character&quot;:30,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:81,&quot;character&quot;:4,&quot;text&quot;:&quot;CreatorDashboardBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:81,&quot;character&quot;:40,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:81,&quot;character&quot;:50,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:83,&quot;character&quot;:4,&quot;text&quot;:&quot;CsrfService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:83,&quot;character&quot;:18,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:83,&quot;character&quot;:28,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:84,&quot;character&quot;:4,&quot;text&quot;:&quot;feedbackThreadObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:84,&quot;character&quot;:34,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:84,&quot;character&quot;:44,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:86,&quot;character&quot;:4,&quot;text&quot;:&quot;SuggestionModalForCreatorDashboardService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:86,&quot;character&quot;:48,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:86,&quot;character&quot;:58,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:88,&quot;character&quot;:4,&quot;text&quot;:&quot;suggestionsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:88,&quot;character&quot;:25,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:88,&quot;character&quot;:35,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:90,&quot;character&quot;:4,&quot;text&quot;:&quot;explorationCreationService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:90,&quot;character&quot;:33,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:90,&quot;character&quot;:43,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:91,&quot;character&quot;:4,&quot;text&quot;:&quot;SuggestionThreadObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:91,&quot;character&quot;:36,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:91,&quot;character&quot;:46,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:93,&quot;character&quot;:4,&quot;text&quot;:&quot;UserService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:93,&quot;character&quot;:18,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:93,&quot;character&quot;:28,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:95,&quot;character&quot;:10,&quot;text&quot;:&quot;CsrfService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:95,&quot;character&quot;:40,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:96,&quot;character&quot;:6,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:96,&quot;character&quot;:9,&quot;text&quot;:&quot;resolve&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:98,&quot;character&quot;:4,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:98,&quot;character&quot;:11,&quot;text&quot;:&quot;$componentController&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:107,&quot;character&quot;:26,&quot;text&quot;:&quot;$window&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:116,&quot;character&quot;:11,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:116,&quot;character&quot;:16,&quot;text&quot;:&quot;getExplorationUrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:123,&quot;character&quot;:11,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:123,&quot;character&quot;:16,&quot;text&quot;:&quot;getCollectionUrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:129,&quot;character&quot;:13,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:129,&quot;character&quot;:18,&quot;text&quot;:&quot;showUsernamePopover&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:130,&quot;character&quot;:13,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:130,&quot;character&quot;:18,&quot;text&quot;:&quot;showUsernamePopover&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:135,&quot;character&quot;:11,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:135,&quot;character&quot;:16,&quot;text&quot;:&quot;getCompleteThumbnailIconUrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:142,&quot;character&quot;:6,&quot;text&quot;:&quot;explorationCreationService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:143,&quot;character&quot;:4,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:143,&quot;character&quot;:9,&quot;text&quot;:&quot;createNewExploration&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:145,&quot;character&quot;:6,&quot;text&quot;:&quot;explorationCreationService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:145,&quot;character&quot;:33,&quot;text&quot;:&quot;createNewExploration&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:277,&quot;character&quot;:14,&quot;text&quot;:&quot;CreatorDashboardBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:278,&quot;character&quot;:11,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:278,&quot;character&quot;:27,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:278,&quot;character&quot;:30,&quot;text&quot;:&quot;resolve&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:286,&quot;character&quot;:43,&quot;text&quot;:&quot;subscribers_list&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:287,&quot;character&quot;:14,&quot;text&quot;:&quot;subscriber&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:289,&quot;character&quot;:12,&quot;text&quot;:&quot;threadsForCreatedSuggestionsList&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:291,&quot;character&quot;:34,&quot;text&quot;:&quot;feedbackThreadObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:292,&quot;character&quot;:19,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:293,&quot;character&quot;:12,&quot;text&quot;:&quot;threadsForSuggestionsToReviewList&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:295,&quot;character&quot;:34,&quot;text&quot;:&quot;feedbackThreadObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:296,&quot;character&quot;:19,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:307,&quot;character&quot;:12,&quot;text&quot;:&quot;createdSuggestionThreadsList&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:310,&quot;character&quot;:14,&quot;text&quot;:&quot;suggestionsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:311,&quot;character&quot;:14,&quot;text&quot;:&quot;SuggestionThreadObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:312,&quot;character&quot;:12,&quot;text&quot;:&quot;suggestionThreadsToReviewList&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:315,&quot;character&quot;:14,&quot;text&quot;:&quot;suggestionsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:316,&quot;character&quot;:14,&quot;text&quot;:&quot;SuggestionThreadObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:320,&quot;character&quot;:43,&quot;text&quot;:&quot;collections_list&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:321,&quot;character&quot;:14,&quot;text&quot;:&quot;collectionSummary&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:324,&quot;character&quot;:14,&quot;text&quot;:&quot;UserService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:324,&quot;character&quot;:47,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:325,&quot;character&quot;:10,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:325,&quot;character&quot;:13,&quot;text&quot;:&quot;resolve&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:327,&quot;character&quot;:8,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:327,&quot;character&quot;:13,&quot;text&quot;:&quot;$onInit&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:328,&quot;character&quot;:8,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:328,&quot;character&quot;:19,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:332,&quot;character&quot;:12,&quot;text&quot;:&quot;suggestionThreadObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:333,&quot;character&quot;:10,&quot;text&quot;:&quot;SuggestionThreadObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:333,&quot;character&quot;:40,&quot;text&quot;:&quot;createFromBackendDicts&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:336,&quot;character&quot;:12,&quot;text&quot;:&quot;suggestionToReviewObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:337,&quot;character&quot;:10,&quot;text&quot;:&quot;SuggestionThreadObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:337,&quot;character&quot;:40,&quot;text&quot;:&quot;createFromBackendDicts&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:341,&quot;character&quot;:15,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:341,&quot;character&quot;:20,&quot;text&quot;:&quot;canCreateCollections&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:342,&quot;character&quot;:15,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:342,&quot;character&quot;:20,&quot;text&quot;:&quot;mySuggestionsList&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:342,&quot;character&quot;:48,&quot;text&quot;:&quot;suggestionThreadObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:343,&quot;character&quot;:15,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:343,&quot;character&quot;:20,&quot;text&quot;:&quot;suggestionsToReviewList&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:344,&quot;character&quot;:11,&quot;text&quot;:&quot;suggestionToReviewObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:345,&quot;character&quot;:15,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:345,&quot;character&quot;:20,&quot;text&quot;:&quot;relativeChangeInTotalPlays&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:350,&quot;character&quot;:17,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:350,&quot;character&quot;:22,&quot;text&quot;:&quot;activeTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:351,&quot;character&quot;:10,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:351,&quot;character&quot;:15,&quot;text&quot;:&quot;setActiveTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:352,&quot;character&quot;:17,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:352,&quot;character&quot;:22,&quot;text&quot;:&quot;activeTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:357,&quot;character&quot;:8,&quot;text&quot;:&quot;$httpBackend&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:357,&quot;character&quot;:21,&quot;text&quot;:&quot;expect&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:358,&quot;character&quot;:11,&quot;text&quot;:&quot;respond&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:359,&quot;character&quot;:8,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:359,&quot;character&quot;:13,&quot;text&quot;:&quot;setMyExplorationsView&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:360,&quot;character&quot;:8,&quot;text&quot;:&quot;$httpBackend&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:360,&quot;character&quot;:21,&quot;text&quot;:&quot;flush&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:362,&quot;character&quot;:15,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:362,&quot;character&quot;:20,&quot;text&quot;:&quot;myExplorationsView&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:367,&quot;character&quot;:15,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:367,&quot;character&quot;:20,&quot;text&quot;:&quot;isCurrentSortDescending&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:368,&quot;character&quot;:15,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:368,&quot;character&quot;:20,&quot;text&quot;:&quot;currentSortType&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:369,&quot;character&quot;:8,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:369,&quot;character&quot;:13,&quot;text&quot;:&quot;setExplorationsSortingOptions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:370,&quot;character&quot;:15,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:370,&quot;character&quot;:20,&quot;text&quot;:&quot;isCurrentSortDescending&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:375,&quot;character&quot;:8,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:375,&quot;character&quot;:13,&quot;text&quot;:&quot;setExplorationsSortingOptions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:376,&quot;character&quot;:15,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:376,&quot;character&quot;:20,&quot;text&quot;:&quot;currentSortType&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:381,&quot;character&quot;:15,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:381,&quot;character&quot;:20,&quot;text&quot;:&quot;isCurrentSubscriptionSortDescending&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:382,&quot;character&quot;:15,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:382,&quot;character&quot;:20,&quot;text&quot;:&quot;currentSubscribersSortType&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:383,&quot;character&quot;:8,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:383,&quot;character&quot;:13,&quot;text&quot;:&quot;setSubscriptionSortingOptions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:384,&quot;character&quot;:15,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:384,&quot;character&quot;:20,&quot;text&quot;:&quot;isCurrentSubscriptionSortDescending&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:389,&quot;character&quot;:8,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:389,&quot;character&quot;:13,&quot;text&quot;:&quot;setSubscriptionSortingOptions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:390,&quot;character&quot;:15,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:390,&quot;character&quot;:20,&quot;text&quot;:&quot;currentSubscribersSortType&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:397,&quot;character&quot;:15,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:397,&quot;character&quot;:20,&quot;text&quot;:&quot;currentSubscribersSortType&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:398,&quot;character&quot;:15,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:398,&quot;character&quot;:20,&quot;text&quot;:&quot;sortSubscriptionFunction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:404,&quot;character&quot;:10,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:404,&quot;character&quot;:15,&quot;text&quot;:&quot;setSubscriptionSortingOptions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:405,&quot;character&quot;:17,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:405,&quot;character&quot;:22,&quot;text&quot;:&quot;currentSubscribersSortType&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:406,&quot;character&quot;:17,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:406,&quot;character&quot;:22,&quot;text&quot;:&quot;sortSubscriptionFunction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:411,&quot;character&quot;:15,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:411,&quot;character&quot;:20,&quot;text&quot;:&quot;currentSortType&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:412,&quot;character&quot;:8,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:412,&quot;character&quot;:13,&quot;text&quot;:&quot;setExplorationsSortingOptions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:413,&quot;character&quot;:15,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:413,&quot;character&quot;:20,&quot;text&quot;:&quot;currentSortType&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:415,&quot;character&quot;:15,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:415,&quot;character&quot;:20,&quot;text&quot;:&quot;sortByFunction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:423,&quot;character&quot;:8,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:423,&quot;character&quot;:13,&quot;text&quot;:&quot;setExplorationsSortingOptions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:424,&quot;character&quot;:15,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:424,&quot;character&quot;:20,&quot;text&quot;:&quot;currentSortType&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:426,&quot;character&quot;:15,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:426,&quot;character&quot;:20,&quot;text&quot;:&quot;sortByFunction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:431,&quot;character&quot;:8,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:431,&quot;character&quot;:13,&quot;text&quot;:&quot;setExplorationsSortingOptions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:432,&quot;character&quot;:15,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:432,&quot;character&quot;:20,&quot;text&quot;:&quot;currentSortType&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:434,&quot;character&quot;:15,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:434,&quot;character&quot;:20,&quot;text&quot;:&quot;sortByFunction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:441,&quot;character&quot;:8,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:441,&quot;character&quot;:13,&quot;text&quot;:&quot;setExplorationsSortingOptions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:442,&quot;character&quot;:15,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:442,&quot;character&quot;:20,&quot;text&quot;:&quot;currentSortType&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:444,&quot;character&quot;:15,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:444,&quot;character&quot;:20,&quot;text&quot;:&quot;sortByFunction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:452,&quot;character&quot;:44,&quot;text&quot;:&quot;$window&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:453,&quot;character&quot;:10,&quot;text&quot;:&quot;$httpBackend&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:453,&quot;character&quot;:23,&quot;text&quot;:&quot;expect&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:453,&quot;character&quot;:71,&quot;text&quot;:&quot;respond&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:455,&quot;character&quot;:10,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:455,&quot;character&quot;:15,&quot;text&quot;:&quot;setMyExplorationsView&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:456,&quot;character&quot;:10,&quot;text&quot;:&quot;$httpBackend&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:456,&quot;character&quot;:23,&quot;text&quot;:&quot;flush&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:458,&quot;character&quot;:17,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:458,&quot;character&quot;:22,&quot;text&quot;:&quot;myExplorationsView&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:461,&quot;character&quot;:10,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:461,&quot;character&quot;:21,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:462,&quot;character&quot;:26,&quot;text&quot;:&quot;$window&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:464,&quot;character&quot;:17,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:464,&quot;character&quot;:22,&quot;text&quot;:&quot;myExplorationsView&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:465,&quot;character&quot;:17,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:465,&quot;character&quot;:22,&quot;text&quot;:&quot;publishText&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:469,&quot;character&quot;:10,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:469,&quot;character&quot;:21,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:470,&quot;character&quot;:26,&quot;text&quot;:&quot;$window&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:472,&quot;character&quot;:17,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:472,&quot;character&quot;:22,&quot;text&quot;:&quot;myExplorationsView&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:473,&quot;character&quot;:17,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:473,&quot;character&quot;:22,&quot;text&quot;:&quot;publishText&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:490,&quot;character&quot;:12,&quot;text&quot;:&quot;suggestionThreadObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:491,&quot;character&quot;:10,&quot;text&quot;:&quot;SuggestionThreadObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:491,&quot;character&quot;:40,&quot;text&quot;:&quot;createFromBackendDicts&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:494,&quot;character&quot;:8,&quot;text&quot;:&quot;suggestionThreadObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:494,&quot;character&quot;:31,&quot;text&quot;:&quot;setMessages&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:497,&quot;character&quot;:8,&quot;text&quot;:&quot;$httpBackend&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:497,&quot;character&quot;:21,&quot;text&quot;:&quot;expect&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:497,&quot;character&quot;:65,&quot;text&quot;:&quot;respond&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:500,&quot;character&quot;:8,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:500,&quot;character&quot;:13,&quot;text&quot;:&quot;setActiveThread&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:501,&quot;character&quot;:8,&quot;text&quot;:&quot;$httpBackend&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:501,&quot;character&quot;:21,&quot;text&quot;:&quot;flush&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:503,&quot;character&quot;:15,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:503,&quot;character&quot;:20,&quot;text&quot;:&quot;activeThread&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:503,&quot;character&quot;:42,&quot;text&quot;:&quot;suggestionThreadObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:504,&quot;character&quot;:15,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:504,&quot;character&quot;:20,&quot;text&quot;:&quot;canReviewActiveThread&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:510,&quot;character&quot;:12,&quot;text&quot;:&quot;suggestionToReviewObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:511,&quot;character&quot;:10,&quot;text&quot;:&quot;SuggestionThreadObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:511,&quot;character&quot;:40,&quot;text&quot;:&quot;createFromBackendDicts&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:515,&quot;character&quot;:8,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:515,&quot;character&quot;:13,&quot;text&quot;:&quot;clearActiveThread&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:517,&quot;character&quot;:8,&quot;text&quot;:&quot;$httpBackend&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:517,&quot;character&quot;:21,&quot;text&quot;:&quot;expect&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:517,&quot;character&quot;:65,&quot;text&quot;:&quot;respond&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:518,&quot;character&quot;:8,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:518,&quot;character&quot;:13,&quot;text&quot;:&quot;setActiveThread&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:519,&quot;character&quot;:8,&quot;text&quot;:&quot;$httpBackend&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:519,&quot;character&quot;:21,&quot;text&quot;:&quot;flush&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:521,&quot;character&quot;:15,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:521,&quot;character&quot;:20,&quot;text&quot;:&quot;activeThread&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:521,&quot;character&quot;:42,&quot;text&quot;:&quot;suggestionToReviewObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:522,&quot;character&quot;:15,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:522,&quot;character&quot;:20,&quot;text&quot;:&quot;canReviewActiveThread&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:529,&quot;character&quot;:10,&quot;text&quot;:&quot;$httpBackend&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:529,&quot;character&quot;:23,&quot;text&quot;:&quot;expect&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:529,&quot;character&quot;:67,&quot;text&quot;:&quot;respond&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:530,&quot;character&quot;:10,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:530,&quot;character&quot;:15,&quot;text&quot;:&quot;setActiveThread&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:531,&quot;character&quot;:10,&quot;text&quot;:&quot;$httpBackend&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:531,&quot;character&quot;:23,&quot;text&quot;:&quot;flush&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:539,&quot;character&quot;:12,&quot;text&quot;:&quot;SuggestionModalForCreatorDashboardService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:540,&quot;character&quot;:13,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:541,&quot;character&quot;:10,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:541,&quot;character&quot;:15,&quot;text&quot;:&quot;showSuggestionModal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:543,&quot;character&quot;:17,&quot;text&quot;:&quot;SuggestionModalForCreatorDashboardService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:543,&quot;character&quot;:59,&quot;text&quot;:&quot;showSuggestionModal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:581,&quot;character&quot;:12,&quot;text&quot;:&quot;CreatorDashboardBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:582,&quot;character&quot;:9,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:582,&quot;character&quot;:25,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:582,&quot;character&quot;:28,&quot;text&quot;:&quot;resolve&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:586,&quot;character&quot;:39,&quot;text&quot;:&quot;last_week_stats&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:588,&quot;character&quot;:51,&quot;text&quot;:&quot;last_week_stats&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:589,&quot;character&quot;:10,&quot;text&quot;:&quot;displayPreference&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:589,&quot;character&quot;:43,&quot;text&quot;:&quot;display_preference&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:590,&quot;character&quot;:41,&quot;text&quot;:&quot;subscribers_list&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:591,&quot;character&quot;:12,&quot;text&quot;:&quot;subscriber&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:593,&quot;character&quot;:10,&quot;text&quot;:&quot;threadsForCreatedSuggestionsList&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:594,&quot;character&quot;:26,&quot;text&quot;:&quot;threads_for_created_suggestions_list&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:595,&quot;character&quot;:14,&quot;text&quot;:&quot;feedbackThread&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:595,&quot;character&quot;:32,&quot;text&quot;:&quot;feedbackThreadObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:596,&quot;character&quot;:17,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:596,&quot;character&quot;:39,&quot;text&quot;:&quot;feedbackThread&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:597,&quot;character&quot;:10,&quot;text&quot;:&quot;threadsForSuggestionsToReviewList&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:598,&quot;character&quot;:26,&quot;text&quot;:&quot;threads_for_suggestions_to_review_list&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:599,&quot;character&quot;:14,&quot;text&quot;:&quot;feedbackThread&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:599,&quot;character&quot;:32,&quot;text&quot;:&quot;feedbackThreadObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:600,&quot;character&quot;:17,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:600,&quot;character&quot;:39,&quot;text&quot;:&quot;feedbackThread&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:602,&quot;character&quot;:26,&quot;text&quot;:&quot;created_suggestions_list&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:603,&quot;character&quot;:14,&quot;text&quot;:&quot;suggestionDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:607,&quot;character&quot;:26,&quot;text&quot;:&quot;suggestions_to_review_list&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:608,&quot;character&quot;:14,&quot;text&quot;:&quot;suggestionDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:611,&quot;character&quot;:10,&quot;text&quot;:&quot;createdSuggestionThreadsList&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:612,&quot;character&quot;:26,&quot;text&quot;:&quot;threads_for_created_suggestions_list&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:613,&quot;character&quot;:26,&quot;text&quot;:&quot;created_suggestions_list&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:614,&quot;character&quot;:12,&quot;text&quot;:&quot;suggestionsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:615,&quot;character&quot;:12,&quot;text&quot;:&quot;SuggestionThreadObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:616,&quot;character&quot;:10,&quot;text&quot;:&quot;suggestionThreadsToReviewList&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:617,&quot;character&quot;:26,&quot;text&quot;:&quot;threads_for_suggestions_to_review_list&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:618,&quot;character&quot;:26,&quot;text&quot;:&quot;suggestions_to_review_list&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:619,&quot;character&quot;:12,&quot;text&quot;:&quot;suggestionsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:620,&quot;character&quot;:12,&quot;text&quot;:&quot;SuggestionThreadObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:621,&quot;character&quot;:42,&quot;text&quot;:&quot;explorations_list&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:622,&quot;character&quot;:12,&quot;text&quot;:&quot;expSummary&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:627,&quot;character&quot;:16,&quot;text&quot;:&quot;collectionSummary as CollectionSummaryBackendDict&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:630,&quot;character&quot;:6,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:630,&quot;character&quot;:11,&quot;text&quot;:&quot;$onInit&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:631,&quot;character&quot;:6,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:631,&quot;character&quot;:17,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:635,&quot;character&quot;:13,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:635,&quot;character&quot;:18,&quot;text&quot;:&quot;activeTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:682,&quot;character&quot;:12,&quot;text&quot;:&quot;CreatorDashboardBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:683,&quot;character&quot;:9,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:683,&quot;character&quot;:25,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:683,&quot;character&quot;:28,&quot;text&quot;:&quot;resolve&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:687,&quot;character&quot;:39,&quot;text&quot;:&quot;last_week_stats&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:689,&quot;character&quot;:51,&quot;text&quot;:&quot;last_week_stats&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:691,&quot;character&quot;:41,&quot;text&quot;:&quot;subscribers_list&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:692,&quot;character&quot;:12,&quot;text&quot;:&quot;subscriber&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:694,&quot;character&quot;:10,&quot;text&quot;:&quot;threadsForCreatedSuggestionsList&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:696,&quot;character&quot;:32,&quot;text&quot;:&quot;feedbackThreadObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:697,&quot;character&quot;:17,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:698,&quot;character&quot;:10,&quot;text&quot;:&quot;threadsForSuggestionsToReviewList&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:699,&quot;character&quot;:26,&quot;text&quot;:&quot;threads_for_suggestions_to_review_list&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:700,&quot;character&quot;:14,&quot;text&quot;:&quot;feedbackThread&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:700,&quot;character&quot;:32,&quot;text&quot;:&quot;feedbackThreadObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:701,&quot;character&quot;:17,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:701,&quot;character&quot;:39,&quot;text&quot;:&quot;feedbackThread&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:708,&quot;character&quot;:26,&quot;text&quot;:&quot;suggestions_to_review_list&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:709,&quot;character&quot;:14,&quot;text&quot;:&quot;suggestionDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:712,&quot;character&quot;:10,&quot;text&quot;:&quot;createdSuggestionThreadsList&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:715,&quot;character&quot;:12,&quot;text&quot;:&quot;suggestionsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:716,&quot;character&quot;:12,&quot;text&quot;:&quot;SuggestionThreadObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:717,&quot;character&quot;:10,&quot;text&quot;:&quot;suggestionThreadsToReviewList&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:718,&quot;character&quot;:26,&quot;text&quot;:&quot;threads_for_suggestions_to_review_list&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:719,&quot;character&quot;:26,&quot;text&quot;:&quot;suggestions_to_review_list&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:720,&quot;character&quot;:12,&quot;text&quot;:&quot;suggestionsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:721,&quot;character&quot;:12,&quot;text&quot;:&quot;SuggestionThreadObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:722,&quot;character&quot;:42,&quot;text&quot;:&quot;explorations_list&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:723,&quot;character&quot;:12,&quot;text&quot;:&quot;expSummary&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:725,&quot;character&quot;:41,&quot;text&quot;:&quot;collections_list&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:726,&quot;character&quot;:12,&quot;text&quot;:&quot;collectionSummary&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:730,&quot;character&quot;:6,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:730,&quot;character&quot;:11,&quot;text&quot;:&quot;$onInit&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:731,&quot;character&quot;:6,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:731,&quot;character&quot;:17,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:735,&quot;character&quot;:13,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:735,&quot;character&quot;:18,&quot;text&quot;:&quot;activeTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:741,&quot;character&quot;:12,&quot;text&quot;:&quot;CreatorDashboardBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:742,&quot;character&quot;:9,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:742,&quot;character&quot;:25,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:742,&quot;character&quot;:28,&quot;text&quot;:&quot;reject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:745,&quot;character&quot;:12,&quot;text&quot;:&quot;AlertsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:745,&quot;character&quot;:41,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:747,&quot;character&quot;:6,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:747,&quot;character&quot;:11,&quot;text&quot;:&quot;$onInit&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:748,&quot;character&quot;:6,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:748,&quot;character&quot;:17,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:749,&quot;character&quot;:13,&quot;text&quot;:&quot;AlertsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.spec.ts&quot;,&quot;line&quot;:749,&quot;character&quot;:27,&quot;text&quot;:&quot;addWarning&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:58 GMT</p>
+    </body>
+  </html>
+  

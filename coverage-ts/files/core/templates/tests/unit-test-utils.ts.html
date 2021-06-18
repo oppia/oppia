@@ -1,0 +1,186 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>unit-test-utils.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/tests/unit-test-utils.ts</td><td class="">94.89%</td><td class="">100%</td><td class="">176</td><td class="">167</td><td class="">9</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Utility functions for unit testing.
+ */
+
+import { HttpClientTestingModule } from &#x27;@angular/common/http/testing&#x27;;
+import { Component, NgModule, NgZone, Pipe, PlatformRef, Type } from &#x27;@angular/core&#x27;;
+import { TestBed } from &#x27;@angular/core/testing&#x27;;
+import { AngularFireAuth } from &#x27;@angular/fire/auth&#x27;;
+import { BrowserModule } from &#x27;@angular/platform-browser&#x27;;
+import { platformBrowserDynamic } from &#x27;@angular/platform-browser-dynamic&#x27;;
+import { downgradeComponent, UpgradeModule } from &#x27;@angular/upgrade/static&#x27;;
+
+import { angularServices } from &#x27;services/angular-services.index&#x27;;
+
+
+declare var angular: ng.IAngularStatic;
+
+export const importAllAngularServices = (): void =&gt; {
+  beforeEach(() =&gt; {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [{provide: AngularFireAuth, useValue: null}],
+    });
+  });
+  beforeEach(angular.mock.module(&#x27;oppia&#x27;, function($provide) {
+    for (let [serviceName, serviceType] of angularServices) {
+      $provide.value(serviceName, TestBed.inject(serviceType));
+    }
+  }));
+};
+
+/**
+ * Returns a div containing the compiled html.
+ * @param {string} html - The html to be compiled.
+ */
+export const html = (html: string): Element =&gt; {
+  // Don&#x27;t return `body` itself, because using it as a `$rootElement` for ng1
+  // will attach `$injector` to it and that will affect subsequent tests.
+  const body = document.body;
+  body.innerHTML = `&lt;div&gt;${html.trim()}&lt;/div&gt;`;
+  const div = document.body.firstChild as Element;
+
+  if (div.childNodes.length === 1 &amp;&amp; div.firstChild instanceof HTMLElement) {
+    return div.firstChild;
+  }
+
+  return div;
+};
+
+/**
+ * Trims the text by removing new lines and extra white space.
+ * @param {string | null | undefined} text - The text to be trimmed of spaces.
+ * @param {bool} allSpace - A bool to define whether to replace new line
+ *   with a space or empty string.
+ */
+export const multiTrim = (
+    text: string | null | undefined, allSpace = false): string =&gt; {
+  // eslint-disable-next-line eqeqeq
+  if (typeof text == &#x27;string&#x27;) {
+    const repl = allSpace ? &#x27;&#x27; : &#x27; &#x27;;
+    return text.replace(/\n/g, &#x27;&#x27;).replace(/\s+/g, repl).trim();
+  }
+  throw new Error(&#x27;Argument can not be undefined.&#x27;);
+};
+
+/**
+ * And upgraded angularjs module.
+ * @param {PlatformRef} platform - The platform reference for bootstraping.
+ * @param {Type&lt;{}&gt;} Ng2Module - Angular module to bootstrap.
+ * @param {Element} element - An html element.
+ * @param {angular.IModule} ng1Module - The angularjs module to be included
+ *  in angular zone.
+ */
+export const bootstrapAsync = async(
+    platform: PlatformRef,
+    Ng2Module: Type&lt;{}&gt;,
+    element: Element,
+    ng1Module: angular.IModule
+): Promise&lt;UpgradeModule&gt; =&gt; {
+// We bootstrap the Angular module first; then when it is ready (async) we
+// bootstrap the AngularJS module on the bootstrap element (also ensuring that
+// AngularJS errors will fail the test).
+  return platform.bootstrapModule(Ng2Module).then(ref =&gt; {
+    const ngZone = ref.injector.get&lt;NgZone&gt;(NgZone);
+    const upgrade = ref.injector.get(UpgradeModule);
+    const failHardModule = ($provide) =&gt; {
+      $provide.value(&#x27;$exceptionHandler&#x27;, (err) =&gt; {
+        throw err;
+      });
+      return &#x27;&#x27;;
+    };
+
+    // The `bootstrap()` helper is used for convenience in tests, so that we
+    // don&#x27;t have to inject and call `upgrade.bootstrap()` on every Angular
+    // module. In order to closer emulate what happens in real application,
+    // ensure AngularJS is bootstrapped inside the Angular zone.
+    ngZone.run(() =&gt; upgrade.bootstrap(
+      // This throws &quot;Type &#x27;($provide) =&gt; string&#x27; is not assignable to
+      // type &#x27;string&#x27;&quot;. We need to suppress this error because typescript
+      // expects the module name to be an string but a custom module is
+      // needed here.
+      // @ts-ignore
+      element, [failHardModule, ng1Module.name]));
+
+    return upgrade;
+  });
+};
+
+/**
+ * A utility function to get coverage of the upgraded component class.
+ * @param {string} kebabCaseName - Name of the upgraded component in kebab-case.
+ * @param {string} camelCaseName - Name of the upgraded component in camelCase.
+ * @param {unknown} upgradedComponentTypes - An array consisting of only
+ *   one element. That element is the type of the upgraded component.
+ */
+export const setupAndGetUpgradedComponentAsync = async(
+    kebabCaseName: string,
+    camelCaseName: string,
+    upgradedComponentTypes: unknown): Promise&lt;string&gt; =&gt; {
+  let template = &#x27;&lt;&#x27; + kebabCaseName + &#x27;&gt;&lt;/&#x27; + kebabCaseName + &#x27;&gt;&#x27;;
+  @Component({
+    selector: &#x27;mock-comp&#x27;,
+    template: template
+  })
+  class MockComponent {}
+  // The template in the next line is what is rendered. The text of the rendered
+  // component should contain &quot;Hello Oppia!&quot;. This text context is return
+  // value.
+  const ng1Component = {template: &#x27;Hello Oppia!&#x27;};
+  const ng1Module = angular.module(&#x27;ng1Module&#x27;, [])
+    .component(camelCaseName, ng1Component)
+    .directive(&#x27;mockComp&#x27;, downgradeComponent({component: MockComponent}));
+  @NgModule({
+    declarations: [upgradedComponentTypes[0], MockComponent],
+    entryComponents: [MockComponent],
+    imports: [BrowserModule, UpgradeModule]
+  })
+  class Ng2Module {
+    ngDoBootstrap() {}
+  }
+
+  // Bootstrap.
+  const element = html(&#x27;&lt;mock-comp&gt;&lt;/mock-comp&gt;&#x27;);
+  return bootstrapAsync(
+    platformBrowserDynamic(), Ng2Module, element, ng1Module).then(
+    () =&gt; multiTrim(element.textContent));
+};
+
+@Pipe({name: &#x27;translate&#x27;})
+export class MockTranslatePipe {
+  transform(value: string, params: Object | undefined): string {
+    return value;
+  }
+}
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/tests/unit-test-utils.ts&quot;,&quot;line&quot;:38,&quot;character&quot;:51,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/tests/unit-test-utils.ts&quot;,&quot;line&quot;:40,&quot;character&quot;:6,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/tests/unit-test-utils.ts&quot;,&quot;line&quot;:40,&quot;character&quot;:15,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/tests/unit-test-utils.ts&quot;,&quot;line&quot;:54,&quot;character&quot;:14,&quot;text&quot;:&quot;document.body.firstChild as Element&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;core/templates/tests/unit-test-utils.ts&quot;,&quot;line&quot;:99,&quot;character&quot;:28,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/tests/unit-test-utils.ts&quot;,&quot;line&quot;:100,&quot;character&quot;:6,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/tests/unit-test-utils.ts&quot;,&quot;line&quot;:100,&quot;character&quot;:15,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/tests/unit-test-utils.ts&quot;,&quot;line&quot;:100,&quot;character&quot;:43,&quot;text&quot;:&quot;err&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/tests/unit-test-utils.ts&quot;,&quot;line&quot;:101,&quot;character&quot;:14,&quot;text&quot;:&quot;err&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:56 GMT</p>
+    </body>
+  </html>
+  

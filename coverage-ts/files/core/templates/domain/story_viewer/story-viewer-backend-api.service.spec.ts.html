@@ -1,0 +1,203 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>story-viewer-backend-api.service.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/domain/story_viewer/story-viewer-backend-api.service.spec.ts</td><td class="">98.13%</td><td class="">100%</td><td class="">214</td><td class="">210</td><td class="">4</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2018 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for StoryViewerBackendApiService.
+ */
+
+import { HttpClientTestingModule, HttpTestingController } from
+  &#x27;@angular/common/http/testing&#x27;;
+import { EventEmitter } from &#x27;@angular/core&#x27;;
+import { TestBed, fakeAsync, flushMicrotasks } from &#x27;@angular/core/testing&#x27;;
+
+import {LearnerExplorationSummary} from
+  &#x27;domain/summary/learner-exploration-summary.model&#x27;;
+import { StoryPlaythrough } from
+  &#x27;domain/story_viewer/story-playthrough.model&#x27;;
+import { StoryDataDict, StoryViewerBackendApiService } from
+  &#x27;domain/story_viewer/story-viewer-backend-api.service&#x27;;
+
+describe(&#x27;Story viewer backend API service&#x27;, () =&gt; {
+  let storyViewerBackendApiService: StoryViewerBackendApiService = null;
+  let httpTestingController: HttpTestingController;
+
+  beforeEach(() =&gt; {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+
+    storyViewerBackendApiService = TestBed.get(StoryViewerBackendApiService);
+    httpTestingController = TestBed.get(HttpTestingController);
+  });
+
+  afterEach(() =&gt; {
+    httpTestingController.verify();
+  });
+
+  it(&#x27;should successfully fetch an existing story from the backend&#x27;,
+    fakeAsync(() =&gt; {
+      let sampleDataResults = {
+        story_id: &#x27;qwerty&#x27;,
+        story_title: &#x27;Story title&#x27;,
+        story_description: &#x27;Story description&#x27;,
+        story_nodes: [],
+        topic_name: &#x27;Topic name&#x27;,
+        meta_tag_content: &#x27;Story meta tag content&#x27;
+      };
+
+      let successHandler = jasmine.createSpy(&#x27;success&#x27;);
+      let failHandler = jasmine.createSpy(&#x27;fail&#x27;);
+
+      storyViewerBackendApiService.fetchStoryDataAsync(
+        &#x27;abbrev&#x27;, &#x27;staging&#x27;, &#x27;0&#x27;).then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        &#x27;/story_data_handler/staging/abbrev/0&#x27;);
+      expect(req.request.method).toEqual(&#x27;GET&#x27;);
+      req.flush(sampleDataResults);
+
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalledWith(
+        StoryPlaythrough.createFromBackendDict(
+          sampleDataResults));
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
+
+  it(&#x27;should handle errorCallback for fetching an existing story&#x27;,
+    fakeAsync(() =&gt; {
+      let successHandler = jasmine.createSpy(&#x27;success&#x27;);
+      let failHandler = jasmine.createSpy(&#x27;fail&#x27;);
+
+      storyViewerBackendApiService.fetchStoryDataAsync(
+        &#x27;abbrev&#x27;, &#x27;staging&#x27;, &#x27;0&#x27;).then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        &#x27;/story_data_handler/staging/abbrev/0&#x27;);
+      expect(req.request.method).toEqual(&#x27;GET&#x27;);
+      req.flush(&#x27;Invalid request&#x27;, {
+        status: 400,
+        statusText: &#x27;Invalid request&#x27;
+      });
+
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalled();
+    })
+  );
+
+  it(&#x27;should successfully record a chapter as completed from the backend&#x27;,
+    fakeAsync(() =&gt; {
+      let sampleDataResults = {
+        summaries: [{
+          last_updated_msec: 1591296737470.528,
+          community_owned: false,
+          objective: &#x27;Test Objective&#x27;,
+          id: &#x27;44LKoKLlIbGe&#x27;,
+          num_views: 0,
+          thumbnail_icon_url: &#x27;/subjects/Algebra.svg&#x27;,
+          human_readable_contributors_summary: {},
+          language_code: &#x27;en&#x27;,
+          thumbnail_bg_color: &#x27;#cd672b&#x27;,
+          created_on_msec: 1591296635736.666,
+          ratings: {
+            1: 0,
+            2: 0,
+            3: 0,
+            4: 0,
+            5: 0
+          },
+          status: &#x27;public&#x27;,
+          tags: [],
+          activity_type: &#x27;exploration&#x27;,
+          category: &#x27;Algebra&#x27;,
+          title: &#x27;Test Title&#x27;
+        }],
+        next_node_id: &#x27;node_2&#x27;,
+        ready_for_review_test: true,
+      };
+
+      let successHandler = jasmine.createSpy(&#x27;success&#x27;);
+      let failHandler = jasmine.createSpy(&#x27;fail&#x27;);
+
+      storyViewerBackendApiService.recordChapterCompletionAsync(
+        &#x27;abbrev&#x27;, &#x27;staging&#x27;, &#x27;0&#x27;, &#x27;node_1&#x27;).then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        &#x27;/story_progress_handler/staging/abbrev/0/node_1&#x27;);
+      expect(req.request.method).toEqual(&#x27;POST&#x27;);
+      req.flush(sampleDataResults);
+
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalledWith({
+        summaries: sampleDataResults.summaries.map(
+          expSummary =&gt; LearnerExplorationSummary.createFromBackendDict(
+            expSummary)),
+        nextNodeId: sampleDataResults.next_node_id,
+        readyForReviewTest: sampleDataResults.ready_for_review_test});
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
+
+  it(&#x27;should handle errorCallback for recording a chapter as completed&#x27;,
+    fakeAsync(() =&gt; {
+      let successHandler = jasmine.createSpy(&#x27;success&#x27;);
+      let failHandler = jasmine.createSpy(&#x27;fail&#x27;);
+
+      storyViewerBackendApiService.recordChapterCompletionAsync(
+        &#x27;abbrev&#x27;, &#x27;staging&#x27;, &#x27;0&#x27;, &#x27;node_1&#x27;).then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        &#x27;/story_progress_handler/staging/abbrev/0/node_1&#x27;);
+      expect(req.request.method).toEqual(&#x27;POST&#x27;);
+
+      req.flush(&#x27;Invalid request&#x27;, {
+        status: 400,
+        statusText: &#x27;Invalid request&#x27;
+      });
+
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalled();
+    })
+  );
+
+  it(&#x27;should emit the story data event correctly&#x27;, function() {
+    let storyDataEventEmitter = new EventEmitter&lt;StoryDataDict&gt;();
+    expect(storyViewerBackendApiService.onSendStoryData).toEqual(
+      storyDataEventEmitter);
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/domain/story_viewer/story-viewer-backend-api.service.spec.ts&quot;,&quot;line&quot;:66,&quot;character&quot;:17,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/story_viewer/story-viewer-backend-api.service.spec.ts&quot;,&quot;line&quot;:88,&quot;character&quot;:17,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/story_viewer/story-viewer-backend-api.service.spec.ts&quot;,&quot;line&quot;:140,&quot;character&quot;:17,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/story_viewer/story-viewer-backend-api.service.spec.ts&quot;,&quot;line&quot;:165,&quot;character&quot;:17,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:57 GMT</p>
+    </body>
+  </html>
+  

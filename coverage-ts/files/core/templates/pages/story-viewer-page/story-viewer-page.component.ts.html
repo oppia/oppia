@@ -1,0 +1,202 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>story-viewer-page.component.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/story-viewer-page/story-viewer-page.component.ts</td><td class="">98.97%</td><td class="">100%</td><td class="">290</td><td class="">287</td><td class="">3</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2018 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Component for the main page of the story viewer.
+ */
+
+import { Component, OnInit } from &#x27;@angular/core&#x27;;
+import { StoryViewerBackendApiService } from &#x27;domain/story_viewer/story-viewer-backend-api.service&#x27;;
+import { UrlInterpolationService } from &#x27;domain/utilities/url-interpolation.service&#x27;;
+import { UrlService } from &#x27;services/contextual/url.service&#x27;;
+import { downgradeComponent } from &#x27;@angular/upgrade/static&#x27;;
+import { AssetsBackendApiService } from &#x27;services/assets-backend-api.service&#x27;;
+import { UserService } from &#x27;services/user.service&#x27;;
+import { AppConstants } from &#x27;app.constants&#x27;;
+import { WindowRef } from &#x27;services/contextual/window-ref.service&#x27;;
+import { LoaderService } from &#x27;services/loader.service&#x27;;
+import { PageTitleService } from &#x27;services/page-title.service&#x27;;
+import { AlertsService } from &#x27;services/alerts.service&#x27;;
+import { StoryPlaythrough } from &#x27;domain/story_viewer/story-playthrough.model&#x27;;
+import { ReadOnlyStoryNode } from &#x27;domain/story_viewer/read-only-story-node.model&#x27;;
+
+interface IconParametersArray {
+  thumbnailIconUrl: string,
+  left: string,
+  top: string,
+  thumbnailBgColor: string,
+}
+
+@Component({
+  selector: &#x27;oppia-story-viewer-page&#x27;,
+  templateUrl: &#x27;./story-viewer-page.component.html&#x27;
+})
+export class StoryViewerPageComponent implements OnInit {
+  storyPlaythroughObject: StoryPlaythrough;
+  storyId: string;
+  storyIsLoaded: boolean;
+  isLoggedIn: boolean;
+  topicUrlFragment: string;
+  classroomUrlFragment: string;
+  storyUrlFragment: string;
+  storyTitle: string;
+  storyDescription: string;
+  pathIconParameters: IconParametersArray[];
+  topicName: string;
+  thumbnailFilename: string;
+  thumbnailBgColor: string;
+  storyNodes: ReadOnlyStoryNode[];
+  iconUrl: string;
+  constructor(
+    private urlInterpolationService: UrlInterpolationService,
+    private assetsBackendApiService: AssetsBackendApiService,
+    private userService: UserService,
+    private windowRef: WindowRef,
+    private urlService: UrlService,
+    private loaderService: LoaderService,
+    private storyViewerBackendApiService: StoryViewerBackendApiService,
+    private pageTitleService: PageTitleService,
+    private alertsService: AlertsService
+  ) {}
+
+  getStaticImageUrl(imagePath: string): string {
+    return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  }
+
+  showChapters(): boolean {
+    if (!this.storyPlaythroughObject) {
+      return false;
+    }
+    return this.storyPlaythroughObject.getStoryNodeCount() &gt; 0;
+  }
+
+  generatePathIconParameters(): IconParametersArray[] {
+    let iconParametersArray: IconParametersArray[] = [];
+    for (
+      let i = 0; i &lt; this.storyPlaythroughObject.getStoryNodeCount();
+      i++) {
+      this.thumbnailFilename = this.storyNodes[i].getThumbnailFilename();
+      this.thumbnailBgColor = this.storyNodes[i].getThumbnailBgColor();
+      if (this.thumbnailFilename === null) {
+        this.iconUrl = &#x27;&#x27;;
+        this.thumbnailFilename = &#x27;&#x27;;
+      } else {
+        this.iconUrl = this.assetsBackendApiService.getThumbnailUrlForPreview(
+          AppConstants.ENTITY_TYPE.STORY, this.storyId,
+          this.thumbnailFilename);
+      }
+      iconParametersArray.push({
+        thumbnailIconUrl: this.iconUrl,
+        left: &#x27;225px&#x27;,
+        top: &#x27;35px&#x27;,
+        thumbnailBgColor: this.thumbnailBgColor,
+      });
+    }
+    return iconParametersArray;
+  }
+
+  signIn(): void {
+    this.userService.getLoginUrlAsync().then(
+      (loginUrl) =&gt; {
+        loginUrl ? this.windowRef.nativeWindow.location.href = loginUrl : (
+          this.windowRef.nativeWindow.location.reload());
+      });
+  }
+
+  getExplorationUrl(
+      node: { getExplorationId: () =&gt; string;
+              getId: () =&gt; string; }): string {
+    let result = &#x27;/explore/&#x27; + node.getExplorationId();
+    result = this.urlService.addField(
+      result, &#x27;topic_url_fragment&#x27;,
+      this.urlService.getTopicUrlFragmentFromLearnerUrl());
+    result = this.urlService.addField(
+      result, &#x27;classroom_url_fragment&#x27;,
+      this.urlService.getClassroomUrlFragmentFromLearnerUrl());
+    result = this.urlService.addField(
+      result, &#x27;story_url_fragment&#x27;,
+      this.urlService.getStoryUrlFragmentFromLearnerUrl());
+    result = this.urlService.addField(
+      result, &#x27;node_id&#x27;, node.getId());
+    return result;
+  }
+
+  ngOnInit(): void {
+    this.storyIsLoaded = false;
+    this.isLoggedIn = false;
+    this.userService.getUserInfoAsync().then((userInfo) =&gt; {
+      this.isLoggedIn = userInfo.isLoggedIn();
+    });
+    this.topicUrlFragment = (
+      this.urlService.getTopicUrlFragmentFromLearnerUrl());
+    this.classroomUrlFragment = (
+      this.urlService.getClassroomUrlFragmentFromLearnerUrl());
+    this.storyUrlFragment = (
+      this.urlService.getStoryUrlFragmentFromLearnerUrl());
+    this.loaderService.showLoadingScreen(&#x27;Loading&#x27;);
+    this.storyViewerBackendApiService.fetchStoryDataAsync(
+      this.topicUrlFragment,
+      this.classroomUrlFragment,
+      this.storyUrlFragment).then(
+      (storyDataDict) =&gt; {
+        this.storyIsLoaded = true;
+        this.storyPlaythroughObject = storyDataDict;
+        this.storyNodes = this.storyPlaythroughObject.getStoryNodes();
+        this.storyId = this.storyPlaythroughObject.getStoryId();
+        this.topicName = this.storyPlaythroughObject.topicName;
+        this.pageTitleService.setPageTitle(
+          `Learn ${this.topicName} | ${storyDataDict.title} | Oppia`);
+        this.pageTitleService.updateMetaTag(
+          storyDataDict.getMetaTagContent());
+        this.storyTitle = storyDataDict.title;
+        this.storyDescription = storyDataDict.description;
+
+        this.loaderService.hideLoadingScreen();
+        this.pathIconParameters = this.generatePathIconParameters();
+      },
+      (errorResponse) =&gt; {
+        let errorCodes = AppConstants.FATAL_ERROR_CODES;
+        if (errorCodes.indexOf(errorResponse.status) !== -1) {
+          this.alertsService.addWarning(&#x27;Failed to get dashboard data&#x27;);
+        }
+      }
+    );
+
+    // The pathIconParameters is an array containing the co-ordinates,
+    // background color and icon url for the icons generated on the
+    // path.
+    this.pathIconParameters = [];
+  }
+}
+
+angular.module(&#x27;oppia&#x27;).directive(&#x27;oppiaStoryViewerPage&#x27;,
+  downgradeComponent({component: StoryViewerPageComponent}));
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/story-viewer-page/story-viewer-page.component.ts&quot;,&quot;line&quot;:167,&quot;character&quot;:7,&quot;text&quot;:&quot;errorResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-viewer-page/story-viewer-page.component.ts&quot;,&quot;line&quot;:169,&quot;character&quot;:31,&quot;text&quot;:&quot;errorResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-viewer-page/story-viewer-page.component.ts&quot;,&quot;line&quot;:169,&quot;character&quot;:45,&quot;text&quot;:&quot;status&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:58 GMT</p>
+    </body>
+  </html>
+  

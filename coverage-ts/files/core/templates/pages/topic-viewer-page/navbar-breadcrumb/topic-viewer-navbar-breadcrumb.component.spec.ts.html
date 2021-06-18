@@ -1,0 +1,99 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>topic-viewer-navbar-breadcrumb.component.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/topic-viewer-page/navbar-breadcrumb/topic-viewer-navbar-breadcrumb.component.spec.ts</td><td class="">83.53%</td><td class="">100%</td><td class="">85</td><td class="">71</td><td class="">14</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for classroom page component.
+ */
+
+import { TestBed, async, ComponentFixture } from &#x27;@angular/core/testing&#x27;;
+import { HttpClientTestingModule } from &#x27;@angular/common/http/testing&#x27;;
+import { UrlService } from &#x27;services/contextual/url.service&#x27;;
+import { TopicViewerBackendApiService } from
+  &#x27;domain/topic_viewer/topic-viewer-backend-api.service&#x27;;
+import { ReadOnlyTopicObjectFactory } from
+  &#x27;domain/topic_viewer/read-only-topic-object.factory&#x27;;
+import { TopicViewerNavbarBreadcrumbComponent } from
+  // eslint-disable-next-line max-len
+  &#x27;pages/topic-viewer-page/navbar-breadcrumb/topic-viewer-navbar-breadcrumb.component&#x27;;
+
+describe(&#x27;Topic viewer navbar breadcrumb component&#x27;, () =&gt; {
+  let component: TopicViewerNavbarBreadcrumbComponent;
+  let fixture: ComponentFixture&lt;TopicViewerNavbarBreadcrumbComponent&gt;;
+  let readOnlyTopicObjectFactory = null;
+  let topicViewerBackendApiService = null;
+  let urlService = null;
+
+  beforeEach(async(() =&gt; {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      declarations: [TopicViewerNavbarBreadcrumbComponent],
+    }).compileComponents();
+
+    readOnlyTopicObjectFactory = TestBed.get(ReadOnlyTopicObjectFactory);
+    topicViewerBackendApiService = TestBed.get(TopicViewerBackendApiService);
+    urlService = TestBed.get(UrlService);
+
+    spyOn(urlService, &#x27;getTopicUrlFragmentFromLearnerUrl&#x27;).and.returnValue(
+      &#x27;topic1&#x27;);
+    spyOn(urlService, &#x27;getClassroomUrlFragmentFromLearnerUrl&#x27;).and.returnValue(
+      &#x27;classroom1&#x27;);
+
+    spyOn(topicViewerBackendApiService, &#x27;fetchTopicDataAsync&#x27;).and.resolveTo(
+      readOnlyTopicObjectFactory.createFromBackendDict({
+        subtopics: [],
+        skill_descriptions: {},
+        uncategorized_skill_ids: [],
+        degrees_of_mastery: {},
+        canonical_story_dicts: [],
+        additional_story_dicts: [],
+        topic_name: &#x27;Topic Name 1&#x27;,
+        topic_id: &#x27;topic1&#x27;,
+        topic_description: &#x27;Description&#x27;,
+        practice_tab_is_displayed: false
+      }));
+  }));
+
+  beforeEach(() =&gt; {
+    fixture = TestBed.createComponent(TopicViewerNavbarBreadcrumbComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it(&#x27;should set topic name using the data retrieved from the backend&#x27;,
+    async(() =&gt; {
+      component.ngOnInit();
+      fixture.whenStable().then(() =&gt; {
+        fixture.detectChanges();
+        expect(component.topicName).toBe(&#x27;Topic Name 1&#x27;);
+      });
+    }));
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/topic-viewer-page/navbar-breadcrumb/topic-viewer-navbar-breadcrumb.component.spec.ts&quot;,&quot;line&quot;:32,&quot;character&quot;:6,&quot;text&quot;:&quot;readOnlyTopicObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-viewer-page/navbar-breadcrumb/topic-viewer-navbar-breadcrumb.component.spec.ts&quot;,&quot;line&quot;:33,&quot;character&quot;:6,&quot;text&quot;:&quot;topicViewerBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-viewer-page/navbar-breadcrumb/topic-viewer-navbar-breadcrumb.component.spec.ts&quot;,&quot;line&quot;:34,&quot;character&quot;:6,&quot;text&quot;:&quot;urlService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-viewer-page/navbar-breadcrumb/topic-viewer-navbar-breadcrumb.component.spec.ts&quot;,&quot;line&quot;:42,&quot;character&quot;:4,&quot;text&quot;:&quot;readOnlyTopicObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-viewer-page/navbar-breadcrumb/topic-viewer-navbar-breadcrumb.component.spec.ts&quot;,&quot;line&quot;:43,&quot;character&quot;:4,&quot;text&quot;:&quot;topicViewerBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-viewer-page/navbar-breadcrumb/topic-viewer-navbar-breadcrumb.component.spec.ts&quot;,&quot;line&quot;:44,&quot;character&quot;:4,&quot;text&quot;:&quot;urlService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-viewer-page/navbar-breadcrumb/topic-viewer-navbar-breadcrumb.component.spec.ts&quot;,&quot;line&quot;:46,&quot;character&quot;:10,&quot;text&quot;:&quot;urlService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-viewer-page/navbar-breadcrumb/topic-viewer-navbar-breadcrumb.component.spec.ts&quot;,&quot;line&quot;:46,&quot;character&quot;:59,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/topic-viewer-page/navbar-breadcrumb/topic-viewer-navbar-breadcrumb.component.spec.ts&quot;,&quot;line&quot;:48,&quot;character&quot;:10,&quot;text&quot;:&quot;urlService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-viewer-page/navbar-breadcrumb/topic-viewer-navbar-breadcrumb.component.spec.ts&quot;,&quot;line&quot;:48,&quot;character&quot;:63,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/topic-viewer-page/navbar-breadcrumb/topic-viewer-navbar-breadcrumb.component.spec.ts&quot;,&quot;line&quot;:51,&quot;character&quot;:10,&quot;text&quot;:&quot;topicViewerBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-viewer-page/navbar-breadcrumb/topic-viewer-navbar-breadcrumb.component.spec.ts&quot;,&quot;line&quot;:51,&quot;character&quot;:63,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/topic-viewer-page/navbar-breadcrumb/topic-viewer-navbar-breadcrumb.component.spec.ts&quot;,&quot;line&quot;:52,&quot;character&quot;:6,&quot;text&quot;:&quot;readOnlyTopicObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-viewer-page/navbar-breadcrumb/topic-viewer-navbar-breadcrumb.component.spec.ts&quot;,&quot;line&quot;:52,&quot;character&quot;:33,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:59 GMT</p>
+    </body>
+  </html>
+  

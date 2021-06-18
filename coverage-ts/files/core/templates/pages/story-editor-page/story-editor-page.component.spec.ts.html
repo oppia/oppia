@@ -1,0 +1,346 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>story-editor-page.component.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/story-editor-page/story-editor-page.component.spec.ts</td><td class="">53.81%</td><td class="">100%</td><td class="">485</td><td class="">261</td><td class="">224</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for story editor page component.
+ */
+
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// App.ts is upgraded to Angular 8.
+import { importAllAngularServices } from &#x27;tests/unit-test-utils&#x27;;
+
+import { EventEmitter } from &#x27;@angular/core&#x27;;
+
+// ^^^ This block is to be removed.
+
+require(&#x27;pages/story-editor-page/story-editor-page.component.ts&#x27;);
+
+describe(&#x27;Story editor page&#x27;, function() {
+  var ctrl = null;
+  var $q = null;
+  var $scope = null;
+  var $rootScope = null;
+  var $uibModal = null;
+  var PageTitleService = null;
+  var PreventPageUnloadEventService = null;
+  var StoryEditorStateService = null;
+  var StoryObjectFactory = null;
+  var UndoRedoService = null;
+  var UrlService = null;
+
+  var mockedWindow = {
+    open: () =&gt; {}
+  };
+  var MockStoryEditorNavigationService = {
+    activeTab: &#x27;story_editor&#x27;,
+    checkIfPresentInChapterEditor: () =&gt; this.activeTab === &#x27;chapter_editor&#x27;,
+    checkIfPresentInStoryPreviewTab: () =&gt; this.activeTab === &#x27;story_preview&#x27;,
+    getActiveTab: () =&gt; this.activeTab,
+    navigateToChapterEditor: () =&gt; {
+      this.activeTab = &#x27;chapter_editor&#x27;;
+    },
+    navigateToStoryEditor: () =&gt; {
+      this.activeTab = &#x27;story_editor&#x27;;
+    },
+    navigateToStoryPreviewTab: () =&gt; {
+      this.activeTab = &#x27;story_preview&#x27;;
+    }
+  };
+  var story = null;
+
+  beforeEach(angular.mock.module(&#x27;oppia&#x27;, function($provide) {
+    $provide.value(&#x27;$window&#x27;, mockedWindow);
+  }));
+
+  importAllAngularServices();
+
+  beforeEach(angular.mock.inject(function($injector, $componentController) {
+    $q = $injector.get(&#x27;$q&#x27;);
+    $rootScope = $injector.get(&#x27;$rootScope&#x27;);
+    $uibModal = $injector.get(&#x27;$uibModal&#x27;);
+    PageTitleService = $injector.get(&#x27;PageTitleService&#x27;);
+    PreventPageUnloadEventService = $injector.get(
+      &#x27;PreventPageUnloadEventService&#x27;);
+    StoryEditorStateService = $injector.get(&#x27;StoryEditorStateService&#x27;);
+    StoryObjectFactory = $injector.get(&#x27;StoryObjectFactory&#x27;);
+    UndoRedoService = $injector.get(&#x27;UndoRedoService&#x27;);
+    UrlService = $injector.get(&#x27;UrlService&#x27;);
+    story = StoryObjectFactory.createFromBackendDict({
+      id: &#x27;2&#x27;,
+      title: &#x27;Story title&#x27;,
+      description: &#x27;Story description&#x27;,
+      notes: &#x27;Story notes&#x27;,
+      story_contents: {
+        initial_node_id: &#x27;node_2&#x27;,
+        nodes: [{
+          id: &#x27;node_2&#x27;,
+          title: &#x27;Title 2&#x27;,
+          prerequisite_skill_ids: [],
+          acquired_skill_ids: [],
+          destination_node_ids: [],
+          outline: &#x27;Outline&#x27;,
+          exploration_id: &#x27;asd4242&#x27;,
+          outline_is_finalized: false,
+          description: &#x27;Description&#x27;,
+          thumbnail_filename: &#x27;img.png&#x27;,
+          thumbnail_bg_color: &#x27;#a33f40&#x27;
+        }, {
+          id: &#x27;node_3&#x27;,
+          title: &#x27;Title 3&#x27;,
+          prerequisite_skill_ids: [],
+          acquired_skill_ids: [],
+          destination_node_ids: [],
+          outline: &#x27;Outline&#x27;,
+          exploration_id: null,
+          outline_is_finalized: false,
+          description: &#x27;Description&#x27;,
+          thumbnail_filename: &#x27;img.png&#x27;,
+          thumbnail_bg_color: &#x27;#a33f40&#x27;
+        }],
+        next_node_id: &#x27;node_4&#x27;
+      },
+      language_code: &#x27;en&#x27;,
+      version: 1,
+      corresponding_topic_id: &#x27;2&#x27;,
+      thumbnail_bg_color: null,
+      thumbnail_filename: null,
+      url_fragment: &#x27;story-url-fragment&#x27;
+    });
+    var MockEditableStoryBackendApiService = {
+      validateExplorationsAsync: async() =&gt; Promise.resolve([])
+    };
+    spyOn(StoryEditorStateService, &#x27;getStory&#x27;).and.returnValue(story);
+
+    $scope = $rootScope.$new();
+    ctrl = $componentController(&#x27;storyEditorPage&#x27;, {
+      $scope: $scope,
+      StoryEditorNavigationService: MockStoryEditorNavigationService,
+      EditableStoryBackendApiService: MockEditableStoryBackendApiService
+    });
+  }));
+
+  it(&#x27;should load story based on its id on url when component is initialized&#x27; +
+    &#x27; and set page title&#x27;, function() {
+    let storyInitializedEventEmitter = new EventEmitter();
+    let storyReinitializedEventEmitter = new EventEmitter();
+    spyOn(StoryEditorStateService, &#x27;loadStory&#x27;).and.callFake(function() {
+      storyInitializedEventEmitter.emit();
+      storyReinitializedEventEmitter.emit();
+    });
+    spyOnProperty(
+      StoryEditorStateService, &#x27;onStoryInitialized&#x27;).and.returnValue(
+      storyInitializedEventEmitter);
+    spyOnProperty(
+      StoryEditorStateService, &#x27;onStoryReinitialized&#x27;).and.returnValue(
+      storyReinitializedEventEmitter);
+    spyOn(UrlService, &#x27;getStoryIdFromUrl&#x27;).and.returnValue(&#x27;story_1&#x27;);
+    spyOn(PageTitleService, &#x27;setPageTitle&#x27;).and.callThrough();
+    MockStoryEditorNavigationService.checkIfPresentInChapterEditor = () =&gt; true;
+    ctrl.$onInit();
+
+    expect(StoryEditorStateService.loadStory).toHaveBeenCalledWith(&#x27;story_1&#x27;);
+    expect(PageTitleService.setPageTitle).toHaveBeenCalledTimes(2);
+
+    ctrl.$onDestroy();
+  });
+
+  it(&#x27;should addListener by passing getChangeCount to &#x27; +
+  &#x27;PreventPageUnloadEventService&#x27;, function() {
+    spyOn(UrlService, &#x27;getStoryIdFromUrl&#x27;).and.returnValue(&#x27;story_1&#x27;);
+    spyOn(PageTitleService, &#x27;setPageTitle&#x27;);
+    spyOn(UndoRedoService, &#x27;getChangeCount&#x27;).and.returnValue(10);
+    spyOn(PreventPageUnloadEventService, &#x27;addListener&#x27;).and
+      .callFake((callback) =&gt; callback());
+
+    ctrl.$onInit();
+
+    expect(PreventPageUnloadEventService.addListener)
+      .toHaveBeenCalledWith(jasmine.any(Function));
+  });
+
+  it(&#x27;should return to topic editor page when closing confirmation modal&#x27;,
+    function() {
+      spyOn(UndoRedoService, &#x27;getChangeCount&#x27;).and.returnValue(1);
+      spyOn($uibModal, &#x27;open&#x27;).and.returnValue({
+        result: $q.resolve()
+      });
+
+      ctrl.returnToTopicEditorPage();
+      $scope.$apply();
+
+      expect($uibModal.open).toHaveBeenCalled();
+    });
+
+  it(&#x27;should return to topic editor page when dismissing confirmation modal&#x27;,
+    function() {
+      spyOn(UndoRedoService, &#x27;getChangeCount&#x27;).and.returnValue(1);
+      spyOn($uibModal, &#x27;open&#x27;).and.returnValue({
+        result: $q.reject()
+      });
+
+      ctrl.returnToTopicEditorPage();
+      $scope.$apply();
+
+      expect($uibModal.open).toHaveBeenCalled();
+    });
+
+  it(&#x27;should open topic editor page when there is no change&#x27;,
+    function() {
+      spyOn(UndoRedoService, &#x27;getChangeCount&#x27;).and.returnValue(0);
+      spyOn(mockedWindow, &#x27;open&#x27;).and.callThrough();
+
+      ctrl.returnToTopicEditorPage();
+      expect(mockedWindow.open).toHaveBeenCalledWith(
+        &#x27;/topic_editor/2&#x27;, &#x27;_self&#x27;);
+    });
+
+  it(&#x27;should return the active tab&#x27;, function() {
+    MockStoryEditorNavigationService.activeTab = &#x27;story_editor&#x27;;
+    MockStoryEditorNavigationService.getActiveTab = () =&gt; &#x27;story_editor&#x27;;
+    MockStoryEditorNavigationService.navigateToStoryEditor();
+    expect(ctrl.getActiveTab()).toEqual(&#x27;story_editor&#x27;);
+  });
+
+  it(&#x27;should return warning count&#x27;, function() {
+    spyOn(StoryEditorStateService, &#x27;loadStory&#x27;).and.stub();
+    spyOn(UrlService, &#x27;getStoryIdFromUrl&#x27;).and.returnValue(&#x27;story_1&#x27;);
+    spyOn(PageTitleService, &#x27;setPageTitle&#x27;).and.callThrough();
+    MockStoryEditorNavigationService.navigateToStoryEditor();
+    ctrl.$onInit();
+    expect(ctrl.getTotalWarningsCount()).toEqual(0);
+  });
+
+  it(&#x27;should report if story fragment already exists&#x27;, () =&gt; {
+    let storyInitializedEventEmitter = new EventEmitter();
+    let storyReinitializedEventEmitter = new EventEmitter();
+    spyOn(StoryEditorStateService, &#x27;loadStory&#x27;).and.callFake(function() {
+      storyInitializedEventEmitter.emit();
+      storyReinitializedEventEmitter.emit();
+    });
+    spyOnProperty(
+      StoryEditorStateService, &#x27;onStoryInitialized&#x27;).and.returnValue(
+      storyInitializedEventEmitter);
+    spyOnProperty(
+      StoryEditorStateService, &#x27;onStoryReinitialized&#x27;).and.returnValue(
+      storyReinitializedEventEmitter);
+    spyOn(UrlService, &#x27;getStoryIdFromUrl&#x27;).and.returnValue(&#x27;story_1&#x27;);
+    spyOn(PageTitleService, &#x27;setPageTitle&#x27;).and.callThrough();
+    spyOn(
+      StoryEditorStateService,
+      &#x27;getStoryWithUrlFragmentExists&#x27;).and.returnValue(true);
+    spyOn(StoryEditorStateService, &#x27;getSkillSummaries&#x27;).and.returnValue([{
+      id: &#x27;skill_id&#x27;
+    }]);
+    MockStoryEditorNavigationService.checkIfPresentInChapterEditor = () =&gt; true;
+    ctrl.$onInit();
+    expect(ctrl.validationIssues).toEqual(
+      [&#x27;Story URL fragment already exists.&#x27;]);
+    ctrl.$onDestroy();
+  });
+
+  it(&#x27;should toggle the display of warnings&#x27;, function() {
+    ctrl.toggleWarnings();
+    expect(ctrl.warningsAreShown).toEqual(true);
+    ctrl.toggleWarnings();
+    expect(ctrl.warningsAreShown).toEqual(false);
+    ctrl.toggleWarnings();
+    expect(ctrl.warningsAreShown).toEqual(true);
+  });
+
+  it(&#x27;should return true if the main editor tab is select&#x27;, function() {
+    MockStoryEditorNavigationService.activeTab = &#x27;story_editor&#x27;;
+    MockStoryEditorNavigationService.getActiveTab = () =&gt; &#x27;story_editor&#x27;;
+    expect(ctrl.isMainEditorTabSelected()).toEqual(true);
+
+    MockStoryEditorNavigationService.activeTab = &#x27;story_preview&#x27;;
+    MockStoryEditorNavigationService.getActiveTab = () =&gt; &#x27;story_preview&#x27;;
+    expect(ctrl.isMainEditorTabSelected()).toEqual(false);
+  });
+
+  it(&#x27;should check if url contains story preview&#x27;, function() {
+    spyOn(StoryEditorStateService, &#x27;loadStory&#x27;).and.stub();
+    spyOn(UrlService, &#x27;getStoryIdFromUrl&#x27;).and.returnValue(&#x27;story_1&#x27;);
+    spyOn(PageTitleService, &#x27;setPageTitle&#x27;).and.callThrough();
+    MockStoryEditorNavigationService.activeTab = &#x27;story_preview&#x27;;
+    MockStoryEditorNavigationService.checkIfPresentInChapterEditor = (
+      () =&gt; false);
+    MockStoryEditorNavigationService.checkIfPresentInStoryPreviewTab = (
+      () =&gt; true);
+    MockStoryEditorNavigationService.getActiveTab = (
+      () =&gt; &#x27;story_preview&#x27;);
+    ctrl.$onInit();
+    expect(ctrl.isMainEditorTabSelected()).toEqual(false);
+
+    MockStoryEditorNavigationService.activeTab = &#x27;story_editor&#x27;;
+    MockStoryEditorNavigationService.getActiveTab = () =&gt; &#x27;story_editor&#x27;;
+  });
+
+  it(&#x27;should navigate to story editor&#x27;, function() {
+    MockStoryEditorNavigationService.activeTab = &#x27;story_editor&#x27;;
+    MockStoryEditorNavigationService.getActiveTab = () =&gt; &#x27;story_editor&#x27;;
+    ctrl.navigateToStoryEditor();
+    expect(ctrl.getActiveTab()).toEqual(&#x27;story_editor&#x27;);
+  });
+
+  it(&#x27;should navigate to story preview tab&#x27;, function() {
+    MockStoryEditorNavigationService.activeTab = &#x27;story_preview&#x27;;
+    MockStoryEditorNavigationService.getActiveTab = () =&gt; &#x27;story_preview&#x27;;
+    ctrl.navigateToStoryPreviewTab();
+    expect(ctrl.getActiveTab()).toEqual(&#x27;story_preview&#x27;);
+  });
+
+  it(&#x27;should return the navbar helper text&#x27;, function() {
+    MockStoryEditorNavigationService.activeTab = &#x27;chapter_editor&#x27;;
+    MockStoryEditorNavigationService.getActiveTab = () =&gt; &#x27;chapter_editor&#x27;;
+    expect(ctrl.getNavbarText()).toEqual(&#x27;Chapter Editor&#x27;);
+
+    MockStoryEditorNavigationService.activeTab = &#x27;story_preview&#x27;;
+    MockStoryEditorNavigationService.getActiveTab = () =&gt; &#x27;story_preview&#x27;;
+    expect(ctrl.getNavbarText()).toEqual(&#x27;Story Preview&#x27;);
+
+    MockStoryEditorNavigationService.activeTab = &#x27;story_editor&#x27;;
+    MockStoryEditorNavigationService.getActiveTab = () =&gt; &#x27;story_editor&#x27;;
+    expect(ctrl.getNavbarText()).toEqual(&#x27;Story Editor&#x27;);
+  });
+
+  it(&#x27;should init page on undo redo change applied&#x27;, () =&gt; {
+    let mockUndoRedoChangeEventEmitter = new EventEmitter();
+    spyOn(UndoRedoService, &#x27;onUndoRedoChangeApplied$&#x27;).and.returnValue(
+      mockUndoRedoChangeEventEmitter);
+    spyOn(UrlService, &#x27;getStoryIdFromUrl&#x27;).and.returnValue(&#x27;story_1&#x27;);
+    spyOn(PageTitleService, &#x27;setPageTitle&#x27;);
+    ctrl.$onInit();
+    mockUndoRedoChangeEventEmitter.emit();
+    expect(PageTitleService.setPageTitle).toHaveBeenCalled();
+    ctrl.$onDestroy();
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:29,&quot;character&quot;:6,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:30,&quot;character&quot;:6,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:31,&quot;character&quot;:6,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:32,&quot;character&quot;:6,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:33,&quot;character&quot;:6,&quot;text&quot;:&quot;$uibModal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:34,&quot;character&quot;:6,&quot;text&quot;:&quot;PageTitleService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:35,&quot;character&quot;:6,&quot;text&quot;:&quot;PreventPageUnloadEventService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:36,&quot;character&quot;:6,&quot;text&quot;:&quot;StoryEditorStateService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:37,&quot;character&quot;:6,&quot;text&quot;:&quot;StoryObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:38,&quot;character&quot;:6,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:39,&quot;character&quot;:6,&quot;text&quot;:&quot;UrlService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:46,&quot;character&quot;:41,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:46,&quot;character&quot;:46,&quot;text&quot;:&quot;activeTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:47,&quot;character&quot;:43,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:47,&quot;character&quot;:48,&quot;text&quot;:&quot;activeTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:48,&quot;character&quot;:24,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:48,&quot;character&quot;:29,&quot;text&quot;:&quot;activeTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:50,&quot;character&quot;:6,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:50,&quot;character&quot;:11,&quot;text&quot;:&quot;activeTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:53,&quot;character&quot;:6,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:53,&quot;character&quot;:11,&quot;text&quot;:&quot;activeTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:56,&quot;character&quot;:6,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:56,&quot;character&quot;:11,&quot;text&quot;:&quot;activeTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:59,&quot;character&quot;:6,&quot;text&quot;:&quot;story&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:61,&quot;character&quot;:51,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:62,&quot;character&quot;:4,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:62,&quot;character&quot;:13,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:67,&quot;character&quot;:42,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:67,&quot;character&quot;:53,&quot;text&quot;:&quot;$componentController&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:68,&quot;character&quot;:4,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:68,&quot;character&quot;:9,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:68,&quot;character&quot;:19,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:69,&quot;character&quot;:4,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:69,&quot;character&quot;:17,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:69,&quot;character&quot;:27,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:70,&quot;character&quot;:4,&quot;text&quot;:&quot;$uibModal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:70,&quot;character&quot;:16,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:70,&quot;character&quot;:26,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:71,&quot;character&quot;:4,&quot;text&quot;:&quot;PageTitleService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:71,&quot;character&quot;:23,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:71,&quot;character&quot;:33,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:72,&quot;character&quot;:4,&quot;text&quot;:&quot;PreventPageUnloadEventService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:72,&quot;character&quot;:36,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:72,&quot;character&quot;:46,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:74,&quot;character&quot;:4,&quot;text&quot;:&quot;StoryEditorStateService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:74,&quot;character&quot;:30,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:74,&quot;character&quot;:40,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:75,&quot;character&quot;:4,&quot;text&quot;:&quot;StoryObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:75,&quot;character&quot;:25,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:75,&quot;character&quot;:35,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:76,&quot;character&quot;:4,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:76,&quot;character&quot;:22,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:76,&quot;character&quot;:32,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:77,&quot;character&quot;:4,&quot;text&quot;:&quot;UrlService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:77,&quot;character&quot;:17,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:77,&quot;character&quot;:27,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:78,&quot;character&quot;:4,&quot;text&quot;:&quot;story&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:78,&quot;character&quot;:12,&quot;text&quot;:&quot;StoryObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:78,&quot;character&quot;:31,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:122,&quot;character&quot;:10,&quot;text&quot;:&quot;StoryEditorStateService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:122,&quot;character&quot;:47,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:122,&quot;character&quot;:63,&quot;text&quot;:&quot;story&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:124,&quot;character&quot;:4,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:124,&quot;character&quot;:13,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:124,&quot;character&quot;:24,&quot;text&quot;:&quot;$new&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:125,&quot;character&quot;:4,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:125,&quot;character&quot;:11,&quot;text&quot;:&quot;$componentController&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:126,&quot;character&quot;:6,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:126,&quot;character&quot;:14,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:134,&quot;character&quot;:8,&quot;text&quot;:&quot;storyInitializedEventEmitter&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:135,&quot;character&quot;:8,&quot;text&quot;:&quot;storyReinitializedEventEmitter&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:136,&quot;character&quot;:10,&quot;text&quot;:&quot;StoryEditorStateService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:136,&quot;character&quot;:48,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:137,&quot;character&quot;:6,&quot;text&quot;:&quot;storyInitializedEventEmitter&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:138,&quot;character&quot;:6,&quot;text&quot;:&quot;storyReinitializedEventEmitter&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:141,&quot;character&quot;:6,&quot;text&quot;:&quot;StoryEditorStateService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:142,&quot;character&quot;:6,&quot;text&quot;:&quot;storyInitializedEventEmitter&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:144,&quot;character&quot;:6,&quot;text&quot;:&quot;StoryEditorStateService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:145,&quot;character&quot;:6,&quot;text&quot;:&quot;storyReinitializedEventEmitter&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:146,&quot;character&quot;:10,&quot;text&quot;:&quot;UrlService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:146,&quot;character&quot;:43,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:147,&quot;character&quot;:10,&quot;text&quot;:&quot;PageTitleService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:147,&quot;character&quot;:44,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:149,&quot;character&quot;:4,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:149,&quot;character&quot;:9,&quot;text&quot;:&quot;$onInit&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:151,&quot;character&quot;:11,&quot;text&quot;:&quot;StoryEditorStateService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:151,&quot;character&quot;:35,&quot;text&quot;:&quot;loadStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:152,&quot;character&quot;:11,&quot;text&quot;:&quot;PageTitleService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:152,&quot;character&quot;:28,&quot;text&quot;:&quot;setPageTitle&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:154,&quot;character&quot;:4,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:154,&quot;character&quot;:9,&quot;text&quot;:&quot;$onDestroy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:159,&quot;character&quot;:10,&quot;text&quot;:&quot;UrlService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:159,&quot;character&quot;:43,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:160,&quot;character&quot;:10,&quot;text&quot;:&quot;PageTitleService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:161,&quot;character&quot;:10,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:161,&quot;character&quot;:45,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:162,&quot;character&quot;:10,&quot;text&quot;:&quot;PreventPageUnloadEventService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:162,&quot;character&quot;:56,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:163,&quot;character&quot;:17,&quot;text&quot;:&quot;callback&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:163,&quot;character&quot;:30,&quot;text&quot;:&quot;callback&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:165,&quot;character&quot;:4,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:165,&quot;character&quot;:9,&quot;text&quot;:&quot;$onInit&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:167,&quot;character&quot;:11,&quot;text&quot;:&quot;PreventPageUnloadEventService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:167,&quot;character&quot;:41,&quot;text&quot;:&quot;addListener&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:173,&quot;character&quot;:12,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:173,&quot;character&quot;:47,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:174,&quot;character&quot;:12,&quot;text&quot;:&quot;$uibModal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:174,&quot;character&quot;:31,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:175,&quot;character&quot;:8,&quot;text&quot;:&quot;result&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:175,&quot;character&quot;:16,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:175,&quot;character&quot;:19,&quot;text&quot;:&quot;resolve&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:178,&quot;character&quot;:6,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:178,&quot;character&quot;:11,&quot;text&quot;:&quot;returnToTopicEditorPage&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:179,&quot;character&quot;:6,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:179,&quot;character&quot;:13,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:181,&quot;character&quot;:13,&quot;text&quot;:&quot;$uibModal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:181,&quot;character&quot;:23,&quot;text&quot;:&quot;open&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:186,&quot;character&quot;:12,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:186,&quot;character&quot;:47,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:187,&quot;character&quot;:12,&quot;text&quot;:&quot;$uibModal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:187,&quot;character&quot;:31,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:188,&quot;character&quot;:8,&quot;text&quot;:&quot;result&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:188,&quot;character&quot;:16,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:188,&quot;character&quot;:19,&quot;text&quot;:&quot;reject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:191,&quot;character&quot;:6,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:191,&quot;character&quot;:11,&quot;text&quot;:&quot;returnToTopicEditorPage&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:192,&quot;character&quot;:6,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:192,&quot;character&quot;:13,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:194,&quot;character&quot;:13,&quot;text&quot;:&quot;$uibModal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:194,&quot;character&quot;:23,&quot;text&quot;:&quot;open&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:199,&quot;character&quot;:12,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:199,&quot;character&quot;:47,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:202,&quot;character&quot;:6,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:202,&quot;character&quot;:11,&quot;text&quot;:&quot;returnToTopicEditorPage&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:211,&quot;character&quot;:11,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:211,&quot;character&quot;:16,&quot;text&quot;:&quot;getActiveTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:215,&quot;character&quot;:10,&quot;text&quot;:&quot;StoryEditorStateService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:215,&quot;character&quot;:48,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:216,&quot;character&quot;:10,&quot;text&quot;:&quot;UrlService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:216,&quot;character&quot;:43,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:217,&quot;character&quot;:10,&quot;text&quot;:&quot;PageTitleService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:217,&quot;character&quot;:44,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:219,&quot;character&quot;:4,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:219,&quot;character&quot;:9,&quot;text&quot;:&quot;$onInit&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:220,&quot;character&quot;:11,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:220,&quot;character&quot;:16,&quot;text&quot;:&quot;getTotalWarningsCount&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:224,&quot;character&quot;:8,&quot;text&quot;:&quot;storyInitializedEventEmitter&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:225,&quot;character&quot;:8,&quot;text&quot;:&quot;storyReinitializedEventEmitter&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:226,&quot;character&quot;:10,&quot;text&quot;:&quot;StoryEditorStateService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:226,&quot;character&quot;:48,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:227,&quot;character&quot;:6,&quot;text&quot;:&quot;storyInitializedEventEmitter&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:228,&quot;character&quot;:6,&quot;text&quot;:&quot;storyReinitializedEventEmitter&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:231,&quot;character&quot;:6,&quot;text&quot;:&quot;StoryEditorStateService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:232,&quot;character&quot;:6,&quot;text&quot;:&quot;storyInitializedEventEmitter&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:234,&quot;character&quot;:6,&quot;text&quot;:&quot;StoryEditorStateService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:235,&quot;character&quot;:6,&quot;text&quot;:&quot;storyReinitializedEventEmitter&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:236,&quot;character&quot;:10,&quot;text&quot;:&quot;UrlService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:236,&quot;character&quot;:43,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:237,&quot;character&quot;:10,&quot;text&quot;:&quot;PageTitleService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:237,&quot;character&quot;:44,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:239,&quot;character&quot;:6,&quot;text&quot;:&quot;StoryEditorStateService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:240,&quot;character&quot;:39,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:241,&quot;character&quot;:10,&quot;text&quot;:&quot;StoryEditorStateService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:241,&quot;character&quot;:56,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:245,&quot;character&quot;:4,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:245,&quot;character&quot;:9,&quot;text&quot;:&quot;$onInit&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:246,&quot;character&quot;:11,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:246,&quot;character&quot;:16,&quot;text&quot;:&quot;validationIssues&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:248,&quot;character&quot;:4,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:248,&quot;character&quot;:9,&quot;text&quot;:&quot;$onDestroy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:252,&quot;character&quot;:4,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:252,&quot;character&quot;:9,&quot;text&quot;:&quot;toggleWarnings&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:253,&quot;character&quot;:11,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:253,&quot;character&quot;:16,&quot;text&quot;:&quot;warningsAreShown&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:254,&quot;character&quot;:4,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:254,&quot;character&quot;:9,&quot;text&quot;:&quot;toggleWarnings&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:255,&quot;character&quot;:11,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:255,&quot;character&quot;:16,&quot;text&quot;:&quot;warningsAreShown&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:256,&quot;character&quot;:4,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:256,&quot;character&quot;:9,&quot;text&quot;:&quot;toggleWarnings&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:257,&quot;character&quot;:11,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:257,&quot;character&quot;:16,&quot;text&quot;:&quot;warningsAreShown&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:263,&quot;character&quot;:11,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:263,&quot;character&quot;:16,&quot;text&quot;:&quot;isMainEditorTabSelected&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:267,&quot;character&quot;:11,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:267,&quot;character&quot;:16,&quot;text&quot;:&quot;isMainEditorTabSelected&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:271,&quot;character&quot;:10,&quot;text&quot;:&quot;StoryEditorStateService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:271,&quot;character&quot;:48,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:272,&quot;character&quot;:10,&quot;text&quot;:&quot;UrlService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:272,&quot;character&quot;:43,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:273,&quot;character&quot;:10,&quot;text&quot;:&quot;PageTitleService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:273,&quot;character&quot;:44,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:281,&quot;character&quot;:4,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:281,&quot;character&quot;:9,&quot;text&quot;:&quot;$onInit&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:282,&quot;character&quot;:11,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:282,&quot;character&quot;:16,&quot;text&quot;:&quot;isMainEditorTabSelected&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:291,&quot;character&quot;:4,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:291,&quot;character&quot;:9,&quot;text&quot;:&quot;navigateToStoryEditor&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:292,&quot;character&quot;:11,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:292,&quot;character&quot;:16,&quot;text&quot;:&quot;getActiveTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:298,&quot;character&quot;:4,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:298,&quot;character&quot;:9,&quot;text&quot;:&quot;navigateToStoryPreviewTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:299,&quot;character&quot;:11,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:299,&quot;character&quot;:16,&quot;text&quot;:&quot;getActiveTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:305,&quot;character&quot;:11,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:305,&quot;character&quot;:16,&quot;text&quot;:&quot;getNavbarText&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:309,&quot;character&quot;:11,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:309,&quot;character&quot;:16,&quot;text&quot;:&quot;getNavbarText&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:313,&quot;character&quot;:11,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:313,&quot;character&quot;:16,&quot;text&quot;:&quot;getNavbarText&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:317,&quot;character&quot;:8,&quot;text&quot;:&quot;mockUndoRedoChangeEventEmitter&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:318,&quot;character&quot;:10,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:318,&quot;character&quot;:55,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:319,&quot;character&quot;:6,&quot;text&quot;:&quot;mockUndoRedoChangeEventEmitter&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:320,&quot;character&quot;:10,&quot;text&quot;:&quot;UrlService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:320,&quot;character&quot;:43,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:321,&quot;character&quot;:10,&quot;text&quot;:&quot;PageTitleService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:322,&quot;character&quot;:4,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:322,&quot;character&quot;:9,&quot;text&quot;:&quot;$onInit&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:323,&quot;character&quot;:4,&quot;text&quot;:&quot;mockUndoRedoChangeEventEmitter&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:324,&quot;character&quot;:11,&quot;text&quot;:&quot;PageTitleService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:324,&quot;character&quot;:28,&quot;text&quot;:&quot;setPageTitle&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:325,&quot;character&quot;:4,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/story-editor-page.component.spec.ts&quot;,&quot;line&quot;:325,&quot;character&quot;:9,&quot;text&quot;:&quot;$onDestroy&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:58 GMT</p>
+    </body>
+  </html>
+  

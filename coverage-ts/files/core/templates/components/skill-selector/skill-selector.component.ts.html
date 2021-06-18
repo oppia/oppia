@@ -1,0 +1,231 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>skill-selector.component.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">core/templates/components/skill-selector/skill-selector.component.ts</td><td class="">100.00%</td><td class="">100%</td><td class="">324</td><td class="">324</td><td class="">0</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2021 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Controller for the skill-selector component.
+ */
+
+import { Component, OnInit, Input, Output, EventEmitter } from &#x27;@angular/core&#x27;;
+import { downgradeComponent } from &#x27;@angular/upgrade/static&#x27;;
+import { ShortSkillSummary } from &#x27;core/templates/domain/skill/short-skill-summary.model&#x27;;
+import { SkillSummary } from &#x27;core/templates/domain/skill/skill-summary.model&#x27;;
+import { CategorizedSkills } from &#x27;domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service&#x27;;
+import { FilterForMatchingSubstringPipe } from &#x27;filters/string-utility-filters/filter-for-matching-substring.pipe&#x27;;
+import cloneDeep from &#x27;lodash/cloneDeep&#x27;;
+import { GroupedSkillSummaries } from &#x27;pages/skill-editor-page/services/skill-editor-state.service&#x27;;
+
+interface SubTopicFilterDict {
+  [topicName: string]: { subTopicName: string; checked: boolean }[]
+}
+
+@Component({
+  selector: &#x27;oppia-skill-selector&#x27;,
+  templateUrl: &#x27;./skill-selector.component.html&#x27;,
+})
+export class SkillSelectorComponent implements OnInit {
+  // If countOfSkillsToPrioritize &gt; 0, then sortedSkillSummaries should
+  // have the initial &#x27;countOfSkillsToPrioritize&#x27; entries of skills with
+  // the same priority.
+  @Input() sortedSkillSummaries: GroupedSkillSummaries;
+  @Input() selectedSkillId: string;
+  @Input() countOfSkillsToPrioritize: number;
+  @Input() categorizedSkills: CategorizedSkills;
+  @Input() untriagedSkillSummaries: SkillSummary[];
+  @Input() allowSkillsFromOtherTopics: boolean;
+  @Output() selectedSkillIdChange: EventEmitter&lt;string&gt; = new EventEmitter();
+  currCategorizedSkills: CategorizedSkills = null;
+  selectedSkill: string = null;
+  skillFilterText: string = &#x27;&#x27;;
+  topicFilterList: { topicName: string ; checked: boolean }[] = [];
+  subTopicFilterDict: SubTopicFilterDict = {};
+  initialSubTopicFilterDict: SubTopicFilterDict = {};
+
+  constructor(
+    private filterForMatchingSubtringPipe: FilterForMatchingSubstringPipe
+  ) {}
+
+  ngOnInit(): void {
+    this.currCategorizedSkills = this.categorizedSkills;
+    for (let topicName in this.currCategorizedSkills) {
+      let topicNameDict = {
+        topicName: topicName,
+        checked: false
+      };
+      this.topicFilterList.push(topicNameDict);
+      let subTopics = this.currCategorizedSkills[topicName];
+      this.subTopicFilterDict[topicName] = [];
+      for (let subTopic in subTopics) {
+        let subTopicNameDict = {
+          subTopicName: subTopic,
+          checked: false
+        };
+        this.subTopicFilterDict[topicName].push(subTopicNameDict);
+      }
+    }
+    this.initialSubTopicFilterDict = cloneDeep(this.subTopicFilterDict);
+  }
+
+  checkIfEmpty(skills: string[]): boolean {
+    return skills.length === 0;
+  }
+
+  checkTopicIsNotEmpty(topicName: string): boolean {
+    for (let key in this.currCategorizedSkills[topicName]) {
+      if (Object.keys(this.currCategorizedSkills[topicName][key]).length) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  setSelectedSkillId(): void {
+    this.selectedSkillIdChange.emit(this.selectedSkill);
+  }
+
+  // The folowing function is called when the subtopic filter changes.
+  // This updates the list of Skills displayed in the selector.
+  updateSkillsListOnSubtopicFilterChange(): void {
+    let updatedSkillsDict: CategorizedSkills = {};
+    let isAnySubTopicChecked: boolean = false;
+    for (let topicName in this.subTopicFilterDict) {
+      var subTopics = this.subTopicFilterDict[topicName];
+      for (var i = 0; i &lt; subTopics.length; i++) {
+        if (subTopics[i].checked) {
+          if (!updatedSkillsDict.hasOwnProperty(topicName)) {
+            updatedSkillsDict[topicName] = { uncategorized: [] };
+          }
+          let tempCategorizedSkills: CategorizedSkills = this.categorizedSkills;
+          let subTopicName: string = subTopics[i].subTopicName;
+          updatedSkillsDict[topicName][subTopicName] =
+            tempCategorizedSkills[topicName][subTopicName];
+          isAnySubTopicChecked = true;
+        }
+      }
+    }
+    if (!isAnySubTopicChecked) {
+      // If no subtopics are checked in the subtop filter, we have
+      // to display all the skills from checked topics.
+      let isAnyTopicChecked: boolean = false;
+      for (var i = 0; i &lt; this.topicFilterList.length; i++) {
+        if (this.topicFilterList[i].checked) {
+          let tempCategorizedSkills: CategorizedSkills = this.categorizedSkills;
+          let topicName: string = this.topicFilterList[i].topicName;
+          updatedSkillsDict[topicName] = tempCategorizedSkills[topicName];
+          isAnyTopicChecked = true;
+        }
+      }
+      if (isAnyTopicChecked) {
+        this.currCategorizedSkills = cloneDeep(updatedSkillsDict);
+      } else {
+        // If no filter is applied on both subtopics and topics, we
+        // need to display all the skills (the original list).
+        this.currCategorizedSkills = cloneDeep(this.categorizedSkills);
+      }
+    } else {
+      this.currCategorizedSkills = cloneDeep(updatedSkillsDict);
+    }
+  }
+
+  // The folowing function is called when the topic filter changes.
+  // First, the subtopic filter is updated according to the changed
+  // topic filter list. Then the main Skills list is updated.
+  updateSkillsListOnTopicFilterChange(): void {
+    let updatedSubTopicFilterList: SubTopicFilterDict = {};
+    let isAnyTopicChecked: boolean = false;
+    for (var i = 0; i &lt; this.topicFilterList.length; i++) {
+      if (this.topicFilterList[i].checked) {
+        let topicName = this.topicFilterList[i].topicName;
+        updatedSubTopicFilterList[topicName] = (
+          cloneDeep(this.initialSubTopicFilterDict[topicName]));
+        isAnyTopicChecked = true;
+      }
+    }
+    if (!isAnyTopicChecked) {
+      // If there are no topics checked on topic filter, we have to
+      // display subtopics from all the topics in the subtopic filter.
+      for (let topic in this.initialSubTopicFilterDict) {
+        if (!this.subTopicFilterDict.hasOwnProperty(topic)) {
+          this.subTopicFilterDict[topic] = (
+            cloneDeep(this.initialSubTopicFilterDict[topic]));
+        }
+      }
+    } else {
+      this.subTopicFilterDict =
+         cloneDeep(updatedSubTopicFilterList);
+    }
+    // After we update the subtopic filter list, we need to update
+    // the main skills list.
+    this.updateSkillsListOnSubtopicFilterChange();
+  }
+
+  searchInSubtopicSkills(input: ShortSkillSummary[], searchText: string):
+  ShortSkillSummary[] {
+    let skills: string[] = input.map(val =&gt; {
+      return val.getDescription();
+    });
+    let filteredSkills = this.filterForMatchingSubtringPipe
+      .transform(skills, searchText);
+    return input.filter(val =&gt; {
+      return filteredSkills.includes(val.description);
+    });
+  }
+
+  searchInUntriagedSkillSummaries(searchText: string): SkillSummary[] {
+    let skills: string[] = this.untriagedSkillSummaries.map(val =&gt; {
+      return val.description;
+    });
+    let filteredSkills = this.filterForMatchingSubtringPipe
+      .transform(skills, searchText);
+    return this.untriagedSkillSummaries.filter(val =&gt; {
+      return filteredSkills.includes(val.description);
+    });
+  }
+
+  clearAllFilters(): void {
+    for (let i = 0; i &lt; this.topicFilterList.length; i++) {
+      this.topicFilterList[i].checked = false;
+    }
+    for (let topicName in this.subTopicFilterDict) {
+      let length: number = this.subTopicFilterDict[topicName].length;
+      for (let j = 0; j &lt; length; j++) {
+        this.subTopicFilterDict[topicName][j].checked = false;
+      }
+    }
+    this.updateSkillsListOnTopicFilterChange();
+  }
+}
+
+angular.module(&#x27;oppia&#x27;).directive(
+  &#x27;oppiaSkillSelector&#x27;, downgradeComponent(
+    { component: SkillSelectorComponent }
+  )
+);
+</textarea><pre id="annotations" style="display:none">[]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:56 GMT</p>
+    </body>
+  </html>
+  

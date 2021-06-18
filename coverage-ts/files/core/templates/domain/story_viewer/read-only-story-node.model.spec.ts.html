@@ -1,0 +1,125 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>read-only-story-node.model.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/domain/story_viewer/read-only-story-node.model.spec.ts</td><td class="">76.47%</td><td class="">100%</td><td class="">102</td><td class="">78</td><td class="">24</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2018 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Tests for ReadOnlyStoryNodeModel.
+ */
+
+import { ReadOnlyStoryNode } from
+  &#x27;domain/story_viewer/read-only-story-node.model&#x27;;
+import { LearnerExplorationSummary } from
+  &#x27;domain/summary/learner-exploration-summary.model&#x27;;
+
+describe(&#x27;Read only story node model&#x27;, () =&gt; {
+  var _sampleStoryNode = null;
+
+  beforeEach(() =&gt; {
+    var sampleReadOnlyStoryNodeBackendDict = {
+      id: &#x27;node_1&#x27;,
+      title: &#x27;Title 1&#x27;,
+      description: &#x27;Description&#x27;,
+      prerequisite_skill_ids: [&#x27;skill_1&#x27;],
+      acquired_skill_ids: [&#x27;skill_2&#x27;],
+      destination_node_ids: [&#x27;node_2&#x27;],
+      outline: &#x27;Outline&#x27;,
+      exploration_id: &#x27;exp_id&#x27;,
+      outline_is_finalized: false,
+      exp_summary_dict: {
+        title: &#x27;Title&#x27;,
+        status: &#x27;private&#x27;,
+        last_updated_msec: 1591296737470.528,
+        community_owned: false,
+        objective: &#x27;Test Objective&#x27;,
+        id: &#x27;44LKoKLlIbGe&#x27;,
+        num_views: 0,
+        thumbnail_icon_url: &#x27;/subjects/Algebra.svg&#x27;,
+        human_readable_contributors_summary: {},
+        language_code: &#x27;en&#x27;,
+        thumbnail_bg_color: &#x27;#cd672b&#x27;,
+        created_on_msec: 1591296635736.666,
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0
+        },
+        tags: [],
+        activity_type: &#x27;exploration&#x27;,
+        category: &#x27;Algebra&#x27;
+      },
+      completed: true,
+      thumbnail_bg_color: &#x27;#a33f40&#x27;,
+      thumbnail_filename: &#x27;image.png&#x27;
+    };
+    _sampleStoryNode = ReadOnlyStoryNode.createFromBackendDict(
+      sampleReadOnlyStoryNodeBackendDict);
+  });
+
+  it(&#x27;should correctly return all the values&#x27;, function() {
+    expect(_sampleStoryNode.getId()).toEqual(&#x27;node_1&#x27;);
+    expect(_sampleStoryNode.getTitle()).toEqual(&#x27;Title 1&#x27;);
+    expect(_sampleStoryNode.getDescription()).toEqual(&#x27;Description&#x27;);
+    expect(_sampleStoryNode.getExplorationId()).toEqual(&#x27;exp_id&#x27;);
+    expect(_sampleStoryNode.isCompleted()).toEqual(true);
+    expect(_sampleStoryNode.getExplorationSummaryObject()).toEqual(
+      LearnerExplorationSummary.createFromBackendDict({
+        title: &#x27;Title&#x27;,
+        status: &#x27;private&#x27;,
+        last_updated_msec: 1591296737470.528,
+        community_owned: false,
+        objective: &#x27;Test Objective&#x27;,
+        id: &#x27;44LKoKLlIbGe&#x27;,
+        num_views: 0,
+        thumbnail_icon_url: &#x27;/subjects/Algebra.svg&#x27;,
+        human_readable_contributors_summary: {},
+        language_code: &#x27;en&#x27;,
+        thumbnail_bg_color: &#x27;#cd672b&#x27;,
+        created_on_msec: 1591296635736.666,
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0
+        },
+        tags: [],
+        activity_type: &#x27;exploration&#x27;,
+        category: &#x27;Algebra&#x27;
+      }));
+    expect(_sampleStoryNode.getOutline()).toEqual(&#x27;Outline&#x27;);
+    expect(_sampleStoryNode.getOutlineStatus()).toEqual(false);
+    expect(_sampleStoryNode.getOutlineStatus()).toEqual(false);
+    expect(_sampleStoryNode.getThumbnailFilename()).toEqual(&#x27;image.png&#x27;);
+    expect(_sampleStoryNode.getThumbnailBgColor()).toEqual(&#x27;#a33f40&#x27;);
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/domain/story_viewer/read-only-story-node.model.spec.ts&quot;,&quot;line&quot;:24,&quot;character&quot;:6,&quot;text&quot;:&quot;_sampleStoryNode&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story_viewer/read-only-story-node.model.spec.ts&quot;,&quot;line&quot;:65,&quot;character&quot;:4,&quot;text&quot;:&quot;_sampleStoryNode&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story_viewer/read-only-story-node.model.spec.ts&quot;,&quot;line&quot;:70,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleStoryNode&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story_viewer/read-only-story-node.model.spec.ts&quot;,&quot;line&quot;:70,&quot;character&quot;:28,&quot;text&quot;:&quot;getId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story_viewer/read-only-story-node.model.spec.ts&quot;,&quot;line&quot;:71,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleStoryNode&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story_viewer/read-only-story-node.model.spec.ts&quot;,&quot;line&quot;:71,&quot;character&quot;:28,&quot;text&quot;:&quot;getTitle&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story_viewer/read-only-story-node.model.spec.ts&quot;,&quot;line&quot;:72,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleStoryNode&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story_viewer/read-only-story-node.model.spec.ts&quot;,&quot;line&quot;:72,&quot;character&quot;:28,&quot;text&quot;:&quot;getDescription&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story_viewer/read-only-story-node.model.spec.ts&quot;,&quot;line&quot;:73,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleStoryNode&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story_viewer/read-only-story-node.model.spec.ts&quot;,&quot;line&quot;:73,&quot;character&quot;:28,&quot;text&quot;:&quot;getExplorationId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story_viewer/read-only-story-node.model.spec.ts&quot;,&quot;line&quot;:74,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleStoryNode&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story_viewer/read-only-story-node.model.spec.ts&quot;,&quot;line&quot;:74,&quot;character&quot;:28,&quot;text&quot;:&quot;isCompleted&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story_viewer/read-only-story-node.model.spec.ts&quot;,&quot;line&quot;:75,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleStoryNode&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story_viewer/read-only-story-node.model.spec.ts&quot;,&quot;line&quot;:75,&quot;character&quot;:28,&quot;text&quot;:&quot;getExplorationSummaryObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story_viewer/read-only-story-node.model.spec.ts&quot;,&quot;line&quot;:100,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleStoryNode&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story_viewer/read-only-story-node.model.spec.ts&quot;,&quot;line&quot;:100,&quot;character&quot;:28,&quot;text&quot;:&quot;getOutline&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story_viewer/read-only-story-node.model.spec.ts&quot;,&quot;line&quot;:101,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleStoryNode&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story_viewer/read-only-story-node.model.spec.ts&quot;,&quot;line&quot;:101,&quot;character&quot;:28,&quot;text&quot;:&quot;getOutlineStatus&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story_viewer/read-only-story-node.model.spec.ts&quot;,&quot;line&quot;:102,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleStoryNode&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story_viewer/read-only-story-node.model.spec.ts&quot;,&quot;line&quot;:102,&quot;character&quot;:28,&quot;text&quot;:&quot;getOutlineStatus&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story_viewer/read-only-story-node.model.spec.ts&quot;,&quot;line&quot;:103,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleStoryNode&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story_viewer/read-only-story-node.model.spec.ts&quot;,&quot;line&quot;:103,&quot;character&quot;:28,&quot;text&quot;:&quot;getThumbnailFilename&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story_viewer/read-only-story-node.model.spec.ts&quot;,&quot;line&quot;:104,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleStoryNode&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story_viewer/read-only-story-node.model.spec.ts&quot;,&quot;line&quot;:104,&quot;character&quot;:28,&quot;text&quot;:&quot;getThumbnailBgColor&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:57 GMT</p>
+    </body>
+  </html>
+  

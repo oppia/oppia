@@ -1,0 +1,250 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>playthrough-issues.service.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/services/playthrough-issues.service.spec.ts</td><td class="">47.81%</td><td class="">100%</td><td class="">320</td><td class="">153</td><td class="">167</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for PlaythroughIssuesService.
+ */
+
+import { UpgradedServices } from &#x27;services/UpgradedServices&#x27;;
+
+describe(&#x27;Playthrough Issues Service&#x27;, function() {
+  var PlaythroughIssuesService = null;
+  var PlaythroughIssueObjectFactory = null;
+  var PlaythroughObjectFactory = null;
+  var PlaythroughIssuesBackendApiService = null;
+  var ImprovementModalService = null;
+  var $q = null;
+  var $rootScope = null;
+  var explorationId = &#x27;abc1&#x27;;
+  var explorationVersion = 1;
+  var backendIssues = [{
+    issue_type: &#x27;MultipleIncorrectSubmissions&#x27;,
+    issue_customization_args: {
+      state_name: {
+        value: &#x27;state_name1&#x27;
+      },
+      state_names: {
+        value: [&#x27;state_name1&#x27;, &#x27;state_name2&#x27;, &#x27;state_name3&#x27;]
+      },
+      num_times_answered_incorrectly: {
+        value: 7
+      }
+    },
+    playthrough_ids: [&#x27;playthrough_id2&#x27;],
+    schema_version: 1,
+    is_valid: true
+  }];
+  var backendPlaythrough = {
+    exp_id: &#x27;exp_id1&#x27;,
+    exp_version: 1,
+    issue_type: &#x27;EarlyQuit&#x27;,
+    issue_customization_args: {
+      state_name: {
+        value: &#x27;state_name1&#x27;
+      },
+      time_spent_in_exp_in_msecs: {
+        value: 200
+      }
+    },
+    actions: [{
+      action_type: &#x27;ExplorationStart&#x27;,
+      action_customization_args: {
+        state_name: {
+          value: &#x27;state_name1&#x27;
+        }
+      },
+      schema_version: 1
+    }]
+  };
+
+  beforeEach(angular.mock.module(&#x27;oppia&#x27;, function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
+  beforeEach(angular.mock.inject(function($injector) {
+    PlaythroughIssuesService = $injector.get(&#x27;PlaythroughIssuesService&#x27;);
+    PlaythroughIssueObjectFactory = $injector.get(
+      &#x27;PlaythroughIssueObjectFactory&#x27;);
+    PlaythroughObjectFactory = $injector.get(&#x27;PlaythroughObjectFactory&#x27;);
+    PlaythroughIssuesBackendApiService = $injector.get(
+      &#x27;PlaythroughIssuesBackendApiService&#x27;);
+    ImprovementModalService = $injector.get(
+      &#x27;ImprovementModalService&#x27;);
+    $q = $injector.get(&#x27;$q&#x27;);
+    $rootScope = $injector.get(&#x27;$rootScope&#x27;);
+
+    PlaythroughIssuesService.initSession(explorationId, explorationVersion);
+  }));
+
+  it(&#x27;should get issues from backend&#x27;, function() {
+    var backendCallSpy = spyOn(
+      PlaythroughIssuesBackendApiService, &#x27;fetchIssuesAsync&#x27;).and.returnValue(
+      $q.resolve(backendIssues.map(
+        PlaythroughIssueObjectFactory.createFromBackendDict)));
+
+    PlaythroughIssuesService.getIssues().then(function(issues) {
+      expect(backendCallSpy).toHaveBeenCalled();
+      expect(issues).toEqual(
+        backendIssues.map(
+          PlaythroughIssueObjectFactory.createFromBackendDict));
+    });
+  });
+
+  it(&#x27;should get playthrough from backend&#x27;, function() {
+    var backendCallSpy = spyOn(
+      PlaythroughIssuesBackendApiService, &#x27;fetchPlaythroughAsync&#x27;).and
+      .returnValue($q.resolve(PlaythroughObjectFactory.createFromBackendDict(
+        backendPlaythrough)));
+    var playthroughId = &#x27;exp_id1&#x27;;
+
+    PlaythroughIssuesService.getPlaythrough(playthroughId)
+      .then(function(playthrough) {
+        expect(backendCallSpy).toHaveBeenCalled();
+        expect(playthrough).toEqual(
+          PlaythroughObjectFactory.createFromBackendDict(backendPlaythrough));
+      });
+  });
+
+  it(
+    &#x27;should render issue statement when its type is&#x27; +
+    &#x27; MultipleIncorrectSubmissions&#x27;, function() {
+      var copiedBackendIssue = angular.copy(backendIssues[0]);
+      var issue = PlaythroughIssueObjectFactory.createFromBackendDict(
+        copiedBackendIssue);
+      var stateName = issue.issueCustomizationArgs.state_name.value;
+
+      expect(PlaythroughIssuesService.renderIssueStatement(issue))
+        .toBe(
+          &#x27;Several learners submitted answers to card &quot;&#x27; + stateName +
+          &#x27;&quot; several times, then gave up and quit.&#x27;);
+    });
+
+  it(&#x27;should render issue statement when its type is EarlyQuit&#x27;, function() {
+    var copiedBackendIssue = angular.copy(backendIssues[0]);
+    copiedBackendIssue.issue_type = &#x27;EarlyQuit&#x27;;
+    var issue = PlaythroughIssueObjectFactory.createFromBackendDict(
+      copiedBackendIssue);
+
+    expect(PlaythroughIssuesService.renderIssueStatement(issue))
+      .toBe(&#x27;Several learners exited the exploration in less than a minute.&#x27;);
+  });
+
+  it(&#x27;should render issue statement when its type is CyclicStateTransitions&#x27;,
+    function() {
+      var copiedBackendIssue = angular.copy(backendIssues[0]);
+      copiedBackendIssue.issue_type = &#x27;CyclicStateTransitions&#x27;;
+      var issue = PlaythroughIssueObjectFactory.createFromBackendDict(
+        copiedBackendIssue);
+      var stateName = issue.issueCustomizationArgs.state_names.value[0];
+
+      expect(PlaythroughIssuesService.renderIssueStatement(issue))
+        .toBe(
+          &#x27;Several learners ended up in a cyclic loop revisiting card &quot;&#x27; +
+          stateName + &#x27;&quot; many times.&#x27;);
+    });
+
+  it(&#x27;should render issue suggestion when its type is&#x27; +
+    &#x27; MultipleIncorrectSubmissions&#x27;, function() {
+    var copiedBackendIssue = angular.copy(backendIssues[0]);
+    var issue = PlaythroughIssueObjectFactory.createFromBackendDict(
+      copiedBackendIssue);
+    var stateName = issue.issueCustomizationArgs.state_name.value;
+
+    expect(PlaythroughIssuesService.renderIssueSuggestions(issue))
+      .toEqual(
+        [&#x27;Check the wording of the card &quot;&#x27; + stateName +
+        &#x27;&quot; to ensure it is not confusing.&#x27;,
+        &#x27;Consider addressing the answers submitted in the sample&#x27; +
+        &#x27; playthroughs explicitly using answer groups.&#x27;]);
+  });
+
+  it(&#x27;should render issue suggestion when its type is EarlyQuit&#x27;, function() {
+    var copiedBackendIssue = angular.copy(backendIssues[0]);
+    copiedBackendIssue.issue_type = &#x27;EarlyQuit&#x27;;
+    var issue = PlaythroughIssueObjectFactory.createFromBackendDict(
+      copiedBackendIssue);
+    var stateName = issue.issueCustomizationArgs.state_name.value;
+
+    expect(PlaythroughIssuesService.renderIssueSuggestions(issue))
+      .toEqual([
+        &#x27;Review the cards up to and including &quot;&#x27; + stateName +
+        &#x27;&quot; for errors, &#x27; + &#x27;ambiguities, or insufficient motivation.&#x27;]);
+  });
+
+  it(&#x27;should render issue suggestion when its type is CyclicStateTransitions&#x27;,
+    function() {
+      var copiedBackendIssue = angular.copy(backendIssues[0]);
+      copiedBackendIssue.issue_type = &#x27;CyclicStateTransitions&#x27;;
+      var issue = PlaythroughIssueObjectFactory.createFromBackendDict(
+        copiedBackendIssue);
+      var statesName = issue.issueCustomizationArgs.state_names.value;
+      var lastStateName = statesName[statesName.length - 1];
+
+      expect(PlaythroughIssuesService.renderIssueSuggestions(issue))
+        .toEqual(
+          [&#x27;Check that the concept presented in &quot;&#x27; + statesName[0] +
+        &#x27;&quot; has &#x27; + &#x27;been reinforced sufficiently by the time the learner&#x27; +
+        &#x27; gets to &quot;&#x27; + lastStateName + &#x27;&quot;.&#x27;]);
+    });
+
+  it(&#x27;should resolve issue&#x27;, function() {
+    var backendCallSpy = spyOn(
+      PlaythroughIssuesBackendApiService, &#x27;resolveIssueAsync&#x27;).and.returnValue(
+      $q.resolve());
+    var issue = PlaythroughIssueObjectFactory.createFromBackendDict(
+      angular.copy(backendIssues[0]));
+
+    PlaythroughIssuesService.resolveIssue(issue).then(function() {
+      expect(backendCallSpy).toHaveBeenCalledWith(
+        issue, explorationId, explorationVersion);
+    });
+  });
+
+  it(&#x27;should open playthrough modal&#x27;, function() {
+    spyOn(PlaythroughIssuesBackendApiService, &#x27;fetchPlaythroughAsync&#x27;).and
+      .returnValue($q.resolve(PlaythroughObjectFactory.createFromBackendDict(
+        backendPlaythrough)));
+    var openModalSpy = spyOn(ImprovementModalService, &#x27;openPlaythroughModal&#x27;)
+      .and.callThrough();
+    var playthroughId = &#x27;exp_id1&#x27;;
+    var index = 1;
+    var playthrough = PlaythroughObjectFactory.createFromBackendDict(
+      backendPlaythrough);
+
+    PlaythroughIssuesService.openPlaythroughModal(playthroughId, index);
+    $rootScope.$digest();
+
+    expect(openModalSpy).toHaveBeenCalledWith(playthrough, index);
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:21,&quot;character&quot;:6,&quot;text&quot;:&quot;PlaythroughIssuesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:22,&quot;character&quot;:6,&quot;text&quot;:&quot;PlaythroughIssueObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:23,&quot;character&quot;:6,&quot;text&quot;:&quot;PlaythroughObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:24,&quot;character&quot;:6,&quot;text&quot;:&quot;PlaythroughIssuesBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:25,&quot;character&quot;:6,&quot;text&quot;:&quot;ImprovementModalService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:26,&quot;character&quot;:6,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:27,&quot;character&quot;:6,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:70,&quot;character&quot;:51,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:73,&quot;character&quot;:6,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:73,&quot;character&quot;:15,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:76,&quot;character&quot;:42,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:77,&quot;character&quot;:4,&quot;text&quot;:&quot;PlaythroughIssuesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:77,&quot;character&quot;:31,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:77,&quot;character&quot;:41,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:78,&quot;character&quot;:4,&quot;text&quot;:&quot;PlaythroughIssueObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:78,&quot;character&quot;:36,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:78,&quot;character&quot;:46,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:80,&quot;character&quot;:4,&quot;text&quot;:&quot;PlaythroughObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:80,&quot;character&quot;:31,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:80,&quot;character&quot;:41,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:81,&quot;character&quot;:4,&quot;text&quot;:&quot;PlaythroughIssuesBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:81,&quot;character&quot;:41,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:81,&quot;character&quot;:51,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:83,&quot;character&quot;:4,&quot;text&quot;:&quot;ImprovementModalService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:83,&quot;character&quot;:30,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:83,&quot;character&quot;:40,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:85,&quot;character&quot;:4,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:85,&quot;character&quot;:9,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:85,&quot;character&quot;:19,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:86,&quot;character&quot;:4,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:86,&quot;character&quot;:17,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:86,&quot;character&quot;:27,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:88,&quot;character&quot;:4,&quot;text&quot;:&quot;PlaythroughIssuesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:88,&quot;character&quot;:29,&quot;text&quot;:&quot;initSession&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:92,&quot;character&quot;:8,&quot;text&quot;:&quot;backendCallSpy&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:93,&quot;character&quot;:6,&quot;text&quot;:&quot;PlaythroughIssuesBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:93,&quot;character&quot;:62,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:94,&quot;character&quot;:6,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:94,&quot;character&quot;:9,&quot;text&quot;:&quot;resolve&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:95,&quot;character&quot;:8,&quot;text&quot;:&quot;PlaythroughIssueObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:95,&quot;character&quot;:38,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:97,&quot;character&quot;:4,&quot;text&quot;:&quot;PlaythroughIssuesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:97,&quot;character&quot;:29,&quot;text&quot;:&quot;getIssues&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:97,&quot;character&quot;:41,&quot;text&quot;:&quot;then&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:97,&quot;character&quot;:55,&quot;text&quot;:&quot;issues&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:98,&quot;character&quot;:13,&quot;text&quot;:&quot;backendCallSpy&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:99,&quot;character&quot;:13,&quot;text&quot;:&quot;issues&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:101,&quot;character&quot;:10,&quot;text&quot;:&quot;PlaythroughIssueObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:101,&quot;character&quot;:40,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:106,&quot;character&quot;:8,&quot;text&quot;:&quot;backendCallSpy&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:107,&quot;character&quot;:6,&quot;text&quot;:&quot;PlaythroughIssuesBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:107,&quot;character&quot;:67,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:108,&quot;character&quot;:19,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:108,&quot;character&quot;:22,&quot;text&quot;:&quot;resolve&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:108,&quot;character&quot;:30,&quot;text&quot;:&quot;PlaythroughObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:108,&quot;character&quot;:55,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:112,&quot;character&quot;:4,&quot;text&quot;:&quot;PlaythroughIssuesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:112,&quot;character&quot;:29,&quot;text&quot;:&quot;getPlaythrough&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:113,&quot;character&quot;:7,&quot;text&quot;:&quot;then&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:113,&quot;character&quot;:21,&quot;text&quot;:&quot;playthrough&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:114,&quot;character&quot;:15,&quot;text&quot;:&quot;backendCallSpy&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:115,&quot;character&quot;:15,&quot;text&quot;:&quot;playthrough&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:116,&quot;character&quot;:10,&quot;text&quot;:&quot;PlaythroughObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:116,&quot;character&quot;:35,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:124,&quot;character&quot;:10,&quot;text&quot;:&quot;issue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:124,&quot;character&quot;:18,&quot;text&quot;:&quot;PlaythroughIssueObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:124,&quot;character&quot;:48,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:126,&quot;character&quot;:10,&quot;text&quot;:&quot;stateName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:126,&quot;character&quot;:22,&quot;text&quot;:&quot;issue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:126,&quot;character&quot;:28,&quot;text&quot;:&quot;issueCustomizationArgs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:126,&quot;character&quot;:51,&quot;text&quot;:&quot;state_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:126,&quot;character&quot;:62,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:128,&quot;character&quot;:13,&quot;text&quot;:&quot;PlaythroughIssuesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:128,&quot;character&quot;:38,&quot;text&quot;:&quot;renderIssueStatement&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:128,&quot;character&quot;:59,&quot;text&quot;:&quot;issue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:130,&quot;character&quot;:59,&quot;text&quot;:&quot;stateName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:137,&quot;character&quot;:8,&quot;text&quot;:&quot;issue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:137,&quot;character&quot;:16,&quot;text&quot;:&quot;PlaythroughIssueObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:137,&quot;character&quot;:46,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:140,&quot;character&quot;:11,&quot;text&quot;:&quot;PlaythroughIssuesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:140,&quot;character&quot;:36,&quot;text&quot;:&quot;renderIssueStatement&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:140,&quot;character&quot;:57,&quot;text&quot;:&quot;issue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:148,&quot;character&quot;:10,&quot;text&quot;:&quot;issue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:148,&quot;character&quot;:18,&quot;text&quot;:&quot;PlaythroughIssueObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:148,&quot;character&quot;:48,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:150,&quot;character&quot;:10,&quot;text&quot;:&quot;stateName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:150,&quot;character&quot;:22,&quot;text&quot;:&quot;issue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:150,&quot;character&quot;:28,&quot;text&quot;:&quot;issueCustomizationArgs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:150,&quot;character&quot;:51,&quot;text&quot;:&quot;state_names&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:150,&quot;character&quot;:63,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:152,&quot;character&quot;:13,&quot;text&quot;:&quot;PlaythroughIssuesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:152,&quot;character&quot;:38,&quot;text&quot;:&quot;renderIssueStatement&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:152,&quot;character&quot;:59,&quot;text&quot;:&quot;issue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:155,&quot;character&quot;:10,&quot;text&quot;:&quot;stateName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:161,&quot;character&quot;:8,&quot;text&quot;:&quot;issue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:161,&quot;character&quot;:16,&quot;text&quot;:&quot;PlaythroughIssueObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:161,&quot;character&quot;:46,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:163,&quot;character&quot;:8,&quot;text&quot;:&quot;stateName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:163,&quot;character&quot;:20,&quot;text&quot;:&quot;issue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:163,&quot;character&quot;:26,&quot;text&quot;:&quot;issueCustomizationArgs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:163,&quot;character&quot;:49,&quot;text&quot;:&quot;state_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:163,&quot;character&quot;:60,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:165,&quot;character&quot;:11,&quot;text&quot;:&quot;PlaythroughIssuesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:165,&quot;character&quot;:36,&quot;text&quot;:&quot;renderIssueSuggestions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:165,&quot;character&quot;:59,&quot;text&quot;:&quot;issue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:167,&quot;character&quot;:45,&quot;text&quot;:&quot;stateName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:176,&quot;character&quot;:8,&quot;text&quot;:&quot;issue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:176,&quot;character&quot;:16,&quot;text&quot;:&quot;PlaythroughIssueObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:176,&quot;character&quot;:46,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:178,&quot;character&quot;:8,&quot;text&quot;:&quot;stateName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:178,&quot;character&quot;:20,&quot;text&quot;:&quot;issue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:178,&quot;character&quot;:26,&quot;text&quot;:&quot;issueCustomizationArgs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:178,&quot;character&quot;:49,&quot;text&quot;:&quot;state_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:178,&quot;character&quot;:60,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:180,&quot;character&quot;:11,&quot;text&quot;:&quot;PlaythroughIssuesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:180,&quot;character&quot;:36,&quot;text&quot;:&quot;renderIssueSuggestions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:180,&quot;character&quot;:59,&quot;text&quot;:&quot;issue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:182,&quot;character&quot;:51,&quot;text&quot;:&quot;stateName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:190,&quot;character&quot;:10,&quot;text&quot;:&quot;issue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:190,&quot;character&quot;:18,&quot;text&quot;:&quot;PlaythroughIssueObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:190,&quot;character&quot;:48,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:192,&quot;character&quot;:10,&quot;text&quot;:&quot;statesName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:192,&quot;character&quot;:23,&quot;text&quot;:&quot;issue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:192,&quot;character&quot;:29,&quot;text&quot;:&quot;issueCustomizationArgs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:192,&quot;character&quot;:52,&quot;text&quot;:&quot;state_names&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:192,&quot;character&quot;:64,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:193,&quot;character&quot;:10,&quot;text&quot;:&quot;lastStateName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:193,&quot;character&quot;:26,&quot;text&quot;:&quot;statesName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:193,&quot;character&quot;:37,&quot;text&quot;:&quot;statesName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:193,&quot;character&quot;:48,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:195,&quot;character&quot;:13,&quot;text&quot;:&quot;PlaythroughIssuesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:195,&quot;character&quot;:38,&quot;text&quot;:&quot;renderIssueSuggestions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:195,&quot;character&quot;:61,&quot;text&quot;:&quot;issue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:197,&quot;character&quot;:53,&quot;text&quot;:&quot;statesName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:199,&quot;character&quot;:23,&quot;text&quot;:&quot;lastStateName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:203,&quot;character&quot;:8,&quot;text&quot;:&quot;backendCallSpy&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:204,&quot;character&quot;:6,&quot;text&quot;:&quot;PlaythroughIssuesBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:204,&quot;character&quot;:63,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:205,&quot;character&quot;:6,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:205,&quot;character&quot;:9,&quot;text&quot;:&quot;resolve&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:206,&quot;character&quot;:8,&quot;text&quot;:&quot;issue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:206,&quot;character&quot;:16,&quot;text&quot;:&quot;PlaythroughIssueObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:206,&quot;character&quot;:46,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:209,&quot;character&quot;:4,&quot;text&quot;:&quot;PlaythroughIssuesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:209,&quot;character&quot;:29,&quot;text&quot;:&quot;resolveIssue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:209,&quot;character&quot;:42,&quot;text&quot;:&quot;issue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:209,&quot;character&quot;:49,&quot;text&quot;:&quot;then&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:210,&quot;character&quot;:13,&quot;text&quot;:&quot;backendCallSpy&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:211,&quot;character&quot;:8,&quot;text&quot;:&quot;issue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:216,&quot;character&quot;:10,&quot;text&quot;:&quot;PlaythroughIssuesBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:216,&quot;character&quot;:71,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:217,&quot;character&quot;:19,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:217,&quot;character&quot;:22,&quot;text&quot;:&quot;resolve&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:217,&quot;character&quot;:30,&quot;text&quot;:&quot;PlaythroughObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:217,&quot;character&quot;:55,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:219,&quot;character&quot;:8,&quot;text&quot;:&quot;openModalSpy&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:219,&quot;character&quot;:29,&quot;text&quot;:&quot;ImprovementModalService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:220,&quot;character&quot;:7,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:223,&quot;character&quot;:8,&quot;text&quot;:&quot;playthrough&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:223,&quot;character&quot;:22,&quot;text&quot;:&quot;PlaythroughObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:223,&quot;character&quot;:47,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:226,&quot;character&quot;:4,&quot;text&quot;:&quot;PlaythroughIssuesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:226,&quot;character&quot;:29,&quot;text&quot;:&quot;openPlaythroughModal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:227,&quot;character&quot;:4,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:227,&quot;character&quot;:15,&quot;text&quot;:&quot;$digest&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:229,&quot;character&quot;:11,&quot;text&quot;:&quot;openModalSpy&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues.service.spec.ts&quot;,&quot;line&quot;:229,&quot;character&quot;:46,&quot;text&quot;:&quot;playthrough&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:56 GMT</p>
+    </body>
+  </html>
+  

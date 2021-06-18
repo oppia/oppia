@@ -1,0 +1,302 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>code-repl-rules.service.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts</td><td class="">70.17%</td><td class="">100%</td><td class="">295</td><td class="">207</td><td class="">88</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2015 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for Code REPL rules.
+ */
+
+import { TestBed } from &#x27;@angular/core/testing&#x27;;
+
+import { CodeReplRulesService } from
+  &#x27;interactions/CodeRepl/directives/code-repl-rules.service&#x27;;
+import { NormalizeWhitespacePipe } from
+  &#x27;filters/string-utility-filters/normalize-whitespace.pipe&#x27;;
+
+describe(&#x27;Code REPL rules service&#x27;, () =&gt; {
+  let crrs = null;
+  beforeEach(() =&gt; {
+    TestBed.configureTestingModule({
+      providers: [NormalizeWhitespacePipe]
+    });
+    crrs = TestBed.get(CodeReplRulesService);
+  });
+
+  describe(&#x27;\&#x27;equals\&#x27; rule&#x27;, () =&gt; {
+    var RULE_INPUT = {
+      x: (
+        &#x27;def x():\n&#x27; +
+        &#x27;    y = \&#x27;ab    c\&#x27;\n&#x27; +
+        &#x27;    return x&#x27;
+      )
+    };
+
+    it(&#x27;should accept the same code&#x27;, () =&gt; {
+      expect(crrs.CodeEquals({
+        code: (
+          &#x27;def x():\n&#x27; +
+          &#x27;    y = \&#x27;ab    c\&#x27;\n&#x27; +
+          &#x27;    return x&#x27;
+        )
+      }, RULE_INPUT)).toBe(true);
+    });
+
+    it(&#x27;should remove extra newlines and trailing whitespace&#x27;, () =&gt; {
+      // Extra newline with spaces.
+      expect(crrs.CodeEquals({
+        code: (
+          &#x27;def x():\n&#x27; +
+          &#x27;    y = \&#x27;ab    c\&#x27;\n&#x27; +
+          &#x27;    \n&#x27; +
+          &#x27;    return x&#x27;
+        )
+      }, RULE_INPUT)).toBe(true);
+
+      // Extra trailing whitespace on first line.
+      expect(crrs.CodeEquals({
+        code: (
+          &#x27;def x():        \n&#x27; +
+          &#x27;    y = \&#x27;ab    c\&#x27;\n&#x27; +
+          &#x27;    return x&#x27;
+        )
+      }, RULE_INPUT)).toBe(true);
+
+      // ---- Tab character ----
+      expect(crrs.CodeEquals({
+        code: (
+          &#x27;def x(): \t\n&#x27; +
+          &#x27;    y = \&#x27;ab    c\&#x27;\n&#x27; +
+          &#x27;    return x\n\n\n&#x27;
+        )
+      }, RULE_INPUT)).toBe(true);
+    });
+
+    it(&#x27;should not change spaces at the start of a line&#x27;, () =&gt; {
+      expect(crrs.CodeEquals({
+        code: (
+          &#x27;def x():\n&#x27; +
+          &#x27;  y = \&#x27;ab    c\&#x27;\n&#x27; +
+          &#x27;    return x&#x27;
+        )
+      }, RULE_INPUT)).toBe(false);
+    });
+
+    it(&#x27;should detect missing newlines&#x27;, () =&gt; {
+      expect(crrs.CodeEquals({
+        code: (
+          &#x27;def x():&#x27; +
+          &#x27;    y = \&#x27;ab    c\&#x27;\n&#x27; +
+          &#x27;    return x&#x27;
+        )
+      }, RULE_INPUT)).toBe(false);
+    });
+
+    it(&#x27;should compare spaces inside quotes&#x27;, () =&gt; {
+      expect(crrs.CodeEquals({
+        code: (
+          &#x27;def x():&#x27; +
+          &#x27;    y = \&#x27;ab c\&#x27;\n&#x27; +
+          &#x27;    return x&#x27;
+        )
+      }, RULE_INPUT)).toBe(false);
+    });
+  });
+
+  describe(&#x27;\&#x27;code contains\&#x27; rule&#x27;, () =&gt; {
+    var RULE_INPUT = {
+      x: &#x27;def x():&#x27;
+    };
+
+    it(&#x27;should check if answer contains some code&#x27;, () =&gt; {
+      expect(crrs.CodeContains({
+        code: (
+          &#x27;def x():\n&#x27; +
+          &#x27;    y = \&#x27;ab c\&#x27;\n&#x27; +
+          &#x27;    return x&#x27;
+        )
+      }, RULE_INPUT)).toBe(true);
+      expect(crrs.CodeContains({
+        code: &#x27;    def x():\n&#x27;
+      }, RULE_INPUT)).toBe(true);
+      expect(crrs.CodeContains({
+        code: &#x27;print 0&#x27;
+      }, RULE_INPUT)).toBe(false);
+    });
+  });
+
+  describe(&#x27;\&#x27;code does not contain\&#x27; rule&#x27;, () =&gt; {
+    var RULE_INPUT = {
+      x: &#x27;def x():&#x27;
+    };
+
+    it(&#x27;should check if answer contains some code&#x27;, () =&gt; {
+      expect(crrs.CodeDoesNotContain({
+        code: (
+          &#x27;def x():\n&#x27; +
+          &#x27;    y = \&#x27;ab c\&#x27;\n&#x27; +
+          &#x27;    return x&#x27;
+        )
+      }, RULE_INPUT)).toBe(false);
+      expect(crrs.CodeDoesNotContain({
+        code: &#x27;def x():\n&#x27;
+      }, RULE_INPUT)).toBe(false);
+      expect(crrs.CodeDoesNotContain({
+        code: &#x27;    def x():\n&#x27;
+      }, RULE_INPUT)).toBe(false);
+      expect(crrs.CodeDoesNotContain({
+        code: &#x27;print 0&#x27;
+      }, RULE_INPUT)).toBe(true);
+    });
+  });
+
+  describe(&#x27;\&#x27;output contains\&#x27; rule&#x27;, () =&gt; {
+    var RULE_INPUT = {
+      x: &#x27;1&#x27;
+    };
+
+    var RULE_INPUT_1 = {
+      x: &#x27;a b c&#x27;
+    };
+
+    var RULE_INPUT_2 = {
+      x: &#x27;a\nb\nc&#x27;
+    };
+
+    it(&#x27;should check if output contains some content&#x27;, () =&gt; {
+      expect(crrs.OutputContains({
+        output: &#x27;1 2 3 4&#x27;
+      }, RULE_INPUT)).toBe(true);
+      expect(crrs.OutputContains({
+        output: &#x27;\n1\n2\n3\n4\n&#x27;
+      }, RULE_INPUT)).toBe(true);
+      expect(crrs.OutputContains({
+        output: &#x27;&#x27;
+      }, RULE_INPUT)).toBe(false);
+      expect(crrs.OutputContains({
+        output: &#x27;bad output&#x27;
+      }, RULE_INPUT)).toBe(false);
+      expect(crrs.OutputContains({
+        output: &#x27;a b c d e&#x27;
+      }, RULE_INPUT_1)).toBe(true);
+      expect(crrs.OutputContains({
+        output: &#x27;a\nb\nc\nd\n&#x27;
+      }, RULE_INPUT_1)).toBe(false);
+      expect(crrs.OutputContains({
+        output: &#x27;ab\nc\n&#x27;
+      }, RULE_INPUT_1)).toBe(false);
+      expect(crrs.OutputContains({
+        output: &#x27;&#x27;
+      }, RULE_INPUT_1)).toBe(false);
+      expect(crrs.OutputContains({
+        output: &#x27;bad output&#x27;
+      }, RULE_INPUT_1)).toBe(false);
+      expect(crrs.OutputContains({
+        output: &#x27;a\nb\nc\nd\ne&#x27;
+      }, RULE_INPUT_2)).toBe(true);
+      expect(crrs.OutputContains({
+        output: &#x27;\nabc\ndef\nfgh\n&#x27;
+      }, RULE_INPUT_2)).toBe(false);
+      expect(crrs.OutputContains({
+        output: &#x27;a b c&#x27;
+      }, RULE_INPUT_2)).toBe(false);
+      expect(crrs.OutputContains({
+        output: &#x27;&#x27;
+      }, RULE_INPUT_2)).toBe(false);
+      expect(crrs.OutputContains({
+        output: &#x27;bad output&#x27;
+      }, RULE_INPUT_2)).toBe(false);
+    });
+  });
+
+  describe(&#x27;\&#x27;output equals\&#x27; rule&#x27;, () =&gt; {
+    var RULE_INPUT = {
+      x: &#x27;1&#x27;
+    };
+
+    it(&#x27;should compare normalized output&#x27;, () =&gt; {
+      expect(crrs.OutputEquals({
+        output: &#x27;1&#x27;
+      }, RULE_INPUT)).toBe(true);
+      expect(crrs.OutputEquals({
+        output: &#x27;\n1\n&#x27;
+      }, RULE_INPUT)).toBe(true);
+      expect(crrs.OutputEquals({
+        output: &#x27;&#x27;
+      }, RULE_INPUT)).toBe(false);
+      expect(crrs.OutputEquals({
+        output: &#x27;bad output&#x27;
+      }, RULE_INPUT)).toBe(false);
+    });
+  });
+
+  describe(&#x27;\&#x27;results in error\&#x27; rule&#x27;, () =&gt; {
+    var RULE_INPUT = null;
+
+    it(&#x27;should check if error is not empty&#x27;, () =&gt; {
+      expect(crrs.ResultsInError({
+        error: &#x27;&#x27;
+      }, RULE_INPUT)).toBe(false);
+      expect(crrs.ResultsInError({
+        error: &#x27; \t\n&#x27;
+      }, RULE_INPUT)).toBe(false);
+      expect(crrs.ResultsInError({
+        error: &#x27;bad output&#x27;
+      }, RULE_INPUT)).toBe(true);
+    });
+  });
+
+  describe(&#x27;\&#x27;error contains\&#x27; rule&#x27;, () =&gt; {
+    var RULE_INPUT = {
+      x: &#x27;bad&#x27;
+    };
+
+    it(&#x27;should check if error message appears&#x27;, () =&gt; {
+      expect(crrs.ErrorContains({
+        error: &#x27;bad&#x27;
+      }, RULE_INPUT)).toBe(true);
+      expect(crrs.ErrorContains({
+        error: &#x27;  bad  &#x27;
+      }, RULE_INPUT)).toBe(true);
+      expect(crrs.ErrorContains({
+        error: &#x27;not bad&#x27;
+      }, RULE_INPUT)).toBe(true);
+      expect(crrs.ErrorContains({
+        error: &#x27;error&#x27;
+      }, RULE_INPUT)).toBe(false);
+      expect(crrs.ErrorContains({
+        error: &#x27;b a d&#x27;
+      }, RULE_INPUT)).toBe(false);
+      expect(crrs.ErrorContains({
+        error: &#x27;&#x27;
+      }, RULE_INPUT)).toBe(false);
+    });
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:26,&quot;character&quot;:6,&quot;text&quot;:&quot;crrs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:31,&quot;character&quot;:4,&quot;text&quot;:&quot;crrs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:44,&quot;character&quot;:13,&quot;text&quot;:&quot;crrs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:44,&quot;character&quot;:18,&quot;text&quot;:&quot;CodeEquals&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:55,&quot;character&quot;:13,&quot;text&quot;:&quot;crrs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:55,&quot;character&quot;:18,&quot;text&quot;:&quot;CodeEquals&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:65,&quot;character&quot;:13,&quot;text&quot;:&quot;crrs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:65,&quot;character&quot;:18,&quot;text&quot;:&quot;CodeEquals&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:74,&quot;character&quot;:13,&quot;text&quot;:&quot;crrs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:74,&quot;character&quot;:18,&quot;text&quot;:&quot;CodeEquals&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:84,&quot;character&quot;:13,&quot;text&quot;:&quot;crrs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:84,&quot;character&quot;:18,&quot;text&quot;:&quot;CodeEquals&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:94,&quot;character&quot;:13,&quot;text&quot;:&quot;crrs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:94,&quot;character&quot;:18,&quot;text&quot;:&quot;CodeEquals&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:104,&quot;character&quot;:13,&quot;text&quot;:&quot;crrs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:104,&quot;character&quot;:18,&quot;text&quot;:&quot;CodeEquals&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:120,&quot;character&quot;:13,&quot;text&quot;:&quot;crrs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:120,&quot;character&quot;:18,&quot;text&quot;:&quot;CodeContains&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:127,&quot;character&quot;:13,&quot;text&quot;:&quot;crrs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:127,&quot;character&quot;:18,&quot;text&quot;:&quot;CodeContains&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:130,&quot;character&quot;:13,&quot;text&quot;:&quot;crrs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:130,&quot;character&quot;:18,&quot;text&quot;:&quot;CodeContains&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:142,&quot;character&quot;:13,&quot;text&quot;:&quot;crrs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:142,&quot;character&quot;:18,&quot;text&quot;:&quot;CodeDoesNotContain&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:149,&quot;character&quot;:13,&quot;text&quot;:&quot;crrs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:149,&quot;character&quot;:18,&quot;text&quot;:&quot;CodeDoesNotContain&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:152,&quot;character&quot;:13,&quot;text&quot;:&quot;crrs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:152,&quot;character&quot;:18,&quot;text&quot;:&quot;CodeDoesNotContain&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:155,&quot;character&quot;:13,&quot;text&quot;:&quot;crrs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:155,&quot;character&quot;:18,&quot;text&quot;:&quot;CodeDoesNotContain&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:175,&quot;character&quot;:13,&quot;text&quot;:&quot;crrs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:175,&quot;character&quot;:18,&quot;text&quot;:&quot;OutputContains&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:178,&quot;character&quot;:13,&quot;text&quot;:&quot;crrs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:178,&quot;character&quot;:18,&quot;text&quot;:&quot;OutputContains&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:181,&quot;character&quot;:13,&quot;text&quot;:&quot;crrs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:181,&quot;character&quot;:18,&quot;text&quot;:&quot;OutputContains&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:184,&quot;character&quot;:13,&quot;text&quot;:&quot;crrs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:184,&quot;character&quot;:18,&quot;text&quot;:&quot;OutputContains&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:187,&quot;character&quot;:13,&quot;text&quot;:&quot;crrs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:187,&quot;character&quot;:18,&quot;text&quot;:&quot;OutputContains&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:190,&quot;character&quot;:13,&quot;text&quot;:&quot;crrs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:190,&quot;character&quot;:18,&quot;text&quot;:&quot;OutputContains&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:193,&quot;character&quot;:13,&quot;text&quot;:&quot;crrs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:193,&quot;character&quot;:18,&quot;text&quot;:&quot;OutputContains&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:196,&quot;character&quot;:13,&quot;text&quot;:&quot;crrs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:196,&quot;character&quot;:18,&quot;text&quot;:&quot;OutputContains&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:199,&quot;character&quot;:13,&quot;text&quot;:&quot;crrs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:199,&quot;character&quot;:18,&quot;text&quot;:&quot;OutputContains&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:202,&quot;character&quot;:13,&quot;text&quot;:&quot;crrs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:202,&quot;character&quot;:18,&quot;text&quot;:&quot;OutputContains&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:205,&quot;character&quot;:13,&quot;text&quot;:&quot;crrs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:205,&quot;character&quot;:18,&quot;text&quot;:&quot;OutputContains&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:208,&quot;character&quot;:13,&quot;text&quot;:&quot;crrs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:208,&quot;character&quot;:18,&quot;text&quot;:&quot;OutputContains&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:211,&quot;character&quot;:13,&quot;text&quot;:&quot;crrs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:211,&quot;character&quot;:18,&quot;text&quot;:&quot;OutputContains&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:214,&quot;character&quot;:13,&quot;text&quot;:&quot;crrs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:214,&quot;character&quot;:18,&quot;text&quot;:&quot;OutputContains&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:226,&quot;character&quot;:13,&quot;text&quot;:&quot;crrs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:226,&quot;character&quot;:18,&quot;text&quot;:&quot;OutputEquals&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:229,&quot;character&quot;:13,&quot;text&quot;:&quot;crrs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:229,&quot;character&quot;:18,&quot;text&quot;:&quot;OutputEquals&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:232,&quot;character&quot;:13,&quot;text&quot;:&quot;crrs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:232,&quot;character&quot;:18,&quot;text&quot;:&quot;OutputEquals&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:235,&quot;character&quot;:13,&quot;text&quot;:&quot;crrs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:235,&quot;character&quot;:18,&quot;text&quot;:&quot;OutputEquals&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:242,&quot;character&quot;:8,&quot;text&quot;:&quot;RULE_INPUT&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:245,&quot;character&quot;:13,&quot;text&quot;:&quot;crrs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:245,&quot;character&quot;:18,&quot;text&quot;:&quot;ResultsInError&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:247,&quot;character&quot;:9,&quot;text&quot;:&quot;RULE_INPUT&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:248,&quot;character&quot;:13,&quot;text&quot;:&quot;crrs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:248,&quot;character&quot;:18,&quot;text&quot;:&quot;ResultsInError&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:250,&quot;character&quot;:9,&quot;text&quot;:&quot;RULE_INPUT&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:251,&quot;character&quot;:13,&quot;text&quot;:&quot;crrs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:251,&quot;character&quot;:18,&quot;text&quot;:&quot;ResultsInError&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:253,&quot;character&quot;:9,&quot;text&quot;:&quot;RULE_INPUT&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:263,&quot;character&quot;:13,&quot;text&quot;:&quot;crrs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:263,&quot;character&quot;:18,&quot;text&quot;:&quot;ErrorContains&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:266,&quot;character&quot;:13,&quot;text&quot;:&quot;crrs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:266,&quot;character&quot;:18,&quot;text&quot;:&quot;ErrorContains&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:269,&quot;character&quot;:13,&quot;text&quot;:&quot;crrs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:269,&quot;character&quot;:18,&quot;text&quot;:&quot;ErrorContains&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:272,&quot;character&quot;:13,&quot;text&quot;:&quot;crrs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:272,&quot;character&quot;:18,&quot;text&quot;:&quot;ErrorContains&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:275,&quot;character&quot;:13,&quot;text&quot;:&quot;crrs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:275,&quot;character&quot;:18,&quot;text&quot;:&quot;ErrorContains&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:278,&quot;character&quot;:13,&quot;text&quot;:&quot;crrs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/code-repl-rules.service.spec.ts&quot;,&quot;line&quot;:278,&quot;character&quot;:18,&quot;text&quot;:&quot;ErrorContains&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:44:00 GMT</p>
+    </body>
+  </html>
+  

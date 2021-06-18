@@ -1,0 +1,269 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>StoryObjectFactory.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/domain/story/StoryObjectFactory.ts</td><td class="">96.35%</td><td class="">100%</td><td class="">301</td><td class="">290</td><td class="">11</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2018 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Factory for creating and mutating instances of frontend
+ * story domain objects.
+ */
+
+import { downgradeInjectable } from &#x27;@angular/upgrade/static&#x27;;
+import { Injectable } from &#x27;@angular/core&#x27;;
+
+import constants from &#x27;assets/constants&#x27;;
+
+import {
+  StoryContentsBackendDict,
+  StoryContents,
+  StoryContentsObjectFactory
+} from &#x27;domain/story/StoryContentsObjectFactory&#x27;;
+
+export interface StoryBackendDict {
+  &#x27;id&#x27;: string;
+  &#x27;title&#x27;: string;
+  &#x27;description&#x27;: string;
+  &#x27;notes&#x27;: string;
+  &#x27;story_contents&#x27;: StoryContentsBackendDict;
+  &#x27;language_code&#x27;: string;
+  &#x27;version&#x27;: number;
+  &#x27;corresponding_topic_id&#x27;: string;
+  &#x27;thumbnail_filename&#x27;: string;
+  &#x27;thumbnail_bg_color&#x27;: string;
+  &#x27;url_fragment&#x27;: string;
+  &#x27;meta_tag_content&#x27;: string;
+}
+
+export class Story {
+  _id: string;
+  _title: string;
+  _description: string;
+  _notes: string;
+  _storyContents: StoryContents;
+  _languageCode: string;
+  _version: number;
+  _correspondingTopicId: string;
+  _thumbnailFilename: string;
+  _thumbnailBgColor: string;
+  _urlFragment: string;
+  _metaTagContent: string;
+  constructor(
+      id: string, title: string, description: string, notes: string,
+      storyContents: StoryContents, languageCode: string, version: number,
+      correspondingTopicId: string, thumbnailBgColor: string,
+      thumbnailFilename: string, urlFragment: string, metaTagContent: string) {
+    this._id = id;
+    this._title = title;
+    this._description = description;
+    this._notes = notes;
+    this._storyContents = storyContents;
+    this._languageCode = languageCode;
+    this._version = version;
+    this._correspondingTopicId = correspondingTopicId;
+    this._thumbnailBgColor = thumbnailBgColor;
+    this._thumbnailFilename = thumbnailFilename;
+    this._urlFragment = urlFragment;
+    this._metaTagContent = metaTagContent;
+  }
+
+  getId(): string {
+    return this._id;
+  }
+
+  getTitle(): string {
+    return this._title;
+  }
+
+  setTitle(title: string): void {
+    this._title = title;
+  }
+
+  getDescription(): string {
+    return this._description;
+  }
+
+  setDescription(description: string): void {
+    this._description = description;
+  }
+
+  getNotes(): string {
+    return this._notes;
+  }
+
+  setNotes(notes: string): void {
+    this._notes = notes;
+  }
+
+  getLanguageCode(): string {
+    return this._languageCode;
+  }
+
+  setLanguageCode(languageCode: string): void {
+    this._languageCode = languageCode;
+  }
+
+  getMetaTagContent(): string {
+    return this._metaTagContent;
+  }
+
+  setMetaTagContent(metaTagContent: string): void {
+    this._metaTagContent = metaTagContent;
+  }
+
+  getVersion(): number {
+    return this._version;
+  }
+
+  getStoryContents(): StoryContents {
+    return this._storyContents;
+  }
+
+  getCorrespondingTopicId(): string {
+    return this._correspondingTopicId;
+  }
+
+  getThumbnailFilename(): string {
+    return this._thumbnailFilename;
+  }
+
+  setThumbnailFilename(thumbnailFilename: string): void {
+    this._thumbnailFilename = thumbnailFilename;
+  }
+
+  getThumbnailBgColor(): string {
+    return this._thumbnailBgColor;
+  }
+
+  setThumbnailBgColor(thumbnailBgColor: string): void {
+    this._thumbnailBgColor = thumbnailBgColor;
+  }
+
+  getUrlFragment(): string {
+    return this._urlFragment;
+  }
+
+  setUrlFragment(urlFragment: string): void {
+    this._urlFragment = urlFragment;
+  }
+
+  validate(): string[] {
+    var issues = [];
+    if (this._title === &#x27;&#x27;) {
+      issues.push(&#x27;Story title should not be empty&#x27;);
+    }
+    const VALID_URL_FRAGMENT_REGEX = new RegExp(
+      constants.VALID_URL_FRAGMENT_REGEX);
+    if (!this._urlFragment) {
+      issues.push(
+        &#x27;Url Fragment should not be empty.&#x27;);
+    } else {
+      if (!VALID_URL_FRAGMENT_REGEX.test(this._urlFragment)) {
+        issues.push(
+          &#x27;Url Fragment contains invalid characters. &#x27; +
+          &#x27;Only lowercase words separated by hyphens are allowed.&#x27;);
+      }
+      if (
+        this._urlFragment.length &gt;
+        constants.MAX_CHARS_IN_STORY_URL_FRAGMENT) {
+        issues.push(
+          &#x27;Url Fragment should not be greater than &#x27; +
+          `${constants.MAX_CHARS_IN_STORY_URL_FRAGMENT} characters`);
+      }
+    }
+
+    issues = issues.concat(this._storyContents.validate());
+    return issues;
+  }
+
+  prepublishValidate(): string[] {
+    const metaTagContentCharLimit = constants.MAX_CHARS_IN_META_TAG_CONTENT;
+    let issues = [];
+    if (!this._thumbnailFilename) {
+      issues.push(&#x27;Story should have a thumbnail.&#x27;);
+    }
+    if (!this._metaTagContent) {
+      issues.push(&#x27;Story should have meta tag content.&#x27;);
+    } else if (this._metaTagContent.length &gt; metaTagContentCharLimit) {
+      issues.push(
+        &#x27;Story meta tag content should not be longer than &#x27; +
+        `${metaTagContentCharLimit} characters.`);
+    }
+    return issues;
+  }
+
+  // Reassigns all values within this story to match the existing
+  // story. This is performed as a deep copy such that none of the
+  // internal, bindable objects are changed within this story.
+  copyFromStory(otherStory: Story): void {
+    this._id = otherStory.getId();
+    this.setTitle(otherStory.getTitle());
+    this.setDescription(otherStory.getDescription());
+    this.setNotes(otherStory.getNotes());
+    this.setLanguageCode(otherStory.getLanguageCode());
+    this._version = otherStory.getVersion();
+    this._storyContents = otherStory.getStoryContents();
+    this._correspondingTopicId = otherStory.getCorrespondingTopicId();
+    this._thumbnailFilename = otherStory.getThumbnailFilename();
+    this._thumbnailBgColor = otherStory.getThumbnailBgColor();
+    this._urlFragment = otherStory.getUrlFragment();
+    this.setMetaTagContent(otherStory.getMetaTagContent());
+  }
+}
+
+@Injectable({
+  providedIn: &#x27;root&#x27;
+})
+export class StoryObjectFactory {
+  constructor(private storyContentsObjectFactory: StoryContentsObjectFactory) {}
+  createFromBackendDict(storyBackendDict: StoryBackendDict): Story {
+    return new Story(
+      storyBackendDict.id, storyBackendDict.title,
+      storyBackendDict.description, storyBackendDict.notes,
+      this.storyContentsObjectFactory.createFromBackendDict(
+        storyBackendDict.story_contents),
+      storyBackendDict.language_code,
+      storyBackendDict.version, storyBackendDict.corresponding_topic_id,
+      storyBackendDict.thumbnail_bg_color,
+      storyBackendDict.thumbnail_filename,
+      storyBackendDict.url_fragment, storyBackendDict.meta_tag_content
+    );
+  }
+
+  // Create an interstitial story that would be displayed in the editor until
+  // the actual story is fetched from the backend.
+  createInterstitialStory(): Story {
+    return new Story(
+      null, &#x27;Story title loading&#x27;, &#x27;Story description loading&#x27;,
+      &#x27;Story notes loading&#x27;, null, &#x27;en&#x27;, 1, null, null, null, null, &#x27;&#x27;);
+  }
+}
+
+angular.module(&#x27;oppia&#x27;).factory(
+  &#x27;StoryObjectFactory&#x27;, downgradeInjectable(StoryObjectFactory));
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/domain/story/StoryObjectFactory.ts&quot;,&quot;line&quot;:158,&quot;character&quot;:8,&quot;text&quot;:&quot;issues&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/story/StoryObjectFactory.ts&quot;,&quot;line&quot;:160,&quot;character&quot;:6,&quot;text&quot;:&quot;issues&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/story/StoryObjectFactory.ts&quot;,&quot;line&quot;:165,&quot;character&quot;:6,&quot;text&quot;:&quot;issues&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/story/StoryObjectFactory.ts&quot;,&quot;line&quot;:169,&quot;character&quot;:8,&quot;text&quot;:&quot;issues&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/story/StoryObjectFactory.ts&quot;,&quot;line&quot;:176,&quot;character&quot;:8,&quot;text&quot;:&quot;issues&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/story/StoryObjectFactory.ts&quot;,&quot;line&quot;:182,&quot;character&quot;:4,&quot;text&quot;:&quot;issues&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/story/StoryObjectFactory.ts&quot;,&quot;line&quot;:182,&quot;character&quot;:13,&quot;text&quot;:&quot;issues&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/story/StoryObjectFactory.ts&quot;,&quot;line&quot;:188,&quot;character&quot;:8,&quot;text&quot;:&quot;issues&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/story/StoryObjectFactory.ts&quot;,&quot;line&quot;:190,&quot;character&quot;:6,&quot;text&quot;:&quot;issues&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/story/StoryObjectFactory.ts&quot;,&quot;line&quot;:193,&quot;character&quot;:6,&quot;text&quot;:&quot;issues&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/story/StoryObjectFactory.ts&quot;,&quot;line&quot;:195,&quot;character&quot;:6,&quot;text&quot;:&quot;issues&quot;,&quot;kind&quot;:2}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:55 GMT</p>
+    </body>
+  </html>
+  

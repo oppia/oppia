@@ -1,0 +1,378 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>search.service.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/services/search.service.spec.ts</td><td class="">92.28%</td><td class="">100%</td><td class="">505</td><td class="">466</td><td class="">39</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2016 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Tests that search service gets correct collections.
+ */
+
+import { EventEmitter } from &#x27;@angular/core&#x27;;
+import { HttpClientTestingModule, HttpTestingController } from
+  &#x27;@angular/common/http/testing&#x27;;
+import { TestBed, fakeAsync, flushMicrotasks } from &#x27;@angular/core/testing&#x27;;
+
+import { SearchService, SelectionDetails, SelectionList } from &#x27;services/search.service&#x27;;
+import { Subscription } from &#x27;rxjs&#x27;;
+
+describe(&#x27;Search Service&#x27;, () =&gt; {
+  let searchService: SearchService;
+  let results: SelectionDetails;
+  let httpTestingController: HttpTestingController;
+
+  beforeEach(() =&gt; {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [SearchService]
+    });
+    searchService = TestBed.get(SearchService);
+  });
+
+  describe(&#x27;updateSearchFieldsBasedOnUrlQuery&#x27;, () =&gt; {
+    let urlComponent;
+    beforeEach(() =&gt; {
+      results = {
+        categories: {
+          description: &#x27;&#x27;,
+          itemsName: &#x27;categories&#x27;,
+          masterList: [],
+          numSelections: 0,
+          selections: {},
+          summary: &#x27;&#x27;
+        },
+        languageCodes: {
+          description: &#x27;&#x27;,
+          itemsName: &#x27;languages&#x27;,
+          masterList: [],
+          numSelections: 0,
+          selections: {},
+          summary: &#x27;&#x27;
+        }
+      };
+    });
+
+    // eslint-disable-next-line max-len
+    it(&#x27;should identify two categories and two languages given in url search query&#x27;, () =&gt; {
+      urlComponent = &#x27;?q=test&amp;category=(&quot;Architecture&quot;%20OR%20&#x27; +
+        &#x27;&quot;Mathematics&quot;)&amp;language_code=(&quot;en&quot;%20OR%20&quot;ar&quot;)&#x27;;
+      expect(searchService.updateSearchFieldsBasedOnUrlQuery(
+        urlComponent, results)).toBe(&#x27;test&#x27;);
+      expect(results.languageCodes.selections).toEqual({
+        ar: true,
+        en: true
+      });
+      expect(results.categories.selections).toEqual({
+        Architecture: true,
+        Mathematics: true
+      });
+    });
+    it(&#x27;should find one category and two languages if given in url search&#x27;,
+      () =&gt; {
+        urlComponent = &#x27;?q=test&amp;category=(&quot;Mathematics&quot;)&amp;&#x27; +
+          &#x27;language_code=(&quot;en&quot;%20OR%20&quot;ar&quot;)&#x27;;
+        expect(searchService.updateSearchFieldsBasedOnUrlQuery(
+          urlComponent, results)).toBe(&#x27;test&#x27;);
+        expect(results.languageCodes.selections).toEqual({
+          ar: true,
+          en: true
+        });
+        expect(results.categories.selections).toEqual({
+          Mathematics: true
+        });
+      }
+    );
+    it(&#x27;should find one category and one language if given in url search&#x27;,
+      () =&gt; {
+        urlComponent =
+          &#x27;?q=test&amp;category=(&quot;Mathematics&quot;)&amp;language_code=(&quot;en&quot;)&#x27;;
+        expect(searchService.updateSearchFieldsBasedOnUrlQuery(
+          urlComponent, results)).toBe(&#x27;test&#x27;);
+        expect(results.languageCodes.selections).toEqual({
+          en: true
+        });
+        expect(results.categories.selections).toEqual({
+          Mathematics: true
+        });
+      }
+    );
+    it(&#x27;should find no categories and one language if given in url search&#x27;,
+      () =&gt; {
+        urlComponent = &#x27;?q=test&amp;language_code=(&quot;en&quot;)&#x27;;
+        expect(searchService.updateSearchFieldsBasedOnUrlQuery(
+          urlComponent, results)).toBe(&#x27;test&#x27;);
+        expect(results.languageCodes.selections).toEqual({
+          en: true
+        });
+        expect(results.categories.selections).toEqual({});
+      }
+    );
+
+    it(&#x27;should find as many keywords as provided in search query&#x27;,
+      () =&gt; {
+        urlComponent = &#x27;?q=protractor%20test&amp;language_code=(&quot;en&quot;)&#x27;;
+        expect(searchService.updateSearchFieldsBasedOnUrlQuery(
+          urlComponent, results)).toBe(&#x27;protractor test&#x27;);
+        expect(results.languageCodes.selections).toEqual({
+          en: true
+        });
+        expect(results.categories.selections).toEqual({});
+      }
+    );
+
+    it(&#x27;should not find languages nor categories when ampersand is escaped&#x27;,
+      () =&gt; {
+        urlComponent = &#x27;?q=protractor%20test%26category=(&quot;Mathematics&quot;)&#x27; +
+          &#x27;%26language_code=(&quot;en&quot;%20OR%20&quot;ar&quot;)&#x27;;
+        expect(searchService.updateSearchFieldsBasedOnUrlQuery(
+          urlComponent, results)).toBe(
+          &#x27;protractor test&amp;category=(&quot;Mathematics&quot;)&#x27; +
+            &#x27;&amp;language_code=(&quot;en&quot; OR &quot;ar&quot;)&#x27;);
+        expect(results.languageCodes.selections).toEqual({});
+        expect(results.categories.selections).toEqual({});
+      }
+    );
+
+    it(&#x27;should only use correct fields when ampersand is not escaped anywhere&#x27;,
+      () =&gt; {
+        urlComponent = &#x27;?q=protractor&amp;test&amp;category=(&quot;Mathematics&quot;)&#x27; +
+          &#x27;&amp;language_code=(&quot;en&quot;%20OR%20&quot;ar&quot;)&#x27;;
+        expect(
+          searchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results)
+        ).toBe(&#x27;protractor&#x27;);
+        expect(results.languageCodes.selections).toEqual({
+          en: true,
+          ar: true
+        });
+        expect(results.categories.selections).toEqual({ Mathematics: true });
+      }
+    );
+
+    it(&#x27;should omit url component if it is malformed&#x27;,
+      () =&gt; {
+        // In the two cases below, language_code param is not wrapped in
+        // parentheses. However, the category param is defined correctly.
+        // updateSearchFieldsBasedOnUrlQuery is expected to clean language_code.
+        urlComponent = (
+          &#x27;?q=protractor%20test&amp;category=(&quot;Mathematics&quot;)&amp;&#x27; +
+          &#x27;language_code=&quot;en&quot; OR &quot;ar&quot;)&#x27;);
+        searchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
+        expect(results.languageCodes.selections).toEqual({});
+        expect(results.categories.selections).toEqual({
+          Mathematics: true
+        });
+
+        urlComponent = (
+          &#x27;?q=protractor%20test&amp;category=(&quot;Mathematics&quot;)&amp;&#x27; +
+          &#x27;language_code=&quot;en&quot; OR &quot;ar&quot;&#x27;);
+        searchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
+        expect(results.languageCodes.selections).toEqual({});
+        expect(results.categories.selections).toEqual({
+          Mathematics: true
+        });
+
+        // In this case, neither of the params are wrapped in parentheses.
+        // updateSearchFieldsBasedOnUrlQuery is expected to clean category and
+        // language_code.
+        urlComponent = (
+          &#x27;?q=protractor%20test&amp;category=&quot;Mathematics&quot;&amp;&#x27; +
+          &#x27;language_code=&quot;en&quot; OR &quot;ar&quot;&#x27;);
+        searchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
+        expect(results.languageCodes.selections).toEqual({});
+        expect(results.categories.selections).toEqual({});
+      }
+    );
+  });
+
+  describe(&#x27;getSearchUrlQueryString&#x27;, () =&gt; {
+    it(&#x27;should successfully get search url query string&#x27;, () =&gt; {
+      const searchQuery = &#x27;[&quot;1&quot;, &quot;2&quot;]&#x27;;
+      const categories: SelectionList = {
+        exploration: true,
+        feedback: true
+      };
+      const languageCodes: SelectionList = {
+        en: true,
+        hi: true
+      };
+
+      expect(searchService.getSearchUrlQueryString(
+        searchQuery, categories, languageCodes)).toBe(
+        &#x27;%5B%221%22%2C%20%222%22%5D&amp;category=(&quot;exploration&quot; OR &quot;feedback&quot;)&#x27; +
+        &#x27;&amp;language_code=(&quot;en&quot; OR &quot;hi&quot;)&#x27;);
+    });
+
+    it(&#x27;should successfully get search url query string when there is no&#x27; +
+      &#x27; category or language_code query params&#x27;, () =&gt; {
+      const searchQuery = &#x27;[&quot;1&quot;, &quot;2&quot;]&#x27;;
+      const categories = {};
+      const languageCodes = {};
+
+      expect(searchService.getSearchUrlQueryString(
+        searchQuery, categories, languageCodes)).toBe(
+        &#x27;%5B%221%22%2C%20%222%22%5D&#x27;);
+    });
+  });
+
+  describe(&#x27;executeSearchQuery&#x27;, () =&gt; {
+    let successHandler;
+    let errorHandler;
+    let searchQuery;
+    let categories;
+    let languageCodes;
+    let initialSearchResultsLoadedSpy;
+    let testSubscriptions: Subscription;
+    const SAMPLE_RESULTS = {
+      search_cursor: &#x27;notempty&#x27;,
+      activity_list: []
+    };
+    const SAMPLE_QUERY = &#x27;/searchhandler/data?q=example&amp;category=&#x27; +
+    &#x27;(&quot;exploration&quot;)&amp;language_code=(&quot;en&quot; OR &quot;hi&quot;)&#x27;;
+    beforeEach(() =&gt; {
+      successHandler = jasmine.createSpy(&#x27;success&#x27;);
+      errorHandler = jasmine.createSpy(&#x27;error&#x27;);
+      searchQuery = &#x27;example&#x27;;
+      categories = {
+        exploration: true
+      };
+      languageCodes = {
+        en: true,
+        hi: true
+      };
+      initialSearchResultsLoadedSpy = jasmine.createSpy(
+        &#x27;initialSearchResultsLoadedSpy&#x27;);
+      testSubscriptions = new Subscription();
+      testSubscriptions.add(
+        searchService.onInitialSearchResultsLoaded.subscribe(
+          initialSearchResultsLoadedSpy
+        ));
+      httpTestingController = TestBed.get(HttpTestingController);
+    });
+
+
+    afterEach(() =&gt; {
+      httpTestingController.verify();
+    });
+
+    it(&#x27;should successfully execute search query&#x27;, fakeAsync(() =&gt; {
+      searchService.executeSearchQuery(
+        searchQuery, categories, languageCodes, successHandler);
+      expect(searchService.isSearchInProgress()).toBe(true);
+      const req = httpTestingController.expectOne(SAMPLE_QUERY);
+      expect(req.request.method).toEqual(&#x27;GET&#x27;);
+      req.flush(SAMPLE_RESULTS);
+      flushMicrotasks();
+
+      expect(searchService.isSearchInProgress()).toBe(false);
+      expect(initialSearchResultsLoadedSpy).toHaveBeenCalled();
+      expect(successHandler).toHaveBeenCalled();
+    }));
+
+    it(&#x27;should use reject handler when fetching query url fails&#x27;,
+      fakeAsync(() =&gt; {
+        searchService.executeSearchQuery(
+          searchQuery, categories, languageCodes, successHandler, errorHandler);
+        expect(searchService.isSearchInProgress()).toBe(true);
+        const req = httpTestingController.expectOne(SAMPLE_QUERY);
+        expect(req.request.method).toEqual(&#x27;GET&#x27;);
+        req.error(new ErrorEvent(&#x27;network error&#x27;));
+        flushMicrotasks();
+
+        expect(searchService.isSearchInProgress()).toBe(false);
+        expect(errorHandler).toHaveBeenCalled();
+      }));
+
+    describe(&#x27;loadMoreData&#x27;, () =&gt; {
+      const MORE_DATA_REQUEST = &#x27;/searchhandler/data?q=example&amp;category=&#x27; +
+      &#x27;(&quot;exploration&quot;)&amp;language_code=(&quot;en&quot; OR &quot;hi&quot;)&amp;cursor=notempty&#x27;;
+      const MORE_DATA_RESPONSE = {
+        search_cursor: &#x27;newcursor&#x27;
+      };
+
+      it(&#x27;should successfully load more data&#x27;, fakeAsync(() =&gt; {
+        searchService.executeSearchQuery(
+          searchQuery, categories, languageCodes, successHandler, errorHandler);
+        const req = httpTestingController.expectOne(SAMPLE_QUERY);
+        expect(req.request.method).toEqual(&#x27;GET&#x27;);
+        req.flush(SAMPLE_RESULTS);
+        flushMicrotasks();
+
+        searchService.loadMoreData(successHandler, errorHandler);
+        const moreDataReq = httpTestingController.expectOne(MORE_DATA_REQUEST);
+        moreDataReq.flush(MORE_DATA_RESPONSE);
+        flushMicrotasks();
+
+        expect(successHandler).toHaveBeenCalledWith(MORE_DATA_RESPONSE, false);
+        expect(errorHandler).not.toHaveBeenCalled();
+      }));
+
+      it(&#x27;should not load more data when a new query is still being sent&#x27;,
+        fakeAsync(() =&gt; {
+          searchService.executeSearchQuery(
+            searchQuery, categories, languageCodes, successHandler);
+          const req = httpTestingController.expectOne(SAMPLE_QUERY);
+          expect(req.request.method).toEqual(&#x27;GET&#x27;);
+          req.flush(SAMPLE_RESULTS);
+          flushMicrotasks();
+
+          searchService.loadMoreData(() =&gt; { }, () =&gt; { });
+          searchService.loadMoreData(successHandler, errorHandler);
+          const moreDataReq = httpTestingController.expectOne(
+            MORE_DATA_REQUEST);
+          moreDataReq.flush(MORE_DATA_RESPONSE);
+          flushMicrotasks();
+          expect(errorHandler).toHaveBeenCalledWith(false);
+        }));
+
+      it(&#x27;should not load more data when the end of page has been reached&#x27;,
+        fakeAsync(() =&gt; {
+          searchService.executeSearchQuery(
+            searchQuery, categories, languageCodes, successHandler);
+          const req = httpTestingController.expectOne(SAMPLE_QUERY);
+          expect(req.request.method).toEqual(&#x27;GET&#x27;);
+          req.flush(SAMPLE_RESULTS);
+          flushMicrotasks();
+
+          searchService.loadMoreData(() =&gt; { }, () =&gt; { });
+          const moreDataReq = httpTestingController.expectOne(
+            SAMPLE_QUERY + &#x27;&amp;cursor=notempty&#x27;);
+          moreDataReq.flush({search_cursor: null});
+          flushMicrotasks();
+          searchService.loadMoreData(successHandler, errorHandler);
+
+          expect(errorHandler).toHaveBeenCalledWith(true);
+        }));
+    });
+  });
+
+  it(&#x27;should fetch searchBarLoaded EventEmitter&#x27;, () =&gt; {
+    let searchBarLoadedEmitter = new EventEmitter();
+    expect(searchService.onSearchBarLoaded).toEqual(searchBarLoadedEmitter);
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/services/search.service.spec.ts&quot;,&quot;line&quot;:40,&quot;character&quot;:8,&quot;text&quot;:&quot;urlComponent&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/search.service.spec.ts&quot;,&quot;line&quot;:64,&quot;character&quot;:6,&quot;text&quot;:&quot;urlComponent&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/search.service.spec.ts&quot;,&quot;line&quot;:79,&quot;character&quot;:8,&quot;text&quot;:&quot;urlComponent&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/search.service.spec.ts&quot;,&quot;line&quot;:94,&quot;character&quot;:8,&quot;text&quot;:&quot;urlComponent&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/search.service.spec.ts&quot;,&quot;line&quot;:108,&quot;character&quot;:8,&quot;text&quot;:&quot;urlComponent&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/search.service.spec.ts&quot;,&quot;line&quot;:120,&quot;character&quot;:8,&quot;text&quot;:&quot;urlComponent&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/search.service.spec.ts&quot;,&quot;line&quot;:132,&quot;character&quot;:8,&quot;text&quot;:&quot;urlComponent&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/search.service.spec.ts&quot;,&quot;line&quot;:145,&quot;character&quot;:8,&quot;text&quot;:&quot;urlComponent&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/search.service.spec.ts&quot;,&quot;line&quot;:163,&quot;character&quot;:8,&quot;text&quot;:&quot;urlComponent&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/search.service.spec.ts&quot;,&quot;line&quot;:172,&quot;character&quot;:8,&quot;text&quot;:&quot;urlComponent&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/search.service.spec.ts&quot;,&quot;line&quot;:184,&quot;character&quot;:8,&quot;text&quot;:&quot;urlComponent&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/search.service.spec.ts&quot;,&quot;line&quot;:225,&quot;character&quot;:8,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/search.service.spec.ts&quot;,&quot;line&quot;:226,&quot;character&quot;:8,&quot;text&quot;:&quot;errorHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/search.service.spec.ts&quot;,&quot;line&quot;:227,&quot;character&quot;:8,&quot;text&quot;:&quot;searchQuery&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/search.service.spec.ts&quot;,&quot;line&quot;:228,&quot;character&quot;:8,&quot;text&quot;:&quot;categories&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/search.service.spec.ts&quot;,&quot;line&quot;:229,&quot;character&quot;:8,&quot;text&quot;:&quot;languageCodes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/search.service.spec.ts&quot;,&quot;line&quot;:230,&quot;character&quot;:8,&quot;text&quot;:&quot;initialSearchResultsLoadedSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/search.service.spec.ts&quot;,&quot;line&quot;:239,&quot;character&quot;:6,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/search.service.spec.ts&quot;,&quot;line&quot;:240,&quot;character&quot;:6,&quot;text&quot;:&quot;errorHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/search.service.spec.ts&quot;,&quot;line&quot;:241,&quot;character&quot;:6,&quot;text&quot;:&quot;searchQuery&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/search.service.spec.ts&quot;,&quot;line&quot;:242,&quot;character&quot;:6,&quot;text&quot;:&quot;categories&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/search.service.spec.ts&quot;,&quot;line&quot;:245,&quot;character&quot;:6,&quot;text&quot;:&quot;languageCodes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/search.service.spec.ts&quot;,&quot;line&quot;:249,&quot;character&quot;:6,&quot;text&quot;:&quot;initialSearchResultsLoadedSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/search.service.spec.ts&quot;,&quot;line&quot;:254,&quot;character&quot;:10,&quot;text&quot;:&quot;initialSearchResultsLoadedSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/search.service.spec.ts&quot;,&quot;line&quot;:269,&quot;character&quot;:17,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/services/search.service.spec.ts&quot;,&quot;line&quot;:274,&quot;character&quot;:13,&quot;text&quot;:&quot;initialSearchResultsLoadedSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/search.service.spec.ts&quot;,&quot;line&quot;:275,&quot;character&quot;:13,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/search.service.spec.ts&quot;,&quot;line&quot;:284,&quot;character&quot;:19,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/services/search.service.spec.ts&quot;,&quot;line&quot;:289,&quot;character&quot;:15,&quot;text&quot;:&quot;errorHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/search.service.spec.ts&quot;,&quot;line&quot;:303,&quot;character&quot;:19,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/services/search.service.spec.ts&quot;,&quot;line&quot;:312,&quot;character&quot;:15,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/search.service.spec.ts&quot;,&quot;line&quot;:313,&quot;character&quot;:15,&quot;text&quot;:&quot;errorHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/search.service.spec.ts&quot;,&quot;line&quot;:313,&quot;character&quot;:29,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/services/search.service.spec.ts&quot;,&quot;line&quot;:321,&quot;character&quot;:21,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/services/search.service.spec.ts&quot;,&quot;line&quot;:331,&quot;character&quot;:17,&quot;text&quot;:&quot;errorHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/search.service.spec.ts&quot;,&quot;line&quot;:339,&quot;character&quot;:21,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/services/search.service.spec.ts&quot;,&quot;line&quot;:350,&quot;character&quot;:17,&quot;text&quot;:&quot;errorHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/search.service.spec.ts&quot;,&quot;line&quot;:356,&quot;character&quot;:8,&quot;text&quot;:&quot;searchBarLoadedEmitter&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/services/search.service.spec.ts&quot;,&quot;line&quot;:357,&quot;character&quot;:52,&quot;text&quot;:&quot;searchBarLoadedEmitter&quot;,&quot;kind&quot;:2}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:56 GMT</p>
+    </body>
+  </html>
+  

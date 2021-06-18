@@ -1,0 +1,189 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>app.constants.ajs.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">core/templates/app.constants.ajs.ts</td><td class="">100.00%</td><td class="">100%</td><td class="">245</td><td class="">245</td><td class="">0</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2019 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Shared constants for the Oppia module.
+ */
+
+// TODO(#7092): Delete this file once migration is complete and these AngularJS
+// equivalents of the Angular constants are no longer needed.
+import { AppConstants } from &#x27;app.constants&#x27;;
+
+import constants from &#x27;assets/constants&#x27;;
+
+for (var constantName in constants) {
+  angular.module(&#x27;oppia&#x27;).constant(constantName, constants[constantName]);
+}
+
+// Translations of strings that are loaded in the front page. They are listed
+// here to be loaded synchronously with the script to prevent a FOUC or
+// Flash of Untranslated Content.
+// See http://angular-translate.github.io/docs/#/guide/12_asynchronous-loading
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;DEFAULT_TRANSLATIONS&#x27;, AppConstants.DEFAULT_TRANSLATIONS);
+
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;RULE_SUMMARY_WRAP_CHARACTER_COUNT&#x27;,
+  AppConstants.RULE_SUMMARY_WRAP_CHARACTER_COUNT);
+
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE&#x27;,
+  AppConstants.EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE);
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;EDITABLE_EXPLORATION_DATA_URL_TEMPLATE&#x27;,
+  AppConstants.EDITABLE_EXPLORATION_DATA_URL_TEMPLATE);
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;EXPLORATION_DATA_URL_TEMPLATE&#x27;,
+  AppConstants.EXPLORATION_DATA_URL_TEMPLATE);
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;EXPLORATION_VERSION_DATA_URL_TEMPLATE&#x27;,
+  AppConstants.EXPLORATION_VERSION_DATA_URL_TEMPLATE);
+
+angular.module(&#x27;oppia&#x27;).constant(&#x27;WARNING_TYPES&#x27;, AppConstants.WARNING_TYPES);
+
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;STATE_ERROR_MESSAGES&#x27;, AppConstants.STATE_ERROR_MESSAGES);
+
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;CHECKPOINT_ERROR_MESSAGES&#x27;, AppConstants.CHECKPOINT_ERROR_MESSAGES);
+
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;EXPLORATION_SUMMARY_DATA_URL_TEMPLATE&#x27;,
+  AppConstants.EXPLORATION_SUMMARY_DATA_URL_TEMPLATE);
+
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;EXPLORATION_AND_SKILL_ID_PATTERN&#x27;,
+  AppConstants.EXPLORATION_AND_SKILL_ID_PATTERN);
+
+// We use a slash because this character is forbidden in a state name.
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;PLACEHOLDER_OUTCOME_DEST&#x27;, AppConstants.PLACEHOLDER_OUTCOME_DEST);
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;INTERACTION_DISPLAY_MODE_INLINE&#x27;,
+  AppConstants.INTERACTION_DISPLAY_MODE_INLINE);
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;LOADING_INDICATOR_URL&#x27;, AppConstants.LOADING_INDICATOR_URL);
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;OBJECT_EDITOR_URL_PREFIX&#x27;, AppConstants.OBJECT_EDITOR_URL_PREFIX);
+// Feature still in development.
+// NOTE TO DEVELOPERS: This should be synchronized with the value in feconf.
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;ENABLE_ML_CLASSIFIERS&#x27;, AppConstants.ENABLE_ML_CLASSIFIERS);
+// Feature still in development.
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION&#x27;,
+  AppConstants.INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION);
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;PARAMETER_TYPES&#x27;, AppConstants.PARAMETER_TYPES);
+
+// The maximum number of nodes to show in a row of the state graph.
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;MAX_NODES_PER_ROW&#x27;, AppConstants.MAX_NODES_PER_ROW);
+// The following variable must be at least 3. It represents the maximum length,
+// in characters, for the name of each node label in the state graph.
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;MAX_NODE_LABEL_LENGTH&#x27;, AppConstants.MAX_NODE_LABEL_LENGTH);
+
+// If an $http request fails with the following error codes, a warning is
+// displayed.
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;FATAL_ERROR_CODES&#x27;, AppConstants.FATAL_ERROR_CODES);
+
+// Do not modify these, for backwards-compatibility reasons.
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;COMPONENT_NAME_CONTENT&#x27;, AppConstants.COMPONENT_NAME_CONTENT);
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;COMPONENT_NAME_FEEDBACK&#x27;, AppConstants.COMPONENT_NAME_FEEDBACK);
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;COMPONENT_NAME_HINT&#x27;, AppConstants.COMPONENT_NAME_HINT);
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;COMPONENT_NAME_INTERACTION_CUSTOMIZATION_ARGS&#x27;,
+  AppConstants.COMPONENT_NAME_INTERACTION_CUSTOMIZATION_ARGS);
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;COMPONENT_NAME_RULE_INPUT&#x27;, AppConstants.COMPONENT_NAME_RULE_INPUT);
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;COMPONENT_NAME_SOLUTION&#x27;, AppConstants.COMPONENT_NAME_SOLUTION);
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;COMPONENT_NAME_EXPLANATION&#x27;, AppConstants.COMPONENT_NAME_EXPLANATION);
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;COMPONENT_NAME_WORKED_EXAMPLE&#x27;, AppConstants.COMPONENT_NAME_WORKED_EXAMPLE);
+
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;ACTION_TYPE_EXPLORATION_START&#x27;, AppConstants.ACTION_TYPE_EXPLORATION_START);
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;ACTION_TYPE_ANSWER_SUBMIT&#x27;, AppConstants.ACTION_TYPE_ANSWER_SUBMIT);
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;ACTION_TYPE_EXPLORATION_QUIT&#x27;, AppConstants.ACTION_TYPE_EXPLORATION_QUIT);
+
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;ISSUE_TYPE_EARLY_QUIT&#x27;, AppConstants.ISSUE_TYPE_EARLY_QUIT);
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS&#x27;,
+  AppConstants.ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS);
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS&#x27;,
+  AppConstants.ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS);
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;MAX_UNRELATED_ACTIONS_PER_BLOCK&#x27;,
+  AppConstants.MAX_UNRELATED_ACTIONS_PER_BLOCK);
+angular.module(&#x27;oppia&#x27;).constant(&#x27;SITE_NAME&#x27;, AppConstants.SITE_NAME);
+
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;DEFAULT_PROFILE_IMAGE_PATH&#x27;, AppConstants.DEFAULT_PROFILE_IMAGE_PATH);
+
+angular.module(&#x27;oppia&#x27;).constant(&#x27;LOGOUT_URL&#x27;, AppConstants.LOGOUT_URL);
+
+// TODO(vojtechjelinek): Move these to separate file later, after we establish
+// process to follow for Angular constants (#6731).
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE&#x27;,
+  AppConstants.SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE);
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;EDITABLE_TOPIC_DATA_URL_TEMPLATE&#x27;,
+  AppConstants.EDITABLE_TOPIC_DATA_URL_TEMPLATE);
+
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;LABEL_FOR_CLEARING_FOCUS&#x27;, AppConstants.LABEL_FOR_CLEARING_FOCUS);
+
+// TODO(bhenning): This constant should be provided by the backend.
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;COLLECTION_DATA_URL_TEMPLATE&#x27;, AppConstants.COLLECTION_DATA_URL_TEMPLATE);
+
+angular.module(&#x27;oppia&#x27;).constant(&#x27;ENTITY_TYPE&#x27;, AppConstants.ENTITY_TYPE);
+
+angular.module(&#x27;oppia&#x27;).constant(&#x27;IMAGE_CONTEXT&#x27;, AppConstants.IMAGE_CONTEXT);
+
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;IMAGE_SAVE_DESTINATION_SERVER&#x27;, AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;IMAGE_SAVE_DESTINATION_LOCAL_STORAGE&#x27;,
+  AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
+</textarea><pre id="annotations" style="display:none">[]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:55 GMT</p>
+    </body>
+  </html>
+  

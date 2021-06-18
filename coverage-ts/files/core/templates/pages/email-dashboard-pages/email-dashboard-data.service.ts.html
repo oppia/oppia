@@ -1,0 +1,138 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>email-dashboard-data.service.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">core/templates/pages/email-dashboard-pages/email-dashboard-data.service.ts</td><td class="">100.00%</td><td class="">100%</td><td class="">186</td><td class="">186</td><td class="">0</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2016 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Services for oppia email dashboard page.
+ */
+
+import { downgradeInjectable } from &#x27;@angular/upgrade/static&#x27;;
+import { Injectable } from &#x27;@angular/core&#x27;;
+
+import { QueryData, EmailDashboardBackendApiService } from
+  &#x27;domain/email-dashboard/email-dashboard-backend-api.service&#x27;;
+import { EmailDashboardQuery } from
+  &#x27;domain/email-dashboard/email-dashboard-query.model&#x27;;
+
+@Injectable({
+  providedIn: &#x27;root&#x27;
+})
+export class EmailDashboardDataService {
+  // No. of query results to display on a single page.
+  QUERIES_PER_PAGE: number = 10;
+  // Store latest cursor value for fetching next query page.
+  latestCursor: string = null;
+  // Array containing all fetched queries.
+  queries: EmailDashboardQuery[] = [];
+  // Index of currently-shown page of query results.
+  currentPageIndex: number = -1;
+
+  constructor(
+    private emailDashboardBackendApiService: EmailDashboardBackendApiService
+  ) {}
+
+  getQueries(): EmailDashboardQuery[] {
+    return this.queries;
+  }
+
+  getCurrentPageIndex(): number {
+    return this.currentPageIndex;
+  }
+
+  getLatestCursor(): string {
+    return this.latestCursor;
+  }
+
+  async submitQueryAsync(data: QueryData): Promise&lt;EmailDashboardQuery[]&gt; {
+    var startQueryIndex = this.currentPageIndex * this.QUERIES_PER_PAGE;
+    var endQueryIndex = (this.currentPageIndex + 1) * this.QUERIES_PER_PAGE;
+
+    return this.emailDashboardBackendApiService.submitQueryAsync(
+      data).then(query =&gt; {
+      var newQueries = [query];
+      this.queries = newQueries.concat(this.queries);
+      return this.queries.slice(startQueryIndex, endQueryIndex);
+    });
+  }
+
+  async getNextQueriesAsync(): Promise&lt;EmailDashboardQuery[]&gt; {
+    var startQueryIndex = (this.currentPageIndex + 1) * this.QUERIES_PER_PAGE;
+    var endQueryIndex = (this.currentPageIndex + 2) * this.QUERIES_PER_PAGE;
+
+    if (this.queries.length &gt;= endQueryIndex ||
+        (this.latestCursor === null &amp;&amp; this.currentPageIndex !== -1)) {
+      this.currentPageIndex = this.currentPageIndex + 1;
+      return new Promise((resolver) =&gt; {
+        resolver(this.queries.slice(startQueryIndex, endQueryIndex));
+      });
+    } else {
+      this.currentPageIndex = this.currentPageIndex + 1;
+      return this.emailDashboardBackendApiService.fetchQueriesPageAsync(
+        this.QUERIES_PER_PAGE, this.latestCursor).then(data =&gt; {
+        this.queries = this.queries.concat(data.recentQueries);
+        this.latestCursor = data.cursor;
+        return this.queries.slice(startQueryIndex, endQueryIndex);
+      });
+    }
+  }
+
+  getPreviousQueries(): EmailDashboardQuery[] {
+    var startQueryIndex = (this.currentPageIndex - 1) * this.QUERIES_PER_PAGE;
+    var endQueryIndex = this.currentPageIndex * this.QUERIES_PER_PAGE;
+    this.currentPageIndex = this.currentPageIndex - 1;
+    return this.queries.slice(startQueryIndex, endQueryIndex);
+  }
+
+  isNextPageAvailable(): boolean {
+    var nextQueryIndex = (this.currentPageIndex + 1) * this.QUERIES_PER_PAGE;
+    return (this.queries.length &gt; nextQueryIndex) || Boolean(this.latestCursor);
+  }
+
+  isPreviousPageAvailable(): boolean {
+    return (this.currentPageIndex &gt; 0);
+  }
+
+  async fetchQueryAsync(queryId: string): Promise&lt;EmailDashboardQuery&gt; {
+    return this.emailDashboardBackendApiService.fetchQueryAsync(queryId)
+      .then(newQuery =&gt; {
+        this.queries.forEach(function(query, index, queries) {
+          if (query.id === queryId) {
+            queries[index] = newQuery;
+          }
+        });
+        return newQuery;
+      });
+  }
+}
+
+angular.module(&#x27;oppia&#x27;).factory(
+  &#x27;EmailDashboardDataService&#x27;,
+  downgradeInjectable(EmailDashboardDataService));
+</textarea><pre id="annotations" style="display:none">[]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:55 GMT</p>
+    </body>
+  </html>
+  

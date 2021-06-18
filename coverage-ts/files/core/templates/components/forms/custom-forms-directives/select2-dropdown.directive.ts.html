@@ -1,0 +1,139 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>select2-dropdown.directive.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts</td><td class="">33.83%</td><td class="">100%</td><td class="">133</td><td class="">45</td><td class="">88</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2014 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Directive for the select2 autocomplete component.
+ */
+
+require(&#x27;domain/utilities/url-interpolation.service.ts&#x27;);
+require(&#x27;third-party-imports/select2.import.ts&#x27;);
+
+angular.module(&#x27;oppia&#x27;).directive(&#x27;select2Dropdown&#x27;, [
+  &#x27;UrlInterpolationService&#x27;, function(UrlInterpolationService) {
+    // Directive for incorporating select2 dropdowns.
+    return {
+      restrict: &#x27;E&#x27;,
+      scope: {
+        // Whether to allow multiple choices. In order to do so, the value of
+        // this attribute must be the exact string &#x27;true&#x27;.
+        allowMultipleChoices: &#x27;@&#x27;,
+        choices: &#x27;=&#x27;,
+        // An additional CSS class to add to the select2 dropdown. May be
+        // undefined.
+        dropdownCssClass: &#x27;@&#x27;,
+        // A function that formats a new selection. May be undefined.
+        formatNewSelection: &#x27;=&#x27;,
+        // The message shown when an invalid search term is entered. May be
+        // undefined, in which case this defaults to &#x27;No matches found&#x27;.
+        invalidSearchTermMessage: &#x27;@&#x27;,
+        item: &#x27;=&#x27;,
+        // The regex used to validate newly-entered choices that do not
+        // already exist. If it is undefined then all new choices are rejected.
+        newChoiceRegex: &#x27;@&#x27;,
+        onSelectionChange: &#x27;&amp;&#x27;,
+        placeholder: &#x27;@&#x27;,
+        width: &#x27;@&#x27;
+      },
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        &#x27;/components/forms/custom-forms-directives/&#x27; +
+        &#x27;select2-dropdown.directive.html&#x27;),
+      controller: [&#x27;$element&#x27;, &#x27;$scope&#x27;, function($element, $scope) {
+        var ctrl = this;
+        ctrl.$onInit = function() {
+          $scope.newChoiceValidator = new RegExp($scope.newChoiceRegex);
+
+          var select2Options = {
+            allowClear: false,
+            data: $scope.choices,
+            multiple: $scope.allowMultipleChoices === &#x27;true&#x27;,
+            tags: $scope.newChoiceRegex !== undefined,
+            placeholder: $scope.placeholder,
+            width: $scope.width || &#x27;250px&#x27;,
+            dropdownCssClass: null,
+            createTag: function(params) {
+              return params.term.match($scope.newChoiceValidator) ? {
+                id: params.term,
+                text: params.term
+              } : null;
+            },
+            templateResult: function(queryResult) {
+              var doesChoiceMatchText = function(choice) {
+                return choice.id === queryResult.text;
+              };
+
+              if ($scope.choices &amp;&amp; $scope.choices.some(doesChoiceMatchText)) {
+                return queryResult.text;
+              } else {
+                if ($scope.formatNewSelection) {
+                  return $scope.formatNewSelection(queryResult.text);
+                } else {
+                  return queryResult.text;
+                }
+              }
+            },
+            language: {
+              noResults: function() {
+                if ($scope.invalidSearchTermMessage) {
+                  return $scope.invalidSearchTermMessage;
+                } else {
+                  return &#x27;No matches found&#x27;;
+                }
+              }
+            }
+          };
+
+          if ($scope.dropdownCssClass) {
+            select2Options.dropdownCssClass = $scope.dropdownCssClass;
+          }
+
+          var select2Node = $element[0].firstChild;
+
+          // Initialize the dropdown.
+          $(select2Node).select2(select2Options);
+          $(select2Node).val($scope.item).trigger(&#x27;change&#x27;);
+
+          // Update $scope.item when the selection changes.
+          $(select2Node).on(&#x27;change&#x27;, function() {
+            $scope.item = $(select2Node).val();
+            $scope.$apply();
+            $scope.onSelectionChange();
+          });
+
+          // Respond to external changes in $scope.item.
+          $scope.$watch(&#x27;item&#x27;, function(newValue) {
+            $(select2Node).val(newValue);
+          });
+        };
+      }]
+    };
+  }
+]);
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:22,&quot;character&quot;:38,&quot;text&quot;:&quot;UrlInterpolationService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:47,&quot;character&quot;:19,&quot;text&quot;:&quot;UrlInterpolationService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:47,&quot;character&quot;:43,&quot;text&quot;:&quot;getDirectiveTemplateUrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:50,&quot;character&quot;:50,&quot;text&quot;:&quot;$element&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:50,&quot;character&quot;:60,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:51,&quot;character&quot;:12,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:51,&quot;character&quot;:19,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:52,&quot;character&quot;:8,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:52,&quot;character&quot;:13,&quot;text&quot;:&quot;$onInit&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:53,&quot;character&quot;:10,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:53,&quot;character&quot;:17,&quot;text&quot;:&quot;newChoiceValidator&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:53,&quot;character&quot;:49,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:53,&quot;character&quot;:56,&quot;text&quot;:&quot;newChoiceRegex&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:57,&quot;character&quot;:12,&quot;text&quot;:&quot;data&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:57,&quot;character&quot;:18,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:57,&quot;character&quot;:25,&quot;text&quot;:&quot;choices&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:58,&quot;character&quot;:22,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:58,&quot;character&quot;:29,&quot;text&quot;:&quot;allowMultipleChoices&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:59,&quot;character&quot;:18,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:59,&quot;character&quot;:25,&quot;text&quot;:&quot;newChoiceRegex&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:60,&quot;character&quot;:12,&quot;text&quot;:&quot;placeholder&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:60,&quot;character&quot;:25,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:60,&quot;character&quot;:32,&quot;text&quot;:&quot;placeholder&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:61,&quot;character&quot;:12,&quot;text&quot;:&quot;width&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:61,&quot;character&quot;:19,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:61,&quot;character&quot;:26,&quot;text&quot;:&quot;width&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:63,&quot;character&quot;:32,&quot;text&quot;:&quot;params&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:64,&quot;character&quot;:21,&quot;text&quot;:&quot;params&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:64,&quot;character&quot;:28,&quot;text&quot;:&quot;term&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:64,&quot;character&quot;:33,&quot;text&quot;:&quot;match&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:64,&quot;character&quot;:39,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:64,&quot;character&quot;:46,&quot;text&quot;:&quot;newChoiceValidator&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:65,&quot;character&quot;:16,&quot;text&quot;:&quot;id&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:65,&quot;character&quot;:20,&quot;text&quot;:&quot;params&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:65,&quot;character&quot;:27,&quot;text&quot;:&quot;term&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:66,&quot;character&quot;:16,&quot;text&quot;:&quot;text&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:66,&quot;character&quot;:22,&quot;text&quot;:&quot;params&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:66,&quot;character&quot;:29,&quot;text&quot;:&quot;term&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:69,&quot;character&quot;:37,&quot;text&quot;:&quot;queryResult&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:70,&quot;character&quot;:49,&quot;text&quot;:&quot;choice&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:71,&quot;character&quot;:23,&quot;text&quot;:&quot;choice&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:71,&quot;character&quot;:30,&quot;text&quot;:&quot;id&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:71,&quot;character&quot;:37,&quot;text&quot;:&quot;queryResult&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:71,&quot;character&quot;:49,&quot;text&quot;:&quot;text&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:74,&quot;character&quot;:18,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:74,&quot;character&quot;:25,&quot;text&quot;:&quot;choices&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:74,&quot;character&quot;:36,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:74,&quot;character&quot;:43,&quot;text&quot;:&quot;choices&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:74,&quot;character&quot;:51,&quot;text&quot;:&quot;some&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:75,&quot;character&quot;:23,&quot;text&quot;:&quot;queryResult&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:75,&quot;character&quot;:35,&quot;text&quot;:&quot;text&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:77,&quot;character&quot;:20,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:77,&quot;character&quot;:27,&quot;text&quot;:&quot;formatNewSelection&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:78,&quot;character&quot;:25,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:78,&quot;character&quot;:32,&quot;text&quot;:&quot;formatNewSelection&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:78,&quot;character&quot;:51,&quot;text&quot;:&quot;queryResult&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:78,&quot;character&quot;:63,&quot;text&quot;:&quot;text&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:80,&quot;character&quot;:25,&quot;text&quot;:&quot;queryResult&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:80,&quot;character&quot;:37,&quot;text&quot;:&quot;text&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:86,&quot;character&quot;:20,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:86,&quot;character&quot;:27,&quot;text&quot;:&quot;invalidSearchTermMessage&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:87,&quot;character&quot;:25,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:87,&quot;character&quot;:32,&quot;text&quot;:&quot;invalidSearchTermMessage&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:95,&quot;character&quot;:14,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:95,&quot;character&quot;:21,&quot;text&quot;:&quot;dropdownCssClass&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:96,&quot;character&quot;:27,&quot;text&quot;:&quot;dropdownCssClass&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:96,&quot;character&quot;:46,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:96,&quot;character&quot;:53,&quot;text&quot;:&quot;dropdownCssClass&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:99,&quot;character&quot;:14,&quot;text&quot;:&quot;select2Node&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:99,&quot;character&quot;:28,&quot;text&quot;:&quot;$element&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:99,&quot;character&quot;:40,&quot;text&quot;:&quot;firstChild&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:102,&quot;character&quot;:12,&quot;text&quot;:&quot;select2Node&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:102,&quot;character&quot;:25,&quot;text&quot;:&quot;select2&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:103,&quot;character&quot;:12,&quot;text&quot;:&quot;select2Node&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:103,&quot;character&quot;:29,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:103,&quot;character&quot;:36,&quot;text&quot;:&quot;item&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:106,&quot;character&quot;:12,&quot;text&quot;:&quot;select2Node&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:107,&quot;character&quot;:12,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:107,&quot;character&quot;:19,&quot;text&quot;:&quot;item&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:107,&quot;character&quot;:28,&quot;text&quot;:&quot;select2Node&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:108,&quot;character&quot;:12,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:108,&quot;character&quot;:19,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:109,&quot;character&quot;:12,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:109,&quot;character&quot;:19,&quot;text&quot;:&quot;onSelectionChange&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:113,&quot;character&quot;:10,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:113,&quot;character&quot;:17,&quot;text&quot;:&quot;$watch&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:113,&quot;character&quot;:41,&quot;text&quot;:&quot;newValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/forms/custom-forms-directives/select2-dropdown.directive.ts&quot;,&quot;line&quot;:114,&quot;character&quot;:14,&quot;text&quot;:&quot;select2Node&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:58 GMT</p>
+    </body>
+  </html>
+  

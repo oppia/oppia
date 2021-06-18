@@ -1,0 +1,313 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>oppia-interactive-code-repl.component.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.ts</td><td class="">88.63%</td><td class="">100%</td><td class="">387</td><td class="">343</td><td class="">44</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2014 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Directive for the CodeRepl interaction.
+ *
+ * IMPORTANT NOTE: The naming convention for customization args that are passed
+ * into the directive is: the name of the parameter, followed by &#x27;With&#x27;,
+ * followed by the name of the arg.
+ */
+
+import { AfterViewInit, ChangeDetectorRef, Component, Input, OnDestroy, OnInit, ViewChild } from &#x27;@angular/core&#x27;;
+import { downgradeComponent } from &#x27;@angular/upgrade/static&#x27;;
+
+import { CodemirrorComponent } from &#x27;@ctrl/ngx-codemirror&#x27;;
+import { Subscription } from &#x27;rxjs&#x27;;
+
+import { CodeReplCustomizationArgs } from &#x27;interactions/customization-args-defs&#x27;;
+import { InteractionAttributesExtractorService } from &#x27;interactions/interaction-attributes-extractor.service&#x27;;
+import { CurrentInteractionService, InteractionRulesService } from &#x27;pages/exploration-player-page/services/current-interaction.service&#x27;;
+import { PlayerPositionService } from &#x27;pages/exploration-player-page/services/player-position.service&#x27;;
+import { CodeReplRulesService } from &#x27;./code-repl-rules.service&#x27;;
+
+@Component({
+  selector: &#x27;oppia-interactive-code-repl&#x27;,
+  templateUrl: &#x27;./code-repl-interaction.component.html&#x27;,
+  styleUrls: []
+})
+export class InteractiveCodeReplComponent implements
+    OnInit, AfterViewInit, OnDestroy {
+  @Input() lastAnswer;
+  @Input() languageWithValue;
+  @Input() placeholderWithValue;
+  @Input() preCodeWithValue;
+  @Input() postCodeWithValue;
+  @ViewChild(CodemirrorComponent) codeMirrorComponent: CodemirrorComponent;
+  componentSubscriptions = new Subscription();
+  hasLoaded: boolean = true;
+  code: string;
+  evaluation: string;
+  fullError: string;
+  output: string;
+  interactionIsActive: boolean;
+  language: string;
+  placeholder: string;
+  preCode: string;
+  postCode: string;
+
+  editorOptions = {
+    lineNumbers: true,
+    indentWithTabs: true,
+    indentUnit: 4,
+    mode: &#x27;python&#x27;,
+    extraKeys: {
+      Tab: (cm: CodeMirror.Editor): void =&gt; {
+        var spaces = Array(cm.getOption(&#x27;indentUnit&#x27;) + 1).join(&#x27; &#x27;);
+        cm.replaceSelection(spaces);
+        // Move the cursor to the end of the selection.
+        var endSelectionPos = cm.getDoc().getCursor(&#x27;head&#x27;);
+        cm.getDoc().setCursor(endSelectionPos);
+      }
+    },
+    theme: &#x27;preview default&#x27;
+  };
+
+  constructor(
+    private changeDetectionRef: ChangeDetectorRef,
+    private currentInteractionService: CurrentInteractionService,
+    private codeReplRulesService: CodeReplRulesService,
+    private interactionAttributesExtractorService:
+      InteractionAttributesExtractorService,
+    private playerPositionService: PlayerPositionService
+  ) { }
+
+  ngOnInit(): void {
+    this.componentSubscriptions.add(
+      this.playerPositionService.onNewCardAvailable.subscribe(
+        () =&gt; this.interactionIsActive = false
+      )
+    );
+    const {
+      language,
+      placeholder,
+      preCode,
+      postCode
+    } = this.interactionAttributesExtractorService.getValuesFromAttributes(
+      &#x27;CodeRepl&#x27;,
+      {
+        languageWithValue: this.languageWithValue,
+        placeholderWithValue: this.placeholderWithValue,
+        preCodeWithValue: this.preCodeWithValue,
+        postCodeWithValue: this.postCodeWithValue,
+      }
+    ) as CodeReplCustomizationArgs;
+
+    this.interactionIsActive = (this.lastAnswer === null);
+    this.language = language.value;
+    this.placeholder = placeholder.value;
+    this.preCode = preCode.value;
+    this.postCode = postCode.value;
+
+    // Make sure this.preCode ends with a newline.
+    if (this.preCode.trim().length === 0) {
+      this.preCode = &#x27;&#x27;;
+    } else if (this.preCode.slice(-1) !== &#x27;\n&#x27;) {
+      this.preCode += &#x27;\n&#x27;;
+    }
+
+    // Make sure this.placeholder ends with a newline.
+    if (this.placeholder.slice(-1) !== &#x27;\n&#x27;) {
+      this.placeholder += &#x27;\n&#x27;;
+    }
+
+    this.hasLoaded = false;
+
+    // Keep the code string given by the user and the stdout from the
+    // evaluation until sending them back to the server.
+    if (this.interactionIsActive) {
+      this.code = (
+        this.preCode + this.placeholder + this.postCode);
+      this.output = &#x27;&#x27;;
+    } else {
+      this.code = this.lastAnswer.code;
+      this.output = this.lastAnswer.output;
+    }
+
+    // Configure Skulpt.
+    Sk.configure({
+      output: (out) =&gt; {
+        // This output function is called continuously throughout the
+        // runtime of the script.
+        this.output += out;
+      },
+      read: (name) =&gt; {
+        // This function is called when a builtin module is imported.
+        if (Sk.builtinFiles.files[name] === undefined) {
+          // If corresponding module is not present then,
+          // removal of this block also results in failure of import.
+          throw new Error(&#x27;module &#x27; + name + &#x27; not found&#x27;);
+        }
+        return Sk.builtinFiles.files[name];
+      },
+      timeoutMsg: () =&gt; {
+        this.sendResponse(&#x27;&#x27;, &#x27;timeout&#x27;);
+      },
+      execLimit: 10000
+    });
+
+    this.currentInteractionService.registerCurrentInteraction(
+      () =&gt; this.submitAnswer(), null);
+  }
+
+  ngAfterViewInit(): void {
+    const runAfterTimeout = () =&gt; {
+      this.initMarkers(this.codeMirrorComponent.codeMirror);
+      this.hasLoaded = true;
+      this.changeDetectionRef.detectChanges();
+    };
+    setTimeout(() =&gt; {
+      runAfterTimeout();
+    }, 0);
+  }
+
+  runAndSubmitCode(codeInput: string): void {
+    this.runCode(codeInput, (evaluation, err) =&gt; {
+      this.sendResponse(evaluation, err);
+    });
+  }
+  private submitAnswer() {
+    this.runAndSubmitCode(this.code);
+  }
+
+  onEditorChange(code: string): void {
+    this.code = code;
+  }
+
+  runCode(
+      codeInput: string,
+      onFinishRunCallback: (x: string, error: string) =&gt; void
+  ): void {
+    this.code = codeInput;
+    this.output = &#x27;&#x27;;
+
+    // Evaluate the program asynchronously using Skulpt.
+    Sk.misceval.asyncToPromise(() =&gt; {
+      Sk.importMainWithBody(&#x27;&lt;stdin&gt;&#x27;, false, codeInput, true);
+    }).then(() =&gt; {
+      // Finished evaluating.
+      this.evaluation = &#x27;&#x27;;
+      this.fullError = &#x27;&#x27;;
+
+      if (onFinishRunCallback) {
+        onFinishRunCallback(&#x27;&#x27;, &#x27;&#x27;);
+      }
+    }, (err) =&gt; {
+      if (!(err instanceof Sk.builtin.TimeLimitError)) {
+        this.evaluation = &#x27;&#x27;;
+        this.fullError = String(err);
+
+        if (onFinishRunCallback) {
+          onFinishRunCallback(&#x27;&#x27;, String(err));
+        }
+      }
+    });
+  }
+
+  private initMarkers(editor) {
+    var doc = editor.getDoc();
+
+    // The -1 here is because prepended code ends with a newline.
+    var preCodeNumLines = this.preCode.split(&#x27;\n&#x27;).length - 1;
+    var postCodeNumLines = this.postCode.split(&#x27;\n&#x27;).length;
+    var fullCodeNumLines = this.code.split(&#x27;\n&#x27;).length;
+    var userCodeNumLines = (
+      fullCodeNumLines - preCodeNumLines - postCodeNumLines);
+
+    // Mark pre- and post- code as uneditable, and give it some styling.
+    var markOptions = {
+      atomic: false,
+      readOnly: true,
+      inclusiveLeft: true,
+      inclusiveRight: true
+    };
+
+    if (this.preCode.length !== 0) {
+      doc.markText(
+        {
+          line: 0,
+          ch: 0
+        },
+        {
+          line: preCodeNumLines,
+          ch: 0
+        },
+        angular.extend({}, markOptions, {
+          inclusiveRight: false
+        }));
+
+      for (var i = 0; i &lt; preCodeNumLines; i++) {
+        editor.addLineClass(i, &#x27;text&#x27;, &#x27;code-repl-noneditable-line&#x27;);
+      }
+    }
+
+    if (this.postCode.length !== 0) {
+      doc.markText(
+        {
+          line: preCodeNumLines + userCodeNumLines,
+          ch: 0
+        },
+        {
+          line: fullCodeNumLines,
+          ch: 0
+        },
+        markOptions);
+
+      for (var i = 0; i &lt; postCodeNumLines; i++) {
+        editor.addLineClass(
+          preCodeNumLines + userCodeNumLines + i,
+          &#x27;text&#x27;, &#x27;code-repl-noneditable-line&#x27;);
+      }
+    }
+  }
+
+  sendResponse(evaluation: string, err: string): void {
+    this.currentInteractionService.onSubmit({
+      // Replace tabs with 2 spaces.
+      // TODO(#12712): (1) CodeRepl interaction.
+      code: this.code.replace(/\t/g, &#x27;  &#x27;) || &#x27;&#x27;,
+      output: this.output,
+      evaluation: this.evaluation,
+      error: (err || &#x27;&#x27;)
+    } as unknown as string,
+    this.codeReplRulesService as unknown as InteractionRulesService);
+  }
+
+  ngOnDestroy(): void {
+    this.componentSubscriptions.unsubscribe();
+  }
+}
+
+angular.module(&#x27;oppia&#x27;).directive(
+  &#x27;oppiaInteractiveCodeRepl&#x27;, downgradeComponent({
+    component: InteractiveCodeReplComponent
+  }) as angular.IDirectiveFactory);
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.ts&quot;,&quot;line&quot;:41,&quot;character&quot;:11,&quot;text&quot;:&quot;lastAnswer&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.ts&quot;,&quot;line&quot;:42,&quot;character&quot;:11,&quot;text&quot;:&quot;languageWithValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.ts&quot;,&quot;line&quot;:43,&quot;character&quot;:11,&quot;text&quot;:&quot;placeholderWithValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.ts&quot;,&quot;line&quot;:44,&quot;character&quot;:11,&quot;text&quot;:&quot;preCodeWithValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.ts&quot;,&quot;line&quot;:45,&quot;character&quot;:11,&quot;text&quot;:&quot;postCodeWithValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.ts&quot;,&quot;line&quot;:96,&quot;character&quot;:8,&quot;text&quot;:&quot;this.interactionAttributesExtractorService.getValuesFromAttributes(\n      &#x27;CodeRepl&#x27;,\n      {\n        languageWithValue: this.languageWithValue,\n        placeholderWithValue: this.placeholderWithValue,\n        preCodeWithValue: this.preCodeWithValue,\n        postCodeWithValue: this.postCodeWithValue,\n      }\n    ) as CodeReplCustomizationArgs&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.ts&quot;,&quot;line&quot;:99,&quot;character&quot;:8,&quot;text&quot;:&quot;languageWithValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.ts&quot;,&quot;line&quot;:99,&quot;character&quot;:32,&quot;text&quot;:&quot;languageWithValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.ts&quot;,&quot;line&quot;:100,&quot;character&quot;:8,&quot;text&quot;:&quot;placeholderWithValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.ts&quot;,&quot;line&quot;:100,&quot;character&quot;:35,&quot;text&quot;:&quot;placeholderWithValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.ts&quot;,&quot;line&quot;:101,&quot;character&quot;:8,&quot;text&quot;:&quot;preCodeWithValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.ts&quot;,&quot;line&quot;:101,&quot;character&quot;:31,&quot;text&quot;:&quot;preCodeWithValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.ts&quot;,&quot;line&quot;:102,&quot;character&quot;:8,&quot;text&quot;:&quot;postCodeWithValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.ts&quot;,&quot;line&quot;:102,&quot;character&quot;:32,&quot;text&quot;:&quot;postCodeWithValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.ts&quot;,&quot;line&quot;:106,&quot;character&quot;:37,&quot;text&quot;:&quot;lastAnswer&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.ts&quot;,&quot;line&quot;:133,&quot;character&quot;:23,&quot;text&quot;:&quot;lastAnswer&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.ts&quot;,&quot;line&quot;:133,&quot;character&quot;:34,&quot;text&quot;:&quot;code&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.ts&quot;,&quot;line&quot;:134,&quot;character&quot;:25,&quot;text&quot;:&quot;lastAnswer&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.ts&quot;,&quot;line&quot;:134,&quot;character&quot;:36,&quot;text&quot;:&quot;output&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.ts&quot;,&quot;line&quot;:139,&quot;character&quot;:15,&quot;text&quot;:&quot;out&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.ts&quot;,&quot;line&quot;:142,&quot;character&quot;:23,&quot;text&quot;:&quot;out&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.ts&quot;,&quot;line&quot;:144,&quot;character&quot;:13,&quot;text&quot;:&quot;name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.ts&quot;,&quot;line&quot;:146,&quot;character&quot;:34,&quot;text&quot;:&quot;name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.ts&quot;,&quot;line&quot;:149,&quot;character&quot;:38,&quot;text&quot;:&quot;name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.ts&quot;,&quot;line&quot;:151,&quot;character&quot;:37,&quot;text&quot;:&quot;name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.ts&quot;,&quot;line&quot;:197,&quot;character&quot;:7,&quot;text&quot;:&quot;then&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.ts&quot;,&quot;line&quot;:205,&quot;character&quot;:8,&quot;text&quot;:&quot;err&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.ts&quot;,&quot;line&quot;:206,&quot;character&quot;:12,&quot;text&quot;:&quot;err&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.ts&quot;,&quot;line&quot;:208,&quot;character&quot;:32,&quot;text&quot;:&quot;err&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.ts&quot;,&quot;line&quot;:211,&quot;character&quot;:41,&quot;text&quot;:&quot;err&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.ts&quot;,&quot;line&quot;:217,&quot;character&quot;:22,&quot;text&quot;:&quot;editor&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.ts&quot;,&quot;line&quot;:218,&quot;character&quot;:8,&quot;text&quot;:&quot;doc&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.ts&quot;,&quot;line&quot;:218,&quot;character&quot;:14,&quot;text&quot;:&quot;editor&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.ts&quot;,&quot;line&quot;:218,&quot;character&quot;:21,&quot;text&quot;:&quot;getDoc&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.ts&quot;,&quot;line&quot;:236,&quot;character&quot;:6,&quot;text&quot;:&quot;doc&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.ts&quot;,&quot;line&quot;:236,&quot;character&quot;:10,&quot;text&quot;:&quot;markText&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.ts&quot;,&quot;line&quot;:250,&quot;character&quot;:8,&quot;text&quot;:&quot;editor&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.ts&quot;,&quot;line&quot;:250,&quot;character&quot;:15,&quot;text&quot;:&quot;addLineClass&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.ts&quot;,&quot;line&quot;:255,&quot;character&quot;:6,&quot;text&quot;:&quot;doc&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.ts&quot;,&quot;line&quot;:255,&quot;character&quot;:10,&quot;text&quot;:&quot;markText&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.ts&quot;,&quot;line&quot;:267,&quot;character&quot;:8,&quot;text&quot;:&quot;editor&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.ts&quot;,&quot;line&quot;:267,&quot;character&quot;:15,&quot;text&quot;:&quot;addLineClass&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.ts&quot;,&quot;line&quot;:275,&quot;character&quot;:44,&quot;text&quot;:&quot;{\n      // Replace tabs with 2 spaces.\n      // TODO(#12712): (1) CodeRepl interaction.\n      code: this.code.replace(/\\t/g, &#x27;  &#x27;) || &#x27;&#x27;,\n      output: this.output,\n      evaluation: this.evaluation,\n      error: (err || &#x27;&#x27;)\n    } as unknown as string&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.ts&quot;,&quot;line&quot;:283,&quot;character&quot;:4,&quot;text&quot;:&quot;this.codeReplRulesService as unknown as InteractionRulesService&quot;,&quot;kind&quot;:3}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:58 GMT</p>
+    </body>
+  </html>
+  

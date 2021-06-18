@@ -1,0 +1,235 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>topics-and-skills-dashboard-backend-api.service.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service.ts</td><td class="">95.29%</td><td class="">100%</td><td class="">255</td><td class="">243</td><td class="">12</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2018 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Service to retrieve information of topics and skills dashboard
+  from the backend and to merge skills from the dashboard.
+ */
+
+import { downgradeInjectable } from &#x27;@angular/upgrade/static&#x27;;
+import { HttpClient } from &#x27;@angular/common/http&#x27;;
+import { EventEmitter, Injectable } from &#x27;@angular/core&#x27;;
+
+import {
+  AssignedSkill,
+  AssignedSkillBackendDict,
+} from &#x27;domain/skill/assigned-skill.model&#x27;;
+import {
+  AugmentedSkillSummary,
+  AugmentedSkillSummaryBackendDict,
+} from &#x27;domain/skill/augmented-skill-summary.model&#x27;;
+import {
+  ShortSkillSummary,
+  ShortSkillSummaryBackendDict
+} from &#x27;domain/skill/short-skill-summary.model&#x27;;
+import { SkillSummary, SkillSummaryBackendDict } from
+  &#x27;domain/skill/skill-summary.model&#x27;;
+import { TopicsAndSkillsDashboardDomainConstants } from
+  // eslint-disable-next-line max-len
+  &#x27;domain/topics_and_skills_dashboard/topics-and-skills-dashboard-domain.constants&#x27;;
+import {
+  TopicsAndSkillsDashboardFilter
+// eslint-disable-next-line max-len
+} from &#x27;domain/topics_and_skills_dashboard/topics-and-skills-dashboard-filter.model&#x27;;
+import { TopicSummary, TopicSummaryBackendDict } from
+  &#x27;domain/topic/topic-summary.model&#x27;;
+import { UrlInterpolationService } from
+  &#x27;domain/utilities/url-interpolation.service&#x27;;
+
+interface CategorizedSkillsBackendDict {
+  [topicName: string]: {
+    uncategorized: ShortSkillSummaryBackendDict[];
+    [subtopicName: string]: ShortSkillSummaryBackendDict[];
+  };
+}
+
+export interface CategorizedSkills {
+  [topicName: string]: {
+    uncategorized: ShortSkillSummary[];
+    [subtopicName: string]: ShortSkillSummary[];
+  };
+}
+
+export interface TopicsAndSkillsDashboardDataBackendDict {
+  &#x27;all_classroom_names&#x27;: string[];
+  &#x27;untriaged_skill_summary_dicts&#x27;: SkillSummaryBackendDict[];
+  &#x27;mergeable_skill_summary_dicts&#x27;: SkillSummaryBackendDict[];
+  &#x27;topic_summary_dicts&#x27;: TopicSummaryBackendDict[];
+  &#x27;can_delete_topic&#x27;: boolean;
+  &#x27;can_create_topic&#x27;: boolean;
+  &#x27;can_delete_skill&#x27;: boolean;
+  &#x27;can_create_skill&#x27;: boolean;
+  &#x27;total_skill_count&#x27;: number;
+  &#x27;categorized_skills_dict&#x27;: CategorizedSkillsBackendDict;
+}
+
+export interface TopicsAndSkillDashboardData {
+  allClassroomNames: string[];
+  canDeleteTopic: boolean;
+  canCreateTopic: boolean;
+  canDeleteSkill: boolean;
+  canCreateSkill: boolean;
+  untriagedSkillSummaries: SkillSummary[];
+  mergeableSkillSummaries: SkillSummary[];
+  totalSkillCount: number;
+  topicSummaries: TopicSummary[];
+  categorizedSkillsDict: CategorizedSkills;
+}
+
+interface SkillsDashboardDataBackendDict {
+  &#x27;skill_summary_dicts&#x27;: AugmentedSkillSummaryBackendDict[];
+  &#x27;next_cursor&#x27;: string;
+  &#x27;more&#x27;: boolean;
+}
+
+interface SkillsDashboardData {
+  skillSummaries: AugmentedSkillSummary[];
+  nextCursor: string;
+  more: boolean;
+}
+
+interface AssignedSkillDataBackendDict {
+  &#x27;topic_assignment_dicts&#x27;: AssignedSkillBackendDict[];
+}
+
+@Injectable({
+  providedIn: &#x27;root&#x27;
+})
+
+export class TopicsAndSkillsDashboardBackendApiService {
+  constructor(
+    private http: HttpClient,
+    private urlInterpolationService: UrlInterpolationService) {}
+
+  private _topicsAndSkillsDashboardReinitializedEventEmitter =
+    new EventEmitter&lt;boolean&gt;();
+
+  async fetchDashboardDataAsync(): Promise&lt;TopicsAndSkillDashboardData&gt; {
+    return this.http.get&lt;TopicsAndSkillsDashboardDataBackendDict&gt;(
+      &#x27;/topics_and_skills_dashboard/data&#x27;).toPromise().then(response =&gt; {
+      let categorizedSkills = {};
+      for (let topic in response.categorized_skills_dict) {
+        let subtopicSkillsDict = response.categorized_skills_dict[topic];
+        let subtopicSkills = {};
+        for (let subtopic in subtopicSkillsDict) {
+          subtopicSkills[subtopic] = (
+            subtopicSkillsDict[subtopic].map(
+              backendDict =&gt; ShortSkillSummary
+                .createFromBackendDict(backendDict)));
+        }
+        categorizedSkills[topic] = subtopicSkills;
+      }
+
+      return {
+        allClassroomNames: response.all_classroom_names,
+        canCreateSkill: response.can_create_skill,
+        canCreateTopic: response.can_create_topic,
+        canDeleteSkill: response.can_delete_skill,
+        canDeleteTopic: response.can_delete_topic,
+        untriagedSkillSummaries: (
+          response.untriaged_skill_summary_dicts.map(
+            backendDict =&gt; SkillSummary
+              .createFromBackendDict(backendDict))),
+        mergeableSkillSummaries: (
+          response.mergeable_skill_summary_dicts.map(
+            backendDict =&gt; SkillSummary
+              .createFromBackendDict(backendDict))),
+        totalSkillCount: response.total_skill_count,
+        topicSummaries: (
+          response.topic_summary_dicts.map(
+            backendDict =&gt; TopicSummary.createFromBackendDict(backendDict))),
+        categorizedSkillsDict: categorizedSkills
+      };
+    }, errorResponse =&gt; {
+      throw new Error(errorResponse.error.error);
+    });
+  }
+
+  async fetchTopicAssignmentsForSkillAsync(
+      skillId: string
+  ): Promise&lt;AssignedSkill[]&gt; {
+    const assignSkillDataUrl = this.urlInterpolationService.interpolateUrl(
+      &#x27;/topics_and_skills_dashboard/unassign_skill/&lt;skill_id&gt;&#x27;, {
+        skill_id: skillId
+      });
+    return this.http.get&lt;AssignedSkillDataBackendDict&gt;(
+      assignSkillDataUrl).toPromise().then(dict =&gt; {
+      return dict.topic_assignment_dicts.map(
+        backendDict =&gt; AssignedSkill
+          .createFromBackendDict(backendDict));
+    }, errorResponse =&gt; {
+      throw new Error(errorResponse.error.error);
+    });
+  }
+
+  async fetchSkillsDashboardDataAsync(
+      filter: TopicsAndSkillsDashboardFilter,
+      itemsPerPage: number, nextCursor: string): Promise&lt;SkillsDashboardData&gt; {
+    return this.http.post&lt;SkillsDashboardDataBackendDict&gt;(
+      TopicsAndSkillsDashboardDomainConstants.SKILL_DASHBOARD_DATA_URL, {
+        classroom_name: filter.classroom,
+        status: filter.status,
+        sort: filter.sort,
+        keywords: filter.keywords,
+        num_skills_to_fetch: itemsPerPage,
+        next_cursor: nextCursor
+      }).toPromise().then(response =&gt; {
+      return {
+        skillSummaries: response.skill_summary_dicts.map(
+          backendDict =&gt; AugmentedSkillSummary
+            .createFromBackendDict(backendDict)),
+        nextCursor: response.next_cursor,
+        more: response.more
+      };
+    }, errorResponse =&gt; {
+      throw new Error(errorResponse.error.error);
+    });
+  }
+
+  async mergeSkillsAsync(
+      oldSkillId: string, newSkillId: string): Promise&lt;void&gt; {
+    let mergeSkillsData = {
+      old_skill_id: oldSkillId,
+      new_skill_id: newSkillId
+    };
+    return this.http.post&lt;void&gt;(
+      TopicsAndSkillsDashboardDomainConstants.MERGE_SKILLS_URL,
+      mergeSkillsData).toPromise();
+  }
+
+  get onTopicsAndSkillsDashboardReinitialized(): EventEmitter&lt;boolean&gt; {
+    return this._topicsAndSkillsDashboardReinitializedEventEmitter;
+  }
+}
+angular.module(&#x27;oppia&#x27;).factory(
+  &#x27;TopicsAndSkillsDashboardBackendApiService&#x27;,
+  downgradeInjectable(TopicsAndSkillsDashboardBackendApiService));
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service.ts&quot;,&quot;line&quot;:153,&quot;character&quot;:7,&quot;text&quot;:&quot;errorResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service.ts&quot;,&quot;line&quot;:154,&quot;character&quot;:22,&quot;text&quot;:&quot;errorResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service.ts&quot;,&quot;line&quot;:154,&quot;character&quot;:36,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service.ts&quot;,&quot;line&quot;:154,&quot;character&quot;:42,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service.ts&quot;,&quot;line&quot;:170,&quot;character&quot;:7,&quot;text&quot;:&quot;errorResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service.ts&quot;,&quot;line&quot;:171,&quot;character&quot;:22,&quot;text&quot;:&quot;errorResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service.ts&quot;,&quot;line&quot;:171,&quot;character&quot;:36,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service.ts&quot;,&quot;line&quot;:171,&quot;character&quot;:42,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service.ts&quot;,&quot;line&quot;:194,&quot;character&quot;:7,&quot;text&quot;:&quot;errorResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service.ts&quot;,&quot;line&quot;:195,&quot;character&quot;:22,&quot;text&quot;:&quot;errorResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service.ts&quot;,&quot;line&quot;:195,&quot;character&quot;:36,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service.ts&quot;,&quot;line&quot;:195,&quot;character&quot;:42,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:55 GMT</p>
+    </body>
+  </html>
+  

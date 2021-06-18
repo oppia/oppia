@@ -1,0 +1,130 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>event-bus.service.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/app-events/event-bus.service.ts</td><td class="">94.87%</td><td class="">100%</td><td class="">117</td><td class="">111</td><td class="">6</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2021 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview A file that contains Event Bus Service and Event Bus Group.
+ */
+
+
+import { Injectable } from &#x27;@angular/core&#x27;;
+import { downgradeInjectable } from &#x27;@angular/upgrade/static&#x27;;
+import { Subject, Subscription } from &#x27;rxjs&#x27;;
+import { filter } from &#x27;rxjs/operators&#x27;;
+import { BaseEvent } from &#x27;./app-events&#x27;;
+
+type NewableType&lt;T&gt; = new(...args) =&gt; T;
+
+@Injectable({
+  providedIn: &#x27;root&#x27;
+})
+export class EventBusService {
+  // Subjects are used for the event passing mechanism.
+  private _subject$ = new Subject&lt;BaseEvent&gt;();
+
+  private _errorHandler(error: Error): void {
+    error.message = &#x27;Error in event bus\n&#x27; + error.message;
+    throw error;
+  }
+
+  /**
+  * This function will listen to messages of specific event types as specified
+  * by the first param.
+  * @param eventType The event that is to be listened for.
+  * @param action The action that is to be run when the event occurs.
+  * @param callbackContext Callback context if any.
+  *
+  * @returns A subscription to the event asked for.
+  */
+  on&lt;T extends BaseEvent&gt;(
+      eventType: NewableType&lt;T&gt;,
+      action: (event: T) =&gt; void,
+      callbackContext = null): Subscription {
+    return this._subject$.pipe(filter((event: T): boolean =&gt; {
+      return (event instanceof eventType);
+    }
+    )).subscribe(
+      (event: T): void =&gt; {
+        try {
+          action.call(callbackContext, event);
+        } catch (error) {
+          this._errorHandler(error);
+        }
+      }
+    );
+  }
+
+  /**
+  * A function to trigger a particular event.
+  * @param event OppiaEvent that we want to trigger.
+  */
+  emit&lt;T extends BaseEvent&gt;(event: T): void {
+    this._subject$.next(event);
+  }
+}
+
+angular.module(&#x27;oppia&#x27;).factory(
+  &#x27;EventBusService&#x27;, downgradeInjectable(EventBusService));
+
+/**
+* This class is a wrapper around the EventBusService. This is not supposed to
+* be DI&#x27;ed in a component/ service. This is used to keep track of subscriptions
+* and unsubscribe all of them at once.
+*/
+export class EventBusGroup {
+  private eventBus: EventBusService;
+  private subscriptions: Subscription;
+
+  constructor(eventBus: EventBusService) {
+    this.eventBus = eventBus;
+    this.subscriptions = new Subscription();
+  }
+
+  public emit(event: BaseEvent): EventBusGroup {
+    this.eventBus.emit(event);
+    return (this);
+  }
+
+
+  public on&lt;T extends BaseEvent&gt;(
+      eventType: NewableType&lt;T&gt;,
+      action: (event: T) =&gt; void,
+      callbackContext = null): void {
+    this.subscriptions.add(
+      this.eventBus.on&lt;T&gt;(eventType, action, callbackContext)
+    );
+  }
+
+  public unsubscribe(): void {
+    this.subscriptions.unsubscribe();
+    this.subscriptions = new Subscription();
+  }
+}
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/app-events/event-bus.service.ts&quot;,&quot;line&quot;:25,&quot;character&quot;:29,&quot;text&quot;:&quot;args&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/app-events/event-bus.service.ts&quot;,&quot;line&quot;:51,&quot;character&quot;:6,&quot;text&quot;:&quot;callbackContext&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/app-events/event-bus.service.ts&quot;,&quot;line&quot;:58,&quot;character&quot;:22,&quot;text&quot;:&quot;callbackContext&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/app-events/event-bus.service.ts&quot;,&quot;line&quot;:59,&quot;character&quot;:17,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/app-events/event-bus.service.ts&quot;,&quot;line&quot;:101,&quot;character&quot;:6,&quot;text&quot;:&quot;callbackContext&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/app-events/event-bus.service.ts&quot;,&quot;line&quot;:103,&quot;character&quot;:45,&quot;text&quot;:&quot;callbackContext&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:55 GMT</p>
+    </body>
+  </html>
+  

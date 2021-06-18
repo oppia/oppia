@@ -1,0 +1,70 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>topic-editor-navbar-breadcrumb.directive.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/topic-editor-page/navbar/topic-editor-navbar-breadcrumb.directive.ts</td><td class="">28.95%</td><td class="">100%</td><td class="">38</td><td class="">11</td><td class="">27</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2016 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Controller for the navbar breadcrumb of the topic editor.
+ */
+
+require(&#x27;domain/utilities/url-interpolation.service.ts&#x27;);
+require(&#x27;pages/topic-editor-page/services/topic-editor-routing.service.ts&#x27;);
+require(&#x27;pages/topic-editor-page/services/topic-editor-state.service.ts&#x27;);
+require(&#x27;services/stateful/focus-manager.service.ts&#x27;);
+
+angular.module(&#x27;oppia&#x27;).directive(&#x27;topicEditorNavbarBreadcrumb&#x27;, [
+  &#x27;UrlInterpolationService&#x27;, function(UrlInterpolationService) {
+    return {
+      restrict: &#x27;E&#x27;,
+      scope: {},
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        &#x27;/pages/topic-editor-page/navbar/&#x27; +
+        &#x27;topic-editor-navbar-breadcrumb.directive.html&#x27;),
+      controller: [
+        &#x27;$scope&#x27;, &#x27;TopicEditorRoutingService&#x27;, &#x27;TopicEditorStateService&#x27;,
+        function(
+            $scope, TopicEditorRoutingService, TopicEditorStateService) {
+          var ctrl = this;
+          $scope.canNavigateToTopicEditorPage = function() {
+            const activeTab = TopicEditorRoutingService.getActiveTabName();
+            return (
+              activeTab.startsWith(&#x27;subtopic&#x27;) ||
+              TopicEditorRoutingService.getLastTabVisited() === &#x27;subtopic&#x27;);
+          };
+          $scope.navigateToMainTab = function() {
+            TopicEditorRoutingService.navigateToMainTab();
+          };
+          ctrl.$onInit = function() {
+            $scope.topic = TopicEditorStateService.getTopic();
+          };
+        }
+      ]
+    };
+  }]);
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/navbar/topic-editor-navbar-breadcrumb.directive.ts&quot;,&quot;line&quot;:24,&quot;character&quot;:38,&quot;text&quot;:&quot;UrlInterpolationService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/navbar/topic-editor-navbar-breadcrumb.directive.ts&quot;,&quot;line&quot;:28,&quot;character&quot;:19,&quot;text&quot;:&quot;UrlInterpolationService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/navbar/topic-editor-navbar-breadcrumb.directive.ts&quot;,&quot;line&quot;:28,&quot;character&quot;:43,&quot;text&quot;:&quot;getDirectiveTemplateUrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/navbar/topic-editor-navbar-breadcrumb.directive.ts&quot;,&quot;line&quot;:34,&quot;character&quot;:12,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/navbar/topic-editor-navbar-breadcrumb.directive.ts&quot;,&quot;line&quot;:34,&quot;character&quot;:20,&quot;text&quot;:&quot;TopicEditorRoutingService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/navbar/topic-editor-navbar-breadcrumb.directive.ts&quot;,&quot;line&quot;:34,&quot;character&quot;:47,&quot;text&quot;:&quot;TopicEditorStateService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/navbar/topic-editor-navbar-breadcrumb.directive.ts&quot;,&quot;line&quot;:35,&quot;character&quot;:14,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/navbar/topic-editor-navbar-breadcrumb.directive.ts&quot;,&quot;line&quot;:35,&quot;character&quot;:21,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/navbar/topic-editor-navbar-breadcrumb.directive.ts&quot;,&quot;line&quot;:36,&quot;character&quot;:10,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/navbar/topic-editor-navbar-breadcrumb.directive.ts&quot;,&quot;line&quot;:36,&quot;character&quot;:17,&quot;text&quot;:&quot;canNavigateToTopicEditorPage&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/navbar/topic-editor-navbar-breadcrumb.directive.ts&quot;,&quot;line&quot;:37,&quot;character&quot;:18,&quot;text&quot;:&quot;activeTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/navbar/topic-editor-navbar-breadcrumb.directive.ts&quot;,&quot;line&quot;:37,&quot;character&quot;:30,&quot;text&quot;:&quot;TopicEditorRoutingService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/navbar/topic-editor-navbar-breadcrumb.directive.ts&quot;,&quot;line&quot;:37,&quot;character&quot;:56,&quot;text&quot;:&quot;getActiveTabName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/navbar/topic-editor-navbar-breadcrumb.directive.ts&quot;,&quot;line&quot;:39,&quot;character&quot;:14,&quot;text&quot;:&quot;activeTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/navbar/topic-editor-navbar-breadcrumb.directive.ts&quot;,&quot;line&quot;:39,&quot;character&quot;:24,&quot;text&quot;:&quot;startsWith&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/navbar/topic-editor-navbar-breadcrumb.directive.ts&quot;,&quot;line&quot;:40,&quot;character&quot;:14,&quot;text&quot;:&quot;TopicEditorRoutingService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/navbar/topic-editor-navbar-breadcrumb.directive.ts&quot;,&quot;line&quot;:40,&quot;character&quot;:40,&quot;text&quot;:&quot;getLastTabVisited&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/navbar/topic-editor-navbar-breadcrumb.directive.ts&quot;,&quot;line&quot;:42,&quot;character&quot;:10,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/navbar/topic-editor-navbar-breadcrumb.directive.ts&quot;,&quot;line&quot;:42,&quot;character&quot;:17,&quot;text&quot;:&quot;navigateToMainTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/navbar/topic-editor-navbar-breadcrumb.directive.ts&quot;,&quot;line&quot;:43,&quot;character&quot;:12,&quot;text&quot;:&quot;TopicEditorRoutingService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/navbar/topic-editor-navbar-breadcrumb.directive.ts&quot;,&quot;line&quot;:43,&quot;character&quot;:38,&quot;text&quot;:&quot;navigateToMainTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/navbar/topic-editor-navbar-breadcrumb.directive.ts&quot;,&quot;line&quot;:45,&quot;character&quot;:10,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/navbar/topic-editor-navbar-breadcrumb.directive.ts&quot;,&quot;line&quot;:45,&quot;character&quot;:15,&quot;text&quot;:&quot;$onInit&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/navbar/topic-editor-navbar-breadcrumb.directive.ts&quot;,&quot;line&quot;:46,&quot;character&quot;:12,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/navbar/topic-editor-navbar-breadcrumb.directive.ts&quot;,&quot;line&quot;:46,&quot;character&quot;:19,&quot;text&quot;:&quot;topic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/navbar/topic-editor-navbar-breadcrumb.directive.ts&quot;,&quot;line&quot;:46,&quot;character&quot;:27,&quot;text&quot;:&quot;TopicEditorStateService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/navbar/topic-editor-navbar-breadcrumb.directive.ts&quot;,&quot;line&quot;:46,&quot;character&quot;:51,&quot;text&quot;:&quot;getTopic&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:59 GMT</p>
+    </body>
+  </html>
+  

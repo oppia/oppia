@@ -1,0 +1,400 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>question-backend-api.service.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/domain/question/question-backend-api.service.spec.ts</td><td class="">86.25%</td><td class="">100%</td><td class="">502</td><td class="">433</td><td class="">69</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2019 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+/**
+ * @fileoverview Unit tests for QuestionBackendApiService.
+ */
+
+import { HttpClientTestingModule, HttpTestingController } from
+  &#x27;@angular/common/http/testing&#x27;;
+import { TestBed, fakeAsync, flushMicrotasks } from &#x27;@angular/core/testing&#x27;;
+
+import { QuestionBackendApiService } from
+  &#x27;domain/question/question-backend-api.service&#x27;;
+
+describe(&#x27;Question backend Api service&#x27;, () =&gt; {
+  let questionBackendApiService = null;
+  let sampleDataResults = null;
+  let sampleResponse = null;
+  let httpTestingController: HttpTestingController;
+
+  beforeEach(() =&gt; {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+
+    questionBackendApiService = TestBed.get(QuestionBackendApiService);
+    httpTestingController = TestBed.get(HttpTestingController);
+
+    // Sample question object returnable from the backend.
+    sampleDataResults = {
+      question_dicts: [{
+        id: &#x27;0&#x27;,
+        question_state_data: {
+          content: {
+            html: &#x27;Question 1&#x27;
+          },
+          recorded_voiceovers: {
+            voiceovers_mapping: {}
+          },
+          interaction: {
+            answer_groups: [],
+            confirmed_unclassified_answers: [],
+            customization_args: {},
+            default_outcome: {
+              dest: null,
+              feedback: {
+                html: &#x27;Correct Answer&#x27;
+              },
+              param_changes: [],
+              labelled_as_correct: true
+            },
+            hints: [{
+              hint_content: {
+                html: &#x27;Hint 1&#x27;
+              }
+            }],
+            solution: {
+              correct_answer: &#x27;This is the correct answer&#x27;,
+              answer_is_exclusive: false,
+              explanation: {
+                html: &#x27;Solution explanation&#x27;
+              }
+            },
+            id: &#x27;TextInput&#x27;
+          },
+          param_changes: [],
+          solicit_answer_details: false
+        },
+        language_code: &#x27;en&#x27;,
+        version: 1
+      }]
+    };
+
+    sampleResponse = {
+      question_summary_dicts: [{
+        skill_descriptions: [],
+        summary: {
+          creator_id: &#x27;1&#x27;,
+          created_on_msec: 0,
+          last_updated_msec: 0,
+          id: &#x27;0&#x27;,
+          question_content: &#x27;&#x27;
+        }
+      }],
+      more: false
+    };
+  });
+
+  afterEach(() =&gt; {
+    httpTestingController.verify();
+  });
+
+  it(&#x27;should successfully fetch questions from the backend&#x27;, fakeAsync(() =&gt; {
+    let successHandler = jasmine.createSpy(&#x27;success&#x27;);
+    let failHandler = jasmine.createSpy(&#x27;fail&#x27;);
+
+    let questionPlayerHandlerUrl =
+      &#x27;/question_player_handler?skill_ids=1&amp;question_count=1&#x27; +
+      &#x27;&amp;fetch_by_difficulty=true&#x27;;
+
+    questionBackendApiService.fetchQuestionsAsync(
+      [&#x27;1&#x27;], 1, true).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(questionPlayerHandlerUrl);
+    expect(req.request.method).toEqual(&#x27;GET&#x27;);
+    req.flush(sampleDataResults);
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(
+      sampleDataResults.question_dicts);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it(&#x27;should successfully fetch questions from the backend when&#x27; +
+      &#x27;sortedByDifficulty is false&#x27;, fakeAsync(() =&gt; {
+    let successHandler = jasmine.createSpy(&#x27;success&#x27;);
+    let failHandler = jasmine.createSpy(&#x27;fail&#x27;);
+
+    let questionPlayerHandlerUrl =
+      &#x27;/question_player_handler?skill_ids=1&amp;question_count=1&#x27; +
+      &#x27;&amp;fetch_by_difficulty=false&#x27;;
+
+    questionBackendApiService.fetchQuestionsAsync(
+      [&#x27;1&#x27;], 1, false).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(questionPlayerHandlerUrl);
+    expect(req.request.method).toEqual(&#x27;GET&#x27;);
+    req.flush(sampleDataResults);
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(
+      sampleDataResults.question_dicts);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it(&#x27;should successfully fetch question count from the backend&#x27;,
+    fakeAsync(() =&gt; {
+      let successHandler = jasmine.createSpy(&#x27;success&#x27;);
+      let failHandler = jasmine.createSpy(&#x27;fail&#x27;);
+
+      let questionCountHandlerUrl = (
+        &#x27;/question_count_handler/&#x27; + encodeURIComponent(1));
+
+      questionBackendApiService.fetchTotalQuestionCountForSkillIdsAsync(
+        [&#x27;1&#x27;]).then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(questionCountHandlerUrl);
+      expect(req.request.method).toEqual(&#x27;GET&#x27;);
+      req.flush({
+        total_question_count: 2
+      });
+
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalledWith(2);
+      expect(failHandler).not.toHaveBeenCalled();
+    }));
+
+  it(&#x27;should use the fail handler if fetch question count fails&#x27;,
+    fakeAsync(() =&gt; {
+      let successHandler = jasmine.createSpy(&#x27;success&#x27;);
+      let failHandler = jasmine.createSpy(&#x27;fail&#x27;);
+
+      let questionCountHandlerUrl = (
+        &#x27;/question_count_handler/&#x27; + encodeURIComponent(1));
+
+      questionBackendApiService.fetchTotalQuestionCountForSkillIdsAsync(
+        [&#x27;1&#x27;]).then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(questionCountHandlerUrl);
+      expect(req.request.method).toEqual(&#x27;GET&#x27;);
+      req.flush({
+        error: &#x27;Error fetching question count.&#x27;
+      }, {
+        status: 400, statusText: &#x27;Invalid request&#x27;
+      });
+
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(
+        &#x27;Error fetching question count.&#x27;);
+    }));
+
+  it(&#x27;should use the fail handler if the backend request failed&#x27;,
+    fakeAsync(() =&gt; {
+      let successHandler = jasmine.createSpy(&#x27;success&#x27;);
+      let failHandler = jasmine.createSpy(&#x27;fail&#x27;);
+
+      let questionPlayerHandlerUrl =
+        &#x27;/question_player_handler?skill_ids=1&amp;question_count=1&#x27; +
+        &#x27;&amp;fetch_by_difficulty=true&#x27;;
+
+      questionBackendApiService.fetchQuestionsAsync(
+        [&#x27;1&#x27;], 1, true).then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(questionPlayerHandlerUrl);
+      expect(req.request.method).toEqual(&#x27;GET&#x27;);
+      req.flush({
+        error: &#x27;Error loading questions.&#x27;
+      }, {
+        status: 400, statusText: &#x27;Invalid request&#x27;
+      });
+
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(
+        &#x27;Error loading questions.&#x27;);
+    })
+  );
+
+  it(&#x27;should use the fail handler if question count is in invalid format&#x27;,
+    fakeAsync(() =&gt; {
+      let successHandler = jasmine.createSpy(&#x27;success&#x27;);
+      let failHandler = jasmine.createSpy(&#x27;fail&#x27;);
+      questionBackendApiService.fetchQuestionsAsync(
+        [&#x27;1&#x27;], &#x27;abc&#x27;, true).then(successHandler, failHandler);
+      flushMicrotasks();
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(
+        &#x27;Question count has to be a positive integer&#x27;);
+    })
+  );
+
+  it(&#x27;should use the fail handler if question count is negative&#x27;,
+    fakeAsync(() =&gt; {
+      let successHandler = jasmine.createSpy(&#x27;success&#x27;);
+      let failHandler = jasmine.createSpy(&#x27;fail&#x27;);
+      questionBackendApiService.fetchQuestionsAsync(
+        [&#x27;1&#x27;], -1, true).then(successHandler, failHandler);
+      flushMicrotasks();
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(
+        &#x27;Question count has to be a positive integer&#x27;);
+    })
+  );
+
+  it(&#x27;should use the fail handler if question count is not an integer&#x27;,
+    fakeAsync(() =&gt; {
+      let successHandler = jasmine.createSpy(&#x27;success&#x27;);
+      let failHandler = jasmine.createSpy(&#x27;fail&#x27;);
+      questionBackendApiService.fetchQuestionsAsync(
+        [&#x27;1&#x27;], 1.5, true).then(successHandler, failHandler);
+      flushMicrotasks();
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(
+        &#x27;Question count has to be a positive integer&#x27;);
+    })
+  );
+
+  it(&#x27;should use the fail handler if skill ids is not a list&#x27;,
+    fakeAsync(() =&gt; {
+      let successHandler = jasmine.createSpy(&#x27;success&#x27;);
+      let failHandler = jasmine.createSpy(&#x27;fail&#x27;);
+      questionBackendApiService.fetchQuestionsAsync(
+        &#x27;x&#x27;, 1, true).then(successHandler, failHandler);
+      flushMicrotasks();
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(
+        &#x27;Skill ids should be a list of strings&#x27;);
+    })
+  );
+
+  it(&#x27;should use the fail handler if skill ids is not a list of strings&#x27;,
+    fakeAsync(() =&gt; {
+      let successHandler = jasmine.createSpy(&#x27;success&#x27;);
+      let failHandler = jasmine.createSpy(&#x27;fail&#x27;);
+      questionBackendApiService.fetchQuestionsAsync(
+        [1, 2], 1, true).then(successHandler, failHandler);
+      flushMicrotasks();
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(
+        &#x27;Skill ids should be a list of strings&#x27;);
+    })
+  );
+
+  it(&#x27;should use the fail handler if skill ids is sent as null&#x27;,
+    fakeAsync(() =&gt; {
+      let successHandler = jasmine.createSpy(&#x27;success&#x27;);
+      let failHandler = jasmine.createSpy(&#x27;fail&#x27;);
+      questionBackendApiService.fetchQuestionsAsync(
+        null, 1, true).then(successHandler, failHandler);
+      flushMicrotasks();
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(
+        &#x27;Skill ids should be a list of strings&#x27;);
+    })
+  );
+
+  it(&#x27;should use the fail handler if question count is sent as null&#x27;,
+    fakeAsync(() =&gt; {
+      let successHandler = jasmine.createSpy(&#x27;success&#x27;);
+      let failHandler = jasmine.createSpy(&#x27;fail&#x27;);
+      questionBackendApiService.fetchQuestionsAsync(
+        [&#x27;1&#x27;], null, true).then(successHandler, failHandler);
+      flushMicrotasks();
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(
+        &#x27;Question count has to be a positive integer&#x27;);
+    })
+  );
+
+  it(&#x27;should successfully fetch questions for editors from the backend&#x27;,
+    fakeAsync(() =&gt; {
+      let successHandler = jasmine.createSpy(&#x27;success&#x27;);
+      let failHandler = jasmine.createSpy(&#x27;fail&#x27;);
+
+      questionBackendApiService.fetchQuestionSummariesAsync(
+        &#x27;1&#x27;).then(successHandler, failHandler);
+      let req = httpTestingController.expectOne(
+        &#x27;/questions_list_handler/1?offset=0&#x27;);
+      expect(req.request.method).toEqual(&#x27;GET&#x27;);
+      req.flush(sampleResponse);
+
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalledWith({
+        questionSummaries: sampleResponse.question_summary_dicts,
+        more: false
+      });
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
+
+  it(&#x27;should use the rejection handler if the backend request failed&#x27;,
+    fakeAsync(() =&gt; {
+      let successHandler = jasmine.createSpy(&#x27;success&#x27;);
+      let failHandler = jasmine.createSpy(&#x27;fail&#x27;);
+
+      questionBackendApiService.fetchQuestionSummariesAsync(
+        &#x27;1&#x27;).then(successHandler, failHandler);
+      let req = httpTestingController.expectOne(
+        &#x27;/questions_list_handler/1?offset=0&#x27;);
+      expect(req.request.method).toEqual(&#x27;GET&#x27;);
+      req.flush({
+        error: &#x27;Error loading questions.&#x27;
+      }, {
+        status: 500, statusText: &#x27;Invaid request&#x27;
+      });
+
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(&#x27;Error loading questions.&#x27;);
+    })
+  );
+
+  it(&#x27;should successfully fetch questions from the backend with cursor&#x27;,
+    fakeAsync(() =&gt; {
+      let successHandler = jasmine.createSpy(&#x27;success&#x27;);
+      let failHandler = jasmine.createSpy(&#x27;fail&#x27;);
+
+      questionBackendApiService.fetchQuestionSummariesAsync(
+        &#x27;1&#x27;, 1).then(successHandler, failHandler);
+      let req = httpTestingController.expectOne(
+        &#x27;/questions_list_handler/1?offset=1&#x27;);
+      expect(req.request.method).toEqual(&#x27;GET&#x27;);
+      req.flush(sampleResponse);
+
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalledWith({
+        questionSummaries: sampleResponse.question_summary_dicts,
+        more: false
+      });
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:25,&quot;character&quot;:6,&quot;text&quot;:&quot;questionBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:26,&quot;character&quot;:6,&quot;text&quot;:&quot;sampleDataResults&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:27,&quot;character&quot;:6,&quot;text&quot;:&quot;sampleResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:35,&quot;character&quot;:4,&quot;text&quot;:&quot;questionBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:39,&quot;character&quot;:4,&quot;text&quot;:&quot;sampleDataResults&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:83,&quot;character&quot;:4,&quot;text&quot;:&quot;sampleResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:110,&quot;character&quot;:4,&quot;text&quot;:&quot;questionBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:110,&quot;character&quot;:30,&quot;text&quot;:&quot;fetchQuestionsAsync&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:111,&quot;character&quot;:22,&quot;text&quot;:&quot;then&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:114,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:120,&quot;character&quot;:6,&quot;text&quot;:&quot;sampleDataResults&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:120,&quot;character&quot;:24,&quot;text&quot;:&quot;question_dicts&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:133,&quot;character&quot;:4,&quot;text&quot;:&quot;questionBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:133,&quot;character&quot;:30,&quot;text&quot;:&quot;fetchQuestionsAsync&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:134,&quot;character&quot;:23,&quot;text&quot;:&quot;then&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:137,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:143,&quot;character&quot;:6,&quot;text&quot;:&quot;sampleDataResults&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:143,&quot;character&quot;:24,&quot;text&quot;:&quot;question_dicts&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:155,&quot;character&quot;:6,&quot;text&quot;:&quot;questionBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:155,&quot;character&quot;:32,&quot;text&quot;:&quot;fetchTotalQuestionCountForSkillIdsAsync&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:156,&quot;character&quot;:15,&quot;text&quot;:&quot;then&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:159,&quot;character&quot;:17,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:178,&quot;character&quot;:6,&quot;text&quot;:&quot;questionBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:178,&quot;character&quot;:32,&quot;text&quot;:&quot;fetchTotalQuestionCountForSkillIdsAsync&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:179,&quot;character&quot;:15,&quot;text&quot;:&quot;then&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:182,&quot;character&quot;:17,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:205,&quot;character&quot;:6,&quot;text&quot;:&quot;questionBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:205,&quot;character&quot;:32,&quot;text&quot;:&quot;fetchQuestionsAsync&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:206,&quot;character&quot;:24,&quot;text&quot;:&quot;then&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:209,&quot;character&quot;:17,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:228,&quot;character&quot;:6,&quot;text&quot;:&quot;questionBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:228,&quot;character&quot;:32,&quot;text&quot;:&quot;fetchQuestionsAsync&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:229,&quot;character&quot;:28,&quot;text&quot;:&quot;then&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:241,&quot;character&quot;:6,&quot;text&quot;:&quot;questionBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:241,&quot;character&quot;:32,&quot;text&quot;:&quot;fetchQuestionsAsync&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:242,&quot;character&quot;:25,&quot;text&quot;:&quot;then&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:254,&quot;character&quot;:6,&quot;text&quot;:&quot;questionBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:254,&quot;character&quot;:32,&quot;text&quot;:&quot;fetchQuestionsAsync&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:255,&quot;character&quot;:26,&quot;text&quot;:&quot;then&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:267,&quot;character&quot;:6,&quot;text&quot;:&quot;questionBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:267,&quot;character&quot;:32,&quot;text&quot;:&quot;fetchQuestionsAsync&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:268,&quot;character&quot;:22,&quot;text&quot;:&quot;then&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:280,&quot;character&quot;:6,&quot;text&quot;:&quot;questionBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:280,&quot;character&quot;:32,&quot;text&quot;:&quot;fetchQuestionsAsync&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:281,&quot;character&quot;:25,&quot;text&quot;:&quot;then&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:293,&quot;character&quot;:6,&quot;text&quot;:&quot;questionBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:293,&quot;character&quot;:32,&quot;text&quot;:&quot;fetchQuestionsAsync&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:294,&quot;character&quot;:23,&quot;text&quot;:&quot;then&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:306,&quot;character&quot;:6,&quot;text&quot;:&quot;questionBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:306,&quot;character&quot;:32,&quot;text&quot;:&quot;fetchQuestionsAsync&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:307,&quot;character&quot;:27,&quot;text&quot;:&quot;then&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:320,&quot;character&quot;:6,&quot;text&quot;:&quot;questionBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:320,&quot;character&quot;:32,&quot;text&quot;:&quot;fetchQuestionSummariesAsync&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:321,&quot;character&quot;:13,&quot;text&quot;:&quot;then&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:324,&quot;character&quot;:17,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:330,&quot;character&quot;:8,&quot;text&quot;:&quot;questionSummaries&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:330,&quot;character&quot;:27,&quot;text&quot;:&quot;sampleResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:330,&quot;character&quot;:42,&quot;text&quot;:&quot;question_summary_dicts&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:342,&quot;character&quot;:6,&quot;text&quot;:&quot;questionBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:342,&quot;character&quot;:32,&quot;text&quot;:&quot;fetchQuestionSummariesAsync&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:343,&quot;character&quot;:13,&quot;text&quot;:&quot;then&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:346,&quot;character&quot;:17,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:365,&quot;character&quot;:6,&quot;text&quot;:&quot;questionBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:365,&quot;character&quot;:32,&quot;text&quot;:&quot;fetchQuestionSummariesAsync&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:366,&quot;character&quot;:16,&quot;text&quot;:&quot;then&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:369,&quot;character&quot;:17,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:375,&quot;character&quot;:8,&quot;text&quot;:&quot;questionSummaries&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:375,&quot;character&quot;:27,&quot;text&quot;:&quot;sampleResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-backend-api.service.spec.ts&quot;,&quot;line&quot;:375,&quot;character&quot;:42,&quot;text&quot;:&quot;question_summary_dicts&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:57 GMT</p>
+    </body>
+  </html>
+  

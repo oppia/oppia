@@ -1,0 +1,541 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>router.service.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/exploration-editor-page/services/router.service.spec.ts</td><td class="">48.94%</td><td class="">100%</td><td class="">709</td><td class="">347</td><td class="">362</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for RouterService.
+ */
+
+import { fakeAsync, flushMicrotasks } from &#x27;@angular/core/testing&#x27;;
+import $ from &#x27;jquery&#x27;;
+import { Subscription } from &#x27;rxjs&#x27;;
+import { importAllAngularServices } from &#x27;tests/unit-test-utils&#x27;;
+
+describe(&#x27;Router Service&#x27;, () =&gt; {
+  var RouterService = null;
+  var ExplorationStatesService = null;
+  var ExplorationImprovementsService = null;
+  var ExplorationInitStateNameService = null;
+  var ExternalSaveService = null;
+  var StateEditorRefreshService = null;
+  var $rootScope = null;
+  var $location = null;
+  var $timeout = null, $interval = null;
+  const centerGraphSpy = jasmine.createSpy(&#x27;centerGraphSpy&#x27;);
+  var testSubscriptions = null;
+  var refreshStatisticsTabSpy = null;
+  var refreshSettingsTabSpy = null;
+  var refreshTranslationTabSpy = null;
+  var externalSaveSpy = null;
+  var refreshVersionHistorySpy = null;
+  var refreshStateEditorSpy = null;
+
+  importAllAngularServices();
+  beforeEach(angular.mock.inject($injector =&gt; {
+    RouterService = $injector.get(&#x27;RouterService&#x27;);
+    ExplorationStatesService = $injector.get(&#x27;ExplorationStatesService&#x27;);
+    ExplorationImprovementsService = $injector.get(
+      &#x27;ExplorationImprovementsService&#x27;);
+    ExplorationInitStateNameService = $injector.get(
+      &#x27;ExplorationInitStateNameService&#x27;);
+    ExternalSaveService = $injector.get(&#x27;ExternalSaveService&#x27;);
+    StateEditorRefreshService = $injector.get(&#x27;StateEditorRefreshService&#x27;);
+    $rootScope = $injector.get(&#x27;$rootScope&#x27;);
+    $location = $injector.get(&#x27;$location&#x27;);
+    $timeout = $injector.get(&#x27;$timeout&#x27;);
+    $interval = $injector.get(&#x27;$interval&#x27;);
+
+    ExplorationInitStateNameService.init(&#x27;initState&#x27;);
+    ExplorationStatesService.init({
+      newState: {
+        content: {
+          content_id: &#x27;content&#x27;,
+          html: &#x27;&#x27;
+        },
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {},
+            default_outcome: {},
+          },
+        },
+        param_changes: [],
+        interaction: {
+          answer_groups: [{
+            rule_specs: [],
+            outcome: {
+              dest: &#x27;Me Llamo&#x27;,
+              feedback: {
+                content_id: &#x27;feedback_1&#x27;,
+                html: &#x27;buen trabajo!&#x27;,
+              },
+            },
+          }],
+          customization_args: {
+            placeholder: {
+              value: {
+                content_id: &#x27;ca_placeholder_0&#x27;,
+                unicode_str: &#x27;&#x27;
+              }
+            },
+            rows: { value: 1 }
+          },
+          default_outcome: {
+            dest: &#x27;Hola&#x27;,
+            feedback: {
+              content_id: &#x27;default_outcome&#x27;,
+              html: &#x27;try again!&#x27;,
+            },
+            labelled_as_correct: false,
+          },
+          hints: [],
+          id: &#x27;TextInput&#x27;,
+          solution: null,
+        },
+        written_translations: {
+          translations_mapping: {
+            content: {},
+            default_outcome: {},
+          },
+        }
+      },
+      initState: {
+        content: {
+          content_id: &#x27;content&#x27;,
+          html: &#x27;&#x27;
+        },
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {},
+            default_outcome: {},
+          },
+        },
+        param_changes: [],
+        interaction: {
+          answer_groups: [{
+            rule_specs: [],
+            outcome: {
+              dest: &#x27;Me Llamo&#x27;,
+              feedback: {
+                content_id: &#x27;feedback_1&#x27;,
+                html: &#x27;buen trabajo!&#x27;,
+              },
+            },
+          }],
+          customization_args: {
+            placeholder: {
+              value: {
+                content_id: &#x27;ca_placeholder_0&#x27;,
+                unicode_str: &#x27;&#x27;
+              }
+            },
+            rows: { value: 1 }
+          },
+          default_outcome: {
+            dest: &#x27;Hola&#x27;,
+            feedback: {
+              content_id: &#x27;default_outcome&#x27;,
+              html: &#x27;try again!&#x27;,
+            },
+            labelled_as_correct: false,
+          },
+          hints: [],
+          id: &#x27;TextInput&#x27;,
+          solution: null,
+        },
+        written_translations: {
+          translations_mapping: {
+            content: {},
+            default_outcome: {},
+          },
+        }
+      }
+    });
+  }));
+
+  beforeEach(() =&gt; {
+    refreshStatisticsTabSpy = jasmine.createSpy(&#x27;refreshStatisticsTab&#x27;);
+    refreshSettingsTabSpy = jasmine.createSpy(&#x27;refreshSettingsTab&#x27;);
+    refreshTranslationTabSpy = jasmine.createSpy(&#x27;refreshTranslationTab&#x27;);
+    refreshStateEditorSpy = jasmine.createSpy(&#x27;RefreshStateEditor&#x27;);
+    externalSaveSpy = jasmine.createSpy(&#x27;externalSpy&#x27;);
+    refreshVersionHistorySpy = jasmine.createSpy(&#x27;refreshVersionHistory&#x27;);
+    testSubscriptions = new Subscription();
+    testSubscriptions.add(RouterService.onCenterGraph.subscribe(
+      centerGraphSpy));
+    testSubscriptions.add(
+      RouterService.onRefreshStatisticsTab.subscribe(refreshStatisticsTabSpy));
+    testSubscriptions.add(
+      RouterService.onRefreshSettingsTab.subscribe(refreshSettingsTabSpy));
+    testSubscriptions.add(
+      RouterService.onRefreshTranslationTab.subscribe(
+        refreshTranslationTabSpy));
+    testSubscriptions.add(
+      ExternalSaveService.onExternalSave.subscribe(externalSaveSpy));
+    testSubscriptions.add(
+      RouterService.onRefreshVersionHistory.subscribe(
+        refreshVersionHistorySpy));
+    testSubscriptions.add(
+      StateEditorRefreshService.onRefreshStateEditor.subscribe(
+        refreshStateEditorSpy));
+  });
+
+  afterEach(() =&gt; {
+    testSubscriptions.unsubscribe();
+  });
+
+  it(&#x27;should navigate to main tab when tab is already on main&#x27;, done =&gt; {
+    var applyAsyncSpy = spyOn($rootScope, &#x27;$applyAsync&#x27;).and.callThrough();
+
+    var jQuerySpy = spyOn(window, &#x27;$&#x27;);
+    jQuerySpy.withArgs(&#x27;.oppia-editor-cards-container&#x27;).and.returnValue(
+      $(document.createElement(&#x27;div&#x27;)));
+    jQuerySpy.and.callThrough();
+
+    expect(RouterService.getActiveTabName()).toBe(&#x27;main&#x27;);
+    RouterService.navigateToMainTab(&#x27;newState&#x27;);
+    // To $watch the first $location.path call.
+    $rootScope.$apply();
+
+    // Function setTimeout is being used here to not conflict with
+    // $timeout.flush for fadeIn Jquery method. This first setTimeout is to wait
+    // the default time for fadeOut Jquery method to complete, which is 400
+    // miliseconds.
+    // Ref: https://api.jquery.com/fadeout/
+    setTimeout(() =&gt; {
+      // Waiting for $applyAsync be called, which can take ~10 miliseconds
+      // according to this ref: https://docs.angularjs.org/api/ng/type/$rootScope.Scope#$applyAsync
+      setTimeout(() =&gt; {
+        expect(externalSaveSpy).toHaveBeenCalled();
+        expect(RouterService.getActiveTabName()).toBe(&#x27;main&#x27;);
+
+        $interval.flush(300);
+
+        expect(applyAsyncSpy).toHaveBeenCalled();
+        done();
+      }, 20);
+      $timeout.flush(150);
+    }, 400);
+  });
+
+  it(&#x27;should not navigate to main tab when already there&#x27;, done =&gt; {
+    var applyAsyncSpy = spyOn($rootScope, &#x27;$applyAsync&#x27;).and.callThrough();
+
+    var jQuerySpy = spyOn(window, &#x27;$&#x27;);
+    jQuerySpy.withArgs(&#x27;.oppia-editor-cards-container&#x27;).and.returnValue(
+      $(document.createElement(&#x27;div&#x27;)));
+    jQuerySpy.and.callThrough();
+
+    expect(RouterService.getActiveTabName()).toBe(&#x27;main&#x27;);
+    RouterService.navigateToMainTab(&#x27;newState&#x27;);
+    // To $watch the first $location.path call.
+    $rootScope.$apply();
+
+    // Function setTimeout is being used here to not conflict with
+    // $timeout.flush for fadeIn Jquery method. This first setTimeout is to wait
+    // the default time for fadeOut Jquery method to complete, which is 400
+    // miliseconds.
+    // Ref: https://api.jquery.com/fadeout/
+    setTimeout(() =&gt; {
+      // Waiting for $applyAsync be called, which can take ~10 miliseconds
+      // according to this ref: https://docs.angularjs.org/api/ng/type/$rootScope.Scope#$applyAsync
+      setTimeout(() =&gt; {
+        expect(externalSaveSpy).toHaveBeenCalled();
+        expect(RouterService.getActiveTabName()).toBe(&#x27;main&#x27;);
+
+        $interval.flush(300);
+
+        expect(applyAsyncSpy).toHaveBeenCalled();
+
+        RouterService.navigateToMainTab(&#x27;newState&#x27;);
+        $timeout.flush();
+        $rootScope.$apply();
+
+        expect(RouterService.getActiveTabName()).toBe(&#x27;main&#x27;);
+        done();
+      }, 20);
+      $timeout.flush(150);
+    }, 400);
+  });
+
+  it(&#x27;should navigate to main tab when current location is not main&#x27;, () =&gt; {
+    // Go to stats tab.
+    RouterService.navigateToStatsTab();
+    $timeout.flush();
+    $rootScope.$apply();
+
+    expect(externalSaveSpy).toHaveBeenCalled();
+    expect(RouterService.getActiveTabName()).toBe(&#x27;stats&#x27;);
+    expect(refreshStatisticsTabSpy).toHaveBeenCalled();
+
+    expect(RouterService.isLocationSetToNonStateEditorTab()).toBe(true);
+    $rootScope.$apply();
+
+    // Now go to main tab.
+    RouterService.navigateToMainTab(&#x27;newState&#x27;);
+    $rootScope.$apply();
+    $rootScope.$apply();
+
+    expect(externalSaveSpy).toHaveBeenCalled();
+    expect(RouterService.getActiveTabName()).toBe(&#x27;main&#x27;);
+    expect(RouterService.isLocationSetToNonStateEditorTab()).toBe(false);
+    $rootScope.$apply();
+
+    $interval.flush(300);
+
+    expect(refreshStateEditorSpy).toHaveBeenCalled();
+    expect(centerGraphSpy).toHaveBeenCalled();
+  });
+
+  it(&#x27;should navigate to translation tab&#x27;, () =&gt; {
+    RouterService.navigateToTranslationTab();
+    $rootScope.$apply();
+
+    expect(externalSaveSpy).toHaveBeenCalled();
+    expect(RouterService.getActiveTabName()).toBe(&#x27;translation&#x27;);
+    $interval.flush(300);
+
+    expect(refreshTranslationTabSpy).toHaveBeenCalled();
+
+    expect(RouterService.isLocationSetToNonStateEditorTab()).toBe(true);
+    $rootScope.$apply();
+  });
+
+  it(&#x27;should navigate to preview tab&#x27;, () =&gt; {
+    expect(RouterService.getActiveTabName()).toBe(&#x27;main&#x27;);
+    RouterService.navigateToPreviewTab();
+    $timeout.flush(200);
+    $rootScope.$apply();
+
+    expect(externalSaveSpy).toHaveBeenCalled();
+    expect(RouterService.getActiveTabName()).toBe(&#x27;preview&#x27;);
+
+    $interval.flush(300);
+    $rootScope.$apply();
+
+    expect(externalSaveSpy).toHaveBeenCalled();
+    expect(RouterService.getActiveTabName()).toBe(&#x27;preview&#x27;);
+
+    $interval.flush(300);
+
+    expect(RouterService.isLocationSetToNonStateEditorTab()).toBe(false);
+    $rootScope.$apply();
+  });
+
+  it(&#x27;should navigate to stats tab&#x27;, () =&gt; {
+    RouterService.navigateToStatsTab();
+    $rootScope.$apply();
+
+    expect(externalSaveSpy).toHaveBeenCalled();
+    expect(RouterService.getActiveTabName()).toBe(&#x27;stats&#x27;);
+    expect(refreshStatisticsTabSpy).toHaveBeenCalled();
+
+    expect(RouterService.isLocationSetToNonStateEditorTab()).toBe(true);
+    $rootScope.$apply();
+  });
+
+  it(&#x27;should navigate to improvements tab&#x27;, fakeAsync(() =&gt; {
+    spyOn(ExplorationImprovementsService, &#x27;isImprovementsTabEnabledAsync&#x27;)
+      .and.returnValue(Promise.resolve(true));
+
+    RouterService.navigateToImprovementsTab();
+    $rootScope.$apply(); // Apply the change of active tab.
+    flushMicrotasks(); // Flush pending promise chains.
+    $rootScope.$apply(); // Apply any new changes made to the active tab.
+
+    expect(externalSaveSpy).toHaveBeenCalled();
+    expect(RouterService.getActiveTabName()).toEqual(&#x27;improvements&#x27;);
+
+    expect(RouterService.isLocationSetToNonStateEditorTab()).toBe(true);
+    $rootScope.$apply();
+  }));
+
+  it(
+    &#x27;should reroute to main tab after confirming improvements tab is disabled&#x27;,
+    fakeAsync(() =&gt; {
+      let resolveIsImprovementsTabEnabledPromise: (_: boolean) =&gt; void;
+      let isImprovementsTabEnabledPromise = new Promise(resolve =&gt; {
+        resolveIsImprovementsTabEnabledPromise = resolve;
+      });
+      spyOn(ExplorationImprovementsService, &#x27;isImprovementsTabEnabledAsync&#x27;)
+        .and.returnValue(isImprovementsTabEnabledPromise);
+
+      RouterService.navigateToImprovementsTab();
+      $rootScope.$apply(); // Apply the change of active tab.
+
+      // Promise hasn&#x27;t been fulfilled yet, should still be on improvements tab.
+      expect(RouterService.getActiveTabName()).toEqual(&#x27;improvements&#x27;);
+      expect(RouterService.isLocationSetToNonStateEditorTab()).toBe(true);
+
+      resolveIsImprovementsTabEnabledPromise(false);
+      flushMicrotasks(); // Flush pending promise chains.
+      $rootScope.$apply(); // Apply any new changes made to the active tab.
+
+      // Promise has been fulfilled, should be redirected to main tab since
+      // we&#x27;ve confirmed the improvements tab is not enabled.
+      expect(RouterService.getActiveTabName()).toEqual(&#x27;main&#x27;);
+      expect(RouterService.isLocationSetToNonStateEditorTab()).toBe(false);
+    }));
+
+  it(&#x27;should reroute to the main tab immediately when improvements tab is &#x27; +
+    &#x27;disabled&#x27;, fakeAsync(() =&gt; {
+    spyOn(ExplorationImprovementsService, &#x27;isImprovementsTabEnabledAsync&#x27;)
+      .and.returnValue(Promise.resolve(false));
+
+    RouterService.navigateToImprovementsTab();
+    $rootScope.$apply(); // Apply the change of active tab.
+    flushMicrotasks(); // Flush pending promise chains.
+    $rootScope.$apply(); // Apply any new changes made to the active tab.
+
+    expect(RouterService.getActiveTabName()).toEqual(&#x27;main&#x27;);
+    expect(RouterService.isLocationSetToNonStateEditorTab()).toBe(false);
+  }));
+
+  it(
+    &#x27;should remain on the improvements tab after confirming it is enabled&#x27;,
+    fakeAsync(() =&gt; {
+      let resolveIsImprovementsTabEnabledPromise: (_: boolean) =&gt; void;
+      let isImprovementsTabEnabledPromise = new Promise(resolve =&gt; {
+        resolveIsImprovementsTabEnabledPromise = resolve;
+      });
+      spyOn(ExplorationImprovementsService, &#x27;isImprovementsTabEnabledAsync&#x27;)
+        .and.returnValue(isImprovementsTabEnabledPromise);
+
+      RouterService.navigateToImprovementsTab();
+      $rootScope.$apply(); // Apply the change of active tab.
+      flushMicrotasks(); // Flush pending promise chains.
+      $rootScope.$apply(); // Apply any new changes made to the active tab.
+
+      expect(RouterService.getActiveTabName()).toEqual(&#x27;improvements&#x27;);
+      expect(RouterService.isLocationSetToNonStateEditorTab()).toBe(true);
+
+      resolveIsImprovementsTabEnabledPromise(true);
+      flushMicrotasks(); // Flush pending promise chains.
+      $rootScope.$apply(); // Apply any new changes made to the active tab.
+
+      expect(RouterService.getActiveTabName()).toEqual(&#x27;improvements&#x27;);
+      expect(RouterService.isLocationSetToNonStateEditorTab()).toBe(true);
+    }));
+
+  it(
+    &#x27;should not reroute to the main tab after leaving improvements tab&#x27;,
+    fakeAsync(() =&gt; {
+      let resolveIsImprovementsTabEnabledPromise: (_: boolean) =&gt; void;
+      let isImprovementsTabEnabledPromise = new Promise(resolve =&gt; {
+        resolveIsImprovementsTabEnabledPromise = resolve;
+      });
+      spyOn(ExplorationImprovementsService, &#x27;isImprovementsTabEnabledAsync&#x27;)
+        .and.returnValue(isImprovementsTabEnabledPromise);
+
+      RouterService.navigateToImprovementsTab();
+      $rootScope.$apply(); // Apply the change of active tab.
+
+      // Promise hasn&#x27;t been fulfilled yet, should still be on improvements tab.
+      expect(RouterService.getActiveTabName()).toEqual(&#x27;improvements&#x27;);
+
+      RouterService.navigateToStatsTab();
+      $rootScope.$apply(); // Apply the change of active tab.
+
+      // Have navigated to stats tab before promise was fulfilled.
+      expect(RouterService.getActiveTabName()).toEqual(&#x27;stats&#x27;);
+
+      resolveIsImprovementsTabEnabledPromise(false);
+      flushMicrotasks(); // Flush pending promise chains.
+      $rootScope.$apply(); // Apply any new changes made to the active tab.
+
+      // Promise has been fulfilled, but user has navigated away from the
+      // improvements tab. They should *not* have been redirected to main tab.
+      expect(RouterService.getActiveTabName()).toEqual(&#x27;stats&#x27;);
+    }));
+
+  it(&#x27;should navigate to settings tab&#x27;, () =&gt; {
+    RouterService.navigateToSettingsTab();
+    $rootScope.$apply();
+
+    expect(externalSaveSpy).toHaveBeenCalled();
+    expect(RouterService.getActiveTabName()).toBe(&#x27;settings&#x27;);
+    expect(refreshSettingsTabSpy).toHaveBeenCalled();
+
+    expect(RouterService.isLocationSetToNonStateEditorTab()).toBe(true);
+    $rootScope.$apply();
+  });
+
+  it(&#x27;should navigate to history tab&#x27;, () =&gt; {
+    RouterService.navigateToHistoryTab();
+    $rootScope.$apply();
+
+    expect(externalSaveSpy).toHaveBeenCalled();
+    expect(refreshVersionHistorySpy).toHaveBeenCalled();
+    expect(RouterService.getActiveTabName()).toBe(&#x27;history&#x27;);
+
+    expect(RouterService.isLocationSetToNonStateEditorTab()).toBe(true);
+    $rootScope.$apply();
+  });
+
+  it(&#x27;should navigate to feedback tab&#x27;, () =&gt; {
+    RouterService.navigateToFeedbackTab();
+    $rootScope.$apply();
+
+    // $watch is called.
+    expect(externalSaveSpy).toHaveBeenCalled();
+    expect(RouterService.getActiveTabName()).toBe(&#x27;feedback&#x27;);
+
+    expect(RouterService.isLocationSetToNonStateEditorTab()).toBe(true);
+    $rootScope.$apply();
+  });
+
+  it(&#x27;should handle when location redirects to an invalid path&#x27;, () =&gt; {
+    var locationPathSpy = spyOn($location, &#x27;path&#x27;);
+    locationPathSpy.and.returnValue(&#x27;/invalid&#x27;);
+
+    RouterService.navigateToMainTab(null);
+    $rootScope.$apply();
+    expect(externalSaveSpy).toHaveBeenCalled();
+
+    // Change to a valid path during the call.
+    locationPathSpy.and.returnValue(&#x27;/gui/initState&#x27;);
+
+    $rootScope.$apply();
+    expect(externalSaveSpy).toHaveBeenCalled();
+    expect(RouterService.getActiveTabName()).toBe(&#x27;main&#x27;);
+    expect(RouterService.getCurrentStateFromLocationPath())
+      .toEqual(&#x27;initState&#x27;);
+
+    $interval.flush(300);
+
+    expect(refreshStateEditorSpy).toHaveBeenCalled();
+    expect(centerGraphSpy).toHaveBeenCalled();
+  });
+
+  it(&#x27;should save pending changes&#x27;, () =&gt; {
+    RouterService.savePendingChanges();
+    expect(externalSaveSpy).toHaveBeenCalled();
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:24,&quot;character&quot;:6,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:25,&quot;character&quot;:6,&quot;text&quot;:&quot;ExplorationStatesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:26,&quot;character&quot;:6,&quot;text&quot;:&quot;ExplorationImprovementsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:27,&quot;character&quot;:6,&quot;text&quot;:&quot;ExplorationInitStateNameService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:28,&quot;character&quot;:6,&quot;text&quot;:&quot;ExternalSaveService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:29,&quot;character&quot;:6,&quot;text&quot;:&quot;StateEditorRefreshService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:30,&quot;character&quot;:6,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:31,&quot;character&quot;:6,&quot;text&quot;:&quot;$location&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:32,&quot;character&quot;:6,&quot;text&quot;:&quot;$timeout&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:32,&quot;character&quot;:23,&quot;text&quot;:&quot;$interval&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:34,&quot;character&quot;:6,&quot;text&quot;:&quot;testSubscriptions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:35,&quot;character&quot;:6,&quot;text&quot;:&quot;refreshStatisticsTabSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:36,&quot;character&quot;:6,&quot;text&quot;:&quot;refreshSettingsTabSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:37,&quot;character&quot;:6,&quot;text&quot;:&quot;refreshTranslationTabSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:38,&quot;character&quot;:6,&quot;text&quot;:&quot;externalSaveSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:39,&quot;character&quot;:6,&quot;text&quot;:&quot;refreshVersionHistorySpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:40,&quot;character&quot;:6,&quot;text&quot;:&quot;refreshStateEditorSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:43,&quot;character&quot;:33,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:44,&quot;character&quot;:4,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:44,&quot;character&quot;:20,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:44,&quot;character&quot;:30,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:45,&quot;character&quot;:4,&quot;text&quot;:&quot;ExplorationStatesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:45,&quot;character&quot;:31,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:45,&quot;character&quot;:41,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:46,&quot;character&quot;:4,&quot;text&quot;:&quot;ExplorationImprovementsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:46,&quot;character&quot;:37,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:46,&quot;character&quot;:47,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:48,&quot;character&quot;:4,&quot;text&quot;:&quot;ExplorationInitStateNameService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:48,&quot;character&quot;:38,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:48,&quot;character&quot;:48,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:50,&quot;character&quot;:4,&quot;text&quot;:&quot;ExternalSaveService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:50,&quot;character&quot;:26,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:50,&quot;character&quot;:36,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:51,&quot;character&quot;:4,&quot;text&quot;:&quot;StateEditorRefreshService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:51,&quot;character&quot;:32,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:51,&quot;character&quot;:42,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:52,&quot;character&quot;:4,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:52,&quot;character&quot;:17,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:52,&quot;character&quot;:27,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:53,&quot;character&quot;:4,&quot;text&quot;:&quot;$location&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:53,&quot;character&quot;:16,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:53,&quot;character&quot;:26,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:54,&quot;character&quot;:4,&quot;text&quot;:&quot;$timeout&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:54,&quot;character&quot;:15,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:54,&quot;character&quot;:25,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:55,&quot;character&quot;:4,&quot;text&quot;:&quot;$interval&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:55,&quot;character&quot;:16,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:55,&quot;character&quot;:26,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:57,&quot;character&quot;:4,&quot;text&quot;:&quot;ExplorationInitStateNameService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:57,&quot;character&quot;:36,&quot;text&quot;:&quot;init&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:58,&quot;character&quot;:4,&quot;text&quot;:&quot;ExplorationStatesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:58,&quot;character&quot;:29,&quot;text&quot;:&quot;init&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:165,&quot;character&quot;:4,&quot;text&quot;:&quot;refreshStatisticsTabSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:166,&quot;character&quot;:4,&quot;text&quot;:&quot;refreshSettingsTabSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:167,&quot;character&quot;:4,&quot;text&quot;:&quot;refreshTranslationTabSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:168,&quot;character&quot;:4,&quot;text&quot;:&quot;refreshStateEditorSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:169,&quot;character&quot;:4,&quot;text&quot;:&quot;externalSaveSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:170,&quot;character&quot;:4,&quot;text&quot;:&quot;refreshVersionHistorySpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:171,&quot;character&quot;:4,&quot;text&quot;:&quot;testSubscriptions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:172,&quot;character&quot;:4,&quot;text&quot;:&quot;testSubscriptions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:172,&quot;character&quot;:22,&quot;text&quot;:&quot;add&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:172,&quot;character&quot;:26,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:172,&quot;character&quot;:40,&quot;text&quot;:&quot;onCenterGraph&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:172,&quot;character&quot;:54,&quot;text&quot;:&quot;subscribe&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:174,&quot;character&quot;:4,&quot;text&quot;:&quot;testSubscriptions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:174,&quot;character&quot;:22,&quot;text&quot;:&quot;add&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:175,&quot;character&quot;:6,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:175,&quot;character&quot;:20,&quot;text&quot;:&quot;onRefreshStatisticsTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:175,&quot;character&quot;:43,&quot;text&quot;:&quot;subscribe&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:175,&quot;character&quot;:53,&quot;text&quot;:&quot;refreshStatisticsTabSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:176,&quot;character&quot;:4,&quot;text&quot;:&quot;testSubscriptions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:176,&quot;character&quot;:22,&quot;text&quot;:&quot;add&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:177,&quot;character&quot;:6,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:177,&quot;character&quot;:20,&quot;text&quot;:&quot;onRefreshSettingsTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:177,&quot;character&quot;:41,&quot;text&quot;:&quot;subscribe&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:177,&quot;character&quot;:51,&quot;text&quot;:&quot;refreshSettingsTabSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:178,&quot;character&quot;:4,&quot;text&quot;:&quot;testSubscriptions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:178,&quot;character&quot;:22,&quot;text&quot;:&quot;add&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:179,&quot;character&quot;:6,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:179,&quot;character&quot;:20,&quot;text&quot;:&quot;onRefreshTranslationTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:179,&quot;character&quot;:44,&quot;text&quot;:&quot;subscribe&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:180,&quot;character&quot;:8,&quot;text&quot;:&quot;refreshTranslationTabSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:181,&quot;character&quot;:4,&quot;text&quot;:&quot;testSubscriptions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:181,&quot;character&quot;:22,&quot;text&quot;:&quot;add&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:182,&quot;character&quot;:6,&quot;text&quot;:&quot;ExternalSaveService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:182,&quot;character&quot;:26,&quot;text&quot;:&quot;onExternalSave&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:182,&quot;character&quot;:41,&quot;text&quot;:&quot;subscribe&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:182,&quot;character&quot;:51,&quot;text&quot;:&quot;externalSaveSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:183,&quot;character&quot;:4,&quot;text&quot;:&quot;testSubscriptions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:183,&quot;character&quot;:22,&quot;text&quot;:&quot;add&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:184,&quot;character&quot;:6,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:184,&quot;character&quot;:20,&quot;text&quot;:&quot;onRefreshVersionHistory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:184,&quot;character&quot;:44,&quot;text&quot;:&quot;subscribe&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:185,&quot;character&quot;:8,&quot;text&quot;:&quot;refreshVersionHistorySpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:186,&quot;character&quot;:4,&quot;text&quot;:&quot;testSubscriptions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:186,&quot;character&quot;:22,&quot;text&quot;:&quot;add&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:187,&quot;character&quot;:6,&quot;text&quot;:&quot;StateEditorRefreshService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:187,&quot;character&quot;:32,&quot;text&quot;:&quot;onRefreshStateEditor&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:187,&quot;character&quot;:53,&quot;text&quot;:&quot;subscribe&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:188,&quot;character&quot;:8,&quot;text&quot;:&quot;refreshStateEditorSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:192,&quot;character&quot;:4,&quot;text&quot;:&quot;testSubscriptions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:192,&quot;character&quot;:22,&quot;text&quot;:&quot;unsubscribe&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:196,&quot;character&quot;:8,&quot;text&quot;:&quot;applyAsyncSpy&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:196,&quot;character&quot;:30,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:196,&quot;character&quot;:57,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:203,&quot;character&quot;:11,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:203,&quot;character&quot;:25,&quot;text&quot;:&quot;getActiveTabName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:204,&quot;character&quot;:4,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:204,&quot;character&quot;:18,&quot;text&quot;:&quot;navigateToMainTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:206,&quot;character&quot;:4,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:206,&quot;character&quot;:15,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:217,&quot;character&quot;:15,&quot;text&quot;:&quot;externalSaveSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:218,&quot;character&quot;:15,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:218,&quot;character&quot;:29,&quot;text&quot;:&quot;getActiveTabName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:220,&quot;character&quot;:8,&quot;text&quot;:&quot;$interval&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:220,&quot;character&quot;:18,&quot;text&quot;:&quot;flush&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:222,&quot;character&quot;:15,&quot;text&quot;:&quot;applyAsyncSpy&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:225,&quot;character&quot;:6,&quot;text&quot;:&quot;$timeout&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:225,&quot;character&quot;:15,&quot;text&quot;:&quot;flush&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:230,&quot;character&quot;:8,&quot;text&quot;:&quot;applyAsyncSpy&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:230,&quot;character&quot;:30,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:230,&quot;character&quot;:57,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:237,&quot;character&quot;:11,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:237,&quot;character&quot;:25,&quot;text&quot;:&quot;getActiveTabName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:238,&quot;character&quot;:4,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:238,&quot;character&quot;:18,&quot;text&quot;:&quot;navigateToMainTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:240,&quot;character&quot;:4,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:240,&quot;character&quot;:15,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:251,&quot;character&quot;:15,&quot;text&quot;:&quot;externalSaveSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:252,&quot;character&quot;:15,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:252,&quot;character&quot;:29,&quot;text&quot;:&quot;getActiveTabName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:254,&quot;character&quot;:8,&quot;text&quot;:&quot;$interval&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:254,&quot;character&quot;:18,&quot;text&quot;:&quot;flush&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:256,&quot;character&quot;:15,&quot;text&quot;:&quot;applyAsyncSpy&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:258,&quot;character&quot;:8,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:258,&quot;character&quot;:22,&quot;text&quot;:&quot;navigateToMainTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:259,&quot;character&quot;:8,&quot;text&quot;:&quot;$timeout&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:259,&quot;character&quot;:17,&quot;text&quot;:&quot;flush&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:260,&quot;character&quot;:8,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:260,&quot;character&quot;:19,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:262,&quot;character&quot;:15,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:262,&quot;character&quot;:29,&quot;text&quot;:&quot;getActiveTabName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:265,&quot;character&quot;:6,&quot;text&quot;:&quot;$timeout&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:265,&quot;character&quot;:15,&quot;text&quot;:&quot;flush&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:271,&quot;character&quot;:4,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:271,&quot;character&quot;:18,&quot;text&quot;:&quot;navigateToStatsTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:272,&quot;character&quot;:4,&quot;text&quot;:&quot;$timeout&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:272,&quot;character&quot;:13,&quot;text&quot;:&quot;flush&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:273,&quot;character&quot;:4,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:273,&quot;character&quot;:15,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:275,&quot;character&quot;:11,&quot;text&quot;:&quot;externalSaveSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:276,&quot;character&quot;:11,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:276,&quot;character&quot;:25,&quot;text&quot;:&quot;getActiveTabName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:277,&quot;character&quot;:11,&quot;text&quot;:&quot;refreshStatisticsTabSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:279,&quot;character&quot;:11,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:279,&quot;character&quot;:25,&quot;text&quot;:&quot;isLocationSetToNonStateEditorTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:280,&quot;character&quot;:4,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:280,&quot;character&quot;:15,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:283,&quot;character&quot;:4,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:283,&quot;character&quot;:18,&quot;text&quot;:&quot;navigateToMainTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:284,&quot;character&quot;:4,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:284,&quot;character&quot;:15,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:285,&quot;character&quot;:4,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:285,&quot;character&quot;:15,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:287,&quot;character&quot;:11,&quot;text&quot;:&quot;externalSaveSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:288,&quot;character&quot;:11,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:288,&quot;character&quot;:25,&quot;text&quot;:&quot;getActiveTabName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:289,&quot;character&quot;:11,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:289,&quot;character&quot;:25,&quot;text&quot;:&quot;isLocationSetToNonStateEditorTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:290,&quot;character&quot;:4,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:290,&quot;character&quot;:15,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:292,&quot;character&quot;:4,&quot;text&quot;:&quot;$interval&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:292,&quot;character&quot;:14,&quot;text&quot;:&quot;flush&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:294,&quot;character&quot;:11,&quot;text&quot;:&quot;refreshStateEditorSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:299,&quot;character&quot;:4,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:299,&quot;character&quot;:18,&quot;text&quot;:&quot;navigateToTranslationTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:300,&quot;character&quot;:4,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:300,&quot;character&quot;:15,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:302,&quot;character&quot;:11,&quot;text&quot;:&quot;externalSaveSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:303,&quot;character&quot;:11,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:303,&quot;character&quot;:25,&quot;text&quot;:&quot;getActiveTabName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:304,&quot;character&quot;:4,&quot;text&quot;:&quot;$interval&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:304,&quot;character&quot;:14,&quot;text&quot;:&quot;flush&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:306,&quot;character&quot;:11,&quot;text&quot;:&quot;refreshTranslationTabSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:308,&quot;character&quot;:11,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:308,&quot;character&quot;:25,&quot;text&quot;:&quot;isLocationSetToNonStateEditorTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:309,&quot;character&quot;:4,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:309,&quot;character&quot;:15,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:313,&quot;character&quot;:11,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:313,&quot;character&quot;:25,&quot;text&quot;:&quot;getActiveTabName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:314,&quot;character&quot;:4,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:314,&quot;character&quot;:18,&quot;text&quot;:&quot;navigateToPreviewTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:315,&quot;character&quot;:4,&quot;text&quot;:&quot;$timeout&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:315,&quot;character&quot;:13,&quot;text&quot;:&quot;flush&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:316,&quot;character&quot;:4,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:316,&quot;character&quot;:15,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:318,&quot;character&quot;:11,&quot;text&quot;:&quot;externalSaveSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:319,&quot;character&quot;:11,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:319,&quot;character&quot;:25,&quot;text&quot;:&quot;getActiveTabName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:321,&quot;character&quot;:4,&quot;text&quot;:&quot;$interval&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:321,&quot;character&quot;:14,&quot;text&quot;:&quot;flush&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:322,&quot;character&quot;:4,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:322,&quot;character&quot;:15,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:324,&quot;character&quot;:11,&quot;text&quot;:&quot;externalSaveSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:325,&quot;character&quot;:11,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:325,&quot;character&quot;:25,&quot;text&quot;:&quot;getActiveTabName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:327,&quot;character&quot;:4,&quot;text&quot;:&quot;$interval&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:327,&quot;character&quot;:14,&quot;text&quot;:&quot;flush&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:329,&quot;character&quot;:11,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:329,&quot;character&quot;:25,&quot;text&quot;:&quot;isLocationSetToNonStateEditorTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:330,&quot;character&quot;:4,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:330,&quot;character&quot;:15,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:334,&quot;character&quot;:4,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:334,&quot;character&quot;:18,&quot;text&quot;:&quot;navigateToStatsTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:335,&quot;character&quot;:4,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:335,&quot;character&quot;:15,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:337,&quot;character&quot;:11,&quot;text&quot;:&quot;externalSaveSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:338,&quot;character&quot;:11,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:338,&quot;character&quot;:25,&quot;text&quot;:&quot;getActiveTabName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:339,&quot;character&quot;:11,&quot;text&quot;:&quot;refreshStatisticsTabSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:341,&quot;character&quot;:11,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:341,&quot;character&quot;:25,&quot;text&quot;:&quot;isLocationSetToNonStateEditorTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:342,&quot;character&quot;:4,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:342,&quot;character&quot;:15,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:346,&quot;character&quot;:10,&quot;text&quot;:&quot;ExplorationImprovementsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:347,&quot;character&quot;:7,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:349,&quot;character&quot;:4,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:349,&quot;character&quot;:18,&quot;text&quot;:&quot;navigateToImprovementsTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:350,&quot;character&quot;:4,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:350,&quot;character&quot;:15,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:352,&quot;character&quot;:4,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:352,&quot;character&quot;:15,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:354,&quot;character&quot;:11,&quot;text&quot;:&quot;externalSaveSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:355,&quot;character&quot;:11,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:355,&quot;character&quot;:25,&quot;text&quot;:&quot;getActiveTabName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:357,&quot;character&quot;:11,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:357,&quot;character&quot;:25,&quot;text&quot;:&quot;isLocationSetToNonStateEditorTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:358,&quot;character&quot;:4,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:358,&quot;character&quot;:15,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:368,&quot;character&quot;:12,&quot;text&quot;:&quot;ExplorationImprovementsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:369,&quot;character&quot;:9,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:371,&quot;character&quot;:6,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:371,&quot;character&quot;:20,&quot;text&quot;:&quot;navigateToImprovementsTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:372,&quot;character&quot;:6,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:372,&quot;character&quot;:17,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:375,&quot;character&quot;:13,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:375,&quot;character&quot;:27,&quot;text&quot;:&quot;getActiveTabName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:376,&quot;character&quot;:13,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:376,&quot;character&quot;:27,&quot;text&quot;:&quot;isLocationSetToNonStateEditorTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:380,&quot;character&quot;:6,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:380,&quot;character&quot;:17,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:384,&quot;character&quot;:13,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:384,&quot;character&quot;:27,&quot;text&quot;:&quot;getActiveTabName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:385,&quot;character&quot;:13,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:385,&quot;character&quot;:27,&quot;text&quot;:&quot;isLocationSetToNonStateEditorTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:390,&quot;character&quot;:10,&quot;text&quot;:&quot;ExplorationImprovementsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:391,&quot;character&quot;:7,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:393,&quot;character&quot;:4,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:393,&quot;character&quot;:18,&quot;text&quot;:&quot;navigateToImprovementsTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:394,&quot;character&quot;:4,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:394,&quot;character&quot;:15,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:396,&quot;character&quot;:4,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:396,&quot;character&quot;:15,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:398,&quot;character&quot;:11,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:398,&quot;character&quot;:25,&quot;text&quot;:&quot;getActiveTabName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:399,&quot;character&quot;:11,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:399,&quot;character&quot;:25,&quot;text&quot;:&quot;isLocationSetToNonStateEditorTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:409,&quot;character&quot;:12,&quot;text&quot;:&quot;ExplorationImprovementsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:410,&quot;character&quot;:9,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:412,&quot;character&quot;:6,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:412,&quot;character&quot;:20,&quot;text&quot;:&quot;navigateToImprovementsTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:413,&quot;character&quot;:6,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:413,&quot;character&quot;:17,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:415,&quot;character&quot;:6,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:415,&quot;character&quot;:17,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:417,&quot;character&quot;:13,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:417,&quot;character&quot;:27,&quot;text&quot;:&quot;getActiveTabName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:418,&quot;character&quot;:13,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:418,&quot;character&quot;:27,&quot;text&quot;:&quot;isLocationSetToNonStateEditorTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:422,&quot;character&quot;:6,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:422,&quot;character&quot;:17,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:424,&quot;character&quot;:13,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:424,&quot;character&quot;:27,&quot;text&quot;:&quot;getActiveTabName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:425,&quot;character&quot;:13,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:425,&quot;character&quot;:27,&quot;text&quot;:&quot;isLocationSetToNonStateEditorTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:435,&quot;character&quot;:12,&quot;text&quot;:&quot;ExplorationImprovementsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:436,&quot;character&quot;:9,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:438,&quot;character&quot;:6,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:438,&quot;character&quot;:20,&quot;text&quot;:&quot;navigateToImprovementsTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:439,&quot;character&quot;:6,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:439,&quot;character&quot;:17,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:442,&quot;character&quot;:13,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:442,&quot;character&quot;:27,&quot;text&quot;:&quot;getActiveTabName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:444,&quot;character&quot;:6,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:444,&quot;character&quot;:20,&quot;text&quot;:&quot;navigateToStatsTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:445,&quot;character&quot;:6,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:445,&quot;character&quot;:17,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:448,&quot;character&quot;:13,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:448,&quot;character&quot;:27,&quot;text&quot;:&quot;getActiveTabName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:452,&quot;character&quot;:6,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:452,&quot;character&quot;:17,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:456,&quot;character&quot;:13,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:456,&quot;character&quot;:27,&quot;text&quot;:&quot;getActiveTabName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:460,&quot;character&quot;:4,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:460,&quot;character&quot;:18,&quot;text&quot;:&quot;navigateToSettingsTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:461,&quot;character&quot;:4,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:461,&quot;character&quot;:15,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:463,&quot;character&quot;:11,&quot;text&quot;:&quot;externalSaveSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:464,&quot;character&quot;:11,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:464,&quot;character&quot;:25,&quot;text&quot;:&quot;getActiveTabName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:465,&quot;character&quot;:11,&quot;text&quot;:&quot;refreshSettingsTabSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:467,&quot;character&quot;:11,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:467,&quot;character&quot;:25,&quot;text&quot;:&quot;isLocationSetToNonStateEditorTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:468,&quot;character&quot;:4,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:468,&quot;character&quot;:15,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:472,&quot;character&quot;:4,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:472,&quot;character&quot;:18,&quot;text&quot;:&quot;navigateToHistoryTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:473,&quot;character&quot;:4,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:473,&quot;character&quot;:15,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:475,&quot;character&quot;:11,&quot;text&quot;:&quot;externalSaveSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:476,&quot;character&quot;:11,&quot;text&quot;:&quot;refreshVersionHistorySpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:477,&quot;character&quot;:11,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:477,&quot;character&quot;:25,&quot;text&quot;:&quot;getActiveTabName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:479,&quot;character&quot;:11,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:479,&quot;character&quot;:25,&quot;text&quot;:&quot;isLocationSetToNonStateEditorTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:480,&quot;character&quot;:4,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:480,&quot;character&quot;:15,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:484,&quot;character&quot;:4,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:484,&quot;character&quot;:18,&quot;text&quot;:&quot;navigateToFeedbackTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:485,&quot;character&quot;:4,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:485,&quot;character&quot;:15,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:488,&quot;character&quot;:11,&quot;text&quot;:&quot;externalSaveSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:489,&quot;character&quot;:11,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:489,&quot;character&quot;:25,&quot;text&quot;:&quot;getActiveTabName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:491,&quot;character&quot;:11,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:491,&quot;character&quot;:25,&quot;text&quot;:&quot;isLocationSetToNonStateEditorTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:492,&quot;character&quot;:4,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:492,&quot;character&quot;:15,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:496,&quot;character&quot;:8,&quot;text&quot;:&quot;locationPathSpy&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:496,&quot;character&quot;:32,&quot;text&quot;:&quot;$location&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:497,&quot;character&quot;:4,&quot;text&quot;:&quot;locationPathSpy&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:497,&quot;character&quot;:20,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:499,&quot;character&quot;:4,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:499,&quot;character&quot;:18,&quot;text&quot;:&quot;navigateToMainTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:500,&quot;character&quot;:4,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:500,&quot;character&quot;:15,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:501,&quot;character&quot;:11,&quot;text&quot;:&quot;externalSaveSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:504,&quot;character&quot;:4,&quot;text&quot;:&quot;locationPathSpy&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:504,&quot;character&quot;:20,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:506,&quot;character&quot;:4,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:506,&quot;character&quot;:15,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:507,&quot;character&quot;:11,&quot;text&quot;:&quot;externalSaveSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:508,&quot;character&quot;:11,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:508,&quot;character&quot;:25,&quot;text&quot;:&quot;getActiveTabName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:509,&quot;character&quot;:11,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:509,&quot;character&quot;:25,&quot;text&quot;:&quot;getCurrentStateFromLocationPath&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:512,&quot;character&quot;:4,&quot;text&quot;:&quot;$interval&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:512,&quot;character&quot;:14,&quot;text&quot;:&quot;flush&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:514,&quot;character&quot;:11,&quot;text&quot;:&quot;refreshStateEditorSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:519,&quot;character&quot;:4,&quot;text&quot;:&quot;RouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:519,&quot;character&quot;:18,&quot;text&quot;:&quot;savePendingChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/router.service.spec.ts&quot;,&quot;line&quot;:520,&quot;character&quot;:11,&quot;text&quot;:&quot;externalSaveSpy&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:59 GMT</p>
+    </body>
+  </html>
+  

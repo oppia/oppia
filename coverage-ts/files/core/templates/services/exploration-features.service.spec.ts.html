@@ -1,0 +1,121 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>exploration-features.service.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">core/templates/services/exploration-features.service.spec.ts</td><td class="">100.00%</td><td class="">100%</td><td class="">110</td><td class="">110</td><td class="">0</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">
+
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit test for ExplorationFeaturesService
+ */
+
+import { TestBed } from &#x27;@angular/core/testing&#x27;;
+import { ParamChangeBackendDict } from &#x27;domain/exploration/ParamChangeObjectFactory&#x27;;
+
+import { ExplorationFeaturesService, ExplorationDataDict} from
+  &#x27;services/exploration-features.service&#x27;;
+import { ExplorationFeatures } from &#x27;./exploration-features-backend-api.service&#x27;;
+
+describe(&#x27;ExplorationFeatureService&#x27;, () =&gt; {
+  let explorationFeatureService: ExplorationFeaturesService;
+  let featureData: ExplorationFeatures;
+  let explorationData: ExplorationDataDict;
+  let explorationData2: ExplorationDataDict;
+  let testParamChange: ParamChangeBackendDict;
+
+  beforeEach(() =&gt; {
+    explorationFeatureService = TestBed.get(ExplorationFeaturesService);
+    ExplorationFeaturesService.settings.areParametersEnabled = false;
+    ExplorationFeaturesService.settings.isPlaythroughRecordingEnabled = false;
+    ExplorationFeaturesService.serviceIsInitialized = false;
+
+    // The property alwaysAskLearnersForAnswerDetails is not used. It is just
+    // for complete the ExplorationFeatures interface.
+    featureData = {
+      isExplorationWhitelisted: true,
+      alwaysAskLearnersForAnswerDetails: false
+    };
+    explorationData = {
+      param_changes: [testParamChange],
+      states: {}
+    };
+    explorationData2 = {
+      param_changes: [],
+      states: {
+        testState: {
+          param_changes: [testParamChange],
+          classifier_model_id: &#x27;&#x27;,
+          content: null,
+          interaction: null,
+          linked_skill_id: null,
+          recorded_voiceovers: null,
+          solicit_answer_details: false,
+          card_is_checkpoint: false,
+          written_translations: null,
+          next_content_id_index: 1,
+        }
+      }
+    };
+    testParamChange = {
+      name: &#x27;param_1&#x27;,
+      generator_id: &#x27;test_id&#x27;,
+      customization_args: {
+        parse_with_jinja: true,
+        value: &#x27;1&#x27;
+      }
+    };
+  });
+
+  it(&#x27;should init the exploration features from param change&#x27;, () =&gt; {
+    explorationFeatureService.init(explorationData, featureData);
+    expect(explorationFeatureService.isInitialized()).toEqual(true);
+    expect(explorationFeatureService.areParametersEnabled()).toEqual(true);
+    expect(explorationFeatureService.isPlaythroughRecordingEnabled())
+      .toEqual(true);
+  });
+
+  it(&#x27;should init the exploration features from states&#x27;, () =&gt; {
+    explorationFeatureService.init(explorationData2, featureData);
+    expect(explorationFeatureService.isInitialized()).toEqual(true);
+    expect(explorationFeatureService.areParametersEnabled()).toEqual(true);
+    expect(explorationFeatureService.isPlaythroughRecordingEnabled())
+      .toEqual(true);
+  });
+
+  it(&#x27;should not init the exploration feature if service is initialized&#x27;,
+    () =&gt; {
+      ExplorationFeaturesService.serviceIsInitialized = true;
+      explorationFeatureService.init(explorationData, featureData);
+      expect(explorationFeatureService.isInitialized()).toEqual(true);
+      expect(explorationFeatureService.areParametersEnabled()).toEqual(false);
+      expect(explorationFeatureService.isPlaythroughRecordingEnabled())
+        .toEqual(false);
+    });
+});
+</textarea><pre id="annotations" style="display:none">[]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:56 GMT</p>
+    </body>
+  </html>
+  

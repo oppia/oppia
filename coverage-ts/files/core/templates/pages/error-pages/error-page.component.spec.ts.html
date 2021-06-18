@@ -1,0 +1,97 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>error-page.component.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/error-pages/error-page.component.spec.ts</td><td class="">94.87%</td><td class="">100%</td><td class="">78</td><td class="">74</td><td class="">4</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for error page.
+ */
+import { EventEmitter, NO_ERRORS_SCHEMA } from &#x27;@angular/core&#x27;;
+import { async, TestBed, ComponentFixture } from &#x27;@angular/core/testing&#x27;;
+
+import { ErrorPageComponent } from &#x27;./error-page.component&#x27;;
+import { UrlInterpolationService } from
+  &#x27;domain/utilities/url-interpolation.service&#x27;;
+import { I18nLanguageCodeService } from &#x27;services/i18n-language-code.service&#x27;;
+import { PageTitleService } from &#x27;services/page-title.service&#x27;;
+import { MockTranslatePipe } from &#x27;tests/unit-test-utils&#x27;;
+
+class MockI18nLanguageCodeService {
+  codeChangeEventEmiiter = new EventEmitter&lt;string&gt;();
+  getCurrentI18nLanguageCode() {
+    return &#x27;en&#x27;;
+  }
+
+  get onI18nLanguageCodeChange() {
+    return this.codeChangeEventEmiiter;
+  }
+}
+
+let component: ErrorPageComponent;
+let fixture: ComponentFixture&lt;ErrorPageComponent&gt;;
+
+describe(&#x27;Error page&#x27;, () =&gt; {
+  let pageTitle = null;
+
+  beforeEach(async(() =&gt; {
+    TestBed.configureTestingModule({
+      declarations: [ErrorPageComponent, MockTranslatePipe],
+      providers: [
+        {
+          provide: I18nLanguageCodeService,
+          useClass: MockI18nLanguageCodeService
+        },
+        UrlInterpolationService,
+        PageTitleService
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
+    pageTitle = TestBed.get(PageTitleService);
+  }));
+
+  beforeEach(() =&gt; {
+    fixture = TestBed.createComponent(ErrorPageComponent);
+    component = fixture.componentInstance;
+    component.statusCode = &#x27;404&#x27;;
+    fixture.detectChanges();
+  });
+
+  it(&#x27;should check if status code is a number&#x27;, () =&gt; {
+    expect(component.getStatusCode()).toBe(404);
+    expect(component.getStatusCode()).toBeInstanceOf(Number);
+  });
+
+  it(&#x27;should set images and page title when $onInit triggers&#x27;, () =&gt; {
+    component.ngOnInit();
+    expect(component.getStaticImageUrl(&#x27;/general/oops_mint.webp&#x27;))
+      .toBe(&#x27;/assets/images/general/oops_mint.webp&#x27;);
+    expect(pageTitle.getPageTitle()).toBe(&#x27;Error 404 - Oppia&#x27;);
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/error-pages/error-page.component.spec.ts&quot;,&quot;line&quot;:42,&quot;character&quot;:6,&quot;text&quot;:&quot;pageTitle&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/error-pages/error-page.component.spec.ts&quot;,&quot;line&quot;:57,&quot;character&quot;:4,&quot;text&quot;:&quot;pageTitle&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/error-pages/error-page.component.spec.ts&quot;,&quot;line&quot;:76,&quot;character&quot;:11,&quot;text&quot;:&quot;pageTitle&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/error-pages/error-page.component.spec.ts&quot;,&quot;line&quot;:76,&quot;character&quot;:21,&quot;text&quot;:&quot;getPageTitle&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:58 GMT</p>
+    </body>
+  </html>
+  

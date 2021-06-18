@@ -1,0 +1,275 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>customization-args-defs-test.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">typings/tests/customization-args-defs-test.ts</td><td class="">100.00%</td><td class="">100%</td><td class="">188</td><td class="">188</td><td class="">0</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Test for type definitions in customization-args-defs.ts.
+ */
+
+import { IsExact, AssertTrue } from &#x27;conditional-type-checks&#x27;;
+import {
+  AlgebraicExpressionInputCustomizationArgs,
+  AlgebraicExpressionInputCustomizationArgsBackendDict,
+  CodeReplCustomizationArgs,
+  CodeReplCustomizationArgsBackendDict,
+  ContinueCustomizationArgs,
+  ContinueCustomizationArgsBackendDict,
+  DragAndDropSortInputCustomizationArgs,
+  DragAndDropSortInputCustomizationArgsBackendDict,
+  EndExplorationCustomizationArgs,
+  EndExplorationCustomizationArgsBackendDict,
+  FractionInputCustomizationArgs,
+  FractionInputCustomizationArgsBackendDict,
+  GraphInputCustomizationArgs,
+  GraphInputCustomizationArgsBackendDict,
+  ImageClickInputCustomizationArgs,
+  ImageClickInputCustomizationArgsBackendDict,
+  InteractiveMapCustomizationArgs,
+  InteractiveMapCustomizationArgsBackendDict,
+  ItemSelectionInputCustomizationArgs,
+  ItemSelectionInputCustomizationArgsBackendDict,
+  LogicProofCustomizationArgs,
+  LogicProofCustomizationArgsBackendDict,
+  MathEquationInputCustomizationArgs,
+  MathEquationInputCustomizationArgsBackendDict,
+  MultipleChoiceInputCustomizationArgs,
+  MultipleChoiceInputCustomizationArgsBackendDict,
+  MusicNotesInputCustomizationArgs,
+  MusicNotesInputCustomizationArgsBackendDict,
+  NumberWithUnitsCustomizationArgs,
+  NumberWithUnitsCustomizationArgsBackendDict,
+  NumericExpressionInputCustomizationArgs,
+  NumericExpressionInputCustomizationArgsBackendDict,
+  NumericInputCustomizationArgs,
+  NumericInputCustomizationArgsBackendDict,
+  PencilCodeEditorCustomizationArgs,
+  PencilCodeEditorCustomizationArgsBackendDict,
+  RatioExpressionInputCustomizationArgs,
+  RatioExpressionInputCustomizationArgsBackendDict,
+  SetInputCustomizationArgs,
+  SetInputCustomizationArgsBackendDict,
+  TextInputCustomizationArgs,
+  TextInputCustomizationArgsBackendDict
+} from &#x27;interactions/customization-args-defs&#x27;;
+import { SubtitledUnicode } from
+  &#x27;domain/exploration/SubtitledUnicodeObjectFactory&#x27;;
+import { SubtitledHtml } from &#x27;domain/exploration/subtitled-html.model&#x27;;
+
+/**
+ * These dtslint type tests check that for each interaction, its frontend
+ * and backend customization argument interfaces are exactly the same, excluding
+ * specific properties that are replaced. We do this because some customization
+ * arguments values contain different frontend/backend types in their values.
+ * For example, ContinueCustomizationArgsBackendDict contains a
+ * SubtitledUnicodeBackendDict value, but it is replaced with a SubtitledUnicode
+ * value in its frontend counterpart ContinueCustomizationArgs.
+ * Note: there is a regex test in the backend in customization_args_util_test.py
+ * that tests that all interaction ids are covered here.
+ */
+
+// This generic type compares the customization argument frontend dict and
+// backend dict after replacing properties of the backend dict by properties in
+// the Replacements interface.
+type IsExactAfterReplacement&lt;BackendDict, Replacements, FrontendDict&gt; = (
+  IsExact&lt;
+    FrontendDict,
+    Omit&lt;BackendDict, keyof Replacements&gt; &amp; Replacements
+  &gt;
+);
+
+
+type TestAlgebraicExpressionInputCustomizationArgsInterfacesMatch = AssertTrue&lt;
+  IsExactAfterReplacement&lt;
+    AlgebraicExpressionInputCustomizationArgsBackendDict,
+    {},
+    AlgebraicExpressionInputCustomizationArgs
+  &gt;
+&gt;;
+
+type TestCodeReplCustomizationArgsInterfacesMatch = AssertTrue&lt;
+  IsExactAfterReplacement&lt;
+    CodeReplCustomizationArgsBackendDict,
+    {},
+    CodeReplCustomizationArgs
+  &gt;
+&gt;;
+
+type TestContinueCustomizationArgsInterfacesMatch = AssertTrue&lt;
+  IsExactAfterReplacement&lt;
+    ContinueCustomizationArgsBackendDict,
+    {buttonText: {value: SubtitledUnicode}},
+    ContinueCustomizationArgs
+  &gt;
+&gt;;
+
+type TestDragAndDropSortInputCustomizationArgsInterfacesMatch = AssertTrue&lt;
+  IsExactAfterReplacement&lt;
+    DragAndDropSortInputCustomizationArgsBackendDict,
+    {choices: {value: SubtitledHtml[]}},
+    DragAndDropSortInputCustomizationArgs
+  &gt;
+&gt;;
+
+type TestEndExplorationCustomizationArgsInterfacesMatch = AssertTrue&lt;
+  IsExactAfterReplacement&lt;
+    EndExplorationCustomizationArgsBackendDict,
+    {},
+    EndExplorationCustomizationArgs
+  &gt;
+&gt;;
+
+type TestFractionInputCustomizationArgsInterfacesMatch = AssertTrue&lt;
+  IsExactAfterReplacement&lt;
+    FractionInputCustomizationArgsBackendDict,
+    {customPlaceholder: {value: SubtitledUnicode}},
+    FractionInputCustomizationArgs
+  &gt;
+&gt;;
+
+type TestGraphInputCustomizationArgsInterfacesMatch = AssertTrue&lt;
+  IsExactAfterReplacement&lt;
+    GraphInputCustomizationArgsBackendDict,
+    {},
+    GraphInputCustomizationArgs
+  &gt;
+&gt;;
+
+type TestImageClickInputCustomizationArgsInterfacesMatch = AssertTrue&lt;
+  IsExactAfterReplacement&lt;
+    ImageClickInputCustomizationArgsBackendDict,
+    {},
+    ImageClickInputCustomizationArgs
+  &gt;
+&gt;;
+
+type TestInteractiveMapCustomizationArgsInterfacesMatch = AssertTrue&lt;
+  IsExactAfterReplacement&lt;
+    InteractiveMapCustomizationArgsBackendDict,
+    {},
+    InteractiveMapCustomizationArgs
+  &gt;
+&gt;;
+
+type TestItemSelectionInputCustomizationArgsInterfacesMatch = AssertTrue&lt;
+  IsExactAfterReplacement&lt;
+    ItemSelectionInputCustomizationArgsBackendDict,
+    {choices: {value: SubtitledHtml[]}},
+    ItemSelectionInputCustomizationArgs
+  &gt;
+&gt;;
+
+type TestLogicProofCustomizationArgsInterfacesMatch = AssertTrue&lt;
+  IsExactAfterReplacement&lt;
+    LogicProofCustomizationArgsBackendDict,
+    {},
+    LogicProofCustomizationArgs
+  &gt;
+&gt;;
+
+type TestMathEquationInputCustomizationArgsInterfacesMatch = AssertTrue&lt;
+  IsExactAfterReplacement&lt;
+    MathEquationInputCustomizationArgsBackendDict,
+    {},
+    MathEquationInputCustomizationArgs
+  &gt;
+&gt;;
+
+type TestMultipleChoiceInputCustomizationArgsInterfacesMatch = AssertTrue&lt;
+  IsExactAfterReplacement&lt;
+    MultipleChoiceInputCustomizationArgsBackendDict,
+    {choices: {value: SubtitledHtml[]}},
+    MultipleChoiceInputCustomizationArgs
+  &gt;
+&gt;;
+
+type TestMusicNotesInputCustomizationArgsInterfacesMatch = AssertTrue&lt;
+  IsExactAfterReplacement&lt;
+    MusicNotesInputCustomizationArgsBackendDict,
+    {},
+    MusicNotesInputCustomizationArgs
+  &gt;
+&gt;;
+
+type TestNumberWithUnitsCustomizationArgsInterfacesMatch = AssertTrue&lt;
+  IsExactAfterReplacement&lt;
+    NumberWithUnitsCustomizationArgsBackendDict,
+    {},
+    NumberWithUnitsCustomizationArgs
+  &gt;
+&gt;;
+
+type TestNumericExpressionInputCustomizationArgsInterfacesMatch = AssertTrue&lt;
+  IsExactAfterReplacement&lt;
+    NumericExpressionInputCustomizationArgsBackendDict,
+    {placeholder: {value: SubtitledUnicode}},
+    NumericExpressionInputCustomizationArgs
+  &gt;
+&gt;;
+
+type TestNumericInputCustomizationArgsInterfacesMatch = AssertTrue&lt;
+  IsExactAfterReplacement&lt;
+    NumericInputCustomizationArgsBackendDict,
+    {},
+    NumericInputCustomizationArgs
+  &gt;
+&gt;;
+
+type TestPencilCodeEditorCustomizationArgsInterfacesMatch = AssertTrue&lt;
+  IsExactAfterReplacement&lt;
+    PencilCodeEditorCustomizationArgsBackendDict,
+    {},
+    PencilCodeEditorCustomizationArgs
+  &gt;
+&gt;;
+
+type TestRatioExpressionInputCustomizationArgsInterfacesMatch = AssertTrue&lt;
+  IsExactAfterReplacement&lt;
+    RatioExpressionInputCustomizationArgsBackendDict,
+    {placeholder: {value: SubtitledUnicode}},
+    RatioExpressionInputCustomizationArgs
+  &gt;
+&gt;;
+
+type TestSetInputCustomizationArgsInterfacesMatch = AssertTrue&lt;
+  IsExactAfterReplacement&lt;
+    SetInputCustomizationArgsBackendDict,
+    {buttonText: {value: SubtitledUnicode}},
+    SetInputCustomizationArgs
+  &gt;
+&gt;;
+
+type TestTextInputCustomizationArgsInterfacesMatch = AssertTrue&lt;
+  IsExactAfterReplacement&lt;
+    TextInputCustomizationArgsBackendDict,
+    {placeholder: {value: SubtitledUnicode}},
+    TextInputCustomizationArgs
+  &gt;
+&gt;;
+</textarea><pre id="annotations" style="display:none">[]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:44:00 GMT</p>
+    </body>
+  </html>
+  

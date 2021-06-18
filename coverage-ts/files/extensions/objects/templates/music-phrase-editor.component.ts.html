@@ -1,0 +1,162 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>music-phrase-editor.component.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">extensions/objects/templates/music-phrase-editor.component.ts</td><td class="">85.81%</td><td class="">100%</td><td class="">155</td><td class="">133</td><td class="">22</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2012 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Component for music phrase editor.
+ */
+
+// This component is always editable.
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output } from &#x27;@angular/core&#x27;;
+import { downgradeComponent } from &#x27;@angular/upgrade/static&#x27;;
+import { AlertsService } from &#x27;services/alerts.service&#x27;;
+
+interface MusicPhraseSchema {
+  type: string;
+  items: {
+    type: string;
+    choices: string[];
+  };
+  &#x27;ui_config&#x27;: {&#x27;add_element_text&#x27;: string;};
+  validators: { id: string; &#x27;max_value&#x27;: number; }[];
+}
+
+@Component({
+  selector: &#x27;music-phrase-editor&#x27;,
+  templateUrl: &#x27;./music-phrase-editor.component.html&#x27;,
+  styleUrls: []
+})
+export class MusicPhraseEditorComponent implements OnInit {
+  @Input() modalId;
+  @Input() value;
+
+  @Output() valueChanged = new EventEmitter();
+
+  _localValue: string[] = [];
+
+  _proxy;
+
+  get localValue(): string[] {
+    return this._proxy;
+  }
+  set localValue(val: string[]) {
+    this._localValue = val;
+    this._createProxy();
+  }
+  // The maximum number of notes allowed in a music phrase.
+  _MAX_NOTES_IN_PHRASE = 8;
+  schema: MusicPhraseSchema = {
+    type: &#x27;list&#x27;,
+    items: {
+      type: &#x27;unicode&#x27;,
+      choices: [
+        &#x27;C4&#x27;, &#x27;D4&#x27;, &#x27;E4&#x27;, &#x27;F4&#x27;, &#x27;G4&#x27;, &#x27;A4&#x27;, &#x27;B4&#x27;, &#x27;C5&#x27;, &#x27;D5&#x27;, &#x27;E5&#x27;,
+        &#x27;F5&#x27;, &#x27;G5&#x27;, &#x27;A5&#x27;
+      ]
+    },
+    ui_config: {
+      add_element_text: &#x27;Add Note ♩&#x27;
+    },
+    validators: [{
+      id: &#x27;has_length_at_most&#x27;,
+      max_value: this._MAX_NOTES_IN_PHRASE
+    }]
+  };
+  constructor(private alertsService: AlertsService) {
+    this._createProxy();
+  }
+
+  ngOnInit(): void {
+  }
+
+  private _createProxy(): void {
+    this._proxy = new Proxy(this._localValue, {
+      apply: function(target, thisArg, argumentsList) {
+        return thisArg[
+          target as unknown as string].apply(this, argumentsList);
+      },
+      deleteProperty: function(target, property) {
+        return true;
+      },
+      set: (target, property, value, receiver) =&gt; {
+        target[property] = value;
+        this._updateValue(this._localValue);
+        return true;
+      }
+    });
+  }
+
+  private _updateValue(newValue: string[]): void {
+    if (newValue &amp;&amp; this.value) {
+      if (newValue.length &gt; this._MAX_NOTES_IN_PHRASE) {
+        this.alertsService.addWarning(
+          &#x27;There are too many notes on the staff.&#x27;);
+      } else {
+        const parentValues = [];
+        for (let i = 0; i &lt; newValue.length; i++) {
+          parentValues.push({
+            readableNoteName: newValue[i],
+            noteDuration: {
+              num: 1,
+              den: 1
+            }
+          });
+        }
+        this.value = parentValues;
+        this.valueChanged.emit(this.value);
+      }
+    }
+  }
+
+  updateValue(newValue: string[]): void {
+    if (newValue.length !== this._localValue.length) {
+      return;
+    }
+    for (let i = 0; i &lt; newValue.length; i++) {
+      if (newValue[i] !== this._localValue[i]) {
+        this.localValue = newValue;
+        break;
+      }
+    }
+  }
+
+  getSchema(): MusicPhraseSchema {
+    return this.schema;
+  }
+}
+angular.module(&#x27;oppia&#x27;).directive(&#x27;musicPhraseEditor&#x27;, downgradeComponent({
+  component: MusicPhraseEditorComponent
+}) as angular.IDirectiveFactory);
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;extensions/objects/templates/music-phrase-editor.component.ts&quot;,&quot;line&quot;:44,&quot;character&quot;:11,&quot;text&quot;:&quot;modalId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/music-phrase-editor.component.ts&quot;,&quot;line&quot;:45,&quot;character&quot;:11,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/music-phrase-editor.component.ts&quot;,&quot;line&quot;:47,&quot;character&quot;:12,&quot;text&quot;:&quot;valueChanged&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/objects/templates/music-phrase-editor.component.ts&quot;,&quot;line&quot;:51,&quot;character&quot;:2,&quot;text&quot;:&quot;_proxy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/music-phrase-editor.component.ts&quot;,&quot;line&quot;:54,&quot;character&quot;:16,&quot;text&quot;:&quot;_proxy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/music-phrase-editor.component.ts&quot;,&quot;line&quot;:87,&quot;character&quot;:9,&quot;text&quot;:&quot;_proxy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/music-phrase-editor.component.ts&quot;,&quot;line&quot;:88,&quot;character&quot;:30,&quot;text&quot;:&quot;thisArg&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/music-phrase-editor.component.ts&quot;,&quot;line&quot;:88,&quot;character&quot;:39,&quot;text&quot;:&quot;argumentsList&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/objects/templates/music-phrase-editor.component.ts&quot;,&quot;line&quot;:89,&quot;character&quot;:15,&quot;text&quot;:&quot;thisArg&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/music-phrase-editor.component.ts&quot;,&quot;line&quot;:90,&quot;character&quot;:10,&quot;text&quot;:&quot;target as unknown as string&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;extensions/objects/templates/music-phrase-editor.component.ts&quot;,&quot;line&quot;:90,&quot;character&quot;:39,&quot;text&quot;:&quot;apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/music-phrase-editor.component.ts&quot;,&quot;line&quot;:90,&quot;character&quot;:45,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/music-phrase-editor.component.ts&quot;,&quot;line&quot;:90,&quot;character&quot;:51,&quot;text&quot;:&quot;argumentsList&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/objects/templates/music-phrase-editor.component.ts&quot;,&quot;line&quot;:95,&quot;character&quot;:30,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/music-phrase-editor.component.ts&quot;,&quot;line&quot;:95,&quot;character&quot;:37,&quot;text&quot;:&quot;receiver&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/music-phrase-editor.component.ts&quot;,&quot;line&quot;:104,&quot;character&quot;:25,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/music-phrase-editor.component.ts&quot;,&quot;line&quot;:109,&quot;character&quot;:14,&quot;text&quot;:&quot;parentValues&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/objects/templates/music-phrase-editor.component.ts&quot;,&quot;line&quot;:111,&quot;character&quot;:10,&quot;text&quot;:&quot;parentValues&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/objects/templates/music-phrase-editor.component.ts&quot;,&quot;line&quot;:119,&quot;character&quot;:13,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/music-phrase-editor.component.ts&quot;,&quot;line&quot;:119,&quot;character&quot;:21,&quot;text&quot;:&quot;parentValues&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/objects/templates/music-phrase-editor.component.ts&quot;,&quot;line&quot;:120,&quot;character&quot;:13,&quot;text&quot;:&quot;valueChanged&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/objects/templates/music-phrase-editor.component.ts&quot;,&quot;line&quot;:120,&quot;character&quot;:36,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:56 GMT</p>
+    </body>
+  </html>
+  

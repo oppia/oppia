@@ -1,0 +1,149 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>story-playthrough.model.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/domain/story_viewer/story-playthrough.model.spec.ts</td><td class="">80.34%</td><td class="">100%</td><td class="">117</td><td class="">94</td><td class="">23</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2018 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Tests for StoryPlaythroughModel.
+ */
+
+import { StoryPlaythrough } from
+  &#x27;domain/story_viewer/story-playthrough.model&#x27;;
+
+describe(&#x27;Story playthrough model&#x27;, () =&gt; {
+  var _samplePlaythroughObject = null;
+
+  beforeEach(() =&gt; {
+    var firstSampleReadOnlyStoryNodeBackendDict = {
+      id: &#x27;node_1&#x27;,
+      description: &#x27;description&#x27;,
+      title: &#x27;Title 1&#x27;,
+      prerequisite_skill_ids: [],
+      acquired_skill_ids: [],
+      destination_node_ids: [&#x27;node_2&#x27;],
+      outline: &#x27;Outline&#x27;,
+      exploration_id: &#x27;exp_id&#x27;,
+      outline_is_finalized: false,
+      exp_summary_dict: {
+        title: &#x27;Title&#x27;,
+        status: &#x27;private&#x27;,
+        last_updated_msec: 1591296737470.528,
+        community_owned: false,
+        objective: &#x27;Test Objective&#x27;,
+        id: &#x27;44LKoKLlIbGe&#x27;,
+        num_views: 0,
+        thumbnail_icon_url: &#x27;/subjects/Algebra.svg&#x27;,
+        human_readable_contributors_summary: {},
+        language_code: &#x27;en&#x27;,
+        thumbnail_bg_color: &#x27;#cd672b&#x27;,
+        created_on_msec: 1591296635736.666,
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0
+        },
+        tags: [],
+        activity_type: &#x27;exploration&#x27;,
+        category: &#x27;Algebra&#x27;
+      },
+      completed: true,
+      thumbnail_bg_color: &#x27;#bb8b2f&#x27;,
+      thumbnail_filename: &#x27;filename&#x27;
+    };
+    var secondSampleReadOnlyStoryNodeBackendDict = {
+      id: &#x27;node_2&#x27;,
+      description: &#x27;description&#x27;,
+      title: &#x27;Title 2&#x27;,
+      prerequisite_skill_ids: [],
+      acquired_skill_ids: [],
+      destination_node_ids: [&#x27;node_3&#x27;],
+      outline: &#x27;Outline&#x27;,
+      exploration_id: &#x27;exp_id&#x27;,
+      outline_is_finalized: false,
+      exp_summary_dict: {
+        title: &#x27;Title&#x27;,
+        status: &#x27;private&#x27;,
+        last_updated_msec: 1591296737470.528,
+        community_owned: false,
+        objective: &#x27;Test Objective&#x27;,
+        id: &#x27;44LKoKLlIbGe&#x27;,
+        num_views: 0,
+        thumbnail_icon_url: &#x27;/subjects/Algebra.svg&#x27;,
+        human_readable_contributors_summary: {},
+        language_code: &#x27;en&#x27;,
+        thumbnail_bg_color: &#x27;#cd672b&#x27;,
+        created_on_msec: 1591296635736.666,
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0
+        },
+        tags: [],
+        activity_type: &#x27;exploration&#x27;,
+        category: &#x27;Algebra&#x27;
+      },
+      completed: false,
+      thumbnail_bg_color: &#x27;#bb8b2f&#x27;,
+      thumbnail_filename: &#x27;filename&#x27;,
+    };
+    var storyPlaythroughBackendObject = {
+      story_id: &#x27;qwerty&#x27;,
+      story_nodes: [
+        firstSampleReadOnlyStoryNodeBackendDict,
+        secondSampleReadOnlyStoryNodeBackendDict],
+      story_title: &#x27;Story&#x27;,
+      story_description: &#x27;Description&#x27;,
+      topic_name: &#x27;Topic 1&#x27;,
+      meta_tag_content: &#x27;Story meta tag content&#x27;
+    };
+    _samplePlaythroughObject =
+      StoryPlaythrough.createFromBackendDict(
+        storyPlaythroughBackendObject);
+  });
+
+  it(&#x27;should correctly return all the values&#x27;, function() {
+    expect(_samplePlaythroughObject.getInitialNode().getId()).toEqual(&#x27;node_1&#x27;);
+    expect(_samplePlaythroughObject.getStoryNodeCount()).toEqual(2);
+    expect(
+      _samplePlaythroughObject.getStoryNodes()[0].getId()).toEqual(&#x27;node_1&#x27;);
+    expect(
+      _samplePlaythroughObject.getStoryNodes()[1].getId()).toEqual(&#x27;node_2&#x27;);
+    expect(_samplePlaythroughObject.hasFinishedStory()).toEqual(false);
+    expect(_samplePlaythroughObject.getNextPendingNodeId()).toEqual(&#x27;node_2&#x27;);
+    expect(_samplePlaythroughObject.hasStartedStory()).toEqual(true);
+    expect(_samplePlaythroughObject.getStoryId()).toEqual(&#x27;qwerty&#x27;);
+    expect(_samplePlaythroughObject.getMetaTagContent()).toEqual(
+      &#x27;Story meta tag content&#x27;);
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/domain/story_viewer/story-playthrough.model.spec.ts&quot;,&quot;line&quot;:22,&quot;character&quot;:6,&quot;text&quot;:&quot;_samplePlaythroughObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story_viewer/story-playthrough.model.spec.ts&quot;,&quot;line&quot;:111,&quot;character&quot;:4,&quot;text&quot;:&quot;_samplePlaythroughObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story_viewer/story-playthrough.model.spec.ts&quot;,&quot;line&quot;:117,&quot;character&quot;:11,&quot;text&quot;:&quot;_samplePlaythroughObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story_viewer/story-playthrough.model.spec.ts&quot;,&quot;line&quot;:117,&quot;character&quot;:36,&quot;text&quot;:&quot;getInitialNode&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story_viewer/story-playthrough.model.spec.ts&quot;,&quot;line&quot;:117,&quot;character&quot;:53,&quot;text&quot;:&quot;getId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story_viewer/story-playthrough.model.spec.ts&quot;,&quot;line&quot;:118,&quot;character&quot;:11,&quot;text&quot;:&quot;_samplePlaythroughObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story_viewer/story-playthrough.model.spec.ts&quot;,&quot;line&quot;:118,&quot;character&quot;:36,&quot;text&quot;:&quot;getStoryNodeCount&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story_viewer/story-playthrough.model.spec.ts&quot;,&quot;line&quot;:120,&quot;character&quot;:6,&quot;text&quot;:&quot;_samplePlaythroughObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story_viewer/story-playthrough.model.spec.ts&quot;,&quot;line&quot;:120,&quot;character&quot;:31,&quot;text&quot;:&quot;getStoryNodes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story_viewer/story-playthrough.model.spec.ts&quot;,&quot;line&quot;:120,&quot;character&quot;:50,&quot;text&quot;:&quot;getId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story_viewer/story-playthrough.model.spec.ts&quot;,&quot;line&quot;:122,&quot;character&quot;:6,&quot;text&quot;:&quot;_samplePlaythroughObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story_viewer/story-playthrough.model.spec.ts&quot;,&quot;line&quot;:122,&quot;character&quot;:31,&quot;text&quot;:&quot;getStoryNodes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story_viewer/story-playthrough.model.spec.ts&quot;,&quot;line&quot;:122,&quot;character&quot;:50,&quot;text&quot;:&quot;getId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story_viewer/story-playthrough.model.spec.ts&quot;,&quot;line&quot;:123,&quot;character&quot;:11,&quot;text&quot;:&quot;_samplePlaythroughObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story_viewer/story-playthrough.model.spec.ts&quot;,&quot;line&quot;:123,&quot;character&quot;:36,&quot;text&quot;:&quot;hasFinishedStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story_viewer/story-playthrough.model.spec.ts&quot;,&quot;line&quot;:124,&quot;character&quot;:11,&quot;text&quot;:&quot;_samplePlaythroughObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story_viewer/story-playthrough.model.spec.ts&quot;,&quot;line&quot;:124,&quot;character&quot;:36,&quot;text&quot;:&quot;getNextPendingNodeId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story_viewer/story-playthrough.model.spec.ts&quot;,&quot;line&quot;:125,&quot;character&quot;:11,&quot;text&quot;:&quot;_samplePlaythroughObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story_viewer/story-playthrough.model.spec.ts&quot;,&quot;line&quot;:125,&quot;character&quot;:36,&quot;text&quot;:&quot;hasStartedStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story_viewer/story-playthrough.model.spec.ts&quot;,&quot;line&quot;:126,&quot;character&quot;:11,&quot;text&quot;:&quot;_samplePlaythroughObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story_viewer/story-playthrough.model.spec.ts&quot;,&quot;line&quot;:126,&quot;character&quot;:36,&quot;text&quot;:&quot;getStoryId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story_viewer/story-playthrough.model.spec.ts&quot;,&quot;line&quot;:127,&quot;character&quot;:11,&quot;text&quot;:&quot;_samplePlaythroughObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story_viewer/story-playthrough.model.spec.ts&quot;,&quot;line&quot;:127,&quot;character&quot;:36,&quot;text&quot;:&quot;getMetaTagContent&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:57 GMT</p>
+    </body>
+  </html>
+  

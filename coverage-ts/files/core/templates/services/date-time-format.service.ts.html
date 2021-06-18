@@ -1,0 +1,122 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>date-time-format.service.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">core/templates/services/date-time-format.service.ts</td><td class="">100.00%</td><td class="">100%</td><td class="">72</td><td class="">72</td><td class="">0</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2014 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Service for converting dates in milliseconds
+ * since the Epoch to human-readable dates.
+ */
+
+import { downgradeInjectable } from &#x27;@angular/upgrade/static&#x27;;
+import { Injectable } from &#x27;@angular/core&#x27;;
+import dayjs from &#x27;dayjs&#x27;;
+
+@Injectable({
+  providedIn: &#x27;root&#x27;
+})
+export class DateTimeFormatService {
+/**
+  * This function returns the time (using locale conventions) if the local
+  * datetime representation has the same date as the current date. Else if the
+  * local datetime representation has the same year as the current date, it
+  * returns the date in the format &#x27;MMM D&#x27;. Else, it returns the full date in
+  * the format &#x27;MM/DD/YY&#x27;.
+  * @param {number} millisSinceEpoch - milliseconds since Epoch
+  * @returns {string} - a date
+  */
+  getLocaleAbbreviatedDatetimeString(millisSinceEpoch: number): string {
+    let date = new Date(millisSinceEpoch);
+    if (date.toLocaleDateString() === new Date().toLocaleDateString()) {
+      return date.toLocaleTimeString([], {
+        hour: &#x27;numeric&#x27;,
+        minute: &#x27;numeric&#x27;,
+        hour12: true
+      });
+    } else if (date.getFullYear() === new Date().getFullYear()) {
+      // Moment will return Oct 10.
+      return dayjs(date).format(&#x27;MMM D&#x27;);
+    } else {
+      // Moment will return 10/22/35(shortDate).
+      return dayjs(date).format(&#x27;MM/DD/YY&#x27;);
+    }
+  }
+  /**
+   * This function converts a millisecond date to a date in the
+   * format &#x27;MMM D HH:mm A&#x27; along with time.
+   * @param {number} millisSinceEpoch - The millisecond date to be converted
+   * @returns {string} a date and time string
+   */
+  getLocaleDateTimeHourString(millisSinceEpoch: number): string {
+    let date = new Date(millisSinceEpoch);
+    if (date.getFullYear() === new Date().getFullYear()) {
+      // Dayjs will return Oct 10 10:15 AM.
+      return dayjs(date).format(&#x27;MMM D, h:mm A&#x27;);
+    } else {
+      // Dayjs will return Oct 10, 2020.
+      return dayjs(date).format(&#x27;MMM D, YYYY&#x27;);
+    }
+  }
+
+  /**
+   * This function converts a millisecond date to date in words.
+   * @param {number} millisSinceEpoch - The millisecond date to be converted
+   * @returns {string} a date and time string
+   */
+  getDateTimeInWords(millisSinceEpoch: number): string {
+    let date = new Date(millisSinceEpoch);
+    // Dayjs will return Monday, January 18, 2021 at 12:30 PM.
+    return dayjs(date).format(&#x27;dddd, MMMM D, YYYY [at] h:mm A&#x27;);
+  }
+  /**
+   * This function converts a millisecond date to a date string, using locale
+   * conventions.
+   * @param {number} millisSinceEpoch - The millisecond date to be converted
+   * @returns {string} a date string
+   */
+  getLocaleDateString(millisSinceEpoch: number): string {
+    let date = new Date(millisSinceEpoch);
+    return date.toLocaleDateString();
+  }
+  /**
+   * This function returns whether the date is at most one week before the
+   * current date.
+   * @param {number} millisSinceEpoch - milliseconds since Epoch
+   * @returns {boolean} Whether the date is at most one week before
+   *                    the current date
+   */
+  isRecent(millisSinceEpoch: number): boolean {
+    let ONE_WEEK_IN_MILLIS = 7 * 24 * 60 * 60 * 1000;
+    return new Date().getTime() - millisSinceEpoch &lt; ONE_WEEK_IN_MILLIS;
+  }
+}
+
+angular.module(&#x27;oppia&#x27;).factory(
+  &#x27;DateTimeFormatService&#x27;, downgradeInjectable(DateTimeFormatService));
+</textarea><pre id="annotations" style="display:none">[]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:55 GMT</p>
+    </body>
+  </html>
+  

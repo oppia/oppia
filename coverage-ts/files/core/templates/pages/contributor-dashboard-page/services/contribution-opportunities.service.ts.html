@@ -1,0 +1,152 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>contribution-opportunities.service.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/contributor-dashboard-page/services/contribution-opportunities.service.ts</td><td class="">99.37%</td><td class="">100%</td><td class="">159</td><td class="">158</td><td class="">1</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2019 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview A service for handling contribution opportunities in different
+ * fields.
+ */
+import { EventEmitter } from &#x27;@angular/core&#x27;;
+import { Injectable } from &#x27;@angular/core&#x27;;
+import { downgradeInjectable } from &#x27;@angular/upgrade/static&#x27;;
+
+import { ContributionOpportunitiesBackendApiService } from &#x27;pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service&#x27;;
+import { SkillOpportunity } from &#x27;domain/opportunity/skill-opportunity.model&#x27;;
+import { ExplorationOpportunitySummary } from &#x27;domain/opportunity/exploration-opportunity-summary.model&#x27;;
+import { LoginRequiredModalContent } from &#x27;pages/contributor-dashboard-page/modal-templates/login-required-modal.component&#x27;;
+import { NgbModal } from &#x27;@ng-bootstrap/ng-bootstrap&#x27;;
+
+class SkillOpportunitiesDict {
+  opportunities: SkillOpportunity[];
+  more: boolean;
+}
+
+export class ExplorationOpportunitiesDict {
+  opportunities: ExplorationOpportunitySummary[];
+  more: boolean;
+}
+
+@Injectable({
+  providedIn: &#x27;root&#x27;
+})
+export class ContributionOpportunitiesService {
+  constructor(
+    private readonly contributionOpportunitiesBackendApiService:
+      ContributionOpportunitiesBackendApiService,
+      private readonly modalService: NgbModal) {}
+
+  public readonly reloadOpportunitiesEventEmitter = new EventEmitter&lt;void&gt;();
+  public readonly removeOpportunitiesEventEmitter = new EventEmitter();
+  private _skillOpportunitiesCursor: string = null;
+  private _translationOpportunitiesCursor: string = null;
+  private _voiceoverOpportunitiesCursor: string = null;
+  private _moreSkillOpportunitiesAvailable = true;
+  private _moreTranslationOpportunitiesAvailable = true;
+  private _moreVoiceoverOpportunitiesAvailable = true;
+
+  private async _getSkillOpportunitiesAsync(cursor: string):
+  Promise&lt;SkillOpportunitiesDict&gt; {
+    return this.contributionOpportunitiesBackendApiService
+      .fetchSkillOpportunitiesAsync(cursor)
+      .then(({ opportunities, nextCursor, more }) =&gt; {
+        this._skillOpportunitiesCursor = nextCursor;
+        this._moreSkillOpportunitiesAvailable = more;
+        return {
+          opportunities: opportunities,
+          more: more
+        };
+      });
+  }
+  private async _getTranslationOpportunitiesAsync(
+      languageCode: string, cursor: string) {
+    return this.contributionOpportunitiesBackendApiService
+      .fetchTranslationOpportunitiesAsync(languageCode, cursor)
+      .then(({ opportunities, nextCursor, more }) =&gt; {
+        this._translationOpportunitiesCursor = nextCursor;
+        this._moreTranslationOpportunitiesAvailable = more;
+        return {
+          opportunities: opportunities,
+          more: more
+        };
+      });
+  }
+  private async _getVoiceoverOpportunitiesAsync(
+      languageCode: string, cursor: string) {
+    return this.contributionOpportunitiesBackendApiService
+      .fetchVoiceoverOpportunitiesAsync(languageCode, cursor)
+      .then(({ opportunities, nextCursor, more }) =&gt; {
+        this._voiceoverOpportunitiesCursor = nextCursor;
+        this._moreVoiceoverOpportunitiesAvailable = more;
+        return {
+          opportunities: opportunities,
+          more: more
+        };
+      });
+  }
+  showRequiresLoginModal(): void {
+    this.modalService.open(LoginRequiredModalContent);
+  }
+
+  async getSkillOpportunitiesAsync(): Promise&lt;SkillOpportunitiesDict&gt; {
+    return this._getSkillOpportunitiesAsync(&#x27;&#x27;);
+  }
+  async getTranslationOpportunitiesAsync(languageCode: string):
+  Promise&lt;ExplorationOpportunitiesDict&gt; {
+    return this._getTranslationOpportunitiesAsync(languageCode, &#x27;&#x27;);
+  }
+  async getVoiceoverOpportunitiesAsync(languageCode: string):
+  Promise&lt;ExplorationOpportunitiesDict&gt; {
+    return this._getVoiceoverOpportunitiesAsync(languageCode, &#x27;&#x27;);
+  }
+  async getMoreSkillOpportunitiesAsync(): Promise&lt;SkillOpportunitiesDict&gt; {
+    if (this._moreSkillOpportunitiesAvailable) {
+      return this._getSkillOpportunitiesAsync(this._skillOpportunitiesCursor);
+    }
+  }
+  async getMoreTranslationOpportunitiesAsync(languageCode: string):
+  Promise&lt;ExplorationOpportunitiesDict&gt; {
+    if (this._moreTranslationOpportunitiesAvailable) {
+      return this._getTranslationOpportunitiesAsync(
+        languageCode, this._translationOpportunitiesCursor);
+    }
+  }
+  async getMoreVoiceoverOpportunitiesAsync(languageCode: string):
+  Promise&lt;ExplorationOpportunitiesDict&gt; {
+    if (this._moreVoiceoverOpportunitiesAvailable) {
+      return this._getVoiceoverOpportunitiesAsync(
+        languageCode, this._voiceoverOpportunitiesCursor);
+    }
+  }
+}
+
+angular.module(&#x27;oppia&#x27;).factory(
+  &#x27;ContributionOpportunitiesService&#x27;,
+  downgradeInjectable(ContributionOpportunitiesService));
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-opportunities.service.ts&quot;,&quot;line&quot;:48,&quot;character&quot;:18,&quot;text&quot;:&quot;removeOpportunitiesEventEmitter&quot;,&quot;kind&quot;:2}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:55 GMT</p>
+    </body>
+  </html>
+  

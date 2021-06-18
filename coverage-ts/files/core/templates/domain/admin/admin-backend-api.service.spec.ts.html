@@ -1,0 +1,1440 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>admin-backend-api.service.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/domain/admin/admin-backend-api.service.spec.ts</td><td class="">86.44%</td><td class="">100%</td><td class="">2087</td><td class="">1804</td><td class="">283</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2021 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for AdminBackendApiService.
+ */
+
+import { HttpClientTestingModule, HttpTestingController } from
+  &#x27;@angular/common/http/testing&#x27;;
+import { TestBed, fakeAsync, flushMicrotasks } from &#x27;@angular/core/testing&#x27;;
+
+import { AdminPageData, AdminBackendApiService } from &#x27;domain/admin/admin-backend-api.service&#x27;;
+import { TopicSummary } from &#x27;domain/topic/topic-summary.model&#x27;;
+import { PlatformParameterFilterType } from &#x27;domain/platform_feature/platform-parameter-filter.model&#x27;;
+import { FeatureStage, PlatformParameter } from &#x27;domain/platform_feature/platform-parameter.model&#x27;;
+import { CsrfTokenService } from &#x27;services/csrf-token.service&#x27;;
+
+describe(&#x27;Admin backend api service&#x27;, () =&gt; {
+  let abas: AdminBackendApiService;
+  let httpTestingController: HttpTestingController;
+  let csrfService: CsrfTokenService = null;
+  let successHandler = null;
+  let failHandler = null;
+  let adminBackendResponse = {
+    role_to_actions: {
+      guest: [&#x27;action for guest&#x27;]
+    },
+    topic_summaries: [
+      {
+        topic_model_created_on: 1591196558882.194,
+        uncategorized_skill_count: 0,
+        name: &#x27;Empty Topic&#x27;,
+        additional_story_count: 0,
+        total_skill_count: 0,
+        version: 1,
+        canonical_story_count: 0,
+        subtopic_count: 0,
+        description: &#x27;&#x27;,
+        id: &#x27;VqgPTpt7JyJy&#x27;,
+        topic_model_last_updated: 1591196558882.2,
+        language_code: &#x27;en&#x27;,
+        thumbnail_filename: &#x27;image.svg&#x27;,
+        thumbnail_bg_color: &#x27;#C6DCDA&#x27;
+      }
+    ],
+    updatable_roles: {
+      TOPIC_MANAGER: &#x27;topic manager&#x27;
+    },
+    demo_collections: [],
+    config_properties: {
+      oppia_csrf_secret: {
+        schema: {
+          type: &#x27;unicode&#x27;
+        },
+        value: &#x27;3WHOWnD3sy0r1wukJ2lX4vBS_YA=&#x27;,
+        description: &#x27;Text used to encrypt CSRF tokens.&#x27;
+      }
+    },
+    demo_exploration_ids: [&#x27;19&#x27;],
+    demo_explorations: [
+      [
+        &#x27;0&#x27;,
+        &#x27;welcome.yaml&#x27;
+      ]
+    ],
+    viewable_roles: {
+      TOPIC_MANAGER: &#x27;topic manager&#x27;
+    },
+    feature_flags: [{
+      name: &#x27;dummy_feature&#x27;,
+      description: &#x27;this is a dummy feature&#x27;,
+      data_type: &#x27;bool&#x27;,
+      rules: [{
+        filters: [{
+          type: PlatformParameterFilterType.ServerMode,
+          conditions: [&lt;[string, string]&gt;[&#x27;=&#x27;, &#x27;dev&#x27;]]
+        }],
+        value_when_matched: true
+      }],
+      rule_schema_version: 1,
+      default_value: false,
+      is_feature: true,
+      feature_stage: FeatureStage.DEV
+    }]
+  };
+  let adminDataObject: AdminPageData;
+  let configPropertyValues = {
+    always_ask_learners_for_answer_details: false,
+    classroom_pages_data: {
+      course_details: &#x27;fds&#x27;,
+      name: &#x27;mathfas&#x27;,
+      topic_ids: [],
+      topic_list_intro: &#x27;fsd&#x27;,
+      url_fragment: &#x27;mathfsad&#x27;,
+    },
+    classroom_promos_are_enabled: false,
+    contributor_can_suggest_questions: false,
+    contributor_dashboard_is_enabled: true,
+    contributor_dashboard_reviewer_emails_is_enabled: true,
+    email_footer: &#x27;fsdf&#x27;,
+    email_sender_name: &#x27;Site Admin&#x27;,
+    enable_admin_notifications_for_reviewer_shortage: false,
+    featured_translation_languages: [],
+    high_bounce_rate_task_minimum_exploration_starts: 1001,
+    high_bounce_rate_task_state_bounce_rate_creation_threshold: 0.2,
+    high_bounce_rate_task_state_bounce_rate_obsoletion_threshold: 0.2,
+    is_improvements_tab_enabled: false,
+    max_number_of_explorations_in_math_svgs_batch: 2,
+    max_number_of_suggestions_per_reviewer: 5,
+    max_number_of_svgs_in_math_svgs_batch: 25,
+    notification_user_ids_for_failed_tasks: [],
+    notify_admins_suggestions_waiting_too_long_is_enabled: false,
+    oppia_csrf_secret: &#x27;H62T5aIngXb1PB6arDkFrAnxakpQ=&#x27;,
+    promo_bar_enabled: false,
+    promo_bar_message: &#x27;fasdfa&#x27;,
+    record_playthrough_probability: 0.2,
+    signup_email_content: {
+      subject: &#x27;THIS IS A PLACEHOLDER.&#x27;,
+      html_body: &#x27;THIS IS A &lt;b&gt;PLACEHOLDER&lt;/b&gt; AND SHOULD BE REPLACED.&#x27;
+    },
+    unpublish_exploration_email_html_body: &#x27;test&#x27;,
+    vmid_shared_secret_key_mapping: {
+      shared_secret_key: &#x27;aafd1a2b3c4e&#x27;,
+      vm_id: &#x27;fds&#x27;
+    },
+    whitelisted_exploration_ids_for_playthroughs: [
+      &#x27;umPkawp0L1M0-&#x27;, &#x27;oswa1m5Q3jK41&#x27;]
+  };
+
+  beforeEach(() =&gt; {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+
+    abas = TestBed.get(AdminBackendApiService);
+    httpTestingController = TestBed.get(HttpTestingController);
+    csrfService = TestBed.get(CsrfTokenService);
+    successHandler = jasmine.createSpy(&#x27;success&#x27;);
+    failHandler = jasmine.createSpy(&#x27;fail&#x27;);
+    adminDataObject = {
+      demoExplorations: adminBackendResponse.demo_explorations,
+      demoCollections: adminBackendResponse.demo_collections,
+      demoExplorationIds: adminBackendResponse.demo_exploration_ids,
+      updatableRoles: adminBackendResponse.updatable_roles,
+      roleToActions: adminBackendResponse.role_to_actions,
+      configProperties: adminBackendResponse.config_properties,
+      viewableRoles: adminBackendResponse.viewable_roles,
+      topicSummaries: adminBackendResponse.topic_summaries.map(
+        TopicSummary.createFromBackendDict),
+      featureFlags: adminBackendResponse.feature_flags.map(
+        dict =&gt; PlatformParameter.createFromBackendDict(dict)
+      )
+    };
+
+    spyOn(csrfService, &#x27;getTokenAsync&#x27;).and.callFake(async() =&gt; {
+      return Promise.resolve(&#x27;sample-csrf-token&#x27;);
+    });
+  });
+
+  afterEach(() =&gt; {
+    httpTestingController.verify();
+  });
+
+  it(&#x27;should fetch the data.&#x27;, fakeAsync(() =&gt; {
+    abas.getDataAsync().then((adminData) =&gt; {
+      expect(adminData).toEqual(adminDataObject);
+    });
+
+    let req = httpTestingController.expectOne(&#x27;/adminhandler&#x27;);
+    expect(req.request.method).toEqual(&#x27;GET&#x27;);
+    req.flush(adminBackendResponse);
+
+    flushMicrotasks();
+  }));
+
+  it(&#x27;should use the rejection handler if the backend request failed.&#x27;,
+    fakeAsync(() =&gt; {
+      abas.getDataAsync().then(successHandler, failHandler);
+
+      var req = httpTestingController.expectOne(
+        &#x27;/adminhandler&#x27;);
+      expect(req.request.method).toEqual(&#x27;GET&#x27;);
+
+      req.flush({
+        error: &#x27;Some error in the backend.&#x27;
+      }, {
+        status: 500, statusText: &#x27;Internal Server Error&#x27;
+      });
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(&#x27;Some error in the backend.&#x27;);
+    })
+  );
+
+  // Test cases for Admin Roles Tab.
+  it(&#x27;should get the data of user given the username&#x27; +
+    &#x27;when calling viewUsersRoleAsync&#x27;, fakeAsync(() =&gt; {
+    let filterCriterion = &#x27;username&#x27;;
+    let role = null;
+    let username = &#x27;validUser&#x27;;
+    let result = {
+      validUser: &#x27;ADMIN&#x27;
+    };
+    abas.viewUsersRoleAsync(filterCriterion, role, username)
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      &#x27;/adminrolehandler&#x27; +
+      &#x27;?filter_criterion=username&amp;role=null&amp;username=validUser&#x27;);
+    expect(req.request.method).toEqual(&#x27;GET&#x27;);
+
+    req.flush(
+      { validUser: &#x27;ADMIN&#x27;},
+      { status: 200, statusText: &#x27;Success.&#x27;});
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(result);
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it(&#x27;should get the data of user given the role&#x27; +
+    &#x27;when calling viewUsersRoleAsync&#x27;, fakeAsync(() =&gt; {
+    let filterCriterion = &#x27;role&#x27;;
+    let role = &#x27;ADMIN&#x27;;
+    let username = null;
+    let result = {
+      validUser: &#x27;ADMIN&#x27;
+    };
+    abas.viewUsersRoleAsync(filterCriterion, role, username)
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      &#x27;/adminrolehandler&#x27; +
+      &#x27;?filter_criterion=role&amp;role=ADMIN&amp;username=null&#x27;);
+    expect(req.request.method).toEqual(&#x27;GET&#x27;);
+
+    req.flush(
+      { validUser: &#x27;ADMIN&#x27;},
+      { status: 200, statusText: &#x27;Success.&#x27;});
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(result);
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it(&#x27;should fail to get the data of user when user does&#x27; +
+    &#x27;not exists when calling viewUsersRoleAsync&#x27;, fakeAsync(() =&gt; {
+    let filterCriterion = &#x27;username&#x27;;
+    let role = null;
+    let username = &#x27;InvalidUser&#x27;;
+    abas.viewUsersRoleAsync(filterCriterion, role, username)
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      &#x27;/adminrolehandler&#x27; +
+      &#x27;?filter_criterion=username&amp;role=null&amp;username=InvalidUser&#x27;);
+    expect(req.request.method).toEqual(&#x27;GET&#x27;);
+
+    req.flush({
+      error: &#x27;User with given username does not exist&#x27;
+    }, {
+      status: 500, statusText: &#x27;Internal Server Error&#x27;
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      &#x27;User with given username does not exist&#x27;);
+  }
+  ));
+
+  it(&#x27;should update the role of the user given the name&#x27; +
+    &#x27;when calling updateUserRoleAsync&#x27;, fakeAsync(() =&gt; {
+    let topicId = null;
+    let newRole = &#x27;ADMIN&#x27;;
+    let username = &#x27;validUser&#x27;;
+    let payload = {
+      role: newRole,
+      username: username,
+      topic_id: topicId
+    };
+    abas.updateUserRoleAsync(newRole, username, topicId)
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(&#x27;/adminrolehandler&#x27;);
+    expect(req.request.method).toEqual(&#x27;POST&#x27;);
+    expect(req.request.body).toEqual(payload);
+
+    req.flush(
+      { status: 200, statusText: &#x27;Success.&#x27;});
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it(&#x27;should fail to update the role of user when user does&#x27; +
+    &#x27;not exists when calling updateUserRoleAsync&#x27;, fakeAsync(() =&gt; {
+    let topicId = null;
+    let newRole = &#x27;ADMIN&#x27;;
+    let username = &#x27;InvalidUser&#x27;;
+    let payload = {
+      role: newRole,
+      username: username,
+      topic_id: topicId
+    };
+    abas.updateUserRoleAsync(newRole, username, topicId)
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(&#x27;/adminrolehandler&#x27;);
+    expect(req.request.method).toEqual(&#x27;POST&#x27;);
+    expect(req.request.body).toEqual(payload);
+
+    req.flush(
+      { error: &#x27;User with given username does not exist&#x27;},
+      { status: 500, statusText: &#x27;Internal Server Error&#x27;});
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      &#x27;User with given username does not exist&#x27;);
+  }
+  ));
+
+  it(&#x27;should add contribution rights to the user given the&#x27; +
+    &#x27;name when calling addContributionReviewerAsync&#x27;, fakeAsync(() =&gt; {
+    let category = &#x27;voiceover&#x27;;
+    let languageCode = &#x27;en&#x27;;
+    let username = &#x27;validUser&#x27;;
+    let payload = {
+      category: category,
+      username: username,
+      language_code: languageCode
+    };
+    abas.addContributionReviewerAsync(
+      category, username, languageCode
+    ).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      &#x27;/addcontributionrightshandler&#x27;);
+    expect(req.request.method).toEqual(&#x27;POST&#x27;);
+    expect(req.request.body).toEqual(payload);
+
+    req.flush(
+      { status: 200, statusText: &#x27;Success.&#x27;});
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it(&#x27;should fail to add contribution rights to the user when user does&#x27; +
+    &#x27;not exists when calling addContributionReviewerAsync&#x27;, fakeAsync(() =&gt; {
+    let category = &#x27;voiceover&#x27;;
+    let languageCode = &#x27;en&#x27;;
+    let username = &#x27;InvalidUser&#x27;;
+    let payload = {
+      category: category,
+      username: username,
+      language_code: languageCode
+    };
+    abas.addContributionReviewerAsync(
+      category, username, languageCode
+    ).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      &#x27;/addcontributionrightshandler&#x27;);
+    expect(req.request.method).toEqual(&#x27;POST&#x27;);
+    expect(req.request.body).toEqual(payload);
+    req.flush(
+      { error: &#x27;User with given username does not exist&#x27;},
+      { status: 500, statusText: &#x27;Internal Server Error&#x27;});
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      &#x27;User with given username does not exist&#x27;);
+  }
+  ));
+
+  it(&#x27;should get the data of contribution rights given the role&#x27; +
+    &#x27;when calling viewContributionReviewersAsync&#x27;, fakeAsync(() =&gt; {
+    let category = &#x27;voiceover&#x27;;
+    let languageCode = &#x27;en&#x27;;
+    let result = [&#x27;validUsername&#x27;];
+    abas.viewContributionReviewersAsync(
+      category, languageCode
+    ).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      &#x27;/getcontributorusershandler&#x27; +
+      &#x27;?category=voiceover&amp;language_code=en&#x27;);
+    expect(req.request.method).toEqual(&#x27;GET&#x27;);
+
+    req.flush(
+      [&#x27;validUsername&#x27;],
+      { status: 200, statusText: &#x27;Success.&#x27;});
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(result);
+    expect(failHandler).not.toHaveBeenCalled();
+
+    category = &#x27;question&#x27;;
+    languageCode = null;
+
+    abas.viewContributionReviewersAsync(
+      category, languageCode
+    ).then(successHandler, failHandler);
+
+    req = httpTestingController.expectOne(
+      &#x27;/getcontributorusershandler&#x27; +
+      &#x27;?category=question&#x27;);
+    expect(req.request.method).toEqual(&#x27;GET&#x27;);
+
+    req.flush(
+      [&#x27;validUsername&#x27;],
+      { status: 200, statusText: &#x27;Success.&#x27;});
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(result);
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it(&#x27;should fail to get the data of contribution rights when category does&#x27; +
+  &#x27;not exists when calling viewContributionReviewersAsync&#x27;, fakeAsync(() =&gt; {
+    let category = &#x27;InvalidCategory&#x27;;
+    let languageCode = &#x27;en&#x27;;
+    abas.viewContributionReviewersAsync(
+      category, languageCode
+    ).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      &#x27;/getcontributorusershandler&#x27; +
+      &#x27;?category=InvalidCategory&amp;language_code=en&#x27;);
+    expect(req.request.method).toEqual(&#x27;GET&#x27;);
+
+    req.flush({
+      error: &#x27;Invalid Category&#x27;
+    }, {
+      status: 500, statusText: &#x27;Internal Server Error&#x27;
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(&#x27;Invalid Category&#x27;);
+  }
+  ));
+
+  it(&#x27;should get the data of contribution rights given the&#x27; +
+    &#x27;username when calling contributionReviewerRightsAsync&#x27;, fakeAsync(() =&gt; {
+    let username = &#x27;validUsername&#x27;;
+    let result = {
+      can_review_questions: false,
+      can_review_translation_for_language_codes: [&#x27;en&#x27;],
+      can_review_voiceover_for_language_codes: [],
+      can_submit_questions: false
+    };
+    abas.contributionReviewerRightsAsync(username)
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      &#x27;/contributionrightsdatahandler&#x27; +
+      &#x27;?username=validUsername&#x27;);
+    expect(req.request.method).toEqual(&#x27;GET&#x27;);
+
+    req.flush({
+      can_review_questions: false,
+      can_review_translation_for_language_codes: [&#x27;en&#x27;],
+      can_review_voiceover_for_language_codes: [],
+      can_submit_questions: false
+    }, {
+      status: 200, statusText: &#x27;Success.&#x27;
+    });
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(result);
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it(&#x27;should fail to get the data of contribution rights when username does&#x27; +
+  &#x27;not exists when calling contributionReviewerRightsAsync&#x27;, fakeAsync(() =&gt; {
+    let username = &#x27;InvalidUsername&#x27;;
+    abas.contributionReviewerRightsAsync(username)
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      &#x27;/contributionrightsdatahandler&#x27; +
+      &#x27;?username=InvalidUsername&#x27;);
+    expect(req.request.method).toEqual(&#x27;GET&#x27;);
+
+    req.flush({
+      error: &#x27;User with given username does not exist.&#x27;
+    }, {
+      status: 500, statusText: &#x27;Internal Server Error&#x27;
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      &#x27;User with given username does not exist.&#x27;);
+  }
+  ));
+
+  it(&#x27;should remove all contribution rights given the username&#x27; +
+    &#x27;when calling emoveContributionReviewerAsync&#x27;, fakeAsync(() =&gt; {
+    let category = &#x27;voiceover&#x27;;
+    let languageCode = null;
+    let username = &#x27;validUser&#x27;;
+    let method = &#x27;all&#x27;;
+    let payload = {
+      username: username,
+      removal_type: method,
+      category: category,
+      language_code: languageCode
+    };
+    abas.removeContributionReviewerAsync(
+      username, method, category, languageCode
+    ).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      &#x27;/removecontributionrightshandler&#x27;);
+    expect(req.request.method).toEqual(&#x27;PUT&#x27;);
+    expect(req.request.body).toEqual(payload);
+    req.flush(
+      { status: 200, statusText: &#x27;Success.&#x27;});
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it(&#x27;should fail to remove all contribution rights when user does&#x27; +
+    &#x27;not exists when calling removeContributionReviewerAsync&#x27;, fakeAsync(() =&gt; {
+    let category = &#x27;voiceover&#x27;;
+    let languageCode = null;
+    let username = &#x27;InvalidUser&#x27;;
+    let method = &#x27;all&#x27;;
+    let payload = {
+      username: username,
+      removal_type: method,
+      category: category,
+      language_code: languageCode
+    };
+    abas.removeContributionReviewerAsync(
+      username, method, category, languageCode
+    ).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      &#x27;/removecontributionrightshandler&#x27;);
+    expect(req.request.method).toEqual(&#x27;PUT&#x27;);
+    expect(req.request.body).toEqual(payload);
+
+    req.flush({
+      error: &#x27;User with given username does not exist.&#x27;
+    }, {
+      status: 500, statusText: &#x27;Internal Server Error&#x27;
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      &#x27;User with given username does not exist.&#x27;);
+  }
+  ));
+
+  it(&#x27;should remove specific contribution rights given the&#x27; +
+    &#x27;username when calling removeContributionReviewerAsync&#x27;, fakeAsync(() =&gt; {
+    let category = &#x27;voiceover&#x27;;
+    let languageCode = &#x27;en&#x27;;
+    let username = &#x27;validUser&#x27;;
+    let method = &#x27;specific&#x27;;
+    let payload = {
+      username: username,
+      removal_type: method,
+      category: category,
+      language_code: languageCode
+    };
+    abas.removeContributionReviewerAsync(
+      username, method, category, languageCode
+    ).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      &#x27;/removecontributionrightshandler&#x27;);
+    expect(req.request.method).toEqual(&#x27;PUT&#x27;);
+    expect(req.request.body).toEqual(payload);
+    req.flush(
+      { status: 200, statusText: &#x27;Success.&#x27;});
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it(&#x27;should fail to remove specific contribution rights when username does&#x27; +
+    &#x27;not exists when calling removeContributionReviewerAsync&#x27;, fakeAsync(() =&gt; {
+    let category = &#x27;voiceover&#x27;;
+    let languageCode = &#x27;en&#x27;;
+    let username = &#x27;InvalidUser&#x27;;
+    let method = &#x27;specific&#x27;;
+    let payload = {
+      username: username,
+      removal_type: method,
+      category: category,
+      language_code: languageCode
+    };
+    abas.removeContributionReviewerAsync(
+      username, method, category, languageCode
+    ).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      &#x27;/removecontributionrightshandler&#x27;);
+    expect(req.request.method).toEqual(&#x27;PUT&#x27;);
+    expect(req.request.body).toEqual(payload);
+
+    req.flush({
+      error: &#x27;User with given username does not exist.&#x27;
+    }, {
+      status: 500, statusText: &#x27;Internal Server Error&#x27;
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      &#x27;User with given username does not exist.&#x27;);
+  }
+  ));
+
+  // Test cases for Admin Misc Tab.
+  it(&#x27;should clear search index when calling clearSearchIndexAsync&#x27;,
+    fakeAsync(() =&gt; {
+      abas.clearSearchIndexAsync()
+        .then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        &#x27;/adminhandler&#x27;);
+      expect(req.request.method).toEqual(&#x27;POST&#x27;);
+      req.flush(200);
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }
+    ));
+
+  it(&#x27;should fail to clear search index when calling clearSearchIndexAsync&#x27;,
+    fakeAsync(() =&gt; {
+      abas.clearSearchIndexAsync()
+        .then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        &#x27;/adminhandler&#x27;);
+      expect(req.request.method).toEqual(&#x27;POST&#x27;);
+      req.flush({
+        error: &#x27;Failed to clear search index.&#x27;
+      }, {
+        status: 500, statusText: &#x27;Internal Server Error&#x27;
+      });
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(&#x27;Failed to clear search index.&#x27;);
+    }
+    ));
+
+  it(&#x27;should populate exploration stats when calling&#x27; +
+    &#x27;populateExplorationStatsRegenerationCsvResultAsync&#x27;, fakeAsync(() =&gt; {
+    let action = &#x27;regenerate_missing_exploration_stats&#x27;;
+    let expIdToRegenerate = &#x27;11&#x27;;
+    let payload = {
+      action: action,
+      exp_id: expIdToRegenerate
+    };
+
+    abas.populateExplorationStatsRegenerationCsvResultAsync(
+      expIdToRegenerate
+    ).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(&#x27;/adminhandler&#x27;);
+    expect(req.request.method).toEqual(&#x27;POST&#x27;);
+    expect(req.request.body).toEqual(payload);
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it(&#x27;should fail to populate exploration stats when calling&#x27; +
+    &#x27;populateExplorationStatsRegenerationCsvResultAsync&#x27;, fakeAsync(() =&gt; {
+    let action = &#x27;regenerate_missing_exploration_stats&#x27;;
+    let expIdToRegenerate = &#x27;InvalidId&#x27;;
+    let payload = {
+      action: action,
+      exp_id: expIdToRegenerate
+    };
+
+    abas.populateExplorationStatsRegenerationCsvResultAsync(
+      expIdToRegenerate
+    ).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(&#x27;/adminhandler&#x27;);
+    expect(req.request.method).toEqual(&#x27;POST&#x27;);
+    expect(req.request.body).toEqual(payload);
+    req.flush({
+      error: &#x27;Failed to get data.&#x27;
+    }, {
+      status: 500, statusText: &#x27;Internal Server Error&#x27;
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(&#x27;Failed to get data.&#x27;);
+  }
+  ));
+
+  it(&#x27;should regenerate topic related oppurtunities when&#x27; +
+    &#x27;calling regenerateOpportunitiesRelatedToTopicAsync&#x27;, fakeAsync(() =&gt; {
+    let action = &#x27;regenerate_topic_related_opportunities&#x27;;
+    let topicId = &#x27;topic_1&#x27;;
+    let payload = {
+      action: action,
+      topic_id: topicId
+    };
+
+    abas.regenerateOpportunitiesRelatedToTopicAsync(
+      topicId
+    ).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(&#x27;/adminhandler&#x27;);
+    expect(req.request.method).toEqual(&#x27;POST&#x27;);
+    expect(req.request.body).toEqual(payload);
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it(&#x27;should fail to regenerate topic related oppurtunities when&#x27; +
+    &#x27;calling regenerateOpportunitiesRelatedToTopicAsync&#x27;, fakeAsync(() =&gt; {
+    let action = &#x27;regenerate_topic_related_opportunities&#x27;;
+    let topicId = &#x27;InvalidId&#x27;;
+    let payload = {
+      action: action,
+      topic_id: topicId
+    };
+
+    abas.regenerateOpportunitiesRelatedToTopicAsync(
+      topicId
+    ).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(&#x27;/adminhandler&#x27;);
+    expect(req.request.method).toEqual(&#x27;POST&#x27;);
+    expect(req.request.body).toEqual(payload);
+    req.flush({
+      error: &#x27;Failed to get data.&#x27;
+    }, {
+      status: 500, statusText: &#x27;Internal Server Error&#x27;
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(&#x27;Failed to get data.&#x27;);
+  }
+  ));
+
+  it(&#x27;should upload topic similarities when calling&#x27; +
+    &#x27;uploadTopicSimilaritiesAsync&#x27;, fakeAsync(() =&gt; {
+    let action = &#x27;upload_topic_similarities&#x27;;
+    let data = &#x27;topic_similarities.csv&#x27;;
+    let payload = {
+      action: action,
+      data: data
+    };
+
+    abas.uploadTopicSimilaritiesAsync(data)
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(&#x27;/adminhandler&#x27;);
+    expect(req.request.method).toEqual(&#x27;POST&#x27;);
+    expect(req.request.body).toEqual(payload);
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it(&#x27;should fail to upload topic similarities when calling&#x27; +
+    &#x27;uploadTopicSimilaritiesAsync&#x27;, fakeAsync(() =&gt; {
+    let action = &#x27;upload_topic_similarities&#x27;;
+    let data = &#x27;topic_similarities.csv&#x27;;
+    let payload = {
+      action: action,
+      data: data
+    };
+
+    abas.uploadTopicSimilaritiesAsync(data)
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(&#x27;/adminhandler&#x27;);
+    expect(req.request.method).toEqual(&#x27;POST&#x27;);
+    expect(req.request.body).toEqual(payload);
+    req.flush({
+      error: &#x27;Failed to upload data.&#x27;
+    }, {
+      status: 500, statusText: &#x27;Internal Server Error&#x27;
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(&#x27;Failed to upload data.&#x27;);
+  }
+  ));
+
+  it(&#x27;should send dummy mail to admin when calling&#x27; +
+    &#x27;sendDummyMailToAdminAsync&#x27;, fakeAsync(() =&gt; {
+    abas.sendDummyMailToAdminAsync()
+      .then(successHandler, failHandler);
+    let req = httpTestingController.expectOne(
+      &#x27;/senddummymailtoadminhandler&#x27;);
+    expect(req.request.method).toEqual(&#x27;POST&#x27;);
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it(&#x27;should fail to send dummy mail to admin when calling&#x27; +
+  &#x27;sendDummyMailToAdminAsync&#x27;, fakeAsync(() =&gt; {
+    abas.sendDummyMailToAdminAsync()
+      .then(successHandler, failHandler);
+    let req = httpTestingController.expectOne(
+      &#x27;/senddummymailtoadminhandler&#x27;);
+    expect(req.request.method).toEqual(&#x27;POST&#x27;);
+    req.flush({
+      error: &#x27;Failed to send dummy mail.&#x27;
+    }, {
+      status: 400, statusText: &#x27;Bad Request&#x27;
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(&#x27;Failed to send dummy mail.&#x27;);
+  }
+  ));
+
+  it(&#x27;should update the username of oppia account given&#x27; +
+    &#x27;the name when calling updateUserNameAsync&#x27;, fakeAsync(() =&gt; {
+    let oldUsername = &#x27;old name&#x27;;
+    let newUsername = &#x27;new name&#x27;;
+    abas.updateUserNameAsync(oldUsername, newUsername)
+      .then(successHandler, failHandler);
+    let req = httpTestingController.expectOne(
+      &#x27;/updateusernamehandler&#x27;);
+    expect(req.request.method).toEqual(&#x27;PUT&#x27;);
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it(&#x27;should fail to update the username of oppia account when username&#x27; +
+    &#x27;does not exist when calling updateUserNameAsync&#x27;, fakeAsync(() =&gt; {
+    let oldUsername = &#x27;Invalid name&#x27;;
+    let newUsername = &#x27;Invalid name&#x27;;
+    abas.updateUserNameAsync(oldUsername, newUsername)
+      .then(successHandler, failHandler);
+    let req = httpTestingController.expectOne(
+      &#x27;/updateusernamehandler&#x27;);
+    expect(req.request.method).toEqual(&#x27;PUT&#x27;);
+    req.flush({
+      error: &#x27;Failed to update username.&#x27;
+    }, {
+      status: 500, statusText: &#x27;Internal Server Error&#x27;
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(&#x27;Failed to update username.&#x27;);
+  }
+  ));
+
+  it(&#x27;should get the data of number of pending delete requests&#x27; +
+    &#x27;when calling getNumberOfPendingDeletionRequestAsync&#x27;, fakeAsync(() =&gt; {
+    abas.getNumberOfPendingDeletionRequestAsync()
+      .then(successHandler, failHandler);
+    let req = httpTestingController.expectOne(
+      &#x27;/numberofdeletionrequestshandler&#x27;);
+    expect(req.request.method).toEqual(&#x27;GET&#x27;);
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it(&#x27;should grant super admin privileges to user&#x27;, fakeAsync(() =&gt; {
+    abas.grantSuperAdminPrivilegesAsync(&#x27;abc&#x27;)
+      .then(successHandler, failHandler);
+    let req = httpTestingController.expectOne(&#x27;/adminsuperadminhandler&#x27;);
+    expect(req.request.body).toEqual({username: &#x27;abc&#x27;});
+    expect(req.request.method).toEqual(&#x27;PUT&#x27;);
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it(&#x27;should revoke super admin privileges to user&#x27;, fakeAsync(() =&gt; {
+    abas.revokeSuperAdminPrivilegesAsync(&#x27;abc&#x27;)
+      .then(successHandler, failHandler);
+    let req = httpTestingController.expectOne(
+      &#x27;/adminsuperadminhandler?username=abc&#x27;);
+    expect(req.request.method).toEqual(&#x27;DELETE&#x27;);
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it(&#x27;should fail to get the data of number of pending deleter requests&#x27; +
+  &#x27;when calling getNumberOfPendingDeletionRequestAsync&#x27;, fakeAsync(() =&gt; {
+    abas.getNumberOfPendingDeletionRequestAsync()
+      .then(successHandler, failHandler);
+    let req = httpTestingController.expectOne(
+      &#x27;/numberofdeletionrequestshandler&#x27;);
+    expect(req.request.method).toEqual(&#x27;GET&#x27;);
+    req.flush({
+      error: &#x27;Failed to get data.&#x27;
+    }, {
+      status: 500, statusText: &#x27;Internal Server Error&#x27;
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(&#x27;Failed to get data.&#x27;);
+  }
+  ));
+
+  it(&#x27;should get the data of models related to the user given the&#x27; +
+    &#x27;userId when calling getModelsRelatedToUserAsync&#x27;, fakeAsync(() =&gt; {
+    let userId = &#x27;validId&#x27;;
+    let result = {
+      related_models_exist: true
+    };
+    abas.getModelsRelatedToUserAsync(userId)
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      &#x27;/verifyusermodelsdeletedhandler&#x27; +
+      &#x27;?user_id=validId&#x27;);
+    expect(req.request.method).toEqual(&#x27;GET&#x27;);
+
+    req.flush({
+      related_models_exist: true
+    }, {
+      status: 200, statusText: &#x27;Success.&#x27;
+    });
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(
+      result.related_models_exist);
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it(&#x27;should fail to get the data of models related to the user given the&#x27; +
+    &#x27;userId when calling getModelsRelatedToUserAsync&#x27;, fakeAsync(() =&gt; {
+    let userId = &#x27;InvalidId&#x27;;
+    abas.getModelsRelatedToUserAsync(userId)
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      &#x27;/verifyusermodelsdeletedhandler&#x27; +
+      &#x27;?user_id=InvalidId&#x27;);
+    expect(req.request.method).toEqual(&#x27;GET&#x27;);
+
+    req.flush({
+      error: &#x27;User does not exist.&#x27;
+    }, {
+      status: 500, statusText: &#x27;Internal Server Error&#x27;
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(&#x27;User does not exist.&#x27;);
+  }
+  ));
+
+  it(&#x27;should delete the user account given the userId and&#x27; +
+    &#x27;username when calling deleteUserAsync&#x27;, fakeAsync(() =&gt; {
+    let userId = &#x27;validId&#x27;;
+    let username = &#x27;validUsername&#x27;;
+
+    abas.deleteUserAsync(userId, username)
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      &#x27;/deleteuserhandler&#x27; +
+      &#x27;?user_id=validId&amp;username=validUsername&#x27;);
+    expect(req.request.method).toEqual(&#x27;DELETE&#x27;);
+
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it(&#x27;should fail to delete the user account given the userId and&#x27; +
+    &#x27;username when calling deleteUserAsync&#x27;, fakeAsync(() =&gt; {
+    let userId = &#x27;InvalidId&#x27;;
+    let username = &#x27;InvalidUsername&#x27;;
+
+    abas.deleteUserAsync(userId, username)
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      &#x27;/deleteuserhandler&#x27; +
+      &#x27;?user_id=InvalidId&amp;username=InvalidUsername&#x27;);
+    expect(req.request.method).toEqual(&#x27;DELETE&#x27;);
+
+    req.flush({
+      error: &#x27;User does not exist.&#x27;
+    }, {
+      status: 500, statusText: &#x27;Internal Server Error&#x27;
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(&#x27;User does not exist.&#x27;);
+  }
+  ));
+
+  // Test cases for Admin Config Tab.
+  it(&#x27;should revert specified config property to default&#x27; +
+    &#x27;value given the config property ID when calling&#x27; +
+    &#x27;revertConfigPropertyAsync&#x27;, fakeAsync(() =&gt; {
+    let action = &#x27;revert_config_property&#x27;;
+    let configPropertyId = &#x27;promo_bar_enabled&#x27;;
+    let payload = {
+      action: action,
+      config_property_id: configPropertyId
+    };
+
+    abas.revertConfigPropertyAsync(
+      configPropertyId).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(&#x27;/adminhandler&#x27;);
+    expect(req.request.method).toEqual(&#x27;POST&#x27;);
+    expect(req.request.body).toEqual(payload);
+
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it(&#x27;should fail to revert specified config property to default&#x27; +
+    &#x27;value when given config property ID is invalid when calling&#x27; +
+    &#x27;revertConfigPropertyAsync&#x27;, fakeAsync(() =&gt; {
+    let action = &#x27;revert_config_property&#x27;;
+    let configPropertyId = &#x27;InvalidId&#x27;;
+    let payload = {
+      action: action,
+      config_property_id: configPropertyId
+    };
+
+    abas.revertConfigPropertyAsync(
+      configPropertyId).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(&#x27;/adminhandler&#x27;);
+    expect(req.request.method).toEqual(&#x27;POST&#x27;);
+    expect(req.request.body).toEqual(payload);
+
+    req.flush({
+      error: &#x27;Config property does not exist.&#x27;
+    }, {
+      status: 500, statusText: &#x27;Internal Server Error&#x27;
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      &#x27;Config property does not exist.&#x27;);
+  }
+  ));
+
+  it(&#x27;should save the new config properties given the new&#x27; +
+    &#x27;config property when calling&#x27; +
+    &#x27;saveConfigPropertiesAsync&#x27;, fakeAsync(() =&gt; {
+    let action = &#x27;save_config_properties&#x27;;
+    let payload = {
+      action: action,
+      new_config_property_values: configPropertyValues
+    };
+
+    abas.saveConfigPropertiesAsync(
+      configPropertyValues).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(&#x27;/adminhandler&#x27;);
+    expect(req.request.method).toEqual(&#x27;POST&#x27;);
+    expect(req.request.body).toEqual(payload);
+
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it(&#x27;should fail to save the new config properties when given new&#x27; +
+    &#x27;config property is invalid when calling&#x27; +
+    &#x27;saveConfigPropertiesAsync&#x27;, fakeAsync(() =&gt; {
+    let action = &#x27;save_config_properties&#x27;;
+    let payload = {
+      action: action,
+      new_config_property_values: configPropertyValues
+    };
+    abas.saveConfigPropertiesAsync(
+      configPropertyValues).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(&#x27;/adminhandler&#x27;);
+    expect(req.request.method).toEqual(&#x27;POST&#x27;);
+    expect(req.request.body).toEqual(payload);
+
+    req.flush({
+      error: &#x27;Config property does not exist.&#x27;
+    }, {
+      status: 500, statusText: &#x27;Internal Server Error&#x27;
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      &#x27;Config property does not exist.&#x27;);
+  }
+  ));
+
+  // Tests for Admin Dev Mode Activities Tab.
+  it(&#x27;should generate dummy explorations&#x27;, fakeAsync(() =&gt; {
+    let action = &#x27;generate_dummy_explorations&#x27;;
+    let numDummyExpsToGenerate = 2;
+    let numDummyExpsToPublish = 1;
+    let payload = {
+      action: action,
+      num_dummy_exps_to_generate: numDummyExpsToGenerate,
+      num_dummy_exps_to_publish: numDummyExpsToPublish
+    };
+
+    abas.generateDummyExplorationsAsync(
+      numDummyExpsToGenerate, numDummyExpsToPublish
+    ).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(&#x27;/adminhandler&#x27;);
+    expect(req.request.method).toEqual(&#x27;POST&#x27;);
+    expect(req.request.body).toEqual(payload);
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it(&#x27;should handle generate dummy explorations &#x27; +
+    &#x27;request failure&#x27;, fakeAsync(() =&gt; {
+    let action = &#x27;generate_dummy_explorations&#x27;;
+    let numDummyExpsToGenerate = 2;
+    let numDummyExpsToPublish = 1;
+    let payload = {
+      action: action,
+      num_dummy_exps_to_generate: numDummyExpsToGenerate,
+      num_dummy_exps_to_publish: numDummyExpsToPublish
+    };
+
+    abas.generateDummyExplorationsAsync(
+      numDummyExpsToGenerate, numDummyExpsToPublish
+    ).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(&#x27;/adminhandler&#x27;);
+    expect(req.request.method).toEqual(&#x27;POST&#x27;);
+    expect(req.request.body).toEqual(payload);
+    req.flush({
+      error: &#x27;Failed to get data.&#x27;
+    }, {
+      status: 500, statusText: &#x27;Internal Server Error&#x27;
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(&#x27;Failed to get data.&#x27;);
+  }
+  ));
+
+  it(&#x27;should reload exploration&#x27;, fakeAsync(() =&gt; {
+    let action = &#x27;reload_exploration&#x27;;
+    let explorationId = &#x27;exp1&#x27;;
+    let payload = {
+      action: action,
+      exploration_id: explorationId
+    };
+
+    abas.reloadExplorationAsync(
+      explorationId
+    ).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(&#x27;/adminhandler&#x27;);
+    expect(req.request.method).toEqual(&#x27;POST&#x27;);
+    expect(req.request.body).toEqual(payload);
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it(&#x27;should handle reload exploration request failure&#x27;, fakeAsync(() =&gt; {
+    let action = &#x27;reload_exploration&#x27;;
+    let explorationId = &#x27;exp1&#x27;;
+    let payload = {
+      action: action,
+      exploration_id: explorationId
+    };
+
+    abas.reloadExplorationAsync(
+      explorationId
+    ).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(&#x27;/adminhandler&#x27;);
+    expect(req.request.method).toEqual(&#x27;POST&#x27;);
+    expect(req.request.body).toEqual(payload);
+    req.flush({
+      error: &#x27;Failed to get data.&#x27;
+    }, {
+      status: 500, statusText: &#x27;Internal Server Error&#x27;
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(&#x27;Failed to get data.&#x27;);
+  }
+  ));
+
+  it(&#x27;should generate dummy new structures data&#x27;, fakeAsync(() =&gt; {
+    let action = &#x27;generate_dummy_new_structures_data&#x27;;
+    let payload = {
+      action: action,
+    };
+
+    abas.generateDummyNewStructuresDataAsync()
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(&#x27;/adminhandler&#x27;);
+    expect(req.request.method).toEqual(&#x27;POST&#x27;);
+    expect(req.request.body).toEqual(payload);
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it(&#x27;should handle generate dummy new structures data &#x27; +
+    &#x27;request failure&#x27;, fakeAsync(() =&gt; {
+    let action = &#x27;generate_dummy_new_structures_data&#x27;;
+    let payload = {
+      action: action,
+    };
+
+    abas.generateDummyNewStructuresDataAsync()
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(&#x27;/adminhandler&#x27;);
+    expect(req.request.method).toEqual(&#x27;POST&#x27;);
+    expect(req.request.body).toEqual(payload);
+    req.flush({
+      error: &#x27;Failed to get data.&#x27;
+    }, {
+      status: 500, statusText: &#x27;Internal Server Error&#x27;
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(&#x27;Failed to get data.&#x27;);
+  }
+  ));
+
+  it(&#x27;should generate dummy new skill data&#x27;, fakeAsync(() =&gt; {
+    let action = &#x27;generate_dummy_new_skill_data&#x27;;
+    let payload = {
+      action: action,
+    };
+
+    abas.generateDummyNewSkillDataAsync()
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(&#x27;/adminhandler&#x27;);
+    expect(req.request.method).toEqual(&#x27;POST&#x27;);
+    expect(req.request.body).toEqual(payload);
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it(&#x27;should handle generate dummy new skill data &#x27; +
+    &#x27;request failure&#x27;, fakeAsync(() =&gt; {
+    let action = &#x27;generate_dummy_new_skill_data&#x27;;
+    let payload = {
+      action: action,
+    };
+
+    abas.generateDummyNewSkillDataAsync()
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(&#x27;/adminhandler&#x27;);
+    expect(req.request.method).toEqual(&#x27;POST&#x27;);
+    expect(req.request.body).toEqual(payload);
+    req.flush({
+      error: &#x27;Failed to get data.&#x27;
+    }, {
+      status: 500, statusText: &#x27;Internal Server Error&#x27;
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(&#x27;Failed to get data.&#x27;);
+  }
+  ));
+
+  it(&#x27;should reload collection&#x27;, fakeAsync(() =&gt; {
+    let action = &#x27;reload_collection&#x27;;
+    let collectionId = &#x27;exp1&#x27;;
+    let payload = {
+      action: action,
+      collection_id: collectionId
+    };
+
+    abas.reloadCollectionAsync(
+      collectionId
+    ).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(&#x27;/adminhandler&#x27;);
+    expect(req.request.method).toEqual(&#x27;POST&#x27;);
+    expect(req.request.body).toEqual(payload);
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it(&#x27;should handle reload collection request failure&#x27;, fakeAsync(() =&gt; {
+    let action = &#x27;reload_collection&#x27;;
+    let collectionId = &#x27;exp1&#x27;;
+    let payload = {
+      action: action,
+      collection_id: collectionId
+    };
+
+    abas.reloadCollectionAsync(
+      collectionId
+    ).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(&#x27;/adminhandler&#x27;);
+    expect(req.request.method).toEqual(&#x27;POST&#x27;);
+    expect(req.request.body).toEqual(payload);
+    req.flush({
+      error: &#x27;Failed to get data.&#x27;
+    }, {
+      status: 500, statusText: &#x27;Internal Server Error&#x27;
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(&#x27;Failed to get data.&#x27;);
+  }
+  ));
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:32,&quot;character&quot;:6,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:33,&quot;character&quot;:6,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:148,&quot;character&quot;:4,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:149,&quot;character&quot;:4,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:152,&quot;character&quot;:44,&quot;text&quot;:&quot;demo_collections&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:180,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:192,&quot;character&quot;:17,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:201,&quot;character&quot;:13,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:201,&quot;character&quot;:29,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:202,&quot;character&quot;:13,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:210,&quot;character&quot;:8,&quot;text&quot;:&quot;role&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:221,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:228,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:229,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:229,&quot;character&quot;:24,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:237,&quot;character&quot;:8,&quot;text&quot;:&quot;username&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:247,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:254,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:255,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:255,&quot;character&quot;:24,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:262,&quot;character&quot;:8,&quot;text&quot;:&quot;role&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:270,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:279,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:279,&quot;character&quot;:27,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:280,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:287,&quot;character&quot;:8,&quot;text&quot;:&quot;topicId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:293,&quot;character&quot;:6,&quot;text&quot;:&quot;topic_id&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:293,&quot;character&quot;:16,&quot;text&quot;:&quot;topicId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:299,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:300,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:300,&quot;character&quot;:23,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:306,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:307,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:307,&quot;character&quot;:24,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:313,&quot;character&quot;:8,&quot;text&quot;:&quot;topicId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:319,&quot;character&quot;:6,&quot;text&quot;:&quot;topic_id&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:319,&quot;character&quot;:16,&quot;text&quot;:&quot;topicId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:325,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:326,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:326,&quot;character&quot;:23,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:333,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:333,&quot;character&quot;:27,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:334,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:355,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:356,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:356,&quot;character&quot;:23,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:362,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:363,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:363,&quot;character&quot;:24,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:383,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:384,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:384,&quot;character&quot;:23,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:390,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:390,&quot;character&quot;:27,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:391,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:408,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:415,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:416,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:416,&quot;character&quot;:24,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:428,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:435,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:436,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:436,&quot;character&quot;:24,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:451,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:460,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:460,&quot;character&quot;:27,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:461,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:480,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:492,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:493,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:493,&quot;character&quot;:24,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:506,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:515,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:515,&quot;character&quot;:27,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:516,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:524,&quot;character&quot;:8,&quot;text&quot;:&quot;languageCode&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:531,&quot;character&quot;:6,&quot;text&quot;:&quot;language_code&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:531,&quot;character&quot;:21,&quot;text&quot;:&quot;languageCode&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:539,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:540,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:540,&quot;character&quot;:23,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:545,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:546,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:546,&quot;character&quot;:24,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:553,&quot;character&quot;:8,&quot;text&quot;:&quot;languageCode&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:560,&quot;character&quot;:6,&quot;text&quot;:&quot;language_code&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:560,&quot;character&quot;:21,&quot;text&quot;:&quot;languageCode&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:568,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:569,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:569,&quot;character&quot;:23,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:578,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:578,&quot;character&quot;:27,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:579,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:602,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:603,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:603,&quot;character&quot;:23,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:608,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:609,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:609,&quot;character&quot;:24,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:631,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:632,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:632,&quot;character&quot;:23,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:641,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:641,&quot;character&quot;:27,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:642,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:655,&quot;character&quot;:17,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:659,&quot;character&quot;:13,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:660,&quot;character&quot;:13,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:660,&quot;character&quot;:26,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:671,&quot;character&quot;:17,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:679,&quot;character&quot;:13,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:679,&quot;character&quot;:29,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:680,&quot;character&quot;:13,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:698,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:699,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:699,&quot;character&quot;:23,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:703,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:704,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:704,&quot;character&quot;:24,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:722,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:723,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:723,&quot;character&quot;:23,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:731,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:731,&quot;character&quot;:27,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:732,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:750,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:751,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:751,&quot;character&quot;:23,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:755,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:756,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:756,&quot;character&quot;:24,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:774,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:775,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:775,&quot;character&quot;:23,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:783,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:783,&quot;character&quot;:27,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:784,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:801,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:802,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:802,&quot;character&quot;:23,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:806,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:807,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:807,&quot;character&quot;:24,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:824,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:825,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:825,&quot;character&quot;:23,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:833,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:833,&quot;character&quot;:27,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:834,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:844,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:848,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:849,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:849,&quot;character&quot;:24,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:859,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:867,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:867,&quot;character&quot;:27,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:868,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:880,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:884,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:885,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:885,&quot;character&quot;:24,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:897,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:905,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:905,&quot;character&quot;:27,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:906,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:916,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:920,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:921,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:921,&quot;character&quot;:24,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:929,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:929,&quot;character&quot;:23,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:930,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:934,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:935,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:935,&quot;character&quot;:24,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:944,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:948,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:949,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:949,&quot;character&quot;:24,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:959,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:967,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:967,&quot;character&quot;:27,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:968,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:984,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:993,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:995,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:995,&quot;character&quot;:24,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1008,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1017,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1017,&quot;character&quot;:27,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1018,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1033,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1038,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1039,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1039,&quot;character&quot;:24,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1054,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1063,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1063,&quot;character&quot;:27,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1064,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1083,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1084,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1084,&quot;character&quot;:23,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1089,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1090,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1090,&quot;character&quot;:24,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1108,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1109,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1109,&quot;character&quot;:23,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1118,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1118,&quot;character&quot;:27,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1119,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1137,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1138,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1138,&quot;character&quot;:23,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1143,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1144,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1144,&quot;character&quot;:24,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1160,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1161,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1161,&quot;character&quot;:23,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1170,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1170,&quot;character&quot;:27,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1171,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1192,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1193,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1193,&quot;character&quot;:23,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1197,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1198,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1198,&quot;character&quot;:24,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1218,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1219,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1219,&quot;character&quot;:23,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1227,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1227,&quot;character&quot;:27,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1228,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1245,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1246,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1246,&quot;character&quot;:23,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1250,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1251,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1251,&quot;character&quot;:24,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1268,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1269,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1269,&quot;character&quot;:23,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1277,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1277,&quot;character&quot;:27,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1278,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1292,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1293,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1293,&quot;character&quot;:23,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1297,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1298,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1298,&quot;character&quot;:24,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1313,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1314,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1314,&quot;character&quot;:23,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1322,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1322,&quot;character&quot;:27,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1323,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1337,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1338,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1338,&quot;character&quot;:23,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1342,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1343,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1343,&quot;character&quot;:24,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1358,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1359,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1359,&quot;character&quot;:23,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1367,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1367,&quot;character&quot;:27,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1368,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1385,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1386,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1386,&quot;character&quot;:23,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1390,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1391,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1391,&quot;character&quot;:24,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1408,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1409,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1409,&quot;character&quot;:23,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1417,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1417,&quot;character&quot;:27,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/admin/admin-backend-api.service.spec.ts&quot;,&quot;line&quot;:1418,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:57 GMT</p>
+    </body>
+  </html>
+  

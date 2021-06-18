@@ -1,0 +1,165 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>user-backend-api.service.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">core/templates/services/user-backend-api.service.ts</td><td class="">100.00%</td><td class="">100%</td><td class="">150</td><td class="">150</td><td class="">0</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2018 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Service for user data.
+ */
+
+import { HttpClient } from &#x27;@angular/common/http&#x27;;
+import { Injectable } from &#x27;@angular/core&#x27;;
+import { downgradeInjectable } from &#x27;@angular/upgrade/static&#x27;;
+import { UserInfo, UserInfoBackendDict } from &#x27;domain/user/user-info.model&#x27;;
+import { WindowRef } from &#x27;./contextual/window-ref.service&#x27;;
+import { Title } from &#x27;@angular/platform-browser&#x27;;
+
+interface SubscriptionSummary {
+  &#x27;creator_picture_data_url&#x27;: string;
+  &#x27;creator_username&#x27;: string;
+  &#x27;creator_impact&#x27;: number;
+}
+
+export interface PreferencesBackendDict {
+  &#x27;preferred_language_codes&#x27;: string[];
+  &#x27;preferred_site_language_code&#x27;: string;
+  &#x27;preferred_audio_language_code&#x27;: string;
+  &#x27;profile_picture_data_url&#x27;: string;
+  &#x27;default_dashboard&#x27;: string;
+  &#x27;user_bio&#x27;: string;
+  &#x27;subject_interests&#x27;: string;
+  &#x27;can_receive_email_updates&#x27;: boolean;
+  &#x27;can_receive_editor_role_email&#x27;: boolean;
+  &#x27;can_receive_feedback_message_email&#x27;: boolean;
+  &#x27;can_receive_subscription_email&#x27;: boolean;
+  &#x27;subscription_list&#x27;: SubscriptionSummary[];
+}
+
+interface LoginUrlResponseDict {
+  &#x27;login_url&#x27;: string;
+}
+
+export interface UserContributionRightsDataBackendDict {
+  &#x27;can_review_translation_for_language_codes&#x27;: boolean;
+  &#x27;can_review_voiceover_for_language_codes&#x27;: boolean;
+  &#x27;can_review_questions&#x27;: boolean;
+}
+
+interface UnseenNotifications {
+  &#x27;num_unseen_notifications&#x27;: number
+}
+
+@Injectable({
+  providedIn: &#x27;root&#x27;
+})
+export class UserBackendApiService {
+  constructor(
+    private http: HttpClient,
+    private windowRef: WindowRef,
+    private titleService: Title) {}
+
+  private USER_INFO_URL = &#x27;/userinfohandler&#x27;;
+  private PROFILE_PICTURE_URL = &#x27;/preferenceshandler/profile_picture&#x27;;
+  private PREFERENCES_DATA_URL = &#x27;/preferenceshandler/data&#x27;;
+  private USER_CONTRIBUTION_RIGHTS_DATA_URL = (
+    &#x27;/usercontributionrightsdatahandler&#x27;);
+  numUnseenNotifications: string | number;
+  private SITE_LANGUAGE_URL = &#x27;/save_site_language&#x27;;
+
+  async getUserInfoAsync(): Promise&lt;UserInfo&gt; {
+    return this.http.get&lt;UserInfoBackendDict&gt;(
+      this.USER_INFO_URL).toPromise().then(
+      (backendDict) =&gt; {
+        return backendDict.user_is_logged_in ? UserInfo.createFromBackendDict(
+          backendDict) : UserInfo.createDefault();
+      });
+  }
+
+  async getProfileImageDataUrlAsync(defaultUrl: string): Promise&lt;string&gt; {
+    return this.http.get&lt;PreferencesBackendDict&gt;(
+      this.PROFILE_PICTURE_URL).toPromise().then(
+      (backendDict) =&gt; {
+        return backendDict.profile_picture_data_url || defaultUrl;
+      });
+  }
+
+  async setProfileImageDataUrlAsync(
+      newProfileImageDataUrl: string): Promise&lt;PreferencesBackendDict&gt; {
+    const profileImageUpdateUrlData = {
+      update_type: &#x27;profile_picture_data_url&#x27;,
+      data: newProfileImageDataUrl
+    };
+    return this.http.put&lt;PreferencesBackendDict&gt;(
+      this.PREFERENCES_DATA_URL, profileImageUpdateUrlData).toPromise();
+  }
+
+  async getLoginUrlAsync(currentUrl: string): Promise&lt;string&gt; {
+    const urlParameters = {
+      current_url: currentUrl
+    };
+    return this.http.get&lt;LoginUrlResponseDict&gt;(
+      &#x27;/url_handler&#x27;, { params: urlParameters }).toPromise().then(
+      (backendDict) =&gt; {
+        return backendDict.login_url;
+      });
+  }
+
+  async getUserContributionRightsDataAsync():
+    Promise&lt;UserContributionRightsDataBackendDict&gt; {
+    return this.http.get&lt;UserContributionRightsDataBackendDict&gt;(
+      this.USER_CONTRIBUTION_RIGHTS_DATA_URL).toPromise();
+  }
+
+  showUnseenNotifications(): void {
+    this.http.get&lt;UnseenNotifications&gt;(
+      &#x27;/notificationshandler&#x27;).toPromise().then(
+      (response: UnseenNotifications) =&gt; {
+        if (this.windowRef.nativeWindow.location.pathname !== &#x27;/&#x27;) {
+          this.numUnseenNotifications =
+               response.num_unseen_notifications;
+          if (this.numUnseenNotifications &gt; 0) {
+            this.titleService.setTitle(
+              &#x27;(&#x27; + this.numUnseenNotifications + &#x27;) &#x27; +
+                  this.titleService.getTitle());
+          }
+        }
+      });
+  }
+  async updatePreferredSiteLanguageAsync(
+      currentLanguageCode: string
+  ): Promise&lt;Object&gt; {
+    return this.http.put(this.SITE_LANGUAGE_URL, {
+      site_language_code: currentLanguageCode
+    }).toPromise();
+  }
+}
+angular.module(&#x27;oppia&#x27;).factory(
+  &#x27;UserBackendApiService&#x27;,
+  downgradeInjectable(UserBackendApiService));
+</textarea><pre id="annotations" style="display:none">[]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:55 GMT</p>
+    </body>
+  </html>
+  

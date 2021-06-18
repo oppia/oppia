@@ -1,0 +1,399 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>translation-modal.component.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/contributor-dashboard-page/modal-templates/translation-modal.component.ts</td><td class="">99.30%</td><td class="">100%</td><td class="">570</td><td class="">566</td><td class="">4</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2021 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Component for the translation modal.
+ */
+
+import { ChangeDetectorRef, Component, Input } from &#x27;@angular/core&#x27;;
+import { downgradeComponent } from &#x27;@angular/upgrade/static&#x27;;
+import { NgbActiveModal } from &#x27;@ng-bootstrap/ng-bootstrap&#x27;;
+
+import { AlertsService } from &#x27;services/alerts.service&#x27;;
+import { CkEditorCopyContentService } from &#x27;components/ck-editor-helpers/ck-editor-copy-content-service&#x27;;
+import { ContextService } from &#x27;services/context.service&#x27;;
+import { ImageLocalStorageService } from &#x27;services/image-local-storage.service&#x27;;
+import { SiteAnalyticsService } from &#x27;services/site-analytics.service&#x27;;
+import { Status, TranslateTextService } from &#x27;pages/contributor-dashboard-page/services/translate-text.service&#x27;;
+import { TranslationLanguageService } from &#x27;pages/exploration-editor-page/translation-tab/services/translation-language.service&#x27;;
+import { AppConstants } from &#x27;app.constants&#x27;;
+import constants from &#x27;assets/constants&#x27;;
+import { OppiaAngularRootComponent } from &#x27;components/oppia-angular-root.component&#x27;;
+
+class UiConfig {
+  &#x27;hide_complex_extensions&#x27;: boolean;
+  &#x27;startupFocusEnabled&#x27;?: boolean;
+  &#x27;language&#x27;?: string;
+  &#x27;languageDirection&#x27;?: string;
+}
+export interface TranslationOpportunity {
+  id: string;
+  heading: string;
+  subheading: string;
+  progressPercentage: string;
+  actionButtonTitle: string;
+}
+export interface HTMLSchema {
+    &#x27;type&#x27;: string;
+    &#x27;ui_config&#x27;: UiConfig;
+}
+export interface ImageDetails {
+  filePaths: string[];
+  alts: string[];
+  descriptions: string[];
+}
+export class TranslationError {
+  constructor(
+    private _hasUncopiedImgs: boolean,
+    private _hasDuplicateAltTexts: boolean,
+    private _hasDuplicateDescriptions: boolean,
+    private _hasUntranslatedElements: boolean) {}
+
+  get hasDuplicateDescriptions(): boolean {
+    return this._hasDuplicateDescriptions;
+  }
+  get hasDuplicateAltTexts(): boolean {
+    return this._hasDuplicateAltTexts;
+  }
+  get hasUncopiedImgs(): boolean {
+    return this._hasUncopiedImgs;
+  }
+  get hasUntranslatedElements(): boolean {
+    return this._hasUntranslatedElements;
+  }
+}
+
+@Component({
+  selector: &#x27;oppia-translation-modal&#x27;,
+  templateUrl: &#x27;./translation-modal.component.html&#x27;
+})
+export class TranslationModalComponent {
+  @Input() opportunity: TranslationOpportunity;
+  activeWrittenTranslation: {html: string} = {html: &#x27;&#x27;};
+  uploadingTranslation = false;
+  subheading: string;
+  heading: string;
+  loadingData = true;
+  moreAvailable = false;
+  textToTranslate = &#x27;&#x27;;
+  languageDescription: string;
+  activeStatus: Status;
+  HTML_SCHEMA: {
+    &#x27;type&#x27;: string;
+    &#x27;ui_config&#x27;: UiConfig;
+  };
+  TRANSLATION_TIPS = constants.TRANSLATION_TIPS;
+  activeLanguageCode: string;
+  hasImgCopyError = false;
+  hadCopyParagraphError = false;
+  hasImgTextError = false;
+  hasIncompleteTranslationError = false;
+
+  constructor(
+    private readonly activeModal: NgbActiveModal,
+    private readonly alertsService: AlertsService,
+    private readonly ckEditorCopyContentService: CkEditorCopyContentService,
+    private readonly contextService: ContextService,
+    private readonly imageLocalStorageService: ImageLocalStorageService,
+    private readonly siteAnalyticsService: SiteAnalyticsService,
+    private readonly translateTextService: TranslateTextService,
+    private readonly translationLanguageService: TranslationLanguageService,
+    private readonly changeDetectorRef: ChangeDetectorRef
+  ) {
+    this.contextService = OppiaAngularRootComponent.contextService;
+  }
+
+  ngOnInit(): void {
+    this.activeLanguageCode =
+    this.translationLanguageService.getActiveLanguageCode();
+    // We need to set the context here so that the rte fetches
+    // images for the given ENTITY_TYPE and targetId.
+    this.contextService.setCustomEntityContext(
+      AppConstants.ENTITY_TYPE.EXPLORATION, this.opportunity.id);
+    this.subheading = this.opportunity.subheading;
+    this.heading = this.opportunity.heading;
+    this.contextService.setImageSaveDestinationToLocalStorage();
+    this.languageDescription = (
+      this.translationLanguageService.getActiveLanguageDescription());
+    this.translateTextService.init(
+      this.opportunity.id,
+      this.translationLanguageService.getActiveLanguageCode(),
+      () =&gt; {
+        const textAndAvailability = (
+          this.translateTextService.getTextToTranslate());
+        this.textToTranslate = textAndAvailability.text;
+        this.moreAvailable = textAndAvailability.more;
+        this.activeStatus = textAndAvailability.status;
+        this.activeWrittenTranslation.html = (
+          textAndAvailability.translationHtml);
+        this.loadingData = false;
+      });
+    this.HTML_SCHEMA = {
+      type: &#x27;html&#x27;,
+      ui_config: {
+        // If this is made true, then the translation cannot be validated
+        // properly since contributors will not be able to view and translate
+        // complex extensions.
+        hide_complex_extensions: false,
+        language: this.translationLanguageService.getActiveLanguageCode(),
+        languageDirection: (
+          this.translationLanguageService.getActiveLanguageDirection())
+      }
+    };
+  }
+
+  close(): void {
+    this.activeModal.close();
+  }
+
+  getHtmlSchema(): HTMLSchema {
+    return this.HTML_SCHEMA;
+  }
+
+  onContentClick(event: MouseEvent): boolean | void {
+    if (this.triedToCopyParagraph(event)) {
+      return this.hadCopyParagraphError = true;
+    }
+    this.hadCopyParagraphError = false;
+    if (this.isCopyModeActive()) {
+      event.stopPropagation();
+    }
+    this.ckEditorCopyContentService.broadcastCopy(event.target as HTMLElement);
+  }
+
+  triedToCopyParagraph($event: MouseEvent): boolean {
+    // Mathematical equations are also wrapped by &lt;p&gt; elements.
+    // Hence, math elements should be allowed to be copied.
+    // See issue #11683.
+    const target = $event.target as HTMLElement;
+    const paragraphChildrenElements: Element[] = (
+      target.localName === &#x27;p&#x27;) ? Array.from(
+        target.children) : [];
+    const mathElementsIncluded = paragraphChildrenElements.some(
+      child =&gt; child.localName === &#x27;oppia-noninteractive-math&#x27;);
+    return target.localName === &#x27;p&#x27; &amp;&amp; !mathElementsIncluded;
+  }
+
+  isCopyModeActive(): boolean {
+    return this.ckEditorCopyContentService.copyModeActive;
+  }
+
+  updateHtml($event: string): void {
+    if ($event !== this.activeWrittenTranslation.html) {
+      this.activeWrittenTranslation.html = $event;
+      this.changeDetectorRef.detectChanges();
+    }
+  }
+
+  hasPreviousTranslations(): boolean {
+    return this.translateTextService.getActiveIndex() &gt; 0;
+  }
+
+  skipActiveTranslation(): void {
+    const textAndAvailability = (
+      this.translateTextService.getTextToTranslate());
+    this.textToTranslate = textAndAvailability.text;
+    this.moreAvailable = textAndAvailability.more;
+    this.activeStatus = textAndAvailability.status;
+    this.activeWrittenTranslation.html = textAndAvailability.translationHtml;
+  }
+
+  isSubmitted(): boolean {
+    return this.activeStatus === &#x27;submitted&#x27;;
+  }
+
+  returnToPreviousTranslation(): void {
+    const textAndAvailability = (
+      this.translateTextService.getPreviousTextToTranslate());
+    this.textToTranslate = textAndAvailability.text;
+    this.moreAvailable = true;
+    this.activeStatus = textAndAvailability.status;
+    this.activeWrittenTranslation.html = textAndAvailability.translationHtml;
+  }
+
+  getElementAttributeTexts(elements: HTMLElement[], type: string): string[] {
+    const textWrapperLength = 6;
+    const attributes = Array.from(elements, function(element: HTMLElement) {
+      // A sample element would be as &lt;oppia-noninteractive-image alt-with-value
+      // =&quot;&amp;amp;quot;Image description&amp;amp;quot;&quot; caption-with-value=
+      // &quot;&amp;amp;quot;Image caption&amp;amp;quot;&quot; filepath-with-value=&quot;&amp;amp;quot;
+      // img_2021029_210552_zbmdt94_height_54_width_490.png&amp;amp;quot;&quot;&gt;
+      // &lt;/oppia-noninteractive-image&gt;
+      if (element.localName === &#x27;oppia-noninteractive-image&#x27;) {
+        const attribute = element.attributes[type].value;
+        return attribute.substring(
+          textWrapperLength, attribute.length - textWrapperLength);
+      }
+    });
+    return attributes.filter(attribute =&gt; attribute);
+  }
+
+  getImageAttributeTexts(htmlElements: HTMLElement[]): ImageDetails {
+    return {
+      filePaths: this.getElementAttributeTexts(
+        htmlElements, &#x27;filepath-with-value&#x27;),
+      alts: this.getElementAttributeTexts(
+        htmlElements, &#x27;alt-with-value&#x27;),
+      descriptions: this.getElementAttributeTexts(
+        htmlElements, &#x27;caption-with-value&#x27;)
+    };
+  }
+
+  copiedAllElements(
+      originalElements: string[],
+      translatedElements: string[]): boolean {
+    const hasMatchingTranslatedElement = element =&gt; (
+      translatedElements.includes(element));
+    return originalElements.every(hasMatchingTranslatedElement);
+  }
+
+  hasSomeDuplicateElements(
+      originalElements: string[],
+      translatedElements: string[]): boolean {
+    if (originalElements.length === 0) {
+      return false;
+    }
+    const hasMatchingTranslatedElement = element =&gt; (
+      translatedElements.includes(element) &amp;&amp; originalElements.length &gt; 0);
+    return originalElements.some(hasMatchingTranslatedElement);
+  }
+
+  isTranslationCompleted(
+      originalElements: HTMLElement[],
+      translatedElements: HTMLElement[]): boolean {
+    const filteredOriginalElements = originalElements.filter(
+      element =&gt; element.nodeType === Node.ELEMENT_NODE);
+    const filteredTranslatedElements = translatedElements.filter(
+      element =&gt; element.nodeType === Node.ELEMENT_NODE);
+
+    if (filteredOriginalElements.length !== filteredTranslatedElements.length) {
+      return false;
+    }
+
+    for (const [i, originalElement] of filteredOriginalElements.entries()) {
+      if (originalElement.nodeName !== filteredTranslatedElements[
+        i].nodeName) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  validateTranslation(
+      textToTranslate: HTMLElement[],
+      translatedText: HTMLElement[]): TranslationError {
+    const translatedElements: ImageDetails = this.getImageAttributeTexts(
+      translatedText);
+    const originalElements: ImageDetails = this.getImageAttributeTexts(
+      textToTranslate);
+
+    const hasUncopiedImgs = !this.copiedAllElements(
+      originalElements.filePaths,
+      translatedElements.filePaths);
+    const hasDuplicateAltTexts = this.hasSomeDuplicateElements(
+      originalElements.alts,
+      translatedElements.alts);
+    const hasDuplicateDescriptions = this.hasSomeDuplicateElements(
+      originalElements.descriptions,
+      translatedElements.descriptions);
+    const hasUntranslatedElements = !(this.isTranslationCompleted(
+      textToTranslate, translatedText));
+
+    return new TranslationError(
+      hasUncopiedImgs, hasDuplicateAltTexts,
+      hasDuplicateDescriptions, hasUntranslatedElements);
+  }
+
+  suggestTranslatedText(): void {
+    const originalElements = Array.from(angular.element(
+      this.textToTranslate));
+    const translatedElements = Array.from(angular.element(
+      this.activeWrittenTranslation.html));
+
+    const translationError = this.validateTranslation(
+      originalElements, translatedElements);
+
+    this.hasImgCopyError = translationError.hasUncopiedImgs;
+    this.hasImgTextError = translationError.hasDuplicateAltTexts ||
+      translationError.hasDuplicateDescriptions;
+    this.hasIncompleteTranslationError = translationError.
+      hasUntranslatedElements;
+
+    if (this.hasImgCopyError || this.hasImgTextError ||
+      this.hasIncompleteTranslationError || this.uploadingTranslation ||
+      this.loadingData) {
+      return;
+    }
+
+    if (this.hadCopyParagraphError) {
+      this.hadCopyParagraphError = false;
+    }
+
+    if (!this.uploadingTranslation &amp;&amp; !this.loadingData) {
+      this.siteAnalyticsService
+        .registerContributorDashboardSubmitSuggestionEvent(&#x27;Translation&#x27;);
+      this.uploadingTranslation = true;
+      const imagesData = this.imageLocalStorageService.getStoredImagesData();
+      this.imageLocalStorageService.flushStoredImagesData();
+      this.translateTextService.suggestTranslatedText(
+        this.activeWrittenTranslation.html,
+        this.translationLanguageService.getActiveLanguageCode(),
+        imagesData, () =&gt; {
+          this.alertsService.addSuccessMessage(
+            &#x27;Submitted translation for review.&#x27;);
+          this.uploadingTranslation = false;
+          if (this.moreAvailable) {
+            const textAndAvailability = (
+              this.translateTextService.getTextToTranslate());
+            this.textToTranslate = textAndAvailability.text;
+            this.moreAvailable = textAndAvailability.more;
+            this.activeStatus = textAndAvailability.status;
+            this.activeWrittenTranslation.html = (
+              textAndAvailability.translationHtml);
+          } else {
+            this.activeWrittenTranslation.html = &#x27;&#x27;;
+          }
+        }, () =&gt; {
+          this.contextService.resetImageSaveDestination();
+          this.close();
+        });
+    }
+    if (!this.moreAvailable) {
+      this.contextService.resetImageSaveDestination();
+      this.close();
+    }
+  }
+}
+
+angular.module(&#x27;oppia&#x27;).directive(
+  &#x27;oppiaTranslationModal&#x27;, downgradeComponent(
+    {component: TranslationModalComponent}));
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/modal-templates/translation-modal.component.ts&quot;,&quot;line&quot;:171,&quot;character&quot;:50,&quot;text&quot;:&quot;event.target as HTMLElement&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/modal-templates/translation-modal.component.ts&quot;,&quot;line&quot;:178,&quot;character&quot;:19,&quot;text&quot;:&quot;$event.target as HTMLElement&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/modal-templates/translation-modal.component.ts&quot;,&quot;line&quot;:255,&quot;character&quot;:41,&quot;text&quot;:&quot;element&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/modal-templates/translation-modal.component.ts&quot;,&quot;line&quot;:266,&quot;character&quot;:41,&quot;text&quot;:&quot;element&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:58 GMT</p>
+    </body>
+  </html>
+  

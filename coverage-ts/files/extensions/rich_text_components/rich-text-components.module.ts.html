@@ -1,0 +1,109 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>rich-text-components.module.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">extensions/rich_text_components/rich-text-components.module.ts</td><td class="">100.00%</td><td class="">100%</td><td class="">66</td><td class="">66</td><td class="">0</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2021 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Module for the rich text extension components.
+ */
+import &#x27;core-js/es7/reflect&#x27;;
+import &#x27;zone.js&#x27;;
+
+import { CommonModule } from &#x27;@angular/common&#x27;;
+import { NgModule } from &#x27;@angular/core&#x27;;
+import { BrowserModule } from &#x27;@angular/platform-browser&#x27;;
+import { MatButtonModule } from &#x27;@angular/material/button&#x27;;
+import { YouTubePlayerModule } from &#x27;@angular/youtube-player&#x27;;
+import { NgbAccordionModule, NgbModalModule, NgbNavModule, NgbTooltipModule } from &#x27;@ng-bootstrap/ng-bootstrap&#x27;;
+import { NoninteractiveCollapsible } from &#x27;./Collapsible/directives/oppia-noninteractive-collapsible.component&#x27;;
+import { DynamicContentModule } from &#x27;components/angular-html-bind/dynamic-content.module&#x27;;
+import { NoninteractiveImage } from &#x27;./Image/directives/oppia-noninteractive-image.component&#x27;;
+import { NoninteractiveLink } from &#x27;./Link/directives/oppia-noninteractive-link.component&#x27;;
+import { NoninteractiveMath } from &#x27;./Math/directives/oppia-noninteractive-math.component&#x27;;
+import { NoninteractiveSvgdiagram } from &#x27;./Svgdiagram/directives/oppia-noninteractive-svgdiagram.component&#x27;;
+import { NoninteractiveTabs } from &#x27;./Tabs/directives/oppia-noninteractive-tabs.component&#x27;;
+import { NoninteractiveVideo } from &#x27;./Video/directives/oppia-noninteractive-video.component&#x27;;
+import { NoninteractiveSkillreview } from &#x27;./Skillreview/directives/oppia-noninteractive-skillreview.component&#x27;;
+import { OppiaNoninteractiveSkillreviewConceptCardModalComponent } from &#x27;./Skillreview/directives/oppia-noninteractive-skillreview-concept-card-modal.component&#x27;;
+import { ConceptCardComponent } from &#x27;components/concept-card/concept-card.directive&#x27;;
+import { PortalModule } from &#x27;@angular/cdk/portal&#x27;;
+
+
+@NgModule({
+  imports: [
+    CommonModule,
+    BrowserModule,
+    DynamicContentModule,
+    MatButtonModule,
+    NgbAccordionModule,
+    NgbModalModule,
+    NgbNavModule,
+    NgbTooltipModule,
+    PortalModule,
+    YouTubePlayerModule
+  ],
+  declarations: [
+    ConceptCardComponent,
+    NoninteractiveCollapsible,
+    NoninteractiveImage,
+    NoninteractiveLink,
+    NoninteractiveMath,
+    NoninteractiveSkillreview,
+    NoninteractiveSvgdiagram,
+    NoninteractiveTabs,
+    NoninteractiveVideo,
+    OppiaNoninteractiveSkillreviewConceptCardModalComponent
+  ],
+  entryComponents: [
+    NoninteractiveCollapsible,
+    NoninteractiveImage,
+    NoninteractiveLink,
+    NoninteractiveMath,
+    NoninteractiveSkillreview,
+    NoninteractiveSvgdiagram,
+    NoninteractiveTabs,
+    NoninteractiveVideo,
+    OppiaNoninteractiveSkillreviewConceptCardModalComponent
+  ],
+  exports: [
+    ConceptCardComponent,
+    NoninteractiveCollapsible,
+    NoninteractiveImage,
+    NoninteractiveLink,
+    NoninteractiveMath,
+    NoninteractiveSkillreview,
+    NoninteractiveSvgdiagram,
+    NoninteractiveTabs,
+    NoninteractiveVideo,
+    OppiaNoninteractiveSkillreviewConceptCardModalComponent
+  ],
+})
+
+export class RichTextComponentsModule { }
+</textarea><pre id="annotations" style="display:none">[]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:56 GMT</p>
+    </body>
+  </html>
+  

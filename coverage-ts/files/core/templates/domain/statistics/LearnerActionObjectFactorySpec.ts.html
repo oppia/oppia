@@ -1,0 +1,240 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>LearnerActionObjectFactorySpec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">core/templates/domain/statistics/LearnerActionObjectFactorySpec.ts</td><td class="">100.00%</td><td class="">100%</td><td class="">180</td><td class="">180</td><td class="">0</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2018 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for the LearnerActionObjectFactory.
+ */
+
+import { TestBed } from &#x27;@angular/core/testing&#x27;;
+
+import { LearnerActionObjectFactory } from
+  &#x27;domain/statistics/LearnerActionObjectFactory&#x27;;
+import { StatisticsDomainConstants } from
+  &#x27;domain/statistics/statistics-domain.constants&#x27;;
+
+describe(&#x27;Learner Action Object Factory&#x27;, () =&gt; {
+  var learnerActionObjectFactory: LearnerActionObjectFactory;
+
+  const LEARNER_ACTION_SCHEMA_LATEST_VERSION =
+      StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION;
+
+  beforeEach(() =&gt; {
+    TestBed.configureTestingModule({
+      providers: [LearnerActionObjectFactory]
+    });
+
+    learnerActionObjectFactory =
+      TestBed.get(LearnerActionObjectFactory);
+  });
+
+  it(&#x27;should create a new learner action&#x27;, () =&gt; {
+    var answerSubmitlearnerActionObject =
+      learnerActionObjectFactory.createNewAnswerSubmitAction({
+        state_name: {
+          value: &#x27;state&#x27;
+        },
+        dest_state_name: {
+          value: &#x27;dest_state&#x27;
+        },
+        interaction_id: {
+          value: &#x27;interaction_id&#x27;
+        },
+        submitted_answer: {
+          value: &#x27;answer&#x27;
+        },
+        feedback: {
+          value: &#x27;feedback&#x27;
+        },
+        time_spent_state_in_msecs: {
+          value: 2
+        }
+      });
+    var explorationStartlearnerActionObject =
+      learnerActionObjectFactory.createNewExplorationStartAction({
+        state_name: {
+          value: &#x27;state&#x27;
+        }
+      });
+    var explorationQuitlearnerActionObject =
+      learnerActionObjectFactory.createNewExplorationQuitAction({
+        state_name: {
+          value: &#x27;state&#x27;
+        },
+        time_spent_in_state_in_msecs: {
+          value: 2
+        }
+      });
+
+    expect(answerSubmitlearnerActionObject.actionType).toEqual(&#x27;AnswerSubmit&#x27;);
+    expect(answerSubmitlearnerActionObject.actionCustomizationArgs).toEqual({
+      state_name: {
+        value: &#x27;state&#x27;
+      },
+      dest_state_name: {
+        value: &#x27;dest_state&#x27;
+      },
+      interaction_id: {
+        value: &#x27;interaction_id&#x27;
+      },
+      submitted_answer: {
+        value: &#x27;answer&#x27;
+      },
+      feedback: {
+        value: &#x27;feedback&#x27;
+      },
+      time_spent_state_in_msecs: {
+        value: 2
+      }
+    });
+    expect(answerSubmitlearnerActionObject.schemaVersion)
+      .toEqual(LEARNER_ACTION_SCHEMA_LATEST_VERSION);
+    expect(explorationStartlearnerActionObject.actionType).toEqual(
+      &#x27;ExplorationStart&#x27;);
+    expect(
+      explorationStartlearnerActionObject.actionCustomizationArgs).toEqual({
+      state_name: {
+        value: &#x27;state&#x27;
+      }
+    });
+    expect(explorationStartlearnerActionObject.schemaVersion)
+      .toEqual(LEARNER_ACTION_SCHEMA_LATEST_VERSION);
+    expect(explorationQuitlearnerActionObject.actionType).toEqual(
+      &#x27;ExplorationQuit&#x27;);
+    expect(
+      explorationQuitlearnerActionObject.actionCustomizationArgs).toEqual({
+      state_name: {
+        value: &#x27;state&#x27;
+      },
+      time_spent_in_state_in_msecs: {
+        value: 2
+      }
+    });
+    expect(explorationQuitlearnerActionObject.schemaVersion)
+      .toEqual(LEARNER_ACTION_SCHEMA_LATEST_VERSION);
+  });
+
+  it(&#x27;should create a new learner action from a backend dict&#x27;, () =&gt; {
+    var learnerActionObject =
+        learnerActionObjectFactory.createFromBackendDict({
+          action_type: &#x27;ExplorationQuit&#x27;,
+          action_customization_args: {
+            state_name: {
+              value: &#x27;state&#x27;
+            },
+            time_spent_in_state_in_msecs: {
+              value: 2
+            }
+          },
+          schema_version: 1
+        });
+
+    expect(learnerActionObject.actionType).toEqual(&#x27;ExplorationQuit&#x27;);
+    expect(learnerActionObject.actionCustomizationArgs).toEqual({
+      state_name: {
+        value: &#x27;state&#x27;
+      },
+      time_spent_in_state_in_msecs: {
+        value: 2
+      }
+    });
+    expect(learnerActionObject.schemaVersion).toEqual(1);
+  });
+
+  it(&#x27;should convert a learner action to a backend dict&#x27;, () =&gt; {
+    var learnerActionObject =
+        learnerActionObjectFactory.createNewAnswerSubmitAction({
+          state_name: {
+            value: &#x27;state&#x27;
+          },
+          dest_state_name: {
+            value: &#x27;dest_state&#x27;
+          },
+          interaction_id: {
+            value: &#x27;interaction_id&#x27;
+          },
+          submitted_answer: {
+            value: &#x27;answer&#x27;
+          },
+          feedback: {
+            value: &#x27;feedback&#x27;
+          },
+          time_spent_state_in_msecs: {
+            value: 2
+          }
+        });
+
+    var learnerActionDict = learnerActionObject.toBackendDict();
+    expect(learnerActionDict).toEqual({
+      action_type: &#x27;AnswerSubmit&#x27;,
+      action_customization_args: {
+        state_name: {
+          value: &#x27;state&#x27;
+        },
+        dest_state_name: {
+          value: &#x27;dest_state&#x27;
+        },
+        interaction_id: {
+          value: &#x27;interaction_id&#x27;
+        },
+        submitted_answer: {
+          value: &#x27;answer&#x27;
+        },
+        feedback: {
+          value: &#x27;feedback&#x27;
+        },
+        time_spent_state_in_msecs: {
+          value: 2
+        }
+      },
+      schema_version: 1
+    });
+  });
+
+  it(&#x27;should throw error on invalid backend dict&#x27;, () =&gt; {
+    const playthroughDict = {
+      action_type: &#x27;InvalidAction&#x27;,
+      action_customization_args: {},
+      schema_version: 1
+    };
+
+    expect(() =&gt; {
+      // This throws &quot;Type &#x27;string&#x27; is not assignable to type
+      // &#x27;&quot;ExplorationQuit&quot;&#x27;.&quot;. We need to suppress this error because
+      // &#x27;playthroughDict&#x27; has an invalid value of &#x27;action_type&#x27; property. We
+      // need to do that in order to test validations.
+      // @ts-expect-error
+      learnerActionObjectFactory.createFromBackendDict(playthroughDict);
+    }).toThrowError(
+      &#x27;Backend dict does not match any known action type: &#x27; +
+      JSON.stringify(playthroughDict));
+  });
+});
+</textarea><pre id="annotations" style="display:none">[]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:57 GMT</p>
+    </body>
+  </html>
+  

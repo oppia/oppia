@@ -1,0 +1,501 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>CollectionObjectFactorySpec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/domain/collection/CollectionObjectFactorySpec.ts</td><td class="">99.27%</td><td class="">100%</td><td class="">548</td><td class="">544</td><td class="">4</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2016 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Tests for collection-model.
+ */
+
+import { CollectionNode } from
+  &#x27;domain/collection/collection-node.model&#x27;;
+import { Collection } from
+  &#x27;domain/collection/collection.model&#x27;;
+
+describe(&#x27;Collection model&#x27;, () =&gt; {
+  let _sampleCollection: Collection = null;
+
+  beforeEach(() =&gt; {
+    var sampleCollectionBackendObject = {
+      id: &#x27;sample_collection_id&#x27;,
+      title: &#x27;a title&#x27;,
+      objective: &#x27;an objective&#x27;,
+      category: &#x27;a category&#x27;,
+      version: 1,
+      nodes: [],
+      language_code: null,
+      tags: null,
+      schema_version: null,
+      playthrough_dict: {
+        next_exploration_id: &#x27;expId&#x27;,
+        completed_exploration_ids: [&#x27;expId2&#x27;]
+      }
+    };
+    _sampleCollection = Collection.create(
+      sampleCollectionBackendObject);
+  });
+
+  var _addCollectionNode = function(explorationId) {
+    var collectionNodeBackendObject = {
+      exploration_id: explorationId,
+      exploration_summary: {
+        last_updated_msec: 1591296737470.528,
+        community_owned: false,
+        objective: &#x27;Test Objective&#x27;,
+        id: &#x27;44LKoKLlIbGe&#x27;,
+        num_views: 0,
+        thumbnail_icon_url: &#x27;/subjects/Algebra.svg&#x27;,
+        human_readable_contributors_summary: {},
+        language_code: &#x27;en&#x27;,
+        thumbnail_bg_color: &#x27;#cd672b&#x27;,
+        created_on_msec: 1591296635736.666,
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0
+        },
+        status: &#x27;public&#x27;,
+        tags: [],
+        activity_type: &#x27;exploration&#x27;,
+        category: &#x27;Algebra&#x27;,
+        title: &#x27;Test Title&#x27;
+      }
+    };
+    return _sampleCollection.addCollectionNode(
+      CollectionNode.create(collectionNodeBackendObject));
+  };
+
+  var _getCollectionNode = function(explorationId) {
+    return _sampleCollection.getCollectionNodeByExplorationId(explorationId);
+  };
+
+  it(&#x27;should be able to create an empty collection object&#x27;, () =&gt; {
+    var collection = Collection.createEmptyCollection();
+    expect(collection.getId()).toBeNull();
+    expect(collection.getTitle()).toBeNull();
+    expect(collection.getCategory()).toBeNull();
+    expect(collection.getObjective()).toBeNull();
+    expect(collection.getLanguageCode()).toBeNull();
+    expect(collection.getTags()).toBeNull();
+    expect(collection.getVersion()).toBeNull();
+    expect(collection.getSchemaVersion()).toBeNull();
+    expect(collection.getPlaythrough().getNextExplorationId()).toBeNull();
+    expect(
+      collection.getPlaythrough().getCompletedExplorationIds()).toEqual([]);
+    expect(collection.getCollectionNodes()).toEqual([]);
+  });
+
+  it(&#x27;should contain a collection node defined in the backend object&#x27;,
+    () =&gt; {
+      var collectionNodeBackendObject = {
+        exploration_id: &#x27;exp_id0&#x27;,
+        exploration_summary: {
+          last_updated_msec: 1591296737470.528,
+          community_owned: false,
+          objective: &#x27;Test Objective&#x27;,
+          id: &#x27;44LKoKLlIbGe&#x27;,
+          num_views: 0,
+          thumbnail_icon_url: &#x27;/subjects/Algebra.svg&#x27;,
+          human_readable_contributors_summary: {},
+          language_code: &#x27;en&#x27;,
+          thumbnail_bg_color: &#x27;#cd672b&#x27;,
+          created_on_msec: 1591296635736.666,
+          ratings: {
+            1: 0,
+            2: 0,
+            3: 0,
+            4: 0,
+            5: 0
+          },
+          status: &#x27;public&#x27;,
+          tags: [],
+          activity_type: &#x27;exploration&#x27;,
+          category: &#x27;Algebra&#x27;,
+          title: &#x27;Test Title&#x27;
+        }
+      };
+      var collection = Collection.create({
+        id: &#x27;collection_id&#x27;,
+        nodes: [collectionNodeBackendObject],
+        title: null,
+        objective: null,
+        language_code: null,
+        tags: null,
+        schema_version: null,
+        playthrough_dict: {
+          next_exploration_id: &#x27;expId&#x27;,
+          completed_exploration_ids: [&#x27;expId2&#x27;]
+        },
+        category: null,
+        version: null
+      });
+      expect(collection.containsCollectionNode(&#x27;exp_id0&#x27;)).toBe(true);
+      expect(collection.getCollectionNodes()).toEqual([
+        CollectionNode.create(collectionNodeBackendObject)
+      ]);
+    }
+  );
+
+  it(&#x27;should contain added explorations and not contain removed ones&#x27;,
+    () =&gt; {
+      expect(_sampleCollection.containsCollectionNode(&#x27;exp_id0&#x27;)).toBe(false);
+      expect(_sampleCollection.getCollectionNodeCount()).toEqual(0);
+
+      var collectionNodeBackendObject = {
+        exploration_id: &#x27;exp_id0&#x27;,
+        exploration_summary: {
+          last_updated_msec: 1591296737470.528,
+          community_owned: false,
+          objective: &#x27;Test Objective&#x27;,
+          id: &#x27;44LKoKLlIbGe&#x27;,
+          num_views: 0,
+          thumbnail_icon_url: &#x27;/subjects/Algebra.svg&#x27;,
+          human_readable_contributors_summary: {},
+          language_code: &#x27;en&#x27;,
+          thumbnail_bg_color: &#x27;#cd672b&#x27;,
+          created_on_msec: 1591296635736.666,
+          ratings: {
+            1: 0,
+            2: 0,
+            3: 0,
+            4: 0,
+            5: 0
+          },
+          status: &#x27;public&#x27;,
+          tags: [],
+          activity_type: &#x27;exploration&#x27;,
+          category: &#x27;Algebra&#x27;,
+          title: &#x27;Test Title&#x27;
+        }
+      };
+      var collectionNode = CollectionNode.create(
+        collectionNodeBackendObject);
+
+      expect(_sampleCollection.addCollectionNode(collectionNode)).toBe(true);
+      expect(_sampleCollection.containsCollectionNode(&#x27;exp_id0&#x27;)).toBe(true);
+      expect(_sampleCollection.getCollectionNodes()).toEqual([
+        CollectionNode.create(collectionNodeBackendObject)
+      ]);
+      expect(_sampleCollection.getCollectionNodeCount()).toEqual(1);
+
+      expect(_sampleCollection.deleteCollectionNode(&#x27;exp_id0&#x27;)).toBe(true);
+      expect(_sampleCollection.containsCollectionNode(&#x27;exp_id0&#x27;)).toBe(false);
+      expect(_sampleCollection.getCollectionNodeCount()).toEqual(0);
+    }
+  );
+
+  it(&#x27;should not add duplicate explorations&#x27;, () =&gt; {
+    var collectionNodeBackendObject = {
+      exploration_id: &#x27;exp_id0&#x27;,
+      exploration_summary: {
+        last_updated_msec: 1591296737470.528,
+        community_owned: false,
+        objective: &#x27;Test Objective&#x27;,
+        id: &#x27;44LKoKLlIbGe&#x27;,
+        num_views: 0,
+        thumbnail_icon_url: &#x27;/subjects/Algebra.svg&#x27;,
+        human_readable_contributors_summary: {},
+        language_code: &#x27;en&#x27;,
+        thumbnail_bg_color: &#x27;#cd672b&#x27;,
+        created_on_msec: 1591296635736.666,
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0
+        },
+        status: &#x27;public&#x27;,
+        tags: [],
+        activity_type: &#x27;exploration&#x27;,
+        category: &#x27;Algebra&#x27;,
+        title: &#x27;Test Title&#x27;
+      }
+    };
+    var collectionNode = CollectionNode.create(
+      collectionNodeBackendObject);
+
+    expect(_sampleCollection.addCollectionNode(collectionNode)).toBe(true);
+    expect(_sampleCollection.addCollectionNode(collectionNode)).toBe(false);
+  });
+
+  it(&#x27;should fail to delete nonexistent explorations&#x27;, () =&gt; {
+    expect(_sampleCollection.deleteCollectionNode(&#x27;fake_exp_id&#x27;)).toBe(false);
+  });
+
+  it(&#x27;should be able to clear all nodes from a collection&#x27;, () =&gt; {
+    expect(_sampleCollection.getCollectionNodeCount()).toEqual(0);
+
+    var collectionNodeBackendObject1 = {
+      exploration_id: &#x27;exp_id0&#x27;,
+      exploration_summary: {
+        last_updated_msec: 1591296737470.528,
+        community_owned: false,
+        objective: &#x27;Test Objective&#x27;,
+        id: &#x27;44LKoKLlIbGe&#x27;,
+        num_views: 0,
+        thumbnail_icon_url: &#x27;/subjects/Algebra.svg&#x27;,
+        human_readable_contributors_summary: {},
+        language_code: &#x27;en&#x27;,
+        thumbnail_bg_color: &#x27;#cd672b&#x27;,
+        created_on_msec: 1591296635736.666,
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0
+        },
+        status: &#x27;public&#x27;,
+        tags: [],
+        activity_type: &#x27;exploration&#x27;,
+        category: &#x27;Algebra&#x27;,
+        title: &#x27;Test Title&#x27;
+      }
+    };
+    var collectionNodeBackendObject2 = {
+      exploration_id: &#x27;exp_id1&#x27;,
+      exploration_summary: {
+        last_updated_msec: 1591296737470.528,
+        community_owned: false,
+        objective: &#x27;Test Objective&#x27;,
+        id: &#x27;44LKoKLlIbGe&#x27;,
+        num_views: 0,
+        thumbnail_icon_url: &#x27;/subjects/Algebra.svg&#x27;,
+        human_readable_contributors_summary: {},
+        language_code: &#x27;en&#x27;,
+        thumbnail_bg_color: &#x27;#cd672b&#x27;,
+        created_on_msec: 1591296635736.666,
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0
+        },
+        status: &#x27;public&#x27;,
+        tags: [],
+        activity_type: &#x27;exploration&#x27;,
+        category: &#x27;Algebra&#x27;,
+        title: &#x27;Test Title&#x27;
+      }
+    };
+    var collectionNode1 = CollectionNode.create(
+      collectionNodeBackendObject1);
+    var collectionNode2 = CollectionNode.create(
+      collectionNodeBackendObject2);
+
+    _sampleCollection.addCollectionNode(collectionNode1);
+    expect(_sampleCollection.getCollectionNodeCount()).toEqual(1);
+    expect(_sampleCollection.containsCollectionNode(&#x27;exp_id0&#x27;)).toBe(true);
+
+    _sampleCollection.clearCollectionNodes();
+    expect(_sampleCollection.getCollectionNodeCount()).toEqual(0);
+    expect(_sampleCollection.containsCollectionNode(&#x27;exp_id0&#x27;)).toBe(false);
+    expect(_sampleCollection.getCollectionNodes()).toEqual([]);
+
+    _sampleCollection.addCollectionNode(collectionNode2);
+    expect(_sampleCollection.getCollectionNodeCount()).toEqual(1);
+    expect(_sampleCollection.containsCollectionNode(&#x27;exp_id1&#x27;)).toBe(true);
+  });
+
+  it(&#x27;should be able to retrieve a mutable collection node by exploration id&#x27;,
+    () =&gt; {
+      expect(_getCollectionNode(&#x27;exp_id0&#x27;)).toBeUndefined();
+      var collectionNodeBackendObject = {
+        exploration_id: &#x27;exp_id0&#x27;,
+        exploration_summary: {
+          last_updated_msec: 1591296737470.528,
+          community_owned: false,
+          objective: &#x27;Test Objective&#x27;,
+          id: &#x27;44LKoKLlIbGe&#x27;,
+          num_views: 0,
+          thumbnail_icon_url: &#x27;/subjects/Algebra.svg&#x27;,
+          human_readable_contributors_summary: {},
+          language_code: &#x27;en&#x27;,
+          thumbnail_bg_color: &#x27;#cd672b&#x27;,
+          created_on_msec: 1591296635736.666,
+          ratings: {
+            1: 0,
+            2: 0,
+            3: 0,
+            4: 0,
+            5: 0
+          },
+          status: &#x27;public&#x27;,
+          tags: [],
+          activity_type: &#x27;exploration&#x27;,
+          category: &#x27;Algebra&#x27;,
+          title: &#x27;Test Title&#x27;
+        }
+      };
+      _sampleCollection.addCollectionNode(
+        CollectionNode.create(collectionNodeBackendObject));
+
+      var collectionNodeBefore = _getCollectionNode(&#x27;exp_id0&#x27;);
+      expect(collectionNodeBefore).toEqual(CollectionNode.create(
+        collectionNodeBackendObject));
+    }
+  );
+
+  it(&#x27;should return a list of collection nodes in the order they were added&#x27;,
+    () =&gt; {
+      _addCollectionNode(&#x27;c_exp_id0&#x27;);
+      _addCollectionNode(&#x27;a_exp_id1&#x27;);
+      _addCollectionNode(&#x27;b_exp_id2&#x27;);
+
+      var collectionNodes = _sampleCollection.getCollectionNodes();
+      expect(collectionNodes[0].getExplorationId()).toEqual(&#x27;c_exp_id0&#x27;);
+      expect(collectionNodes[1].getExplorationId()).toEqual(&#x27;a_exp_id1&#x27;);
+      expect(collectionNodes[2].getExplorationId()).toEqual(&#x27;b_exp_id2&#x27;);
+
+      _sampleCollection.deleteCollectionNode(&#x27;a_exp_id1&#x27;);
+      collectionNodes = _sampleCollection.getCollectionNodes();
+      expect(collectionNodes[0].getExplorationId()).toEqual(&#x27;c_exp_id0&#x27;);
+      expect(collectionNodes[1].getExplorationId()).toEqual(&#x27;b_exp_id2&#x27;);
+    }
+  );
+
+  it(&#x27;should ignore changes to the list of returned collection nodes&#x27;,
+    () =&gt; {
+      _addCollectionNode(&#x27;exp_id0&#x27;);
+      _addCollectionNode(&#x27;exp_id1&#x27;);
+      expect(_sampleCollection.getCollectionNodeCount()).toEqual(2);
+
+      // Ensure the array itself cannot be mutated and then reflected in the
+      // collection object.
+      var collectionNodes = _sampleCollection.getCollectionNodes();
+      collectionNodes.splice(0, 1);
+
+      expect(
+        _sampleCollection.getCollectionNodes()).not.toEqual(collectionNodes);
+      expect(_sampleCollection.getCollectionNodeCount()).toEqual(2);
+
+      // Ensure contained collection nodes can be mutated and reflected in the
+      // collection object.
+      collectionNodes = _sampleCollection.getBindableCollectionNodes();
+      expect(_sampleCollection.getBindableCollectionNodes()).toEqual(
+        collectionNodes);
+      expect(_getCollectionNode(&#x27;exp_id1&#x27;)).toEqual(collectionNodes[1]);
+    }
+  );
+
+  it(&#x27;should accept changes to the bindable list of collection nodes&#x27;,
+    () =&gt; {
+      _addCollectionNode(&#x27;exp_id0&#x27;);
+      _addCollectionNode(&#x27;exp_id1&#x27;);
+      expect(_sampleCollection.getCollectionNodeCount()).toEqual(2);
+
+      // The array itself can be mutated.
+      var collectionNodes = _sampleCollection.getBindableCollectionNodes();
+      collectionNodes.splice(0, 1);
+      expect(_sampleCollection.getCollectionNodeCount()).toEqual(1);
+
+      // Collection nodes can be mutated and reflected in the collection object.
+      collectionNodes = _sampleCollection.getBindableCollectionNodes();
+      expect(_sampleCollection.getBindableCollectionNodes()).toEqual(
+        collectionNodes);
+      expect(_getCollectionNode(&#x27;exp_id1&#x27;)).toEqual(collectionNodes[1]);
+    }
+  );
+
+  it(&#x27;should return a list of referenced exporation IDs&#x27;, () =&gt; {
+    _addCollectionNode(&#x27;exp_id0&#x27;);
+    _addCollectionNode(&#x27;exp_id1&#x27;);
+    _addCollectionNode(&#x27;exp_id2&#x27;);
+
+    expect(_sampleCollection.getExplorationIds()).toEqual([
+      &#x27;exp_id0&#x27;, &#x27;exp_id1&#x27;, &#x27;exp_id2&#x27;
+    ]);
+
+    _sampleCollection.deleteCollectionNode(&#x27;exp_id1&#x27;);
+
+    expect(_sampleCollection.getExplorationIds()).toEqual([
+      &#x27;exp_id0&#x27;, &#x27;exp_id2&#x27;
+    ]);
+  });
+
+  it(&#x27;should be able to copy from another collection&#x27;, () =&gt; {
+    var secondCollection = Collection.create({
+      id: &#x27;col_id0&#x27;,
+      title: &#x27;Another title&#x27;,
+      objective: &#x27;Another objective&#x27;,
+      category: &#x27;Another category&#x27;,
+      language_code: &#x27;en&#x27;,
+      version: 15,
+      nodes: [],
+      tags: null,
+      schema_version: null,
+      playthrough_dict: {
+        next_exploration_id: &#x27;expId&#x27;,
+        completed_exploration_ids: [&#x27;expId2&#x27;]
+      }
+    });
+    secondCollection.addCollectionNode(CollectionNode.create({
+      exploration_id: &#x27;exp_id5&#x27;,
+      exploration_summary: {
+        last_updated_msec: 1591296737470.528,
+        community_owned: false,
+        objective: &#x27;Test Objective&#x27;,
+        id: &#x27;44LKoKLlIbGe&#x27;,
+        num_views: 0,
+        thumbnail_icon_url: &#x27;/subjects/Algebra.svg&#x27;,
+        human_readable_contributors_summary: {},
+        language_code: &#x27;en&#x27;,
+        thumbnail_bg_color: &#x27;#cd672b&#x27;,
+        created_on_msec: 1591296635736.666,
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0
+        },
+        status: &#x27;public&#x27;,
+        tags: [],
+        activity_type: &#x27;exploration&#x27;,
+        category: &#x27;Algebra&#x27;,
+        title: &#x27;Test Title&#x27;
+      }
+    }));
+
+    _addCollectionNode(&#x27;exp_id0&#x27;);
+    _addCollectionNode(&#x27;exp_id1&#x27;);
+
+    expect(_sampleCollection).not.toBe(secondCollection);
+    expect(_sampleCollection).not.toEqual(secondCollection);
+
+    _sampleCollection.copyFromCollection(secondCollection);
+    expect(_sampleCollection).not.toBe(secondCollection);
+    expect(_sampleCollection).toEqual(secondCollection);
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/domain/collection/CollectionObjectFactorySpec.ts&quot;,&quot;line&quot;:46,&quot;character&quot;:36,&quot;text&quot;:&quot;explorationId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/CollectionObjectFactorySpec.ts&quot;,&quot;line&quot;:48,&quot;character&quot;:6,&quot;text&quot;:&quot;exploration_id&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/CollectionObjectFactorySpec.ts&quot;,&quot;line&quot;:48,&quot;character&quot;:22,&quot;text&quot;:&quot;explorationId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/CollectionObjectFactorySpec.ts&quot;,&quot;line&quot;:78,&quot;character&quot;:36,&quot;text&quot;:&quot;explorationId&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:57 GMT</p>
+    </body>
+  </html>
+  

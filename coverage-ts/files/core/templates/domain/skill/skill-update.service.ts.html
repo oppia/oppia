@@ -1,0 +1,473 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>skill-update.service.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/domain/skill/skill-update.service.ts</td><td class="">78.28%</td><td class="">100%</td><td class="">580</td><td class="">454</td><td class="">126</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Service to handle the updating of a skill.
+ */
+
+import cloneDeep from &#x27;lodash/cloneDeep&#x27;;
+
+import { downgradeInjectable } from &#x27;@angular/upgrade/static&#x27;;
+import { Injectable } from &#x27;@angular/core&#x27;;
+
+import {
+  BackendChangeObject,
+  Change,
+} from &#x27;domain/editor/undo_redo/change.model&#x27;;
+import { Misconception } from &#x27;domain/skill/MisconceptionObjectFactory&#x27;;
+import { Skill } from &#x27;domain/skill/SkillObjectFactory&#x27;;
+import { SkillDomainConstants } from &#x27;domain/skill/skill-domain.constants&#x27;;
+import { UndoRedoService } from &#x27;domain/editor/undo_redo/undo-redo.service&#x27;;
+import { WorkedExample } from &#x27;domain/skill/WorkedExampleObjectFactory&#x27;;
+import { SubtitledHtml } from &#x27;domain/exploration/subtitled-html.model&#x27;;
+
+@Injectable({
+  providedIn: &#x27;root&#x27;,
+})
+export class SkillUpdateService {
+  constructor(private undoRedoService: UndoRedoService) {}
+
+  private _applyChange = (
+      skill,
+      command: string,
+      params,
+      apply,
+      reverse
+  ) =&gt; {
+    const changeDict = cloneDeep(params);
+    changeDict.cmd = command;
+    const changeObj = new Change(changeDict, apply, reverse);
+    this.undoRedoService.applyChange(changeObj, skill);
+  };
+
+  private _applyPropertyChange = (
+      skill,
+      propertyName: string,
+      newValue: string,
+      oldValue: string,
+      apply,
+      reverse
+  ) =&gt; {
+    this._applyChange(
+      skill,
+      SkillDomainConstants.CMD_UPDATE_SKILL_PROPERTY,
+      {
+        property_name: propertyName,
+        new_value: cloneDeep(newValue),
+        old_value: cloneDeep(oldValue),
+      },
+      apply,
+      reverse
+    );
+  };
+
+  private _applyMisconceptionPropertyChange = (
+      skill,
+      misconceptionId: string,
+      propertyName: string,
+      newValue: string | boolean,
+      oldValue: string | boolean,
+      apply,
+      reverse
+  ) =&gt; {
+    this._applyChange(
+      skill,
+      SkillDomainConstants.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
+      {
+        property_name: propertyName,
+        new_value: cloneDeep(newValue),
+        old_value: cloneDeep(oldValue),
+        misconception_id: misconceptionId,
+      },
+      apply,
+      reverse
+    );
+  };
+
+  private _applyRubricPropertyChange = (
+      skill,
+      difficulty: string,
+      explanations: string[],
+      apply,
+      reverse
+  ) =&gt; {
+    this._applyChange(
+      skill,
+      SkillDomainConstants.CMD_UPDATE_RUBRICS,
+      {
+        difficulty: cloneDeep(difficulty),
+        explanations: cloneDeep(explanations),
+      },
+      apply,
+      reverse
+    );
+  };
+
+  private _applySkillContentsPropertyChange = (
+      skill,
+      propertyName: string,
+      newValue,
+      oldValue,
+      apply,
+      reverse
+  ) =&gt; {
+    this._applyChange(
+      skill,
+      SkillDomainConstants.CMD_UPDATE_SKILL_CONTENTS_PROPERTY,
+      {
+        property_name: propertyName,
+        new_value: cloneDeep(newValue),
+        old_value: cloneDeep(oldValue),
+      },
+      apply,
+      reverse
+    );
+  };
+
+  private _getParameterFromChangeDict = (
+      changeDict: BackendChangeObject,
+      paramName: string
+  ) =&gt; changeDict[paramName];
+
+  private _getNewPropertyValueFromChangeDict = (
+      changeDict: BackendChangeObject
+  ) =&gt; this._getParameterFromChangeDict(changeDict, &#x27;new_value&#x27;);
+
+  setSkillDescription(skill: Skill, newDescription: string): void {
+    let oldDescription = cloneDeep(skill.getDescription());
+    this._applyPropertyChange(
+      skill,
+      SkillDomainConstants.SKILL_PROPERTY_DESCRIPTION,
+      newDescription,
+      oldDescription,
+      (changeDict, skill) =&gt; {
+        let description = this._getNewPropertyValueFromChangeDict(changeDict);
+        skill.setDescription(description);
+      },
+      (changeDict, skill) =&gt; {
+        skill.setDescription(oldDescription);
+      }
+    );
+  }
+
+  setConceptCardExplanation(skill: Skill, newExplanation: SubtitledHtml): void {
+    const oldExplanation = skill.getConceptCard().getExplanation();
+    this._applySkillContentsPropertyChange(
+      skill,
+      SkillDomainConstants.SKILL_CONTENTS_PROPERTY_EXPLANATION,
+      newExplanation.toBackendDict(),
+      oldExplanation.toBackendDict(),
+      (changeDict, skill) =&gt; {
+        skill.getConceptCard().setExplanation(newExplanation);
+      },
+      (changeDict, skill) =&gt; {
+        skill.getConceptCard().setExplanation(oldExplanation);
+      }
+    );
+  }
+
+  addWorkedExample(skill: Skill, newWorkedExample: WorkedExample): void {
+    const oldWorkedExamples = cloneDeep(
+      skill.getConceptCard().getWorkedExamples()
+    );
+    const newWorkedExamples = cloneDeep(oldWorkedExamples);
+    newWorkedExamples.push(newWorkedExample);
+    this._applySkillContentsPropertyChange(
+      skill,
+      SkillDomainConstants.SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES,
+      newWorkedExamples.map((workedExample) =&gt; {
+        return workedExample.toBackendDict();
+      }),
+      oldWorkedExamples.map((workedExample) =&gt; workedExample.toBackendDict()),
+      (changeDict, skill) =&gt; {
+        skill.getConceptCard().setWorkedExamples(newWorkedExamples);
+      },
+      (changeDict, skill) =&gt; {
+        skill.getConceptCard().setWorkedExamples(oldWorkedExamples);
+      }
+    );
+  }
+
+  deleteWorkedExample(skill: Skill, index: number): void {
+    const oldWorkedExamples = cloneDeep(
+      skill.getConceptCard().getWorkedExamples()
+    );
+    const newWorkedExamples = cloneDeep(oldWorkedExamples);
+    newWorkedExamples.splice(index, 1);
+    this._applySkillContentsPropertyChange(
+      skill,
+      SkillDomainConstants.SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES,
+      newWorkedExamples.map((workedExample) =&gt; {
+        return workedExample.toBackendDict();
+      }),
+      oldWorkedExamples.map((workedExample) =&gt; {
+        return workedExample.toBackendDict();
+      }),
+      (changeDict, skill) =&gt; {
+        skill.getConceptCard().setWorkedExamples(newWorkedExamples);
+      },
+      (changeDict, skill) =&gt; {
+        skill.getConceptCard().setWorkedExamples(oldWorkedExamples);
+      }
+    );
+  }
+
+  updateWorkedExamples(skill: Skill, newWorkedExamples: WorkedExample[]): void {
+    const oldWorkedExamples = skill.getConceptCard().getWorkedExamples();
+    this._applySkillContentsPropertyChange(
+      skill,
+      SkillDomainConstants.SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES,
+      newWorkedExamples.map((workedExample) =&gt; {
+        return workedExample.toBackendDict();
+      }),
+      oldWorkedExamples.map((workedExample) =&gt; {
+        return workedExample.toBackendDict();
+      }),
+      (changeDict, skill) =&gt; {
+        skill.getConceptCard().setWorkedExamples(newWorkedExamples);
+      },
+      (changeDict, skill) =&gt; {
+        skill.getConceptCard().setWorkedExamples(oldWorkedExamples);
+      }
+    );
+  }
+
+  updateWorkedExample(
+      skill: Skill,
+      workedExampleIndex: number,
+      newWorkedExampleQuestionHtml: string,
+      newWorkedExampleAnswerHtml: string
+  ): void {
+    const newWorkedExamples = cloneDeep(
+      skill.getConceptCard().getWorkedExamples()
+    );
+    newWorkedExamples[workedExampleIndex]
+      .getQuestion()
+      .html = newWorkedExampleQuestionHtml;
+    newWorkedExamples[workedExampleIndex]
+      .getExplanation()
+      .html = newWorkedExampleAnswerHtml;
+    this.updateWorkedExamples(skill, newWorkedExamples);
+  }
+
+  addMisconception(skill: Skill, newMisconception: Misconception): void {
+    const params = {
+      new_misconception_dict: newMisconception.toBackendDict(),
+    };
+
+    const misconceptionId = newMisconception.getId();
+    this._applyChange(
+      skill,
+      SkillDomainConstants.CMD_ADD_SKILL_MISCONCEPTION,
+      params,
+      (changeDict, skill) =&gt; {
+        skill.appendMisconception(newMisconception);
+      },
+      (changeDict, skill) =&gt; {
+        skill.deleteMisconception(misconceptionId);
+      }
+    );
+  }
+
+  deleteMisconception(skill: Skill, misconceptionId: string): void {
+    const params = {
+      misconception_id: misconceptionId,
+    };
+    const oldMisconception = skill.findMisconceptionById(misconceptionId);
+    this._applyChange(
+      skill,
+      SkillDomainConstants.CMD_DELETE_SKILL_MISCONCEPTION,
+      params,
+      (changeDict, skill) =&gt; {
+        skill.deleteMisconception(misconceptionId);
+      },
+      (changeDict, skill) =&gt; {
+        skill.appendMisconception(oldMisconception);
+      }
+    );
+  }
+
+  addPrerequisiteSkill(skill: Skill, skillId: string): void {
+    const params = {
+      skill_id: skillId,
+    };
+    this._applyChange(
+      skill,
+      SkillDomainConstants.CMD_ADD_PREREQUISITE_SKILL,
+      params,
+      (changeDict, skill) =&gt; {
+        skill.addPrerequisiteSkill(skillId);
+      },
+      (changeDict, skill) =&gt; {
+        skill.deletePrerequisiteSkill(skillId);
+      }
+    );
+  }
+
+  deletePrerequisiteSkill(skill: Skill, skillId: string): void {
+    const params = {
+      skill_id: skillId,
+    };
+    this._applyChange(
+      skill,
+      SkillDomainConstants.CMD_DELETE_PREREQUISITE_SKILL,
+      params,
+      (changeDict, skill) =&gt; {
+        skill.deletePrerequisiteSkill(skillId);
+      },
+      (changeDict, skill) =&gt; {
+        skill.addPrerequisiteSkill(skillId);
+      }
+    );
+  }
+
+  updateMisconceptionName(
+      skill: Skill,
+      misconceptionId: string,
+      oldName: string,
+      newName: string
+  ): void {
+    const misconception = skill.findMisconceptionById(misconceptionId);
+    if (misconception) {
+      this._applyMisconceptionPropertyChange(
+        skill,
+        misconceptionId,
+        SkillDomainConstants.SKILL_MISCONCEPTIONS_PROPERTY_NAME,
+        newName,
+        oldName,
+        () =&gt; {
+          misconception.setName(newName);
+        },
+        () =&gt; {
+          misconception.setName(oldName);
+        }
+      );
+    }
+  }
+
+  updateMisconceptionMustBeAddressed(
+      skill: Skill,
+      misconceptionId: string,
+      oldValue: boolean,
+      newValue: boolean
+  ): void {
+    const misconception = skill.findMisconceptionById(misconceptionId);
+    if (misconception) {
+      this._applyMisconceptionPropertyChange(
+        skill,
+        misconceptionId,
+        SkillDomainConstants.SKILL_MISCONCEPTIONS_PROPERTY_MUST_BE_ADDRESSED,
+        newValue,
+        oldValue,
+        () =&gt; {
+          misconception.setMustBeAddressed(newValue);
+        },
+        () =&gt; {
+          misconception.setMustBeAddressed(oldValue);
+        }
+      );
+    }
+  }
+
+  updateMisconceptionNotes(
+      skill: Skill,
+      misconceptionId: string,
+      oldNotes: string,
+      newNotes: string
+  ): void {
+    const misconception = skill.findMisconceptionById(misconceptionId);
+    if (misconception) {
+      this._applyMisconceptionPropertyChange(
+        skill,
+        misconceptionId,
+        SkillDomainConstants.SKILL_MISCONCEPTIONS_PROPERTY_NOTES,
+        newNotes,
+        oldNotes,
+        () =&gt; {
+          misconception.setNotes(newNotes);
+        },
+        () =&gt; {
+          misconception.setNotes(oldNotes);
+        }
+      );
+    }
+  }
+
+  updateMisconceptionFeedback(
+      skill: Skill,
+      misconceptionId: string,
+      oldFeedback: string,
+      newFeedback: string
+  ): void {
+    const misconception = skill.findMisconceptionById(misconceptionId);
+    if (misconception) {
+      this._applyMisconceptionPropertyChange(
+        skill,
+        misconceptionId,
+        SkillDomainConstants.SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK,
+        newFeedback,
+        oldFeedback,
+        () =&gt; {
+          misconception.setFeedback(newFeedback);
+        },
+        () =&gt; {
+          misconception.setFeedback(oldFeedback);
+        }
+      );
+    }
+  }
+
+  updateRubricForDifficulty(
+      skill: Skill,
+      difficulty: string,
+      explanations: string[]
+  ): void {
+    if (skill.SKILL_DIFFICULTIES.indexOf(difficulty) === -1) {
+      throw new Error(&#x27;Invalid difficulty value passed&#x27;);
+    }
+    const oldExplanations = skill.getRubricExplanations(difficulty);
+    this._applyRubricPropertyChange(
+      skill,
+      difficulty,
+      explanations,
+      (changeDict, skill) =&gt; {
+        skill.updateRubricForDifficulty(difficulty, explanations);
+      },
+      (changeDict, skill) =&gt; {
+        skill.updateRubricForDifficulty(difficulty, oldExplanations);
+      }
+    );
+  }
+}
+
+angular.module(&#x27;oppia&#x27;)
+  .factory(&#x27;SkillUpdateService&#x27;, downgradeInjectable(SkillUpdateService));
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:41,&quot;character&quot;:6,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:43,&quot;character&quot;:6,&quot;text&quot;:&quot;params&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:44,&quot;character&quot;:6,&quot;text&quot;:&quot;apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:45,&quot;character&quot;:6,&quot;text&quot;:&quot;reverse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:47,&quot;character&quot;:10,&quot;text&quot;:&quot;changeDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:47,&quot;character&quot;:33,&quot;text&quot;:&quot;params&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:48,&quot;character&quot;:4,&quot;text&quot;:&quot;changeDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:48,&quot;character&quot;:15,&quot;text&quot;:&quot;cmd&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:54,&quot;character&quot;:6,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:58,&quot;character&quot;:6,&quot;text&quot;:&quot;apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:59,&quot;character&quot;:6,&quot;text&quot;:&quot;reverse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:62,&quot;character&quot;:6,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:69,&quot;character&quot;:6,&quot;text&quot;:&quot;apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:70,&quot;character&quot;:6,&quot;text&quot;:&quot;reverse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:75,&quot;character&quot;:6,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:80,&quot;character&quot;:6,&quot;text&quot;:&quot;apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:81,&quot;character&quot;:6,&quot;text&quot;:&quot;reverse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:84,&quot;character&quot;:6,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:92,&quot;character&quot;:6,&quot;text&quot;:&quot;apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:93,&quot;character&quot;:6,&quot;text&quot;:&quot;reverse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:98,&quot;character&quot;:6,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:101,&quot;character&quot;:6,&quot;text&quot;:&quot;apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:102,&quot;character&quot;:6,&quot;text&quot;:&quot;reverse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:105,&quot;character&quot;:6,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:111,&quot;character&quot;:6,&quot;text&quot;:&quot;apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:112,&quot;character&quot;:6,&quot;text&quot;:&quot;reverse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:117,&quot;character&quot;:6,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:119,&quot;character&quot;:6,&quot;text&quot;:&quot;newValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:120,&quot;character&quot;:6,&quot;text&quot;:&quot;oldValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:121,&quot;character&quot;:6,&quot;text&quot;:&quot;apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:122,&quot;character&quot;:6,&quot;text&quot;:&quot;reverse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:125,&quot;character&quot;:6,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:129,&quot;character&quot;:8,&quot;text&quot;:&quot;new_value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:129,&quot;character&quot;:29,&quot;text&quot;:&quot;newValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:130,&quot;character&quot;:8,&quot;text&quot;:&quot;old_value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:130,&quot;character&quot;:29,&quot;text&quot;:&quot;oldValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:132,&quot;character&quot;:6,&quot;text&quot;:&quot;apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:133,&quot;character&quot;:6,&quot;text&quot;:&quot;reverse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:153,&quot;character&quot;:7,&quot;text&quot;:&quot;changeDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:153,&quot;character&quot;:19,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:155,&quot;character&quot;:8,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:155,&quot;character&quot;:14,&quot;text&quot;:&quot;setDescription&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:157,&quot;character&quot;:7,&quot;text&quot;:&quot;changeDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:157,&quot;character&quot;:19,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:158,&quot;character&quot;:8,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:158,&quot;character&quot;:14,&quot;text&quot;:&quot;setDescription&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:170,&quot;character&quot;:7,&quot;text&quot;:&quot;changeDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:170,&quot;character&quot;:19,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:171,&quot;character&quot;:8,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:171,&quot;character&quot;:14,&quot;text&quot;:&quot;getConceptCard&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:171,&quot;character&quot;:31,&quot;text&quot;:&quot;setExplanation&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:173,&quot;character&quot;:7,&quot;text&quot;:&quot;changeDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:173,&quot;character&quot;:19,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:174,&quot;character&quot;:8,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:174,&quot;character&quot;:14,&quot;text&quot;:&quot;getConceptCard&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:174,&quot;character&quot;:31,&quot;text&quot;:&quot;setExplanation&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:192,&quot;character&quot;:7,&quot;text&quot;:&quot;changeDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:192,&quot;character&quot;:19,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:193,&quot;character&quot;:8,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:193,&quot;character&quot;:14,&quot;text&quot;:&quot;getConceptCard&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:193,&quot;character&quot;:31,&quot;text&quot;:&quot;setWorkedExamples&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:195,&quot;character&quot;:7,&quot;text&quot;:&quot;changeDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:195,&quot;character&quot;:19,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:196,&quot;character&quot;:8,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:196,&quot;character&quot;:14,&quot;text&quot;:&quot;getConceptCard&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:196,&quot;character&quot;:31,&quot;text&quot;:&quot;setWorkedExamples&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:216,&quot;character&quot;:7,&quot;text&quot;:&quot;changeDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:216,&quot;character&quot;:19,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:217,&quot;character&quot;:8,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:217,&quot;character&quot;:14,&quot;text&quot;:&quot;getConceptCard&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:217,&quot;character&quot;:31,&quot;text&quot;:&quot;setWorkedExamples&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:219,&quot;character&quot;:7,&quot;text&quot;:&quot;changeDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:219,&quot;character&quot;:19,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:220,&quot;character&quot;:8,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:220,&quot;character&quot;:14,&quot;text&quot;:&quot;getConceptCard&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:220,&quot;character&quot;:31,&quot;text&quot;:&quot;setWorkedExamples&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:236,&quot;character&quot;:7,&quot;text&quot;:&quot;changeDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:236,&quot;character&quot;:19,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:237,&quot;character&quot;:8,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:237,&quot;character&quot;:14,&quot;text&quot;:&quot;getConceptCard&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:237,&quot;character&quot;:31,&quot;text&quot;:&quot;setWorkedExamples&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:239,&quot;character&quot;:7,&quot;text&quot;:&quot;changeDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:239,&quot;character&quot;:19,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:240,&quot;character&quot;:8,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:240,&quot;character&quot;:14,&quot;text&quot;:&quot;getConceptCard&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:240,&quot;character&quot;:31,&quot;text&quot;:&quot;setWorkedExamples&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:273,&quot;character&quot;:7,&quot;text&quot;:&quot;changeDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:273,&quot;character&quot;:19,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:274,&quot;character&quot;:8,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:274,&quot;character&quot;:14,&quot;text&quot;:&quot;appendMisconception&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:276,&quot;character&quot;:7,&quot;text&quot;:&quot;changeDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:276,&quot;character&quot;:19,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:277,&quot;character&quot;:8,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:277,&quot;character&quot;:14,&quot;text&quot;:&quot;deleteMisconception&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:291,&quot;character&quot;:7,&quot;text&quot;:&quot;changeDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:291,&quot;character&quot;:19,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:292,&quot;character&quot;:8,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:292,&quot;character&quot;:14,&quot;text&quot;:&quot;deleteMisconception&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:294,&quot;character&quot;:7,&quot;text&quot;:&quot;changeDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:294,&quot;character&quot;:19,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:295,&quot;character&quot;:8,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:295,&quot;character&quot;:14,&quot;text&quot;:&quot;appendMisconception&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:308,&quot;character&quot;:7,&quot;text&quot;:&quot;changeDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:308,&quot;character&quot;:19,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:309,&quot;character&quot;:8,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:309,&quot;character&quot;:14,&quot;text&quot;:&quot;addPrerequisiteSkill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:311,&quot;character&quot;:7,&quot;text&quot;:&quot;changeDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:311,&quot;character&quot;:19,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:312,&quot;character&quot;:8,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:312,&quot;character&quot;:14,&quot;text&quot;:&quot;deletePrerequisiteSkill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:325,&quot;character&quot;:7,&quot;text&quot;:&quot;changeDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:325,&quot;character&quot;:19,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:326,&quot;character&quot;:8,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:326,&quot;character&quot;:14,&quot;text&quot;:&quot;deletePrerequisiteSkill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:328,&quot;character&quot;:7,&quot;text&quot;:&quot;changeDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:328,&quot;character&quot;:19,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:329,&quot;character&quot;:8,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:329,&quot;character&quot;:14,&quot;text&quot;:&quot;addPrerequisiteSkill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:443,&quot;character&quot;:7,&quot;text&quot;:&quot;changeDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:443,&quot;character&quot;:19,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:444,&quot;character&quot;:8,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:444,&quot;character&quot;:14,&quot;text&quot;:&quot;updateRubricForDifficulty&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:446,&quot;character&quot;:7,&quot;text&quot;:&quot;changeDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:446,&quot;character&quot;:19,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:447,&quot;character&quot;:8,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-update.service.ts&quot;,&quot;line&quot;:447,&quot;character&quot;:14,&quot;text&quot;:&quot;updateRubricForDifficulty&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:55 GMT</p>
+    </body>
+  </html>
+  

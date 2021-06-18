@@ -1,0 +1,153 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>topic-domain.constants.ajs.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">core/templates/domain/topic/topic-domain.constants.ajs.ts</td><td class="">100.00%</td><td class="">100%</td><td class="">176</td><td class="">176</td><td class="">0</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2018 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Constants for topic domain.
+ */
+
+// TODO(#7092): Delete this file once migration is complete and these AngularJS
+// equivalents of the Angular constants are no longer needed.
+import { TopicDomainConstants } from &#x27;domain/topic/topic-domain.constants&#x27;;
+
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;TOPIC_EDITOR_STORY_URL_TEMPLATE&#x27;,
+  TopicDomainConstants.TOPIC_EDITOR_STORY_URL_TEMPLATE);
+
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;TOPIC_NAME_HANDLER_URL_TEMPLATE&#x27;,
+  TopicDomainConstants.TOPIC_NAME_HANDLER_URL_TEMPLATE);
+
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;TOPIC_URL_FRAGMENT_HANDLER_URL_TEMPLATE&#x27;,
+  TopicDomainConstants.TOPIC_URL_FRAGMENT_HANDLER_URL_TEMPLATE);
+
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;TOPIC_EDITOR_QUESTION_URL_TEMPLATE&#x27;,
+  TopicDomainConstants.TOPIC_EDITOR_QUESTION_URL_TEMPLATE);
+
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;TOPIC_MANAGER_RIGHTS_URL_TEMPLATE&#x27;,
+  TopicDomainConstants.TOPIC_MANAGER_RIGHTS_URL_TEMPLATE);
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;TOPIC_RIGHTS_URL_TEMPLATE&#x27;, TopicDomainConstants.TOPIC_RIGHTS_URL_TEMPLATE);
+
+// These should match the constants defined in core.domain.topic_domain.
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;CMD_ADD_SUBTOPIC&#x27;, TopicDomainConstants.CMD_ADD_SUBTOPIC);
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;CMD_DELETE_ADDITIONAL_STORY&#x27;,
+  TopicDomainConstants.CMD_DELETE_ADDITIONAL_STORY);
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;CMD_DELETE_CANONICAL_STORY&#x27;,
+  TopicDomainConstants.CMD_DELETE_CANONICAL_STORY);
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;CMD_REARRANGE_CANONICAL_STORY&#x27;,
+  TopicDomainConstants.CMD_REARRANGE_CANONICAL_STORY);
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;CMD_DELETE_SUBTOPIC&#x27;, TopicDomainConstants.CMD_DELETE_SUBTOPIC);
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;CMD_REMOVE_UNCATEGORIZED_SKILL_ID&#x27;,
+  TopicDomainConstants.CMD_REMOVE_UNCATEGORIZED_SKILL_ID);
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;CMD_REARRANGE_SKILL_IN_SUBTOPIC&#x27;,
+  TopicDomainConstants.CMD_REARRANGE_SKILL_IN_SUBTOPIC);
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;CMD_REARRANGE_SUBTOPIC&#x27;,
+  TopicDomainConstants.CMD_REARRANGE_SUBTOPIC);
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;CMD_MOVE_SKILL_ID_TO_SUBTOPIC&#x27;,
+  TopicDomainConstants.CMD_MOVE_SKILL_ID_TO_SUBTOPIC);
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC&#x27;,
+  TopicDomainConstants.CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC);
+
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;CMD_UPDATE_TOPIC_PROPERTY&#x27;, TopicDomainConstants.CMD_UPDATE_TOPIC_PROPERTY);
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;CMD_UPDATE_SUBTOPIC_PROPERTY&#x27;,
+  TopicDomainConstants.CMD_UPDATE_SUBTOPIC_PROPERTY);
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY&#x27;,
+  TopicDomainConstants.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY);
+
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;TOPIC_PROPERTY_NAME&#x27;, TopicDomainConstants.TOPIC_PROPERTY_NAME);
+
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;TOPIC_PROPERTY_ABBREVIATED_NAME&#x27;,
+  TopicDomainConstants.TOPIC_PROPERTY_ABBREVIATED_NAME);
+
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;TOPIC_PROPERTY_URL_FRAGMENT&#x27;,
+  TopicDomainConstants.TOPIC_PROPERTY_URL_FRAGMENT);
+
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;TOPIC_PROPERTY_THUMBNAIL_FILENAME&#x27;,
+  TopicDomainConstants.TOPIC_PROPERTY_THUMBNAIL_FILENAME);
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;TOPIC_PROPERTY_THUMBNAIL_BG_COLOR&#x27;,
+  TopicDomainConstants.TOPIC_PROPERTY_THUMBNAIL_BG_COLOR);
+
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;TOPIC_PROPERTY_DESCRIPTION&#x27;,
+  TopicDomainConstants.TOPIC_PROPERTY_DESCRIPTION);
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;TOPIC_PROPERTY_LANGUAGE_CODE&#x27;,
+  TopicDomainConstants.TOPIC_PROPERTY_LANGUAGE_CODE);
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;TOPIC_PROPERTY_PRACTICE_TAB_IS_DISPLAYED&#x27;,
+  TopicDomainConstants.TOPIC_PROPERTY_PRACTICE_TAB_IS_DISPLAYED);
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;TOPIC_PROPERTY_META_TAG_CONTENT&#x27;,
+  TopicDomainConstants.TOPIC_PROPERTY_META_TAG_CONTENT);
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;TOPIC_PROPERTY_PAGE_TITLE_FRAGMENT_FOR_WEB&#x27;,
+  TopicDomainConstants.TOPIC_PROPERTY_PAGE_TITLE_FRAGMENT_FOR_WEB);
+
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME&#x27;,
+  TopicDomainConstants.SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME);
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR&#x27;,
+  TopicDomainConstants.SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR);
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;SUBTOPIC_PROPERTY_TITLE&#x27;, TopicDomainConstants.SUBTOPIC_PROPERTY_TITLE);
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;SUBTOPIC_PROPERTY_URL_FRAGMENT&#x27;,
+  TopicDomainConstants.SUBTOPIC_PROPERTY_URL_FRAGMENT);
+
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML&#x27;,
+  TopicDomainConstants.SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML);
+angular.module(&#x27;oppia&#x27;).constant(
+  &#x27;SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO&#x27;,
+  TopicDomainConstants.SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO);
+</textarea><pre id="annotations" style="display:none">[]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:57 GMT</p>
+    </body>
+  </html>
+  

@@ -1,0 +1,122 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>fatigue-detection-service.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">core/templates/pages/exploration-player-page/services/fatigue-detection-service.spec.ts</td><td class="">100.00%</td><td class="">100%</td><td class="">141</td><td class="">141</td><td class="">0</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &#x27;License&#x27;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &#x27;AS-IS&#x27; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for the Fatigue Detection service.
+ */
+
+
+
+import { TestBed } from &#x27;@angular/core/testing&#x27;;
+import { FatigueDetectionService } from &#x27;pages/exploration-player-page/services/fatigue-detection.service&#x27;;
+
+
+describe(&#x27;Fatigue detection service&#x27;, () =&gt; {
+  let fatigueDetectionService: FatigueDetectionService;
+  beforeEach(() =&gt; {
+    fatigueDetectionService = TestBed.get(FatigueDetectionService);
+  });
+
+  beforeEach(() =&gt; {
+    jasmine.clock().uninstall();
+    jasmine.clock().install();
+    jasmine.clock().mockDate();
+  });
+
+  afterEach(() =&gt; {
+    jasmine.clock().uninstall();
+  });
+
+  describe(&#x27;isSubmittingTooFast&#x27;, () =&gt; {
+    it(&#x27;should return true for 4 or more submissions in under 10 seconds&#x27;,
+      () =&gt; {
+        fatigueDetectionService.recordSubmissionTimestamp();
+        jasmine.clock().tick(100);
+        fatigueDetectionService.recordSubmissionTimestamp();
+        jasmine.clock().tick(100);
+        fatigueDetectionService.recordSubmissionTimestamp();
+        jasmine.clock().tick(100);
+        fatigueDetectionService.recordSubmissionTimestamp();
+        expect(fatigueDetectionService.isSubmittingTooFast()).toBe(true);
+
+        jasmine.clock().tick(100);
+        fatigueDetectionService.recordSubmissionTimestamp();
+        expect(fatigueDetectionService.isSubmittingTooFast()).toBe(true);
+      });
+
+    it(&#x27;should return false for 4 or more submissions in over 10 seconds&#x27;,
+      () =&gt; {
+        fatigueDetectionService.recordSubmissionTimestamp();
+        jasmine.clock().tick(100);
+        fatigueDetectionService.recordSubmissionTimestamp();
+        jasmine.clock().tick(100);
+        fatigueDetectionService.recordSubmissionTimestamp();
+        jasmine.clock().tick(10000);
+        fatigueDetectionService.recordSubmissionTimestamp();
+        expect(fatigueDetectionService.isSubmittingTooFast()).toBe(false);
+
+        jasmine.clock().tick(100);
+        fatigueDetectionService.recordSubmissionTimestamp();
+        expect(fatigueDetectionService.isSubmittingTooFast()).toBe(false);
+      });
+
+    it(&#x27;should return false for less than 4 submissions&#x27;, () =&gt; {
+      fatigueDetectionService.recordSubmissionTimestamp();
+      expect(fatigueDetectionService.isSubmittingTooFast()).toBe(false);
+
+      jasmine.clock().tick(1000);
+      fatigueDetectionService.recordSubmissionTimestamp();
+      expect(fatigueDetectionService.isSubmittingTooFast()).toBe(false);
+
+      jasmine.clock().tick(1000);
+      fatigueDetectionService.recordSubmissionTimestamp();
+      expect(fatigueDetectionService.isSubmittingTooFast()).toBe(false);
+    });
+  });
+
+  describe(&#x27;reset&#x27;, () =&gt; {
+    it(&#x27;should properly reset submissions&#x27;, () =&gt; {
+      fatigueDetectionService.recordSubmissionTimestamp();
+      jasmine.clock().tick(1000);
+      fatigueDetectionService.recordSubmissionTimestamp();
+      jasmine.clock().tick(1000);
+      fatigueDetectionService.recordSubmissionTimestamp();
+      jasmine.clock().tick(1000);
+      fatigueDetectionService.recordSubmissionTimestamp();
+      expect(fatigueDetectionService.isSubmittingTooFast()).toBe(true);
+
+      fatigueDetectionService.reset();
+
+      expect(fatigueDetectionService.isSubmittingTooFast()).toBe(false);
+    });
+  });
+});
+</textarea><pre id="annotations" style="display:none">[]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:59 GMT</p>
+    </body>
+  </html>
+  

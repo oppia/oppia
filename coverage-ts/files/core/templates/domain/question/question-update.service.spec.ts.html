@@ -1,0 +1,278 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>question-update.service.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/domain/question/question-update.service.spec.ts</td><td class="">65.40%</td><td class="">100%</td><td class="">263</td><td class="">172</td><td class="">91</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2018 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for question update service.
+ */
+
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// question-update.service.ts is upgraded to Angular 8.
+import { AnswerGroupObjectFactory } from
+  &#x27;domain/exploration/AnswerGroupObjectFactory&#x27;;
+import { FractionObjectFactory } from &#x27;domain/objects/FractionObjectFactory&#x27;;
+import { HintObjectFactory } from &#x27;domain/exploration/HintObjectFactory&#x27;;
+import { OutcomeObjectFactory } from
+  &#x27;domain/exploration/OutcomeObjectFactory&#x27;;
+import { ParamChangeObjectFactory } from
+  &#x27;domain/exploration/ParamChangeObjectFactory&#x27;;
+import { ParamChangesObjectFactory } from
+  &#x27;domain/exploration/ParamChangesObjectFactory&#x27;;
+import { RuleObjectFactory } from &#x27;domain/exploration/RuleObjectFactory&#x27;;
+import { UnitsObjectFactory } from &#x27;domain/objects/UnitsObjectFactory&#x27;;
+import { WrittenTranslationObjectFactory } from
+  &#x27;domain/exploration/WrittenTranslationObjectFactory&#x27;;
+import { WrittenTranslationsObjectFactory } from
+  &#x27;domain/exploration/WrittenTranslationsObjectFactory&#x27;;
+import { UpgradedServices } from &#x27;services/UpgradedServices&#x27;;
+// ^^^ This block is to be removed.
+// TODO(#7222): Remove usage of importAllAngularServices once upgraded to
+// Angular 8.
+import { importAllAngularServices } from &#x27;tests/unit-test-utils&#x27;;
+import { SubtitledHtml } from &#x27;domain/exploration/subtitled-html.model&#x27;;
+
+require(&#x27;App.ts&#x27;);
+require(&#x27;domain/editor/undo_redo/question-undo-redo.service.ts&#x27;);
+require(&#x27;domain/question/QuestionObjectFactory.ts&#x27;);
+require(&#x27;domain/question/question-update.service.ts&#x27;);
+require(&#x27;domain/state/StateObjectFactory.ts&#x27;);
+require(
+  &#x27;components/question-directives/question-editor/&#x27; +
+  &#x27;question-editor.directive.ts&#x27;);
+
+describe(&#x27;Question update service&#x27;, function() {
+  var QuestionUpdateService = null;
+  var QuestionObjectFactory = null;
+  var QuestionUndoRedoService = null;
+  var StateObjectFactory = null;
+  var sampleQuestion = null;
+  var sampleStateDict = null;
+  var expectedOutputStateDict = null;
+  var expectedOutputState = null;
+  var sampleQuestionBackendObject = null;
+  importAllAngularServices();
+
+  beforeEach(angular.mock.module(&#x27;oppia&#x27;));
+  beforeEach(angular.mock.module(&#x27;oppia&#x27;, function($provide) {
+    $provide.value(
+      &#x27;AnswerGroupObjectFactory&#x27;, new AnswerGroupObjectFactory(
+        new OutcomeObjectFactory(),
+        new RuleObjectFactory()));
+    $provide.value(&#x27;FractionObjectFactory&#x27;, new FractionObjectFactory());
+    $provide.value(
+      &#x27;HintObjectFactory&#x27;, new HintObjectFactory());
+    $provide.value(
+      &#x27;OutcomeObjectFactory&#x27;, new OutcomeObjectFactory());
+    $provide.value(&#x27;ParamChangeObjectFactory&#x27;, new ParamChangeObjectFactory());
+    $provide.value(
+      &#x27;ParamChangesObjectFactory&#x27;, new ParamChangesObjectFactory(
+        new ParamChangeObjectFactory()));
+    $provide.value(&#x27;RuleObjectFactory&#x27;, new RuleObjectFactory());
+    $provide.value(&#x27;UnitsObjectFactory&#x27;, new UnitsObjectFactory());
+    $provide.value(
+      &#x27;WrittenTranslationObjectFactory&#x27;,
+      new WrittenTranslationObjectFactory());
+    $provide.value(
+      &#x27;WrittenTranslationsObjectFactory&#x27;,
+      new WrittenTranslationsObjectFactory(
+        new WrittenTranslationObjectFactory()));
+  }));
+  beforeEach(angular.mock.module(&#x27;oppia&#x27;, function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
+  beforeEach(angular.mock.inject(function($injector) {
+    QuestionUpdateService = $injector.get(&#x27;QuestionUpdateService&#x27;);
+    QuestionObjectFactory = $injector.get(&#x27;QuestionObjectFactory&#x27;);
+    QuestionUndoRedoService = $injector.get(&#x27;QuestionUndoRedoService&#x27;);
+    StateObjectFactory = $injector.get(&#x27;StateObjectFactory&#x27;);
+
+    sampleStateDict = {
+      name: &#x27;question&#x27;,
+      classifier_model_id: 0,
+      content: {
+        html: &#x27;old content&#x27;,
+        content_id: &#x27;content&#x27;
+      },
+      param_changes: [],
+      interaction: {
+        answer_groups: [{
+          rule_specs: [{
+            rule_type: &#x27;Contains&#x27;,
+            inputs: {x: {
+              contentId: &#x27;rule_input&#x27;,
+              normalizedStrSet: [&#x27;hola&#x27;]
+            }}
+          }],
+          outcome: {
+            dest: &#x27;Me Llamo&#x27;,
+            feedback: {
+              content_id: &#x27;feedback_1&#x27;,
+              html: &#x27;buen trabajo!&#x27;
+            },
+            labelled_as_correct: true
+          }
+        }],
+        customization_args: {
+          placeholder: {
+            value: {
+              content_id: &#x27;ca_placeholder_0&#x27;,
+              unicode_str: &#x27;&#x27;
+            }
+          },
+          rows: { value: 1 }
+        },
+        default_outcome: {
+          dest: &#x27;Hola&#x27;,
+          feedback: {
+            content_id: &#x27;default_outcome&#x27;,
+            html: &#x27;try again!&#x27;
+          },
+          labelled_as_correct: false
+        },
+        hints: [],
+        id: &#x27;TextInput&#x27;,
+      },
+      linked_skill_id: null,
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          content: {},
+          default_outcome: {}
+        }
+      },
+      solicit_answer_details: false,
+      written_translations: {
+        translations_mapping: {
+          content: {},
+          default_outcome: {}
+        }
+      }
+    };
+
+    expectedOutputStateDict = {
+      name: &#x27;question&#x27;,
+      classifier_model_id: 0,
+      content: {
+        html: &#x27;test content&#x27;,
+        content_id: &#x27;content&#x27;
+      },
+      param_changes: [],
+      interaction: {
+        answer_groups: [{
+          rule_specs: [{
+            rule_type: &#x27;Contains&#x27;,
+            inputs: {x: {
+              contentId: &#x27;rule_input&#x27;,
+              normalizedStrSet: [&#x27;hola&#x27;]
+            }}
+          }],
+          outcome: {
+            dest: &#x27;Me Llamo&#x27;,
+            feedback: {
+              content_id: &#x27;feedback_1&#x27;,
+              html: &#x27;buen trabajo!&#x27;
+            },
+            labelled_as_correct: true
+          }
+        }],
+        customization_args: {
+          placeholder: {
+            value: {
+              content_id: &#x27;ca_placeholder_0&#x27;,
+              unicode_str: &#x27;&#x27;
+            }
+          },
+          rows: { value: 1 }
+        },
+        default_outcome: {
+          dest: &#x27;Hola&#x27;,
+          feedback: {
+            content_id: &#x27;default_outcome&#x27;,
+            html: &#x27;try again!&#x27;
+          },
+          labelled_as_correct: false
+        },
+        hints: [],
+        id: &#x27;TextInput&#x27;,
+      },
+      linked_skill_id: null,
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          content: {},
+          default_outcome: {}
+        }
+      },
+      solicit_answer_details: false,
+      written_translations: {
+        translations_mapping: {
+          content: {},
+          default_outcome: {}
+        }
+      }
+    };
+
+    expectedOutputState = StateObjectFactory.createFromBackendDict(
+      &#x27;question&#x27;, expectedOutputStateDict);
+
+    sampleQuestionBackendObject = {
+      id: &#x27;0&#x27;,
+      question_state_data: sampleStateDict,
+      language_code: &#x27;en&#x27;,
+      version: 1
+    };
+    sampleQuestion = QuestionObjectFactory.createFromBackendDict(
+      sampleQuestionBackendObject);
+  }));
+
+  it(&#x27;should update the language code of the question&#x27;, function() {
+    expect(sampleQuestion.getLanguageCode()).toEqual(&#x27;en&#x27;);
+    QuestionUpdateService.setQuestionLanguageCode(sampleQuestion, &#x27;zh&#x27;);
+    expect(sampleQuestion.getLanguageCode()).toEqual(&#x27;zh&#x27;);
+    QuestionUndoRedoService.undoChange(sampleQuestion);
+    expect(sampleQuestion.getLanguageCode()).toEqual(&#x27;en&#x27;);
+  });
+
+  it(&#x27;should update the state data of the question&#x27;, function() {
+    var oldStateData = angular.copy(sampleQuestion.getStateData());
+    var updateFunction = function() {
+      var stateData = sampleQuestion.getStateData();
+      stateData.content = SubtitledHtml.createDefault(
+        &#x27;test content&#x27;, &#x27;content&#x27;);
+    };
+    QuestionUpdateService.setQuestionStateData(
+      sampleQuestion, updateFunction);
+    expect(sampleQuestion.getStateData()).toEqual(expectedOutputState);
+    QuestionUndoRedoService.undoChange(sampleQuestion);
+    expect(sampleQuestion.getStateData()).toEqual(oldStateData);
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:53,&quot;character&quot;:6,&quot;text&quot;:&quot;QuestionUpdateService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:54,&quot;character&quot;:6,&quot;text&quot;:&quot;QuestionObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:55,&quot;character&quot;:6,&quot;text&quot;:&quot;QuestionUndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:56,&quot;character&quot;:6,&quot;text&quot;:&quot;StateObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:57,&quot;character&quot;:6,&quot;text&quot;:&quot;sampleQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:58,&quot;character&quot;:6,&quot;text&quot;:&quot;sampleStateDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:59,&quot;character&quot;:6,&quot;text&quot;:&quot;expectedOutputStateDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:60,&quot;character&quot;:6,&quot;text&quot;:&quot;expectedOutputState&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:61,&quot;character&quot;:6,&quot;text&quot;:&quot;sampleQuestionBackendObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:65,&quot;character&quot;:51,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:66,&quot;character&quot;:4,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:66,&quot;character&quot;:13,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:70,&quot;character&quot;:4,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:70,&quot;character&quot;:13,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:71,&quot;character&quot;:4,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:71,&quot;character&quot;:13,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:73,&quot;character&quot;:4,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:73,&quot;character&quot;:13,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:75,&quot;character&quot;:4,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:75,&quot;character&quot;:13,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:76,&quot;character&quot;:4,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:76,&quot;character&quot;:13,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:79,&quot;character&quot;:4,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:79,&quot;character&quot;:13,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:80,&quot;character&quot;:4,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:80,&quot;character&quot;:13,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:81,&quot;character&quot;:4,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:81,&quot;character&quot;:13,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:84,&quot;character&quot;:4,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:84,&quot;character&quot;:13,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:89,&quot;character&quot;:51,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:92,&quot;character&quot;:6,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:92,&quot;character&quot;:15,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:95,&quot;character&quot;:42,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:96,&quot;character&quot;:4,&quot;text&quot;:&quot;QuestionUpdateService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:96,&quot;character&quot;:28,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:96,&quot;character&quot;:38,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:97,&quot;character&quot;:4,&quot;text&quot;:&quot;QuestionObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:97,&quot;character&quot;:28,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:97,&quot;character&quot;:38,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:98,&quot;character&quot;:4,&quot;text&quot;:&quot;QuestionUndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:98,&quot;character&quot;:30,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:98,&quot;character&quot;:40,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:99,&quot;character&quot;:4,&quot;text&quot;:&quot;StateObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:99,&quot;character&quot;:25,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:99,&quot;character&quot;:35,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:101,&quot;character&quot;:4,&quot;text&quot;:&quot;sampleStateDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:163,&quot;character&quot;:4,&quot;text&quot;:&quot;expectedOutputStateDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:225,&quot;character&quot;:4,&quot;text&quot;:&quot;expectedOutputState&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:225,&quot;character&quot;:26,&quot;text&quot;:&quot;StateObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:225,&quot;character&quot;:45,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:226,&quot;character&quot;:18,&quot;text&quot;:&quot;expectedOutputStateDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:228,&quot;character&quot;:4,&quot;text&quot;:&quot;sampleQuestionBackendObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:230,&quot;character&quot;:6,&quot;text&quot;:&quot;question_state_data&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:230,&quot;character&quot;:27,&quot;text&quot;:&quot;sampleStateDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:234,&quot;character&quot;:4,&quot;text&quot;:&quot;sampleQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:234,&quot;character&quot;:21,&quot;text&quot;:&quot;QuestionObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:234,&quot;character&quot;:43,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:235,&quot;character&quot;:6,&quot;text&quot;:&quot;sampleQuestionBackendObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:239,&quot;character&quot;:11,&quot;text&quot;:&quot;sampleQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:239,&quot;character&quot;:26,&quot;text&quot;:&quot;getLanguageCode&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:240,&quot;character&quot;:4,&quot;text&quot;:&quot;QuestionUpdateService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:240,&quot;character&quot;:26,&quot;text&quot;:&quot;setQuestionLanguageCode&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:240,&quot;character&quot;:50,&quot;text&quot;:&quot;sampleQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:241,&quot;character&quot;:11,&quot;text&quot;:&quot;sampleQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:241,&quot;character&quot;:26,&quot;text&quot;:&quot;getLanguageCode&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:242,&quot;character&quot;:4,&quot;text&quot;:&quot;QuestionUndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:242,&quot;character&quot;:28,&quot;text&quot;:&quot;undoChange&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:242,&quot;character&quot;:39,&quot;text&quot;:&quot;sampleQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:243,&quot;character&quot;:11,&quot;text&quot;:&quot;sampleQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:243,&quot;character&quot;:26,&quot;text&quot;:&quot;getLanguageCode&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:247,&quot;character&quot;:8,&quot;text&quot;:&quot;oldStateData&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:247,&quot;character&quot;:36,&quot;text&quot;:&quot;sampleQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:247,&quot;character&quot;:51,&quot;text&quot;:&quot;getStateData&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:249,&quot;character&quot;:10,&quot;text&quot;:&quot;stateData&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:249,&quot;character&quot;:22,&quot;text&quot;:&quot;sampleQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:249,&quot;character&quot;:37,&quot;text&quot;:&quot;getStateData&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:250,&quot;character&quot;:6,&quot;text&quot;:&quot;stateData&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:250,&quot;character&quot;:16,&quot;text&quot;:&quot;content&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:253,&quot;character&quot;:4,&quot;text&quot;:&quot;QuestionUpdateService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:253,&quot;character&quot;:26,&quot;text&quot;:&quot;setQuestionStateData&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:254,&quot;character&quot;:6,&quot;text&quot;:&quot;sampleQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:255,&quot;character&quot;:11,&quot;text&quot;:&quot;sampleQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:255,&quot;character&quot;:26,&quot;text&quot;:&quot;getStateData&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:255,&quot;character&quot;:50,&quot;text&quot;:&quot;expectedOutputState&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:256,&quot;character&quot;:4,&quot;text&quot;:&quot;QuestionUndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:256,&quot;character&quot;:28,&quot;text&quot;:&quot;undoChange&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:256,&quot;character&quot;:39,&quot;text&quot;:&quot;sampleQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:257,&quot;character&quot;:11,&quot;text&quot;:&quot;sampleQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:257,&quot;character&quot;:26,&quot;text&quot;:&quot;getStateData&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/question-update.service.spec.ts&quot;,&quot;line&quot;:257,&quot;character&quot;:50,&quot;text&quot;:&quot;oldStateData&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:57 GMT</p>
+    </body>
+  </html>
+  

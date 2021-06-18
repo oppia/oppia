@@ -1,0 +1,191 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>release-coordinator-backend-api.service.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.ts</td><td class="">91.53%</td><td class="">100%</td><td class="">236</td><td class="">216</td><td class="">20</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2021 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Service that manages release coordinator&#x27;s backend api calls.
+ */
+
+import { downgradeInjectable } from &#x27;@angular/upgrade/static&#x27;;
+import { HttpClient } from &#x27;@angular/common/http&#x27;;
+import { Injectable } from &#x27;@angular/core&#x27;;
+
+import { UrlInterpolationService } from &#x27;domain/utilities/url-interpolation.service&#x27;;
+import { ComputationData, ComputationDataBackendDict } from &#x27;domain/admin/computation-data.model&#x27;;
+import { Job, JobDataBackendDict } from &#x27;domain/admin/job.model&#x27;;
+import { JobStatusSummary, JobStatusSummaryBackendDict } from &#x27;domain/admin/job-status-summary.model&#x27;;
+
+interface JobOutputBackendResponse {
+  output: string[];
+}
+
+export interface JobsDataBackendDict {
+  &#x27;one_off_job_status_summaries&#x27;: JobStatusSummaryBackendDict[];
+  &#x27;human_readable_current_time&#x27;: string;
+  &#x27;audit_job_status_summaries&#x27;: JobStatusSummaryBackendDict[];
+  &#x27;unfinished_job_data&#x27;: JobDataBackendDict[];
+  &#x27;recent_job_data&#x27;: JobDataBackendDict[];
+  &#x27;continuous_computations_data&#x27;: ComputationDataBackendDict[];
+}
+
+interface MemoryCacheProfileResponse {
+  &#x27;peak_allocation&#x27;: string,
+  &#x27;total_allocation&#x27;: string,
+  &#x27;total_keys_stored&#x27;: string
+}
+
+export interface JobsData {
+  oneOffJobStatusSummaries: JobStatusSummary[];
+  humanReadableCurrentTime: string;
+  auditJobStatusSummaries: JobStatusSummary[];
+  unfinishedJobData: Job[];
+  recentJobData: Job[];
+  continuousComputationsData: ComputationData[];
+}
+
+@Injectable({
+  providedIn: &#x27;root&#x27;
+})
+export class ReleaseCoordinatorBackendApiService {
+  constructor(
+    private http: HttpClient,
+    private urlInterpolationService: UrlInterpolationService) {}
+
+  async getJobsDataAsync(): Promise&lt;JobsData&gt; {
+    return new Promise((resolve, reject) =&gt; {
+      this.http.get&lt;JobsDataBackendDict&gt;(
+        &#x27;/jobshandler&#x27;).toPromise().then(response =&gt; {
+        resolve({
+          oneOffJobStatusSummaries: response.one_off_job_status_summaries.map(
+            JobStatusSummary.createFromBackendDict),
+          humanReadableCurrentTime: response.human_readable_current_time,
+          auditJobStatusSummaries: response.audit_job_status_summaries.map(
+            JobStatusSummary.createFromBackendDict),
+          unfinishedJobData: response.unfinished_job_data.map(
+            Job.createFromBackendDict),
+          recentJobData: response.recent_job_data.map(
+            Job.createFromBackendDict),
+          continuousComputationsData: response.continuous_computations_data.map(
+            ComputationData.createFromBackendDict),
+        });
+      }, errorResponse =&gt; {
+        reject(errorResponse.error.error);
+      });
+    });
+  }
+
+  private async _postRequestAsync(
+      payload?: Object, action?: string): Promise&lt;void&gt; {
+    return new Promise((resolve, reject) =&gt; {
+      this.http.post&lt;void&gt;(
+        &#x27;/jobshandler&#x27;, { action, ...payload }).toPromise()
+        .then(response =&gt; {
+          resolve(response);
+        }, errorResponse =&gt; {
+          reject(errorResponse.error.error);
+        });
+    });
+  }
+
+  async startNewJobAsync(jobType: string): Promise&lt;void&gt; {
+    let action = &#x27;start_new_job&#x27;;
+    let payload = {
+      job_type: jobType
+    };
+    return this._postRequestAsync(payload, action);
+  }
+
+  async cancelJobAsync(jobId: string, jobType: string): Promise&lt;void&gt; {
+    let action = &#x27;cancel_job&#x27;;
+    let payload = {
+      job_id: jobId,
+      job_type: jobType
+    };
+    return this._postRequestAsync(payload, action);
+  }
+
+  async startComputationAsync(computationType: string): Promise&lt;void&gt; {
+    let action = &#x27;start_computation&#x27;;
+    let payload = {
+      computation_type: computationType
+    };
+    return this._postRequestAsync(payload, action);
+  }
+
+  async stopComputationAsync(computationType: string): Promise&lt;void&gt; {
+    let action = &#x27;stop_computation&#x27;;
+    let payload = {
+      computation_type: computationType
+    };
+    return this._postRequestAsync(payload, action);
+  }
+
+  async fetchJobOutputAsync(jobId: string): Promise&lt;string[]&gt; {
+    let adminJobOutputUrl = this.urlInterpolationService.interpolateUrl(
+      &#x27;/joboutputhandler?job_id=&lt;jobId&gt;&#x27;, {
+        jobId: jobId
+      });
+    return new Promise((resolve, reject) =&gt; {
+      this.http.get&lt;JobOutputBackendResponse&gt;(
+        adminJobOutputUrl).toPromise().then(response =&gt; {
+        resolve(Array.isArray(response.output) ? response.output.sort() : []);
+      }, errorResponse =&gt; {
+        reject(errorResponse.error.error);
+      });
+    });
+  }
+
+  async getMemoryCacheProfileAsync(): Promise&lt;MemoryCacheProfileResponse&gt; {
+    return new Promise((resolve, reject) =&gt; {
+      this.http.get&lt;MemoryCacheProfileResponse&gt;(
+        &#x27;/memorycachehandler&#x27;).toPromise().then(response =&gt; {
+        resolve(response);
+      }, errorResponse =&gt; {
+        reject(errorResponse.error.error);
+      });
+    });
+  }
+
+  async flushMemoryCacheAsync(): Promise&lt;void&gt; {
+    return new Promise((resolve, reject) =&gt; {
+      this.http.delete&lt;void&gt;(
+        &#x27;/memorycachehandler&#x27;).toPromise().then(response =&gt; {
+        resolve(response);
+      }, errorResponse =&gt; {
+        reject(errorResponse.error.error);
+      });
+    });
+  }
+}
+
+angular.module(&#x27;oppia&#x27;).factory(
+  &#x27;ReleaseCoordinatorBackendApiService&#x27;,
+  downgradeInjectable(ReleaseCoordinatorBackendApiService));
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.ts&quot;,&quot;line&quot;:80,&quot;character&quot;:9,&quot;text&quot;:&quot;errorResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.ts&quot;,&quot;line&quot;:81,&quot;character&quot;:15,&quot;text&quot;:&quot;errorResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.ts&quot;,&quot;line&quot;:81,&quot;character&quot;:29,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.ts&quot;,&quot;line&quot;:81,&quot;character&quot;:35,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.ts&quot;,&quot;line&quot;:93,&quot;character&quot;:11,&quot;text&quot;:&quot;errorResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.ts&quot;,&quot;line&quot;:94,&quot;character&quot;:17,&quot;text&quot;:&quot;errorResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.ts&quot;,&quot;line&quot;:94,&quot;character&quot;:31,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.ts&quot;,&quot;line&quot;:94,&quot;character&quot;:37,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.ts&quot;,&quot;line&quot;:141,&quot;character&quot;:9,&quot;text&quot;:&quot;errorResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.ts&quot;,&quot;line&quot;:142,&quot;character&quot;:15,&quot;text&quot;:&quot;errorResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.ts&quot;,&quot;line&quot;:142,&quot;character&quot;:29,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.ts&quot;,&quot;line&quot;:142,&quot;character&quot;:35,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.ts&quot;,&quot;line&quot;:152,&quot;character&quot;:9,&quot;text&quot;:&quot;errorResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.ts&quot;,&quot;line&quot;:153,&quot;character&quot;:15,&quot;text&quot;:&quot;errorResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.ts&quot;,&quot;line&quot;:153,&quot;character&quot;:29,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.ts&quot;,&quot;line&quot;:153,&quot;character&quot;:35,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.ts&quot;,&quot;line&quot;:163,&quot;character&quot;:9,&quot;text&quot;:&quot;errorResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.ts&quot;,&quot;line&quot;:164,&quot;character&quot;:15,&quot;text&quot;:&quot;errorResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.ts&quot;,&quot;line&quot;:164,&quot;character&quot;:29,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.ts&quot;,&quot;line&quot;:164,&quot;character&quot;:35,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:56 GMT</p>
+    </body>
+  </html>
+  

@@ -1,0 +1,175 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>oppia-interactive-algebraic-expression-input.component.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">extensions/interactions/AlgebraicExpressionInput/directives/oppia-interactive-algebraic-expression-input.component.ts</td><td class="">97.30%</td><td class="">100%</td><td class="">185</td><td class="">180</td><td class="">5</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2021 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Component for the AlgebraicExpressionInput interaction.
+ *
+ * IMPORTANT NOTE: The naming convention for customization args that are passed
+ * into the directive is: the name of the parameter, followed by &#x27;With&#x27;,
+ * followed by the name of the arg.
+ */
+
+import { ChangeDetectorRef, Component, Input, OnInit } from &#x27;@angular/core&#x27;;
+import { CurrentInteractionService } from &#x27;pages/exploration-player-page/services/current-interaction.service&#x27;;
+import { DeviceInfoService } from &#x27;services/contextual/device-info.service&#x27;;
+import { GuppyConfigurationService } from &#x27;services/guppy-configuration.service&#x27;;
+import { GuppyInitializationService } from &#x27;services/guppy-initialization.service&#x27;;
+import { HtmlEscaperService } from &#x27;services/html-escaper.service&#x27;;
+import { MathInteractionsService } from &#x27;services/math-interactions.service&#x27;;
+import { AlgebraicExpressionInputRulesService } from &#x27;./algebraic-expression-input-rules.service&#x27;;
+import constants from &#x27;assets/constants&#x27;;
+import { InteractionRulesService } from &#x27;pages/exploration-player-page/services/answer-classification.service&#x27;;
+import { downgradeComponent } from &#x27;@angular/upgrade/static&#x27;;
+import { InteractionAnswer } from &#x27;interactions/answer-defs&#x27;;
+
+@Component({
+  selector: &#x27;oppia-interactive-algebraic-expression-input&#x27;,
+  templateUrl: &#x27;./algebraic-expression-input-interaction.component.html&#x27;,
+  styleUrls: []
+})
+export class AlgebraicExpressionInputInteractionComponent implements OnInit {
+  value: string = &#x27;&#x27;;
+  hasBeenTouched = false;
+  warningText: string = &#x27;&#x27;;
+  @Input() customOskLettersWithValue: string = &#x27;&#x27;;
+  @Input() savedSolution: InteractionAnswer;
+  @Input() useFractionForDivisionWithValue: string;
+
+  constructor(
+    private algebraicExpressionInputRulesService:
+      AlgebraicExpressionInputRulesService,
+    private currentInteractionService: CurrentInteractionService,
+    private changeDetectorRef: ChangeDetectorRef,
+    private deviceInfoService: DeviceInfoService,
+    private guppyConfigurationService: GuppyConfigurationService,
+    private guppyInitializationService: GuppyInitializationService,
+    private htmlEscaperService: HtmlEscaperService,
+    private mathInteractionsService: MathInteractionsService
+  ) {}
+
+  isCurrentAnswerValid(): boolean {
+    const activeGuppyObject = (
+      this.guppyInitializationService.findActiveGuppyObject());
+    if (this.hasBeenTouched &amp;&amp; activeGuppyObject === undefined) {
+      // Replacing abs symbol, &#x27;|x|&#x27;, with text, &#x27;abs(x)&#x27; since the symbol
+      // is not compatible with nerdamer or with the backend validations.
+      this.value = this.mathInteractionsService.replaceAbsSymbolWithText(
+        this.value);
+      let answerIsValid = (
+        this.mathInteractionsService.validateAlgebraicExpression(
+          this.value, this.guppyInitializationService.getCustomOskLetters()));
+      this.warningText = this.mathInteractionsService.getWarningText();
+      return answerIsValid;
+    }
+    this.warningText = &#x27;&#x27;;
+    return true;
+  }
+
+  submitAnswer(): void {
+    if (!this.isCurrentAnswerValid()) {
+      return;
+    }
+    this.currentInteractionService.onSubmit(
+      this.value,
+      // eslint-disable-next-line max-len
+      this.algebraicExpressionInputRulesService as unknown as InteractionRulesService
+    );
+  }
+
+  ngOnInit(): void {
+    this.hasBeenTouched = false;
+    this.guppyConfigurationService.init();
+    this.guppyConfigurationService.changeDivSymbol(
+      JSON.parse(this.useFractionForDivisionWithValue || &#x27;false&#x27;));
+    this.guppyInitializationService.setCustomOskLetters(
+      this.htmlEscaperService.escapedJsonToObj(
+        this.customOskLettersWithValue) as string[]
+    );
+    this.guppyInitializationService.init(
+      &#x27;guppy-div-learner&#x27;,
+      constants.MATH_INTERACTION_PLACEHOLDERS.AlgebraicExpressionInput,
+      this.savedSolution !== undefined ? this.savedSolution as string : &#x27;&#x27;
+    );
+    const eventType = (
+      this.deviceInfoService.isMobileUserAgent() &amp;&amp;
+      this.deviceInfoService.hasTouchEvents()) ? &#x27;focus&#x27; : &#x27;change&#x27;;
+    // We need the &#x27;focus&#x27; event while using the on screen keyboard (only
+    // for touch-based devices) to capture input from user and the &#x27;change&#x27;
+    // event while using the normal keyboard.
+    Guppy.event(eventType, () =&gt; {
+      const activeGuppyObject = (
+        this.guppyInitializationService.findActiveGuppyObject());
+      if (activeGuppyObject !== undefined) {
+        this.hasBeenTouched = true;
+        this.value = activeGuppyObject.guppyInstance.asciimath();
+        if (eventType === &#x27;change&#x27;) {
+          // Need to manually trigger the digest cycle to make any
+          // &#x27;watchers&#x27; aware of changes in answer.
+          this.changeDetectorRef.detectChanges();
+        }
+      }
+    });
+    const isCurrentAnswerValid = (): boolean =&gt; {
+      return this.isCurrentAnswerValid();
+    };
+
+    const submitAnswer = () =&gt; {
+      return this.submitAnswer();
+    };
+    this.currentInteractionService.registerCurrentInteraction(
+      submitAnswer, isCurrentAnswerValid);
+  }
+
+  showOsk(): void {
+    this.guppyInitializationService.setShowOSK(true);
+    GuppyInitializationService.interactionType = &#x27;AlgebraicExpressionInput&#x27;;
+  }
+}
+
+require(
+  &#x27;interactions/AlgebraicExpressionInput/directives/&#x27; +
+  &#x27;algebraic-expression-input-rules.service.ts&#x27;);
+require(
+  &#x27;pages/exploration-player-page/services/current-interaction.service.ts&#x27;);
+require(&#x27;services/contextual/device-info.service.ts&#x27;);
+require(&#x27;services/guppy-configuration.service.ts&#x27;);
+require(&#x27;services/guppy-initialization.service.ts&#x27;);
+require(&#x27;services/html-escaper.service.ts&#x27;);
+require(&#x27;services/math-interactions.service.ts&#x27;);
+
+angular.module(&#x27;oppia&#x27;).directive(
+  &#x27;oppiaInteractiveAlgebraicExpressionInput&#x27;,
+  downgradeComponent(
+    {
+      component: AlgebraicExpressionInputInteractionComponent
+    }
+  ) as angular.IDirectiveFactory);
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;extensions/interactions/AlgebraicExpressionInput/directives/oppia-interactive-algebraic-expression-input.component.ts&quot;,&quot;line&quot;:85,&quot;character&quot;:6,&quot;text&quot;:&quot;this.algebraicExpressionInputRulesService as unknown as InteractionRulesService&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;extensions/interactions/AlgebraicExpressionInput/directives/oppia-interactive-algebraic-expression-input.component.ts&quot;,&quot;line&quot;:95,&quot;character&quot;:6,&quot;text&quot;:&quot;this.htmlEscaperService.escapedJsonToObj(\n        this.customOskLettersWithValue) as string[]&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;extensions/interactions/AlgebraicExpressionInput/directives/oppia-interactive-algebraic-expression-input.component.ts&quot;,&quot;line&quot;:101,&quot;character&quot;:41,&quot;text&quot;:&quot;this.savedSolution as string&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;extensions/interactions/AlgebraicExpressionInput/directives/oppia-interactive-algebraic-expression-input.component.ts&quot;,&quot;line&quot;:114,&quot;character&quot;:39,&quot;text&quot;:&quot;guppyInstance&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/AlgebraicExpressionInput/directives/oppia-interactive-algebraic-expression-input.component.ts&quot;,&quot;line&quot;:114,&quot;character&quot;:53,&quot;text&quot;:&quot;asciimath&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:57 GMT</p>
+    </body>
+  </html>
+  

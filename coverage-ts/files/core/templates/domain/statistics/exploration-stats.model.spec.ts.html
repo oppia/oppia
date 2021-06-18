@@ -1,0 +1,218 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>exploration-stats.model.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">core/templates/domain/statistics/exploration-stats.model.spec.ts</td><td class="">100.00%</td><td class="">100%</td><td class="">226</td><td class="">226</td><td class="">0</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for the ExplorationStatsModel.
+ */
+
+import {
+  ExplorationStats,
+  ExplorationStatsBackendDict
+} from &#x27;domain/statistics/exploration-stats.model&#x27;;
+import { StateStats } from &#x27;domain/statistics/state-stats-model&#x27;;
+
+describe(&#x27;Exploration stats model&#x27;, function() {
+  it(&#x27;should derive values from the backend dict&#x27;, () =&gt; {
+    const explorationStatsBackendDict: ExplorationStatsBackendDict = {
+      exp_id: &#x27;eid&#x27;,
+      exp_version: 1,
+      num_starts: 1,
+      num_actual_starts: 10,
+      num_completions: 100,
+      state_stats_mapping: {},
+    };
+
+    const explorationStats: ExplorationStats = (
+      ExplorationStats.createFromBackendDict(
+        explorationStatsBackendDict));
+
+    expect(explorationStats.expId).toEqual(&#x27;eid&#x27;);
+    expect(explorationStats.expVersion).toEqual(1);
+    expect(explorationStats.numStarts).toEqual(1);
+    expect(explorationStats.numActualStarts).toEqual(10);
+    expect(explorationStats.numCompletions).toEqual(100);
+  });
+
+  describe(&#x27;Querying for state stats&#x27;, () =&gt; {
+    let explorationStats: ExplorationStats;
+    beforeEach(() =&gt; {
+      explorationStats = ExplorationStats.createFromBackendDict({
+        exp_id: &#x27;eid&#x27;,
+        exp_version: 100,
+        num_starts: 100,
+        num_actual_starts: 100,
+        num_completions: 100,
+        state_stats_mapping: {
+          Introduction: {
+            total_answers_count: 1,
+            useful_feedback_count: 1,
+            total_hit_count: 10,
+            first_hit_count: 10,
+            num_times_solution_viewed: 100,
+            num_completions: 1,
+          },
+          Middle: {
+            total_answers_count: 1,
+            useful_feedback_count: 1,
+            total_hit_count: 10,
+            first_hit_count: 10,
+            num_times_solution_viewed: 100,
+            num_completions: 1,
+          },
+          End: {
+            total_answers_count: 1,
+            useful_feedback_count: 1,
+            total_hit_count: 10,
+            first_hit_count: 10,
+            num_times_solution_viewed: 100,
+            num_completions: 1,
+          },
+        },
+      });
+    });
+
+    it(&#x27;should return whether corresponding state stats exists&#x27;, () =&gt; {
+      expect(explorationStats.hasStateStates(&#x27;Introduction&#x27;)).toBeTrue();
+      expect(explorationStats.hasStateStates(&#x27;Middle&#x27;)).toBeTrue();
+      expect(explorationStats.hasStateStates(&#x27;End&#x27;)).toBeTrue();
+      expect(explorationStats.hasStateStates(&#x27;Prelude&#x27;)).toBeFalse();
+    });
+
+    it(&#x27;should return corresponding state stats&#x27;, () =&gt; {
+      const introductionStats = explorationStats.getStateStats(&#x27;Introduction&#x27;);
+      expect(introductionStats).toBeInstanceOf(StateStats);
+    });
+
+    it(&#x27;should return array of included state names&#x27;, () =&gt; {
+      expect(explorationStats.getStateNames()).toEqual(
+        jasmine.arrayWithExactContents([&#x27;Introduction&#x27;, &#x27;Middle&#x27;, &#x27;End&#x27;]));
+    });
+
+    it(&#x27;should throw an error if state stats do not exist&#x27;, () =&gt; {
+      expect(() =&gt; explorationStats.getStateStats(&#x27;Prelude&#x27;))
+        .toThrowError(&#x27;no stats exist for state: Prelude&#x27;);
+    });
+
+    it(&#x27;should calculate bounce rate of state compared to exploration&#x27;, () =&gt; {
+      const introductionStats = explorationStats.getStateStats(&#x27;Introduction&#x27;);
+
+      expect(introductionStats.totalHitCount).toEqual(10);
+      expect(introductionStats.numCompletions).toEqual(1);
+      expect(explorationStats.numStarts).toEqual(100);
+
+      expect(explorationStats.getBounceRate(&#x27;Introduction&#x27;))
+        .toBeCloseTo((10 - 1) / 100);
+    });
+
+    it(&#x27;should throw an error when trying to calculate bounce rate of an &#x27; +
+      &#x27;unplayed exploration&#x27;, () =&gt; {
+      explorationStats = ExplorationStats.createFromBackendDict({
+        exp_id: &#x27;eid&#x27;,
+        exp_version: 0,
+        num_starts: 0,
+        num_actual_starts: 0,
+        num_completions: 0,
+        state_stats_mapping: {
+          Introduction: {
+            total_answers_count: 0,
+            useful_feedback_count: 0,
+            total_hit_count: 0,
+            first_hit_count: 0,
+            num_times_solution_viewed: 0,
+            num_completions: 0,
+          },
+        },
+      });
+      expect(() =&gt; explorationStats.getBounceRate(&#x27;Introduction&#x27;))
+        .toThrowError(&#x27;Can not get bounce rate of an unplayed exploration&#x27;);
+    });
+  });
+
+  describe(&#x27;Deriving new exploration stats&#x27;, () =&gt; {
+    let original: ExplorationStats;
+    beforeEach(() =&gt; {
+      original = ExplorationStats.createFromBackendDict({
+        exp_id: &#x27;eid&#x27;,
+        exp_version: 100,
+        num_starts: 100,
+        num_actual_starts: 100,
+        num_completions: 100,
+        state_stats_mapping: {
+          Introduction: {
+            total_answers_count: 1,
+            useful_feedback_count: 1,
+            total_hit_count: 10,
+            first_hit_count: 10,
+            num_times_solution_viewed: 100,
+            num_completions: 1,
+          },
+          Middle: {
+            total_answers_count: 1,
+            useful_feedback_count: 1,
+            total_hit_count: 10,
+            first_hit_count: 10,
+            num_times_solution_viewed: 100,
+            num_completions: 1,
+          },
+          End: {
+            total_answers_count: 1,
+            useful_feedback_count: 1,
+            total_hit_count: 10,
+            first_hit_count: 10,
+            num_times_solution_viewed: 100,
+            num_completions: 1,
+          },
+        },
+      });
+    });
+
+    it(&#x27;should create a copy with an added state&#x27;, () =&gt; {
+      let copy = original.createNewWithStateAdded(&#x27;Epilogue&#x27;);
+      expect(copy.hasStateStates(&#x27;Epilogue&#x27;)).toBeTrue();
+      expect(original.hasStateStates(&#x27;Epilogue&#x27;)).toBeFalse();
+    });
+
+    it(&#x27;should create a copy with a deleted state&#x27;, () =&gt; {
+      let copy = original.createNewWithStateDeleted(&#x27;End&#x27;);
+      expect(copy.hasStateStates(&#x27;End&#x27;)).toBeFalse();
+      expect(original.hasStateStates(&#x27;End&#x27;)).toBeTrue();
+    });
+
+    it(&#x27;should create a copy with a renamed state&#x27;, () =&gt; {
+      let copy = original.createNewWithStateRenamed(&#x27;Introduction&#x27;, &#x27;Prologue&#x27;);
+      expect(copy.hasStateStates(&#x27;Introduction&#x27;)).toBeFalse();
+      expect(original.hasStateStates(&#x27;Prologue&#x27;)).toBeFalse();
+      expect(copy.getStateStats(&#x27;Prologue&#x27;))
+        .toEqual(original.getStateStats(&#x27;Introduction&#x27;));
+    });
+  });
+});
+</textarea><pre id="annotations" style="display:none">[]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:57 GMT</p>
+    </body>
+  </html>
+  

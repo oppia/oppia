@@ -1,0 +1,199 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>numeric-input-rules.service.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">extensions/interactions/NumericInput/directives/numeric-input-rules.service.spec.ts</td><td class="">100.00%</td><td class="">100%</td><td class="">229</td><td class="">229</td><td class="">0</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2015 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for Numeric Input rules.
+ */
+
+import { NumericInputRulesService } from
+  &#x27;interactions/NumericInput/directives/numeric-input-rules.service&#x27;;
+
+describe(&#x27;Numeric Input service&#x27;, () =&gt; {
+  let nirs: NumericInputRulesService;
+  beforeEach(() =&gt; {
+    nirs = new NumericInputRulesService();
+  });
+
+  it(&#x27;should have a correct equals rule&#x27;, () =&gt; {
+    expect(nirs.Equals(3, {
+      x: 3
+    })).toBe(true);
+    expect(nirs.Equals(3.0, {
+      x: 3
+    })).toBe(true);
+    expect(nirs.Equals(4, {
+      x: 3
+    })).toBe(false);
+  });
+
+  it(&#x27;should have a correct is less than rule&#x27;, () =&gt; {
+    expect(nirs.IsLessThan(3.0, {
+      x: 4.0
+    })).toBe(true);
+    expect(nirs.IsLessThan(3, {
+      x: 4
+    })).toBe(true);
+    expect(nirs.IsLessThan(2, {
+      x: 4
+    })).toBe(true);
+    expect(nirs.IsLessThan(3.0, {
+      x: 4.0
+    })).toBe(true);
+    expect(nirs.IsLessThan(4, {
+      x: 3.0
+    })).toBe(false);
+    expect(nirs.IsLessThan(4.0, {
+      x: 3.0
+    })).toBe(false);
+    expect(nirs.IsLessThan(3, {
+      x: 3
+    })).toBe(false);
+  });
+
+  it(&#x27;should have a correct is greater than rule&#x27;, () =&gt; {
+    expect(nirs.IsGreaterThan(3.0, {
+      x: 4.0
+    })).toBe(false);
+    expect(nirs.IsGreaterThan(3, {
+      x: 4
+    })).toBe(false);
+    expect(nirs.IsGreaterThan(3.0, {
+      x: 4.0
+    })).toBe(false);
+    expect(nirs.IsGreaterThan(4, {
+      x: 3.0
+    })).toBe(true);
+    expect(nirs.IsGreaterThan(4, {
+      x: 3
+    })).toBe(true);
+    expect(nirs.IsGreaterThan(4.0, {
+      x: 3.0
+    })).toBe(true);
+    expect(nirs.IsGreaterThan(3, {
+      x: 3
+    })).toBe(false);
+  });
+
+  it(&#x27;should have a correct less than or equal to rule&#x27;, () =&gt; {
+    expect(nirs.IsLessThanOrEqualTo(3.0, {
+      x: 4.0
+    })).toBe(true);
+    expect(nirs.IsLessThanOrEqualTo(3, {
+      x: 4
+    })).toBe(true);
+    expect(nirs.IsLessThanOrEqualTo(2, {
+      x: 4
+    })).toBe(true);
+    expect(nirs.IsLessThanOrEqualTo(3, {
+      x: 3
+    })).toBe(true);
+    expect(nirs.IsLessThanOrEqualTo(3.0, {
+      x: 4.0
+    })).toBe(true);
+    expect(nirs.IsLessThanOrEqualTo(4, {
+      x: 3.0
+    })).toBe(false);
+    expect(nirs.IsLessThanOrEqualTo(4.0, {
+      x: 3.0
+    })).toBe(false);
+  });
+
+  it(&#x27;should have a correct greater than or equal to rule&#x27;, () =&gt; {
+    expect(nirs.IsGreaterThanOrEqualTo(3.0, {
+      x: 4.0
+    })).toBe(false);
+    expect(nirs.IsGreaterThanOrEqualTo(3, {
+      x: 4
+    })).toBe(false);
+    expect(nirs.IsGreaterThanOrEqualTo(2, {
+      x: 4
+    })).toBe(false);
+    expect(nirs.IsGreaterThanOrEqualTo(3.0, {
+      x: 4.0
+    })).toBe(false);
+    expect(nirs.IsGreaterThanOrEqualTo(3, {
+      x: 3
+    })).toBe(true);
+    expect(nirs.IsGreaterThanOrEqualTo(4, {
+      x: 3.0
+    })).toBe(true);
+    expect(nirs.IsGreaterThanOrEqualTo(4.0, {
+      x: 3.0
+    })).toBe(true);
+  });
+
+  it(&#x27;should have a correct inclusively between rule&#x27;, () =&gt; {
+    expect(nirs.IsInclusivelyBetween(1, {
+      a: 0,
+      b: 2
+    })).toBe(true);
+    expect(nirs.IsInclusivelyBetween(1, {
+      a: 0,
+      b: 1
+    })).toBe(true);
+    expect(nirs.IsInclusivelyBetween(1.0, {
+      a: 0,
+      b: 2
+    })).toBe(true);
+    expect(nirs.IsInclusivelyBetween(1.01, {
+      a: 0,
+      b: 1
+    })).toBe(false);
+    expect(nirs.IsInclusivelyBetween(1, {
+      a: 0,
+      b: 0
+    })).toBe(false);
+  });
+
+  it(&#x27;should have a correct within tolerence rule&#x27;, () =&gt; {
+    expect(nirs.IsWithinTolerance(0, {
+      x: 0,
+      tol: 1
+    })).toBe(true);
+    expect(nirs.IsWithinTolerance(0.5, {
+      x: 0,
+      tol: 0.5
+    })).toBe(true);
+    expect(nirs.IsWithinTolerance(-0.5, {
+      x: 0,
+      tol: 0.5
+    })).toBe(true);
+    expect(nirs.IsWithinTolerance(3, {
+      x: 2.0,
+      tol: 1
+    })).toBe(true);
+    expect(nirs.IsWithinTolerance(0.1, {
+      x: 0,
+      tol: 0
+    })).toBe(false);
+  });
+});
+</textarea><pre id="annotations" style="display:none">[]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:44:00 GMT</p>
+    </body>
+  </html>
+  

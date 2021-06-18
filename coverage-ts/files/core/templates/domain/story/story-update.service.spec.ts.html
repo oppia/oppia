@@ -1,0 +1,649 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>story-update.service.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/domain/story/story-update.service.spec.ts</td><td class="">72.77%</td><td class="">100%</td><td class="">797</td><td class="">580</td><td class="">217</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2021 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Tests for Story update service.
+ */
+
+import { HttpClientTestingModule } from
+  &#x27;@angular/common/http/testing&#x27;;
+import { TestBed } from &#x27;@angular/core/testing&#x27;;
+
+import { StoryObjectFactory } from &#x27;domain/story/StoryObjectFactory&#x27;;
+import { StoryUpdateService } from &#x27;domain/story/story-update.service&#x27;;
+import { UndoRedoService } from &#x27;domain/editor/undo_redo/undo-redo.service&#x27;;
+
+describe(&#x27;Story update service&#x27;, () =&gt; {
+  let storyObjectFactory: StoryObjectFactory;
+  let storyUpdateService: StoryUpdateService;
+  let undoRedoService: UndoRedoService;
+  let _sampleStory;
+
+  beforeEach(() =&gt; {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+    });
+
+    storyUpdateService = TestBed.inject(StoryUpdateService);
+    undoRedoService = TestBed.inject(UndoRedoService);
+    storyObjectFactory = TestBed.inject(StoryObjectFactory);
+
+    let sampleStoryBackendObject = {
+      id: &#x27;sample_story_id&#x27;,
+      title: &#x27;Story title&#x27;,
+      description: &#x27;Story description&#x27;,
+      notes: &#x27;Story notes&#x27;,
+      version: 1,
+      corresponding_topic_id: &#x27;topic_id&#x27;,
+      story_contents: {
+        initial_node_id: &#x27;node_2&#x27;,
+        nodes: [
+          {
+            id: &#x27;node_1&#x27;,
+            title: &#x27;Title 1&#x27;,
+            description: &#x27;Description 1&#x27;,
+            prerequisite_skill_ids: [&#x27;skill_1&#x27;],
+            acquired_skill_ids: [&#x27;skill_2&#x27;],
+            destination_node_ids: [],
+            outline: &#x27;Outline&#x27;,
+            exploration_id: null,
+            outline_is_finalized: false,
+            thumbnail_filename: &#x27;fileName&#x27;,
+            thumbnail_bg_color: &#x27;blue&#x27;,
+          }, {
+            id: &#x27;node_2&#x27;,
+            title: &#x27;Title 2&#x27;,
+            description: &#x27;Description 2&#x27;,
+            prerequisite_skill_ids: [&#x27;skill_3&#x27;],
+            acquired_skill_ids: [&#x27;skill_4&#x27;],
+            destination_node_ids: [&#x27;node_1&#x27;],
+            outline: &#x27;Outline 2&#x27;,
+            exploration_id: &#x27;exp_1&#x27;,
+            outline_is_finalized: true,
+            thumbnail_filename: &#x27;fileName&#x27;,
+            thumbnail_bg_color: &#x27;blue&#x27;,
+          }],
+        next_node_id: &#x27;node_3&#x27;
+      },
+      language_code: &#x27;en&#x27;,
+      thumbnail_filename: &#x27;fileName&#x27;,
+      thumbnail_bg_color: &#x27;blue&#x27;,
+      url_fragment: &#x27;url&#x27;,
+      meta_tag_content: &#x27;meta&#x27;
+    };
+
+    _sampleStory = storyObjectFactory.createFromBackendDict(
+      sampleStoryBackendObject);
+  });
+
+  it(&#x27;should add/remove a prerequisite skill id to/from a node in the story&#x27;,
+    () =&gt; {
+      expect(
+        _sampleStory.getStoryContents().getNodes()[0].getPrerequisiteSkillIds()
+      ).toEqual([&#x27;skill_1&#x27;]);
+      storyUpdateService.addPrerequisiteSkillIdToNode(
+        _sampleStory, &#x27;node_1&#x27;, &#x27;skill_3&#x27;);
+      expect(
+        _sampleStory.getStoryContents().getNodes()[0].getPrerequisiteSkillIds()
+      ).toEqual([&#x27;skill_1&#x27;, &#x27;skill_3&#x27;]);
+
+      undoRedoService.undoChange(_sampleStory);
+      expect(
+        _sampleStory.getStoryContents().getNodes()[0].getPrerequisiteSkillIds()
+      ).toEqual([&#x27;skill_1&#x27;]);
+    }
+  );
+
+  it(&#x27;should create a proper backend change dict for adding a prerequisite &#x27; +
+    &#x27;skill id to a node&#x27;,
+  () =&gt; {
+    storyUpdateService.addPrerequisiteSkillIdToNode(
+      _sampleStory, &#x27;node_1&#x27;, &#x27;skill_3&#x27;);
+    expect(undoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: &#x27;update_story_node_property&#x27;,
+      property_name: &#x27;prerequisite_skill_ids&#x27;,
+      new_value: [&#x27;skill_1&#x27;, &#x27;skill_3&#x27;],
+      old_value: [&#x27;skill_1&#x27;],
+      node_id: &#x27;node_1&#x27;
+    }]);
+  });
+
+  it(&#x27;should add/remove an acquired skill id to/from a node in the story&#x27;,
+    () =&gt; {
+      expect(
+        _sampleStory.getStoryContents().getNodes()[0].getAcquiredSkillIds()
+      ).toEqual([&#x27;skill_2&#x27;]);
+      storyUpdateService.addAcquiredSkillIdToNode(
+        _sampleStory, &#x27;node_1&#x27;, &#x27;skill_4&#x27;);
+      expect(
+        _sampleStory.getStoryContents().getNodes()[0].getAcquiredSkillIds()
+      ).toEqual([&#x27;skill_2&#x27;, &#x27;skill_4&#x27;]);
+
+      undoRedoService.undoChange(_sampleStory);
+      expect(
+        _sampleStory.getStoryContents().getNodes()[0].getAcquiredSkillIds()
+      ).toEqual([&#x27;skill_2&#x27;]);
+    }
+  );
+
+  it(&#x27;should create a proper backend change dict for adding an acquired &#x27; +
+    &#x27;skill id to a node&#x27;,
+  () =&gt; {
+    storyUpdateService.addAcquiredSkillIdToNode(
+      _sampleStory, &#x27;node_1&#x27;, &#x27;skill_4&#x27;);
+    expect(undoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: &#x27;update_story_node_property&#x27;,
+      property_name: &#x27;acquired_skill_ids&#x27;,
+      new_value: [&#x27;skill_2&#x27;, &#x27;skill_4&#x27;],
+      old_value: [&#x27;skill_2&#x27;],
+      node_id: &#x27;node_1&#x27;
+    }]);
+  });
+
+  it(&#x27;should add/remove a destination node id to/from a node in the story&#x27;,
+    () =&gt; {
+      expect(
+        _sampleStory.getStoryContents().getNodes()[0].getDestinationNodeIds()
+      ).toEqual([]);
+      storyUpdateService.addDestinationNodeIdToNode(
+        _sampleStory, &#x27;node_1&#x27;, &#x27;node_2&#x27;);
+
+      // Adding an invalid destination node id should throw an error.
+      expect(() =&gt; {
+        storyUpdateService.addDestinationNodeIdToNode(
+          _sampleStory, &#x27;node_1&#x27;, &#x27;node_5&#x27;);
+      }).toThrowError(&#x27;The destination node with given id doesn\&#x27;t exist&#x27;);
+
+      expect(
+        _sampleStory.getStoryContents().getNodes()[0].getDestinationNodeIds()
+      ).toEqual([&#x27;node_2&#x27;]);
+
+      undoRedoService.undoChange(_sampleStory);
+      expect(
+        _sampleStory.getStoryContents().getNodes()[0].getDestinationNodeIds()
+      ).toEqual([]);
+    }
+  );
+
+  it(&#x27;should create a proper backend change dict for adding a destination &#x27; +
+    &#x27;node id to a node&#x27;,
+  () =&gt; {
+    storyUpdateService.addDestinationNodeIdToNode(
+      _sampleStory, &#x27;node_1&#x27;, &#x27;node_2&#x27;);
+    expect(undoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: &#x27;update_story_node_property&#x27;,
+      property_name: &#x27;destination_node_ids&#x27;,
+      new_value: [&#x27;node_2&#x27;],
+      old_value: [],
+      node_id: &#x27;node_1&#x27;
+    }]);
+  });
+
+  it(&#x27;should remove/add a prerequisite skill id from/to a node in the story&#x27;,
+    () =&gt; {
+      expect(
+        _sampleStory.getStoryContents().getNodes()[0].getPrerequisiteSkillIds()
+      ).toEqual([&#x27;skill_1&#x27;]);
+      storyUpdateService.removePrerequisiteSkillIdFromNode(
+        _sampleStory, &#x27;node_1&#x27;, &#x27;skill_1&#x27;);
+      expect(
+        _sampleStory.getStoryContents().getNodes()[0].getPrerequisiteSkillIds()
+      ).toEqual([]);
+
+      undoRedoService.undoChange(_sampleStory);
+      expect(
+        _sampleStory.getStoryContents().getNodes()[0].getPrerequisiteSkillIds()
+      ).toEqual([&#x27;skill_1&#x27;]);
+    }
+  );
+
+  it(&#x27;should create a proper backend change dict for removing a prerequisite &#x27; +
+    &#x27;skill id from a node&#x27;,
+  () =&gt; {
+    storyUpdateService.removePrerequisiteSkillIdFromNode(
+      _sampleStory, &#x27;node_1&#x27;, &#x27;skill_1&#x27;);
+    expect(undoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: &#x27;update_story_node_property&#x27;,
+      property_name: &#x27;prerequisite_skill_ids&#x27;,
+      new_value: [],
+      old_value: [&#x27;skill_1&#x27;],
+      node_id: &#x27;node_1&#x27;
+    }]);
+  });
+
+  it(&#x27;should remove/add an acquired skill id from/to a node in the story&#x27;,
+    () =&gt; {
+      expect(
+        _sampleStory.getStoryContents().getNodes()[0].getAcquiredSkillIds()
+      ).toEqual([&#x27;skill_2&#x27;]);
+      storyUpdateService.removeAcquiredSkillIdFromNode(
+        _sampleStory, &#x27;node_1&#x27;, &#x27;skill_2&#x27;);
+      expect(
+        _sampleStory.getStoryContents().getNodes()[0].getAcquiredSkillIds()
+      ).toEqual([]);
+
+      undoRedoService.undoChange(_sampleStory);
+      expect(
+        _sampleStory.getStoryContents().getNodes()[0].getAcquiredSkillIds()
+      ).toEqual([&#x27;skill_2&#x27;]);
+    }
+  );
+
+  it(&#x27;should create a proper backend change dict for removing an acquired &#x27; +
+    &#x27;skill id from a node&#x27;,
+  () =&gt; {
+    storyUpdateService.removeAcquiredSkillIdFromNode(
+      _sampleStory, &#x27;node_1&#x27;, &#x27;skill_2&#x27;);
+    expect(undoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: &#x27;update_story_node_property&#x27;,
+      property_name: &#x27;acquired_skill_ids&#x27;,
+      new_value: [],
+      old_value: [&#x27;skill_2&#x27;],
+      node_id: &#x27;node_1&#x27;
+    }]);
+  });
+
+  it(&#x27;should remove/add a destination node id from/to a node in the story&#x27;,
+    () =&gt; {
+      expect(
+        _sampleStory.getStoryContents().getNodes()[1].getDestinationNodeIds()
+      ).toEqual([&#x27;node_1&#x27;]);
+      storyUpdateService.removeDestinationNodeIdFromNode(
+        _sampleStory, &#x27;node_2&#x27;, &#x27;node_1&#x27;);
+
+      expect(
+        _sampleStory.getStoryContents().getNodes()[1].getDestinationNodeIds()
+      ).toEqual([]);
+
+      undoRedoService.undoChange(_sampleStory);
+      expect(
+        _sampleStory.getStoryContents().getNodes()[1].getDestinationNodeIds()
+      ).toEqual([&#x27;node_1&#x27;]);
+    }
+  );
+
+  it(&#x27;should create a proper backend change dict for removing a destination &#x27; +
+    &#x27;node id from a node&#x27;,
+  () =&gt; {
+    storyUpdateService.removeDestinationNodeIdFromNode(
+      _sampleStory, &#x27;node_2&#x27;, &#x27;node_1&#x27;);
+    expect(undoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: &#x27;update_story_node_property&#x27;,
+      property_name: &#x27;destination_node_ids&#x27;,
+      new_value: [],
+      old_value: [&#x27;node_1&#x27;],
+      node_id: &#x27;node_2&#x27;
+    }]);
+  });
+
+  it(&#x27;should add/remove a story node&#x27;, () =&gt; {
+    expect(_sampleStory.getStoryContents().getNodes().length).toEqual(2);
+    storyUpdateService.addStoryNode(_sampleStory, &#x27;Title 2&#x27;);
+    expect(_sampleStory.getStoryContents().getNodes().length).toEqual(3);
+    expect(_sampleStory.getStoryContents().getNextNodeId()).toEqual(&#x27;node_4&#x27;);
+    expect(
+      _sampleStory.getStoryContents().getNodes()[2].getId()).toEqual(&#x27;node_3&#x27;);
+    expect(
+      _sampleStory.getStoryContents().getNodes()[2].getTitle()).toEqual(
+      &#x27;Title 2&#x27;);
+
+    undoRedoService.undoChange(_sampleStory);
+    expect(_sampleStory.getStoryContents().getNodes().length).toEqual(2);
+  });
+
+  it(&#x27;should create a proper backend change dict for adding a story node&#x27;,
+    () =&gt; {
+      storyUpdateService.addStoryNode(_sampleStory, &#x27;Title 2&#x27;);
+      expect(undoRedoService.getCommittableChangeList()).toEqual([{
+        cmd: &#x27;add_story_node&#x27;,
+        node_id: &#x27;node_3&#x27;,
+        title: &#x27;Title 2&#x27;
+      }]);
+    }
+  );
+
+  it(&#x27;should remove/add a story node&#x27;, () =&gt; {
+    expect(() =&gt; {
+      storyUpdateService.deleteStoryNode(_sampleStory, &#x27;node_2&#x27;);
+    }).toThrowError(&#x27;Cannot delete initial story node&#x27;);
+    expect(_sampleStory.getStoryContents().getNodes().length).toEqual(2);
+    expect(
+      _sampleStory.getStoryContents().getNodes()[1].getDestinationNodeIds()
+    ).toEqual([&#x27;node_1&#x27;]);
+    storyUpdateService.deleteStoryNode(_sampleStory, &#x27;node_1&#x27;);
+    // Initial node should not be deleted.
+    storyUpdateService.deleteStoryNode(_sampleStory, &#x27;node_2&#x27;);
+    expect(_sampleStory.getStoryContents().getInitialNodeId()).toEqual(null);
+    expect(_sampleStory.getStoryContents().getNodes().length).toEqual(0);
+
+    expect(() =&gt; {
+      undoRedoService.undoChange(_sampleStory);
+    }).toThrowError(&#x27;A deleted story node cannot be restored.&#x27;);
+  });
+
+  it(&#x27;should create a proper backend change dict for removing a story node&#x27;,
+    () =&gt; {
+      storyUpdateService.deleteStoryNode(_sampleStory, &#x27;node_1&#x27;);
+      expect(undoRedoService.getCommittableChangeList()).toEqual([{
+        cmd: &#x27;delete_story_node&#x27;,
+        node_id: &#x27;node_1&#x27;
+      }]);
+    }
+  );
+
+  it(&#x27;should finalize a story node outline&#x27;, () =&gt; {
+    expect(
+      _sampleStory.getStoryContents().getNodes()[0].getOutlineStatus()
+    ).toBe(false);
+    storyUpdateService.finalizeStoryNodeOutline(_sampleStory, &#x27;node_1&#x27;);
+    expect(
+      _sampleStory.getStoryContents().getNodes()[0].getOutlineStatus()
+    ).toBe(true);
+
+    undoRedoService.undoChange(_sampleStory);
+    expect(
+      _sampleStory.getStoryContents().getNodes()[0].getOutlineStatus()
+    ).toBe(false);
+  });
+
+  it(&#x27;should create a proper backend change dict for finalizing a node outline&#x27;,
+    () =&gt; {
+      storyUpdateService.finalizeStoryNodeOutline(_sampleStory, &#x27;node_1&#x27;);
+      expect(undoRedoService.getCommittableChangeList()).toEqual([{
+        cmd: &#x27;update_story_node_outline_status&#x27;,
+        new_value: true,
+        old_value: false,
+        node_id: &#x27;node_1&#x27;
+      }]);
+    }
+  );
+
+  it(&#x27;should unfinalize a story node outline&#x27;, () =&gt; {
+    expect(
+      _sampleStory.getStoryContents().getNodes()[1].getOutlineStatus()
+    ).toBe(true);
+    storyUpdateService.unfinalizeStoryNodeOutline(_sampleStory, &#x27;node_2&#x27;);
+    expect(
+      _sampleStory.getStoryContents().getNodes()[1].getOutlineStatus()
+    ).toBe(false);
+
+    undoRedoService.undoChange(_sampleStory);
+    expect(
+      _sampleStory.getStoryContents().getNodes()[1].getOutlineStatus()
+    ).toBe(true);
+  });
+
+  it(&#x27;should create a proper backend change dict for unfinalizing a node &#x27; +
+    &#x27;outline&#x27;, () =&gt; {
+    storyUpdateService.unfinalizeStoryNodeOutline(_sampleStory, &#x27;node_2&#x27;);
+    expect(undoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: &#x27;update_story_node_outline_status&#x27;,
+      new_value: false,
+      old_value: true,
+      node_id: &#x27;node_2&#x27;
+    }]);
+  });
+
+  it(&#x27;should set a story node outline&#x27;, () =&gt; {
+    expect(
+      _sampleStory.getStoryContents().getNodes()[0].getOutline()
+    ).toBe(&#x27;Outline&#x27;);
+    storyUpdateService.setStoryNodeOutline(
+      _sampleStory, &#x27;node_1&#x27;, &#x27;new outline&#x27;);
+    expect(
+      _sampleStory.getStoryContents().getNodes()[0].getOutline()
+    ).toBe(&#x27;new outline&#x27;);
+
+    undoRedoService.undoChange(_sampleStory);
+    expect(
+      _sampleStory.getStoryContents().getNodes()[0].getOutline()
+    ).toBe(&#x27;Outline&#x27;);
+  });
+
+  it(&#x27;should create a proper backend change dict for setting a node outline&#x27;,
+    () =&gt; {
+      storyUpdateService.setStoryNodeOutline(
+        _sampleStory, &#x27;node_1&#x27;, &#x27;new outline&#x27;);
+      expect(undoRedoService.getCommittableChangeList()).toEqual([{
+        cmd: &#x27;update_story_node_property&#x27;,
+        property_name: &#x27;outline&#x27;,
+        new_value: &#x27;new outline&#x27;,
+        old_value: &#x27;Outline&#x27;,
+        node_id: &#x27;node_1&#x27;
+      }]);
+    }
+  );
+
+  it(&#x27;should set a story node title&#x27;, () =&gt; {
+    expect(
+      _sampleStory.getStoryContents().getNodes()[0].getTitle()
+    ).toBe(&#x27;Title 1&#x27;);
+    storyUpdateService.setStoryNodeTitle(
+      _sampleStory, &#x27;node_1&#x27;, &#x27;new title&#x27;);
+    expect(
+      _sampleStory.getStoryContents().getNodes()[0].getTitle()
+    ).toBe(&#x27;new title&#x27;);
+
+    undoRedoService.undoChange(_sampleStory);
+    expect(
+      _sampleStory.getStoryContents().getNodes()[0].getTitle()
+    ).toBe(&#x27;Title 1&#x27;);
+  });
+
+  it(&#x27;should create a proper backend change dict for setting a node title&#x27;,
+    () =&gt; {
+      storyUpdateService.setStoryNodeTitle(
+        _sampleStory, &#x27;node_1&#x27;, &#x27;new title&#x27;);
+      expect(undoRedoService.getCommittableChangeList()).toEqual([{
+        cmd: &#x27;update_story_node_property&#x27;,
+        property_name: &#x27;title&#x27;,
+        new_value: &#x27;new title&#x27;,
+        old_value: &#x27;Title 1&#x27;,
+        node_id: &#x27;node_1&#x27;
+      }]);
+    }
+  );
+
+  it(&#x27;should set a story node description&#x27;, () =&gt; {
+    expect(
+      _sampleStory.getStoryContents().getNodes()[0].getDescription()
+    ).toBe(&#x27;Description 1&#x27;);
+    storyUpdateService.setStoryNodeDescription(
+      _sampleStory, &#x27;node_1&#x27;, &#x27;new description&#x27;);
+    expect(
+      _sampleStory.getStoryContents().getNodes()[0].getDescription()
+    ).toBe(&#x27;new description&#x27;);
+
+    undoRedoService.undoChange(_sampleStory);
+    expect(
+      _sampleStory.getStoryContents().getNodes()[0].getDescription()
+    ).toBe(&#x27;Description 1&#x27;);
+  });
+
+  it(&#x27;should create a backend change dict for setting a node description&#x27;,
+    () =&gt; {
+      storyUpdateService.setStoryNodeDescription(
+        _sampleStory, &#x27;node_1&#x27;, &#x27;new description&#x27;);
+      expect(undoRedoService.getCommittableChangeList()).toEqual([{
+        cmd: &#x27;update_story_node_property&#x27;,
+        property_name: &#x27;description&#x27;,
+        new_value: &#x27;new description&#x27;,
+        old_value: &#x27;Description 1&#x27;,
+        node_id: &#x27;node_1&#x27;
+      }]);
+    }
+  );
+
+  it(&#x27;should set the exploration id of a story node&#x27;, () =&gt; {
+    expect(
+      _sampleStory.getStoryContents().getNodes()[0].getExplorationId()
+    ).toBe(null);
+    storyUpdateService.setStoryNodeExplorationId(
+      _sampleStory, &#x27;node_1&#x27;, &#x27;exp_2&#x27;);
+    expect(
+      _sampleStory.getStoryContents().getNodes()[0].getExplorationId()
+    ).toBe(&#x27;exp_2&#x27;);
+
+    // Adding an already existing exploration in the story should throw an
+    // error.
+    expect(() =&gt; {
+      storyUpdateService.setStoryNodeExplorationId(
+        _sampleStory, &#x27;node_1&#x27;, &#x27;exp_1&#x27;);
+    }).toThrowError(&#x27;The given exploration already exists in the story.&#x27;);
+
+    undoRedoService.undoChange(_sampleStory);
+    expect(
+      _sampleStory.getStoryContents().getNodes()[0].getExplorationId()
+    ).toBe(null);
+  });
+
+  it(&#x27;should create a proper backend change dict for setting the exploration &#x27; +
+    &#x27;id of a node&#x27;, () =&gt; {
+    storyUpdateService.setStoryNodeExplorationId(
+      _sampleStory, &#x27;node_1&#x27;, &#x27;exp_2&#x27;);
+    expect(undoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: &#x27;update_story_node_property&#x27;,
+      property_name: &#x27;exploration_id&#x27;,
+      new_value: &#x27;exp_2&#x27;,
+      old_value: null,
+      node_id: &#x27;node_1&#x27;
+    }]);
+  });
+
+  it(&#x27;should set/unset the initial node of the story&#x27;, () =&gt; {
+    expect(
+      _sampleStory.getStoryContents().getInitialNodeId()).toEqual(&#x27;node_2&#x27;);
+    storyUpdateService.setInitialNodeId(_sampleStory, &#x27;node_1&#x27;);
+    expect(
+      _sampleStory.getStoryContents().getInitialNodeId()).toEqual(&#x27;node_1&#x27;);
+
+    undoRedoService.undoChange(_sampleStory);
+    expect(
+      _sampleStory.getStoryContents().getInitialNodeId()).toEqual(&#x27;node_2&#x27;);
+  });
+
+  it(&#x27;should create a proper backend change dict for setting initial node&#x27;,
+    () =&gt; {
+      storyUpdateService.setInitialNodeId(_sampleStory, &#x27;node_1&#x27;);
+      expect(undoRedoService.getCommittableChangeList()).toEqual([{
+        cmd: &#x27;update_story_contents_property&#x27;,
+        property_name: &#x27;initial_node_id&#x27;,
+        new_value: &#x27;node_1&#x27;,
+        old_value: &#x27;node_2&#x27;
+      }]);
+    }
+  );
+
+  it(&#x27;should set/unset changes to a story\&#x27;s title&#x27;, () =&gt; {
+    expect(_sampleStory.getTitle()).toEqual(&#x27;Story title&#x27;);
+    storyUpdateService.setStoryTitle(_sampleStory, &#x27;new title&#x27;);
+    expect(_sampleStory.getTitle()).toEqual(&#x27;new title&#x27;);
+
+    undoRedoService.undoChange(_sampleStory);
+    expect(_sampleStory.getTitle()).toEqual(&#x27;Story title&#x27;);
+  });
+
+  it(&#x27;should create a proper backend change dict for changing title&#x27;,
+    () =&gt; {
+      storyUpdateService.setStoryTitle(_sampleStory, &#x27;new title&#x27;);
+      expect(undoRedoService.getCommittableChangeList()).toEqual([{
+        cmd: &#x27;update_story_property&#x27;,
+        property_name: &#x27;title&#x27;,
+        new_value: &#x27;new title&#x27;,
+        old_value: &#x27;Story title&#x27;
+      }]);
+    }
+  );
+
+  it(&#x27;should set/unset changes to a story\&#x27;s description&#x27;, () =&gt; {
+    expect(_sampleStory.getDescription()).toEqual(&#x27;Story description&#x27;);
+    storyUpdateService.setStoryDescription(_sampleStory, &#x27;new description&#x27;);
+    expect(_sampleStory.getDescription()).toEqual(&#x27;new description&#x27;);
+
+    undoRedoService.undoChange(_sampleStory);
+    expect(_sampleStory.getDescription()).toEqual(&#x27;Story description&#x27;);
+  });
+
+  it(&#x27;should create a proper backend change dict for changing descriptions&#x27;,
+    () =&gt; {
+      storyUpdateService.setStoryDescription(_sampleStory, &#x27;new description&#x27;);
+      expect(undoRedoService.getCommittableChangeList()).toEqual([{
+        cmd: &#x27;update_story_property&#x27;,
+        property_name: &#x27;description&#x27;,
+        new_value: &#x27;new description&#x27;,
+        old_value: &#x27;Story description&#x27;
+      }]);
+    }
+  );
+
+  it(&#x27;should set/unset changes to a story\&#x27;s notes&#x27;, () =&gt; {
+    expect(_sampleStory.getNotes()).toEqual(&#x27;Story notes&#x27;);
+    storyUpdateService.setStoryNotes(_sampleStory, &#x27;new notes&#x27;);
+    expect(_sampleStory.getNotes()).toEqual(&#x27;new notes&#x27;);
+
+    undoRedoService.undoChange(_sampleStory);
+    expect(_sampleStory.getNotes()).toEqual(&#x27;Story notes&#x27;);
+  });
+
+  it(&#x27;should create a proper backend change dict for changing notes&#x27;,
+    () =&gt; {
+      storyUpdateService.setStoryNotes(_sampleStory, &#x27;new notes&#x27;);
+      expect(undoRedoService.getCommittableChangeList()).toEqual([{
+        cmd: &#x27;update_story_property&#x27;,
+        property_name: &#x27;notes&#x27;,
+        new_value: &#x27;new notes&#x27;,
+        old_value: &#x27;Story notes&#x27;
+      }]);
+    }
+  );
+
+  it(&#x27;should set/unset changes to a story\&#x27;s language code&#x27;, () =&gt; {
+    expect(_sampleStory.getLanguageCode()).toEqual(&#x27;en&#x27;);
+    storyUpdateService.setStoryLanguageCode(_sampleStory, &#x27;fi&#x27;);
+    expect(_sampleStory.getLanguageCode()).toEqual(&#x27;fi&#x27;);
+
+    undoRedoService.undoChange(_sampleStory);
+    expect(_sampleStory.getLanguageCode()).toEqual(&#x27;en&#x27;);
+  });
+
+  it(&#x27;should create a proper backend change dict for changing language codes&#x27;,
+    () =&gt; {
+      storyUpdateService.setStoryLanguageCode(_sampleStory, &#x27;fi&#x27;);
+      expect(undoRedoService.getCommittableChangeList()).toEqual([{
+        cmd: &#x27;update_story_property&#x27;,
+        property_name: &#x27;language_code&#x27;,
+        new_value: &#x27;fi&#x27;,
+        old_value: &#x27;en&#x27;
+      }]);
+    }
+  );
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:30,&quot;character&quot;:6,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:85,&quot;character&quot;:4,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:92,&quot;character&quot;:8,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:92,&quot;character&quot;:21,&quot;text&quot;:&quot;getStoryContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:92,&quot;character&quot;:40,&quot;text&quot;:&quot;getNodes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:92,&quot;character&quot;:54,&quot;text&quot;:&quot;getPrerequisiteSkillIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:97,&quot;character&quot;:8,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:97,&quot;character&quot;:21,&quot;text&quot;:&quot;getStoryContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:97,&quot;character&quot;:40,&quot;text&quot;:&quot;getNodes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:97,&quot;character&quot;:54,&quot;text&quot;:&quot;getPrerequisiteSkillIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:102,&quot;character&quot;:8,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:102,&quot;character&quot;:21,&quot;text&quot;:&quot;getStoryContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:102,&quot;character&quot;:40,&quot;text&quot;:&quot;getNodes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:102,&quot;character&quot;:54,&quot;text&quot;:&quot;getPrerequisiteSkillIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:124,&quot;character&quot;:8,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:124,&quot;character&quot;:21,&quot;text&quot;:&quot;getStoryContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:124,&quot;character&quot;:40,&quot;text&quot;:&quot;getNodes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:124,&quot;character&quot;:54,&quot;text&quot;:&quot;getAcquiredSkillIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:129,&quot;character&quot;:8,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:129,&quot;character&quot;:21,&quot;text&quot;:&quot;getStoryContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:129,&quot;character&quot;:40,&quot;text&quot;:&quot;getNodes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:129,&quot;character&quot;:54,&quot;text&quot;:&quot;getAcquiredSkillIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:134,&quot;character&quot;:8,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:134,&quot;character&quot;:21,&quot;text&quot;:&quot;getStoryContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:134,&quot;character&quot;:40,&quot;text&quot;:&quot;getNodes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:134,&quot;character&quot;:54,&quot;text&quot;:&quot;getAcquiredSkillIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:156,&quot;character&quot;:8,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:156,&quot;character&quot;:21,&quot;text&quot;:&quot;getStoryContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:156,&quot;character&quot;:40,&quot;text&quot;:&quot;getNodes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:156,&quot;character&quot;:54,&quot;text&quot;:&quot;getDestinationNodeIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:168,&quot;character&quot;:8,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:168,&quot;character&quot;:21,&quot;text&quot;:&quot;getStoryContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:168,&quot;character&quot;:40,&quot;text&quot;:&quot;getNodes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:168,&quot;character&quot;:54,&quot;text&quot;:&quot;getDestinationNodeIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:173,&quot;character&quot;:8,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:173,&quot;character&quot;:21,&quot;text&quot;:&quot;getStoryContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:173,&quot;character&quot;:40,&quot;text&quot;:&quot;getNodes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:173,&quot;character&quot;:54,&quot;text&quot;:&quot;getDestinationNodeIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:195,&quot;character&quot;:8,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:195,&quot;character&quot;:21,&quot;text&quot;:&quot;getStoryContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:195,&quot;character&quot;:40,&quot;text&quot;:&quot;getNodes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:195,&quot;character&quot;:54,&quot;text&quot;:&quot;getPrerequisiteSkillIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:200,&quot;character&quot;:8,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:200,&quot;character&quot;:21,&quot;text&quot;:&quot;getStoryContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:200,&quot;character&quot;:40,&quot;text&quot;:&quot;getNodes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:200,&quot;character&quot;:54,&quot;text&quot;:&quot;getPrerequisiteSkillIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:205,&quot;character&quot;:8,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:205,&quot;character&quot;:21,&quot;text&quot;:&quot;getStoryContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:205,&quot;character&quot;:40,&quot;text&quot;:&quot;getNodes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:205,&quot;character&quot;:54,&quot;text&quot;:&quot;getPrerequisiteSkillIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:227,&quot;character&quot;:8,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:227,&quot;character&quot;:21,&quot;text&quot;:&quot;getStoryContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:227,&quot;character&quot;:40,&quot;text&quot;:&quot;getNodes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:227,&quot;character&quot;:54,&quot;text&quot;:&quot;getAcquiredSkillIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:232,&quot;character&quot;:8,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:232,&quot;character&quot;:21,&quot;text&quot;:&quot;getStoryContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:232,&quot;character&quot;:40,&quot;text&quot;:&quot;getNodes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:232,&quot;character&quot;:54,&quot;text&quot;:&quot;getAcquiredSkillIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:237,&quot;character&quot;:8,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:237,&quot;character&quot;:21,&quot;text&quot;:&quot;getStoryContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:237,&quot;character&quot;:40,&quot;text&quot;:&quot;getNodes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:237,&quot;character&quot;:54,&quot;text&quot;:&quot;getAcquiredSkillIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:259,&quot;character&quot;:8,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:259,&quot;character&quot;:21,&quot;text&quot;:&quot;getStoryContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:259,&quot;character&quot;:40,&quot;text&quot;:&quot;getNodes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:259,&quot;character&quot;:54,&quot;text&quot;:&quot;getDestinationNodeIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:265,&quot;character&quot;:8,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:265,&quot;character&quot;:21,&quot;text&quot;:&quot;getStoryContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:265,&quot;character&quot;:40,&quot;text&quot;:&quot;getNodes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:265,&quot;character&quot;:54,&quot;text&quot;:&quot;getDestinationNodeIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:270,&quot;character&quot;:8,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:270,&quot;character&quot;:21,&quot;text&quot;:&quot;getStoryContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:270,&quot;character&quot;:40,&quot;text&quot;:&quot;getNodes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:270,&quot;character&quot;:54,&quot;text&quot;:&quot;getDestinationNodeIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:290,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:290,&quot;character&quot;:24,&quot;text&quot;:&quot;getStoryContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:290,&quot;character&quot;:43,&quot;text&quot;:&quot;getNodes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:290,&quot;character&quot;:54,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:292,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:292,&quot;character&quot;:24,&quot;text&quot;:&quot;getStoryContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:292,&quot;character&quot;:43,&quot;text&quot;:&quot;getNodes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:292,&quot;character&quot;:54,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:293,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:293,&quot;character&quot;:24,&quot;text&quot;:&quot;getStoryContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:293,&quot;character&quot;:43,&quot;text&quot;:&quot;getNextNodeId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:295,&quot;character&quot;:6,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:295,&quot;character&quot;:19,&quot;text&quot;:&quot;getStoryContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:295,&quot;character&quot;:38,&quot;text&quot;:&quot;getNodes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:295,&quot;character&quot;:52,&quot;text&quot;:&quot;getId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:297,&quot;character&quot;:6,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:297,&quot;character&quot;:19,&quot;text&quot;:&quot;getStoryContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:297,&quot;character&quot;:38,&quot;text&quot;:&quot;getNodes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:297,&quot;character&quot;:52,&quot;text&quot;:&quot;getTitle&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:301,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:301,&quot;character&quot;:24,&quot;text&quot;:&quot;getStoryContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:301,&quot;character&quot;:43,&quot;text&quot;:&quot;getNodes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:301,&quot;character&quot;:54,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:319,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:319,&quot;character&quot;:24,&quot;text&quot;:&quot;getStoryContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:319,&quot;character&quot;:43,&quot;text&quot;:&quot;getNodes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:319,&quot;character&quot;:54,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:321,&quot;character&quot;:6,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:321,&quot;character&quot;:19,&quot;text&quot;:&quot;getStoryContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:321,&quot;character&quot;:38,&quot;text&quot;:&quot;getNodes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:321,&quot;character&quot;:52,&quot;text&quot;:&quot;getDestinationNodeIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:326,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:326,&quot;character&quot;:24,&quot;text&quot;:&quot;getStoryContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:326,&quot;character&quot;:43,&quot;text&quot;:&quot;getInitialNodeId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:327,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:327,&quot;character&quot;:24,&quot;text&quot;:&quot;getStoryContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:327,&quot;character&quot;:43,&quot;text&quot;:&quot;getNodes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:327,&quot;character&quot;:54,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:346,&quot;character&quot;:6,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:346,&quot;character&quot;:19,&quot;text&quot;:&quot;getStoryContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:346,&quot;character&quot;:38,&quot;text&quot;:&quot;getNodes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:346,&quot;character&quot;:52,&quot;text&quot;:&quot;getOutlineStatus&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:350,&quot;character&quot;:6,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:350,&quot;character&quot;:19,&quot;text&quot;:&quot;getStoryContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:350,&quot;character&quot;:38,&quot;text&quot;:&quot;getNodes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:350,&quot;character&quot;:52,&quot;text&quot;:&quot;getOutlineStatus&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:355,&quot;character&quot;:6,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:355,&quot;character&quot;:19,&quot;text&quot;:&quot;getStoryContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:355,&quot;character&quot;:38,&quot;text&quot;:&quot;getNodes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:355,&quot;character&quot;:52,&quot;text&quot;:&quot;getOutlineStatus&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:373,&quot;character&quot;:6,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:373,&quot;character&quot;:19,&quot;text&quot;:&quot;getStoryContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:373,&quot;character&quot;:38,&quot;text&quot;:&quot;getNodes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:373,&quot;character&quot;:52,&quot;text&quot;:&quot;getOutlineStatus&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:377,&quot;character&quot;:6,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:377,&quot;character&quot;:19,&quot;text&quot;:&quot;getStoryContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:377,&quot;character&quot;:38,&quot;text&quot;:&quot;getNodes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:377,&quot;character&quot;:52,&quot;text&quot;:&quot;getOutlineStatus&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:382,&quot;character&quot;:6,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:382,&quot;character&quot;:19,&quot;text&quot;:&quot;getStoryContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:382,&quot;character&quot;:38,&quot;text&quot;:&quot;getNodes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:382,&quot;character&quot;:52,&quot;text&quot;:&quot;getOutlineStatus&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:399,&quot;character&quot;:6,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:399,&quot;character&quot;:19,&quot;text&quot;:&quot;getStoryContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:399,&quot;character&quot;:38,&quot;text&quot;:&quot;getNodes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:399,&quot;character&quot;:52,&quot;text&quot;:&quot;getOutline&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:404,&quot;character&quot;:6,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:404,&quot;character&quot;:19,&quot;text&quot;:&quot;getStoryContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:404,&quot;character&quot;:38,&quot;text&quot;:&quot;getNodes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:404,&quot;character&quot;:52,&quot;text&quot;:&quot;getOutline&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:409,&quot;character&quot;:6,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:409,&quot;character&quot;:19,&quot;text&quot;:&quot;getStoryContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:409,&quot;character&quot;:38,&quot;text&quot;:&quot;getNodes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:409,&quot;character&quot;:52,&quot;text&quot;:&quot;getOutline&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:429,&quot;character&quot;:6,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:429,&quot;character&quot;:19,&quot;text&quot;:&quot;getStoryContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:429,&quot;character&quot;:38,&quot;text&quot;:&quot;getNodes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:429,&quot;character&quot;:52,&quot;text&quot;:&quot;getTitle&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:434,&quot;character&quot;:6,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:434,&quot;character&quot;:19,&quot;text&quot;:&quot;getStoryContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:434,&quot;character&quot;:38,&quot;text&quot;:&quot;getNodes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:434,&quot;character&quot;:52,&quot;text&quot;:&quot;getTitle&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:439,&quot;character&quot;:6,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:439,&quot;character&quot;:19,&quot;text&quot;:&quot;getStoryContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:439,&quot;character&quot;:38,&quot;text&quot;:&quot;getNodes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:439,&quot;character&quot;:52,&quot;text&quot;:&quot;getTitle&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:459,&quot;character&quot;:6,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:459,&quot;character&quot;:19,&quot;text&quot;:&quot;getStoryContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:459,&quot;character&quot;:38,&quot;text&quot;:&quot;getNodes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:459,&quot;character&quot;:52,&quot;text&quot;:&quot;getDescription&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:464,&quot;character&quot;:6,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:464,&quot;character&quot;:19,&quot;text&quot;:&quot;getStoryContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:464,&quot;character&quot;:38,&quot;text&quot;:&quot;getNodes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:464,&quot;character&quot;:52,&quot;text&quot;:&quot;getDescription&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:469,&quot;character&quot;:6,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:469,&quot;character&quot;:19,&quot;text&quot;:&quot;getStoryContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:469,&quot;character&quot;:38,&quot;text&quot;:&quot;getNodes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:469,&quot;character&quot;:52,&quot;text&quot;:&quot;getDescription&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:489,&quot;character&quot;:6,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:489,&quot;character&quot;:19,&quot;text&quot;:&quot;getStoryContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:489,&quot;character&quot;:38,&quot;text&quot;:&quot;getNodes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:489,&quot;character&quot;:52,&quot;text&quot;:&quot;getExplorationId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:494,&quot;character&quot;:6,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:494,&quot;character&quot;:19,&quot;text&quot;:&quot;getStoryContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:494,&quot;character&quot;:38,&quot;text&quot;:&quot;getNodes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:494,&quot;character&quot;:52,&quot;text&quot;:&quot;getExplorationId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:506,&quot;character&quot;:6,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:506,&quot;character&quot;:19,&quot;text&quot;:&quot;getStoryContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:506,&quot;character&quot;:38,&quot;text&quot;:&quot;getNodes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:506,&quot;character&quot;:52,&quot;text&quot;:&quot;getExplorationId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:525,&quot;character&quot;:6,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:525,&quot;character&quot;:19,&quot;text&quot;:&quot;getStoryContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:525,&quot;character&quot;:38,&quot;text&quot;:&quot;getInitialNodeId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:528,&quot;character&quot;:6,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:528,&quot;character&quot;:19,&quot;text&quot;:&quot;getStoryContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:528,&quot;character&quot;:38,&quot;text&quot;:&quot;getInitialNodeId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:532,&quot;character&quot;:6,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:532,&quot;character&quot;:19,&quot;text&quot;:&quot;getStoryContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:532,&quot;character&quot;:38,&quot;text&quot;:&quot;getInitialNodeId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:548,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:548,&quot;character&quot;:24,&quot;text&quot;:&quot;getTitle&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:550,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:550,&quot;character&quot;:24,&quot;text&quot;:&quot;getTitle&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:553,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:553,&quot;character&quot;:24,&quot;text&quot;:&quot;getTitle&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:569,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:569,&quot;character&quot;:24,&quot;text&quot;:&quot;getDescription&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:571,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:571,&quot;character&quot;:24,&quot;text&quot;:&quot;getDescription&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:574,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:574,&quot;character&quot;:24,&quot;text&quot;:&quot;getDescription&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:590,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:590,&quot;character&quot;:24,&quot;text&quot;:&quot;getNotes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:592,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:592,&quot;character&quot;:24,&quot;text&quot;:&quot;getNotes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:595,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:595,&quot;character&quot;:24,&quot;text&quot;:&quot;getNotes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:611,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:611,&quot;character&quot;:24,&quot;text&quot;:&quot;getLanguageCode&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:613,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:613,&quot;character&quot;:24,&quot;text&quot;:&quot;getLanguageCode&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:616,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleStory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/story-update.service.spec.ts&quot;,&quot;line&quot;:616,&quot;character&quot;:24,&quot;text&quot;:&quot;getLanguageCode&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:57 GMT</p>
+    </body>
+  </html>
+  

@@ -1,0 +1,237 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>ck-editor-copy-content-service.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/components/ck-editor-helpers/ck-editor-copy-content-service.spec.ts</td><td class="">88.58%</td><td class="">100%</td><td class="">289</td><td class="">256</td><td class="">33</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for the Ck editor copy content service.
+ */
+
+import { CkEditorCopyContentService } from
+  &#x27;components/ck-editor-helpers/ck-editor-copy-content-service&#x27;;
+import { HtmlEscaperService } from &#x27;services/html-escaper.service&#x27;;
+import { LoggerService } from &#x27;services/contextual/logger.service&#x27;;
+
+/**
+ * Returns a HTMLElement containing the element to copy.
+ * @param {string} html The hmtl to place in angular-html-bind element.
+ * @returns {HTMLElement} The element created by param html.
+ */
+const generateContent = (html: string): HTMLElement =&gt; {
+  const container = document.createElement(&#x27;template&#x27;);
+  container.innerHTML = `&lt;angular-html-bind&gt;${html.trim()}&lt;/angular-html-bind&gt;`;
+  // Return element inside &lt;angular-html-bind /&gt;
+  return &lt;HTMLElement&gt;(container.content.firstChild.firstChild);
+};
+
+describe(&#x27;Ck editor copy content service&#x27;, () =&gt; {
+  let loggerService = new LoggerService();
+  let htmlEscaperService = new HtmlEscaperService(loggerService);
+
+  let service: CkEditorCopyContentService;
+  let ckEditorStub: Partial&lt;CKEDITOR.editor&gt;;
+  let insertHtmlSpy;
+  let execCommandSpy;
+
+  beforeEach(() =&gt; {
+    ckEditorStub = {
+      id: &#x27;editor1&#x27;,
+      insertHtml: (_: string) =&gt; {},
+      execCommand: (_: string): boolean =&gt; true,
+    };
+    insertHtmlSpy = spyOn(ckEditorStub, &#x27;insertHtml&#x27;);
+    execCommandSpy = spyOn(ckEditorStub, &#x27;execCommand&#x27;);
+
+    service = new CkEditorCopyContentService(htmlEscaperService);
+  });
+
+  it(&#x27;should not copy and paste if copy mode is not active&#x27;, () =&gt; {
+    expect(service.copyModeActive).toBe(false);
+
+    const pElement = generateContent(&#x27;&lt;p&gt;Hello&lt;/p&gt;&#x27;);
+
+    service.bindPasteHandler(ckEditorStub);
+    service.broadcastCopy(pElement);
+
+    expect(insertHtmlSpy).not.toHaveBeenCalled();
+    expect(execCommandSpy).not.toHaveBeenCalled();
+  });
+
+  it(&#x27;should copy and paste plain html elements&#x27;, () =&gt; {
+    expect(service.copyModeActive).toBe(false);
+    service.toggleCopyMode();
+    expect(service.copyModeActive).toBe(true);
+
+    const pElement = generateContent(&#x27;&lt;p&gt;Hello&lt;/p&gt;&#x27;);
+
+    service.bindPasteHandler(ckEditorStub);
+    service.broadcastCopy(pElement);
+
+    expect(insertHtmlSpy).toHaveBeenCalledWith(&#x27;&lt;p&gt;Hello&lt;/p&gt;&#x27;);
+    expect(execCommandSpy).not.toHaveBeenCalled();
+  });
+
+  it(&#x27;should copy and paste the top level plain html element when clicking a &#x27; +
+    &#x27;descendant&#x27;, () =&gt; {
+    expect(service.copyModeActive).toBe(false);
+    service.toggleCopyMode();
+    expect(service.copyModeActive).toBe(true);
+
+    // eslint-disable-next-line quotes
+    let listHtml = `&lt;ul&gt;&lt;li&gt;Parent bullet&lt;ul&gt;&lt;li&gt;Child bullet&lt;ul&gt;\
+&lt;li&gt;Grandchild bullet&lt;/li&gt;&lt;/ul&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/li&gt;&lt;/ul&gt;`;
+    const listElement = generateContent(listHtml);
+
+    let liElements = listElement.querySelectorAll(&#x27;li&#x27;);
+    let innerMostLiElement = liElements[liElements.length - 1];
+    expect(innerMostLiElement.innerText).toEqual(&#x27;Grandchild bullet&#x27;);
+
+    service.bindPasteHandler(ckEditorStub);
+    service.broadcastCopy(innerMostLiElement);
+
+    expect(insertHtmlSpy).toHaveBeenCalledWith(listHtml);
+    expect(execCommandSpy).not.toHaveBeenCalled();
+  });
+
+  it(&#x27;should copy and paste widgets&#x27;, () =&gt; {
+    expect(service.copyModeActive).toBe(false);
+    service.toggleCopyMode();
+    expect(service.copyModeActive).toBe(true);
+    const imageWidgetElement = generateContent(
+      &#x27;&lt;oppia-noninteractive-image alt-with-value=&quot;&amp;amp;quot;&amp;amp;quot;&quot; capt&#x27; +
+      &#x27;ion-with-value=&quot;&amp;amp;quot;Banana&amp;amp;quot;&quot; filepath-with-value=&quot;&amp;amp;&#x27; +
+      &#x27;quot;img_20200630_114637_c2ek92uvb8_height_326_width_490.png&amp;amp;quot;&#x27; +
+      &#x27;&quot;&gt;&lt;/oppia-noninteractive-image&gt;&#x27;);
+
+    service.bindPasteHandler(ckEditorStub);
+    service.broadcastCopy(imageWidgetElement);
+
+    expect(insertHtmlSpy).not.toHaveBeenCalled();
+    expect(execCommandSpy).toHaveBeenCalledWith(
+      &#x27;oppiaimage&#x27;,
+      {
+        startupData: {
+          alt: &#x27;&#x27;,
+          caption: &#x27;Banana&#x27;,
+          filepath: &#x27;img_20200630_114637_c2ek92uvb8_height_326_width_490.png&#x27;
+        }
+      }
+    );
+  });
+
+  it(&#x27;should not copy and paste non-whitelisted widgets&#x27;, () =&gt; {
+    expect(service.copyModeActive).toBe(false);
+    service.toggleCopyMode();
+    expect(service.copyModeActive).toBe(true);
+
+    const imageWidgetElement = generateContent(
+      &#x27;&lt;oppia-noninteractive-fake alt-with-value=&quot;&amp;amp;quot;&amp;amp;quot;&quot; capt&#x27; +
+      &#x27;ion-with-value=&quot;&amp;amp;quot;Banana&amp;amp;quot;&quot; filepath-with-value=&quot;&amp;amp;&#x27; +
+      &#x27;quot;img_20200630_114637_c2ek92uvb8_height_326_width_490.png&amp;amp;quot;&#x27; +
+      &#x27;&quot;&gt;&lt;/oppia-noninteractive-fake&gt;&#x27;);
+
+    service.bindPasteHandler(ckEditorStub);
+    service.broadcastCopy(imageWidgetElement);
+
+    expect(insertHtmlSpy).not.toHaveBeenCalled();
+    expect(execCommandSpy).not.toHaveBeenCalled();
+  });
+
+  it(&#x27;should copy and paste widgets when clicking a widget descendant&#x27;, () =&gt; {
+    expect(service.copyModeActive).toBe(false);
+    service.toggleCopyMode();
+    expect(service.copyModeActive).toBe(true);
+
+
+    const mathWidgetElement = generateContent(
+      &#x27;&lt;p&gt;&lt;oppia-noninteractive-math math_content-with-value=&quot;{&amp;amp;quot;raw_&#x27; +
+      &#x27;latex&amp;amp;quot;:&amp;amp;quot;\\\\frac{x}{y}&amp;amp;quot;,&amp;amp;quot;svg_filen&#x27; +
+      &#x27;ame&amp;amp;quot;:&amp;amp;quot;&amp;amp;quot;}&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;/oppia-noninteracti&#x27; +
+      &#x27;ve-math&gt;&lt;/p&gt;&#x27;);
+
+    const nestedMathWidgetElement = (
+      &lt;HTMLElement&gt;mathWidgetElement.firstChild.firstChild);
+
+    service.bindPasteHandler(ckEditorStub);
+    service.broadcastCopy(nestedMathWidgetElement);
+
+    expect(insertHtmlSpy).not.toHaveBeenCalled();
+    expect(execCommandSpy).toHaveBeenCalledWith(
+      &#x27;oppiamath&#x27;,
+      {
+        startupData: {
+          math_content: {
+            raw_latex: &#x27;\\frac{x}{y}&#x27;, svg_filename: &#x27;&#x27;
+          }
+        }
+      }
+    );
+  });
+
+  it(&#x27;should copy and paste widgets when clicking a widget ancestor&#x27;, () =&gt; {
+    expect(service.copyModeActive).toBe(false);
+    service.toggleCopyMode();
+    expect(service.copyModeActive).toBe(true);
+
+    const mathWidgetElement = generateContent(
+      &#x27;&lt;p&gt;&lt;oppia-noninteractive-math math_content-with-value=&quot;{&amp;amp;quot;raw_&#x27; +
+      &#x27;latex&amp;amp;quot;:&amp;amp;quot;\\\\frac{x}{y}&amp;amp;quot;,&amp;amp;quot;svg_filen&#x27; +
+      &#x27;ame&amp;amp;quot;:&amp;amp;quot;&amp;amp;quot;}&quot;&gt;&lt;/oppia-noninteractive-math&gt;&lt;/p&gt;&#x27;);
+
+    service.bindPasteHandler(ckEditorStub);
+    service.broadcastCopy(mathWidgetElement);
+
+    expect(insertHtmlSpy).not.toHaveBeenCalled();
+    expect(execCommandSpy).toHaveBeenCalledWith(
+      &#x27;oppiamath&#x27;,
+      {
+        startupData: {
+          math_content: {
+            raw_latex: &#x27;\\frac{x}{y}&#x27;, svg_filename: &#x27;&#x27;
+          }
+        }
+      }
+    );
+  });
+
+  it(&#x27;should not copy and paste after editor is destroyed&#x27;, () =&gt; {
+    expect(service.copyModeActive).toBe(false);
+    service.toggleCopyMode();
+    expect(service.copyModeActive).toBe(true);
+
+    const pElement = generateContent(&#x27;&lt;p&gt;Hello&lt;/p&gt;&#x27;);
+
+    ckEditorStub = { ...ckEditorStub, status: &#x27;destroyed&#x27; };
+    service.bindPasteHandler(ckEditorStub);
+    service.broadcastCopy(pElement);
+    expect(insertHtmlSpy).not.toHaveBeenCalled();
+    expect(execCommandSpy).not.toHaveBeenCalled();
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-copy-content-service.spec.ts&quot;,&quot;line&quot;:32,&quot;character&quot;:9,&quot;text&quot;:&quot;&lt;HTMLElement&gt;(container.content.firstChild.firstChild)&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-copy-content-service.spec.ts&quot;,&quot;line&quot;:41,&quot;character&quot;:6,&quot;text&quot;:&quot;insertHtmlSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-copy-content-service.spec.ts&quot;,&quot;line&quot;:42,&quot;character&quot;:6,&quot;text&quot;:&quot;execCommandSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-copy-content-service.spec.ts&quot;,&quot;line&quot;:50,&quot;character&quot;:4,&quot;text&quot;:&quot;insertHtmlSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-copy-content-service.spec.ts&quot;,&quot;line&quot;:51,&quot;character&quot;:4,&quot;text&quot;:&quot;execCommandSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-copy-content-service.spec.ts&quot;,&quot;line&quot;:64,&quot;character&quot;:11,&quot;text&quot;:&quot;insertHtmlSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-copy-content-service.spec.ts&quot;,&quot;line&quot;:64,&quot;character&quot;:26,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-copy-content-service.spec.ts&quot;,&quot;line&quot;:65,&quot;character&quot;:11,&quot;text&quot;:&quot;execCommandSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-copy-content-service.spec.ts&quot;,&quot;line&quot;:65,&quot;character&quot;:27,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-copy-content-service.spec.ts&quot;,&quot;line&quot;:78,&quot;character&quot;:11,&quot;text&quot;:&quot;insertHtmlSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-copy-content-service.spec.ts&quot;,&quot;line&quot;:79,&quot;character&quot;:11,&quot;text&quot;:&quot;execCommandSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-copy-content-service.spec.ts&quot;,&quot;line&quot;:79,&quot;character&quot;:27,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-copy-content-service.spec.ts&quot;,&quot;line&quot;:100,&quot;character&quot;:11,&quot;text&quot;:&quot;insertHtmlSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-copy-content-service.spec.ts&quot;,&quot;line&quot;:101,&quot;character&quot;:11,&quot;text&quot;:&quot;execCommandSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-copy-content-service.spec.ts&quot;,&quot;line&quot;:101,&quot;character&quot;:27,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-copy-content-service.spec.ts&quot;,&quot;line&quot;:117,&quot;character&quot;:11,&quot;text&quot;:&quot;insertHtmlSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-copy-content-service.spec.ts&quot;,&quot;line&quot;:117,&quot;character&quot;:26,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-copy-content-service.spec.ts&quot;,&quot;line&quot;:118,&quot;character&quot;:11,&quot;text&quot;:&quot;execCommandSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-copy-content-service.spec.ts&quot;,&quot;line&quot;:144,&quot;character&quot;:11,&quot;text&quot;:&quot;insertHtmlSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-copy-content-service.spec.ts&quot;,&quot;line&quot;:144,&quot;character&quot;:26,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-copy-content-service.spec.ts&quot;,&quot;line&quot;:145,&quot;character&quot;:11,&quot;text&quot;:&quot;execCommandSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-copy-content-service.spec.ts&quot;,&quot;line&quot;:145,&quot;character&quot;:27,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-copy-content-service.spec.ts&quot;,&quot;line&quot;:161,&quot;character&quot;:6,&quot;text&quot;:&quot;&lt;HTMLElement&gt;mathWidgetElement.firstChild.firstChild&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-copy-content-service.spec.ts&quot;,&quot;line&quot;:166,&quot;character&quot;:11,&quot;text&quot;:&quot;insertHtmlSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-copy-content-service.spec.ts&quot;,&quot;line&quot;:166,&quot;character&quot;:26,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-copy-content-service.spec.ts&quot;,&quot;line&quot;:167,&quot;character&quot;:11,&quot;text&quot;:&quot;execCommandSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-copy-content-service.spec.ts&quot;,&quot;line&quot;:192,&quot;character&quot;:11,&quot;text&quot;:&quot;insertHtmlSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-copy-content-service.spec.ts&quot;,&quot;line&quot;:192,&quot;character&quot;:26,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-copy-content-service.spec.ts&quot;,&quot;line&quot;:193,&quot;character&quot;:11,&quot;text&quot;:&quot;execCommandSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-copy-content-service.spec.ts&quot;,&quot;line&quot;:215,&quot;character&quot;:11,&quot;text&quot;:&quot;insertHtmlSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-copy-content-service.spec.ts&quot;,&quot;line&quot;:215,&quot;character&quot;:26,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-copy-content-service.spec.ts&quot;,&quot;line&quot;:216,&quot;character&quot;:11,&quot;text&quot;:&quot;execCommandSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-copy-content-service.spec.ts&quot;,&quot;line&quot;:216,&quot;character&quot;:27,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:57 GMT</p>
+    </body>
+  </html>
+  

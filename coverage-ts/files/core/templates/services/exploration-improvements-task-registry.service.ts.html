@@ -1,0 +1,500 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>exploration-improvements-task-registry.service.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/services/exploration-improvements-task-registry.service.ts</td><td class="">98.51%</td><td class="">100%</td><td class="">803</td><td class="">791</td><td class="">12</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Service responsible for keeping track of all of the registered
+ * improvements tasks for an exploration.
+ */
+
+import { downgradeInjectable } from &#x27;@angular/upgrade/static&#x27;;
+import { Injectable } from &#x27;@angular/core&#x27;;
+import { group } from &#x27;d3-array&#x27;;
+
+import { AnswerStats } from &#x27;domain/exploration/answer-stats.model&#x27;;
+import { States } from &#x27;domain/exploration/StatesObjectFactory&#x27;;
+import { ExplorationImprovementsConfig } from
+  &#x27;domain/improvements/exploration-improvements-config.model&#x27;;
+import {
+  ExplorationTask,
+  ExplorationTaskModel,
+  ExplorationTaskType,
+} from &#x27;domain/improvements/exploration-task.model&#x27;;
+import { HighBounceRateTask } from
+  &#x27;domain/improvements/high-bounce-rate-task.model&#x27;;
+import { ImprovementsConstants } from
+  &#x27;domain/improvements/improvements.constants&#x27;;
+import { IneffectiveFeedbackLoopTask } from
+  &#x27;domain/improvements/ineffective-feedback-loop-task.model&#x27;;
+import { NeedsGuidingResponsesTask } from
+  &#x27;domain/improvements/needs-guiding-response-task.model&#x27;;
+import { SuccessiveIncorrectAnswersTask } from
+  &#x27;domain/improvements/successive-incorrect-answers-task.model&#x27;;
+import { State } from &#x27;domain/state/StateObjectFactory&#x27;;
+import {
+  CyclicStateTransitionsPlaythroughIssue,
+  EarlyQuitPlaythroughIssue,
+  MultipleIncorrectSubmissionsPlaythroughIssue,
+  PlaythroughIssue
+} from &#x27;domain/statistics/PlaythroughIssueObjectFactory&#x27;;
+import { ExplorationStats } from
+  &#x27;domain/statistics/exploration-stats.model&#x27;;
+import { StateStats } from &#x27;domain/statistics/state-stats-model&#x27;;
+
+type HbrTask = HighBounceRateTask;
+type IflTask = IneffectiveFeedbackLoopTask;
+type NgrTask = NeedsGuidingResponsesTask;
+type SiaTask = SuccessiveIncorrectAnswersTask;
+
+type CstPlaythroughIssue = CyclicStateTransitionsPlaythroughIssue;
+type EqPlaythroughIssue = EarlyQuitPlaythroughIssue;
+type MisPlaythroughIssue = MultipleIncorrectSubmissionsPlaythroughIssue;
+
+/**
+ * Holds shallow references to the state-specific statistics used to support the
+ * tasks of a state. These statistics help determine whether a task should
+ * become open, resolved, or obsolete.
+ *
+ * We keep shallow references to the statistics because they are shared across
+ * services. As a consequence, we can receive updates to the stats with minimal
+ * communication between services.
+ *
+ * Although some tasks do require exploration-level statistics, this class does
+ * not hold onto them. Doing so would be extremely wasteful, since every state
+ * would be holding a reference to the exact same instance. Instead, we pass
+ * them explicitly as needed.
+ */
+export class SupportingStateStats {
+  public readonly stateStats: StateStats;
+  public readonly answerStats: readonly AnswerStats[];
+  public readonly cstPlaythroughIssues: readonly CstPlaythroughIssue[];
+  public readonly eqPlaythroughIssues: readonly EqPlaythroughIssue[];
+  public readonly misPlaythroughIssues: readonly MisPlaythroughIssue[];
+
+  constructor(
+      stateStats: StateStats,
+      answerStats: readonly AnswerStats[] = [],
+      cstPlaythroughIssues: readonly CstPlaythroughIssue[] = [],
+      eqPlaythroughIssues: readonly EqPlaythroughIssue[] = [],
+      misPlaythroughIssues: readonly MisPlaythroughIssue[] = []) {
+    this.stateStats = stateStats;
+    this.answerStats = [...answerStats];
+    this.cstPlaythroughIssues = [...cstPlaythroughIssues];
+    this.eqPlaythroughIssues = [...eqPlaythroughIssues];
+    this.misPlaythroughIssues = [...misPlaythroughIssues];
+  }
+}
+
+/**
+ * Container for the tasks of an exploration&#x27;s state, coupled with references to
+ * their supporting statistics.
+ *
+ * The class provides a container-like interface for convenience and because it
+ * fits with the &quot;container&quot; model the class aims to fulfill.
+ */
+export class StateTasks implements Iterable&lt;ExplorationTask&gt; {
+  public readonly stateName: string;
+  public readonly hbrTask: HighBounceRateTask;
+  public readonly iflTask: IneffectiveFeedbackLoopTask;
+  public readonly ngrTask: NeedsGuidingResponsesTask;
+  public readonly siaTask: SuccessiveIncorrectAnswersTask;
+  public readonly length: number = 4;
+
+  public readonly supportingStats: SupportingStateStats;
+
+  constructor(
+      stateName: string,
+      tasksByType: ReadonlyMap&lt;ExplorationTaskType, ExplorationTask&gt;,
+      supportingStats: SupportingStateStats) {
+    this.stateName = stateName;
+    this.hbrTask = &lt;HbrTask&gt; tasksByType.get(
+      ImprovementsConstants.TASK_TYPE_HIGH_BOUNCE_RATE);
+    this.iflTask = &lt;IflTask&gt; tasksByType.get(
+      ImprovementsConstants.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP);
+    this.ngrTask = &lt;NgrTask&gt; tasksByType.get(
+      ImprovementsConstants.TASK_TYPE_NEEDS_GUIDING_RESPONSES);
+    this.siaTask = &lt;SiaTask&gt; tasksByType.get(
+      ImprovementsConstants.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS);
+    this.supportingStats = supportingStats;
+  }
+
+  public refresh(
+      expStats: ExplorationStats, config: ExplorationImprovementsConfig): void {
+    this.hbrTask.refreshStatus(
+      expStats, this.supportingStats.eqPlaythroughIssues.length, config);
+    this.iflTask.refreshStatus(
+      this.supportingStats.cstPlaythroughIssues.length);
+    this.ngrTask.refreshStatus(
+      this.supportingStats.answerStats);
+    this.siaTask.refreshStatus(
+      this.supportingStats.misPlaythroughIssues.length);
+  }
+
+  *[Symbol.iterator](): Iterator&lt;ExplorationTask&gt; {
+    yield this.hbrTask;
+    yield this.iflTask;
+    yield this.ngrTask;
+    yield this.siaTask;
+  }
+
+  map&lt;U&gt;(fn: &lt;T extends ExplorationTask&gt;(_: T) =&gt; U): U[] {
+    return [
+      fn(this.hbrTask),
+      fn(this.iflTask),
+      fn(this.ngrTask),
+      fn(this.siaTask),
+    ];
+  }
+}
+
+/**
+ * Manages all of the improvement tasks for an exploration.
+ *
+ * Provides hooks for keeping the tasks fresh after events which could otherwise
+ * invalidate them.
+ */
+@Injectable({providedIn: &#x27;root&#x27;})
+export class ExplorationImprovementsTaskRegistryService {
+  private config: ExplorationImprovementsConfig;
+  private expStats: ExplorationStats;
+  private tasksByState: Map&lt;string, StateTasks&gt;;
+  private openTasksByType: ReadonlyMap&lt;ExplorationTaskType, ExplorationTask[]&gt;;
+
+  initialize(
+      config: ExplorationImprovementsConfig,
+      states: States,
+      expStats: ExplorationStats,
+      openTasks: readonly ExplorationTask[],
+      resolvedTaskTypesByStateName:
+        ReadonlyMap&lt;string, readonly ExplorationTaskType[]&gt;,
+      topAnswersByStateName: ReadonlyMap&lt;string, readonly AnswerStats[]&gt;,
+      playthroughIssues: readonly PlaythroughIssue[]): void {
+    this.validateInitializationArgs(
+      config, states, expStats, openTasks,
+      resolvedTaskTypesByStateName, topAnswersByStateName,
+      playthroughIssues);
+
+    this.config = config;
+    this.expStats = expStats;
+    this.tasksByState = new Map();
+    this.openTasksByType = new Map(
+      ImprovementsConstants.TASK_TYPES.map(taskType =&gt; [taskType, []]));
+
+    const openTasksByStateName = group(openTasks, t =&gt; t.targetId);
+    const playthroughIssuesByStateName = (
+      group(playthroughIssues, p =&gt; p.getStateNameWithIssue()));
+
+    for (const stateName of states.getStateNames()) {
+      const playthroughIssuesByType = group(
+        playthroughIssuesByStateName.get(stateName) || [], p =&gt; p.issueType);
+      const cstPlaythroughIssues = &lt;CstPlaythroughIssue[]&gt; (
+        playthroughIssuesByType.get(&#x27;CyclicStateTransitions&#x27;));
+      const eqPlaythroughIssues = &lt;EqPlaythroughIssue[]&gt; (
+        playthroughIssuesByType.get(&#x27;EarlyQuit&#x27;));
+      const misPlaythroughIssues = &lt;MisPlaythroughIssue[]&gt; (
+        playthroughIssuesByType.get(&#x27;MultipleIncorrectSubmissions&#x27;));
+
+      this.registerNewStateTasks(
+        stateName,
+        openTasksByStateName.get(stateName) || [],
+        resolvedTaskTypesByStateName.get(stateName) || [],
+        topAnswersByStateName.get(stateName) || [],
+        cstPlaythroughIssues || [],
+        eqPlaythroughIssues || [],
+        misPlaythroughIssues || []);
+      this.refreshStateTasks(stateName);
+    }
+  }
+
+  getExplorationStats(): ExplorationStats {
+    return this.expStats;
+  }
+
+  onStateAdded(newStateName: string): void {
+    this.expStats = this.expStats.createNewWithStateAdded(newStateName);
+    const newStateTasks = new StateTasks(
+      newStateName,
+      new Map(ImprovementsConstants.TASK_TYPES.map(taskType =&gt; [
+        taskType, ExplorationTaskModel.createNewObsoleteTask(
+          this.config.explorationId, this.config.explorationVersion, taskType,
+          newStateName),
+      ])),
+      new SupportingStateStats(this.expStats.getStateStats(newStateName)));
+
+    this.tasksByState.set(newStateName, newStateTasks);
+  }
+
+  onStateDeleted(oldStateName: string): void {
+    this.expStats = this.expStats.createNewWithStateDeleted(oldStateName);
+    const oldStateTasks = this.tasksByState.get(oldStateName);
+
+    for (const oldTask of oldStateTasks) {
+      if (oldTask.isOpen()) {
+        this.popOpenTask(oldTask);
+      }
+      oldTask.markAsObsolete();
+    }
+
+    this.tasksByState.delete(oldStateName);
+  }
+
+  onStateRenamed(oldStateName: string, newStateName: string): void {
+    this.expStats = this.expStats.createNewWithStateRenamed(
+      oldStateName, newStateName);
+    const oldStateTasks = this.tasksByState.get(oldStateName);
+    const newStateTasks = new StateTasks(
+      newStateName,
+      new Map(oldStateTasks.map(oldTask =&gt; [
+        oldTask.taskType,
+        ExplorationTaskModel.createFromBackendDict({
+          ...oldTask.toBackendDict(),
+          ...{target_id: newStateName},
+        })
+      ])),
+      new SupportingStateStats(
+        this.expStats.getStateStats(newStateName),
+        oldStateTasks.supportingStats.answerStats,
+        oldStateTasks.supportingStats.cstPlaythroughIssues,
+        oldStateTasks.supportingStats.eqPlaythroughIssues,
+        oldStateTasks.supportingStats.misPlaythroughIssues));
+
+    for (const newTask of newStateTasks) {
+      if (newTask.isOpen()) {
+        this.pushOpenTask(newTask);
+      }
+    }
+    for (const oldTask of oldStateTasks) {
+      if (oldTask.isOpen()) {
+        this.popOpenTask(oldTask);
+      }
+      oldTask.markAsObsolete();
+    }
+
+    this.tasksByState.set(newStateName, newStateTasks);
+    this.tasksByState.delete(oldStateName);
+  }
+
+  onStateInteractionSaved(state: State): void {
+    this.refreshStateTasks(state.name);
+  }
+
+  getOpenHighBounceRateTasks(): HbrTask[] {
+    return &lt;HbrTask[]&gt; this.openTasksByType.get(
+      ImprovementsConstants.TASK_TYPE_HIGH_BOUNCE_RATE);
+  }
+
+  getOpenIneffectiveFeedbackLoopTasks(): IflTask[] {
+    return &lt;IflTask[]&gt; this.openTasksByType.get(
+      ImprovementsConstants.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP);
+  }
+
+  getOpenNeedsGuidingResponsesTasks(): NgrTask[] {
+    return &lt;NgrTask[]&gt; this.openTasksByType.get(
+      ImprovementsConstants.TASK_TYPE_NEEDS_GUIDING_RESPONSES);
+  }
+
+  getOpenSuccessiveIncorrectAnswersTasks(): SiaTask[] {
+    return &lt;SiaTask[]&gt; this.openTasksByType.get(
+      ImprovementsConstants.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS);
+  }
+
+  getStateTasks(stateName: string): StateTasks {
+    if (!this.tasksByState.has(stateName)) {
+      throw new Error(&#x27;Unknown state with name: &#x27; + stateName);
+    }
+    return this.tasksByState.get(stateName);
+  }
+
+  getAllStateTasks(): StateTasks[] {
+    return Array.from(this.tasksByState.values());
+  }
+
+  private validateInitializationArgs(
+      config: ExplorationImprovementsConfig,
+      states: States,
+      expStats: ExplorationStats,
+      openTasks: readonly ExplorationTask[],
+      resolvedTaskTypesByStateName: ReadonlyMap&lt;
+          string, readonly ExplorationTaskType[]&gt;,
+      topAnswersByStateName: ReadonlyMap&lt;string, readonly AnswerStats[]&gt;,
+      playthroughIssues: readonly PlaythroughIssue[]): void {
+    // Validate that the exploration stats correspond with provided exploration.
+    if (expStats.expId !== config.explorationId) {
+      throw new Error(
+        &#x27;Expected stats for exploration &quot;&#x27; + config.explorationId + &#x27;&quot;, but &#x27; +
+        &#x27;got stats for exploration &quot;&#x27; + expStats.expId + &#x27;&quot;&#x27;);
+    }
+    if (expStats.expVersion !== config.explorationVersion) {
+      throw new Error(
+        &#x27;Expected stats for exploration version &#x27; + config.explorationVersion +
+        &#x27;, but got stats for exploration version &#x27; + expStats.expVersion);
+    }
+
+    // Validate that all state names referenced by the provided arguments exist
+    // according to the source-of-truth: the `states` argument.
+    const actualStateNames = new Set&lt;string&gt;(states.getStateNames());
+    const allStateNameReferences = new Set&lt;string&gt;([
+      ...openTasks.map(t =&gt; t.targetId),
+      ...resolvedTaskTypesByStateName.keys(),
+      ...topAnswersByStateName.keys(),
+      ...playthroughIssues.map(p =&gt; p.getStateNameWithIssue())
+    ]);
+    for (const stateName of allStateNameReferences) {
+      if (!actualStateNames.has(stateName)) {
+        throw new Error(
+          &#x27;Unexpected reference to state &quot;&#x27; + stateName + &#x27;&quot;, which does not &#x27; +
+          &#x27;exist&#x27;);
+      }
+    }
+
+    // Validate that each open task is targeting the provided exploration.
+    for (const task of openTasks) {
+      if (task.entityId !== config.explorationId) {
+        throw new Error(
+          &#x27;Expected task for exploration &quot;&#x27; + config.explorationId + &#x27;&quot;, but &#x27; +
+          &#x27;got task for exploration &quot;&#x27; + task.entityId + &#x27;&quot;&#x27;);
+      }
+      if (task.entityVersion !== config.explorationVersion) {
+        throw new Error(
+          &#x27;Expected task for exploration version &#x27; +
+          config.explorationVersion + &#x27;, but got task for exploration &#x27; +
+          &#x27;version &#x27; + task.entityVersion);
+      }
+    }
+
+    // Validate that there are no tasks with the same type targeting the same
+    // state.
+    const stateNameReferencesByTaskType = new Map(
+      ImprovementsConstants.TASK_TYPES.map(taskType =&gt; [taskType, new Set()]));
+    for (const task of openTasks) {
+      const stateNameReferences = (
+        stateNameReferencesByTaskType.get(task.taskType));
+      if (stateNameReferences.has(task.targetId)) {
+        throw new Error(
+          &#x27;Found duplicate task of type &quot;&#x27; + task.taskType + &#x27;&quot; targeting &#x27; +
+          &#x27;state &quot;&#x27; + task.targetId + &#x27;&quot;&#x27;);
+      } else {
+        stateNameReferences.add(task.targetId);
+      }
+    }
+    for (const [stateName, taskTypes] of resolvedTaskTypesByStateName) {
+      for (const taskType of taskTypes) {
+        const stateNameReferences = stateNameReferencesByTaskType.get(taskType);
+        if (stateNameReferences.has(stateName)) {
+          throw new Error(
+            &#x27;Found duplicate task of type &quot;&#x27; + taskType + &#x27;&quot; targeting state &#x27; +
+            &#x27;&quot;&#x27; + stateName + &#x27;&quot;&#x27;);
+        } else {
+          stateNameReferences.add(stateName);
+        }
+      }
+    }
+  }
+
+  private registerNewStateTasks(
+      stateName: string,
+      openTasks: readonly ExplorationTask[],
+      resolvedTaskTypes: readonly ExplorationTaskType[],
+      answerStats: readonly AnswerStats[],
+      cstPlaythroughIssues: readonly CstPlaythroughIssue[],
+      eqPlaythroughIssues: readonly EqPlaythroughIssue[],
+      misPlaythroughIssues: readonly MisPlaythroughIssue[]): StateTasks {
+    if (!this.expStats.hasStateStates(stateName)) {
+      // Not an error to be missing stats.
+      this.expStats = this.expStats.createNewWithStateAdded(stateName);
+    }
+    const tasksByType = new Map(&lt;[ExplorationTaskType, ExplorationTask][]&gt; [
+      // NOTE TO DEVELOPERS: The last repeated key wins. For example:
+      //    let map = new Map([[&#x27;a&#x27;, 1], [&#x27;b&#x27;, 3], [&#x27;a&#x27;, 9]]);
+      //    map.get(&#x27;a&#x27;); // Returns 9.
+      ...ImprovementsConstants.TASK_TYPES.map(taskType =&gt; [
+        taskType, ExplorationTaskModel.createNewObsoleteTask(
+          this.config.explorationId, this.config.explorationVersion, taskType,
+          stateName)
+      ]),
+      ...openTasks.map(task =&gt; [
+        task.taskType, task
+      ]),
+      ...resolvedTaskTypes.map(taskType =&gt; [
+        taskType, ExplorationTaskModel.createNewResolvedTask(
+          this.config.explorationId, this.config.explorationVersion, taskType,
+          stateName)
+      ]),
+    ]);
+    const supportingStats = new SupportingStateStats(
+      this.expStats.getStateStats(stateName), answerStats, cstPlaythroughIssues,
+      eqPlaythroughIssues, misPlaythroughIssues);
+    const newStateTasks = (
+      new StateTasks(stateName, tasksByType, supportingStats));
+
+    for (const task of newStateTasks) {
+      if (task.isOpen()) {
+        this.pushOpenTask(task);
+      }
+    }
+
+    this.tasksByState.set(stateName, newStateTasks);
+    return newStateTasks;
+  }
+
+  private refreshStateTasks(stateName: string): void {
+    const stateTasks = this.tasksByState.get(stateName);
+    const tasksWithOldStatus: [ExplorationTask, string][] = (
+      stateTasks.map(task =&gt; [task, task.getStatus()]));
+
+    stateTasks.refresh(this.expStats, this.config);
+
+    for (const [task, oldStatus] of tasksWithOldStatus) {
+      if (task.getStatus() === oldStatus) {
+        continue;
+      } else if (task.getStatus() === ImprovementsConstants.TASK_STATUS_OPEN) {
+        this.pushOpenTask(task);
+      } else if (oldStatus === ImprovementsConstants.TASK_STATUS_OPEN) {
+        this.popOpenTask(task);
+      }
+    }
+  }
+
+  /** Pre-condition: task is missing from the openTasksByType data structure. */
+  private pushOpenTask(task: ExplorationTask): void {
+    this.openTasksByType.get(task.taskType).push(task);
+  }
+
+  /** Pre-condition: task is present in the openTasksByType data structure. */
+  private popOpenTask(task: ExplorationTask): void {
+    const arrayWithTask = this.openTasksByType.get(task.taskType);
+    arrayWithTask.splice(arrayWithTask.indexOf(task), 1);
+  }
+}
+
+angular.module(&#x27;oppia&#x27;).factory(
+  &#x27;ExplorationImprovementsTaskRegistryService&#x27;,
+  downgradeInjectable(ExplorationImprovementsTaskRegistryService));
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/services/exploration-improvements-task-registry.service.ts&quot;,&quot;line&quot;:119,&quot;character&quot;:19,&quot;text&quot;:&quot;&lt;HbrTask&gt; tasksByType.get(\n      ImprovementsConstants.TASK_TYPE_HIGH_BOUNCE_RATE)&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements-task-registry.service.ts&quot;,&quot;line&quot;:121,&quot;character&quot;:19,&quot;text&quot;:&quot;&lt;IflTask&gt; tasksByType.get(\n      ImprovementsConstants.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP)&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements-task-registry.service.ts&quot;,&quot;line&quot;:123,&quot;character&quot;:19,&quot;text&quot;:&quot;&lt;NgrTask&gt; tasksByType.get(\n      ImprovementsConstants.TASK_TYPE_NEEDS_GUIDING_RESPONSES)&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements-task-registry.service.ts&quot;,&quot;line&quot;:125,&quot;character&quot;:19,&quot;text&quot;:&quot;&lt;SiaTask&gt; tasksByType.get(\n      ImprovementsConstants.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS)&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements-task-registry.service.ts&quot;,&quot;line&quot;:199,&quot;character&quot;:35,&quot;text&quot;:&quot;&lt;CstPlaythroughIssue[]&gt; (\n        playthroughIssuesByType.get(&#x27;CyclicStateTransitions&#x27;))&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements-task-registry.service.ts&quot;,&quot;line&quot;:201,&quot;character&quot;:34,&quot;text&quot;:&quot;&lt;EqPlaythroughIssue[]&gt; (\n        playthroughIssuesByType.get(&#x27;EarlyQuit&#x27;))&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements-task-registry.service.ts&quot;,&quot;line&quot;:203,&quot;character&quot;:35,&quot;text&quot;:&quot;&lt;MisPlaythroughIssue[]&gt; (\n        playthroughIssuesByType.get(&#x27;MultipleIncorrectSubmissions&#x27;))&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements-task-registry.service.ts&quot;,&quot;line&quot;:291,&quot;character&quot;:11,&quot;text&quot;:&quot;&lt;HbrTask[]&gt; this.openTasksByType.get(\n      ImprovementsConstants.TASK_TYPE_HIGH_BOUNCE_RATE)&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements-task-registry.service.ts&quot;,&quot;line&quot;:296,&quot;character&quot;:11,&quot;text&quot;:&quot;&lt;IflTask[]&gt; this.openTasksByType.get(\n      ImprovementsConstants.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP)&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements-task-registry.service.ts&quot;,&quot;line&quot;:301,&quot;character&quot;:11,&quot;text&quot;:&quot;&lt;NgrTask[]&gt; this.openTasksByType.get(\n      ImprovementsConstants.TASK_TYPE_NEEDS_GUIDING_RESPONSES)&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements-task-registry.service.ts&quot;,&quot;line&quot;:306,&quot;character&quot;:11,&quot;text&quot;:&quot;&lt;SiaTask[]&gt; this.openTasksByType.get(\n      ImprovementsConstants.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS)&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements-task-registry.service.ts&quot;,&quot;line&quot;:415,&quot;character&quot;:32,&quot;text&quot;:&quot;&lt;[ExplorationTaskType, ExplorationTask][]&gt; [\n      // NOTE TO DEVELOPERS: The last repeated key wins. For example:\n      //    let map = new Map([[&#x27;a&#x27;, 1], [&#x27;b&#x27;, 3], [&#x27;a&#x27;, 9]]);\n      //    map.get(&#x27;a&#x27;); // Returns 9.\n      ...ImprovementsConstants.TASK_TYPES.map(taskType =&gt; [\n        taskType, ExplorationTaskModel.createNewObsoleteTask(\n          this.config.explorationId, this.config.explorationVersion, taskType,\n          stateName)\n      ]),\n      ...openTasks.map(task =&gt; [\n        task.taskType, task\n      ]),\n      ...resolvedTaskTypes.map(taskType =&gt; [\n        taskType, ExplorationTaskModel.createNewResolvedTask(\n          this.config.explorationId, this.config.explorationVersion, taskType,\n          stateName)\n      ]),\n    ]&quot;,&quot;kind&quot;:4}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:55 GMT</p>
+    </body>
+  </html>
+  

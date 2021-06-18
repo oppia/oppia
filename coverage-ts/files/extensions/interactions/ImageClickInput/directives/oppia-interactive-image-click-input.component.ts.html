@@ -1,0 +1,308 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>oppia-interactive-image-click-input.component.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts</td><td class="">89.55%</td><td class="">100%</td><td class="">469</td><td class="">420</td><td class="">49</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2014 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Directive for the ImageClickInput interaction.
+ *
+ * IMPORTANT NOTE: The naming convention for customization args that are passed
+ * into the directive is: the name of the parameter, followed by &#x27;With&#x27;,
+ * followed by the name of the arg.
+ */
+
+import { Component, ElementRef, Input, OnDestroy, OnInit } from &#x27;@angular/core&#x27;;
+import { downgradeComponent } from &#x27;@angular/upgrade/static&#x27;;
+import { AppConstants } from &#x27;app.constants&#x27;;
+import { UrlInterpolationService } from &#x27;domain/utilities/url-interpolation.service&#x27;;
+import { ImageClickAnswer } from &#x27;interactions/answer-defs&#x27;;
+import { ImageClickInputCustomizationArgs, ImageWithRegions, LabeledRegion } from &#x27;interactions/customization-args-defs&#x27;;
+import { InteractionAttributesExtractorService } from &#x27;interactions/interaction-attributes-extractor.service&#x27;;
+import { CurrentInteractionService, InteractionRulesService } from &#x27;pages/exploration-player-page/services/current-interaction.service&#x27;;
+import { ImageDimensions, ImagePreloaderService } from &#x27;pages/exploration-player-page/services/image-preloader.service&#x27;;
+import { PlayerPositionService } from &#x27;pages/exploration-player-page/services/player-position.service&#x27;;
+import { Subscription } from &#x27;rxjs&#x27;;
+import { AssetsBackendApiService } from &#x27;services/assets-backend-api.service&#x27;;
+import { ContextService } from &#x27;services/context.service&#x27;;
+import { ServicesConstants } from &#x27;services/services.constants&#x27;;
+import { ImageClickInputRulesService } from &#x27;./image-click-input-rules.service&#x27;;
+
+interface RectangleRegion extends ImagePoint {
+  height: number;
+  width: number;
+}
+
+interface ImagePoint {
+  left: number,
+  top: number
+}
+
+@Component({
+  selector: &#x27;oppia-interactive-image-click-input&#x27;,
+  templateUrl: &#x27;./image-click-input-interaction.component&#x27;,
+  styleUrls: []
+})
+export class InteractiveImageClickInput implements OnInit, OnDestroy {
+  @Input() imageAndRegionsWithValue: string;
+  @Input() highlightRegionsOnHoverWithValue: string;
+  @Input() lastAnswer: ImageClickAnswer;
+  imageAndRegions: ImageWithRegions;
+  highlightRegionsOnHover: boolean = false;
+  componentSubscriptions = new Subscription();
+  currentlyHoveredRegions: string[] = [];
+  filepath: string;
+  imageUrl: string;
+  mouseX: number;
+  mouseY: number;
+  interactionIsActive: boolean;
+  loadingIndicatorUrl: string;
+  isLoadingIndicatorShown: boolean;
+  isTryAgainShown: boolean;
+  dimensions: ImageDimensions;
+  imageContainerStyle: { height: string; width?: string; };
+  loadingIndicatorStyle: { height: string; width?: string; };
+  allRegions: LabeledRegion[];
+  constructor(
+    private assetsBackendApiService: AssetsBackendApiService,
+    private contextService: ContextService,
+    private currentInteractionService: CurrentInteractionService,
+    private el: ElementRef,
+    private imageClickInputRulesService: ImageClickInputRulesService,
+    private imagePreloaderService: ImagePreloaderService,
+    private interactionAttributesExtractorService:
+      InteractionAttributesExtractorService,
+    private playerPositionService: PlayerPositionService,
+    private urlInterpolationService: UrlInterpolationService
+  ) {}
+
+  private _getAttrs() {
+    return {
+      imageAndRegionsWithValue: this.imageAndRegionsWithValue,
+      highlightRegionsOnHoverWithValue: this.highlightRegionsOnHoverWithValue
+    };
+  }
+
+  private _isMouseInsideRegion(regionArea): boolean {
+    return (
+      this.mouseX &gt;= regionArea[0][0] &amp;&amp;
+      this.mouseX &lt;= regionArea[1][0] &amp;&amp;
+      this.mouseY &gt;= regionArea[0][1] &amp;&amp;
+      this.mouseY &lt;= regionArea[1][1]
+    );
+  }
+
+  ngOnInit(): void {
+    const {
+      imageAndRegions,
+      highlightRegionsOnHover
+    } = this.interactionAttributesExtractorService.getValuesFromAttributes(
+      &#x27;ImageClickInput&#x27;, this._getAttrs()) as ImageClickInputCustomizationArgs;
+    this.imageAndRegions = imageAndRegions.value;
+    this.highlightRegionsOnHover = highlightRegionsOnHover.value;
+    this.componentSubscriptions.add(
+      this.playerPositionService.onNewCardAvailable.subscribe(
+        () =&gt; {
+          this.interactionIsActive = false;
+          this.lastAnswer = {
+            clickPosition: [this.mouseX, this.mouseY],
+            clickedRegions: []
+          };
+        }
+      )
+    );
+    this.filepath = this.imageAndRegions.imagePath;
+    this.imageUrl = &#x27;&#x27;;
+    this.loadingIndicatorUrl = this.urlInterpolationService
+      .getStaticImageUrl(AppConstants.LOADING_INDICATOR_URL);
+    this.isLoadingIndicatorShown = false;
+    this.isTryAgainShown = false;
+    this.dimensions = (
+      this.imagePreloaderService.getDimensionsOfImage(this.filepath));
+    this.imageContainerStyle = {
+      height: this.dimensions.height + &#x27;px&#x27;,
+      width: this.dimensions.width + &#x27;px&#x27;
+    };
+    if (this.imagePreloaderService.inExplorationPlayer()) {
+      this.isLoadingIndicatorShown = true;
+      // For aligning the gif to the center of it&#x27;s container.
+      const loadingIndicatorSize = (
+                (this.dimensions.height &lt; 124) ? 24 : 120);
+      this.imageContainerStyle = {
+        height: this.dimensions.height + &#x27;px&#x27;
+      };
+      this.loadingIndicatorStyle = {
+        height: loadingIndicatorSize + &#x27;px&#x27;,
+        width: loadingIndicatorSize + &#x27;px&#x27;
+      };
+      this.loadImage();
+    } else {
+      // This is the case when user is in exploration editor or in
+      // preview mode. We don&#x27;t have loading indicator or try again for
+      // showing images in the exploration editor or in preview mode. So
+      // we directly assign the url to the imageUrl.
+      this.imageUrl = this.assetsBackendApiService.getImageUrlForPreview(
+        this.contextService.getEntityType(), this.contextService.getEntityId(),
+        this.filepath);
+    }
+
+    this.mouseX = 0;
+    this.mouseY = 0;
+    this.interactionIsActive = (this.lastAnswer === null);
+
+    this.currentlyHoveredRegions = [];
+    this.allRegions = this.imageAndRegions.labeledRegions;
+    if (!this.interactionIsActive) {
+      /**
+       * The following lines highlight the learner&#x27;s last answer for
+       * this card. This need only be done at the beginning as if he
+       * submits an answer, based on newCardAvailable, the image
+       * is made inactive, so his last selection would be highlighted.
+       */
+      this.mouseX = this.lastAnswer.clickPosition[0];
+      this.mouseY = this.lastAnswer.clickPosition[1];
+      this.updateCurrentlyHoveredRegions();
+    }
+
+    this.currentInteractionService.registerCurrentInteraction(null, null);
+  }
+
+  loadImage(): void {
+    this.imagePreloaderService.getImageUrlAsync(this.filepath)
+      .then((objectUrl: string) =&gt; {
+        this.isTryAgainShown = false;
+        this.isLoadingIndicatorShown = false;
+        this.imageUrl = objectUrl;
+      }, () =&gt; {
+        this.isTryAgainShown = true;
+        this.isLoadingIndicatorShown = false;
+      });
+  }
+
+  updateCurrentlyHoveredRegions(): void {
+    for (let i = 0; i &lt; this.imageAndRegions.labeledRegions.length; i++) {
+      const labeledRegion = this.imageAndRegions.labeledRegions[i];
+      const regionArea = labeledRegion.region.area;
+      if (this._isMouseInsideRegion(regionArea)) {
+        this.currentlyHoveredRegions.push(labeledRegion.label);
+      }
+    }
+  }
+
+  getRegionDimensions(index: number): RectangleRegion {
+    const images = this.el.nativeElement.querySelectorAll(
+      &#x27;.oppia-image-click-img&#x27;);
+    const image = images[0];
+    const labeledRegion = this.imageAndRegions.labeledRegions[index];
+    const regionArea = labeledRegion.region.area;
+    const leftDelta = (
+      image.getBoundingClientRect().left -
+      image.parentElement.getBoundingClientRect().left);
+    const topDelta = (
+      image.getBoundingClientRect().top -
+      image.parentElement.getBoundingClientRect().top);
+    const returnValue = {
+      left: regionArea[0][0] * image.width + leftDelta,
+      top: regionArea[0][1] * image.height + topDelta,
+      width: (regionArea[1][0] - regionArea[0][0]) * image.width,
+      height: (regionArea[1][1] - regionArea[0][1]) * image.height
+    };
+    return returnValue;
+  }
+
+  getRegionDisplay(label: string): &#x27;none&#x27; | &#x27;inline&#x27; {
+    if (this.currentlyHoveredRegions.indexOf(label) === -1) {
+      return &#x27;none&#x27;;
+    }
+    return &#x27;inline&#x27;;
+  }
+
+  getDotDisplay(): &#x27;none&#x27; | &#x27;inline&#x27; {
+    if (this.contextService.getEditorTabContext() ===
+        ServicesConstants.EXPLORATION_EDITOR_TAB_CONTEXT.EDITOR) {
+      return &#x27;none&#x27;;
+    }
+    return &#x27;inline&#x27;;
+  }
+
+  getDotLocation(): ImagePoint {
+    const images = this.el.nativeElement.querySelectorAll(
+      &#x27;.oppia-image-click-img&#x27;);
+    const image: HTMLImageElement = images[0];
+    var dotLocation = {
+      left: null,
+      top: null
+    };
+    if (this.lastAnswer) {
+      dotLocation.left = (
+        this.lastAnswer.clickPosition[0] * image.width +
+        image.getBoundingClientRect().left -
+        image.parentElement.getBoundingClientRect().left - 5);
+      dotLocation.top = (
+        this.lastAnswer.clickPosition[1] * image.height +
+        image.getBoundingClientRect().top -
+        image.parentElement.getBoundingClientRect().top - 5);
+    }
+    return dotLocation;
+  }
+
+  onMousemoveImage(event: MouseEvent): void {
+    if (!this.interactionIsActive) {
+      return;
+    }
+    const images = this.el.nativeElement.querySelectorAll(
+      &#x27;.oppia-image-click-img&#x27;);
+    const image: HTMLImageElement = images[0];
+    this.mouseX =
+      (event.pageX - image.getBoundingClientRect().left) / image.width;
+    this.mouseY =
+      (event.pageY - image.getBoundingClientRect().top) / image.height;
+    this.currentlyHoveredRegions = [];
+    this.updateCurrentlyHoveredRegions();
+  }
+
+  onClickImage(): void {
+    const answer = {
+      clickPosition: [this.mouseX, this.mouseY],
+      clickedRegions: this.currentlyHoveredRegions
+    };
+    this.currentInteractionService.onSubmit(
+      answer as unknown as string,
+      this.imageClickInputRulesService as unknown as InteractionRulesService);
+  }
+
+  ngOnDestroy(): void {
+    this.componentSubscriptions.unsubscribe();
+  }
+}
+
+angular.module(&#x27;oppia&#x27;).directive(
+  &#x27;oppiaInteractiveImageClickInput&#x27;, downgradeComponent({
+    component: InteractiveImageClickInput
+  }) as angular.IDirectiveFactory);
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts&quot;,&quot;line&quot;:77,&quot;character&quot;:12,&quot;text&quot;:&quot;el&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts&quot;,&quot;line&quot;:93,&quot;character&quot;:31,&quot;text&quot;:&quot;regionArea&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts&quot;,&quot;line&quot;:95,&quot;character&quot;:21,&quot;text&quot;:&quot;regionArea&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts&quot;,&quot;line&quot;:96,&quot;character&quot;:21,&quot;text&quot;:&quot;regionArea&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts&quot;,&quot;line&quot;:97,&quot;character&quot;:21,&quot;text&quot;:&quot;regionArea&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts&quot;,&quot;line&quot;:98,&quot;character&quot;:21,&quot;text&quot;:&quot;regionArea&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts&quot;,&quot;line&quot;:106,&quot;character&quot;:8,&quot;text&quot;:&quot;this.interactionAttributesExtractorService.getValuesFromAttributes(\n      &#x27;ImageClickInput&#x27;, this._getAttrs()) as ImageClickInputCustomizationArgs&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts&quot;,&quot;line&quot;:200,&quot;character&quot;:10,&quot;text&quot;:&quot;images&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts&quot;,&quot;line&quot;:200,&quot;character&quot;:24,&quot;text&quot;:&quot;el&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts&quot;,&quot;line&quot;:200,&quot;character&quot;:27,&quot;text&quot;:&quot;nativeElement&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts&quot;,&quot;line&quot;:200,&quot;character&quot;:41,&quot;text&quot;:&quot;querySelectorAll&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts&quot;,&quot;line&quot;:202,&quot;character&quot;:10,&quot;text&quot;:&quot;image&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts&quot;,&quot;line&quot;:202,&quot;character&quot;:18,&quot;text&quot;:&quot;images&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts&quot;,&quot;line&quot;:206,&quot;character&quot;:6,&quot;text&quot;:&quot;image&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts&quot;,&quot;line&quot;:206,&quot;character&quot;:12,&quot;text&quot;:&quot;getBoundingClientRect&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts&quot;,&quot;line&quot;:206,&quot;character&quot;:36,&quot;text&quot;:&quot;left&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts&quot;,&quot;line&quot;:207,&quot;character&quot;:6,&quot;text&quot;:&quot;image&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts&quot;,&quot;line&quot;:207,&quot;character&quot;:12,&quot;text&quot;:&quot;parentElement&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts&quot;,&quot;line&quot;:207,&quot;character&quot;:26,&quot;text&quot;:&quot;getBoundingClientRect&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts&quot;,&quot;line&quot;:207,&quot;character&quot;:50,&quot;text&quot;:&quot;left&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts&quot;,&quot;line&quot;:209,&quot;character&quot;:6,&quot;text&quot;:&quot;image&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts&quot;,&quot;line&quot;:209,&quot;character&quot;:12,&quot;text&quot;:&quot;getBoundingClientRect&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts&quot;,&quot;line&quot;:209,&quot;character&quot;:36,&quot;text&quot;:&quot;top&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts&quot;,&quot;line&quot;:210,&quot;character&quot;:6,&quot;text&quot;:&quot;image&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts&quot;,&quot;line&quot;:210,&quot;character&quot;:12,&quot;text&quot;:&quot;parentElement&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts&quot;,&quot;line&quot;:210,&quot;character&quot;:26,&quot;text&quot;:&quot;getBoundingClientRect&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts&quot;,&quot;line&quot;:210,&quot;character&quot;:50,&quot;text&quot;:&quot;top&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts&quot;,&quot;line&quot;:212,&quot;character&quot;:31,&quot;text&quot;:&quot;image&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts&quot;,&quot;line&quot;:212,&quot;character&quot;:37,&quot;text&quot;:&quot;width&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts&quot;,&quot;line&quot;:213,&quot;character&quot;:30,&quot;text&quot;:&quot;image&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts&quot;,&quot;line&quot;:213,&quot;character&quot;:36,&quot;text&quot;:&quot;height&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts&quot;,&quot;line&quot;:214,&quot;character&quot;:53,&quot;text&quot;:&quot;image&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts&quot;,&quot;line&quot;:214,&quot;character&quot;:59,&quot;text&quot;:&quot;width&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts&quot;,&quot;line&quot;:215,&quot;character&quot;:54,&quot;text&quot;:&quot;image&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts&quot;,&quot;line&quot;:215,&quot;character&quot;:60,&quot;text&quot;:&quot;height&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts&quot;,&quot;line&quot;:236,&quot;character&quot;:10,&quot;text&quot;:&quot;images&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts&quot;,&quot;line&quot;:236,&quot;character&quot;:24,&quot;text&quot;:&quot;el&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts&quot;,&quot;line&quot;:236,&quot;character&quot;:27,&quot;text&quot;:&quot;nativeElement&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts&quot;,&quot;line&quot;:236,&quot;character&quot;:41,&quot;text&quot;:&quot;querySelectorAll&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts&quot;,&quot;line&quot;:238,&quot;character&quot;:36,&quot;text&quot;:&quot;images&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts&quot;,&quot;line&quot;:244,&quot;character&quot;:18,&quot;text&quot;:&quot;left&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts&quot;,&quot;line&quot;:248,&quot;character&quot;:18,&quot;text&quot;:&quot;top&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts&quot;,&quot;line&quot;:260,&quot;character&quot;:10,&quot;text&quot;:&quot;images&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts&quot;,&quot;line&quot;:260,&quot;character&quot;:24,&quot;text&quot;:&quot;el&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts&quot;,&quot;line&quot;:260,&quot;character&quot;:27,&quot;text&quot;:&quot;nativeElement&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts&quot;,&quot;line&quot;:260,&quot;character&quot;:41,&quot;text&quot;:&quot;querySelectorAll&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts&quot;,&quot;line&quot;:262,&quot;character&quot;:36,&quot;text&quot;:&quot;images&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts&quot;,&quot;line&quot;:277,&quot;character&quot;:6,&quot;text&quot;:&quot;answer as unknown as string&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts&quot;,&quot;line&quot;:278,&quot;character&quot;:6,&quot;text&quot;:&quot;this.imageClickInputRulesService as unknown as InteractionRulesService&quot;,&quot;kind&quot;:3}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:58 GMT</p>
+    </body>
+  </html>
+  

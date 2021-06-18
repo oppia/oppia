@@ -1,0 +1,335 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>platform-feature.service.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/services/platform-feature.service.ts</td><td class="">94.83%</td><td class="">100%</td><td class="">271</td><td class="">257</td><td class="">14</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview A service for retriving feature flags - boolean parameters
+ * that are used to determine if features should be enabled.
+ *
+ * Once the initialization is done, the value of each feature flag is guaranteed
+ * to be constant within the page.
+ * The values are also cached in SessionStorage, so that even after page
+ * refreshing, the values stay the same, unless:
+ *   - the cache TTL of 12 hours has been reached, or
+ *   - the current account is different than the account in use when the values
+ *     are loaded, i.e. a different session id is present in the cookies.
+ *   - there are new features defined in the code base while the cached
+ *     summary is out-of-date.
+ * In such cases, the values will be re-initialized and they may be changed.
+ *
+ * The values in SessionStorage is not shared between tabs, we don&#x27;t want
+ * sudden updates in the same tab but it&#x27;s okay to always load the latest
+ * values in a new tab.
+ */
+
+import { Injectable } from &#x27;@angular/core&#x27;;
+import { downgradeInjectable } from &#x27;@angular/upgrade/static&#x27;;
+
+import isEqual from &#x27;lodash/isEqual&#x27;;
+
+import { PlatformFeatureBackendApiService } from
+  &#x27;domain/platform_feature/platform-feature-backend-api.service&#x27;;
+import {
+  FeatureNames,
+  FeatureStatusSummary,
+  FeatureStatusChecker
+} from &#x27;domain/platform_feature/feature-status-summary.model&#x27;;
+import { LoggerService } from &#x27;services/contextual/logger.service&#x27;;
+import { UrlService } from &#x27;services/contextual/url.service&#x27;;
+import { WindowRef } from &#x27;services/contextual/window-ref.service&#x27;;
+import { BrowserCheckerService } from
+  &#x27;domain/utilities/browser-checker.service&#x27;;
+import { ClientContext } from &#x27;domain/platform_feature/client-context.model&#x27;;
+
+interface FeatureFlagsCacheItem {
+  timestamp: number;
+  sessionId: string;
+  featureStatusSummary: FeatureStatusSummary;
+}
+
+@Injectable({
+  providedIn: &#x27;root&#x27;
+})
+export class PlatformFeatureService {
+  private static SESSION_STORAGE_KEY = &#x27;SAVED_FEATURE_FLAGS&#x27;;
+  private static SESSION_STORAGE_CACHE_TTL = 12 * 3600 * 1000; // 12 hours.
+
+  private static COOKIE_NAME_FOR_SESSION_ID = &#x27;SACSID&#x27;;
+  private static COOKIE_NAME_FOR_SESSION_ID_IN_DEV = &#x27;dev_appserver_login&#x27;;
+
+  // The following attributes are made static to avoid potential inconsistencies
+  // caused by multi-instantiation of the service.
+  static featureStatusSummary: FeatureStatusSummary = null;
+  static initializationPromise: Promise&lt;void&gt; = null;
+  static _isInitializedWithError = false;
+  static _isSkipped = false;
+
+  constructor(
+      private platformFeatureBackendApiService:
+        PlatformFeatureBackendApiService,
+      private windowRef: WindowRef,
+      private loggerService: LoggerService,
+      private urlService: UrlService,
+      private browserCheckerService: BrowserCheckerService) {
+    this.initialize();
+  }
+
+  /**
+   * Inializes the PlatformFeatureService. This function guarantees that the
+   * service is initialized only once for subsequent calls.
+   *
+   * @returns {Promise} - A promise that is resolved when the initialization
+   * is done.
+   */
+  async initialize(): Promise&lt;void&gt; {
+    if (!PlatformFeatureService.initializationPromise) {
+      PlatformFeatureService.initializationPromise = this._initialize();
+    }
+    return PlatformFeatureService.initializationPromise;
+  }
+
+  /**
+   * Returns the status checker object for feature flags, which can be used
+   * to get the value of feature flags.
+   *
+   * Example:
+   *   platformFeatureService.status.DummyFeature.isEnabled === true.
+   *
+   * @returns {FeatureStatusChecker} - Status checker object for feature flags.
+   * @throws {Error} - If this method is called before inialization.
+   */
+  get status(): FeatureStatusChecker {
+    if (PlatformFeatureService.featureStatusSummary) {
+      return PlatformFeatureService.featureStatusSummary.toStatusChecker();
+    } else {
+      throw new Error(&#x27;The platform feature service has not been initialized.&#x27;);
+    }
+  }
+
+  /**
+   * Checks if there&#x27;s any error, e.g. request timeout, during initialization.
+   *
+   * @returns {boolean} - True if there is any error during initialization.
+   */
+  get isInitialzedWithError(): boolean {
+    return PlatformFeatureService._isInitializedWithError;
+  }
+
+  /**
+   * Checks if the loading is skipped.
+   *
+   * @returns {boolean} - True if the loading is skipped.
+   */
+  get isSkipped(): boolean {
+    return PlatformFeatureService._isSkipped;
+  }
+
+  /**
+   * Initializes the PlatformFeatureService. It first checks if there is
+   * previously saved feature flag result in the sessionStorage, if there is
+   * and the result is still valid, it will be loaded. Otherwise it sends
+   * a request to the server to get the feature flag result.
+   *
+   * @returns {Promise} - A promise that is resolved when the initialization
+   * is done.
+   */
+  private async _initialize(): Promise&lt;void&gt; {
+    try {
+      const item = this.loadSavedResults();
+      if (item &amp;&amp; this.validateSavedResults(item)) {
+        PlatformFeatureService.featureStatusSummary = item.featureStatusSummary;
+        this.saveResults();
+        return;
+      }
+      this.clearSavedResults();
+
+      // The user is &#x27;partially logged-in&#x27; at the signup page, we need to skip
+      // the loading from server otherwise the request will have the cookies
+      // erased, leading to the &#x27;Registration session expired&#x27; error.
+      if (this.urlService.getPathname() === &#x27;/signup&#x27;) {
+        PlatformFeatureService._isSkipped = true;
+        PlatformFeatureService.featureStatusSummary =
+          FeatureStatusSummary.createDefault();
+        return;
+      }
+
+      PlatformFeatureService.featureStatusSummary = await this
+        .loadFeatureFlagsFromServer();
+      this.saveResults();
+    } catch (err) {
+      this.loggerService.error(
+        &#x27;Error during initialization of PlatformFeatureService: &#x27; +
+        `${err.message ? err.message : err}`);
+      // If any error, just disable all features.
+      PlatformFeatureService.featureStatusSummary =
+        FeatureStatusSummary.createDefault();
+      PlatformFeatureService._isInitializedWithError = true;
+      this.clearSavedResults();
+    }
+  }
+
+  private async loadFeatureFlagsFromServer(): Promise&lt;FeatureStatusSummary&gt; {
+    const context = this.generateClientContext();
+    return this.platformFeatureBackendApiService.fetchFeatureFlags(context);
+  }
+
+  /**
+   * Saves the results in sessionStorage, along with current timestamp and
+   * the current session id.
+   */
+  private saveResults(): void {
+    const item = {
+      timestamp: this.getCurrentTimestamp(),
+      sessionId: this.getSessionIdFromCookie(),
+      featureStatusSummary: PlatformFeatureService.featureStatusSummary
+        .toBackendDict(),
+    };
+    this.windowRef.nativeWindow.sessionStorage.setItem(
+      PlatformFeatureService.SESSION_STORAGE_KEY, JSON.stringify(item));
+  }
+
+  /**
+   * Clears results from the sessionStorage, if any.
+   */
+  private clearSavedResults(): void {
+    this.windowRef.nativeWindow.sessionStorage.removeItem(
+      PlatformFeatureService.SESSION_STORAGE_KEY);
+  }
+
+  /**
+   * Reads and parses feature flag results from the sessionStorage.
+   *
+   * @returns {FeatureFlagsCacheItem|null} - Saved results along with timestamp
+   * and session id. Null if there isn&#x27;t any saved result.
+   */
+  private loadSavedResults(): FeatureFlagsCacheItem | null {
+    const savedStr = this.windowRef.nativeWindow.sessionStorage.getItem(
+      PlatformFeatureService.SESSION_STORAGE_KEY);
+    if (savedStr) {
+      const savedObj = JSON.parse(savedStr);
+      return {
+        timestamp: savedObj.timestamp,
+        sessionId: savedObj.sessionId,
+        featureStatusSummary: (
+          FeatureStatusSummary.createFromBackendDict(
+            savedObj.featureStatusSummary))
+      };
+    }
+    return null;
+  }
+
+  /**
+   * Validates the result saved in sessionStorage. The result is valid only when
+   * all following conditions hold:
+   *   - it hasn&#x27;t expired.
+   *   - its session id matches the current session id.
+   *   - there isn&#x27;t any new feature defined in the code base that is not
+   *     presented in the cached result.
+   *
+   * @param {FeatureFlagsCacheItem} item - The result item loaded from
+   * sessionStorage.
+   *
+   * @returns {boolean} - True if the result is valid and can be directly used.
+   */
+  private validateSavedResults(item: FeatureFlagsCacheItem): boolean {
+    if (this.getCurrentTimestamp() - item.timestamp &gt;
+        PlatformFeatureService.SESSION_STORAGE_CACHE_TTL) {
+      return false;
+    }
+
+    if (this.getSessionIdFromCookie() !== item.sessionId) {
+      return false;
+    }
+
+    const storedFeatures: string[] = Array.from(
+      item.featureStatusSummary.featureNameToFlag.keys());
+    const requiredFeatures: string[] = Object.keys(FeatureNames)
+      .map(name =&gt; FeatureNames[name]);
+
+    if (!isEqual(storedFeatures.sort(), requiredFeatures.sort())) {
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
+   * Generates context containing the client side information required to
+   * request feature flag values.
+   *
+   * @returns {ClientContext} - The ClientContext instance containing required
+   * client information.
+   */
+  private generateClientContext(): ClientContext {
+    const platformType = &#x27;Web&#x27;;
+    const browserType = this.browserCheckerService.detectBrowserType();
+
+    return ClientContext.create(platformType, browserType);
+  }
+
+  /**
+   * Parse session id from cookies.
+   *
+   * @returns {string|null} - The value of the cookie representing session id.
+   */
+  private getSessionIdFromCookie(): string | null {
+    const cookieStrs = this.windowRef.nativeWindow.document.cookie.split(&#x27;; &#x27;);
+    const cookieMap = new Map(
+      cookieStrs.map(cookieStr =&gt; &lt;[string, string]&gt;cookieStr.split(&#x27;=&#x27;)));
+
+    if (cookieMap.has(PlatformFeatureService.COOKIE_NAME_FOR_SESSION_ID)) {
+      return cookieMap.get(PlatformFeatureService.COOKIE_NAME_FOR_SESSION_ID);
+    }
+    if (cookieMap.has(
+      PlatformFeatureService.COOKIE_NAME_FOR_SESSION_ID_IN_DEV)) {
+      return cookieMap.get(
+        PlatformFeatureService.COOKIE_NAME_FOR_SESSION_ID_IN_DEV);
+    }
+    return null;
+  }
+
+  /**
+   * Gets the current timestamp.
+   *
+   * @returns {number} - The current timestamp.
+   */
+  private getCurrentTimestamp(): number {
+    return Date.now();
+  }
+}
+
+export const platformFeatureInitFactory = (
+    service: PlatformFeatureService) =&gt; {
+  return async(): Promise&lt;void&gt; =&gt; service.initialize();
+};
+
+angular.module(&#x27;oppia&#x27;).factory(
+  &#x27;PlatformFeatureService&#x27;, downgradeInjectable(PlatformFeatureService));
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/services/platform-feature.service.ts&quot;,&quot;line&quot;:171,&quot;character&quot;:11,&quot;text&quot;:&quot;err&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/platform-feature.service.ts&quot;,&quot;line&quot;:171,&quot;character&quot;:15,&quot;text&quot;:&quot;message&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/platform-feature.service.ts&quot;,&quot;line&quot;:171,&quot;character&quot;:25,&quot;text&quot;:&quot;err&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/platform-feature.service.ts&quot;,&quot;line&quot;:171,&quot;character&quot;:29,&quot;text&quot;:&quot;message&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/platform-feature.service.ts&quot;,&quot;line&quot;:171,&quot;character&quot;:39,&quot;text&quot;:&quot;err&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/platform-feature.service.ts&quot;,&quot;line&quot;:168,&quot;character&quot;:13,&quot;text&quot;:&quot;err&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/platform-feature.service.ts&quot;,&quot;line&quot;:218,&quot;character&quot;:12,&quot;text&quot;:&quot;savedObj&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/platform-feature.service.ts&quot;,&quot;line&quot;:220,&quot;character&quot;:19,&quot;text&quot;:&quot;savedObj&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/platform-feature.service.ts&quot;,&quot;line&quot;:220,&quot;character&quot;:28,&quot;text&quot;:&quot;timestamp&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/platform-feature.service.ts&quot;,&quot;line&quot;:221,&quot;character&quot;:19,&quot;text&quot;:&quot;savedObj&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/platform-feature.service.ts&quot;,&quot;line&quot;:221,&quot;character&quot;:28,&quot;text&quot;:&quot;sessionId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/platform-feature.service.ts&quot;,&quot;line&quot;:224,&quot;character&quot;:12,&quot;text&quot;:&quot;savedObj&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/platform-feature.service.ts&quot;,&quot;line&quot;:224,&quot;character&quot;:21,&quot;text&quot;:&quot;featureStatusSummary&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/platform-feature.service.ts&quot;,&quot;line&quot;:287,&quot;character&quot;:34,&quot;text&quot;:&quot;&lt;[string, string]&gt;cookieStr.split(&#x27;=&#x27;)&quot;,&quot;kind&quot;:4}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:55 GMT</p>
+    </body>
+  </html>
+  

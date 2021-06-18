@@ -1,0 +1,127 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>truncate-at-first-line.pipe.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">core/templates/filters/string-utility-filters/truncate-at-first-line.pipe.spec.ts</td><td class="">100.00%</td><td class="">100%</td><td class="">135</td><td class="">135</td><td class="">0</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2019 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Tests for TruncateAtFirstLine filter for Oppia.
+ */
+
+import { TruncateAtFirstLinePipe } from
+  &#x27;filters/string-utility-filters/truncate-at-first-line.pipe&#x27;;
+
+describe(&#x27;Testing filters&#x27;, function() {
+  let truncateAtFirstLinePipe: TruncateAtFirstLinePipe = null;
+  beforeEach(() =&gt; {
+    truncateAtFirstLinePipe = new TruncateAtFirstLinePipe();
+  });
+
+  it(&#x27;should have all expected filters&#x27;, () =&gt; {
+    expect(truncateAtFirstLinePipe).not.toEqual(null);
+  });
+
+  it(&#x27;should truncate multi-line text to the first non-empty line&#x27;, () =&gt; {
+    expect(truncateAtFirstLinePipe.transform(&#x27;&#x27;)).toEqual(&#x27;&#x27;);
+    expect(truncateAtFirstLinePipe.transform(null)).toEqual(null);
+    expect(truncateAtFirstLinePipe.transform(undefined)).toEqual(undefined);
+
+    expect(truncateAtFirstLinePipe.transform(
+      &#x27; A   single line with spaces at either end. &#x27;)).toEqual(
+      &#x27; A   single line with spaces at either end. &#x27;);
+    expect(truncateAtFirstLinePipe.transform(&#x27;a\nb\nc&#x27;)).toEqual(&#x27;a...&#x27;);
+    expect(truncateAtFirstLinePipe.transform(
+      &#x27;Removes newline at end\n&#x27;)).toEqual(&#x27;Removes newline at end&#x27;);
+    expect(truncateAtFirstLinePipe.transform(&#x27;\nRemoves newline at beginning.&#x27;))
+      .toEqual(
+        &#x27;Removes newline at beginning.&#x27;);
+
+    expect(truncateAtFirstLinePipe.transform(&#x27;\n&#x27;)).toEqual(&#x27;&#x27;);
+    expect(truncateAtFirstLinePipe.transform(&#x27;\n\n\n&#x27;)).toEqual(&#x27;&#x27;);
+
+    // ---- Windows ----
+    expect(truncateAtFirstLinePipe.transform(
+      &#x27;Single line\r\nWindows EOL&#x27;)).toEqual(&#x27;Single line...&#x27;);
+    expect(truncateAtFirstLinePipe.transform(
+      &#x27;Single line\u000D\u000AEOL&#x27;)).toEqual(&#x27;Single line...&#x27;);
+    expect(truncateAtFirstLinePipe.transform(
+      &#x27;Single line\x0D\x0AEOL&#x27;)).toEqual(&#x27;Single line...&#x27;);
+    expect(truncateAtFirstLinePipe.transform(
+      &#x27;Single line\u000D\x0AEOL&#x27;)).toEqual(&#x27;Single line...&#x27;);
+    expect(truncateAtFirstLinePipe.transform(
+      &#x27;Single line\x0D\u000AEOL&#x27;)).toEqual(&#x27;Single line...&#x27;);
+
+    // ---- Mac ----
+    expect(truncateAtFirstLinePipe.transform(
+      &#x27;Single line\rEOL&#x27;)).toEqual(&#x27;Single line...&#x27;);
+    expect(truncateAtFirstLinePipe.transform(
+      &#x27;Single line\u000DEOL&#x27;)).toEqual(&#x27;Single line...&#x27;);
+    expect(truncateAtFirstLinePipe.transform(
+      &#x27;Single line\x0DEOL&#x27;)).toEqual(&#x27;Single line...&#x27;);
+
+    // ---- Linux ----
+    expect(truncateAtFirstLinePipe.transform(
+      &#x27;Single line\nEOL&#x27;)).toEqual(&#x27;Single line...&#x27;);
+    expect(truncateAtFirstLinePipe.transform(
+      &#x27;Single line\u000AEOL&#x27;)).toEqual(&#x27;Single line...&#x27;);
+    expect(truncateAtFirstLinePipe.transform(
+      &#x27;Single line\x0AEOL&#x27;)).toEqual(&#x27;Single line...&#x27;);
+
+    // ---- Vertical Tab ----
+    expect(truncateAtFirstLinePipe.transform(
+      &#x27;Vertical Tab\vEOL&#x27;)).toEqual(&#x27;Vertical Tab...&#x27;);
+    expect(truncateAtFirstLinePipe.transform(
+      &#x27;Vertical Tab\u000BEOL&#x27;)).toEqual(&#x27;Vertical Tab...&#x27;);
+    expect(truncateAtFirstLinePipe.transform(
+      &#x27;Vertical Tab\x0BEOL&#x27;)).toEqual(&#x27;Vertical Tab...&#x27;);
+
+    // ---- Form Feed ----
+    expect(truncateAtFirstLinePipe.transform(
+      &#x27;Form Feed\fEOL&#x27;)).toEqual(&#x27;Form Feed...&#x27;);
+    expect(truncateAtFirstLinePipe.transform(
+      &#x27;Form Feed\u000CEOL&#x27;)).toEqual(&#x27;Form Feed...&#x27;);
+    expect(truncateAtFirstLinePipe.transform(
+      &#x27;Form Feed\x0CEOL&#x27;)).toEqual(&#x27;Form Feed...&#x27;);
+
+    // ---- Next Line ----
+    expect(truncateAtFirstLinePipe.transform(
+      &#x27;Next Line\u0085EOL&#x27;)).toEqual(&#x27;Next Line...&#x27;);
+    expect(truncateAtFirstLinePipe.transform(
+      &#x27;Next Line\x85EOL&#x27;)).toEqual(&#x27;Next Line...&#x27;);
+
+    // ---- Line Separator ----
+    expect(truncateAtFirstLinePipe.transform(
+      &#x27;Line Separator\u2028EOL&#x27;)).toEqual(&#x27;Line Separator...&#x27;);
+
+    // ---- Paragraph Separator ----
+    expect(truncateAtFirstLinePipe.transform(
+      &#x27;Paragraph Separator\u2029EOL&#x27;)).toEqual(
+      &#x27;Paragraph Separator...&#x27;);
+  });
+});
+</textarea><pre id="annotations" style="display:none">[]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:57 GMT</p>
+    </body>
+  </html>
+  

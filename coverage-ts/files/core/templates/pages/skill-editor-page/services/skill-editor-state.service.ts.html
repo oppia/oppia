@@ -1,0 +1,270 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>skill-editor-state.service.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/skill-editor-page/services/skill-editor-state.service.ts</td><td class="">89.93%</td><td class="">100%</td><td class="">288</td><td class="">259</td><td class="">29</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Service for managing the state of the skill being edited
+ * in the skill editor.
+ */
+
+import cloneDeep from &#x27;lodash/cloneDeep&#x27;;
+
+import { EventEmitter, Injectable } from &#x27;@angular/core&#x27;;
+import { downgradeInjectable } from &#x27;@angular/upgrade/static&#x27;;
+
+import { UndoRedoService } from &#x27;domain/editor/undo_redo/undo-redo.service&#x27;;
+import { SkillBackendApiService } from &#x27;domain/skill/skill-backend-api.service&#x27;;
+import { SkillRights } from &#x27;domain/skill/skill-rights.model&#x27;;
+import { SkillRightsBackendApiService } from &#x27;domain/skill/skill-rights-backend-api.service&#x27;;
+import { SkillSummaryBackendDict } from &#x27;domain/skill/skill-summary.model&#x27;;
+import { Skill, SkillObjectFactory } from &#x27;domain/skill/SkillObjectFactory&#x27;;
+import { AlertsService } from &#x27;services/alerts.service&#x27;;
+import { QuestionsListService } from &#x27;services/questions-list.service&#x27;;
+
+export interface GroupedSkillSummaries {
+  current: {
+    id: string,
+    description: string,
+  }[],
+  others: SkillSummaryBackendDict[]
+}
+@Injectable({
+  providedIn: &#x27;root&#x27;
+})
+export class SkillEditorStateService {
+  constructor(
+    private alertsService: AlertsService,
+    private questionsListService: QuestionsListService,
+    private skillBackendApiService: SkillBackendApiService,
+    private skillObjectFactory: SkillObjectFactory,
+    private skillRightsBackendApiService: SkillRightsBackendApiService,
+    private undoRedoService: UndoRedoService
+  ) {}
+
+  private _skill: Skill = this.skillObjectFactory.createInterstitialSkill();
+  private _skillRights: SkillRights = (
+    SkillRights.createInterstitialSkillRights());
+  private _skillIsInitialized: boolean = false;
+  private assignedSkillTopicData = null;
+  private _skillIsBeingLoaded: boolean = false;
+  private _skillIsBeingSaved: boolean = false;
+  private _groupedSkillSummaries: GroupedSkillSummaries = {
+    current: [],
+    others: []
+  };
+  private _skillChangedEventEmitter = new EventEmitter();
+
+  private _setSkill = (skill: Skill) =&gt; {
+    this._skill.copyFromSkill(skill);
+    this._skillIsInitialized = true;
+    this._skillChangedEventEmitter.emit();
+  };
+
+  private _updateSkill = (skill: Skill) =&gt; {
+    this._setSkill(skill);
+  };
+
+  private _updateGroupedSkillSummaries = (groupedSkillSummaries) =&gt; {
+    let topicName = null;
+    this._groupedSkillSummaries.current = [];
+    this._groupedSkillSummaries.others = [];
+
+    for (let name in groupedSkillSummaries) {
+      const skillSummaries = groupedSkillSummaries[name];
+      for (let idx in skillSummaries) {
+        if (skillSummaries[idx].id === this._skill.getId()) {
+          topicName = name;
+          break;
+        }
+      }
+      if (topicName !== null) {
+        break;
+      }
+    }
+    for (let idx in groupedSkillSummaries[topicName]) {
+      this._groupedSkillSummaries.current.push(
+        groupedSkillSummaries[topicName][idx]);
+    }
+    for (let name in groupedSkillSummaries) {
+      if (name === topicName) {
+        continue;
+      }
+      const skillSummaries = groupedSkillSummaries[name];
+      for (let idx in skillSummaries) {
+        this._groupedSkillSummaries.others.push(skillSummaries[idx]);
+      }
+    }
+  };
+
+  private _setSkillRights = (skillRights: SkillRights) =&gt; {
+    this._skillRights.copyFromSkillRights(skillRights);
+  };
+
+  private _updateSkillRights = (newSkillRightsObject: SkillRights) =&gt; {
+    this._setSkillRights(newSkillRightsObject);
+  };
+
+  /**
+   * Loads, or reloads, the skill stored by this service given a
+   * specified collection ID. See setSkill() for more information on
+   * additional behavior of this function.
+   */
+  loadSkill(skillId: string): void {
+    this._skillIsBeingLoaded = true;
+    let skillDataPromise = this.skillBackendApiService.fetchSkillAsync(skillId);
+    let skillRightsPromise = (
+      this.skillRightsBackendApiService.fetchSkillRightsAsync(skillId));
+    Promise.all([skillDataPromise, skillRightsPromise]).then(
+      ([newBackendSkillObject, newSkillRightsObject]) =&gt; {
+        this._updateSkillRights(newSkillRightsObject);
+        this.assignedSkillTopicData = (
+          newBackendSkillObject.assignedSkillTopicData);
+        this._updateSkill(newBackendSkillObject.skill);
+        this._updateGroupedSkillSummaries(
+          newBackendSkillObject.groupedSkillSummaries);
+        this.questionsListService.getQuestionSummariesAsync(
+          skillId, true, false
+        );
+        this._skillIsBeingLoaded = false;
+      }, (error) =&gt; {
+        this.alertsService.addWarning(error);
+        this._skillIsBeingLoaded = false;
+      });
+  }
+  /**
+   * Returns whether this service is currently attempting to load the
+   * skill maintained by this service.
+   */
+  isLoadingSkill(): boolean {
+    return this._skillIsBeingLoaded;
+  }
+
+  getAssignedSkillTopicData(): string {
+    return this.assignedSkillTopicData;
+  }
+
+  getGroupedSkillSummaries(): GroupedSkillSummaries {
+    return cloneDeep(this._groupedSkillSummaries);
+  }
+  /**
+     * Returns whether a skill has yet been loaded using either
+     * loadSkill().
+     */
+  hasLoadedSkill(): boolean {
+    return this._skillIsInitialized;
+  }
+  /**
+   * Returns the current skill to be shared among the skill
+   * editor. Please note any changes to this skill will be propogated
+   * to all bindings to it. This skill object will be retained for the
+   * lifetime of the editor. This function never returns null, though it may
+   * return an empty skill object if the skill has not yet been
+   * loaded for this editor instance.
+   */
+  getSkill(): Skill {
+    return this._skill;
+  }
+  /**
+   * Attempts to save the current skill given a commit message. This
+   * function cannot be called until after a skill has been initialized
+   * in this service. Returns false if a save is not performed due to no
+   * changes pending, or true if otherwise. This function, upon success,
+   * will clear the UndoRedoService of pending changes. This function also
+   * shares behavior with setSkill(), when it succeeds.
+   */
+  saveSkill(
+      commitMessage: string,
+      successCallback: (value?: Object) =&gt; void): boolean {
+    if (!this._skillIsInitialized) {
+      this.alertsService.fatalWarning(
+        &#x27;Cannot save a skill before one is loaded.&#x27;);
+    }
+    // Don&#x27;t attempt to save the skill if there are no changes pending.
+    if (!this.undoRedoService.hasChanges()) {
+      return false;
+    }
+    this._skillIsBeingSaved = true;
+
+    this.skillBackendApiService.updateSkillAsync(
+      this._skill.getId(), this._skill.getVersion(), commitMessage,
+      this.undoRedoService.getCommittableChangeList()).then(
+      (skill) =&gt; {
+        this._updateSkill(skill);
+        this.undoRedoService.clearChanges();
+        this._skillIsBeingSaved = false;
+        if (successCallback) {
+          successCallback();
+        }
+      }, (error) =&gt; {
+        this.alertsService.addWarning(
+          error || &#x27;There was an error when saving the skill&#x27;);
+        this._skillIsBeingSaved = false;
+      });
+    return true;
+  }
+  /**
+   * Checks if the skill description exists and updates class
+   * variable. `create-new-skill-modal.controller` will search
+   * for that variable.
+   */
+  updateExistenceOfSkillDescription(
+      description: string, successCallback: (value?: Object) =&gt; void): void {
+    this.skillBackendApiService.doesSkillWithDescriptionExistAsync(
+      description).then(
+      (skillDescriptionExists) =&gt; {
+        successCallback(skillDescriptionExists);
+      }, (error) =&gt; {
+        this.alertsService.addWarning(
+          error ||
+          &#x27;There was an error when checking if the skill description &#x27; +
+          &#x27;exists for another skill.&#x27;);
+      });
+  }
+
+  get onSkillChange(): EventEmitter&lt;unknown&gt; {
+    return this._skillChangedEventEmitter;
+  }
+
+  getSkillRights(): SkillRights {
+    return this._skillRights;
+  }
+
+  isSavingSkill(): boolean {
+    return this._skillIsBeingSaved;
+  }
+
+  setSkillRights(skillRights: SkillRights): void {
+    this._setSkillRights(skillRights);
+  }
+}
+
+angular.module(&#x27;oppia&#x27;).factory(&#x27;SkillEditorStateService&#x27;,
+  downgradeInjectable(SkillEditorStateService));
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.ts&quot;,&quot;line&quot;:57,&quot;character&quot;:10,&quot;text&quot;:&quot;assignedSkillTopicData&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.ts&quot;,&quot;line&quot;:64,&quot;character&quot;:10,&quot;text&quot;:&quot;_skillChangedEventEmitter&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.ts&quot;,&quot;line&quot;:69,&quot;character&quot;:9,&quot;text&quot;:&quot;_skillChangedEventEmitter&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.ts&quot;,&quot;line&quot;:76,&quot;character&quot;:42,&quot;text&quot;:&quot;groupedSkillSummaries&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.ts&quot;,&quot;line&quot;:77,&quot;character&quot;:8,&quot;text&quot;:&quot;topicName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.ts&quot;,&quot;line&quot;:81,&quot;character&quot;:21,&quot;text&quot;:&quot;groupedSkillSummaries&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.ts&quot;,&quot;line&quot;:82,&quot;character&quot;:12,&quot;text&quot;:&quot;skillSummaries&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.ts&quot;,&quot;line&quot;:82,&quot;character&quot;:29,&quot;text&quot;:&quot;groupedSkillSummaries&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.ts&quot;,&quot;line&quot;:83,&quot;character&quot;:22,&quot;text&quot;:&quot;skillSummaries&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.ts&quot;,&quot;line&quot;:84,&quot;character&quot;:12,&quot;text&quot;:&quot;skillSummaries&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.ts&quot;,&quot;line&quot;:84,&quot;character&quot;:32,&quot;text&quot;:&quot;id&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.ts&quot;,&quot;line&quot;:85,&quot;character&quot;:10,&quot;text&quot;:&quot;topicName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.ts&quot;,&quot;line&quot;:89,&quot;character&quot;:10,&quot;text&quot;:&quot;topicName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.ts&quot;,&quot;line&quot;:93,&quot;character&quot;:20,&quot;text&quot;:&quot;groupedSkillSummaries&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.ts&quot;,&quot;line&quot;:93,&quot;character&quot;:42,&quot;text&quot;:&quot;topicName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.ts&quot;,&quot;line&quot;:95,&quot;character&quot;:8,&quot;text&quot;:&quot;groupedSkillSummaries&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.ts&quot;,&quot;line&quot;:95,&quot;character&quot;:30,&quot;text&quot;:&quot;topicName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.ts&quot;,&quot;line&quot;:97,&quot;character&quot;:21,&quot;text&quot;:&quot;groupedSkillSummaries&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.ts&quot;,&quot;line&quot;:98,&quot;character&quot;:19,&quot;text&quot;:&quot;topicName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.ts&quot;,&quot;line&quot;:101,&quot;character&quot;:12,&quot;text&quot;:&quot;skillSummaries&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.ts&quot;,&quot;line&quot;:101,&quot;character&quot;:29,&quot;text&quot;:&quot;groupedSkillSummaries&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.ts&quot;,&quot;line&quot;:102,&quot;character&quot;:22,&quot;text&quot;:&quot;skillSummaries&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.ts&quot;,&quot;line&quot;:103,&quot;character&quot;:48,&quot;text&quot;:&quot;skillSummaries&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.ts&quot;,&quot;line&quot;:129,&quot;character&quot;:13,&quot;text&quot;:&quot;assignedSkillTopicData&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.ts&quot;,&quot;line&quot;:138,&quot;character&quot;:10,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.ts&quot;,&quot;line&quot;:152,&quot;character&quot;:16,&quot;text&quot;:&quot;assignedSkillTopicData&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.ts&quot;,&quot;line&quot;:207,&quot;character&quot;:10,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.ts&quot;,&quot;line&quot;:225,&quot;character&quot;:10,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.ts&quot;,&quot;line&quot;:234,&quot;character&quot;:16,&quot;text&quot;:&quot;_skillChangedEventEmitter&quot;,&quot;kind&quot;:2}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:56 GMT</p>
+    </body>
+  </html>
+  

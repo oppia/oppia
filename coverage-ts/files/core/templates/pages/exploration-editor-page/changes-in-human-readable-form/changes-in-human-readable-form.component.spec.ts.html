@@ -1,0 +1,787 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>changes-in-human-readable-form.component.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts</td><td class="">42.94%</td><td class="">100%</td><td class="">687</td><td class="">295</td><td class="">392</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for ChangesInHumanReadableForm directive.
+*/
+
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { UpgradedServices } from &#x27;services/UpgradedServices&#x27;;
+// ^^^ This block is to be removed.
+import { TranslatorProviderForTests } from &#x27;tests/test.extras&#x27;;
+
+// This function is a helper to clean the compiled html for each test, in
+// order to make a cleaner assertion.
+var cleanCompiledHtml = function(html) {
+  return html
+    // AngularJS uses comments in some directives in order to figure out
+    // where the last element was placed in relation.
+    // Ref: https://github.com/angular/angular.js/issues/8722.
+    .replace(/&lt;!----&gt;/g, &#x27;&#x27;)
+    // Removes all ng-content elements.
+    .replace(/&lt;(ng-content|\/ng-content).*&gt;/g, &#x27;&#x27;)
+    // Removes all ng-repeat directives that is not the last attribute
+    // described in an element.
+    .replace(/(ng-repeat=&quot;.*&quot;\s)/g, &#x27;&#x27;)
+    // Removes all ng-repeat directives that is the last attribute
+    // described in an element.
+    .replace(/\sng-repeat=&quot;.*&quot;/g, &#x27;&#x27;)
+    // Removes all ng-if directives that is not the last attribute
+    // described in an element.
+    .replace(/(ng-if=&quot;.*&quot;\s)/g, &#x27;&#x27;)
+    // Removes all ng-if directives that is the last attribute
+    // described in an element.
+    .replace(/\sng-if=&quot;.*&quot;/g, &#x27;&#x27;)
+    // Removes all ng-show directives that is not the last attribute
+    // described in an element.
+    .replace(/ng-show=&quot;.*&quot;\s/g, &#x27;&#x27;)
+    // Removes all ng-show directives that is the last attribute
+    // described in an element.
+    .replace(/\sng-show=&quot;.*&quot;/g, &#x27;&#x27;)
+    // Removes all ng-switch directives that is the last attribute
+    // described in an element.
+    .replace(/ng-switch=&quot;.*&quot;\s/, &#x27;&#x27;)
+    // Removes all ng-switch directives that is the last attribute
+    // described in an element.
+    .replace(/\sng-switch=&quot;.*&quot;/, &#x27;&#x27;)
+    // Removes all ng-switch-when directives that is not the last attribute
+    // described in an element.
+    .replace(/ng-switch-when=&quot;.*&quot;\s/, &#x27;&#x27;)
+    // Removes all ng-switch-when directives that is the last attribute
+    // described in an element.
+    .replace(/\sng-switch-when=&quot;.*&quot;/, &#x27;&#x27;)
+    // Removes all ng-bind-html directives that is not the last attribute
+    // described in an element.
+    .replace(/ng-bind-html=&quot;.*&quot;\s/, &#x27;&#x27;)
+    // Removes all ng-bind-html directives that is the last attribute
+    // described in an element.
+    .replace(/\sng-bind-html=&quot;.*&quot;/, &#x27;&#x27;)
+    // Removes all indentation spaces.
+    .replace(/\s{2,}/g, &#x27;&#x27;)
+    // Removes all line breaks.
+    .replace(/\n/g, &#x27;&#x27;);
+};
+
+describe(&#x27;Changes in Human Readable Form Directive&#x27;, function() {
+  var $compile = null;
+  var scope = null;
+  var LostChangeObjectFactory = null;
+  var OutcomeObjectFactory = null;
+
+  beforeEach(angular.mock.module(&#x27;directiveTemplates&#x27;));
+  beforeEach(
+    angular.mock.module(&#x27;oppia&#x27;, TranslatorProviderForTests));
+  beforeEach(angular.mock.module(&#x27;oppia&#x27;, function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
+  beforeEach(angular.mock.inject(function($injector, $rootScope, _$compile_) {
+    $compile = _$compile_;
+    scope = $rootScope.$new();
+    LostChangeObjectFactory = $injector.get(&#x27;LostChangeObjectFactory&#x27;);
+    OutcomeObjectFactory = $injector.get(&#x27;OutcomeObjectFactory&#x27;);
+  }));
+
+  it(&#x27;should make human readable when adding a state&#x27;, function() {
+    scope.lostChanges = [LostChangeObjectFactory.createNew({
+      cmd: &#x27;add_state&#x27;,
+      state_name: &#x27;State name&#x27;,
+    })];
+
+    var element = angular.element(
+      &#x27;&lt;changes-in-human-readable-form lost-changes=&quot;lostChanges&quot;&gt;&#x27; +
+      &#x27;&lt;/changes-in-human-readable-form&gt;&#x27;);
+    var elementCompiled = $compile(element)(scope);
+    scope.$digest();
+
+    var html = cleanCompiledHtml(elementCompiled.html());
+    expect(html).toBe(
+      &#x27;&lt;div class=&quot;oppia-lost-changes&quot;&gt;&#x27; +
+      &#x27;&lt;ul&gt;&#x27; +
+      &#x27;&lt;li&gt;&#x27; +
+      &#x27;&lt;span&gt;Added state: &#x27; + scope.lostChanges[0].stateName + &#x27;&lt;/span&gt;&#x27; +
+      &#x27;&lt;/li&gt;&#x27; +
+      &#x27;&lt;/ul&gt;&#x27; +
+      &#x27;&lt;/div&gt;&#x27;
+    );
+  });
+
+  it(&#x27;should make human readable when renaming a state&#x27;, function() {
+    scope.lostChanges = [LostChangeObjectFactory.createNew({
+      cmd: &#x27;rename_state&#x27;,
+      old_state_name: &#x27;Old state name&#x27;,
+      new_state_name: &#x27;New state name&#x27;
+    })];
+
+    var element = angular.element(
+      &#x27;&lt;changes-in-human-readable-form lost-changes=&quot;lostChanges&quot;&gt;&#x27; +
+      &#x27;&lt;/changes-in-human-readable-form&gt;&#x27;);
+    var elementCompiled = $compile(element)(scope);
+    scope.$digest();
+
+    var html = cleanCompiledHtml(elementCompiled.html());
+    expect(html).toBe(
+      &#x27;&lt;div class=&quot;oppia-lost-changes&quot;&gt;&#x27; +
+      &#x27;&lt;ul&gt;&#x27; +
+      &#x27;&lt;li&gt;&#x27; +
+      &#x27;&lt;span&gt;Renamed state: &#x27; + scope.lostChanges[0].oldStateName +
+      &#x27; to &#x27; + scope.lostChanges[0].newStateName + &#x27;&lt;/span&gt;&#x27; +
+      &#x27;&lt;/li&gt;&#x27; +
+      &#x27;&lt;/ul&gt;&#x27; +
+      &#x27;&lt;/div&gt;&#x27;
+    );
+  });
+
+  it(&#x27;should make human readable when deleting a state&#x27;, function() {
+    scope.lostChanges = [LostChangeObjectFactory.createNew({
+      cmd: &#x27;delete_state&#x27;,
+      state_name: &#x27;Deleted state name&#x27;
+    })];
+
+    var element = angular.element(
+      &#x27;&lt;changes-in-human-readable-form lost-changes=&quot;lostChanges&quot;&gt;&#x27; +
+      &#x27;&lt;/changes-in-human-readable-form&gt;&#x27;);
+    var elementCompiled = $compile(element)(scope);
+    scope.$digest();
+
+    var html = cleanCompiledHtml(elementCompiled.html());
+    expect(html).toBe(
+      &#x27;&lt;div class=&quot;oppia-lost-changes&quot;&gt;&#x27; +
+      &#x27;&lt;ul&gt;&#x27; +
+      &#x27;&lt;li&gt;&#x27; +
+      &#x27;&lt;span&gt;Deleted state: &#x27; + scope.lostChanges[0].stateName + &#x27;&lt;/span&gt;&#x27; +
+      &#x27;&lt;/li&gt;&#x27; +
+      &#x27;&lt;/ul&gt;&#x27; +
+      &#x27;&lt;/div&gt;&#x27;
+    );
+  });
+
+  it(&#x27;should make human readable when editing a state with property content&#x27;,
+    function() {
+      scope.lostChanges = [LostChangeObjectFactory.createNew({
+        cmd: &#x27;edit_state_property&#x27;,
+        state_name: &#x27;Edited state name&#x27;,
+        new_value: {
+          html: &#x27;newValue&#x27;
+        },
+        old_value: {
+          html: &#x27;oldValue&#x27;
+        },
+        property_name: &#x27;content&#x27;
+      })];
+
+      var element = angular.element(
+        &#x27;&lt;changes-in-human-readable-form lost-changes=&quot;lostChanges&quot;&gt;&#x27; +
+        &#x27;&lt;/changes-in-human-readable-form&gt;&#x27;);
+      var elementCompiled = $compile(element)(scope);
+      scope.$digest();
+
+      var html = cleanCompiledHtml(elementCompiled.html());
+      expect(html).toBe(
+        &#x27;&lt;div class=&quot;oppia-lost-changes&quot;&gt;&#x27; +
+        &#x27;&lt;ul&gt;&#x27; +
+        &#x27;&lt;li&gt;&#x27; +
+        &#x27;&lt;div&gt;&#x27; +
+        &#x27;Edits to state: &#x27; + scope.lostChanges[0].stateName +
+        &#x27;&lt;div&gt;&#x27; +
+        &#x27;&lt;div class=&quot;state-edit-desc&quot;&gt;&#x27; +
+        &#x27;&lt;strong&gt;Edited content: &lt;/strong&gt;&#x27; +
+        &#x27;&lt;div class=&quot;content&quot;&gt;&#x27; + scope.lostChanges[0].newValue.html +
+        &#x27;&lt;/div&gt;&#x27; +
+        &#x27;&lt;/div&gt;&#x27; +
+        &#x27;&lt;/div&gt;&#x27; +
+        &#x27;&lt;/div&gt;&#x27; +
+        &#x27;&lt;/li&gt;&#x27; +
+        &#x27;&lt;/ul&gt;&#x27; +
+        &#x27;&lt;/div&gt;&#x27;
+      );
+    });
+
+  it(&#x27;should make human readable when editing a state with property&#x27; +
+  &#x27; widget_id and exploration ended&#x27;, function() {
+    scope.lostChanges = [LostChangeObjectFactory.createNew({
+      cmd: &#x27;edit_state_property&#x27;,
+      state_name: &#x27;Edited state name&#x27;,
+      new_value: &#x27;EndExploration&#x27;,
+      old_value: null,
+      property_name: &#x27;widget_id&#x27;
+    })];
+
+    var element = angular.element(
+      &#x27;&lt;changes-in-human-readable-form lost-changes=&quot;lostChanges&quot;&gt;&#x27; +
+      &#x27;&lt;/changes-in-human-readable-form&gt;&#x27;);
+    var elementCompiled = $compile(element)(scope);
+    scope.$digest();
+
+    var html = cleanCompiledHtml(elementCompiled.html());
+    expect(html).toBe(
+      &#x27;&lt;div class=&quot;oppia-lost-changes&quot;&gt;&#x27; +
+      &#x27;&lt;ul&gt;&#x27; +
+      &#x27;&lt;li&gt;&#x27; +
+      &#x27;&lt;div&gt;&#x27; +
+      &#x27;Edits to state: &#x27; + scope.lostChanges[0].stateName +
+      &#x27;&lt;div class=&quot;state-edit-desc&quot;&gt;&#x27; +
+      &#x27;&lt;span&gt;Ended Exploration&lt;/span&gt;&#x27; +
+      &#x27;&lt;/div&gt;&#x27; +
+      &#x27;&lt;/div&gt;&#x27; +
+      &#x27;&lt;/li&gt;&#x27; +
+      &#x27;&lt;/ul&gt;&#x27; +
+      &#x27;&lt;/div&gt;&#x27;
+    );
+  });
+
+  it(&#x27;should make human readable when editing a state with property&#x27; +
+    &#x27; widget_id and an interaction is added&#x27;, function() {
+    scope.lostChanges = [LostChangeObjectFactory.createNew({
+      cmd: &#x27;edit_state_property&#x27;,
+      state_name: &#x27;Edited state name&#x27;,
+      new_value: &#x27;Exploration&#x27;,
+      old_value: null,
+      property_name: &#x27;widget_id&#x27;
+    })];
+
+    var element = angular.element(
+      &#x27;&lt;changes-in-human-readable-form lost-changes=&quot;lostChanges&quot;&gt;&#x27; +
+      &#x27;&lt;/changes-in-human-readable-form&gt;&#x27;);
+    var elementCompiled = $compile(element)(scope);
+    scope.$digest();
+
+    var html = cleanCompiledHtml(elementCompiled.html());
+    expect(html).toBe(
+      &#x27;&lt;div class=&quot;oppia-lost-changes&quot;&gt;&#x27; +
+      &#x27;&lt;ul&gt;&#x27; +
+      &#x27;&lt;li&gt;&#x27; +
+      &#x27;&lt;div&gt;&#x27; +
+      &#x27;Edits to state: &#x27; + scope.lostChanges[0].stateName +
+      &#x27;&lt;div class=&quot;state-edit-desc&quot;&gt;&#x27; +
+      &#x27;&lt;span&gt;&#x27; +
+      &#x27;&lt;strong&gt;Added Interaction: &lt;/strong&gt;&#x27; + scope.lostChanges[0].newValue +
+      &#x27;&lt;/span&gt;&#x27; +
+      &#x27;&lt;/div&gt;&#x27; +
+      &#x27;&lt;/div&gt;&#x27; +
+      &#x27;&lt;/li&gt;&#x27; +
+      &#x27;&lt;/ul&gt;&#x27; +
+      &#x27;&lt;/div&gt;&#x27;
+    );
+  });
+
+  it(&#x27;should make human readable when editing a state with property&#x27; +
+    &#x27; widget_id and an interaction is deleted&#x27;, function() {
+    scope.lostChanges = [LostChangeObjectFactory.createNew({
+      cmd: &#x27;edit_state_property&#x27;,
+      state_name: &#x27;Edited state name&#x27;,
+      new_value: null,
+      old_value: &#x27;EndExploration&#x27;,
+      property_name: &#x27;widget_id&#x27;
+    })];
+
+    var element = angular.element(
+      &#x27;&lt;changes-in-human-readable-form lost-changes=&quot;lostChanges&quot;&gt;&#x27; +
+      &#x27;&lt;/changes-in-human-readable-form&gt;&#x27;);
+    var elementCompiled = $compile(element)(scope);
+    scope.$digest();
+
+    var html = cleanCompiledHtml(elementCompiled.html());
+    expect(html).toBe(
+      &#x27;&lt;div class=&quot;oppia-lost-changes&quot;&gt;&#x27; +
+      &#x27;&lt;ul&gt;&#x27; +
+      &#x27;&lt;li&gt;&#x27; +
+      &#x27;&lt;div&gt;&#x27; +
+      &#x27;Edits to state: &#x27; + scope.lostChanges[0].stateName +
+      &#x27;&lt;div class=&quot;state-edit-desc&quot;&gt;&#x27; +
+      &#x27;&lt;span&gt;&#x27; +
+      &#x27;&lt;strong&gt;Deleted Interaction: &lt;/strong&gt;&#x27; +
+      scope.lostChanges[0].oldValue +
+      &#x27;&lt;/span&gt;&#x27; +
+      &#x27;&lt;/div&gt;&#x27; +
+      &#x27;&lt;/div&gt;&#x27; +
+      &#x27;&lt;/li&gt;&#x27; +
+      &#x27;&lt;/ul&gt;&#x27; +
+      &#x27;&lt;/div&gt;&#x27;
+    );
+  });
+
+  it(&#x27;should make human readable when editing a state with property&#x27; +
+  &#x27; widget_customization_args and an interaction is added&#x27;, function() {
+    scope.lostChanges = [LostChangeObjectFactory.createNew({
+      cmd: &#x27;edit_state_property&#x27;,
+      state_name: &#x27;Edited state name&#x27;,
+      new_value: {
+        property1: true
+      },
+      old_value: {},
+      property_name: &#x27;widget_customization_args&#x27;
+    })];
+
+    var element = angular.element(
+      &#x27;&lt;changes-in-human-readable-form lost-changes=&quot;lostChanges&quot;&gt;&#x27; +
+      &#x27;&lt;/changes-in-human-readable-form&gt;&#x27;);
+    var elementCompiled = $compile(element)(scope);
+    scope.$digest();
+
+    var html = cleanCompiledHtml(elementCompiled.html());
+    expect(html).toBe(
+      &#x27;&lt;div class=&quot;oppia-lost-changes&quot;&gt;&#x27; +
+      &#x27;&lt;ul&gt;&#x27; +
+      &#x27;&lt;li&gt;&#x27; +
+      &#x27;&lt;div&gt;&#x27; +
+      &#x27;Edits to state: &#x27; + scope.lostChanges[0].stateName +
+      &#x27;&lt;div class=&quot;state-edit-desc&quot;&gt;&#x27; +
+      &#x27;&lt;span&gt;Added Interaction Customizations&lt;/span&gt;&#x27; +
+      &#x27;&lt;/div&gt;&#x27; +
+      &#x27;&lt;/div&gt;&#x27; +
+      &#x27;&lt;/li&gt;&#x27; +
+      &#x27;&lt;/ul&gt;&#x27; +
+      &#x27;&lt;/div&gt;&#x27;
+    );
+  });
+
+  it(&#x27;should make human readable when editing a state with property&#x27; +
+  &#x27; widget_customization_args and an interaction is removed&#x27;, function() {
+    scope.lostChanges = [LostChangeObjectFactory.createNew({
+      cmd: &#x27;edit_state_property&#x27;,
+      state_name: &#x27;Edited state name&#x27;,
+      new_value: {},
+      old_value: {
+        property1: true
+      },
+      property_name: &#x27;widget_customization_args&#x27;
+    })];
+
+    var element = angular.element(
+      &#x27;&lt;changes-in-human-readable-form lost-changes=&quot;lostChanges&quot;&gt;&#x27; +
+      &#x27;&lt;/changes-in-human-readable-form&gt;&#x27;);
+    var elementCompiled = $compile(element)(scope);
+    scope.$digest();
+
+    var html = cleanCompiledHtml(elementCompiled.html());
+    expect(html).toBe(
+      &#x27;&lt;div class=&quot;oppia-lost-changes&quot;&gt;&#x27; +
+      &#x27;&lt;ul&gt;&#x27; +
+      &#x27;&lt;li&gt;&#x27; +
+      &#x27;&lt;div&gt;&#x27; +
+      &#x27;Edits to state: &#x27; + scope.lostChanges[0].stateName +
+      &#x27;&lt;div class=&quot;state-edit-desc&quot;&gt;&#x27; +
+      &#x27;&lt;span&gt;Removed Interaction Customizations&lt;/span&gt;&#x27; +
+      &#x27;&lt;/div&gt;&#x27; +
+      &#x27;&lt;/div&gt;&#x27; +
+      &#x27;&lt;/li&gt;&#x27; +
+      &#x27;&lt;/ul&gt;&#x27; +
+      &#x27;&lt;/div&gt;&#x27;
+    );
+  });
+
+  it(&#x27;should make human readable when editing a state with property&#x27; +
+  &#x27; widget_customization_args and an interaction is edited&#x27;, function() {
+    scope.lostChanges = [LostChangeObjectFactory.createNew({
+      cmd: &#x27;edit_state_property&#x27;,
+      state_name: &#x27;Edited state name&#x27;,
+      new_value: {
+        property1: true
+      },
+      old_value: {
+        property1: true
+      },
+      property_name: &#x27;widget_customization_args&#x27;
+    })];
+
+    var element = angular.element(
+      &#x27;&lt;changes-in-human-readable-form lost-changes=&quot;lostChanges&quot;&gt;&#x27; +
+      &#x27;&lt;/changes-in-human-readable-form&gt;&#x27;);
+    var elementCompiled = $compile(element)(scope);
+    scope.$digest();
+
+    var html = cleanCompiledHtml(elementCompiled.html());
+    expect(html).toBe(
+      &#x27;&lt;div class=&quot;oppia-lost-changes&quot;&gt;&#x27; +
+      &#x27;&lt;ul&gt;&#x27; +
+      &#x27;&lt;li&gt;&#x27; +
+      &#x27;&lt;div&gt;&#x27; +
+      &#x27;Edits to state: &#x27; + scope.lostChanges[0].stateName +
+      &#x27;&lt;div class=&quot;state-edit-desc&quot;&gt;&#x27; +
+      &#x27;&lt;span&gt;Edited Interaction Customizations&lt;/span&gt;&#x27; +
+      &#x27;&lt;/div&gt;&#x27; +
+      &#x27;&lt;/div&gt;&#x27; +
+      &#x27;&lt;/li&gt;&#x27; +
+      &#x27;&lt;/ul&gt;&#x27; +
+      &#x27;&lt;/div&gt;&#x27;
+    );
+  });
+
+  it(&#x27;should make human readable when editing a state with property&#x27; +
+  &#x27; answer_groups and a change is added&#x27;, function() {
+    scope.lostChanges = [LostChangeObjectFactory.createNew({
+      cmd: &#x27;edit_state_property&#x27;,
+      state_name: &#x27;Edited state name&#x27;,
+      new_value: {
+        outcome: OutcomeObjectFactory.createFromBackendDict({
+          dest: &#x27;outcome 2&#x27;,
+          feedback: {
+            content_id: &#x27;feedback_2&#x27;,
+            html: &#x27;Html&#x27;
+          },
+        }),
+        rules: [{
+          type: &#x27;Type1&#x27;,
+          inputs: {
+            input1: &#x27;input1&#x27;,
+            input2: &#x27;input2&#x27;
+          }
+        }]
+      },
+      old_value: {},
+      property_name: &#x27;answer_groups&#x27;
+    })];
+
+    var element = angular.element(
+      &#x27;&lt;changes-in-human-readable-form lost-changes=&quot;lostChanges&quot;&gt;&#x27; +
+      &#x27;&lt;/changes-in-human-readable-form&gt;&#x27;);
+    var elementCompiled = $compile(element)(scope);
+    scope.$digest();
+
+    var html = cleanCompiledHtml(elementCompiled.html());
+    expect(html).toBe(
+      &#x27;&lt;div class=&quot;oppia-lost-changes&quot;&gt;&#x27; +
+      &#x27;&lt;ul&gt;&#x27; +
+      &#x27;&lt;li&gt;&#x27; +
+      &#x27;&lt;div&gt;Edits to state: &#x27; + scope.lostChanges[0].stateName +
+      &#x27;&lt;div&gt;&#x27; +
+      &#x27;&lt;div class=&quot;state-edit-desc answer-group&quot;&gt;&#x27; +
+      &#x27;&lt;strong&gt;Added answer group: &lt;/strong&gt;&#x27; +
+      &#x27;&lt;p class=&quot;sub-edit&quot;&gt;&lt;i&gt;Destination: &lt;/i&gt;&#x27; +
+      scope.lostChanges[0].newValue.outcome.dest + &#x27;&lt;/p&gt;&#x27; +
+      &#x27;&lt;div class=&quot;sub-edit&quot;&gt;&lt;i&gt;Feedback: &lt;/i&gt;&#x27; +
+      &#x27;&lt;div class=&quot;feedback&quot;&gt;&#x27; +
+      scope.lostChanges[0].newValue.outcome.feedback.html +
+      &#x27;&lt;/div&gt;&#x27; +
+      &#x27;&lt;/div&gt;&#x27; +
+      &#x27;&lt;div class=&quot;sub-edit&quot;&gt;&lt;i&gt;Rules: &lt;/i&gt;&#x27; +
+      &#x27;&lt;ol class=&quot;rules-list&quot;&gt;&#x27; +
+      &#x27;&lt;li&gt;&#x27; +
+      &#x27;&lt;p&gt;Type: &#x27; + scope.lostChanges[0].newValue.rules[0].type + &#x27;&lt;/p&gt;&#x27; +
+      &#x27;&lt;p&gt;Value:&lt;span&gt; &lt;/span&gt;&#x27; +
+      Object.keys(scope.lostChanges[0].newValue.rules[0].inputs).toString() +
+      &#x27;&lt;/p&gt;&#x27; +
+      &#x27;&lt;/li&gt;&#x27; +
+      &#x27;&lt;/ol&gt;&#x27; +
+      &#x27;&lt;/div&gt;&#x27; +
+      &#x27;&lt;/div&gt;&#x27; +
+      &#x27;&lt;/div&gt;&#x27; +
+      &#x27;&lt;/div&gt;&#x27; +
+      &#x27;&lt;/li&gt;&#x27; +
+      &#x27;&lt;/ul&gt;&#x27; +
+      &#x27;&lt;/div&gt;&#x27;
+    );
+  });
+
+  it(&#x27;should make human readable when editing a state with property&#x27; +
+  &#x27; answer_groups and a change is edited&#x27;, function() {
+    scope.lostChanges = [LostChangeObjectFactory.createNew({
+      cmd: &#x27;edit_state_property&#x27;,
+      state_name: &#x27;Edited state name&#x27;,
+      new_value: {
+        outcome: OutcomeObjectFactory.createFromBackendDict({
+          dest: &#x27;outcome 2&#x27;,
+          feedback: {
+            content_id: &#x27;feedback_2&#x27;,
+            html: &#x27;Html&#x27;
+          },
+        }),
+        rules: [{
+          type: &#x27;Type1&#x27;,
+          inputs: {
+            input1: &#x27;input1&#x27;,
+            input2: &#x27;input2&#x27;
+          }
+        }]
+      },
+      old_value: {
+        outcome: OutcomeObjectFactory.createFromBackendDict({
+          dest: &#x27;outcome 1&#x27;,
+          feedback: {
+            content_id: &#x27;feedback_2&#x27;,
+            html: &#x27;Html&#x27;
+          },
+        }),
+        rules: [{
+          type: &#x27;Type1&#x27;,
+          inputs: {
+            input1: &#x27;input1&#x27;,
+            input2: &#x27;input2&#x27;
+          }
+        }]
+      },
+      property_name: &#x27;answer_groups&#x27;
+    })];
+
+    var element = angular.element(
+      &#x27;&lt;changes-in-human-readable-form lost-changes=&quot;lostChanges&quot;&gt;&#x27; +
+      &#x27;&lt;/changes-in-human-readable-form&gt;&#x27;);
+    var elementCompiled = $compile(element)(scope);
+    scope.$digest();
+
+    var html = cleanCompiledHtml(elementCompiled.html());
+    expect(html).toBe(
+      &#x27;&lt;div class=&quot;oppia-lost-changes&quot;&gt;&#x27; +
+      &#x27;&lt;ul&gt;&#x27; +
+      &#x27;&lt;li&gt;&#x27; +
+      &#x27;&lt;div&gt;Edits to state: &#x27; + scope.lostChanges[0].stateName +
+      &#x27;&lt;div&gt;&#x27; +
+      &#x27;&lt;div class=&quot;state-edit-desc answer-group&quot;&gt;&#x27; +
+      &#x27;&lt;strong&gt;Edited answer group: &lt;/strong&gt;&#x27; +
+      &#x27;&lt;p class=&quot;sub-edit&quot;&gt;&lt;i&gt;Destination: &lt;/i&gt;&#x27; +
+      scope.lostChanges[0].newValue.outcome.dest + &#x27;&lt;/p&gt;&#x27; +
+      &#x27;&lt;div class=&quot;sub-edit&quot;&gt;&lt;i&gt;Feedback: &lt;/i&gt;&#x27; +
+      &#x27;&lt;div class=&quot;feedback&quot;&gt;&#x27; +
+      scope.lostChanges[0].newValue.outcome.feedback.html +
+      &#x27;&lt;/div&gt;&#x27; +
+      &#x27;&lt;/div&gt;&#x27; +
+      &#x27;&lt;div class=&quot;sub-edit&quot;&gt;&lt;i&gt;Rules: &lt;/i&gt;&#x27; +
+      &#x27;&lt;ol class=&quot;rules-list&quot;&gt;&#x27; +
+      &#x27;&lt;li&gt;&#x27; +
+      &#x27;&lt;p&gt;Type: &#x27; + scope.lostChanges[0].newValue.rules[0].type + &#x27;&lt;/p&gt;&#x27; +
+      &#x27;&lt;p&gt;Value:&lt;span&gt; &lt;/span&gt;&#x27; +
+      Object.keys(scope.lostChanges[0].newValue.rules[0].inputs).toString() +
+      &#x27;&lt;/p&gt;&#x27; +
+      &#x27;&lt;/li&gt;&#x27; +
+      &#x27;&lt;/ol&gt;&#x27; +
+      &#x27;&lt;/div&gt;&#x27; +
+      &#x27;&lt;/div&gt;&#x27; +
+      &#x27;&lt;/div&gt;&#x27; +
+      &#x27;&lt;/div&gt;&#x27; +
+      &#x27;&lt;/li&gt;&#x27; +
+      &#x27;&lt;/ul&gt;&#x27; +
+      &#x27;&lt;/div&gt;&#x27;
+    );
+  });
+
+  it(&#x27;should make human readable when editing a state with property&#x27; +
+  &#x27; answer_groups and a change is deleted&#x27;, function() {
+    scope.lostChanges = [LostChangeObjectFactory.createNew({
+      cmd: &#x27;edit_state_property&#x27;,
+      state_name: &#x27;Edited state name&#x27;,
+      new_value: {},
+      old_value: {
+        outcome: OutcomeObjectFactory.createFromBackendDict({
+          dest: &#x27;outcome 1&#x27;,
+          feedback: {
+            content_id: &#x27;feedback_2&#x27;,
+            html: &#x27;Html&#x27;
+          },
+        }),
+        rules: [{
+          type: &#x27;Type1&#x27;,
+          inputs: {
+            input1: &#x27;input1&#x27;,
+            input2: &#x27;input2&#x27;
+          }
+        }]
+      },
+      property_name: &#x27;answer_groups&#x27;
+    })];
+
+    var element = angular.element(
+      &#x27;&lt;changes-in-human-readable-form lost-changes=&quot;lostChanges&quot;&gt;&#x27; +
+      &#x27;&lt;/changes-in-human-readable-form&gt;&#x27;);
+    var elementCompiled = $compile(element)(scope);
+    scope.$digest();
+
+    var html = cleanCompiledHtml(elementCompiled.html());
+    expect(html).toBe(
+      &#x27;&lt;div class=&quot;oppia-lost-changes&quot;&gt;&#x27; +
+      &#x27;&lt;ul&gt;&#x27; +
+      &#x27;&lt;li&gt;&#x27; +
+      &#x27;&lt;div&gt;Edits to state: &#x27; + scope.lostChanges[0].stateName +
+      &#x27;&lt;div&gt;&#x27; +
+      &#x27;&lt;div class=&quot;state-edit-desc&quot;&gt;&#x27; +
+      &#x27;Deleted answer group&#x27; +
+      &#x27;&lt;/div&gt;&#x27; +
+      &#x27;&lt;/div&gt;&#x27; +
+      &#x27;&lt;/div&gt;&#x27; +
+      &#x27;&lt;/li&gt;&#x27; +
+      &#x27;&lt;/ul&gt;&#x27; +
+      &#x27;&lt;/div&gt;&#x27;
+    );
+  });
+
+  it(&#x27;should make human readable when editing a state with property&#x27; +
+  &#x27; default_outcome and a change is added&#x27;, function() {
+    scope.lostChanges = [LostChangeObjectFactory.createNew({
+      cmd: &#x27;edit_state_property&#x27;,
+      state_name: &#x27;Edited state name&#x27;,
+      new_value: OutcomeObjectFactory.createFromBackendDict({
+        dest: &#x27;outcome 2&#x27;,
+        feedback: {
+          content_id: &#x27;feedback_2&#x27;,
+          html: &#x27;Html&#x27;
+        },
+      }),
+      old_value: {},
+      property_name: &#x27;default_outcome&#x27;
+    })];
+
+    var element = angular.element(
+      &#x27;&lt;changes-in-human-readable-form lost-changes=&quot;lostChanges&quot;&gt;&#x27; +
+      &#x27;&lt;/changes-in-human-readable-form&gt;&#x27;);
+    var elementCompiled = $compile(element)(scope);
+    scope.$digest();
+
+    var html = cleanCompiledHtml(elementCompiled.html());
+    expect(html).toBe(
+      &#x27;&lt;div class=&quot;oppia-lost-changes&quot;&gt;&#x27; +
+      &#x27;&lt;ul&gt;&#x27; +
+      &#x27;&lt;li&gt;&#x27; +
+      &#x27;&lt;div&gt;Edits to state: &#x27; + scope.lostChanges[0].stateName +
+      &#x27;&lt;div&gt;&#x27; +
+      &#x27;&lt;div class=&quot;state-edit-desc default-outcome&quot;&gt;&#x27; +
+      &#x27;Added default outcome:&#x27; +
+      &#x27;&lt;p class=&quot;sub-edit&quot;&gt;&lt;i&gt;Destination: &lt;/i&gt;&#x27; +
+      scope.lostChanges[0].newValue.dest + &#x27;&lt;/p&gt;&#x27; +
+      &#x27;&lt;div class=&quot;sub-edit&quot;&gt;&lt;i&gt;Feedback: &lt;/i&gt;&#x27; +
+      &#x27;&lt;div class=&quot;feedback&quot;&gt;&#x27; +
+      scope.lostChanges[0].newValue.feedback.html +
+      &#x27;&lt;/div&gt;&#x27; +
+      &#x27;&lt;/div&gt;&#x27; +
+      &#x27;&lt;/div&gt;&#x27; +
+      &#x27;&lt;/div&gt;&#x27; +
+      &#x27;&lt;/div&gt;&#x27; +
+      &#x27;&lt;/li&gt;&#x27; +
+      &#x27;&lt;/ul&gt;&#x27; +
+      &#x27;&lt;/div&gt;&#x27;
+    );
+  });
+
+  it(&#x27;should make human readable when editing a state with property&#x27; +
+  &#x27; default_outcome and a change is edited&#x27;, function() {
+    scope.lostChanges = [LostChangeObjectFactory.createNew({
+      cmd: &#x27;edit_state_property&#x27;,
+      state_name: &#x27;Edited state name&#x27;,
+      new_value: OutcomeObjectFactory.createFromBackendDict({
+        dest: &#x27;outcome 2&#x27;,
+        feedback: {
+          content_id: &#x27;feedback_2&#x27;,
+          html: &#x27;Html&#x27;
+        },
+      }),
+      old_value: OutcomeObjectFactory.createFromBackendDict({
+        dest: &#x27;outcome 1&#x27;,
+        feedback: {
+          content_id: &#x27;feedback_2&#x27;,
+          html: &#x27;Html&#x27;
+        },
+      }),
+      property_name: &#x27;default_outcome&#x27;
+    })];
+
+    var element = angular.element(
+      &#x27;&lt;changes-in-human-readable-form lost-changes=&quot;lostChanges&quot;&gt;&#x27; +
+      &#x27;&lt;/changes-in-human-readable-form&gt;&#x27;);
+    var elementCompiled = $compile(element)(scope);
+    scope.$digest();
+
+    var html = cleanCompiledHtml(elementCompiled.html());
+    expect(html).toBe(
+      &#x27;&lt;div class=&quot;oppia-lost-changes&quot;&gt;&#x27; +
+      &#x27;&lt;ul&gt;&#x27; +
+      &#x27;&lt;li&gt;&#x27; +
+      &#x27;&lt;div&gt;Edits to state: &#x27; + scope.lostChanges[0].stateName +
+      &#x27;&lt;div&gt;&#x27; +
+      &#x27;&lt;div class=&quot;state-edit-desc default-outcome&quot;&gt;&#x27; +
+      &#x27;Edited default outcome:&#x27; +
+      &#x27;&lt;p class=&quot;sub-edit&quot;&gt;&lt;i&gt;Destination: &lt;/i&gt;&#x27; +
+      scope.lostChanges[0].newValue.dest + &#x27;&lt;/p&gt;&#x27; +
+      &#x27;&lt;div class=&quot;sub-edit&quot;&gt;&lt;i&gt;Feedback: &lt;/i&gt;&#x27; +
+      &#x27;&lt;div class=&quot;feedback&quot;&gt;&#x27; +
+      scope.lostChanges[0].newValue.feedback.html +
+      &#x27;&lt;/div&gt;&#x27; +
+      &#x27;&lt;/div&gt;&#x27; +
+      &#x27;&lt;/div&gt;&#x27; +
+      &#x27;&lt;/div&gt;&#x27; +
+      &#x27;&lt;/div&gt;&#x27; +
+      &#x27;&lt;/li&gt;&#x27; +
+      &#x27;&lt;/ul&gt;&#x27; +
+      &#x27;&lt;/div&gt;&#x27;
+    );
+  });
+
+  it(&#x27;should make human readable when editing a state with property&#x27; +
+  &#x27; default_outcome and a change is deleted&#x27;, function() {
+    scope.lostChanges = [LostChangeObjectFactory.createNew({
+      cmd: &#x27;edit_state_property&#x27;,
+      state_name: &#x27;Edited state name&#x27;,
+      new_value: {},
+      old_value: {
+        outcome: OutcomeObjectFactory.createFromBackendDict({
+          dest: &#x27;outcome 1&#x27;,
+          feedback: {
+            content_id: &#x27;feedback_2&#x27;,
+            html: &#x27;Html&#x27;
+          },
+        }),
+        rules: [{
+          type: &#x27;Type1&#x27;,
+          inputs: {
+            input1: &#x27;input1&#x27;,
+            input2: &#x27;input2&#x27;
+          }
+        }]
+      },
+      property_name: &#x27;default_outcome&#x27;
+    })];
+
+    var element = angular.element(
+      &#x27;&lt;changes-in-human-readable-form lost-changes=&quot;lostChanges&quot;&gt;&#x27; +
+      &#x27;&lt;/changes-in-human-readable-form&gt;&#x27;);
+    var elementCompiled = $compile(element)(scope);
+    scope.$digest();
+
+    var html = cleanCompiledHtml(elementCompiled.html());
+    expect(html).toBe(
+      &#x27;&lt;div class=&quot;oppia-lost-changes&quot;&gt;&#x27; +
+      &#x27;&lt;ul&gt;&#x27; +
+      &#x27;&lt;li&gt;&#x27; +
+      &#x27;&lt;div&gt;Edits to state: &#x27; + scope.lostChanges[0].stateName +
+      &#x27;&lt;div&gt;&#x27; +
+      &#x27;&lt;div class=&quot;state-edit-desc&quot;&gt;&#x27; +
+      &#x27;Deleted default outcome&#x27; +
+      &#x27;&lt;/div&gt;&#x27; +
+      &#x27;&lt;/div&gt;&#x27; +
+      &#x27;&lt;/div&gt;&#x27; +
+      &#x27;&lt;/li&gt;&#x27; +
+      &#x27;&lt;/ul&gt;&#x27; +
+      &#x27;&lt;/div&gt;&#x27;
+    );
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:26,&quot;character&quot;:33,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:27,&quot;character&quot;:9,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:31,&quot;character&quot;:5,&quot;text&quot;:&quot;replace&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:33,&quot;character&quot;:5,&quot;text&quot;:&quot;replace&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:36,&quot;character&quot;:5,&quot;text&quot;:&quot;replace&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:39,&quot;character&quot;:5,&quot;text&quot;:&quot;replace&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:42,&quot;character&quot;:5,&quot;text&quot;:&quot;replace&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:45,&quot;character&quot;:5,&quot;text&quot;:&quot;replace&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:48,&quot;character&quot;:5,&quot;text&quot;:&quot;replace&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:51,&quot;character&quot;:5,&quot;text&quot;:&quot;replace&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:54,&quot;character&quot;:5,&quot;text&quot;:&quot;replace&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:57,&quot;character&quot;:5,&quot;text&quot;:&quot;replace&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:60,&quot;character&quot;:5,&quot;text&quot;:&quot;replace&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:63,&quot;character&quot;:5,&quot;text&quot;:&quot;replace&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:66,&quot;character&quot;:5,&quot;text&quot;:&quot;replace&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:69,&quot;character&quot;:5,&quot;text&quot;:&quot;replace&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:71,&quot;character&quot;:5,&quot;text&quot;:&quot;replace&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:73,&quot;character&quot;:5,&quot;text&quot;:&quot;replace&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:77,&quot;character&quot;:6,&quot;text&quot;:&quot;$compile&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:78,&quot;character&quot;:6,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:79,&quot;character&quot;:6,&quot;text&quot;:&quot;LostChangeObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:80,&quot;character&quot;:6,&quot;text&quot;:&quot;OutcomeObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:85,&quot;character&quot;:51,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:88,&quot;character&quot;:6,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:88,&quot;character&quot;:15,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:91,&quot;character&quot;:42,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:91,&quot;character&quot;:53,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:91,&quot;character&quot;:65,&quot;text&quot;:&quot;_$compile_&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:92,&quot;character&quot;:4,&quot;text&quot;:&quot;$compile&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:92,&quot;character&quot;:15,&quot;text&quot;:&quot;_$compile_&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:93,&quot;character&quot;:4,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:93,&quot;character&quot;:12,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:93,&quot;character&quot;:23,&quot;text&quot;:&quot;$new&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:94,&quot;character&quot;:4,&quot;text&quot;:&quot;LostChangeObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:94,&quot;character&quot;:30,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:94,&quot;character&quot;:40,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:95,&quot;character&quot;:4,&quot;text&quot;:&quot;OutcomeObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:95,&quot;character&quot;:27,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:95,&quot;character&quot;:37,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:99,&quot;character&quot;:4,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:99,&quot;character&quot;:10,&quot;text&quot;:&quot;lostChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:99,&quot;character&quot;:25,&quot;text&quot;:&quot;LostChangeObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:99,&quot;character&quot;:49,&quot;text&quot;:&quot;createNew&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:107,&quot;character&quot;:8,&quot;text&quot;:&quot;elementCompiled&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:107,&quot;character&quot;:26,&quot;text&quot;:&quot;$compile&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:107,&quot;character&quot;:44,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:108,&quot;character&quot;:4,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:108,&quot;character&quot;:10,&quot;text&quot;:&quot;$digest&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:110,&quot;character&quot;:8,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:110,&quot;character&quot;:33,&quot;text&quot;:&quot;elementCompiled&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:110,&quot;character&quot;:49,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:111,&quot;character&quot;:11,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:115,&quot;character&quot;:30,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:115,&quot;character&quot;:36,&quot;text&quot;:&quot;lostChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:115,&quot;character&quot;:51,&quot;text&quot;:&quot;stateName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:123,&quot;character&quot;:4,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:123,&quot;character&quot;:10,&quot;text&quot;:&quot;lostChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:123,&quot;character&quot;:25,&quot;text&quot;:&quot;LostChangeObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:123,&quot;character&quot;:49,&quot;text&quot;:&quot;createNew&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:132,&quot;character&quot;:8,&quot;text&quot;:&quot;elementCompiled&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:132,&quot;character&quot;:26,&quot;text&quot;:&quot;$compile&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:132,&quot;character&quot;:44,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:133,&quot;character&quot;:4,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:133,&quot;character&quot;:10,&quot;text&quot;:&quot;$digest&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:135,&quot;character&quot;:8,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:135,&quot;character&quot;:33,&quot;text&quot;:&quot;elementCompiled&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:135,&quot;character&quot;:49,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:136,&quot;character&quot;:11,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:140,&quot;character&quot;:32,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:140,&quot;character&quot;:38,&quot;text&quot;:&quot;lostChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:140,&quot;character&quot;:53,&quot;text&quot;:&quot;oldStateName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:141,&quot;character&quot;:15,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:141,&quot;character&quot;:21,&quot;text&quot;:&quot;lostChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:141,&quot;character&quot;:36,&quot;text&quot;:&quot;newStateName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:149,&quot;character&quot;:4,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:149,&quot;character&quot;:10,&quot;text&quot;:&quot;lostChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:149,&quot;character&quot;:25,&quot;text&quot;:&quot;LostChangeObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:149,&quot;character&quot;:49,&quot;text&quot;:&quot;createNew&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:157,&quot;character&quot;:8,&quot;text&quot;:&quot;elementCompiled&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:157,&quot;character&quot;:26,&quot;text&quot;:&quot;$compile&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:157,&quot;character&quot;:44,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:158,&quot;character&quot;:4,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:158,&quot;character&quot;:10,&quot;text&quot;:&quot;$digest&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:160,&quot;character&quot;:8,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:160,&quot;character&quot;:33,&quot;text&quot;:&quot;elementCompiled&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:160,&quot;character&quot;:49,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:161,&quot;character&quot;:11,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:165,&quot;character&quot;:32,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:165,&quot;character&quot;:38,&quot;text&quot;:&quot;lostChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:165,&quot;character&quot;:53,&quot;text&quot;:&quot;stateName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:174,&quot;character&quot;:6,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:174,&quot;character&quot;:12,&quot;text&quot;:&quot;lostChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:174,&quot;character&quot;:27,&quot;text&quot;:&quot;LostChangeObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:174,&quot;character&quot;:51,&quot;text&quot;:&quot;createNew&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:189,&quot;character&quot;:10,&quot;text&quot;:&quot;elementCompiled&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:189,&quot;character&quot;:28,&quot;text&quot;:&quot;$compile&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:189,&quot;character&quot;:46,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:190,&quot;character&quot;:6,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:190,&quot;character&quot;:12,&quot;text&quot;:&quot;$digest&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:192,&quot;character&quot;:10,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:192,&quot;character&quot;:35,&quot;text&quot;:&quot;elementCompiled&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:192,&quot;character&quot;:51,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:193,&quot;character&quot;:13,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:198,&quot;character&quot;:29,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:198,&quot;character&quot;:35,&quot;text&quot;:&quot;lostChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:198,&quot;character&quot;:50,&quot;text&quot;:&quot;stateName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:202,&quot;character&quot;:34,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:202,&quot;character&quot;:40,&quot;text&quot;:&quot;lostChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:202,&quot;character&quot;:55,&quot;text&quot;:&quot;newValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:202,&quot;character&quot;:64,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:215,&quot;character&quot;:4,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:215,&quot;character&quot;:10,&quot;text&quot;:&quot;lostChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:215,&quot;character&quot;:25,&quot;text&quot;:&quot;LostChangeObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:215,&quot;character&quot;:49,&quot;text&quot;:&quot;createNew&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:226,&quot;character&quot;:8,&quot;text&quot;:&quot;elementCompiled&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:226,&quot;character&quot;:26,&quot;text&quot;:&quot;$compile&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:226,&quot;character&quot;:44,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:227,&quot;character&quot;:4,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:227,&quot;character&quot;:10,&quot;text&quot;:&quot;$digest&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:229,&quot;character&quot;:8,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:229,&quot;character&quot;:33,&quot;text&quot;:&quot;elementCompiled&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:229,&quot;character&quot;:49,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:230,&quot;character&quot;:11,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:235,&quot;character&quot;:27,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:235,&quot;character&quot;:33,&quot;text&quot;:&quot;lostChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:235,&quot;character&quot;:48,&quot;text&quot;:&quot;stateName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:248,&quot;character&quot;:4,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:248,&quot;character&quot;:10,&quot;text&quot;:&quot;lostChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:248,&quot;character&quot;:25,&quot;text&quot;:&quot;LostChangeObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:248,&quot;character&quot;:49,&quot;text&quot;:&quot;createNew&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:259,&quot;character&quot;:8,&quot;text&quot;:&quot;elementCompiled&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:259,&quot;character&quot;:26,&quot;text&quot;:&quot;$compile&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:259,&quot;character&quot;:44,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:260,&quot;character&quot;:4,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:260,&quot;character&quot;:10,&quot;text&quot;:&quot;$digest&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:262,&quot;character&quot;:8,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:262,&quot;character&quot;:33,&quot;text&quot;:&quot;elementCompiled&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:262,&quot;character&quot;:49,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:263,&quot;character&quot;:11,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:268,&quot;character&quot;:27,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:268,&quot;character&quot;:33,&quot;text&quot;:&quot;lostChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:268,&quot;character&quot;:48,&quot;text&quot;:&quot;stateName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:271,&quot;character&quot;:47,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:271,&quot;character&quot;:53,&quot;text&quot;:&quot;lostChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:271,&quot;character&quot;:68,&quot;text&quot;:&quot;newValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:283,&quot;character&quot;:4,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:283,&quot;character&quot;:10,&quot;text&quot;:&quot;lostChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:283,&quot;character&quot;:25,&quot;text&quot;:&quot;LostChangeObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:283,&quot;character&quot;:49,&quot;text&quot;:&quot;createNew&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:294,&quot;character&quot;:8,&quot;text&quot;:&quot;elementCompiled&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:294,&quot;character&quot;:26,&quot;text&quot;:&quot;$compile&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:294,&quot;character&quot;:44,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:295,&quot;character&quot;:4,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:295,&quot;character&quot;:10,&quot;text&quot;:&quot;$digest&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:297,&quot;character&quot;:8,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:297,&quot;character&quot;:33,&quot;text&quot;:&quot;elementCompiled&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:297,&quot;character&quot;:49,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:298,&quot;character&quot;:11,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:303,&quot;character&quot;:27,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:303,&quot;character&quot;:33,&quot;text&quot;:&quot;lostChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:303,&quot;character&quot;:48,&quot;text&quot;:&quot;stateName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:307,&quot;character&quot;:6,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:307,&quot;character&quot;:12,&quot;text&quot;:&quot;lostChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:307,&quot;character&quot;:27,&quot;text&quot;:&quot;oldValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:319,&quot;character&quot;:4,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:319,&quot;character&quot;:10,&quot;text&quot;:&quot;lostChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:319,&quot;character&quot;:25,&quot;text&quot;:&quot;LostChangeObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:319,&quot;character&quot;:49,&quot;text&quot;:&quot;createNew&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:332,&quot;character&quot;:8,&quot;text&quot;:&quot;elementCompiled&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:332,&quot;character&quot;:26,&quot;text&quot;:&quot;$compile&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:332,&quot;character&quot;:44,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:333,&quot;character&quot;:4,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:333,&quot;character&quot;:10,&quot;text&quot;:&quot;$digest&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:335,&quot;character&quot;:8,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:335,&quot;character&quot;:33,&quot;text&quot;:&quot;elementCompiled&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:335,&quot;character&quot;:49,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:336,&quot;character&quot;:11,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:341,&quot;character&quot;:27,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:341,&quot;character&quot;:33,&quot;text&quot;:&quot;lostChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:341,&quot;character&quot;:48,&quot;text&quot;:&quot;stateName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:354,&quot;character&quot;:4,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:354,&quot;character&quot;:10,&quot;text&quot;:&quot;lostChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:354,&quot;character&quot;:25,&quot;text&quot;:&quot;LostChangeObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:354,&quot;character&quot;:49,&quot;text&quot;:&quot;createNew&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:367,&quot;character&quot;:8,&quot;text&quot;:&quot;elementCompiled&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:367,&quot;character&quot;:26,&quot;text&quot;:&quot;$compile&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:367,&quot;character&quot;:44,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:368,&quot;character&quot;:4,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:368,&quot;character&quot;:10,&quot;text&quot;:&quot;$digest&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:370,&quot;character&quot;:8,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:370,&quot;character&quot;:33,&quot;text&quot;:&quot;elementCompiled&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:370,&quot;character&quot;:49,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:371,&quot;character&quot;:11,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:376,&quot;character&quot;:27,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:376,&quot;character&quot;:33,&quot;text&quot;:&quot;lostChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:376,&quot;character&quot;:48,&quot;text&quot;:&quot;stateName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:389,&quot;character&quot;:4,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:389,&quot;character&quot;:10,&quot;text&quot;:&quot;lostChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:389,&quot;character&quot;:25,&quot;text&quot;:&quot;LostChangeObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:389,&quot;character&quot;:49,&quot;text&quot;:&quot;createNew&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:404,&quot;character&quot;:8,&quot;text&quot;:&quot;elementCompiled&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:404,&quot;character&quot;:26,&quot;text&quot;:&quot;$compile&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:404,&quot;character&quot;:44,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:405,&quot;character&quot;:4,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:405,&quot;character&quot;:10,&quot;text&quot;:&quot;$digest&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:407,&quot;character&quot;:8,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:407,&quot;character&quot;:33,&quot;text&quot;:&quot;elementCompiled&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:407,&quot;character&quot;:49,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:408,&quot;character&quot;:11,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:413,&quot;character&quot;:27,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:413,&quot;character&quot;:33,&quot;text&quot;:&quot;lostChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:413,&quot;character&quot;:48,&quot;text&quot;:&quot;stateName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:426,&quot;character&quot;:4,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:426,&quot;character&quot;:10,&quot;text&quot;:&quot;lostChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:426,&quot;character&quot;:25,&quot;text&quot;:&quot;LostChangeObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:426,&quot;character&quot;:49,&quot;text&quot;:&quot;createNew&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:430,&quot;character&quot;:8,&quot;text&quot;:&quot;outcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:430,&quot;character&quot;:17,&quot;text&quot;:&quot;OutcomeObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:430,&quot;character&quot;:38,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:452,&quot;character&quot;:8,&quot;text&quot;:&quot;elementCompiled&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:452,&quot;character&quot;:26,&quot;text&quot;:&quot;$compile&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:452,&quot;character&quot;:44,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:453,&quot;character&quot;:4,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:453,&quot;character&quot;:10,&quot;text&quot;:&quot;$digest&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:455,&quot;character&quot;:8,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:455,&quot;character&quot;:33,&quot;text&quot;:&quot;elementCompiled&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:455,&quot;character&quot;:49,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:456,&quot;character&quot;:11,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:460,&quot;character&quot;:32,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:460,&quot;character&quot;:38,&quot;text&quot;:&quot;lostChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:460,&quot;character&quot;:53,&quot;text&quot;:&quot;stateName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:465,&quot;character&quot;:6,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:465,&quot;character&quot;:12,&quot;text&quot;:&quot;lostChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:465,&quot;character&quot;:27,&quot;text&quot;:&quot;newValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:465,&quot;character&quot;:36,&quot;text&quot;:&quot;outcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:465,&quot;character&quot;:44,&quot;text&quot;:&quot;dest&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:468,&quot;character&quot;:6,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:468,&quot;character&quot;:12,&quot;text&quot;:&quot;lostChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:468,&quot;character&quot;:27,&quot;text&quot;:&quot;newValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:468,&quot;character&quot;:36,&quot;text&quot;:&quot;outcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:468,&quot;character&quot;:44,&quot;text&quot;:&quot;feedback&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:468,&quot;character&quot;:53,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:474,&quot;character&quot;:20,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:474,&quot;character&quot;:26,&quot;text&quot;:&quot;lostChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:474,&quot;character&quot;:41,&quot;text&quot;:&quot;newValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:474,&quot;character&quot;:50,&quot;text&quot;:&quot;rules&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:474,&quot;character&quot;:59,&quot;text&quot;:&quot;type&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:476,&quot;character&quot;:18,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:476,&quot;character&quot;:24,&quot;text&quot;:&quot;lostChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:476,&quot;character&quot;:39,&quot;text&quot;:&quot;newValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:476,&quot;character&quot;:48,&quot;text&quot;:&quot;rules&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:476,&quot;character&quot;:57,&quot;text&quot;:&quot;inputs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:492,&quot;character&quot;:4,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:492,&quot;character&quot;:10,&quot;text&quot;:&quot;lostChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:492,&quot;character&quot;:25,&quot;text&quot;:&quot;LostChangeObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:492,&quot;character&quot;:49,&quot;text&quot;:&quot;createNew&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:496,&quot;character&quot;:8,&quot;text&quot;:&quot;outcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:496,&quot;character&quot;:17,&quot;text&quot;:&quot;OutcomeObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:496,&quot;character&quot;:38,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:512,&quot;character&quot;:8,&quot;text&quot;:&quot;outcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:512,&quot;character&quot;:17,&quot;text&quot;:&quot;OutcomeObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:512,&quot;character&quot;:38,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:533,&quot;character&quot;:8,&quot;text&quot;:&quot;elementCompiled&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:533,&quot;character&quot;:26,&quot;text&quot;:&quot;$compile&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:533,&quot;character&quot;:44,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:534,&quot;character&quot;:4,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:534,&quot;character&quot;:10,&quot;text&quot;:&quot;$digest&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:536,&quot;character&quot;:8,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:536,&quot;character&quot;:33,&quot;text&quot;:&quot;elementCompiled&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:536,&quot;character&quot;:49,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:537,&quot;character&quot;:11,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:541,&quot;character&quot;:32,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:541,&quot;character&quot;:38,&quot;text&quot;:&quot;lostChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:541,&quot;character&quot;:53,&quot;text&quot;:&quot;stateName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:546,&quot;character&quot;:6,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:546,&quot;character&quot;:12,&quot;text&quot;:&quot;lostChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:546,&quot;character&quot;:27,&quot;text&quot;:&quot;newValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:546,&quot;character&quot;:36,&quot;text&quot;:&quot;outcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:546,&quot;character&quot;:44,&quot;text&quot;:&quot;dest&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:549,&quot;character&quot;:6,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:549,&quot;character&quot;:12,&quot;text&quot;:&quot;lostChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:549,&quot;character&quot;:27,&quot;text&quot;:&quot;newValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:549,&quot;character&quot;:36,&quot;text&quot;:&quot;outcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:549,&quot;character&quot;:44,&quot;text&quot;:&quot;feedback&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:549,&quot;character&quot;:53,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:555,&quot;character&quot;:20,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:555,&quot;character&quot;:26,&quot;text&quot;:&quot;lostChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:555,&quot;character&quot;:41,&quot;text&quot;:&quot;newValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:555,&quot;character&quot;:50,&quot;text&quot;:&quot;rules&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:555,&quot;character&quot;:59,&quot;text&quot;:&quot;type&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:557,&quot;character&quot;:18,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:557,&quot;character&quot;:24,&quot;text&quot;:&quot;lostChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:557,&quot;character&quot;:39,&quot;text&quot;:&quot;newValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:557,&quot;character&quot;:48,&quot;text&quot;:&quot;rules&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:557,&quot;character&quot;:57,&quot;text&quot;:&quot;inputs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:573,&quot;character&quot;:4,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:573,&quot;character&quot;:10,&quot;text&quot;:&quot;lostChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:573,&quot;character&quot;:25,&quot;text&quot;:&quot;LostChangeObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:573,&quot;character&quot;:49,&quot;text&quot;:&quot;createNew&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:578,&quot;character&quot;:8,&quot;text&quot;:&quot;outcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:578,&quot;character&quot;:17,&quot;text&quot;:&quot;OutcomeObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:578,&quot;character&quot;:38,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:599,&quot;character&quot;:8,&quot;text&quot;:&quot;elementCompiled&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:599,&quot;character&quot;:26,&quot;text&quot;:&quot;$compile&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:599,&quot;character&quot;:44,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:600,&quot;character&quot;:4,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:600,&quot;character&quot;:10,&quot;text&quot;:&quot;$digest&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:602,&quot;character&quot;:8,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:602,&quot;character&quot;:33,&quot;text&quot;:&quot;elementCompiled&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:602,&quot;character&quot;:49,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:603,&quot;character&quot;:11,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:607,&quot;character&quot;:32,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:607,&quot;character&quot;:38,&quot;text&quot;:&quot;lostChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:607,&quot;character&quot;:53,&quot;text&quot;:&quot;stateName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:622,&quot;character&quot;:4,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:622,&quot;character&quot;:10,&quot;text&quot;:&quot;lostChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:622,&quot;character&quot;:25,&quot;text&quot;:&quot;LostChangeObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:622,&quot;character&quot;:49,&quot;text&quot;:&quot;createNew&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:625,&quot;character&quot;:6,&quot;text&quot;:&quot;new_value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:625,&quot;character&quot;:17,&quot;text&quot;:&quot;OutcomeObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:625,&quot;character&quot;:38,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:639,&quot;character&quot;:8,&quot;text&quot;:&quot;elementCompiled&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:639,&quot;character&quot;:26,&quot;text&quot;:&quot;$compile&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:639,&quot;character&quot;:44,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:640,&quot;character&quot;:4,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:640,&quot;character&quot;:10,&quot;text&quot;:&quot;$digest&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:642,&quot;character&quot;:8,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:642,&quot;character&quot;:33,&quot;text&quot;:&quot;elementCompiled&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:642,&quot;character&quot;:49,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:643,&quot;character&quot;:11,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:647,&quot;character&quot;:32,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:647,&quot;character&quot;:38,&quot;text&quot;:&quot;lostChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:647,&quot;character&quot;:53,&quot;text&quot;:&quot;stateName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:652,&quot;character&quot;:6,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:652,&quot;character&quot;:12,&quot;text&quot;:&quot;lostChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:652,&quot;character&quot;:27,&quot;text&quot;:&quot;newValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:652,&quot;character&quot;:36,&quot;text&quot;:&quot;dest&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:655,&quot;character&quot;:6,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:655,&quot;character&quot;:12,&quot;text&quot;:&quot;lostChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:655,&quot;character&quot;:27,&quot;text&quot;:&quot;newValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:655,&quot;character&quot;:36,&quot;text&quot;:&quot;feedback&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:655,&quot;character&quot;:45,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:669,&quot;character&quot;:4,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:669,&quot;character&quot;:10,&quot;text&quot;:&quot;lostChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:669,&quot;character&quot;:25,&quot;text&quot;:&quot;LostChangeObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:669,&quot;character&quot;:49,&quot;text&quot;:&quot;createNew&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:672,&quot;character&quot;:6,&quot;text&quot;:&quot;new_value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:672,&quot;character&quot;:17,&quot;text&quot;:&quot;OutcomeObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:672,&quot;character&quot;:38,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:679,&quot;character&quot;:6,&quot;text&quot;:&quot;old_value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:679,&quot;character&quot;:17,&quot;text&quot;:&quot;OutcomeObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:679,&quot;character&quot;:38,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:692,&quot;character&quot;:8,&quot;text&quot;:&quot;elementCompiled&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:692,&quot;character&quot;:26,&quot;text&quot;:&quot;$compile&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:692,&quot;character&quot;:44,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:693,&quot;character&quot;:4,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:693,&quot;character&quot;:10,&quot;text&quot;:&quot;$digest&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:695,&quot;character&quot;:8,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:695,&quot;character&quot;:33,&quot;text&quot;:&quot;elementCompiled&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:695,&quot;character&quot;:49,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:696,&quot;character&quot;:11,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:700,&quot;character&quot;:32,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:700,&quot;character&quot;:38,&quot;text&quot;:&quot;lostChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:700,&quot;character&quot;:53,&quot;text&quot;:&quot;stateName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:705,&quot;character&quot;:6,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:705,&quot;character&quot;:12,&quot;text&quot;:&quot;lostChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:705,&quot;character&quot;:27,&quot;text&quot;:&quot;newValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:705,&quot;character&quot;:36,&quot;text&quot;:&quot;dest&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:708,&quot;character&quot;:6,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:708,&quot;character&quot;:12,&quot;text&quot;:&quot;lostChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:708,&quot;character&quot;:27,&quot;text&quot;:&quot;newValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:708,&quot;character&quot;:36,&quot;text&quot;:&quot;feedback&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:708,&quot;character&quot;:45,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:722,&quot;character&quot;:4,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:722,&quot;character&quot;:10,&quot;text&quot;:&quot;lostChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:722,&quot;character&quot;:25,&quot;text&quot;:&quot;LostChangeObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:722,&quot;character&quot;:49,&quot;text&quot;:&quot;createNew&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:727,&quot;character&quot;:8,&quot;text&quot;:&quot;outcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:727,&quot;character&quot;:17,&quot;text&quot;:&quot;OutcomeObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:727,&quot;character&quot;:38,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:748,&quot;character&quot;:8,&quot;text&quot;:&quot;elementCompiled&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:748,&quot;character&quot;:26,&quot;text&quot;:&quot;$compile&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:748,&quot;character&quot;:44,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:749,&quot;character&quot;:4,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:749,&quot;character&quot;:10,&quot;text&quot;:&quot;$digest&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:751,&quot;character&quot;:8,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:751,&quot;character&quot;:33,&quot;text&quot;:&quot;elementCompiled&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:751,&quot;character&quot;:49,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:752,&quot;character&quot;:11,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:756,&quot;character&quot;:32,&quot;text&quot;:&quot;scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:756,&quot;character&quot;:38,&quot;text&quot;:&quot;lostChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts&quot;,&quot;line&quot;:756,&quot;character&quot;:53,&quot;text&quot;:&quot;stateName&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:59 GMT</p>
+    </body>
+  </html>
+  

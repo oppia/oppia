@@ -1,0 +1,138 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>player-position.service.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/exploration-player-page/services/player-position.service.spec.ts</td><td class="">89.02%</td><td class="">100%</td><td class="">164</td><td class="">146</td><td class="">18</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2019 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for the player position service.
+ */
+
+import { EventEmitter } from &#x27;@angular/core&#x27;;
+import { TestBed } from &#x27;@angular/core/testing&#x27;;
+
+import { Subscription } from &#x27;rxjs&#x27;;
+
+import { PlayerPositionService } from
+  &#x27;pages/exploration-player-page/services/player-position.service&#x27;;
+import { PlayerTranscriptService } from
+  &#x27;pages/exploration-player-page/services/player-transcript.service&#x27;;
+import { StateCardObjectFactory } from
+  &#x27;domain/state_card/StateCardObjectFactory&#x27;;
+
+describe(&#x27;Player position service&#x27;, () =&gt; {
+  let pts = null;
+  let pps: PlayerPositionService = null;
+  let scof = null;
+  let onQuestionChangeSpy: jasmine.Spy;
+  let subscriptions: Subscription;
+
+  beforeEach(() =&gt; {
+    pts = TestBed.get(PlayerTranscriptService);
+    pps = TestBed.get(PlayerPositionService);
+    scof = TestBed.get(StateCardObjectFactory);
+    onQuestionChangeSpy = jasmine.createSpy(&#x27;onQuestionChangeSpy&#x27;);
+    subscriptions = new Subscription();
+    subscriptions.add(pps.onCurrentQuestionChange.subscribe(
+      onQuestionChangeSpy));
+  });
+
+  afterEach(() =&gt; {
+    subscriptions.unsubscribe();
+  });
+
+  it(&#x27;should record answer submission as true&#x27;, () =&gt; {
+    expect(pps.hasLearnerJustSubmittedAnAnswer()).toBe(false);
+    pps.recordAnswerSubmission();
+    expect(pps.hasLearnerJustSubmittedAnAnswer()).toBe(true);
+  });
+
+  it(&#x27;should record answer submission by the learner as false&#x27;, () =&gt; {
+    expect(pps.hasLearnerJustSubmittedAnAnswer()).toBe(false);
+    pps.recordAnswerSubmission();
+    expect(pps.hasLearnerJustSubmittedAnAnswer()).toBe(true);
+    pps.recordNavigationButtonClick();
+    expect(pps.hasLearnerJustSubmittedAnAnswer()).toBe(false);
+  });
+
+  it(&#x27;should set displayed index card to given value&#x27;, () =&gt; {
+    let callBack = () =&gt; {};
+    expect(pps.getDisplayedCardIndex()).toBe(null);
+    pps.init(callBack);
+    pps.setDisplayedCardIndex(4);
+    expect(pps.getDisplayedCardIndex()).toBe(4);
+  });
+
+  it(&#x27;should get current state name&#x27;, () =&gt; {
+    pts.addNewCard(scof.createNewCard(
+      &#x27;First state&#x27;, &#x27;Content HTML&#x27;,
+      &#x27;&lt;oppia-text-input-html&gt;&lt;/oppia-text-input-html&gt;&#x27;));
+    pts.addNewCard(scof.createNewCard(
+      &#x27;Second state&#x27;, &#x27;Content HTML&#x27;,
+      &#x27;&lt;oppia-text-input-html&gt;&lt;/oppia-text-input-html&gt;&#x27;));
+    let callBack = () =&gt; {};
+    pps.init(callBack);
+    pps.setDisplayedCardIndex(0);
+    expect(pps.getCurrentStateName()).toBe(&#x27;First state&#x27;);
+    pps.setDisplayedCardIndex(1);
+    expect(pps.getCurrentStateName()).toBe(&#x27;Second state&#x27;);
+  });
+
+  it(&#x27;should not change displayed card index if it is the same as the&#x27; +
+     &#x27;previously displayed card index&#x27;, () =&gt; {
+    let callBack = () =&gt; {};
+    expect(pps.getDisplayedCardIndex()).toBe(null);
+    pps.init(callBack);
+    pps.setDisplayedCardIndex(4);
+    pps.setDisplayedCardIndex(4);
+    expect(pps.getDisplayedCardIndex()).toBe(4);
+    pps.setDisplayedCardIndex(5);
+    expect(pps.getDisplayedCardIndex()).toBe(5);
+  });
+
+  it(&#x27;should get onNewCardOpened EventEmitter&#x27;, () =&gt; {
+    let mockNewCardOpenedEventEmitter = new EventEmitter();
+    expect(pps.onNewCardOpened).toEqual(mockNewCardOpenedEventEmitter);
+  });
+
+  it(&#x27;should emit the index of the question change&#x27;, () =&gt; {
+    pps.changeCurrentQuestion(3);
+    expect(onQuestionChangeSpy).toHaveBeenCalledWith(3);
+  });
+
+  it(&#x27;should fetch EventEmitter for changing active card&#x27;, () =&gt; {
+    let mockActiveCardChangedEvent = new EventEmitter();
+    expect(pps.onActiveCardChanged).toEqual(mockActiveCardChangedEvent);
+  });
+
+  it(&#x27;should fetch EventEmitter when help card is available&#x27;, () =&gt; {
+    let mockHelpCardAvailableEvent = new EventEmitter();
+    expect(pps.onHelpCardAvailable).toEqual(mockHelpCardAvailableEvent);
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/player-position.service.spec.ts&quot;,&quot;line&quot;:31,&quot;character&quot;:6,&quot;text&quot;:&quot;pts&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/player-position.service.spec.ts&quot;,&quot;line&quot;:33,&quot;character&quot;:6,&quot;text&quot;:&quot;scof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/player-position.service.spec.ts&quot;,&quot;line&quot;:38,&quot;character&quot;:4,&quot;text&quot;:&quot;pts&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/player-position.service.spec.ts&quot;,&quot;line&quot;:40,&quot;character&quot;:4,&quot;text&quot;:&quot;scof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/player-position.service.spec.ts&quot;,&quot;line&quot;:74,&quot;character&quot;:4,&quot;text&quot;:&quot;pts&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/player-position.service.spec.ts&quot;,&quot;line&quot;:74,&quot;character&quot;:8,&quot;text&quot;:&quot;addNewCard&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/player-position.service.spec.ts&quot;,&quot;line&quot;:74,&quot;character&quot;:19,&quot;text&quot;:&quot;scof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/player-position.service.spec.ts&quot;,&quot;line&quot;:74,&quot;character&quot;:24,&quot;text&quot;:&quot;createNewCard&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/player-position.service.spec.ts&quot;,&quot;line&quot;:77,&quot;character&quot;:4,&quot;text&quot;:&quot;pts&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/player-position.service.spec.ts&quot;,&quot;line&quot;:77,&quot;character&quot;:8,&quot;text&quot;:&quot;addNewCard&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/player-position.service.spec.ts&quot;,&quot;line&quot;:77,&quot;character&quot;:19,&quot;text&quot;:&quot;scof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/player-position.service.spec.ts&quot;,&quot;line&quot;:77,&quot;character&quot;:24,&quot;text&quot;:&quot;createNewCard&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/player-position.service.spec.ts&quot;,&quot;line&quot;:101,&quot;character&quot;:8,&quot;text&quot;:&quot;mockNewCardOpenedEventEmitter&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/player-position.service.spec.ts&quot;,&quot;line&quot;:102,&quot;character&quot;:40,&quot;text&quot;:&quot;mockNewCardOpenedEventEmitter&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/player-position.service.spec.ts&quot;,&quot;line&quot;:111,&quot;character&quot;:8,&quot;text&quot;:&quot;mockActiveCardChangedEvent&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/player-position.service.spec.ts&quot;,&quot;line&quot;:112,&quot;character&quot;:44,&quot;text&quot;:&quot;mockActiveCardChangedEvent&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/player-position.service.spec.ts&quot;,&quot;line&quot;:116,&quot;character&quot;:8,&quot;text&quot;:&quot;mockHelpCardAvailableEvent&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/player-position.service.spec.ts&quot;,&quot;line&quot;:117,&quot;character&quot;:44,&quot;text&quot;:&quot;mockHelpCardAvailableEvent&quot;,&quot;kind&quot;:2}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:59 GMT</p>
+    </body>
+  </html>
+  

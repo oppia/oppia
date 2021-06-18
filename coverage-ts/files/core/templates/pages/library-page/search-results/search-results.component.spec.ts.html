@@ -1,0 +1,136 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>search-results.component.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/library-page/search-results/search-results.component.spec.ts</td><td class="">45.93%</td><td class="">100%</td><td class="">135</td><td class="">62</td><td class="">73</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for searchResults.
+ */
+
+import { HttpClientTestingModule } from &#x27;@angular/common/http/testing&#x27;;
+import { TestBed } from &#x27;@angular/core/testing&#x27;;
+import { SiteAnalyticsService } from &#x27;services/site-analytics.service&#x27;;
+import { EventEmitter } from &#x27;@angular/core&#x27;;
+import { importAllAngularServices } from &#x27;tests/unit-test-utils&#x27;;
+
+describe(&#x27;Search Results component&#x27;, function() {
+  var ctrl = null;
+  var $flushPendingTasks = null;
+  var $q = null;
+  var $rootScope = null;
+  var $scope = null;
+  var searchService = null;
+  var siteAnalyticsService = null;
+  var userService = null;
+
+  var mockWindow = {
+    location: &#x27;&#x27;
+  };
+  var initialSearchResultsLoadedEmitter = new EventEmitter();
+
+  importAllAngularServices();
+
+  beforeEach(function() {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+  });
+
+  beforeEach(angular.mock.module(&#x27;oppia&#x27;, function($provide) {
+    $provide.value(&#x27;$window&#x27;, mockWindow);
+  }));
+
+  beforeEach(function() {
+    siteAnalyticsService = TestBed.get(SiteAnalyticsService);
+  });
+
+  beforeEach(angular.mock.inject(function($injector, $componentController) {
+    $flushPendingTasks = $injector.get(&#x27;$flushPendingTasks&#x27;);
+    $q = $injector.get(&#x27;$q&#x27;);
+    $rootScope = $injector.get(&#x27;$rootScope&#x27;);
+    searchService = $injector.get(&#x27;SearchService&#x27;);
+    userService = $injector.get(&#x27;UserService&#x27;);
+
+    spyOnProperty(searchService, &#x27;onInitialSearchResultsLoaded&#x27;).and
+      .returnValue(initialSearchResultsLoadedEmitter);
+    spyOn(userService, &#x27;getUserInfoAsync&#x27;).and.returnValue(
+      $q.resolve({
+        isLoggedIn: () =&gt; true
+      }));
+
+    $scope = $rootScope.$new();
+    ctrl = $componentController(&#x27;searchResults&#x27;, {
+      $scope: $scope,
+      SiteAnalyticsService: siteAnalyticsService
+    });
+    ctrl.$onInit();
+    $scope.$apply();
+  }));
+
+  afterEach(function() {
+    ctrl.$onDestroy();
+  });
+
+  it(&#x27;should initialize controller properties after its initialization and&#x27; +
+    &#x27; get data from backend&#x27;, function() {
+    expect(ctrl.someResultsExist).toBe(true);
+    expect(ctrl.userIsLoggedIn).toBe(true);
+  });
+
+  it(&#x27;should show search results when data retrieved from backend is not&#x27; +
+    &#x27; empty&#x27;, function() {
+    initialSearchResultsLoadedEmitter.emit(new Array(2));
+    $scope.$apply();
+    expect(ctrl.someResultsExist).toBe(true);
+  });
+
+  it(&#x27;should not show search results when data retrieved from back is empty&#x27;,
+    function() {
+      initialSearchResultsLoadedEmitter.emit([]);
+      $scope.$apply();
+      expect(ctrl.someResultsExist).toBe(false);
+    });
+
+  it(&#x27;should get url for static image resources&#x27;, function() {
+    var imagePath = &#x27;/path/to/image.png&#x27;;
+    expect(ctrl.getStaticImageUrl(imagePath)).toBe(
+      &#x27;/assets/images/path/to/image.png&#x27;);
+  });
+
+  it(&#x27;should redirect to login page when trying to create a exploration&#x27; +
+    &#x27; question and user is not logged in&#x27;, function() {
+    spyOn(siteAnalyticsService, &#x27;registerStartLoginEvent&#x27;);
+    ctrl.onRedirectToLogin(&#x27;login-url&#x27;);
+    $flushPendingTasks();
+
+    expect(siteAnalyticsService.registerStartLoginEvent).toHaveBeenCalled();
+    expect(mockWindow.location).toBe(&#x27;login-url&#x27;);
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:25,&quot;character&quot;:6,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:26,&quot;character&quot;:6,&quot;text&quot;:&quot;$flushPendingTasks&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:27,&quot;character&quot;:6,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:28,&quot;character&quot;:6,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:29,&quot;character&quot;:6,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:30,&quot;character&quot;:6,&quot;text&quot;:&quot;searchService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:31,&quot;character&quot;:6,&quot;text&quot;:&quot;siteAnalyticsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:32,&quot;character&quot;:6,&quot;text&quot;:&quot;userService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:37,&quot;character&quot;:6,&quot;text&quot;:&quot;initialSearchResultsLoadedEmitter&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:47,&quot;character&quot;:51,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:48,&quot;character&quot;:4,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:48,&quot;character&quot;:13,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:52,&quot;character&quot;:4,&quot;text&quot;:&quot;siteAnalyticsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:55,&quot;character&quot;:42,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:55,&quot;character&quot;:53,&quot;text&quot;:&quot;$componentController&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:56,&quot;character&quot;:4,&quot;text&quot;:&quot;$flushPendingTasks&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:56,&quot;character&quot;:25,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:56,&quot;character&quot;:35,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:57,&quot;character&quot;:4,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:57,&quot;character&quot;:9,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:57,&quot;character&quot;:19,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:58,&quot;character&quot;:4,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:58,&quot;character&quot;:17,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:58,&quot;character&quot;:27,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:59,&quot;character&quot;:4,&quot;text&quot;:&quot;searchService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:59,&quot;character&quot;:20,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:59,&quot;character&quot;:30,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:60,&quot;character&quot;:4,&quot;text&quot;:&quot;userService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:60,&quot;character&quot;:18,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:60,&quot;character&quot;:28,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:62,&quot;character&quot;:18,&quot;text&quot;:&quot;searchService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:63,&quot;character&quot;:19,&quot;text&quot;:&quot;initialSearchResultsLoadedEmitter&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:64,&quot;character&quot;:10,&quot;text&quot;:&quot;userService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:64,&quot;character&quot;:43,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:65,&quot;character&quot;:6,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:65,&quot;character&quot;:9,&quot;text&quot;:&quot;resolve&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:69,&quot;character&quot;:4,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:69,&quot;character&quot;:13,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:69,&quot;character&quot;:24,&quot;text&quot;:&quot;$new&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:70,&quot;character&quot;:4,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:70,&quot;character&quot;:11,&quot;text&quot;:&quot;$componentController&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:71,&quot;character&quot;:6,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:71,&quot;character&quot;:14,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:72,&quot;character&quot;:6,&quot;text&quot;:&quot;SiteAnalyticsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:72,&quot;character&quot;:28,&quot;text&quot;:&quot;siteAnalyticsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:74,&quot;character&quot;:4,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:74,&quot;character&quot;:9,&quot;text&quot;:&quot;$onInit&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:75,&quot;character&quot;:4,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:75,&quot;character&quot;:11,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:79,&quot;character&quot;:4,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:79,&quot;character&quot;:9,&quot;text&quot;:&quot;$onDestroy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:84,&quot;character&quot;:11,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:84,&quot;character&quot;:16,&quot;text&quot;:&quot;someResultsExist&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:85,&quot;character&quot;:11,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:85,&quot;character&quot;:16,&quot;text&quot;:&quot;userIsLoggedIn&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:90,&quot;character&quot;:4,&quot;text&quot;:&quot;initialSearchResultsLoadedEmitter&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:91,&quot;character&quot;:4,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:91,&quot;character&quot;:11,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:92,&quot;character&quot;:11,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:92,&quot;character&quot;:16,&quot;text&quot;:&quot;someResultsExist&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:97,&quot;character&quot;:6,&quot;text&quot;:&quot;initialSearchResultsLoadedEmitter&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:98,&quot;character&quot;:6,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:98,&quot;character&quot;:13,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:99,&quot;character&quot;:13,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:99,&quot;character&quot;:18,&quot;text&quot;:&quot;someResultsExist&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:104,&quot;character&quot;:11,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:104,&quot;character&quot;:16,&quot;text&quot;:&quot;getStaticImageUrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:110,&quot;character&quot;:10,&quot;text&quot;:&quot;siteAnalyticsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:111,&quot;character&quot;:4,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:111,&quot;character&quot;:9,&quot;text&quot;:&quot;onRedirectToLogin&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:112,&quot;character&quot;:4,&quot;text&quot;:&quot;$flushPendingTasks&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:114,&quot;character&quot;:11,&quot;text&quot;:&quot;siteAnalyticsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/library-page/search-results/search-results.component.spec.ts&quot;,&quot;line&quot;:114,&quot;character&quot;:32,&quot;text&quot;:&quot;registerStartLoginEvent&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:59 GMT</p>
+    </body>
+  </html>
+  

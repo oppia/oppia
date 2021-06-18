@@ -1,0 +1,230 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>translate-text-backend-api.service.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/contributor-dashboard-page/services/translate-text-backend-api.service.spec.ts</td><td class="">84.07%</td><td class="">100%</td><td class="">270</td><td class="">227</td><td class="">43</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2021 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Tests that translatable text backend api works correctly.
+ */
+
+import { HttpErrorResponse } from &#x27;@angular/common/http&#x27;;
+import { HttpClientTestingModule, HttpTestingController } from
+  &#x27;@angular/common/http/testing&#x27;;
+import { TestBed, fakeAsync, flushMicrotasks } from &#x27;@angular/core/testing&#x27;;
+import { TranslatableTexts } from &#x27;domain/opportunity/translatable-texts.model&#x27;;
+import { TranslateTextBackendApiService } from &#x27;./translate-text-backend-api.service&#x27;;
+
+describe(&#x27;TranslateTextBackendApiService&#x27;, () =&gt; {
+  let translateTextBackendApiService: TranslateTextBackendApiService;
+  let httpTestingController: HttpTestingController;
+  beforeEach(() =&gt; {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+    });
+    httpTestingController = TestBed.inject(HttpTestingController);
+    translateTextBackendApiService = TestBed.inject(
+      TranslateTextBackendApiService);
+  });
+
+  afterEach(() =&gt; {
+    httpTestingController.verify();
+  });
+
+  describe(&#x27;getTranslatableTextsAsync&#x27;, () =&gt; {
+    let successHandler, failHandler;
+    it(&#x27;should correctly request translatable texts for a given exploration &#x27; +
+    &#x27;id and language code&#x27;, fakeAsync(() =&gt; {
+      successHandler = jasmine.createSpy(&#x27;success&#x27;);
+      failHandler = jasmine.createSpy(&#x27;error&#x27;);
+      const sampleDataResults = {
+        state_names_to_content_id_mapping: {
+          stateName1: {contentId1: &#x27;text1&#x27;, contentId2: &#x27;text2&#x27;},
+          stateName2: {contentId3: &#x27;text3&#x27;}
+        },
+        version: &#x27;1&#x27;
+      };
+      translateTextBackendApiService.getTranslatableTextsAsync(&#x27;1&#x27;, &#x27;en&#x27;).then(
+        successHandler, failHandler
+      );
+      const req = httpTestingController.expectOne(
+        &#x27;/gettranslatabletexthandler?exp_id=1&amp;language_code=en&#x27;);
+      expect(req.request.method).toEqual(&#x27;GET&#x27;);
+      req.flush(sampleDataResults);
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalledWith(
+        TranslatableTexts.createFromBackendDict(sampleDataResults));
+    }));
+
+    it(&#x27;should call the failHandler on error response&#x27;, fakeAsync(() =&gt; {
+      const errorEvent = new ErrorEvent(&#x27;error&#x27;);
+      failHandler = (error: HttpErrorResponse) =&gt; {
+        expect(error.error).toBe(errorEvent);
+      };
+      translateTextBackendApiService.getTranslatableTextsAsync(&#x27;1&#x27;, &#x27;en&#x27;).then(
+        successHandler, failHandler
+      );
+      const req = httpTestingController.expectOne(
+        &#x27;/gettranslatabletexthandler?exp_id=1&amp;language_code=en&#x27;);
+      expect(req.request.method).toEqual(&#x27;GET&#x27;);
+      req.error(errorEvent);
+      flushMicrotasks();
+    }));
+  });
+
+  describe(&#x27;suggestTranslatedTextAsync&#x27;, () =&gt; {
+    let successHandler, failHandler, imagesData;
+    beforeEach(() =&gt; {
+      successHandler = jasmine.createSpy(&#x27;success&#x27;);
+      failHandler = jasmine.createSpy(&#x27;error&#x27;);
+      imagesData = [{
+        filename: &#x27;imageFilename&#x27;,
+        imageBlob: &#x27;imageBlob&#x27;
+      }];
+    });
+
+    it(&#x27;should correctly submit a translation suggestion&#x27;, fakeAsync(() =&gt; {
+      const expectedPayload = {
+        suggestion_type: &#x27;translate_content&#x27;,
+        target_type: &#x27;exploration&#x27;,
+        description: &#x27;Adds translation&#x27;,
+        target_id: &#x27;activeExpId&#x27;,
+        target_version_at_submission: &#x27;activeExpVersion&#x27;,
+        change: {
+          cmd: &#x27;add_written_translation&#x27;,
+          content_id: &#x27;activeContentId&#x27;,
+          state_name: &#x27;activeStateName&#x27;,
+          language_code: &#x27;languageCode&#x27;,
+          content_html: &#x27;contentHtml&#x27;,
+          translation_html: &#x27;translationHtml&#x27;,
+          data_format: &#x27;html&#x27;
+        }
+      };
+
+      translateTextBackendApiService.suggestTranslatedTextAsync(
+        &#x27;activeExpId&#x27;,
+        &#x27;activeExpVersion&#x27;,
+        &#x27;activeContentId&#x27;,
+        &#x27;activeStateName&#x27;,
+        &#x27;languageCode&#x27;,
+        &#x27;contentHtml&#x27;,
+        &#x27;translationHtml&#x27;,
+        imagesData).then(successHandler, failHandler);
+      const req = httpTestingController.expectOne(
+        &#x27;/suggestionhandler/&#x27;);
+      expect(req.request.method).toEqual(&#x27;POST&#x27;);
+      expect(req.request.body.getAll(&#x27;payload&#x27;)[0]).toEqual(
+        JSON.stringify(expectedPayload));
+      req.flush({});
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+    }));
+
+    it(&#x27;should append image data to form data&#x27;, fakeAsync(() =&gt; {
+      translateTextBackendApiService.suggestTranslatedTextAsync(
+        &#x27;activeExpId&#x27;,
+        &#x27;activeExpVersion&#x27;,
+        &#x27;activeContentId&#x27;,
+        &#x27;activeStateName&#x27;,
+        &#x27;languageCode&#x27;,
+        &#x27;contentHtml&#x27;,
+        &#x27;translationHtml&#x27;,
+        imagesData).then(successHandler, failHandler);
+      const req = httpTestingController.expectOne(
+        &#x27;/suggestionhandler/&#x27;);
+      expect(req.request.method).toEqual(&#x27;POST&#x27;);
+      expect(req.request.body.getAll(&#x27;imageFilename&#x27;)[0]).toEqual(&#x27;imageBlob&#x27;);
+      req.flush({});
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+    }));
+    it(&#x27;should handle multiple image blobs per filename&#x27;, fakeAsync(() =&gt; {
+      imagesData = [{
+        filename: &#x27;imageFilename1&#x27;,
+        imageBlob: &#x27;imageBlob1&#x27;
+      }, {
+        filename: &#x27;imageFilename1&#x27;,
+        imageBlob: &#x27;imageBlob2&#x27;
+      }, {
+        filename: &#x27;imageFilename2&#x27;,
+        imageBlob: &#x27;imageBlob1&#x27;
+      }, {
+        filename: &#x27;imageFilename2&#x27;,
+        imageBlob: &#x27;imageBlob2&#x27;
+      }];
+      translateTextBackendApiService.suggestTranslatedTextAsync(
+        &#x27;activeExpId&#x27;,
+        &#x27;activeExpVersion&#x27;,
+        &#x27;activeContentId&#x27;,
+        &#x27;activeStateName&#x27;,
+        &#x27;languageCode&#x27;,
+        &#x27;contentHtml&#x27;,
+        &#x27;translationHtml&#x27;,
+        imagesData).then(successHandler, failHandler);
+      const req = httpTestingController.expectOne(
+        &#x27;/suggestionhandler/&#x27;);
+      expect(req.request.method).toEqual(&#x27;POST&#x27;);
+      const filename1Blobs = req.request.body.getAll(&#x27;imageFilename1&#x27;);
+      const filename2Blobs = req.request.body.getAll(&#x27;imageFilename2&#x27;);
+      expect(filename1Blobs).toContain(&#x27;imageBlob1&#x27;);
+      expect(filename1Blobs).toContain(&#x27;imageBlob2&#x27;);
+      expect(filename2Blobs).toContain(&#x27;imageBlob1&#x27;);
+      expect(filename2Blobs).toContain(&#x27;imageBlob2&#x27;);
+      req.flush({});
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+    }));
+
+    it(&#x27;should call the failhandler on error response&#x27;, fakeAsync(() =&gt; {
+      const errorEvent = new ErrorEvent(&#x27;error&#x27;);
+      failHandler = (error: HttpErrorResponse) =&gt; {
+        expect(error.error).toBe(errorEvent);
+      };
+
+      translateTextBackendApiService.suggestTranslatedTextAsync(
+        &#x27;activeExpId&#x27;,
+        &#x27;activeExpVersion&#x27;,
+        &#x27;activeContentId&#x27;,
+        &#x27;activeStateName&#x27;,
+        &#x27;languageCode&#x27;,
+        &#x27;contentHtml&#x27;,
+        &#x27;translationHtml&#x27;,
+        imagesData).then(successHandler, failHandler);
+      const req = httpTestingController.expectOne(
+        &#x27;/suggestionhandler/&#x27;);
+      expect(req.request.method).toEqual(&#x27;POST&#x27;);
+      req.error(errorEvent);
+      flushMicrotasks();
+    }));
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/translate-text-backend-api.service.spec.ts&quot;,&quot;line&quot;:42,&quot;character&quot;:8,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/translate-text-backend-api.service.spec.ts&quot;,&quot;line&quot;:42,&quot;character&quot;:24,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/translate-text-backend-api.service.spec.ts&quot;,&quot;line&quot;:45,&quot;character&quot;:6,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/translate-text-backend-api.service.spec.ts&quot;,&quot;line&quot;:46,&quot;character&quot;:6,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/translate-text-backend-api.service.spec.ts&quot;,&quot;line&quot;:59,&quot;character&quot;:17,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/translate-text-backend-api.service.spec.ts&quot;,&quot;line&quot;:63,&quot;character&quot;:13,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/translate-text-backend-api.service.spec.ts&quot;,&quot;line&quot;:69,&quot;character&quot;:6,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/translate-text-backend-api.service.spec.ts&quot;,&quot;line&quot;:70,&quot;character&quot;:21,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/translate-text-backend-api.service.spec.ts&quot;,&quot;line&quot;:77,&quot;character&quot;:17,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/translate-text-backend-api.service.spec.ts&quot;,&quot;line&quot;:84,&quot;character&quot;:8,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/translate-text-backend-api.service.spec.ts&quot;,&quot;line&quot;:84,&quot;character&quot;:24,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/translate-text-backend-api.service.spec.ts&quot;,&quot;line&quot;:84,&quot;character&quot;:37,&quot;text&quot;:&quot;imagesData&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/translate-text-backend-api.service.spec.ts&quot;,&quot;line&quot;:86,&quot;character&quot;:6,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/translate-text-backend-api.service.spec.ts&quot;,&quot;line&quot;:87,&quot;character&quot;:6,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/translate-text-backend-api.service.spec.ts&quot;,&quot;line&quot;:88,&quot;character&quot;:6,&quot;text&quot;:&quot;imagesData&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/translate-text-backend-api.service.spec.ts&quot;,&quot;line&quot;:123,&quot;character&quot;:17,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/translate-text-backend-api.service.spec.ts&quot;,&quot;line&quot;:124,&quot;character&quot;:17,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/translate-text-backend-api.service.spec.ts&quot;,&quot;line&quot;:124,&quot;character&quot;:25,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/translate-text-backend-api.service.spec.ts&quot;,&quot;line&quot;:124,&quot;character&quot;:30,&quot;text&quot;:&quot;getAll&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/translate-text-backend-api.service.spec.ts&quot;,&quot;line&quot;:129,&quot;character&quot;:13,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/translate-text-backend-api.service.spec.ts&quot;,&quot;line&quot;:144,&quot;character&quot;:17,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/translate-text-backend-api.service.spec.ts&quot;,&quot;line&quot;:145,&quot;character&quot;:17,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/translate-text-backend-api.service.spec.ts&quot;,&quot;line&quot;:145,&quot;character&quot;:25,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/translate-text-backend-api.service.spec.ts&quot;,&quot;line&quot;:145,&quot;character&quot;:30,&quot;text&quot;:&quot;getAll&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/translate-text-backend-api.service.spec.ts&quot;,&quot;line&quot;:149,&quot;character&quot;:13,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/translate-text-backend-api.service.spec.ts&quot;,&quot;line&quot;:152,&quot;character&quot;:6,&quot;text&quot;:&quot;imagesData&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/translate-text-backend-api.service.spec.ts&quot;,&quot;line&quot;:176,&quot;character&quot;:17,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/translate-text-backend-api.service.spec.ts&quot;,&quot;line&quot;:177,&quot;character&quot;:12,&quot;text&quot;:&quot;filename1Blobs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/translate-text-backend-api.service.spec.ts&quot;,&quot;line&quot;:177,&quot;character&quot;:33,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/translate-text-backend-api.service.spec.ts&quot;,&quot;line&quot;:177,&quot;character&quot;:41,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/translate-text-backend-api.service.spec.ts&quot;,&quot;line&quot;:177,&quot;character&quot;:46,&quot;text&quot;:&quot;getAll&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/translate-text-backend-api.service.spec.ts&quot;,&quot;line&quot;:178,&quot;character&quot;:12,&quot;text&quot;:&quot;filename2Blobs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/translate-text-backend-api.service.spec.ts&quot;,&quot;line&quot;:178,&quot;character&quot;:33,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/translate-text-backend-api.service.spec.ts&quot;,&quot;line&quot;:178,&quot;character&quot;:41,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/translate-text-backend-api.service.spec.ts&quot;,&quot;line&quot;:178,&quot;character&quot;:46,&quot;text&quot;:&quot;getAll&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/translate-text-backend-api.service.spec.ts&quot;,&quot;line&quot;:179,&quot;character&quot;:13,&quot;text&quot;:&quot;filename1Blobs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/translate-text-backend-api.service.spec.ts&quot;,&quot;line&quot;:180,&quot;character&quot;:13,&quot;text&quot;:&quot;filename1Blobs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/translate-text-backend-api.service.spec.ts&quot;,&quot;line&quot;:181,&quot;character&quot;:13,&quot;text&quot;:&quot;filename2Blobs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/translate-text-backend-api.service.spec.ts&quot;,&quot;line&quot;:182,&quot;character&quot;:13,&quot;text&quot;:&quot;filename2Blobs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/translate-text-backend-api.service.spec.ts&quot;,&quot;line&quot;:186,&quot;character&quot;:13,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/translate-text-backend-api.service.spec.ts&quot;,&quot;line&quot;:191,&quot;character&quot;:6,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/translate-text-backend-api.service.spec.ts&quot;,&quot;line&quot;:192,&quot;character&quot;:21,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/translate-text-backend-api.service.spec.ts&quot;,&quot;line&quot;:206,&quot;character&quot;:17,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:59 GMT</p>
+    </body>
+  </html>
+  

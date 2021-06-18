@@ -1,0 +1,129 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>rte-helper.service.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/services/rte-helper.service.ts</td><td class="">36.43%</td><td class="">100%</td><td class="">140</td><td class="">51</td><td class="">89</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2014 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview A helper service for the Rich text editor(RTE).
+ */
+
+require(&#x27;domain/utilities/url-interpolation.service.ts&#x27;);
+require(&#x27;services/html-escaper.service.ts&#x27;);
+require(&#x27;services/stateful/focus-manager.service.ts&#x27;);
+require(&#x27;services/rte-helper-modal.controller.ts&#x27;);
+
+require(&#x27;services/alerts.service.ts&#x27;);
+require(&#x27;services/assets-backend-api.service.ts&#x27;);
+require(&#x27;services/context.service.ts&#x27;);
+require(&#x27;services/image-local-storage.service.ts&#x27;);
+require(&#x27;services/image-upload-helper.service.ts&#x27;);
+require(&#x27;app.constants.ajs.ts&#x27;);
+require(&#x27;services/services.constants.ajs.ts&#x27;);
+
+angular.module(&#x27;oppia&#x27;).factory(&#x27;RteHelperService&#x27;, [
+  &#x27;$document&#x27;, &#x27;$log&#x27;, &#x27;$uibModal&#x27;, &#x27;HtmlEscaperService&#x27;,
+  &#x27;UrlInterpolationService&#x27;, &#x27;INLINE_RTE_COMPONENTS&#x27;,
+  &#x27;RTE_COMPONENT_SPECS&#x27;, function(
+      $document, $log, $uibModal, HtmlEscaperService,
+      UrlInterpolationService, INLINE_RTE_COMPONENTS,
+      RTE_COMPONENT_SPECS) {
+    var _RICH_TEXT_COMPONENTS = [];
+
+    Object.keys(RTE_COMPONENT_SPECS).sort().forEach(function(componentId) {
+      _RICH_TEXT_COMPONENTS.push({
+        backendId: RTE_COMPONENT_SPECS[componentId].backend_id,
+        customizationArgSpecs: angular.copy(
+          RTE_COMPONENT_SPECS[componentId].customization_arg_specs),
+        id: RTE_COMPONENT_SPECS[componentId].frontend_id,
+        iconDataUrl: RTE_COMPONENT_SPECS[componentId].icon_data_url,
+        isComplex: RTE_COMPONENT_SPECS[componentId].is_complex,
+        isBlockElement: RTE_COMPONENT_SPECS[componentId].is_block_element,
+        requiresFs: RTE_COMPONENT_SPECS[componentId].requires_fs,
+        tooltip: RTE_COMPONENT_SPECS[componentId].tooltip
+      });
+    });
+
+    var _createCustomizationArgDictFromAttrs = function(attrs) {
+      var customizationArgsDict = {};
+      for (var i = 0; i &lt; attrs.length; i++) {
+        var attr = attrs[i];
+        if (attr.name === &#x27;class&#x27; || attr.name === &#x27;src&#x27; ||
+          attr.name === &#x27;_moz_resizing&#x27;) {
+          continue;
+        }
+        var separatorLocation = attr.name.indexOf(&#x27;-with-value&#x27;);
+        if (separatorLocation === -1) {
+          $log.error(&#x27;RTE Error: invalid customization attribute &#x27; + attr.name);
+          continue;
+        }
+        var argName = attr.name.substring(0, separatorLocation);
+        customizationArgsDict[argName] = HtmlEscaperService.escapedJsonToObj(
+          attr.value);
+      }
+      return customizationArgsDict;
+    };
+
+    return {
+      createCustomizationArgDictFromAttrs: function(attrs) {
+        return _createCustomizationArgDictFromAttrs(attrs);
+      },
+      getRichTextComponents: function() {
+        return angular.copy(_RICH_TEXT_COMPONENTS);
+      },
+      isInlineComponent: function(richTextComponent) {
+        return INLINE_RTE_COMPONENTS.indexOf(richTextComponent) !== -1;
+      },
+      // The refocusFn arg is a function that restores focus to the text editor
+      // after exiting the modal, and moves the cursor back to where it was
+      // before the modal was opened.
+      openCustomizationModal: function(
+          customizationArgSpecs, attrsCustomizationArgsDict, onSubmitCallback,
+          onDismissCallback, refocusFn) {
+        $document[0].execCommand(&#x27;enableObjectResizing&#x27;, false, false);
+        $uibModal.open({
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            &#x27;/components/ck-editor-helpers/&#x27; +
+            &#x27;customize-rte-component-modal.template.html&#x27;),
+          backdrop: &#x27;static&#x27;,
+          resolve: {
+            customizationArgSpecs: function() {
+              return customizationArgSpecs;
+            },
+            attrsCustomizationArgsDict: function() {
+              return attrsCustomizationArgsDict;
+            }
+          },
+          controller: &#x27;RteHelperModalController&#x27;
+        }).result.then(onSubmitCallback).catch(onDismissCallback);
+      }
+
+    };
+  }
+]);
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:35,&quot;character&quot;:6,&quot;text&quot;:&quot;$document&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:35,&quot;character&quot;:17,&quot;text&quot;:&quot;$log&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:35,&quot;character&quot;:23,&quot;text&quot;:&quot;$uibModal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:35,&quot;character&quot;:34,&quot;text&quot;:&quot;HtmlEscaperService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:36,&quot;character&quot;:6,&quot;text&quot;:&quot;UrlInterpolationService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:36,&quot;character&quot;:31,&quot;text&quot;:&quot;INLINE_RTE_COMPONENTS&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:37,&quot;character&quot;:6,&quot;text&quot;:&quot;RTE_COMPONENT_SPECS&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:38,&quot;character&quot;:8,&quot;text&quot;:&quot;_RICH_TEXT_COMPONENTS&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:41,&quot;character&quot;:6,&quot;text&quot;:&quot;_RICH_TEXT_COMPONENTS&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:42,&quot;character&quot;:8,&quot;text&quot;:&quot;backendId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:42,&quot;character&quot;:19,&quot;text&quot;:&quot;RTE_COMPONENT_SPECS&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:42,&quot;character&quot;:52,&quot;text&quot;:&quot;backend_id&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:43,&quot;character&quot;:8,&quot;text&quot;:&quot;customizationArgSpecs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:44,&quot;character&quot;:10,&quot;text&quot;:&quot;RTE_COMPONENT_SPECS&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:44,&quot;character&quot;:43,&quot;text&quot;:&quot;customization_arg_specs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:45,&quot;character&quot;:8,&quot;text&quot;:&quot;id&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:45,&quot;character&quot;:12,&quot;text&quot;:&quot;RTE_COMPONENT_SPECS&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:45,&quot;character&quot;:45,&quot;text&quot;:&quot;frontend_id&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:46,&quot;character&quot;:8,&quot;text&quot;:&quot;iconDataUrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:46,&quot;character&quot;:21,&quot;text&quot;:&quot;RTE_COMPONENT_SPECS&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:46,&quot;character&quot;:54,&quot;text&quot;:&quot;icon_data_url&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:47,&quot;character&quot;:8,&quot;text&quot;:&quot;isComplex&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:47,&quot;character&quot;:19,&quot;text&quot;:&quot;RTE_COMPONENT_SPECS&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:47,&quot;character&quot;:52,&quot;text&quot;:&quot;is_complex&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:48,&quot;character&quot;:8,&quot;text&quot;:&quot;isBlockElement&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:48,&quot;character&quot;:24,&quot;text&quot;:&quot;RTE_COMPONENT_SPECS&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:48,&quot;character&quot;:57,&quot;text&quot;:&quot;is_block_element&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:49,&quot;character&quot;:8,&quot;text&quot;:&quot;requiresFs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:49,&quot;character&quot;:20,&quot;text&quot;:&quot;RTE_COMPONENT_SPECS&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:49,&quot;character&quot;:53,&quot;text&quot;:&quot;requires_fs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:50,&quot;character&quot;:8,&quot;text&quot;:&quot;tooltip&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:50,&quot;character&quot;:17,&quot;text&quot;:&quot;RTE_COMPONENT_SPECS&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:50,&quot;character&quot;:50,&quot;text&quot;:&quot;tooltip&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:54,&quot;character&quot;:56,&quot;text&quot;:&quot;attrs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:56,&quot;character&quot;:26,&quot;text&quot;:&quot;attrs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:56,&quot;character&quot;:32,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:57,&quot;character&quot;:12,&quot;text&quot;:&quot;attr&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:57,&quot;character&quot;:19,&quot;text&quot;:&quot;attrs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:58,&quot;character&quot;:12,&quot;text&quot;:&quot;attr&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:58,&quot;character&quot;:17,&quot;text&quot;:&quot;name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:58,&quot;character&quot;:37,&quot;text&quot;:&quot;attr&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:58,&quot;character&quot;:42,&quot;text&quot;:&quot;name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:59,&quot;character&quot;:10,&quot;text&quot;:&quot;attr&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:59,&quot;character&quot;:15,&quot;text&quot;:&quot;name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:62,&quot;character&quot;:12,&quot;text&quot;:&quot;separatorLocation&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:62,&quot;character&quot;:32,&quot;text&quot;:&quot;attr&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:62,&quot;character&quot;:37,&quot;text&quot;:&quot;name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:62,&quot;character&quot;:42,&quot;text&quot;:&quot;indexOf&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:63,&quot;character&quot;:12,&quot;text&quot;:&quot;separatorLocation&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:64,&quot;character&quot;:10,&quot;text&quot;:&quot;$log&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:64,&quot;character&quot;:15,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:64,&quot;character&quot;:69,&quot;text&quot;:&quot;attr&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:64,&quot;character&quot;:74,&quot;text&quot;:&quot;name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:67,&quot;character&quot;:12,&quot;text&quot;:&quot;argName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:67,&quot;character&quot;:22,&quot;text&quot;:&quot;attr&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:67,&quot;character&quot;:27,&quot;text&quot;:&quot;name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:67,&quot;character&quot;:32,&quot;text&quot;:&quot;substring&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:67,&quot;character&quot;:45,&quot;text&quot;:&quot;separatorLocation&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:68,&quot;character&quot;:30,&quot;text&quot;:&quot;argName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:68,&quot;character&quot;:41,&quot;text&quot;:&quot;HtmlEscaperService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:68,&quot;character&quot;:60,&quot;text&quot;:&quot;escapedJsonToObj&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:69,&quot;character&quot;:10,&quot;text&quot;:&quot;attr&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:69,&quot;character&quot;:15,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:75,&quot;character&quot;:52,&quot;text&quot;:&quot;attrs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:76,&quot;character&quot;:52,&quot;text&quot;:&quot;attrs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:79,&quot;character&quot;:28,&quot;text&quot;:&quot;_RICH_TEXT_COMPONENTS&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:81,&quot;character&quot;:34,&quot;text&quot;:&quot;richTextComponent&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:82,&quot;character&quot;:15,&quot;text&quot;:&quot;INLINE_RTE_COMPONENTS&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:82,&quot;character&quot;:37,&quot;text&quot;:&quot;indexOf&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:82,&quot;character&quot;:45,&quot;text&quot;:&quot;richTextComponent&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:88,&quot;character&quot;:10,&quot;text&quot;:&quot;customizationArgSpecs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:88,&quot;character&quot;:33,&quot;text&quot;:&quot;attrsCustomizationArgsDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:88,&quot;character&quot;:61,&quot;text&quot;:&quot;onSubmitCallback&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:89,&quot;character&quot;:10,&quot;text&quot;:&quot;onDismissCallback&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:89,&quot;character&quot;:29,&quot;text&quot;:&quot;refocusFn&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:90,&quot;character&quot;:8,&quot;text&quot;:&quot;$document&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:90,&quot;character&quot;:21,&quot;text&quot;:&quot;execCommand&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:91,&quot;character&quot;:8,&quot;text&quot;:&quot;$uibModal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:91,&quot;character&quot;:18,&quot;text&quot;:&quot;open&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:92,&quot;character&quot;:10,&quot;text&quot;:&quot;templateUrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:92,&quot;character&quot;:23,&quot;text&quot;:&quot;UrlInterpolationService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:92,&quot;character&quot;:47,&quot;text&quot;:&quot;getDirectiveTemplateUrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:98,&quot;character&quot;:21,&quot;text&quot;:&quot;customizationArgSpecs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:101,&quot;character&quot;:21,&quot;text&quot;:&quot;attrsCustomizationArgsDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:105,&quot;character&quot;:11,&quot;text&quot;:&quot;result&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:105,&quot;character&quot;:18,&quot;text&quot;:&quot;then&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:105,&quot;character&quot;:23,&quot;text&quot;:&quot;onSubmitCallback&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:105,&quot;character&quot;:41,&quot;text&quot;:&quot;catch&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/rte-helper.service.ts&quot;,&quot;line&quot;:105,&quot;character&quot;:47,&quot;text&quot;:&quot;onDismissCallback&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:56 GMT</p>
+    </body>
+  </html>
+  

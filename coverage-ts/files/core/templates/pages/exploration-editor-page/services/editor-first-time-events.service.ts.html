@@ -1,0 +1,145 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>editor-first-time-events.service.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/exploration-editor-page/services/editor-first-time-events.service.ts</td><td class="">81.82%</td><td class="">100%</td><td class="">143</td><td class="">117</td><td class="">26</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2014 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview A Service registering analytics events for the editor
+ * for events which are  only logged when they happen after the editor
+ * is opened for the first time for an exploration.
+ */
+
+import { downgradeInjectable } from &#x27;@angular/upgrade/static&#x27;;
+import { Injectable } from &#x27;@angular/core&#x27;;
+
+import { SiteAnalyticsService } from &#x27;services/site-analytics.service&#x27;;
+
+@Injectable({
+  providedIn: &#x27;root&#x27;
+})
+export class EditorFirstTimeEventsService {
+  constructor(private siteAnalyticsService: SiteAnalyticsService) {}
+
+    explorationId = null;
+    shouldRegisterEvents = false;
+    alreadyRegisteredEvents = {
+      EditorFirstEntryEvent: null,
+      FirstOpenContentBoxEvent: null,
+      FirstSaveContentEvent: null,
+      FirstClickAddInteractionEvent: null,
+      FirstSelectInteractionTypeEvent: null,
+      FirstSaveInteractionEvent: null,
+      FirstSaveRuleEvent: null,
+      FirstCreateSecondStateEvent: null
+    };
+
+    initRegisterEvents(expId: string): void {
+      this.shouldRegisterEvents = true;
+      this.explorationId = expId;
+    }
+
+    registerEditorFirstEntryEvent(): void {
+      if (this.shouldRegisterEvents &amp;&amp;
+            this.alreadyRegisteredEvents.EditorFirstEntryEvent === null) {
+        this.siteAnalyticsService.registerEditorFirstEntryEvent(
+          this.explorationId);
+        this.alreadyRegisteredEvents.EditorFirstEntryEvent = true;
+      }
+    }
+
+    registerFirstOpenContentBoxEvent(): void {
+      if (this.shouldRegisterEvents &amp;&amp;
+            this.alreadyRegisteredEvents.FirstOpenContentBoxEvent === null) {
+        this.siteAnalyticsService.registerFirstOpenContentBoxEvent(
+          this.explorationId);
+        this.alreadyRegisteredEvents.FirstOpenContentBoxEvent = true;
+      }
+    }
+
+    registerFirstSaveContentEvent(): void {
+      if (this.shouldRegisterEvents &amp;&amp;
+            this.alreadyRegisteredEvents.FirstSaveContentEvent === null) {
+        this.siteAnalyticsService.registerFirstSaveContentEvent(
+          this.explorationId);
+        this.alreadyRegisteredEvents.FirstSaveContentEvent = true;
+      }
+    }
+
+    registerFirstClickAddInteractionEvent(): void {
+      if (this.shouldRegisterEvents &amp;&amp;
+            this.alreadyRegisteredEvents.FirstClickAddInteractionEvent ===
+          null) {
+        this.siteAnalyticsService.registerFirstClickAddInteractionEvent(
+          this.explorationId);
+        this.alreadyRegisteredEvents.FirstClickAddInteractionEvent = true;
+      }
+    }
+
+    registerFirstSelectInteractionTypeEvent(): void {
+      if (this.shouldRegisterEvents &amp;&amp;
+            this.alreadyRegisteredEvents.FirstSelectInteractionTypeEvent ===
+          null) {
+        this.siteAnalyticsService.registerFirstSelectInteractionTypeEvent(
+          this.explorationId);
+        this.alreadyRegisteredEvents.FirstSelectInteractionTypeEvent = true;
+      }
+    }
+
+    registerFirstSaveInteractionEvent(): void {
+      if (this.shouldRegisterEvents &amp;&amp;
+            this.alreadyRegisteredEvents.FirstSaveInteractionEvent === null) {
+        this.siteAnalyticsService.registerFirstSaveInteractionEvent(
+          this.explorationId);
+        this.alreadyRegisteredEvents.FirstSaveInteractionEvent = true;
+      }
+    }
+
+    registerFirstSaveRuleEvent(): void {
+      if (this.shouldRegisterEvents &amp;&amp;
+            this.alreadyRegisteredEvents.FirstSaveRuleEvent === null) {
+        this.siteAnalyticsService.registerFirstSaveRuleEvent(
+          this.explorationId);
+        this.alreadyRegisteredEvents.FirstSaveRuleEvent = true;
+      }
+    }
+
+    registerFirstCreateSecondStateEvent(): void {
+      if (this.shouldRegisterEvents &amp;&amp;
+            this.alreadyRegisteredEvents.FirstCreateSecondStateEvent === null) {
+        this.siteAnalyticsService.registerFirstCreateSecondStateEvent(
+          this.explorationId);
+        this.alreadyRegisteredEvents.FirstCreateSecondStateEvent = true;
+      }
+    }
+}
+
+angular.module(&#x27;oppia&#x27;).factory(
+  &#x27;EditorFirstTimeEventsService&#x27;,
+  downgradeInjectable(EditorFirstTimeEventsService));
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/editor-first-time-events.service.ts&quot;,&quot;line&quot;:31,&quot;character&quot;:4,&quot;text&quot;:&quot;explorationId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/editor-first-time-events.service.ts&quot;,&quot;line&quot;:46,&quot;character&quot;:11,&quot;text&quot;:&quot;explorationId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/editor-first-time-events.service.ts&quot;,&quot;line&quot;:51,&quot;character&quot;:41,&quot;text&quot;:&quot;EditorFirstEntryEvent&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/editor-first-time-events.service.ts&quot;,&quot;line&quot;:53,&quot;character&quot;:15,&quot;text&quot;:&quot;explorationId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/editor-first-time-events.service.ts&quot;,&quot;line&quot;:54,&quot;character&quot;:37,&quot;text&quot;:&quot;EditorFirstEntryEvent&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/editor-first-time-events.service.ts&quot;,&quot;line&quot;:60,&quot;character&quot;:41,&quot;text&quot;:&quot;FirstOpenContentBoxEvent&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/editor-first-time-events.service.ts&quot;,&quot;line&quot;:62,&quot;character&quot;:15,&quot;text&quot;:&quot;explorationId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/editor-first-time-events.service.ts&quot;,&quot;line&quot;:63,&quot;character&quot;:37,&quot;text&quot;:&quot;FirstOpenContentBoxEvent&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/editor-first-time-events.service.ts&quot;,&quot;line&quot;:69,&quot;character&quot;:41,&quot;text&quot;:&quot;FirstSaveContentEvent&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/editor-first-time-events.service.ts&quot;,&quot;line&quot;:71,&quot;character&quot;:15,&quot;text&quot;:&quot;explorationId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/editor-first-time-events.service.ts&quot;,&quot;line&quot;:72,&quot;character&quot;:37,&quot;text&quot;:&quot;FirstSaveContentEvent&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/editor-first-time-events.service.ts&quot;,&quot;line&quot;:78,&quot;character&quot;:41,&quot;text&quot;:&quot;FirstClickAddInteractionEvent&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/editor-first-time-events.service.ts&quot;,&quot;line&quot;:81,&quot;character&quot;:15,&quot;text&quot;:&quot;explorationId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/editor-first-time-events.service.ts&quot;,&quot;line&quot;:82,&quot;character&quot;:37,&quot;text&quot;:&quot;FirstClickAddInteractionEvent&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/editor-first-time-events.service.ts&quot;,&quot;line&quot;:88,&quot;character&quot;:41,&quot;text&quot;:&quot;FirstSelectInteractionTypeEvent&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/editor-first-time-events.service.ts&quot;,&quot;line&quot;:91,&quot;character&quot;:15,&quot;text&quot;:&quot;explorationId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/editor-first-time-events.service.ts&quot;,&quot;line&quot;:92,&quot;character&quot;:37,&quot;text&quot;:&quot;FirstSelectInteractionTypeEvent&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/editor-first-time-events.service.ts&quot;,&quot;line&quot;:98,&quot;character&quot;:41,&quot;text&quot;:&quot;FirstSaveInteractionEvent&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/editor-first-time-events.service.ts&quot;,&quot;line&quot;:100,&quot;character&quot;:15,&quot;text&quot;:&quot;explorationId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/editor-first-time-events.service.ts&quot;,&quot;line&quot;:101,&quot;character&quot;:37,&quot;text&quot;:&quot;FirstSaveInteractionEvent&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/editor-first-time-events.service.ts&quot;,&quot;line&quot;:107,&quot;character&quot;:41,&quot;text&quot;:&quot;FirstSaveRuleEvent&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/editor-first-time-events.service.ts&quot;,&quot;line&quot;:109,&quot;character&quot;:15,&quot;text&quot;:&quot;explorationId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/editor-first-time-events.service.ts&quot;,&quot;line&quot;:110,&quot;character&quot;:37,&quot;text&quot;:&quot;FirstSaveRuleEvent&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/editor-first-time-events.service.ts&quot;,&quot;line&quot;:116,&quot;character&quot;:41,&quot;text&quot;:&quot;FirstCreateSecondStateEvent&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/editor-first-time-events.service.ts&quot;,&quot;line&quot;:118,&quot;character&quot;:15,&quot;text&quot;:&quot;explorationId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/editor-first-time-events.service.ts&quot;,&quot;line&quot;:119,&quot;character&quot;:37,&quot;text&quot;:&quot;FirstCreateSecondStateEvent&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:55 GMT</p>
+    </body>
+  </html>
+  

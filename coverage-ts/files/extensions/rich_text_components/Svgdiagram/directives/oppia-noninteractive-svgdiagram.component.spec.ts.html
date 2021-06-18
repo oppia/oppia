@@ -1,0 +1,199 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>oppia-noninteractive-svgdiagram.component.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">extensions/rich_text_components/Svgdiagram/directives/oppia-noninteractive-svgdiagram.component.spec.ts</td><td class="">96.41%</td><td class="">100%</td><td class="">223</td><td class="">215</td><td class="">8</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for the oppia noninteractive svg diagram component.
+ */
+
+import { AppConstants } from &#x27;app.constants&#x27;;
+import { ComponentFixture, waitForAsync, TestBed } from &#x27;@angular/core/testing&#x27;;
+import { NoninteractiveSvgdiagram } from &#x27;./oppia-noninteractive-svgdiagram.component&#x27;;
+import { AssetsBackendApiService } from &#x27;services/assets-backend-api.service&#x27;;
+import { ImagePreloaderService } from &#x27;pages/exploration-player-page/services/image-preloader.service&#x27;;
+import { ContextService } from &#x27;services/context.service&#x27;;
+import { ImageLocalStorageService } from &#x27;services/image-local-storage.service&#x27;;
+import { HttpClientTestingModule } from &#x27;@angular/common/http/testing&#x27;;
+import { SimpleChanges, SimpleChange } from &#x27;@angular/core&#x27;;
+import { SvgSanitizerService } from &#x27;services/svg-sanitizer.service&#x27;;
+
+describe(&#x27;oppiaNoninteractiveSvgdiagram&#x27;, () =&gt; {
+  let component: NoninteractiveSvgdiagram;
+  let fixture: ComponentFixture&lt;NoninteractiveSvgdiagram&gt;;
+  let contextService: ContextService;
+  const mockAssetsBackendApiService = {
+    getImageUrlForPreview: function(contentType, contentId, filename) {
+      return &#x27;imageUrl:&#x27; + contentType + &#x27;_&#x27; + contentId + &#x27;_&#x27; + filename;
+    }
+  };
+  const mockImagePreloaderService = {
+    getDimensionsOfImage: function() {
+      return {
+        width: 450,
+        height: 350
+      };
+    }
+  };
+
+  beforeEach(waitForAsync(() =&gt; {
+    TestBed.configureTestingModule(
+      {
+        imports: [HttpClientTestingModule],
+        declarations: [NoninteractiveSvgdiagram],
+        providers: [
+          {
+            provide: AssetsBackendApiService,
+            useValue: mockAssetsBackendApiService
+          },
+          {
+            provide: ImagePreloaderService,
+            useValue: mockImagePreloaderService
+          }
+        ]
+      }
+    ).compileComponents();
+  }));
+
+  beforeEach(() =&gt; {
+    contextService = TestBed.inject(ContextService);
+    fixture = TestBed.createComponent(
+      NoninteractiveSvgdiagram);
+    component = fixture.componentInstance;
+    component.svgFilenameWithValue = &#x27;&amp;quot;svgFilename.svg&amp;quot;&#x27;;
+    component.altWithValue = &#x27;&amp;quot;altText&amp;quot;&#x27;;
+    spyOn(contextService, &#x27;getEntityType&#x27;).and.returnValue(&#x27;exploration&#x27;);
+    spyOn(contextService, &#x27;getEntityId&#x27;).and.returnValue(&#x27;1&#x27;);
+    spyOn(contextService, &#x27;getImageSaveDestination&#x27;).and.returnValue(
+      AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
+    fixture.detectChanges();
+  });
+
+  it(&#x27;should run update on change&#x27;, () =&gt; {
+    component.svgFilenameWithValue = undefined;
+    component.altWithValue = undefined;
+    component.ngOnInit();
+    component.svgFilenameWithValue = &#x27;&amp;quot;svgFilename.svg&amp;quot;&#x27;;
+    component.altWithValue = &#x27;&amp;quot;altText&amp;quot;&#x27;;
+    let changes: SimpleChanges = {};
+    changes.svgFilenameWithValue = new SimpleChange(
+      undefined,
+      &#x27;&amp;quot;svgFilename.svg&amp;quot;&#x27;,
+      true
+    );
+    changes.svgFilenameWithValue = new SimpleChange(
+      undefined,
+      &#x27;&amp;quot;altText&amp;quot;&#x27;,
+      true
+    );
+    component.ngOnChanges(changes);
+    expect(component.filename).toBe(&#x27;svgFilename.svg&#x27;);
+    expect(component.svgAltText).toBe(&#x27;altText&#x27;);
+    expect(component.svgUrl).toBe(&#x27;imageUrl:exploration_1_svgFilename.svg&#x27;);
+  });
+
+  it(&#x27;should fetch the svg file&#x27;, () =&gt; {
+    component.ngOnInit();
+    expect(component.filename).toBe(&#x27;svgFilename.svg&#x27;);
+    expect(component.svgAltText).toBe(&#x27;altText&#x27;);
+    expect(component.svgUrl).toBe(&#x27;imageUrl:exploration_1_svgFilename.svg&#x27;);
+    component.svgFilenameWithValue = &#x27;&amp;quot;&amp;quot;&#x27;;
+    component.ngOnInit();
+    expect(component.filename).toBe(&#x27;&#x27;);
+  });
+});
+
+describe(
+  &#x27;OppiaNoninteractiveSvgdiagram with image save destination as local storage&#x27;,
+  () =&gt; {
+    let component: NoninteractiveSvgdiagram;
+    let fixture: ComponentFixture&lt;NoninteractiveSvgdiagram&gt;;
+    let contextService: ContextService;
+
+    const mockImageLocalStorageService = {
+      getRawImageData: function() {
+        return &#x27;imageUrl:exploration_1_svgFilename.svg&#x27;;
+      }
+    };
+    const mockImagePreloaderService = {
+      getDimensionsOfImage: function() {
+        return {
+          width: 450,
+          height: 350
+        };
+      }
+    };
+
+    const mockSvgSanitizerService = {
+      getTrustedSvgResourceUrl: (url) =&gt; url
+    };
+
+    beforeEach(waitForAsync(() =&gt; {
+      TestBed.configureTestingModule(
+        {
+          imports: [HttpClientTestingModule],
+          declarations: [NoninteractiveSvgdiagram],
+          providers: [
+            {
+              provide: ImageLocalStorageService,
+              useValue: mockImageLocalStorageService
+            },
+            {
+              provide: ImagePreloaderService,
+              useValue: mockImagePreloaderService
+            },
+            {
+              provide: SvgSanitizerService,
+              useValue: mockSvgSanitizerService
+            }
+          ]
+        }
+      ).compileComponents();
+    }));
+
+    beforeEach(() =&gt; {
+      contextService = TestBed.inject(ContextService);
+      fixture = TestBed.createComponent(
+        NoninteractiveSvgdiagram);
+      component = fixture.componentInstance;
+      component.svgFilenameWithValue = &#x27;&amp;quot;svgFilename.svg&amp;quot;&#x27;;
+      component.altWithValue = &#x27;&amp;quot;altText&amp;quot;&#x27;;
+      spyOn(contextService, &#x27;getImageSaveDestination&#x27;).and.returnValue(
+        AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
+      fixture.detectChanges();
+    });
+
+    it(&#x27;should fetch the svg file&#x27;, () =&gt; {
+      component.ngOnInit();
+      expect(component.filename).toBe(&#x27;svgFilename.svg&#x27;);
+      expect(component.svgAltText).toBe(&#x27;altText&#x27;);
+      expect(component.svgUrl).toBe(&#x27;imageUrl:exploration_1_svgFilename.svg&#x27;);
+    });
+  });
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;extensions/rich_text_components/Svgdiagram/directives/oppia-noninteractive-svgdiagram.component.spec.ts&quot;,&quot;line&quot;:34,&quot;character&quot;:36,&quot;text&quot;:&quot;contentType&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Svgdiagram/directives/oppia-noninteractive-svgdiagram.component.spec.ts&quot;,&quot;line&quot;:34,&quot;character&quot;:49,&quot;text&quot;:&quot;contentId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Svgdiagram/directives/oppia-noninteractive-svgdiagram.component.spec.ts&quot;,&quot;line&quot;:34,&quot;character&quot;:60,&quot;text&quot;:&quot;filename&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Svgdiagram/directives/oppia-noninteractive-svgdiagram.component.spec.ts&quot;,&quot;line&quot;:35,&quot;character&quot;:27,&quot;text&quot;:&quot;contentType&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Svgdiagram/directives/oppia-noninteractive-svgdiagram.component.spec.ts&quot;,&quot;line&quot;:35,&quot;character&quot;:47,&quot;text&quot;:&quot;contentId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Svgdiagram/directives/oppia-noninteractive-svgdiagram.component.spec.ts&quot;,&quot;line&quot;:35,&quot;character&quot;:65,&quot;text&quot;:&quot;filename&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Svgdiagram/directives/oppia-noninteractive-svgdiagram.component.spec.ts&quot;,&quot;line&quot;:136,&quot;character&quot;:33,&quot;text&quot;:&quot;url&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Svgdiagram/directives/oppia-noninteractive-svgdiagram.component.spec.ts&quot;,&quot;line&quot;:136,&quot;character&quot;:41,&quot;text&quot;:&quot;url&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:44:00 GMT</p>
+    </body>
+  </html>
+  

@@ -1,0 +1,87 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>protractor.js</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">extensions/rich_text_components/Tabs/protractor.js</td><td class="">36.79%</td><td class="">100%</td><td class="">106</td><td class="">39</td><td class="">67</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2014 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Utilities for using the Tabs component during
+ * end-to-end testing with Protractor.js
+ */
+
+var forms = require(process.cwd() + &#x27;/core/tests/protractor_utils/forms.js&#x27;);
+var waitFor = require(
+  process.cwd() + &#x27;/core/tests/protractor_utils/waitFor.js&#x27;);
+
+// The &#x27;tabArray&#x27; arg should be an array of dictionaries with keys:
+//   &#x27;title&#x27;: a string
+//   &#x27;content&#x27;: a function that gives rich text editing instructions.
+var customizeComponent = async function(modal, tabArray) {
+  var listEditor = await forms.ListEditor(modal);
+
+  await listEditor.setLength(tabArray.length);
+  for (var i = 0; i &lt; tabArray.length; i++) {
+    var dictionaryEditor = await listEditor.editItem(i, &#x27;Dictionary&#x27;);
+    var unicodeEditor = await dictionaryEditor.editEntry(0, &#x27;UnicodeString&#x27;);
+    await unicodeEditor.setValue(tabArray[i].title);
+    var richTextEditor = await dictionaryEditor.editEntry(1, &#x27;RichText&#x27;);
+    await richTextEditor.clear();
+    await tabArray[i].content(richTextEditor);
+  }
+};
+
+var expectComponentDetailsToMatch = async function(elem, tabArray) {
+  var titleElems = elem.all(
+    by.css(&#x27;.protractor-test-non-interactive-tabs-headers&#x27;));
+  expect(await titleElems.count()).toEqual(tabArray.length);
+
+  for (var i = 0; i &lt; tabArray.length; i++) {
+    // Click on each tab in turn to check its contents.
+    await waitFor.visibilityOf(
+      elem.element(by.css(&#x27;.protractor-test-non-interactive-tabs-headers&#x27;)),
+      &#x27;Non-interactive-tabs-headers is taking too long to appear&#x27;
+    );
+    expect(await (await titleElems.get(i)).getText()).toMatch(
+      tabArray[i].title);
+    await (await titleElems.get(i)).click();
+
+    const tabContentEl = elem.element(
+      by.css(&#x27;.protractor-test-tab-content-&#x27; + i));
+
+    await waitFor.visibilityOf(
+      tabContentEl,
+      &#x27;.protractor-test-tab-content-&#x27; + i + &#x27;is taking too long to appear&#x27;
+    );
+    await forms.expectRichText(tabContentEl).toMatch(
+      tabArray[i].content);
+  }
+};
+
+exports.customizeComponent = customizeComponent;
+exports.expectComponentDetailsToMatch = expectComponentDetailsToMatch;
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:19,&quot;character&quot;:4,&quot;text&quot;:&quot;forms&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:20,&quot;character&quot;:4,&quot;text&quot;:&quot;waitFor&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:26,&quot;character&quot;:40,&quot;text&quot;:&quot;modal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:26,&quot;character&quot;:47,&quot;text&quot;:&quot;tabArray&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:27,&quot;character&quot;:6,&quot;text&quot;:&quot;listEditor&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:27,&quot;character&quot;:25,&quot;text&quot;:&quot;forms&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:27,&quot;character&quot;:31,&quot;text&quot;:&quot;ListEditor&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:27,&quot;character&quot;:42,&quot;text&quot;:&quot;modal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:29,&quot;character&quot;:8,&quot;text&quot;:&quot;listEditor&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:29,&quot;character&quot;:19,&quot;text&quot;:&quot;setLength&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:29,&quot;character&quot;:29,&quot;text&quot;:&quot;tabArray&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:29,&quot;character&quot;:38,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:30,&quot;character&quot;:22,&quot;text&quot;:&quot;tabArray&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:30,&quot;character&quot;:31,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:31,&quot;character&quot;:8,&quot;text&quot;:&quot;dictionaryEditor&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:31,&quot;character&quot;:33,&quot;text&quot;:&quot;listEditor&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:31,&quot;character&quot;:44,&quot;text&quot;:&quot;editItem&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:32,&quot;character&quot;:8,&quot;text&quot;:&quot;unicodeEditor&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:32,&quot;character&quot;:30,&quot;text&quot;:&quot;dictionaryEditor&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:32,&quot;character&quot;:47,&quot;text&quot;:&quot;editEntry&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:33,&quot;character&quot;:10,&quot;text&quot;:&quot;unicodeEditor&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:33,&quot;character&quot;:24,&quot;text&quot;:&quot;setValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:33,&quot;character&quot;:33,&quot;text&quot;:&quot;tabArray&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:33,&quot;character&quot;:45,&quot;text&quot;:&quot;title&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:34,&quot;character&quot;:8,&quot;text&quot;:&quot;richTextEditor&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:34,&quot;character&quot;:31,&quot;text&quot;:&quot;dictionaryEditor&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:34,&quot;character&quot;:48,&quot;text&quot;:&quot;editEntry&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:35,&quot;character&quot;:10,&quot;text&quot;:&quot;richTextEditor&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:35,&quot;character&quot;:25,&quot;text&quot;:&quot;clear&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:36,&quot;character&quot;:10,&quot;text&quot;:&quot;tabArray&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:36,&quot;character&quot;:22,&quot;text&quot;:&quot;content&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:36,&quot;character&quot;:30,&quot;text&quot;:&quot;richTextEditor&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:40,&quot;character&quot;:51,&quot;text&quot;:&quot;elem&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:40,&quot;character&quot;:57,&quot;text&quot;:&quot;tabArray&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:41,&quot;character&quot;:6,&quot;text&quot;:&quot;titleElems&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:41,&quot;character&quot;:19,&quot;text&quot;:&quot;elem&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:41,&quot;character&quot;:24,&quot;text&quot;:&quot;all&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:43,&quot;character&quot;:15,&quot;text&quot;:&quot;titleElems&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:43,&quot;character&quot;:26,&quot;text&quot;:&quot;count&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:43,&quot;character&quot;:43,&quot;text&quot;:&quot;tabArray&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:43,&quot;character&quot;:52,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:45,&quot;character&quot;:22,&quot;text&quot;:&quot;tabArray&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:45,&quot;character&quot;:31,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:47,&quot;character&quot;:10,&quot;text&quot;:&quot;waitFor&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:47,&quot;character&quot;:18,&quot;text&quot;:&quot;visibilityOf&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:48,&quot;character&quot;:6,&quot;text&quot;:&quot;elem&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:48,&quot;character&quot;:11,&quot;text&quot;:&quot;element&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:51,&quot;character&quot;:24,&quot;text&quot;:&quot;titleElems&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:51,&quot;character&quot;:35,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:51,&quot;character&quot;:43,&quot;text&quot;:&quot;getText&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:52,&quot;character&quot;:6,&quot;text&quot;:&quot;tabArray&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:52,&quot;character&quot;:18,&quot;text&quot;:&quot;title&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:53,&quot;character&quot;:17,&quot;text&quot;:&quot;titleElems&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:53,&quot;character&quot;:28,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:53,&quot;character&quot;:36,&quot;text&quot;:&quot;click&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:55,&quot;character&quot;:10,&quot;text&quot;:&quot;tabContentEl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:55,&quot;character&quot;:25,&quot;text&quot;:&quot;elem&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:55,&quot;character&quot;:30,&quot;text&quot;:&quot;element&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:58,&quot;character&quot;:10,&quot;text&quot;:&quot;waitFor&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:58,&quot;character&quot;:18,&quot;text&quot;:&quot;visibilityOf&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:59,&quot;character&quot;:6,&quot;text&quot;:&quot;tabContentEl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:62,&quot;character&quot;:10,&quot;text&quot;:&quot;forms&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:62,&quot;character&quot;:16,&quot;text&quot;:&quot;expectRichText&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:62,&quot;character&quot;:31,&quot;text&quot;:&quot;tabContentEl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:62,&quot;character&quot;:45,&quot;text&quot;:&quot;toMatch&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:63,&quot;character&quot;:6,&quot;text&quot;:&quot;tabArray&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/protractor.js&quot;,&quot;line&quot;:63,&quot;character&quot;:18,&quot;text&quot;:&quot;content&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:44:00 GMT</p>
+    </body>
+  </html>
+  

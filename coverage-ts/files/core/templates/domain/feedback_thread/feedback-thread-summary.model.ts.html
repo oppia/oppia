@@ -1,0 +1,122 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>feedback-thread-summary.model.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">core/templates/domain/feedback_thread/feedback-thread-summary.model.ts</td><td class="">100.00%</td><td class="">100%</td><td class="">121</td><td class="">121</td><td class="">0</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2015 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Model class for creating new frontend instances of
+ * feedback thread domain objects.
+ */
+
+export interface FeedbackThreadSummaryBackendDict {
+  &#x27;status&#x27;: string;
+  &#x27;original_author_id&#x27;: string;
+  &#x27;last_updated_msecs&#x27;: number;
+  &#x27;last_message_text&#x27;: string;
+  &#x27;total_message_count&#x27;: number;
+  &#x27;last_message_is_read&#x27;: boolean;
+  &#x27;second_last_message_is_read&#x27;: boolean;
+  &#x27;author_last_message&#x27;: string;
+  &#x27;author_second_last_message&#x27;: string;
+  &#x27;exploration_title&#x27;: string;
+  &#x27;exploration_id&#x27;: string;
+  &#x27;thread_id&#x27;: string;
+}
+
+export class FeedbackThreadSummary {
+  status: string;
+  originalAuthorId: string;
+  lastUpdatedMsecs: number;
+  lastMessageText: string;
+  totalMessageCount: number;
+  lastMessageIsRead: boolean;
+  secondLastMessageIsRead: boolean;
+  authorLastMessage: string;
+  authorSecondLastMessage: string;
+  explorationTitle: string;
+  explorationId: string;
+  threadId: string;
+
+  constructor(
+      status: string, originalAuthorId: string, lastUpdatedMsecs: number,
+      lastMessageText: string, totalMessageCount: number,
+      lastMessageIsRead: boolean, secondLastMessageIsRead: boolean,
+      authorLastMessage: string, authorSecondLastMessage: string,
+      explorationTitle: string, explorationId: string, threadId: string) {
+    this.status = status;
+    this.originalAuthorId = originalAuthorId;
+    this.lastUpdatedMsecs = lastUpdatedMsecs;
+    this.lastMessageText = lastMessageText;
+    this.totalMessageCount = totalMessageCount;
+    this.lastMessageIsRead = lastMessageIsRead;
+    this.secondLastMessageIsRead = secondLastMessageIsRead;
+    this.authorLastMessage = authorLastMessage;
+    this.authorSecondLastMessage = authorSecondLastMessage;
+    this.explorationTitle = explorationTitle;
+    this.explorationId = explorationId;
+    this.threadId = threadId;
+  }
+
+  markTheLastTwoMessagesAsRead(): void {
+    if (this.authorSecondLastMessage) {
+      this.secondLastMessageIsRead = true;
+    }
+    this.lastMessageIsRead = true;
+  }
+
+  appendNewMessage(lastMessageText: string, authorLastMessage: string): void {
+    this.lastMessageText = lastMessageText;
+    this.lastUpdatedMsecs = new Date().getTime();
+    this.authorSecondLastMessage = this.authorLastMessage;
+    this.authorLastMessage = authorLastMessage;
+    this.totalMessageCount += 1;
+    this.lastMessageIsRead = true;
+    this.secondLastMessageIsRead = true;
+  }
+
+  static createFromBackendDict(
+      feedbackThreadSummaryBackendDict: FeedbackThreadSummaryBackendDict):
+      FeedbackThreadSummary {
+    return new FeedbackThreadSummary(
+      feedbackThreadSummaryBackendDict.status,
+      feedbackThreadSummaryBackendDict.original_author_id,
+      feedbackThreadSummaryBackendDict.last_updated_msecs,
+      feedbackThreadSummaryBackendDict.last_message_text,
+      feedbackThreadSummaryBackendDict.total_message_count,
+      feedbackThreadSummaryBackendDict.last_message_is_read,
+      feedbackThreadSummaryBackendDict.second_last_message_is_read,
+      feedbackThreadSummaryBackendDict.author_last_message,
+      feedbackThreadSummaryBackendDict.author_second_last_message,
+      feedbackThreadSummaryBackendDict.exploration_title,
+      feedbackThreadSummaryBackendDict.exploration_id,
+      feedbackThreadSummaryBackendDict.thread_id
+    );
+  }
+}
+</textarea><pre id="annotations" style="display:none">[]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:55 GMT</p>
+    </body>
+  </html>
+  

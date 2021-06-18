@@ -1,0 +1,134 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>user-email-preferences.service.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/exploration-editor-page/services/user-email-preferences.service.spec.ts</td><td class="">98.46%</td><td class="">100%</td><td class="">130</td><td class="">128</td><td class="">2</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2021 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for the UserEmailPreferencesService.
+ */
+
+import { UserEmailPreferencesService } from &#x27;./user-email-preferences.service&#x27;;
+import { HttpClientTestingModule, HttpTestingController } from
+  &#x27;@angular/common/http/testing&#x27;;
+import { fakeAsync, flushMicrotasks, TestBed } from &#x27;@angular/core/testing&#x27;;
+import { CsrfTokenService } from &#x27;services/csrf-token.service&#x27;;
+import { ExplorationDataService } from &#x27;./exploration-data.service&#x27;;
+
+describe(&#x27;User Email Preferences Service&#x27;, () =&gt; {
+  let expId = &#x27;12345&#x27;;
+  let sampleResponse = {
+    email_preferences: {
+      mute_feedback_notifications: false,
+      mute_suggestion_notifications: false
+    }
+  };
+  class MockExplorationDataService {
+    explorationId: string = expId;
+  }
+
+  let userEmailPreferencesService: UserEmailPreferencesService;
+  let httpTestingController: HttpTestingController;
+  let csrfTokenService: CsrfTokenService;
+
+  beforeEach(() =&gt; {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [{ provide: ExplorationDataService,
+        useClass: MockExplorationDataService }]
+    });
+    userEmailPreferencesService = TestBed.inject(UserEmailPreferencesService);
+    httpTestingController = TestBed.inject(HttpTestingController);
+    csrfTokenService = TestBed.inject(CsrfTokenService);
+
+    spyOn(csrfTokenService, &#x27;getTokenAsync&#x27;).and.callFake(async() =&gt; {
+      return new Promise((resolve) =&gt; {
+        resolve(&#x27;sample-csrf-token&#x27;);
+      });
+    });
+  });
+
+  afterEach(() =&gt; {
+    httpTestingController.verify();
+  });
+
+  it(&#x27;should successfully intialise the service&#x27;, () =&gt; {
+    expect(userEmailPreferencesService.feedbackNotificationsMuted)
+      .toBeUndefined();
+    expect(userEmailPreferencesService.suggestionNotificationsMuted)
+      .toBeUndefined();
+
+    userEmailPreferencesService.init(true, true);
+
+    expect(userEmailPreferencesService.feedbackNotificationsMuted).toBe(true);
+    expect(userEmailPreferencesService.suggestionNotificationsMuted).toBe(true);
+  });
+
+  it(&#x27;should successfully return the feedbackNotificationsMuted value&#x27;,
+    () =&gt; {
+      userEmailPreferencesService.init(true, true);
+      expect(userEmailPreferencesService.areFeedbackNotificationsMuted())
+        .toBe(true);
+    });
+
+  it(&#x27;should successfully return the suggestionNotificationsMuted value&#x27;,
+    () =&gt; {
+      userEmailPreferencesService.init(true, true);
+      expect(userEmailPreferencesService.areSuggestionNotificationsMuted())
+        .toBe(true);
+    });
+
+  it(&#x27;should successfully set the feedback notification preferences&#x27;,
+    fakeAsync(() =&gt; {
+      userEmailPreferencesService
+        .setFeedbackNotificationPreferences(false, () =&gt; {});
+      let req = httpTestingController.expectOne(
+        &#x27;/createhandler/notificationpreferences/&#x27; + expId);
+      expect(req.request.method).toEqual(&#x27;PUT&#x27;);
+      req.flush(sampleResponse);
+      flushMicrotasks();
+      expect(userEmailPreferencesService.areFeedbackNotificationsMuted())
+        .toBe(false);
+    }));
+
+  it(&#x27;should successfully set the suggestion notification preferences&#x27;,
+    fakeAsync(() =&gt; {
+      userEmailPreferencesService
+        .setSuggestionNotificationPreferences(false, () =&gt; {});
+
+      let req = httpTestingController.expectOne(
+        &#x27;/createhandler/notificationpreferences/&#x27; + expId
+      );
+      expect(req.request.method).toEqual(&#x27;PUT&#x27;);
+      req.flush(sampleResponse);
+      flushMicrotasks();
+      expect(userEmailPreferencesService.areSuggestionNotificationsMuted())
+        .toBe(false);
+    }));
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/user-email-preferences.service.spec.ts&quot;,&quot;line&quot;:94,&quot;character&quot;:17,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/user-email-preferences.service.spec.ts&quot;,&quot;line&quot;:109,&quot;character&quot;:17,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:59 GMT</p>
+    </body>
+  </html>
+  

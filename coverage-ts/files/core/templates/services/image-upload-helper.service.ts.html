@@ -1,0 +1,123 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>image-upload-helper.service.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">core/templates/services/image-upload-helper.service.ts</td><td class="">100.00%</td><td class="">100%</td><td class="">118</td><td class="">118</td><td class="">0</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Image upload helper service.
+ */
+
+import { Injectable } from &#x27;@angular/core&#x27;;
+import { downgradeInjectable } from &#x27;@angular/upgrade/static&#x27;;
+
+import { AssetsBackendApiService } from &#x27;services/assets-backend-api.service&#x27;;
+
+import constants from &#x27;assets/constants&#x27;;
+
+@Injectable({
+  providedIn: &#x27;root&#x27;
+})
+export class ImageUploadHelperService {
+  constructor(private assetsBackendApiService: AssetsBackendApiService) {}
+
+  private _generateDateTimeStringForFilename(): string {
+    let date = new Date();
+    return date.getFullYear() +
+      (&#x27;0&#x27; + (date.getMonth() + 1)).slice(-2) +
+      (&#x27;0&#x27; + date.getDate()).slice(-2) + &#x27;_&#x27; +
+      (&#x27;0&#x27; + date.getHours()).slice(-2) +
+      (&#x27;0&#x27; + date.getMinutes()).slice(-2) +
+      (&#x27;0&#x27; + date.getSeconds()).slice(-2) + &#x27;_&#x27; +
+      Math.random().toString(36).substr(2, 10);
+  }
+
+  convertImageDataToImageFile(dataURI: string): Blob {
+    // Convert base64/URLEncoded data component to raw binary data
+    // held in a string.
+    let byteString = atob(dataURI.split(&#x27;,&#x27;)[1]);
+
+    // Separate out the mime component.
+    let mime = dataURI.split(&#x27;,&#x27;)[0].split(&#x27;:&#x27;)[1].split(&#x27;;&#x27;)[0];
+
+    // Write the bytes of the string to a typed array.
+    let ia = new Uint8Array(byteString.length);
+    for (let i = 0; i &lt; byteString.length; i++) {
+      ia[i] = byteString.charCodeAt(i);
+    }
+
+    let blob = new Blob([ia], { type: mime });
+    if (blob.type.match(&#x27;image&#x27;) &amp;&amp;
+      blob.size &gt; 0) {
+      return blob;
+    }
+
+    return null;
+  }
+
+  getTrustedResourceUrlForThumbnailFilename(
+      imageFileName: string, entityType: string, entityId: string): string {
+    let encodedFilepath = window.encodeURIComponent(imageFileName);
+    return this.assetsBackendApiService.getThumbnailUrlForPreview(
+      entityType, entityId, encodedFilepath);
+  }
+
+  generateImageFilename(
+      height: number, width: number, extension: string): string {
+    return &#x27;img_&#x27; +
+      this._generateDateTimeStringForFilename() +
+      &#x27;_height_&#x27; + height +
+      &#x27;_width_&#x27; + width +
+      &#x27;.&#x27; + extension;
+  }
+
+  generateMathExpressionImageFilename(
+      height: string, width: string, verticalPadding: string): string {
+    let filename = (
+      &#x27;mathImg_&#x27; +
+        this._generateDateTimeStringForFilename() +
+        &#x27;_height_&#x27; + height +
+        &#x27;_width_&#x27; + width +
+        &#x27;_vertical_&#x27; + verticalPadding +
+        &#x27;.&#x27; + &#x27;svg&#x27;
+    );
+    let filenameRegexString = constants.MATH_SVG_FILENAME_REGEX;
+    let filenameRegex = RegExp(filenameRegexString, &#x27;g&#x27;);
+    if (filenameRegex.exec(filename)) {
+      return filename;
+    } else {
+      throw new Error(
+        &#x27;The Math SVG filename format is invalid.&#x27;);
+    }
+  }
+}
+
+angular.module(&#x27;oppia&#x27;).factory(
+  &#x27;ImageUploadHelperService&#x27;,
+  downgradeInjectable(ImageUploadHelperService));
+</textarea><pre id="annotations" style="display:none">[]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:54 GMT</p>
+    </body>
+  </html>
+  

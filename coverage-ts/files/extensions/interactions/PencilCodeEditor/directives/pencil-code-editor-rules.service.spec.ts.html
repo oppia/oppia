@@ -1,0 +1,369 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>pencil-code-editor-rules.service.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">extensions/interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service.spec.ts</td><td class="">100.00%</td><td class="">100%</td><td class="">341</td><td class="">341</td><td class="">0</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2015 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for Pencil Code Editor rules.
+ */
+import { TestBed } from &#x27;@angular/core/testing&#x27;;
+
+import { NormalizeWhitespacePipe } from
+  &#x27;filters/string-utility-filters/normalize-whitespace.pipe&#x27;;
+import { NormalizeWhitespacePunctuationAndCasePipe } from &#x27;filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe&#x27;;
+import { PencilCodeEditorRulesService } from
+  &#x27;interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service&#x27;;
+
+describe(&#x27;Pencil Code Editor rules service&#x27;, () =&gt; {
+  let pcers: PencilCodeEditorRulesService = null;
+  beforeEach(() =&gt; {
+    TestBed.configureTestingModule({
+      providers: [
+        NormalizeWhitespacePipe, NormalizeWhitespacePunctuationAndCasePipe]
+    });
+    pcers = TestBed.get(PencilCodeEditorRulesService);
+  });
+
+  describe(&#x27;\&#x27;equals\&#x27; rule&#x27;, () =&gt; {
+    var RULE_INPUT = {
+      x: (
+        &#x27;def x():\n&#x27; +
+        &#x27;    y = \&#x27;ab    c\&#x27;\n&#x27; +
+        &#x27;    return x&#x27;
+      )
+    };
+
+    it(&#x27;should accept the same code&#x27;, () =&gt; {
+      expect(pcers.CodeEquals({
+        code: (
+          &#x27;def x():\n&#x27; +
+          &#x27;    y = \&#x27;ab    c\&#x27;\n&#x27; +
+          &#x27;    return x&#x27;
+        ),
+        error: &#x27;&#x27;,
+        output: &#x27;&#x27;,
+        evaluation: &#x27;&#x27;
+      }, RULE_INPUT)).toBe(true);
+    });
+
+    it(&#x27;should remove extra newlines and trailing whitespace&#x27;, () =&gt; {
+      // Extra newline with spaces.
+      expect(pcers.CodeEquals({
+        code: (
+          &#x27;def x():\n&#x27; +
+          &#x27;    y = \&#x27;ab    c\&#x27;\n&#x27; +
+          &#x27;    \n&#x27; +
+          &#x27;    return x&#x27;
+        ),
+        error: &#x27;&#x27;,
+        output: &#x27;&#x27;,
+        evaluation: &#x27;&#x27;
+      }, RULE_INPUT)).toBe(true);
+
+      // Extra trailing whitespace on first line.
+      expect(pcers.CodeEquals({
+        code: (
+          &#x27;def x():        \n&#x27; +
+          &#x27;    y = \&#x27;ab    c\&#x27;\n&#x27; +
+          &#x27;    return x&#x27;
+        ),
+        error: &#x27;&#x27;,
+        output: &#x27;&#x27;,
+        evaluation: &#x27;&#x27;
+      }, RULE_INPUT)).toBe(true);
+
+      // ---- Tab character ----
+      expect(pcers.CodeEquals({
+        code: (
+          &#x27;def x(): \t\n&#x27; +
+          &#x27;    y = \&#x27;ab    c\&#x27;\n&#x27; +
+          &#x27;    return x\n\n\n&#x27;
+        ),
+        error: &#x27;&#x27;,
+        output: &#x27;&#x27;,
+        evaluation: &#x27;&#x27;
+      }, RULE_INPUT)).toBe(true);
+    });
+
+    it(&#x27;should not change spaces at the start of a line&#x27;, () =&gt; {
+      expect(pcers.CodeEquals({
+        code: (
+          &#x27;def x():\n&#x27; +
+          &#x27;  y = \&#x27;ab    c\&#x27;\n&#x27; +
+          &#x27;    return x&#x27;
+        ),
+        error: &#x27;&#x27;,
+        output: &#x27;&#x27;,
+        evaluation: &#x27;&#x27;
+      }, RULE_INPUT)).toBe(false);
+    });
+
+    it(&#x27;should detect missing newlines&#x27;, () =&gt; {
+      expect(pcers.CodeEquals({
+        code: (
+          &#x27;def x():&#x27; +
+          &#x27;    y = \&#x27;ab    c\&#x27;\n&#x27; +
+          &#x27;    return x&#x27;
+        ),
+        error: &#x27;&#x27;,
+        output: &#x27;&#x27;,
+        evaluation: &#x27;&#x27;
+      }, RULE_INPUT)).toBe(false);
+    });
+
+    it(&#x27;should compare spaces inside quotes&#x27;, () =&gt; {
+      expect(pcers.CodeEquals({
+        code: (
+          &#x27;def x():&#x27; +
+          &#x27;    y = \&#x27;ab c\&#x27;\n&#x27; +
+          &#x27;    return x&#x27;
+        ),
+        error: &#x27;&#x27;,
+        output: &#x27;&#x27;,
+        evaluation: &#x27;&#x27;
+      }, RULE_INPUT)).toBe(false);
+    });
+  });
+
+  describe(&#x27;\&#x27;code contains\&#x27; rule&#x27;, () =&gt; {
+    var RULE_INPUT = {
+      x: &#x27;def x():&#x27;
+    };
+
+    it(&#x27;should check if answer contains some code&#x27;, () =&gt; {
+      expect(pcers.CodeContains({
+        code: (
+          &#x27;def x():\n&#x27; +
+          &#x27;    y = \&#x27;ab c\&#x27;\n&#x27; +
+          &#x27;    return x&#x27;
+        ),
+        error: &#x27;&#x27;,
+        output: &#x27;&#x27;,
+        evaluation: &#x27;&#x27;
+      }, RULE_INPUT)).toBe(true);
+      expect(pcers.CodeContains({
+        code: &#x27;    def x():\n&#x27;,
+        error: &#x27;&#x27;,
+        output: &#x27;&#x27;,
+        evaluation: &#x27;&#x27;
+      }, RULE_INPUT)).toBe(true);
+      expect(pcers.CodeContains({
+        code: &#x27;print 0&#x27;,
+        error: &#x27;&#x27;,
+        output: &#x27;&#x27;,
+        evaluation: &#x27;&#x27;
+      }, RULE_INPUT)).toBe(false);
+    });
+  });
+
+  describe(&#x27;\&#x27;code does not contain\&#x27; rule&#x27;, () =&gt; {
+    var RULE_INPUT = {
+      x: &#x27;def x():&#x27;
+    };
+
+    it(&#x27;should check if answer contains some code&#x27;, () =&gt; {
+      expect(pcers.CodeDoesNotContain({
+        code: (
+          &#x27;def x():\n&#x27; +
+          &#x27;    y = \&#x27;ab c\&#x27;\n&#x27; +
+          &#x27;    return x&#x27;
+        ),
+        error: &#x27;&#x27;,
+        output: &#x27;&#x27;,
+        evaluation: &#x27;&#x27;
+      }, RULE_INPUT)).toBe(false);
+      expect(pcers.CodeDoesNotContain({
+        code: &#x27;    def x():\n&#x27;,
+        error: &#x27;&#x27;,
+        output: &#x27;&#x27;,
+        evaluation: &#x27;&#x27;
+      }, RULE_INPUT)).toBe(false);
+      expect(pcers.CodeDoesNotContain({
+        code: &#x27;print 0&#x27;,
+        error: &#x27;&#x27;,
+        output: &#x27;&#x27;,
+        evaluation: &#x27;&#x27;
+      }, RULE_INPUT)).toBe(true);
+    });
+  });
+
+  describe(&#x27;\&#x27;output equals\&#x27; rule&#x27;, () =&gt; {
+    var RULE_INPUT = {
+      x: &#x27;1&#x27;
+    };
+
+    it(&#x27;should compare normalized output&#x27;, () =&gt; {
+      expect(pcers.OutputEquals({
+        output: &#x27;1&#x27;,
+        code: &#x27;&#x27;,
+        error: &#x27;&#x27;,
+        evaluation: &#x27;&#x27;
+      }, RULE_INPUT)).toBe(true);
+      expect(pcers.OutputEquals({
+        output: &#x27;\n1\n&#x27;,
+        error: &#x27;&#x27;,
+        code: &#x27;&#x27;,
+        evaluation: &#x27;&#x27;
+      }, RULE_INPUT)).toBe(true);
+      expect(pcers.OutputEquals({
+        output: &#x27;&#x27;,
+        error: &#x27;&#x27;,
+        code: &#x27;&#x27;,
+        evaluation: &#x27;&#x27;
+      }, RULE_INPUT)).toBe(false);
+      expect(pcers.OutputEquals({
+        output: &#x27;bad output&#x27;,
+        error: &#x27;&#x27;,
+        code: &#x27;&#x27;,
+        evaluation: &#x27;&#x27;
+      }, RULE_INPUT)).toBe(false);
+    });
+  });
+
+  describe(&#x27;\&#x27;output roughly equals\&#x27; rule&#x27;, () =&gt; {
+    var RULE_INPUT = {
+      x: &#x27;1\n      a W ? b\n&#x27;
+    };
+
+    it(&#x27;should compare normalized output&#x27;, () =&gt; {
+      expect(pcers.OutputRoughlyEquals({
+        output: &#x27;1\n   a   W ?   b&#x27;,
+        error: &#x27;&#x27;,
+        code: &#x27;&#x27;,
+        evaluation: &#x27;&#x27;
+      }, RULE_INPUT)).toBe(true);
+      expect(pcers.OutputRoughlyEquals({
+        output: &#x27;\n1\na  w?B&#x27;,
+        error: &#x27;&#x27;,
+        code: &#x27;&#x27;,
+        evaluation: &#x27;&#x27;
+      }, RULE_INPUT)).toBe(true);
+      expect(pcers.OutputRoughlyEquals({
+        output: &#x27;   1\n\na w?b    \n\n\n&#x27;,
+        error: &#x27;&#x27;,
+        code: &#x27;&#x27;,
+        evaluation: &#x27;&#x27;
+      }, RULE_INPUT)).toBe(true);
+
+      expect(pcers.OutputRoughlyEquals({
+        output: &#x27;1 a w ? b&#x27;,
+        error: &#x27;&#x27;,
+        code: &#x27;&#x27;,
+        evaluation: &#x27;&#x27;
+      }, RULE_INPUT)).toBe(false);
+      expect(pcers.OutputRoughlyEquals({
+        output: &#x27;1 \n a w b&#x27;,
+        error: &#x27;&#x27;,
+        code: &#x27;&#x27;,
+        evaluation: &#x27;&#x27;
+      }, RULE_INPUT)).toBe(false);
+      expect(pcers.OutputRoughlyEquals({
+        output: &#x27;b ? w a \n 1&#x27;,
+        error: &#x27;&#x27;,
+        code: &#x27;&#x27;,
+        evaluation: &#x27;&#x27;
+      }, RULE_INPUT)).toBe(false);
+      expect(pcers.OutputRoughlyEquals({
+        output: &#x27;bad output&#x27;,
+        error: &#x27;&#x27;,
+        code: &#x27;&#x27;,
+        evaluation: &#x27;&#x27;
+      }, RULE_INPUT)).toBe(false);
+    });
+  });
+
+  describe(&#x27;\&#x27;results in error\&#x27; rule&#x27;, () =&gt; {
+    it(&#x27;should check if error is not empty&#x27;, () =&gt; {
+      expect(pcers.ResultsInError({
+        error: &#x27;&#x27;,
+        code: &#x27;&#x27;,
+        output: &#x27;&#x27;,
+        evaluation: &#x27;&#x27;
+      })).toBe(false);
+      expect(pcers.ResultsInError({
+        error: &#x27; \t\n&#x27;,
+        code: &#x27;&#x27;,
+        output: &#x27;&#x27;,
+        evaluation: &#x27;&#x27;
+      })).toBe(false);
+      expect(pcers.ResultsInError({
+        error: &#x27;bad output&#x27;,
+        code: &#x27;&#x27;,
+        output: &#x27;&#x27;,
+        evaluation: &#x27;&#x27;
+      })).toBe(true);
+    });
+  });
+
+  describe(&#x27;\&#x27;error contains\&#x27; rule&#x27;, () =&gt; {
+    var RULE_INPUT = {
+      x: &#x27;bad&#x27;
+    };
+
+    it(&#x27;should check if error message appears&#x27;, () =&gt; {
+      expect(pcers.ErrorContains({
+        error: &#x27;bad&#x27;,
+        code: &#x27;&#x27;,
+        output: &#x27;&#x27;,
+        evaluation: &#x27;&#x27;
+      }, RULE_INPUT)).toBe(true);
+      expect(pcers.ErrorContains({
+        error: &#x27;  bad  &#x27;,
+        code: &#x27;&#x27;,
+        output: &#x27;&#x27;,
+        evaluation: &#x27;&#x27;
+      }, RULE_INPUT)).toBe(true);
+      expect(pcers.ErrorContains({
+        error: &#x27;not bad&#x27;,
+        code: &#x27;&#x27;,
+        output: &#x27;&#x27;,
+        evaluation: &#x27;&#x27;
+      }, RULE_INPUT)).toBe(true);
+      expect(pcers.ErrorContains({
+        error: &#x27;error&#x27;,
+        code: &#x27;&#x27;,
+        output: &#x27;&#x27;,
+        evaluation: &#x27;&#x27;
+      }, RULE_INPUT)).toBe(false);
+      expect(pcers.ErrorContains({
+        error: &#x27;b a d&#x27;,
+        code: &#x27;&#x27;,
+        output: &#x27;&#x27;,
+        evaluation: &#x27;&#x27;
+      }, RULE_INPUT)).toBe(false);
+      expect(pcers.ErrorContains({
+        error: &#x27;&#x27;,
+        code: &#x27;&#x27;,
+        output: &#x27;&#x27;,
+        evaluation: &#x27;&#x27;
+      }, RULE_INPUT)).toBe(false);
+    });
+  });
+});
+</textarea><pre id="annotations" style="display:none">[]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:44:00 GMT</p>
+    </body>
+  </html>
+  

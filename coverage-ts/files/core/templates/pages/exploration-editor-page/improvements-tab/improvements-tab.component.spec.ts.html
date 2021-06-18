@@ -1,0 +1,362 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>improvements-tab.component.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts</td><td class="">50.89%</td><td class="">100%</td><td class="">503</td><td class="">256</td><td class="">247</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for the controller of the &#x27;Completion Graph&#x27; used by
+ * the improvements tab.
+ */
+
+import { fakeAsync, flushMicrotasks } from &#x27;@angular/core/testing&#x27;;
+
+import { ExplorationTaskType } from
+  &#x27;domain/improvements/exploration-task.model&#x27;;
+import { HighBounceRateTask } from
+  &#x27;domain/improvements/high-bounce-rate-task.model&#x27;;
+import { IneffectiveFeedbackLoopTask } from
+  &#x27;domain/improvements/ineffective-feedback-loop-task.model&#x27;;
+import { NeedsGuidingResponsesTask } from
+  &#x27;domain/improvements/needs-guiding-response-task.model&#x27;;
+import { SuccessiveIncorrectAnswersTask } from
+  &#x27;domain/improvements/successive-incorrect-answers-task.model&#x27;;
+import { StateStats } from &#x27;domain/statistics/state-stats-model&#x27;;
+import { ExplorationStats } from
+  &#x27;domain/statistics/exploration-stats.model&#x27;;
+import { ExplorationImprovementsTaskRegistryService } from
+  &#x27;services/exploration-improvements-task-registry.service&#x27;;
+
+// TODO(#7222): Remove usages of UpgradedServices. Used here because too many
+// indirect AngularJS dependencies are required for the improvements tab.
+import { importAllAngularServices } from &#x27;tests/unit-test-utils&#x27;;
+
+require(
+  &#x27;pages/exploration-editor-page/improvements-tab/&#x27; +
+  &#x27;improvements-tab.component.ts&#x27;);
+
+describe(&#x27;Improvements tab&#x27;, function() {
+  let $ctrl, $scope, explorationImprovementsService, routerService;
+
+  let taskRegistryService: ExplorationImprovementsTaskRegistryService;
+
+  importAllAngularServices();
+
+  beforeEach(angular.mock.inject(function(
+      $componentController, $rootScope, _ExplorationImprovementsService_,
+      _ExplorationImprovementsTaskRegistryService_, _RouterService_) {
+    explorationImprovementsService = _ExplorationImprovementsService_;
+    routerService = _RouterService_;
+    taskRegistryService = _ExplorationImprovementsTaskRegistryService_;
+
+    $scope = $rootScope.$new();
+    $ctrl = $componentController(&#x27;improvementsTab&#x27;);
+  }));
+
+  const emptyStateStats = new StateStats(0, 0, 0, 0, 0, 0);
+  const emptyExpStats = new ExplorationStats(&#x27;id&#x27;, 1, 0, 0, 0, new Map([
+    [&#x27;Introduction&#x27;, emptyStateStats],
+  ]));
+
+  beforeEach(() =&gt; {
+    this.expStatsSpy = spyOn(taskRegistryService, &#x27;getExplorationStats&#x27;);
+    this.hbrTasksSpy = (
+      spyOn(taskRegistryService, &#x27;getOpenHighBounceRateTasks&#x27;));
+    this.iflTasksSpy = (
+      spyOn(taskRegistryService, &#x27;getOpenIneffectiveFeedbackLoopTasks&#x27;));
+    this.ngrTasksSpy = (
+      spyOn(taskRegistryService, &#x27;getOpenNeedsGuidingResponsesTasks&#x27;));
+    this.siaTasksSpy = (
+      spyOn(taskRegistryService, &#x27;getOpenSuccessiveIncorrectAnswersTasks&#x27;));
+    this.stateTasksSpy = spyOn(taskRegistryService, &#x27;getStateTasks&#x27;);
+    this.allStateTasksSpy = spyOn(taskRegistryService, &#x27;getAllStateTasks&#x27;);
+
+    this.expStatsSpy.and.returnValue(emptyExpStats);
+    this.hbrTasksSpy.and.returnValue([]);
+    this.iflTasksSpy.and.returnValue([]);
+    this.ngrTasksSpy.and.returnValue([]);
+    this.siaTasksSpy.and.returnValue([]);
+    this.allStateTasksSpy.and.returnValue([]);
+  });
+
+  it(&#x27;should provide the time machine image URL&#x27;, () =&gt; {
+    $ctrl.$onInit();
+
+    expect($ctrl.timeMachineImageUrl).toMatch(&#x27;/icons/time_machine.svg&#x27;);
+  });
+
+  it(&#x27;should use router service to navigate to state editor&#x27;, () =&gt; {
+    const spy = spyOn(routerService, &#x27;navigateToMainTab&#x27;);
+    $ctrl.$onInit();
+
+    $ctrl.navigateToStateEditor(&#x27;foo&#x27;);
+
+    expect(spy).toHaveBeenCalledWith(&#x27;foo&#x27;);
+  });
+
+  describe(&#x27;Post-initialization&#x27;, () =&gt; {
+    const newTaskEntryBackendDict = (
+      &lt;T extends ExplorationTaskType&gt;(taskType: T, isOpen: boolean) =&gt; ({
+        entity_type: &#x27;exploration&#x27;,
+        entity_id: &#x27;eid&#x27;,
+        entity_version: 1,
+        task_type: taskType,
+        target_type: &#x27;state&#x27;,
+        target_id: &#x27;Introduction&#x27;,
+        status: (isOpen ? &#x27;open&#x27; : &#x27;obsolete&#x27;),
+        issue_description: null,
+        resolver_username: null,
+        resolver_profile_picture_data_url: null,
+        resolved_on_msecs: null,
+      }));
+
+    const newHbrTask = (isOpen = true) =&gt; new HighBounceRateTask(
+      newTaskEntryBackendDict(&#x27;high_bounce_rate&#x27;, isOpen));
+    const newIflTask = (isOpen = true) =&gt; new IneffectiveFeedbackLoopTask(
+      newTaskEntryBackendDict(&#x27;ineffective_feedback_loop&#x27;, isOpen));
+    const newNgrTask = (isOpen = true) =&gt; new NeedsGuidingResponsesTask(
+      newTaskEntryBackendDict(&#x27;needs_guiding_responses&#x27;, isOpen));
+    const newSiaTask = (isOpen = true) =&gt; new SuccessiveIncorrectAnswersTask(
+      newTaskEntryBackendDict(&#x27;successive_incorrect_answers&#x27;, isOpen));
+
+    beforeEach(() =&gt; {
+      spyOn(explorationImprovementsService, &#x27;isImprovementsTabEnabledAsync&#x27;)
+        .and.returnValue(Promise.resolve(true));
+    });
+
+    it(&#x27;should report the number of exp-level tasks&#x27;, fakeAsync(() =&gt; {
+      this.hbrTasksSpy.and.returnValue([newHbrTask()]);
+
+      $ctrl.$onInit();
+      flushMicrotasks();
+      $scope.$apply();
+
+      expect($ctrl.getNumExpLevelTasks()).toEqual(1);
+    }));
+
+    it(&#x27;should report the number of concept-level tasks&#x27;, fakeAsync(() =&gt; {
+      this.iflTasksSpy.and.returnValue([newIflTask()]);
+
+      $ctrl.$onInit();
+      flushMicrotasks();
+      $scope.$apply();
+
+      expect($ctrl.getNumConceptLevelTasks()).toEqual(1);
+    }));
+
+    it(&#x27;should report the number of card-level tasks&#x27;, fakeAsync(() =&gt; {
+      this.ngrTasksSpy.and.returnValue([newNgrTask()]);
+      this.siaTasksSpy.and.returnValue([newSiaTask()]);
+
+      $ctrl.$onInit();
+      flushMicrotasks();
+      $scope.$apply();
+
+      expect($ctrl.getNumCardLevelTasks()).toEqual(2);
+    }));
+
+    it(&#x27;should report the total number of tasks&#x27;, fakeAsync(() =&gt; {
+      this.hbrTasksSpy.and.returnValue([newHbrTask()]);
+      this.iflTasksSpy.and.returnValue([newIflTask()]);
+      this.ngrTasksSpy.and.returnValue([newNgrTask()]);
+      this.siaTasksSpy.and.returnValue([newSiaTask()]);
+
+      $ctrl.$onInit();
+      flushMicrotasks();
+      $scope.$apply();
+
+      expect($ctrl.getNumTasks()).toEqual(4);
+    }));
+
+    it(&#x27;should report that critical tasks exist&#x27;, fakeAsync(() =&gt; {
+      this.ngrTasksSpy.and.returnValue([newNgrTask()]);
+
+      $ctrl.$onInit();
+      flushMicrotasks();
+      $scope.$apply();
+
+      expect($ctrl.hasCriticalTasks()).toEqual(true);
+    }));
+
+    it(&#x27;should report the completion rate&#x27;, fakeAsync(() =&gt; {
+      const numStarts = 100;
+      const numCompletions = 60;
+      this.expStatsSpy.and.returnValue(
+        new ExplorationStats(&#x27;id&#x27;, 1, numStarts, 0, numCompletions, new Map()));
+
+      $ctrl.$onInit();
+      flushMicrotasks();
+      $scope.$apply();
+
+      expect($ctrl.completionRate).toBeCloseTo(0.6);
+      expect($ctrl.completionRateAsPercent).toEqual(&#x27;60%&#x27;);
+    }));
+
+    it(&#x27;should provide the correct state retention&#x27;, fakeAsync(() =&gt; {
+      const totalHitCount = 100;
+      const numCompletions = 60;
+      const stateStats = (
+        new StateStats(0, 0, totalHitCount, 0, 0, numCompletions));
+      this.expStatsSpy.and.returnValue(new ExplorationStats(
+        &#x27;id&#x27;, 1, 0, 0, 0, new Map([[&#x27;Introduction&#x27;, stateStats]])));
+      this.allStateTasksSpy.and.returnValue([
+        {
+          stateName: &#x27;Introduction&#x27;,
+          ngrTask: newNgrTask(),
+          siaTask: newSiaTask(),
+          supportingStats: {stateStats},
+        }
+      ]);
+
+      $ctrl.$onInit();
+      flushMicrotasks();
+      $scope.$apply();
+
+      expect($ctrl.getStateRetentionPercent(&#x27;Introduction&#x27;)).toEqual(&#x27;60%&#x27;);
+    }));
+
+    it(&#x27;should provide the number of open cards in a state&#x27;, fakeAsync(() =&gt; {
+      this.expStatsSpy.and.returnValue(
+        new ExplorationStats(&#x27;id&#x27;, 1, 0, 0, 0, new Map([
+          [&#x27;Introduction&#x27;, emptyStateStats],
+          [&#x27;End&#x27;, emptyStateStats],
+        ])));
+      const stateTasks = {
+        Introduction: {
+          stateName: &#x27;Introduction&#x27;,
+          ngrTask: newNgrTask(true),
+          siaTask: newSiaTask(false),
+          supportingStats: {stateStats: emptyStateStats},
+        },
+        End: {
+          stateName: &#x27;End&#x27;,
+          ngrTask: newNgrTask(true),
+          siaTask: newSiaTask(true),
+          supportingStats: {stateStats: emptyStateStats},
+        },
+      };
+      this.stateTasksSpy.and.callFake(stateName =&gt; stateTasks[stateName]);
+
+      $ctrl.$onInit();
+      flushMicrotasks();
+      $scope.$apply();
+
+      expect($ctrl.getNumCardLevelTasksForState(&#x27;Introduction&#x27;)).toEqual(1);
+      expect($ctrl.getNumCardLevelTasksForState(&#x27;End&#x27;)).toEqual(2);
+    }));
+
+    it(&#x27;should toggle the visibility of state tasks&#x27;, fakeAsync(() =&gt; {
+      this.expStatsSpy.and.returnValue(
+        new ExplorationStats(&#x27;id&#x27;, 1, 0, 0, 0, new Map([
+          [&#x27;Introduction&#x27;, emptyStateStats],
+          [&#x27;End&#x27;, emptyStateStats],
+        ])));
+      this.allStateTasksSpy.and.returnValue([
+        {
+          stateName: &#x27;Introduction&#x27;,
+          ngrTask: newNgrTask(),
+          siaTask: newSiaTask(),
+          supportingStats: {stateStats: emptyStateStats},
+        },
+        {
+          stateName: &#x27;End&#x27;,
+          ngrTask: newNgrTask(),
+          siaTask: newSiaTask(),
+          supportingStats: {stateStats: emptyStateStats},
+        },
+      ]);
+
+      $ctrl.$onInit();
+      flushMicrotasks();
+      $scope.$apply();
+
+      expect($ctrl.isStateTasksVisible(&#x27;Introduction&#x27;)).toBeTrue();
+      expect($ctrl.isStateTasksVisible(&#x27;End&#x27;)).toBeTrue();
+
+      $ctrl.toggleStateTasks(&#x27;End&#x27;);
+
+      expect($ctrl.isStateTasksVisible(&#x27;Introduction&#x27;)).toBeTrue();
+      expect($ctrl.isStateTasksVisible(&#x27;End&#x27;)).toBeFalse();
+    }));
+
+    describe(&#x27;Exploration-health&#x27;, () =&gt; {
+      it(&#x27;should report health as warning if HBR task exists&#x27;, fakeAsync(() =&gt; {
+        this.hbrTasksSpy.and.returnValue([newHbrTask()]);
+
+        $ctrl.$onInit();
+        flushMicrotasks();
+        $scope.$apply();
+
+        expect($ctrl.getExplorationHealth()).toEqual(&#x27;warning&#x27;);
+      }));
+
+      it(&#x27;should report heath as warning if only IFL task exists&#x27;,
+        fakeAsync(() =&gt; {
+          this.iflTasksSpy.and.returnValue([newIflTask()]);
+
+          $ctrl.$onInit();
+          flushMicrotasks();
+          $scope.$apply();
+
+          expect($ctrl.getExplorationHealth()).toEqual(&#x27;warning&#x27;);
+        }));
+
+      it(&#x27;should report heath as critical if NGR task exists&#x27;,
+        fakeAsync(() =&gt; {
+          this.ngrTasksSpy.and.returnValue([newNgrTask()]);
+
+          $ctrl.$onInit();
+          flushMicrotasks();
+          $scope.$apply();
+
+          expect($ctrl.getExplorationHealth()).toEqual(&#x27;critical&#x27;);
+        }));
+
+      it(&#x27;should report heath as warning if only SIA task exists&#x27;,
+        fakeAsync(() =&gt; {
+          this.siaTasksSpy.and.returnValue([newSiaTask()]);
+
+          $ctrl.$onInit();
+          flushMicrotasks();
+          $scope.$apply();
+
+          expect($ctrl.getExplorationHealth()).toEqual(&#x27;warning&#x27;);
+        }));
+
+      it(&#x27;should report health as healthy if zero tasks exist&#x27;,
+        fakeAsync(() =&gt; {
+          $ctrl.$onInit();
+          flushMicrotasks();
+          $scope.$apply();
+
+          expect($ctrl.getExplorationHealth()).toEqual(&#x27;healthy&#x27;);
+        }));
+    });
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:46,&quot;character&quot;:6,&quot;text&quot;:&quot;$ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:46,&quot;character&quot;:13,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:46,&quot;character&quot;:21,&quot;text&quot;:&quot;explorationImprovementsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:46,&quot;character&quot;:53,&quot;text&quot;:&quot;routerService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:53,&quot;character&quot;:6,&quot;text&quot;:&quot;$componentController&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:53,&quot;character&quot;:28,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:53,&quot;character&quot;:40,&quot;text&quot;:&quot;_ExplorationImprovementsService_&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:54,&quot;character&quot;:6,&quot;text&quot;:&quot;_ExplorationImprovementsTaskRegistryService_&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:54,&quot;character&quot;:52,&quot;text&quot;:&quot;_RouterService_&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:55,&quot;character&quot;:4,&quot;text&quot;:&quot;explorationImprovementsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:55,&quot;character&quot;:37,&quot;text&quot;:&quot;_ExplorationImprovementsService_&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:56,&quot;character&quot;:4,&quot;text&quot;:&quot;routerService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:56,&quot;character&quot;:20,&quot;text&quot;:&quot;_RouterService_&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:59,&quot;character&quot;:4,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:59,&quot;character&quot;:13,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:59,&quot;character&quot;:24,&quot;text&quot;:&quot;$new&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:60,&quot;character&quot;:4,&quot;text&quot;:&quot;$ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:60,&quot;character&quot;:12,&quot;text&quot;:&quot;$componentController&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:69,&quot;character&quot;:4,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:69,&quot;character&quot;:9,&quot;text&quot;:&quot;expStatsSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:70,&quot;character&quot;:4,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:70,&quot;character&quot;:9,&quot;text&quot;:&quot;hbrTasksSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:72,&quot;character&quot;:4,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:72,&quot;character&quot;:9,&quot;text&quot;:&quot;iflTasksSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:74,&quot;character&quot;:4,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:74,&quot;character&quot;:9,&quot;text&quot;:&quot;ngrTasksSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:76,&quot;character&quot;:4,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:76,&quot;character&quot;:9,&quot;text&quot;:&quot;siaTasksSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:78,&quot;character&quot;:4,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:78,&quot;character&quot;:9,&quot;text&quot;:&quot;stateTasksSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:79,&quot;character&quot;:4,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:79,&quot;character&quot;:9,&quot;text&quot;:&quot;allStateTasksSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:81,&quot;character&quot;:4,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:81,&quot;character&quot;:9,&quot;text&quot;:&quot;expStatsSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:81,&quot;character&quot;:21,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:81,&quot;character&quot;:25,&quot;text&quot;:&quot;returnValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:82,&quot;character&quot;:4,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:82,&quot;character&quot;:9,&quot;text&quot;:&quot;hbrTasksSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:82,&quot;character&quot;:21,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:82,&quot;character&quot;:25,&quot;text&quot;:&quot;returnValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:83,&quot;character&quot;:4,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:83,&quot;character&quot;:9,&quot;text&quot;:&quot;iflTasksSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:83,&quot;character&quot;:21,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:83,&quot;character&quot;:25,&quot;text&quot;:&quot;returnValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:84,&quot;character&quot;:4,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:84,&quot;character&quot;:9,&quot;text&quot;:&quot;ngrTasksSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:84,&quot;character&quot;:21,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:84,&quot;character&quot;:25,&quot;text&quot;:&quot;returnValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:85,&quot;character&quot;:4,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:85,&quot;character&quot;:9,&quot;text&quot;:&quot;siaTasksSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:85,&quot;character&quot;:21,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:85,&quot;character&quot;:25,&quot;text&quot;:&quot;returnValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:86,&quot;character&quot;:4,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:86,&quot;character&quot;:9,&quot;text&quot;:&quot;allStateTasksSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:86,&quot;character&quot;:26,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:86,&quot;character&quot;:30,&quot;text&quot;:&quot;returnValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:90,&quot;character&quot;:4,&quot;text&quot;:&quot;$ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:90,&quot;character&quot;:10,&quot;text&quot;:&quot;$onInit&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:92,&quot;character&quot;:11,&quot;text&quot;:&quot;$ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:92,&quot;character&quot;:17,&quot;text&quot;:&quot;timeMachineImageUrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:96,&quot;character&quot;:10,&quot;text&quot;:&quot;spy&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:96,&quot;character&quot;:22,&quot;text&quot;:&quot;routerService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:97,&quot;character&quot;:4,&quot;text&quot;:&quot;$ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:97,&quot;character&quot;:10,&quot;text&quot;:&quot;$onInit&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:99,&quot;character&quot;:4,&quot;text&quot;:&quot;$ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:99,&quot;character&quot;:10,&quot;text&quot;:&quot;navigateToStateEditor&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:101,&quot;character&quot;:11,&quot;text&quot;:&quot;spy&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:130,&quot;character&quot;:12,&quot;text&quot;:&quot;explorationImprovementsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:131,&quot;character&quot;:9,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:135,&quot;character&quot;:6,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:135,&quot;character&quot;:11,&quot;text&quot;:&quot;hbrTasksSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:135,&quot;character&quot;:23,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:135,&quot;character&quot;:27,&quot;text&quot;:&quot;returnValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:137,&quot;character&quot;:6,&quot;text&quot;:&quot;$ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:137,&quot;character&quot;:12,&quot;text&quot;:&quot;$onInit&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:139,&quot;character&quot;:6,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:139,&quot;character&quot;:13,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:141,&quot;character&quot;:13,&quot;text&quot;:&quot;$ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:141,&quot;character&quot;:19,&quot;text&quot;:&quot;getNumExpLevelTasks&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:145,&quot;character&quot;:6,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:145,&quot;character&quot;:11,&quot;text&quot;:&quot;iflTasksSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:145,&quot;character&quot;:23,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:145,&quot;character&quot;:27,&quot;text&quot;:&quot;returnValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:147,&quot;character&quot;:6,&quot;text&quot;:&quot;$ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:147,&quot;character&quot;:12,&quot;text&quot;:&quot;$onInit&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:149,&quot;character&quot;:6,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:149,&quot;character&quot;:13,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:151,&quot;character&quot;:13,&quot;text&quot;:&quot;$ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:151,&quot;character&quot;:19,&quot;text&quot;:&quot;getNumConceptLevelTasks&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:155,&quot;character&quot;:6,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:155,&quot;character&quot;:11,&quot;text&quot;:&quot;ngrTasksSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:155,&quot;character&quot;:23,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:155,&quot;character&quot;:27,&quot;text&quot;:&quot;returnValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:156,&quot;character&quot;:6,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:156,&quot;character&quot;:11,&quot;text&quot;:&quot;siaTasksSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:156,&quot;character&quot;:23,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:156,&quot;character&quot;:27,&quot;text&quot;:&quot;returnValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:158,&quot;character&quot;:6,&quot;text&quot;:&quot;$ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:158,&quot;character&quot;:12,&quot;text&quot;:&quot;$onInit&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:160,&quot;character&quot;:6,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:160,&quot;character&quot;:13,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:162,&quot;character&quot;:13,&quot;text&quot;:&quot;$ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:162,&quot;character&quot;:19,&quot;text&quot;:&quot;getNumCardLevelTasks&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:166,&quot;character&quot;:6,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:166,&quot;character&quot;:11,&quot;text&quot;:&quot;hbrTasksSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:166,&quot;character&quot;:23,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:166,&quot;character&quot;:27,&quot;text&quot;:&quot;returnValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:167,&quot;character&quot;:6,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:167,&quot;character&quot;:11,&quot;text&quot;:&quot;iflTasksSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:167,&quot;character&quot;:23,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:167,&quot;character&quot;:27,&quot;text&quot;:&quot;returnValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:168,&quot;character&quot;:6,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:168,&quot;character&quot;:11,&quot;text&quot;:&quot;ngrTasksSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:168,&quot;character&quot;:23,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:168,&quot;character&quot;:27,&quot;text&quot;:&quot;returnValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:169,&quot;character&quot;:6,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:169,&quot;character&quot;:11,&quot;text&quot;:&quot;siaTasksSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:169,&quot;character&quot;:23,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:169,&quot;character&quot;:27,&quot;text&quot;:&quot;returnValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:171,&quot;character&quot;:6,&quot;text&quot;:&quot;$ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:171,&quot;character&quot;:12,&quot;text&quot;:&quot;$onInit&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:173,&quot;character&quot;:6,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:173,&quot;character&quot;:13,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:175,&quot;character&quot;:13,&quot;text&quot;:&quot;$ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:175,&quot;character&quot;:19,&quot;text&quot;:&quot;getNumTasks&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:179,&quot;character&quot;:6,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:179,&quot;character&quot;:11,&quot;text&quot;:&quot;ngrTasksSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:179,&quot;character&quot;:23,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:179,&quot;character&quot;:27,&quot;text&quot;:&quot;returnValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:181,&quot;character&quot;:6,&quot;text&quot;:&quot;$ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:181,&quot;character&quot;:12,&quot;text&quot;:&quot;$onInit&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:183,&quot;character&quot;:6,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:183,&quot;character&quot;:13,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:185,&quot;character&quot;:13,&quot;text&quot;:&quot;$ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:185,&quot;character&quot;:19,&quot;text&quot;:&quot;hasCriticalTasks&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:191,&quot;character&quot;:6,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:191,&quot;character&quot;:11,&quot;text&quot;:&quot;expStatsSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:191,&quot;character&quot;:23,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:191,&quot;character&quot;:27,&quot;text&quot;:&quot;returnValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:194,&quot;character&quot;:6,&quot;text&quot;:&quot;$ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:194,&quot;character&quot;:12,&quot;text&quot;:&quot;$onInit&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:196,&quot;character&quot;:6,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:196,&quot;character&quot;:13,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:198,&quot;character&quot;:13,&quot;text&quot;:&quot;$ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:198,&quot;character&quot;:19,&quot;text&quot;:&quot;completionRate&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:199,&quot;character&quot;:13,&quot;text&quot;:&quot;$ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:199,&quot;character&quot;:19,&quot;text&quot;:&quot;completionRateAsPercent&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:207,&quot;character&quot;:6,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:207,&quot;character&quot;:11,&quot;text&quot;:&quot;expStatsSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:207,&quot;character&quot;:23,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:207,&quot;character&quot;:27,&quot;text&quot;:&quot;returnValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:209,&quot;character&quot;:6,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:209,&quot;character&quot;:11,&quot;text&quot;:&quot;allStateTasksSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:209,&quot;character&quot;:28,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:209,&quot;character&quot;:32,&quot;text&quot;:&quot;returnValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:218,&quot;character&quot;:6,&quot;text&quot;:&quot;$ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:218,&quot;character&quot;:12,&quot;text&quot;:&quot;$onInit&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:220,&quot;character&quot;:6,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:220,&quot;character&quot;:13,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:222,&quot;character&quot;:13,&quot;text&quot;:&quot;$ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:222,&quot;character&quot;:19,&quot;text&quot;:&quot;getStateRetentionPercent&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:226,&quot;character&quot;:6,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:226,&quot;character&quot;:11,&quot;text&quot;:&quot;expStatsSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:226,&quot;character&quot;:23,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:226,&quot;character&quot;:27,&quot;text&quot;:&quot;returnValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:245,&quot;character&quot;:6,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:245,&quot;character&quot;:11,&quot;text&quot;:&quot;stateTasksSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:245,&quot;character&quot;:25,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:245,&quot;character&quot;:29,&quot;text&quot;:&quot;callFake&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:245,&quot;character&quot;:38,&quot;text&quot;:&quot;stateName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:245,&quot;character&quot;:62,&quot;text&quot;:&quot;stateName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:247,&quot;character&quot;:6,&quot;text&quot;:&quot;$ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:247,&quot;character&quot;:12,&quot;text&quot;:&quot;$onInit&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:249,&quot;character&quot;:6,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:249,&quot;character&quot;:13,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:251,&quot;character&quot;:13,&quot;text&quot;:&quot;$ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:251,&quot;character&quot;:19,&quot;text&quot;:&quot;getNumCardLevelTasksForState&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:252,&quot;character&quot;:13,&quot;text&quot;:&quot;$ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:252,&quot;character&quot;:19,&quot;text&quot;:&quot;getNumCardLevelTasksForState&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:256,&quot;character&quot;:6,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:256,&quot;character&quot;:11,&quot;text&quot;:&quot;expStatsSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:256,&quot;character&quot;:23,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:256,&quot;character&quot;:27,&quot;text&quot;:&quot;returnValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:261,&quot;character&quot;:6,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:261,&quot;character&quot;:11,&quot;text&quot;:&quot;allStateTasksSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:261,&quot;character&quot;:28,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:261,&quot;character&quot;:32,&quot;text&quot;:&quot;returnValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:276,&quot;character&quot;:6,&quot;text&quot;:&quot;$ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:276,&quot;character&quot;:12,&quot;text&quot;:&quot;$onInit&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:278,&quot;character&quot;:6,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:278,&quot;character&quot;:13,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:280,&quot;character&quot;:13,&quot;text&quot;:&quot;$ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:280,&quot;character&quot;:19,&quot;text&quot;:&quot;isStateTasksVisible&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:281,&quot;character&quot;:13,&quot;text&quot;:&quot;$ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:281,&quot;character&quot;:19,&quot;text&quot;:&quot;isStateTasksVisible&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:283,&quot;character&quot;:6,&quot;text&quot;:&quot;$ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:283,&quot;character&quot;:12,&quot;text&quot;:&quot;toggleStateTasks&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:285,&quot;character&quot;:13,&quot;text&quot;:&quot;$ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:285,&quot;character&quot;:19,&quot;text&quot;:&quot;isStateTasksVisible&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:286,&quot;character&quot;:13,&quot;text&quot;:&quot;$ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:286,&quot;character&quot;:19,&quot;text&quot;:&quot;isStateTasksVisible&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:291,&quot;character&quot;:8,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:291,&quot;character&quot;:13,&quot;text&quot;:&quot;hbrTasksSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:291,&quot;character&quot;:25,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:291,&quot;character&quot;:29,&quot;text&quot;:&quot;returnValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:293,&quot;character&quot;:8,&quot;text&quot;:&quot;$ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:293,&quot;character&quot;:14,&quot;text&quot;:&quot;$onInit&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:295,&quot;character&quot;:8,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:295,&quot;character&quot;:15,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:297,&quot;character&quot;:15,&quot;text&quot;:&quot;$ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:297,&quot;character&quot;:21,&quot;text&quot;:&quot;getExplorationHealth&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:302,&quot;character&quot;:10,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:302,&quot;character&quot;:15,&quot;text&quot;:&quot;iflTasksSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:302,&quot;character&quot;:27,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:302,&quot;character&quot;:31,&quot;text&quot;:&quot;returnValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:304,&quot;character&quot;:10,&quot;text&quot;:&quot;$ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:304,&quot;character&quot;:16,&quot;text&quot;:&quot;$onInit&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:306,&quot;character&quot;:10,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:306,&quot;character&quot;:17,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:308,&quot;character&quot;:17,&quot;text&quot;:&quot;$ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:308,&quot;character&quot;:23,&quot;text&quot;:&quot;getExplorationHealth&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:313,&quot;character&quot;:10,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:313,&quot;character&quot;:15,&quot;text&quot;:&quot;ngrTasksSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:313,&quot;character&quot;:27,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:313,&quot;character&quot;:31,&quot;text&quot;:&quot;returnValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:315,&quot;character&quot;:10,&quot;text&quot;:&quot;$ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:315,&quot;character&quot;:16,&quot;text&quot;:&quot;$onInit&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:317,&quot;character&quot;:10,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:317,&quot;character&quot;:17,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:319,&quot;character&quot;:17,&quot;text&quot;:&quot;$ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:319,&quot;character&quot;:23,&quot;text&quot;:&quot;getExplorationHealth&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:324,&quot;character&quot;:10,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:324,&quot;character&quot;:15,&quot;text&quot;:&quot;siaTasksSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:324,&quot;character&quot;:27,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:324,&quot;character&quot;:31,&quot;text&quot;:&quot;returnValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:326,&quot;character&quot;:10,&quot;text&quot;:&quot;$ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:326,&quot;character&quot;:16,&quot;text&quot;:&quot;$onInit&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:328,&quot;character&quot;:10,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:328,&quot;character&quot;:17,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:330,&quot;character&quot;:17,&quot;text&quot;:&quot;$ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:330,&quot;character&quot;:23,&quot;text&quot;:&quot;getExplorationHealth&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:335,&quot;character&quot;:10,&quot;text&quot;:&quot;$ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:335,&quot;character&quot;:16,&quot;text&quot;:&quot;$onInit&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:337,&quot;character&quot;:10,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:337,&quot;character&quot;:17,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:339,&quot;character&quot;:17,&quot;text&quot;:&quot;$ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts&quot;,&quot;line&quot;:339,&quot;character&quot;:23,&quot;text&quot;:&quot;getExplorationHealth&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:59 GMT</p>
+    </body>
+  </html>
+  

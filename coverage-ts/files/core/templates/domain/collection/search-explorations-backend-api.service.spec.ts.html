@@ -1,0 +1,143 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>search-explorations-backend-api.service.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">core/templates/domain/collection/search-explorations-backend-api.service.spec.ts</td><td class="">100.00%</td><td class="">100%</td><td class="">139</td><td class="">139</td><td class="">0</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2017 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for SearchExplorationsBackendApiService.
+ */
+
+import { HttpClientTestingModule, HttpTestingController } from
+  &#x27;@angular/common/http/testing&#x27;;
+import { TestBed, fakeAsync, flushMicrotasks } from &#x27;@angular/core/testing&#x27;;
+
+import { SearchExplorationsBackendApiService } from
+  &#x27;domain/collection/search-explorations-backend-api.service&#x27;;
+
+import { ExplorationMetadata } from
+  &#x27;domain/exploration/exploration-metadata.model&#x27;;
+
+describe(&#x27;Exploration search backend API service&#x27;, () =&gt; {
+  let SearchExplorationsService: SearchExplorationsBackendApiService = null;
+  let httpTestingController: HttpTestingController;
+
+  beforeEach(() =&gt; {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+
+    SearchExplorationsService = TestBed.get(
+      SearchExplorationsBackendApiService);
+    httpTestingController = TestBed.get(HttpTestingController);
+  });
+
+  afterEach(() =&gt; {
+    httpTestingController.verify();
+  });
+
+  it(&#x27;should call the provided success handler on HTTP success&#x27;,
+    fakeAsync(() =&gt; {
+      let successHandler = jasmine.createSpy(&#x27;success&#x27;);
+      let failHandler = jasmine.createSpy(&#x27;fail&#x27;);
+      let query = escape(btoa(&#x27;three&#x27;));
+
+      SearchExplorationsService.fetchExplorationsAsync(&#x27;three&#x27;)
+        .then(successHandler, failHandler);
+      let req = httpTestingController.expectOne(
+        &#x27;/exploration/metadata_search?q=&#x27; + query);
+      req.flush({collection_node_metadata_list: []});
+
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
+
+  it(&#x27;should search for explorations from the backend&#x27;,
+    fakeAsync(() =&gt; {
+      let successHandler = jasmine.createSpy(&#x27;success&#x27;);
+      let failHandler = jasmine.createSpy(&#x27;fail&#x27;);
+      let query = escape(btoa(&#x27;count&#x27;));
+
+      // Search result object returnable from the backend.
+      let searchResults = {
+        collection_node_metadata_list: [{
+          id: &#x27;12&#x27;,
+          objective:
+          &#x27;learn how to count permutations accurately and systematically&#x27;,
+          title: &#x27;Protractor Test&#x27;
+        }, {
+          id: &#x27;4&#x27;,
+          objective:
+          &#x27;learn how to count permutations accurately and systematically&#x27;,
+          title: &#x27;Three Balls&#x27;
+        }]
+      };
+
+      var explorationMetadataObjects = (
+        searchResults.collection_node_metadata_list.map(
+          explorationMetadataBackendDict =&gt; ExplorationMetadata
+            .createFromBackendDict(explorationMetadataBackendDict)));
+
+      SearchExplorationsService.fetchExplorationsAsync(&#x27;count&#x27;)
+        .then(successHandler, failHandler);
+      let req = httpTestingController.expectOne(
+        &#x27;/exploration/metadata_search?q=&#x27; + query);
+      req.flush(searchResults);
+
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalledWith(explorationMetadataObjects);
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
+
+  it(&#x27;should call the provided fail handler on HTTP failure&#x27;,
+    fakeAsync(() =&gt; {
+      let successHandler = jasmine.createSpy(&#x27;success&#x27;);
+      let failHandler = jasmine.createSpy(&#x27;fail&#x27;);
+      let query = escape(btoa(&#x27;oppia&#x27;));
+
+      SearchExplorationsService.fetchExplorationsAsync(&#x27;oppia&#x27;)
+        .then(successHandler, failHandler);
+      let req = httpTestingController.expectOne(
+        &#x27;/exploration/metadata_search?q=&#x27; + query);
+      req.flush(&#x27;Error searching exploration&#x27;, {
+        status: 500, statusText: &#x27;Invalid Request&#x27;
+      });
+
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalled();
+    })
+  );
+});
+</textarea><pre id="annotations" style="display:none">[]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:57 GMT</p>
+    </body>
+  </html>
+  

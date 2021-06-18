@@ -1,0 +1,228 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>exploration-summary-backend-api.service.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/domain/summary/exploration-summary-backend-api.service.spec.ts</td><td class="">90.11%</td><td class="">100%</td><td class="">273</td><td class="">246</td><td class="">27</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for ExplorationSummaryBackendApiService.
+ */
+
+import { HttpClientTestingModule, HttpTestingController } from
+  &#x27;@angular/common/http/testing&#x27;;
+import { TestBed, fakeAsync, flushMicrotasks } from &#x27;@angular/core/testing&#x27;;
+
+import { ExplorationSummaryBackendApiService } from
+  &#x27;domain/summary/exploration-summary-backend-api.service&#x27;;
+import { AlertsService } from &#x27;services/alerts.service&#x27;;
+import { CsrfTokenService } from &#x27;services/csrf-token.service&#x27;;
+
+describe(&#x27;Exploration Summary Backend Api Service&#x27;, () =&gt; {
+  let explorationSummaryBackendApiService:
+    ExplorationSummaryBackendApiService = null;
+  let httpTestingController: HttpTestingController = null;
+  let csrfService: CsrfTokenService = null;
+  let alertsService: AlertsService = null;
+  let successHandler = null;
+  let failHandler = null;
+
+  beforeEach(() =&gt; {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+
+    explorationSummaryBackendApiService = TestBed.get(
+      ExplorationSummaryBackendApiService
+    );
+    csrfService = TestBed.get(CsrfTokenService);
+    alertsService = TestBed.get(AlertsService);
+    httpTestingController = TestBed.get(
+      HttpTestingController
+    );
+
+    successHandler = jasmine.createSpy(&#x27;success&#x27;);
+    failHandler = jasmine.createSpy(&#x27;fail&#x27;);
+
+    spyOn(csrfService, &#x27;getTokenAsync&#x27;).and.callFake(async() =&gt; {
+      return Promise.resolve(&#x27;simple-csrf-token&#x27;);
+    });
+  });
+
+  afterEach(() =&gt; {
+    httpTestingController.verify();
+  });
+
+  it(&#x27;should not load public exploration summaries from backend when&#x27; +
+  &#x27; exploration id is not valid&#x27;, fakeAsync(() =&gt; {
+    const explorationIds = [&#x27;#&#x27;, null, &#x27;1&#x27;];
+    const alertSpy = spyOn(alertsService, &#x27;addWarning&#x27;).and.callThrough();
+
+    explorationSummaryBackendApiService.loadPublicExplorationSummariesAsync(
+      explorationIds).then(successHandler, failHandler);
+
+    flushMicrotasks();
+
+    expect(alertSpy).toHaveBeenCalledWith(
+      &#x27;Please enter a valid exploration ID.&#x27;);
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith([null, null, null]);
+  }));
+
+  it(&#x27;should use reject handler when server throws and error&#x27;,
+    fakeAsync(() =&gt; {
+      const explorationIds = [&#x27;12&#x27;];
+      const requestUrl = &#x27;/explorationsummarieshandler/data?&#x27; +
+      &#x27;stringified_exp_ids=&#x27; + encodeURI(JSON.stringify(explorationIds)) +
+      &#x27;&amp;&#x27; + &#x27;include_private_explorations=false&#x27;;
+
+      explorationSummaryBackendApiService.loadPublicExplorationSummariesAsync(
+        explorationIds).then(successHandler, failHandler);
+      const req = httpTestingController.expectOne(requestUrl);
+      expect(req.request.method).toEqual(&#x27;GET&#x27;);
+      req.flush(
+        {error: &#x27;Error Communicating with Server&#x27;},
+        {status: 400, statusText: &#x27;&#x27;}
+      );
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(
+        &#x27;Error Communicating with Server&#x27;);
+    }));
+
+  it(&#x27;should load public exploration summaries from backend&#x27;, fakeAsync(()=&gt; {
+    const explorationIds = [&#x27;0&#x27;, &#x27;1&#x27;, &#x27;2&#x27;];
+    const sampleResults = [{
+      title: &#x27;Title 1&#x27;,
+      category: &#x27;Category 1&#x27;,
+      status: &#x27;public&#x27;,
+      language_code: &#x27;en&#x27;
+    }];
+
+    const requestUrl = &#x27;/explorationsummarieshandler/data?&#x27; +
+      &#x27;stringified_exp_ids=&#x27; + encodeURI(JSON.stringify(explorationIds)) +
+      &#x27;&amp;&#x27; + &#x27;include_private_explorations=false&#x27;;
+
+    explorationSummaryBackendApiService
+      .loadPublicExplorationSummariesAsync(explorationIds)
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(requestUrl);
+    expect(req.request.method).toEqual(&#x27;GET&#x27;);
+    req.flush(sampleResults);
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(sampleResults);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it(&#x27;should load public and private exploration summaries from backend&#x27;,
+    fakeAsync(() =&gt; {
+      const explorationIds = [&#x27;0&#x27;, &#x27;1&#x27;, &#x27;2&#x27;];
+      const sampleResults = [{
+        title: &#x27;Title 1&#x27;,
+        category: &#x27;Category 1&#x27;,
+        status: &#x27;public&#x27;,
+        language_code: &#x27;en&#x27;
+      }, {
+        title: &#x27;Title 2&#x27;,
+        category: &#x27;Category 2&#x27;,
+        status: &#x27;private&#x27;,
+        language_code: &#x27;en&#x27;
+      }];
+
+      const requestUrl = &#x27;/explorationsummarieshandler/data?&#x27; +
+        &#x27;stringified_exp_ids=&#x27; + encodeURI(JSON.stringify(explorationIds)) +
+        &#x27;&amp;&#x27; + &#x27;include_private_explorations=true&#x27;;
+
+
+      explorationSummaryBackendApiService
+        .loadPublicAndPrivateExplorationSummariesAsync(explorationIds).then(
+          successHandler, failHandler);
+
+      const req = httpTestingController.expectOne(requestUrl);
+      expect(req.request.method).toEqual(&#x27;GET&#x27;);
+      req.flush(sampleResults);
+
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalledWith(sampleResults);
+      expect(failHandler).not.toHaveBeenCalled();
+    }));
+
+  it(&#x27;should use reject handler when loading public exploration summaries&#x27; +
+    &#x27; from backend returns null&#x27;, fakeAsync(() =&gt; {
+    const explorationIds = [&#x27;0&#x27;, &#x27;1&#x27;, &#x27;2&#x27;];
+
+    const requestUrl = &#x27;/explorationsummarieshandler/data?&#x27; +
+      &#x27;stringified_exp_ids=&#x27; + encodeURI(JSON.stringify(explorationIds)) +
+      &#x27;&amp;&#x27; + &#x27;include_private_explorations=false&#x27;;
+
+    explorationSummaryBackendApiService
+      .loadPublicExplorationSummariesAsync(explorationIds)
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(requestUrl);
+    expect(req.request.method).toEqual(&#x27;GET&#x27;);
+    req.flush(null);
+
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      &#x27;Summaries fetched are null for explorationIds: &#x27; + explorationIds);
+  }));
+
+  it(&#x27;should use reject handler when loading public exploration summaries&#x27; +
+    &#x27; from backend fails&#x27;, fakeAsync(() =&gt; {
+    const explorationIds = [&#x27;0&#x27;, &#x27;1&#x27;, &#x27;2&#x27;];
+    const errorMessage = &#x27;Error on loading public exploration summaries.&#x27;;
+
+    const requestUrl = &#x27;/explorationsummarieshandler/data?&#x27; +
+      &#x27;stringified_exp_ids=&#x27; + encodeURI(JSON.stringify(explorationIds)) +
+      &#x27;&amp;&#x27; + &#x27;include_private_explorations=false&#x27;;
+
+    explorationSummaryBackendApiService
+      .loadPublicExplorationSummariesAsync(explorationIds)
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(requestUrl);
+    expect(req.request.method).toEqual(&#x27;GET&#x27;);
+    req.flush(
+      { error: errorMessage },
+      { status: 500, statusText: &#x27;&#x27;}
+    );
+
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(errorMessage);
+  }));
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/domain/summary/exploration-summary-backend-api.service.spec.ts&quot;,&quot;line&quot;:33,&quot;character&quot;:6,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/summary/exploration-summary-backend-api.service.spec.ts&quot;,&quot;line&quot;:34,&quot;character&quot;:6,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/summary/exploration-summary-backend-api.service.spec.ts&quot;,&quot;line&quot;:50,&quot;character&quot;:4,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/summary/exploration-summary-backend-api.service.spec.ts&quot;,&quot;line&quot;:51,&quot;character&quot;:4,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/summary/exploration-summary-backend-api.service.spec.ts&quot;,&quot;line&quot;:74,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/summary/exploration-summary-backend-api.service.spec.ts&quot;,&quot;line&quot;:74,&quot;character&quot;:27,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/summary/exploration-summary-backend-api.service.spec.ts&quot;,&quot;line&quot;:75,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/summary/exploration-summary-backend-api.service.spec.ts&quot;,&quot;line&quot;:88,&quot;character&quot;:17,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/summary/exploration-summary-backend-api.service.spec.ts&quot;,&quot;line&quot;:95,&quot;character&quot;:13,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/summary/exploration-summary-backend-api.service.spec.ts&quot;,&quot;line&quot;:95,&quot;character&quot;:29,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/summary/exploration-summary-backend-api.service.spec.ts&quot;,&quot;line&quot;:96,&quot;character&quot;:13,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/summary/exploration-summary-backend-api.service.spec.ts&quot;,&quot;line&quot;:118,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/summary/exploration-summary-backend-api.service.spec.ts&quot;,&quot;line&quot;:123,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/summary/exploration-summary-backend-api.service.spec.ts&quot;,&quot;line&quot;:124,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/summary/exploration-summary-backend-api.service.spec.ts&quot;,&quot;line&quot;:124,&quot;character&quot;:24,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/summary/exploration-summary-backend-api.service.spec.ts&quot;,&quot;line&quot;:152,&quot;character&quot;:17,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/summary/exploration-summary-backend-api.service.spec.ts&quot;,&quot;line&quot;:157,&quot;character&quot;:13,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/summary/exploration-summary-backend-api.service.spec.ts&quot;,&quot;line&quot;:158,&quot;character&quot;:13,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/summary/exploration-summary-backend-api.service.spec.ts&quot;,&quot;line&quot;:158,&quot;character&quot;:26,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/summary/exploration-summary-backend-api.service.spec.ts&quot;,&quot;line&quot;:174,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/summary/exploration-summary-backend-api.service.spec.ts&quot;,&quot;line&quot;:179,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/summary/exploration-summary-backend-api.service.spec.ts&quot;,&quot;line&quot;:179,&quot;character&quot;:27,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/summary/exploration-summary-backend-api.service.spec.ts&quot;,&quot;line&quot;:180,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/summary/exploration-summary-backend-api.service.spec.ts&quot;,&quot;line&quot;:198,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/summary/exploration-summary-backend-api.service.spec.ts&quot;,&quot;line&quot;:206,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/summary/exploration-summary-backend-api.service.spec.ts&quot;,&quot;line&quot;:206,&quot;character&quot;:27,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/summary/exploration-summary-backend-api.service.spec.ts&quot;,&quot;line&quot;:207,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:57 GMT</p>
+    </body>
+  </html>
+  

@@ -1,0 +1,108 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>normalized-string-editor.component.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">extensions/objects/templates/normalized-string-editor.component.ts</td><td class="">83.64%</td><td class="">100%</td><td class="">110</td><td class="">92</td><td class="">18</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2014 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Directive for normalized string editor.
+ */
+
+// This is a copy of the UnicodeStringEditor.
+
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from &#x27;@angular/core&#x27;;
+import { downgradeComponent } from &#x27;@angular/upgrade/static&#x27;;
+import { Subscription } from &#x27;rxjs&#x27;;
+import { ExternalSaveService } from &#x27;services/external-save.service&#x27;;
+@Component({
+  selector: &#x27;normalized-string-editor&#x27;,
+  templateUrl: &#x27;./unicode-string-editor.component.html&#x27;
+})
+export class NormalizedStringEditorComponent implements
+    OnInit, OnChanges, OnDestroy {
+  @Input() alwaysEditable;
+  @Input() initArgs;
+  @Input() value;
+  @Output() valueChanged = new EventEmitter();
+  componentSubscriptions = new Subscription();
+  active: boolean;
+  largeInput = false;
+  constructor(private externalSaveService: ExternalSaveService) { }
+
+  ngOnInit(): void {
+    if (!this.alwaysEditable) {
+      this.componentSubscriptions.add(
+        this.externalSaveService.onExternalSave.subscribe(() =&gt; {
+          if (this.active) {
+            this.replaceValue(this.value);
+          }
+        })
+      );
+      this.closeEditor();
+    }
+  }
+
+  updateLocalValue(newValue: string): void {
+    this.value = newValue;
+  }
+
+  openEditor(): void {
+    this.active = true;
+  }
+
+  closeEditor(): void {
+    this.active = false;
+  }
+
+  replaceValue(newValue: string): void {
+    this.value = newValue;
+    this.closeEditor();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (
+      changes.initArgs &amp;&amp;
+      changes.initArgs.currentValue &amp;&amp;
+      changes.initArgs.currentValue.largeInput &amp;&amp;
+      changes.initArgs.previousValue &amp;&amp;
+      changes.initArgs.currentValue?.largeInput !==
+      changes.initArgs.previousValue?.largeInput
+    ) {
+      this.largeInput = changes.initArgs.currentValue?.largeInput;
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.componentSubscriptions.unsubscribe();
+  }
+}
+
+angular.module(&#x27;oppia&#x27;).directive(&#x27;normalizedStringEditor&#x27;, downgradeComponent({
+  component: NormalizedStringEditorComponent
+}) as angular.IDirectiveFactory);
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;extensions/objects/templates/normalized-string-editor.component.ts&quot;,&quot;line&quot;:30,&quot;character&quot;:11,&quot;text&quot;:&quot;alwaysEditable&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/normalized-string-editor.component.ts&quot;,&quot;line&quot;:31,&quot;character&quot;:11,&quot;text&quot;:&quot;initArgs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/normalized-string-editor.component.ts&quot;,&quot;line&quot;:32,&quot;character&quot;:11,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/normalized-string-editor.component.ts&quot;,&quot;line&quot;:33,&quot;character&quot;:12,&quot;text&quot;:&quot;valueChanged&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/objects/templates/normalized-string-editor.component.ts&quot;,&quot;line&quot;:40,&quot;character&quot;:14,&quot;text&quot;:&quot;alwaysEditable&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/normalized-string-editor.component.ts&quot;,&quot;line&quot;:44,&quot;character&quot;:35,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/normalized-string-editor.component.ts&quot;,&quot;line&quot;:53,&quot;character&quot;:9,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/normalized-string-editor.component.ts&quot;,&quot;line&quot;:65,&quot;character&quot;:9,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/normalized-string-editor.component.ts&quot;,&quot;line&quot;:72,&quot;character&quot;:23,&quot;text&quot;:&quot;currentValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/normalized-string-editor.component.ts&quot;,&quot;line&quot;:73,&quot;character&quot;:23,&quot;text&quot;:&quot;currentValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/normalized-string-editor.component.ts&quot;,&quot;line&quot;:73,&quot;character&quot;:36,&quot;text&quot;:&quot;largeInput&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/normalized-string-editor.component.ts&quot;,&quot;line&quot;:74,&quot;character&quot;:23,&quot;text&quot;:&quot;previousValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/normalized-string-editor.component.ts&quot;,&quot;line&quot;:75,&quot;character&quot;:23,&quot;text&quot;:&quot;currentValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/normalized-string-editor.component.ts&quot;,&quot;line&quot;:75,&quot;character&quot;:37,&quot;text&quot;:&quot;largeInput&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/normalized-string-editor.component.ts&quot;,&quot;line&quot;:76,&quot;character&quot;:23,&quot;text&quot;:&quot;previousValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/normalized-string-editor.component.ts&quot;,&quot;line&quot;:76,&quot;character&quot;:38,&quot;text&quot;:&quot;largeInput&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/normalized-string-editor.component.ts&quot;,&quot;line&quot;:78,&quot;character&quot;:41,&quot;text&quot;:&quot;currentValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/normalized-string-editor.component.ts&quot;,&quot;line&quot;:78,&quot;character&quot;:55,&quot;text&quot;:&quot;largeInput&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:56 GMT</p>
+    </body>
+  </html>
+  

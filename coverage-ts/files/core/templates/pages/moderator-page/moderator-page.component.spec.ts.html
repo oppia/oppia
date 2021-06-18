@@ -1,0 +1,256 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>moderator-page.component.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/moderator-page/moderator-page.component.spec.ts</td><td class="">99.00%</td><td class="">100%</td><td class="">300</td><td class="">297</td><td class="">3</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2021 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for Moderator Page Component.
+ */
+
+import { ComponentFixture, fakeAsync, TestBed, waitForAsync }
+  from &#x27;@angular/core/testing&#x27;;
+import { NgbNavModule } from &#x27;@ng-bootstrap/ng-bootstrap&#x27;;
+import { SchemaBasedEditorDirective }
+  from &#x27;components/forms/schema-based-editors/schema-based-editor.directive&#x27;;
+import { ThreadMessage, ThreadMessageBackendDict }
+  from &#x27;domain/feedback_message/ThreadMessage.model&#x27;;
+import { AlertsService } from &#x27;services/alerts.service&#x27;;
+import { DateTimeFormatService } from &#x27;services/date-time-format.service&#x27;;
+import { LoaderService } from &#x27;services/loader.service&#x27;;
+import { ModeratorPageComponent } from &#x27;./moderator-page.component&#x27;;
+import { ActivityIdTypeDict, FeaturedActivityResponse,
+  ModeratorPageBackendApiService, RecentCommitResponse, RecentFeedbackMessages }
+  from &#x27;./services/moderator-page-backend-api.service&#x27;;
+
+describe(&#x27;Moderator Page Component&#x27;, () =&gt; {
+  let fixture: ComponentFixture&lt;ModeratorPageComponent&gt;;
+  let componentInstance: ModeratorPageComponent;
+  let loaderService: LoaderService;
+  let datetimeFormatService: DateTimeFormatService;
+  let alertsService: AlertsService;
+  let threadMessageBackendDict: ThreadMessageBackendDict = {
+    author_username: &#x27;author&#x27;,
+    created_on_msecs: 123,
+    entity_type: &#x27;exploration&#x27;,
+    entity_id: &#x27;id&#x27;,
+    message_id: 12312,
+    text: &#x27;test_txt&#x27;,
+    updated_status: &#x27;stastu&#x27;,
+    updated_subject: &#x27;asdf&#x27;
+  };
+
+  let message: ThreadMessage = ThreadMessage
+    .createFromBackendDict(threadMessageBackendDict);
+
+  let recentCommits: RecentCommitResponse = {
+    results: [],
+    cursor: &#x27;str1&#x27;,
+    more: true,
+    exp_ids_to_exp_data: [{
+      category: &#x27;test_category&#x27;,
+      title: &#x27;test_title&#x27;
+    }]
+  };
+
+  let recentFeedbackMessages: RecentFeedbackMessages = {
+    results: [threadMessageBackendDict],
+    cursor: &#x27;test&#x27;,
+    more: true
+  };
+
+  let activityResponse: FeaturedActivityResponse = {
+    featured_activity_references: []
+  };
+
+  class MockModeratorPageBackendApiService {
+    getRecentCommitsAsync() {
+      return {
+        then: (
+            successCallback: (response: RecentCommitResponse) =&gt; void
+        ) =&gt; {
+          successCallback(recentCommits);
+        }
+      };
+    }
+
+    getRecentFeedbackMessagesAsync() {
+      return {
+        then: (
+            successCallback: (response: RecentFeedbackMessages) =&gt; void
+        ) =&gt; {
+          successCallback(recentFeedbackMessages);
+        }
+      };
+    }
+
+    getFeaturedActivityReferencesAsync() {
+      return {
+        then: (
+            successCallback: (response: FeaturedActivityResponse) =&gt; void
+        ) =&gt; {
+          successCallback(activityResponse);
+        }
+      };
+    }
+
+    saveFeaturedActivityReferencesAsync(references: ActivityIdTypeDict[]) {
+      return {
+        then: (
+            successCallback: () =&gt; void
+        ) =&gt; {
+          successCallback();
+        }
+      };
+    }
+  }
+
+  beforeEach(waitForAsync(() =&gt; {
+    TestBed.configureTestingModule({
+      imports: [
+        NgbNavModule
+      ],
+      declarations: [
+        ModeratorPageComponent,
+        SchemaBasedEditorDirective
+      ],
+      providers: [
+        {
+          provide: ModeratorPageBackendApiService,
+          useClass: MockModeratorPageBackendApiService
+        }
+      ]
+    }).compileComponents();
+  }));
+
+  beforeEach(() =&gt; {
+    fixture = TestBed.createComponent(ModeratorPageComponent);
+    componentInstance = fixture.componentInstance;
+    loaderService = (TestBed.inject(LoaderService) as unknown) as
+      jasmine.SpyObj&lt;LoaderService&gt;;
+    datetimeFormatService = (
+      TestBed.inject(DateTimeFormatService) as unknown) as
+      jasmine.SpyObj&lt;DateTimeFormatService&gt;;
+    alertsService = (
+      TestBed.inject(AlertsService) as unknown) as
+      jasmine.SpyObj&lt;AlertsService&gt;;
+  });
+
+  it(&#x27;should create&#x27;, () =&gt; {
+    expect(componentInstance).toBeDefined();
+  });
+
+  it(&#x27;should initiailze&#x27;, fakeAsync(() =&gt; {
+    spyOn(loaderService, &#x27;showLoadingScreen&#x27;);
+    spyOn(loaderService, &#x27;hideLoadingScreen&#x27;);
+    componentInstance.explorationData = [];
+    componentInstance.ngOnInit();
+    expect(componentInstance.explorationData)
+      .toEqual(recentCommits.exp_ids_to_exp_data);
+    expect(loaderService.showLoadingScreen).toHaveBeenCalled();
+    expect(componentInstance.allCommits).toEqual(recentCommits.results);
+    expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
+
+    expect(componentInstance.allFeedbackMessages)
+      .toEqual(recentFeedbackMessages.results.map(
+        d =&gt; ThreadMessage.createFromBackendDict(d))
+      );
+
+    expect(componentInstance.displayedFeaturedActivityReferences)
+      .toEqual(activityResponse.featured_activity_references);
+    expect(componentInstance.lastSavedFeaturedActivityReferences).toEqual(
+      componentInstance.displayedFeaturedActivityReferences);
+  }));
+
+  it(&#x27;should get date time as string&#x27;, () =&gt; {
+    let testDatetime: string = &#x27;test_datetime&#x27;;
+    spyOn(datetimeFormatService, &#x27;getLocaleAbbreviatedDatetimeString&#x27;)
+      .and.returnValue(testDatetime);
+    expect(componentInstance.getDatetimeAsString(100)).toEqual(testDatetime);
+  });
+
+  it(&#x27;should tell if message is from exploration&#x27;, () =&gt; {
+    expect(componentInstance.isMessageFromExploration(message)).toBeTrue();
+    message.entityType = &#x27;other_than_exploration&#x27;;
+    expect(componentInstance.isMessageFromExploration(message)).toBeFalse();
+  });
+
+  it(&#x27;should get exploration create url&#x27;, () =&gt; {
+    expect(componentInstance.getExplorationCreateUrl(&#x27;test&#x27;))
+      .toEqual(&#x27;/create/test&#x27;);
+  });
+
+  it(&#x27;should get activity create url&#x27;, () =&gt; {
+    let reference: ActivityIdTypeDict = {
+      id: &#x27;test_id&#x27;,
+      type: &#x27;exploration&#x27;
+    };
+    expect(componentInstance.getActivityCreateUrl(reference))
+      .toEqual(&#x27;/create/&#x27; + reference.id);
+    reference.type = &#x27;not_exploration&#x27;;
+    expect(componentInstance.getActivityCreateUrl(reference))
+      .toEqual(&#x27;/create_collection/&#x27; + reference.id);
+  });
+
+  it(&#x27;should tell if save featured activies button is disabled&#x27;, () =&gt; {
+    componentInstance.displayedFeaturedActivityReferences = componentInstance
+      .lastSavedFeaturedActivityReferences;
+    expect(componentInstance.isSaveFeaturedActivitiesButtonDisabled())
+      .toBeTrue();
+    componentInstance.displayedFeaturedActivityReferences = [];
+    componentInstance.lastSavedFeaturedActivityReferences = [
+      { id: &#x27;not&#x27;, type: &#x27;equal&#x27; }];
+    expect(componentInstance.isSaveFeaturedActivitiesButtonDisabled())
+      .toBeFalse();
+  });
+
+  it(&#x27;should save featured activity references&#x27;, () =&gt; {
+    spyOn(alertsService, &#x27;clearWarnings&#x27;);
+    spyOn(alertsService, &#x27;addSuccessMessage&#x27;);
+    componentInstance.saveFeaturedActivityReferences();
+    expect(alertsService.clearWarnings).toHaveBeenCalled();
+    expect(alertsService.addSuccessMessage).toHaveBeenCalled();
+  });
+
+  it(&#x27;should get schema&#x27;, () =&gt; {
+    expect(componentInstance.getSchema())
+      .toEqual(componentInstance.FEATURED_ACTIVITY_REFERENCES_SCHEMA);
+  });
+
+  it(&#x27;should update displayed featured activity references&#x27;, () =&gt; {
+    let newValue: ActivityIdTypeDict[] = [{
+      id: &#x27;test_id&#x27;,
+      type: &#x27;exploration&#x27;
+    }];
+    componentInstance.displayedFeaturedActivityReferences = [];
+    componentInstance.updateDisplayedFeaturedActivityReferences(newValue);
+    expect(componentInstance.displayedFeaturedActivityReferences)
+      .toEqual(newValue);
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/moderator-page/moderator-page.component.spec.ts&quot;,&quot;line&quot;:136,&quot;character&quot;:20,&quot;text&quot;:&quot;(TestBed.inject(LoaderService) as unknown) as\n      jasmine.SpyObj&lt;LoaderService&gt;&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;core/templates/pages/moderator-page/moderator-page.component.spec.ts&quot;,&quot;line&quot;:138,&quot;character&quot;:28,&quot;text&quot;:&quot;(\n      TestBed.inject(DateTimeFormatService) as unknown) as\n      jasmine.SpyObj&lt;DateTimeFormatService&gt;&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;core/templates/pages/moderator-page/moderator-page.component.spec.ts&quot;,&quot;line&quot;:141,&quot;character&quot;:20,&quot;text&quot;:&quot;(\n      TestBed.inject(AlertsService) as unknown) as\n      jasmine.SpyObj&lt;AlertsService&gt;&quot;,&quot;kind&quot;:3}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:58 GMT</p>
+    </body>
+  </html>
+  

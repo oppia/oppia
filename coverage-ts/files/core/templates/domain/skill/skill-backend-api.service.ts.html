@@ -1,0 +1,208 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>skill-backend-api.service.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/domain/skill/skill-backend-api.service.ts</td><td class="">91.97%</td><td class="">100%</td><td class="">249</td><td class="">229</td><td class="">20</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2018 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Service to send changes to a skill to the backend.
+ */
+
+import { downgradeInjectable } from &#x27;@angular/upgrade/static&#x27;;
+import { Injectable } from &#x27;@angular/core&#x27;;
+
+import { HttpClient } from &#x27;@angular/common/http&#x27;;
+import { BackendChangeObject } from &#x27;domain/editor/undo_redo/change.model&#x27;;
+import { SkillDomainConstants } from &#x27;domain/skill/skill-domain.constants&#x27;;
+import { Skill, SkillBackendDict, SkillObjectFactory } from
+  &#x27;domain/skill/SkillObjectFactory&#x27;;
+import { SkillSummaryBackendDict } from
+  &#x27;domain/skill/skill-summary.model&#x27;;
+import { UrlInterpolationService } from
+  &#x27;domain/utilities/url-interpolation.service&#x27;;
+import { Observable } from &#x27;rxjs&#x27;;
+
+interface FetchSkillBackendResponse {
+  &#x27;skill&#x27;: SkillBackendDict;
+  &#x27;assigned_skill_topic_data_dict&#x27;: {
+    [topicName: string]: string;
+  };
+  &#x27;grouped_skill_summaries&#x27;: {
+    [topicName: string]: SkillSummaryBackendDict[];
+  }
+}
+
+interface FetchSkillResponse {
+  skill: Skill;
+  assignedSkillTopicData: {
+    [topicName: string]: string;
+  };
+  groupedSkillSummaries: {
+    [topicName: string]: SkillSummaryBackendDict[];
+  };
+}
+
+interface FetchMultiSkillsBackendResponse {
+  skills: SkillBackendDict[];
+}
+
+interface UpdateSkillBackendResponse {
+  skill: SkillBackendDict;
+}
+
+interface DoesSkillWithDescriptionExistBackendResponse {
+  &#x27;skill_description_exists&#x27;: boolean;
+}
+
+@Injectable({
+  providedIn: &#x27;root&#x27;
+})
+export class SkillBackendApiService {
+  constructor(
+    private http: HttpClient,
+    private skillObjectFactory: SkillObjectFactory,
+    private urlInterpolationService: UrlInterpolationService) {}
+
+  async fetchSkillAsync(skillId: string): Promise&lt;FetchSkillResponse&gt; {
+    return new Promise((resolve, reject) =&gt; {
+      const skillDataUrl = this.urlInterpolationService.interpolateUrl(
+        SkillDomainConstants.EDITABLE_SKILL_DATA_URL_TEMPLATE, {
+          skill_id: skillId
+        });
+
+      this.http.get&lt;FetchSkillBackendResponse&gt;(skillDataUrl).toPromise()
+        .then(response =&gt; {
+          resolve({
+            skill: this.skillObjectFactory.createFromBackendDict(
+              response.skill),
+            assignedSkillTopicData: response.assigned_skill_topic_data_dict,
+            // TODO(nishantwrp): Refactor this property to return SkillSummary
+            // domain objects instead of backend dicts.
+            groupedSkillSummaries: response.grouped_skill_summaries
+          });
+        }, errorResponse =&gt; {
+          reject(errorResponse.error.error);
+        });
+    });
+  }
+
+  fetchAllSkills(): Observable&lt;{skills: SkillBackendDict[]}&gt; {
+    return this.http.get&lt;{skills: SkillBackendDict[]}&gt;(
+      SkillDomainConstants.FETCH_SKILLS_URL_TEMPLATE
+    );
+  }
+
+  async fetchMultiSkillsAsync(skillIds: string[]): Promise&lt;Skill[]&gt; {
+    return new Promise((resolve, reject) =&gt; {
+      const skillDataUrl = this.urlInterpolationService.interpolateUrl(
+        SkillDomainConstants.SKILL_DATA_URL_TEMPLATE, {
+          comma_separated_skill_ids: skillIds.join(&#x27;,&#x27;)
+        }
+      );
+
+      this.http.get&lt;FetchMultiSkillsBackendResponse&gt;(
+        skillDataUrl).toPromise().then(response =&gt; {
+        resolve(response.skills.map(backendDict =&gt; {
+          return this.skillObjectFactory.createFromBackendDict(backendDict);
+        }));
+      }, errorResponse =&gt; {
+        reject(errorResponse.error.error);
+      });
+    });
+  }
+
+  async deleteSkillAsync(skillId: string): Promise&lt;void&gt; {
+    return new Promise((resolve, reject) =&gt; {
+      const skillDataUrl = this.urlInterpolationService.interpolateUrl(
+        SkillDomainConstants.EDITABLE_SKILL_DATA_URL_TEMPLATE, {
+          skill_id: skillId
+        });
+
+      this.http.delete&lt;void&gt;(skillDataUrl).toPromise().then(() =&gt; {
+        resolve();
+      }, function(errorResponse) {
+        reject(errorResponse.error.error);
+      });
+    });
+  }
+
+  async updateSkillAsync(
+      skillId: string, skillVersion: number,
+      commitMessage: string,
+      changeList: BackendChangeObject[]): Promise&lt;Skill&gt; {
+    return new Promise((resolve, reject) =&gt; {
+      const editableSkillDataUrl = this.urlInterpolationService.interpolateUrl(
+        SkillDomainConstants.EDITABLE_SKILL_DATA_URL_TEMPLATE, {
+          skill_id: skillId
+        });
+
+      const putData = {
+        version: skillVersion,
+        commit_message: commitMessage,
+        change_dicts: changeList
+      };
+
+      this.http.put&lt;UpdateSkillBackendResponse&gt;(
+        editableSkillDataUrl, putData).toPromise().then(response =&gt; {
+        resolve(this.skillObjectFactory.createFromBackendDict(response.skill));
+      }, errorResponse =&gt; {
+        reject(errorResponse.error.error);
+      });
+    });
+  }
+
+  private _doesSkillWithDescriptionExist(
+      description: string,
+      successCallback: (value?: boolean) =&gt; void,
+      errorCallback: (reason?: string) =&gt; void): void {
+    let skillDescriptionUrl = this.urlInterpolationService.interpolateUrl(
+      SkillDomainConstants.SKILL_DESCRIPTION_HANDLER_URL_TEMPLATE, {
+        skill_description: description
+      });
+    this.http.get&lt;DoesSkillWithDescriptionExistBackendResponse&gt;(
+      skillDescriptionUrl).toPromise().then((response) =&gt; {
+      if (successCallback) {
+        successCallback(response.skill_description_exists);
+      }
+    }, (errorResponse) =&gt; {
+      errorCallback(errorResponse.error.error);
+    });
+  }
+
+  async doesSkillWithDescriptionExistAsync(description: string):
+      Promise&lt;boolean&gt; {
+    return new Promise((resolve, reject) =&gt; {
+      this._doesSkillWithDescriptionExist(description, resolve, reject);
+    });
+  }
+}
+
+angular.module(&#x27;oppia&#x27;).factory(
+  &#x27;SkillBackendApiService&#x27;,
+  downgradeInjectable(SkillBackendApiService));
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/domain/skill/skill-backend-api.service.ts&quot;,&quot;line&quot;:90,&quot;character&quot;:11,&quot;text&quot;:&quot;errorResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-backend-api.service.ts&quot;,&quot;line&quot;:91,&quot;character&quot;:17,&quot;text&quot;:&quot;errorResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-backend-api.service.ts&quot;,&quot;line&quot;:91,&quot;character&quot;:31,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-backend-api.service.ts&quot;,&quot;line&quot;:91,&quot;character&quot;:37,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-backend-api.service.ts&quot;,&quot;line&quot;:115,&quot;character&quot;:9,&quot;text&quot;:&quot;errorResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-backend-api.service.ts&quot;,&quot;line&quot;:116,&quot;character&quot;:15,&quot;text&quot;:&quot;errorResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-backend-api.service.ts&quot;,&quot;line&quot;:116,&quot;character&quot;:29,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-backend-api.service.ts&quot;,&quot;line&quot;:116,&quot;character&quot;:35,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-backend-api.service.ts&quot;,&quot;line&quot;:130,&quot;character&quot;:18,&quot;text&quot;:&quot;errorResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-backend-api.service.ts&quot;,&quot;line&quot;:131,&quot;character&quot;:15,&quot;text&quot;:&quot;errorResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-backend-api.service.ts&quot;,&quot;line&quot;:131,&quot;character&quot;:29,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-backend-api.service.ts&quot;,&quot;line&quot;:131,&quot;character&quot;:35,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-backend-api.service.ts&quot;,&quot;line&quot;:155,&quot;character&quot;:9,&quot;text&quot;:&quot;errorResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-backend-api.service.ts&quot;,&quot;line&quot;:156,&quot;character&quot;:15,&quot;text&quot;:&quot;errorResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-backend-api.service.ts&quot;,&quot;line&quot;:156,&quot;character&quot;:29,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-backend-api.service.ts&quot;,&quot;line&quot;:156,&quot;character&quot;:35,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-backend-api.service.ts&quot;,&quot;line&quot;:174,&quot;character&quot;:8,&quot;text&quot;:&quot;errorResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-backend-api.service.ts&quot;,&quot;line&quot;:175,&quot;character&quot;:20,&quot;text&quot;:&quot;errorResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-backend-api.service.ts&quot;,&quot;line&quot;:175,&quot;character&quot;:34,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-backend-api.service.ts&quot;,&quot;line&quot;:175,&quot;character&quot;:40,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:55 GMT</p>
+    </body>
+  </html>
+  

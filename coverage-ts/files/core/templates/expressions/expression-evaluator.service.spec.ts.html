@@ -1,0 +1,179 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>expression-evaluator.service.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">core/templates/expressions/expression-evaluator.service.spec.ts</td><td class="">100.00%</td><td class="">100%</td><td class="">141</td><td class="">141</td><td class="">0</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for Expression Evaluator Service.
+ */
+
+import { Type } from &#x27;@angular/core&#x27;;
+import { TestBed } from &#x27;@angular/core/testing&#x27;;
+
+import { ExpressionEvaluatorService } from
+  &#x27;expressions/expression-evaluator.service&#x27;;
+import { ExpressionParserService } from
+  &#x27;expressions/expression-parser.service&#x27;;
+import {
+  EnvDict,
+  Expr,
+  ExprUndefinedVarError,
+  ExprWrongArgTypeError,
+  ExprWrongNumArgsError,
+  ExpressionError,
+  ExpressionSyntaxTreeService,
+} from &#x27;expressions/expression-syntax-tree.service&#x27;;
+
+describe(&#x27;Expression evaluator service&#x27;, () =&gt; {
+  let expressionEvaluatorService: ExpressionEvaluatorService;
+  let expressionParserService: ExpressionParserService;
+  let expressionSyntaxTreeService: ExpressionSyntaxTreeService;
+
+  beforeEach(() =&gt; {
+    expressionEvaluatorService = TestBed.get(ExpressionEvaluatorService);
+    expressionParserService = TestBed.get(ExpressionParserService);
+    expressionSyntaxTreeService = TestBed.get(ExpressionSyntaxTreeService);
+  });
+
+  const ENVS: EnvDict[] = [
+    {
+      numZero: 0,
+      boolTrue: true,
+      strXYZ: &#x27;XYZ&#x27;,
+      num100_001: 100.001,
+      boolFalse: false,
+      strNull: &#x27;&#x27;
+    }
+  ];
+
+  describe(&#x27;Getting params from expressions&#x27;, () =&gt; {
+    type TestParam = [string, string[]];
+    (&lt;TestParam[]&gt; [
+      [&#x27;numZero&#x27;, [&#x27;numZero&#x27;]],
+      [&#x27;b + a&#x27;, [&#x27;a&#x27;, &#x27;b&#x27;]],
+      [&#x27;a + b + a&#x27;, [&#x27;a&#x27;, &#x27;b&#x27;]],
+      [&#x27;+10&#x27;, []],
+      [&#x27;2   + 10&#x27;, []],
+      [&#x27;num100_001   + numZero&#x27;, [&#x27;num100_001&#x27;, &#x27;numZero&#x27;]],
+      [&#x27;20 - num100_001&#x27;, [&#x27;num100_001&#x27;]],
+      [&#x27;0x100 - 256&#x27;, []],
+      [&#x27;!strNull&#x27;, [&#x27;strNull&#x27;]],
+      [&#x27;1 - 2 * 3&#x27;, []],
+      [&#x27;num100_001 / 0.1&#x27;, [&#x27;num100_001&#x27;]],
+      [&#x27;floor((numZero + num100_001)/2)&#x27;, [&#x27;num100_001&#x27;, &#x27;numZero&#x27;]],
+      [&#x27;23 % 5&#x27;, []],
+      [&#x27;1 &lt;= numZero || 1 &gt;= numZero&#x27;, [&#x27;numZero&#x27;]],
+      [&#x27;100 &lt; num100_001 &amp;&amp; 1 &gt; num100_001&#x27;, [&#x27;num100_001&#x27;]],
+      [&#x27;boolTrue == boolFalse&#x27;, [&#x27;boolFalse&#x27;, &#x27;boolTrue&#x27;]],
+      [&#x27;strNull != strXYZ&#x27;, [&#x27;strNull&#x27;, &#x27;strXYZ&#x27;]],
+      [
+        &#x27;if boolFalse then boolTrue else numZero&#x27;,
+        [&#x27;boolFalse&#x27;, &#x27;boolTrue&#x27;, &#x27;numZero&#x27;]
+      ],
+      [&#x27;num100_001 / 0&#x27;, [&#x27;num100_001&#x27;]],
+      [&#x27;abs(-3)&#x27;, []],
+      [&#x27;pow(num100_001, numZero)&#x27;, [&#x27;num100_001&#x27;, &#x27;numZero&#x27;]],
+      [&#x27;log(9, 3)&#x27;, []],
+      [&#x27;numZero + numOne&#x27;, [&#x27;numOne&#x27;, &#x27;numZero&#x27;]]
+    ]).forEach(([expression, expectedParams]) =&gt; {
+      it(&#x27;should get references from the expression &#x27; +
+        JSON.stringify(expression), () =&gt; {
+        expect(
+          expressionSyntaxTreeService.getParamsUsedInExpression(expression)
+        ).toEqual(expectedParams);
+      });
+    });
+  });
+
+  describe(&#x27;Evaluating valid expressions&#x27;, () =&gt; {
+    type TestParam = [string, Expr];
+    (&lt;TestParam[]&gt; [
+      [&#x27;numZero&#x27;, 0],
+      [&#x27;+10&#x27;, 10],
+      [&#x27;2   + 10&#x27;, 12],
+      [&#x27;num100_001   + numZero&#x27;, 100.001],
+      [&#x27;20 - num100_001&#x27;, -80.001],
+      [&#x27;0x100 - 256&#x27;, 0],
+      [&#x27;!strNull&#x27;, true],
+      [&#x27;1 - 2 * 3&#x27;, -5],
+      [&#x27;num100_001 / 0.1&#x27;, 1000.01],
+      [&#x27;floor((numZero + num100_001)/2)&#x27;, 50],
+      [&#x27;23 % 5&#x27;, 3],
+      [&#x27;1 &lt;= numZero || 1 &gt;= numZero&#x27;, true],
+      [&#x27;100 &lt; num100_001 &amp;&amp; 1 &gt; num100_001&#x27;, false],
+      [&#x27;boolTrue == boolFalse&#x27;, false],
+      [&#x27;strNull != strXYZ&#x27;, true],
+      [&#x27;if boolFalse then boolTrue else numZero&#x27;, 0],
+      [&#x27;num100_001 / 0&#x27;, Infinity],
+      [&#x27;abs(-3)&#x27;, 3],
+      [&#x27;pow(num100_001, numZero)&#x27;, 1],
+      [&#x27;log(9, 3)&#x27;, 2],
+    ]).forEach(([expression, expected]) =&gt; {
+      it(&#x27;should evaluate &#x27; + JSON.stringify(expression) + &#x27; correctly&#x27;, () =&gt; {
+        expect(
+          expressionSyntaxTreeService.applyFunctionToParseTree(
+            expressionParserService.parse(expression), ENVS,
+            (parsed, envs) =&gt; expressionEvaluatorService.evaluate(parsed, envs))
+        ).toEqual(expected);
+        expect(expressionEvaluatorService.evaluateExpression(expression, ENVS))
+          .toEqual(expected);
+      });
+    });
+  });
+
+  describe(&#x27;Evaluating invalid expressions&#x27;, () =&gt; {
+    type TestParam = [string, Expr[], Type&lt;ExpressionError&gt;];
+    (&lt;TestParam[]&gt; [
+      [&#x27;there are too many args&#x27;, [&#x27;+&#x27;, 10, 20, 30], ExprWrongNumArgsError],
+      [&#x27;there are too few args&#x27;, [&#x27;==&#x27;, true], ExprWrongNumArgsError],
+      [&#x27;an arg has the wrong type&#x27;, [&#x27;+&#x27;, &#x27;abc&#x27;, 1], ExprWrongArgTypeError],
+    ]).forEach(([problemDescription, expression, errorType]) =&gt; {
+      it(&#x27;should report an error when &#x27; + problemDescription, () =&gt; {
+        expect(
+          () =&gt; expressionSyntaxTreeService.applyFunctionToParseTree(
+            expression, ENVS,
+            (parsed, envs) =&gt; expressionEvaluatorService.evaluate(parsed, envs))
+        ).toThrowError(errorType);
+      });
+    });
+
+    it(&#x27;should report an error when using an undefined variable&#x27;, () =&gt; {
+      const expression = &#x27;numZero + numOne&#x27;; // The param `numOne` is undefined.
+      expect(
+        () =&gt; expressionSyntaxTreeService.applyFunctionToParseTree(
+          expressionParserService.parse(expression), ENVS,
+          (parsed, envs) =&gt; expressionEvaluatorService.evaluate(parsed, envs)))
+        .toThrowError(ExprUndefinedVarError);
+      expect(
+        () =&gt; expressionEvaluatorService.evaluateExpression(expression, ENVS)
+      ).toThrowError(ExprUndefinedVarError);
+    });
+  });
+});
+</textarea><pre id="annotations" style="display:none">[]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:56 GMT</p>
+    </body>
+  </html>
+  

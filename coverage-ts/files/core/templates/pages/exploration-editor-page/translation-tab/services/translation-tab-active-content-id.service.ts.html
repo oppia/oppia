@@ -1,0 +1,81 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>translation-tab-active-content-id.service.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/exploration-editor-page/translation-tab/services/translation-tab-active-content-id.service.ts</td><td class="">82.35%</td><td class="">100%</td><td class="">51</td><td class="">42</td><td class="">9</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2021 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Service to get and set active content id in translation tab.
+ */
+
+import { downgradeInjectable } from &#x27;@angular/upgrade/static&#x27;;
+import { EventEmitter } from &#x27;@angular/core&#x27;;
+import { Injectable } from &#x27;@angular/core&#x27;;
+
+import { StateRecordedVoiceoversService } from &#x27;components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service&#x27;;
+
+
+@Injectable({
+  providedIn: &#x27;root&#x27;
+})
+export class TranslationTabActiveContentIdService {
+  constructor(
+    private _stateRecordedVoiceoversService: StateRecordedVoiceoversService) {}
+
+  activeContentId = null;
+  activeDataFormat = null;
+  _activeContentIdChangedEventEmitter = new EventEmitter();
+
+  getActiveContentId(): string {
+    return this.activeContentId;
+  }
+
+  getActiveDataFormat(): string {
+    return this.activeDataFormat;
+  }
+
+  setActiveContent(contentId: string, dataFormat: string): void {
+    var allContentIds = (
+      this._stateRecordedVoiceoversService.displayed.getAllContentIds());
+    if (allContentIds.indexOf(contentId) === -1) {
+      throw new Error(&#x27;Invalid active content id: &#x27; + contentId);
+    }
+    this.activeContentId = contentId;
+    this.activeDataFormat = dataFormat;
+    this._activeContentIdChangedEventEmitter.emit(dataFormat);
+  }
+
+  get onActiveContentIdChanged(): EventEmitter&lt;string&gt; {
+    return this._activeContentIdChangedEventEmitter;
+  }
+}
+
+angular.module(&#x27;oppia&#x27;).factory(
+  &#x27;TranslationTabActiveContentIdService&#x27;, downgradeInjectable(
+    TranslationTabActiveContentIdService));
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/translation-tab-active-content-id.service.ts&quot;,&quot;line&quot;:32,&quot;character&quot;:2,&quot;text&quot;:&quot;activeContentId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/translation-tab-active-content-id.service.ts&quot;,&quot;line&quot;:33,&quot;character&quot;:2,&quot;text&quot;:&quot;activeDataFormat&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/translation-tab-active-content-id.service.ts&quot;,&quot;line&quot;:34,&quot;character&quot;:2,&quot;text&quot;:&quot;_activeContentIdChangedEventEmitter&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/translation-tab-active-content-id.service.ts&quot;,&quot;line&quot;:37,&quot;character&quot;:16,&quot;text&quot;:&quot;activeContentId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/translation-tab-active-content-id.service.ts&quot;,&quot;line&quot;:41,&quot;character&quot;:16,&quot;text&quot;:&quot;activeDataFormat&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/translation-tab-active-content-id.service.ts&quot;,&quot;line&quot;:50,&quot;character&quot;:9,&quot;text&quot;:&quot;activeContentId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/translation-tab-active-content-id.service.ts&quot;,&quot;line&quot;:51,&quot;character&quot;:9,&quot;text&quot;:&quot;activeDataFormat&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/translation-tab-active-content-id.service.ts&quot;,&quot;line&quot;:52,&quot;character&quot;:9,&quot;text&quot;:&quot;_activeContentIdChangedEventEmitter&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/translation-tab-active-content-id.service.ts&quot;,&quot;line&quot;:56,&quot;character&quot;:16,&quot;text&quot;:&quot;_activeContentIdChangedEventEmitter&quot;,&quot;kind&quot;:2}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:56 GMT</p>
+    </body>
+  </html>
+  

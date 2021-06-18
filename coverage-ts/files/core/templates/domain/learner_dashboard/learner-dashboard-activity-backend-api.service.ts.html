@@ -1,0 +1,173 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>learner-dashboard-activity-backend-api.service.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/domain/learner_dashboard/learner-dashboard-activity-backend-api.service.ts</td><td class="">89.71%</td><td class="">100%</td><td class="">175</td><td class="">157</td><td class="">18</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2021 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Service related to the learner playlist.
+ */
+
+import { downgradeInjectable } from &#x27;@angular/upgrade/static&#x27;;
+import { Injectable } from &#x27;@angular/core&#x27;;
+
+import { AppConstants } from &#x27;app.constants&#x27;;
+import { AlertsService } from &#x27;services/alerts.service&#x27;;
+import { HttpClient } from &#x27;@angular/common/http&#x27;;
+import { NgbModal } from &#x27;@ng-bootstrap/ng-bootstrap&#x27;;
+import { UrlInterpolationService } from &#x27;domain/utilities/url-interpolation.service&#x27;;
+import { LearnerDashboardActivityIds } from &#x27;domain/learner_dashboard/learner-dashboard-activity-ids.model&#x27;;
+import { LearnerPlaylistModalComponent } from &#x27;pages/learner-dashboard-page/modal-templates/learner-playlist-modal.component&#x27;;
+import { RemoveActivityModalComponent } from &#x27;pages/learner-dashboard-page/modal-templates/remove-activity-modal.component&#x27;;
+
+interface LearnerPlaylistResponseObject {
+  &#x27;belongs_to_completed_or_incomplete_list&#x27;: boolean
+  &#x27;belongs_to_subscribed_activities&#x27;: boolean
+  &#x27;is_admin&#x27;: boolean
+  &#x27;is_moderator&#x27;: boolean
+  &#x27;is_super_admin&#x27;: boolean
+  &#x27;is_topic_manager&#x27;: boolean
+  &#x27;playlist_limit_exceeded&#x27;: boolean
+  &#x27;user_email&#x27;: string
+  &#x27;username&#x27;: string
+  }
+
+@Injectable({
+  providedIn: &#x27;root&#x27;
+})
+export class LearnerDashboardActivityBackendApiService {
+  successfullyAdded: boolean;
+  addToLearnerPlaylistUrl: string;
+  removeActivityModalStatus: string;
+
+  constructor(
+    private alertsService: AlertsService,
+    private http: HttpClient,
+    private ngbModal: NgbModal,
+    private urlInterpolationService: UrlInterpolationService,
+  ) {}
+
+  addToLearnerPlaylist(activityId: string, activityType: string): boolean {
+    this.successfullyAdded = true;
+    this.addToLearnerPlaylistUrl = (
+      this.urlInterpolationService.interpolateUrl(
+        &#x27;/learnerplaylistactivityhandler/&lt;activityType&gt;/&lt;activityId&gt;&#x27;, {
+          activityType: activityType,
+          activityId: activityId
+        }));
+    this.http.post&lt;LearnerPlaylistResponseObject&gt;(
+      this.addToLearnerPlaylistUrl, {}).toPromise()
+      .then(response =&gt; {
+        if (response.belongs_to_completed_or_incomplete_list) {
+          this.successfullyAdded = false;
+          this.alertsService.addInfoMessage(
+            &#x27;You have already completed or are completing this &#x27; +
+            &#x27;activity.&#x27;);
+        }
+        if (response.belongs_to_subscribed_activities) {
+          this.successfullyAdded = false;
+          this.alertsService.addInfoMessage(
+            &#x27;This is present in your creator dashboard&#x27;);
+        }
+        if (response.playlist_limit_exceeded) {
+          this.successfullyAdded = false;
+          this.alertsService.addInfoMessage(
+            &#x27;Your \&#x27;Play Later\&#x27; list is full!  Either you can &#x27; +
+            &#x27;complete some or you can head to the learner dashboard &#x27; +
+            &#x27;and remove some.&#x27;);
+        }
+        if (this.successfullyAdded) {
+          this.alertsService.addSuccessMessage(
+            &#x27;Successfully added to your \&#x27;Play Later\&#x27; list.&#x27;);
+        }
+      });
+    return this.successfullyAdded;
+  }
+
+  // This function will open a modal to remove an exploration
+  // from the &#x27;Play Later&#x27; list in the Library Page.
+  removeFromLearnerPlaylistModal(
+      activityId: string, activityTitle: string, activityType: string,
+      learnerDashboardActivityIds: LearnerDashboardActivityIds): void {
+    const modelRef = this.ngbModal.open(
+      LearnerPlaylistModalComponent, {backdrop: true});
+    modelRef.componentInstance.activityId = activityId;
+    modelRef.componentInstance.activityTitle = activityTitle;
+    modelRef.componentInstance.activityType = activityType;
+    modelRef.result.then((playlistUrl) =&gt; {
+      this.http.delete&lt;void&gt;(playlistUrl).toPromise();
+      if (activityType === AppConstants.ACTIVITY_TYPE_EXPLORATION) {
+        learnerDashboardActivityIds.removeFromExplorationLearnerPlaylist(
+          activityId);
+      } else if (activityType === AppConstants.ACTIVITY_TYPE_COLLECTION) {
+        learnerDashboardActivityIds.removeFromCollectionLearnerPlaylist(
+          activityId);
+      }
+    }, () =&gt; {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
+    });
+  }
+
+  // This function will open a modal to remove an exploration
+  // from the given list either &#x27;Play Later&#x27; or &#x27;In Progress&#x27;
+  // in Learner Dashboard Page.
+  async removeActivityModalAsync(
+      sectionNameI18nId: string, subsectionName: string,
+      activityId: string, activityTitle: string): Promise&lt;void&gt; {
+    this.removeActivityModalStatus = null;
+    const modelRef = this.ngbModal.open(
+      RemoveActivityModalComponent, {backdrop: true});
+    modelRef.componentInstance.sectionNameI18nId = sectionNameI18nId;
+    modelRef.componentInstance.subsectionName = subsectionName;
+    modelRef.componentInstance.activityId = activityId;
+    modelRef.componentInstance.activityTitle = activityTitle;
+    await modelRef.result.then((playlistUrl) =&gt; {
+      this.http.delete&lt;void&gt;(playlistUrl).toPromise();
+      this.removeActivityModalStatus = &#x27;removed&#x27;;
+    }, () =&gt; {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
+      this.removeActivityModalStatus = &#x27;canceled&#x27;;
+    });
+
+    return new Promise((resolve, reject) =&gt; {
+      if (this.removeActivityModalStatus === &#x27;removed&#x27;) {
+        resolve();
+      }
+    });
+  }
+}
+
+angular.module(&#x27;oppia&#x27;).factory(
+  &#x27;LearnerDashboardActivityBackendApiService&#x27;,
+  downgradeInjectable(LearnerDashboardActivityBackendApiService)
+);
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/domain/learner_dashboard/learner-dashboard-activity-backend-api.service.ts&quot;,&quot;line&quot;:101,&quot;character&quot;:13,&quot;text&quot;:&quot;componentInstance&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/learner_dashboard/learner-dashboard-activity-backend-api.service.ts&quot;,&quot;line&quot;:101,&quot;character&quot;:31,&quot;text&quot;:&quot;activityId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/learner_dashboard/learner-dashboard-activity-backend-api.service.ts&quot;,&quot;line&quot;:102,&quot;character&quot;:13,&quot;text&quot;:&quot;componentInstance&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/learner_dashboard/learner-dashboard-activity-backend-api.service.ts&quot;,&quot;line&quot;:102,&quot;character&quot;:31,&quot;text&quot;:&quot;activityTitle&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/learner_dashboard/learner-dashboard-activity-backend-api.service.ts&quot;,&quot;line&quot;:103,&quot;character&quot;:13,&quot;text&quot;:&quot;componentInstance&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/learner_dashboard/learner-dashboard-activity-backend-api.service.ts&quot;,&quot;line&quot;:103,&quot;character&quot;:31,&quot;text&quot;:&quot;activityType&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/learner_dashboard/learner-dashboard-activity-backend-api.service.ts&quot;,&quot;line&quot;:104,&quot;character&quot;:13,&quot;text&quot;:&quot;result&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/learner_dashboard/learner-dashboard-activity-backend-api.service.ts&quot;,&quot;line&quot;:104,&quot;character&quot;:26,&quot;text&quot;:&quot;playlistUrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/learner_dashboard/learner-dashboard-activity-backend-api.service.ts&quot;,&quot;line&quot;:129,&quot;character&quot;:13,&quot;text&quot;:&quot;componentInstance&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/learner_dashboard/learner-dashboard-activity-backend-api.service.ts&quot;,&quot;line&quot;:129,&quot;character&quot;:31,&quot;text&quot;:&quot;sectionNameI18nId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/learner_dashboard/learner-dashboard-activity-backend-api.service.ts&quot;,&quot;line&quot;:130,&quot;character&quot;:13,&quot;text&quot;:&quot;componentInstance&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/learner_dashboard/learner-dashboard-activity-backend-api.service.ts&quot;,&quot;line&quot;:130,&quot;character&quot;:31,&quot;text&quot;:&quot;subsectionName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/learner_dashboard/learner-dashboard-activity-backend-api.service.ts&quot;,&quot;line&quot;:131,&quot;character&quot;:13,&quot;text&quot;:&quot;componentInstance&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/learner_dashboard/learner-dashboard-activity-backend-api.service.ts&quot;,&quot;line&quot;:131,&quot;character&quot;:31,&quot;text&quot;:&quot;activityId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/learner_dashboard/learner-dashboard-activity-backend-api.service.ts&quot;,&quot;line&quot;:132,&quot;character&quot;:13,&quot;text&quot;:&quot;componentInstance&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/learner_dashboard/learner-dashboard-activity-backend-api.service.ts&quot;,&quot;line&quot;:132,&quot;character&quot;:31,&quot;text&quot;:&quot;activityTitle&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/learner_dashboard/learner-dashboard-activity-backend-api.service.ts&quot;,&quot;line&quot;:133,&quot;character&quot;:19,&quot;text&quot;:&quot;result&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/learner_dashboard/learner-dashboard-activity-backend-api.service.ts&quot;,&quot;line&quot;:133,&quot;character&quot;:32,&quot;text&quot;:&quot;playlistUrl&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:55 GMT</p>
+    </body>
+  </html>
+  

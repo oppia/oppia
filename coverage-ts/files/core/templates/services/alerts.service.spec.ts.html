@@ -1,0 +1,233 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>alerts.service.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">core/templates/services/alerts.service.spec.ts</td><td class="">100.00%</td><td class="">100%</td><td class="">372</td><td class="">372</td><td class="">0</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2016 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for the Alerts Service.
+ */
+import { TestBed } from &#x27;@angular/core/testing&#x27;;
+
+import { AlertsService } from &#x27;services/alerts.service&#x27;;
+
+describe(&#x27;Alerts Service&#x27;, function() {
+  let alertsService: AlertsService = null;
+
+  beforeEach(() =&gt; {
+    TestBed.configureTestingModule({
+      providers: [AlertsService]
+    });
+    alertsService = TestBed.get(AlertsService);
+  });
+
+  describe(&#x27;Warnings&#x27;, () =&gt; {
+    it(&#x27;should add a warning&#x27;, () =&gt; {
+      expect(alertsService.warnings.length).toBe(0);
+      alertsService.addWarning(&#x27;Warning 1&#x27;);
+      expect(alertsService.warnings.length).toBe(1);
+    });
+
+    it(&#x27;should add a fatal warning&#x27;, () =&gt; {
+      expect(alertsService.warnings.length).toBe(0);
+      expect(() =&gt; {
+        alertsService.fatalWarning(&#x27;Fatal Warning&#x27;);
+      }).toThrowError(&#x27;Fatal Warning&#x27;);
+      expect(alertsService.warnings.length).toBe(1);
+    });
+
+    it(&#x27;should delete a warning (no duplicates)&#x27;, () =&gt; {
+      const warning = &#x27;Warning 1&#x27;;
+      // Warning message to be deleted.
+      alertsService.addWarning(warning);
+      // Add a few other warning message.
+      alertsService.addWarning(&#x27;Warning 2&#x27;);
+      alertsService.addWarning(&#x27;Warning 3&#x27;);
+
+      expect(alertsService.warnings.length).toBe(3);
+      alertsService.deleteWarning({
+        type: &#x27;warning&#x27;,
+        content: warning
+      });
+      expect(alertsService.warnings.length).toBe(2);
+
+      // Search for the deleted warning message.
+      let found = false;
+      for (let i = 0; i &lt; alertsService.warnings.length; i++) {
+        if (alertsService.warnings[i].content === warning) {
+          found = true;
+        }
+      }
+      expect(found).toBe(false);
+      expect(alertsService.warnings[0].content).toBe(&#x27;Warning 2&#x27;);
+      expect(alertsService.warnings[1].content).toBe(&#x27;Warning 3&#x27;);
+    });
+
+    it(&#x27;should delete a warning (with duplicates)&#x27;, () =&gt; {
+      const warning = &#x27;Warning 1&#x27;;
+      // Warning message to be deleted.
+      alertsService.addWarning(warning);
+      // Add a few other warning message.
+      alertsService.addWarning(&#x27;Warning 2&#x27;);
+      alertsService.addWarning(warning);
+      alertsService.addWarning(&#x27;Warning 3&#x27;);
+
+      expect(alertsService.warnings.length).toBe(4);
+      alertsService.deleteWarning({
+        type: &#x27;warning&#x27;,
+        content: warning
+      });
+      expect(alertsService.warnings.length).toBe(2);
+
+      // Search for the deleted warning message.
+      let found = false;
+      for (let i = 0; i &lt; alertsService.warnings.length; i++) {
+        if (alertsService.warnings[i].content === warning) {
+          found = true;
+        }
+      }
+      expect(found).toBe(false);
+      expect(alertsService.warnings[0].content).toBe(&#x27;Warning 2&#x27;);
+      expect(alertsService.warnings[1].content).toBe(&#x27;Warning 3&#x27;);
+    });
+
+    it(&#x27;should not add more than 10 warnings&#x27;, () =&gt; {
+      const warning = &#x27;Warning &#x27;;
+      for (let i = 1; i &lt; 15; i++) {
+        alertsService.addWarning(warning + i);
+      }
+      expect(alertsService.warnings.length).toBe(10);
+    });
+
+    it(&#x27;should clear all the warning messages&#x27;, () =&gt; {
+      alertsService.addWarning(&#x27;Warning 1&#x27;);
+      alertsService.addWarning(&#x27;Warning 2&#x27;);
+      alertsService.addWarning(&#x27;Warning 3&#x27;);
+      alertsService.clearWarnings();
+      expect(alertsService.warnings.length).toBe(0);
+    });
+  });
+
+  describe(&#x27;Messages&#x27;, () =&gt; {
+    it(&#x27;should add an info message&#x27;, () =&gt; {
+      const message = &#x27;Info 1&#x27;;
+      expect(alertsService.messages.length).toBe(0);
+      alertsService.addInfoMessage(message);
+      expect(alertsService.messages.length).toBe(1);
+      expect(alertsService.messages[0].type).toBe(&#x27;info&#x27;);
+      expect(alertsService.messages[0].content).toBe(message);
+    });
+
+    it(&#x27;should add a success message&#x27;, () =&gt; {
+      const message = &#x27;Success 1&#x27;;
+      expect(alertsService.messages.length).toBe(0);
+      alertsService.addSuccessMessage(message);
+      alertsService.addInfoMessage(&#x27;Info 1&#x27;);
+      expect(alertsService.messages.length).toBe(2);
+      expect(alertsService.messages[0].type).toBe(&#x27;success&#x27;);
+      expect(alertsService.messages[0].content).toBe(message);
+    });
+
+    it(&#x27;should delete a message (no duplicates)&#x27;, () =&gt; {
+      const message = &#x27;Info 1&#x27;;
+      // Info Message to be deleted.
+      alertsService.addInfoMessage(message);
+      // Add a few other messages.
+      alertsService.addInfoMessage(&#x27;Info 2&#x27;);
+      alertsService.addSuccessMessage(&#x27;Success 1&#x27;);
+
+      expect(alertsService.messages.length).toBe(3);
+      alertsService.deleteMessage({
+        type: &#x27;info&#x27;,
+        content: message,
+        timeout: null
+      });
+      expect(alertsService.messages.length).toBe(2);
+
+      // Search for the message.
+      let found = false;
+      for (let i = 0; i &lt; alertsService.messages.length; i++) {
+        if (alertsService.messages[i].content === message &amp;&amp;
+            alertsService.messages[i].type === &#x27;info&#x27;) {
+          found = true;
+        }
+      }
+      expect(found).toBe(false);
+      expect(alertsService.messages[0].content).toBe(&#x27;Info 2&#x27;);
+      expect(alertsService.messages[1].content).toBe(&#x27;Success 1&#x27;);
+    });
+
+    it(&#x27;should delete a message (with duplicates)&#x27;, () =&gt; {
+      const message = &#x27;Info 1&#x27;;
+      // Info Message to be deleted.
+      alertsService.addInfoMessage(message);
+      // Add a few other messages.
+      alertsService.addInfoMessage(&#x27;Info 2&#x27;);
+      alertsService.addSuccessMessage(&#x27;Success 1&#x27;);
+      alertsService.addInfoMessage(message);
+
+      expect(alertsService.messages.length).toBe(4);
+      alertsService.deleteMessage({
+        type: &#x27;info&#x27;,
+        content: message,
+        timeout: null
+      });
+      expect(alertsService.messages.length).toBe(2);
+
+      // Search for the message.
+      let found = false;
+      for (let i = 0; i &lt; alertsService.messages.length; i++) {
+        if (alertsService.messages[i].content === message &amp;&amp;
+            alertsService.messages[i].type === &#x27;info&#x27;) {
+          found = true;
+        }
+      }
+      expect(found).toBe(false);
+      expect(alertsService.messages[0].content).toBe(&#x27;Info 2&#x27;);
+      expect(alertsService.messages[1].content).toBe(&#x27;Success 1&#x27;);
+    });
+
+    it(&#x27;should not add more than 10 messages&#x27;, () =&gt; {
+      const message = &#x27;Info &#x27;;
+      for (let i = 1; i &lt; 15; i++) {
+        alertsService.addInfoMessage(message + i);
+      }
+      alertsService.addSuccessMessage(&#x27;Success 1&#x27;);
+      expect(alertsService.messages.length).toBe(10);
+    });
+
+    it(&#x27;should clear all the messages&#x27;, () =&gt; {
+      alertsService.addInfoMessage(&#x27;Info 1&#x27;);
+      alertsService.addInfoMessage(&#x27;Info 2&#x27;);
+      alertsService.addSuccessMessage(&#x27;Success 1&#x27;);
+      alertsService.clearMessages();
+      expect(alertsService.messages.length).toBe(0);
+    });
+  });
+});
+</textarea><pre id="annotations" style="display:none">[]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:56 GMT</p>
+    </body>
+  </html>
+  

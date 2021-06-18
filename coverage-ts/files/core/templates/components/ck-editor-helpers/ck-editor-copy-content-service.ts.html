@@ -1,0 +1,217 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>ck-editor-copy-content-service.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/components/ck-editor-helpers/ck-editor-copy-content-service.ts</td><td class="">93.65%</td><td class="">100%</td><td class="">189</td><td class="">177</td><td class="">12</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Service for copying html content from an output view to an
+ *               ck editor
+ */
+
+import { downgradeInjectable } from &#x27;@angular/upgrade/static&#x27;;
+import { Injectable, EventEmitter } from &#x27;@angular/core&#x27;;
+
+import { HtmlEscaperService } from &#x27;services/html-escaper.service&#x27;;
+import { Subscription } from &#x27;rxjs&#x27;;
+
+interface CkEditorCopyEvent {
+  rootElement?: HTMLElement;
+  containedWidgetTagName?: string;
+}
+
+@Injectable({
+  providedIn: &#x27;root&#x27;
+})
+export class CkEditorCopyContentService {
+  private readonly OUTPUT_VIEW_TAG_NAME = &#x27;ANGULAR-HTML-BIND&#x27;;
+  private readonly NON_INTERACTIVE_TAG = &#x27;-noninteractive-&#x27;;
+  private readonly ALLOWLISTED_WIDGETS = new Set([
+    &#x27;oppia-noninteractive-collapsible&#x27;,
+    &#x27;oppia-noninteractive-image&#x27;,
+    &#x27;oppia-noninteractive-link&#x27;,
+    &#x27;oppia-noninteractive-math&#x27;,
+    &#x27;oppia-noninteractive-tabs&#x27;,
+    &#x27;oppia-noninteractive-video&#x27;,
+    &#x27;oppia-noninteractive-skillreview&#x27;
+  ]);
+
+  private copyEventEmitter = new EventEmitter&lt;CkEditorCopyEvent&gt;();
+  private ckEditorIdToSubscription: {[id: string]: Subscription} = {};
+
+  copyModeActive = false;
+
+  constructor(private htmlEscaperService: HtmlEscaperService) {}
+
+  /**
+   * Traverses up and down element ancestors/descendants, searching for widget
+   * tags.
+   * @param {HTMLElement} target The element target that contains or is a
+   *  descendant of a widget, or a plain HTML element/group.
+   * @returns {CkEditorCopyEvent} Returns an object of type CkEditorCopyEvent,
+   *  where rootElement is the root ancestor of target and is
+   *  always a child of angular-html-bind. containedWidgetTagName is the tag
+   *  name of the widget if found in ancestors or descendants.
+   */
+  private _handleCopy(target: HTMLElement): CkEditorCopyEvent {
+    let containedWidgetTagName;
+    let currentElement = target;
+
+    while (true) {
+      const currentTagName = currentElement.tagName.toLowerCase();
+      if (currentTagName.includes(this.NON_INTERACTIVE_TAG)) {
+        containedWidgetTagName = currentTagName;
+        break;
+      }
+
+      if (currentElement.parentElement.tagName === this.OUTPUT_VIEW_TAG_NAME) {
+        break;
+      }
+
+      currentElement = currentElement.parentElement;
+    }
+
+    let descendants = Array.from(target.childNodes);
+    while (descendants.length !== 0) {
+      let currentDescendant = descendants.shift();
+      const currentTagName = currentDescendant.nodeName.toLowerCase();
+      if (currentTagName.includes(this.NON_INTERACTIVE_TAG)) {
+        containedWidgetTagName = currentTagName;
+        break;
+      }
+
+      descendants = [
+        ...descendants,
+        ...Array.from(currentDescendant.childNodes)
+      ];
+    }
+
+    if (containedWidgetTagName &amp;&amp;
+        !this.ALLOWLISTED_WIDGETS.has(containedWidgetTagName)) {
+      return {};
+    }
+
+    return { rootElement: currentElement, containedWidgetTagName };
+  }
+
+  /**
+   * Detects if element is to be copied as a widget or as a HTML element, and
+   * inserts into editor.
+   * @param {CKEDITOR.editor} editor The editor in which to create widget or
+   *  insert HTML.
+   * @param {HTMLElement} element The element to be copied.
+   * @param {string|undefined} containedWidgetTagName The name of the widget
+   *  in which element contains, if present.
+   */
+  private _handlePaste(
+      editor: CKEDITOR.editor | Partial&lt;CKEDITOR.editor&gt;,
+      element: HTMLElement,
+      containedWidgetTagName: string | undefined
+  ) {
+    let elementTagName = (
+      containedWidgetTagName || element.tagName.toLowerCase());
+    let html = element.outerHTML;
+
+    if (!containedWidgetTagName) {
+      editor.insertHtml(html);
+    } else {
+      const widgetName = elementTagName.replace(&#x27;-noninteractive-&#x27;, &#x27;&#x27;);
+
+      // Look for x-with-value=&quot;y&quot; to extract x and y.
+      //  Group 1 (\w+): Any word containing [a-zA-Z0-9_] characters. This is
+      //    the name of the property.
+      //  Group 2 (-with-value=&quot;): Matches characters literally.
+      //  Group 3 ([^&quot;]+): Matches any characters excluding &quot;. This is the
+      //    value of the property.
+      //  Group 4 (&quot;): Matches &quot; literally.
+      const valueMatcher = /(\w+)(-with-value=&quot;)([^&quot;]+)(&quot;)/g;
+
+      let match;
+      let startupData: {[id: string]: string} = {};
+
+      while ((match = valueMatcher.exec(html)) !== null) {
+        const key = match[1];
+        // Must replace &amp; for html escaper to properly work- html escaper
+        // service depends on &amp; already escaped.
+        const value = match[3].replace(/&amp;amp;/g, &#x27;&amp;&#x27;);
+
+        startupData[key] = JSON.parse(
+          this.htmlEscaperService.escapedStrToUnescapedStr(value));
+      }
+
+      editor.execCommand(widgetName, { startupData });
+    }
+  }
+
+  toggleCopyMode(): void {
+    this.copyModeActive = !this.copyModeActive;
+  }
+
+  /**
+   * Broadcasts to subject to copy target.
+   * @param {HTMLElement} target The element to copy.
+   */
+  broadcastCopy(target: HTMLElement): void {
+    if (!this.copyModeActive) {
+      return;
+    }
+
+    this.copyEventEmitter.emit(
+      this._handleCopy(target)
+    );
+  }
+
+  /**
+   * Binds ckeditor to subject.
+   * @param {CKEDITOR.editor} editor The editor to add copied content to.
+   */
+  bindPasteHandler(
+      editor: CKEDITOR.editor | Partial&lt;CKEDITOR.editor&gt;
+  ): void {
+    this.ckEditorIdToSubscription[editor.id] = this.copyEventEmitter.subscribe(
+      ({rootElement, containedWidgetTagName}: CkEditorCopyEvent) =&gt; {
+        if (!rootElement) {
+          return;
+        }
+        if (editor.status === &#x27;destroyed&#x27;) {
+          this.ckEditorIdToSubscription[editor.id].unsubscribe();
+          delete this.ckEditorIdToSubscription[editor.id];
+          return;
+        }
+        this._handlePaste(
+          editor, rootElement, containedWidgetTagName);
+      }
+    );
+  }
+}
+
+angular.module(&#x27;oppia&#x27;).factory(
+  &#x27;CkEditorCopyContentService&#x27;,
+  downgradeInjectable(CkEditorCopyContentService)
+);
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-copy-content-service.ts&quot;,&quot;line&quot;:64,&quot;character&quot;:8,&quot;text&quot;:&quot;containedWidgetTagName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-copy-content-service.ts&quot;,&quot;line&quot;:70,&quot;character&quot;:8,&quot;text&quot;:&quot;containedWidgetTagName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-copy-content-service.ts&quot;,&quot;line&quot;:86,&quot;character&quot;:8,&quot;text&quot;:&quot;containedWidgetTagName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-copy-content-service.ts&quot;,&quot;line&quot;:96,&quot;character&quot;:8,&quot;text&quot;:&quot;containedWidgetTagName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-copy-content-service.ts&quot;,&quot;line&quot;:136,&quot;character&quot;:10,&quot;text&quot;:&quot;match&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-copy-content-service.ts&quot;,&quot;line&quot;:139,&quot;character&quot;:14,&quot;text&quot;:&quot;match&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-copy-content-service.ts&quot;,&quot;line&quot;:140,&quot;character&quot;:14,&quot;text&quot;:&quot;key&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-copy-content-service.ts&quot;,&quot;line&quot;:140,&quot;character&quot;:20,&quot;text&quot;:&quot;match&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-copy-content-service.ts&quot;,&quot;line&quot;:143,&quot;character&quot;:14,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-copy-content-service.ts&quot;,&quot;line&quot;:143,&quot;character&quot;:22,&quot;text&quot;:&quot;match&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-copy-content-service.ts&quot;,&quot;line&quot;:143,&quot;character&quot;:31,&quot;text&quot;:&quot;replace&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-copy-content-service.ts&quot;,&quot;line&quot;:145,&quot;character&quot;:20,&quot;text&quot;:&quot;key&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:54 GMT</p>
+    </body>
+  </html>
+  

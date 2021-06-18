@@ -1,0 +1,330 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>high-bounce-rate-task.model.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">core/templates/domain/improvements/high-bounce-rate-task.model.spec.ts</td><td class="">100.00%</td><td class="">100%</td><td class="">399</td><td class="">399</td><td class="">0</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for the HighBounceRateTaskModel.
+ */
+
+import { ExplorationImprovementsConfig } from
+  &#x27;domain/improvements/exploration-improvements-config.model&#x27;;
+import { HighBounceRateTask } from
+  &#x27;domain/improvements/high-bounce-rate-task.model&#x27;;
+import { ExplorationStats } from
+  &#x27;domain/statistics/exploration-stats.model&#x27;;
+
+describe(&#x27;High bounce rate task&#x27;, function() {
+  describe(&#x27;High bounce rate task model&#x27;, function() {
+    let config: ExplorationImprovementsConfig;
+    let createFromExplorationStats: (
+      expStats: ExplorationStats,
+      stateName: string,
+      numEqPlaythroughs: number
+    ) =&gt; HighBounceRateTask;
+    let newExplorationStatsWithBounceRate: (
+      numExpStarts: number,
+      bounceRate: number
+    ) =&gt; ExplorationStats;
+    beforeEach(() =&gt; {
+      config = (
+        new ExplorationImprovementsConfig(&#x27;eid&#x27;, 1, true, 0.25, 0.20, 100));
+      createFromExplorationStats = (
+          expStats: ExplorationStats, stateName: string,
+          numEqPlaythroughs: number) =&gt; {
+        const task = HighBounceRateTask.createFromBackendDict({
+          entity_type: &#x27;exploration&#x27;,
+          entity_id: &#x27;eid&#x27;,
+          entity_version: 1,
+          task_type: &#x27;high_bounce_rate&#x27;,
+          target_type: &#x27;state&#x27;,
+          target_id: stateName,
+          issue_description: null,
+          status: &#x27;obsolete&#x27;,
+          resolver_username: null,
+          resolver_profile_picture_data_url: null,
+          resolved_on_msecs: null,
+        });
+        task.refreshStatus(expStats, numEqPlaythroughs, config);
+        return task;
+      };
+      newExplorationStatsWithBounceRate = (
+        (numExpStarts: number, bounceRate: number) =&gt; {
+          return ExplorationStats.createFromBackendDict({
+            exp_id: &#x27;eid&#x27;,
+            exp_version: 1,
+            num_starts: numExpStarts,
+            num_actual_starts: 0,
+            num_completions: 0,
+            state_stats_mapping: {
+              Introduction: {
+                total_answers_count: 0,
+                useful_feedback_count: 0,
+                total_hit_count: numExpStarts,
+                first_hit_count: 0,
+                num_times_solution_viewed: 0,
+                num_completions: Math.round(numExpStarts * (1 - bounceRate)),
+              },
+            },
+          });
+        });
+    });
+
+    it(&#x27;should return new task if any state has a high bounce rate&#x27;, () =&gt; {
+      const task = createFromExplorationStats(
+        newExplorationStatsWithBounceRate(200, 0.50), &#x27;Introduction&#x27;, 1);
+
+      expect(task).not.toBeNull();
+      expect(task.taskType).toEqual(&#x27;high_bounce_rate&#x27;);
+      expect(task.targetType).toEqual(&#x27;state&#x27;);
+      expect(task.targetId).toEqual(&#x27;Introduction&#x27;);
+      expect(task.getIssueDescription())
+        .toEqual(&#x27;50% of learners had dropped off at this card.&#x27;);
+      expect(task.isOpen()).toBeTrue();
+    });
+
+    it(&#x27;should return obsolete if state has a low bounce rate&#x27;, () =&gt; {
+      const task = createFromExplorationStats(
+        newExplorationStatsWithBounceRate(200, 0.15), &#x27;Introduction&#x27;, 1);
+      expect(task.isObsolete()).toBeTrue();
+    });
+
+    it(&#x27;should return obsolete if state has no early quit playthroughs&#x27;, () =&gt; {
+      const task = createFromExplorationStats(
+        newExplorationStatsWithBounceRate(200, 0.15), &#x27;Introduction&#x27;, 0);
+      expect(task.isObsolete()).toBeTrue();
+    });
+
+    it(&#x27;should return obsolete if exploration starts are too low&#x27;, () =&gt; {
+      const task = createFromExplorationStats(
+        newExplorationStatsWithBounceRate(80, 0.50), &#x27;Introduction&#x27;, 1);
+      expect(task.isObsolete()).toBeTrue();
+    });
+
+    it(&#x27;should create from a high bounce rate backend dict&#x27;, () =&gt; {
+      const task = HighBounceRateTask.createFromBackendDict({
+        entity_type: &#x27;exploration&#x27;,
+        entity_id: &#x27;eid&#x27;,
+        entity_version: 1,
+        task_type: &#x27;high_bounce_rate&#x27;,
+        target_type: &#x27;state&#x27;,
+        target_id: &#x27;Introduction&#x27;,
+        issue_description: &#x27;28% of learners had dropped off at this card.&#x27;,
+        status: &#x27;open&#x27;,
+        resolver_username: null,
+        resolver_profile_picture_data_url: null,
+        resolved_on_msecs: null,
+      });
+
+      expect(task.entityType).toEqual(&#x27;exploration&#x27;);
+      expect(task.entityId).toEqual(&#x27;eid&#x27;);
+      expect(task.entityVersion).toEqual(1);
+      expect(task.taskType).toEqual(&#x27;high_bounce_rate&#x27;);
+      expect(task.targetType).toEqual(&#x27;state&#x27;);
+      expect(task.targetId).toEqual(&#x27;Introduction&#x27;);
+      expect(task.getIssueDescription())
+        .toEqual(&#x27;28% of learners had dropped off at this card.&#x27;);
+      expect(task.isOpen()).toBeTrue();
+    });
+
+    it(&#x27;should throw when backend dict entity type is not exploration&#x27;, () =&gt; {
+      expect(
+        () =&gt; HighBounceRateTask.createFromBackendDict({
+          entity_type: &#x27;???&#x27;,
+          entity_id: &#x27;eid&#x27;,
+          entity_version: 1,
+          task_type: &#x27;high_bounce_rate&#x27;,
+          target_type: &#x27;state&#x27;,
+          target_id: &#x27;Introduction&#x27;,
+          issue_description: &#x27;28% of learners had dropped off at this card.&#x27;,
+          status: &#x27;open&#x27;,
+          resolver_username: null,
+          resolver_profile_picture_data_url: null,
+          resolved_on_msecs: null,
+        })
+      ).toThrowError(
+        &#x27;backend dict has entity_type &quot;???&quot; but expected &quot;exploration&quot;&#x27;);
+    });
+
+    it(&#x27;should throw when backend dict task type is not high bounce rate&#x27;,
+      () =&gt; {
+        expect(
+          () =&gt; HighBounceRateTask.createFromBackendDict({
+            entity_type: &#x27;exploration&#x27;,
+            entity_id: &#x27;eid&#x27;,
+            entity_version: 1,
+            // This throws &quot;Type &#x27;&quot;???&quot;&#x27; is not assignable to type
+            // &#x27;&quot;high_bounce_rate&quot;&#x27;.&quot;. We need to suppress this error because
+            // &#x27;task_type&#x27; should be equal to &#x27;high_bounce_rate&#x27; but we set it
+            // to an invalid value in order to test validations.
+            // @ts-expect-error
+            task_type: &#x27;???&#x27;,
+            target_type: &#x27;state&#x27;,
+            target_id: &#x27;Introduction&#x27;,
+            issue_description: &#x27;28% of learners had dropped off at this card.&#x27;,
+            status: &#x27;open&#x27;,
+            resolver_username: null,
+            resolver_profile_picture_data_url: null,
+            resolved_on_msecs: null,
+          })
+        ).toThrowError(
+          &#x27;backend dict has task_type &quot;???&quot; but expected &quot;high_bounce_rate&quot;&#x27;);
+      });
+
+    it(&#x27;should throw when backend dict target type is not state&#x27;, () =&gt; {
+      expect(
+        () =&gt; HighBounceRateTask.createFromBackendDict({
+          entity_type: &#x27;exploration&#x27;,
+          entity_id: &#x27;eid&#x27;,
+          entity_version: 1,
+          task_type: &#x27;high_bounce_rate&#x27;,
+          target_type: &#x27;???&#x27;,
+          target_id: &#x27;Introduction&#x27;,
+          issue_description: &#x27;28% of learners had dropped off at this card.&#x27;,
+          status: &#x27;open&#x27;,
+          resolver_username: null,
+          resolver_profile_picture_data_url: null,
+          resolved_on_msecs: null,
+        })
+      ).toThrowError(&#x27;backend dict has target_type &quot;???&quot; but expected &quot;state&quot;&#x27;);
+    });
+
+    it(&#x27;should update status based on changes to exploration stats&#x27;, () =&gt; {
+      const task = createFromExplorationStats(
+        newExplorationStatsWithBounceRate(200, 0.50), &#x27;Introduction&#x27;, 1);
+      expect(task.isOpen()).toBeTrue();
+      expect(task.isObsolete()).toBeFalse();
+      expect(task.isResolved()).toBeFalse();
+
+      task.refreshStatus(
+        newExplorationStatsWithBounceRate(200, 0.10), 1, config);
+      expect(task.isOpen()).toBeFalse();
+      expect(task.isObsolete()).toBeTrue();
+      expect(task.isResolved()).toBeFalse();
+
+      task.refreshStatus(
+        newExplorationStatsWithBounceRate(200, 0.80), 1, config);
+      expect(task.isOpen()).toBeTrue();
+      expect(task.isObsolete()).toBeFalse();
+      expect(task.isResolved()).toBeFalse();
+    });
+
+    it(&#x27;should throw when provided stats from a different exploration&#x27;, () =&gt; {
+      const task = createFromExplorationStats(
+        newExplorationStatsWithBounceRate(200, 0.50), &#x27;Introduction&#x27;, 1);
+
+      const statsWithWrongId = (
+        ExplorationStats.createFromBackendDict({
+          exp_id: &#x27;eid2&#x27;,
+          exp_version: 1,
+          num_starts: 100,
+          num_actual_starts: 0,
+          num_completions: 0,
+          state_stats_mapping: {
+            Introduction: {
+              total_answers_count: 0,
+              useful_feedback_count: 0,
+              total_hit_count: 100,
+              first_hit_count: 0,
+              num_times_solution_viewed: 0,
+              num_completions: 50,
+            },
+          },
+        }));
+      expect(() =&gt; task.refreshStatus(
+        statsWithWrongId, 1, config
+      )).toThrowError(
+        &#x27;Expected stats for exploration id=&quot;eid&quot; v1 but given stats are for &#x27; +
+        &#x27;exploration id=&quot;eid2&quot; v1&#x27;);
+
+      const statsWithWrongVersion = (
+        ExplorationStats.createFromBackendDict({
+          exp_id: &#x27;eid&#x27;,
+          exp_version: 2,
+          num_starts: 100,
+          num_actual_starts: 0,
+          num_completions: 0,
+          state_stats_mapping: {
+            Introduction: {
+              total_answers_count: 0,
+              useful_feedback_count: 0,
+              total_hit_count: 100,
+              first_hit_count: 0,
+              num_times_solution_viewed: 0,
+              num_completions: 50,
+            },
+          },
+        }));
+      expect(() =&gt; task.refreshStatus(
+        statsWithWrongVersion, 1, config
+      )).toThrowError(
+        &#x27;Expected stats for exploration id=&quot;eid&quot; v1 but given stats are for &#x27; +
+        &#x27;exploration id=&quot;eid&quot; v2&#x27;);
+    });
+
+    it(&#x27;should not update status when number of starts is too low&#x27;, () =&gt; {
+      const task = createFromExplorationStats(
+        newExplorationStatsWithBounceRate(200, 0.50), &#x27;Introduction&#x27;, 1);
+      expect(task.isOpen()).toBeTrue();
+      expect(task.isObsolete()).toBeFalse();
+
+      task.refreshStatus(
+        newExplorationStatsWithBounceRate(25, 0.05), 1, config);
+      expect(task.isOpen()).toBeTrue();
+      expect(task.isObsolete()).toBeFalse();
+    });
+
+    it(&#x27;should stay resolved regardless of changes in exploration stats&#x27;,
+      () =&gt; {
+        const task = createFromExplorationStats(
+          newExplorationStatsWithBounceRate(200, 0.50), &#x27;Introduction&#x27;, 1);
+        expect(task.isResolved()).toBeFalse();
+        expect(task.isOpen()).toBeTrue();
+        expect(task.isObsolete()).toBeFalse();
+
+        task.resolve();
+        expect(task.isResolved()).toBeTrue();
+        expect(task.isOpen()).toBeFalse();
+        expect(task.isObsolete()).toBeFalse();
+
+        task.refreshStatus(
+          newExplorationStatsWithBounceRate(200, 0.05), 1, config);
+        expect(task.isResolved()).toBeTrue();
+        expect(task.isOpen()).toBeFalse();
+        expect(task.isObsolete()).toBeFalse();
+
+        task.refreshStatus(
+          newExplorationStatsWithBounceRate(200, 0.95), 1, config);
+        expect(task.isResolved()).toBeTrue();
+        expect(task.isOpen()).toBeFalse();
+        expect(task.isObsolete()).toBeFalse();
+      });
+  });
+});
+</textarea><pre id="annotations" style="display:none">[]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:57 GMT</p>
+    </body>
+  </html>
+  

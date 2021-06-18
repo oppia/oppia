@@ -1,0 +1,284 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>editable-story-backend-api.service.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/domain/story/editable-story-backend-api.service.ts</td><td class="">92.90%</td><td class="">100%</td><td class="">338</td><td class="">314</td><td class="">24</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2018 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Service to send changes to a story to the backend.
+ */
+
+import { downgradeInjectable } from &#x27;@angular/upgrade/static&#x27;;
+import { Injectable } from &#x27;@angular/core&#x27;;
+import { HttpClient } from &#x27;@angular/common/http&#x27;;
+
+import { StoryChange } from &#x27;domain/editor/undo_redo/change.model&#x27;;
+import { SkillSummaryBackendDict } from &#x27;domain/skill/skill-summary.model&#x27;;
+import { StoryBackendDict } from &#x27;domain/story/StoryObjectFactory&#x27;;
+import { StoryDomainConstants } from &#x27;domain/story/story-domain.constants&#x27;;
+import { UrlInterpolationService } from
+  &#x27;domain/utilities/url-interpolation.service&#x27;;
+
+interface FetchStoryBackendResponse {
+  &#x27;story&#x27;: StoryBackendDict;
+  &#x27;topic_name&#x27;: string;
+  &#x27;story_is_published&#x27;: boolean;
+  &#x27;skill_summaries&#x27;: SkillSummaryBackendDict[];
+  &#x27;topic_url_fragment&#x27;: string;
+  &#x27;classroom_url_fragment&#x27;: string;
+}
+
+interface FetchStoryResponse {
+  story: StoryBackendDict;
+  topicName: string;
+  storyIsPublished: boolean;
+  skillSummaries: SkillSummaryBackendDict[];
+  topicUrlFragment: string;
+  classroomUrlFragment: string;
+}
+
+interface UpdateStoryBackendResponse {
+  &#x27;story&#x27;: StoryBackendDict;
+}
+
+interface StoryUrlFragmentExistsBackendResponse {
+  &#x27;story_url_fragment_exists&#x27;: boolean;
+}
+
+interface ValidationExplorationBackendResponse {
+  &#x27;validation_error_messages&#x27;: string[];
+}
+
+@Injectable({
+  providedIn: &#x27;root&#x27;
+})
+export class EditableStoryBackendApiService {
+  constructor(
+    private http: HttpClient,
+    private urlInterpolationService: UrlInterpolationService) {}
+
+  private _fetchStory(
+      storyId: string,
+      successCallback: (value: FetchStoryResponse) =&gt; void,
+      errorCallback: (reason: string) =&gt; void): void {
+    const editableStoryDataUrl = this.urlInterpolationService.interpolateUrl(
+      StoryDomainConstants.EDITABLE_STORY_DATA_URL_TEMPLATE, {
+        story_id: storyId
+      });
+
+    this.http.get&lt;FetchStoryBackendResponse&gt;(
+      editableStoryDataUrl).toPromise().then(response =&gt; {
+      if (successCallback) {
+        successCallback({
+          story: response.story,
+          topicName: response.topic_name,
+          storyIsPublished: response.story_is_published,
+          skillSummaries: response.skill_summaries,
+          topicUrlFragment: response.topic_url_fragment,
+          classroomUrlFragment: response.classroom_url_fragment
+        });
+      }
+    }, errorResponse =&gt; {
+      if (errorCallback) {
+        errorCallback(errorResponse.error.error);
+      }
+    });
+  }
+
+  private _updateStory(
+      storyId: string, storyVersion: number,
+      commitMessage: string,
+      changeList: StoryChange[],
+      successCallback: (value: StoryBackendDict) =&gt; void,
+      errorCallback: (reason: string) =&gt; void): void {
+    const editableStoryDataUrl = this.urlInterpolationService.interpolateUrl(
+      StoryDomainConstants.EDITABLE_STORY_DATA_URL_TEMPLATE, {
+        story_id: storyId
+      });
+
+    const putData = {
+      version: storyVersion,
+      commit_message: commitMessage,
+      change_dicts: changeList
+    };
+
+    this.http.put&lt;UpdateStoryBackendResponse&gt;(
+      editableStoryDataUrl, putData).toPromise().then(
+      response =&gt; successCallback(response.story),
+      errorResponse =&gt; errorCallback(errorResponse.error.error)
+    );
+  }
+
+  private _changeStoryPublicationStatus(
+      storyId: string,
+      newStoryStatusIsPublic: boolean,
+      successCallback: (value: void) =&gt; void,
+      errorCallback: (reason: string) =&gt; void): void {
+    const storyPublishUrl = this.urlInterpolationService.interpolateUrl(
+      StoryDomainConstants.STORY_PUBLISH_URL_TEMPLATE, {
+        story_id: storyId
+      });
+    const putData = {
+      new_story_status_is_public: newStoryStatusIsPublic
+    };
+    this.http.put(storyPublishUrl, putData).toPromise().then(
+      response =&gt; successCallback(),
+      errorResponse =&gt; errorCallback(errorResponse.error.error));
+  }
+
+  private _validateExplorations(
+      storyId: string,
+      expIds: string[],
+      successCallback: (value: string[]) =&gt; void,
+      errorCallback: (reason: string) =&gt; void): void {
+    const validateExplorationsUrl =
+      this.urlInterpolationService.interpolateUrl(
+        StoryDomainConstants.VALIDATE_EXPLORATIONS_URL_TEMPLATE, {
+          story_id: storyId
+        });
+
+    this.http.get&lt;ValidationExplorationBackendResponse&gt;(
+      validateExplorationsUrl, {
+        params: {
+          comma_separated_exp_ids: expIds.join(&#x27;,&#x27;)
+        }
+      }
+    ).toPromise().then(
+      response =&gt; successCallback(response.validation_error_messages),
+      errorResponse =&gt; errorCallback(errorResponse.error.error));
+  }
+
+  private _deleteStory(
+      storyId: string,
+      successCallback: (value: number) =&gt; void,
+      errorCallback: (reason: string) =&gt; void): void {
+    const storyDataUrl = this.urlInterpolationService.interpolateUrl(
+      StoryDomainConstants.EDITABLE_STORY_DATA_URL_TEMPLATE, {
+        story_id: storyId
+      });
+
+    this.http.delete(
+      storyDataUrl, {observe: &#x27;response&#x27;}).toPromise().then(
+      (response) =&gt; {
+        if (successCallback) {
+          successCallback(response.status);
+        }
+      }, (errorResponse) =&gt; {
+        if (errorCallback) {
+          errorCallback(errorResponse.error.error);
+        }
+      });
+  }
+
+  private _doesStoryWithUrlFragmentExist(
+      storyUrlFragment: string,
+      successCallback: (value: boolean) =&gt; void,
+      errorCallback: (reason: string) =&gt; void): void {
+    const storyUrlFragmentUrl = this.urlInterpolationService.interpolateUrl(
+      StoryDomainConstants.STORY_URL_FRAGMENT_HANDLER_URL_TEMPLATE, {
+        story_url_fragment: storyUrlFragment
+      });
+    this.http.get&lt;StoryUrlFragmentExistsBackendResponse&gt;(
+      storyUrlFragmentUrl).toPromise().then(
+      (response) =&gt; {
+        if (successCallback) {
+          successCallback(response.story_url_fragment_exists);
+        }
+      }, (errorResponse) =&gt; {
+        if (errorCallback) {
+          errorCallback(errorResponse.error.error);
+        }
+      });
+  }
+
+  async fetchStoryAsync(storyId: string): Promise&lt;FetchStoryResponse&gt; {
+    return new Promise((resolve, reject) =&gt; {
+      this._fetchStory(storyId, resolve, reject);
+    });
+  }
+
+  /**
+     * Updates a story in the backend with the provided story ID.
+     * The changes only apply to the story of the given version and the
+     * request to update the story will fail if the provided story
+     * version is older than the current version stored in the backend. Both
+     * the changes and the message to associate with those changes are used
+     * to commit a change to the story. The new story is passed to
+     * the success callback, if one is provided to the returned promise
+     * object. Errors are passed to the error callback, if one is provided.
+     */
+  async updateStoryAsync(
+      storyId: string, storyVersion: number,
+      commitMessage: string,
+      changeList: StoryChange[]):
+    Promise&lt;StoryBackendDict&gt; {
+    return new Promise((resolve, reject) =&gt; {
+      this._updateStory(
+        storyId, storyVersion, commitMessage, changeList,
+        resolve, reject);
+    });
+  }
+
+  async changeStoryPublicationStatusAsync(
+      storyId: string,
+      newStoryStatusIsPublic: boolean):
+  Promise&lt;void&gt; {
+    return new Promise((resolve, reject) =&gt; {
+      this._changeStoryPublicationStatus(
+        storyId, newStoryStatusIsPublic, resolve, reject);
+    });
+  }
+
+  async validateExplorationsAsync(
+      storyId: string,
+      expIds: string[]): Promise&lt;string[]&gt; {
+    return new Promise((resolve, reject) =&gt; {
+      this._validateExplorations(
+        storyId, expIds, resolve, reject);
+    });
+  }
+
+  async deleteStoryAsync(storyId: string): Promise&lt;number&gt; {
+    return new Promise((resolve, reject) =&gt; {
+      this._deleteStory(storyId, resolve, reject);
+    });
+  }
+
+  async doesStoryWithUrlFragmentExistAsync(storyUrlFragment: string):
+  Promise&lt;boolean&gt; {
+    return new Promise((resolve, reject) =&gt; {
+      this._doesStoryWithUrlFragmentExist(
+        storyUrlFragment, resolve, reject);
+    });
+  }
+}
+
+angular.module(&#x27;oppia&#x27;).factory(
+  &#x27;EditableStoryBackendApiService&#x27;, downgradeInjectable(
+    EditableStoryBackendApiService));
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/domain/story/editable-story-backend-api.service.ts&quot;,&quot;line&quot;:88,&quot;character&quot;:7,&quot;text&quot;:&quot;errorResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/editable-story-backend-api.service.ts&quot;,&quot;line&quot;:90,&quot;character&quot;:22,&quot;text&quot;:&quot;errorResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/editable-story-backend-api.service.ts&quot;,&quot;line&quot;:90,&quot;character&quot;:36,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/editable-story-backend-api.service.ts&quot;,&quot;line&quot;:90,&quot;character&quot;:42,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/editable-story-backend-api.service.ts&quot;,&quot;line&quot;:115,&quot;character&quot;:6,&quot;text&quot;:&quot;errorResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/editable-story-backend-api.service.ts&quot;,&quot;line&quot;:115,&quot;character&quot;:37,&quot;text&quot;:&quot;errorResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/editable-story-backend-api.service.ts&quot;,&quot;line&quot;:115,&quot;character&quot;:51,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/editable-story-backend-api.service.ts&quot;,&quot;line&quot;:115,&quot;character&quot;:57,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/editable-story-backend-api.service.ts&quot;,&quot;line&quot;:133,&quot;character&quot;:6,&quot;text&quot;:&quot;errorResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/editable-story-backend-api.service.ts&quot;,&quot;line&quot;:133,&quot;character&quot;:37,&quot;text&quot;:&quot;errorResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/editable-story-backend-api.service.ts&quot;,&quot;line&quot;:133,&quot;character&quot;:51,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/editable-story-backend-api.service.ts&quot;,&quot;line&quot;:133,&quot;character&quot;:57,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/editable-story-backend-api.service.ts&quot;,&quot;line&quot;:155,&quot;character&quot;:6,&quot;text&quot;:&quot;errorResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/editable-story-backend-api.service.ts&quot;,&quot;line&quot;:155,&quot;character&quot;:37,&quot;text&quot;:&quot;errorResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/editable-story-backend-api.service.ts&quot;,&quot;line&quot;:155,&quot;character&quot;:51,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/editable-story-backend-api.service.ts&quot;,&quot;line&quot;:155,&quot;character&quot;:57,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/editable-story-backend-api.service.ts&quot;,&quot;line&quot;:173,&quot;character&quot;:10,&quot;text&quot;:&quot;errorResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/editable-story-backend-api.service.ts&quot;,&quot;line&quot;:175,&quot;character&quot;:24,&quot;text&quot;:&quot;errorResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/editable-story-backend-api.service.ts&quot;,&quot;line&quot;:175,&quot;character&quot;:38,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/editable-story-backend-api.service.ts&quot;,&quot;line&quot;:175,&quot;character&quot;:44,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/editable-story-backend-api.service.ts&quot;,&quot;line&quot;:194,&quot;character&quot;:10,&quot;text&quot;:&quot;errorResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/editable-story-backend-api.service.ts&quot;,&quot;line&quot;:196,&quot;character&quot;:24,&quot;text&quot;:&quot;errorResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/editable-story-backend-api.service.ts&quot;,&quot;line&quot;:196,&quot;character&quot;:38,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/story/editable-story-backend-api.service.ts&quot;,&quot;line&quot;:196,&quot;character&quot;:44,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:55 GMT</p>
+    </body>
+  </html>
+  

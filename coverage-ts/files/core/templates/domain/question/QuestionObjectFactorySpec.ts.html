@@ -1,0 +1,324 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>QuestionObjectFactorySpec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/domain/question/QuestionObjectFactorySpec.ts</td><td class="">49.88%</td><td class="">100%</td><td class="">407</td><td class="">203</td><td class="">204</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2018 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Tests for QuestionContentsObjectFactory.
+ */
+
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// QuestionObjectFactory.ts is upgraded to Angular 8.
+import { AnswerGroupObjectFactory } from
+  &#x27;domain/exploration/AnswerGroupObjectFactory&#x27;;
+import { FractionObjectFactory } from &#x27;domain/objects/FractionObjectFactory&#x27;;
+import { HintObjectFactory } from &#x27;domain/exploration/HintObjectFactory&#x27;;
+import { MisconceptionObjectFactory } from
+  &#x27;domain/skill/MisconceptionObjectFactory&#x27;;
+import { OutcomeObjectFactory } from
+  &#x27;domain/exploration/OutcomeObjectFactory&#x27;;
+import { ParamChangeObjectFactory } from
+  &#x27;domain/exploration/ParamChangeObjectFactory&#x27;;
+import { ParamChangesObjectFactory } from
+  &#x27;domain/exploration/ParamChangesObjectFactory&#x27;;
+import { RuleObjectFactory } from &#x27;domain/exploration/RuleObjectFactory&#x27;;
+import { UnitsObjectFactory } from &#x27;domain/objects/UnitsObjectFactory&#x27;;
+import { WrittenTranslationObjectFactory } from
+  &#x27;domain/exploration/WrittenTranslationObjectFactory&#x27;;
+import { WrittenTranslationsObjectFactory } from
+  &#x27;domain/exploration/WrittenTranslationsObjectFactory&#x27;;
+import { UpgradedServices } from &#x27;services/UpgradedServices&#x27;;
+// ^^^ This block is to be removed.
+// TODO(#7222): Remove usage of importAllAngularServices once upgraded to
+// Angular 8.
+import { importAllAngularServices } from &#x27;tests/unit-test-utils&#x27;;
+
+require(&#x27;domain/question/QuestionObjectFactory.ts&#x27;);
+require(&#x27;domain/state/StateObjectFactory.ts&#x27;);
+
+describe(&#x27;Question object factory&#x27;, function() {
+  var QuestionObjectFactory = null;
+  var StateObjectFactory = null;
+  var sampleQuestion = null;
+  var sampleQuestionBackendDict = null;
+  var misconceptionObjectFactory = null;
+  importAllAngularServices();
+
+  beforeEach(angular.mock.module(&#x27;oppia&#x27;));
+  beforeEach(angular.mock.module(&#x27;oppia&#x27;, function($provide) {
+    $provide.value(
+      &#x27;AnswerGroupObjectFactory&#x27;, new AnswerGroupObjectFactory(
+        new OutcomeObjectFactory(),
+        new RuleObjectFactory()));
+    $provide.value(&#x27;FractionObjectFactory&#x27;, new FractionObjectFactory());
+    $provide.value(
+      &#x27;HintObjectFactory&#x27;, new HintObjectFactory());
+    $provide.value(
+      &#x27;MisconceptionObjectFactory&#x27;, new MisconceptionObjectFactory());
+    $provide.value(
+      &#x27;OutcomeObjectFactory&#x27;, new OutcomeObjectFactory());
+    $provide.value(&#x27;ParamChangeObjectFactory&#x27;, new ParamChangeObjectFactory());
+    $provide.value(
+      &#x27;ParamChangesObjectFactory&#x27;, new ParamChangesObjectFactory(
+        new ParamChangeObjectFactory()));
+    $provide.value(&#x27;RuleObjectFactory&#x27;, new RuleObjectFactory());
+    $provide.value(&#x27;UnitsObjectFactory&#x27;, new UnitsObjectFactory());
+    $provide.value(
+      &#x27;WrittenTranslationObjectFactory&#x27;,
+      new WrittenTranslationObjectFactory());
+    $provide.value(
+      &#x27;WrittenTranslationsObjectFactory&#x27;,
+      new WrittenTranslationsObjectFactory(
+        new WrittenTranslationObjectFactory()));
+  }));
+  beforeEach(angular.mock.module(&#x27;oppia&#x27;, function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
+
+  beforeEach(function() {
+    angular.mock.module(function($provide) {
+      $provide.constant(&#x27;INTERACTION_SPECS&#x27;, {
+        TextInput: {
+          can_have_solution: true
+        }
+      });
+    });
+  });
+
+  beforeEach(angular.mock.inject(function($injector) {
+    QuestionObjectFactory = $injector.get(&#x27;QuestionObjectFactory&#x27;);
+    StateObjectFactory = $injector.get(&#x27;StateObjectFactory&#x27;);
+    // The injector is required because this service is directly used in this
+    // spec, therefore even though MisconceptionObjectFactory is upgraded to
+    // Angular, it cannot be used just by instantiating it by its class but
+    // instead needs to be injected. Note that &#x27;misconceptionObjectFactory&#x27; is
+    // the injected service instance whereas &#x27;MisconceptionObjectFactory&#x27; is the
+    // service class itself. Therefore, use the instance instead of the class in
+    // the specs.
+    misconceptionObjectFactory = $injector.get(&#x27;MisconceptionObjectFactory&#x27;);
+
+    sampleQuestionBackendDict = {
+      id: &#x27;question_id&#x27;,
+      question_state_data: {
+        content: {
+          html: &#x27;Question 1&#x27;,
+          content_id: &#x27;content_1&#x27;
+        },
+        interaction: {
+          answer_groups: [{
+            outcome: {
+              dest: &#x27;outcome 1&#x27;,
+              feedback: {
+                content_id: &#x27;content_5&#x27;,
+                html: &#x27;&#x27;
+              },
+              labelled_as_correct: true,
+              param_changes: [],
+              refresher_exploration_id: null
+            },
+            rule_specs: [{
+              rule_type: &#x27;Equals&#x27;,
+              inputs: {x: 10}
+            }],
+          }],
+          confirmed_unclassified_answers: [],
+          customization_args: {
+            placeholder: {
+              value: {
+                content_id: &#x27;ca_placeholder_0&#x27;,
+                unicode_str: &#x27;&#x27;
+              }
+            },
+            rows: { value: 1 }
+          },
+          default_outcome: {
+            dest: null,
+            feedback: {
+              html: &#x27;Correct Answer&#x27;,
+              content_id: &#x27;content_2&#x27;
+            },
+            param_changes: [],
+            labelled_as_correct: false
+          },
+          hints: [
+            {
+              hint_content: {
+                html: &#x27;Hint 1&#x27;,
+                content_id: &#x27;content_3&#x27;
+              }
+            }
+          ],
+          solution: {
+            correct_answer: &#x27;This is the correct answer&#x27;,
+            answer_is_exclusive: false,
+            explanation: {
+              html: &#x27;Solution explanation&#x27;,
+              content_id: &#x27;content_4&#x27;
+            }
+          },
+          id: &#x27;TextInput&#x27;
+        },
+        param_changes: [],
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content_1: {},
+            content_2: {},
+            content_3: {},
+            content_4: {},
+            content_5: {}
+          }
+        },
+        written_translations: {
+          translations_mapping: {
+            content_1: {},
+            content_2: {},
+            content_3: {},
+            content_4: {},
+            content_5: {}
+          }
+        },
+        solicit_answer_details: false
+      },
+      inapplicable_skill_misconception_ids: [&#x27;a-1&#x27;, &#x27;b-2&#x27;],
+      language_code: &#x27;en&#x27;,
+      version: 1
+    };
+    sampleQuestion = QuestionObjectFactory.createFromBackendDict(
+      sampleQuestionBackendDict);
+  }));
+
+  it(&#x27;should correctly get various fields of the question&#x27;, function() {
+    expect(sampleQuestion.getId()).toEqual(&#x27;question_id&#x27;);
+    expect(sampleQuestion.getLanguageCode()).toEqual(&#x27;en&#x27;);
+    sampleQuestion.setLanguageCode(&#x27;cn&#x27;);
+    expect(sampleQuestion.getLanguageCode()).toEqual(&#x27;cn&#x27;);
+    expect(sampleQuestion.getVersion()).toEqual(1);
+    sampleQuestion.setLinkedSkillIds([&#x27;skill_id1&#x27;, &#x27;skill_id2&#x27;]);
+    expect(sampleQuestion.getLinkedSkillIds()).toEqual(
+      [&#x27;skill_id1&#x27;, &#x27;skill_id2&#x27;]);
+    expect(sampleQuestion.getInapplicableSkillMisconceptionIds()).toEqual(
+      [&#x27;a-1&#x27;, &#x27;b-2&#x27;]);
+    sampleQuestion.setInapplicableSkillMisconceptionIds([&#x27;abc-123&#x27;]);
+    expect(sampleQuestion.getInapplicableSkillMisconceptionIds()).toEqual(
+      [&#x27;abc-123&#x27;]);
+    var stateData = sampleQuestion.getStateData();
+    expect(stateData.name).toEqual(&#x27;question&#x27;);
+    expect(stateData.content.html).toEqual(&#x27;Question 1&#x27;);
+    var interaction = stateData.interaction;
+    expect(interaction.id).toEqual(&#x27;TextInput&#x27;);
+    expect(interaction.hints[0].hintContent.html).toEqual(&#x27;Hint 1&#x27;);
+    expect(interaction.solution.explanation.html).toEqual(
+      &#x27;Solution explanation&#x27;);
+    expect(interaction.solution.correctAnswer).toEqual(
+      &#x27;This is the correct answer&#x27;);
+    var defaultOutcome = interaction.defaultOutcome;
+    expect(defaultOutcome.labelledAsCorrect).toEqual(false);
+    expect(defaultOutcome.feedback.html).toEqual(&#x27;Correct Answer&#x27;);
+  });
+
+  it(&#x27;should correctly get backend dict&#x27;, function() {
+    var newQuestionBackendDict = sampleQuestion.toBackendDict(true);
+    expect(newQuestionBackendDict.id).toEqual(null);
+    expect(newQuestionBackendDict.linked_skill_ids).not.toBeDefined();
+    expect(newQuestionBackendDict.inapplicable_skill_misconception_ids).toEqual(
+      [&#x27;a-1&#x27;, &#x27;b-2&#x27;]);
+    expect(newQuestionBackendDict.version).toEqual(0);
+    expect(sampleQuestion.toBackendDict(false).id).toEqual(&#x27;question_id&#x27;);
+  });
+
+  it(&#x27;should correctly report unaddressed misconceptions&#x27;, function() {
+    var interaction = sampleQuestion.getStateData().interaction;
+    var misconception1 = misconceptionObjectFactory.create(
+      &#x27;id&#x27;, &#x27;name&#x27;, &#x27;notes&#x27;, &#x27;feedback&#x27;, true);
+    var misconception2 = misconceptionObjectFactory.create(
+      &#x27;id_2&#x27;, &#x27;name_2&#x27;, &#x27;notes&#x27;, &#x27;feedback&#x27;, true);
+    var misconception3 = misconceptionObjectFactory.create(
+      &#x27;id_3&#x27;, &#x27;name_3&#x27;, &#x27;notes&#x27;, &#x27;feedback&#x27;, false);
+    var misconceptionsDict = {
+      skillId1: [misconception1],
+      skillId2: [misconception2, misconception3]
+    };
+    interaction.answerGroups[0].outcome.labelledAsCorrect = false;
+    interaction.answerGroups[0].taggedSkillMisconceptionId = &#x27;skillId1-id&#x27;;
+    expect(sampleQuestion.getUnaddressedMisconceptionNames(
+      misconceptionsDict)).toEqual([&#x27;name_2&#x27;, &#x27;name_3&#x27;]);
+  });
+
+  it(&#x27;should correctly validate question&#x27;, function() {
+    var interaction = sampleQuestion.getStateData().interaction;
+
+    expect(sampleQuestion.getValidationErrorMessage()).toBeNull();
+
+    interaction.defaultOutcome.feedback.html = &#x27;&#x27;;
+    expect(sampleQuestion.getValidationErrorMessage()).toEqual(
+      &#x27;Please enter a feedback for the default outcome.&#x27;);
+
+    interaction.defaultOutcome.feedback.html = &#x27;feedback&#x27;;
+
+    interaction.answerGroups[0].outcome.labelledAsCorrect = false;
+    expect(sampleQuestion.getValidationErrorMessage()).toEqual(
+      &#x27;At least one answer should be marked correct&#x27;);
+
+    interaction.solution = null;
+    expect(sampleQuestion.getValidationErrorMessage()).toEqual(
+      &#x27;A solution must be specified&#x27;);
+
+    interaction.hints = [];
+    expect(sampleQuestion.getValidationErrorMessage()).toEqual(
+      &#x27;At least 1 hint should be specified&#x27;);
+
+    interaction.id = null;
+    expect(sampleQuestion.getValidationErrorMessage()).toEqual(
+      &#x27;An interaction must be specified&#x27;);
+
+    var questionContent = sampleQuestion.getStateData().content;
+    questionContent.html = &#x27;&#x27;;
+    expect(sampleQuestion.getValidationErrorMessage()).toEqual(
+      &#x27;Please enter a question.&#x27;);
+  });
+
+  it(&#x27;should correctly create a Default Question&#x27;, function() {
+    var sampleQuestion1 = QuestionObjectFactory.createDefaultQuestion(
+      [&#x27;skill_id3&#x27;, &#x27;skill_id4&#x27;]);
+    var state = StateObjectFactory.createDefaultState(null);
+
+    expect(sampleQuestion1.getId()).toEqual(null);
+    expect(sampleQuestion1.getLanguageCode()).toEqual(&#x27;en&#x27;);
+    expect(sampleQuestion1.getVersion()).toEqual(1);
+    expect(sampleQuestion1.getStateData()).toEqual(state);
+    expect(sampleQuestion1.getLinkedSkillIds()).toEqual(
+      [&#x27;skill_id3&#x27;, &#x27;skill_id4&#x27;]);
+    expect(sampleQuestion.getInapplicableSkillMisconceptionIds()).toEqual(
+      [&#x27;a-1&#x27;, &#x27;b-2&#x27;]);
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:48,&quot;character&quot;:6,&quot;text&quot;:&quot;QuestionObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:49,&quot;character&quot;:6,&quot;text&quot;:&quot;StateObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:50,&quot;character&quot;:6,&quot;text&quot;:&quot;sampleQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:51,&quot;character&quot;:6,&quot;text&quot;:&quot;sampleQuestionBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:52,&quot;character&quot;:6,&quot;text&quot;:&quot;misconceptionObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:56,&quot;character&quot;:51,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:57,&quot;character&quot;:4,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:57,&quot;character&quot;:13,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:61,&quot;character&quot;:4,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:61,&quot;character&quot;:13,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:62,&quot;character&quot;:4,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:62,&quot;character&quot;:13,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:64,&quot;character&quot;:4,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:64,&quot;character&quot;:13,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:66,&quot;character&quot;:4,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:66,&quot;character&quot;:13,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:68,&quot;character&quot;:4,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:68,&quot;character&quot;:13,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:69,&quot;character&quot;:4,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:69,&quot;character&quot;:13,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:72,&quot;character&quot;:4,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:72,&quot;character&quot;:13,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:73,&quot;character&quot;:4,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:73,&quot;character&quot;:13,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:74,&quot;character&quot;:4,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:74,&quot;character&quot;:13,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:77,&quot;character&quot;:4,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:77,&quot;character&quot;:13,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:82,&quot;character&quot;:51,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:85,&quot;character&quot;:6,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:85,&quot;character&quot;:15,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:90,&quot;character&quot;:33,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:91,&quot;character&quot;:6,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:91,&quot;character&quot;:15,&quot;text&quot;:&quot;constant&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:99,&quot;character&quot;:42,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:100,&quot;character&quot;:4,&quot;text&quot;:&quot;QuestionObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:100,&quot;character&quot;:28,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:100,&quot;character&quot;:38,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:101,&quot;character&quot;:4,&quot;text&quot;:&quot;StateObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:101,&quot;character&quot;:25,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:101,&quot;character&quot;:35,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:109,&quot;character&quot;:4,&quot;text&quot;:&quot;misconceptionObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:109,&quot;character&quot;:33,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:109,&quot;character&quot;:43,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:111,&quot;character&quot;:4,&quot;text&quot;:&quot;sampleQuestionBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:197,&quot;character&quot;:4,&quot;text&quot;:&quot;sampleQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:197,&quot;character&quot;:21,&quot;text&quot;:&quot;QuestionObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:197,&quot;character&quot;:43,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:198,&quot;character&quot;:6,&quot;text&quot;:&quot;sampleQuestionBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:202,&quot;character&quot;:11,&quot;text&quot;:&quot;sampleQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:202,&quot;character&quot;:26,&quot;text&quot;:&quot;getId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:203,&quot;character&quot;:11,&quot;text&quot;:&quot;sampleQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:203,&quot;character&quot;:26,&quot;text&quot;:&quot;getLanguageCode&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:204,&quot;character&quot;:4,&quot;text&quot;:&quot;sampleQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:204,&quot;character&quot;:19,&quot;text&quot;:&quot;setLanguageCode&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:205,&quot;character&quot;:11,&quot;text&quot;:&quot;sampleQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:205,&quot;character&quot;:26,&quot;text&quot;:&quot;getLanguageCode&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:206,&quot;character&quot;:11,&quot;text&quot;:&quot;sampleQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:206,&quot;character&quot;:26,&quot;text&quot;:&quot;getVersion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:207,&quot;character&quot;:4,&quot;text&quot;:&quot;sampleQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:207,&quot;character&quot;:19,&quot;text&quot;:&quot;setLinkedSkillIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:208,&quot;character&quot;:11,&quot;text&quot;:&quot;sampleQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:208,&quot;character&quot;:26,&quot;text&quot;:&quot;getLinkedSkillIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:210,&quot;character&quot;:11,&quot;text&quot;:&quot;sampleQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:210,&quot;character&quot;:26,&quot;text&quot;:&quot;getInapplicableSkillMisconceptionIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:212,&quot;character&quot;:4,&quot;text&quot;:&quot;sampleQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:212,&quot;character&quot;:19,&quot;text&quot;:&quot;setInapplicableSkillMisconceptionIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:213,&quot;character&quot;:11,&quot;text&quot;:&quot;sampleQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:213,&quot;character&quot;:26,&quot;text&quot;:&quot;getInapplicableSkillMisconceptionIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:215,&quot;character&quot;:8,&quot;text&quot;:&quot;stateData&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:215,&quot;character&quot;:20,&quot;text&quot;:&quot;sampleQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:215,&quot;character&quot;:35,&quot;text&quot;:&quot;getStateData&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:216,&quot;character&quot;:11,&quot;text&quot;:&quot;stateData&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:216,&quot;character&quot;:21,&quot;text&quot;:&quot;name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:217,&quot;character&quot;:11,&quot;text&quot;:&quot;stateData&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:217,&quot;character&quot;:21,&quot;text&quot;:&quot;content&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:217,&quot;character&quot;:29,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:218,&quot;character&quot;:8,&quot;text&quot;:&quot;interaction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:218,&quot;character&quot;:22,&quot;text&quot;:&quot;stateData&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:218,&quot;character&quot;:32,&quot;text&quot;:&quot;interaction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:219,&quot;character&quot;:11,&quot;text&quot;:&quot;interaction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:219,&quot;character&quot;:23,&quot;text&quot;:&quot;id&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:220,&quot;character&quot;:11,&quot;text&quot;:&quot;interaction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:220,&quot;character&quot;:23,&quot;text&quot;:&quot;hints&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:220,&quot;character&quot;:32,&quot;text&quot;:&quot;hintContent&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:220,&quot;character&quot;:44,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:221,&quot;character&quot;:11,&quot;text&quot;:&quot;interaction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:221,&quot;character&quot;:23,&quot;text&quot;:&quot;solution&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:221,&quot;character&quot;:32,&quot;text&quot;:&quot;explanation&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:221,&quot;character&quot;:44,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:223,&quot;character&quot;:11,&quot;text&quot;:&quot;interaction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:223,&quot;character&quot;:23,&quot;text&quot;:&quot;solution&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:223,&quot;character&quot;:32,&quot;text&quot;:&quot;correctAnswer&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:225,&quot;character&quot;:8,&quot;text&quot;:&quot;defaultOutcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:225,&quot;character&quot;:25,&quot;text&quot;:&quot;interaction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:225,&quot;character&quot;:37,&quot;text&quot;:&quot;defaultOutcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:226,&quot;character&quot;:11,&quot;text&quot;:&quot;defaultOutcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:226,&quot;character&quot;:26,&quot;text&quot;:&quot;labelledAsCorrect&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:227,&quot;character&quot;:11,&quot;text&quot;:&quot;defaultOutcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:227,&quot;character&quot;:26,&quot;text&quot;:&quot;feedback&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:227,&quot;character&quot;:35,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:231,&quot;character&quot;:8,&quot;text&quot;:&quot;newQuestionBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:231,&quot;character&quot;:33,&quot;text&quot;:&quot;sampleQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:231,&quot;character&quot;:48,&quot;text&quot;:&quot;toBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:232,&quot;character&quot;:11,&quot;text&quot;:&quot;newQuestionBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:232,&quot;character&quot;:34,&quot;text&quot;:&quot;id&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:233,&quot;character&quot;:11,&quot;text&quot;:&quot;newQuestionBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:233,&quot;character&quot;:34,&quot;text&quot;:&quot;linked_skill_ids&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:233,&quot;character&quot;:52,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:234,&quot;character&quot;:11,&quot;text&quot;:&quot;newQuestionBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:234,&quot;character&quot;:34,&quot;text&quot;:&quot;inapplicable_skill_misconception_ids&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:236,&quot;character&quot;:11,&quot;text&quot;:&quot;newQuestionBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:236,&quot;character&quot;:34,&quot;text&quot;:&quot;version&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:237,&quot;character&quot;:11,&quot;text&quot;:&quot;sampleQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:237,&quot;character&quot;:26,&quot;text&quot;:&quot;toBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:237,&quot;character&quot;:47,&quot;text&quot;:&quot;id&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:241,&quot;character&quot;:8,&quot;text&quot;:&quot;interaction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:241,&quot;character&quot;:22,&quot;text&quot;:&quot;sampleQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:241,&quot;character&quot;:37,&quot;text&quot;:&quot;getStateData&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:241,&quot;character&quot;:52,&quot;text&quot;:&quot;interaction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:242,&quot;character&quot;:8,&quot;text&quot;:&quot;misconception1&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:242,&quot;character&quot;:25,&quot;text&quot;:&quot;misconceptionObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:242,&quot;character&quot;:52,&quot;text&quot;:&quot;create&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:244,&quot;character&quot;:8,&quot;text&quot;:&quot;misconception2&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:244,&quot;character&quot;:25,&quot;text&quot;:&quot;misconceptionObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:244,&quot;character&quot;:52,&quot;text&quot;:&quot;create&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:246,&quot;character&quot;:8,&quot;text&quot;:&quot;misconception3&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:246,&quot;character&quot;:25,&quot;text&quot;:&quot;misconceptionObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:246,&quot;character&quot;:52,&quot;text&quot;:&quot;create&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:249,&quot;character&quot;:6,&quot;text&quot;:&quot;skillId1&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:249,&quot;character&quot;:17,&quot;text&quot;:&quot;misconception1&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:250,&quot;character&quot;:6,&quot;text&quot;:&quot;skillId2&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:250,&quot;character&quot;:17,&quot;text&quot;:&quot;misconception2&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:250,&quot;character&quot;:33,&quot;text&quot;:&quot;misconception3&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:252,&quot;character&quot;:4,&quot;text&quot;:&quot;interaction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:252,&quot;character&quot;:16,&quot;text&quot;:&quot;answerGroups&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:252,&quot;character&quot;:32,&quot;text&quot;:&quot;outcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:252,&quot;character&quot;:40,&quot;text&quot;:&quot;labelledAsCorrect&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:253,&quot;character&quot;:4,&quot;text&quot;:&quot;interaction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:253,&quot;character&quot;:16,&quot;text&quot;:&quot;answerGroups&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:253,&quot;character&quot;:32,&quot;text&quot;:&quot;taggedSkillMisconceptionId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:254,&quot;character&quot;:11,&quot;text&quot;:&quot;sampleQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:254,&quot;character&quot;:26,&quot;text&quot;:&quot;getUnaddressedMisconceptionNames&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:259,&quot;character&quot;:8,&quot;text&quot;:&quot;interaction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:259,&quot;character&quot;:22,&quot;text&quot;:&quot;sampleQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:259,&quot;character&quot;:37,&quot;text&quot;:&quot;getStateData&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:259,&quot;character&quot;:52,&quot;text&quot;:&quot;interaction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:261,&quot;character&quot;:11,&quot;text&quot;:&quot;sampleQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:261,&quot;character&quot;:26,&quot;text&quot;:&quot;getValidationErrorMessage&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:263,&quot;character&quot;:4,&quot;text&quot;:&quot;interaction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:263,&quot;character&quot;:16,&quot;text&quot;:&quot;defaultOutcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:263,&quot;character&quot;:31,&quot;text&quot;:&quot;feedback&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:263,&quot;character&quot;:40,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:264,&quot;character&quot;:11,&quot;text&quot;:&quot;sampleQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:264,&quot;character&quot;:26,&quot;text&quot;:&quot;getValidationErrorMessage&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:267,&quot;character&quot;:4,&quot;text&quot;:&quot;interaction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:267,&quot;character&quot;:16,&quot;text&quot;:&quot;defaultOutcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:267,&quot;character&quot;:31,&quot;text&quot;:&quot;feedback&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:267,&quot;character&quot;:40,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:269,&quot;character&quot;:4,&quot;text&quot;:&quot;interaction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:269,&quot;character&quot;:16,&quot;text&quot;:&quot;answerGroups&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:269,&quot;character&quot;:32,&quot;text&quot;:&quot;outcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:269,&quot;character&quot;:40,&quot;text&quot;:&quot;labelledAsCorrect&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:270,&quot;character&quot;:11,&quot;text&quot;:&quot;sampleQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:270,&quot;character&quot;:26,&quot;text&quot;:&quot;getValidationErrorMessage&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:273,&quot;character&quot;:4,&quot;text&quot;:&quot;interaction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:273,&quot;character&quot;:16,&quot;text&quot;:&quot;solution&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:274,&quot;character&quot;:11,&quot;text&quot;:&quot;sampleQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:274,&quot;character&quot;:26,&quot;text&quot;:&quot;getValidationErrorMessage&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:277,&quot;character&quot;:4,&quot;text&quot;:&quot;interaction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:277,&quot;character&quot;:16,&quot;text&quot;:&quot;hints&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:278,&quot;character&quot;:11,&quot;text&quot;:&quot;sampleQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:278,&quot;character&quot;:26,&quot;text&quot;:&quot;getValidationErrorMessage&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:281,&quot;character&quot;:4,&quot;text&quot;:&quot;interaction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:281,&quot;character&quot;:16,&quot;text&quot;:&quot;id&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:282,&quot;character&quot;:11,&quot;text&quot;:&quot;sampleQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:282,&quot;character&quot;:26,&quot;text&quot;:&quot;getValidationErrorMessage&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:285,&quot;character&quot;:8,&quot;text&quot;:&quot;questionContent&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:285,&quot;character&quot;:26,&quot;text&quot;:&quot;sampleQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:285,&quot;character&quot;:41,&quot;text&quot;:&quot;getStateData&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:285,&quot;character&quot;:56,&quot;text&quot;:&quot;content&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:286,&quot;character&quot;:4,&quot;text&quot;:&quot;questionContent&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:286,&quot;character&quot;:20,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:287,&quot;character&quot;:11,&quot;text&quot;:&quot;sampleQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:287,&quot;character&quot;:26,&quot;text&quot;:&quot;getValidationErrorMessage&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:292,&quot;character&quot;:8,&quot;text&quot;:&quot;sampleQuestion1&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:292,&quot;character&quot;:26,&quot;text&quot;:&quot;QuestionObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:292,&quot;character&quot;:48,&quot;text&quot;:&quot;createDefaultQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:294,&quot;character&quot;:8,&quot;text&quot;:&quot;state&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:294,&quot;character&quot;:16,&quot;text&quot;:&quot;StateObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:294,&quot;character&quot;:35,&quot;text&quot;:&quot;createDefaultState&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:296,&quot;character&quot;:11,&quot;text&quot;:&quot;sampleQuestion1&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:296,&quot;character&quot;:27,&quot;text&quot;:&quot;getId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:297,&quot;character&quot;:11,&quot;text&quot;:&quot;sampleQuestion1&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:297,&quot;character&quot;:27,&quot;text&quot;:&quot;getLanguageCode&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:298,&quot;character&quot;:11,&quot;text&quot;:&quot;sampleQuestion1&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:298,&quot;character&quot;:27,&quot;text&quot;:&quot;getVersion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:299,&quot;character&quot;:11,&quot;text&quot;:&quot;sampleQuestion1&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:299,&quot;character&quot;:27,&quot;text&quot;:&quot;getStateData&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:299,&quot;character&quot;:51,&quot;text&quot;:&quot;state&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:300,&quot;character&quot;:11,&quot;text&quot;:&quot;sampleQuestion1&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:300,&quot;character&quot;:27,&quot;text&quot;:&quot;getLinkedSkillIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:302,&quot;character&quot;:11,&quot;text&quot;:&quot;sampleQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/QuestionObjectFactorySpec.ts&quot;,&quot;line&quot;:302,&quot;character&quot;:26,&quot;text&quot;:&quot;getInapplicableSkillMisconceptionIds&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:57 GMT</p>
+    </body>
+  </html>
+  

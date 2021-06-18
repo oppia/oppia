@@ -1,0 +1,362 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>site-analytics.service.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">core/templates/services/site-analytics.service.ts</td><td class="">100.00%</td><td class="">100%</td><td class="">393</td><td class="">393</td><td class="">0</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2014 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Utility services for explorations which may be shared by both
+ * the learner and editor views.
+ */
+
+import { downgradeInjectable } from &#x27;@angular/upgrade/static&#x27;;
+import { Injectable } from &#x27;@angular/core&#x27;;
+
+import constants from &#x27;assets/constants&#x27;;
+import { WindowRef } from &#x27;services/contextual/window-ref.service&#x27;;
+
+// Service for sending events to Google Analytics.
+//
+// Note that events are only sent if the CAN_SEND_ANALYTICS_EVENTS flag is
+// turned on. This flag must be turned on explicitly by the application
+// owner in feconf.py.
+
+@Injectable({
+  providedIn: &#x27;root&#x27;
+})
+export class SiteAnalyticsService {
+  constructor(private windowRef: WindowRef) {}
+
+  get CAN_SEND_ANALYTICS_EVENTS(): boolean {
+    return constants.CAN_SEND_ANALYTICS_EVENTS;
+  }
+
+  // For definitions of the various arguments, please see:
+  // https://developers.google.com/analytics/devguides/collection/analyticsjs/events
+  _sendEventToGoogleAnalytics(
+      eventCategory: string, eventAction: string, eventLabel: string): void {
+    if (this.CAN_SEND_ANALYTICS_EVENTS) {
+      this.windowRef.nativeWindow.gtag(&#x27;event&#x27;, eventAction, {
+        event_category: eventCategory,
+        event_label: eventLabel
+      });
+    }
+  }
+
+  // The srcElement refers to the element on the page that is clicked.
+  registerStartLoginEvent(srcElement: string): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;LoginButton&#x27;, &#x27;click&#x27;,
+      this.windowRef.nativeWindow.location.pathname + &#x27; &#x27; + srcElement);
+  }
+  registerNewSignupEvent(): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;OnboardingEngagement&#x27;, &#x27;signup&#x27;, &#x27;AccountSignUp&#x27;);
+  }
+  registerClickBrowseLessonsButtonEvent(): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;BrowseLessonsButton&#x27;, &#x27;click&#x27;,
+      this.windowRef.nativeWindow.location.pathname);
+  }
+  registerClickGuideParentsButtonEvent(): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;GuideParentsButton&#x27;, &#x27;click&#x27;,
+      this.windowRef.nativeWindow.location.pathname);
+  }
+  registerClickTipforParentsButtonEvent(): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;TipforParentsButton&#x27;, &#x27;click&#x27;,
+      this.windowRef.nativeWindow.location.pathname);
+  }
+  registerClickExploreLessonsButtonEvent(): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;ExploreLessonsButton&#x27;, &#x27;click&#x27;,
+      this.windowRef.nativeWindow.location.pathname);
+  }
+  registerClickStartLearningButtonEvent(): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;StartLearningButton&#x27;, &#x27;click&#x27;,
+      this.windowRef.nativeWindow.location.pathname);
+  }
+  registerClickStartContributingButtonEvent(): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;StartContributingButton&#x27;, &#x27;click&#x27;,
+      this.windowRef.nativeWindow.location.pathname);
+  }
+  registerClickStartTeachingButtonEvent(): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;StartTeachingButton&#x27;, &#x27;click&#x27;,
+      this.windowRef.nativeWindow.location.pathname);
+  }
+  registerClickVisitClassroomButtonEvent(): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;ClassroomButton&#x27;, &#x27;click&#x27;,
+      this.windowRef.nativeWindow.location.pathname);
+  }
+  registerClickBrowseLibraryButtonEvent(): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;BrowseLibraryButton&#x27;, &#x27;click&#x27;,
+      this.windowRef.nativeWindow.location.pathname);
+  }
+  registerGoToDonationSiteEvent(donationSiteName: string): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;GoToDonationSite&#x27;, &#x27;click&#x27;, donationSiteName);
+  }
+  registerCreateLessonButtonEvent(): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;CreateLessonButton&#x27;, &#x27;click&#x27;,
+      this.windowRef.nativeWindow.location.pathname);
+  }
+  registerApplyToTeachWithOppiaEvent(): void {
+    this._sendEventToGoogleAnalytics(&#x27;ApplyToTeachWithOppia&#x27;, &#x27;click&#x27;, &#x27;&#x27;);
+  }
+  registerClickCreateExplorationButtonEvent(): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;CreateExplorationButton&#x27;, &#x27;click&#x27;,
+      this.windowRef.nativeWindow.location.pathname);
+  }
+  registerCreateNewExplorationEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(&#x27;NewExploration&#x27;, &#x27;create&#x27;, explorationId);
+  }
+  registerCreateNewExplorationInCollectionEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;NewExplorationFromCollection&#x27;, &#x27;create&#x27;, explorationId);
+  }
+  registerCreateNewCollectionEvent(collectionId: string): void {
+    this._sendEventToGoogleAnalytics(&#x27;NewCollection&#x27;, &#x27;create&#x27;, collectionId);
+  }
+  registerCommitChangesToPrivateExplorationEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;CommitToPrivateExploration&#x27;, &#x27;click&#x27;, explorationId);
+  }
+  registerShareExplorationEvent(network: string): void {
+    this._sendEventToGoogleAnalytics(
+      network, &#x27;share&#x27;, this.windowRef.nativeWindow.location.pathname);
+  }
+  registerShareCollectionEvent(network: string): void {
+    this._sendEventToGoogleAnalytics(
+      network, &#x27;share&#x27;, this.windowRef.nativeWindow.location.pathname);
+  }
+  registerOpenEmbedInfoEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(&#x27;EmbedInfoModal&#x27;, &#x27;open&#x27;, explorationId);
+  }
+  registerCommitChangesToPublicExplorationEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;CommitToPublicExploration&#x27;, &#x27;click&#x27;, explorationId);
+  }
+  // Metrics for tutorial on first creating exploration.
+  registerTutorialModalOpenEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;TutorialModalOpen&#x27;, &#x27;open&#x27;, explorationId);
+  }
+  registerDeclineTutorialModalEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;DeclineTutorialModal&#x27;, &#x27;click&#x27;, explorationId);
+  }
+  registerAcceptTutorialModalEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;AcceptTutorialModal&#x27;, &#x27;click&#x27;, explorationId);
+  }
+  // Metrics for visiting the help center.
+  registerClickHelpButtonEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;ClickHelpButton&#x27;, &#x27;click&#x27;, explorationId);
+  }
+  registerVisitHelpCenterEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;VisitHelpCenter&#x27;, &#x27;click&#x27;, explorationId);
+  }
+  registerOpenTutorialFromHelpCenterEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;OpenTutorialFromHelpCenter&#x27;, &#x27;click&#x27;, explorationId);
+  }
+  // Metrics for exiting the tutorial.
+  registerSkipTutorialEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;SkipTutorial&#x27;, &#x27;click&#x27;, explorationId);
+  }
+  registerFinishTutorialEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;FinishTutorial&#x27;, &#x27;click&#x27;, explorationId);
+  }
+  // Metrics for first time editor use.
+  registerEditorFirstEntryEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;FirstEnterEditor&#x27;, &#x27;open&#x27;, explorationId);
+  }
+  registerFirstOpenContentBoxEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;FirstOpenContentBox&#x27;, &#x27;open&#x27;, explorationId);
+  }
+  registerFirstSaveContentEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;FirstSaveContent&#x27;, &#x27;click&#x27;, explorationId);
+  }
+  registerFirstClickAddInteractionEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;FirstClickAddInteraction&#x27;, &#x27;click&#x27;, explorationId);
+  }
+  registerFirstSelectInteractionTypeEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;FirstSelectInteractionType&#x27;, &#x27;click&#x27;, explorationId);
+  }
+  registerFirstSaveInteractionEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;FirstSaveInteraction&#x27;, &#x27;click&#x27;, explorationId);
+  }
+  registerFirstSaveRuleEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;FirstSaveRule&#x27;, &#x27;click&#x27;, explorationId);
+  }
+  registerFirstCreateSecondStateEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;FirstCreateSecondState&#x27;, &#x27;create&#x27;, explorationId);
+  }
+  // Metrics for publishing explorations.
+  registerSavePlayableExplorationEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;SavePlayableExploration&#x27;, &#x27;save&#x27;, explorationId);
+  }
+  registerOpenPublishExplorationModalEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;PublishExplorationModal&#x27;, &#x27;open&#x27;, explorationId);
+  }
+  registerPublishExplorationEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;PublishExploration&#x27;, &#x27;click&#x27;, explorationId);
+  }
+  registerVisitOppiaFromIframeEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;VisitOppiaFromIframe&#x27;, &#x27;click&#x27;, explorationId);
+  }
+  registerNewCard(cardNum: number): void {
+    if (cardNum &lt;= 10 || cardNum % 10 === 0) {
+      this._sendEventToGoogleAnalytics(
+        &#x27;PlayerNewCard&#x27;, &#x27;click&#x27;, cardNum.toString());
+    }
+  }
+  registerOpenCollectionFromLandingPageEvent(collectionId: string): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;OpenFractionsFromLandingPage&#x27;, &#x27;click&#x27;, collectionId);
+  }
+  registerStewardsLandingPageEvent(
+      viewerType: string, buttonText: string): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;ClickButtonOnStewardsPage&#x27;, &#x27;click&#x27;, viewerType + &#x27;:&#x27; + buttonText);
+  }
+  registerSaveRecordedAudioEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;SaveRecordedAudio&#x27;, &#x27;click&#x27;, explorationId);
+  }
+  registerStartAudioRecordingEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;StartAudioRecording&#x27;, &#x27;click&#x27;, explorationId);
+  }
+  registerUploadAudioEvent(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;UploadRecordedAudio&#x27;, &#x27;click&#x27;, explorationId);
+  }
+  // Contributor Dashboard Events.
+  registerContributorDashboardSuggestEvent(contributionType: string): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;ContributorDashboardSuggest&#x27;, &#x27;click&#x27;, contributionType);
+  }
+  registerContributorDashboardSubmitSuggestionEvent(
+      contributionType: string): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;ContributorDashboardSubmitSuggestion&#x27;, &#x27;click&#x27;, contributionType);
+  }
+  registerContributorDashboardViewSuggestionForReview(
+      contributionType: string): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;ContributorDashboardViewSuggestionForReview&#x27;, &#x27;click&#x27;, contributionType);
+  }
+  registerContributorDashboardAcceptSuggestion(contributionType: string): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;ContributorDashboardAcceptSuggestion&#x27;, &#x27;click&#x27;, contributionType);
+  }
+  registerContributorDashboardRejectSuggestion(contributionType: string): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;ContributorDashboardRejectSuggestion&#x27;, &#x27;click&#x27;, contributionType);
+  }
+
+  registerLessonActiveUse(): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;ActiveUserStartAndSawCards&#x27;, &#x27;engage&#x27;, &#x27;&#x27;);
+  }
+
+  registerStartExploration(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;PlayerStartExploration&#x27;, &#x27;engage&#x27;, explorationId);
+  }
+
+  registerFinishExploration(explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;PlayerFinishExploration&#x27;, &#x27;engage&#x27;, explorationId);
+  }
+
+  registerCuratedLessonStarted(
+      topicName: string, explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;CuratedLessonStarted&#x27;, `start ${topicName}`, explorationId);
+  }
+
+  registerCuratedLessonCompleted(
+      topicName: string, explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;CuratedLessonCompleted&#x27;, `start ${topicName}`, explorationId);
+  }
+
+  registerClassroomLessonActiveUse(
+      topicName: string, explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;ClassroomActiveUserStartAndSawCards&#x27;,
+      `start ${topicName}`,
+      explorationId);
+  }
+
+  registerClassoomHeaderClickEvent(): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;ClassroomEngagement&#x27;, &#x27;click&#x27;, &#x27;ClickOnClassroom&#x27;);
+  }
+
+  registerClassroomPageViewed(): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;ClassroomEngagement&#x27;, &#x27;impression&#x27;, &#x27;ViewClassroom&#x27;);
+  }
+
+  registerAccountDeletion(): void {
+    this._sendEventToGoogleAnalytics(
+      &#x27;OnboardingEngagement&#x27;, &#x27;delete&#x27;, &#x27;AccountDeletion&#x27;);
+  }
+}
+
+angular.module(&#x27;oppia&#x27;).factory(
+  &#x27;SiteAnalyticsService&#x27;,
+  downgradeInjectable(SiteAnalyticsService));
+</textarea><pre id="annotations" style="display:none">[]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:55 GMT</p>
+    </body>
+  </html>
+  

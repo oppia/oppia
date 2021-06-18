@@ -1,0 +1,139 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>numeric-expression-input-rules.service.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">extensions/interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service.ts</td><td class="">99.16%</td><td class="">100%</td><td class="">119</td><td class="">118</td><td class="">1</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Rules service for the NumericExpressionInput interaction.
+ */
+
+import { Injectable } from &#x27;@angular/core&#x27;;
+import { downgradeInjectable } from &#x27;@angular/upgrade/static&#x27;;
+
+import nerdamer from &#x27;nerdamer&#x27;;
+
+import { MathInteractionsService } from &#x27;services/math-interactions.service&#x27;;
+import { NumericExpressionAnswer } from &#x27;interactions/answer-defs&#x27;;
+import { NumericExpressionRuleInputs } from &#x27;interactions/rule-input-defs&#x27;;
+
+@Injectable({
+  providedIn: &#x27;root&#x27;
+})
+export class NumericExpressionInputRulesService {
+  MatchesExactlyWith(
+      answer: NumericExpressionAnswer,
+      inputs: NumericExpressionRuleInputs): boolean {
+    let mis = new MathInteractionsService();
+
+    // The expression is first split into terms by addition and subtraction.
+    let answerTerms = mis.getTerms(answer);
+    let inputTerms = mis.getTerms(inputs.x);
+
+    // Now, we try to match all terms between the answer and input.
+    // NOTE: We only need to iterate from the top in the answerTerms list since
+    // in the inputTerms list, we will break the loop each time an element is
+    // removed from it, thus, indexing errors would only arise in the outer
+    // loop.
+    for (let i = answerTerms.length - 1; i &gt;= 0; i--) {
+      for (let j = 0; j &lt; inputTerms.length; j++) {
+        if (mis.termsMatch(answerTerms[i], inputTerms[j])) {
+          answerTerms.splice(i, 1);
+          inputTerms.splice(j, 1);
+          break;
+        }
+      }
+    }
+
+    // The two expressions are considered an exact match if both lists are empty
+    // implying that each term in the answer got uniquely matched with a term
+    // in the input.
+    return answerTerms.length === 0 &amp;&amp; inputTerms.length === 0;
+  }
+
+  IsEquivalentTo(
+      answer: NumericExpressionAnswer, inputs: NumericExpressionRuleInputs
+  ): boolean {
+    // TODO(#13083): Remove the &#x27;as unknown as boolean&#x27; part after the library
+    // typing is fixed.
+    return nerdamer(answer).eq(
+      nerdamer(inputs.x).toString()
+    ) as unknown as boolean;
+  }
+
+  ContainsSomeOf(
+      answer: NumericExpressionAnswer,
+      inputs: NumericExpressionRuleInputs): boolean {
+    // At least one term should match between answer and input.
+    let mis = new MathInteractionsService();
+
+    // The expression is first split into terms by addition and subtraction.
+    let answerTerms = mis.getTerms(answer);
+    let inputTerms = mis.getTerms(inputs.x);
+
+    for (let answerTerm of answerTerms) {
+      for (let inputTerm of inputTerms) {
+        if (mis.termsMatch(answerTerm, inputTerm)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  OmitsSomeOf(
+      answer: NumericExpressionAnswer,
+      inputs: NumericExpressionRuleInputs): boolean {
+    // There must be at least one term in the input that is not present in the
+    // answer.
+    let mis = new MathInteractionsService();
+
+    // The expression is first split into terms by addition and subtraction.
+    let answerTerms = mis.getTerms(answer);
+    let inputTerms = mis.getTerms(inputs.x);
+
+    for (let inputTerm of inputTerms) {
+      let matched = false;
+      for (let answerTerm of answerTerms) {
+        if (mis.termsMatch(answerTerm, inputTerm)) {
+          matched = true;
+          break;
+        }
+      }
+      if (!matched) {
+        return true;
+      }
+    }
+    return false;
+  }
+}
+
+angular.module(&#x27;oppia&#x27;).factory(
+  &#x27;NumericExpressionInputRulesService&#x27;,
+  downgradeInjectable(NumericExpressionInputRulesService));
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;extensions/interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service.ts&quot;,&quot;line&quot;:66,&quot;character&quot;:11,&quot;text&quot;:&quot;nerdamer(answer).eq(\n      nerdamer(inputs.x).toString()\n    ) as unknown as boolean&quot;,&quot;kind&quot;:3}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:55 GMT</p>
+    </body>
+  </html>
+  

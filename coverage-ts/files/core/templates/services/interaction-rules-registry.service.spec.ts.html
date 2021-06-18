@@ -1,0 +1,344 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>interaction-rules-registry.service.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">core/templates/services/interaction-rules-registry.service.spec.ts</td><td class="">100.00%</td><td class="">100%</td><td class="">320</td><td class="">320</td><td class="">0</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2019 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for interaction rules registry service.
+ */
+
+import { TestBed } from &#x27;@angular/core/testing&#x27;;
+
+import { AlgebraicExpressionInputRulesService } from
+  // eslint-disable-next-line max-len
+  &#x27;interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service&#x27;;
+import { CodeReplRulesService } from
+  &#x27;interactions/CodeRepl/directives/code-repl-rules.service&#x27;;
+import { ContinueRulesService } from
+  &#x27;interactions/Continue/directives/continue-rules.service&#x27;;
+import { DragAndDropSortInputRulesService } from
+  // eslint-disable-next-line max-len
+  &#x27;interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service&#x27;;
+import { EndExplorationRulesService } from
+  &#x27;interactions/EndExploration/directives/end-exploration-rules.service&#x27;;
+import { FractionInputRulesService } from
+  &#x27;interactions/FractionInput/directives/fraction-input-rules.service&#x27;;
+import { GraphInputRulesService } from
+  &#x27;interactions/GraphInput/directives/graph-input-rules.service&#x27;;
+import { ImageClickInputRulesService } from
+  &#x27;interactions/ImageClickInput/directives/image-click-input-rules.service&#x27;;
+import { InteractionRulesRegistryService } from
+  &#x27;services/interaction-rules-registry.service&#x27;;
+import { InteractionSpecsConstants } from
+  &#x27;pages/interaction-specs.constants&#x27;;
+import { InteractiveMapRulesService } from
+  &#x27;interactions/InteractiveMap/directives/interactive-map-rules.service&#x27;;
+import { ItemSelectionInputRulesService } from
+  // eslint-disable-next-line max-len
+  &#x27;interactions/ItemSelectionInput/directives/item-selection-input-rules.service&#x27;;
+import { LogicProofRulesService } from
+  &#x27;interactions/LogicProof/directives/logic-proof-rules.service&#x27;;
+import { MathEquationInputRulesService } from
+  // eslint-disable-next-line max-len
+  &#x27;interactions/MathEquationInput/directives/math-equation-input-rules.service&#x27;;
+import { MultipleChoiceInputRulesService } from
+  // eslint-disable-next-line max-len
+  &#x27;interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service&#x27;;
+import { MusicNotesInputRulesService } from
+  &#x27;interactions/MusicNotesInput/directives/music-notes-input-rules.service&#x27;;
+import { NormalizeWhitespacePipe } from
+  &#x27;filters/string-utility-filters/normalize-whitespace.pipe&#x27;;
+import { NormalizeWhitespacePunctuationAndCasePipe } from
+  // eslint-disable-next-line max-len
+  &#x27;filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe&#x27;;
+import { NumberWithUnitsRulesService } from
+  &#x27;interactions/NumberWithUnits/directives/number-with-units-rules.service&#x27;;
+import { NumericExpressionInputRulesService } from
+  // eslint-disable-next-line max-len
+  &#x27;interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service&#x27;;
+import { NumericInputRulesService } from
+  &#x27;interactions/NumericInput/directives/numeric-input-rules.service&#x27;;
+import { PencilCodeEditorRulesService } from
+  &#x27;interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service&#x27;;
+import { RatioExpressionInputRulesService } from
+  // eslint-disable-next-line max-len
+  &#x27;interactions/RatioExpressionInput/directives/ratio-expression-input-rules.service&#x27;;
+import { SetInputRulesService } from
+  &#x27;interactions/SetInput/directives/set-input-rules.service&#x27;;
+import { TextInputRulesService } from
+  &#x27;interactions/TextInput/directives/text-input-rules.service&#x27;;
+
+describe(&#x27;Interaction Rules Registry Service&#x27;, () =&gt; {
+  let interactionRulesRegistryService: InteractionRulesRegistryService;
+  let algebraicExpressionInputRulesService:
+    AlgebraicExpressionInputRulesService;
+  let codeReplRulesService: CodeReplRulesService;
+  let continueRulesService: ContinueRulesService;
+  let dragAndDropSortInputRulesService: DragAndDropSortInputRulesService;
+  let endExplorationRulesService: EndExplorationRulesService;
+  let fractionInputRulesService: FractionInputRulesService;
+  let graphInputRulesService: GraphInputRulesService;
+  let imageClickInputRulesService: ImageClickInputRulesService;
+  let interactiveMapRulesService: InteractiveMapRulesService;
+  let itemSelectionInputRulesService: ItemSelectionInputRulesService;
+  let logicProofRulesService: LogicProofRulesService;
+  let mathEquationInputRulesService: MathEquationInputRulesService;
+  let multipleChoiceInputRulesService: MultipleChoiceInputRulesService;
+  let musicNotesInputRulesService: MusicNotesInputRulesService;
+  let numberWithUnitsRulesService: NumberWithUnitsRulesService;
+  let numericExpressionInputRulesService: NumericExpressionInputRulesService;
+  let numericInputRulesService: NumericInputRulesService;
+  let pencilCodeEditorRulesService: PencilCodeEditorRulesService;
+  let ratioExpressionInputRulesService: RatioExpressionInputRulesService;
+  let setInputRulesService: SetInputRulesService;
+  let textInputRulesService: TextInputRulesService;
+
+  beforeEach(() =&gt; {
+    TestBed.configureTestingModule({
+      providers: [
+        NormalizeWhitespacePipe,
+        NormalizeWhitespacePunctuationAndCasePipe,
+      ],
+    });
+
+    interactionRulesRegistryService = (
+      TestBed.get(InteractionRulesRegistryService));
+
+    algebraicExpressionInputRulesService = (
+      TestBed.get(AlgebraicExpressionInputRulesService));
+    codeReplRulesService = TestBed.get(CodeReplRulesService);
+    continueRulesService = TestBed.get(ContinueRulesService);
+    dragAndDropSortInputRulesService = (
+      TestBed.get(DragAndDropSortInputRulesService));
+    endExplorationRulesService = TestBed.get(EndExplorationRulesService);
+    fractionInputRulesService = TestBed.get(FractionInputRulesService);
+    graphInputRulesService = TestBed.get(GraphInputRulesService);
+    imageClickInputRulesService = TestBed.get(ImageClickInputRulesService);
+    interactiveMapRulesService = TestBed.get(InteractiveMapRulesService);
+    itemSelectionInputRulesService = (
+      TestBed.get(ItemSelectionInputRulesService));
+    logicProofRulesService = TestBed.get(LogicProofRulesService);
+    mathEquationInputRulesService = (
+      TestBed.get(MathEquationInputRulesService));
+    multipleChoiceInputRulesService = (
+      TestBed.get(MultipleChoiceInputRulesService));
+    musicNotesInputRulesService = TestBed.get(MusicNotesInputRulesService);
+    numberWithUnitsRulesService = TestBed.get(NumberWithUnitsRulesService);
+    numericExpressionInputRulesService = (
+      TestBed.get(NumericExpressionInputRulesService));
+    numericInputRulesService = TestBed.get(NumericInputRulesService);
+    pencilCodeEditorRulesService = (
+      TestBed.get(PencilCodeEditorRulesService));
+    ratioExpressionInputRulesService = (
+      TestBed.get(RatioExpressionInputRulesService));
+    setInputRulesService = TestBed.get(SetInputRulesService);
+    textInputRulesService = TestBed.get(TextInputRulesService);
+  });
+
+  it(&#x27;should throw an error for falsey interaction ids&#x27;, () =&gt; {
+    expect(
+      () =&gt; interactionRulesRegistryService.getRulesServiceByInteractionId(&#x27;&#x27;)
+    ).toThrowError(&#x27;Interaction ID must not be empty&#x27;);
+    expect(
+      () =&gt; interactionRulesRegistryService.getRulesServiceByInteractionId(null)
+    ).toThrowError(&#x27;Interaction ID must not be empty&#x27;);
+    expect(
+      () =&gt; interactionRulesRegistryService.getRulesServiceByInteractionId(
+        undefined)
+    ).toThrowError(&#x27;Interaction ID must not be empty&#x27;);
+  });
+
+  it(&#x27;should throw an error for an interaction id that does not exist&#x27;, () =&gt; {
+    expect(
+      () =&gt; interactionRulesRegistryService.getRulesServiceByInteractionId(
+        &#x27;FakeInput&#x27;)
+    ).toThrowError(&#x27;Unknown interaction ID: FakeInput&#x27;);
+  });
+
+  it(&#x27;should return a non-null service for each interaction spec&#x27;, () =&gt; {
+    for (const interactionId in InteractionSpecsConstants.INTERACTION_SPECS) {
+      expect(
+        () =&gt; interactionRulesRegistryService.getRulesServiceByInteractionId(
+          interactionId)
+      ).not.toThrowError();
+    }
+  });
+
+  it(&#x27;should return the correct rules service for AlgebraicExpressionInput&#x27;,
+    () =&gt; {
+      expect(interactionRulesRegistryService.getRulesServiceByInteractionId(
+        &#x27;AlgebraicExpressionInput&#x27;)).toBe(
+        algebraicExpressionInputRulesService);
+    }
+  );
+
+  it(&#x27;should return the correct rules service for CodeRepl&#x27;, () =&gt; {
+    expect(
+      interactionRulesRegistryService
+        .getRulesServiceByInteractionId(&#x27;CodeRepl&#x27;)
+    ).toBe(codeReplRulesService);
+  });
+
+  it(&#x27;should return the correct rules service for Continue&#x27;, () =&gt; {
+    expect(
+      interactionRulesRegistryService
+        .getRulesServiceByInteractionId(&#x27;Continue&#x27;)
+    ).toBe(continueRulesService);
+  });
+
+  it(&#x27;should return the correct rules service for DragAndDropSortInput&#x27;, () =&gt; {
+    expect(
+      interactionRulesRegistryService
+        .getRulesServiceByInteractionId(&#x27;DragAndDropSortInput&#x27;)
+    ).toBe(dragAndDropSortInputRulesService);
+  });
+
+  it(&#x27;should return the correct rules service for EndExploration&#x27;, () =&gt; {
+    expect(
+      interactionRulesRegistryService
+        .getRulesServiceByInteractionId(&#x27;EndExploration&#x27;)
+    ).toBe(endExplorationRulesService);
+  });
+
+  it(&#x27;should return the correct rules service for FractionInput&#x27;, () =&gt; {
+    expect(
+      interactionRulesRegistryService
+        .getRulesServiceByInteractionId(&#x27;FractionInput&#x27;)
+    ).toBe(fractionInputRulesService);
+  });
+
+  it(&#x27;should return the correct rules service for GraphInput&#x27;, () =&gt; {
+    expect(
+      interactionRulesRegistryService
+        .getRulesServiceByInteractionId(&#x27;GraphInput&#x27;)
+    ).toBe(graphInputRulesService);
+  });
+
+  it(&#x27;should return the correct rules service for ImageClickInput&#x27;, () =&gt; {
+    expect(
+      interactionRulesRegistryService
+        .getRulesServiceByInteractionId(&#x27;ImageClickInput&#x27;)
+    ).toBe(imageClickInputRulesService);
+  });
+
+  it(&#x27;should return the correct rules service for InteractiveMap&#x27;, () =&gt; {
+    expect(
+      interactionRulesRegistryService
+        .getRulesServiceByInteractionId(&#x27;InteractiveMap&#x27;)
+    ).toBe(interactiveMapRulesService);
+  });
+
+  it(&#x27;should return the correct rules service for ItemSelectionInput&#x27;, () =&gt; {
+    expect(
+      interactionRulesRegistryService
+        .getRulesServiceByInteractionId(&#x27;ItemSelectionInput&#x27;)
+    ).toBe(itemSelectionInputRulesService);
+  });
+
+  it(&#x27;should return the correct rules service for LogicProof&#x27;, () =&gt; {
+    expect(
+      interactionRulesRegistryService
+        .getRulesServiceByInteractionId(&#x27;LogicProof&#x27;)
+    ).toBe(logicProofRulesService);
+  });
+
+  it(&#x27;should return the correct rules service for MathEquationInput&#x27;, () =&gt; {
+    expect(
+      interactionRulesRegistryService
+        .getRulesServiceByInteractionId(&#x27;MathEquationInput&#x27;)
+    ).toBe(mathEquationInputRulesService);
+  });
+
+  it(&#x27;should return the correct rules service for MultipleChoiceInput&#x27;, () =&gt; {
+    expect(
+      interactionRulesRegistryService
+        .getRulesServiceByInteractionId(&#x27;MultipleChoiceInput&#x27;)
+    ).toBe(multipleChoiceInputRulesService);
+  });
+
+  it(&#x27;should return the correct rules service for MusicNotesInput&#x27;, () =&gt; {
+    expect(
+      interactionRulesRegistryService
+        .getRulesServiceByInteractionId(&#x27;MusicNotesInput&#x27;)
+    ).toBe(musicNotesInputRulesService);
+  });
+
+  it(&#x27;should return the correct rules service for NumberWithUnits&#x27;, () =&gt; {
+    expect(
+      interactionRulesRegistryService
+        .getRulesServiceByInteractionId(&#x27;NumberWithUnits&#x27;)
+    ).toBe(numberWithUnitsRulesService);
+  });
+
+  it(&#x27;should return the correct rules service for NumericExpressionInput&#x27;,
+    () =&gt; {
+      expect(
+        interactionRulesRegistryService
+          .getRulesServiceByInteractionId(&#x27;NumericExpressionInput&#x27;)
+      ).toBe(numericExpressionInputRulesService);
+    }
+  );
+
+  it(&#x27;should return the correct rules service for NumericInput&#x27;, () =&gt; {
+    expect(
+      interactionRulesRegistryService
+        .getRulesServiceByInteractionId(&#x27;NumericInput&#x27;)
+    ).toBe(numericInputRulesService);
+  });
+
+  it(&#x27;should return the correct rules service for PencilCodeEditor&#x27;, () =&gt; {
+    expect(
+      interactionRulesRegistryService
+        .getRulesServiceByInteractionId(&#x27;PencilCodeEditor&#x27;)
+    ).toBe(pencilCodeEditorRulesService);
+  });
+
+  it(&#x27;should return the correct rules service for RatioExpressionInput&#x27;,
+    () =&gt; {
+      expect(
+        interactionRulesRegistryService
+          .getRulesServiceByInteractionId(&#x27;RatioExpressionInput&#x27;)
+      ).toBe(ratioExpressionInputRulesService);
+    }
+  );
+
+  it(&#x27;should return the correct rules service for SetInput&#x27;, () =&gt; {
+    expect(
+      interactionRulesRegistryService.getRulesServiceByInteractionId(&#x27;SetInput&#x27;)
+    ).toBe(setInputRulesService);
+  });
+
+  it(&#x27;should return the correct rules service for TextInput&#x27;, () =&gt; {
+    expect(
+      interactionRulesRegistryService
+        .getRulesServiceByInteractionId(&#x27;TextInput&#x27;)
+    ).toBe(textInputRulesService);
+  });
+});
+</textarea><pre id="annotations" style="display:none">[]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:56 GMT</p>
+    </body>
+  </html>
+  

@@ -1,0 +1,206 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>guest-collection-progress.model.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">core/templates/domain/collection/guest-collection-progress.model.spec.ts</td><td class="">100.00%</td><td class="">100%</td><td class="">220</td><td class="">220</td><td class="">0</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2018 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Tests for GuestCollectionProgressModel.
+ */
+
+import { GuestCollectionProgress } from
+  &#x27;domain/collection/guest-collection-progress.model&#x27;;
+
+describe(&#x27;Guest collection progress model&#x27;, () =&gt; {
+  var _collectionId0: string;
+  var _collectionId1: string;
+  var _expId0: string;
+  var _expId1: string;
+
+  beforeEach(() =&gt; {
+    _collectionId0 = &#x27;collection_id0&#x27;;
+    _collectionId1 = &#x27;collection_id1&#x27;;
+    _expId0 = &#x27;exploration_id0&#x27;;
+    _expId1 = &#x27;exploration_id1&#x27;;
+  });
+
+  var _createEmptyProgressObject = () =&gt; {
+    return GuestCollectionProgress.createFromJson(&#x27;&#x27;);
+  };
+
+  describe(&#x27;hasCompletionProgress&#x27;, () =&gt; {
+    it(&#x27;should initially have no progress&#x27;, () =&gt; {
+      var guestCollectionProgress = _createEmptyProgressObject();
+      expect(guestCollectionProgress.hasCompletionProgress(
+        _collectionId0)).toBe(false);
+    });
+
+    it(&#x27;should have progress after recording an exploration&#x27;, () =&gt; {
+      var guestCollectionProgress = _createEmptyProgressObject();
+      guestCollectionProgress.addCompletedExplorationId(
+        _collectionId0, _expId0);
+      expect(guestCollectionProgress.hasCompletionProgress(
+        _collectionId0)).toBe(true);
+    });
+
+    it(&#x27;should have no progress for an unknown exploration&#x27;, () =&gt; {
+      var guestCollectionProgress = _createEmptyProgressObject();
+      guestCollectionProgress.addCompletedExplorationId(
+        _collectionId1, _expId0);
+      expect(guestCollectionProgress.hasCompletionProgress(
+        _collectionId0)).toBe(false);
+    });
+  });
+
+  describe(&#x27;getCompletedExplorationIds&#x27;, () =&gt; {
+    it(&#x27;should initially have no completed exploration IDs&#x27;, () =&gt; {
+      var guestCollectionProgress = _createEmptyProgressObject();
+      expect(guestCollectionProgress.getCompletedExplorationIds(
+        _collectionId0)).toEqual([]);
+    });
+
+    it(&#x27;should provide completed exploration ID&#x27;, () =&gt; {
+      var guestCollectionProgress = _createEmptyProgressObject();
+      guestCollectionProgress.addCompletedExplorationId(
+        _collectionId0, _expId0);
+      expect(guestCollectionProgress.getCompletedExplorationIds(
+        _collectionId0)).toEqual([_expId0]);
+    });
+
+    it(&#x27;should not provide completed exp ID for other collection&#x27;, () =&gt; {
+      var guestCollectionProgress = _createEmptyProgressObject();
+      guestCollectionProgress.addCompletedExplorationId(
+        _collectionId1, _expId0);
+      expect(guestCollectionProgress.getCompletedExplorationIds(
+        _collectionId0)).toEqual([]);
+    });
+
+    it(&#x27;should provide all completed exploration IDs in order&#x27;, () =&gt; {
+      var guestCollectionProgress = _createEmptyProgressObject();
+      guestCollectionProgress.addCompletedExplorationId(
+        _collectionId0, _expId1);
+      guestCollectionProgress.addCompletedExplorationId(
+        _collectionId1, _expId0);
+      guestCollectionProgress.addCompletedExplorationId(
+        _collectionId0, _expId0);
+      expect(guestCollectionProgress.getCompletedExplorationIds(
+        _collectionId0)).toEqual([_expId1, _expId0]);
+    });
+  });
+
+  describe(&#x27;addCompletedExplorationId&#x27;, () =&gt; {
+    it(&#x27;should successfully add exploration to empty collection&#x27;, () =&gt; {
+      var guestCollectionProgress = _createEmptyProgressObject();
+      expect(guestCollectionProgress.addCompletedExplorationId(
+        _collectionId0, _expId0)).toBe(true);
+    });
+
+    it(&#x27;should fail to re-add exploration to collection&#x27;, () =&gt; {
+      var guestCollectionProgress = _createEmptyProgressObject();
+      guestCollectionProgress.addCompletedExplorationId(
+        _collectionId0, _expId0);
+      expect(guestCollectionProgress.addCompletedExplorationId(
+        _collectionId0, _expId0)).toBe(false);
+    });
+
+    it(&#x27;should successfully add exploration to second collection&#x27;, () =&gt; {
+      var guestCollectionProgress = _createEmptyProgressObject();
+      guestCollectionProgress.addCompletedExplorationId(
+        _collectionId0, _expId0);
+      expect(guestCollectionProgress.addCompletedExplorationId(
+        _collectionId1, _expId0)).toBe(true);
+    });
+  });
+
+  describe(&#x27;toJson&#x27;, () =&gt; {
+    it(&#x27;should convert an empty progress object to simple JSON&#x27;, () =&gt; {
+      expect(_createEmptyProgressObject().toJson()).toEqual(&#x27;{}&#x27;);
+    });
+
+    it(&#x27;should convert progress for one collection to JSON&#x27;, () =&gt; {
+      var guestCollectionProgress = _createEmptyProgressObject();
+      guestCollectionProgress.addCompletedExplorationId(
+        _collectionId0, _expId0);
+
+      expect(guestCollectionProgress.toJson()).toEqual(
+        &#x27;{&quot;collection_id0&quot;:[&quot;exploration_id0&quot;]}&#x27;);
+    });
+
+    it(&#x27;should convert progress for multiple collections to JSON&#x27;, () =&gt; {
+      var guestCollectionProgress = _createEmptyProgressObject();
+      guestCollectionProgress.addCompletedExplorationId(
+        _collectionId1, _expId1);
+      guestCollectionProgress.addCompletedExplorationId(
+        _collectionId0, _expId1);
+      guestCollectionProgress.addCompletedExplorationId(
+        _collectionId1, _expId0);
+
+      expect(guestCollectionProgress.toJson()).toEqual(
+        &#x27;{&quot;collection_id1&quot;:[&quot;exploration_id1&quot;,&quot;exploration_id0&quot;],&#x27; +
+        &#x27;&quot;collection_id0&quot;:[&quot;exploration_id1&quot;]}&#x27;);
+    });
+  });
+
+  describe(&#x27;createFromJson&#x27;, () =&gt; {
+    it(&#x27;should create a new empty progress object from JSON&#x27;, () =&gt; {
+      var guestCollectionProgress = (
+        GuestCollectionProgress.createFromJson(&#x27;{}&#x27;));
+      expect(guestCollectionProgress).toEqual(_createEmptyProgressObject());
+    });
+
+    it(&#x27;should create a progress object from some progress JSON&#x27;, () =&gt; {
+      var expectedCollectionProgress = _createEmptyProgressObject();
+      expectedCollectionProgress.addCompletedExplorationId(
+        _collectionId0, _expId0);
+
+      var guestCollectionProgress = (
+        GuestCollectionProgress.createFromJson(
+          &#x27;{&quot;collection_id0&quot;: [&quot;exploration_id0&quot;]}&#x27;));
+
+      expect(guestCollectionProgress).toEqual(expectedCollectionProgress);
+    });
+
+    it(&#x27;should create a progress object for multiple collections&#x27;, () =&gt; {
+      var expectedCollectionProgress = _createEmptyProgressObject();
+      expectedCollectionProgress.addCompletedExplorationId(
+        _collectionId1, _expId1);
+      expectedCollectionProgress.addCompletedExplorationId(
+        _collectionId0, _expId1);
+      expectedCollectionProgress.addCompletedExplorationId(
+        _collectionId1, _expId0);
+
+      var guestCollectionProgress = (
+        GuestCollectionProgress.createFromJson(
+          &#x27;{&quot;collection_id1&quot;: [&quot;exploration_id1&quot;, &quot;exploration_id0&quot;], &#x27; +
+          &#x27;&quot;collection_id0&quot;: [&quot;exploration_id1&quot;]}&#x27;));
+
+      expect(guestCollectionProgress).toEqual(expectedCollectionProgress);
+    });
+  });
+});
+</textarea><pre id="annotations" style="display:none">[]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:57 GMT</p>
+    </body>
+  </html>
+  

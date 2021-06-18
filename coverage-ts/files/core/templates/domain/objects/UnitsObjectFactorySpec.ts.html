@@ -1,0 +1,244 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>UnitsObjectFactorySpec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">core/templates/domain/objects/UnitsObjectFactorySpec.ts</td><td class="">100.00%</td><td class="">100%</td><td class="">358</td><td class="">358</td><td class="">0</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview unit tests for the units object factory service.
+ */
+
+import {TestBed} from &#x27;@angular/core/testing&#x27;;
+import { Units, UnitsObjectFactory } from
+  &#x27;domain/objects/UnitsObjectFactory&#x27;;
+
+describe(&#x27;UnitsObjectFactory&#x27;, () =&gt; {
+  let units: UnitsObjectFactory;
+
+  beforeEach(() =&gt; {
+    units = TestBed.get(UnitsObjectFactory);
+  });
+
+  it(&#x27;should test the createCurrencyUnits function&#x27;, () =&gt; {
+    const spy = spyOn(units, &#x27;createCurrencyUnits&#x27;);
+    units.createCurrencyUnits();
+    expect(spy).toHaveBeenCalledTimes(1);
+  });
+
+  it(&#x27;should convert unitsList to a string in units format&#x27;, () =&gt; {
+    let UOF = new UnitsObjectFactory();
+    expect(UOF.fromList([{ exponent: -1, unit: &#x27;cents&#x27; }]).toString())
+      .toBe(&#x27;cents^-1&#x27;);
+    expect(UOF.fromList([{ exponent: 1, unit: &#x27;mol&#x27; }]).toString()).toBe(&#x27;mol&#x27;);
+    expect(UOF.fromList([{ exponent: 2, unit: &#x27;N&#x27; }]).toString()).toBe(&#x27;N^2&#x27;);
+    expect(UOF.fromList([
+      { exponent: 3, unit: &#x27;cm&#x27; },
+      { exponent: -3, unit: &#x27;s&#x27; }])
+      .toString()).toBe(&#x27;cm^3 s^-3&#x27;);
+    expect(UOF.fromList([
+      { exponent: 1, unit: &#x27;paise&#x27; },
+      { exponent: -1, unit: &#x27;kg&#x27; },
+      { exponent: 1, unit: &#x27;N&#x27; },
+      { exponent: 1, unit: &#x27;m&#x27; },
+      { exponent: -2, unit: &#x27;s&#x27; }])
+      .toString()).toBe(&#x27;paise kg^-1 N m s^-2&#x27;);
+  });
+
+  it(&#x27;should convert units to list format&#x27;, () =&gt; {
+    expect(units.fromStringToList(&#x27;kg / kg^4 K mol / (N m s^2) K s&#x27;))
+      .toEqual([
+        { exponent: -3, unit: &#x27;kg&#x27; },
+        { exponent: 2, unit: &#x27;K&#x27; },
+        { exponent: 1, unit: &#x27;mol&#x27; },
+        { exponent: -1, unit: &#x27;N&#x27; },
+        { exponent: -1, unit: &#x27;m&#x27; },
+        { exponent: -1, unit: &#x27;s&#x27; }]);
+    expect(units.fromStringToList(&#x27;cm /(kg / (N m / s^3))&#x27;))
+      .toEqual([
+        { exponent: 1, unit: &#x27;cm&#x27; },
+        { exponent: -1, unit: &#x27;kg&#x27; },
+        { exponent: 1, unit: &#x27;N&#x27; },
+        { exponent: 1, unit: &#x27;m&#x27; },
+        { exponent: -3, unit: &#x27;s&#x27; }]);
+    expect(units.fromStringToList(&#x27;mol per (kg per (N m per s^3) K)&#x27;))
+      .toEqual([
+        { exponent: 1, unit: &#x27;mol&#x27; },
+        { exponent: -1, unit: &#x27;kg&#x27; },
+        { exponent: 1, unit: &#x27;N&#x27; },
+        { exponent: 1, unit: &#x27;m&#x27; },
+        { exponent: -3, unit: &#x27;s&#x27; },
+        { exponent: -1, unit: &#x27;K&#x27; }]);
+    expect(units.fromStringToList(&#x27;cents kg (N^7 per paise)&#x27;))
+      .toEqual([
+        { exponent: 1, unit: &#x27;cents&#x27; },
+        { exponent: 1, unit: &#x27;kg&#x27; },
+        { exponent: 7, unit: &#x27;N&#x27; },
+        { exponent: -1, unit: &#x27;paise&#x27; }]);
+  });
+
+  it(&#x27;should convert units from string to lexical format&#x27;, () =&gt; {
+    expect(units.stringToLexical(&#x27;kg per kg^4 K mol per (N m s^2) K s&#x27;))
+      .toEqual([
+        &#x27;kg&#x27;, &#x27;/&#x27;, &#x27;kg^4&#x27;, &#x27;*&#x27;, &#x27;K&#x27;, &#x27;*&#x27;, &#x27;mol&#x27;, &#x27;/&#x27;, &#x27;(&#x27;,
+        &#x27;N&#x27;, &#x27;*&#x27;, &#x27;m&#x27;, &#x27;*&#x27;, &#x27;s^2&#x27;, &#x27;)&#x27;, &#x27;K&#x27;, &#x27;*&#x27;, &#x27;s&#x27;]);
+    expect(units.stringToLexical(&#x27;cm /(kg / (N m / s^3))&#x27;))
+      .toEqual([
+        &#x27;cm&#x27;, &#x27;/&#x27;, &#x27;(&#x27;, &#x27;kg&#x27;, &#x27;/&#x27;, &#x27;(&#x27;,
+        &#x27;N&#x27;, &#x27;*&#x27;, &#x27;m&#x27;, &#x27;/&#x27;, &#x27;s^3&#x27;, &#x27;)&#x27;, &#x27;)&#x27;]);
+    expect(units.stringToLexical(&#x27;mol per (kg per (N m per s^3) paise)&#x27;))
+      .toEqual([
+        &#x27;mol&#x27;, &#x27;/&#x27;, &#x27;(&#x27;, &#x27;kg&#x27;, &#x27;/&#x27;, &#x27;(&#x27;, &#x27;N&#x27;,
+        &#x27;*&#x27;, &#x27;m&#x27;, &#x27;/&#x27;, &#x27;s^3&#x27;, &#x27;)&#x27;, &#x27;paise&#x27;, &#x27;)&#x27;]);
+  });
+
+  it(&#x27;should parse valid units strings&#x27;, () =&gt; {
+    let UOF = new UnitsObjectFactory();
+    expect(
+      units.fromRawInputString(&#x27;&#x27;)
+        .toDict()).toEqual(UOF.fromList([]).toDict());
+    expect(
+      units.fromRawInputString(&#x27;kg per kg^4 K mol per (N m s^2) K s&#x27;)
+        .toDict()).toEqual(UOF.fromList([
+      { exponent: -3, unit: &#x27;kg&#x27; },
+      { exponent: 2, unit: &#x27;K&#x27; },
+      { exponent: 1, unit: &#x27;mol&#x27; },
+      { exponent: -1, unit: &#x27;N&#x27; },
+      { exponent: -1, unit: &#x27;m&#x27; },
+      { exponent: -1, unit: &#x27;s&#x27; }]).toDict());
+    expect(
+      units.fromRawInputString(&#x27;cm /(kg / (N m / s^3))&#x27;)
+        .toDict()).toEqual(UOF.fromList([
+      { exponent: 1, unit: &#x27;cm&#x27; },
+      { exponent: -1, unit: &#x27;kg&#x27; },
+      { exponent: 1, unit: &#x27;N&#x27; },
+      { exponent: 1, unit: &#x27;m&#x27; },
+      { exponent: -3, unit: &#x27;s&#x27; }]).toDict());
+    expect(
+      units.fromRawInputString(&#x27;cent per (kg per (N m per s^3) paise)&#x27;)
+        .toDict()).toEqual(UOF.fromList([
+      { exponent: 1, unit: &#x27;cent&#x27; },
+      { exponent: -1, unit: &#x27;kg&#x27; },
+      { exponent: 1, unit: &#x27;N&#x27; },
+      { exponent: 1, unit: &#x27;m&#x27; },
+      { exponent: -3, unit: &#x27;s&#x27; },
+      { exponent: -1, unit: &#x27;paise&#x27; }]).toDict());
+  });
+
+  it(&#x27;should have units without char /, *, (, )&#x27;, () =&gt; {
+    expect(units.isunit(&#x27;kg cm^3&#x27;)).toBe(true);
+    expect(units.isunit(&#x27;/*&#x27;)).toBe(false);
+    expect(units.isunit(&#x27;()&#x27;)).toBe(false);
+  });
+
+  it(&#x27;should convert new units from the list&#x27;, () =&gt; {
+    expect(units.fromList([{ exponent: -1, unit: &#x27;kg&#x27; }]))
+      .toEqual(new Units([{ exponent: -1, unit: &#x27;kg&#x27; }]));
+    expect(units.fromList([{ exponent: 1, unit: &#x27;mol&#x27; }]))
+      .toEqual(new Units([{ exponent: 1, unit: &#x27;mol&#x27; }]));
+    expect(units.fromList([
+      { exponent: 3, unit: &#x27;cm&#x27; },
+      { exponent: -3, unit: &#x27;s&#x27; }]))
+      .toEqual(new Units([
+        { exponent: 3, unit: &#x27;cm&#x27; },
+        { exponent: -3, unit: &#x27;s&#x27; }]));
+    expect(units.fromList([
+      { exponent: 1, unit: &#x27;paise&#x27; },
+      { exponent: -1, unit: &#x27;kg&#x27; },
+      { exponent: 1, unit: &#x27;N&#x27; },
+      { exponent: 1, unit: &#x27;m&#x27; },
+      { exponent: -2, unit: &#x27;s&#x27; }]))
+      .toEqual(new Units([
+        {exponent: 1, unit: &#x27;paise&#x27;},
+        {exponent: -1, unit: &#x27;kg&#x27;},
+        { exponent: 1, unit: &#x27;N&#x27; },
+        { exponent: 1, unit: &#x27;m&#x27; },
+        { exponent: -2, unit: &#x27;s&#x27; }]));
+  });
+
+  it(&#x27;should have the correct division form with multiplier&#x27;, () =&gt; {
+    expect(units.unitWithMultiplier(
+      [&#x27;cm&#x27;, &#x27;/&#x27;, &#x27;(&#x27;, &#x27;kg&#x27;, &#x27;/&#x27;, &#x27;N&#x27;, &#x27;)&#x27;]))
+      .toEqual([[&#x27;cm&#x27;, 1], [&#x27;kg&#x27;, -1], [&#x27;N&#x27;, 1]]);
+    expect(units.unitWithMultiplier(
+      [&#x27;kg&#x27;, &#x27;/&#x27;, &#x27;kg^4&#x27;, &#x27;*&#x27;, &#x27;K&#x27;, &#x27;*&#x27;, &#x27;mol&#x27;]))
+      .toEqual([[&#x27;kg&#x27;, 1], [&#x27;kg^4&#x27;, -1], [&#x27;K&#x27;, 1], [&#x27;mol&#x27;, 1]]);
+    expect(units.unitWithMultiplier(
+      [&#x27;cent&#x27;, &#x27;*&#x27;, &#x27;(&#x27;, &#x27;kg&#x27;, &#x27;/&#x27;, &#x27;N&#x27;, &#x27;)&#x27;]))
+      .toEqual([[&#x27;cent&#x27;, 1], [&#x27;kg&#x27;, 1], [&#x27;N&#x27;, -1]]);
+    expect(() =&gt; units.unitWithMultiplier(
+      [&#x27;cm&#x27;, &#x27;/&#x27;, &#x27;kg&#x27;, &#x27;/&#x27;, &#x27;N&#x27;, &#x27;)&#x27;]))
+      .toThrowError(&#x27;Close parenthesis with no open parenthesis&#x27;);
+  });
+
+  it(&#x27;should convert a unit dict to a list&#x27;, () =&gt; {
+    expect(units.unitToList(units.unitWithMultiplier(
+      [&#x27;cm&#x27;, &#x27;/&#x27;, &#x27;(&#x27;, &#x27;kg&#x27;, &#x27;/&#x27;, &#x27;N&#x27;, &#x27;)&#x27;])))
+      .toEqual([
+        { unit: &#x27;cm&#x27;, exponent: 1 },
+        { unit: &#x27;kg&#x27;, exponent: -1 },
+        { unit: &#x27;N&#x27;, exponent: 1 }]);
+    expect(units.unitToList(units.unitWithMultiplier(
+      [&#x27;kg&#x27;, &#x27;/&#x27;, &#x27;kg^4&#x27;, &#x27;*&#x27;, &#x27;K&#x27;, &#x27;*&#x27;, &#x27;mol&#x27;])))
+      .toEqual([
+        { unit: &#x27;kg&#x27;, exponent: -3 },
+        { unit: &#x27;K&#x27;, exponent: 1 },
+        { unit: &#x27;mol&#x27;, exponent: 1 }]);
+    expect(units.unitToList(units.unitWithMultiplier(
+      [&#x27;cent&#x27;, &#x27;*&#x27;, &#x27;(&#x27;, &#x27;kg&#x27;, &#x27;/&#x27;, &#x27;N&#x27;, &#x27;)&#x27;])))
+      .toEqual([
+        { unit: &#x27;cent&#x27;, exponent: 1 },
+        { unit: &#x27;kg&#x27;, exponent: 1 },
+        { unit: &#x27;N&#x27;, exponent: -1 }]);
+  });
+
+  it(&#x27;should replace the special symbol because of math.js&#x27;, () =&gt; {
+    expect(units.toMathjsCompatibleString(&#x27;cents&#x27;))
+      .toEqual(&#x27;cent&#x27;);
+    expect(units.toMathjsCompatibleString(&#x27;dollars kg&#x27;))
+      .toEqual(&#x27;dollar kg&#x27;);
+    expect(units.toMathjsCompatibleString(&#x27;rupee cents&#x27;))
+      .toEqual(&#x27;rupee cent&#x27;);
+    expect(units.toMathjsCompatibleString(&#x27;cent USD / Paisa&#x27;))
+      .toEqual(&#x27;cent dollar / paise&#x27;);
+  });
+
+  it(&#x27;should throw errors for invalid units&#x27;, () =&gt; {
+    expect(() =&gt; {
+      units.fromRawInputString(&#x27;NK*kg&#x27;);
+    }).toThrowError(&#x27;SyntaxError: Unit &quot;NK&quot; not found.&#x27;);
+    expect(() =&gt; {
+      units.fromRawInputString(&#x27;per &amp;kg$&#x27;);
+    }).toThrowError(
+      &#x27;SyntaxError: Unexpected &quot;&amp;&quot; in &quot;dollar/ &amp;kg&quot; at index 8&#x27;);
+    expect(() =&gt; {
+      units.fromRawInputString(&#x27;cent %mol$&#x27;);
+    }).toThrowError(
+      &#x27;SyntaxError: Unit &quot;dollarcent&quot; not found.&#x27;);
+  });
+});
+</textarea><pre id="annotations" style="display:none">[]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:57 GMT</p>
+    </body>
+  </html>
+  

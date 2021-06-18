@@ -1,0 +1,112 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>admin-page.directive.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/admin-page/admin-page.directive.ts</td><td class="">27.06%</td><td class="">100%</td><td class="">85</td><td class="">23</td><td class="">62</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2014 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Data and directive for the Oppia admin page.
+ */
+
+require(
+  &#x27;components/forms/schema-based-editors/schema-based-editor.directive.ts&#x27;);
+require(&#x27;directives/focus-on.directive.ts&#x27;);
+require(&#x27;pages/admin-page/navbar/admin-navbar.component.ts&#x27;);
+require(
+  &#x27;pages/admin-page/activities-tab/&#x27; +
+  &#x27;admin-prod-mode-activities-tab.component.ts&#x27;);
+require(&#x27;pages/admin-page/config-tab/admin-config-tab.directive.ts&#x27;);
+require(&#x27;pages/admin-page/misc-tab/admin-misc-tab.directive.ts&#x27;);
+require(&#x27;pages/admin-page/roles-tab/admin-roles-tab.directive.ts&#x27;);
+require(&#x27;pages/admin-page/features-tab/admin-features-tab.component&#x27;);
+require(&#x27;value_generators/valueGeneratorsRequires.ts&#x27;);
+
+require(&#x27;domain/objects/NumberWithUnitsObjectFactory.ts&#x27;);
+require(&#x27;domain/utilities/url-interpolation.service.ts&#x27;);
+require(&#x27;pages/admin-page/services/admin-router.service.ts&#x27;);
+require(&#x27;services/csrf-token.service.ts&#x27;);
+require(&#x27;services/utils.service.ts&#x27;);
+
+angular.module(&#x27;oppia&#x27;).directive(&#x27;adminPage&#x27;, [
+  &#x27;UrlInterpolationService&#x27;, function(UrlInterpolationService) {
+    return {
+      restrict: &#x27;E&#x27;,
+      scope: {},
+      bindToController: {},
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        &#x27;/pages/admin-page/admin-page.directive.html&#x27;),
+      controllerAs: &#x27;$ctrl&#x27;,
+      controller: [
+        &#x27;$location&#x27;, &#x27;$rootScope&#x27;, &#x27;$scope&#x27;,
+        &#x27;AdminRouterService&#x27;, &#x27;CsrfTokenService&#x27;, &#x27;PlatformFeatureService&#x27;,
+        &#x27;DEV_MODE&#x27;,
+        function(
+            $location, $rootScope, $scope,
+            AdminRouterService, CsrfTokenService, PlatformFeatureService,
+            DEV_MODE) {
+          var ctrl = this;
+          ctrl.isActivitiesTabOpen = function() {
+            return AdminRouterService.isActivitiesTabOpen();
+          };
+          ctrl.isConfigTabOpen = function() {
+            return AdminRouterService.isConfigTabOpen();
+          };
+          ctrl.isFeaturesTabOpen = function() {
+            return AdminRouterService.isFeaturesTabOpen();
+          };
+          ctrl.isRolesTabOpen = function() {
+            return AdminRouterService.isRolesTabOpen();
+          };
+          ctrl.isMiscTabOpen = function() {
+            return AdminRouterService.isMiscTabOpen();
+          };
+          ctrl.setStatusMessage = function(statusMessage) {
+            ctrl.statusMessage = statusMessage;
+            // TODO(#8521): Remove the use of $rootScope.$apply()
+            // once the directive is migrated to angular.
+            $rootScope.$applyAsync();
+          };
+
+          ctrl.isDummyFeatureEnabled = function() {
+            return PlatformFeatureService.status.DummyFeature.isEnabled;
+          };
+
+          ctrl.$onInit = function() {
+            $scope.$on(&#x27;$locationChangeSuccess&#x27;, function() {
+              AdminRouterService.showTab($location.path().replace(&#x27;/&#x27;, &#x27;#&#x27;));
+            });
+            ctrl.inDevMode = DEV_MODE;
+            ctrl.statusMessage = &#x27;&#x27;;
+            CsrfTokenService.initializeToken();
+          };
+        }
+      ]
+    };
+  }
+]);
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:38,&quot;character&quot;:38,&quot;text&quot;:&quot;UrlInterpolationService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:43,&quot;character&quot;:19,&quot;text&quot;:&quot;UrlInterpolationService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:43,&quot;character&quot;:43,&quot;text&quot;:&quot;getDirectiveTemplateUrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:51,&quot;character&quot;:12,&quot;text&quot;:&quot;$location&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:51,&quot;character&quot;:23,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:51,&quot;character&quot;:35,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:52,&quot;character&quot;:12,&quot;text&quot;:&quot;AdminRouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:52,&quot;character&quot;:32,&quot;text&quot;:&quot;CsrfTokenService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:52,&quot;character&quot;:50,&quot;text&quot;:&quot;PlatformFeatureService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:53,&quot;character&quot;:12,&quot;text&quot;:&quot;DEV_MODE&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:54,&quot;character&quot;:14,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:54,&quot;character&quot;:21,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:55,&quot;character&quot;:10,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:55,&quot;character&quot;:15,&quot;text&quot;:&quot;isActivitiesTabOpen&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:56,&quot;character&quot;:19,&quot;text&quot;:&quot;AdminRouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:56,&quot;character&quot;:38,&quot;text&quot;:&quot;isActivitiesTabOpen&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:58,&quot;character&quot;:10,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:58,&quot;character&quot;:15,&quot;text&quot;:&quot;isConfigTabOpen&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:59,&quot;character&quot;:19,&quot;text&quot;:&quot;AdminRouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:59,&quot;character&quot;:38,&quot;text&quot;:&quot;isConfigTabOpen&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:61,&quot;character&quot;:10,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:61,&quot;character&quot;:15,&quot;text&quot;:&quot;isFeaturesTabOpen&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:62,&quot;character&quot;:19,&quot;text&quot;:&quot;AdminRouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:62,&quot;character&quot;:38,&quot;text&quot;:&quot;isFeaturesTabOpen&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:64,&quot;character&quot;:10,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:64,&quot;character&quot;:15,&quot;text&quot;:&quot;isRolesTabOpen&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:65,&quot;character&quot;:19,&quot;text&quot;:&quot;AdminRouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:65,&quot;character&quot;:38,&quot;text&quot;:&quot;isRolesTabOpen&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:67,&quot;character&quot;:10,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:67,&quot;character&quot;:15,&quot;text&quot;:&quot;isMiscTabOpen&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:68,&quot;character&quot;:19,&quot;text&quot;:&quot;AdminRouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:68,&quot;character&quot;:38,&quot;text&quot;:&quot;isMiscTabOpen&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:70,&quot;character&quot;:10,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:70,&quot;character&quot;:15,&quot;text&quot;:&quot;setStatusMessage&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:70,&quot;character&quot;:43,&quot;text&quot;:&quot;statusMessage&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:71,&quot;character&quot;:12,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:71,&quot;character&quot;:17,&quot;text&quot;:&quot;statusMessage&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:71,&quot;character&quot;:33,&quot;text&quot;:&quot;statusMessage&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:74,&quot;character&quot;:12,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:74,&quot;character&quot;:23,&quot;text&quot;:&quot;$applyAsync&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:77,&quot;character&quot;:10,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:77,&quot;character&quot;:15,&quot;text&quot;:&quot;isDummyFeatureEnabled&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:78,&quot;character&quot;:19,&quot;text&quot;:&quot;PlatformFeatureService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:78,&quot;character&quot;:42,&quot;text&quot;:&quot;status&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:78,&quot;character&quot;:49,&quot;text&quot;:&quot;DummyFeature&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:78,&quot;character&quot;:62,&quot;text&quot;:&quot;isEnabled&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:81,&quot;character&quot;:10,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:81,&quot;character&quot;:15,&quot;text&quot;:&quot;$onInit&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:82,&quot;character&quot;:12,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:82,&quot;character&quot;:19,&quot;text&quot;:&quot;$on&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:83,&quot;character&quot;:14,&quot;text&quot;:&quot;AdminRouterService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:83,&quot;character&quot;:33,&quot;text&quot;:&quot;showTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:83,&quot;character&quot;:41,&quot;text&quot;:&quot;$location&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:83,&quot;character&quot;:51,&quot;text&quot;:&quot;path&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:83,&quot;character&quot;:58,&quot;text&quot;:&quot;replace&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:85,&quot;character&quot;:12,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:85,&quot;character&quot;:17,&quot;text&quot;:&quot;inDevMode&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:85,&quot;character&quot;:29,&quot;text&quot;:&quot;DEV_MODE&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:86,&quot;character&quot;:12,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:86,&quot;character&quot;:17,&quot;text&quot;:&quot;statusMessage&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:87,&quot;character&quot;:12,&quot;text&quot;:&quot;CsrfTokenService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/admin-page/admin-page.directive.ts&quot;,&quot;line&quot;:87,&quot;character&quot;:29,&quot;text&quot;:&quot;initializeToken&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:57 GMT</p>
+    </body>
+  </html>
+  

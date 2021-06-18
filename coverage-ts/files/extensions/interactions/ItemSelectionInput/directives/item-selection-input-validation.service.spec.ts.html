@@ -1,0 +1,340 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>item-selection-input-validation.service.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">extensions/interactions/ItemSelectionInput/directives/item-selection-input-validation.service.spec.ts</td><td class="">100.00%</td><td class="">100%</td><td class="">326</td><td class="">326</td><td class="">0</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2014 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for item selection input validation service.
+ */
+
+import { TestBed } from &#x27;@angular/core/testing&#x27;;
+
+import { AnswerGroup, AnswerGroupObjectFactory } from
+  &#x27;domain/exploration/AnswerGroupObjectFactory&#x27;;
+import { ItemSelectionInputValidationService } from &#x27;interactions/ItemSelectionInput/directives/item-selection-input-validation.service&#x27;;
+import { Outcome, OutcomeObjectFactory } from
+  &#x27;domain/exploration/OutcomeObjectFactory&#x27;;
+import { RuleObjectFactory } from &#x27;domain/exploration/RuleObjectFactory&#x27;;
+import { SubtitledHtml } from &#x27;domain/exploration/subtitled-html.model&#x27;;
+
+import { AppConstants } from &#x27;app.constants&#x27;;
+import { ItemSelectionInputCustomizationArgs } from
+  &#x27;interactions/customization-args-defs&#x27;;
+
+describe(&#x27;ItemSelectionInputValidationService&#x27;, () =&gt; {
+  let WARNING_TYPES: typeof AppConstants.WARNING_TYPES;
+  let validatorService: ItemSelectionInputValidationService;
+
+  let currentState: string = null;
+  let goodAnswerGroups: AnswerGroup[] = null,
+    goodDefaultOutcome: Outcome = null;
+  let customizationArguments: ItemSelectionInputCustomizationArgs = null;
+  let IsProperSubsetValidOption: AnswerGroup[] = null;
+  let oof: OutcomeObjectFactory = null,
+    agof: AnswerGroupObjectFactory = null,
+    rof: RuleObjectFactory = null;
+  let ThreeInputsAnswerGroups: AnswerGroup[] = null,
+    OneInputAnswerGroups: AnswerGroup[] = null,
+    NoInputAnswerGroups: AnswerGroup[] = null;
+
+  beforeEach(() =&gt; {
+    TestBed.configureTestingModule({
+      providers: [ItemSelectionInputValidationService]
+    });
+
+    validatorService = TestBed.get(ItemSelectionInputValidationService);
+    WARNING_TYPES = AppConstants.WARNING_TYPES;
+
+    oof = TestBed.get(OutcomeObjectFactory);
+    agof = TestBed.get(AnswerGroupObjectFactory);
+    rof = TestBed.get(RuleObjectFactory);
+
+    currentState = &#x27;First State&#x27;;
+
+    goodDefaultOutcome = oof.createFromBackendDict({
+      dest: &#x27;Second State&#x27;,
+      feedback: {
+        html: &#x27;Feedback&#x27;,
+        content_id: &#x27;&#x27;
+      },
+      labelled_as_correct: false,
+      param_changes: [],
+      refresher_exploration_id: null,
+      missing_prerequisite_skill_id: null
+    });
+
+    customizationArguments = {
+      choices: {
+        value: [
+          new SubtitledHtml(&#x27;Selection 1&#x27;, &#x27;ca_0&#x27;),
+          new SubtitledHtml(&#x27;Selection 2&#x27;, &#x27;ca_1&#x27;),
+          new SubtitledHtml(&#x27;Selection 3&#x27;, &#x27;ca_2&#x27;)
+        ]
+      },
+      maxAllowableSelectionCount: {
+        value: 2
+      },
+      minAllowableSelectionCount: {
+        value: 1
+      }
+    };
+    goodAnswerGroups = [agof.createNew(
+      [rof.createFromBackendDict({
+        rule_type: &#x27;Equals&#x27;,
+        inputs: {
+          x: [&#x27;ca_0&#x27;, &#x27;ca_1&#x27;]
+        }
+      }, &#x27;ItemSelectionInput&#x27;)],
+      goodDefaultOutcome,
+      null,
+      null)
+    ];
+    ThreeInputsAnswerGroups = [agof.createNew(
+      [rof.createFromBackendDict({
+        rule_type: &#x27;Equals&#x27;,
+        inputs: {
+          x: [&#x27;ca_0&#x27;, &#x27;ca_1&#x27;, &#x27;ca_2&#x27;]
+        }
+      }, &#x27;ItemSelectionInput&#x27;)],
+      goodDefaultOutcome,
+      null,
+      null)
+    ];
+    OneInputAnswerGroups = [agof.createNew(
+      [rof.createFromBackendDict({
+        rule_type: &#x27;Equals&#x27;,
+        inputs: {
+          x: [&#x27;ca_0&#x27;]
+        }
+      }, &#x27;ItemSelectionInput&#x27;)],
+      goodDefaultOutcome,
+      null,
+      null)
+    ];
+    NoInputAnswerGroups = [agof.createNew(
+      [rof.createFromBackendDict({
+        rule_type: &#x27;ContainsAtLeastOneOf&#x27;,
+        inputs: {
+          x: []
+        }
+      }, &#x27;ItemSelectionInput&#x27;)],
+      goodDefaultOutcome,
+      null,
+      null)
+    ];
+    IsProperSubsetValidOption = [agof.createNew(
+      [rof.createFromBackendDict({
+        rule_type: &#x27;IsProperSubsetOf&#x27;,
+        inputs: {
+          x: [&#x27;ca_0&#x27;]
+        }
+      }, &#x27;ItemSelectionInput&#x27;)],
+      goodDefaultOutcome,
+      null,
+      null)
+    ];
+  });
+
+  it(&#x27;should be able to perform basic validation&#x27;, () =&gt; {
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, goodAnswerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([]);
+  });
+
+  it(&#x27;should expect a choices customization argument&#x27;, () =&gt; {
+    expect(() =&gt; {
+      validatorService.getAllWarnings(
+        // This throws &quot;Argument of type &#x27;{}&#x27;. We need to suppress this error
+        // because is not assignable to parameter of type
+        // &#x27;ItemSelectionInputCustomizationArgs&#x27;.&quot; We are purposely assigning
+        // the wrong type of customization args in order to test validations.
+        // @ts-expect-error
+        currentState, {}, goodAnswerGroups, goodDefaultOutcome);
+    }).toThrowError(
+      &#x27;Expected customization arguments to have property: choices&#x27;);
+  });
+
+  it(
+    &#x27;should expect the minAllowableSelectionCount to be less than or &#x27; +
+    &#x27;equal to maxAllowableSelectionCount&#x27;,
+    () =&gt; {
+      customizationArguments.minAllowableSelectionCount.value = 3;
+
+      var warnings = validatorService.getAllWarnings(
+        currentState, customizationArguments, ThreeInputsAnswerGroups,
+        goodDefaultOutcome);
+      expect(warnings).toContain({
+        type: WARNING_TYPES.CRITICAL,
+        message: (
+          &#x27;Please ensure that the max allowed count is not less than the &#x27; +
+          &#x27;min count.&#x27;)
+      });
+    });
+
+  it(
+    &#x27;should expect maxAllowableSelectionCount to be less than the total &#x27; +
+    &#x27;number of selections&#x27;,
+    () =&gt; {
+      customizationArguments.maxAllowableSelectionCount.value = 3;
+
+      // Remove the last choice.
+      customizationArguments.choices.value.splice(2, 1);
+
+      var warnings = validatorService.getAllWarnings(
+        currentState, customizationArguments, goodAnswerGroups,
+        goodDefaultOutcome);
+      expect(warnings).toEqual([{
+        type: WARNING_TYPES.CRITICAL,
+        message: (
+          &#x27;Please ensure that you have enough choices to reach the max count.&#x27;)
+      }]);
+    });
+
+  it(
+    &#x27;should expect minAllowableSelectionCount to be less than the total &#x27; +
+    &#x27;number of selections&#x27;,
+    () =&gt; {
+      // Remove the last choice.
+      customizationArguments.choices.value.splice(2, 1);
+
+      customizationArguments.minAllowableSelectionCount.value = 3;
+      customizationArguments.maxAllowableSelectionCount.value = 3;
+
+      var warnings = validatorService.getAllWarnings(
+        currentState, customizationArguments, ThreeInputsAnswerGroups,
+        goodDefaultOutcome);
+      expect(warnings).toEqual([{
+        type: WARNING_TYPES.CRITICAL,
+        message: (
+          &#x27;Please ensure that you have enough choices to reach the min count.&#x27;)
+      }, {
+        type: WARNING_TYPES.ERROR,
+        message: (
+          &#x27;Rule 1 from answer group 1 options do not match &#x27; +
+          &#x27;customization argument choices.&#x27;)
+      }]);
+    });
+
+  it(&#x27;should expect all choices to be nonempty&#x27;, () =&gt; {
+    // Set the first choice to empty.
+    customizationArguments.choices.value[0] = (
+      new SubtitledHtml(&#x27;&#x27;, &#x27;&#x27;));
+
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, goodAnswerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.CRITICAL,
+      message: &#x27;Please ensure the choices are nonempty.&#x27;
+    }, {
+      type: WARNING_TYPES.ERROR,
+      message: (
+        &#x27;Rule 1 from answer group 1 options do not match &#x27; +
+        &#x27;customization argument choices.&#x27;)
+    }]);
+  });
+
+  it(&#x27;should expect all choices to be unique&#x27;, () =&gt; {
+    // Repeat the last choice.
+    customizationArguments.choices.value.push(
+      new SubtitledHtml(&#x27;Selection 3&#x27;, &#x27;ca_4&#x27;));
+
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, goodAnswerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.CRITICAL,
+      message: &#x27;Please ensure the choices are unique.&#x27;
+    }]);
+  });
+
+  it(
+    &#x27;should expect more that 1 element to be in the rule input, if the &#x27; +
+    &#x27;&quot;proper subset&quot; rule is used.&#x27;,
+    () =&gt; {
+      var warnings = validatorService.getAllWarnings(
+        currentState, customizationArguments, IsProperSubsetValidOption,
+        goodDefaultOutcome);
+      expect(warnings).toEqual([{
+        type: WARNING_TYPES.ERROR,
+        message: (
+          &#x27;In answer group 1, &#x27; +
+          &#x27;rule 1, the &quot;proper subset&quot; rule must include at least 2 options.&#x27;)
+      }]);
+    });
+
+  it(
+    &#x27;should expect number of correct options to be in between the maximum &#x27; +
+    &#x27;and minimum allowed selections when the &quot;Equals&quot; rule is used.&#x27;,
+    () =&gt; {
+      // Make min allowed selections greater than correct answers.
+      customizationArguments.minAllowableSelectionCount.value = 2;
+
+      var warnings = validatorService.getAllWarnings(
+        currentState, customizationArguments, OneInputAnswerGroups,
+        goodDefaultOutcome);
+      expect(warnings).toEqual([{
+        type: WARNING_TYPES.ERROR,
+        message: (
+          &#x27;In answer group 1, rule 1, the number of correct options in &#x27; +
+          &#x27;the &quot;Equals&quot; rule should be between 2 and 2 (the &#x27; +
+          &#x27;minimum and maximum allowed selection counts).&#x27;)
+      }]);
+    });
+
+  it(
+    &#x27;should expect at least one option when &#x27; +
+    &#x27;&quot;ContainsAtLeastOneOf&quot; rule is used.&#x27;,
+    () =&gt; {
+      var warnings = validatorService.getAllWarnings(
+        currentState, customizationArguments, NoInputAnswerGroups,
+        goodDefaultOutcome);
+      expect(warnings).toEqual([{
+        type: WARNING_TYPES.ERROR,
+        message: (
+          &#x27;In answer group 1, rule 1, the &quot;ContainsAtLeastOneOf&quot; rule &#x27; +
+          &#x27;should have at least one option.&#x27;)
+      }]);
+    });
+
+  it(&#x27;should expect all rule inputs to match choices&#x27;, () =&gt; {
+    goodAnswerGroups[0].rules[0].inputs.x[0] = &#x27;invalid_content_id&#x27;;
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, goodAnswerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: (
+        &#x27;Rule 1 from answer group 1 options do not match &#x27; +
+        &#x27;customization argument choices.&#x27;)
+    }]);
+  });
+});
+</textarea><pre id="annotations" style="display:none">[]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:44:00 GMT</p>
+    </body>
+  </html>
+  

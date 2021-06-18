@@ -1,0 +1,408 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>url-interpolation.service.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/domain/utilities/url-interpolation.service.spec.ts</td><td class="">96.11%</td><td class="">100%</td><td class="">540</td><td class="">519</td><td class="">21</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2015 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for UrlInterpolationService.
+ */
+import { TestBed } from &#x27;@angular/core/testing&#x27;;
+
+import { AlertsService } from &#x27;services/alerts.service&#x27;;
+import { UrlInterpolationService } from
+  &#x27;domain/utilities/url-interpolation.service&#x27;;
+import { UrlService } from &#x27;services/contextual/url.service&#x27;;
+
+describe(&#x27;URL Interpolation Service&#x27;, () =&gt; {
+  let hashes = require(&#x27;hashes.json&#x27;);
+  let uis: UrlInterpolationService;
+  let urlService: UrlService;
+  let mockLocation;
+  let alertsService;
+  let alertsObject = {
+    alertsService
+  };
+  beforeEach(() =&gt; {
+    mockLocation = {
+      origin: &#x27;http://sample.com&#x27;
+    };
+
+    uis = TestBed.get(UrlInterpolationService);
+    urlService = TestBed.get(UrlService);
+    alertsService = TestBed.get(AlertsService);
+    spyOnProperty(uis, &#x27;DEV_MODE&#x27;, &#x27;get&#x27;).and.returnValue(false);
+    spyOn(urlService, &#x27;getCurrentLocation&#x27;).and.returnValue(mockLocation);
+    alertsObject.alertsService = alertsService;
+  });
+
+  it(&#x27;should add hash to url if hash is set&#x27;, () =&gt; {
+    expect(uis._getUrlWithSlug(&#x27;/hash_test.html&#x27;)).toBe(
+      &#x27;/hash_test.&#x27; + hashes[&#x27;/hash_test.html&#x27;] + &#x27;.html&#x27;
+    );
+    expect(uis._getUrlWithSlug(&#x27;/path_test/hash_test.html&#x27;)).toBe(
+      &#x27;/path_test/hash_test.&#x27; + hashes[&#x27;/path_test/hash_test.html&#x27;] + &#x27;.html&#x27;
+    );
+    expect(uis._getUrlWithSlug(&#x27;/hash_test.min.js&#x27;)).toBe(
+      &#x27;/hash_test.min.&#x27; + hashes[&#x27;/hash_test.min.js&#x27;] + &#x27;.js&#x27;
+    );
+  });
+
+  it(&#x27;should build complete URL with prefixes and hash&#x27;, () =&gt; {
+    expect(uis._getCompleteUrl(&#x27;/test_folder&#x27;, &#x27;/hash_test.html&#x27;)).toBe(
+      &#x27;/build/test_folder/hash_test.&#x27; + hashes[&#x27;/hash_test.html&#x27;] + &#x27;.html&#x27;
+    );
+    expect(
+      uis._getCompleteUrl(&#x27;/test_folder&#x27;, &#x27;/path_test/hash_test.html&#x27;)).toBe(
+      &#x27;/build/test_folder/path_test/hash_test.&#x27; +
+        hashes[&#x27;/path_test/hash_test.html&#x27;] + &#x27;.html&#x27;
+    );
+    expect(uis._getCompleteUrl(&#x27;/test_folder&#x27;, &#x27;/hash_test.min.js&#x27;)).toBe(
+      &#x27;/build/test_folder/hash_test.min.&#x27; + hashes[&#x27;/hash_test.min.js&#x27;] + &#x27;.js&#x27;
+    );
+    expect(uis._getCompleteUrl(&#x27;&#x27;, &#x27;/hash_test.html&#x27;)).toBe(
+      &#x27;/build/hash_test.&#x27; + hashes[&#x27;/hash_test.html&#x27;] + &#x27;.html&#x27;
+    );
+  });
+
+  it(&#x27;should throw an error for erroneous URLs&#x27;, () =&gt; {
+    expect(uis.interpolateUrl.bind(uis, null, null))
+      .toThrowError(&#x27;Invalid or empty URL template passed in: \&#x27;null\&#x27;&#x27;);
+    expect(uis.interpolateUrl.bind(uis, null, {}))
+      .toThrowError(&#x27;Invalid or empty URL template passed in: \&#x27;null\&#x27;&#x27;);
+    expect(uis.interpolateUrl.bind(uis, undefined, {}))
+      .toThrowError(
+        &#x27;Invalid or empty URL template passed in: \&#x27;undefined\&#x27;&#x27;);
+    expect(uis.interpolateUrl.bind(uis, &#x27;&#x27;, {}))
+      .toThrowError(&#x27;Invalid or empty URL template passed in: \&#x27;\&#x27;&#x27;);
+    expect(uis.interpolateUrl.bind(uis, &#x27;&#x27;, null))
+      .toThrowError(&#x27;Invalid or empty URL template passed in: \&#x27;\&#x27;&#x27;);
+  });
+
+  it(&#x27;should throw an error for erroneous interpolation values&#x27;, () =&gt; {
+    expect(uis.interpolateUrl.bind(alertsObject, &#x27;url&#x27;, null))
+      .toThrowError(
+        &#x27;Expected an object of interpolation values to be passed &#x27; +
+        &#x27;into interpolateUrl.&#x27;);
+    expect(uis.interpolateUrl.bind(alertsObject, &#x27;url&#x27;, undefined))
+      .toThrowError(
+        &#x27;Expected an object of interpolation values to be passed &#x27; +
+        &#x27;into interpolateUrl.&#x27;);
+    expect(
+      uis.interpolateUrl.bind(alertsObject, &#x27;/test_url/&lt;param&gt;&#x27;, &#x27;value&#x27;)
+    ).toThrowError(
+      &#x27;Expected an object of interpolation values to be passed into &#x27; +
+      &#x27;interpolateUrl.&#x27;);
+    expect(
+      uis.interpolateUrl.bind(alertsObject, &#x27;/test_url/&lt;param&gt;&#x27;, [&#x27;value&#x27;])
+    ).toThrowError(
+      &#x27;Expected an object of interpolation values to be passed into &#x27; +
+      &#x27;interpolateUrl.&#x27;);
+  });
+
+  it(&#x27;should interpolate URLs not requiring parameters&#x27;, () =&gt; {
+    expect(uis.interpolateUrl(&#x27;/test_url/&#x27;, {})).toBe(&#x27;/test_url/&#x27;);
+    expect(uis.interpolateUrl(&#x27;/test_url/&#x27;, {
+      param: &#x27;value&#x27;
+    })).toBe(&#x27;/test_url/&#x27;);
+  });
+
+  it(&#x27;should interpolate URLs when parameters have parentheses&#x27;, () =&gt; {
+    expect(uis.interpolateUrl(&#x27;/test_url/&lt;param&gt;&#x27;, {
+      param: &#x27;value (1&#x27;
+    })).toBe(&#x27;/test_url/value%20(1&#x27;);
+    expect(uis.interpolateUrl(&#x27;/test_url/&lt;param&gt;&#x27;, {
+      param: &#x27;value 1)&#x27;
+    })).toBe(&#x27;/test_url/value%201)&#x27;);
+    expect(uis.interpolateUrl(&#x27;/test_url/&lt;param&gt;&#x27;, {
+      param: &#x27;value (1)&#x27;
+    })).toBe(&#x27;/test_url/value%20(1)&#x27;);
+  });
+
+  it(&#x27;should interpolate URLs requiring one or more parameters&#x27;, () =&gt; {
+    expect(uis.interpolateUrl(&#x27;/test_url/&lt;fparam&gt;&#x27;, {
+      fparam: &#x27;value&#x27;
+    })).toBe(&#x27;/test_url/value&#x27;);
+    expect(uis.interpolateUrl(
+      &#x27;/test_url/&lt;first_param&gt;/&lt;second_param&gt;/&lt;third_param&gt;&#x27;, {
+        first_param: &#x27;value1&#x27;,
+        second_param: &#x27;value2&#x27;,
+        third_param: &#x27;value3&#x27;
+      })).toBe(&#x27;/test_url/value1/value2/value3&#x27;);
+  });
+
+  it(&#x27;should interpolate parameters within words or adjacent to other &#x27; +
+      &#x27;parameters&#x27;, () =&gt; {
+    // It also doesn&#x27;t need to have &#x27;/&#x27; prefixing the URL.
+    expect(uis.interpolateUrl(&#x27;word&lt;with_param&gt;&#x27;, {
+      with_param: &#x27;_with_value&#x27;
+    })).toBe(&#x27;word_with_value&#x27;);
+    expect(uis.interpolateUrl(&#x27;Eating_&lt;param1&gt;&lt;param2&gt;_with_syrup&#x27;, {
+      param1: &#x27;pan&#x27;,
+      param2: &#x27;cakes&#x27;
+    })).toBe(&#x27;Eating_pancakes_with_syrup&#x27;);
+  });
+
+  it(&#x27;should interpolate parameters beginning, ending, or composing &#x27; +
+      &#x27;the URL&#x27;, () =&gt; {
+    expect(uis.interpolateUrl(&#x27;&lt;prefix&gt;_with_words&#x27;, {
+      prefix: &#x27;Signs&#x27;
+    })).toBe(&#x27;Signs_with_words&#x27;);
+    expect(uis.interpolateUrl(&#x27;Neither_here_nor_&lt;suffix&gt;&#x27;, {
+      suffix: &#x27;anywhere&#x27;
+    })).toBe(&#x27;Neither_here_nor_anywhere&#x27;);
+    expect(uis.interpolateUrl(&#x27;&lt;param&gt;&#x27;, {
+      param: &#x27;value&#x27;
+    })).toBe(&#x27;value&#x27;);
+  });
+
+  it(&#x27;should sanitize parameters but not URLs&#x27;, () =&gt; {
+    expect(uis.interpolateUrl(&#x27;URL with a space&#x27;, {})).toBe(
+      &#x27;URL with a space&#x27;);
+    expect(uis.interpolateUrl(
+      &#x27;/test_url/&lt;first_param&gt;?&lt;query_name&gt;=&lt;query_value&gt;&#x27;, {
+        first_param: &#x27;SEARCH&#x27;,
+        query_name: &#x27;title or website&#x27;,
+        query_value: &#x27;oppia&#x27;
+      })).toBe(&#x27;/test_url/SEARCH?title%20or%20website=oppia&#x27;);
+  });
+
+  it(&#x27;should escape the &quot;=&quot; symbol correctly&#x27;, () =&gt; {
+    expect(uis.interpolateUrl(
+      &#x27;/test_url/&lt;first_param&gt;&#x27;, {
+        first_param: &#x27;first=param&#x27;,
+      })).toBe(&#x27;/test_url/first%3Dparam&#x27;);
+  });
+
+  it(&#x27;should not interpolate bad parameter names and values&#x27;, () =&gt; {
+    // Empty angle brackets indicate a malformed URL.
+    expect(uis.interpolateUrl.bind(uis, &#x27;/test_url/&lt;&gt;&#x27;, {})).toThrowError(
+      &#x27;Invalid URL template received: \&#x27;/test_url/&lt;&gt;\&#x27;&#x27;);
+    expect(uis.interpolateUrl.bind(uis, &#x27;/test_url/&lt;&gt;&#x27;, {
+      &#x27;&#x27;: &#x27;value&#x27;
+    })).toThrowError(&#x27;Invalid URL template received: \&#x27;/test_url/&lt;&gt;\&#x27;&#x27;);
+
+    // Non alpha-numeric will not match the pattern matching for finding a
+    // parameter name.
+    expect(uis.interpolateUrl(
+      &#x27;/test_url/&lt;b@d!#$%^&amp;*() p@r@m n@m3`~[]{}&gt;&#x27;, {}
+    )).toBe(&#x27;/test_url/&lt;b@d!#$%^&amp;*() p@r@m n@m3`~[]{}&gt;&#x27;);
+
+    // Parameter names cannot have spaces.
+    expect(uis.interpolateUrl(&#x27;/test_url/&lt;parameter with spaces&gt;&#x27;, {
+      &#x27;parameter with spaces&#x27;: &#x27;value&#x27;
+    })).toBe(&#x27;/test_url/&lt;parameter with spaces&gt;&#x27;);
+
+    expect(uis.interpolateUrl.bind(uis, &#x27;/test_url/&lt;&lt;name&gt;&gt;&#x27;, {
+      name: &#x27;value&#x27;
+    })).toThrowError(
+      &#x27;Invalid URL template received: \&#x27;/test_url/&lt;&lt;name&gt;&gt;\&#x27;&#x27;);
+
+    expect(uis.interpolateUrl(&#x27;/test_url/&lt;name&gt;&#x27;, {
+      name: &#x27;&lt;value&gt;&#x27;
+    })).toEqual(&#x27;/test_url/%3Cvalue%3E&#x27;);
+
+    expect(uis.interpolateUrl(&#x27;/test_url/&lt;name&gt;&#x27;, {
+      name: &#x27;&lt;&lt;value&gt;&gt;&#x27;
+    })).toEqual(&#x27;/test_url/%3C%3Cvalue%3E%3E&#x27;);
+
+    expect(uis.interpolateUrl(&#x27;/test_url/&lt;name&gt;&#x27;, {
+      name: &#x27;&lt;&gt;&#x27;
+    })).toEqual(&#x27;/test_url/%3C%3E&#x27;);
+
+    expect(uis.interpolateUrl(&#x27;/test_url/?&lt;query_name&gt;=&lt;query_value&gt;&#x27;, {
+      query_name: &#x27;website&#x27;,
+      query_value: &#x27;https://www.oppia.org/&#x27;
+    })).toEqual(&#x27;/test_url/?website=https%3A%2F%2Fwww.oppia.org%2F&#x27;);
+
+    expect(uis.interpolateUrl(&#x27;/test_url/&lt;name&gt;&#x27;, {
+      name: &#x27;value\nmultiple lines&#x27;
+    })).toEqual(&#x27;/test_url/value%0Amultiple%20lines&#x27;);
+  });
+
+  it(&#x27;should throw an error for missing parameters&#x27;, () =&gt; {
+    expect(uis.interpolateUrl.bind(uis, &#x27;/test_url/&lt;page&gt;&#x27;, {})).toThrowError(
+      &#x27;Expected variable \&#x27;page\&#x27; when interpolating URL.&#x27;);
+    expect(uis.interpolateUrl.bind(uis, &#x27;/test_url/&lt;page1&gt;&#x27;, {
+      page2: &#x27;v&#x27;
+    })).toThrowError(
+      &#x27;Expected variable \&#x27;page1\&#x27; when interpolating URL.&#x27;);
+  });
+
+  it(&#x27;should throw an error for non-string parameters&#x27;, () =&gt; {
+    expect(uis.interpolateUrl.bind(uis, &#x27;/test_url/&lt;page&gt;&#x27;, {
+      page: 0
+    })).toThrowError(
+      &#x27;Every parameter passed into interpolateUrl must have string values, &#x27; +
+      &#x27;but received: {page: 0}&#x27;);
+    expect(uis.interpolateUrl.bind(uis, &#x27;/test_url/&lt;page&gt;&#x27;, {
+      page: {}
+    })).toThrowError(
+      &#x27;Every parameter passed into interpolateUrl must have string values, &#x27; +
+      &#x27;but received: {page: {}}&#x27;);
+    expect(uis.interpolateUrl.bind(uis, &#x27;/test_url/&lt;page&gt;&#x27;, {
+      page: []
+    })).toThrowError(
+      &#x27;Every parameter passed into interpolateUrl must have string values, &#x27; +
+      &#x27;but received: {page: []}&#x27;);
+    expect(uis.interpolateUrl.bind(uis, &#x27;/test_url/&lt;page&gt;&#x27;, {
+      page: /abc/
+    })).toThrowError(
+      &#x27;Every parameter passed into interpolateUrl must have string values, &#x27; +
+      &#x27;but received: {page: {}}&#x27;);
+  });
+
+  it(&#x27;should interpolate correct path&#x27;, () =&gt; {
+    expect(uis.getStaticImageUrl(&#x27;/test.png&#x27;)).toBe(
+      &#x27;/build/assets/images/test.png&#x27;);
+    expect(uis.getStaticImageUrl(&#x27;/test_url/test.png&#x27;)).toBe(
+      &#x27;/build/assets/images/test_url/test.png&#x27;);
+    expect(uis.getStaticImageUrl(&#x27;/hash_test.png&#x27;)).toBe(
+      &#x27;/build/assets/images/hash_test.&#x27; + hashes[&#x27;/images/hash_test.png&#x27;] +
+        &#x27;.png&#x27;);
+
+    expect(uis.getStaticVideoUrl(&#x27;/test.mp4&#x27;)).toBe(
+      &#x27;/build/assets/videos/test.mp4&#x27;);
+    expect(uis.getStaticVideoUrl(&#x27;/test_url/test.mp4&#x27;)).toBe(
+      &#x27;/build/assets/videos/test_url/test.mp4&#x27;);
+    expect(uis.getStaticVideoUrl(&#x27;/hash_test.mp4&#x27;)).toBe(
+      &#x27;/build/assets/videos/hash_test.&#x27; + hashes[&#x27;/videos/hash_test.mp4&#x27;] +
+        &#x27;.mp4&#x27;);
+
+    expect(uis.getInteractionThumbnailImageUrl(&#x27;LogicProof&#x27;)).toBe(
+      &#x27;/build/extensions/interactions/LogicProof/static/LogicProof.png&#x27;);
+    expect(uis.getInteractionThumbnailImageUrl(&#x27;interTest&#x27;)).toBe(
+      &#x27;/build/extensions/interactions/interTest/static/interTest.&#x27; +
+        hashes[&#x27;/interactions/interTest/static/interTest.png&#x27;] + &#x27;.png&#x27;);
+
+    expect(uis.getDirectiveTemplateUrl(&#x27;/test.html&#x27;)).toBe(
+      &#x27;/build/templates/test.html&#x27;);
+    expect(uis.getDirectiveTemplateUrl(&#x27;/test_url/test.html&#x27;)).toBe(
+      &#x27;/build/templates/test_url/test.html&#x27;);
+    expect(uis.getDirectiveTemplateUrl(&#x27;/pages_test/hash_test.html&#x27;)).toBe(
+      &#x27;/build/templates/pages_test/hash_test.&#x27; +
+        hashes[&#x27;/pages_test/hash_test.html&#x27;] + &#x27;.html&#x27;);
+
+    expect(uis.getStaticAssetUrl(&#x27;/test.json&#x27;)).toBe(
+      &#x27;/build/assets/test.json&#x27;);
+    expect(uis.getStaticAssetUrl(&#x27;/test_url/test.json&#x27;)).toBe(
+      &#x27;/build/assets/test_url/test.json&#x27;);
+    expect(uis.getStaticAssetUrl(&#x27;/assets_test/hash_test.json&#x27;)).toBe(
+      &#x27;/build/assets/assets_test/hash_test.&#x27; +
+        hashes[&#x27;/assets_test/hash_test.json&#x27;] + &#x27;.json&#x27;);
+
+    expect(uis.getFullStaticAssetUrl(
+      &#x27;/assets/msapplication-large.png&#x27;)).toBe(
+      &#x27;http://sample.com/build/assets/msapplication-large.png&#x27;);
+    expect(uis.getFullStaticAssetUrl(
+      &#x27;/assets/images/msapplication-large.png&#x27;)).toBe(
+      &#x27;http://sample.com/build/assets/images/msapplication-large.png&#x27;);
+    expect(uis.getFullStaticAssetUrl(
+      &#x27;/assets/images/path/msapplication-large.png&#x27;)).toBe(
+      &#x27;http://sample.com/build/assets/images/path/msapplication-large.png&#x27;);
+
+    expect(uis.getExtensionResourceUrl(&#x27;/test.html&#x27;)).toBe(
+      &#x27;/build/extensions/test.html&#x27;);
+    expect(uis.getExtensionResourceUrl(&#x27;/test_url/test.html&#x27;)).toBe(
+      &#x27;/build/extensions/test_url/test.html&#x27;);
+    expect(uis.getExtensionResourceUrl(&#x27;/path_test/hash_test.html&#x27;)).toBe(
+      &#x27;/build/extensions/path_test/hash_test.&#x27; +
+        hashes[&#x27;/path_test/hash_test.html&#x27;] + &#x27;.html&#x27;);
+  });
+
+  it(&#x27;should throw an error for empty path&#x27;, () =&gt; {
+    expect(uis.getStaticImageUrl.bind(uis, null)).toThrowError(
+      &#x27;Empty path passed in method.&#x27;);
+    expect(uis.getStaticImageUrl.bind(uis, &#x27;&#x27;)).toThrowError(
+      &#x27;Empty path passed in method.&#x27;);
+
+    expect(uis.getStaticVideoUrl.bind(uis, null)).toThrowError(
+      &#x27;Empty path passed in method.&#x27;);
+    expect(uis.getStaticVideoUrl.bind(uis, &#x27;&#x27;)).toThrowError(
+      &#x27;Empty path passed in method.&#x27;);
+
+    expect(uis.getInteractionThumbnailImageUrl.bind(uis, null)).toThrowError(
+      &#x27;Empty interactionId passed in getInteractionThumbnailImageUrl.&#x27;);
+    expect(uis.getInteractionThumbnailImageUrl.bind(uis, &#x27;&#x27;)).toThrowError(
+      &#x27;Empty interactionId passed in getInteractionThumbnailImageUrl.&#x27;);
+
+    expect(uis.getDirectiveTemplateUrl.bind(uis, null)).toThrowError(
+      &#x27;Empty path passed in method.&#x27;);
+    expect(uis.getDirectiveTemplateUrl.bind(uis, &#x27;&#x27;)).toThrowError(
+      &#x27;Empty path passed in method.&#x27;);
+
+    expect(uis.getStaticAssetUrl.bind(uis, null))
+      .toThrowError(&#x27;Empty path passed in method.&#x27;);
+    expect(uis.getStaticAssetUrl.bind(uis, &#x27;&#x27;))
+      .toThrowError(&#x27;Empty path passed in method.&#x27;);
+
+    expect(uis.getExtensionResourceUrl.bind(uis, null))
+      .toThrowError(&#x27;Empty path passed in method.&#x27;);
+    expect(uis.getExtensionResourceUrl.bind(uis, &#x27;&#x27;))
+      .toThrowError(&#x27;Empty path passed in method.&#x27;);
+  });
+
+  it(&#x27;should throw an error for path not beginning with forward slash&#x27;,
+    () =&gt; {
+      expect(uis.getStaticImageUrl.bind(uis, &#x27;test_fail.png&#x27;)).toThrowError(
+        &#x27;Path must start with \&#x27;\/\&#x27;: \&#x27;&#x27; + &#x27;test_fail.png&#x27; + &#x27;\&#x27;.&#x27;);
+      expect(uis.getStaticImageUrl.bind(uis, &#x27;test_url/fail.png&#x27;)).toThrowError(
+        &#x27;Path must start with \&#x27;\/\&#x27;: \&#x27;&#x27; + &#x27;test_url/fail.png&#x27; + &#x27;\&#x27;.&#x27;);
+
+      expect(uis.getStaticVideoUrl.bind(uis, &#x27;test_fail.png&#x27;))
+        .toThrowError(
+          &#x27;Path must start with \&#x27;\/\&#x27;: \&#x27;&#x27; + &#x27;test_fail.png&#x27; + &#x27;\&#x27;.&#x27;);
+      expect(uis.getStaticVideoUrl.bind(uis, &#x27;test_url/fail.png&#x27;))
+        .toThrowError(
+          &#x27;Path must start with \&#x27;\/\&#x27;: \&#x27;&#x27; + &#x27;test_url/fail.png&#x27; + &#x27;\&#x27;.&#x27;);
+
+      expect(uis.getDirectiveTemplateUrl.bind(uis, &#x27;test_fail.html&#x27;))
+        .toThrowError(
+          &#x27;Path must start with \&#x27;\/\&#x27;: \&#x27;&#x27; + &#x27;test_fail.html&#x27; + &#x27;\&#x27;.&#x27;);
+      expect(
+        uis.getDirectiveTemplateUrl.bind(uis, &#x27;test_url/fail.html&#x27;))
+        .toThrowError(
+          &#x27;Path must start with \&#x27;\/\&#x27;: \&#x27;&#x27; + &#x27;test_url/fail.html&#x27; + &#x27;\&#x27;.&#x27;);
+
+      expect(uis.getStaticAssetUrl.bind(uis, &#x27;test_fail.html&#x27;))
+        .toThrowError(
+          &#x27;Path must start with \&#x27;\/\&#x27;: \&#x27;&#x27; + &#x27;test_fail.html&#x27; + &#x27;\&#x27;.&#x27;);
+      expect(uis.getStaticAssetUrl.bind(uis, &#x27;test_url/fail.html&#x27;))
+        .toThrowError(
+          &#x27;Path must start with \&#x27;\/\&#x27;: \&#x27;&#x27; + &#x27;test_url/fail.html&#x27; + &#x27;\&#x27;.&#x27;);
+
+      expect(uis.getExtensionResourceUrl.bind(uis, &#x27;test_fail.html&#x27;))
+        .toThrowError(
+          &#x27;Path must start with \&#x27;\/\&#x27;: \&#x27;&#x27; + &#x27;test_fail.html&#x27; + &#x27;\&#x27;.&#x27;);
+      expect(
+        uis.getExtensionResourceUrl.bind(uis, &#x27;test_url/fail.html&#x27;))
+        .toThrowError(
+          &#x27;Path must start with \&#x27;\/\&#x27;: \&#x27;&#x27; + &#x27;test_url/fail.html&#x27; + &#x27;\&#x27;.&#x27;);
+    });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/domain/utilities/url-interpolation.service.spec.ts&quot;,&quot;line&quot;:25,&quot;character&quot;:6,&quot;text&quot;:&quot;hashes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/utilities/url-interpolation.service.spec.ts&quot;,&quot;line&quot;:28,&quot;character&quot;:6,&quot;text&quot;:&quot;mockLocation&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/utilities/url-interpolation.service.spec.ts&quot;,&quot;line&quot;:29,&quot;character&quot;:6,&quot;text&quot;:&quot;alertsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/utilities/url-interpolation.service.spec.ts&quot;,&quot;line&quot;:31,&quot;character&quot;:4,&quot;text&quot;:&quot;alertsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/utilities/url-interpolation.service.spec.ts&quot;,&quot;line&quot;:34,&quot;character&quot;:4,&quot;text&quot;:&quot;mockLocation&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/utilities/url-interpolation.service.spec.ts&quot;,&quot;line&quot;:40,&quot;character&quot;:4,&quot;text&quot;:&quot;alertsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/utilities/url-interpolation.service.spec.ts&quot;,&quot;line&quot;:43,&quot;character&quot;:17,&quot;text&quot;:&quot;alertsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/utilities/url-interpolation.service.spec.ts&quot;,&quot;line&quot;:43,&quot;character&quot;:33,&quot;text&quot;:&quot;alertsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/utilities/url-interpolation.service.spec.ts&quot;,&quot;line&quot;:48,&quot;character&quot;:22,&quot;text&quot;:&quot;hashes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/utilities/url-interpolation.service.spec.ts&quot;,&quot;line&quot;:51,&quot;character&quot;:32,&quot;text&quot;:&quot;hashes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/utilities/url-interpolation.service.spec.ts&quot;,&quot;line&quot;:54,&quot;character&quot;:26,&quot;text&quot;:&quot;hashes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/utilities/url-interpolation.service.spec.ts&quot;,&quot;line&quot;:60,&quot;character&quot;:40,&quot;text&quot;:&quot;hashes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/utilities/url-interpolation.service.spec.ts&quot;,&quot;line&quot;:65,&quot;character&quot;:8,&quot;text&quot;:&quot;hashes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/utilities/url-interpolation.service.spec.ts&quot;,&quot;line&quot;:68,&quot;character&quot;:44,&quot;text&quot;:&quot;hashes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/utilities/url-interpolation.service.spec.ts&quot;,&quot;line&quot;:71,&quot;character&quot;:28,&quot;text&quot;:&quot;hashes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/utilities/url-interpolation.service.spec.ts&quot;,&quot;line&quot;:268,&quot;character&quot;:42,&quot;text&quot;:&quot;hashes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/utilities/url-interpolation.service.spec.ts&quot;,&quot;line&quot;:276,&quot;character&quot;:42,&quot;text&quot;:&quot;hashes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/utilities/url-interpolation.service.spec.ts&quot;,&quot;line&quot;:283,&quot;character&quot;:8,&quot;text&quot;:&quot;hashes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/utilities/url-interpolation.service.spec.ts&quot;,&quot;line&quot;:291,&quot;character&quot;:8,&quot;text&quot;:&quot;hashes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/utilities/url-interpolation.service.spec.ts&quot;,&quot;line&quot;:299,&quot;character&quot;:8,&quot;text&quot;:&quot;hashes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/utilities/url-interpolation.service.spec.ts&quot;,&quot;line&quot;:317,&quot;character&quot;:8,&quot;text&quot;:&quot;hashes&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:57 GMT</p>
+    </body>
+  </html>
+  

@@ -1,0 +1,185 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>current-interaction.service.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">core/templates/pages/exploration-player-page/services/current-interaction.service.ts</td><td class="">100.00%</td><td class="">100%</td><td class="">135</td><td class="">135</td><td class="">0</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2018 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Facilitates communication between the current interaction
+ * and the progress nav. The former holds data about the learner&#x27;s answer,
+ * while the latter contains the actual &quot;Submit&quot; button which triggers the
+ * answer submission process.
+ */
+
+import { downgradeInjectable } from &#x27;@angular/upgrade/static&#x27;;
+import { Injectable } from &#x27;@angular/core&#x27;;
+
+import { ContextService } from &#x27;services/context.service&#x27;;
+import { PlayerPositionService } from
+  &#x27;pages/exploration-player-page/services/player-position.service&#x27;;
+import { PlayerTranscriptService } from
+  &#x27;pages/exploration-player-page/services/player-transcript.service&#x27;;
+import { InteractionAnswer } from &#x27;interactions/answer-defs&#x27;;
+import { InteractionRuleInputs } from &#x27;interactions/rule-input-defs&#x27;;
+import { Observable, Subject } from &#x27;rxjs&#x27;;
+
+export interface InteractionRulesService {
+  [ruleName: string]: (
+    answer: InteractionAnswer, ruleInputs: InteractionRuleInputs) =&gt; boolean;
+}
+
+type SubmitAnswerFn = () =&gt; void;
+
+type OnSubmitFn = (
+  answer: string, interactionRulesService: InteractionRulesService) =&gt; void;
+
+type ValidityCheckFn = () =&gt; boolean;
+
+type PresubmitHookFn = () =&gt; void;
+
+@Injectable({
+  providedIn: &#x27;root&#x27;
+})
+export class CurrentInteractionService {
+  constructor(
+    private contextService: ContextService,
+    private playerPositionService: PlayerPositionService,
+    private playerTranscriptService: PlayerTranscriptService) {}
+  private static submitAnswerFn: SubmitAnswerFn = null;
+  private static onSubmitFn: OnSubmitFn = null;
+  private static validityCheckFn: ValidityCheckFn = null;
+  private static presubmitHooks: PresubmitHookFn[] = [];
+  private static answerChangedSubject: Subject&lt;void&gt; = new Subject&lt;void&gt;();
+
+  setOnSubmitFn(onSubmit: OnSubmitFn): void {
+    /**
+     * The ConversationSkinDirective should register its onSubmit
+     * callback here.
+     *
+     * @param {function(answer, interactionRulesService)} onSubmit
+     */
+    CurrentInteractionService.onSubmitFn = onSubmit;
+  }
+
+  registerCurrentInteraction(
+      submitAnswerFn: SubmitAnswerFn, validityCheckFn: ValidityCheckFn): void {
+    /**
+     * Each interaction directive should call registerCurrentInteraction
+     * when the interaction directive is first created.
+     *
+     * @param {function|null} submitAnswerFn - Should grab the learner&#x27;s
+     *   answer and pass it to onSubmit. The interaction can pass in
+     *   null if it does not use the progress nav&#x27;s submit button
+     *   (ex: MultipleChoiceInput).
+     * @param {function} validityCheckFn - The progress nav will use this
+     *   to decide whether or not to disable the submit button. If the
+     *   interaction passes in null, the submit button will remain
+     *   enabled (for the entire duration of the current interaction).
+     */
+    CurrentInteractionService.submitAnswerFn = submitAnswerFn || null;
+    CurrentInteractionService.validityCheckFn = validityCheckFn || null;
+  }
+
+  registerPresubmitHook(hookFn: PresubmitHookFn): void {
+    /* Register a hook that will be called right before onSubmit.
+     * All hooks for the current interaction will be cleared right
+     * before loading the next card.
+     */
+    CurrentInteractionService.presubmitHooks.push(hookFn);
+  }
+
+  clearPresubmitHooks(): void {
+    /* Clear out all the hooks for the current interaction. Should
+     * be called before loading the next card.
+     */
+    CurrentInteractionService.presubmitHooks = [];
+  }
+
+  onSubmit(
+      answer: string, interactionRulesService: InteractionRulesService): void {
+    for (
+      let i = 0; i &lt; CurrentInteractionService.presubmitHooks.length; i++) {
+      CurrentInteractionService.presubmitHooks[i]();
+    }
+    CurrentInteractionService.onSubmitFn(answer, interactionRulesService);
+  }
+
+  submitAnswer(): void {
+    /* This starts the answer submit process, it should be called once the
+     * learner presses the &quot;Submit&quot; button.
+     */
+    if (CurrentInteractionService.submitAnswerFn === null) {
+      let index = this.playerPositionService.getDisplayedCardIndex();
+      let displayedCard = this.playerTranscriptService.getCard(index);
+      let additionalInfo = (
+        &#x27;\nUndefined submit answer debug logs:&#x27; +
+        &#x27;\nInteraction ID: &#x27; + displayedCard.getInteractionId() +
+        &#x27;\nExploration ID: &#x27; + this.contextService.getExplorationId() +
+        &#x27;\nState Name: &#x27; + displayedCard.getStateName() +
+        &#x27;\nContext: &#x27; + this.contextService.getPageContext() +
+        &#x27;\nErrored at index: &#x27; + index);
+      throw new Error(
+        &#x27;The current interaction did not &#x27; +
+        &#x27;register a _submitAnswerFn.&#x27; + additionalInfo);
+    } else {
+      CurrentInteractionService.submitAnswerFn();
+    }
+  }
+
+  isSubmitButtonDisabled(): boolean {
+    /* The submit button should be disabled if the current interaction
+     * did not register a _submitAnswerFn. This could occur in
+     * low-bandwidth scenarios where the interaction has not finished
+     * loading.
+     */
+    if (CurrentInteractionService.submitAnswerFn === null) {
+      return true;
+    }
+    /* Returns whether or not the Submit button should be disabled based on
+     * the validity of the current answer. If the interaction does not pass
+     * in a _validityCheckFn, then _validityCheckFn will be null and by
+     * default we assume the answer is valid, so the submit button should
+     * not be disabled.
+     */
+    if (CurrentInteractionService.validityCheckFn === null) {
+      return false;
+    }
+    return !CurrentInteractionService.validityCheckFn();
+  }
+
+  updateViewWithNewAnswer(): void {
+    CurrentInteractionService.answerChangedSubject.next();
+  }
+
+  get onAnswerChanged$(): Observable&lt;void&gt; {
+    return CurrentInteractionService.answerChangedSubject.asObservable();
+  }
+}
+angular.module(&#x27;oppia&#x27;).factory(&#x27;CurrentInteractionService&#x27;,
+  downgradeInjectable(CurrentInteractionService));
+</textarea><pre id="annotations" style="display:none">[]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:55 GMT</p>
+    </body>
+  </html>
+  

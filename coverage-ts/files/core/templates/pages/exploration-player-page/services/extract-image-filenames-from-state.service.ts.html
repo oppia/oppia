@@ -1,0 +1,307 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>extract-image-filenames-from-state.service.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/exploration-player-page/services/extract-image-filenames-from-state.service.ts</td><td class="">89.16%</td><td class="">100%</td><td class="">369</td><td class="">329</td><td class="">40</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2017 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Service to extract image filenames in a State.
+ */
+
+import { downgradeInjectable } from &#x27;@angular/upgrade/static&#x27;;
+import { Injectable } from &#x27;@angular/core&#x27;;
+
+import { ContentTranslationLanguageService } from
+  &#x27;pages/exploration-player-page/services/content-translation-language.service&#x27;;
+import { ContentTranslationManagerService } from
+  &#x27;pages/exploration-player-page/services/content-translation-manager.service&#x27;;
+import { HtmlEscaperService } from &#x27;services/html-escaper.service&#x27;;
+import { State } from &#x27;domain/state/StateObjectFactory&#x27;;
+import {
+  DragAndDropSortInputCustomizationArgs,
+  ImageClickInputCustomizationArgs,
+  ItemSelectionInputCustomizationArgs,
+  MultipleChoiceInputCustomizationArgs
+} from &#x27;interactions/customization-args-defs&#x27;;
+
+type CustomizationArgsWithChoices = (
+  DragAndDropSortInputCustomizationArgs |
+  ItemSelectionInputCustomizationArgs |
+  MultipleChoiceInputCustomizationArgs);
+
+@Injectable({
+  providedIn: &#x27;root&#x27;
+})
+export class ExtractImageFilenamesFromStateService {
+  constructor(
+    private htmlEscaperService: HtmlEscaperService,
+    private contentTranslationManagerService: ContentTranslationManagerService,
+    private contentTranslationLanguageService: ContentTranslationLanguageService
+  ) {}
+
+    INTERACTION_TYPE_MULTIPLE_CHOICE = &#x27;MultipleChoiceInput&#x27;;
+    INTERACTION_TYPE_ITEM_SELECTION = &#x27;ItemSelectionInput&#x27;;
+    INTERACTION_TYPE_IMAGE_CLICK_INPUT = &#x27;ImageClickInput&#x27;;
+    INTERACTION_TYPE_DRAG_AND_DROP_SORT = &#x27;DragAndDropSortInput&#x27;;
+
+    filenamesInState = [];
+
+    /**
+     * Gets the html from the state&#x27;s content.
+     * @param {object} state - The state from which the html of the content
+     *                         should be returned.
+     */
+    _getStateContentHtml(state: State): string {
+      let languageCode = (
+        this.contentTranslationLanguageService.getCurrentContentLanguageCode());
+      return this.contentTranslationManagerService.getTranslatedHtml(
+        state.writtenTranslations, languageCode, state.content);
+    }
+
+    /**
+     * Gets the html from the outcome of the answer groups and the default
+     * outcome of the state.
+     * @param {object} state - The state from which the html of the outcomes of
+     *                         the answer groups should be returned.
+     */
+    _getOutcomesHtml(state: State): string {
+      let outcomesHtml = &#x27;&#x27;;
+      let languageCode = (
+        this.contentTranslationLanguageService.getCurrentContentLanguageCode());
+      state.interaction.answerGroups.forEach(answerGroup =&gt; {
+        let answerGroupHtml = (
+          this.contentTranslationManagerService.getTranslatedHtml(
+            state.writtenTranslations, languageCode,
+            answerGroup.outcome.feedback));
+        outcomesHtml = outcomesHtml.concat(answerGroupHtml);
+      });
+      if (state.interaction.defaultOutcome !== null) {
+        let defaultOutcomeHtml = (
+          this.contentTranslationManagerService.getTranslatedHtml(
+            state.writtenTranslations, languageCode,
+            state.interaction.defaultOutcome.feedback));
+        outcomesHtml = outcomesHtml.concat(defaultOutcomeHtml);
+      }
+      return outcomesHtml;
+    }
+
+    /**
+     * Gets the html from the hints in the state.
+     * @param {object} state - The state whose hints&#x27; html should be returned.
+     */
+    _getHintsHtml(state: State): string {
+      let hintsHtml = &#x27;&#x27;;
+      let languageCode = (
+        this.contentTranslationLanguageService.getCurrentContentLanguageCode());
+      state.interaction.hints.forEach(hint =&gt; {
+        let hintHtml = (
+          this.contentTranslationManagerService.getTranslatedHtml(
+            state.writtenTranslations, languageCode,
+            hint.hintContent));
+        hintsHtml = hintsHtml.concat(hintHtml);
+      });
+      return hintsHtml;
+    }
+
+    /**
+     * Gets the html from the solution in the state.
+     * @param {object} state - The state whose solution&#x27;s html should be
+     *                         returned.
+     */
+    _getSolutionHtml(state: State): string {
+      let languageCode = (
+        this.contentTranslationLanguageService.getCurrentContentLanguageCode());
+      return this.contentTranslationManagerService.getTranslatedHtml(
+        state.writtenTranslations, languageCode,
+        state.interaction.solution.explanation);
+    }
+
+    /**
+     * Gets all the html in a state.
+     * @param {object} state - The state whose html is to be fetched.
+     */
+    _getAllHtmlOfState(state: State): string[] {
+      let _allHtmlInTheState = [];
+      // The order of the extracted image names is same as they appear in a
+      // state. The images should be preloaded in the following order ---
+      // content, customizationArgs of interactions, feedback of outcomes ()
+      // including feedback of default outcome if any), hints, solution if any.
+
+      _allHtmlInTheState.push(this._getStateContentHtml(state));
+
+      if (state.interaction.id === this.INTERACTION_TYPE_MULTIPLE_CHOICE ||
+          state.interaction.id === this.INTERACTION_TYPE_ITEM_SELECTION ||
+          state.interaction.id === this.INTERACTION_TYPE_DRAG_AND_DROP_SORT) {
+        let customizationArgsHtml = &#x27;&#x27;;
+        let languageCode = (
+          this.contentTranslationLanguageService.getCurrentContentLanguageCode()
+        );
+        const self = this;
+        (&lt;CustomizationArgsWithChoices&gt; state.interaction.customizationArgs)
+          .choices.value.forEach(function(value) {
+            customizationArgsHtml = (
+              customizationArgsHtml.concat(
+                self.contentTranslationManagerService.getTranslatedHtml(
+                  state.writtenTranslations, languageCode, value)));
+          });
+        _allHtmlInTheState.push(customizationArgsHtml);
+      }
+
+      _allHtmlInTheState.push(this._getOutcomesHtml(state));
+
+      _allHtmlInTheState.push(this._getHintsHtml(state));
+
+      if (state.interaction.solution !== null) {
+        _allHtmlInTheState.push(this._getSolutionHtml(state));
+      }
+      return _allHtmlInTheState;
+    }
+
+    /**
+     * Extracts the filepath object from the filepath-value attribute of the
+     * oppia-noninteractive-image tags in the htmlString(given string).
+     * @param {string} htmlString - The string from which the object of
+     *                           filepath should be extracted.
+     */
+    _extractFilepathValueFromOppiaNonInteractiveImageTag(
+        htmlString: string): string[] {
+      let filenames = [];
+      let unescapedHtmlString = (
+        this.htmlEscaperService.escapedStrToUnescapedStr(htmlString));
+      let dummyDocument = (
+        new DOMParser().parseFromString(unescapedHtmlString, &#x27;text/html&#x27;));
+
+      let imageTagLists = [];
+
+      // Add images that are in the base content (not embedded).
+      imageTagLists.push(
+        dummyDocument.getElementsByTagName(
+          &#x27;oppia-noninteractive-image&#x27;));
+
+      // Add images that are embedded in collapsibles.
+      let collapsibleTagList = dummyDocument.getElementsByTagName(
+        &#x27;oppia-noninteractive-collapsible&#x27;);
+      for (let i = 0; i &lt; collapsibleTagList.length; i++) {
+        let contentWithValue = JSON.parse(
+          collapsibleTagList[i].getAttribute(&#x27;content-with-value&#x27;));
+        let collapsibleDocument = (
+          new DOMParser().parseFromString(contentWithValue, &#x27;text/html&#x27;));
+        imageTagLists.push(
+          collapsibleDocument.getElementsByTagName(
+            &#x27;oppia-noninteractive-image&#x27;));
+      }
+
+      // Add images that are embedded in tabs.
+      let tabsTagList = dummyDocument.getElementsByTagName(
+        &#x27;oppia-noninteractive-tabs&#x27;);
+      for (let i = 0; i &lt; tabsTagList.length; i++) {
+        let contentsWithValue = JSON.parse(
+          tabsTagList[i].getAttribute(&#x27;tab_contents-with-value&#x27;));
+        for (let contentWithValue of contentsWithValue) {
+          let tabDocument = (
+            new DOMParser().parseFromString(
+              contentWithValue.content, &#x27;text/html&#x27;));
+          imageTagLists.push(
+            tabDocument.getElementsByTagName(
+              &#x27;oppia-noninteractive-image&#x27;));
+        }
+      }
+
+      for (let imageTagList of imageTagLists) {
+        for (let i = 0; i &lt; imageTagList.length; i++) {
+          // We have the attribute of filepath in oppia-noninteractive-image
+          // tag. But it actually contains the filename only. We use the
+          // variable filename instead of filepath since in the end we are
+          // retrieving the filenames in the exploration.
+          let filename = JSON.parse(
+            this.htmlEscaperService.escapedStrToUnescapedStr(
+              imageTagList[i].getAttribute(&#x27;filepath-with-value&#x27;)));
+          filenames.push(filename);
+        }
+      }
+      return filenames;
+    }
+
+    /**
+     * Extracts the SVG filename from the math-content attribute of the
+     * oppia-noninteractive-math tags in the htmlString(given string).
+     * @param {string} htmlString - The string from which the object of
+     *                           filepath should be extracted.
+     */
+    _extractSvgFilenameFromOppiaNonInteractiveMathTag(
+        htmlString: string): string[] {
+      let filenames = [];
+      let unescapedHtmlString = (
+        this.htmlEscaperService.escapedStrToUnescapedStr(htmlString));
+      let dummyDocument = (
+        new DOMParser().parseFromString(unescapedHtmlString, &#x27;text/html&#x27;));
+
+      let mathTagList = dummyDocument.getElementsByTagName(
+        &#x27;oppia-noninteractive-math&#x27;);
+      for (let i = 0; i &lt; mathTagList.length; i++) {
+        let mathContentWithValue = JSON.parse(
+          mathTagList[i].getAttribute(&#x27;math_content-with-value&#x27;));
+        filenames.push(mathContentWithValue.svg_filename);
+      }
+      return filenames;
+    }
+
+    /**
+     * Gets the filenames of all the images that are a part of the state.
+     * @param {object} state - The state from which the filenames of the image
+     *                         should be extracted.
+     */
+    _getImageFilenamesInState(state: State): string[] {
+      let filenamesInState = [];
+      // The Image Click Input interaction has an image whose filename is
+      // directly stored in the customizationArgs.imageAndRegion.value
+      // .imagePath.
+      if (state.interaction.id === this.INTERACTION_TYPE_IMAGE_CLICK_INPUT) {
+        let filename = ((
+          &lt;ImageClickInputCustomizationArgs&gt; state.interaction
+            .customizationArgs).imageAndRegions.value.imagePath);
+        filenamesInState.push(filename);
+      }
+      let allHtmlOfState = this._getAllHtmlOfState(state);
+      allHtmlOfState.forEach((htmlStr) =&gt; {
+        filenamesInState = filenamesInState.concat(
+          this._extractFilepathValueFromOppiaNonInteractiveImageTag(htmlStr));
+        filenamesInState = filenamesInState.concat(
+          this._extractSvgFilenameFromOppiaNonInteractiveMathTag(htmlStr));
+      });
+      return filenamesInState;
+    }
+
+    getImageFilenamesInState = this._getImageFilenamesInState;
+}
+
+
+angular.module(&#x27;oppia&#x27;).factory(
+  &#x27;ExtractImageFilenamesFromStateService&#x27;,
+  downgradeInjectable(ExtractImageFilenamesFromStateService));
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/extract-image-filenames-from-state.service.ts&quot;,&quot;line&quot;:54,&quot;character&quot;:4,&quot;text&quot;:&quot;filenamesInState&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/extract-image-filenames-from-state.service.ts&quot;,&quot;line&quot;:131,&quot;character&quot;:10,&quot;text&quot;:&quot;_allHtmlInTheState&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/extract-image-filenames-from-state.service.ts&quot;,&quot;line&quot;:137,&quot;character&quot;:6,&quot;text&quot;:&quot;_allHtmlInTheState&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/extract-image-filenames-from-state.service.ts&quot;,&quot;line&quot;:147,&quot;character&quot;:9,&quot;text&quot;:&quot;&lt;CustomizationArgsWithChoices&gt; state.interaction.customizationArgs&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/extract-image-filenames-from-state.service.ts&quot;,&quot;line&quot;:154,&quot;character&quot;:8,&quot;text&quot;:&quot;_allHtmlInTheState&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/extract-image-filenames-from-state.service.ts&quot;,&quot;line&quot;:157,&quot;character&quot;:6,&quot;text&quot;:&quot;_allHtmlInTheState&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/extract-image-filenames-from-state.service.ts&quot;,&quot;line&quot;:159,&quot;character&quot;:6,&quot;text&quot;:&quot;_allHtmlInTheState&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/extract-image-filenames-from-state.service.ts&quot;,&quot;line&quot;:162,&quot;character&quot;:8,&quot;text&quot;:&quot;_allHtmlInTheState&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/extract-image-filenames-from-state.service.ts&quot;,&quot;line&quot;:175,&quot;character&quot;:10,&quot;text&quot;:&quot;filenames&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/extract-image-filenames-from-state.service.ts&quot;,&quot;line&quot;:181,&quot;character&quot;:10,&quot;text&quot;:&quot;imageTagLists&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/extract-image-filenames-from-state.service.ts&quot;,&quot;line&quot;:184,&quot;character&quot;:6,&quot;text&quot;:&quot;imageTagLists&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/extract-image-filenames-from-state.service.ts&quot;,&quot;line&quot;:192,&quot;character&quot;:12,&quot;text&quot;:&quot;contentWithValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/extract-image-filenames-from-state.service.ts&quot;,&quot;line&quot;:196,&quot;character&quot;:8,&quot;text&quot;:&quot;imageTagLists&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/extract-image-filenames-from-state.service.ts&quot;,&quot;line&quot;:205,&quot;character&quot;:12,&quot;text&quot;:&quot;contentsWithValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/extract-image-filenames-from-state.service.ts&quot;,&quot;line&quot;:207,&quot;character&quot;:17,&quot;text&quot;:&quot;contentWithValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/extract-image-filenames-from-state.service.ts&quot;,&quot;line&quot;:210,&quot;character&quot;:14,&quot;text&quot;:&quot;contentWithValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/extract-image-filenames-from-state.service.ts&quot;,&quot;line&quot;:210,&quot;character&quot;:31,&quot;text&quot;:&quot;content&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/extract-image-filenames-from-state.service.ts&quot;,&quot;line&quot;:211,&quot;character&quot;:10,&quot;text&quot;:&quot;imageTagLists&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/extract-image-filenames-from-state.service.ts&quot;,&quot;line&quot;:207,&quot;character&quot;:37,&quot;text&quot;:&quot;contentsWithValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/extract-image-filenames-from-state.service.ts&quot;,&quot;line&quot;:217,&quot;character&quot;:15,&quot;text&quot;:&quot;imageTagList&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/extract-image-filenames-from-state.service.ts&quot;,&quot;line&quot;:218,&quot;character&quot;:28,&quot;text&quot;:&quot;imageTagList&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/extract-image-filenames-from-state.service.ts&quot;,&quot;line&quot;:218,&quot;character&quot;:41,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/extract-image-filenames-from-state.service.ts&quot;,&quot;line&quot;:223,&quot;character&quot;:14,&quot;text&quot;:&quot;filename&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/extract-image-filenames-from-state.service.ts&quot;,&quot;line&quot;:225,&quot;character&quot;:14,&quot;text&quot;:&quot;imageTagList&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/extract-image-filenames-from-state.service.ts&quot;,&quot;line&quot;:225,&quot;character&quot;:30,&quot;text&quot;:&quot;getAttribute&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/extract-image-filenames-from-state.service.ts&quot;,&quot;line&quot;:226,&quot;character&quot;:10,&quot;text&quot;:&quot;filenames&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/extract-image-filenames-from-state.service.ts&quot;,&quot;line&quot;:226,&quot;character&quot;:25,&quot;text&quot;:&quot;filename&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/extract-image-filenames-from-state.service.ts&quot;,&quot;line&quot;:217,&quot;character&quot;:31,&quot;text&quot;:&quot;imageTagLists&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/extract-image-filenames-from-state.service.ts&quot;,&quot;line&quot;:240,&quot;character&quot;:10,&quot;text&quot;:&quot;filenames&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/extract-image-filenames-from-state.service.ts&quot;,&quot;line&quot;:249,&quot;character&quot;:12,&quot;text&quot;:&quot;mathContentWithValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/extract-image-filenames-from-state.service.ts&quot;,&quot;line&quot;:251,&quot;character&quot;:8,&quot;text&quot;:&quot;filenames&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/extract-image-filenames-from-state.service.ts&quot;,&quot;line&quot;:251,&quot;character&quot;:23,&quot;text&quot;:&quot;mathContentWithValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/extract-image-filenames-from-state.service.ts&quot;,&quot;line&quot;:251,&quot;character&quot;:44,&quot;text&quot;:&quot;svg_filename&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/extract-image-filenames-from-state.service.ts&quot;,&quot;line&quot;:262,&quot;character&quot;:10,&quot;text&quot;:&quot;filenamesInState&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/extract-image-filenames-from-state.service.ts&quot;,&quot;line&quot;:268,&quot;character&quot;:10,&quot;text&quot;:&quot;&lt;ImageClickInputCustomizationArgs&gt; state.interaction\n            .customizationArgs&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/extract-image-filenames-from-state.service.ts&quot;,&quot;line&quot;:270,&quot;character&quot;:8,&quot;text&quot;:&quot;filenamesInState&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/extract-image-filenames-from-state.service.ts&quot;,&quot;line&quot;:274,&quot;character&quot;:8,&quot;text&quot;:&quot;filenamesInState&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/extract-image-filenames-from-state.service.ts&quot;,&quot;line&quot;:274,&quot;character&quot;:27,&quot;text&quot;:&quot;filenamesInState&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/extract-image-filenames-from-state.service.ts&quot;,&quot;line&quot;:276,&quot;character&quot;:8,&quot;text&quot;:&quot;filenamesInState&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/extract-image-filenames-from-state.service.ts&quot;,&quot;line&quot;:276,&quot;character&quot;:27,&quot;text&quot;:&quot;filenamesInState&quot;,&quot;kind&quot;:2}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:54 GMT</p>
+    </body>
+  </html>
+  

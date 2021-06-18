@@ -1,0 +1,161 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>algebraic-expression-editor.component.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">extensions/objects/templates/algebraic-expression-editor.component.spec.ts</td><td class="">98.54%</td><td class="">100%</td><td class="">206</td><td class="">203</td><td class="">3</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for the algebraic expression editor.
+ */
+
+import { HttpClientTestingModule } from &#x27;@angular/common/http/testing&#x27;;
+import { ComponentFixture, waitForAsync, TestBed } from &#x27;@angular/core/testing&#x27;;
+import { DeviceInfoService } from &#x27;services/contextual/device-info.service&#x27;;
+import { WindowRef } from &#x27;services/contextual/window-ref.service&#x27;;
+import { GuppyInitializationService } from &#x27;services/guppy-initialization.service&#x27;;
+import { AlgebraicExpressionEditorComponent } from &#x27;./algebraic-expression-editor.component&#x27;;
+
+describe(&#x27;AlgebraicExpressionEditor&#x27;, () =&gt; {
+  let component: AlgebraicExpressionEditorComponent;
+  let fixture: ComponentFixture&lt;AlgebraicExpressionEditorComponent&gt;;
+  let windowRef: WindowRef;
+  let guppyInitializationService: GuppyInitializationService;
+  let deviceInfoService: DeviceInfoService;
+  const mockGuppyObject = {
+    divId: &#x27;1&#x27;,
+    guppyInstance: {
+      asciimath: () =&gt; {
+        return &#x27;Dummy value&#x27;;
+      }
+    }
+  };
+
+  class MockGuppy {
+    static focused = true;
+    constructor(id: string, config: Object) {}
+
+    asciimath() {
+      return &#x27;Dummy value&#x27;;
+    }
+    configure(name: string, val: Object): void {}
+    static event(name: string, handler: Function): void {
+      handler({focused: MockGuppy.focused});
+    }
+    static configure(name: string, val: Object): void {}
+    static &#x27;remove_global_symbol&#x27;(symbol: string): void {}
+    static &#x27;add_global_symbol&#x27;(name: string, symbol: Object): void {}
+  }
+
+  class MockWindowRef {
+    _window = {
+      Guppy: MockGuppy
+    };
+    get nativeWindow() {
+      return this._window;
+    }
+  }
+
+  beforeEach(waitForAsync(() =&gt; {
+    TestBed.configureTestingModule(
+      {
+        imports: [HttpClientTestingModule],
+        declarations: [AlgebraicExpressionEditorComponent],
+        providers: [{provide: windowRef, useClass: MockWindowRef}]
+      }
+    ).compileComponents();
+  }));
+  beforeEach(() =&gt; {
+    windowRef = TestBed.inject(WindowRef);
+    deviceInfoService = TestBed.inject(DeviceInfoService);
+    guppyInitializationService = TestBed.inject(GuppyInitializationService);
+    fixture = TestBed.createComponent(
+      AlgebraicExpressionEditorComponent);
+    component = fixture.componentInstance;
+    windowRef.nativeWindow.Guppy = MockGuppy;
+    component.currentValue = &#x27;&#x27;;
+  });
+
+  it(&#x27;should add the change handler to guppy&#x27;, () =&gt; {
+    spyOn(guppyInitializationService, &#x27;findActiveGuppyObject&#x27;).and.returnValue(
+      mockGuppyObject);
+    component.ngOnInit();
+    expect(guppyInitializationService.findActiveGuppyObject).toHaveBeenCalled();
+  });
+
+  it(&#x27;should not show warnings if the editor is active&#x27;, () =&gt; {
+    spyOn(guppyInitializationService, &#x27;findActiveGuppyObject&#x27;).and.returnValue(
+      mockGuppyObject);
+    component.currentValue = undefined;
+    component.warningText = &#x27;&#x27;;
+    component.isCurrentAnswerValid();
+    expect(component.warningText).toBe(&#x27;&#x27;);
+  });
+
+  it(&#x27;should initialize component.value with an empty string&#x27;, () =&gt; {
+    spyOn(guppyInitializationService, &#x27;findActiveGuppyObject&#x27;).and.returnValue(
+      mockGuppyObject);
+    component.value = null;
+    MockGuppy.focused = false;
+    component.ngOnInit();
+    expect(component.value).not.toBeNull();
+  });
+
+  it(&#x27;should correctly validate current answer&#x27;, () =&gt; {
+    // This should not show warnings if the editor hasn&#x27;t been touched.
+    component.currentValue = &#x27;&#x27;;
+    component.isCurrentAnswerValid();
+    expect(component.warningText).toBe(&#x27;&#x27;);
+
+    component.hasBeenTouched = true;
+    // This should be validated as false if the editor has been touched.
+    component.currentValue = &#x27;&#x27;;
+    expect(component.isCurrentAnswerValid()).toBeFalse();
+    expect(
+      component.warningText).toBe(&#x27;Please enter an answer before submitting.&#x27;);
+
+    component.currentValue = &#x27;x/2&#x27;;
+    spyOn(guppyInitializationService, &#x27;getCustomOskLetters&#x27;).and.returnValue(
+      [&#x27;x&#x27;]);
+    expect(component.isCurrentAnswerValid()).toBeTrue();
+    expect(component.warningText).toBe(&#x27;&#x27;);
+  });
+
+  it(&#x27;should set the value of showOSK to true&#x27;, () =&gt; {
+    spyOn(deviceInfoService, &#x27;isMobileUserAgent&#x27;).and.returnValue(true);
+    spyOn(deviceInfoService, &#x27;hasTouchEvents&#x27;).and.returnValue(true);
+
+    expect(guppyInitializationService.getShowOSK()).toBeFalse();
+    component.showOSK();
+    expect(guppyInitializationService.getShowOSK()).toBeTrue();
+    spyOn(guppyInitializationService, &#x27;findActiveGuppyObject&#x27;).and.returnValue(
+      mockGuppyObject);
+    MockGuppy.focused = false;
+    component.ngOnInit();
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;extensions/objects/templates/algebraic-expression-editor.component.spec.ts&quot;,&quot;line&quot;:104,&quot;character&quot;:14,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/algebraic-expression-editor.component.spec.ts&quot;,&quot;line&quot;:107,&quot;character&quot;:21,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/algebraic-expression-editor.component.spec.ts&quot;,&quot;line&quot;:107,&quot;character&quot;:28,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:44:00 GMT</p>
+    </body>
+  </html>
+  

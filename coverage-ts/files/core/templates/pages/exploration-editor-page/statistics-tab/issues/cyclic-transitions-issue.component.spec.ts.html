@@ -1,0 +1,135 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>cyclic-transitions-issue.component.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts</td><td class="">49.65%</td><td class="">100%</td><td class="">141</td><td class="">70</td><td class="">71</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+import { TestBed } from &#x27;@angular/core/testing&#x27;;
+import { AlertsService } from &#x27;services/alerts.service&#x27;;
+import { PlaythroughIssueObjectFactory } from
+  &#x27;domain/statistics/PlaythroughIssueObjectFactory&#x27;;
+import { importAllAngularServices } from &#x27;tests/unit-test-utils&#x27;;
+
+/**
+ * @fileoverview Unit tests for cyclicTransitionsIssue.
+ */
+
+describe(&#x27;Cyclic Transitions Issue Component&#x27;, function() {
+  var $scope = null;
+  var alertsService = null;
+  var playthroughIssueObjectFactory = null;
+  var playthroughIssuesService = null;
+
+  var explorationId = &#x27;exp1&#x27;;
+  var explorationVersion = 1;
+
+  beforeEach(angular.mock.module(&#x27;oppia&#x27;));
+  importAllAngularServices();
+  beforeEach(function() {
+    alertsService = TestBed.get(AlertsService);
+    playthroughIssueObjectFactory = TestBed.get(PlaythroughIssueObjectFactory);
+  });
+
+  beforeEach(angular.mock.inject(function($injector, $componentController) {
+    playthroughIssuesService = $injector.get(&#x27;PlaythroughIssuesService&#x27;);
+    var $rootScope = $injector.get(&#x27;$rootScope&#x27;);
+
+    playthroughIssuesService.initSession(explorationId, explorationVersion);
+
+    $scope = $rootScope.$new();
+    var ctrl = $componentController(&#x27;cyclicTransitionsIssue&#x27;, {
+      $scope: $scope,
+      AlertsService: alertsService,
+      PlaythroughIssuesService: playthroughIssuesService
+    }, {
+      index: () =&gt; 1,
+      issue: () =&gt; (playthroughIssueObjectFactory.createFromBackendDict({
+        issue_type: &#x27;CyclicStateTransitions&#x27;,
+        issue_customization_args: {
+          state_names: {
+            value: [&#x27;State1&#x27;, &#x27;State2&#x27;]
+          }
+        },
+        playthrough_ids: [&#x27;1&#x27;, &#x27;2&#x27;, &#x27;3&#x27;],
+        schema_version: 1,
+        is_valid: true
+      }))
+    });
+    ctrl.$onInit();
+  }));
+
+  it(&#x27;should initialize controller properties after its initialization&#x27;,
+    function() {
+      expect($scope.currentIssueIdentifier).toBe(2);
+      expect($scope.issueStatement).toBe(
+        &#x27;Several learners ended up in a cyclic loop revisiting card &quot;State1&quot;&#x27; +
+        &#x27; many times.&#x27;);
+      expect($scope.suggestions).toEqual([
+        &#x27;Check that the concept presented in &quot;State1&quot; has been reinforced&#x27; +
+        &#x27; sufficiently by the time the learner gets to &quot;State2&quot;.&#x27;]);
+      expect($scope.playthroughIds).toEqual([&#x27;1&#x27;, &#x27;2&#x27;, &#x27;3&#x27;]);
+    });
+
+  it(&#x27;should open playthrough modal with specific playthrough id&#x27;, function() {
+    spyOn(playthroughIssuesService, &#x27;openPlaythroughModal&#x27;);
+    $scope.showPlaythrough(&#x27;2&#x27;);
+    expect(playthroughIssuesService.openPlaythroughModal)
+      .toHaveBeenCalledWith(&#x27;2&#x27;, 1);
+  });
+
+  it(&#x27;should create playthorugh nav id based on playthrough id&#x27;, function() {
+    expect($scope.createPlaythroughNavId(&#x27;1&#x27;)).toBe(1);
+    expect($scope.createPlaythroughNavId(&#x27;2&#x27;)).toBe(2);
+    expect($scope.createPlaythroughNavId(&#x27;3&#x27;)).toBe(3);
+  });
+
+  it(&#x27;should resolve issue if it\&#x27;s not resolved yet&#x27;, function() {
+    spyOn(playthroughIssuesService, &#x27;resolveIssue&#x27;).and.callFake(() =&gt; {});
+    spyOn(alertsService, &#x27;addSuccessMessage&#x27;);
+    $scope.resolveIssue();
+
+    expect(playthroughIssuesService.resolveIssue).toHaveBeenCalled();
+    expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
+      &#x27;Issue resolved. Refresh the page to view changes.&#x27;);
+  });
+
+  it(&#x27;should not resolve issue if it\&#x27;s already resolved&#x27;, function() {
+    // Resolve issue.
+    $scope.resolveIssue();
+
+    spyOn(playthroughIssuesService, &#x27;resolveIssue&#x27;).and.callFake(() =&gt; {});
+    spyOn(alertsService, &#x27;addSuccessMessage&#x27;);
+    $scope.resolveIssue();
+
+    expect(playthroughIssuesService.resolveIssue).not.toHaveBeenCalled();
+    expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
+      &#x27;Issue has already been resolved. No need to resolve again. &#x27; +
+      &#x27;Refresh the page to view changes.&#x27;);
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:25,&quot;character&quot;:6,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:26,&quot;character&quot;:6,&quot;text&quot;:&quot;alertsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:27,&quot;character&quot;:6,&quot;text&quot;:&quot;playthroughIssueObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:28,&quot;character&quot;:6,&quot;text&quot;:&quot;playthroughIssuesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:36,&quot;character&quot;:4,&quot;text&quot;:&quot;alertsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:37,&quot;character&quot;:4,&quot;text&quot;:&quot;playthroughIssueObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:40,&quot;character&quot;:42,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:40,&quot;character&quot;:53,&quot;text&quot;:&quot;$componentController&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:41,&quot;character&quot;:4,&quot;text&quot;:&quot;playthroughIssuesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:41,&quot;character&quot;:31,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:41,&quot;character&quot;:41,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:42,&quot;character&quot;:8,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:42,&quot;character&quot;:21,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:42,&quot;character&quot;:31,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:44,&quot;character&quot;:4,&quot;text&quot;:&quot;playthroughIssuesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:44,&quot;character&quot;:29,&quot;text&quot;:&quot;initSession&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:46,&quot;character&quot;:4,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:46,&quot;character&quot;:13,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:46,&quot;character&quot;:24,&quot;text&quot;:&quot;$new&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:47,&quot;character&quot;:8,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:47,&quot;character&quot;:15,&quot;text&quot;:&quot;$componentController&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:48,&quot;character&quot;:6,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:48,&quot;character&quot;:14,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:49,&quot;character&quot;:6,&quot;text&quot;:&quot;AlertsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:49,&quot;character&quot;:21,&quot;text&quot;:&quot;alertsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:50,&quot;character&quot;:6,&quot;text&quot;:&quot;PlaythroughIssuesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:50,&quot;character&quot;:32,&quot;text&quot;:&quot;playthroughIssuesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:53,&quot;character&quot;:20,&quot;text&quot;:&quot;playthroughIssueObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:53,&quot;character&quot;:50,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:65,&quot;character&quot;:4,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:65,&quot;character&quot;:9,&quot;text&quot;:&quot;$onInit&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:70,&quot;character&quot;:13,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:70,&quot;character&quot;:20,&quot;text&quot;:&quot;currentIssueIdentifier&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:71,&quot;character&quot;:13,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:71,&quot;character&quot;:20,&quot;text&quot;:&quot;issueStatement&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:74,&quot;character&quot;:13,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:74,&quot;character&quot;:20,&quot;text&quot;:&quot;suggestions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:77,&quot;character&quot;:13,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:77,&quot;character&quot;:20,&quot;text&quot;:&quot;playthroughIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:81,&quot;character&quot;:10,&quot;text&quot;:&quot;playthroughIssuesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:82,&quot;character&quot;:4,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:82,&quot;character&quot;:11,&quot;text&quot;:&quot;showPlaythrough&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:83,&quot;character&quot;:11,&quot;text&quot;:&quot;playthroughIssuesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:83,&quot;character&quot;:36,&quot;text&quot;:&quot;openPlaythroughModal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:88,&quot;character&quot;:11,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:88,&quot;character&quot;:18,&quot;text&quot;:&quot;createPlaythroughNavId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:89,&quot;character&quot;:11,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:89,&quot;character&quot;:18,&quot;text&quot;:&quot;createPlaythroughNavId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:90,&quot;character&quot;:11,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:90,&quot;character&quot;:18,&quot;text&quot;:&quot;createPlaythroughNavId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:94,&quot;character&quot;:10,&quot;text&quot;:&quot;playthroughIssuesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:94,&quot;character&quot;:52,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:95,&quot;character&quot;:10,&quot;text&quot;:&quot;alertsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:96,&quot;character&quot;:4,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:96,&quot;character&quot;:11,&quot;text&quot;:&quot;resolveIssue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:98,&quot;character&quot;:11,&quot;text&quot;:&quot;playthroughIssuesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:98,&quot;character&quot;:36,&quot;text&quot;:&quot;resolveIssue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:99,&quot;character&quot;:11,&quot;text&quot;:&quot;alertsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:99,&quot;character&quot;:25,&quot;text&quot;:&quot;addSuccessMessage&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:105,&quot;character&quot;:4,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:105,&quot;character&quot;:11,&quot;text&quot;:&quot;resolveIssue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:107,&quot;character&quot;:10,&quot;text&quot;:&quot;playthroughIssuesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:107,&quot;character&quot;:52,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:108,&quot;character&quot;:10,&quot;text&quot;:&quot;alertsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:109,&quot;character&quot;:4,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:109,&quot;character&quot;:11,&quot;text&quot;:&quot;resolveIssue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:111,&quot;character&quot;:11,&quot;text&quot;:&quot;playthroughIssuesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:111,&quot;character&quot;:36,&quot;text&quot;:&quot;resolveIssue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:111,&quot;character&quot;:50,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:112,&quot;character&quot;:11,&quot;text&quot;:&quot;alertsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/issues/cyclic-transitions-issue.component.spec.ts&quot;,&quot;line&quot;:112,&quot;character&quot;:25,&quot;text&quot;:&quot;addSuccessMessage&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:59 GMT</p>
+    </body>
+  </html>
+  

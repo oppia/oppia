@@ -1,0 +1,141 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>sharing-links.component.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/components/common-layout-directives/common-elements/sharing-links.component.ts</td><td class="">97.62%</td><td class="">100%</td><td class="">168</td><td class="">164</td><td class="">4</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2016 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Component for the Social Sharing Links.
+ */
+import constants from &#x27;assets/constants&#x27;;
+
+import { Component, Input, OnInit } from &#x27;@angular/core&#x27;;
+import { downgradeComponent } from &#x27;@angular/upgrade/static&#x27;;
+import { NgbModal } from &#x27;@ng-bootstrap/ng-bootstrap&#x27;;
+
+import { UrlInterpolationService } from
+  &#x27;domain/utilities/url-interpolation.service&#x27;;
+import { SiteAnalyticsService } from &#x27;services/site-analytics.service&#x27;;
+import { HtmlEscaperService } from &#x27;services/html-escaper.service&#x27;;
+import { ExplorationEmbedButtonModalComponent } from
+  &#x27;components/button-directives/exploration-embed-button-modal.component&#x27;;
+
+@Component({
+  selector: &#x27;sharing-links&#x27;,
+  templateUrl: &#x27;./sharing-links.component.html&#x27;,
+  styleUrls: []
+})
+export class SharingLinksComponent implements OnInit {
+  @Input() layoutType: string;
+  @Input() layoutAlignType: string;
+  @Input() shareType: ShareType;
+  @Input() explorationId: string;
+  @Input() collectionId: string;
+  @Input() smallFont: boolean;
+  classroomUrl: string;
+  activityId: string;
+  activityUrlFragment: string;
+  serverName: string;
+  escapedTwitterText: string;
+
+  constructor(
+    private nbgModal: NgbModal,
+    private urlInterpolationService: UrlInterpolationService,
+    private siteAnalyticsService: SiteAnalyticsService,
+    private htmlEscaperService: HtmlEscaperService) {}
+
+  ngOnInit(): void {
+    if (this.shareType === &#x27;exploration&#x27;) {
+      this.activityId = this.explorationId;
+      this.activityUrlFragment = &#x27;explore&#x27;;
+    } else if (this.shareType === &#x27;collection&#x27;) {
+      this.activityId = this.collectionId;
+      this.activityUrlFragment = &#x27;collection&#x27;;
+    } else {
+      throw new Error(
+        &#x27;SharingLinks directive can only be used either in the&#x27; +
+        &#x27;collection player or the exploration player&#x27;);
+    }
+
+    this.serverName = (
+      window.location.protocol + &#x27;//&#x27; + window.location.host);
+
+    this.escapedTwitterText = (
+      this.htmlEscaperService.unescapedStrToEscapedStr(
+        constants.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR));
+
+    this.classroomUrl = this.urlInterpolationService.getStaticImageUrl(
+      &#x27;/general/classroom.png&#x27;);
+  }
+
+  getFontAndFlexClass(): string {
+    let classes = &#x27;&#x27;;
+    classes += this.smallFont ? &#x27;font-small&#x27; : &#x27;font-big&#x27;;
+    classes += &#x27; fx-&#x27; + this.layoutType;
+    classes += &#x27; fx-main-&#x27; + this.layoutAlignType.split(&#x27;-&#x27;)[0];
+    classes += &#x27; fx-cross-&#x27; + this.layoutAlignType.split(&#x27;-&#x27;)[1];
+    return classes;
+  }
+
+  getUrl(network: SharingPlatform): string {
+    if (network === &#x27;facebook&#x27;) {
+      return `https://www.facebook.com/sharer/sharer.php?sdk=joey&amp;u=${this.serverName}/${this.activityUrlFragment}/${this.activityId}&amp;display=popup&amp;ref=plugin&amp;src=share_button`;
+    }
+
+    if (network === &#x27;twitter&#x27;) {
+      return `https://twitter.com/share?text=${this.escapedTwitterText}&amp;url=${this.serverName}/${this.activityUrlFragment}/${this.activityId}`;
+    }
+
+    if (network === &#x27;classroom&#x27;) {
+      return `https://classroom.google.com/share?url=${this.serverName}/${this.activityUrlFragment}/${this.activityId}`;
+    }
+  }
+
+  showEmbedExplorationModal(): void {
+    const modelRef = this.nbgModal.open(
+      ExplorationEmbedButtonModalComponent, {backdrop: true});
+    modelRef.componentInstance.serverName = this.serverName;
+    modelRef.componentInstance.explorationId = this.explorationId;
+  }
+
+  registerShareEvent(network: SharingPlatform): void {
+    if (this.shareType === &#x27;exploration&#x27;) {
+      this.siteAnalyticsService.registerShareExplorationEvent(network);
+    } else if (this.shareType === &#x27;collection&#x27;) {
+      this.siteAnalyticsService.registerShareCollectionEvent(network);
+    }
+    window.open(this.getUrl(network), &#x27;&#x27;, &#x27;height=460, width=640&#x27;);
+  }
+}
+
+type ShareType = &#x27;exploration&#x27; | &#x27;collection&#x27;;
+type SharingPlatform = &#x27;facebook&#x27; | &#x27;twitter&#x27; | &#x27;classroom&#x27;;
+
+angular.module(&#x27;oppia&#x27;).directive(&#x27;sharingLinks&#x27;, downgradeComponent(
+  {component: SharingLinksComponent}));
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/components/common-layout-directives/common-elements/sharing-links.component.ts&quot;,&quot;line&quot;:104,&quot;character&quot;:13,&quot;text&quot;:&quot;componentInstance&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/common-layout-directives/common-elements/sharing-links.component.ts&quot;,&quot;line&quot;:104,&quot;character&quot;:31,&quot;text&quot;:&quot;serverName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/common-layout-directives/common-elements/sharing-links.component.ts&quot;,&quot;line&quot;:105,&quot;character&quot;:13,&quot;text&quot;:&quot;componentInstance&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/common-layout-directives/common-elements/sharing-links.component.ts&quot;,&quot;line&quot;:105,&quot;character&quot;:31,&quot;text&quot;:&quot;explorationId&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:56 GMT</p>
+    </body>
+  </html>
+  

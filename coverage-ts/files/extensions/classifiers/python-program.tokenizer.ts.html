@@ -1,0 +1,383 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>python-program.tokenizer.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">extensions/classifiers/python-program.tokenizer.ts</td><td class="">93.83%</td><td class="">100%</td><td class="">616</td><td class="">578</td><td class="">38</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2017 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Tokenizer for Python code.
+ *
+ * IMPORTANT NOTE: The tokenizer is built using Python&#x27;s own tokenizer module.
+ * These functions are simply translated from Python code to JS code and they
+ * both do same task. The unnecessary code from Python&#x27;s tokenizer module
+ * has been removed before translating it into JS and code relevant to
+ * generating tokens has been kept intact. If Python version changes on Oppia-ml
+ * then changes in Python&#x27;s tokenizer module must be propagated here.
+ *
+ * Python&#x27;s tokenizer module for Python version 2.7:
+ * https://github.com/python/cpython/blob/2.7/Lib/tokenize.py
+ */
+
+import { downgradeInjectable } from &#x27;@angular/upgrade/static&#x27;;
+import { Injectable } from &#x27;@angular/core&#x27;;
+
+import { ClassifiersExtensionConstants } from
+  &#x27;classifiers/classifiers-extension.constants&#x27;;
+import { LoggerService } from &#x27;services/contextual/logger.service&#x27;;
+
+@Injectable({
+  providedIn: &#x27;root&#x27;
+})
+export class PythonProgramTokenizer {
+  private PythonProgramTokenType = (
+    ClassifiersExtensionConstants.PythonProgramTokenType);
+  constructor(private loggerService: LoggerService) {}
+
+  private groupOfRegEx(...params: (string | string[])[]): string {
+    return &#x27;(&#x27; + Array.prototype.join.call(params, &#x27;|&#x27;) + &#x27;)&#x27;;
+  }
+
+  private regExMayBePresent(params: string | string[]): string {
+    return this.groupOfRegEx(params) + &#x27;?&#x27;;
+  }
+
+  private repeatedRegEx(params: string | string[]): string {
+    return this.groupOfRegEx(params) + &#x27;*&#x27;;
+  }
+
+  private whitespace = &#x27;[ \\f\\t]*&#x27;;
+  private comment = &#x27;#[^\\r\\n]*&#x27;;
+  private ignore = this.whitespace + this.repeatedRegEx(
+    &#x27;\\\\\\r?\\n&#x27; + this.whitespace) + this.regExMayBePresent(this.comment);
+  private name = &#x27;[a-zA-Z_]\\w*&#x27;;
+
+  private hexnumber = &#x27;0[xX][\\da-fA-F]+[lL]?&#x27;;
+  private octnumber = &#x27;(0[oO][0-7]+)|(0[0-7]*)[lL]?&#x27;;
+  private binnumber = &#x27;0[bB][01]+[lL]?&#x27;;
+  private decnumber = &#x27;[1-9]\\d*[lL]?&#x27;;
+  private intnumber = this.groupOfRegEx(
+    this.hexnumber, this.binnumber, this.octnumber, this.decnumber);
+  private exponent = &#x27;[eE][-+]?\\d+&#x27;;
+  private pointfloat = this.groupOfRegEx(
+    &#x27;\\d+\\.\\d*&#x27;, &#x27;\\\\d+\\\\.\\\\d*&#x27;) + this.regExMayBePresent(this.exponent);
+  private expfloat = &#x27;\\d+&#x27; + this.exponent;
+  private floatnumber = this.groupOfRegEx(this.pointfloat, this.expfloat);
+  private imagnumber = this.groupOfRegEx(
+    &#x27;\\d+[jJ]&#x27;, this.floatnumber + &#x27;[jJ]&#x27;);
+  private num = this.groupOfRegEx(
+    this.imagnumber, this.floatnumber, this.intnumber);
+  // Tail end of &#x27; string.
+  private single = &#x27;[^\&#x27;\\\\]*(?:\\\\.[^\&#x27;\\\\]*)*\&#x27;&#x27;;
+  // Tail end of &quot; string.
+  private doubleQuote = &#x27;[^&quot;\\\\]*(?:\\\\.[^&quot;\\\\]*)*&quot;&#x27;;
+  // Tail end of &#x27;&#x27;&#x27; string.
+  private single3 = &quot;[^&#x27;\\\\]*(?:(?:\\\\.|&#x27;(?!&#x27;&#x27;))[^&#x27;\\\\]*)*&#x27;&#x27;&#x27;&quot;;
+  // Tail end of &quot;&quot;&quot; string.
+  private double3 = &#x27;[^&quot;\\\\]*(?:(?:\\\\.|&quot;(?!&quot;&quot;))[^&quot;\\\\]*)*&quot;&quot;&quot;&#x27;;
+  private triple = this.groupOfRegEx(&quot;[uUbB]?[rR]?&#x27;&#x27;&#x27;&quot;, &#x27;[uUbB]?[rR]?&quot;&quot;&quot;&#x27;);
+  // Single-line &#x27; or &quot; string.
+  private str = this.groupOfRegEx(
+    &quot;[uUbB]?[rR]?&#x27;[^\\n&#x27;\\\\]*(?:\\\\.[^\\n&#x27;\\\\]*)*&#x27;&quot;,
+    &#x27;[uUbB]?[rR]?&quot;[^\\n&quot;\\\\]*(?:\\\\.[^\\n&quot;\\\\]*)*&quot;&#x27;);
+
+  // Because of leftmost-then-longest match semantics, be sure to put the
+  // longest operators first (e.g., if = came before ==, == would get
+  // recognized as two instances of =).
+  private operator = this.groupOfRegEx(
+    &#x27;\\*\\*=?&#x27;, &#x27;&gt;&gt;=?&#x27;, &#x27;&lt;&lt;=?&#x27;, &#x27;&lt;&gt;&#x27;, &#x27;!=&#x27;, &#x27;//=?&#x27;, &#x27;[+\\-*/%&amp;|^=&lt;&gt;]=?&#x27;, &#x27;~&#x27;);
+
+  private bracket = &#x27;[(){}]&#x27;;
+  private special = this.groupOfRegEx(&#x27;\\r?\\n&#x27;, &#x27;[:;.,\\`@]&#x27;);
+  private funny = this.groupOfRegEx(this.operator, this.bracket, this.special);
+
+  private plaintoken = this.groupOfRegEx(
+    this.num, this.funny, this.str, this.name);
+  private token = this.ignore + this.plaintoken;
+
+  // First (or only) line of &#x27; or &quot; string.
+  private contStr = this.groupOfRegEx(
+    &quot;[uUbB]?[rR]?&#x27;[^\\n&#x27;\\\\]*(?:\\\\.[^\\n&#x27;\\\\]*)*&#x27;&quot; +
+    this.groupOfRegEx(&quot;&#x27;&quot;, &#x27;\\\\\\r?\\n&#x27;),
+    &#x27;[uUbB]?[rR]?&quot;[^\\n&quot;\\\\]*(?:\\\\.[^\\n&quot;\\\\]*)*&#x27; +
+    this.groupOfRegEx(&#x27;&quot;&#x27;, &#x27;\\\\\\r?\\n&#x27;));
+  private pseudoextras = this.groupOfRegEx(
+    &#x27;\\\\\\r?\\n|\\Z&#x27;, this.comment, this.triple);
+  private pseudotoken = this.whitespace + this.groupOfRegEx(
+    this.pseudoextras, this.num, this.funny, this.contStr, this.name);
+
+  // Regular Expression object.
+  private tokenprog = new RegExp(this.token);
+  private pseudoprog = new RegExp(this.pseudotoken);
+  private single3prog = new RegExp(this.single3);
+  private double3prog = new RegExp(this.double3);
+
+  private endprogs = {
+    &quot;&#x27;&quot;: new RegExp(this.single), &#x27;&quot;&#x27;: new RegExp(this.doubleQuote),
+    &quot;&#x27;&#x27;&#x27;&quot;: this.single3prog, &#x27;&quot;&quot;&quot;&#x27;: this.double3prog,
+    &quot;r&#x27;&#x27;&#x27;&quot;: this.single3prog, &#x27;r&quot;&quot;&quot;&#x27;: this.double3prog,
+    &quot;u&#x27;&#x27;&#x27;&quot;: this.single3prog, &#x27;u&quot;&quot;&quot;&#x27;: this.double3prog,
+    &quot;ur&#x27;&#x27;&#x27;&quot;: this.single3prog, &#x27;ur&quot;&quot;&quot;&#x27;: this.double3prog,
+    &quot;R&#x27;&#x27;&#x27;&quot;: this.single3prog, &#x27;R&quot;&quot;&quot;&#x27;: this.double3prog,
+    &quot;U&#x27;&#x27;&#x27;&quot;: this.single3prog, &#x27;U&quot;&quot;&quot;&#x27;: this.double3prog,
+    &quot;uR&#x27;&#x27;&#x27;&quot;: this.single3prog, &#x27;uR&quot;&quot;&quot;&#x27;: this.double3prog,
+    &quot;Ur&#x27;&#x27;&#x27;&quot;: this.single3prog, &#x27;Ur&quot;&quot;&quot;&#x27;: this.double3prog,
+    &quot;UR&#x27;&#x27;&#x27;&quot;: this.single3prog, &#x27;UR&quot;&quot;&quot;&#x27;: this.double3prog,
+    &quot;b&#x27;&#x27;&#x27;&quot;: this.single3prog, &#x27;b&quot;&quot;&quot;&#x27;: this.double3prog,
+    &quot;br&#x27;&#x27;&#x27;&quot;: this.single3prog, &#x27;br&quot;&quot;&quot;&#x27;: this.double3prog,
+    &quot;B&#x27;&#x27;&#x27;&quot;: this.single3prog, &#x27;B&quot;&quot;&quot;&#x27;: this.double3prog,
+    &quot;bR&#x27;&#x27;&#x27;&quot;: this.single3prog, &#x27;bR&quot;&quot;&quot;&#x27;: this.double3prog,
+    &quot;Br&#x27;&#x27;&#x27;&quot;: this.single3prog, &#x27;Br&quot;&quot;&quot;&#x27;: this.double3prog,
+    &quot;BR&#x27;&#x27;&#x27;&quot;: this.single3prog, &#x27;BR&quot;&quot;&quot;&#x27;: this.double3prog,
+    r: null, R: null, u: null, U: null,
+    b: null, B: null
+  };
+
+  private tripleQuoted = [
+    &quot;&#x27;&#x27;&#x27;&quot;, &#x27;&quot;&quot;&quot;&#x27;, &quot;r&#x27;&#x27;&#x27;&quot;, &#x27;r&quot;&quot;&quot;&#x27;, &quot;R&#x27;&#x27;&#x27;&quot;, &#x27;R&quot;&quot;&quot;&#x27;,
+    &quot;u&#x27;&#x27;&#x27;&quot;, &#x27;u&quot;&quot;&quot;&#x27;, &quot;U&#x27;&#x27;&#x27;&quot;, &#x27;U&quot;&quot;&quot;&#x27;, &quot;ur&#x27;&#x27;&#x27;&quot;, &#x27;ur&quot;&quot;&quot;&#x27;, &quot;Ur&#x27;&#x27;&#x27;&quot;, &#x27;Ur&quot;&quot;&quot;&#x27;,
+    &quot;uR&#x27;&#x27;&#x27;&quot;, &#x27;uR&quot;&quot;&quot;&#x27;, &quot;UR&#x27;&#x27;&#x27;&quot;, &#x27;UR&quot;&quot;&quot;&#x27;, &quot;b&#x27;&#x27;&#x27;&quot;, &#x27;b&quot;&quot;&quot;&#x27;, &quot;B&#x27;&#x27;&#x27;&quot;, &#x27;B&quot;&quot;&quot;&#x27;,
+    &quot;br&#x27;&#x27;&#x27;&quot;, &#x27;br&quot;&quot;&quot;&#x27;, &quot;Br&#x27;&#x27;&#x27;&quot;, &#x27;Br&quot;&quot;&quot;&#x27;, &quot;bR&#x27;&#x27;&#x27;&quot;, &#x27;bR&quot;&quot;&quot;&#x27;, &quot;BR&#x27;&#x27;&#x27;&quot;, &#x27;BR&quot;&quot;&quot;&#x27;];
+
+  private singleQuoted = [
+    &quot;&#x27;&quot;, &#x27;&quot;&#x27;, &quot;r&#x27;&quot;, &#x27;r&quot;&#x27;, &quot;R&#x27;&quot;, &#x27;R&quot;&#x27;, &quot;u&#x27;&quot;, &#x27;u&quot;&#x27;, &quot;U&#x27;&quot;, &#x27;U&quot;&#x27;, &quot;ur&#x27;&quot;,
+    &#x27;ur&quot;&#x27;, &quot;Ur&#x27;&quot;, &#x27;Ur&quot;&#x27;, &quot;uR&#x27;&quot;, &#x27;uR&quot;&#x27;, &quot;UR&#x27;&quot;, &#x27;UR&quot;&#x27;, &quot;b&#x27;&quot;, &#x27;b&quot;&#x27;, &quot;B&#x27;&quot;, &#x27;B&quot;&#x27;,
+    &quot;br&#x27;&quot;, &#x27;br&quot;&#x27;, &quot;Br&#x27;&quot;, &#x27;Br&quot;&#x27;, &quot;bR&#x27;&quot;, &#x27;bR&quot;&#x27;, &quot;BR&#x27;&quot;, &#x27;BR&quot;&#x27;];
+
+  private tabsize = 8;
+
+  generateTokens(program: string[]): string[][] {
+    const tokenizedProgram = [];
+    let parenlev = 0;
+    let continued = 0;
+    const namechars = &#x27;abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_&#x27;;
+    const numchars = &#x27;0123456789&#x27;;
+    let contstr = &#x27;&#x27;;
+    let needcont = 0;
+    let contline = null;
+    let indents = [0];
+    let lcount = 0;
+    let endprog = null;
+
+    while (1) {
+      let line = program[lcount];
+      lcount++;
+      if (line === undefined) {
+        break;
+      }
+      let pos = 0;
+      const max = line.length;
+
+      let endmatch: { length: number; }[];
+      if (contstr) {
+        if (!line) {
+          // Exception.
+          this.loggerService.error(&#x27;EOF in multi-line string&#x27;);
+        }
+
+        let endmatch = endprog.exec(line);
+        if (endmatch &amp;&amp; endmatch.index === 0) {
+          this.token = endmatch[0];
+          pos = pos + this.token.length;
+          tokenizedProgram.push(
+            [this.PythonProgramTokenType.STRING, this.token]);
+          contstr = &#x27;&#x27;;
+          needcont = 0;
+          contline = null;
+        } else if (
+          needcont &amp;&amp; line.slice(-2) !== &#x27;\\\n&#x27; ||
+          line.slice(-3) !== &#x27;\\\r\n&#x27;) {
+          tokenizedProgram.push(
+            [this.PythonProgramTokenType.ERRORTOKEN, contstr + line]);
+          contstr = &#x27;&#x27;;
+          contline = null;
+          continue;
+        } else {
+          contstr = contstr + line;
+          contline = contline + line;
+          continue;
+        }
+      } else if (parenlev === 0 &amp;&amp; !continued) {
+        // New statement.
+        if (!line) {
+          break;
+        }
+
+        let column = 0;
+        // Measure leading whitespace.
+        while (pos &lt; max) {
+          if (line[pos] === &#x27; &#x27;) {
+            column += 1;
+          } else if (line[pos] === &#x27;\t&#x27;) {
+            column = (column / this.tabsize + 1) * this.tabsize;
+          } else if (line[pos] === &#x27;\f&#x27;) {
+            column = 0;
+          } else {
+            break;
+          }
+          pos += 1;
+        }
+
+        if (pos === max) {
+          break;
+        }
+
+        // Skip comments or blank lines.
+        if ((&#x27;#\r\n&#x27;).indexOf(line[pos]) !== -1) {
+          if (line[pos] === &#x27;#&#x27;) {
+            const commentToken = line.slice(pos).replace(&#x27;\\r\\n&#x27;, &#x27;&#x27;);
+            const nlPos = pos + commentToken.length;
+            tokenizedProgram.push(
+              [this.PythonProgramTokenType.COMMENT, commentToken]);
+            tokenizedProgram.push(
+              [this.PythonProgramTokenType.NL, line.slice(nlPos)]);
+          } else {
+            const comment = this.PythonProgramTokenType.COMMENT;
+            const nl = this.PythonProgramTokenType.NL;
+            tokenizedProgram.push([
+              line[pos] === &#x27;#&#x27; ? comment : nl,
+              line.slice(pos)]);
+          }
+          continue;
+        }
+
+        // Count indents or dedents.
+        if (column &gt; indents[-1]) {
+          indents.push(column);
+          tokenizedProgram.push(
+            [this.PythonProgramTokenType.INDENT, line.slice(0, pos)]);
+        }
+
+        while (column &lt; indents[-1]) {
+          if (indents.indexOf(column) === -1) {
+            this.loggerService.error(
+              &#x27;unindent does not match any outer indentation level&#x27;);
+          }
+          indents = indents.slice(0, -1);
+          tokenizedProgram.push([this.PythonProgramTokenType.DEDENT, &#x27;&#x27;]);
+        }
+      } else {
+        // Continued statement.
+        if (!line) {
+          this.loggerService.error(&#x27;EOF in multi-line statement&#x27;);
+        }
+        continued = 0;
+      }
+
+      while (pos &lt; max) {
+        const pseudomatch = this.pseudoprog.exec(line.slice(pos));
+        // Scan for tokens.
+        if (pseudomatch &amp;&amp; pseudomatch.index === 0) {
+          const start = pos + pseudomatch[0].indexOf(pseudomatch[1]);
+          const end = start + pseudomatch[1].length;
+          pos = end;
+          if (start === end) {
+            continue;
+          }
+          let token = line.slice(start, end);
+          const initial = line[start];
+
+          // Ordinary number.
+          if (
+            numchars.indexOf(initial) !== -1 ||
+            (initial === &#x27;.&#x27; &amp;&amp; token !== &#x27;.&#x27;)) {
+            tokenizedProgram.push([this.PythonProgramTokenType.NUMBER, token]);
+          } else if (&#x27;\r\n&#x27;.indexOf(initial) !== -1) {
+            tokenizedProgram.push([this.PythonProgramTokenType.NL, token]);
+          } else if (initial === &#x27;#&#x27;) {
+            if (!token.endsWith(&#x27;\n&#x27;)) {
+              tokenizedProgram.push(
+                [this.PythonProgramTokenType.COMMENT, token]);
+            }
+          } else if (this.tripleQuoted.indexOf(token) !== -1) {
+            endprog = this.endprogs[token];
+            endmatch = endprog.exec(line.slice(pos));
+            // All on one line.
+            if (endmatch) {
+              pos = pos + endmatch[0].length;
+              token = line.slice(start, pos);
+              tokenizedProgram.push(
+                [this.PythonProgramTokenType.STRING, token]);
+            } else {
+              // Multiple lines.
+              contstr = line.slice(start);
+              contline = line;
+              break;
+            }
+          } else if (
+            this.singleQuoted.indexOf(initial) !== -1 ||
+              this.singleQuoted.indexOf(token.slice(0, 2)) !== -1 ||
+              this.singleQuoted.indexOf(token.slice(0, 3)) !== -1) {
+            // Continued string.
+            if (token.slice(-1) === &#x27;\n&#x27;) {
+              endprog = (
+                this.endprogs[initial] || this.endprogs[token[1]] ||
+                this.endprogs[token[2]]);
+              contstr = line.slice(start);
+              needcont = 1;
+              contline = line;
+              break;
+            } else {
+              tokenizedProgram.push(
+                [this.PythonProgramTokenType.STRING, token]);
+            }
+          } else if (namechars.indexOf(initial) !== -1) {
+            // Ordinary name.
+            tokenizedProgram.push([this.PythonProgramTokenType.NAME, token]);
+          } else if (initial === &#x27;\\&#x27;) {
+            // Continued statement.
+            continued = 1;
+          } else {
+            if (&#x27;([{&#x27;.indexOf(initial) !== -1) {
+              parenlev += 1;
+            } else if (&#x27;)]}&#x27;.indexOf(initial) !== -1) {
+              parenlev -= 1;
+            }
+            tokenizedProgram.push([this.PythonProgramTokenType.OP, token]);
+          }
+        } else {
+          tokenizedProgram.push(
+            [this.PythonProgramTokenType.ERRORTOKEN, line[pos]]);
+          pos += 1;
+        }
+      }
+    }
+
+    // Pop remaining indent levels.
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    for (let indent in indents.slice(1)) {
+      tokenizedProgram.push([this.PythonProgramTokenType.DEDENT, &#x27;&#x27;]);
+    }
+
+    tokenizedProgram.push([this.PythonProgramTokenType.ENDMARKER, &#x27;&#x27;]);
+    return tokenizedProgram;
+  }
+}
+
+angular.module(&#x27;oppia&#x27;).factory(
+  &#x27;PythonProgramTokenizer&#x27;, downgradeInjectable(PythonProgramTokenizer));
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;extensions/classifiers/python-program.tokenizer.ts&quot;,&quot;line&quot;:44,&quot;character&quot;:23,&quot;text&quot;:&quot;prototype&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/classifiers/python-program.tokenizer.ts&quot;,&quot;line&quot;:156,&quot;character&quot;:10,&quot;text&quot;:&quot;tokenizedProgram&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/classifiers/python-program.tokenizer.ts&quot;,&quot;line&quot;:163,&quot;character&quot;:8,&quot;text&quot;:&quot;contline&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/classifiers/python-program.tokenizer.ts&quot;,&quot;line&quot;:166,&quot;character&quot;:8,&quot;text&quot;:&quot;endprog&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/classifiers/python-program.tokenizer.ts&quot;,&quot;line&quot;:184,&quot;character&quot;:12,&quot;text&quot;:&quot;endmatch&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/classifiers/python-program.tokenizer.ts&quot;,&quot;line&quot;:184,&quot;character&quot;:23,&quot;text&quot;:&quot;endprog&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/classifiers/python-program.tokenizer.ts&quot;,&quot;line&quot;:184,&quot;character&quot;:31,&quot;text&quot;:&quot;exec&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/classifiers/python-program.tokenizer.ts&quot;,&quot;line&quot;:185,&quot;character&quot;:12,&quot;text&quot;:&quot;endmatch&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/classifiers/python-program.tokenizer.ts&quot;,&quot;line&quot;:185,&quot;character&quot;:24,&quot;text&quot;:&quot;endmatch&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/classifiers/python-program.tokenizer.ts&quot;,&quot;line&quot;:185,&quot;character&quot;:33,&quot;text&quot;:&quot;index&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/classifiers/python-program.tokenizer.ts&quot;,&quot;line&quot;:186,&quot;character&quot;:23,&quot;text&quot;:&quot;endmatch&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/classifiers/python-program.tokenizer.ts&quot;,&quot;line&quot;:188,&quot;character&quot;:10,&quot;text&quot;:&quot;tokenizedProgram&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/classifiers/python-program.tokenizer.ts&quot;,&quot;line&quot;:192,&quot;character&quot;:10,&quot;text&quot;:&quot;contline&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/classifiers/python-program.tokenizer.ts&quot;,&quot;line&quot;:196,&quot;character&quot;:10,&quot;text&quot;:&quot;tokenizedProgram&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/classifiers/python-program.tokenizer.ts&quot;,&quot;line&quot;:199,&quot;character&quot;:10,&quot;text&quot;:&quot;contline&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/classifiers/python-program.tokenizer.ts&quot;,&quot;line&quot;:203,&quot;character&quot;:10,&quot;text&quot;:&quot;contline&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/classifiers/python-program.tokenizer.ts&quot;,&quot;line&quot;:203,&quot;character&quot;:21,&quot;text&quot;:&quot;contline&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/classifiers/python-program.tokenizer.ts&quot;,&quot;line&quot;:236,&quot;character&quot;:12,&quot;text&quot;:&quot;tokenizedProgram&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/classifiers/python-program.tokenizer.ts&quot;,&quot;line&quot;:238,&quot;character&quot;:12,&quot;text&quot;:&quot;tokenizedProgram&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/classifiers/python-program.tokenizer.ts&quot;,&quot;line&quot;:243,&quot;character&quot;:12,&quot;text&quot;:&quot;tokenizedProgram&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/classifiers/python-program.tokenizer.ts&quot;,&quot;line&quot;:253,&quot;character&quot;:10,&quot;text&quot;:&quot;tokenizedProgram&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/classifiers/python-program.tokenizer.ts&quot;,&quot;line&quot;:263,&quot;character&quot;:10,&quot;text&quot;:&quot;tokenizedProgram&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/classifiers/python-program.tokenizer.ts&quot;,&quot;line&quot;:290,&quot;character&quot;:12,&quot;text&quot;:&quot;tokenizedProgram&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/classifiers/python-program.tokenizer.ts&quot;,&quot;line&quot;:292,&quot;character&quot;:12,&quot;text&quot;:&quot;tokenizedProgram&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/classifiers/python-program.tokenizer.ts&quot;,&quot;line&quot;:295,&quot;character&quot;:14,&quot;text&quot;:&quot;tokenizedProgram&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/classifiers/python-program.tokenizer.ts&quot;,&quot;line&quot;:299,&quot;character&quot;:12,&quot;text&quot;:&quot;endprog&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/classifiers/python-program.tokenizer.ts&quot;,&quot;line&quot;:300,&quot;character&quot;:23,&quot;text&quot;:&quot;endprog&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/classifiers/python-program.tokenizer.ts&quot;,&quot;line&quot;:300,&quot;character&quot;:31,&quot;text&quot;:&quot;exec&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/classifiers/python-program.tokenizer.ts&quot;,&quot;line&quot;:305,&quot;character&quot;:14,&quot;text&quot;:&quot;tokenizedProgram&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/classifiers/python-program.tokenizer.ts&quot;,&quot;line&quot;:310,&quot;character&quot;:14,&quot;text&quot;:&quot;contline&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/classifiers/python-program.tokenizer.ts&quot;,&quot;line&quot;:319,&quot;character&quot;:14,&quot;text&quot;:&quot;endprog&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/classifiers/python-program.tokenizer.ts&quot;,&quot;line&quot;:324,&quot;character&quot;:14,&quot;text&quot;:&quot;contline&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/classifiers/python-program.tokenizer.ts&quot;,&quot;line&quot;:327,&quot;character&quot;:14,&quot;text&quot;:&quot;tokenizedProgram&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/classifiers/python-program.tokenizer.ts&quot;,&quot;line&quot;:332,&quot;character&quot;:12,&quot;text&quot;:&quot;tokenizedProgram&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/classifiers/python-program.tokenizer.ts&quot;,&quot;line&quot;:342,&quot;character&quot;:12,&quot;text&quot;:&quot;tokenizedProgram&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/classifiers/python-program.tokenizer.ts&quot;,&quot;line&quot;:345,&quot;character&quot;:10,&quot;text&quot;:&quot;tokenizedProgram&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/classifiers/python-program.tokenizer.ts&quot;,&quot;line&quot;:355,&quot;character&quot;:6,&quot;text&quot;:&quot;tokenizedProgram&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/classifiers/python-program.tokenizer.ts&quot;,&quot;line&quot;:358,&quot;character&quot;:4,&quot;text&quot;:&quot;tokenizedProgram&quot;,&quot;kind&quot;:2}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:55 GMT</p>
+    </body>
+  </html>
+  

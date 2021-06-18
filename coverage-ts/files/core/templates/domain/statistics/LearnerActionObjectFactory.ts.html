@@ -1,0 +1,197 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>LearnerActionObjectFactory.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">core/templates/domain/statistics/LearnerActionObjectFactory.ts</td><td class="">100.00%</td><td class="">100%</td><td class="">133</td><td class="">133</td><td class="">0</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2018 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Factory for creating new frontend instances of Learner
+ *     Action domain objects.
+ */
+
+import { downgradeInjectable } from &#x27;@angular/upgrade/static&#x27;;
+import { Injectable } from &#x27;@angular/core&#x27;;
+
+import { StatisticsDomainConstants } from
+  &#x27;domain/statistics/statistics-domain.constants&#x27;;
+
+export interface ExplorationStartCustomizationArgs {
+  &#x27;state_name&#x27;: {value: string};
+}
+
+export interface AnswerSubmitCustomizationArgs {
+  &#x27;state_name&#x27;: {value: string};
+  &#x27;dest_state_name&#x27;: {value: string};
+  &#x27;interaction_id&#x27;: {value: string};
+  &#x27;submitted_answer&#x27;: {value: string};
+  &#x27;feedback&#x27;: {value: string};
+  &#x27;time_spent_state_in_msecs&#x27;: {value: number};
+}
+
+export interface ExplorationQuitCustomizationArgs {
+  &#x27;state_name&#x27;: {value: string};
+  &#x27;time_spent_in_state_in_msecs&#x27;: {value: number};
+}
+
+// NOTE TO DEVELOPERS: Treat this as an implementation detail; do not export it.
+// This type takes one of the values of the above customization args based
+// on the type of ActionType.
+type ActionCustomizationArgs&lt;ActionType&gt; = (
+  ActionType extends &#x27;ExplorationStart&#x27; ?
+  ExplorationStartCustomizationArgs :
+  ActionType extends &#x27;AnswerSubmit&#x27; ? AnswerSubmitCustomizationArgs :
+  ActionType extends &#x27;ExplorationQuit&#x27; ?
+  ExplorationQuitCustomizationArgs : never);
+
+// NOTE TO DEVELOPERS: Treat this as an implementation detail; do not export it.
+// This interface takes the type of backend dict according to the ActionType
+// parameter.
+interface LearnerActionBackendDictBase&lt;ActionType&gt; {
+  &#x27;action_type&#x27;: ActionType;
+  &#x27;action_customization_args&#x27;: ActionCustomizationArgs&lt;ActionType&gt;;
+  &#x27;schema_version&#x27;: number;
+}
+
+export type ExplorationStartLearnerActionBackendDict = (
+  LearnerActionBackendDictBase&lt;&#x27;ExplorationStart&#x27;&gt;);
+
+export type AnswerSubmitLearnerActionBackendDict = (
+  LearnerActionBackendDictBase&lt;&#x27;AnswerSubmit&#x27;&gt;);
+
+export type ExplorationQuitLearnerActionBackendDict = (
+  LearnerActionBackendDictBase&lt;&#x27;ExplorationQuit&#x27;&gt;);
+
+export type LearnerActionBackendDict = (
+  ExplorationStartLearnerActionBackendDict |
+  AnswerSubmitLearnerActionBackendDict |
+  ExplorationQuitLearnerActionBackendDict);
+
+// NOTE TO DEVELOPERS: Treat this as an implementation detail; do not export it.
+// This class takes the type according to the ActionType parameter.
+class LearnerActionBase&lt;ActionType&gt; {
+  constructor(
+      public readonly actionType: ActionType,
+      public actionCustomizationArgs: ActionCustomizationArgs&lt;ActionType&gt;,
+      public schemaVersion: number) {}
+
+  toBackendDict(): LearnerActionBackendDictBase&lt;ActionType&gt; {
+    return {
+      action_type: this.actionType,
+      action_customization_args: this.actionCustomizationArgs,
+      schema_version: this.schemaVersion,
+    };
+  }
+}
+
+export class ExplorationStartLearnerAction extends
+  LearnerActionBase&lt;&#x27;ExplorationStart&#x27;&gt; {}
+
+export class AnswerSubmitLearnerAction extends
+  LearnerActionBase&lt;&#x27;AnswerSubmit&#x27;&gt; {}
+
+export class ExplorationQuitLearnerAction extends
+  LearnerActionBase&lt;&#x27;ExplorationQuit&#x27;&gt; {}
+
+export type LearnerAction = (
+  ExplorationStartLearnerAction |
+  AnswerSubmitLearnerAction |
+  ExplorationQuitLearnerAction);
+
+@Injectable({
+  providedIn: &#x27;root&#x27;
+})
+export class LearnerActionObjectFactory {
+  createNewExplorationStartAction(
+      actionCustomizationArgs: ExplorationStartCustomizationArgs
+  ): ExplorationStartLearnerAction {
+    return new ExplorationStartLearnerAction(
+      &#x27;ExplorationStart&#x27;, actionCustomizationArgs,
+      StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION);
+  }
+
+  createNewAnswerSubmitAction(
+      actionCustomizationArgs: AnswerSubmitCustomizationArgs
+  ): AnswerSubmitLearnerAction {
+    return new AnswerSubmitLearnerAction(
+      &#x27;AnswerSubmit&#x27;, actionCustomizationArgs,
+      StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION);
+  }
+
+  createNewExplorationQuitAction(
+      actionCustomizationArgs: ExplorationQuitCustomizationArgs
+  ): ExplorationQuitLearnerAction {
+    return new ExplorationQuitLearnerAction(
+      &#x27;ExplorationQuit&#x27;, actionCustomizationArgs,
+      StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION);
+  }
+
+  /**
+   * @typedef LearnerActionBackendDict
+   * @property {string} actionType - type of an action.
+   * @property {Object.&lt;string, *&gt;} actionCustomizationArgs - customization
+   *   dict for an action.
+   * @property {number} schemaVersion - schema version of the class instance.
+   *   Defaults to the latest schema version.
+   */
+
+  /**
+   * @param {LearnerActionBackendDict} learnerActionBackendDict
+   * @returns {LearnerAction}
+   */
+  createFromBackendDict(
+      learnerActionBackendDict: LearnerActionBackendDict): LearnerAction {
+    switch (learnerActionBackendDict.action_type) {
+      case &#x27;ExplorationStart&#x27;:
+        return new ExplorationStartLearnerAction(
+          learnerActionBackendDict.action_type,
+          learnerActionBackendDict.action_customization_args,
+          learnerActionBackendDict.schema_version);
+      case &#x27;AnswerSubmit&#x27;:
+        return new AnswerSubmitLearnerAction(
+          learnerActionBackendDict.action_type,
+          learnerActionBackendDict.action_customization_args,
+          learnerActionBackendDict.schema_version);
+      case &#x27;ExplorationQuit&#x27;:
+        return new ExplorationQuitLearnerAction(
+          learnerActionBackendDict.action_type,
+          learnerActionBackendDict.action_customization_args,
+          learnerActionBackendDict.schema_version);
+      default:
+        break;
+    }
+    const invalidBackendDict: never = learnerActionBackendDict;
+    throw new Error(
+      &#x27;Backend dict does not match any known action type: &#x27; +
+      angular.toJson(invalidBackendDict));
+  }
+}
+
+angular.module(&#x27;oppia&#x27;).factory(
+  &#x27;LearnerActionObjectFactory&#x27;,
+  downgradeInjectable(LearnerActionObjectFactory));
+</textarea><pre id="annotations" style="display:none">[]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:55 GMT</p>
+    </body>
+  </html>
+  

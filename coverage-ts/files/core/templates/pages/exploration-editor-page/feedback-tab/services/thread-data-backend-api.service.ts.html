@@ -1,0 +1,318 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>thread-data-backend-api.service.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/exploration-editor-page/feedback-tab/services/thread-data-backend-api.service.ts</td><td class="">99.53%</td><td class="">100%</td><td class="">426</td><td class="">424</td><td class="">2</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2014 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Service for getting thread data from the backend for the
+ * feedback tab of the exploration editor.
+ */
+
+import { Injectable } from &#x27;@angular/core&#x27;;
+import { HttpClient } from &#x27;@angular/common/http&#x27;;
+import { downgradeInjectable } from &#x27;@angular/upgrade/static&#x27;;
+
+import { forkJoin } from &#x27;rxjs&#x27;;
+
+import { AppConstants } from &#x27;app.constants&#x27;;
+import { FeedbackThread, FeedbackThreadBackendDict, FeedbackThreadObjectFactory } from &#x27;domain/feedback_thread/FeedbackThreadObjectFactory&#x27;;
+import { ThreadMessage, ThreadMessageBackendDict } from &#x27;domain/feedback_message/ThreadMessage.model&#x27;;
+import { SuggestionBackendDict } from &#x27;domain/suggestion/suggestion.model&#x27;;
+import { SuggestionThread, SuggestionThreadObjectFactory } from &#x27;domain/suggestion/SuggestionThreadObjectFactory&#x27;;
+import { UrlInterpolationService } from &#x27;domain/utilities/url-interpolation.service&#x27;;
+import { ExplorationEditorPageConstants } from &#x27;pages/exploration-editor-page/exploration-editor-page.constants&#x27;;
+import { AlertsService } from &#x27;services/alerts.service&#x27;;
+import { ContextService } from &#x27;services/context.service&#x27;;
+import { SuggestionsService } from &#x27;services/suggestions.service&#x27;;
+
+type SuggestionAndFeedbackThread = FeedbackThread | SuggestionThread;
+
+interface NumberOfOpenThreads {
+  &#x27;num_open_threads&#x27;: number;
+}
+
+interface SuggestionAndFeedbackThreads {
+  feedbackThreads: FeedbackThread[];
+  suggestionThreads: SuggestionThread[];
+}
+
+interface SuggestionData {
+  suggestions: SuggestionBackendDict[];
+}
+
+interface ThreadData {
+  &#x27;feedback_thread_dicts&#x27;: FeedbackThreadBackendDict[];
+  &#x27;suggestion_thread_dicts&#x27;: FeedbackThreadBackendDict[];
+}
+
+interface ThreadMessages {
+  &#x27;messages&#x27;: ThreadMessageBackendDict[];
+}
+
+@Injectable({
+  providedIn: &#x27;root&#x27;
+})
+export class ThreadDataBackendApiService {
+  // Container for all of the threads related to this exploration.
+  threadsById: Map&lt;string, SuggestionAndFeedbackThread&gt; = (
+    new Map&lt;string, SuggestionAndFeedbackThread&gt;());
+
+  // Cached number of open threads requiring action.
+  openThreadsCount: number = 0;
+
+  constructor(
+    private alertsService: AlertsService,
+    private contextService: ContextService,
+    private feedbackThreadObjectFactory: FeedbackThreadObjectFactory,
+    private http: HttpClient,
+    private suggestionThreadObjectFactory: SuggestionThreadObjectFactory,
+    private suggestionsService: SuggestionsService,
+    private urlInterpolationService: UrlInterpolationService
+  ) {}
+
+  getFeedbackStatsHandlerUrl(): string {
+    return this.urlInterpolationService.interpolateUrl(
+      &#x27;/feedbackstatshandler/&lt;exploration_id&gt;&#x27;, {
+        exploration_id: this.contextService.getExplorationId()
+      });
+  }
+
+  getFeedbackThreadViewEventUrl(threadId: string): string {
+    return this.urlInterpolationService.interpolateUrl(
+      &#x27;/feedbackhandler/thread_view_event/&lt;thread_id&gt;&#x27;, {
+        thread_id: threadId
+      });
+  }
+
+  getSuggestionActionHandlerUrl(threadId: string): string {
+    return this.urlInterpolationService.interpolateUrl(
+      &#x27;/suggestionactionhandler/exploration/&lt;exploration_id&gt;/&lt;thread_id&gt;&#x27;, {
+        exploration_id: this.contextService.getExplorationId(),
+        thread_id: threadId
+      });
+  }
+
+  getSuggestionListHandlerUrl(): string {
+    return &#x27;/suggestionlisthandler&#x27;;
+  }
+
+  getThreadHandlerUrl(threadId: string): string {
+    return this.urlInterpolationService.interpolateUrl(
+      &#x27;/threadhandler/&lt;thread_id&gt;&#x27;, {
+        thread_id: threadId
+      });
+  }
+
+  getThreadListHandlerUrl(): string {
+    return this.urlInterpolationService.interpolateUrl(
+      &#x27;/threadlisthandler/&lt;exploration_id&gt;&#x27;, {
+        exploration_id: this.contextService.getExplorationId()
+      });
+  }
+
+  setFeedbackThreadFromBackendDict(
+      threadBackendDict: FeedbackThreadBackendDict): FeedbackThread {
+    if (!threadBackendDict) {
+      throw new Error(&#x27;Missing input backend dict&#x27;);
+    }
+    let thread = this.feedbackThreadObjectFactory.createFromBackendDict(
+      threadBackendDict);
+    this.threadsById.set(thread.threadId, thread);
+    return thread;
+  }
+
+  setSuggestionThreadFromBackendDicts(
+      threadBackendDict: FeedbackThreadBackendDict,
+      suggestionBackendDict: SuggestionBackendDict): SuggestionThread {
+    if (!threadBackendDict || !suggestionBackendDict) {
+      throw new Error(&#x27;Missing input backend dicts&#x27;);
+    }
+    let thread = this.suggestionThreadObjectFactory.createFromBackendDicts(
+      threadBackendDict, suggestionBackendDict);
+    this.threadsById.set(thread.threadId, thread);
+    return thread;
+  }
+
+  getThread(threadId: string): SuggestionAndFeedbackThread {
+    return this.threadsById.get(threadId) || null;
+  }
+
+  async getThreadsAsync(): Promise&lt;SuggestionAndFeedbackThreads&gt; {
+    let suggestions$ = this.http.get(this.getSuggestionListHandlerUrl(), {
+      params: {
+        target_type: &#x27;exploration&#x27;,
+        target_id: this.contextService.getExplorationId()
+      }
+    });
+
+    let threads$ = this.http.get(this.getThreadListHandlerUrl());
+
+    return forkJoin([suggestions$, threads$])
+      .toPromise()
+      .then((response: [SuggestionData, ThreadData]) =&gt; {
+        let [suggestionData, threadData] = response;
+        let suggestionBackendDicts: SuggestionBackendDict[] = (
+          suggestionData.suggestions);
+        let feedbackThreadBackendDicts = threadData.feedback_thread_dicts;
+        let suggestionThreadBackendDicts = threadData.suggestion_thread_dicts;
+
+        let suggestionBackendDictsByThreadId = new Map(
+          suggestionBackendDicts.map(dict =&gt; [
+            this.suggestionsService.getThreadIdFromSuggestionBackendDict(dict),
+            dict
+          ]));
+
+        return {
+          feedbackThreads: feedbackThreadBackendDicts.map(
+            dict =&gt; this.setFeedbackThreadFromBackendDict(dict)),
+          suggestionThreads: suggestionThreadBackendDicts.map(
+            dict =&gt; this.setSuggestionThreadFromBackendDicts(
+              dict, suggestionBackendDictsByThreadId.get(
+                (dict === null ? null : dict.thread_id))))
+        };
+      },
+      async() =&gt; Promise.reject(&#x27;Error on retrieving feedback threads.&#x27;));
+  }
+
+  async getMessagesAsync(thread: SuggestionAndFeedbackThread):
+   Promise&lt;ThreadMessage[]&gt; {
+    if (!thread) {
+      throw new Error(&#x27;Trying to update a non-existent thread&#x27;);
+    }
+    let threadId = thread.threadId;
+
+    return this.http.get(this.getThreadHandlerUrl(threadId)).toPromise()
+      .then((response: ThreadMessages) =&gt; {
+        let threadMessageBackendDicts = response.messages;
+        thread.setMessages(threadMessageBackendDicts.map(
+          m =&gt; ThreadMessage.createFromBackendDict(m)));
+        return thread.getMessages();
+      });
+  }
+
+  async getOpenThreadsCountAsync(): Promise&lt;number&gt; {
+    return this.http.get(this.getFeedbackStatsHandlerUrl()).toPromise()
+      .then((response: NumberOfOpenThreads) =&gt; {
+        return this.openThreadsCount = response.num_open_threads;
+      });
+  }
+
+  getOpenThreadsCount(): number {
+    return this.openThreadsCount;
+  }
+
+  async createNewThreadAsync(newSubject: string, newText: string):
+    Promise&lt;void | SuggestionAndFeedbackThreads&gt; {
+    return this.http.post(this.getThreadListHandlerUrl(), {
+      state_name: null,
+      subject: newSubject,
+      text: newText
+    }).toPromise().then(async() =&gt; {
+      this.openThreadsCount += 1;
+      return this.getThreadsAsync();
+    },
+    error =&gt; {
+      this.alertsService.addWarning(
+        &#x27;Error creating new thread: &#x27; + error + &#x27;.&#x27;);
+    });
+  }
+
+  async markThreadAsSeenAsync(
+      thread: SuggestionAndFeedbackThread): Promise&lt;void&gt; {
+    if (!thread) {
+      throw new Error(&#x27;Trying to update a non-existent thread&#x27;);
+    }
+    let threadId = thread.threadId;
+
+    return this.http.post(this.getFeedbackThreadViewEventUrl(threadId), {
+      thread_id: threadId
+    }).toPromise().then();
+  }
+
+  async addNewMessageAsync(
+      thread: SuggestionAndFeedbackThread, newMessage: string,
+      newStatus: string): Promise&lt;ThreadMessage[]&gt; {
+    if (!thread) {
+      throw new Error(&#x27;Trying to update a non-existent thread&#x27;);
+    }
+    let threadId = thread.threadId;
+    let oldStatus = thread.status;
+    let updatedStatus = (oldStatus === newStatus) ? null : newStatus;
+
+    return this.http.post(this.getThreadHandlerUrl(threadId), {
+      updated_status: updatedStatus,
+      updated_subject: null,
+      text: newMessage
+    }).toPromise().then((response: ThreadMessages) =&gt; {
+      if (updatedStatus) {
+        if (newStatus === ExplorationEditorPageConstants.STATUS_OPEN) {
+          this.openThreadsCount += 1;
+        } else {
+          this.openThreadsCount += (
+            oldStatus === ExplorationEditorPageConstants.STATUS_OPEN ? -1 : 0);
+        }
+      }
+      thread.status = newStatus;
+      let threadMessageBackendDicts = response.messages;
+      thread.setMessages(threadMessageBackendDicts.map(
+        m =&gt; ThreadMessage.createFromBackendDict(m)));
+      return thread.messages;
+    });
+  }
+
+  async resolveSuggestionAsync(
+      thread: SuggestionAndFeedbackThread, action: string, commitMsg: string,
+      reviewMsg: string): Promise&lt;ThreadMessage[]&gt; {
+    if (!thread) {
+      throw new Error(&#x27;Trying to update a non-existent thread&#x27;);
+    }
+    let threadId = thread.threadId;
+
+    return this.http.put(this.getSuggestionActionHandlerUrl(threadId), {
+      action: action,
+      review_message: reviewMsg,
+      commit_message: (
+        action === AppConstants.ACTION_ACCEPT_SUGGESTION ?
+          commitMsg : null)
+    }).toPromise().then(async() =&gt; {
+      thread.status = (
+        action === AppConstants.ACTION_ACCEPT_SUGGESTION ?
+         ExplorationEditorPageConstants.STATUS_FIXED :
+          ExplorationEditorPageConstants.STATUS_IGNORED);
+      this.openThreadsCount -= 1;
+
+      return this.getMessagesAsync(thread);
+    });
+  }
+}
+
+angular.module(&#x27;oppia&#x27;).factory(
+  &#x27;ThreadDataBackendApiService&#x27;,
+  downgradeInjectable(ThreadDataBackendApiService));
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/feedback-tab/services/thread-data-backend-api.service.ts&quot;,&quot;line&quot;:222,&quot;character&quot;:4,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/feedback-tab/services/thread-data-backend-api.service.ts&quot;,&quot;line&quot;:224,&quot;character&quot;:40,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:56 GMT</p>
+    </body>
+  </html>
+  

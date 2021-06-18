@@ -1,0 +1,178 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>practice-tab.component.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/topic-viewer-page/practice-tab/practice-tab.component.spec.ts</td><td class="">98.78%</td><td class="">100%</td><td class="">164</td><td class="">162</td><td class="">2</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for practiceTab.
+ */
+
+import { TestBed, async, ComponentFixture, fakeAsync, flushMicrotasks } from
+  &#x27;@angular/core/testing&#x27;;
+import { Subtopic } from &#x27;domain/topic/subtopic.model&#x27;;
+import { PracticeTabComponent } from &#x27;./practice-tab.component&#x27;;
+import { QuestionBackendApiService } from
+  &#x27;domain/question/question-backend-api.service&#x27;;
+import { UrlInterpolationService } from
+  &#x27;domain/utilities/url-interpolation.service&#x27;;
+import { NO_ERRORS_SCHEMA } from &#x27;@angular/core&#x27;;
+import { UrlService } from &#x27;services/contextual/url.service&#x27;;
+import { WindowRef } from &#x27;services/contextual/window-ref.service&#x27;;
+import { MockTranslatePipe } from &#x27;tests/unit-test-utils&#x27;;
+
+class MockUrlService {
+  getTopicUrlFragmentFromLearnerUrl() {
+    return &#x27;topic_1&#x27;;
+  }
+
+  getClassroomUrlFragmentFromLearnerUrl() {
+    return &#x27;classroom_1&#x27;;
+  }
+}
+
+class MockWindowRef {
+  _window = {
+    location: {
+      href: &#x27;&#x27;,
+      reload: (val) =&gt; val
+    },
+  };
+  get nativeWindow() {
+    return this._window;
+  }
+}
+
+class MockQuestionBackendApiService {
+  async fetchTotalQuestionCountForSkillIdsAsync() {
+    return Promise.resolve(1);
+  }
+}
+
+describe(&#x27;Practice tab component&#x27;, function() {
+  let component: PracticeTabComponent;
+  let fixture: ComponentFixture&lt;PracticeTabComponent&gt;;
+  let windowRef: MockWindowRef;
+  let questionBackendApiService: MockQuestionBackendApiService;
+
+  beforeEach(async(() =&gt; {
+    windowRef = new MockWindowRef();
+    questionBackendApiService = new MockQuestionBackendApiService();
+    TestBed.configureTestingModule({
+      declarations: [PracticeTabComponent, MockTranslatePipe],
+      providers: [
+        UrlInterpolationService,
+        { provide: UrlService, useClass: MockUrlService },
+        { provide: WindowRef, useValue: windowRef },
+        {
+          provide: QuestionBackendApiService,
+          useValue: questionBackendApiService
+        }
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
+  }));
+
+  beforeEach(() =&gt; {
+    fixture = TestBed.createComponent(PracticeTabComponent);
+    component = fixture.componentInstance;
+    component.topicName = &#x27;Topic Name&#x27;;
+    component.subtopicsList = [
+      Subtopic.create({
+        id: 1,
+        title: &#x27;Subtopic 1&#x27;,
+        skill_ids: [&#x27;1&#x27;, &#x27;2&#x27;],
+        thumbnail_filename: &#x27;&#x27;,
+        thumbnail_bg_color: &#x27;&#x27;,
+        url_fragment: &#x27;&#x27;
+      }, {
+        1: &#x27;First skill&#x27;,
+        2: &#x27;Second skill&#x27;
+      }),
+      Subtopic.create({
+        id: 2,
+        title: &#x27;Subtopic 2&#x27;,
+        skill_ids: [],
+        thumbnail_filename: &#x27;&#x27;,
+        thumbnail_bg_color: &#x27;&#x27;,
+        url_fragment: &#x27;&#x27;
+      }, {
+        1: &#x27;First skill&#x27;,
+        2: &#x27;Second skill&#x27;
+      })
+    ];
+    fixture.detectChanges();
+  });
+
+  it(&#x27;should initialize controller properties after its initilization&#x27;,
+    function() {
+      component.ngOnInit();
+      expect(component.selectedSubtopics).toEqual([]);
+      expect(component.availableSubtopics.length).toBe(1);
+      expect(component.selectedSubtopicIndices).toEqual([false]);
+    });
+
+  it(&#x27;should have start button enabled when a subtopic is selected&#x27;,
+    function() {
+      component.selectedSubtopicIndices[0] = true;
+      component.questionsAreAvailable = true;
+      expect(component.isStartButtonDisabled()).toBe(false);
+    });
+
+  it(&#x27;should have start button disabled when there is no subtopic selected&#x27;,
+    function() {
+      component.selectedSubtopicIndices[0] = false;
+      expect(component.isStartButtonDisabled()).toBe(true);
+    });
+
+  it(&#x27;should have start button disabled when the disable boolean is set&#x27;,
+    function() {
+      component.startButtonIsDisabled = true;
+      expect(component.isStartButtonDisabled()).toBe(true);
+    });
+
+  it(&#x27;should open a new practice session containing the selected subtopic&#x27; +
+    &#x27; when start button is clicked&#x27;, function() {
+    component.selectedSubtopicIndices[0] = true;
+    component.openNewPracticeSession();
+
+    expect(windowRef.nativeWindow.location.href).toBe(
+      &#x27;/learn/classroom_1/topic_1/practice/session?selected_subtopic_ids=1&#x27;);
+  });
+
+  it(&#x27;should check if questions exist for the selected subtopics&#x27;,
+    fakeAsync(() =&gt; {
+      component.checkIfQuestionsExist([true]);
+      flushMicrotasks();
+      expect(component.questionsAreAvailable).toBeTrue();
+      component.checkIfQuestionsExist([false]);
+      flushMicrotasks();
+      expect(component.questionsAreAvailable).toBeFalse();
+    }));
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/topic-viewer-page/practice-tab/practice-tab.component.spec.ts&quot;,&quot;line&quot;:45,&quot;character&quot;:15,&quot;text&quot;:&quot;val&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-viewer-page/practice-tab/practice-tab.component.spec.ts&quot;,&quot;line&quot;:45,&quot;character&quot;:23,&quot;text&quot;:&quot;val&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:59 GMT</p>
+    </body>
+  </html>
+  

@@ -1,0 +1,178 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>exploration-draft.model.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">core/templates/domain/exploration/exploration-draft.model.ts</td><td class="">100.00%</td><td class="">100%</td><td class="">93</td><td class="">93</td><td class="">0</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2017 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Model Class for creating instances of ExplorationDraft
+ * domain objects.
+ */
+
+import { ParamChangeBackendDict } from &#x27;domain/exploration/ParamChangeObjectFactory&#x27;;
+import { ParamSpecBackendDict } from &#x27;domain/exploration/ParamSpecObjectFactory&#x27;;
+import { InteractionBackendDict } from &#x27;domain/exploration/InteractionObjectFactory&#x27;;
+import { WrittenTranslationsBackendDict } from &#x27;domain/exploration/WrittenTranslationsObjectFactory&#x27;;
+import { SubtitledHtmlBackendDict } from &#x27;./subtitled-html.model&#x27;;
+import { RecordedVoiceOverBackendDict } from &#x27;./recorded-voiceovers.model&#x27;;
+
+export type ExplorationChange = (
+  ExplorationChangeAddState |
+  ExplorationChangeAddWrittenTranslation |
+  ExplorationChangeMarkWrittenTranslationsAsNeedingUpdate |
+  ExplorationChangeRenameState |
+  ExplorationChangeDeleteState |
+  ExplorationChangeEditStateProperty |
+  ExplorationChangeEditExplorationProperty|
+  RevertChangeList |
+  CreateChangeList |
+  MigrateStatesVersionChangeList);
+
+export interface ExplorationChangeAddState {
+  cmd: &#x27;add_state&#x27;;
+  &#x27;state_name&#x27;: string;
+}
+
+export interface ExplorationChangeRenameState {
+  cmd: &#x27;rename_state&#x27;,
+  &#x27;new_state_name&#x27;: string;
+  &#x27;old_state_name&#x27;: string;
+}
+
+export interface ExplorationChangeDeleteState {
+  cmd: &#x27;delete_state&#x27;;
+  &#x27;state_name&#x27;: string;
+}
+
+export interface ExplorationChangeEditStateProperty {
+  cmd: &#x27;edit_state_property&#x27;,
+  &#x27;new_value&#x27;: SubtitledHtmlBackendDict |
+    InteractionBackendDict |
+    ParamChangeBackendDict[] |
+    RecordedVoiceOverBackendDict |
+    WrittenTranslationsBackendDict |
+    boolean | number | string;
+  &#x27;old_value&#x27;: SubtitledHtmlBackendDict |
+    InteractionBackendDict |
+    ParamChangeBackendDict[] |
+    RecordedVoiceOverBackendDict |
+    WrittenTranslationsBackendDict |
+    boolean | number | string;
+  &#x27;state_name&#x27;: string;
+  &#x27;property_name&#x27;: string;
+}
+
+export interface ExplorationChangeEditExplorationProperty {
+  cmd: &#x27;edit_exploration_property&#x27;;
+  &#x27;new_value&#x27;: ParamChangeBackendDict[] | ParamSpecBackendDict | string;
+  &#x27;old_value&#x27;: ParamChangeBackendDict[] | ParamSpecBackendDict | string;
+  &#x27;property_name&#x27;: string;
+}
+
+export interface RevertChangeList {
+  &#x27;cmd&#x27;: &#x27;AUTO_revert_version_number&#x27;;
+  &#x27;version_number&#x27;: number;
+}
+
+export interface CreateChangeList {
+  cmd: &#x27;create_new&#x27;;
+  category: string;
+  title: string;
+}
+
+export interface MigrateStatesVersionChangeList {
+  &#x27;cmd&#x27;: &#x27;migrate_states_schema_to_latest_version&#x27;;
+  &#x27;from_version&#x27;: number;
+  &#x27;to_version&#x27;: number;
+}
+
+export interface ExplorationChangeAddWrittenTranslation {
+  &#x27;cmd&#x27;: &#x27;add_written_translation&#x27;;
+  &#x27;content_id&#x27;: string;
+  &#x27;data_format&#x27;: string;
+  &#x27;language_code&#x27;: string;
+  &#x27;content_html&#x27;: string;
+  &#x27;state_name&#x27;: string;
+  &#x27;translation_html&#x27;: string;
+}
+
+export interface ExplorationChangeMarkWrittenTranslationsAsNeedingUpdate {
+  &#x27;cmd&#x27;: &#x27;mark_written_translations_as_needing_update&#x27;;
+  &#x27;content_id&#x27;: string;
+  &#x27;state_name&#x27;: string;
+}
+
+export interface ExplorationDraftDict {
+  draftChanges: ExplorationChange[];
+  draftChangeListId: number
+}
+
+export class ExplorationDraft {
+  draftChanges: ExplorationChange[];
+  draftChangeListId: number;
+
+  constructor(
+      draftChanges: ExplorationChange[], draftChangeListId: number) {
+    this.draftChanges = draftChanges;
+    this.draftChangeListId = draftChangeListId;
+  }
+  /**
+   * Checks whether the draft object has been overwritten by another
+   * draft which has been committed to the back-end. If the supplied draft id
+   * has a different value then a newer changeList must have been committed
+   * to the back-end.
+   * @param {Integer} - currentDraftId. The id of the draft changes whch was
+   *  retrieved from the back-end.
+   * @returns {Boolean} - True iff the currentDraftId is the same as the
+   * draftChangeListId corresponding to this draft.
+   */
+  isValid(currentDraftId: number): boolean {
+    return (currentDraftId === this.draftChangeListId);
+  }
+
+  getChanges(): ExplorationChange[] {
+    return this.draftChanges;
+  }
+
+  static createFromLocalStorageDict(
+      explorationDraftDict: ExplorationDraftDict): ExplorationDraft {
+    return new ExplorationDraft(
+      explorationDraftDict.draftChanges,
+      explorationDraftDict.draftChangeListId);
+  }
+
+  static toLocalStorageDict(
+      changeList: ExplorationChange[],
+      draftChangeListId: number): ExplorationDraftDict {
+    return {
+      draftChanges: changeList,
+      draftChangeListId: draftChangeListId
+    };
+  }
+}
+</textarea><pre id="annotations" style="display:none">[]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:54 GMT</p>
+    </body>
+  </html>
+  

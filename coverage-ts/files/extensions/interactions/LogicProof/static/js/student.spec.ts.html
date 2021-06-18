@@ -1,0 +1,972 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>student.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">extensions/interactions/LogicProof/static/js/student.spec.ts</td><td class="">86.67%</td><td class="">100%</td><td class="">968</td><td class="">839</td><td class="">129</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2014 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for LogicProof interaction student components.
+ */
+
+import logicProofShared from &#x27;interactions/LogicProof/static/js/shared&#x27;;
+import logicProofStudent from &#x27;interactions/LogicProof/static/js/student&#x27;;
+import logicProofData from &#x27;interactions/LogicProof/static/js/data&#x27;;
+import logicProofParser from
+  &#x27;interactions/LogicProof/static/js/generatedParser&#x27;;
+
+describe(&#x27;Match expression to expression template&#x27;, function() {
+  var expressionR = {
+    top_kind_name: &#x27;variable&#x27;,
+    top_operator_name: &#x27;R&#x27;,
+    arguments: [],
+    dummies: []
+  };
+  var expressionS = {
+    top_kind_name: &#x27;variable&#x27;,
+    top_operator_name: &#x27;S&#x27;,
+    arguments: [],
+    dummies: []
+  };
+  var expressionRandS = {
+    top_kind_name: &#x27;binary_connective&#x27;,
+    top_operator_name: &#x27;and&#x27;,
+    arguments: [expressionR, expressionS],
+    dummies: []
+  };
+  var expressiona = {
+    top_kind_name: &#x27;variable&#x27;,
+    top_operator_name: &#x27;a&#x27;,
+    arguments: [],
+    dummies: []
+  };
+  var expressionAllxp = {
+    top_kind_name: &#x27;quantifier&#x27;,
+    top_operator_name: &#x27;for_all&#x27;,
+    arguments: [{
+      top_kind_name: &#x27;variable&#x27;,
+      top_operator_name: &#x27;p&#x27;,
+      arguments: [],
+      dummies: []
+    }],
+    dummies: [{
+      top_kind_name: &#x27;variable&#x27;,
+      top_operator_name: &#x27;x&#x27;,
+      arguments: [],
+      dummies: []
+    }]
+  };
+  var expressionT = {
+    top_kind_name: &#x27;variable&#x27;,
+    top_operator_name: &#x27;T&#x27;,
+    arguments: [],
+    dummies: []
+  };
+  var expressionU = {
+    top_kind_name: &#x27;variable&#x27;,
+    top_operator_name: &#x27;U&#x27;,
+    arguments: [],
+    dummies: []
+  };
+
+  var sampleControlLanguage = logicProofData.BASE_CONTROL_LANGUAGE;
+  var sampleControlModel = logicProofStudent.BASE_CONTROL_MODEL;
+  sampleControlLanguage.operators = Object.assign(
+    sampleControlLanguage.operators,
+    {
+      scoper: {
+        kind: &#x27;prefix_function&#x27;,
+        typing: [{
+          arguments: [{
+            type: &#x27;integer&#x27;,
+            arbitrarily_many: false
+          }],
+          dummies: [],
+          output: &#x27;integer&#x27;
+        }]
+      }
+    }
+  );
+  sampleControlModel.evaluation_rules = Object.assign(
+    sampleControlModel.evaluation_rules,
+    {
+      scoper: {
+        format: &#x27;definition&#x27;,
+        evaluateExpression: function(
+            expression, inputs, model, parameters, cache) {
+          return logicProofStudent.evaluate({
+            top_kind_name: &#x27;ranged_function&#x27;,
+            top_operator_name: &#x27;max&#x27;,
+            arguments: [{
+              top_kind_name: &#x27;binary_relation&#x27;,
+              top_operator_name: &#x27;less_than&#x27;,
+              arguments: [{
+                top_kind_name: &#x27;variable&#x27;,
+                top_operator_name: &#x27;k&#x27;,
+                arguments: [],
+                dummies: [],
+                type: &#x27;integer&#x27;
+              }, {
+                top_kind_name: &#x27;variable&#x27;,
+                top_operator_name: &#x27;n&#x27;,
+                arguments: [],
+                dummies: [],
+                type: &#x27;integer&#x27;
+              }],
+              dummies: [],
+              type: &#x27;boolean&#x27;
+            }, {
+              top_kind_name: &#x27;binary_relation&#x27;,
+              top_operator_name: &#x27;less_than&#x27;,
+              arguments: [{
+                top_kind_name: &#x27;prefix_function&#x27;,
+                top_operator_name: &#x27;indentation&#x27;,
+                arguments: [{
+                  top_kind_name: &#x27;variable&#x27;,
+                  top_operator_name: &#x27;k&#x27;,
+                  arguments: [],
+                  dummies: [],
+                  type: &#x27;integer&#x27;
+                }],
+                dummies: [],
+                type: &#x27;integer&#x27;
+              }, {
+                top_kind_name: &#x27;prefix_function&#x27;,
+                top_operator_name: &#x27;indentation&#x27;,
+                arguments: [{
+                  top_kind_name: &#x27;variable&#x27;,
+                  top_operator_name: &#x27;n&#x27;,
+                  arguments: [],
+                  dummies: [],
+                  type: &#x27;integer&#x27;
+                }],
+                dummies: [],
+                type: &#x27;integer&#x27;
+              }],
+              dummies: [],
+              integer: &#x27;boolean&#x27;
+            }],
+            dummies: [{
+              top_kind_name: &#x27;variable&#x27;,
+              top_operator_name: &#x27;k&#x27;,
+              arguments: [],
+              dummies: [],
+              type: &#x27;integer&#x27;
+            }]
+          }, {
+            n: logicProofStudent.evaluate(
+              expression.arguments[0], inputs, model, parameters, cache)
+          }, model, parameters, cache);
+        },
+        description: &#x27;The most recent line (not including n) &#x27; +
+        &#x27;in whose scope line n is&#x27;
+      }
+    }
+  );
+
+  var sampleInteraction = {
+    assumptions: [],
+    results: [{
+      top_kind_name: &#x27;variable&#x27;,
+      top_operator_name: &#x27;p&#x27;,
+      arguments: [],
+      dummies: []
+    }],
+    language: logicProofData.BASE_STUDENT_LANGUAGE,
+    general_messages: logicProofData.BASE_GENERAL_MESSAGES,
+    line_templates: [{
+      name: &#x27;and_introduce&#x27;,
+      reader_view: [{
+        format: &#x27;phrase&#x27;,
+        content: &#x27;from&#x27;
+      }, {
+        format: &#x27;expression&#x27;,
+        content: {
+          expression: expressionR,
+          substitutions: [],
+          type: &#x27;boolean&#x27;
+        }
+      }, {
+        format: &#x27;phrase&#x27;,
+        content: &#x27;and&#x27;
+      }, {
+        format: &#x27;expression&#x27;,
+        content: {
+          expression: expressionS,
+          substitutions: [],
+          type: &#x27;boolean&#x27;
+        }
+      }, {
+        format: &#x27;phrase&#x27;,
+        content: &#x27;have&#x27;
+      }, {
+        format: &#x27;expression&#x27;,
+        content: {
+          expression: expressionRandS,
+          substitutions: [],
+          type: &#x27;boolean&#x27;
+        }
+      }],
+      antecedents: [{
+        expression: expressionR,
+        substitutions: [],
+        type: &#x27;boolean&#x27;
+      }, {
+        expression: expressionS,
+        substitutions: [],
+        type: &#x27;boolean&#x27;
+      }],
+      results: [{
+        expression: expressionRandS,
+        substitutions: [],
+        type: &#x27;boolean&#x27;
+      }],
+      variables: [],
+      error: []
+    }, {
+      name: &#x27;for_all_introduce&#x27;,
+      reader_view: [{
+        format: &#x27;expression&#x27;,
+        content: {
+          expression: expressiona,
+          substitutions: [],
+          type: &#x27;element&#x27;,
+          kind: &#x27;variable&#x27;
+        }
+      }, {
+        format: &#x27;phrase&#x27;,
+        content: &#x27;arbitrary&#x27;
+      }, {
+        format: &#x27;phrase&#x27;,
+        content: &#x27;hence&#x27;
+      }, {
+        format: &#x27;expression&#x27;,
+        content: {
+          expression: expressionAllxp,
+          substitutions: [],
+          type: &#x27;boolean&#x27;
+        }
+      }],
+      antecedents: [{
+        expression: {
+          top_kind_name: &#x27;variable&#x27;,
+          top_operator_name: &#x27;p&#x27;,
+          arguments: [],
+          dummies: []
+        },
+        substitutions: [{
+          x: expressiona
+        }],
+        type: &#x27;boolean&#x27;
+      }],
+      results: [{
+        expression: expressionAllxp,
+        substitutions: [],
+        type: &#x27;boolean&#x27;
+      }],
+      variables: [expressiona],
+      error: []
+    }, {
+      name: &#x27;and_introduce_e4&#x27;,
+      reader_view: [{
+        format: &#x27;phrase&#x27;,
+        content: &#x27;from&#x27;
+      }, {
+        format: &#x27;expression&#x27;,
+        content: {
+          expression: expressionT,
+          substitutions: [],
+          type: &#x27;boolean&#x27;
+        }
+      }, {
+        format: &#x27;phrase&#x27;,
+        content: &#x27;and&#x27;
+      }, {
+        format: &#x27;expression&#x27;,
+        content: {
+          expression: expressionU,
+          substitutions: [],
+          type: &#x27;boolean&#x27;
+        }
+      }, {
+        format: &#x27;phrase&#x27;,
+        content: &#x27;have&#x27;
+      }, {
+        format: &#x27;expression&#x27;,
+        content: {
+          expression: expressionRandS,
+          substitutions: [],
+          type: &#x27;boolean&#x27;
+        }
+      }],
+      antecedents: [],
+      results: [],
+      variables: [],
+      error: [[{
+        format: &#x27;string&#x27;,
+        content: &#x27;The conclusion you are allowed to make here is \&#x27;From &#x27;
+      }, {
+        format: &#x27;expression&#x27;,
+        content: {
+          expression: expressionT,
+          substitutions: [],
+          type: &#x27;boolean&#x27;
+        }
+      }, {
+        format: &#x27;string&#x27;,
+        content: &#x27; and &#x27;
+      }, {
+        format: &#x27;expression&#x27;,
+        content: {
+          expression: expressionU,
+          substitutions: [],
+          type: &#x27;boolean&#x27;
+        }
+      }, {
+        format: &#x27;string&#x27;,
+        content: &#x27; we have &#x27;
+      }, {
+        format: &#x27;expression&#x27;,
+        content: {
+          expression: {
+            top_kind_name: &#x27;binary_connective&#x27;,
+            top_operator_name: &#x27;and&#x27;,
+            arguments: [expressionT, expressionU],
+            dummies: []
+          },
+          substitutions: [],
+          type: &#x27;boolean&#x27;
+        }
+      }, {
+        format: &#x27;string&#x27;,
+        content: &#x27;\&#x27;.&#x27;
+      }]]
+    }],
+    vocabulary: logicProofData.BASE_VOCABULARY,
+    mistake_table: [{
+      name: &#x27;variables&#x27;,
+      entries: [{
+        name: &#x27;incorrect_variable_forall&#x27;,
+        occurs: logicProofShared.assignTypesToExpression(
+          logicProofParser.parse(
+            &#x27;template(n)=\&#x27;for_all_introduce\&#x27;\u2227entry(1,variables(n))&#x27; +
+            &#x27;!=entry(1,variables(scoper(n-1)))&#x27;,
+            &#x27;expression&#x27;),
+          [&#x27;boolean&#x27;], sampleControlLanguage,
+          [&#x27;constant&#x27;, &#x27;variable&#x27;]
+        )[0].typedExpression,
+        message: [[{
+          format: &#x27;string&#x27;,
+          content: &#x27;We originally took &#x27;
+        }, {
+          format: &#x27;expression&#x27;,
+          content: logicProofShared.assignTypesToExpression(
+            logicProofParser.parse(
+              &#x27;entry(1,variables(scoper(n-1)))&#x27;, &#x27;expression&#x27;),
+            [&#x27;formula&#x27;], sampleControlLanguage,
+            [&#x27;constant&#x27;, &#x27;variable&#x27;]
+          )[0].typedExpression
+        }, {
+          format: &#x27;string&#x27;,
+          content: &#x27; as our arbitrary variable so this, rather than &#x27;
+        }, {
+          format: &#x27;expression&#x27;,
+          content: {
+            top_operator_name: &#x27;variables&#x27;,
+            top_kind_name: &#x27;prefix_function&#x27;,
+            arguments: [{
+              top_operator_name: &#x27;n&#x27;,
+              top_kind_name: &#x27;variable&#x27;,
+              arguments: [],
+              dummies: [],
+              type: &#x27;integer&#x27;
+            }],
+            dummies: [],
+            type: &#x27;set_of_formulas&#x27;
+          }
+        }, {
+          format: &#x27;string&#x27;,
+          content: &#x27;, needs to be the one that we quantify out over.&#x27;
+        }]]
+      }]
+    }, {
+      name: &#x27;target&#x27;,
+      entries: [{
+        name: &#x27;last_line_indented_assumption&#x27;,
+        occurs: logicProofShared.assignTypesToExpression(
+          logicProofParser.parse(
+            &#x27;n=num_lines()\u2227indentation(n)&gt;0\u2227template(scoper(n))!=&#x27; +
+              &#x27;\&#x27;given\&#x27;&#x27;,
+            &#x27;expression&#x27;),
+          [&#x27;boolean&#x27;], sampleControlLanguage, [&#x27;constant&#x27;, &#x27;variable&#x27;]
+        )[0].typedExpression,
+        message: [[{
+          format: &#x27;string&#x27;,
+          content: &#x27;The last line of a proof should not be indented; you &#x27; +
+            &#x27;need to prove that the given formulas holds just from the &#x27; +
+            &#x27;original assumptions, not the additional assumption of &#x27;
+        }, {
+          format: &#x27;expression&#x27;,
+          content: logicProofShared.assignTypesToExpression(
+            logicProofParser.parse(
+              &#x27;entry(1,results(scoper(n)))&#x27;, &#x27;expression&#x27;), [&#x27;formula&#x27;],
+            sampleControlLanguage, [&#x27;constant&#x27;, &#x27;variable&#x27;]
+          )[0].typedExpression
+        }, {
+          format: &#x27;string&#x27;,
+          content: &#x27;.&#x27;
+        }]]
+      }]
+    }],
+    control_language: sampleControlLanguage,
+    control_model: sampleControlModel
+  };
+  var displayExpressionDictionary = function(expressionDictionary, operators) {
+    var processedArray = [];
+    for (var key in expressionDictionary) {
+      processedArray.push(key + &#x27;:&#x27; + logicProofShared.displayExpression(
+        expressionDictionary[key], operators));
+    }
+    return processedArray.join(&#x27;, &#x27;);
+  };
+  var matchThenDisplay = function(
+      expressionString, templateString, oldMatchings) {
+    return displayExpressionDictionary(
+      logicProofStudent.matchExpression(
+        logicProofParser.parse(expressionString, &#x27;expression&#x27;),
+        logicProofParser.parse(templateString, &#x27;expression&#x27;), oldMatchings),
+      logicProofData.BASE_STUDENT_LANGUAGE.operators
+    );
+  };
+  var errorWrapper = function(
+      dubiousFunction, ...input) {
+    return function() {
+      try {
+        dubiousFunction(...input);
+      } catch (err) {
+        throw new Error(logicProofShared.renderError(
+          err, logicProofData.BASE_GENERAL_MESSAGES,
+          logicProofData.BASE_STUDENT_LANGUAGE));
+      }
+    };
+  };
+
+  it(&#x27;should match then display examples correctly&#x27;, function() {
+    expect(matchThenDisplay(&#x27;A(x)\u2227t&#x27;, &#x27;p\u2227q&#x27;, {})).toEqual(
+      &#x27;p:A(x), q:t&#x27;);
+    expect(matchThenDisplay(&#x27;\u2203y.R(y)&#x27;, &#x27;\u2203x.p&#x27;, {})).toEqual(
+      &#x27;p:R(y), x:y&#x27;);
+  });
+
+  it(&#x27;should reject expressions that do not match&#x27;, function() {
+    expect(errorWrapper(matchThenDisplay, &#x27;A(x)\u2227t&#x27;, &#x27;p\u2227q&#x27;, {
+      q: logicProofParser.parse(&#x27;s&#x27;, &#x27;expression&#x27;)
+    })).toThrowError(
+      &#x27;This line could not be identified as valid - please check the list &#x27; +
+      &#x27;of possible lines.&#x27;);
+  });
+  describe(&#x27;Substitute into expression&#x27;, function() {
+    it(&#x27;should substitute examples correctly&#x27;, function() {
+      expect(
+        logicProofShared.displayExpression(
+          logicProofStudent.substituteIntoExpression(
+            logicProofParser.parse(&#x27;p\u2227A(x,x)&#x27;, &#x27;expression&#x27;), {
+              p: logicProofParser.parse(&#x27;B(x)&lt;=&gt;q&#x27;, &#x27;expression&#x27;),
+              x: logicProofParser.parse(&#x27;y+2&#x27;, &#x27;expression&#x27;)
+            }), logicProofData.BASE_STUDENT_LANGUAGE.operators)
+      ).toEqual(&#x27;(B(x)&lt;=&gt;q)\u2227A(y+2,y+2)&#x27;);
+
+      expect(
+        logicProofShared.displayExpression(
+          logicProofStudent.substituteIntoExpression(
+            logicProofParser.parse(&#x27;\u2200y.y=z&#x27;, &#x27;expression&#x27;), {
+              y: logicProofParser.parse(&#x27;x&#x27;, &#x27;expression&#x27;),
+              z: logicProofParser.parse(&#x27;22&#x27;, &#x27;expression&#x27;)
+            }), logicProofData.BASE_STUDENT_LANGUAGE.operators)
+      ).toEqual(&#x27;\u2200y.(y=22)&#x27;);
+    });
+  });
+  describe(&#x27;Instantiate expression&#x27;, function() {
+    it(&#x27;should instantiate examples correctly&#x27;, function() {
+      expect(
+        logicProofShared.displayExpression(
+          logicProofStudent.instantiateExpression(
+            logicProofParser.parse(&#x27;\u2200y.y=z\u2228p&#x27;, &#x27;expression&#x27;), {
+              y: logicProofParser.parse(&#x27;x&#x27;, &#x27;expression&#x27;),
+              z: logicProofParser.parse(&#x27;22&#x27;, &#x27;expression&#x27;),
+              p: logicProofParser.parse(&#x27;p=&gt;p&#x27;, &#x27;expression&#x27;)
+            }
+          ),
+          logicProofData.BASE_STUDENT_LANGUAGE.operators
+        )
+      ).toEqual(&#x27;\u2200x.((x=22)\u2228(p=&gt;p))&#x27;);
+    });
+  });
+  describe(&#x27;Compute expression from template&#x27;, function() {
+    it(&#x27;should compute examples correctly&#x27;, function() {
+      expect(
+        logicProofShared.displayExpression(
+          logicProofStudent.computeExpressionFromTemplate(
+            logicProofParser.parse(&#x27;p[x-&gt;a]&#x27;, &#x27;booleanTemplate&#x27;), {
+              p: logicProofParser.parse(&#x27;B(y)&#x27;, &#x27;expression&#x27;),
+              x: logicProofParser.parse(&#x27;y&#x27;, &#x27;expression&#x27;),
+              a: logicProofParser.parse(&#x27;2-2&#x27;, &#x27;expression&#x27;)
+            }), logicProofData.BASE_STUDENT_LANGUAGE.operators)
+      ).toEqual(&#x27;B(2-2)&#x27;);
+    });
+  });
+  describe(&#x27;Throw lines messages&#x27;, function() {
+    it(&#x27;should throw the error messages for sample lines correctly&#x27;,
+      function() {
+        expect(errorWrapper(function() {
+          logicProofStudent.throwLineMessages(
+            sampleInteraction.line_templates[2].error, &#x27;name&#x27;, {
+              T: logicProofParser.parse(&#x27;x=y&#x27;, &#x27;expression&#x27;),
+              U: logicProofParser.parse(&#x27;A2(x,y)&#x27;, &#x27;expression&#x27;)
+            }, logicProofData.BASE_STUDENT_LANGUAGE.operators);
+        })).toThrowError(
+          &#x27;The conclusion you are allowed to make here is \&#x27;From x=y &#x27; +
+          &#x27;and A2(x,y) we have (x=y)\u2227A2(x,y)\&#x27;.&#x27;);
+      }
+    );
+  });
+  describe(&#x27;Match line to template&#x27;, function() {
+    var matchLineToTemplate = function(lineString, template) {
+      return logicProofStudent.matchLineToTemplate(
+        logicProofShared.parseLineString(
+          lineString, logicProofData.BASE_STUDENT_LANGUAGE.operators,
+          logicProofData.BASE_VOCABULARY
+        )[0], template.reader_view);
+    };
+
+    it(&#x27;should match examples correctly&#x27;, function() {
+      expect(
+        matchLineToTemplate(
+          &#x27;from A(x,y) and A(y,z) we have A(x,y)\u2227A(y,z)&#x27;,
+          sampleInteraction.line_templates[0])
+      ).toEqual({
+        R: logicProofParser.parse(&#x27;A(x,y)&#x27;, &#x27;expression&#x27;),
+        S: logicProofParser.parse(&#x27;A(y,z)&#x27;, &#x27;expression&#x27;)
+      });
+
+      expect(
+        matchLineToTemplate(
+          &#x27;z was arbitrary so \u2200x.x=2&#x27;, sampleInteraction.line_templates[1])
+      ).toEqual({
+        a: logicProofParser.parse(&#x27;z&#x27;, &#x27;expression&#x27;),
+        p: logicProofParser.parse(&#x27;x=2&#x27;, &#x27;expression&#x27;),
+        x: logicProofParser.parse(&#x27;x&#x27;, &#x27;expression&#x27;)
+      });
+    });
+
+    it(&#x27;should reject examples that do not match&#x27;, function() {
+      expect(
+        errorWrapper(
+          matchLineToTemplate, &#x27;from p and q we have q\u2227p&#x27;,
+          sampleInteraction.line_templates[0])
+      ).toThrowError(
+        &#x27;This line could not be identified as valid - please check the&#x27; +
+        &#x27; list of possible lines.&#x27;);
+
+      expect(
+        errorWrapper(
+          matchLineToTemplate, &#x27;z was arbitrary from \u2200x.x=2&#x27;,
+          sampleInteraction.line_templates[1])
+      ).toThrowError(
+        &#x27;This line could not be identified as valid - please check the&#x27; +
+        &#x27; list of possible lines.&#x27;);
+    });
+  });
+  describe(&#x27;Line to have known layout as student types&#x27;, function() {
+    var requireIdentifiable = function(lineString) {
+      return logicProofStudent.requireIdentifiableLine(
+        lineString, sampleInteraction.line_templates,
+        logicProofData.BASE_STUDENT_LANGUAGE, logicProofData.BASE_VOCABULARY,
+        logicProofData.BASE_GENERAL_MESSAGES
+      );
+    };
+
+    it(&#x27;should accept known layouts&#x27;, function() {
+      expect(requireIdentifiable(&#x27;from p and q we have p\u2227q&#x27;)).toEqual(
+        undefined);
+    });
+
+    it(&#x27;should reject unknown layouts&#x27;, function() {
+      expect(
+        errorWrapper(requireIdentifiable, &#x27;from p we have p\u2228q&#x27;)).toThrow(
+        {
+          message: (
+            &#x27;This line could not be identified as valid - please &#x27; +
+            &#x27;check the list of possible lines.&#x27;)
+        });
+    });
+  });
+  describe(&#x27;Build, validate and display line&#x27;, function() {
+    var displayLine = function(line, operators) {
+      var matchings = {};
+      for (var key in line.matchings) {
+        matchings[key] = logicProofShared.displayExpression(
+          line.matchings[key], operators);
+      }
+      var antecedents = [];
+      for (var i = 0; i &lt; line.antecedents.length; i++) {
+        antecedents.push(
+          logicProofShared.displayExpression(
+            line.antecedents[i].content, operators));
+      }
+      return {
+        template_name: line.template_name,
+        matchings: matchings,
+        antecedents: antecedents.join(&#x27;, &#x27;),
+        results: logicProofShared.displayExpressionArray(
+          line.results, operators),
+        variables: logicProofShared.displayExpressionArray(
+          line.variables, operators),
+        indentation: line.indentation,
+        text: line.text
+      };
+    };
+
+    var buildThenDisplay = function(lineString) {
+      return displayLine(
+        logicProofStudent.buildLine(
+          lineString, sampleInteraction.line_templates,
+          logicProofData.BASE_STUDENT_LANGUAGE, logicProofData.BASE_VOCABULARY
+        ), logicProofData.BASE_STUDENT_LANGUAGE.operators
+      );
+    };
+
+    it(&#x27;should accept and build examples correctly&#x27;, function() {
+      expect(
+        buildThenDisplay(
+          &#x27;    from a\u2228b and c&lt;=&gt;d have (a\u2228b) \u2227 (c&lt;=&gt;d)&#x27;)
+      ).toEqual({
+        template_name: &#x27;and_introduce&#x27;,
+        matchings: {
+          R: &#x27;a\u2228b&#x27;,
+          S: &#x27;c&lt;=&gt;d&#x27;
+        },
+        antecedents: &#x27;a\u2228b, c&lt;=&gt;d&#x27;,
+        results: &#x27;(a\u2228b)\u2227(c&lt;=&gt;d)&#x27;,
+        variables: &#x27;&#x27;,
+        indentation: 2,
+        text: &#x27;    from a\u2228b and c&lt;=&gt;d have (a\u2228b) \u2227 (c&lt;=&gt;d)&#x27;
+      });
+    });
+
+    it(&#x27;should reject lines for which type assignment fails&#x27;, function() {
+      expect(
+        errorWrapper(buildThenDisplay, &#x27;x+2 was arbitrary so \u2200y.p&#x27;)
+      ).toThrowError(&#x27;In a line of this form, your x+2 should be a variable.&#x27;);
+
+      expect(
+        errorWrapper(
+          buildThenDisplay, &#x27;from A(x) and A(y) we have A(x)\u2227A(z)&#x27;)
+      ).toThrowError(&#x27;The operator A could not be identified.&#x27;);
+    });
+
+    it(&#x27;should reject lines that cannot be parsed&#x27;, function() {
+      expect(
+        errorWrapper(buildThenDisplay, &#x27;fromj p we have q&#x27;)).toThrowError(
+        &#x27;We could not identify either of \&#x27;fromj\&#x27; or \&#x27;p\&#x27; as words;&#x27; +
+        &#x27; please make sure you are using vocabulary from the given list, and&#x27; +
+        &#x27; don\&#x27;t have two consecutive expressions.&#x27;);
+    });
+
+    it(&#x27;should reject lines that do not match a template&#x27;, function() {
+      expect(errorWrapper(buildThenDisplay, &#x27;Hence A=&gt;x=3&#x27;)).toThrowError(
+        &#x27;This line could not be identified as valid - please check the list &#x27; +
+        &#x27;of possible lines.&#x27;);
+    });
+
+    it(&#x27;should reject lines that match an incorrect template&#x27;, function() {
+      expect(
+        errorWrapper(
+          buildThenDisplay, &#x27;from a&lt;b and b&lt;c we have a&lt;b \u2227 b&lt;d&#x27;)
+      ).toThrowError(
+        &#x27;The conclusion you are allowed to make here is \&#x27;From a&lt;b and&#x27; +
+        &#x27; b&lt;c we have (a&lt;b)\u2227(b&lt;c)\&#x27;.&#x27;);
+    });
+
+    it(&#x27;should reject lines starting with an odd number of spaces&#x27;, function() {
+      expect(
+        errorWrapper(buildThenDisplay, &#x27;   from R and A=&gt;B have R\u2227(A=&gt;B)&#x27;)
+      ).toThrowError(
+        &#x27;An indentation is indicated by a double space at the start of&#x27; +
+        &#x27; the line, but this line starts with an odd number of spaces.&#x27;
+      );
+    });
+    describe(&#x27;Build, validate and display proof&#x27;, function() {
+      var displayProof = function(proof, operators) {
+        var output = [];
+        for (var i = 0; i &lt; proof.lines.length; i++) {
+          output.push(displayLine(proof.lines[i], operators));
+        }
+        return output;
+      };
+      var buildThenDisplay = function(proofString) {
+        return displayProof(
+          logicProofStudent.buildProof(proofString, sampleInteraction),
+          logicProofData.BASE_STUDENT_LANGUAGE.operators);
+      };
+      var sharedErrorWrapper = function(message, line, code, category) {
+        return {
+          message: message,
+          line: line,
+          code: code,
+          category: category
+        };
+      };
+
+      it(&#x27;should accept and build examples correctly&#x27;, function() {
+        expect(
+          buildThenDisplay(
+            &#x27;a was arbitrary thus \u2200y.R\n  from p and \u2200y.R have &#x27; +
+            &#x27;p\u2227\u2200y.R&#x27;)
+        ).toEqual([{
+          template_name: &#x27;for_all_introduce&#x27;,
+          matchings: {
+            a: &#x27;a&#x27;,
+            p: &#x27;R&#x27;,
+            x: &#x27;y&#x27;
+          },
+          antecedents: &#x27;R&#x27;,
+          results: &#x27;\u2200y.R&#x27;,
+          variables: &#x27;a&#x27;,
+          indentation: 0,
+          text: &#x27;a was arbitrary thus \u2200y.R&#x27;
+        }, {
+          template_name: &#x27;and_introduce&#x27;,
+          matchings: {
+            R: &#x27;p&#x27;,
+            S: &#x27;\u2200y.R&#x27;
+          },
+          antecedents: &#x27;p, \u2200y.R&#x27;,
+          results: &#x27;p\u2227(\u2200y.R)&#x27;,
+          variables: &#x27;&#x27;,
+          indentation: 1,
+          text: &#x27;  from p and \u2200y.R have p\u2227\u2200y.R&#x27;
+        }]);
+      });
+
+      it(&#x27;should reject proofs with invalid lines&#x27;, function() {
+        expect(function() {
+          buildThenDisplay(
+            &#x27;from a and b we have a\u2227b\nfrom a and b we have b\u2227a&#x27;);
+        }).toThrow(
+          sharedErrorWrapper(
+            &#x27;The conclusion you are allowed to make here is \&#x27;From&#x27; +
+            &#x27; a and b we have a\u2227b\&#x27;.&#x27;, 1, &#x27;and_introduce_e4&#x27;, &#x27;line&#x27;));
+      });
+      describe(&#x27;Check proof makes no mistakes from the mistake table&#x27;,
+        function() {
+          var testCheck = function(proofString) {
+            return logicProofStudent.checkProof(
+              logicProofStudent.buildProof(proofString, sampleInteraction),
+              sampleInteraction);
+          };
+
+          it(&#x27;should allow proofs that make no mistake&#x27;, function() {
+            expect(
+              testCheck([
+                &#x27;from p and q we have p\u2227q&#x27;,
+                &#x27;from p and p\u2227q we have p\u2227(p\u2227q)&#x27;].join(&#x27;\n&#x27;))
+            ).toBeUndefined();
+          });
+
+          it(&#x27;should reject proofs that make mistakes&#x27;, function() {
+            expect(function() {
+              testCheck([
+                &#x27;from p and q we have p\u2227q&#x27;,
+                &#x27;  from p and p\u2227q we have p\u2227(p\u2227q)&#x27;].join(&#x27;\n&#x27;));
+            }).toThrow(
+              sharedErrorWrapper(
+                &#x27;The last line of a proof should not be indented; you need &#x27; +
+                &#x27;to prove that the given formulas holds just from the &#x27; +
+                &#x27;original assumptions, not the additional assumption of &#x27; +
+                &#x27;p\u2227q.&#x27;,
+                1, &#x27;last_line_indented_assumption&#x27;, &#x27;target&#x27;));
+
+            expect(function() {
+              testCheck([
+                &#x27;a was arbitrary hence \u2200x.p&#x27;,
+                &#x27;  from p and q we have p\u2227q&#x27;,
+                &#x27;  b was arbitrary hence \u2200x.q&#x27;].join(&#x27;\n&#x27;));
+            }).toThrow(
+              sharedErrorWrapper(
+                &#x27;We originally took a as our arbitrary variable so this, &#x27; +
+                &#x27;rather than b, needs to be the one that we quantify out over.&#x27;,
+                2, &#x27;incorrect_variable_forall&#x27;, &#x27;variables&#x27;));
+          });
+        }
+      );
+    });
+  });
+
+  describe(&#x27;Require all lines to have known layouts as student types&#x27;,
+    function() {
+      it(&#x27;should accept known layouts&#x27;, function() {
+        expect(
+          logicProofStudent.validateProof(
+            &#x27;from A and B we have A\u2227B\n&#x27;, sampleInteraction)
+        ).toEqual(undefined);
+      });
+
+      it(&#x27;should reject unknown layouts&#x27;, function() {
+        expect(function() {
+          logicProofStudent.validateProof(
+            &#x27;from A and B we have A\u2227\n&#x27;, sampleInteraction);
+        }).toThrow(
+          {
+            message: (
+              &#x27;We could not identify \&#x27;A\u2227\&#x27;; please make sure you &#x27; +
+              &#x27;are using vocabulary from the given list, and don\&#x27;t have &#x27; +
+              &#x27;two consecutive expressions.&#x27;),
+            line: 0
+          }
+        );
+      });
+    }
+  );
+
+  describe(&#x27;Evaluate a logical expression&#x27;, function() {
+    var testEvaluate = function(expressionString, type, inputs, parameters) {
+      return logicProofStudent.evaluate(
+        logicProofShared.assignTypesToExpression(
+          logicProofParser.parse(expressionString, &#x27;expression&#x27;), [type],
+          logicProofData.BASE_CONTROL_LANGUAGE
+        )[0].typedExpression, inputs, logicProofStudent.BASE_CONTROL_MODEL,
+        parameters, {});
+    };
+
+    it(&#x27;should evaluate examples correctly&#x27;, function() {
+      expect(testEvaluate(&#x27;2+2&#x27;, &#x27;integer&#x27;, {}, {})).toEqual(4);
+
+      expect(testEvaluate(&#x27;y\u2208z&#x27;, &#x27;boolean&#x27;, {
+        x: &#x27;a&#x27;,
+        y: logicProofParser.parse(&#x27;p\u2227q&#x27;, &#x27;expression&#x27;),
+        z: [
+          logicProofParser.parse(&#x27;\u2203x.p&#x27;, &#x27;expression&#x27;),
+          logicProofParser.parse(&#x27;p\u2227q&#x27;, &#x27;expression&#x27;)
+        ]
+      }, {})).toEqual(true);
+
+      expect(testEvaluate(&#x27;x=\&#x27;a\&#x27;&#x27;, &#x27;boolean&#x27;, {
+        x: &#x27;\&#x27;a\&#x27;&#x27;,
+        y: logicProofParser.parse(&#x27;p\u2227q&#x27;, &#x27;expression&#x27;),
+        z: [
+          logicProofParser.parse(&#x27;\u2203x.p&#x27;, &#x27;expression&#x27;),
+          logicProofParser.parse(&#x27;p\u2227q&#x27;, &#x27;expression&#x27;)
+        ]
+      }, {})).toEqual(true);
+
+      expect(
+        testEvaluate(
+          &#x27;max{n&lt;10|~\u2203x&lt;10.\u2203y&lt;10.(x&gt;1\u2227y&gt;1\u2227x*y=n)}&#x27;,
+          &#x27;integer&#x27;, {}, {})
+      ).toEqual(7);
+
+      expect(
+        testEvaluate(
+          &#x27;min{n&lt;20|n&gt;1\u2227~\u2200x&lt;5.~x*x*x=n}&#x27;, &#x27;integer&#x27;, {}, {})
+      ).toEqual(8);
+
+      expect(
+        logicProofShared.displayExpressionArray(
+          testEvaluate(&#x27;antecedents(2)&#x27;, &#x27;set_of_formulas&#x27;, {}, {
+            proof: logicProofStudent.buildProof([
+              &#x27;from r and s we have r\u2227s&#x27;,
+              &#x27;from r\u2227s and s we have (r\u2227s)\u2227s&#x27;
+            ].join(&#x27;\n&#x27;), sampleInteraction)
+          }), logicProofData.BASE_CONTROL_LANGUAGE.operators)
+      ).toEqual(&#x27;r\u2227s, s&#x27;);
+
+      expect(testEvaluate(&#x27;scoper(num_lines())&#x27;, &#x27;integer&#x27;, {}, {
+        proof: logicProofStudent.buildProof(
+          &#x27;from r and s we have r\u2227s\n  from r\u2227s and s we have &#x27; +
+          &#x27;(r\u2227s)\u2227s&#x27;,
+          sampleInteraction)
+      })).toEqual(1);
+
+      expect(
+        logicProofStudent.evaluate(
+          sampleInteraction.mistake_table[0].entries[0].occurs, {
+            n: 3
+          },
+          sampleInteraction.control_model, {
+            proof: logicProofStudent.buildProof(
+              &#x27;a was arbitrary hence \u2200x.p\n  from p and q we have&#x27; +
+              &#x27; p\u2227q\n  a was arbitrary hence \u2200x.q&#x27;, sampleInteraction)
+          },
+          {}
+        )
+      ).toEqual(false);
+    });
+  });
+
+  describe(&#x27;Render mistake messages&#x27;, function() {
+    var render = function(mistakeEntry, lineInProof, proofString) {
+      return logicProofStudent.renderMistakeMessages(
+        mistakeEntry, lineInProof, sampleInteraction.control_model, {
+          proof: logicProofStudent.buildProof(
+            proofString, sampleInteraction)
+        }, logicProofData.BASE_STUDENT_LANGUAGE.operators);
+    };
+
+    it(&#x27;should render example messages with respect to given proofs&#x27;,
+      function() {
+        expect(
+          render(
+            sampleInteraction.mistake_table[0].entries[0], 2, [
+              &#x27;a was arbitrary hence \u2200x.p&#x27;,
+              &#x27;  from p and q we have p\u2227q&#x27;,
+              &#x27;  b was arbitrary hence \u2200x.q&#x27;].join(&#x27;\n&#x27;))[0]
+        ).toEqual(
+          &#x27;We originally took a as our arbitrary variable so this, &#x27; +
+          &#x27;rather than b, needs to be the one that we quantify out over.&#x27;);
+
+        expect(
+          render(
+            sampleInteraction.mistake_table[1].entries[0], 1,
+            &#x27;a was arbitrary hence \u2200x.p\n  from p and q we &#x27; +
+            &#x27;have p\u2227q&#x27;)[0]
+        ).toEqual(
+          &#x27;The last line of a proof should not be indented; you need &#x27; +
+          &#x27;to prove that the given formulas holds just from the original &#x27; +
+          &#x27;assumptions, not the additional assumption of \u2200x.p.&#x27;);
+
+        expect(
+          render(
+            sampleInteraction.mistake_table[1].entries[0], 0, [
+              &#x27;a was arbitrary hence \u2200x.p&#x27;,
+              &#x27;  from p and q we have p\u2227q&#x27;].join(&#x27;\n&#x27;))
+        ).toEqual([]);
+      }
+    );
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:102,&quot;character&quot;:12,&quot;text&quot;:&quot;expression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:102,&quot;character&quot;:24,&quot;text&quot;:&quot;inputs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:102,&quot;character&quot;:32,&quot;text&quot;:&quot;model&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:102,&quot;character&quot;:39,&quot;text&quot;:&quot;parameters&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:102,&quot;character&quot;:51,&quot;text&quot;:&quot;cache&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:163,&quot;character&quot;:12,&quot;text&quot;:&quot;n&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:164,&quot;character&quot;:14,&quot;text&quot;:&quot;expression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:164,&quot;character&quot;:25,&quot;text&quot;:&quot;arguments&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:164,&quot;character&quot;:39,&quot;text&quot;:&quot;inputs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:164,&quot;character&quot;:47,&quot;text&quot;:&quot;model&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:164,&quot;character&quot;:54,&quot;text&quot;:&quot;parameters&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:164,&quot;character&quot;:66,&quot;text&quot;:&quot;cache&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:165,&quot;character&quot;:13,&quot;text&quot;:&quot;model&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:165,&quot;character&quot;:20,&quot;text&quot;:&quot;parameters&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:165,&quot;character&quot;:32,&quot;text&quot;:&quot;cache&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:356,&quot;character&quot;:8,&quot;text&quot;:&quot;occurs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:363,&quot;character&quot;:13,&quot;text&quot;:&quot;typedExpression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:369,&quot;character&quot;:10,&quot;text&quot;:&quot;content&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:374,&quot;character&quot;:15,&quot;text&quot;:&quot;typedExpression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:402,&quot;character&quot;:8,&quot;text&quot;:&quot;occurs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:408,&quot;character&quot;:13,&quot;text&quot;:&quot;typedExpression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:416,&quot;character&quot;:10,&quot;text&quot;:&quot;content&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:420,&quot;character&quot;:15,&quot;text&quot;:&quot;typedExpression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:430,&quot;character&quot;:45,&quot;text&quot;:&quot;expressionDictionary&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:430,&quot;character&quot;:67,&quot;text&quot;:&quot;operators&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:431,&quot;character&quot;:8,&quot;text&quot;:&quot;processedArray&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:432,&quot;character&quot;:20,&quot;text&quot;:&quot;expressionDictionary&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:433,&quot;character&quot;:6,&quot;text&quot;:&quot;processedArray&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:434,&quot;character&quot;:8,&quot;text&quot;:&quot;expressionDictionary&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:434,&quot;character&quot;:35,&quot;text&quot;:&quot;operators&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:436,&quot;character&quot;:11,&quot;text&quot;:&quot;processedArray&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:439,&quot;character&quot;:6,&quot;text&quot;:&quot;expressionString&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:439,&quot;character&quot;:24,&quot;text&quot;:&quot;templateString&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:439,&quot;character&quot;:40,&quot;text&quot;:&quot;oldMatchings&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:442,&quot;character&quot;:31,&quot;text&quot;:&quot;expressionString&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:443,&quot;character&quot;:31,&quot;text&quot;:&quot;templateString&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:443,&quot;character&quot;:62,&quot;text&quot;:&quot;oldMatchings&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:448,&quot;character&quot;:6,&quot;text&quot;:&quot;dubiousFunction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:448,&quot;character&quot;:26,&quot;text&quot;:&quot;input&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:451,&quot;character&quot;:8,&quot;text&quot;:&quot;dubiousFunction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:451,&quot;character&quot;:27,&quot;text&quot;:&quot;input&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:454,&quot;character&quot;:10,&quot;text&quot;:&quot;err&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:452,&quot;character&quot;:15,&quot;text&quot;:&quot;err&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:540,&quot;character&quot;:39,&quot;text&quot;:&quot;lineString&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:540,&quot;character&quot;:51,&quot;text&quot;:&quot;template&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:543,&quot;character&quot;:10,&quot;text&quot;:&quot;lineString&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:545,&quot;character&quot;:14,&quot;text&quot;:&quot;template&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:545,&quot;character&quot;:23,&quot;text&quot;:&quot;reader_view&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:587,&quot;character&quot;:39,&quot;text&quot;:&quot;lineString&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:589,&quot;character&quot;:8,&quot;text&quot;:&quot;lineString&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:611,&quot;character&quot;:31,&quot;text&quot;:&quot;line&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:611,&quot;character&quot;:37,&quot;text&quot;:&quot;operators&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:613,&quot;character&quot;:22,&quot;text&quot;:&quot;line&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:613,&quot;character&quot;:27,&quot;text&quot;:&quot;matchings&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:615,&quot;character&quot;:10,&quot;text&quot;:&quot;line&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:615,&quot;character&quot;:15,&quot;text&quot;:&quot;matchings&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:615,&quot;character&quot;:31,&quot;text&quot;:&quot;operators&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:617,&quot;character&quot;:10,&quot;text&quot;:&quot;antecedents&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:618,&quot;character&quot;:26,&quot;text&quot;:&quot;line&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:618,&quot;character&quot;:31,&quot;text&quot;:&quot;antecedents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:618,&quot;character&quot;:43,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:619,&quot;character&quot;:8,&quot;text&quot;:&quot;antecedents&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:621,&quot;character&quot;:12,&quot;text&quot;:&quot;line&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:621,&quot;character&quot;:17,&quot;text&quot;:&quot;antecedents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:621,&quot;character&quot;:32,&quot;text&quot;:&quot;content&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:621,&quot;character&quot;:41,&quot;text&quot;:&quot;operators&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:624,&quot;character&quot;:8,&quot;text&quot;:&quot;template_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:624,&quot;character&quot;:23,&quot;text&quot;:&quot;line&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:624,&quot;character&quot;:28,&quot;text&quot;:&quot;template_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:626,&quot;character&quot;:21,&quot;text&quot;:&quot;antecedents&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:628,&quot;character&quot;:10,&quot;text&quot;:&quot;line&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:628,&quot;character&quot;:15,&quot;text&quot;:&quot;results&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:628,&quot;character&quot;:24,&quot;text&quot;:&quot;operators&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:630,&quot;character&quot;:10,&quot;text&quot;:&quot;line&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:630,&quot;character&quot;:15,&quot;text&quot;:&quot;variables&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:630,&quot;character&quot;:26,&quot;text&quot;:&quot;operators&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:631,&quot;character&quot;:8,&quot;text&quot;:&quot;indentation&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:631,&quot;character&quot;:21,&quot;text&quot;:&quot;line&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:631,&quot;character&quot;:26,&quot;text&quot;:&quot;indentation&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:632,&quot;character&quot;:8,&quot;text&quot;:&quot;text&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:632,&quot;character&quot;:14,&quot;text&quot;:&quot;line&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:632,&quot;character&quot;:19,&quot;text&quot;:&quot;text&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:636,&quot;character&quot;:36,&quot;text&quot;:&quot;lineString&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:639,&quot;character&quot;:10,&quot;text&quot;:&quot;lineString&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:706,&quot;character&quot;:34,&quot;text&quot;:&quot;proof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:706,&quot;character&quot;:41,&quot;text&quot;:&quot;operators&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:707,&quot;character&quot;:12,&quot;text&quot;:&quot;output&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:708,&quot;character&quot;:28,&quot;text&quot;:&quot;proof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:708,&quot;character&quot;:34,&quot;text&quot;:&quot;lines&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:708,&quot;character&quot;:40,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:709,&quot;character&quot;:10,&quot;text&quot;:&quot;output&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:709,&quot;character&quot;:34,&quot;text&quot;:&quot;proof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:709,&quot;character&quot;:40,&quot;text&quot;:&quot;lines&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:709,&quot;character&quot;:50,&quot;text&quot;:&quot;operators&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:711,&quot;character&quot;:15,&quot;text&quot;:&quot;output&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:713,&quot;character&quot;:38,&quot;text&quot;:&quot;proofString&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:715,&quot;character&quot;:39,&quot;text&quot;:&quot;proofString&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:718,&quot;character&quot;:40,&quot;text&quot;:&quot;message&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:718,&quot;character&quot;:49,&quot;text&quot;:&quot;line&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:718,&quot;character&quot;:55,&quot;text&quot;:&quot;code&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:718,&quot;character&quot;:61,&quot;text&quot;:&quot;category&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:720,&quot;character&quot;:10,&quot;text&quot;:&quot;message&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:720,&quot;character&quot;:19,&quot;text&quot;:&quot;message&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:721,&quot;character&quot;:10,&quot;text&quot;:&quot;line&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:721,&quot;character&quot;:16,&quot;text&quot;:&quot;line&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:722,&quot;character&quot;:10,&quot;text&quot;:&quot;code&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:722,&quot;character&quot;:16,&quot;text&quot;:&quot;code&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:723,&quot;character&quot;:10,&quot;text&quot;:&quot;category&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:723,&quot;character&quot;:20,&quot;text&quot;:&quot;category&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:769,&quot;character&quot;:35,&quot;text&quot;:&quot;proofString&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:771,&quot;character&quot;:43,&quot;text&quot;:&quot;proofString&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:839,&quot;character&quot;:32,&quot;text&quot;:&quot;expressionString&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:839,&quot;character&quot;:50,&quot;text&quot;:&quot;type&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:839,&quot;character&quot;:56,&quot;text&quot;:&quot;inputs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:839,&quot;character&quot;:64,&quot;text&quot;:&quot;parameters&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:842,&quot;character&quot;:33,&quot;text&quot;:&quot;expressionString&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:842,&quot;character&quot;:67,&quot;text&quot;:&quot;type&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:844,&quot;character&quot;:13,&quot;text&quot;:&quot;typedExpression&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:844,&quot;character&quot;:30,&quot;text&quot;:&quot;inputs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:845,&quot;character&quot;:8,&quot;text&quot;:&quot;parameters&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:854,&quot;character&quot;:8,&quot;text&quot;:&quot;z&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:863,&quot;character&quot;:8,&quot;text&quot;:&quot;z&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:899,&quot;character&quot;:56,&quot;text&quot;:&quot;occurs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:914,&quot;character&quot;:26,&quot;text&quot;:&quot;mistakeEntry&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:914,&quot;character&quot;:40,&quot;text&quot;:&quot;lineInProof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:914,&quot;character&quot;:53,&quot;text&quot;:&quot;proofString&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:916,&quot;character&quot;:8,&quot;text&quot;:&quot;mistakeEntry&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:916,&quot;character&quot;:22,&quot;text&quot;:&quot;lineInProof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/student.spec.ts&quot;,&quot;line&quot;:918,&quot;character&quot;:12,&quot;text&quot;:&quot;proofString&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:44:00 GMT</p>
+    </body>
+  </html>
+  

@@ -1,0 +1,236 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>karma-fixtures.d.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">typings/karma-fixtures.d.ts</td><td class="">100.00%</td><td class="">100%</td><td class="">215</td><td class="">215</td><td class="">0</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">interface KNN {
+  &#x27;occurrence&#x27;: number;
+  &#x27;K&#x27;: number;
+  &#x27;T&#x27;: number;
+  &#x27;top&#x27;: number;
+  &#x27;fingerprint_data&#x27;: {
+    [key: number]: {
+      class: number;
+      fingerprint: number[][]
+    }
+  };
+  &#x27;token_to_id&#x27;: {
+    [key: string]: number;
+  };
+}
+
+interface KernelParams {
+  kernel: string;
+  coef0: number;
+  degree: number;
+  gamma: number;
+}
+
+interface SVM {
+  &#x27;classes&#x27;: number[];
+  &#x27;kernel_params&#x27;: KernelParams;
+  &#x27;intercept&#x27;: number[];
+  &#x27;n_support&#x27;: number[];
+  &#x27;probA&#x27;: number[];
+  &#x27;support_vectors&#x27;: number[][];
+  &#x27;probB&#x27;: number[];
+  &#x27;dual_coef&#x27;: number[][];
+}
+
+type ClassifierAccuracyTest = {
+  &#x27;answer_group_index&#x27;: number;
+  &#x27;answers&#x27;: {
+    code: string
+  }[];
+}[];
+
+interface Hashes {
+  &#x27;/hash_test.html&#x27;: string;
+  &#x27;/path_test/hash_test.html&#x27;: string;
+  &#x27;/hash_test.min.js&#x27;: string;
+  &#x27;/assets_test/hash_test.json&#x27;: string;
+  &#x27;/pages_test/hash_test.html&#x27;: string;
+  &#x27;/images/hash_test.png&#x27;: string;
+  &#x27;/videos/hash_test.mp4&#x27;: string;
+  &#x27;/interactions/interTest/static/interTest.png&#x27;: string;
+}
+
+interface InplaceReplaceTest {
+  RANDMON1: string;
+  &#x27;312RANDOM&#x27;: string;
+  DEV_MODE: boolean;
+  RAN213DOM: string;
+}
+
+interface TestCasesRTE {
+  RTE_TYPE_TEXTANGULAR: {
+    TEST_CASES: {
+      &#x27;html_content&#x27;: string;
+      &#x27;expected_output&#x27;: string;
+      &#x27;case&#x27;: string;
+    }[];
+  };
+}
+
+type TextClassifierResults = {
+  &#x27;answer_group_index&#x27;: number;
+  &#x27;answers&#x27;: string[];
+}[];
+
+interface TextInputClassifierData {
+  &#x27;best_params&#x27;: {
+    kernel: string;
+    C: number;
+  };
+  &#x27;best_score&#x27;: number;
+  &#x27;SVM&#x27;: SVM;
+  &#x27;cv_vocabulary&#x27;: {
+    [key: string]: number;
+  };
+}
+
+interface RuleDescription {
+  description: string;
+}
+
+interface RuleTemplates {
+  AlgebraicExpressionInput: {
+    MatchesExactlyWith: RuleDescription;
+    IsEquivalentTo: RuleDescription;
+    ContainsSomeOf: RuleDescription;
+    OmitsSomeOf: RuleDescription;
+    MatchesWithGeneralForm: RuleDescription;
+  };
+  CodeRepl: {
+    CodeEquals: RuleDescription;
+    CodeContains: RuleDescription;
+    CodeDoesNotContain: RuleDescription;
+    OutputEquals: RuleDescription;
+    OutputContains: RuleDescription;
+    ResultsInError: RuleDescription;
+    ErrorContains: RuleDescription;
+  };
+  Continue: {};
+  DragAndDropSortInput: {
+    IsEqualToOrdering: RuleDescription;
+    IsEqualToOrderingWithOneItemAtIncorrectPosition: RuleDescription;
+    HasElementXAtPositionY: RuleDescription;
+    HasElementXBeforeElementY: RuleDescription;
+  };
+  EndExploration: {};
+  FractionInput: {
+    IsExactlyEqualTo: RuleDescription;
+    IsEquivalentTo: RuleDescription;
+    IsEquivalentToAndInSimplestForm: RuleDescription;
+    IsLessThan: RuleDescription;
+    IsGreaterThan: RuleDescription;
+    HasNumeratorEqualTo: RuleDescription;
+    HasDenominatorEqualTo: RuleDescription;
+    HasIntegerPartEqualTo: RuleDescription;
+    HasNoFractionalPart: RuleDescription;
+    HasFractionalPartExactlyEqualTo: RuleDescription;
+  };
+  GraphInput: {
+    IsIsomorphicTo: RuleDescription;
+  };
+  ImageClickInput: {
+    IsInRegion: RuleDescription;
+  };
+  InteractiveMap: {
+    Within: RuleDescription;
+    NotWithin: RuleDescription;
+  };
+  ItemSelectionInput: {
+    Equals: RuleDescription;
+    ContainsAtLeastOneOf: RuleDescription;
+    DoesNotContainAtLeastOneOf: RuleDescription;
+    IsProperSubsetOf: RuleDescription;
+  };
+  LogicProof: {
+    Correct: RuleDescription;
+    NotCorrect: RuleDescription;
+    NotCorrectByCategory: RuleDescription;
+  };
+  MathEquationInput: {
+    MatchesExactlyWith: RuleDescription;
+    IsEquivalentTo: RuleDescription;
+    ContainsSomeOf: RuleDescription;
+    OmitsSomeOf: RuleDescription;
+  };
+  MultipleChoiceInput: {
+    Equals: RuleDescription;
+  };
+  MusicNotesInput: {
+    Equals: RuleDescription;
+    IsLongerThan: RuleDescription;
+    HasLengthInclusivelyBetween: RuleDescription;
+    IsEqualToExceptFor: RuleDescription;
+    IsTranspositionOf: RuleDescription;
+    IsTranspositionOfExceptFor: RuleDescription;
+  };
+  NumberWithUnits: {
+    IsEqualTo: RuleDescription;
+    IsEquivalentTo: RuleDescription;
+  };
+  NumericExpressionInput: {
+    MatchesExactlyWith: RuleDescription;
+    IsEquivalentTo: RuleDescription;
+    ContainsSomeOf: RuleDescription;
+    OmitsSomeOf: RuleDescription;
+  };
+  NumericInput: {
+    Equals: RuleDescription;
+    IsLessThan: RuleDescription;
+    IsGreaterThan: RuleDescription;
+    IsLessThanOrEqualTo: RuleDescription;
+    IsGreaterThanOrEqualTo: RuleDescription;
+    IsInclusivelyBetween: RuleDescription;
+    IsWithinTolerance: RuleDescription;
+  };
+  PencilCodeEditor: {
+    CodeEquals: RuleDescription;
+    CodeContains: RuleDescription;
+    CodeDoesNotContain: RuleDescription;
+    OutputEquals: RuleDescription;
+    OutputRoughlyEquals: RuleDescription;
+    ResultsInError: RuleDescription;
+    ErrorContains: RuleDescription;
+  };
+  SetInput: {
+    Equals: RuleDescription;
+    IsSubsetOf: RuleDescription;
+    IsSupersetOf: RuleDescription;
+    HasElementsNotIn: RuleDescription;
+    OmitsElementsIn: RuleDescription;
+    IsDisjointFrom: RuleDescription;
+  };
+  TextInput: {
+    Equals: RuleDescription;
+    StartsWith: RuleDescription;
+    Contains: RuleDescription;
+    FuzzyEquals: RuleDescription;
+  }
+}
+
+interface KarmaFixtures {
+  &#x27;extensions/interactions/rule_templates&#x27;: RuleTemplates;
+  &#x27;core/tests/data/hashes&#x27;: Hashes;
+  &#x27;core/tests/data/inplace_replace_test&#x27;: InplaceReplaceTest;
+  &#x27;core/tests/data/test_cases_for_rte&#x27;: TestCasesRTE;
+  &#x27;core/tests/data/text_classifier_results&#x27;: TextClassifierResults;
+  &#x27;core/tests/data/text_input_classifier_data&#x27;: TextInputClassifierData;
+  &#x27;core/tests/data/text_input_training_data&#x27;: TextClassifierResults;
+}
+</textarea><pre id="annotations" style="display:none">[]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:44:00 GMT</p>
+    </body>
+  </html>
+  

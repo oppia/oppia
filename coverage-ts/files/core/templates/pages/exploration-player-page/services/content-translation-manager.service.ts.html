@@ -1,0 +1,310 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>content-translation-manager.service.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/exploration-player-page/services/content-translation-manager.service.ts</td><td class="">98.25%</td><td class="">100%</td><td class="">400</td><td class="">393</td><td class="">7</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Service to manage the content translations displayed.
+ */
+
+import { downgradeInjectable } from &#x27;@angular/upgrade/static&#x27;;
+import { EventEmitter, Injectable } from &#x27;@angular/core&#x27;;
+import cloneDeep from &#x27;lodash/cloneDeep&#x27;;
+import isObject from &#x27;lodash/isObject&#x27;;
+
+import { BaseTranslatableObject, InteractionRuleInputs } from
+  &#x27;interactions/rule-input-defs&#x27;;
+import { PlayerTranscriptService } from
+  &#x27;pages/exploration-player-page/services/player-transcript.service&#x27;;
+import { StateCard } from
+  &#x27;domain/state_card/StateCardObjectFactory&#x27;;
+import { WrittenTranslation } from
+  &#x27;domain/exploration/WrittenTranslationObjectFactory&#x27;;
+import { SubtitledHtml } from
+  &#x27;domain/exploration/subtitled-html.model&#x27;;
+import { Schema } from &#x27;services/schema-default-value.service&#x27;;
+import { SchemaConstants } from
+  &#x27;components/forms/schema-based-editors/schema-constants&#x27;;
+import INTERACTION_SPECS from &#x27;pages/interaction-specs.constants.ajs&#x27;;
+import { WrittenTranslations } from
+  &#x27;domain/exploration/WrittenTranslationsObjectFactory&#x27;;
+import { SubtitledUnicode } from
+  &#x27;domain/exploration/SubtitledUnicodeObjectFactory&#x27;;
+import { ExtensionTagAssemblerService } from
+  &#x27;services/extension-tag-assembler.service&#x27;;
+
+
+@Injectable({
+  providedIn: &#x27;root&#x27;
+})
+export class ContentTranslationManagerService {
+  private explorationLanguageCode: string;
+  private onStateCardContentUpdateEmitter: EventEmitter&lt;void&gt; = (
+    new EventEmitter());
+  // The &#x27;originalTranscript&#x27; is a copy of the transcript in the exploration
+  // language in it&#x27;s initial state.
+  private originalTranscript: StateCard[] = [];
+
+  constructor(
+    private playerTranscriptService: PlayerTranscriptService,
+    private extensionTagAssemblerService: ExtensionTagAssemblerService
+  ) {}
+
+  init(explorationLanguageCode: string): void {
+    this.explorationLanguageCode = explorationLanguageCode;
+    this.originalTranscript = cloneDeep(
+      this.playerTranscriptService.transcript);
+  }
+
+  get onStateCardContentUpdate(): EventEmitter&lt;void&gt; {
+    return this.onStateCardContentUpdateEmitter;
+  }
+
+  /**
+   * This method replaces the translatable content inside the player transcript
+   * service&#x27;s StateCards. If the language code is set back to the original
+   * exploration language, the original transcript in the exploration language
+   * is restored, since it was previously modified from switching to another
+   * language previously. Note that learners can only freely switch content
+   * languages when they are on the first state and have not entered an answer
+   * yet (so, there are no response pairs), otherwise they will have to refresh
+   * the page and restart the exploration.
+   * @param {string} languageCode The language code to display translations for.
+   */
+  displayTranslations(languageCode: string): void {
+    const cards = this.playerTranscriptService.transcript;
+
+    if (languageCode === this.explorationLanguageCode) {
+      this.playerTranscriptService.restoreImmutably(this.originalTranscript);
+    } else {
+      cards.forEach(
+        card =&gt; this._displayTranslationsForCard(card, languageCode));
+    }
+
+    this.onStateCardContentUpdateEmitter.emit();
+  }
+
+  getTranslatedHtml(
+      writtenTranslations: WrittenTranslations,
+      languageCode: string,
+      content: SubtitledHtml
+  ): string {
+    const writtenTranslation = writtenTranslations.translationsMapping[
+      content.contentId][languageCode];
+    if (!writtenTranslation) {
+      return content.html;
+    }
+    const translationText = writtenTranslation.getTranslation();
+
+    // The isString() check is needed for the TypeScript compiler to narrow the
+    // type down from string|string[] to string. See &quot;Using type predicates&quot; at
+    // https://www.typescriptlang.org/docs/handbook/2/narrowing.html
+    // for more information.
+    if (this._isString(translationText) &amp;&amp;
+        this._isValidStringTranslation(writtenTranslation)) {
+      return translationText;
+    }
+
+    return content.html;
+  }
+
+  _swapContent(
+      writtenTranslations: WrittenTranslations,
+      languageCode: string,
+      content: SubtitledHtml|SubtitledUnicode
+  ): void {
+    const writtenTranslation = writtenTranslations.translationsMapping[
+      content.contentId][languageCode];
+
+    if (!this._isValidStringTranslation(writtenTranslation)) {
+      return;
+    }
+
+    let valueName;
+    // Note: The content can only be of type SubtitledHtml|SubtitledUnicode.
+    if (content instanceof SubtitledHtml) {
+      valueName = &#x27;html&#x27;;
+    } else if (content instanceof SubtitledUnicode) {
+      valueName = &#x27;unicode&#x27;;
+    }
+
+    content[valueName] = writtenTranslation.translation;
+  }
+
+  _displayTranslationsForCard(card: StateCard, languageCode: string): void {
+    const writtenTranslations = card.writtenTranslations;
+
+    const contentTranslation = writtenTranslations.translationsMapping[
+      card.contentId][languageCode];
+    const contentTranslationText = (
+      contentTranslation &amp;&amp; contentTranslation.getTranslation());
+
+    // The isString() check is needed for the TypeScript compiler to narrow the
+    // type down from string|string[] to string. See &quot;Using type predicates&quot; at
+    // https://www.typescriptlang.org/docs/handbook/2/narrowing.html
+    // for more information.
+    if (this._isString(contentTranslationText) &amp;&amp;
+        this._isValidStringTranslation(contentTranslation)) {
+      card.contentHtml = contentTranslationText;
+    }
+
+    card.getHints().forEach(hint =&gt; this._swapContent(
+      writtenTranslations, languageCode, hint.hintContent));
+
+    const solution = card.getSolution();
+    if (solution !== null) {
+      this._swapContent(
+        writtenTranslations, languageCode, solution.explanation);
+    }
+
+    if (card.getInteraction().defaultOutcome) {
+      this._swapContent(
+        writtenTranslations,
+        languageCode,
+        card.getInteraction().defaultOutcome.feedback);
+    }
+
+    const answerGroups = card.getInteraction().answerGroups;
+    answerGroups.forEach(answerGroup =&gt; {
+      this._swapContent(
+        writtenTranslations, languageCode, answerGroup.outcome.feedback);
+    });
+
+    if (card.getInteraction().id) {
+      this._swapContentInCustomizationArgs(card, languageCode);
+      this._swapContentInRules(card, languageCode);
+    }
+  }
+
+  _swapContentInCustomizationArgs(card: StateCard, languageCode: string): void {
+    const interactionId = card.getInteractionId();
+    const caValues = card.getInteraction().customizationArgs;
+    const writtenTranslations = card.writtenTranslations;
+
+    let traverseSchemaAndSwapTranslatableContent = (
+        value: Object | Object[],
+        schema: Schema
+    ): void =&gt; {
+      const schemaIsSubtitledHtml = (
+        schema.type === SchemaConstants.SCHEMA_TYPE_CUSTOM &amp;&amp;
+        schema.obj_type === SchemaConstants.SCHEMA_OBJ_TYPE_SUBTITLED_HTML);
+      const schemaIsSubtitledUnicode = (
+        schema.type === SchemaConstants.SCHEMA_TYPE_CUSTOM &amp;&amp;
+        schema.obj_type === SchemaConstants.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE
+      );
+
+      if (schemaIsSubtitledHtml || schemaIsSubtitledUnicode) {
+        this._swapContent(
+          writtenTranslations, languageCode,
+          &lt;SubtitledHtml|SubtitledUnicode&gt;value);
+      } else if (schema.type === SchemaConstants.SCHEMA_KEY_LIST) {
+        (&lt;Object[]&gt; value).forEach(
+          item =&gt; traverseSchemaAndSwapTranslatableContent(
+            item, &lt;Schema&gt; schema.items));
+      } else if (schema.type === SchemaConstants.SCHEMA_TYPE_DICT) {
+        schema.properties.forEach(property =&gt; {
+          const name = property.name;
+          traverseSchemaAndSwapTranslatableContent(
+            value[name],
+            property.schema);
+        });
+      }
+    };
+
+    const caSpecs = INTERACTION_SPECS[interactionId].customization_arg_specs;
+    for (const caSpec of caSpecs) {
+      const name = caSpec.name;
+      if (caValues.hasOwnProperty(name)) {
+        traverseSchemaAndSwapTranslatableContent(
+          caValues[name].value,
+          caSpec.schema);
+      }
+    }
+
+    const element = $(card.getInteractionHtml());
+    this.extensionTagAssemblerService.formatCustomizationArgAttrs(
+      element, caValues);
+    card.setInteractionHtml(element.get(0).outerHTML);
+  }
+
+  _swapContentInRules(card: StateCard, languageCode: string): void {
+    const writtenTranslations = card.writtenTranslations;
+    const CONTENT_ID_KEY = &#x27;contentId&#x27;;
+
+    const answerGroups = card.getInteraction().answerGroups;
+    answerGroups.forEach(answerGroup =&gt; {
+      answerGroup.rules.forEach(rule =&gt; {
+        for (var key in rule.inputs) {
+          let ruleInputValue = rule.inputs[key];
+          if (this._isTranslatableObject(ruleInputValue)) {
+            const writtenTranslation = writtenTranslations.translationsMapping[
+              ruleInputValue.contentId][languageCode];
+            // There must be at least one translation.
+            if (writtenTranslation.translation.length === 0) {
+              continue;
+            }
+
+            let ruleInputValueKeys = Object.keys(ruleInputValue);
+
+            // Remove the &#x27;contentId&#x27; key.
+            let contentIdIndex = ruleInputValueKeys.indexOf(CONTENT_ID_KEY);
+            ruleInputValueKeys.splice(contentIdIndex, 1);
+
+            // Retrieve the value corresponding to the other key.
+            let nonContentIdKey = ruleInputValueKeys[0];
+            ruleInputValue[nonContentIdKey] = writtenTranslation.translation;
+          }
+        }
+      });
+    });
+  }
+
+  _isTranslatableObject(
+      ruleInputValue: InteractionRuleInputs):
+      ruleInputValue is BaseTranslatableObject {
+    return isObject(ruleInputValue) &amp;&amp; &#x27;contentId&#x27; in ruleInputValue;
+  }
+
+  _isString(translation: string|string[]): translation is string {
+    return (typeof translation === &#x27;string&#x27;);
+  }
+
+  _isValidStringTranslation(writtenTranslation: WrittenTranslation): boolean {
+    return (
+      writtenTranslation !== undefined &amp;&amp;
+      this._isString(writtenTranslation.translation) &amp;&amp;
+      writtenTranslation.translation !== &#x27;&#x27; &amp;&amp;
+      writtenTranslation.needsUpdate === false);
+  }
+}
+
+angular.module(&#x27;oppia&#x27;).factory(
+  &#x27;ContentTranslationManagerService&#x27;,
+  downgradeInjectable(ContentTranslationManagerService));
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/content-translation-manager.service.ts&quot;,&quot;line&quot;:131,&quot;character&quot;:8,&quot;text&quot;:&quot;valueName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/content-translation-manager.service.ts&quot;,&quot;line&quot;:134,&quot;character&quot;:6,&quot;text&quot;:&quot;valueName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/content-translation-manager.service.ts&quot;,&quot;line&quot;:136,&quot;character&quot;:6,&quot;text&quot;:&quot;valueName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/content-translation-manager.service.ts&quot;,&quot;line&quot;:139,&quot;character&quot;:12,&quot;text&quot;:&quot;valueName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/content-translation-manager.service.ts&quot;,&quot;line&quot;:207,&quot;character&quot;:10,&quot;text&quot;:&quot;&lt;SubtitledHtml|SubtitledUnicode&gt;value&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/content-translation-manager.service.ts&quot;,&quot;line&quot;:209,&quot;character&quot;:9,&quot;text&quot;:&quot;&lt;Object[]&gt; value&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/content-translation-manager.service.ts&quot;,&quot;line&quot;:211,&quot;character&quot;:18,&quot;text&quot;:&quot;&lt;Schema&gt; schema.items&quot;,&quot;kind&quot;:4}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:54 GMT</p>
+    </body>
+  </html>
+  

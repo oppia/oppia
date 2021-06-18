@@ -1,0 +1,175 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>version-tree.service.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/exploration-editor-page/history-tab/services/version-tree.service.ts</td><td class="">90.18%</td><td class="">100%</td><td class="">163</td><td class="">147</td><td class="">16</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2014 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Service for handling all interactions with the version history
+ * tree.
+ */
+
+import cloneDeep from &#x27;lodash/cloneDeep&#x27;;
+
+import { Injectable } from &#x27;@angular/core&#x27;;
+import { downgradeInjectable } from &#x27;@angular/upgrade/static&#x27;;
+
+import { RevertChangeList, ExplorationChange } from
+  &#x27;domain/exploration/exploration-draft.model&#x27;;
+
+export interface ExplorationSnapshot {
+  &#x27;commit_message&#x27;: string;
+  &#x27;committer_id&#x27;: string;
+  &#x27;commit_type&#x27;: string;
+  &#x27;version_number&#x27;: number;
+  &#x27;created_on_ms&#x27;: number;
+  &#x27;commit_cmds&#x27;: ExplorationChange[];
+}
+
+interface ExplorationSnapshots {
+  [version: number]: ExplorationSnapshot;
+}
+
+@Injectable({
+  providedIn: &#x27;root&#x27;
+})
+export class VersionTreeService {
+  private _snapshots: ExplorationSnapshots = null;
+  private _treeParents: {} = null;
+
+  init(snapshotsData: ExplorationSnapshot[]): void {
+    this._treeParents = {};
+    this._snapshots = {};
+    var numberOfVersions = snapshotsData.length;
+
+    // Populate _snapshots so _snapshots[i] corresponds to version i.
+    for (var i = 0; i &lt; numberOfVersions; i++) {
+      this._snapshots[i + 1] = snapshotsData[i];
+    }
+
+    // Generate the version tree of an exploration from its snapshots.
+    for (var versionNum = 2; versionNum &lt;= numberOfVersions; versionNum++) {
+      if (this._snapshots[versionNum].commit_type === &#x27;revert&#x27;) {
+        for (
+          var i = 0; i &lt; this._snapshots[versionNum].commit_cmds.length; i++) {
+          if (this._snapshots[versionNum].commit_cmds[i].cmd ===
+              &#x27;AUTO_revert_version_number&#x27;) {
+            this._treeParents[versionNum] =
+              (&lt;RevertChangeList&gt; this._snapshots[versionNum].commit_cmds[i])
+                .version_number;
+          }
+        }
+      } else {
+        this._treeParents[versionNum] = versionNum - 1;
+      }
+    }
+    this._treeParents[1] = -1;
+  }
+
+  /**
+   * Returns a object whose keys are the version number and whose value is
+   * the parent of each version, where parent points to previous version
+   * in general or reverted version if commit is a reversion.
+   * The parent of the root (version 1) is -1.
+   */
+  getVersionTree(): {} {
+    if (this._treeParents === null) {
+      throw new Error(&#x27;version tree not initialized.&#x27;);
+    }
+    return this._treeParents;
+  }
+
+  // Finds lowest common ancestor of v1 and v2 in the version tree.
+  findLCA(v1: number, v2: number): number {
+    // Find paths from root to v1 and v2.
+    var pathToV1 = [];
+    var pathToV2 = [];
+    while (this._treeParents[v1] !== -1) {
+      pathToV1.push(v1);
+      if (this._treeParents[v1] === undefined) {
+        throw new Error(&#x27;Could not find parent of &#x27; + v1);
+      }
+      v1 = this._treeParents[v1];
+    }
+    pathToV1.push(1);
+    pathToV1.reverse();
+
+    while (this._treeParents[v2] !== -1) {
+      pathToV2.push(v2);
+      if (this._treeParents[v2] === undefined) {
+        throw new Error(&#x27;Could not find parent of &#x27; + v2);
+      }
+      v2 = this._treeParents[v2];
+    }
+    pathToV2.push(1);
+    pathToV2.reverse();
+
+    // ---- Compare paths ----
+    var maxIndex = Math.min(pathToV1.length, pathToV2.length) - 1;
+    var lca = null;
+    for (var i = maxIndex; i &gt;= 0; i--) {
+      if (pathToV1[i] === pathToV2[i]) {
+        lca = pathToV1[i];
+        break;
+      }
+    }
+    return lca;
+  }
+
+  /**
+   * Returns the change list of a version of the exploration.
+   * Should be called only after getVersionTree is called to initialize
+   * _snapshots. Should not be called to retrieve change list of version 1.
+   * Returns a list of objects with keys depending on type of commit:
+   *  - &#x27;cmd&#x27;: type of commit; &#x27;add_state&#x27;, &#x27;rename_state&#x27;, &#x27;delete_state&#x27;,
+   *           &#x27;edit_state_property&#x27; or &#x27;revert&#x27;
+   * for &#x27;add_state&#x27; and &#x27;delete_state&#x27;:
+   *  - &#x27;state_name&#x27;: added or deleted state name
+   * for &#x27;rename_state&#x27;:
+   *  - &#x27;new_state_name&#x27;: new state name
+   *  - &#x27;old_state_name&#x27;: old state name
+   * for &#x27;edit_state_property&#x27;: (edits to state content or rules)
+   *  - &#x27;new_value&#x27;: object which represents new version of state
+   *  - &#x27;old_value&#x27;: object which represents old version of state
+   *  - &#x27;state_name&#x27;: name of state which was changed
+   * for &#x27;revert&#x27;:
+   *  - &#x27;version_number&#x27;: version number reverted to
+   */
+  getChangeList(version: number): ExplorationChange[] {
+    if (this._snapshots === null) {
+      throw new Error(&#x27;snapshots is not initialized&#x27;);
+    } else if (version === 1) {
+      throw new Error(&#x27;Tried to retrieve change list of version 1&#x27;);
+    }
+    return cloneDeep(this._snapshots[version].commit_cmds);
+  }
+}
+
+angular.module(&#x27;oppia&#x27;).factory(
+  &#x27;VersionTreeService&#x27;, downgradeInjectable(VersionTreeService));
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/history-tab/services/version-tree.service.ts&quot;,&quot;line&quot;:65,&quot;character&quot;:15,&quot;text&quot;:&quot;&lt;RevertChangeList&gt; this._snapshots[versionNum].commit_cmds[i]&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/history-tab/services/version-tree.service.ts&quot;,&quot;line&quot;:92,&quot;character&quot;:8,&quot;text&quot;:&quot;pathToV1&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/history-tab/services/version-tree.service.ts&quot;,&quot;line&quot;:93,&quot;character&quot;:8,&quot;text&quot;:&quot;pathToV2&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/history-tab/services/version-tree.service.ts&quot;,&quot;line&quot;:95,&quot;character&quot;:6,&quot;text&quot;:&quot;pathToV1&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/history-tab/services/version-tree.service.ts&quot;,&quot;line&quot;:101,&quot;character&quot;:4,&quot;text&quot;:&quot;pathToV1&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/history-tab/services/version-tree.service.ts&quot;,&quot;line&quot;:102,&quot;character&quot;:4,&quot;text&quot;:&quot;pathToV1&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/history-tab/services/version-tree.service.ts&quot;,&quot;line&quot;:105,&quot;character&quot;:6,&quot;text&quot;:&quot;pathToV2&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/history-tab/services/version-tree.service.ts&quot;,&quot;line&quot;:111,&quot;character&quot;:4,&quot;text&quot;:&quot;pathToV2&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/history-tab/services/version-tree.service.ts&quot;,&quot;line&quot;:112,&quot;character&quot;:4,&quot;text&quot;:&quot;pathToV2&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/history-tab/services/version-tree.service.ts&quot;,&quot;line&quot;:115,&quot;character&quot;:28,&quot;text&quot;:&quot;pathToV1&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/history-tab/services/version-tree.service.ts&quot;,&quot;line&quot;:115,&quot;character&quot;:45,&quot;text&quot;:&quot;pathToV2&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/history-tab/services/version-tree.service.ts&quot;,&quot;line&quot;:116,&quot;character&quot;:8,&quot;text&quot;:&quot;lca&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/history-tab/services/version-tree.service.ts&quot;,&quot;line&quot;:118,&quot;character&quot;:10,&quot;text&quot;:&quot;pathToV1&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/history-tab/services/version-tree.service.ts&quot;,&quot;line&quot;:118,&quot;character&quot;:26,&quot;text&quot;:&quot;pathToV2&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/history-tab/services/version-tree.service.ts&quot;,&quot;line&quot;:119,&quot;character&quot;:8,&quot;text&quot;:&quot;lca&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/history-tab/services/version-tree.service.ts&quot;,&quot;line&quot;:119,&quot;character&quot;:14,&quot;text&quot;:&quot;pathToV1&quot;,&quot;kind&quot;:2}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:55 GMT</p>
+    </body>
+  </html>
+  

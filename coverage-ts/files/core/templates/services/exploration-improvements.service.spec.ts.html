@@ -1,0 +1,620 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>exploration-improvements.service.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/services/exploration-improvements.service.spec.ts</td><td class="">64.96%</td><td class="">100%</td><td class="">896</td><td class="">582</td><td class="">314</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+import { fakeAsync, flushMicrotasks } from &#x27;@angular/core/testing&#x27;;
+
+import { AnswerStats } from &#x27;domain/exploration/answer-stats.model&#x27;;
+import { StateObjectsBackendDict } from
+  &#x27;domain/exploration/StatesObjectFactory&#x27;;
+import { ExplorationPermissions } from
+  &#x27;domain/exploration/exploration-permissions.model&#x27;;
+import { ExplorationImprovementsConfig } from
+  &#x27;domain/improvements/exploration-improvements-config.model&#x27;;
+import { HighBounceRateTask } from
+  &#x27;domain/improvements/high-bounce-rate-task.model&#x27;;
+import { StateBackendDict } from &#x27;domain/state/StateObjectFactory&#x27;;
+import { ExplorationStats } from
+  &#x27;domain/statistics/exploration-stats.model&#x27;;
+import { PlaythroughObjectFactory } from
+  &#x27;domain/statistics/PlaythroughObjectFactory&#x27;;
+import { StateStats } from &#x27;domain/statistics/state-stats-model&#x27;;
+import { UserExplorationPermissionsService } from
+  &#x27;pages/exploration-editor-page/services/user-exploration-permissions.service&#x27;;
+import { ContextService } from &#x27;services/context.service&#x27;;
+import {
+  ExplorationImprovementsBackendApiService, ExplorationImprovementsResponse
+} from &#x27;services/exploration-improvements-backend-api.service&#x27;;
+import { ExplorationImprovementsTaskRegistryService } from
+  &#x27;services/exploration-improvements-task-registry.service&#x27;;
+import { ExplorationStatsService } from &#x27;services/exploration-stats.service&#x27;;
+import { PlaythroughIssuesBackendApiService } from
+  &#x27;services/playthrough-issues-backend-api.service&#x27;;
+import { StateTopAnswersStatsService } from
+  &#x27;services/state-top-answers-stats.service&#x27;;
+
+// TODO(#7222): Remove usage of UpgradedServices once upgraded to Angular 8.
+import { importAllAngularServices } from &#x27;tests/unit-test-utils&#x27;;
+
+/**
+ * @fileoverview Tests for ExplorationImprovementsService.
+ */
+
+describe(&#x27;ExplorationImprovementsService&#x27;, function() {
+  let explorationImprovementsService;
+
+  let $uibModal;
+  let changeListService;
+  let explorationStatesService;
+  let explorationRightsService;
+
+  let explorationImprovementsTaskRegistryService:
+    ExplorationImprovementsTaskRegistryService;
+  let explorationStatsService: ExplorationStatsService;
+  let playthroughObjectFactory: PlaythroughObjectFactory;
+  let playthroughIssuesBackendApiService: PlaythroughIssuesBackendApiService;
+  let stateTopAnswersStatsService: StateTopAnswersStatsService;
+  let contextService: ContextService;
+  let explorationImprovementsBackendApiService:
+    ExplorationImprovementsBackendApiService;
+  let userExplorationPermissionsService: UserExplorationPermissionsService;
+
+  const expId = &#x27;eid&#x27;;
+  const expVersion = 1;
+  const stateName = &#x27;Introduction&#x27;;
+  const stateBackendDict: StateBackendDict = {
+    classifier_model_id: null,
+    content: {
+      content_id: &#x27;content&#x27;,
+      html: &#x27;&#x27;,
+    },
+    recorded_voiceovers: {
+      voiceovers_mapping: {
+        content: {},
+        default_outcome: {},
+      },
+    },
+    interaction: {
+      answer_groups: [],
+      confirmed_unclassified_answers: [],
+      customization_args: {
+        placeholder: {
+          value: {
+            content_id: &#x27;ca_placeholder_0&#x27;,
+            unicode_str: &#x27;&#x27;,
+          },
+        },
+        rows: { value: 1 },
+      },
+      default_outcome: {
+        dest: &#x27;new state&#x27;,
+        feedback: {
+          content_id: &#x27;default_outcome&#x27;,
+          html: &#x27;&#x27;,
+        },
+        labelled_as_correct: false,
+        param_changes: [],
+        refresher_exploration_id: null,
+        missing_prerequisite_skill_id: null,
+      },
+      hints: [],
+      solution: {
+        answer_is_exclusive: false,
+        correct_answer: &#x27;answer&#x27;,
+        explanation: {
+          content_id: &#x27;solution&#x27;,
+          html: &#x27;&lt;p&gt;This is an explanation.&lt;/p&gt;&#x27;,
+        },
+      },
+      id: &#x27;TextInput&#x27;,
+    },
+    linked_skill_id: null,
+    next_content_id_index: 0,
+    param_changes: [],
+    solicit_answer_details: false,
+    card_is_checkpoint: false,
+    written_translations: {
+      translations_mapping: {
+        content: {},
+        default_outcome: {},
+      },
+    },
+  };
+  const statesBackendDict: StateObjectsBackendDict = {
+    [stateName]: stateBackendDict,
+    End: stateBackendDict,
+  };
+
+  const newExpImprovementsConfig = (improvementsTabIsEnabled: boolean) =&gt; {
+    return new ExplorationImprovementsConfig(
+      expId, expVersion, improvementsTabIsEnabled, 0.25, 0.20, 100);
+  };
+
+  const newExpPermissions = (canEdit: boolean) =&gt; {
+    return (
+      new ExplorationPermissions(null, null, null, null, null, null, canEdit));
+  };
+
+  importAllAngularServices();
+
+  beforeEach(angular.mock.inject($injector =&gt; {
+    $uibModal = $injector.get(&#x27;$uibModal&#x27;);
+    changeListService = $injector.get(&#x27;ChangeListService&#x27;);
+    contextService = $injector.get(&#x27;ContextService&#x27;);
+    explorationImprovementsBackendApiService = (
+      $injector.get(&#x27;ExplorationImprovementsBackendApiService&#x27;));
+    explorationImprovementsService = (
+      $injector.get(&#x27;ExplorationImprovementsService&#x27;));
+    explorationImprovementsTaskRegistryService = (
+      $injector.get(&#x27;ExplorationImprovementsTaskRegistryService&#x27;));
+    explorationRightsService = $injector.get(&#x27;ExplorationRightsService&#x27;);
+    explorationStatesService = $injector.get(&#x27;ExplorationStatesService&#x27;);
+    explorationStatsService = $injector.get(&#x27;ExplorationStatsService&#x27;);
+    playthroughIssuesBackendApiService = (
+      $injector.get(&#x27;PlaythroughIssuesBackendApiService&#x27;));
+    playthroughObjectFactory = $injector.get(&#x27;PlaythroughObjectFactory&#x27;);
+    stateTopAnswersStatsService = $injector.get(&#x27;StateTopAnswersStatsService&#x27;);
+    userExplorationPermissionsService = (
+      $injector.get(&#x27;UserExplorationPermissionsService&#x27;));
+  }));
+
+  beforeEach(() =&gt; {
+    spyOn(contextService, &#x27;getExplorationId&#x27;).and.returnValue(expId);
+
+    this.eibasGetTasksAsyncSpy = (
+      spyOn(explorationImprovementsBackendApiService, &#x27;getTasksAsync&#x27;));
+    this.essGetExplorationStatsSpy = (
+      spyOn(explorationStatsService, &#x27;getExplorationStatsAsync&#x27;));
+    this.pibasFetchIssuesSpy = (
+      spyOn(playthroughIssuesBackendApiService, &#x27;fetchIssuesAsync&#x27;));
+    this.stassGetTopAnswersByStateNameAsyncSpy = (
+      spyOn(stateTopAnswersStatsService, &#x27;getTopAnswersByStateNameAsync&#x27;));
+
+    this.eibasGetTasksAsyncSpy.and.returnValue(Promise.resolve(
+      new ExplorationImprovementsResponse([], new Map())));
+    this.essGetExplorationStatsSpy.and.returnValue(Promise.resolve(
+      new ExplorationStats(expId, expVersion, 0, 0, 0, new Map())));
+    this.pibasFetchIssuesSpy.and.returnValue(Promise.resolve(
+      []));
+    this.stassGetTopAnswersByStateNameAsyncSpy.and.returnValue(Promise.resolve(
+      new Map()));
+
+    explorationStatesService.init(statesBackendDict);
+  });
+
+  it(&#x27;should enable improvements tab based on back-end response&#x27;,
+    fakeAsync(async() =&gt; {
+      spyOn(explorationRightsService, &#x27;isPublic&#x27;).and.returnValue(true);
+      spyOn(userExplorationPermissionsService, &#x27;getPermissionsAsync&#x27;)
+        .and.returnValue(Promise.resolve(newExpPermissions(true)));
+      spyOn(explorationImprovementsBackendApiService, &#x27;getConfigAsync&#x27;)
+        .and.returnValue(Promise.resolve(newExpImprovementsConfig(true)));
+
+      explorationImprovementsService.initAsync();
+      flushMicrotasks();
+
+      expect(
+        await explorationImprovementsService.isImprovementsTabEnabledAsync()
+      ).toBeTrue();
+    }));
+
+  it(&#x27;should disable improvements tab based on back-end response&#x27;,
+    fakeAsync(async() =&gt; {
+      spyOn(explorationRightsService, &#x27;isPublic&#x27;).and.returnValue(true);
+      spyOn(userExplorationPermissionsService, &#x27;getPermissionsAsync&#x27;)
+        .and.returnValue(Promise.resolve(newExpPermissions(true)));
+      spyOn(explorationImprovementsBackendApiService, &#x27;getConfigAsync&#x27;)
+        .and.returnValue(Promise.resolve(newExpImprovementsConfig(false)));
+
+      explorationImprovementsService.initAsync();
+      flushMicrotasks();
+
+      expect(
+        await explorationImprovementsService.isImprovementsTabEnabledAsync()
+      ).toBeFalse();
+    }));
+
+  it(&#x27;should disable improvements tab for private explorations&#x27;,
+    fakeAsync(async() =&gt; {
+      spyOn(explorationRightsService, &#x27;isPublic&#x27;).and.returnValue(false);
+      spyOn(userExplorationPermissionsService, &#x27;getPermissionsAsync&#x27;)
+        .and.returnValue(Promise.resolve(newExpPermissions(true)));
+      spyOn(explorationImprovementsBackendApiService, &#x27;getConfigAsync&#x27;)
+        .and.returnValue(Promise.resolve(newExpImprovementsConfig(true)));
+
+      explorationImprovementsService.initAsync();
+      flushMicrotasks();
+
+      expect(
+        await explorationImprovementsService.isImprovementsTabEnabledAsync()
+      ).toBeFalse();
+    }));
+
+  it(&#x27;should disable improvements tab for non-editors when config gives false&#x27;,
+    fakeAsync(async() =&gt; {
+      spyOn(explorationRightsService, &#x27;isPublic&#x27;).and.returnValue(true);
+      spyOn(userExplorationPermissionsService, &#x27;getPermissionsAsync&#x27;)
+        .and.returnValue(Promise.resolve(newExpPermissions(false)));
+      spyOn(explorationImprovementsBackendApiService, &#x27;getConfigAsync&#x27;)
+        .and.returnValue(Promise.resolve(newExpImprovementsConfig(false)));
+
+      explorationImprovementsService.initAsync();
+      flushMicrotasks();
+
+      expect(
+        await explorationImprovementsService.isImprovementsTabEnabledAsync()
+      ).toBeFalse();
+    }));
+
+  it(&#x27;should disable improvements tab for non-editors when config gives true&#x27;,
+    fakeAsync(async() =&gt; {
+      spyOn(explorationRightsService, &#x27;isPublic&#x27;).and.returnValue(true);
+      spyOn(userExplorationPermissionsService, &#x27;getPermissionsAsync&#x27;)
+        .and.returnValue(Promise.resolve(newExpPermissions(false)));
+      spyOn(explorationImprovementsBackendApiService, &#x27;getConfigAsync&#x27;)
+        .and.returnValue(Promise.resolve(newExpImprovementsConfig(true)));
+
+      explorationImprovementsService.initAsync();
+      flushMicrotasks();
+
+      expect(
+        await explorationImprovementsService.isImprovementsTabEnabledAsync()
+      ).toBeFalse();
+    }));
+
+  it(&#x27;should propagate errors from the back-end&#x27;, fakeAsync(async() =&gt; {
+    const error = new Error(&#x27;Whoops!&#x27;);
+    spyOn(userExplorationPermissionsService, &#x27;getPermissionsAsync&#x27;)
+      .and.throwError(error);
+
+    const onSuccess = jasmine.createSpy(&#x27;onSuccess&#x27;);
+    const onFailure = jasmine.createSpy(&#x27;onFailure&#x27;, reason =&gt; {
+      expect(reason).toBe(error);
+    });
+
+    const promise = explorationImprovementsService.initAsync()
+      .then(onSuccess, onFailure);
+    flushMicrotasks();
+    await promise;
+    expect(onSuccess).not.toHaveBeenCalled();
+    expect(onFailure).toHaveBeenCalled();
+  }));
+
+  describe(&#x27;Flushing updated tasks&#x27;, () =&gt; {
+    beforeEach(() =&gt; {
+      this.eibasPostTasksAsyncSpy = (
+        spyOn(explorationImprovementsBackendApiService, &#x27;postTasksAsync&#x27;));
+      this.eibasGetConfigAsyncSpy = (
+        spyOn(explorationImprovementsBackendApiService, &#x27;getConfigAsync&#x27;));
+
+      spyOn(explorationRightsService, &#x27;isPublic&#x27;).and.returnValue(true);
+      spyOn(userExplorationPermissionsService, &#x27;getPermissionsAsync&#x27;)
+        .and.returnValue(Promise.resolve(newExpPermissions(true)));
+      this.eibasGetConfigAsyncSpy.and.returnValue(Promise.resolve(
+        newExpImprovementsConfig(true)));
+    });
+
+    it(&#x27;should do nothing when flush is attempted while the improvements &#x27; +
+      &#x27;tab is disabled&#x27;, fakeAsync(() =&gt; {
+      this.eibasGetConfigAsyncSpy.and.returnValue(Promise.resolve(
+        newExpImprovementsConfig(false)));
+
+      explorationImprovementsService.initAsync();
+      expect(
+        async() =&gt; (
+          await explorationImprovementsService.flushUpdatedTasksToBackend()))
+        .not.toThrowError();
+
+      flushMicrotasks();
+    }));
+
+    it(&#x27;should post new high bounce rate tasks&#x27;, fakeAsync(async() =&gt; {
+      // Set-up the conditions to generate an HBR task:
+      // -   A state demonstrating a high bounce-rate (determined by config).
+      const numStarts = 100;
+      const numCompletions = 60;
+      // Bounce-rate is 40% because only 40% of starts led to a completion.
+      const expStats = new ExplorationStats(
+        expId, expVersion, numStarts, numStarts, numCompletions, new Map([
+          [stateName, new StateStats(0, 0, numStarts, 0, 0, numCompletions)],
+          [&#x27;End&#x27;, new StateStats(0, 0, numStarts, 0, 0, numCompletions)],
+        ]));
+      this.essGetExplorationStatsSpy.and.returnValue(Promise.resolve(expStats));
+      // -   A state with an early-quit playthrough associated to it.
+      const eqPlaythrough = (
+        playthroughObjectFactory.createNewEarlyQuitPlaythrough(
+          expId, expVersion, {
+            state_name: {value: stateName},
+            time_spent_in_exp_in_msecs: {value: 1000},
+          }, []));
+      this.pibasFetchIssuesSpy.and.returnValue(Promise.resolve(
+        [eqPlaythrough]));
+
+      // The newly open HBR tasks should be flushed to the back-end.
+      this.eibasPostTasksAsyncSpy.and.callFake(async(_, tasks) =&gt; {
+        expect(tasks.length).toEqual(1);
+        expect(tasks[0].taskType).toEqual(&#x27;high_bounce_rate&#x27;);
+      });
+
+      explorationImprovementsService.initAsync();
+      let p = explorationImprovementsService.flushUpdatedTasksToBackend();
+      flushMicrotasks();
+      await p;
+
+      expect(this.eibasPostTasksAsyncSpy).toHaveBeenCalled();
+
+      // Each newly opened HBR task is flushed once and only once.
+      this.eibasPostTasksAsyncSpy.calls.reset();
+      this.eibasPostTasksAsyncSpy.and.callFake(async(_, tasks) =&gt; {
+        expect(tasks.length).toEqual(0);
+      });
+
+      p = explorationImprovementsService.flushUpdatedTasksToBackend();
+      flushMicrotasks();
+      await p;
+
+      expect(this.eibasPostTasksAsyncSpy).toHaveBeenCalled();
+    }));
+
+    it(&#x27;should post obsolete high bounce rate tasks&#x27;, fakeAsync(async() =&gt; {
+      // Set-up the conditions to obsolete an HBR task:
+      // -   A state demonstrating a low bounce-rate.
+      const numStarts = 100;
+      const numCompletions = 100;
+      // Bounce-rate is 0% because every start led to a completion.
+      const expStats = new ExplorationStats(
+        expId, expVersion, numStarts, numStarts, numCompletions, new Map([
+          [stateName, new StateStats(0, 0, numStarts, 0, 0, numCompletions)],
+          [&#x27;End&#x27;, new StateStats(0, 0, numStarts, 0, 0, numCompletions)],
+        ]));
+      this.essGetExplorationStatsSpy.and.returnValue(Promise.resolve(expStats));
+
+      // Mock a preexisting open HBR task provided by the back-end.
+      const hbrTask = HighBounceRateTask.createFromBackendDict({
+        entity_type: &#x27;exploration&#x27;,
+        entity_id: expId,
+        entity_version: expVersion,
+        task_type: &#x27;high_bounce_rate&#x27;,
+        target_type: &#x27;state&#x27;,
+        target_id: stateName,
+        status: &#x27;open&#x27;,
+        issue_description: null,
+        resolved_on_msecs: null,
+        resolver_username: null,
+        resolver_profile_picture_data_url: null,
+      });
+      this.eibasGetTasksAsyncSpy.and.returnValue(Promise.resolve(
+        new ExplorationImprovementsResponse([hbrTask], new Map())));
+
+      // The HBR task should no longer be open.
+      let p = explorationImprovementsService.initAsync();
+      flushMicrotasks();
+      await p;
+
+      expect(hbrTask.isOpen()).toBeFalse();
+      expect(
+        explorationImprovementsTaskRegistryService.getOpenHighBounceRateTasks()
+          .length)
+        .toEqual(0);
+
+      // The HBR task should be flushed.
+      this.eibasPostTasksAsyncSpy.and.callFake(async(_, tasks) =&gt; {
+        expect(tasks).toEqual([hbrTask]);
+      });
+
+      p = explorationImprovementsService.flushUpdatedTasksToBackend();
+      flushMicrotasks();
+      await p;
+
+      expect(this.eibasPostTasksAsyncSpy).toHaveBeenCalled();
+
+      // The HBR task should not be flushed again.
+      this.eibasPostTasksAsyncSpy.calls.reset();
+      this.eibasPostTasksAsyncSpy.and.callFake(async(_, tasks) =&gt; {
+        expect(tasks).toEqual([]);
+      });
+
+      p = explorationImprovementsService.flushUpdatedTasksToBackend();
+      flushMicrotasks();
+      await p;
+
+      expect(this.eibasPostTasksAsyncSpy).toHaveBeenCalled();
+    }));
+
+    it(&#x27;should post new NGR tasks after they are resolved&#x27;, fakeAsync(
+      async() =&gt; {
+      // Set-up the conditions to generate an NGR task:
+      // -   A high-frequency unaddressed answer.
+        const answerStats = new AnswerStats(&#x27;foo&#x27;, &#x27;foo&#x27;, 100, false);
+        this.stassGetTopAnswersByStateNameAsyncSpy.and.returnValue(
+          Promise.resolve(new Map([[stateName, [answerStats]]])));
+        const expStats = new ExplorationStats(
+          expId, expVersion, 0, 0, 0,
+          new Map([[stateName, new StateStats(0, 0, 0, 0, 0, 0)]]));
+        this.essGetExplorationStatsSpy.and.returnValue(
+          Promise.resolve(expStats));
+
+        // Initialize the service, this should generate a new NGR task.
+        let p = explorationImprovementsService.initAsync();
+        flushMicrotasks();
+        await p;
+
+        const [ngrTask] = (
+          explorationImprovementsTaskRegistryService
+            .getOpenNeedsGuidingResponsesTasks());
+        expect(ngrTask).toBeDefined();
+        expect(ngrTask.targetId).toEqual(stateName);
+
+        // There should be no tasks to flush, because the NGR task is still
+        // open.
+        this.eibasPostTasksAsyncSpy.and.callFake(async(_, tasks) =&gt; {
+          expect(tasks).toEqual([]);
+        });
+
+        p = explorationImprovementsService.flushUpdatedTasksToBackend();
+        flushMicrotasks();
+        await p;
+        expect(this.eibasPostTasksAsyncSpy).toHaveBeenCalled();
+
+        // Once the NGR task is resolved, however, it should get flushed.
+        answerStats.isAddressed = true;
+        explorationImprovementsTaskRegistryService
+          .onStateInteractionSaved(
+            explorationStatesService.getState(stateName));
+        expect(ngrTask.isResolved()).toBeTrue();
+
+        this.eibasPostTasksAsyncSpy.calls.reset();
+        this.eibasPostTasksAsyncSpy.and.callFake(async(_, tasks) =&gt; {
+          expect(tasks).toEqual([ngrTask]);
+        });
+
+        p = explorationImprovementsService.flushUpdatedTasksToBackend();
+        flushMicrotasks();
+        await p;
+
+        expect(this.eibasPostTasksAsyncSpy).toHaveBeenCalled();
+
+        // The NGR task should be flushed once and only once.
+        this.eibasPostTasksAsyncSpy.calls.reset();
+        this.eibasPostTasksAsyncSpy.and.callFake(async(_, tasks) =&gt; {
+          expect(tasks).toEqual([]);
+        });
+
+        p = explorationImprovementsService.flushUpdatedTasksToBackend();
+        flushMicrotasks();
+        await p;
+
+        expect(this.eibasPostTasksAsyncSpy).toHaveBeenCalled();
+      }));
+
+    it(&#x27;should not store post-init NGR tasks&#x27;, fakeAsync(async() =&gt; {
+      // An NGR task will not be generated because all answers are addressed.
+      const answerStats = new AnswerStats(&#x27;foo&#x27;, &#x27;foo&#x27;, 100, true);
+      this.stassGetTopAnswersByStateNameAsyncSpy.and.returnValue(
+        Promise.resolve(new Map([[stateName, [answerStats]]])));
+
+      // Initialize the service. This should not generate a new NGR task.
+      let p = explorationImprovementsService.initAsync();
+      flushMicrotasks();
+      await p;
+
+      expect(
+        explorationImprovementsTaskRegistryService
+          .getOpenNeedsGuidingResponsesTasks().length)
+        .toEqual(0);
+
+      // After making answer unaddressed, a new NGR task should be generated.
+      answerStats.isAddressed = false;
+      explorationImprovementsTaskRegistryService
+        .onStateInteractionSaved(explorationStatesService.getState(stateName));
+      const [ngrTask] = (
+        explorationImprovementsTaskRegistryService
+          .getOpenNeedsGuidingResponsesTasks());
+      expect(ngrTask).toBeDefined();
+
+      // Even after resolving the new task.
+      answerStats.isAddressed = true;
+      explorationImprovementsTaskRegistryService
+        .onStateInteractionSaved(explorationStatesService.getState(stateName));
+      expect(ngrTask.isResolved()).toBeTrue();
+
+      // It should not be flushed because it wasn&#x27;t created by initAsync().
+      this.eibasPostTasksAsyncSpy.and.callFake(async(_, tasks) =&gt; {
+        expect(tasks).toEqual([]);
+      });
+
+      p = explorationImprovementsService.flushUpdatedTasksToBackend();
+      flushMicrotasks();
+      await p;
+
+      expect(this.eibasPostTasksAsyncSpy).toHaveBeenCalled();
+    }));
+  });
+
+  describe(&#x27;Registering callbacks for state changes&#x27;, () =&gt; {
+    beforeEach(fakeAsync(() =&gt; {
+      spyOn($uibModal, &#x27;open&#x27;).and.returnValue({result: Promise.resolve()});
+      spyOn(changeListService, &#x27;addState&#x27;).and.stub();
+      spyOn(changeListService, &#x27;deleteState&#x27;).and.stub();
+      spyOn(changeListService, &#x27;editStateProperty&#x27;).and.stub();
+      spyOn(changeListService, &#x27;renameState&#x27;).and.stub();
+      spyOn(explorationImprovementsBackendApiService, &#x27;getConfigAsync&#x27;)
+        .and.returnValue(Promise.resolve(newExpImprovementsConfig(true)));
+      spyOn(explorationRightsService, &#x27;isPublic&#x27;).and.returnValue(true);
+      spyOn(userExplorationPermissionsService, &#x27;getPermissionsAsync&#x27;)
+        .and.returnValue(Promise.resolve(newExpPermissions(true)));
+
+      explorationImprovementsService.initAsync();
+      flushMicrotasks();
+    }));
+
+    it(&#x27;should respond to state additions&#x27;, fakeAsync(() =&gt; {
+      let onStateAddedSpy = (
+        spyOn(explorationImprovementsTaskRegistryService, &#x27;onStateAdded&#x27;));
+
+      explorationStatesService.addState(&#x27;Prologue&#x27;);
+      flushMicrotasks();
+
+      expect(onStateAddedSpy).toHaveBeenCalledWith(&#x27;Prologue&#x27;);
+    }));
+
+    it(&#x27;should respond to state deletions&#x27;, fakeAsync(() =&gt; {
+      let onStateDeletedSpy = (
+        spyOn(explorationImprovementsTaskRegistryService, &#x27;onStateDeleted&#x27;));
+
+      explorationStatesService.deleteState(&#x27;End&#x27;);
+      flushMicrotasks();
+
+      expect(onStateDeletedSpy).toHaveBeenCalledWith(&#x27;End&#x27;);
+    }));
+
+    it(&#x27;should respond to state renames&#x27;, fakeAsync(() =&gt; {
+      let onStateRenamedSpy = (
+        spyOn(explorationImprovementsTaskRegistryService, &#x27;onStateRenamed&#x27;));
+
+      explorationStatesService.renameState(&#x27;Introduction&#x27;, &#x27;Start&#x27;);
+      flushMicrotasks();
+
+      expect(onStateRenamedSpy).toHaveBeenCalledWith(&#x27;Introduction&#x27;, &#x27;Start&#x27;);
+    }));
+
+    it(&#x27;should respond to state interaction changes&#x27;, fakeAsync(() =&gt; {
+      let onStateInteractionSavedSpy = spyOn(
+        explorationImprovementsTaskRegistryService, &#x27;onStateInteractionSaved&#x27;);
+
+      explorationStatesService.saveInteractionAnswerGroups(&#x27;Introduction&#x27;, []);
+      flushMicrotasks();
+
+      expect(onStateInteractionSavedSpy).toHaveBeenCalledWith(
+        explorationStatesService.getState(&#x27;Introduction&#x27;));
+    }));
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:53,&quot;character&quot;:6,&quot;text&quot;:&quot;explorationImprovementsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:55,&quot;character&quot;:6,&quot;text&quot;:&quot;$uibModal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:56,&quot;character&quot;:6,&quot;text&quot;:&quot;changeListService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:57,&quot;character&quot;:6,&quot;text&quot;:&quot;explorationStatesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:58,&quot;character&quot;:6,&quot;text&quot;:&quot;explorationRightsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:149,&quot;character&quot;:33,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:150,&quot;character&quot;:4,&quot;text&quot;:&quot;$uibModal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:150,&quot;character&quot;:16,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:150,&quot;character&quot;:26,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:151,&quot;character&quot;:4,&quot;text&quot;:&quot;changeListService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:151,&quot;character&quot;:24,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:151,&quot;character&quot;:34,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:152,&quot;character&quot;:21,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:152,&quot;character&quot;:31,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:154,&quot;character&quot;:6,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:154,&quot;character&quot;:16,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:155,&quot;character&quot;:4,&quot;text&quot;:&quot;explorationImprovementsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:156,&quot;character&quot;:6,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:156,&quot;character&quot;:16,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:158,&quot;character&quot;:6,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:158,&quot;character&quot;:16,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:159,&quot;character&quot;:4,&quot;text&quot;:&quot;explorationRightsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:159,&quot;character&quot;:31,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:159,&quot;character&quot;:41,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:160,&quot;character&quot;:4,&quot;text&quot;:&quot;explorationStatesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:160,&quot;character&quot;:31,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:160,&quot;character&quot;:41,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:161,&quot;character&quot;:30,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:161,&quot;character&quot;:40,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:163,&quot;character&quot;:6,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:163,&quot;character&quot;:16,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:164,&quot;character&quot;:31,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:164,&quot;character&quot;:41,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:165,&quot;character&quot;:34,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:165,&quot;character&quot;:44,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:167,&quot;character&quot;:6,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:167,&quot;character&quot;:16,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:173,&quot;character&quot;:4,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:173,&quot;character&quot;:9,&quot;text&quot;:&quot;eibasGetTasksAsyncSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:175,&quot;character&quot;:4,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:175,&quot;character&quot;:9,&quot;text&quot;:&quot;essGetExplorationStatsSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:177,&quot;character&quot;:4,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:177,&quot;character&quot;:9,&quot;text&quot;:&quot;pibasFetchIssuesSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:179,&quot;character&quot;:4,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:179,&quot;character&quot;:9,&quot;text&quot;:&quot;stassGetTopAnswersByStateNameAsyncSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:182,&quot;character&quot;:4,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:182,&quot;character&quot;:9,&quot;text&quot;:&quot;eibasGetTasksAsyncSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:182,&quot;character&quot;:31,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:182,&quot;character&quot;:35,&quot;text&quot;:&quot;returnValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:184,&quot;character&quot;:4,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:184,&quot;character&quot;:9,&quot;text&quot;:&quot;essGetExplorationStatsSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:184,&quot;character&quot;:35,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:184,&quot;character&quot;:39,&quot;text&quot;:&quot;returnValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:186,&quot;character&quot;:4,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:186,&quot;character&quot;:9,&quot;text&quot;:&quot;pibasFetchIssuesSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:186,&quot;character&quot;:29,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:186,&quot;character&quot;:33,&quot;text&quot;:&quot;returnValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:188,&quot;character&quot;:4,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:188,&quot;character&quot;:9,&quot;text&quot;:&quot;stassGetTopAnswersByStateNameAsyncSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:188,&quot;character&quot;:47,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:188,&quot;character&quot;:51,&quot;text&quot;:&quot;returnValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:191,&quot;character&quot;:4,&quot;text&quot;:&quot;explorationStatesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:191,&quot;character&quot;:29,&quot;text&quot;:&quot;init&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:196,&quot;character&quot;:12,&quot;text&quot;:&quot;explorationRightsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:196,&quot;character&quot;:50,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:202,&quot;character&quot;:6,&quot;text&quot;:&quot;explorationImprovementsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:202,&quot;character&quot;:37,&quot;text&quot;:&quot;initAsync&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:206,&quot;character&quot;:14,&quot;text&quot;:&quot;explorationImprovementsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:206,&quot;character&quot;:45,&quot;text&quot;:&quot;isImprovementsTabEnabledAsync&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:212,&quot;character&quot;:12,&quot;text&quot;:&quot;explorationRightsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:212,&quot;character&quot;:50,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:218,&quot;character&quot;:6,&quot;text&quot;:&quot;explorationImprovementsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:218,&quot;character&quot;:37,&quot;text&quot;:&quot;initAsync&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:222,&quot;character&quot;:14,&quot;text&quot;:&quot;explorationImprovementsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:222,&quot;character&quot;:45,&quot;text&quot;:&quot;isImprovementsTabEnabledAsync&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:228,&quot;character&quot;:12,&quot;text&quot;:&quot;explorationRightsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:228,&quot;character&quot;:50,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:234,&quot;character&quot;:6,&quot;text&quot;:&quot;explorationImprovementsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:234,&quot;character&quot;:37,&quot;text&quot;:&quot;initAsync&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:238,&quot;character&quot;:14,&quot;text&quot;:&quot;explorationImprovementsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:238,&quot;character&quot;:45,&quot;text&quot;:&quot;isImprovementsTabEnabledAsync&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:244,&quot;character&quot;:12,&quot;text&quot;:&quot;explorationRightsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:244,&quot;character&quot;:50,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:250,&quot;character&quot;:6,&quot;text&quot;:&quot;explorationImprovementsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:250,&quot;character&quot;:37,&quot;text&quot;:&quot;initAsync&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:254,&quot;character&quot;:14,&quot;text&quot;:&quot;explorationImprovementsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:254,&quot;character&quot;:45,&quot;text&quot;:&quot;isImprovementsTabEnabledAsync&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:260,&quot;character&quot;:12,&quot;text&quot;:&quot;explorationRightsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:260,&quot;character&quot;:50,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:266,&quot;character&quot;:6,&quot;text&quot;:&quot;explorationImprovementsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:266,&quot;character&quot;:37,&quot;text&quot;:&quot;initAsync&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:270,&quot;character&quot;:14,&quot;text&quot;:&quot;explorationImprovementsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:270,&quot;character&quot;:45,&quot;text&quot;:&quot;isImprovementsTabEnabledAsync&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:280,&quot;character&quot;:53,&quot;text&quot;:&quot;reason&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:281,&quot;character&quot;:13,&quot;text&quot;:&quot;reason&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:284,&quot;character&quot;:10,&quot;text&quot;:&quot;promise&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:284,&quot;character&quot;:20,&quot;text&quot;:&quot;explorationImprovementsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:284,&quot;character&quot;:51,&quot;text&quot;:&quot;initAsync&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:285,&quot;character&quot;:7,&quot;text&quot;:&quot;then&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:287,&quot;character&quot;:10,&quot;text&quot;:&quot;promise&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:294,&quot;character&quot;:6,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:294,&quot;character&quot;:11,&quot;text&quot;:&quot;eibasPostTasksAsyncSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:296,&quot;character&quot;:6,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:296,&quot;character&quot;:11,&quot;text&quot;:&quot;eibasGetConfigAsyncSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:299,&quot;character&quot;:12,&quot;text&quot;:&quot;explorationRightsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:299,&quot;character&quot;:50,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:302,&quot;character&quot;:6,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:302,&quot;character&quot;:11,&quot;text&quot;:&quot;eibasGetConfigAsyncSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:302,&quot;character&quot;:34,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:302,&quot;character&quot;:38,&quot;text&quot;:&quot;returnValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:308,&quot;character&quot;:6,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:308,&quot;character&quot;:11,&quot;text&quot;:&quot;eibasGetConfigAsyncSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:308,&quot;character&quot;:34,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:308,&quot;character&quot;:38,&quot;text&quot;:&quot;returnValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:311,&quot;character&quot;:6,&quot;text&quot;:&quot;explorationImprovementsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:311,&quot;character&quot;:37,&quot;text&quot;:&quot;initAsync&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:314,&quot;character&quot;:16,&quot;text&quot;:&quot;explorationImprovementsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:314,&quot;character&quot;:47,&quot;text&quot;:&quot;flushUpdatedTasksToBackend&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:331,&quot;character&quot;:6,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:331,&quot;character&quot;:11,&quot;text&quot;:&quot;essGetExplorationStatsSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:331,&quot;character&quot;:37,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:331,&quot;character&quot;:41,&quot;text&quot;:&quot;returnValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:339,&quot;character&quot;:6,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:339,&quot;character&quot;:11,&quot;text&quot;:&quot;pibasFetchIssuesSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:339,&quot;character&quot;:31,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:339,&quot;character&quot;:35,&quot;text&quot;:&quot;returnValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:343,&quot;character&quot;:6,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:343,&quot;character&quot;:11,&quot;text&quot;:&quot;eibasPostTasksAsyncSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:343,&quot;character&quot;:34,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:343,&quot;character&quot;:38,&quot;text&quot;:&quot;callFake&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:343,&quot;character&quot;:53,&quot;text&quot;:&quot;_&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:343,&quot;character&quot;:56,&quot;text&quot;:&quot;tasks&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:344,&quot;character&quot;:15,&quot;text&quot;:&quot;tasks&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:344,&quot;character&quot;:21,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:345,&quot;character&quot;:15,&quot;text&quot;:&quot;tasks&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:345,&quot;character&quot;:24,&quot;text&quot;:&quot;taskType&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:348,&quot;character&quot;:6,&quot;text&quot;:&quot;explorationImprovementsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:348,&quot;character&quot;:37,&quot;text&quot;:&quot;initAsync&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:349,&quot;character&quot;:10,&quot;text&quot;:&quot;p&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:349,&quot;character&quot;:14,&quot;text&quot;:&quot;explorationImprovementsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:349,&quot;character&quot;:45,&quot;text&quot;:&quot;flushUpdatedTasksToBackend&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:351,&quot;character&quot;:12,&quot;text&quot;:&quot;p&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:353,&quot;character&quot;:13,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:353,&quot;character&quot;:18,&quot;text&quot;:&quot;eibasPostTasksAsyncSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:356,&quot;character&quot;:6,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:356,&quot;character&quot;:11,&quot;text&quot;:&quot;eibasPostTasksAsyncSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:356,&quot;character&quot;:34,&quot;text&quot;:&quot;calls&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:356,&quot;character&quot;:40,&quot;text&quot;:&quot;reset&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:357,&quot;character&quot;:6,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:357,&quot;character&quot;:11,&quot;text&quot;:&quot;eibasPostTasksAsyncSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:357,&quot;character&quot;:34,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:357,&quot;character&quot;:38,&quot;text&quot;:&quot;callFake&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:357,&quot;character&quot;:53,&quot;text&quot;:&quot;_&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:357,&quot;character&quot;:56,&quot;text&quot;:&quot;tasks&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:358,&quot;character&quot;:15,&quot;text&quot;:&quot;tasks&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:358,&quot;character&quot;:21,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:361,&quot;character&quot;:6,&quot;text&quot;:&quot;p&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:361,&quot;character&quot;:10,&quot;text&quot;:&quot;explorationImprovementsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:361,&quot;character&quot;:41,&quot;text&quot;:&quot;flushUpdatedTasksToBackend&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:363,&quot;character&quot;:12,&quot;text&quot;:&quot;p&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:365,&quot;character&quot;:13,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:365,&quot;character&quot;:18,&quot;text&quot;:&quot;eibasPostTasksAsyncSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:379,&quot;character&quot;:6,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:379,&quot;character&quot;:11,&quot;text&quot;:&quot;essGetExplorationStatsSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:379,&quot;character&quot;:37,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:379,&quot;character&quot;:41,&quot;text&quot;:&quot;returnValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:395,&quot;character&quot;:6,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:395,&quot;character&quot;:11,&quot;text&quot;:&quot;eibasGetTasksAsyncSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:395,&quot;character&quot;:33,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:395,&quot;character&quot;:37,&quot;text&quot;:&quot;returnValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:399,&quot;character&quot;:10,&quot;text&quot;:&quot;p&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:399,&quot;character&quot;:14,&quot;text&quot;:&quot;explorationImprovementsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:399,&quot;character&quot;:45,&quot;text&quot;:&quot;initAsync&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:401,&quot;character&quot;:12,&quot;text&quot;:&quot;p&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:410,&quot;character&quot;:6,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:410,&quot;character&quot;:11,&quot;text&quot;:&quot;eibasPostTasksAsyncSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:410,&quot;character&quot;:34,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:410,&quot;character&quot;:38,&quot;text&quot;:&quot;callFake&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:410,&quot;character&quot;:53,&quot;text&quot;:&quot;_&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:410,&quot;character&quot;:56,&quot;text&quot;:&quot;tasks&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:411,&quot;character&quot;:15,&quot;text&quot;:&quot;tasks&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:414,&quot;character&quot;:6,&quot;text&quot;:&quot;p&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:414,&quot;character&quot;:10,&quot;text&quot;:&quot;explorationImprovementsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:414,&quot;character&quot;:41,&quot;text&quot;:&quot;flushUpdatedTasksToBackend&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:416,&quot;character&quot;:12,&quot;text&quot;:&quot;p&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:418,&quot;character&quot;:13,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:418,&quot;character&quot;:18,&quot;text&quot;:&quot;eibasPostTasksAsyncSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:421,&quot;character&quot;:6,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:421,&quot;character&quot;:11,&quot;text&quot;:&quot;eibasPostTasksAsyncSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:421,&quot;character&quot;:34,&quot;text&quot;:&quot;calls&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:421,&quot;character&quot;:40,&quot;text&quot;:&quot;reset&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:422,&quot;character&quot;:6,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:422,&quot;character&quot;:11,&quot;text&quot;:&quot;eibasPostTasksAsyncSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:422,&quot;character&quot;:34,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:422,&quot;character&quot;:38,&quot;text&quot;:&quot;callFake&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:422,&quot;character&quot;:53,&quot;text&quot;:&quot;_&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:422,&quot;character&quot;:56,&quot;text&quot;:&quot;tasks&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:423,&quot;character&quot;:15,&quot;text&quot;:&quot;tasks&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:426,&quot;character&quot;:6,&quot;text&quot;:&quot;p&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:426,&quot;character&quot;:10,&quot;text&quot;:&quot;explorationImprovementsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:426,&quot;character&quot;:41,&quot;text&quot;:&quot;flushUpdatedTasksToBackend&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:428,&quot;character&quot;:12,&quot;text&quot;:&quot;p&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:430,&quot;character&quot;:13,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:430,&quot;character&quot;:18,&quot;text&quot;:&quot;eibasPostTasksAsyncSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:438,&quot;character&quot;:8,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:438,&quot;character&quot;:13,&quot;text&quot;:&quot;stassGetTopAnswersByStateNameAsyncSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:438,&quot;character&quot;:51,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:438,&quot;character&quot;:55,&quot;text&quot;:&quot;returnValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:443,&quot;character&quot;:8,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:443,&quot;character&quot;:13,&quot;text&quot;:&quot;essGetExplorationStatsSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:443,&quot;character&quot;:39,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:443,&quot;character&quot;:43,&quot;text&quot;:&quot;returnValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:447,&quot;character&quot;:12,&quot;text&quot;:&quot;p&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:447,&quot;character&quot;:16,&quot;text&quot;:&quot;explorationImprovementsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:447,&quot;character&quot;:47,&quot;text&quot;:&quot;initAsync&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:449,&quot;character&quot;:14,&quot;text&quot;:&quot;p&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:459,&quot;character&quot;:8,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:459,&quot;character&quot;:13,&quot;text&quot;:&quot;eibasPostTasksAsyncSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:459,&quot;character&quot;:36,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:459,&quot;character&quot;:40,&quot;text&quot;:&quot;callFake&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:459,&quot;character&quot;:55,&quot;text&quot;:&quot;_&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:459,&quot;character&quot;:58,&quot;text&quot;:&quot;tasks&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:460,&quot;character&quot;:17,&quot;text&quot;:&quot;tasks&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:463,&quot;character&quot;:8,&quot;text&quot;:&quot;p&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:463,&quot;character&quot;:12,&quot;text&quot;:&quot;explorationImprovementsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:463,&quot;character&quot;:43,&quot;text&quot;:&quot;flushUpdatedTasksToBackend&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:465,&quot;character&quot;:14,&quot;text&quot;:&quot;p&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:466,&quot;character&quot;:15,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:466,&quot;character&quot;:20,&quot;text&quot;:&quot;eibasPostTasksAsyncSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:472,&quot;character&quot;:12,&quot;text&quot;:&quot;explorationStatesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:472,&quot;character&quot;:37,&quot;text&quot;:&quot;getState&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:475,&quot;character&quot;:8,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:475,&quot;character&quot;:13,&quot;text&quot;:&quot;eibasPostTasksAsyncSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:475,&quot;character&quot;:36,&quot;text&quot;:&quot;calls&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:475,&quot;character&quot;:42,&quot;text&quot;:&quot;reset&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:476,&quot;character&quot;:8,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:476,&quot;character&quot;:13,&quot;text&quot;:&quot;eibasPostTasksAsyncSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:476,&quot;character&quot;:36,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:476,&quot;character&quot;:40,&quot;text&quot;:&quot;callFake&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:476,&quot;character&quot;:55,&quot;text&quot;:&quot;_&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:476,&quot;character&quot;:58,&quot;text&quot;:&quot;tasks&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:477,&quot;character&quot;:17,&quot;text&quot;:&quot;tasks&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:480,&quot;character&quot;:8,&quot;text&quot;:&quot;p&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:480,&quot;character&quot;:12,&quot;text&quot;:&quot;explorationImprovementsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:480,&quot;character&quot;:43,&quot;text&quot;:&quot;flushUpdatedTasksToBackend&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:482,&quot;character&quot;:14,&quot;text&quot;:&quot;p&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:484,&quot;character&quot;:15,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:484,&quot;character&quot;:20,&quot;text&quot;:&quot;eibasPostTasksAsyncSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:487,&quot;character&quot;:8,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:487,&quot;character&quot;:13,&quot;text&quot;:&quot;eibasPostTasksAsyncSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:487,&quot;character&quot;:36,&quot;text&quot;:&quot;calls&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:487,&quot;character&quot;:42,&quot;text&quot;:&quot;reset&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:488,&quot;character&quot;:8,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:488,&quot;character&quot;:13,&quot;text&quot;:&quot;eibasPostTasksAsyncSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:488,&quot;character&quot;:36,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:488,&quot;character&quot;:40,&quot;text&quot;:&quot;callFake&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:488,&quot;character&quot;:55,&quot;text&quot;:&quot;_&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:488,&quot;character&quot;:58,&quot;text&quot;:&quot;tasks&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:489,&quot;character&quot;:17,&quot;text&quot;:&quot;tasks&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:492,&quot;character&quot;:8,&quot;text&quot;:&quot;p&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:492,&quot;character&quot;:12,&quot;text&quot;:&quot;explorationImprovementsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:492,&quot;character&quot;:43,&quot;text&quot;:&quot;flushUpdatedTasksToBackend&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:494,&quot;character&quot;:14,&quot;text&quot;:&quot;p&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:496,&quot;character&quot;:15,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:496,&quot;character&quot;:20,&quot;text&quot;:&quot;eibasPostTasksAsyncSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:502,&quot;character&quot;:6,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:502,&quot;character&quot;:11,&quot;text&quot;:&quot;stassGetTopAnswersByStateNameAsyncSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:502,&quot;character&quot;:49,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:502,&quot;character&quot;:53,&quot;text&quot;:&quot;returnValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:506,&quot;character&quot;:10,&quot;text&quot;:&quot;p&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:506,&quot;character&quot;:14,&quot;text&quot;:&quot;explorationImprovementsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:506,&quot;character&quot;:45,&quot;text&quot;:&quot;initAsync&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:508,&quot;character&quot;:12,&quot;text&quot;:&quot;p&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:518,&quot;character&quot;:33,&quot;text&quot;:&quot;explorationStatesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:518,&quot;character&quot;:58,&quot;text&quot;:&quot;getState&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:527,&quot;character&quot;:33,&quot;text&quot;:&quot;explorationStatesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:527,&quot;character&quot;:58,&quot;text&quot;:&quot;getState&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:531,&quot;character&quot;:6,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:531,&quot;character&quot;:11,&quot;text&quot;:&quot;eibasPostTasksAsyncSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:531,&quot;character&quot;:34,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:531,&quot;character&quot;:38,&quot;text&quot;:&quot;callFake&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:531,&quot;character&quot;:53,&quot;text&quot;:&quot;_&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:531,&quot;character&quot;:56,&quot;text&quot;:&quot;tasks&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:532,&quot;character&quot;:15,&quot;text&quot;:&quot;tasks&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:535,&quot;character&quot;:6,&quot;text&quot;:&quot;p&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:535,&quot;character&quot;:10,&quot;text&quot;:&quot;explorationImprovementsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:535,&quot;character&quot;:41,&quot;text&quot;:&quot;flushUpdatedTasksToBackend&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:537,&quot;character&quot;:12,&quot;text&quot;:&quot;p&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:539,&quot;character&quot;:13,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:539,&quot;character&quot;:18,&quot;text&quot;:&quot;eibasPostTasksAsyncSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:545,&quot;character&quot;:12,&quot;text&quot;:&quot;$uibModal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:545,&quot;character&quot;:31,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:546,&quot;character&quot;:12,&quot;text&quot;:&quot;changeListService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:546,&quot;character&quot;:43,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:547,&quot;character&quot;:12,&quot;text&quot;:&quot;changeListService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:547,&quot;character&quot;:46,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:548,&quot;character&quot;:12,&quot;text&quot;:&quot;changeListService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:548,&quot;character&quot;:52,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:549,&quot;character&quot;:12,&quot;text&quot;:&quot;changeListService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:549,&quot;character&quot;:46,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:552,&quot;character&quot;:12,&quot;text&quot;:&quot;explorationRightsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:552,&quot;character&quot;:50,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:556,&quot;character&quot;:6,&quot;text&quot;:&quot;explorationImprovementsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:556,&quot;character&quot;:37,&quot;text&quot;:&quot;initAsync&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:564,&quot;character&quot;:6,&quot;text&quot;:&quot;explorationStatesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:564,&quot;character&quot;:31,&quot;text&quot;:&quot;addState&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:574,&quot;character&quot;:6,&quot;text&quot;:&quot;explorationStatesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:574,&quot;character&quot;:31,&quot;text&quot;:&quot;deleteState&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:584,&quot;character&quot;:6,&quot;text&quot;:&quot;explorationStatesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:584,&quot;character&quot;:31,&quot;text&quot;:&quot;renameState&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:594,&quot;character&quot;:6,&quot;text&quot;:&quot;explorationStatesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:594,&quot;character&quot;:31,&quot;text&quot;:&quot;saveInteractionAnswerGroups&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:598,&quot;character&quot;:8,&quot;text&quot;:&quot;explorationStatesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-improvements.service.spec.ts&quot;,&quot;line&quot;:598,&quot;character&quot;:33,&quot;text&quot;:&quot;getState&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:56 GMT</p>
+    </body>
+  </html>
+  

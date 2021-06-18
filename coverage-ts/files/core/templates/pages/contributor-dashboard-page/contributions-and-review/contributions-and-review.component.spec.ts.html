@@ -1,0 +1,783 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>contributions-and-review.component.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts</td><td class="">47.64%</td><td class="">100%</td><td class="">932</td><td class="">444</td><td class="">488</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for contributionsAndReview.
+ */
+
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { importAllAngularServices } from &#x27;tests/unit-test-utils&#x27;;
+// ^^^ This block is to be removed.
+
+describe(&#x27;Contributions and review component&#x27;, function() {
+  var ctrl = null;
+  var $httpBackend = null;
+  var $q = null;
+  var $scope = null;
+  var $uibModal = null;
+  var contextService = null;
+  var contributionAndReviewService = null;
+  var contributionOpportunitiesService = null;
+  var csrfTokenService = null;
+  var misconceptionObjectFactory = null;
+  var skillBackendApiService = null;
+  var skillObjectFactory = null;
+  var userService = null;
+
+  beforeEach(angular.mock.module(&#x27;oppia&#x27;));
+
+  importAllAngularServices();
+
+  describe(&#x27;when user is allowed to review questions&#x27;, function() {
+    beforeEach(angular.mock.inject(function($injector, $componentController) {
+      $q = $injector.get(&#x27;$q&#x27;);
+      var $rootScope = $injector.get(&#x27;$rootScope&#x27;);
+      $uibModal = $injector.get(&#x27;$uibModal&#x27;);
+      contributionAndReviewService = $injector.get(
+        &#x27;ContributionAndReviewService&#x27;);
+      userService = $injector.get(&#x27;UserService&#x27;);
+      contextService = $injector.get(&#x27;ContextService&#x27;);
+      skillBackendApiService = $injector.get(&#x27;SkillBackendApiService&#x27;);
+      contributionOpportunitiesService = $injector.get(
+        &#x27;ContributionOpportunitiesService&#x27;);
+      spyOn(contextService, &#x27;getExplorationId&#x27;).and.returnValue(&#x27;exp1&#x27;);
+      misconceptionObjectFactory = $injector.get(&#x27;MisconceptionObjectFactory&#x27;);
+
+      spyOn(userService, &#x27;getUserInfoAsync&#x27;)
+        .and.returnValue($q.resolve({
+          isLoggedIn: () =&gt; true
+        }));
+      spyOn(userService, &#x27;getUserContributionRightsDataAsync&#x27;)
+        .and.returnValue($q.resolve({
+          can_review_translation_for_language_codes: [{}],
+          can_review_questions: true
+        }));
+      spyOn(
+        contributionAndReviewService,
+        &#x27;getUserCreatedTranslationSuggestionsAsync&#x27;).and.returnValue(
+        Promise.resolve({
+          suggestion_1: {
+            suggestion: {
+              suggestion_id: &#x27;suggestion_1&#x27;,
+              target_id: &#x27;1&#x27;,
+              suggestion_type: &#x27;translate_content&#x27;,
+              change: {
+                content_html: &#x27;Translation&#x27;,
+                translation_html: &#x27;Tradução&#x27;
+              },
+              status: &#x27;review&#x27;
+            },
+            details: &#x27;skill_1&#x27;
+          }
+        }));
+      spyOn(
+        contributionAndReviewService, &#x27;getReviewableQuestionSuggestionsAsync&#x27;)
+        .and.returnValue(Promise.resolve({
+          suggestion_1: {
+            suggestion: {
+              suggestion_id: &#x27;suggestion_1&#x27;,
+              target_id: &#x27;1&#x27;,
+              suggestion_type: &#x27;translate_content&#x27;,
+              change: {
+                skill_id: &#x27;skill1&#x27;,
+                question_dict: {
+                  id: &#x27;1&#x27;,
+                  question_state_data: {
+                    content: {
+                      html: &#x27;Question 1&#x27;,
+                      content_id: &#x27;content_1&#x27;
+                    },
+                    interaction: {
+                      answer_groups: [{
+                        outcome: {
+                          dest: &#x27;outcome 1&#x27;,
+                          feedback: {
+                            content_id: &#x27;content_5&#x27;,
+                            html: &#x27;&#x27;
+                          },
+                          labelled_as_correct: true,
+                          param_changes: [],
+                          refresher_exploration_id: null
+                        },
+                        rule_specs: [],
+                      }],
+                      confirmed_unclassified_answers: [],
+                      customization_args: {
+                        placeholder: {
+                          value: {
+                            content_id: &#x27;ca_placeholder_0&#x27;,
+                            unicode_str: &#x27;&#x27;
+                          }
+                        },
+                        rows: { value: 1 }
+                      },
+                      default_outcome: {
+                        dest: null,
+                        feedback: {
+                          html: &#x27;Correct Answer&#x27;,
+                          content_id: &#x27;content_2&#x27;
+                        },
+                        param_changes: [],
+                        labelled_as_correct: true
+                      },
+                      hints: [{
+                        hint_content: {
+                          html: &#x27;Hint 1&#x27;,
+                          content_id: &#x27;content_3&#x27;
+                        }
+                      }],
+                      solution: {
+                        correct_answer: &#x27;This is the correct answer&#x27;,
+                        answer_is_exclusive: false,
+                        explanation: {
+                          html: &#x27;Solution explanation&#x27;,
+                          content_id: &#x27;content_4&#x27;
+                        }
+                      },
+                      id: &#x27;TextInput&#x27;
+                    },
+                    param_changes: [],
+                    recorded_voiceovers: {
+                      voiceovers_mapping: {}
+                    },
+                    written_translations: {
+                      translations_mapping: {}
+                    },
+                  },
+                }
+              },
+              status: &#x27;review&#x27;
+            },
+            details: {
+              skill_description: &#x27;Skill description&#x27;
+            }
+          }
+        }));
+
+      $scope = $rootScope.$new();
+      ctrl = $componentController(&#x27;contributionsAndReview&#x27;, {
+        $scope: $scope,
+        ContextService: contextService,
+        MisconceptionObjectFactory: misconceptionObjectFactory
+      });
+      ctrl.$onInit();
+      $scope.$apply();
+      $scope.$apply();
+    }));
+
+    it(&#x27;should initialize $scope properties after controller is&#x27; +
+      &#x27; initialized&#x27;, function() {
+      expect(ctrl.activeTabType).toBe(&#x27;reviews&#x27;);
+      expect(ctrl.activeSuggestionType).toBe(&#x27;add_question&#x27;);
+      expect(ctrl.userIsLoggedIn).toBe(true);
+      expect(ctrl.userDetailsLoading).toBe(false);
+      expect(ctrl.reviewTabs.length).toEqual(2);
+    });
+
+    describe(&#x27;ctrl.loadContributions&#x27;, () =&gt; {
+      it(&#x27;should load contributions correctly&#x27;, () =&gt; {
+        ctrl.loadContributions().then(({opportunitiesDicts, more}) =&gt; {
+          expect(Object.keys(ctrl.contributions)).toContain(&#x27;suggestion_1&#x27;);
+          expect(opportunitiesDicts).toEqual([{
+            id: &#x27;suggestion_1&#x27;,
+            heading: &#x27;Question 1&#x27;,
+            subheading: &#x27;Skill description&#x27;,
+            labelText: &#x27;Awaiting review&#x27;,
+            labelColor: &#x27;#eeeeee&#x27;,
+            actionButtonTitle: &#x27;Review&#x27;
+          }]);
+          expect(more).toEqual(false);
+        });
+      });
+
+      it(&#x27;should return empty list if tab is not initialized&#x27;, () =&gt; {
+        ctrl.activeTabType = null;
+        ctrl.loadContributions().then(({opportunitiesDicts, more}) =&gt; {
+          expect(ctrl.contributions).toEqual({});
+          expect(opportunitiesDicts).toEqual([]);
+          expect(more).toEqual(false);
+        });
+      });
+
+      it(&#x27;should return empty list if suggestion type is not initialized&#x27;,
+        () =&gt; {
+          ctrl.activeTabType = null;
+          ctrl.loadContributions().then(({opportunitiesDicts, more}) =&gt; {
+            expect(ctrl.contributions).toEqual({});
+            expect(opportunitiesDicts).toEqual([]);
+            expect(more).toEqual(false);
+          });
+        });
+    });
+
+    it(&#x27;should open show translation suggestion modal when clicking on&#x27; +
+      &#x27; suggestion&#x27;, function() {
+      contributionOpportunitiesService
+        .reloadOpportunitiesEventEmitter.subscribe(() =&gt; {
+          ctrl.loadContributions().then(() =&gt; {
+            spyOn($uibModal, &#x27;open&#x27;).and.callThrough();
+            ctrl.onClickViewSuggestion(&#x27;suggestion_1&#x27;);
+
+            expect($uibModal.open).toHaveBeenCalled();
+          });
+        });
+
+      ctrl.switchToTab(ctrl.TAB_TYPE_CONTRIBUTIONS, &#x27;translate_content&#x27;);
+      $scope.$apply();
+    });
+
+    it(&#x27;should resolve suggestion when closing show suggestion modal&#x27;,
+      function() {
+        contributionOpportunitiesService
+          .reloadOpportunitiesEventEmitter.subscribe(() =&gt; {
+            ctrl.loadContributions().then(() =&gt; {
+              spyOn($uibModal, &#x27;open&#x27;).and.returnValue({
+                result: $q.resolve({
+                  action: &#x27;add&#x27;,
+                  reviewMessage: &#x27;Review message&#x27;,
+                  skillDifficulty: &#x27;Easy&#x27;
+                })
+              });
+              ctrl.onClickViewSuggestion(&#x27;suggestion_1&#x27;);
+              $scope.$apply();
+
+              expect($uibModal.open).toHaveBeenCalled();
+            });
+          });
+        ctrl.switchToTab(ctrl.TAB_TYPE_CONTRIBUTIONS, &#x27;translate_content&#x27;);
+        $scope.$apply();
+      });
+
+    it(&#x27;should not resolve suggestion when dismissing show suggestion modal&#x27;,
+      function() {
+        contributionOpportunitiesService
+          .reloadOpportunitiesEventEmitter.subscribe(() =&gt; {
+            ctrl.loadContributions().then(() =&gt; {
+              spyOn($uibModal, &#x27;open&#x27;).and.returnValue({
+                result: $q.reject()
+              });
+              ctrl.onClickViewSuggestion(&#x27;suggestion_1&#x27;);
+              $scope.$apply();
+
+              expect($uibModal.open).toHaveBeenCalled();
+            });
+          });
+        ctrl.switchToTab(ctrl.TAB_TYPE_CONTRIBUTIONS, &#x27;translate_content&#x27;);
+        $scope.$apply();
+      });
+  });
+
+  describe(&#x27;for the suggestion related to deleted opportunity&#x27;, function() {
+    beforeEach(angular.mock.inject(function($injector, $componentController) {
+      $httpBackend = $injector.get(&#x27;$httpBackend&#x27;);
+      $q = $injector.get(&#x27;$q&#x27;);
+      var $rootScope = $injector.get(&#x27;$rootScope&#x27;);
+      $uibModal = $injector.get(&#x27;$uibModal&#x27;);
+      contributionAndReviewService = $injector.get(
+        &#x27;ContributionAndReviewService&#x27;);
+      contributionOpportunitiesService = $injector.get(
+        &#x27;ContributionOpportunitiesService&#x27;);
+      csrfTokenService = $injector.get(&#x27;CsrfTokenService&#x27;);
+      userService = $injector.get(&#x27;UserService&#x27;);
+      contextService = $injector.get(&#x27;ContextService&#x27;);
+      skillBackendApiService = $injector.get(&#x27;SkillBackendApiService&#x27;);
+      skillObjectFactory = $injector.get(&#x27;SkillObjectFactory&#x27;);
+      spyOn(contextService, &#x27;getExplorationId&#x27;).and.returnValue(&#x27;exp1&#x27;);
+      misconceptionObjectFactory = $injector.get(&#x27;MisconceptionObjectFactory&#x27;);
+
+      spyOn(csrfTokenService, &#x27;getTokenAsync&#x27;).and.returnValue(
+        $q.resolve(&#x27;sample-csrf-token&#x27;));
+
+      spyOn(userService, &#x27;getUserInfoAsync&#x27;)
+        .and.returnValue($q.resolve({
+          isLoggedIn: () =&gt; true
+        }));
+      spyOn(userService, &#x27;getUserContributionRightsDataAsync&#x27;)
+        .and.returnValue(
+          $q.resolve({
+            can_review_translation_for_language_codes: [],
+            can_review_questions: false
+          }));
+      spyOn(
+        contributionAndReviewService, &#x27;getUserCreatedQuestionSuggestionsAsync&#x27;)
+        .and.returnValue($q.resolve({
+          suggestion_1: {
+            suggestion: {
+              suggestion_id: &#x27;suggestion_1&#x27;,
+              target_id: &#x27;1&#x27;,
+              suggestion_type: &#x27;add_question&#x27;,
+              change: {
+                skill_id: &#x27;skill1&#x27;,
+                question_dict: {
+                  id: &#x27;1&#x27;,
+                  question_state_data: {
+                    content: {
+                      html: &#x27;Question 1&#x27;,
+                      content_id: &#x27;content_1&#x27;
+                    },
+                    interaction: {
+                      answer_groups: [{
+                        outcome: {
+                          dest: &#x27;outcome 1&#x27;,
+                          feedback: {
+                            content_id: &#x27;content_5&#x27;,
+                            html: &#x27;&#x27;
+                          },
+                          labelled_as_correct: true,
+                          param_changes: [],
+                          refresher_exploration_id: null
+                        },
+                        rule_specs: [],
+                      }],
+                      confirmed_unclassified_answers: [],
+                      customization_args: {
+                        placeholder: {
+                          value: {
+                            content_id: &#x27;ca_placeholder_0&#x27;,
+                            unicode_str: &#x27;&#x27;
+                          }
+                        },
+                        rows: { value: 1 }
+                      },
+                      default_outcome: {
+                        dest: null,
+                        feedback: {
+                          html: &#x27;Correct Answer&#x27;,
+                          content_id: &#x27;content_2&#x27;
+                        },
+                        param_changes: [],
+                        labelled_as_correct: true
+                      },
+                      hints: [{
+                        hint_content: {
+                          html: &#x27;Hint 1&#x27;,
+                          content_id: &#x27;content_3&#x27;
+                        }
+                      }],
+                      solution: {
+                        correct_answer: &#x27;This is the correct answer&#x27;,
+                        answer_is_exclusive: false,
+                        explanation: {
+                          html: &#x27;Solution explanation&#x27;,
+                          content_id: &#x27;content_4&#x27;
+                        }
+                      },
+                      id: &#x27;TextInput&#x27;
+                    },
+                    param_changes: [],
+                    recorded_voiceovers: {
+                      voiceovers_mapping: {}
+                    },
+                    written_translations: {
+                      translations_mapping: {}
+                    },
+                  },
+                }
+              },
+              status: &#x27;accepted&#x27;
+            },
+            details: null
+          }
+        }));
+      spyOn(skillBackendApiService, &#x27;fetchSkillAsync&#x27;).and.returnValue(
+        $q.resolve({
+          skill: skillObjectFactory.createFromBackendDict({
+            id: &#x27;skill1&#x27;,
+            description: &#x27;test description 1&#x27;,
+            misconceptions: [{
+              id: &#x27;2&#x27;,
+              name: &#x27;test name&#x27;,
+              notes: &#x27;test notes&#x27;,
+              feedback: &#x27;test feedback&#x27;,
+              must_be_addressed: true
+            }],
+            rubrics: [{
+              difficulty: &#x27;Easy&#x27;,
+              explanations: [&#x27;explanation&#x27;]
+            }],
+            skill_contents: {
+              explanation: {
+                html: &#x27;test explanation&#x27;,
+                content_id: &#x27;explanation&#x27;,
+              },
+              worked_examples: [],
+              recorded_voiceovers: {
+                voiceovers_mapping: {}
+              }
+            },
+            language_code: &#x27;en&#x27;,
+            version: 3,
+            prerequisite_skill_ids: [&#x27;skill_1&#x27;]
+          })
+        }));
+      spyOn(
+        contributionAndReviewService,
+        &#x27;getUserCreatedTranslationSuggestionsAsync&#x27;)
+        .and.returnValue($q.resolve({
+          suggestion_1: {
+            suggestion: {
+              suggestion_id: &#x27;suggestion_1&#x27;,
+              target_id: &#x27;1&#x27;,
+              suggestion_type: &#x27;translate_content&#x27;,
+              change: {
+                content_html: &#x27;Translation&#x27;,
+                translation_html: &#x27;Tradução&#x27;
+              },
+              status: &#x27;review&#x27;
+            },
+            details: null
+          }
+        }));
+      spyOn(
+        contributionOpportunitiesService.reloadOpportunitiesEventEmitter,
+        &#x27;emit&#x27;).and.callThrough();
+      spyOn(
+        contributionOpportunitiesService.reloadOpportunitiesEventEmitter,
+        &#x27;subscribe&#x27;).and.callThrough();
+      $scope = $rootScope.$new();
+      ctrl = $componentController(&#x27;contributionsAndReview&#x27;, {
+        $scope: $scope,
+        ContextService: contextService,
+        MisconceptionObjectFactory: misconceptionObjectFactory
+      });
+      ctrl.$onInit();
+      $scope.$apply();
+    }));
+
+    it(&#x27;should show correct heading for translation suggestions&#x27;, function() {
+      contributionOpportunitiesService
+        .reloadOpportunitiesEventEmitter.subscribe(() =&gt; {
+          ctrl.loadContributions().then(({opportunitiesDicts, more}) =&gt; {
+            expect(opportunitiesDicts).toEqual([{
+              id: &#x27;suggestion_1&#x27;,
+              heading: &#x27;Tradução&#x27;,
+              subheading: &#x27;[The corresponding opportunity has been deleted.]&#x27;,
+              labelText: &#x27;Awaiting review&#x27;,
+              labelColor: &#x27;#eeeeee&#x27;,
+              actionButtonTitle: &#x27;View&#x27;
+            }]);
+          });
+        });
+
+      ctrl.switchToTab(ctrl.TAB_TYPE_CONTRIBUTIONS, &#x27;translate_content&#x27;);
+      expect(
+        contributionOpportunitiesService.reloadOpportunitiesEventEmitter
+          .subscribe).toHaveBeenCalled();
+      expect(
+        contributionOpportunitiesService.reloadOpportunitiesEventEmitter
+          .emit).toHaveBeenCalled();
+    });
+
+    it(&#x27;should show correct heading for question suggestions&#x27;, function() {
+      contributionOpportunitiesService
+        .reloadOpportunitiesEventEmitter.subscribe(() =&gt; {
+          ctrl.loadContributions();
+        });
+
+      ctrl.switchToTab(ctrl.TAB_TYPE_CONTRIBUTIONS, &#x27;add_question&#x27;);
+      $scope.$apply();
+
+      ctrl.loadContributions().then(({opportunitiesDicts, more}) =&gt; {
+        expect(opportunitiesDicts).toEqual([{
+          id: &#x27;suggestion_1&#x27;,
+          heading: &#x27;Question 1&#x27;,
+          subheading: &#x27;[The corresponding opportunity has been deleted.]&#x27;,
+          labelText: &#x27;Accepted&#x27;,
+          labelColor: &#x27;#8ed274&#x27;,
+          actionButtonTitle: &#x27;View&#x27;
+        }]);
+      });
+    });
+  });
+
+  describe(&#x27;when user is not allowed to review questions&#x27;, function() {
+    beforeEach(angular.mock.inject(function($injector, $componentController) {
+      $httpBackend = $injector.get(&#x27;$httpBackend&#x27;);
+      $q = $injector.get(&#x27;$q&#x27;);
+      var $rootScope = $injector.get(&#x27;$rootScope&#x27;);
+      $uibModal = $injector.get(&#x27;$uibModal&#x27;);
+      contributionOpportunitiesService = $injector.get(
+        &#x27;ContributionOpportunitiesService&#x27;);
+      contributionAndReviewService = $injector.get(
+        &#x27;ContributionAndReviewService&#x27;);
+      csrfTokenService = $injector.get(&#x27;CsrfTokenService&#x27;);
+      userService = $injector.get(&#x27;UserService&#x27;);
+      contextService = $injector.get(&#x27;ContextService&#x27;);
+      skillBackendApiService = $injector.get(&#x27;SkillBackendApiService&#x27;);
+      skillObjectFactory = $injector.get(&#x27;SkillObjectFactory&#x27;);
+      spyOn(contextService, &#x27;getExplorationId&#x27;).and.returnValue(&#x27;exp1&#x27;);
+      misconceptionObjectFactory = $injector.get(&#x27;MisconceptionObjectFactory&#x27;);
+
+      spyOn(csrfTokenService, &#x27;getTokenAsync&#x27;).and.returnValue(
+        $q.resolve(&#x27;sample-csrf-token&#x27;));
+
+      spyOn(userService, &#x27;getUserInfoAsync&#x27;)
+        .and.returnValue($q.resolve({
+          isLoggedIn: () =&gt; true
+        }));
+      spyOn(userService, &#x27;getUserContributionRightsDataAsync&#x27;)
+        .and.returnValue(
+          $q.resolve({
+            can_review_translation_for_language_codes: [],
+            can_review_questions: false,
+            can_suggest_questions: true
+          }));
+      spyOn(
+        contributionAndReviewService, &#x27;getUserCreatedQuestionSuggestionsAsync&#x27;)
+        .and.returnValue($q.resolve({
+          suggestion_1: {
+            suggestion: {
+              suggestion_id: &#x27;suggestion_1&#x27;,
+              target_id: &#x27;1&#x27;,
+              suggestion_type: &#x27;add_question&#x27;,
+              change: {
+                skill_id: &#x27;skill1&#x27;,
+                question_dict: {
+                  id: &#x27;1&#x27;,
+                  question_state_data: {
+                    content: {
+                      html: &#x27;Question 1&#x27;,
+                      content_id: &#x27;content_1&#x27;
+                    },
+                    interaction: {
+                      answer_groups: [{
+                        outcome: {
+                          dest: &#x27;outcome 1&#x27;,
+                          feedback: {
+                            content_id: &#x27;content_5&#x27;,
+                            html: &#x27;&#x27;
+                          },
+                          labelled_as_correct: true,
+                          param_changes: [],
+                          refresher_exploration_id: null
+                        },
+                        rule_specs: [],
+                      }],
+                      confirmed_unclassified_answers: [],
+                      customization_args: {
+                        placeholder: {
+                          value: {
+                            content_id: &#x27;ca_placeholder_0&#x27;,
+                            unicode_str: &#x27;&#x27;
+                          }
+                        },
+                        rows: { value: 1 }
+                      },
+                      default_outcome: {
+                        dest: null,
+                        feedback: {
+                          html: &#x27;Correct Answer&#x27;,
+                          content_id: &#x27;content_2&#x27;
+                        },
+                        param_changes: [],
+                        labelled_as_correct: true
+                      },
+                      hints: [{
+                        hint_content: {
+                          html: &#x27;Hint 1&#x27;,
+                          content_id: &#x27;content_3&#x27;
+                        }
+                      }],
+                      solution: {
+                        correct_answer: &#x27;This is the correct answer&#x27;,
+                        answer_is_exclusive: false,
+                        explanation: {
+                          html: &#x27;Solution explanation&#x27;,
+                          content_id: &#x27;content_4&#x27;
+                        }
+                      },
+                      id: &#x27;TextInput&#x27;
+                    },
+                    param_changes: [],
+                    recorded_voiceovers: {
+                      voiceovers_mapping: {}
+                    },
+                    written_translations: {
+                      translations_mapping: {}
+                    },
+                  },
+                }
+              },
+              status: &#x27;accepted&#x27;
+            },
+            details: &#x27;skill_1&#x27;
+          }
+        }));
+      spyOn(skillBackendApiService, &#x27;fetchSkillAsync&#x27;).and.returnValue(
+        $q.resolve({
+          skill: skillObjectFactory.createFromBackendDict({
+            id: &#x27;skill1&#x27;,
+            description: &#x27;test description 1&#x27;,
+            misconceptions: [{
+              id: &#x27;2&#x27;,
+              name: &#x27;test name&#x27;,
+              notes: &#x27;test notes&#x27;,
+              feedback: &#x27;test feedback&#x27;,
+              must_be_addressed: true
+            }],
+            rubrics: [{
+              difficulty: &#x27;Easy&#x27;,
+              explanations: [&#x27;explanation&#x27;]
+            }],
+            skill_contents: {
+              explanation: {
+                html: &#x27;test explanation&#x27;,
+                content_id: &#x27;explanation&#x27;,
+              },
+              worked_examples: [],
+              recorded_voiceovers: {
+                voiceovers_mapping: {}
+              }
+            },
+            language_code: &#x27;en&#x27;,
+            version: 3,
+            prerequisite_skill_ids: [&#x27;skill_1&#x27;]
+          })
+        }));
+
+      spyOn(
+        contributionAndReviewService,
+        &#x27;getReviewableTranslationSuggestionsAsync&#x27;)
+        .and.returnValue($q.resolve({
+          suggestion_1: {
+            suggestion: {
+              suggestion_id: &#x27;suggestion_1&#x27;,
+              target_id: &#x27;1&#x27;,
+              suggestion_type: &#x27;translate_content&#x27;,
+              change: {
+                content_html: &#x27;Translation&#x27;,
+                translation_html: &#x27;Tradução&#x27;
+              },
+              status: &#x27;review&#x27;
+            },
+            details: {
+              topic_name: &#x27;Topic 1&#x27;,
+              story_title: &#x27;Story title&#x27;,
+              chapter_title: &#x27;Chapter title&#x27;
+            }
+          }
+        }));
+
+      $scope = $rootScope.$new();
+      ctrl = $componentController(&#x27;contributionsAndReview&#x27;, {
+        $scope: $scope,
+        ContextService: contextService,
+        MisconceptionObjectFactory: misconceptionObjectFactory
+      });
+
+      contributionOpportunitiesService
+        .reloadOpportunitiesEventEmitter.subscribe(() =&gt; {
+          ctrl.loadContributions();
+        });
+      ctrl.$onInit();
+      $scope.$apply();
+    }));
+
+    it(&#x27;should initialize $scope properties after controller is&#x27; +
+      &#x27; initialized&#x27;, function() {
+      expect(ctrl.activeTabType).toBe(&#x27;contributions&#x27;);
+      expect(ctrl.activeSuggestionType).toBe(&#x27;add_question&#x27;);
+      expect(ctrl.userIsLoggedIn).toBe(true);
+      expect(ctrl.userDetailsLoading).toBe(false);
+      expect(ctrl.reviewTabs.length).toEqual(0);
+    });
+
+    it(&#x27;should emit reload even when when switching to translation&#x27; +
+      &#x27; in review tab&#x27;, function() {
+      spyOn(
+        contributionOpportunitiesService.reloadOpportunitiesEventEmitter,
+        &#x27;emit&#x27;).and.callThrough();
+
+      ctrl.switchToTab(ctrl.TAB_TYPE_REVIEWS, &#x27;translate_content&#x27;);
+      $scope.$apply();
+
+      expect(
+        contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit)
+        .toHaveBeenCalled();
+    });
+
+    it(&#x27;should open show view question modal when clicking on&#x27; +
+      &#x27; question suggestion&#x27;, function() {
+      spyOn($uibModal, &#x27;open&#x27;).and.callThrough();
+      ctrl.switchToTab(ctrl.TAB_TYPE_REVIEWS, &#x27;add_question&#x27;);
+      ctrl.loadContributions().then(function() {
+        ctrl.onClickViewSuggestion(&#x27;suggestion_1&#x27;);
+        $scope.$apply();
+
+        expect($uibModal.open).toHaveBeenCalled();
+      });
+    });
+
+    it(&#x27;should resolve suggestion to skill when closing show question&#x27; +
+      &#x27; suggestion modal&#x27;, function() {
+      $httpBackend.expectPUT(
+        &#x27;/suggestionactionhandler/skill/1/suggestion_1&#x27;).respond(200);
+      spyOn($uibModal, &#x27;open&#x27;).and.returnValue({
+        result: $q.resolve({})
+      });
+
+      ctrl.switchToTab(ctrl.TAB_TYPE_REVIEWS, &#x27;add_question&#x27;);
+      ctrl.loadContributions().then(function() {
+        expect(Object.keys(ctrl.contributions).length).toBe(1);
+        ctrl.onClickViewSuggestion(&#x27;suggestion_1&#x27;);
+        $scope.$apply();
+        $httpBackend.flush();
+
+        expect($uibModal.open).toHaveBeenCalled();
+      });
+    });
+
+    it(&#x27;should not resolve suggestion to skill when dismissing show question&#x27; +
+      &#x27; suggestion modal&#x27;, function() {
+      ctrl.switchToTab(ctrl.TAB_TYPE_REVIEWS, &#x27;add_question&#x27;);
+      spyOn(contributionAndReviewService, &#x27;resolveSuggestiontoSkill&#x27;);
+      spyOn($uibModal, &#x27;open&#x27;).and.returnValue({
+        result: $q.reject({})
+      });
+      ctrl.loadContributions().then(function() {
+        ctrl.onClickViewSuggestion(&#x27;suggestion_1&#x27;);
+        $scope.$apply();
+
+        expect($uibModal.open).toHaveBeenCalled();
+      });
+    });
+
+    it(&#x27;should return correctly check the active tab&#x27;, function() {
+      ctrl.switchToTab(ctrl.TAB_TYPE_REVIEWS, &#x27;translate_content&#x27;);
+      ctrl.isActiveTab(ctrl.TAB_TYPE_REVIEWS, &#x27;translate_content&#x27;);
+
+      ctrl.switchToTab(ctrl.TAB_TYPE_CONTRIBUTIONS, &#x27;add_question&#x27;);
+      ctrl.isActiveTab(ctrl.TAB_TYPE_CONTRIBUTIONS, &#x27;add_question&#x27;);
+    });
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:24,&quot;character&quot;:6,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:25,&quot;character&quot;:6,&quot;text&quot;:&quot;$httpBackend&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:26,&quot;character&quot;:6,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:27,&quot;character&quot;:6,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:28,&quot;character&quot;:6,&quot;text&quot;:&quot;$uibModal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:29,&quot;character&quot;:6,&quot;text&quot;:&quot;contextService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:30,&quot;character&quot;:6,&quot;text&quot;:&quot;contributionAndReviewService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:31,&quot;character&quot;:6,&quot;text&quot;:&quot;contributionOpportunitiesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:32,&quot;character&quot;:6,&quot;text&quot;:&quot;csrfTokenService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:33,&quot;character&quot;:6,&quot;text&quot;:&quot;misconceptionObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:34,&quot;character&quot;:6,&quot;text&quot;:&quot;skillBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:35,&quot;character&quot;:6,&quot;text&quot;:&quot;skillObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:36,&quot;character&quot;:6,&quot;text&quot;:&quot;userService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:43,&quot;character&quot;:44,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:43,&quot;character&quot;:55,&quot;text&quot;:&quot;$componentController&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:44,&quot;character&quot;:6,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:44,&quot;character&quot;:11,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:44,&quot;character&quot;:21,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:45,&quot;character&quot;:10,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:45,&quot;character&quot;:23,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:45,&quot;character&quot;:33,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:46,&quot;character&quot;:6,&quot;text&quot;:&quot;$uibModal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:46,&quot;character&quot;:18,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:46,&quot;character&quot;:28,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:47,&quot;character&quot;:6,&quot;text&quot;:&quot;contributionAndReviewService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:47,&quot;character&quot;:37,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:47,&quot;character&quot;:47,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:49,&quot;character&quot;:6,&quot;text&quot;:&quot;userService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:49,&quot;character&quot;:20,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:49,&quot;character&quot;:30,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:50,&quot;character&quot;:6,&quot;text&quot;:&quot;contextService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:50,&quot;character&quot;:23,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:50,&quot;character&quot;:33,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:51,&quot;character&quot;:6,&quot;text&quot;:&quot;skillBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:51,&quot;character&quot;:31,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:51,&quot;character&quot;:41,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:52,&quot;character&quot;:6,&quot;text&quot;:&quot;contributionOpportunitiesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:52,&quot;character&quot;:41,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:52,&quot;character&quot;:51,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:54,&quot;character&quot;:12,&quot;text&quot;:&quot;contextService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:54,&quot;character&quot;:48,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:55,&quot;character&quot;:6,&quot;text&quot;:&quot;misconceptionObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:55,&quot;character&quot;:35,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:55,&quot;character&quot;:45,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:57,&quot;character&quot;:12,&quot;text&quot;:&quot;userService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:58,&quot;character&quot;:9,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:58,&quot;character&quot;:25,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:58,&quot;character&quot;:28,&quot;text&quot;:&quot;resolve&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:61,&quot;character&quot;:12,&quot;text&quot;:&quot;userService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:62,&quot;character&quot;:9,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:62,&quot;character&quot;:25,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:62,&quot;character&quot;:28,&quot;text&quot;:&quot;resolve&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:67,&quot;character&quot;:8,&quot;text&quot;:&quot;contributionAndReviewService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:68,&quot;character&quot;:53,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:85,&quot;character&quot;:8,&quot;text&quot;:&quot;contributionAndReviewService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:86,&quot;character&quot;:9,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:168,&quot;character&quot;:6,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:168,&quot;character&quot;:15,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:168,&quot;character&quot;:26,&quot;text&quot;:&quot;$new&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:169,&quot;character&quot;:6,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:169,&quot;character&quot;:13,&quot;text&quot;:&quot;$componentController&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:170,&quot;character&quot;:8,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:170,&quot;character&quot;:16,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:171,&quot;character&quot;:8,&quot;text&quot;:&quot;ContextService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:171,&quot;character&quot;:24,&quot;text&quot;:&quot;contextService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:172,&quot;character&quot;:8,&quot;text&quot;:&quot;MisconceptionObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:172,&quot;character&quot;:36,&quot;text&quot;:&quot;misconceptionObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:174,&quot;character&quot;:6,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:174,&quot;character&quot;:11,&quot;text&quot;:&quot;$onInit&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:175,&quot;character&quot;:6,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:175,&quot;character&quot;:13,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:176,&quot;character&quot;:6,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:176,&quot;character&quot;:13,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:181,&quot;character&quot;:13,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:181,&quot;character&quot;:18,&quot;text&quot;:&quot;activeTabType&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:182,&quot;character&quot;:13,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:182,&quot;character&quot;:18,&quot;text&quot;:&quot;activeSuggestionType&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:183,&quot;character&quot;:13,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:183,&quot;character&quot;:18,&quot;text&quot;:&quot;userIsLoggedIn&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:184,&quot;character&quot;:13,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:184,&quot;character&quot;:18,&quot;text&quot;:&quot;userDetailsLoading&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:185,&quot;character&quot;:13,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:185,&quot;character&quot;:18,&quot;text&quot;:&quot;reviewTabs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:185,&quot;character&quot;:29,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:190,&quot;character&quot;:8,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:190,&quot;character&quot;:13,&quot;text&quot;:&quot;loadContributions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:190,&quot;character&quot;:33,&quot;text&quot;:&quot;then&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:190,&quot;character&quot;:40,&quot;text&quot;:&quot;opportunitiesDicts&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:190,&quot;character&quot;:60,&quot;text&quot;:&quot;more&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:191,&quot;character&quot;:29,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:191,&quot;character&quot;:34,&quot;text&quot;:&quot;contributions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:192,&quot;character&quot;:17,&quot;text&quot;:&quot;opportunitiesDicts&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:200,&quot;character&quot;:17,&quot;text&quot;:&quot;more&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:205,&quot;character&quot;:8,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:205,&quot;character&quot;:13,&quot;text&quot;:&quot;activeTabType&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:206,&quot;character&quot;:8,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:206,&quot;character&quot;:13,&quot;text&quot;:&quot;loadContributions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:206,&quot;character&quot;:33,&quot;text&quot;:&quot;then&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:206,&quot;character&quot;:40,&quot;text&quot;:&quot;opportunitiesDicts&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:206,&quot;character&quot;:60,&quot;text&quot;:&quot;more&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:207,&quot;character&quot;:17,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:207,&quot;character&quot;:22,&quot;text&quot;:&quot;contributions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:208,&quot;character&quot;:17,&quot;text&quot;:&quot;opportunitiesDicts&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:209,&quot;character&quot;:17,&quot;text&quot;:&quot;more&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:215,&quot;character&quot;:10,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:215,&quot;character&quot;:15,&quot;text&quot;:&quot;activeTabType&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:216,&quot;character&quot;:10,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:216,&quot;character&quot;:15,&quot;text&quot;:&quot;loadContributions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:216,&quot;character&quot;:35,&quot;text&quot;:&quot;then&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:216,&quot;character&quot;:42,&quot;text&quot;:&quot;opportunitiesDicts&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:216,&quot;character&quot;:62,&quot;text&quot;:&quot;more&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:217,&quot;character&quot;:19,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:217,&quot;character&quot;:24,&quot;text&quot;:&quot;contributions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:218,&quot;character&quot;:19,&quot;text&quot;:&quot;opportunitiesDicts&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:219,&quot;character&quot;:19,&quot;text&quot;:&quot;more&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:226,&quot;character&quot;:6,&quot;text&quot;:&quot;contributionOpportunitiesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:227,&quot;character&quot;:9,&quot;text&quot;:&quot;reloadOpportunitiesEventEmitter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:227,&quot;character&quot;:41,&quot;text&quot;:&quot;subscribe&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:228,&quot;character&quot;:10,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:228,&quot;character&quot;:15,&quot;text&quot;:&quot;loadContributions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:228,&quot;character&quot;:35,&quot;text&quot;:&quot;then&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:229,&quot;character&quot;:18,&quot;text&quot;:&quot;$uibModal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:229,&quot;character&quot;:37,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:230,&quot;character&quot;:12,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:230,&quot;character&quot;:17,&quot;text&quot;:&quot;onClickViewSuggestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:232,&quot;character&quot;:19,&quot;text&quot;:&quot;$uibModal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:232,&quot;character&quot;:29,&quot;text&quot;:&quot;open&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:236,&quot;character&quot;:6,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:236,&quot;character&quot;:11,&quot;text&quot;:&quot;switchToTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:236,&quot;character&quot;:23,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:236,&quot;character&quot;:28,&quot;text&quot;:&quot;TAB_TYPE_CONTRIBUTIONS&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:237,&quot;character&quot;:6,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:237,&quot;character&quot;:13,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:242,&quot;character&quot;:8,&quot;text&quot;:&quot;contributionOpportunitiesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:243,&quot;character&quot;:11,&quot;text&quot;:&quot;reloadOpportunitiesEventEmitter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:243,&quot;character&quot;:43,&quot;text&quot;:&quot;subscribe&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:244,&quot;character&quot;:12,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:244,&quot;character&quot;:17,&quot;text&quot;:&quot;loadContributions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:244,&quot;character&quot;:37,&quot;text&quot;:&quot;then&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:245,&quot;character&quot;:20,&quot;text&quot;:&quot;$uibModal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:245,&quot;character&quot;:39,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:246,&quot;character&quot;:16,&quot;text&quot;:&quot;result&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:246,&quot;character&quot;:24,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:246,&quot;character&quot;:27,&quot;text&quot;:&quot;resolve&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:252,&quot;character&quot;:14,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:252,&quot;character&quot;:19,&quot;text&quot;:&quot;onClickViewSuggestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:253,&quot;character&quot;:14,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:253,&quot;character&quot;:21,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:255,&quot;character&quot;:21,&quot;text&quot;:&quot;$uibModal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:255,&quot;character&quot;:31,&quot;text&quot;:&quot;open&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:258,&quot;character&quot;:8,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:258,&quot;character&quot;:13,&quot;text&quot;:&quot;switchToTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:258,&quot;character&quot;:25,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:258,&quot;character&quot;:30,&quot;text&quot;:&quot;TAB_TYPE_CONTRIBUTIONS&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:259,&quot;character&quot;:8,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:259,&quot;character&quot;:15,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:264,&quot;character&quot;:8,&quot;text&quot;:&quot;contributionOpportunitiesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:265,&quot;character&quot;:11,&quot;text&quot;:&quot;reloadOpportunitiesEventEmitter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:265,&quot;character&quot;:43,&quot;text&quot;:&quot;subscribe&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:266,&quot;character&quot;:12,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:266,&quot;character&quot;:17,&quot;text&quot;:&quot;loadContributions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:266,&quot;character&quot;:37,&quot;text&quot;:&quot;then&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:267,&quot;character&quot;:20,&quot;text&quot;:&quot;$uibModal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:267,&quot;character&quot;:39,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:268,&quot;character&quot;:16,&quot;text&quot;:&quot;result&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:268,&quot;character&quot;:24,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:268,&quot;character&quot;:27,&quot;text&quot;:&quot;reject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:270,&quot;character&quot;:14,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:270,&quot;character&quot;:19,&quot;text&quot;:&quot;onClickViewSuggestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:271,&quot;character&quot;:14,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:271,&quot;character&quot;:21,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:273,&quot;character&quot;:21,&quot;text&quot;:&quot;$uibModal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:273,&quot;character&quot;:31,&quot;text&quot;:&quot;open&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:276,&quot;character&quot;:8,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:276,&quot;character&quot;:13,&quot;text&quot;:&quot;switchToTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:276,&quot;character&quot;:25,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:276,&quot;character&quot;:30,&quot;text&quot;:&quot;TAB_TYPE_CONTRIBUTIONS&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:277,&quot;character&quot;:8,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:277,&quot;character&quot;:15,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:282,&quot;character&quot;:44,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:282,&quot;character&quot;:55,&quot;text&quot;:&quot;$componentController&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:283,&quot;character&quot;:6,&quot;text&quot;:&quot;$httpBackend&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:283,&quot;character&quot;:21,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:283,&quot;character&quot;:31,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:284,&quot;character&quot;:6,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:284,&quot;character&quot;:11,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:284,&quot;character&quot;:21,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:285,&quot;character&quot;:10,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:285,&quot;character&quot;:23,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:285,&quot;character&quot;:33,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:286,&quot;character&quot;:6,&quot;text&quot;:&quot;$uibModal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:286,&quot;character&quot;:18,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:286,&quot;character&quot;:28,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:287,&quot;character&quot;:6,&quot;text&quot;:&quot;contributionAndReviewService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:287,&quot;character&quot;:37,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:287,&quot;character&quot;:47,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:289,&quot;character&quot;:6,&quot;text&quot;:&quot;contributionOpportunitiesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:289,&quot;character&quot;:41,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:289,&quot;character&quot;:51,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:291,&quot;character&quot;:6,&quot;text&quot;:&quot;csrfTokenService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:291,&quot;character&quot;:25,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:291,&quot;character&quot;:35,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:292,&quot;character&quot;:6,&quot;text&quot;:&quot;userService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:292,&quot;character&quot;:20,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:292,&quot;character&quot;:30,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:293,&quot;character&quot;:6,&quot;text&quot;:&quot;contextService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:293,&quot;character&quot;:23,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:293,&quot;character&quot;:33,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:294,&quot;character&quot;:6,&quot;text&quot;:&quot;skillBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:294,&quot;character&quot;:31,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:294,&quot;character&quot;:41,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:295,&quot;character&quot;:6,&quot;text&quot;:&quot;skillObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:295,&quot;character&quot;:27,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:295,&quot;character&quot;:37,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:296,&quot;character&quot;:12,&quot;text&quot;:&quot;contextService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:296,&quot;character&quot;:48,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:297,&quot;character&quot;:6,&quot;text&quot;:&quot;misconceptionObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:297,&quot;character&quot;:35,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:297,&quot;character&quot;:45,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:299,&quot;character&quot;:12,&quot;text&quot;:&quot;csrfTokenService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:299,&quot;character&quot;:47,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:300,&quot;character&quot;:8,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:300,&quot;character&quot;:11,&quot;text&quot;:&quot;resolve&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:302,&quot;character&quot;:12,&quot;text&quot;:&quot;userService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:303,&quot;character&quot;:9,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:303,&quot;character&quot;:25,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:303,&quot;character&quot;:28,&quot;text&quot;:&quot;resolve&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:306,&quot;character&quot;:12,&quot;text&quot;:&quot;userService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:307,&quot;character&quot;:9,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:308,&quot;character&quot;:10,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:308,&quot;character&quot;:13,&quot;text&quot;:&quot;resolve&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:313,&quot;character&quot;:8,&quot;text&quot;:&quot;contributionAndReviewService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:314,&quot;character&quot;:9,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:314,&quot;character&quot;:25,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:314,&quot;character&quot;:28,&quot;text&quot;:&quot;resolve&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:393,&quot;character&quot;:12,&quot;text&quot;:&quot;skillBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:393,&quot;character&quot;:55,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:394,&quot;character&quot;:8,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:394,&quot;character&quot;:11,&quot;text&quot;:&quot;resolve&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:395,&quot;character&quot;:10,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:395,&quot;character&quot;:17,&quot;text&quot;:&quot;skillObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:395,&quot;character&quot;:36,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:425,&quot;character&quot;:8,&quot;text&quot;:&quot;contributionAndReviewService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:427,&quot;character&quot;:9,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:427,&quot;character&quot;:25,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:427,&quot;character&quot;:28,&quot;text&quot;:&quot;resolve&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:443,&quot;character&quot;:8,&quot;text&quot;:&quot;contributionOpportunitiesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:443,&quot;character&quot;:41,&quot;text&quot;:&quot;reloadOpportunitiesEventEmitter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:444,&quot;character&quot;:16,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:446,&quot;character&quot;:8,&quot;text&quot;:&quot;contributionOpportunitiesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:446,&quot;character&quot;:41,&quot;text&quot;:&quot;reloadOpportunitiesEventEmitter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:447,&quot;character&quot;:21,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:448,&quot;character&quot;:6,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:448,&quot;character&quot;:15,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:448,&quot;character&quot;:26,&quot;text&quot;:&quot;$new&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:449,&quot;character&quot;:6,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:449,&quot;character&quot;:13,&quot;text&quot;:&quot;$componentController&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:450,&quot;character&quot;:8,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:450,&quot;character&quot;:16,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:451,&quot;character&quot;:8,&quot;text&quot;:&quot;ContextService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:451,&quot;character&quot;:24,&quot;text&quot;:&quot;contextService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:452,&quot;character&quot;:8,&quot;text&quot;:&quot;MisconceptionObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:452,&quot;character&quot;:36,&quot;text&quot;:&quot;misconceptionObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:454,&quot;character&quot;:6,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:454,&quot;character&quot;:11,&quot;text&quot;:&quot;$onInit&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:455,&quot;character&quot;:6,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:455,&quot;character&quot;:13,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:459,&quot;character&quot;:6,&quot;text&quot;:&quot;contributionOpportunitiesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:460,&quot;character&quot;:9,&quot;text&quot;:&quot;reloadOpportunitiesEventEmitter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:460,&quot;character&quot;:41,&quot;text&quot;:&quot;subscribe&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:461,&quot;character&quot;:10,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:461,&quot;character&quot;:15,&quot;text&quot;:&quot;loadContributions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:461,&quot;character&quot;:35,&quot;text&quot;:&quot;then&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:461,&quot;character&quot;:42,&quot;text&quot;:&quot;opportunitiesDicts&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:461,&quot;character&quot;:62,&quot;text&quot;:&quot;more&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:462,&quot;character&quot;:19,&quot;text&quot;:&quot;opportunitiesDicts&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:473,&quot;character&quot;:6,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:473,&quot;character&quot;:11,&quot;text&quot;:&quot;switchToTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:473,&quot;character&quot;:23,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:473,&quot;character&quot;:28,&quot;text&quot;:&quot;TAB_TYPE_CONTRIBUTIONS&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:475,&quot;character&quot;:8,&quot;text&quot;:&quot;contributionOpportunitiesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:475,&quot;character&quot;:41,&quot;text&quot;:&quot;reloadOpportunitiesEventEmitter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:476,&quot;character&quot;:11,&quot;text&quot;:&quot;subscribe&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:478,&quot;character&quot;:8,&quot;text&quot;:&quot;contributionOpportunitiesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:478,&quot;character&quot;:41,&quot;text&quot;:&quot;reloadOpportunitiesEventEmitter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:479,&quot;character&quot;:11,&quot;text&quot;:&quot;emit&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:483,&quot;character&quot;:6,&quot;text&quot;:&quot;contributionOpportunitiesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:484,&quot;character&quot;:9,&quot;text&quot;:&quot;reloadOpportunitiesEventEmitter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:484,&quot;character&quot;:41,&quot;text&quot;:&quot;subscribe&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:485,&quot;character&quot;:10,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:485,&quot;character&quot;:15,&quot;text&quot;:&quot;loadContributions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:488,&quot;character&quot;:6,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:488,&quot;character&quot;:11,&quot;text&quot;:&quot;switchToTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:488,&quot;character&quot;:23,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:488,&quot;character&quot;:28,&quot;text&quot;:&quot;TAB_TYPE_CONTRIBUTIONS&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:489,&quot;character&quot;:6,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:489,&quot;character&quot;:13,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:491,&quot;character&quot;:6,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:491,&quot;character&quot;:11,&quot;text&quot;:&quot;loadContributions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:491,&quot;character&quot;:31,&quot;text&quot;:&quot;then&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:491,&quot;character&quot;:38,&quot;text&quot;:&quot;opportunitiesDicts&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:491,&quot;character&quot;:58,&quot;text&quot;:&quot;more&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:492,&quot;character&quot;:15,&quot;text&quot;:&quot;opportunitiesDicts&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:505,&quot;character&quot;:44,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:505,&quot;character&quot;:55,&quot;text&quot;:&quot;$componentController&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:506,&quot;character&quot;:6,&quot;text&quot;:&quot;$httpBackend&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:506,&quot;character&quot;:21,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:506,&quot;character&quot;:31,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:507,&quot;character&quot;:6,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:507,&quot;character&quot;:11,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:507,&quot;character&quot;:21,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:508,&quot;character&quot;:10,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:508,&quot;character&quot;:23,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:508,&quot;character&quot;:33,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:509,&quot;character&quot;:6,&quot;text&quot;:&quot;$uibModal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:509,&quot;character&quot;:18,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:509,&quot;character&quot;:28,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:510,&quot;character&quot;:6,&quot;text&quot;:&quot;contributionOpportunitiesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:510,&quot;character&quot;:41,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:510,&quot;character&quot;:51,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:512,&quot;character&quot;:6,&quot;text&quot;:&quot;contributionAndReviewService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:512,&quot;character&quot;:37,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:512,&quot;character&quot;:47,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:514,&quot;character&quot;:6,&quot;text&quot;:&quot;csrfTokenService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:514,&quot;character&quot;:25,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:514,&quot;character&quot;:35,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:515,&quot;character&quot;:6,&quot;text&quot;:&quot;userService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:515,&quot;character&quot;:20,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:515,&quot;character&quot;:30,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:516,&quot;character&quot;:6,&quot;text&quot;:&quot;contextService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:516,&quot;character&quot;:23,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:516,&quot;character&quot;:33,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:517,&quot;character&quot;:6,&quot;text&quot;:&quot;skillBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:517,&quot;character&quot;:31,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:517,&quot;character&quot;:41,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:518,&quot;character&quot;:6,&quot;text&quot;:&quot;skillObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:518,&quot;character&quot;:27,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:518,&quot;character&quot;:37,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:519,&quot;character&quot;:12,&quot;text&quot;:&quot;contextService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:519,&quot;character&quot;:48,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:520,&quot;character&quot;:6,&quot;text&quot;:&quot;misconceptionObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:520,&quot;character&quot;:35,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:520,&quot;character&quot;:45,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:522,&quot;character&quot;:12,&quot;text&quot;:&quot;csrfTokenService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:522,&quot;character&quot;:47,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:523,&quot;character&quot;:8,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:523,&quot;character&quot;:11,&quot;text&quot;:&quot;resolve&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:525,&quot;character&quot;:12,&quot;text&quot;:&quot;userService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:526,&quot;character&quot;:9,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:526,&quot;character&quot;:25,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:526,&quot;character&quot;:28,&quot;text&quot;:&quot;resolve&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:529,&quot;character&quot;:12,&quot;text&quot;:&quot;userService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:530,&quot;character&quot;:9,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:531,&quot;character&quot;:10,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:531,&quot;character&quot;:13,&quot;text&quot;:&quot;resolve&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:537,&quot;character&quot;:8,&quot;text&quot;:&quot;contributionAndReviewService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:538,&quot;character&quot;:9,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:538,&quot;character&quot;:25,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:538,&quot;character&quot;:28,&quot;text&quot;:&quot;resolve&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:617,&quot;character&quot;:12,&quot;text&quot;:&quot;skillBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:617,&quot;character&quot;:55,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:618,&quot;character&quot;:8,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:618,&quot;character&quot;:11,&quot;text&quot;:&quot;resolve&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:619,&quot;character&quot;:10,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:619,&quot;character&quot;:17,&quot;text&quot;:&quot;skillObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:619,&quot;character&quot;:36,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:650,&quot;character&quot;:8,&quot;text&quot;:&quot;contributionAndReviewService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:652,&quot;character&quot;:9,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:652,&quot;character&quot;:25,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:652,&quot;character&quot;:28,&quot;text&quot;:&quot;resolve&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:672,&quot;character&quot;:6,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:672,&quot;character&quot;:15,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:672,&quot;character&quot;:26,&quot;text&quot;:&quot;$new&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:673,&quot;character&quot;:6,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:673,&quot;character&quot;:13,&quot;text&quot;:&quot;$componentController&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:674,&quot;character&quot;:8,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:674,&quot;character&quot;:16,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:675,&quot;character&quot;:8,&quot;text&quot;:&quot;ContextService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:675,&quot;character&quot;:24,&quot;text&quot;:&quot;contextService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:676,&quot;character&quot;:8,&quot;text&quot;:&quot;MisconceptionObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:676,&quot;character&quot;:36,&quot;text&quot;:&quot;misconceptionObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:679,&quot;character&quot;:6,&quot;text&quot;:&quot;contributionOpportunitiesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:680,&quot;character&quot;:9,&quot;text&quot;:&quot;reloadOpportunitiesEventEmitter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:680,&quot;character&quot;:41,&quot;text&quot;:&quot;subscribe&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:681,&quot;character&quot;:10,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:681,&quot;character&quot;:15,&quot;text&quot;:&quot;loadContributions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:683,&quot;character&quot;:6,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:683,&quot;character&quot;:11,&quot;text&quot;:&quot;$onInit&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:684,&quot;character&quot;:6,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:684,&quot;character&quot;:13,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:689,&quot;character&quot;:13,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:689,&quot;character&quot;:18,&quot;text&quot;:&quot;activeTabType&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:690,&quot;character&quot;:13,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:690,&quot;character&quot;:18,&quot;text&quot;:&quot;activeSuggestionType&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:691,&quot;character&quot;:13,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:691,&quot;character&quot;:18,&quot;text&quot;:&quot;userIsLoggedIn&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:692,&quot;character&quot;:13,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:692,&quot;character&quot;:18,&quot;text&quot;:&quot;userDetailsLoading&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:693,&quot;character&quot;:13,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:693,&quot;character&quot;:18,&quot;text&quot;:&quot;reviewTabs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:693,&quot;character&quot;:29,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:699,&quot;character&quot;:8,&quot;text&quot;:&quot;contributionOpportunitiesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:699,&quot;character&quot;:41,&quot;text&quot;:&quot;reloadOpportunitiesEventEmitter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:700,&quot;character&quot;:16,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:702,&quot;character&quot;:6,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:702,&quot;character&quot;:11,&quot;text&quot;:&quot;switchToTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:702,&quot;character&quot;:23,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:702,&quot;character&quot;:28,&quot;text&quot;:&quot;TAB_TYPE_REVIEWS&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:703,&quot;character&quot;:6,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:703,&quot;character&quot;:13,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:706,&quot;character&quot;:8,&quot;text&quot;:&quot;contributionOpportunitiesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:706,&quot;character&quot;:41,&quot;text&quot;:&quot;reloadOpportunitiesEventEmitter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:706,&quot;character&quot;:73,&quot;text&quot;:&quot;emit&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:712,&quot;character&quot;:12,&quot;text&quot;:&quot;$uibModal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:712,&quot;character&quot;:31,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:713,&quot;character&quot;:6,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:713,&quot;character&quot;:11,&quot;text&quot;:&quot;switchToTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:713,&quot;character&quot;:23,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:713,&quot;character&quot;:28,&quot;text&quot;:&quot;TAB_TYPE_REVIEWS&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:714,&quot;character&quot;:6,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:714,&quot;character&quot;:11,&quot;text&quot;:&quot;loadContributions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:714,&quot;character&quot;:31,&quot;text&quot;:&quot;then&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:715,&quot;character&quot;:8,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:715,&quot;character&quot;:13,&quot;text&quot;:&quot;onClickViewSuggestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:716,&quot;character&quot;:8,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:716,&quot;character&quot;:15,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:718,&quot;character&quot;:15,&quot;text&quot;:&quot;$uibModal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:718,&quot;character&quot;:25,&quot;text&quot;:&quot;open&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:724,&quot;character&quot;:6,&quot;text&quot;:&quot;$httpBackend&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:724,&quot;character&quot;:19,&quot;text&quot;:&quot;expectPUT&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:725,&quot;character&quot;:57,&quot;text&quot;:&quot;respond&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:726,&quot;character&quot;:12,&quot;text&quot;:&quot;$uibModal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:726,&quot;character&quot;:31,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:727,&quot;character&quot;:8,&quot;text&quot;:&quot;result&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:727,&quot;character&quot;:16,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:727,&quot;character&quot;:19,&quot;text&quot;:&quot;resolve&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:730,&quot;character&quot;:6,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:730,&quot;character&quot;:11,&quot;text&quot;:&quot;switchToTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:730,&quot;character&quot;:23,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:730,&quot;character&quot;:28,&quot;text&quot;:&quot;TAB_TYPE_REVIEWS&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:731,&quot;character&quot;:6,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:731,&quot;character&quot;:11,&quot;text&quot;:&quot;loadContributions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:731,&quot;character&quot;:31,&quot;text&quot;:&quot;then&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:732,&quot;character&quot;:27,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:732,&quot;character&quot;:32,&quot;text&quot;:&quot;contributions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:733,&quot;character&quot;:8,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:733,&quot;character&quot;:13,&quot;text&quot;:&quot;onClickViewSuggestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:734,&quot;character&quot;:8,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:734,&quot;character&quot;:15,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:735,&quot;character&quot;:8,&quot;text&quot;:&quot;$httpBackend&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:735,&quot;character&quot;:21,&quot;text&quot;:&quot;flush&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:737,&quot;character&quot;:15,&quot;text&quot;:&quot;$uibModal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:737,&quot;character&quot;:25,&quot;text&quot;:&quot;open&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:743,&quot;character&quot;:6,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:743,&quot;character&quot;:11,&quot;text&quot;:&quot;switchToTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:743,&quot;character&quot;:23,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:743,&quot;character&quot;:28,&quot;text&quot;:&quot;TAB_TYPE_REVIEWS&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:744,&quot;character&quot;:12,&quot;text&quot;:&quot;contributionAndReviewService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:745,&quot;character&quot;:12,&quot;text&quot;:&quot;$uibModal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:745,&quot;character&quot;:31,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:746,&quot;character&quot;:8,&quot;text&quot;:&quot;result&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:746,&quot;character&quot;:16,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:746,&quot;character&quot;:19,&quot;text&quot;:&quot;reject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:748,&quot;character&quot;:6,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:748,&quot;character&quot;:11,&quot;text&quot;:&quot;loadContributions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:748,&quot;character&quot;:31,&quot;text&quot;:&quot;then&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:749,&quot;character&quot;:8,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:749,&quot;character&quot;:13,&quot;text&quot;:&quot;onClickViewSuggestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:750,&quot;character&quot;:8,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:750,&quot;character&quot;:15,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:752,&quot;character&quot;:15,&quot;text&quot;:&quot;$uibModal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:752,&quot;character&quot;:25,&quot;text&quot;:&quot;open&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:757,&quot;character&quot;:6,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:757,&quot;character&quot;:11,&quot;text&quot;:&quot;switchToTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:757,&quot;character&quot;:23,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:757,&quot;character&quot;:28,&quot;text&quot;:&quot;TAB_TYPE_REVIEWS&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:758,&quot;character&quot;:6,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:758,&quot;character&quot;:11,&quot;text&quot;:&quot;isActiveTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:758,&quot;character&quot;:23,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:758,&quot;character&quot;:28,&quot;text&quot;:&quot;TAB_TYPE_REVIEWS&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:760,&quot;character&quot;:6,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:760,&quot;character&quot;:11,&quot;text&quot;:&quot;switchToTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:760,&quot;character&quot;:23,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:760,&quot;character&quot;:28,&quot;text&quot;:&quot;TAB_TYPE_CONTRIBUTIONS&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:761,&quot;character&quot;:6,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:761,&quot;character&quot;:11,&quot;text&quot;:&quot;isActiveTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:761,&quot;character&quot;:23,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts&quot;,&quot;line&quot;:761,&quot;character&quot;:28,&quot;text&quot;:&quot;TAB_TYPE_CONTRIBUTIONS&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:59 GMT</p>
+    </body>
+  </html>
+  

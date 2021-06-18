@@ -1,0 +1,410 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>ExplorationObjectFactorySpec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/domain/exploration/ExplorationObjectFactorySpec.ts</td><td class="">95.86%</td><td class="">100%</td><td class="">435</td><td class="">417</td><td class="">18</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2017 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for the Exploration object factory.
+ */
+
+import { TestBed } from &#x27;@angular/core/testing&#x27;;
+
+import { CamelCaseToHyphensPipe } from
+  &#x27;filters/string-utility-filters/camel-case-to-hyphens.pipe&#x27;;
+import { Exploration, ExplorationBackendDict, ExplorationObjectFactory } from &#x27;domain/exploration/ExplorationObjectFactory&#x27;;
+import { StateObjectFactory } from &#x27;domain/state/StateObjectFactory&#x27;;
+import { Voiceover } from
+  &#x27;domain/exploration/voiceover.model&#x27;;
+import { InteractionObjectFactory } from
+  &#x27;domain/exploration/InteractionObjectFactory&#x27;;
+import { LoggerService } from &#x27;services/contextual/logger.service&#x27;;
+import { StatesObjectFactory } from &#x27;domain/exploration/StatesObjectFactory&#x27;;
+import { SubtitledUnicode } from
+  &#x27;domain/exploration/SubtitledUnicodeObjectFactory&#x27;;
+
+describe(&#x27;Exploration object factory&#x27;, () =&gt; {
+  let eof: ExplorationObjectFactory;
+  let sof: StateObjectFactory, exploration: Exploration;
+  let ssof: StatesObjectFactory;
+  let iof: InteractionObjectFactory;
+  let ls: LoggerService;
+  let loggerErrorSpy;
+  let firstState, secondState;
+
+  beforeEach(() =&gt; {
+    TestBed.configureTestingModule({
+      providers: [CamelCaseToHyphensPipe]
+    });
+    eof = TestBed.get(ExplorationObjectFactory);
+    sof = TestBed.get(StateObjectFactory);
+    ssof = TestBed.get(StatesObjectFactory);
+    iof = TestBed.get(InteractionObjectFactory);
+    ls = TestBed.get(LoggerService);
+
+    firstState = {
+      content: {
+        content_id: &#x27;content&#x27;,
+        html: &#x27;content&#x27;
+      },
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          content: {
+            en: {
+              filename: &#x27;myfile1.mp3&#x27;,
+              file_size_bytes: 210000,
+              needs_update: false,
+              duration_secs: 4.3
+            },
+            &#x27;hi-en&#x27;: {
+              filename: &#x27;myfile3.mp3&#x27;,
+              file_size_bytes: 430000,
+              needs_update: false,
+              duration_secs: 2.1
+            }
+          },
+          default_outcome: {}
+        }
+      },
+      interaction: {
+        answer_groups: [],
+        confirmed_unclassified_answers: [],
+        customization_args: {
+          placeholder: {
+            value: {
+              content_id: &#x27;ca_placeholder_0&#x27;,
+              unicode_str: &#x27;&#x27;
+            }
+          },
+          rows: { value: 1 }
+        },
+        default_outcome: {
+          dest: &#x27;new state&#x27;,
+          feedback: [],
+          param_changes: []
+        },
+        hints: [],
+        id: &#x27;TextInput&#x27;
+      },
+      param_changes: [],
+      solicit_answer_details: false,
+      written_translations: {
+        translations_mapping: {
+          content: {},
+          default_outcome: {}
+        }
+      },
+    };
+    secondState = {
+      content: {
+        content_id: &#x27;content&#x27;,
+        html: &#x27;more content&#x27;
+      },
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          content: {
+            &#x27;hi-en&#x27;: {
+              filename: &#x27;myfile2.mp3&#x27;,
+              file_size_bytes: 120000,
+              needs_update: false,
+              duration_secs: 1.2
+            }
+          },
+          default_outcome: {}
+        }
+      },
+      interaction: {
+        answer_groups: [],
+        confirmed_unclassified_answers: [],
+        customization_args: {
+          recommendedExplorationIds: { value: [] }
+        },
+        default_outcome: {
+          dest: &#x27;new state&#x27;,
+          feedback: [],
+          param_changes: []
+        },
+        hints: [],
+        id: &#x27;EndExploration&#x27;
+      },
+      param_changes: [],
+      solicit_answer_details: false,
+      written_translations: {
+        translations_mapping: {
+          content: {},
+          default_outcome: {}
+        }
+      },
+    };
+
+    const explorationDict: ExplorationBackendDict = {
+      title: &#x27;My Title&#x27;,
+      init_state_name: &#x27;Introduction&#x27;,
+      language_code: &#x27;en&#x27;,
+      states: {
+        &#x27;first state&#x27;: firstState,
+        &#x27;second state&#x27;: secondState},
+      param_specs: {},
+      param_changes: [],
+      draft_changes: [],
+      is_version_of_draft_valid: true,
+      version: 1,
+      correctness_feedback_enabled: false
+    };
+
+    exploration = eof.createFromBackendDict(explorationDict);
+    exploration.setInitialStateName(&#x27;first state&#x27;);
+
+    loggerErrorSpy = spyOn(ls, &#x27;error&#x27;).and.callThrough();
+  });
+
+  it(&#x27;should get all language codes of an exploration&#x27;, () =&gt; {
+    expect(exploration.getAllVoiceoverLanguageCodes())
+      .toEqual([&#x27;en&#x27;, &#x27;hi-en&#x27;]);
+  });
+
+  it(&#x27;should get the language code of an exploration&#x27;, () =&gt; {
+    expect(exploration.getLanguageCode()).toBe(&#x27;en&#x27;);
+  });
+
+  it(&#x27;should correctly get the content html&#x27;, () =&gt; {
+    expect(exploration.getUninterpolatedContentHtml(&#x27;first state&#x27;))
+      .toEqual(&#x27;content&#x27;);
+  });
+
+  it(&#x27;should correctly get all audio translations by language code&#x27;,
+    () =&gt; {
+      expect(exploration.getAllVoiceovers(&#x27;hi-en&#x27;)).toEqual({
+        &#x27;first state&#x27;: [Voiceover.createFromBackendDict({
+          filename: &#x27;myfile3.mp3&#x27;,
+          file_size_bytes: 430000,
+          needs_update: false,
+          duration_secs: 2.1
+        })],
+        &#x27;second state&#x27;: [Voiceover.createFromBackendDict({
+          filename: &#x27;myfile2.mp3&#x27;,
+          file_size_bytes: 120000,
+          needs_update: false,
+          duration_secs: 1.2
+        })]
+      });
+      expect(exploration.getAllVoiceovers(&#x27;en&#x27;)).toEqual({
+        &#x27;first state&#x27;: [Voiceover.createFromBackendDict({
+          filename: &#x27;myfile1.mp3&#x27;,
+          file_size_bytes: 210000,
+          needs_update: false,
+          duration_secs: 4.3
+        })],
+        &#x27;second state&#x27;: []
+      });
+
+      expect(exploration.getAllVoiceovers(&#x27;hi&#x27;)).toEqual({
+        &#x27;first state&#x27;: [],
+        &#x27;second state&#x27;: []
+      });
+    });
+
+  it(&#x27;should correctly get the voiceovers from a language code in&#x27; +
+    &#x27; an exploration&#x27;, () =&gt; {
+    expect(exploration.getVoiceover(&#x27;first state&#x27;, &#x27;en&#x27;)).toEqual(
+      Voiceover.createFromBackendDict({
+        filename: &#x27;myfile1.mp3&#x27;,
+        file_size_bytes: 210000,
+        needs_update: false,
+        duration_secs: 4.3
+      })
+    );
+
+    expect(exploration.getVoiceover(&#x27;second state&#x27;, &#x27;en&#x27;)).toBeNull();
+
+    expect(exploration.getVoiceover(&#x27;third state&#x27;, &#x27;en&#x27;)).toBeNull();
+    expect(loggerErrorSpy).toHaveBeenCalledWith(
+      &#x27;Invalid state name: third state&#x27;);
+  });
+
+  it(&#x27;should correctly get all voiceovers from an exploration&#x27;, () =&gt; {
+    expect(exploration.getVoiceovers(&#x27;first state&#x27;)).toEqual({
+      en: Voiceover.createFromBackendDict({
+        filename: &#x27;myfile1.mp3&#x27;,
+        file_size_bytes: 210000,
+        needs_update: false,
+        duration_secs: 4.3
+      }),
+      &#x27;hi-en&#x27;: Voiceover.createFromBackendDict({
+        filename: &#x27;myfile3.mp3&#x27;,
+        file_size_bytes: 430000,
+        needs_update: false,
+        duration_secs: 2.1
+      })
+    });
+
+    expect(exploration.getVoiceovers(&#x27;second state&#x27;)).toEqual({
+      &#x27;hi-en&#x27;: Voiceover.createFromBackendDict({
+        filename: &#x27;myfile2.mp3&#x27;,
+        file_size_bytes: 120000,
+        needs_update: false,
+        duration_secs: 1.2
+      })
+    });
+
+    expect(exploration.getVoiceovers(&#x27;third state&#x27;)).toBeNull();
+    expect(loggerErrorSpy).toHaveBeenCalledWith(
+      &#x27;Invalid state name: third state&#x27;);
+  });
+
+  it(&#x27;should correctly get all the states from an exploration&#x27;, () =&gt; {
+    expect(exploration.getState(&#x27;first state&#x27;)).toEqual(
+      sof.createFromBackendDict(&#x27;first state&#x27;, firstState));
+    expect(exploration.getState(&#x27;second state&#x27;)).toEqual(
+      sof.createFromBackendDict(&#x27;second state&#x27;, secondState));
+    expect(exploration.getStates()).toEqual(
+      ssof.createFromBackendDict({
+        &#x27;first state&#x27;: firstState,
+        &#x27;second state&#x27;: secondState
+      }));
+  });
+
+  it(&#x27;should correctly get the interaction from an exploration&#x27;, () =&gt; {
+    expect(exploration.getInteraction(&#x27;first state&#x27;)).toEqual(
+      iof.createFromBackendDict(firstState.interaction)
+    );
+    expect(exploration.getInteraction(&#x27;second state&#x27;)).toEqual(
+      iof.createFromBackendDict(secondState.interaction)
+    );
+
+    expect(exploration.getInteraction(&#x27;invalid state&#x27;)).toBeNull();
+    expect(loggerErrorSpy).toHaveBeenCalledWith(
+      &#x27;Invalid state name: &#x27; + &#x27;invalid state&#x27;);
+  });
+
+  it(&#x27;should correctly get the interaction id from an exploration&#x27;, () =&gt; {
+    expect(exploration.getInteractionId(&#x27;first state&#x27;))
+      .toBe(&#x27;TextInput&#x27;);
+    expect(exploration.getInteractionId(&#x27;second state&#x27;))
+      .toBe(&#x27;EndExploration&#x27;);
+
+    expect(exploration.getInteractionId(&#x27;invalid state&#x27;)).toBeNull();
+    expect(loggerErrorSpy).toHaveBeenCalledWith(
+      &#x27;Invalid state name: &#x27; + &#x27;invalid state&#x27;);
+  });
+
+  it(&#x27;should correctly get the interaction customization args from an&#x27; +
+    &#x27; exploration&#x27;, () =&gt; {
+    expect(exploration.getInteractionCustomizationArgs(&#x27;invalid state&#x27;))
+      .toBeNull();
+    expect(loggerErrorSpy).toHaveBeenCalledWith(
+      &#x27;Invalid state name: &#x27; + &#x27;invalid state&#x27;);
+
+    expect(exploration.getInteractionCustomizationArgs(&#x27;first state&#x27;))
+      .toEqual({
+        placeholder: {
+          value: new SubtitledUnicode(&#x27;&#x27;, &#x27;ca_placeholder_0&#x27;)
+        },
+        rows: {
+          value: 1
+        }
+      });
+    expect(exploration.getInteractionCustomizationArgs(&#x27;second state&#x27;))
+      .toEqual({
+        recommendedExplorationIds: {
+          value: []
+        }
+      });
+  });
+
+  it(&#x27;should correctly get the interaction instructions from an exploration&#x27;,
+    () =&gt; {
+      expect(exploration.getInteractionInstructions(&#x27;first state&#x27;)).toBeNull();
+      expect(exploration.getNarrowInstructions(&#x27;first state&#x27;)).toBeNull();
+
+      expect(exploration.getInteractionInstructions(&#x27;invalid state&#x27;)).toBe(&#x27;&#x27;);
+      expect(loggerErrorSpy).toHaveBeenCalledWith(
+        &#x27;Invalid state name: &#x27; + &#x27;invalid state&#x27;);
+
+      expect(exploration.getNarrowInstructions(&#x27;invalid state&#x27;)).toBe(&#x27;&#x27;);
+      expect(loggerErrorSpy).toHaveBeenCalledWith(
+        &#x27;Invalid state name: &#x27; + &#x27;invalid state&#x27;);
+    });
+
+  it(&#x27;should correctly get interaction thumbnail src from an exploration&#x27;,
+    () =&gt; {
+      expect(exploration.getInteractionThumbnailSrc(&#x27;first state&#x27;)).toBe(
+        &#x27;/extensions/interactions/TextInput/static/TextInput.png&#x27;);
+      expect(exploration.getInteractionThumbnailSrc(&#x27;invalid state&#x27;)).toBe(&#x27;&#x27;);
+    });
+
+  it(&#x27;should correctly check when an exploration has inline display mode&#x27;,
+    () =&gt; {
+      expect(exploration.isInteractionInline(&#x27;first state&#x27;)).toBe(true);
+      expect(exploration.isInteractionInline(&#x27;first state&#x27;)).toBe(true);
+
+      expect(exploration.isInteractionInline(&#x27;invalid state&#x27;)).toBe(true);
+      expect(loggerErrorSpy).toHaveBeenCalledWith(
+        &#x27;Invalid state name: invalid state&#x27;);
+    });
+
+  it(&#x27;should get and set initial state of an exploration&#x27;, () =&gt; {
+    expect(exploration.getInitialState()).toEqual(
+      sof.createFromBackendDict(&#x27;first state&#x27;, firstState));
+
+    exploration.setInitialStateName(&#x27;second state&#x27;);
+    expect(exploration.getInitialState()).toEqual(
+      sof.createFromBackendDict(&#x27;second state&#x27;, secondState));
+  });
+
+  it(&#x27;should get author recommended exploration ids according by if state&#x27; +
+    &#x27; is terminal in an exploration&#x27;, () =&gt; {
+    expect(exploration.isStateTerminal(&#x27;first state&#x27;)).toBe(false);
+    expect(() =&gt; {
+      exploration.getAuthorRecommendedExpIds(&#x27;first state&#x27;);
+    }).toThrowError(
+      &#x27;Tried to get recommendations for a non-terminal state: &#x27; +
+      &#x27;first state&#x27;);
+
+    expect(exploration.isStateTerminal(&#x27;second state&#x27;)).toBe(true);
+    expect(exploration.getAuthorRecommendedExpIds(&#x27;second state&#x27;))
+      .toEqual([]);
+  });
+
+  it(&#x27;should correctly get displayable written translation language codes&#x27;,
+    () =&gt; {
+      expect(
+        exploration.getDisplayableWrittenTranslationLanguageCodes()
+      ).toEqual([]);
+
+      const firstState = exploration.getState(&#x27;first state&#x27;);
+
+      firstState.interaction.id = null;
+      firstState.writtenTranslations.addWrittenTranslation(
+        &#x27;content&#x27;, &#x27;fr&#x27;, &#x27;html&#x27;, &#x27;&lt;p&gt;translation&lt;/p&gt;&#x27;);
+      expect(
+        exploration.getDisplayableWrittenTranslationLanguageCodes()
+      ).toEqual([&#x27;fr&#x27;]);
+    });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/domain/exploration/ExplorationObjectFactorySpec.ts&quot;,&quot;line&quot;:39,&quot;character&quot;:6,&quot;text&quot;:&quot;loggerErrorSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/ExplorationObjectFactorySpec.ts&quot;,&quot;line&quot;:40,&quot;character&quot;:6,&quot;text&quot;:&quot;firstState&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/ExplorationObjectFactorySpec.ts&quot;,&quot;line&quot;:40,&quot;character&quot;:18,&quot;text&quot;:&quot;secondState&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/ExplorationObjectFactorySpec.ts&quot;,&quot;line&quot;:52,&quot;character&quot;:4,&quot;text&quot;:&quot;firstState&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/ExplorationObjectFactorySpec.ts&quot;,&quot;line&quot;:105,&quot;character&quot;:4,&quot;text&quot;:&quot;secondState&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/ExplorationObjectFactorySpec.ts&quot;,&quot;line&quot;:165,&quot;character&quot;:4,&quot;text&quot;:&quot;loggerErrorSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/ExplorationObjectFactorySpec.ts&quot;,&quot;line&quot;:228,&quot;character&quot;:11,&quot;text&quot;:&quot;loggerErrorSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/ExplorationObjectFactorySpec.ts&quot;,&quot;line&quot;:258,&quot;character&quot;:11,&quot;text&quot;:&quot;loggerErrorSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/ExplorationObjectFactorySpec.ts&quot;,&quot;line&quot;:276,&quot;character&quot;:32,&quot;text&quot;:&quot;firstState&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/ExplorationObjectFactorySpec.ts&quot;,&quot;line&quot;:276,&quot;character&quot;:43,&quot;text&quot;:&quot;interaction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/ExplorationObjectFactorySpec.ts&quot;,&quot;line&quot;:279,&quot;character&quot;:32,&quot;text&quot;:&quot;secondState&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/ExplorationObjectFactorySpec.ts&quot;,&quot;line&quot;:279,&quot;character&quot;:44,&quot;text&quot;:&quot;interaction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/ExplorationObjectFactorySpec.ts&quot;,&quot;line&quot;:283,&quot;character&quot;:11,&quot;text&quot;:&quot;loggerErrorSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/ExplorationObjectFactorySpec.ts&quot;,&quot;line&quot;:294,&quot;character&quot;:11,&quot;text&quot;:&quot;loggerErrorSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/ExplorationObjectFactorySpec.ts&quot;,&quot;line&quot;:302,&quot;character&quot;:11,&quot;text&quot;:&quot;loggerErrorSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/ExplorationObjectFactorySpec.ts&quot;,&quot;line&quot;:328,&quot;character&quot;:13,&quot;text&quot;:&quot;loggerErrorSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/ExplorationObjectFactorySpec.ts&quot;,&quot;line&quot;:332,&quot;character&quot;:13,&quot;text&quot;:&quot;loggerErrorSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/ExplorationObjectFactorySpec.ts&quot;,&quot;line&quot;:349,&quot;character&quot;:13,&quot;text&quot;:&quot;loggerErrorSpy&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:57 GMT</p>
+    </body>
+  </html>
+  

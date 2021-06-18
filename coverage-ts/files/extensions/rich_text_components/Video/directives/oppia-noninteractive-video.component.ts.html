@@ -1,0 +1,184 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>oppia-noninteractive-video.component.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">extensions/rich_text_components/Video/directives/oppia-noninteractive-video.component.ts</td><td class="">87.29%</td><td class="">100%</td><td class="">181</td><td class="">158</td><td class="">23</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2014 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Directive for the Video rich-text component.
+ *
+ * IMPORTANT NOTE: The naming convention for customization args that are passed
+ * into the directive is: the name of the parameter, followed by &#x27;With&#x27;,
+ * followed by the name of the arg.
+ *
+ * All of the RTE components follow this pattern of updateView and ngOnChanges.
+ * This is because these are also web-components (So basically, we can create
+ * this component using document.createElement). CKEditor creates instances of
+ * these on the fly and runs ngOnInit before we can set the @Input properties.
+ * When the input properties are not set, we get errors in the console.
+ * The `if` condition in update view prevents that from happening.
+ * The `if` condition in the updateView and ngOnChanges might look like the
+ * literal opposite but that&#x27;s not the case. We know from the previous
+ * statements above that the if condition in the updateView is for preventing
+ * the code to run until all the values needed for successful execution are
+ * present. The if condition in ngOnChanges is to optimize the re-runs of
+ * updateView and only re-run when a property we care about has changed in
+ * value.
+ */
+
+import { Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges } from &#x27;@angular/core&#x27;;
+import { downgradeComponent } from &#x27;@angular/upgrade/static&#x27;;
+import { AutoplayedVideosService } from &#x27;services/autoplayed-videos.service&#x27;;
+import { ContextService } from &#x27;services/context.service&#x27;;
+import { HtmlEscaperService } from &#x27;services/html-escaper.service&#x27;;
+import { ServicesConstants } from &#x27;services/services.constants&#x27;;
+
+/**
+ * The &quot;apiLoaded&quot; variable only changes once during the lifetime of
+ * the application. If it is inside the component we would end up fetching and
+ * loading the YouTube embed script every-time time this component was created.
+ * If this were a feature used in multiple places, keeping it in a service would
+ * be a better place. But currently restricted to this component. This
+ * syntax/ code is taken from the example given in the angular repo.
+ * https://github.com/angular/components/tree/master/src/youtube-player#example
+ */
+
+let apiLoaded = false;
+@Component({
+  selector: &#x27;oppia-noninteractive-video&#x27;,
+  templateUrl: &#x27;./video.component.html&#x27;,
+  styleUrls: []
+})
+export class NoninteractiveVideo implements OnInit, OnChanges {
+  @Input() autoplayWithValue: string;
+  @Input() endWithValue: string;
+  @Input() startWithValue: string;
+  @Input() videoIdWithValue: string;
+
+  playerVars = {
+    autoplay: 0,
+    origin: &#x27;http://localhost:8181&#x27;
+  };
+  start: number;
+  end: number;
+  tabIndexVal: number;
+  videoId: string;
+  width: number;
+
+  constructor(
+    private autoplayedVideosService: AutoplayedVideosService,
+    private contextService: ContextService,
+    private elementRed: ElementRef,
+    private htmlEscaperService: HtmlEscaperService
+  ) {}
+
+  private _updateViewOnNewVideo(): void {
+    if (
+      !this.autoplayWithValue ||
+      !this.endWithValue ||
+      !this.startWithValue ||
+      !this.videoIdWithValue
+    ) {
+      return;
+    }
+    if (!apiLoaded) {
+      // This code loads the IFrame Player API code asynchronously, according to
+      // the instructions at
+      // https://developers.google.com/youtube/iframe_api_reference#Getting_Started
+      const tag = document.createElement(&#x27;script&#x27;);
+      tag.src = &#x27;https://www.youtube.com/iframe_api&#x27;;
+      document.body.appendChild(tag);
+      apiLoaded = true;
+    }
+    const start = this.htmlEscaperService.escapedJsonToObj(
+      this.startWithValue) as string;
+    const end = this.htmlEscaperService.escapedJsonToObj(
+      this.endWithValue) as string;
+    this.start = Number(start);
+    this.end = Number(end);
+    this.videoId = this.htmlEscaperService.escapedJsonToObj(
+      this.videoIdWithValue) as string;
+
+    // Check whether creator wants to autoplay this video or not.
+    const autoplayVal = this.htmlEscaperService.escapedJsonToObj(
+      this.autoplayWithValue);
+
+    // This code helps in visibility of video. It checks whether
+    // mid point of video frame is in the view or not.
+    const rect = this.elementRed.nativeElement.getBoundingClientRect();
+    const clientHeight = window.innerHeight;
+    const clientWidth = window.innerWidth;
+    this.width = this.elementRed.nativeElement.width;
+    const isVisible = (
+      (rect.left + rect.right) / 2 &lt; clientWidth &amp;&amp;
+      (rect.top + rect.bottom) / 2 &lt; clientHeight) &amp;&amp;
+      (rect.left &gt; 0 &amp;&amp; rect.right &gt; 0);
+
+    // Autoplay if user is in learner view and creator has specified
+    // to autoplay given video.
+    if (this.contextService.getPageContext() ===
+      ServicesConstants.PAGE_CONTEXT.EXPLORATION_PLAYER &amp;&amp; autoplayVal
+    ) {
+      // If it has been autoplayed then do not autoplay again.
+      if (
+        !this.autoplayedVideosService.hasVideoBeenAutoplayed(
+          this.videoId) &amp;&amp; isVisible
+      ) {
+        this.playerVars.autoplay = 1;
+        this.autoplayedVideosService.addAutoplayedVideo(this.videoId);
+      }
+    }
+
+    // This following check disables the video in Editor being caught
+    // by tabbing while in Exploration Editor mode.
+    if (this.contextService.isInExplorationEditorMode()) {
+      this.tabIndexVal = -1;
+    }
+  }
+
+  ngOnInit(): void {
+    this._updateViewOnNewVideo();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (
+      changes.autoplayWithValue ||
+      changes.endWithValue ||
+      changes.startWithValue ||
+      changes.videoIdWithValue
+    ) {
+      this._updateViewOnNewVideo();
+    }
+  }
+}
+
+angular.module(&#x27;oppia&#x27;).directive(
+  &#x27;oppiaNoninteractiveVideo&#x27;, downgradeComponent({
+    component: NoninteractiveVideo
+  }) as angular.IDirectiveFactory);
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;extensions/rich_text_components/Video/directives/oppia-noninteractive-video.component.ts&quot;,&quot;line&quot;:78,&quot;character&quot;:12,&quot;text&quot;:&quot;elementRed&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/rich_text_components/Video/directives/oppia-noninteractive-video.component.ts&quot;,&quot;line&quot;:100,&quot;character&quot;:18,&quot;text&quot;:&quot;this.htmlEscaperService.escapedJsonToObj(\n      this.startWithValue) as string&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;extensions/rich_text_components/Video/directives/oppia-noninteractive-video.component.ts&quot;,&quot;line&quot;:102,&quot;character&quot;:16,&quot;text&quot;:&quot;this.htmlEscaperService.escapedJsonToObj(\n      this.endWithValue) as string&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;extensions/rich_text_components/Video/directives/oppia-noninteractive-video.component.ts&quot;,&quot;line&quot;:106,&quot;character&quot;:19,&quot;text&quot;:&quot;this.htmlEscaperService.escapedJsonToObj(\n      this.videoIdWithValue) as string&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;extensions/rich_text_components/Video/directives/oppia-noninteractive-video.component.ts&quot;,&quot;line&quot;:115,&quot;character&quot;:10,&quot;text&quot;:&quot;rect&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Video/directives/oppia-noninteractive-video.component.ts&quot;,&quot;line&quot;:115,&quot;character&quot;:22,&quot;text&quot;:&quot;elementRed&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/rich_text_components/Video/directives/oppia-noninteractive-video.component.ts&quot;,&quot;line&quot;:115,&quot;character&quot;:33,&quot;text&quot;:&quot;nativeElement&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Video/directives/oppia-noninteractive-video.component.ts&quot;,&quot;line&quot;:115,&quot;character&quot;:47,&quot;text&quot;:&quot;getBoundingClientRect&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Video/directives/oppia-noninteractive-video.component.ts&quot;,&quot;line&quot;:118,&quot;character&quot;:22,&quot;text&quot;:&quot;elementRed&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/rich_text_components/Video/directives/oppia-noninteractive-video.component.ts&quot;,&quot;line&quot;:118,&quot;character&quot;:33,&quot;text&quot;:&quot;nativeElement&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Video/directives/oppia-noninteractive-video.component.ts&quot;,&quot;line&quot;:118,&quot;character&quot;:47,&quot;text&quot;:&quot;width&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Video/directives/oppia-noninteractive-video.component.ts&quot;,&quot;line&quot;:120,&quot;character&quot;:7,&quot;text&quot;:&quot;rect&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Video/directives/oppia-noninteractive-video.component.ts&quot;,&quot;line&quot;:120,&quot;character&quot;:12,&quot;text&quot;:&quot;left&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Video/directives/oppia-noninteractive-video.component.ts&quot;,&quot;line&quot;:120,&quot;character&quot;:19,&quot;text&quot;:&quot;rect&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Video/directives/oppia-noninteractive-video.component.ts&quot;,&quot;line&quot;:120,&quot;character&quot;:24,&quot;text&quot;:&quot;right&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Video/directives/oppia-noninteractive-video.component.ts&quot;,&quot;line&quot;:121,&quot;character&quot;:7,&quot;text&quot;:&quot;rect&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Video/directives/oppia-noninteractive-video.component.ts&quot;,&quot;line&quot;:121,&quot;character&quot;:12,&quot;text&quot;:&quot;top&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Video/directives/oppia-noninteractive-video.component.ts&quot;,&quot;line&quot;:121,&quot;character&quot;:18,&quot;text&quot;:&quot;rect&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Video/directives/oppia-noninteractive-video.component.ts&quot;,&quot;line&quot;:121,&quot;character&quot;:23,&quot;text&quot;:&quot;bottom&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Video/directives/oppia-noninteractive-video.component.ts&quot;,&quot;line&quot;:122,&quot;character&quot;:7,&quot;text&quot;:&quot;rect&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Video/directives/oppia-noninteractive-video.component.ts&quot;,&quot;line&quot;:122,&quot;character&quot;:12,&quot;text&quot;:&quot;left&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Video/directives/oppia-noninteractive-video.component.ts&quot;,&quot;line&quot;:122,&quot;character&quot;:24,&quot;text&quot;:&quot;rect&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/rich_text_components/Video/directives/oppia-noninteractive-video.component.ts&quot;,&quot;line&quot;:122,&quot;character&quot;:29,&quot;text&quot;:&quot;right&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:54 GMT</p>
+    </body>
+  </html>
+  

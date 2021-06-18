@@ -1,0 +1,255 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>audio-player.service.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/services/audio-player.service.ts</td><td class="">98.00%</td><td class="">100%</td><td class="">300</td><td class="">294</td><td class="">6</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2017 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Service to operate the playback of audio.
+ */
+
+import { EventEmitter, Injectable, NgZone } from &#x27;@angular/core&#x27;;
+import { AudioFile } from &#x27;domain/utilities/audio-file.model&#x27;;
+import { AudioTranslationManagerService, AudioTranslations } from &#x27;pages/exploration-player-page/services/audio-translation-manager.service&#x27;;
+import { AssetsBackendApiService } from &#x27;./assets-backend-api.service&#x27;;
+import { ContextService } from &#x27;./context.service&#x27;;
+import { Howl } from &#x27;howler&#x27;;
+import { downgradeInjectable } from &#x27;@angular/upgrade/static&#x27;;
+import { interval, Subject } from &#x27;rxjs&#x27;;
+import { takeUntil } from &#x27;rxjs/operators&#x27;;
+
+export interface AutoPlayAudioEvent {
+  audioTranslations: AudioTranslations;
+  html: string;
+  componentName: string;
+}
+
+@Injectable({
+  providedIn: &#x27;root&#x27;
+})
+export class AudioPlayerService {
+  private _currentTrackFilename: string | null = null;
+  private _currentTrack: Howl | null = null;
+  private _lastPauseOrSeekPos: number | null = null;
+  private _loadingTrack = false;
+  private _updateViewEventEmitter = new EventEmitter&lt;void&gt;();
+  private _autoplayAudioEventEmitter = (
+    new EventEmitter&lt;void | AutoPlayAudioEvent&gt;());
+  private _stopIntervalSubject = new Subject&lt;void&gt;();
+  constructor(
+    private assetsBackendApiService: AssetsBackendApiService,
+    private audioTranslationManagerService: AudioTranslationManagerService,
+    private contextService: ContextService,
+    private ngZone: NgZone
+  ) {}
+
+  private async _loadAsync(filename: string, successCallback, errorCallback) {
+    if (this._loadingTrack) {
+      throw new Error(&#x27;Already loading a track... Please try again!&#x27;);
+    }
+    if (this._currentTrackFilename === filename) {
+      return;
+    }
+    this.assetsBackendApiService.loadAudio(
+      this.contextService.getExplorationId(),
+      filename).then(
+      (loadedAudioFile: AudioFile) =&gt; {
+        this._currentTrack = new Howl({
+          src: [URL.createObjectURL(loadedAudioFile.data)],
+          format: [&#x27;mp3&#x27;]
+        });
+        this._currentTrack.on(&#x27;load&#x27;, () =&gt; {
+          this._stopIntervalSubject.next();
+          this._currentTrackFilename = loadedAudioFile.filename;
+          this._loadingTrack = false;
+          this._lastPauseOrSeekPos = 0;
+          successCallback();
+        });
+        this._currentTrack.on(&#x27;end&#x27;, () =&gt; {
+          this._stopIntervalSubject.next();
+          this._currentTrack = null;
+          this._currentTrackFilename = null;
+          this._lastPauseOrSeekPos = null;
+          this.audioTranslationManagerService.clearSecondaryAudioTranslations();
+        });
+      }, (e) =&gt; errorCallback(e)
+    );
+  }
+
+  async loadAsync(filename: string): Promise&lt;void&gt; {
+    return new Promise((resolve, reject) =&gt; {
+      this._loadAsync(filename, resolve, reject);
+    });
+  }
+
+  play(): void {
+    if (this.isPlaying()) {
+      return;
+    }
+
+    this.ngZone.runOutsideAngular(() =&gt; {
+      if (this._currentTrack !== null) {
+        this._currentTrack.seek(this._lastPauseOrSeekPos);
+      }
+      interval(500).pipe(takeUntil(
+        this._stopIntervalSubject)).subscribe(() =&gt; {
+        this.ngZone.run(() =&gt; {
+          this._updateViewEventEmitter.emit();
+        });
+      });
+
+      this._currentTrack.play();
+    });
+  }
+
+  pause(): void {
+    if (!this.isPlaying()) {
+      return;
+    }
+    this._lastPauseOrSeekPos = this.getCurrentTime();
+    this._currentTrack.pause();
+    this._stopIntervalSubject.next();
+  }
+
+  stop(): void {
+    if (!this._currentTrack) {
+      return;
+    }
+    this._lastPauseOrSeekPos = 0;
+    this.setCurrentTime(0);
+    this._currentTrack.stop();
+    this._stopIntervalSubject.next();
+  }
+
+  rewind(seconds: number): void {
+    if (!this._currentTrack) {
+      return;
+    }
+    const currentSeconds = (
+      this._currentTrack.seek());
+    if (typeof currentSeconds !== &#x27;number&#x27;) {
+      return;
+    }
+    const rewindTo = currentSeconds - seconds;
+    this._currentTrack.seek(rewindTo &gt; 0 ? rewindTo : 0);
+  }
+
+  forward(seconds: number): void {
+    if (!this._currentTrack) {
+      return;
+    }
+    const currentSeconds = this._currentTrack.seek();
+    if (typeof currentSeconds !== &#x27;number&#x27;) {
+      return;
+    }
+    if (currentSeconds + seconds &lt; this._currentTrack.duration()) {
+      this._currentTrack.seek(currentSeconds + seconds);
+    }
+  }
+
+  getCurrentTime(): number {
+    if (!this._currentTrack) {
+      return 0;
+    }
+    const currentTime = this._currentTrack.seek();
+    if (typeof currentTime !== &#x27;number&#x27;) {
+      return 0;
+    }
+    return Math.floor(currentTime);
+  }
+
+  setCurrentTime(val: number): void {
+    if (!this._currentTrack) {
+      return;
+    }
+    if (val &lt; 0) {
+      this._currentTrack.seek(0);
+      return;
+    }
+    if (val &gt; this._currentTrack.duration()) {
+      this._currentTrack.seek(this._currentTrack.duration());
+      return;
+    }
+    this._lastPauseOrSeekPos = val;
+    this._currentTrack.seek(Math.floor(val));
+  }
+
+  getAudioDuration(): number {
+    if (this._currentTrack) {
+      return this._currentTrack.duration();
+    } else {
+      return 0;
+    }
+  }
+
+  getProgress(): number {
+    if (this.getAudioDuration() &gt; 0) {
+      return this.getCurrentTime() / this.getAudioDuration();
+    }
+    return 0;
+  }
+
+  setProgress(progress: number): void {
+    if (progress &gt;= 0 &amp;&amp; progress &lt;= 1) {
+      this.setCurrentTime(this.getAudioDuration() * progress);
+    }
+  }
+
+  isPlaying(): boolean {
+    return this._currentTrack &amp;&amp; this._currentTrack.playing();
+  }
+
+  isTrackLoaded(): boolean {
+    return this._currentTrack !== null;
+  }
+
+  clear(): void {
+    if (this.isPlaying()) {
+      this.stop();
+    }
+    this._currentTrackFilename = null;
+    this._currentTrack = null;
+  }
+
+  get viewUpdate(): EventEmitter&lt;void&gt; {
+    return this._updateViewEventEmitter;
+  }
+
+  get onAutoplayAudio(): EventEmitter&lt;void | AutoPlayAudioEvent&gt; {
+    return this._autoplayAudioEventEmitter;
+  }
+
+  get onAudioStop(): Subject&lt;void&gt; {
+    return this._stopIntervalSubject;
+  }
+}
+
+angular.module(&#x27;oppia&#x27;).factory(&#x27;AudioPlayerService&#x27;, downgradeInjectable(
+  AudioPlayerService
+));
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/services/audio-player.service.ts&quot;,&quot;line&quot;:53,&quot;character&quot;:45,&quot;text&quot;:&quot;successCallback&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/audio-player.service.ts&quot;,&quot;line&quot;:53,&quot;character&quot;:62,&quot;text&quot;:&quot;errorCallback&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/audio-player.service.ts&quot;,&quot;line&quot;:73,&quot;character&quot;:10,&quot;text&quot;:&quot;successCallback&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/audio-player.service.ts&quot;,&quot;line&quot;:82,&quot;character&quot;:10,&quot;text&quot;:&quot;e&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/audio-player.service.ts&quot;,&quot;line&quot;:82,&quot;character&quot;:16,&quot;text&quot;:&quot;errorCallback&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/audio-player.service.ts&quot;,&quot;line&quot;:82,&quot;character&quot;:30,&quot;text&quot;:&quot;e&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:56 GMT</p>
+    </body>
+  </html>
+  

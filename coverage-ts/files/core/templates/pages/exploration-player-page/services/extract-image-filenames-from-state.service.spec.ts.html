@@ -1,0 +1,838 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>extract-image-filenames-from-state.service.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/exploration-player-page/services/extract-image-filenames-from-state.service.spec.ts</td><td class="">99.11%</td><td class="">100%</td><td class="">561</td><td class="">556</td><td class="">5</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">
+
+// Copyright 2017 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &#x27;License&#x27;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &#x27;AS-IS&#x27; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for the extracting image files in state service.
+ */
+
+import { TestBed } from &#x27;@angular/core/testing&#x27;;
+
+import { CamelCaseToHyphensPipe } from
+  &#x27;filters/string-utility-filters/camel-case-to-hyphens.pipe&#x27;;
+import { ContextService } from &#x27;services/context.service&#x27;;
+import { ExplorationObjectFactory } from
+  &#x27;domain/exploration/ExplorationObjectFactory&#x27;;
+import { ExtractImageFilenamesFromStateService } from
+  // eslint-disable-next-line max-len
+  &#x27;pages/exploration-player-page/services/extract-image-filenames-from-state.service&#x27;;
+import { ContentTranslationManagerService } from &#x27;pages/exploration-player-page/services/content-translation-manager.service&#x27;;
+
+
+describe(&#x27;Extracting Image file names in the state service&#x27;, () =&gt; {
+  let eifss: ExtractImageFilenamesFromStateService;
+  let eof: ExplorationObjectFactory;
+  let ecs: ContextService;
+  let ctms: ContentTranslationManagerService;
+  let explorationDict;
+  let ImageFilenamesInExploration;
+  beforeEach(() =&gt; {
+    TestBed.configureTestingModule({
+      providers: [CamelCaseToHyphensPipe]
+    });
+    eof = TestBed.get(ExplorationObjectFactory);
+    ecs = TestBed.get(ContextService);
+    eifss = TestBed.get(ExtractImageFilenamesFromStateService);
+    ctms = TestBed.get(ContentTranslationManagerService);
+    spyOn(ecs, &#x27;getExplorationId&#x27;).and.returnValue(&#x27;1&#x27;);
+    spyOn(ctms, &#x27;getTranslatedHtml&#x27;).and.callFake(
+      (unusedWrittenTranslations, unusedLanguageCode, content) =&gt; {
+        return content.html;
+      });
+
+    explorationDict = {
+      id: 1,
+      title: &#x27;My Title&#x27;,
+      category: &#x27;Art&#x27;,
+      objective: &#x27;Your objective&#x27;,
+      tags: [],
+      blurb: &#x27;&#x27;,
+      author_notes: &#x27;&#x27;,
+      states_schema_version: 15,
+      init_state_name: &#x27;Introduction&#x27;,
+      states: {
+        &#x27;State 1&#x27;: {
+          param_changes: [],
+          content: {
+            content_id: &#x27;content&#x27;,
+            html: &#x27;&#x27;
+          },
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {}
+            }
+          },
+          interaction: {
+            id: &#x27;Continue&#x27;,
+            default_outcome: {
+              feedback: {
+                content_id: &#x27;default_outcome&#x27;,
+                html: &#x27;&#x27;
+              },
+              dest: &#x27;State 3&#x27;,
+              param_changes: []
+            },
+            confirmed_unclassified_answers: [],
+            customization_args: {
+              buttonText: {
+                value: {
+                  content_id: &#x27;ca_buttonText_0&#x27;,
+                  unicode_str: &#x27;Continue&#x27;
+                }
+              }
+            },
+            solution: null,
+            answer_groups: [],
+            hints: []
+          },
+          linked_skill_id: null,
+          next_content_id_index: 1,
+          solicit_answer_details: false,
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              ca_buttonText_0: {},
+              default_outcome: {}
+            }
+          },
+          classifier_model_id: null
+        },
+        &#x27;State 3&#x27;: {
+          param_changes: [],
+          content: {
+            content_id: &#x27;content&#x27;,
+            html: &#x27;Congratulations, you have finished!&#x27;
+          },
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {}
+            }
+          },
+          interaction: {
+            id: &#x27;EndExploration&#x27;,
+            default_outcome: null,
+            confirmed_unclassified_answers: [],
+            customization_args: {
+              recommendedExplorationIds: {
+                value: []
+              }
+            },
+            solution: null,
+            answer_groups: [],
+            hints: []
+          },
+          linked_skill_id: null,
+          next_content_id_index: 0,
+          solicit_answer_details: false,
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {}
+            }
+          },
+          classifier_model_id: null
+        },
+        Introduction: {
+          classifier_model_id: null,
+          param_changes: [],
+          content: {
+            content_id: &#x27;content&#x27;,
+            html: &#x27;Multiple Choice&#x27;
+          },
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_1: {},
+              feedback_2: {}
+            }
+          },
+          interaction: {
+            id: &#x27;MultipleChoiceInput&#x27;,
+            default_outcome: {
+              dest: &#x27;Introduction&#x27;,
+              feedback: {
+                content_id: &#x27;default_outcome&#x27;,
+                html: &#x27;Try Again!&#x27;
+              }
+            },
+            confirmed_unclassified_answers: [],
+            customization_args: {
+              choices: {
+                value: [{
+                  content_id: &#x27;ca_choices_3&#x27;,
+                  html: &#x27;&lt;p&gt; Go to ItemSelection &lt;oppia-noninteractive-image&#x27; +
+                  &#x27; filepath-with-value=&quot;&amp;amp;quot;sIMultipleChoice1.png&amp;amp;&#x27; +
+                  &#x27;quot;&quot;&gt;&lt;/oppia-noninteractive-image&gt;&lt;/p&gt;&#x27;
+                }, {
+                  content_id: &#x27;ca_choices_4&#x27;,
+                  html: &#x27;&lt;p&gt; Go to ImageAndRegion&lt;oppia-noninteractive-image&#x27; +
+                  &#x27; filepath-with-value=&quot;&amp;amp;quot;sIMultipleChoice2.png&amp;amp;&#x27; +
+                  &#x27;quot;&quot;&gt;&lt;/oppia-noninteractive-image&gt;&lt;/p&gt;&#x27;
+                }]
+              },
+              showChoicesInShuffledOrder: {value: false}
+            },
+            answer_groups: [
+              {
+                labelled_as_correct: false,
+                outcome: {
+                  dest: &#x27;State 4&#x27;,
+                  feedback: {
+                    content_id: &#x27;feedback_1&#x27;,
+                    html: &#x27;&lt;p&gt;We are going to ItemSelection&#x27; +
+                          &#x27;&lt;oppia-noninteractive-image filepath-with-value=&#x27; +
+                          &#x27;&quot;&amp;amp;quot;sIOutcomeFeedback.png&amp;amp;quot;&quot;&gt;&#x27; +
+                          &#x27;&lt;/oppia-noninteractive-image&gt;&lt;/p&gt;&#x27;
+                  },
+                  param_changes: [],
+                  refresher_exploration_id: null
+                },
+                rule_specs: [{
+                  rule_type: &#x27;Equals&#x27;,
+                  inputs: {x: 0}
+                }],
+              },
+              {
+                labelled_as_correct: false,
+                outcome: {
+                  dest: &#x27;State 5&#x27;,
+                  feedback: {
+                    content_id: &#x27;feedback_2&#x27;,
+                    html: &quot;Let&#x27;s go to state 5 ImageAndRegion&quot;
+                  },
+                  param_changes: [],
+                  refresher_exploration_id: null
+                },
+                rule_specs: [{
+                  rule_type: &#x27;Equals&#x27;,
+                  inputs: {x: 1}
+                }],
+              }
+            ],
+            hints: [],
+            solution: null
+          },
+          linked_skill_id: null,
+          next_content_id_index: 5,
+          solicit_answer_details: false,
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              ca_choices_3: {},
+              ca_choices_4: {},
+              default_outcome: {},
+              feedback_1: {},
+              feedback_2: {}
+            }
+          }
+        },
+        &#x27;State 4&#x27;: {
+          param_changes: [],
+          content: {
+            content_id: &#x27;content&#x27;,
+            html: &#x27;&lt;p&gt;&lt;oppia-noninteractive-image filepath-with-value=&quot;&amp;amp;&#x27; +
+                  &#x27;quot;s4Content.png&amp;amp;quot;&quot;&gt;&#x27; +
+                  &#x27;&lt;/oppia-noninteractive-image&gt;&lt;/p&gt;&#x27;
+          },
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_1: {},
+              feedback_2: {}
+            }
+          },
+          interaction: {
+            id: &#x27;ItemSelectionInput&#x27;,
+            default_outcome: {
+              feedback: {
+                content_id: &#x27;content&#x27;,
+                html: &#x27;&lt;p&gt;Try Again! &lt;oppia-noninteractive-image&#x27; +
+                      &#x27;filepath-with-value=&quot;&amp;amp;quot;&#x27; +
+                      &#x27;s4DefaultOutcomeFeedback.png&amp;amp;quot;&quot;&gt;&#x27; +
+                      &#x27;&lt;/oppia-noninteractive-image&gt;&lt;/p&gt;&#x27;
+              },
+              dest: &#x27;State 4&#x27;,
+              param_changes: []
+            },
+            confirmed_unclassifies_answers: [],
+            customization_args: {
+              minAllowableSelectionCount: {
+                value: 1
+              },
+              maxAllowableSelectionCount: {
+                value: 2
+              },
+              choices: {
+                value: [{
+                  content_id: &#x27;ca_choices_3&#x27;,
+                  html: &#x27;&lt;p&gt;&lt;oppia-noninteractive-image filepath-with-value=&#x27; +
+                  &#x27;&quot;&amp;amp;quot;s4Choice1.png&amp;amp;quot;&quot;&gt;&#x27; +
+                  &#x27;&lt;/oppia-noninteractive-image&gt;&lt;/p&gt;&#x27;
+                }, {
+                  content_id: &#x27;ca_choices_4&#x27;,
+                  html: &#x27;&lt;p&gt;&lt;oppia-noninteractive-image filepath-with-value=&#x27; +
+                  &#x27;&quot;&amp;amp;quot;s4Choice2.png&amp;amp;quot;&quot;&gt;&#x27; +
+                  &#x27;&lt;/oppia-noninteractive-image&gt;&lt;/p&gt;&#x27;
+                }]
+              }
+            },
+            hints: [],
+            solution: null,
+            answer_groups: [
+              {
+                labelled_as_correct: false,
+                outcome: {
+                  dest: &#x27;State 6&#x27;,
+                  feedback: {
+                    content_id: &#x27;feedback_1&#x27;,
+                    html: &quot;It is choice number 1. Let&#x27;s go to the Text Input&quot;
+                  },
+                  param_changes: [],
+                  refresher_exploration_id: null
+                },
+                rule_specs: [{
+                  rule_type: &#x27;Equals&#x27;,
+                  inputs: {
+                    x: [
+                      &#x27;&lt;p&gt;&lt;oppia-noninteractive-image filepath-with-value&#x27; +
+                      &#x27;=\&amp;amp;quot;s4Choice1.png&amp;amp;quot;\&gt;&lt;/oppia-nonin&#x27; +
+                      &#x27;teractive-image&gt;&lt;/p&gt;&#x27;
+                    ]
+                  }
+                }],
+              },
+              {
+                labelled_as_correct: true,
+                outcome: {
+                  dest: &#x27;State 1&#x27;,
+                  feedback: {
+                    content_id: &#x27;feedback_2&#x27;,
+                    html: &#x27;It is choice number 2&#x27;
+                  },
+                  param_changes: [],
+                  refresher_exploration_id: null
+                },
+                rule_specs: [{
+                  rule_type: &#x27;Equals&#x27;,
+                  inputs: {
+                    x: [
+                      &#x27;&lt;p&gt;&lt;oppia-noninteractive-image filepath-with-value=&#x27; +
+                      &#x27;&quot;&amp;amp;quot;s4Choice2.png&amp;amp;quot;&quot;&gt;&#x27; +
+                      &#x27;&lt;/oppia-noninteractive-image&gt;&lt;/p&gt;&#x27;
+                    ]
+                  }
+                }],
+              }
+            ]
+          },
+          linked_skill_id: null,
+          next_content_id_index: 5,
+          solicit_answer_details: false,
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              ca_choices_3: {},
+              ca_choices_4: {},
+              default_outcome: {},
+              feedback_1: {},
+              feedback_2: {}
+            }
+          }
+        },
+        &#x27;State 5&#x27;: {
+          classifier_model_id: null,
+          param_changes: [],
+          content: {
+            content_id: &#x27;content&#x27;,
+            html: &#x27;&#x27;
+          },
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_1: {},
+              feedback_2: {},
+              feedback_3: {},
+              feedback_4: {},
+              feedback_5: {}
+            }
+          },
+          interaction: {
+            id: &#x27;ImageClickInput&#x27;,
+            confirmed_unclassified_answers: [],
+            default_outcome: {
+              dest: &#x27;State 5&#x27;,
+              feedback: {
+                content_id: &#x27;content&#x27;,
+                html: &#x27;Try Again!&#x27;
+              }
+            },
+            answer_groups: [
+              {
+                labelled_as_correct: false,
+                outcome: {
+                  dest: &#x27;State 5&#x27;,
+                  feedback: {
+                    content_id: &#x27;feeedback_1&#x27;,
+                    html: &#x27;&lt;p&gt;That is the class definition. Try again.&lt;/p&gt;&#x27;
+                  },
+                  param_changes: [],
+                  refresher_exploration_id: null
+                },
+                rule_specs: [{
+                  rule_type: &#x27;IsInRegion&#x27;,
+                  inputs: { x: &#x27;classdef&#x27; }
+                }]
+              },
+              {
+                labelled_as_correct: false,
+                outcome: {
+                  dest: &#x27;State 5&#x27;,
+                  feedback: {
+                    content_id: &#x27;feeedback_2&#x27;,
+                    html: &#x27;&lt;p&gt;That is a function, which is close to what you&#x27; +
+                          &#x27;are looking for. Try again!&lt;/p&gt;&#x27;
+                  },
+                  param_changes: [],
+                  refresher_exploration_id: null
+                },
+                rule_specs: [{
+                  rule_type: &#x27;IsInRegion&#x27;,
+                  inputs: { x: &#x27;instancefunc&#x27; }
+                }]
+              },
+              {
+                labelled_as_correct: false,
+                outcome: {
+                  dest: &#x27;State 5&#x27;,
+                  feedback: {
+                    content_id: &#x27;feeedback_3&#x27;,
+                    html: &#x27;&lt;p&gt;That is the class docstring. Try again.&lt;/p&gt;&#x27;
+                  },
+                  param_changes: [],
+                  refresher_exploration_id: null
+                },
+                rule_specs: [{
+                  rule_type: &#x27;IsInRegion&#x27;,
+                  inputs: { x: &#x27;docstring&#x27; }
+                }]
+              },
+              {
+                labelled_as_correct: false,
+                outcome: {
+                  dest: &#x27;State 5&#x27;,
+                  feedback: {
+                    content_id: &#x27;feeedback_4&#x27;,
+                    html: &quot;&lt;p&gt;That&#x27;s a classmethod. It does execute code,&quot; +
+                          &quot;but it doesn&#x27;t construct anything. Try again!&lt;/p&gt;&quot;
+                  },
+                  param_changes: [],
+                  refresher_exploration_id: null
+                },
+                rule_specs: [{
+                  rule_type: &#x27;IsInRegion&#x27;,
+                  inputs: { x: &#x27;classfunc&#x27; }
+                }]
+              },
+              {
+                labelled_as_correct: false,
+                outcome: {
+                  dest: &#x27;State 1&#x27;,
+                  feedback: {
+                    content_id: &#x27;feeedback_5&#x27;,
+                    html: &#x27;&lt;p&gt;You found it! This is the code responsible for&#x27; +
+                          &#x27;constructing a new class object.&lt;/p&gt;&#x27;
+                  },
+                  param_changes: [],
+                  refresher_exploration_id: null
+                },
+                rule_specs: [{
+                  rule_type: &#x27;IsInRegion&#x27;,
+                  inputs: { x: &#x27;ctor&#x27; }
+                }]
+              }
+            ],
+            customization_args: {
+              highlightRegionsOnHover: {
+                value: true
+              },
+              imageAndRegions: {
+                value: {
+                  imagePath: &#x27;s5ImagePath.png&#x27;,
+                  labeledRegions: [{
+                    label: &#x27;classdef&#x27;,
+                    region: {
+                      area: [
+                        [0.004291845493562232, 0.004692192192192192],
+                        [0.40987124463519314, 0.05874624624624625]
+                      ],
+                      regionType: &#x27;Rectangle&#x27;
+                    }
+                  },
+                  {
+                    label: &#x27;docstring&#x27;,
+                    region: {
+                      area: [
+                        [0.07296137339055794, 0.06475225225225226],
+                        [0.9892703862660944, 0.1218093093093093]
+                      ],
+                      regionType: &#x27;Rectangle&#x27;
+                    }
+                  },
+                  {
+                    label: &#x27;instancefunc&#x27;,
+                    region: {
+                      area: [
+                        [0.07296137339055794, 0.15183933933933935],
+                        [0.6995708154506438, 0.44012762762762764]
+                      ],
+                      regionType: &#x27;Rectangle&#x27;
+                    }
+                  },
+                  {
+                    label: &#x27;classfunc&#x27;,
+                    region: {
+                      area: [
+                        [0.06866952789699571, 0.46114864864864863],
+                        [0.6931330472103004, 0.776463963963964]
+                      ],
+                      regionType: &#x27;Rectangle&#x27;
+                    }
+                  },
+                  {
+                    label: &#x27;ctor&#x27;,
+                    region: {
+                      area: [
+                        [0.06437768240343347, 0.821509009009009],
+                        [0.740343347639485, 0.9926801801801802]
+                      ],
+                      regionType: &#x27;Rectangle&#x27;
+                    }
+                  }]
+                }
+              }
+            },
+            hints: [],
+            solution: null
+          },
+          solicit_answer_details: false,
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_1: {},
+              feedback_2: {},
+              feedback_3: {},
+              feedback_4: {},
+              feedback_5: {}
+            }
+          }
+        },
+        &#x27;State 6&#x27;: {
+          param_changes: [],
+          content: {
+            content_id: &#x27;content&#x27;,
+            html: &#x27;&lt;p&gt;Text Input Content&lt;/p&gt;&#x27;
+          },
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_1: {},
+              feedback_2: {},
+              hint_1: {},
+              solution: {}
+            }
+          },
+          interaction: {
+            id: &#x27;TextInput&#x27;,
+            default_outcome: {
+              dest: &#x27;State 6&#x27;,
+              feedback: {
+                content_id: &#x27;default_outcome&#x27;,
+                html: &#x27;&lt;p&gt;Try again.&lt;/p&gt;&#x27;
+              },
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null
+            },
+            confirmed_unclassified_answers: [],
+            customization_args: {
+              rows: {
+                value: 1
+              },
+              placeholder: {
+                value: {
+                  content_id: &#x27;ca_placeholder_3&#x27;,
+                  unicode_str: &#x27;&#x27;
+                }
+              }
+            },
+            answer_groups: [{
+              rule_specs: [{
+                rule_type: &#x27;Contains&#x27;,
+                inputs: {x: {
+                  contentId: &#x27;rule_input&#x27;,
+                  normalizedStrSet: [&#x27;1&#x27;]
+                }}
+              }],
+              outcome: {
+                dest: &#x27;State 1&#x27;,
+                feedback: {
+                  content_id: &#x27;feedback_1&#x27;,
+                  html: &quot;&lt;p&gt;Let&#x27;s go to State 1&lt;/p&gt;&quot;
+                },
+                labelled_as_correct: false,
+                param_changes: [],
+                refresher_exploration_id: null
+              }
+            }, {
+              rule_specs: [{
+                rule_type: &#x27;Contains&#x27;,
+                inputs: {x: {
+                  contentId: &#x27;rule_input&#x27;,
+                  normalizedStrSet: [&#x27;2&#x27;]
+                }}
+              }],
+              outcome: {
+                dest: &#x27;State 1&#x27;,
+                feedback: {
+                  content_id: &#x27;feedback_2&#x27;,
+                  html: &#x27;&lt;p&gt;Let\&#x27;s go to State 1&lt;/p&gt;&lt;oppia-noninteractive-mat&#x27; +
+                  &#x27;h math_content-with-value=&quot;{&amp;amp;quot;raw_latex&amp;amp;quot;:&#x27; +
+                  &#x27; &amp;amp;quot;+,-,-,+&amp;amp;quot;, &amp;amp;quot;svg_filename&amp;amp;q&#x27; +
+                  &#x27;uot;: &amp;amp;quot;mathImg_20207261338jhi1j6rvob_height_1d34&#x27; +
+                  &#x27;5_width_3d124_vertical_0d124.svg&amp;amp;quot;}&quot;&gt;&lt;/oppia-noni&#x27; +
+                  &#x27;nteractive-math&gt;&#x27;
+                },
+                labelled_as_correct: false,
+                param_changes: [],
+                refresher_exploration_id: null
+              }
+            }],
+            hints: [{
+              hint_content: {
+                content_id: &#x27;hint_1&#x27;,
+                html: &#x27;&lt;p&gt;&lt;oppia-noninteractive-image filepath-with-value=&quot;&#x27; +
+                      &#x27;&amp;amp;quot;s6Hint1.png&amp;amp;quot;&quot;&gt;&#x27; +
+                      &#x27;&lt;/oppia-noninteractive-image&gt;&lt;/p&gt;&#x27;
+              }
+            }],
+            solution: {
+              answer_is_exclusive: false,
+              correct_answer: &#x27;cat&#x27;,
+              explanation: {
+                content_id: &#x27;solution&#x27;,
+                html: &#x27;&lt;p&gt;&lt;oppia-noninteractive-image filepath-with-value=&quot;&#x27; +
+                      &#x27;&amp;amp;quot;s6SolutionExplanation.png&amp;amp;quot;&quot;&gt;&#x27; +
+                      &#x27;&lt;/oppia-noninteractive-image&gt;&lt;/p&gt;&#x27;
+              }
+            },
+          },
+          linked_skill_id: null,
+          next_content_id_index: 4,
+          solicit_answer_details: false,
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              ca_placeholder_3: {},
+              default_outcome: {},
+              feedback_1: {},
+              feedback_2: {},
+              hint_1: {},
+              solution: {}
+            }
+          },
+          classifier_model_id: null
+        },
+        &#x27;State 7&#x27;: {
+          param_changes: [],
+          content: {
+            content_id: &#x27;content&#x27;,
+            html: &#x27;&lt;p&gt;&lt;oppia-noninteractive-image filepath-with-value=\&quot;&#x27; +
+                  &#x27;&amp;amp;quot;s7Image.png&amp;amp;quot;\&quot;&gt;&#x27; +
+                  &#x27;&lt;/oppia-noninteractive-image&gt;&#x27; +
+                  &#x27;&lt;oppia-noninteractive-collapsible content-with-value=&#x27; +
+                  &#x27;\&quot;&amp;amp;quot;&amp;amp;lt;p&amp;amp;gt;Content.&amp;amp;lt;/p&amp;amp;&#x27; +
+                  &#x27;gt;&amp;amp;lt;oppia-noninteractive-image &#x27; +
+                  &#x27;filepath-with-value=\\&amp;amp;quot;&amp;amp;amp;amp;quot;&#x27; +
+                  &#x27;s7CollapsibleImage.png&amp;amp;amp;amp;quot;\\&amp;amp;quot;&#x27; +
+                  &#x27;&amp;amp;gt;&amp;amp;lt;/oppia-noninteractive-image&amp;amp;gt;&#x27; +
+                  &#x27;&amp;amp;quot;\&quot;&gt;&lt;/oppia-noninteractive-collapsible&gt;&#x27; +
+                  &#x27;&lt;oppia-noninteractive-tabs tab_contents-with-value=\&quot;&#x27; +
+                  &#x27;[{&amp;amp;quot;title&amp;amp;quot;:&amp;amp;quot;Title1&amp;amp;&#x27; +
+                  &#x27;quot;,&amp;amp;quot;content&amp;amp;quot;:&amp;amp;quot;&amp;amp;lt;p&#x27; +
+                  &#x27;&amp;amp;gt;Content1&amp;amp;lt;/p&amp;amp;gt;&amp;amp;quot;},&#x27; +
+                  &#x27;{&amp;amp;quot;title&amp;amp;quot;:&amp;amp;quot;Title2&amp;amp;quot;&#x27; +
+                  &#x27;,&amp;amp;quot;content&amp;amp;quot;:&amp;amp;quot;&amp;amp;lt;p&amp;amp;&#x27; +
+                  &#x27;gt;Content2&amp;amp;lt;/p&amp;amp;gt;&amp;amp;lt;&#x27; +
+                  &#x27;oppia-noninteractive-image filepath-with-value=\\&#x27; +
+                  &#x27;&amp;amp;quot;&amp;amp;amp;amp;quot;s7TabImage.png&amp;amp;amp;&#x27; +
+                  &#x27;amp;quot;\\&amp;amp;quot;&amp;amp;gt;&amp;amp;lt;/&#x27; +
+                  &#x27;oppia-noninteractive-image&amp;amp;gt;&amp;amp;quot;}]\&quot;&gt;&#x27; +
+                  &#x27;&lt;/oppia-noninteractive-tabs&gt;&lt;/p&gt;&#x27;
+          },
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_1: {},
+              feedback_2: {}
+            }
+          },
+          interaction: {
+            id: &#x27;ItemSelectionInput&#x27;,
+            default_outcome: {
+              feedback: {
+                content_id: &#x27;content&#x27;,
+                html: &#x27;&lt;p&gt;Try again!&lt;/p&gt;&#x27;
+              },
+              dest: &#x27;State 4&#x27;,
+              param_changes: []
+            },
+            confirmed_unclassifies_answers: [],
+            customization_args: {
+              minAllowableSelectionCount: {
+                value: 1
+              },
+              maxAllowableSelectionCount: {
+                value: 2
+              },
+              choices: {
+                value: [{
+                  content_id: &#x27;ca_choices_3&#x27;,
+                  html: &#x27;&lt;p&gt;Choice 1&lt;/p&gt;&#x27;
+                }, {
+                  content_id: &#x27;ca_choices_4&#x27;,
+                  html: &#x27;&lt;p&gt;Choice 2&lt;/p&gt;&#x27;
+                }]
+              }
+            },
+            hints: [],
+            solution: null,
+            answer_groups: [
+              {
+                labelled_as_correct: false,
+                outcome: {
+                  dest: &#x27;State 7&#x27;,
+                  feedback: {
+                    content_id: &#x27;feedback_1&#x27;,
+                    html: &#x27;It is choice number 1.&#x27;
+                  },
+                  param_changes: [],
+                  refresher_exploration_id: null
+                },
+                rule_specs: [{
+                  rule_type: &#x27;Equals&#x27;,
+                  inputs: {
+                    x: [
+                      &#x27;&lt;p&gt;Choice 1&lt;/p&gt;&#x27;
+                    ]
+                  }
+                }],
+              },
+              {
+                labelled_as_correct: true,
+                outcome: {
+                  dest: &#x27;State 1&#x27;,
+                  feedback: {
+                    content_id: &#x27;feedback_2&#x27;,
+                    html: &#x27;It is choice number 2&#x27;
+                  },
+                  param_changes: [],
+                  refresher_exploration_id: null
+                },
+                rule_specs: [{
+                  rule_type: &#x27;Equals&#x27;,
+                  inputs: {
+                    x: [
+                      &#x27;&lt;p&gt;Choice 2&lt;/p&gt;&#x27;
+                    ]
+                  }
+                }],
+              }
+            ]
+          },
+          next_content_id_index: 5,
+          solicit_answer_details: false,
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              ca_choices_3: {},
+              ca_choices_4: {},
+              default_outcome: {},
+              feedback_1: {},
+              feedback_2: {}
+            }
+          }
+        }
+      },
+      param_specs: {},
+      param_changes: [],
+      version: 1
+    };
+
+    ImageFilenamesInExploration = {
+      &#x27;State 1&#x27;: [],
+      &#x27;State 3&#x27;: [],
+      &#x27;State 4&#x27;: [&#x27;s4Content.png&#x27;, &#x27;s4Choice1.png&#x27;, &#x27;s4Choice2.png&#x27;,
+        &#x27;s4DefaultOutcomeFeedback.png&#x27;],
+      &#x27;State 5&#x27;: [&#x27;s5ImagePath.png&#x27;],
+      &#x27;State 6&#x27;: [
+        &#x27;s6Hint1.png&#x27;, &#x27;s6SolutionExplanation.png&#x27;,
+        &#x27;mathImg_20207261338jhi1j6rvob_height_1d34&#x27; +
+        &#x27;5_width_3d124_vertical_0d124.svg&#x27;],
+      &#x27;State 7&#x27;: [&#x27;s7Image.png&#x27;, &#x27;s7CollapsibleImage.png&#x27;, &#x27;s7TabImage.png&#x27;],
+      Introduction: [&#x27;sIMultipleChoice1.png&#x27;, &#x27;sIMultipleChoice2.png&#x27;,
+        &#x27;sIOutcomeFeedback.png&#x27;]
+    };
+  });
+
+  it(&#x27;should get all the filenames of the images in a state&#x27;,
+    () =&gt; {
+      let exploration = eof.createFromBackendDict(explorationDict);
+      let states = exploration.getStates();
+      let stateNames = states.getStateNames();
+      stateNames.forEach((statename) =&gt; {
+        let filenamesInState = (
+          eifss.getImageFilenamesInState(states.getState(statename)));
+        filenamesInState.forEach(function(filename) {
+          expect(ImageFilenamesInExploration[statename]).toContain(filename);
+        });
+      });
+    });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/extract-image-filenames-from-state.service.spec.ts&quot;,&quot;line&quot;:37,&quot;character&quot;:6,&quot;text&quot;:&quot;explorationDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/extract-image-filenames-from-state.service.spec.ts&quot;,&quot;line&quot;:38,&quot;character&quot;:6,&quot;text&quot;:&quot;ImageFilenamesInExploration&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/extract-image-filenames-from-state.service.spec.ts&quot;,&quot;line&quot;:53,&quot;character&quot;:4,&quot;text&quot;:&quot;explorationDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/extract-image-filenames-from-state.service.spec.ts&quot;,&quot;line&quot;:789,&quot;character&quot;:4,&quot;text&quot;:&quot;ImageFilenamesInExploration&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/extract-image-filenames-from-state.service.spec.ts&quot;,&quot;line&quot;:814,&quot;character&quot;:17,&quot;text&quot;:&quot;ImageFilenamesInExploration&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:59 GMT</p>
+    </body>
+  </html>
+  

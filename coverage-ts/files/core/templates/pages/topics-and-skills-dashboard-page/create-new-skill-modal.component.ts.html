@@ -1,0 +1,174 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>create-new-skill-modal.component.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/topics-and-skills-dashboard-page/create-new-skill-modal.component.ts</td><td class="">97.94%</td><td class="">100%</td><td class="">194</td><td class="">190</td><td class="">4</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2016 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Modal for the creating new skill.
+ */
+
+import { ChangeDetectorRef, Component } from &#x27;@angular/core&#x27;;
+import { downgradeComponent } from &#x27;@angular/upgrade/static&#x27;;
+import { NgbActiveModal } from &#x27;@ng-bootstrap/ng-bootstrap&#x27;;
+import { AppConstants } from &#x27;app.constants&#x27;;
+import constants from &#x27;assets/constants&#x27;;
+import { SkillCreationService } from &#x27;components/entity-creation-services/skill-creation.service&#x27;;
+import { SubtitledHtml } from &#x27;domain/exploration/subtitled-html.model&#x27;;
+import { Rubric } from &#x27;domain/skill/rubric.model&#x27;;
+import { SkillObjectFactory } from &#x27;domain/skill/SkillObjectFactory&#x27;;
+import { SkillEditorStateService } from &#x27;pages/skill-editor-page/services/skill-editor-state.service&#x27;;
+import { ContextService } from &#x27;services/context.service&#x27;;
+import { ImageLocalStorageService } from &#x27;services/image-local-storage.service&#x27;;
+import { TopicsAndSkillsDashboardPageConstants } from &#x27;./topics-and-skills-dashboard-page.constants&#x27;;
+
+@Component({
+  selector: &#x27;oppia-create-new-skill-modal&#x27;,
+  templateUrl: &#x27;./create-new-skill-modal.component.html&#x27;
+})
+export class CreateNewSkillModalComponent {
+  rubrics = [
+    Rubric.create(constants.SKILL_DIFFICULTIES[0], []),
+    Rubric.create(constants.SKILL_DIFFICULTIES[1], [&#x27;&#x27;]),
+    Rubric.create(constants.SKILL_DIFFICULTIES[2], [])];
+  newSkillDescription: string = &#x27;&#x27;;
+  errorMsg: string = &#x27;&#x27;;
+  skillDescriptionExists: boolean = true;
+  isEditorShown = {conceptCardExplanationEditorIsShown: false};
+  bindableDict = {displayedConceptCardExplanation: &#x27;&#x27;};
+  HTML_SCHEMA: {type: string} = { type: &#x27;html&#x27; };
+  MAX_CHARS_IN_SKILL_DESCRIPTION = (
+    constants.MAX_CHARS_IN_SKILL_DESCRIPTION);
+  newExplanationObject = null;
+
+  constructor(
+    private ngbActiveModal: NgbActiveModal,
+    private contextService: ContextService,
+    private imageLocalStorageService: ImageLocalStorageService,
+    private skillCreationService: SkillCreationService,
+    private skillEditorStateService: SkillEditorStateService,
+    private skillObjectFactory: SkillObjectFactory,
+    private changeDetectorRef: ChangeDetectorRef
+  ) {}
+
+  ngOnInit(): void {
+    this.contextService.setImageSaveDestinationToLocalStorage();
+  }
+
+  updateExplanation($event: string): void {
+    if ($event !== this.bindableDict.displayedConceptCardExplanation) {
+      this.bindableDict.displayedConceptCardExplanation = $event;
+      this.changeDetectorRef.detectChanges();
+    }
+  }
+
+  openConceptCardExplanationEditor(): void {
+    if (this.isEditorShown.conceptCardExplanationEditorIsShown !== true) {
+      this.isEditorShown.conceptCardExplanationEditorIsShown = true;
+      this.changeDetectorRef.detectChanges();
+    }
+  }
+
+  getHtmlSchema(): { type: string } {
+    return this.HTML_SCHEMA;
+  }
+
+  setErrorMessageIfNeeded(): void {
+    if (
+      !this.skillObjectFactory.hasValidDescription(
+        this.newSkillDescription)) {
+      this.errorMsg = (
+        &#x27;Please use a non-empty description consisting of &#x27; +
+          &#x27;alphanumeric characters, spaces and/or hyphens.&#x27;);
+    }
+    if (this.skillDescriptionExists) {
+      this.errorMsg = (
+        &#x27;This description already exists. Please choose a &#x27; +
+            &#x27;new name or modify the existing skill.&#x27;);
+    }
+  }
+
+  _skillDescriptionExistsCallback(skillDescriptionExists: boolean): void {
+    this.skillDescriptionExists = skillDescriptionExists;
+    this.setErrorMessageIfNeeded();
+  }
+  updateSkillDescriptionAndCheckIfExists(): void {
+    this.resetErrorMsg();
+
+    if (this.newSkillDescription !== &#x27;&#x27;) {
+      this.skillEditorStateService.updateExistenceOfSkillDescription(
+        this.newSkillDescription,
+        this._skillDescriptionExistsCallback.bind(this)
+      );
+    }
+    if (
+      this.skillCreationService.getSkillDescriptionStatus() !==
+          TopicsAndSkillsDashboardPageConstants.SKILL_DESCRIPTION_STATUS_VALUES
+            .STATUS_DISABLED) {
+      this.rubrics[1].setExplanations([this.newSkillDescription]);
+      this.skillCreationService.markChangeInSkillDescription();
+    }
+  }
+
+  resetErrorMsg(): void {
+    this.errorMsg = &#x27;&#x27;;
+  }
+
+  saveConceptCardExplanation(): void {
+    const explanationObject: SubtitledHtml =
+    SubtitledHtml.createDefault(
+      this.bindableDict.displayedConceptCardExplanation,
+      AppConstants.COMPONENT_NAME_EXPLANATION);
+    this.newExplanationObject = explanationObject.toBackendDict();
+    this.bindableDict.displayedConceptCardExplanation = (
+      explanationObject.html);
+  }
+
+  createNewSkill(): void {
+    this.setErrorMessageIfNeeded();
+    if (this.errorMsg !== &#x27;&#x27;) {
+      return;
+    }
+    this.saveConceptCardExplanation();
+    this.ngbActiveModal.close({
+      description: this.newSkillDescription,
+      rubrics: this.rubrics,
+      explanation: this.newExplanationObject
+    });
+  }
+
+  cancel(): void {
+    this.imageLocalStorageService.flushStoredImagesData();
+    this.skillCreationService.resetSkillDescriptionStatusMarker();
+    this.ngbActiveModal.dismiss(&#x27;cancel&#x27;);
+  }
+}
+
+angular.module(&#x27;oppia&#x27;).directive(&#x27;oppiaCreateNewSkillModalComponent&#x27;,
+  downgradeComponent({ component: CreateNewSkillModalComponent }));
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/topics-and-skills-dashboard-page/create-new-skill-modal.component.ts&quot;,&quot;line&quot;:49,&quot;character&quot;:2,&quot;text&quot;:&quot;newExplanationObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topics-and-skills-dashboard-page/create-new-skill-modal.component.ts&quot;,&quot;line&quot;:129,&quot;character&quot;:9,&quot;text&quot;:&quot;newExplanationObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topics-and-skills-dashboard-page/create-new-skill-modal.component.ts&quot;,&quot;line&quot;:143,&quot;character&quot;:6,&quot;text&quot;:&quot;explanation&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topics-and-skills-dashboard-page/create-new-skill-modal.component.ts&quot;,&quot;line&quot;:143,&quot;character&quot;:24,&quot;text&quot;:&quot;newExplanationObject&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:56 GMT</p>
+    </body>
+  </html>
+  

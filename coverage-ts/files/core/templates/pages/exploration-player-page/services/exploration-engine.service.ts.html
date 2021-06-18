@@ -1,0 +1,567 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>exploration-engine.service.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/exploration-player-page/services/exploration-engine.service.ts</td><td class="">98.44%</td><td class="">100%</td><td class="">895</td><td class="">881</td><td class="">14</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2014 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Utility service for the learner&#x27;s view of an exploration.
+ */
+
+import { EventEmitter, Injectable } from &#x27;@angular/core&#x27;;
+import { downgradeInjectable } from &#x27;@angular/upgrade/static&#x27;;
+import { AnswerClassificationResult } from &#x27;domain/classifier/answer-classification-result.model&#x27;;
+import { Exploration, ExplorationBackendDict, ExplorationObjectFactory } from &#x27;domain/exploration/ExplorationObjectFactory&#x27;;
+import { Interaction } from &#x27;domain/exploration/InteractionObjectFactory&#x27;;
+import { ParamChange } from &#x27;domain/exploration/ParamChangeObjectFactory&#x27;;
+import { ReadOnlyExplorationBackendApiService } from &#x27;domain/exploration/read-only-exploration-backend-api.service&#x27;;
+import { BindableVoiceovers, RecordedVoiceovers } from &#x27;domain/exploration/recorded-voiceovers.model&#x27;;
+import { State } from &#x27;domain/state/StateObjectFactory&#x27;;
+import { StateCard, StateCardObjectFactory } from &#x27;domain/state_card/StateCardObjectFactory&#x27;;
+import { ExpressionInterpolationService } from &#x27;expressions/expression-interpolation.service&#x27;;
+import { AlertsService } from &#x27;services/alerts.service&#x27;;
+import { ContextService } from &#x27;services/context.service&#x27;;
+import { UrlService } from &#x27;services/contextual/url.service&#x27;;
+import { ExplorationFeaturesBackendApiService } from &#x27;services/exploration-features-backend-api.service&#x27;;
+import { ExplorationHtmlFormatterService } from &#x27;services/exploration-html-formatter.service&#x27;;
+import { FocusManagerService } from &#x27;services/stateful/focus-manager.service&#x27;;
+import { AnswerClassificationService, InteractionRulesService } from &#x27;./answer-classification.service&#x27;;
+import { AudioPreloaderService } from &#x27;./audio-preloader.service&#x27;;
+import { AudioTranslationLanguageService } from &#x27;./audio-translation-language.service&#x27;;
+import { ContentTranslationLanguageService } from &#x27;./content-translation-language.service&#x27;;
+import { ImagePreloaderService } from &#x27;./image-preloader.service&#x27;;
+import { ExplorationParams, LearnerParamsService } from &#x27;./learner-params.service&#x27;;
+import { PlayerTranscriptService } from &#x27;./player-transcript.service&#x27;;
+import { StatsReportingService } from &#x27;./stats-reporting.service&#x27;;
+
+ @Injectable({
+   providedIn: &#x27;root&#x27;
+ })
+export class ExplorationEngineService {
+   private _explorationId: string;
+   private _editorPreviewMode: boolean;
+   private _questionPlayerMode: boolean;
+   private _updateActiveStateIfInEditorEventEmitter: EventEmitter&lt;string&gt; =
+     (new EventEmitter());
+
+   answerIsBeingProcessed: boolean = false;
+   alwaysAskLearnersForAnswerDetails: boolean = false;
+   exploration: Exploration;
+
+   // This list may contain duplicates. A state name is added to it each time
+   // the learner moves to a new card.
+   visitedStateNames: string[] = [];
+   currentStateName: string;
+   nextStateName: string;
+
+   // Param changes to be used ONLY in editor preview mode.
+   manualParamChanges: ParamChange[];
+   initStateName: string;
+   version: number;
+
+   constructor(
+     private alertsService: AlertsService,
+     private answerClassificationService: AnswerClassificationService,
+     private audioPreloaderService: AudioPreloaderService,
+     private audioTranslationLanguageService: AudioTranslationLanguageService,
+     private contentTranslationLanguageService:
+       ContentTranslationLanguageService,
+     private contextService: ContextService,
+     private explorationFeaturesBackendApiService:
+       ExplorationFeaturesBackendApiService,
+     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
+     private explorationObjectFactory: ExplorationObjectFactory,
+     private expressionInterpolationService: ExpressionInterpolationService,
+     private focusManagerService: FocusManagerService,
+     private imagePreloaderService: ImagePreloaderService,
+     private learnerParamsService: LearnerParamsService,
+     private playerTranscriptService: PlayerTranscriptService,
+     private readOnlyExplorationBackendApiService:
+       ReadOnlyExplorationBackendApiService,
+     private stateCardObjectFactory: StateCardObjectFactory,
+     private statsReportingService: StatsReportingService,
+     private urlService: UrlService
+   ) {
+     let pathnameArray = this.urlService.getPathname().split(&#x27;/&#x27;);
+     let explorationContext = false;
+
+     for (let i = 0; i &lt; pathnameArray.length; i++) {
+       if (pathnameArray[i] === &#x27;explore&#x27; ||
+            pathnameArray[i] === &#x27;create&#x27; ||
+            pathnameArray[i] === &#x27;skill_editor&#x27; ||
+            pathnameArray[i] === &#x27;embed&#x27;) {
+         explorationContext = true;
+         break;
+       }
+     }
+
+     if (explorationContext) {
+       this._explorationId = this.contextService.getExplorationId();
+       this.version = this.urlService.getExplorationVersionFromUrl();
+       this._editorPreviewMode = this.contextService
+         .isInExplorationEditorPage();
+       this._questionPlayerMode = this.contextService.isInQuestionPlayerMode();
+       if (!this._questionPlayerMode &amp;&amp;
+       !(&#x27;skill_editor&#x27; === this.urlService.getPathname()
+         .split(&#x27;/&#x27;)[1].replace(/&quot;/g, &quot;&#x27;&quot;))) {
+         this.readOnlyExplorationBackendApiService
+           .loadExplorationAsync(this._explorationId, this.version)
+           .then((exploration) =&gt; {
+             this.version = exploration.version;
+           });
+       }
+     } else {
+       this._explorationId = &#x27;test_id&#x27;;
+       this.version = 1;
+       this._editorPreviewMode = false;
+       this._questionPlayerMode = false;
+     }
+   }
+
+   randomFromArray&lt;T&gt;(arr: T[]): T {
+     return arr[Math.floor(Math.random() * arr.length)];
+   }
+
+   // Evaluate feedback.
+   makeFeedback(
+       feedbackHtml: string, envs: Record&lt;string, string&gt;[]): string {
+     return this.expressionInterpolationService
+       .processHtml(feedbackHtml, envs);
+   }
+
+   private _getRandomSuffix(): string {
+     // This is a bit of a hack. When a refresh to a $scope variable
+     // happens,
+     // AngularJS compares the new value of the variable to its previous
+     // value. If they are the same, then the variable is not updated.
+     // Appending a random suffix makes the new value different from the
+     // previous one, and thus indirectly forces a refresh.
+     let randomSuffix = &#x27;&#x27;;
+     let N = Math.round(Math.random() * 1000);
+     for (let i = 0; i &lt; N; i++) {
+       randomSuffix += &#x27; &#x27;;
+     }
+     return randomSuffix;
+   }
+
+   // Evaluate parameters. Returns null if any evaluation fails.
+   makeParams(
+       oldParams: ExplorationParams, paramChanges: ParamChange[],
+       envs: Record&lt;string, string&gt;[]): ExplorationParams {
+     let newParams: ExplorationParams = { ...oldParams };
+     if (paramChanges.every((pc) =&gt; {
+       if (pc.generatorId === &#x27;Copier&#x27;) {
+         if (!pc.customizationArgs.parse_with_jinja) {
+           newParams[pc.name] = pc.customizationArgs.value;
+         } else {
+           let paramValue: string = this.expressionInterpolationService
+             .processUnicode(
+               pc.customizationArgs.value, [newParams].concat(envs));
+           if (paramValue === null) {
+             return false;
+           }
+           newParams[pc.name] = paramValue;
+         }
+       } else {
+         // RandomSelector.
+         newParams[pc.name] = this.randomFromArray(
+           pc.customizationArgs.list_of_values);
+       }
+       return true;
+     })) {
+       // All parameters were evaluated successfully.
+       return newParams;
+     }
+     // Evaluation of some parameter failed.
+     return null;
+   }
+
+   // Evaluate question string.
+   makeQuestion(newState: State, envs: Record&lt;string, string&gt;[]): string {
+     return this.expressionInterpolationService.processHtml(
+       newState.content.html, envs);
+   }
+
+
+   // This should only be called when &#x27;exploration&#x27; is non-null.
+   _loadInitialState(
+       successCallback: (stateCard: StateCard, str: string) =&gt; void): void {
+     let initialState: State = this.exploration.getInitialState();
+     let oldParams: ExplorationParams = this.learnerParamsService
+       .getAllParams();
+     let newParams: ExplorationParams = this.makeParams(
+       oldParams, initialState.paramChanges, [oldParams]);
+     if (newParams === null) {
+       this.alertsService.addWarning(&#x27;Expression parsing error.&#x27;);
+       return;
+     }
+     if (newParams) {
+       this.learnerParamsService.init(newParams);
+     }
+     this.currentStateName = this.exploration.initStateName;
+     this.nextStateName = this.exploration.initStateName;
+
+     let interaction: Interaction = this.exploration
+       .getInteraction(this.exploration.initStateName);
+     let nextFocusLabel: string = this.focusManagerService.generateFocusLabel();
+
+     let interactionId = interaction.id;
+     let interactionHtml = null;
+
+     if (interactionId) {
+       interactionHtml = this.explorationHtmlFormatterService
+         .getInteractionHtml(
+           interactionId,
+           this.exploration.getInteractionCustomizationArgs(
+             this.currentStateName),
+           true, nextFocusLabel, null);
+     }
+
+     let questionHtml: string = this.makeQuestion(initialState, [newParams]);
+     if (questionHtml === null) {
+       this.alertsService.addWarning(&#x27;Expression parsing error.&#x27;);
+       return;
+     }
+
+     if (!this._editorPreviewMode) {
+       this.statsReportingService.recordExplorationStarted(
+         this.exploration.initStateName, newParams);
+     }
+
+     let initialCard =
+       this.stateCardObjectFactory.createNewCard(
+         this.currentStateName, questionHtml, interactionHtml,
+         interaction, initialState.recordedVoiceovers,
+         initialState.writtenTranslations,
+         initialState.content.contentId);
+     successCallback(initialCard, nextFocusLabel);
+   }
+
+   // Initialize the parameters in the exploration as specified in the
+   // exploration-level initial parameter changes list, followed by any
+   // manual parameter changes (in editor preview mode).
+   initParams(manualParamChanges: ParamChange[]): void {
+     let baseParams = {};
+     this.exploration.paramSpecs.forEach((paramName, paramSpec) =&gt; {
+       baseParams[paramName] = paramSpec.getType().createDefaultValue();
+     });
+
+     let startingParams = this.makeParams(
+       baseParams,
+       this.exploration.paramChanges.concat(manualParamChanges),
+       [baseParams]);
+
+     this.learnerParamsService.init(startingParams);
+   }
+
+   private _getNextInteractionHtml(labelForFocusTarget: string): string {
+     let interactionId: string = this.exploration
+       .getInteractionId(this.nextStateName);
+
+     return this.explorationHtmlFormatterService.getInteractionHtml(
+       interactionId,
+       this.exploration.getInteractionCustomizationArgs(this.nextStateName),
+       true,
+       labelForFocusTarget, null);
+   }
+
+   checkAlwaysAskLearnersForAnswerDetails(): void {
+     this.explorationFeaturesBackendApiService.fetchExplorationFeaturesAsync(
+       this._explorationId).then((featuresData) =&gt; {
+       this.alwaysAskLearnersForAnswerDetails = (
+         featuresData.alwaysAskLearnersForAnswerDetails);
+     });
+   }
+
+   // This should only be used in editor preview mode. It sets the
+   // exploration data from what&#x27;s currently specified in the editor, and
+   // also initializes the parameters to empty strings.
+   initSettingsFromEditor(
+       activeStateNameFromPreviewTab: string,
+       manualParamChangesToInit: ParamChange[]): void {
+     if (this._editorPreviewMode) {
+       this.manualParamChanges = manualParamChangesToInit;
+       this.initStateName = activeStateNameFromPreviewTab;
+     } else {
+       throw new Error(&#x27;Cannot populate exploration in learner mode.&#x27;);
+     }
+   }
+
+   /**
+    * Initializes an exploration, passing the data for the first state to
+    * successCallback.
+    *
+    * In editor preview mode, populateExploration() must be called before
+    * calling init().
+    *
+    * @param {function} successCallback - The function to execute after the
+    *   initial exploration data is successfully loaded. This function will
+    *   be passed two arguments:
+    *   - stateName {string}, the name of the first state
+    *   - initHtml {string}, an HTML string representing the content of the
+    *       first state.
+    */
+   init(
+       explorationDict: ExplorationBackendDict,
+       explorationVersion: number, preferredAudioLanguage: string,
+       autoTtsEnabled: boolean, preferredContentLanguageCodes: string[],
+       successCallback: (stateCard: StateCard, label: string) =&gt; void): void {
+     this.exploration = this.explorationObjectFactory.createFromBackendDict(
+       explorationDict);
+     this.answerIsBeingProcessed = false;
+     if (this._editorPreviewMode) {
+       this.exploration.setInitialStateName(this.initStateName);
+       this.visitedStateNames = [this.exploration.getInitialState().name];
+       this.initParams(this.manualParamChanges);
+       this.audioTranslationLanguageService.init(
+         this.exploration.getAllVoiceoverLanguageCodes(),
+         null,
+         this.exploration.getLanguageCode(),
+         explorationDict.auto_tts_enabled);
+       this.audioPreloaderService.init(this.exploration);
+       this.audioPreloaderService.kickOffAudioPreloader(this.initStateName);
+       this._loadInitialState(successCallback);
+     } else {
+       this.visitedStateNames.push(this.exploration.getInitialState().name);
+       this.version = explorationVersion;
+       this.initParams([]);
+       this.audioTranslationLanguageService.init(
+         this.exploration.getAllVoiceoverLanguageCodes(),
+         preferredAudioLanguage,
+         this.exploration.getLanguageCode(),
+         autoTtsEnabled);
+       this.audioPreloaderService.init(this.exploration);
+       this.audioPreloaderService.kickOffAudioPreloader(
+         this.exploration.getInitialState().name);
+       this.imagePreloaderService.init(this.exploration);
+       this.imagePreloaderService.kickOffImagePreloader(
+         this.exploration.getInitialState().name);
+       this.checkAlwaysAskLearnersForAnswerDetails();
+       this._loadInitialState(successCallback);
+     }
+     this.contentTranslationLanguageService.init(
+       this.exploration.getDisplayableWrittenTranslationLanguageCodes(),
+       preferredContentLanguageCodes,
+       this.exploration.getLanguageCode()
+     );
+   }
+
+   moveToExploration(successCallback: (StateCard, string) =&gt; void): void {
+     this._loadInitialState(successCallback);
+   }
+
+   isCurrentStateInitial(): boolean {
+     return this.currentStateName === this.exploration.initStateName;
+   }
+
+   recordNewCardAdded(): void {
+     this.currentStateName = this.nextStateName;
+   }
+
+   getState(): State {
+     let stateName: string = this.playerTranscriptService.getLastStateName();
+     return this.exploration.getState(stateName);
+   }
+
+   getExplorationId(): string {
+     return this._explorationId;
+   }
+
+   getExplorationTitle(): string {
+     return this.exploration.title;
+   }
+
+   getExplorationVersion(): number {
+     return this.version;
+   }
+
+   getAuthorRecommendedExpIds(): string[] {
+     return this.exploration.getAuthorRecommendedExpIds(this.currentStateName);
+   }
+
+   getLanguageCode(): string {
+     return this.exploration.getLanguageCode();
+   }
+
+   isInPreviewMode(): boolean {
+     return !!this._editorPreviewMode;
+   }
+
+   submitAnswer(
+       answer: string, interactionRulesService: InteractionRulesService,
+       successCallback: (
+         nextCard: StateCard,
+         refreshInteraction: boolean,
+         feedbackHtml: string,
+         feedbackAudioTranslations: BindableVoiceovers,
+         refresherExplorationId: string,
+         missingPrerequisiteSkillId: string,
+         remainOnCurrentCard: boolean,
+         taggedSkillMisconceptionId: string,
+         wasOldStateInitial: boolean,
+         isFirstHit: boolean,
+         isFinalQuestion: boolean,
+         focusLabel: string
+       ) =&gt; void): boolean {
+     if (this.answerIsBeingProcessed) {
+       return;
+     }
+     this.answerIsBeingProcessed = true;
+     let oldStateName: string = this.playerTranscriptService.getLastStateName();
+     let oldState: State = this.exploration.getState(oldStateName);
+     let recordedVoiceovers: RecordedVoiceovers = oldState.recordedVoiceovers;
+     let oldStateCard: StateCard = this.playerTranscriptService.getLastCard();
+     let classificationResult: AnswerClassificationResult = (
+       this.answerClassificationService.getMatchingClassificationResult(
+         oldStateName, oldStateCard.getInteraction(), answer,
+         interactionRulesService));
+     let answerIsCorrect: boolean = classificationResult.outcome
+       .labelledAsCorrect;
+
+     // Use {...} to clone the object
+     // since classificationResult.outcome points
+     // at oldState.interaction.default_outcome.
+     let outcome = {...classificationResult.outcome};
+     let newStateName: string = outcome.dest;
+
+     if (!this._editorPreviewMode) {
+       let feedbackIsUseful: boolean = (
+         this.answerClassificationService
+           .isClassifiedExplicitlyOrGoesToNewState(
+             oldStateName, oldState, answer,
+             interactionRulesService));
+       this.statsReportingService.recordAnswerSubmitted(
+         oldStateName,
+         this.learnerParamsService.getAllParams(),
+         answer,
+         classificationResult.answerGroupIndex,
+         classificationResult.ruleIndex,
+         classificationResult.classificationCategorization,
+         feedbackIsUseful);
+
+       this.statsReportingService.recordAnswerSubmitAction(
+         oldStateName, newStateName, oldState.interaction.id, answer,
+         outcome.feedback.html);
+     }
+
+     let refresherExplorationId = outcome.refresherExplorationId;
+     let missingPrerequisiteSkillId = outcome.missingPrerequisiteSkillId;
+     let newState = this.exploration.getState(newStateName);
+     let isFirstHit = Boolean(this.visitedStateNames.indexOf(
+       newStateName) === -1);
+     if (oldStateName !== newStateName) {
+       this.visitedStateNames.push(newStateName);
+     }
+     // Compute the data for the next state.
+     let oldParams: ExplorationParams = this.learnerParamsService
+       .getAllParams();
+     oldParams.answer = answer;
+     let feedbackHtml: string =
+       this.makeFeedback(outcome.feedback.html, [oldParams]);
+     let feedbackContentId: string = outcome.feedback.contentId;
+     let feedbackAudioTranslations: BindableVoiceovers = (
+       recordedVoiceovers.getBindableVoiceovers(feedbackContentId));
+     if (feedbackHtml === null) {
+       this.answerIsBeingProcessed = false;
+       this.alertsService.addWarning(&#x27;Expression parsing error.&#x27;);
+       return;
+     }
+     let newParams = (
+       newState ? this.makeParams(
+         oldParams, newState.paramChanges, [oldParams]) : oldParams);
+     if (newParams === null) {
+       this.answerIsBeingProcessed = false;
+       this.alertsService.addWarning(&#x27;Expression parsing error.&#x27;);
+       return;
+     }
+
+     let questionHtml = this.makeQuestion(newState, [newParams, {
+       answer: &#x27;answer&#x27;
+     }]);
+     if (questionHtml === null) {
+       this.answerIsBeingProcessed = false;
+       this.alertsService.addWarning(&#x27;Expression parsing error.&#x27;);
+       return;
+     }
+
+     // TODO(sll): Remove the &#x27;answer&#x27; key from newParams.
+     newParams.answer = answer;
+
+     this.answerIsBeingProcessed = false;
+
+     let refreshInteraction = (
+       oldStateName !== newStateName ||
+       this.exploration.isInteractionInline(oldStateName));
+     this.nextStateName = newStateName;
+     let onSameCard: boolean = (oldStateName === newStateName);
+
+     this._updateActiveStateIfInEditorEventEmitter.emit(newStateName);
+
+     let _nextFocusLabel = this.focusManagerService.generateFocusLabel();
+     let nextInteractionHtml = null;
+     if (this.exploration.getInteraction(this.nextStateName).id) {
+       nextInteractionHtml = this._getNextInteractionHtml(_nextFocusLabel);
+     }
+     if (newParams) {
+       this.learnerParamsService.init(newParams);
+     }
+
+     questionHtml = questionHtml + this._getRandomSuffix();
+     nextInteractionHtml = nextInteractionHtml + this._getRandomSuffix();
+
+     let nextCard = this.stateCardObjectFactory.createNewCard(
+       this.nextStateName, questionHtml, nextInteractionHtml,
+       this.exploration.getInteraction(this.nextStateName),
+       this.exploration.getState(this.nextStateName).recordedVoiceovers,
+       this.exploration.getState(this.nextStateName).writtenTranslations,
+       this.exploration.getState(this.nextStateName).content.contentId);
+     successCallback(
+       nextCard, refreshInteraction, feedbackHtml,
+       feedbackAudioTranslations, refresherExplorationId,
+       missingPrerequisiteSkillId, onSameCard, null,
+       (oldStateName === this.exploration.initStateName), isFirstHit, false,
+       _nextFocusLabel);
+     return answerIsCorrect;
+   }
+
+   isAnswerBeingProcessed(): boolean {
+     return this.answerIsBeingProcessed;
+   }
+
+   getAlwaysAskLearnerForAnswerDetails(): boolean {
+     return this.alwaysAskLearnersForAnswerDetails;
+   }
+
+   get onUpdateActiveStateIfInEditor(): EventEmitter&lt;string&gt; {
+     return this._updateActiveStateIfInEditorEventEmitter;
+   }
+}
+
+angular.module(&#x27;oppia&#x27;).factory(&#x27;ExplorationEngineService&#x27;,
+  downgradeInjectable(ExplorationEngineService));
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/exploration-engine.service.ts&quot;,&quot;line&quot;:216,&quot;character&quot;:9,&quot;text&quot;:&quot;interactionHtml&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/exploration-engine.service.ts&quot;,&quot;line&quot;:219,&quot;character&quot;:7,&quot;text&quot;:&quot;interactionHtml&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/exploration-engine.service.ts&quot;,&quot;line&quot;:252,&quot;character&quot;:42,&quot;text&quot;:&quot;paramName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/exploration-engine.service.ts&quot;,&quot;line&quot;:252,&quot;character&quot;:53,&quot;text&quot;:&quot;paramSpec&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/exploration-engine.service.ts&quot;,&quot;line&quot;:253,&quot;character&quot;:18,&quot;text&quot;:&quot;paramName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/exploration-engine.service.ts&quot;,&quot;line&quot;:253,&quot;character&quot;:31,&quot;text&quot;:&quot;paramSpec&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/exploration-engine.service.ts&quot;,&quot;line&quot;:253,&quot;character&quot;:41,&quot;text&quot;:&quot;getType&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/exploration-engine.service.ts&quot;,&quot;line&quot;:253,&quot;character&quot;:51,&quot;text&quot;:&quot;createDefaultValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/exploration-engine.service.ts&quot;,&quot;line&quot;:356,&quot;character&quot;:39,&quot;text&quot;:&quot;StateCard&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/exploration-engine.service.ts&quot;,&quot;line&quot;:356,&quot;character&quot;:50,&quot;text&quot;:&quot;string&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/exploration-engine.service.ts&quot;,&quot;line&quot;:508,&quot;character&quot;:9,&quot;text&quot;:&quot;nextInteractionHtml&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/exploration-engine.service.ts&quot;,&quot;line&quot;:510,&quot;character&quot;:7,&quot;text&quot;:&quot;nextInteractionHtml&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/exploration-engine.service.ts&quot;,&quot;line&quot;:517,&quot;character&quot;:5,&quot;text&quot;:&quot;nextInteractionHtml&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/exploration-engine.service.ts&quot;,&quot;line&quot;:517,&quot;character&quot;:27,&quot;text&quot;:&quot;nextInteractionHtml&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:56 GMT</p>
+    </body>
+  </html>
+  

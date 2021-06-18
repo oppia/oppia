@@ -1,0 +1,240 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>text-input-validation.service.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">extensions/interactions/TextInput/directives/text-input-validation.service.ts</td><td class="">97.64%</td><td class="">100%</td><td class="">296</td><td class="">289</td><td class="">7</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2014 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Validator service for the interaction.
+ */
+
+import { downgradeInjectable } from &#x27;@angular/upgrade/static&#x27;;
+import { Injectable } from &#x27;@angular/core&#x27;;
+
+import { AnswerGroup } from
+  &#x27;domain/exploration/AnswerGroupObjectFactory&#x27;;
+import { AppConstants } from &#x27;app.constants&#x27;;
+import { baseInteractionValidationService } from
+  &#x27;interactions/base-interaction-validation.service&#x27;;
+import { InteractionSpecsConstants } from &#x27;pages/interaction-specs.constants&#x27;;
+import { NormalizeWhitespacePipe } from
+  &#x27;filters/string-utility-filters/normalize-whitespace.pipe&#x27;;
+import { TextInputCustomizationArgs } from
+  &#x27;interactions/customization-args-defs&#x27;;
+import { TextInputRulesService } from &#x27;./text-input-rules.service&#x27;;
+import { Outcome } from
+  &#x27;domain/exploration/OutcomeObjectFactory&#x27;;
+import { SubtitledUnicode } from
+  &#x27;domain/exploration/SubtitledUnicodeObjectFactory&#x27;;
+import { TranslatableSetOfNormalizedString } from &#x27;interactions/rule-input-defs&#x27;;
+import { UtilsService } from &#x27;services/utils.service&#x27;;
+
+interface Warning {
+  type: string,
+  message: string
+}
+
+@Injectable({
+  providedIn: &#x27;root&#x27;
+})
+export class TextInputValidationService {
+  constructor(private bivs: baseInteractionValidationService) {}
+  getCustomizationArgsWarnings(
+      customizationArgs: TextInputCustomizationArgs): Warning[] {
+    let warningsList = [];
+    this.bivs.requireCustomizationArguments(
+      customizationArgs,
+      [&#x27;placeholder&#x27;, &#x27;rows&#x27;]);
+
+    let placeholder = customizationArgs.placeholder.value;
+
+    if (
+      !(placeholder instanceof SubtitledUnicode) ||
+      !angular.isString(placeholder.unicode)
+    ) {
+      warningsList.push({
+        type: AppConstants.WARNING_TYPES.ERROR,
+        message: (
+          &#x27;Placeholder text must be a string.&#x27;)
+      });
+    }
+
+    let isInt = function(n) {
+      return angular.isNumber(n) &amp;&amp; n % 1 === 0;
+    };
+
+    let rows = customizationArgs.rows.value;
+    if (isInt(rows)) {
+      let textSpecs = InteractionSpecsConstants.INTERACTION_SPECS.TextInput;
+      let customizationArgSpecs = textSpecs.customization_arg_specs;
+      let rowsSpecs = customizationArgSpecs[1];
+      let minRows = rowsSpecs.schema.validators[0].min_value;
+      let maxRows = rowsSpecs.schema.validators[1].max_value;
+      if (rows &lt; minRows || rows &gt; maxRows) {
+        warningsList.push({
+          type: AppConstants.WARNING_TYPES.ERROR,
+          message: (
+            &#x27;Number of rows must be between &#x27; + minRows + &#x27; and &#x27; +
+            maxRows + &#x27;.&#x27;)
+        });
+      }
+    } else {
+      warningsList.push({
+        type: AppConstants.WARNING_TYPES.ERROR,
+        message: (
+          &#x27;Number of rows must be integral.&#x27;)
+      });
+    }
+    return warningsList;
+  }
+
+  getAllWarnings(
+      stateName: string,
+      customizationArgs: TextInputCustomizationArgs,
+      answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
+    let warningsList: Warning[] = [];
+    let textInputRulesService = (
+      new TextInputRulesService(
+        new NormalizeWhitespacePipe(new UtilsService())));
+
+    warningsList = warningsList.concat(
+      this.getCustomizationArgsWarnings(customizationArgs));
+
+    let seenStringsContains: string[] = [];
+    let seenStringsStartsWith: string[] = [];
+    let seenStringsEquals: string[] = [];
+    let seenStringsFuzzyEquals: string[] = [];
+    let seenRuleTypes: Set&lt;string&gt;;
+
+    for (let [answerGroupIndex, answerGroup] of answerGroups.entries()) {
+      seenRuleTypes = new Set();
+      for (let [ruleIndex, rule] of answerGroup.rules.entries()) {
+        if (seenRuleTypes.has(rule.type)) {
+          warningsList.push({
+            type: AppConstants.WARNING_TYPES.ERROR,
+            message: (
+              `Answer group ${answerGroupIndex + 1} has multiple rules with ` +
+              `the same type \&#x27;${rule.type}\&#x27; within the same group.`
+            )
+          });
+        }
+        seenRuleTypes.add(rule.type);
+
+
+        let currentStrings = (
+          &lt;TranslatableSetOfNormalizedString&gt;rule.inputs.x).normalizedStrSet;
+        if (rule.type === &#x27;Contains&#x27;) {
+          // Check if any of the current strings contain any of the previously
+          // seen strings as a substring.
+          const hasCollision = seenStringsContains.some(
+            seenString =&gt; currentStrings.some(
+              currentString =&gt; currentString.includes(seenString)
+            )
+          );
+
+          if (hasCollision || seenStringsStartsWith.includes(&#x27;&#x27;)) {
+            warningsList.push({
+              type: AppConstants.WARNING_TYPES.ERROR,
+              message: `Rule ${ruleIndex + 1} from answer group ` +
+                `${answerGroupIndex + 1} will never be matched because it ` +
+                &#x27;is preceded by a \&#x27;Contains\&#x27; rule with a matching input.&#x27;
+            });
+          }
+
+          seenStringsContains.push(...currentStrings);
+        } else if (rule.type === &#x27;StartsWith&#x27;) {
+          // Check if any of the current strings contain any of the previously
+          // seen strings as a prefix.
+          const hasCollision = (
+            seenStringsStartsWith.concat(seenStringsContains).some(
+              seenString =&gt; currentStrings.some(
+                currentString =&gt; currentString.indexOf(seenString) === 0)
+            )
+          );
+
+          if (hasCollision) {
+            warningsList.push({
+              type: AppConstants.WARNING_TYPES.ERROR,
+              message: `Rule ${ruleIndex + 1} from answer group ` +
+                `${answerGroupIndex + 1} will never be matched because it ` +
+                &#x27;is preceded by a \&#x27;StartsWith\&#x27; rule with a matching prefix.&#x27;
+            });
+          }
+          seenStringsStartsWith.push(...currentStrings);
+        } else if (rule.type === &#x27;Equals&#x27;) {
+          if (seenStringsEquals.some(
+            (seenString) =&gt; textInputRulesService.Equals(
+              seenString, {x: {
+                contentId: null, normalizedStrSet: currentStrings
+              }}))) {
+            warningsList.push({
+              type: AppConstants.WARNING_TYPES.ERROR,
+              message: `Rule ${ruleIndex + 1} from answer group ` +
+                `${answerGroupIndex + 1} will never be matched because it ` +
+                &#x27;is preceded by a \&#x27;Equals\&#x27; rule with a matching input.&#x27;
+            });
+          } else if (seenStringsFuzzyEquals.some(
+            (seenString) =&gt; textInputRulesService.FuzzyEquals(
+              seenString, {x: {
+                contentId: null, normalizedStrSet: currentStrings
+              }}))) {
+            warningsList.push({
+              type: AppConstants.WARNING_TYPES.ERROR,
+              message: `Rule ${ruleIndex + 1} from answer group ` +
+                `${answerGroupIndex + 1} will never be matched because it ` +
+                &#x27;is preceded by a \&#x27;FuzzyEquals\&#x27; rule with a matching input.&#x27;
+            });
+          }
+          seenStringsEquals.push(...currentStrings);
+        } else if (rule.type === &#x27;FuzzyEquals&#x27;) {
+          if (seenStringsFuzzyEquals.some(
+            (seenString) =&gt; textInputRulesService.FuzzyEquals(
+              seenString, {x: {
+                contentId: null, normalizedStrSet: currentStrings
+              }}))) {
+            warningsList.push({
+              type: AppConstants.WARNING_TYPES.ERROR,
+              message: `Rule ${ruleIndex + 1} from answer group ` +
+                `${answerGroupIndex + 1} will never be matched because it ` +
+                &#x27;is preceded by a \&#x27;FuzzyEquals\&#x27; rule with a matching input.&#x27;
+            });
+          }
+          seenStringsFuzzyEquals.push(...currentStrings);
+        }
+      }
+    }
+
+    return warningsList.concat(this.bivs.getAllOutcomeWarnings(
+      answerGroups, defaultOutcome, stateName));
+  }
+}
+
+angular.module(&#x27;oppia&#x27;).factory(
+  &#x27;TextInputValidationService&#x27;,
+  downgradeInjectable(TextInputValidationService));
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;extensions/interactions/TextInput/directives/text-input-validation.service.ts&quot;,&quot;line&quot;:51,&quot;character&quot;:8,&quot;text&quot;:&quot;warningsList&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/TextInput/directives/text-input-validation.service.ts&quot;,&quot;line&quot;:62,&quot;character&quot;:6,&quot;text&quot;:&quot;warningsList&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/TextInput/directives/text-input-validation.service.ts&quot;,&quot;line&quot;:69,&quot;character&quot;:25,&quot;text&quot;:&quot;n&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/TextInput/directives/text-input-validation.service.ts&quot;,&quot;line&quot;:70,&quot;character&quot;:30,&quot;text&quot;:&quot;n&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/TextInput/directives/text-input-validation.service.ts&quot;,&quot;line&quot;:81,&quot;character&quot;:8,&quot;text&quot;:&quot;warningsList&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/TextInput/directives/text-input-validation.service.ts&quot;,&quot;line&quot;:89,&quot;character&quot;:6,&quot;text&quot;:&quot;warningsList&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/TextInput/directives/text-input-validation.service.ts&quot;,&quot;line&quot;:132,&quot;character&quot;:10,&quot;text&quot;:&quot;&lt;TranslatableSetOfNormalizedString&gt;rule.inputs.x&quot;,&quot;kind&quot;:4}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:55 GMT</p>
+    </body>
+  </html>
+  

@@ -1,0 +1,133 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>review-test-page.component.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/review-test-page/review-test-page.component.spec.ts</td><td class="">53.91%</td><td class="">100%</td><td class="">115</td><td class="">62</td><td class="">53</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for reviewTestPage.
+ */
+
+import { TestBed } from &#x27;@angular/core/testing&#x27;;
+import { ReviewTestBackendApiService } from
+  &#x27;domain/review_test/review-test-backend-api.service&#x27;;
+import { PageTitleService } from &#x27;services/page-title.service&#x27;;
+import { ReviewTestEngineService } from
+  &#x27;pages/review-test-page/review-test-engine.service&#x27;;
+import { importAllAngularServices } from &#x27;tests/unit-test-utils&#x27;;
+
+describe(&#x27;Review test page component&#x27;, function() {
+  var ctrl = null;
+  var $q = null;
+  var $scope = null;
+  var pageTitleService = null;
+  var reviewTestBackendApiService = null;
+  var reviewTestEngineService = null;
+  var urlService = null;
+
+  importAllAngularServices();
+
+  beforeEach(function() {
+    pageTitleService = TestBed.get(PageTitleService);
+    reviewTestBackendApiService = TestBed.get(ReviewTestBackendApiService);
+    reviewTestEngineService = TestBed.get(ReviewTestEngineService);
+  });
+
+  beforeEach(angular.mock.module(&#x27;oppia&#x27;, function($provide) {
+    $provide.value(&#x27;ReviewTestBackendApiService&#x27;, reviewTestBackendApiService);
+  }));
+
+  beforeEach(angular.mock.inject(function($injector, $componentController) {
+    $q = $injector.get(&#x27;$q&#x27;);
+    var $rootScope = $injector.get(&#x27;$rootScope&#x27;);
+    urlService = $injector.get(&#x27;UrlService&#x27;);
+
+    spyOn(urlService, &#x27;getTopicUrlFragmentFromLearnerUrl&#x27;).and.returnValue(
+      &#x27;topic_1&#x27;);
+    spyOn(urlService, &#x27;getStoryUrlFragmentFromLearnerUrl&#x27;).and.returnValue(
+      &#x27;story_1&#x27;);
+    spyOn(urlService, &#x27;getClassroomUrlFragmentFromLearnerUrl&#x27;).and.returnValue(
+      &#x27;classroom_1&#x27;);
+
+    $scope = $rootScope.$new();
+    ctrl = $componentController(&#x27;reviewTestPage&#x27;, {
+      PageTitleService: pageTitleService,
+      ReviewTestEngineService: reviewTestEngineService
+    });
+
+    // This approach was choosen because spyOn() doesn&#x27;t work on properties
+    // that doesn&#x27;t have a get access type.
+    // Without this approach the test will fail because it&#x27;ll throw
+    // &#x27;Property reviewTestBackendApiService does not have access type get&#x27;
+    // or &#x27;Property reviewTestBackendApiService does not have access type set&#x27;
+    // error.
+    Object.defineProperty(ctrl, &#x27;reviewTestBackendApiService&#x27;, {
+      get: () =&gt; undefined,
+      set: () =&gt; {}
+    });
+
+    spyOnProperty(ctrl, &#x27;reviewTestBackendApiService&#x27;).and.returnValue(
+      reviewTestBackendApiService);
+    spyOn(
+      reviewTestBackendApiService, &#x27;fetchReviewTestDataAsync&#x27;).and.returnValue(
+      $q.resolve({
+        storyName: &#x27;&#x27;,
+        skillDescriptions: [&#x27;skill_1&#x27;, &#x27;skill_2&#x27;]
+      }));
+
+    ctrl.$onInit();
+    $scope.$apply();
+  }));
+
+  it(&#x27;should initialize correctly controller properties after its&#x27; +
+  &#x27; initialization and get skill details from backend&#x27;, function() {
+    expect(ctrl.questionPlayerConfig).toEqual({
+      resultActionButtons: [{
+        type: &#x27;BOOST_SCORE&#x27;,
+        i18nId: &#x27;I18N_QUESTION_PLAYER_BOOST_SCORE&#x27;
+      }, {
+        type: &#x27;RETRY_SESSION&#x27;,
+        i18nId: &#x27;I18N_QUESTION_PLAYER_RETRY_TEST&#x27;,
+        url: &#x27;/learn/classroom_1/topic_1/review-test/story_1&#x27;
+      }, {
+        type: &#x27;DASHBOARD&#x27;,
+        i18nId: &#x27;I18N_QUESTION_PLAYER_RETURN_TO_STORY&#x27;,
+        url: &#x27;/learn/classroom_1/topic_1/story/story_1&#x27;
+      }],
+      skillList: [&#x27;0&#x27;, &#x27;1&#x27;],
+      skillDescriptions: [&#x27;skill_1&#x27;, &#x27;skill_2&#x27;],
+      questionCount: 6,
+      questionPlayerMode: {
+        modeType: &#x27;PASS_FAIL&#x27;,
+        passCutoff: 0.75
+      },
+      questionsSortedByDifficulty: true
+    });
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/review-test-page/review-test-page.component.spec.ts&quot;,&quot;line&quot;:27,&quot;character&quot;:6,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/review-test-page/review-test-page.component.spec.ts&quot;,&quot;line&quot;:28,&quot;character&quot;:6,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/review-test-page/review-test-page.component.spec.ts&quot;,&quot;line&quot;:29,&quot;character&quot;:6,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/review-test-page/review-test-page.component.spec.ts&quot;,&quot;line&quot;:30,&quot;character&quot;:6,&quot;text&quot;:&quot;pageTitleService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/review-test-page/review-test-page.component.spec.ts&quot;,&quot;line&quot;:31,&quot;character&quot;:6,&quot;text&quot;:&quot;reviewTestBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/review-test-page/review-test-page.component.spec.ts&quot;,&quot;line&quot;:32,&quot;character&quot;:6,&quot;text&quot;:&quot;reviewTestEngineService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/review-test-page/review-test-page.component.spec.ts&quot;,&quot;line&quot;:33,&quot;character&quot;:6,&quot;text&quot;:&quot;urlService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/review-test-page/review-test-page.component.spec.ts&quot;,&quot;line&quot;:38,&quot;character&quot;:4,&quot;text&quot;:&quot;pageTitleService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/review-test-page/review-test-page.component.spec.ts&quot;,&quot;line&quot;:39,&quot;character&quot;:4,&quot;text&quot;:&quot;reviewTestBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/review-test-page/review-test-page.component.spec.ts&quot;,&quot;line&quot;:40,&quot;character&quot;:4,&quot;text&quot;:&quot;reviewTestEngineService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/review-test-page/review-test-page.component.spec.ts&quot;,&quot;line&quot;:43,&quot;character&quot;:51,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/review-test-page/review-test-page.component.spec.ts&quot;,&quot;line&quot;:44,&quot;character&quot;:4,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/review-test-page/review-test-page.component.spec.ts&quot;,&quot;line&quot;:44,&quot;character&quot;:13,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/review-test-page/review-test-page.component.spec.ts&quot;,&quot;line&quot;:44,&quot;character&quot;:50,&quot;text&quot;:&quot;reviewTestBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/review-test-page/review-test-page.component.spec.ts&quot;,&quot;line&quot;:47,&quot;character&quot;:42,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/review-test-page/review-test-page.component.spec.ts&quot;,&quot;line&quot;:47,&quot;character&quot;:53,&quot;text&quot;:&quot;$componentController&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/review-test-page/review-test-page.component.spec.ts&quot;,&quot;line&quot;:48,&quot;character&quot;:4,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/review-test-page/review-test-page.component.spec.ts&quot;,&quot;line&quot;:48,&quot;character&quot;:9,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/review-test-page/review-test-page.component.spec.ts&quot;,&quot;line&quot;:48,&quot;character&quot;:19,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/review-test-page/review-test-page.component.spec.ts&quot;,&quot;line&quot;:49,&quot;character&quot;:8,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/review-test-page/review-test-page.component.spec.ts&quot;,&quot;line&quot;:49,&quot;character&quot;:21,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/review-test-page/review-test-page.component.spec.ts&quot;,&quot;line&quot;:49,&quot;character&quot;:31,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/review-test-page/review-test-page.component.spec.ts&quot;,&quot;line&quot;:50,&quot;character&quot;:4,&quot;text&quot;:&quot;urlService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/review-test-page/review-test-page.component.spec.ts&quot;,&quot;line&quot;:50,&quot;character&quot;:17,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/review-test-page/review-test-page.component.spec.ts&quot;,&quot;line&quot;:50,&quot;character&quot;:27,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/review-test-page/review-test-page.component.spec.ts&quot;,&quot;line&quot;:52,&quot;character&quot;:10,&quot;text&quot;:&quot;urlService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/review-test-page/review-test-page.component.spec.ts&quot;,&quot;line&quot;:52,&quot;character&quot;:59,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/review-test-page/review-test-page.component.spec.ts&quot;,&quot;line&quot;:54,&quot;character&quot;:10,&quot;text&quot;:&quot;urlService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/review-test-page/review-test-page.component.spec.ts&quot;,&quot;line&quot;:54,&quot;character&quot;:59,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/review-test-page/review-test-page.component.spec.ts&quot;,&quot;line&quot;:56,&quot;character&quot;:10,&quot;text&quot;:&quot;urlService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/review-test-page/review-test-page.component.spec.ts&quot;,&quot;line&quot;:56,&quot;character&quot;:63,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/review-test-page/review-test-page.component.spec.ts&quot;,&quot;line&quot;:59,&quot;character&quot;:4,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/review-test-page/review-test-page.component.spec.ts&quot;,&quot;line&quot;:59,&quot;character&quot;:13,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/review-test-page/review-test-page.component.spec.ts&quot;,&quot;line&quot;:59,&quot;character&quot;:24,&quot;text&quot;:&quot;$new&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/review-test-page/review-test-page.component.spec.ts&quot;,&quot;line&quot;:60,&quot;character&quot;:4,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/review-test-page/review-test-page.component.spec.ts&quot;,&quot;line&quot;:60,&quot;character&quot;:11,&quot;text&quot;:&quot;$componentController&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/review-test-page/review-test-page.component.spec.ts&quot;,&quot;line&quot;:61,&quot;character&quot;:6,&quot;text&quot;:&quot;PageTitleService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/review-test-page/review-test-page.component.spec.ts&quot;,&quot;line&quot;:61,&quot;character&quot;:24,&quot;text&quot;:&quot;pageTitleService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/review-test-page/review-test-page.component.spec.ts&quot;,&quot;line&quot;:62,&quot;character&quot;:6,&quot;text&quot;:&quot;ReviewTestEngineService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/review-test-page/review-test-page.component.spec.ts&quot;,&quot;line&quot;:62,&quot;character&quot;:31,&quot;text&quot;:&quot;reviewTestEngineService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/review-test-page/review-test-page.component.spec.ts&quot;,&quot;line&quot;:71,&quot;character&quot;:26,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/review-test-page/review-test-page.component.spec.ts&quot;,&quot;line&quot;:76,&quot;character&quot;:18,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/review-test-page/review-test-page.component.spec.ts&quot;,&quot;line&quot;:77,&quot;character&quot;:6,&quot;text&quot;:&quot;reviewTestBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/review-test-page/review-test-page.component.spec.ts&quot;,&quot;line&quot;:79,&quot;character&quot;:6,&quot;text&quot;:&quot;reviewTestBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/review-test-page/review-test-page.component.spec.ts&quot;,&quot;line&quot;:79,&quot;character&quot;:63,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/review-test-page/review-test-page.component.spec.ts&quot;,&quot;line&quot;:80,&quot;character&quot;:6,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/review-test-page/review-test-page.component.spec.ts&quot;,&quot;line&quot;:80,&quot;character&quot;:9,&quot;text&quot;:&quot;resolve&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/review-test-page/review-test-page.component.spec.ts&quot;,&quot;line&quot;:85,&quot;character&quot;:4,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/review-test-page/review-test-page.component.spec.ts&quot;,&quot;line&quot;:85,&quot;character&quot;:9,&quot;text&quot;:&quot;$onInit&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/review-test-page/review-test-page.component.spec.ts&quot;,&quot;line&quot;:86,&quot;character&quot;:4,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/review-test-page/review-test-page.component.spec.ts&quot;,&quot;line&quot;:86,&quot;character&quot;:11,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/review-test-page/review-test-page.component.spec.ts&quot;,&quot;line&quot;:91,&quot;character&quot;:11,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/review-test-page/review-test-page.component.spec.ts&quot;,&quot;line&quot;:91,&quot;character&quot;:16,&quot;text&quot;:&quot;questionPlayerConfig&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:58 GMT</p>
+    </body>
+  </html>
+  

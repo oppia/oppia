@@ -1,0 +1,148 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>topic-creation-backend-api.service.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/domain/topic/topic-creation-backend-api.service.spec.ts</td><td class="">92.78%</td><td class="">100%</td><td class="">194</td><td class="">180</td><td class="">14</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit test for TopicCreationBackendApiService.
+ */
+
+import { HttpErrorResponse } from &#x27;@angular/common/http&#x27;;
+import { HttpClientTestingModule, HttpTestingController }
+  from &#x27;@angular/common/http/testing&#x27;;
+import { TestBed, fakeAsync, flushMicrotasks } from &#x27;@angular/core/testing&#x27;;
+
+import { CsrfTokenService } from &#x27;services/csrf-token.service&#x27;;
+import { ImageData } from &#x27;domain/skill/skill-creation-backend-api.service&#x27;;
+import { NewlyCreatedTopic } from
+  &#x27;domain/topics_and_skills_dashboard/newly-created-topic.model&#x27;;
+import { TopicCreationBackendApiService } from
+  &#x27;domain/topic/topic-creation-backend-api.service&#x27;;
+
+describe(&#x27;Topic creation backend api service&#x27;, () =&gt; {
+  let csrfService: CsrfTokenService = null;
+  let httpTestingController: HttpTestingController = null;
+  let topicCreationBackendApiService: TopicCreationBackendApiService = null;
+  let topic: NewlyCreatedTopic = null;
+  let imagesData: ImageData[] = null;
+  const thumbnailBgColor = &#x27;#e3e3e3&#x27;;
+  let postData = {
+    name: &#x27;topic-name&#x27;,
+    description: &#x27;Description&#x27;,
+    thumbnailBgColor: thumbnailBgColor,
+    filename: &#x27;image.svg&#x27;,
+    url_fragment: &#x27;url-fragment&#x27;
+  };
+
+  beforeEach(() =&gt; {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [TopicCreationBackendApiService]
+    });
+
+    csrfService = TestBed.get(CsrfTokenService);
+    httpTestingController = TestBed.get(HttpTestingController);
+    topicCreationBackendApiService = TestBed.get(
+      TopicCreationBackendApiService);
+    topic = NewlyCreatedTopic.createDefault();
+    topic.name = &#x27;topic-name&#x27;;
+    topic.description = &#x27;Description&#x27;;
+    topic.urlFragment = &#x27;url-fragment&#x27;;
+    let imageBlob = new Blob(
+      [&#x27;data:image/png;base64,xyz&#x27;]);
+    imagesData = [{
+      filename: &#x27;image.svg&#x27;,
+      imageBlob: imageBlob
+    }];
+
+    // This throws &quot;Argument of type &#x27;() -&gt; Promise&lt;unknown&gt;&#x27;
+    // is not assignable to parameter of type &#x27;PromiseLike&lt;string&gt;&#x27;.&quot;.
+    // We need to suppress this error because we need to mock the
+    // `getTokenAsync` function for testing purposes.
+    // @ts-expect-error
+    spyOn(csrfService, &#x27;getTokenAsync&#x27;).and.returnValue(async() =&gt; {
+      return new Promise((resolve) =&gt; {
+        resolve(&#x27;sample-csrf-token&#x27;);
+      });
+    });
+  });
+
+  afterEach(()=&gt; {
+    httpTestingController.verify();
+  });
+
+  it(&#x27;should successfully create a new topic and obtain the skill ID&#x27;,
+    fakeAsync(() =&gt; {
+      let successHandler = jasmine.createSpy(&#x27;success&#x27;);
+      let failHandler = jasmine.createSpy(&#x27;fail&#x27;);
+      topicCreationBackendApiService.createTopicAsync(
+        topic, imagesData, thumbnailBgColor).then(
+        successHandler);
+      let req = httpTestingController.expectOne(
+        &#x27;/topic_editor_handler/create_new&#x27;);
+      expect(req.request.method).toEqual(&#x27;POST&#x27;);
+
+      expect(req.request.body.get(&#x27;payload&#x27;)).toEqual(JSON.stringify(postData));
+      let sampleFormData = new FormData();
+      sampleFormData.append(&#x27;image&#x27;, imagesData[0].imageBlob);
+      expect(
+        req.request.body.get(&#x27;image&#x27;)).toEqual(sampleFormData.get(&#x27;image&#x27;));
+      req.flush(postData);
+      flushMicrotasks();
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }));
+
+  it(&#x27;should fail to create a new topic and call the fail handler&#x27;,
+    fakeAsync(() =&gt; {
+      let successHandler = jasmine.createSpy(&#x27;success&#x27;);
+      let failHandler = jasmine.createSpy(&#x27;fail&#x27;);
+      topicCreationBackendApiService.createTopicAsync(
+        topic, imagesData, thumbnailBgColor).then(
+        successHandler, failHandler);
+      const errorResponse = new HttpErrorResponse({
+        error: &#x27;test 404 error&#x27;,
+        status: 404,
+        statusText: &#x27;Not Found&#x27;
+      });
+      let req = httpTestingController.expectOne(
+        &#x27;/topic_editor_handler/create_new&#x27;);
+      req.error(new ErrorEvent(&#x27;Error&#x27;), errorResponse);
+      expect(req.request.method).toEqual(&#x27;POST&#x27;);
+      expect(req.request.body.get(&#x27;payload&#x27;)).toEqual(JSON.stringify(postData));
+      let sampleFormData = new FormData();
+      sampleFormData.append(&#x27;image&#x27;, imagesData[0].imageBlob);
+      expect(
+        req.request.body.get(&#x27;image&#x27;)).toEqual(sampleFormData.get(&#x27;image&#x27;));
+      flushMicrotasks();
+      expect(failHandler).toHaveBeenCalled();
+      expect(successHandler).not.toHaveBeenCalled();
+    }));
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/domain/topic/topic-creation-backend-api.service.spec.ts&quot;,&quot;line&quot;:91,&quot;character&quot;:17,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-creation-backend-api.service.spec.ts&quot;,&quot;line&quot;:93,&quot;character&quot;:17,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-creation-backend-api.service.spec.ts&quot;,&quot;line&quot;:93,&quot;character&quot;:25,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-creation-backend-api.service.spec.ts&quot;,&quot;line&quot;:93,&quot;character&quot;:30,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-creation-backend-api.service.spec.ts&quot;,&quot;line&quot;:97,&quot;character&quot;:12,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-creation-backend-api.service.spec.ts&quot;,&quot;line&quot;:97,&quot;character&quot;:20,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-creation-backend-api.service.spec.ts&quot;,&quot;line&quot;:97,&quot;character&quot;:25,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-creation-backend-api.service.spec.ts&quot;,&quot;line&quot;:119,&quot;character&quot;:17,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-creation-backend-api.service.spec.ts&quot;,&quot;line&quot;:120,&quot;character&quot;:17,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-creation-backend-api.service.spec.ts&quot;,&quot;line&quot;:120,&quot;character&quot;:25,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-creation-backend-api.service.spec.ts&quot;,&quot;line&quot;:120,&quot;character&quot;:30,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-creation-backend-api.service.spec.ts&quot;,&quot;line&quot;:124,&quot;character&quot;:12,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-creation-backend-api.service.spec.ts&quot;,&quot;line&quot;:124,&quot;character&quot;:20,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-creation-backend-api.service.spec.ts&quot;,&quot;line&quot;:124,&quot;character&quot;:25,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:57 GMT</p>
+    </body>
+  </html>
+  

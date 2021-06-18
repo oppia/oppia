@@ -1,0 +1,314 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>SkillObjectFactory.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/domain/skill/SkillObjectFactory.ts</td><td class="">99.32%</td><td class="">100%</td><td class="">442</td><td class="">439</td><td class="">3</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2018 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Factory for creating frontend skills
+ */
+
+export interface SkillBackendDict {
+  &#x27;all_questions_merged&#x27;: boolean;
+  description: string;
+  id: string;
+  &#x27;language_code&#x27;: string;
+  misconceptions: MisconceptionBackendDict[];
+  &#x27;next_misconception_id&#x27;: number;
+  &#x27;prerequisite_skill_ids&#x27;: string[];
+  rubrics: RubricBackendDict[];
+  &#x27;skill_contents&#x27;: ConceptCardBackendDict;
+  &#x27;superseding_skill_id&#x27;: string;
+  version: number;
+}
+
+import { downgradeInjectable } from &#x27;@angular/upgrade/static&#x27;;
+import { Injectable } from &#x27;@angular/core&#x27;;
+
+import { ConceptCardObjectFactory, ConceptCard, ConceptCardBackendDict } from
+  &#x27;domain/skill/ConceptCardObjectFactory&#x27;;
+import { MisconceptionObjectFactory, Misconception, MisconceptionBackendDict }
+  from &#x27;domain/skill/MisconceptionObjectFactory&#x27;;
+import { Rubric, RubricBackendDict } from
+  &#x27;domain/skill/rubric.model&#x27;;
+import { ValidatorsService } from &#x27;services/validators.service&#x27;;
+import constants from &#x27;assets/constants&#x27;;
+
+export class Skill {
+  _id: string;
+  _description: string;
+  _misconceptions: Misconception[];
+  _rubrics: Rubric[];
+  _conceptCard: ConceptCard;
+  _languageCode: string;
+  _version: number;
+  _nextMisconceptionId: number;
+  _supersedingSkillId: string | null;
+  _allQuestionsMerged: boolean;
+  _prerequisiteSkillIds: string[];
+  SKILL_DIFFICULTIES: readonly string[] = constants.SKILL_DIFFICULTIES;
+
+  constructor(
+      id: string, description: string, misconceptions: Misconception[],
+      rubrics: Rubric[], conceptCard: ConceptCard, languageCode: string,
+      version: number, nextMisconceptionId: number, supersedingSkillId: string,
+      allQuestionsMerged: boolean, prerequisiteSkillIds: string[]) {
+    this._id = id;
+    this._allQuestionsMerged = allQuestionsMerged;
+    this._conceptCard = conceptCard;
+    this._rubrics = rubrics;
+    this._misconceptions = misconceptions;
+    this._languageCode = languageCode;
+    this._version = version;
+    this._description = description;
+    this._nextMisconceptionId = nextMisconceptionId;
+    this._supersedingSkillId = supersedingSkillId;
+    this._prerequisiteSkillIds = prerequisiteSkillIds;
+  }
+  copyFromSkill(skill: Skill): void {
+    this._id = skill.getId();
+    this._description = skill.getDescription();
+    this._misconceptions = skill.getMisconceptions();
+    this._rubrics = skill.getRubrics();
+    this._conceptCard = skill.getConceptCard();
+    this._languageCode = skill.getLanguageCode();
+    this._version = skill.getVersion();
+    this._nextMisconceptionId = skill.getNextMisconceptionId();
+    this._supersedingSkillId = skill.getSupersedingSkillId();
+    this._allQuestionsMerged = skill.getAllQuestionsMerged();
+    this._prerequisiteSkillIds = skill.getPrerequisiteSkillIds();
+  }
+  getId(): string {
+    return this._id;
+  }
+
+  setDescription(description: string): void {
+    this._description = description;
+  }
+
+  getDescription(): string {
+    return this._description;
+  }
+
+  getPrerequisiteSkillIds(): string[] {
+    return this._prerequisiteSkillIds.slice();
+  }
+
+  addPrerequisiteSkill(skillId: string): void {
+    this._prerequisiteSkillIds.push(skillId);
+  }
+
+  deletePrerequisiteSkill(skillId: string): void {
+    this._prerequisiteSkillIds.forEach((preReq: string, index) =&gt; {
+      if (preReq === skillId) {
+        this._prerequisiteSkillIds.splice(index, 1);
+      }
+    });
+  }
+
+  getConceptCard(): ConceptCard {
+    return this._conceptCard;
+  }
+
+  getMisconceptions(): Misconception[] {
+    return this._misconceptions.slice();
+  }
+
+  getRubrics(): Rubric[] {
+    return this._rubrics;
+  }
+
+  appendMisconception(newMisconception: Misconception): void {
+    this._misconceptions.push(newMisconception);
+    this._nextMisconceptionId = this.getIncrementedMisconceptionId(
+      newMisconception.getId());
+  }
+
+  getLanguageCode(): string {
+    return this._languageCode;
+  }
+
+  getVersion(): number {
+    return this._version;
+  }
+
+  getNextMisconceptionId(): number {
+    return this._nextMisconceptionId;
+  }
+
+  getIncrementedMisconceptionId(id: string): number {
+    return (parseInt(id) + 1);
+  }
+
+  getSupersedingSkillId(): string {
+    return this._supersedingSkillId;
+  }
+
+  getAllQuestionsMerged(): boolean {
+    return this._allQuestionsMerged;
+  }
+
+  findMisconceptionById(id: string): Misconception {
+    for (var idx in this._misconceptions) {
+      if (this._misconceptions[idx].getId() === id) {
+        return this._misconceptions[idx];
+      }
+    }
+    throw new Error(&#x27;Could not find misconception with ID: &#x27; + id);
+  }
+
+  deleteMisconception(id: string): void {
+    this._misconceptions.forEach((misc: Misconception) =&gt; {
+      if (misc.getId() === id) {
+        this._misconceptions.splice(this._misconceptions.indexOf(misc), 1);
+      }
+    });
+  }
+
+  getMisconceptionAtIndex(idx: number): Misconception {
+    return this._misconceptions[idx];
+  }
+
+  getRubricExplanations(difficulty: string): string[] {
+    for (var idx in this._rubrics) {
+      if (this._rubrics[idx].getDifficulty() === difficulty) {
+        return this._rubrics[idx].getExplanations();
+      }
+    }
+    return null;
+  }
+
+  getMisconceptionId(index: number): string {
+    return this._misconceptions[index].getId();
+  }
+
+  updateRubricForDifficulty(difficulty: string, explanations: string[]): void {
+    if (this.SKILL_DIFFICULTIES.indexOf(difficulty) === -1) {
+      throw new Error(&#x27;Invalid difficulty value passed&#x27;);
+    }
+    for (var idx in this._rubrics) {
+      if (this._rubrics[idx].getDifficulty() === difficulty) {
+        this._rubrics[idx].setExplanations(explanations);
+        return;
+      }
+    }
+    this._rubrics.push(Rubric.create(difficulty, explanations));
+  }
+
+  toBackendDict(): SkillBackendDict {
+    return {
+      id: this._id,
+      description: this._description,
+      misconceptions: this._misconceptions.map(
+        (misconception: Misconception) =&gt; {
+          return misconception.toBackendDict();
+        }),
+      rubrics: this._rubrics.map((rubric: Rubric) =&gt; {
+        return rubric.toBackendDict();
+      }),
+      skill_contents: this._conceptCard.toBackendDict(),
+      language_code: this._languageCode,
+      version: this._version,
+      next_misconception_id: this._nextMisconceptionId,
+      superseding_skill_id: this._supersedingSkillId,
+      all_questions_merged: this._allQuestionsMerged,
+      prerequisite_skill_ids: this._prerequisiteSkillIds
+    };
+  }
+  getValidationIssues(): string[] {
+    var issues = [];
+    if (this.getConceptCard().getExplanation().html === &#x27;&#x27;) {
+      issues.push(
+        &#x27;There should be review material in the concept card.&#x27;);
+    }
+    if (this.getRubrics().length !== 3) {
+      issues.push(
+        &#x27;All 3 difficulties (Easy, Medium and Hard) should be addressed &#x27; +
+        &#x27;in rubrics.&#x27;);
+    }
+    return issues;
+  }
+}
+
+@Injectable({
+  providedIn: &#x27;root&#x27;
+})
+export class SkillObjectFactory {
+  constructor(
+    private conceptCardObjectFactory: ConceptCardObjectFactory,
+    private misconceptionObjectFactory: MisconceptionObjectFactory,
+    private validatorService: ValidatorsService) {
+  }
+  createInterstitialSkill(): Skill {
+    return new Skill(
+      null, &#x27;Skill description loading&#x27;,
+      [], [], this.conceptCardObjectFactory.createInterstitialConceptCard(),
+      &#x27;en&#x27;, 1, 0, null, false, []);
+  }
+
+  hasValidDescription(description: string): boolean {
+    var allowDescriptionToBeBlank = false;
+    return this.validatorService.isValidEntityName(
+      description, false, allowDescriptionToBeBlank);
+  }
+
+  createFromBackendDict(skillBackendDict: SkillBackendDict): Skill {
+    return new Skill(
+      skillBackendDict.id,
+      skillBackendDict.description,
+      this.generateMisconceptionsFromBackendDict(
+        skillBackendDict.misconceptions),
+      this.generateRubricsFromBackendDict(skillBackendDict.rubrics),
+      this.conceptCardObjectFactory.createFromBackendDict(
+        skillBackendDict.skill_contents),
+      skillBackendDict.language_code,
+      skillBackendDict.version,
+      skillBackendDict.next_misconception_id,
+      skillBackendDict.superseding_skill_id,
+      skillBackendDict.all_questions_merged,
+      skillBackendDict.prerequisite_skill_ids);
+  }
+
+  generateMisconceptionsFromBackendDict(
+      misconceptionsBackendDicts: MisconceptionBackendDict[]): Misconception[] {
+    return misconceptionsBackendDicts.map(misconceptionsBackendDict =&gt; {
+      return this.misconceptionObjectFactory.createFromBackendDict(
+        misconceptionsBackendDict);
+    });
+  }
+
+  generateRubricsFromBackendDict(
+      rubricBackendDicts: RubricBackendDict[]): Rubric[] {
+    return rubricBackendDicts.map((rubricBackendDict) =&gt; {
+      return Rubric.createFromBackendDict(rubricBackendDict);
+    });
+  }
+}
+angular.module(&#x27;oppia&#x27;).factory(&#x27;SkillObjectFactory&#x27;,
+  downgradeInjectable(SkillObjectFactory));
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/domain/skill/SkillObjectFactory.ts&quot;,&quot;line&quot;:226,&quot;character&quot;:8,&quot;text&quot;:&quot;issues&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/skill/SkillObjectFactory.ts&quot;,&quot;line&quot;:228,&quot;character&quot;:6,&quot;text&quot;:&quot;issues&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/skill/SkillObjectFactory.ts&quot;,&quot;line&quot;:232,&quot;character&quot;:6,&quot;text&quot;:&quot;issues&quot;,&quot;kind&quot;:2}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:55 GMT</p>
+    </body>
+  </html>
+  

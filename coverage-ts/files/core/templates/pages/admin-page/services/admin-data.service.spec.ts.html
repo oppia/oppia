@@ -1,0 +1,177 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>admin-data.service.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/admin-page/services/admin-data.service.spec.ts</td><td class="">98.84%</td><td class="">100%</td><td class="">173</td><td class="">171</td><td class="">2</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2019 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Tests for AdminDataService.
+ */
+
+import { HttpClientTestingModule, HttpTestingController } from
+  &#x27;@angular/common/http/testing&#x27;;
+import { TestBed, fakeAsync, flushMicrotasks } from &#x27;@angular/core/testing&#x27;;
+
+import { AdminDataService } from
+  &#x27;pages/admin-page/services/admin-data.service&#x27;;
+import { AdminPageData, AdminPageDataBackendDict } from
+  &#x27;domain/admin/admin-backend-api.service&#x27;;
+import { PlatformParameterFilterType } from &#x27;domain/platform_feature/platform-parameter-filter.model&#x27;;
+import { FeatureStage, PlatformParameter } from &#x27;domain/platform_feature/platform-parameter.model&#x27;;
+import { TopicSummary } from &#x27;domain/topic/topic-summary.model&#x27;;
+
+
+describe(&#x27;Admin Data Service&#x27;, () =&gt; {
+  let adminDataService: AdminDataService = null;
+  let httpTestingController: HttpTestingController;
+  var sampleAdminData: AdminPageDataBackendDict = {
+    role_to_actions: {
+      guest: [&#x27;action for guest&#x27;]
+    },
+    topic_summaries: [
+      {
+        topic_model_created_on: 1591196558882.194,
+        uncategorized_skill_count: 0,
+        name: &#x27;Empty Topic&#x27;,
+        additional_story_count: 0,
+        total_skill_count: 0,
+        version: 1,
+        canonical_story_count: 0,
+        subtopic_count: 0,
+        description: &#x27;&#x27;,
+        id: &#x27;VqgPTpt7JyJy&#x27;,
+        topic_model_last_updated: 1591196558882.2,
+        language_code: &#x27;en&#x27;,
+        thumbnail_filename: &#x27;image.svg&#x27;,
+        thumbnail_bg_color: &#x27;#C6DCDA&#x27;,
+        total_published_node_count: 10,
+        url_fragment: &#x27;topicurlfrag&#x27;
+      }
+    ],
+    updatable_roles: {
+      TOPIC_MANAGER: &#x27;topic manager&#x27;
+    },
+    human_readable_current_time: &#x27;June 03 15:31:20&#x27;,
+    demo_collections: [],
+    config_properties: {
+      oppia_csrf_secret: {
+        schema: {
+          type: &#x27;unicode&#x27;
+        },
+        value: &#x27;3WHOWnD3sy0r1wukJ2lX4vBS_YA=&#x27;,
+        description: &#x27;Text used to encrypt CSRF tokens.&#x27;
+      }
+    },
+    demo_exploration_ids: [&#x27;19&#x27;],
+    demo_explorations: [
+      [
+        &#x27;0&#x27;,
+        &#x27;welcome.yaml&#x27;
+      ]
+    ],
+    viewable_roles: {
+      TOPIC_MANAGER: &#x27;topic manager&#x27;
+    },
+    feature_flags: [{
+      name: &#x27;dummy_feature&#x27;,
+      description: &#x27;this is a dummy feature&#x27;,
+      data_type: &#x27;bool&#x27;,
+      rules: [{
+        filters: [{
+          type: PlatformParameterFilterType.ServerMode,
+          conditions: [&lt;[string, string]&gt;[&#x27;=&#x27;, &#x27;dev&#x27;]]
+        }],
+        value_when_matched: true
+      }],
+      rule_schema_version: 1,
+      default_value: false,
+      is_feature: true,
+      feature_stage: FeatureStage.DEV
+    }]
+  };
+  let adminDataResponse: AdminPageData;
+
+  beforeEach(() =&gt; {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [AdminDataService]
+    });
+    adminDataService = TestBed.get(AdminDataService);
+    httpTestingController = TestBed.get(HttpTestingController);
+    adminDataResponse = {
+      demoExplorations: sampleAdminData.demo_explorations,
+      demoCollections: sampleAdminData.demo_collections,
+      demoExplorationIds: sampleAdminData.demo_exploration_ids,
+      updatableRoles: sampleAdminData.updatable_roles,
+      roleToActions: sampleAdminData.role_to_actions,
+      configProperties: sampleAdminData.config_properties,
+      viewableRoles: sampleAdminData.viewable_roles,
+      topicSummaries: sampleAdminData.topic_summaries.map(
+        TopicSummary.createFromBackendDict),
+      featureFlags: sampleAdminData.feature_flags.map(
+        dict =&gt; PlatformParameter.createFromBackendDict(dict))
+    };
+  });
+
+  afterEach(() =&gt; {
+    httpTestingController.verify();
+  });
+
+  it(&#x27;should return the correct admin data&#x27;, fakeAsync(() =&gt; {
+    adminDataService.getDataAsync().then(function(response) {
+      expect(response).toEqual(adminDataResponse);
+    });
+
+    var req = httpTestingController.expectOne(
+      &#x27;/adminhandler&#x27;);
+    expect(req.request.method).toEqual(&#x27;GET&#x27;);
+    req.flush(sampleAdminData);
+
+    flushMicrotasks();
+  }));
+
+  it(&#x27;should cache the response and not make a second request&#x27;,
+    fakeAsync(() =&gt; {
+      adminDataService.getDataAsync();
+
+      var req = httpTestingController.expectOne(
+        &#x27;/adminhandler&#x27;);
+      expect(req.request.method).toEqual(&#x27;GET&#x27;);
+      req.flush(sampleAdminData);
+
+      flushMicrotasks();
+
+      adminDataService.getDataAsync().then(function(response) {
+        expect(response).toEqual(adminDataResponse);
+      });
+
+      httpTestingController.expectNone(&#x27;/adminhandler&#x27;);
+    })
+  );
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/admin-page/services/admin-data.service.spec.ts&quot;,&quot;line&quot;:134,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/admin-page/services/admin-data.service.spec.ts&quot;,&quot;line&quot;:146,&quot;character&quot;:17,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:59 GMT</p>
+    </body>
+  </html>
+  

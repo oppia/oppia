@@ -1,0 +1,196 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>keyboard-shortcut.service.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/services/keyboard-shortcut.service.spec.ts</td><td class="">75.63%</td><td class="">100%</td><td class="">316</td><td class="">239</td><td class="">77</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for the keyboard shortcut service.
+ */
+import Mousetrap from &#x27;mousetrap&#x27;;
+
+import { ApplicationRef } from &#x27;@angular/core&#x27;;
+import { async, TestBed } from &#x27;@angular/core/testing&#x27;;
+import { KeyboardShortcutService } from &#x27;services/keyboard-shortcut.service&#x27;;
+import { KeyboardShortcutHelpModalComponent } from
+  // eslint-disable-next-line max-len
+  &#x27;components/keyboard-shortcut-help/keyboard-shortcut-help-modal.component&#x27;;
+import { NgbModal, NgbActiveModal } from &#x27;@ng-bootstrap/ng-bootstrap&#x27;;
+import { WindowRef } from &#x27;services/contextual/window-ref.service&#x27;;
+
+class MockActiveModal {
+  dismiss(): void {
+    return;
+  }
+}
+describe(&#x27;Keyboard Shortcuts&#x27;, () =&gt; {
+  let skipButton = document.createElement(&#x27;button&#x27;);
+  let nextButton = document.createElement(&#x27;button&#x27;);
+  let continueButton = document.createElement(&#x27;button&#x27;);
+  let backButton = document.createElement(&#x27;button&#x27;);
+  let searchBar = document.createElement(&#x27;input&#x27;);
+  let categoryBar = document.createElement(&#x27;select&#x27;);
+
+  let openQuickReferenceSpy;
+
+  let mockWindow = {
+    location: {
+      href: &#x27;&#x27;
+    }
+  };
+
+  let windowRef;
+  let appRef: ApplicationRef;
+  let keyboardShortcutService;
+  let ngbModal: NgbModal;
+
+
+  beforeEach(async(() =&gt; {
+    TestBed.configureTestingModule({
+      declarations: [KeyboardShortcutHelpModalComponent],
+      providers: [
+        {
+          provide: NgbActiveModal,
+          useClass: MockActiveModal
+        }
+      ]
+    }).compileComponents();
+  }));
+
+  beforeEach(async() =&gt; {
+    ngbModal = TestBed.get(NgbModal);
+    windowRef = new WindowRef();
+    appRef = TestBed.get(ApplicationRef);
+    keyboardShortcutService = new KeyboardShortcutService(
+      windowRef,
+      ngbModal,
+      appRef
+    );
+  });
+
+  beforeAll(() =&gt; {
+    skipButton.setAttribute(&#x27;class&#x27;, &#x27;oppia-skip-to-content&#x27;);
+    backButton.setAttribute(&#x27;class&#x27;, &#x27;oppia-back-button&#x27;);
+    nextButton.setAttribute(&#x27;class&#x27;, &#x27;oppia-next-button&#x27;);
+    continueButton.setAttribute(&#x27;class&#x27;, &#x27;oppia-learner-confirm-button&#x27;);
+    searchBar.setAttribute(&#x27;class&#x27;, &#x27;oppia-search-bar-text-input&#x27;);
+    categoryBar.setAttribute(&#x27;class&#x27;, &#x27;oppia-search-bar-dropdown-toggle&#x27;);
+    document.body.append(skipButton);
+    document.body.append(continueButton);
+    document.body.append(backButton);
+    document.body.append(searchBar);
+    document.body.append(categoryBar);
+  });
+
+
+  it(&#x27;should navigate to the corresponding page&#x27; +
+    &#x27; when the navigation key is pressed&#x27;, () =&gt; {
+    spyOnProperty(windowRef, &#x27;nativeWindow&#x27;).and.returnValue(mockWindow);
+    keyboardShortcutService.bindNavigationShortcuts();
+
+    mockWindow.location.href = &#x27;&#x27;;
+    expect(windowRef.nativeWindow.location.href).toBe(&#x27;&#x27;);
+
+    Mousetrap.trigger(&#x27;ctrl+0&#x27;);
+    expect(windowRef.nativeWindow.location.href).toEqual(&#x27;/get-started&#x27;);
+    mockWindow.location.href = &#x27;&#x27;;
+    expect(windowRef.nativeWindow.location.href).toBe(&#x27;&#x27;);
+
+    Mousetrap.trigger(&#x27;ctrl+1&#x27;);
+    expect(windowRef.nativeWindow.location.href).toEqual(&#x27;/community-library&#x27;);
+    mockWindow.location.href = &#x27;&#x27;;
+    expect(windowRef.nativeWindow.location.href).toBe(&#x27;&#x27;);
+
+    Mousetrap.trigger(&#x27;ctrl+2&#x27;);
+    expect(windowRef.nativeWindow.location.href).toEqual(&#x27;/learner-dashboard&#x27;);
+    mockWindow.location.href = &#x27;&#x27;;
+    expect(windowRef.nativeWindow.location.href).toBe(&#x27;&#x27;);
+
+    Mousetrap.trigger(&#x27;ctrl+3&#x27;);
+    expect(windowRef.nativeWindow.location.href).toEqual(&#x27;/creator-dashboard&#x27;);
+    mockWindow.location.href = &#x27;&#x27;;
+    expect(windowRef.nativeWindow.location.href).toBe(&#x27;&#x27;);
+
+    Mousetrap.trigger(&#x27;ctrl+4&#x27;);
+    expect(windowRef.nativeWindow.location.href).toEqual(&#x27;/about&#x27;);
+    mockWindow.location.href = &#x27;&#x27;;
+    expect(windowRef.nativeWindow.location.href).toBe(&#x27;&#x27;);
+
+    Mousetrap.trigger(&#x27;ctrl+5&#x27;);
+    expect(windowRef.nativeWindow.location.href).toEqual(&#x27;/notifications&#x27;);
+    mockWindow.location.href = &#x27;&#x27;;
+    expect(windowRef.nativeWindow.location.href).toBe(&#x27;&#x27;);
+
+    Mousetrap.trigger(&#x27;ctrl+6&#x27;);
+    expect(windowRef.nativeWindow.location.href).toEqual(&#x27;/preferences&#x27;);
+    mockWindow.location.href = &#x27;&#x27;;
+    expect(windowRef.nativeWindow.location.href).toBe(&#x27;&#x27;);
+  });
+
+  it(&#x27;should move the focus to the corresponding element&#x27; +
+    &#x27; when the action key is pressed&#x27;, () =&gt; {
+    openQuickReferenceSpy = spyOn(
+      keyboardShortcutService, &#x27;openQuickReference&#x27;).and.callThrough();
+    spyOn(ngbModal, &#x27;open&#x27;);
+    spyOn(ngbModal, &#x27;dismissAll&#x27;);
+    spyOn(appRef, &#x27;tick&#x27;);
+
+    keyboardShortcutService.bindLibraryPageShortcuts();
+
+    Mousetrap.trigger(&#x27;s&#x27;);
+    expect(skipButton.isEqualNode(document.activeElement));
+
+    Mousetrap.trigger(&#x27;/&#x27;);
+    expect(searchBar.isEqualNode(document.activeElement));
+
+    Mousetrap.trigger(&#x27;c&#x27;);
+    expect(categoryBar.isEqualNode(document.activeElement));
+
+    Mousetrap.trigger(&#x27;?&#x27;);
+    expect(openQuickReferenceSpy).toHaveBeenCalled();
+
+    keyboardShortcutService.bindExplorationPlayerShortcuts();
+
+    Mousetrap.trigger(&#x27;s&#x27;);
+    expect(skipButton.isEqualNode(document.activeElement));
+
+    Mousetrap.trigger(&#x27;k&#x27;);
+    expect(backButton.isEqualNode(document.activeElement));
+
+    Mousetrap.trigger(&#x27;j&#x27;);
+    expect(continueButton.isEqualNode(document.activeElement));
+
+    document.body.append(nextButton);
+    Mousetrap.trigger(&#x27;j&#x27;);
+    expect(nextButton.isEqualNode(document.activeElement));
+
+    Mousetrap.trigger(&#x27;?&#x27;);
+    expect(openQuickReferenceSpy).toHaveBeenCalled();
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:41,&quot;character&quot;:6,&quot;text&quot;:&quot;openQuickReferenceSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:49,&quot;character&quot;:6,&quot;text&quot;:&quot;windowRef&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:51,&quot;character&quot;:6,&quot;text&quot;:&quot;keyboardShortcutService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:69,&quot;character&quot;:4,&quot;text&quot;:&quot;windowRef&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:71,&quot;character&quot;:4,&quot;text&quot;:&quot;keyboardShortcutService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:95,&quot;character&quot;:18,&quot;text&quot;:&quot;windowRef&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:96,&quot;character&quot;:4,&quot;text&quot;:&quot;keyboardShortcutService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:96,&quot;character&quot;:28,&quot;text&quot;:&quot;bindNavigationShortcuts&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:99,&quot;character&quot;:11,&quot;text&quot;:&quot;windowRef&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:99,&quot;character&quot;:21,&quot;text&quot;:&quot;nativeWindow&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:99,&quot;character&quot;:34,&quot;text&quot;:&quot;location&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:99,&quot;character&quot;:43,&quot;text&quot;:&quot;href&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:102,&quot;character&quot;:11,&quot;text&quot;:&quot;windowRef&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:102,&quot;character&quot;:21,&quot;text&quot;:&quot;nativeWindow&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:102,&quot;character&quot;:34,&quot;text&quot;:&quot;location&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:102,&quot;character&quot;:43,&quot;text&quot;:&quot;href&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:104,&quot;character&quot;:11,&quot;text&quot;:&quot;windowRef&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:104,&quot;character&quot;:21,&quot;text&quot;:&quot;nativeWindow&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:104,&quot;character&quot;:34,&quot;text&quot;:&quot;location&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:104,&quot;character&quot;:43,&quot;text&quot;:&quot;href&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:107,&quot;character&quot;:11,&quot;text&quot;:&quot;windowRef&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:107,&quot;character&quot;:21,&quot;text&quot;:&quot;nativeWindow&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:107,&quot;character&quot;:34,&quot;text&quot;:&quot;location&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:107,&quot;character&quot;:43,&quot;text&quot;:&quot;href&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:109,&quot;character&quot;:11,&quot;text&quot;:&quot;windowRef&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:109,&quot;character&quot;:21,&quot;text&quot;:&quot;nativeWindow&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:109,&quot;character&quot;:34,&quot;text&quot;:&quot;location&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:109,&quot;character&quot;:43,&quot;text&quot;:&quot;href&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:112,&quot;character&quot;:11,&quot;text&quot;:&quot;windowRef&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:112,&quot;character&quot;:21,&quot;text&quot;:&quot;nativeWindow&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:112,&quot;character&quot;:34,&quot;text&quot;:&quot;location&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:112,&quot;character&quot;:43,&quot;text&quot;:&quot;href&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:114,&quot;character&quot;:11,&quot;text&quot;:&quot;windowRef&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:114,&quot;character&quot;:21,&quot;text&quot;:&quot;nativeWindow&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:114,&quot;character&quot;:34,&quot;text&quot;:&quot;location&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:114,&quot;character&quot;:43,&quot;text&quot;:&quot;href&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:117,&quot;character&quot;:11,&quot;text&quot;:&quot;windowRef&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:117,&quot;character&quot;:21,&quot;text&quot;:&quot;nativeWindow&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:117,&quot;character&quot;:34,&quot;text&quot;:&quot;location&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:117,&quot;character&quot;:43,&quot;text&quot;:&quot;href&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:119,&quot;character&quot;:11,&quot;text&quot;:&quot;windowRef&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:119,&quot;character&quot;:21,&quot;text&quot;:&quot;nativeWindow&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:119,&quot;character&quot;:34,&quot;text&quot;:&quot;location&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:119,&quot;character&quot;:43,&quot;text&quot;:&quot;href&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:122,&quot;character&quot;:11,&quot;text&quot;:&quot;windowRef&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:122,&quot;character&quot;:21,&quot;text&quot;:&quot;nativeWindow&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:122,&quot;character&quot;:34,&quot;text&quot;:&quot;location&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:122,&quot;character&quot;:43,&quot;text&quot;:&quot;href&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:124,&quot;character&quot;:11,&quot;text&quot;:&quot;windowRef&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:124,&quot;character&quot;:21,&quot;text&quot;:&quot;nativeWindow&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:124,&quot;character&quot;:34,&quot;text&quot;:&quot;location&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:124,&quot;character&quot;:43,&quot;text&quot;:&quot;href&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:127,&quot;character&quot;:11,&quot;text&quot;:&quot;windowRef&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:127,&quot;character&quot;:21,&quot;text&quot;:&quot;nativeWindow&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:127,&quot;character&quot;:34,&quot;text&quot;:&quot;location&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:127,&quot;character&quot;:43,&quot;text&quot;:&quot;href&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:129,&quot;character&quot;:11,&quot;text&quot;:&quot;windowRef&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:129,&quot;character&quot;:21,&quot;text&quot;:&quot;nativeWindow&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:129,&quot;character&quot;:34,&quot;text&quot;:&quot;location&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:129,&quot;character&quot;:43,&quot;text&quot;:&quot;href&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:132,&quot;character&quot;:11,&quot;text&quot;:&quot;windowRef&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:132,&quot;character&quot;:21,&quot;text&quot;:&quot;nativeWindow&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:132,&quot;character&quot;:34,&quot;text&quot;:&quot;location&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:132,&quot;character&quot;:43,&quot;text&quot;:&quot;href&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:134,&quot;character&quot;:11,&quot;text&quot;:&quot;windowRef&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:134,&quot;character&quot;:21,&quot;text&quot;:&quot;nativeWindow&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:134,&quot;character&quot;:34,&quot;text&quot;:&quot;location&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:134,&quot;character&quot;:43,&quot;text&quot;:&quot;href&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:139,&quot;character&quot;:4,&quot;text&quot;:&quot;openQuickReferenceSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:140,&quot;character&quot;:6,&quot;text&quot;:&quot;keyboardShortcutService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:140,&quot;character&quot;:53,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:145,&quot;character&quot;:4,&quot;text&quot;:&quot;keyboardShortcutService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:145,&quot;character&quot;:28,&quot;text&quot;:&quot;bindLibraryPageShortcuts&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:157,&quot;character&quot;:11,&quot;text&quot;:&quot;openQuickReferenceSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:159,&quot;character&quot;:4,&quot;text&quot;:&quot;keyboardShortcutService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:159,&quot;character&quot;:28,&quot;text&quot;:&quot;bindExplorationPlayerShortcuts&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/keyboard-shortcut.service.spec.ts&quot;,&quot;line&quot;:175,&quot;character&quot;:11,&quot;text&quot;:&quot;openQuickReferenceSpy&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:56 GMT</p>
+    </body>
+  </html>
+  

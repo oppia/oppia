@@ -1,0 +1,159 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>algebraic-expression-input-rules.service.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">extensions/interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service.ts</td><td class="">98.89%</td><td class="">100%</td><td class="">180</td><td class="">178</td><td class="">2</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Rules service for the AlgebraicExpressionInput interaction.
+ */
+
+import { Injectable } from &#x27;@angular/core&#x27;;
+import { downgradeInjectable } from &#x27;@angular/upgrade/static&#x27;;
+
+import nerdamer from &#x27;nerdamer&#x27;;
+
+import { MathInteractionsService } from &#x27;services/math-interactions.service&#x27;;
+import { AlgebraicExpressionAnswer } from &#x27;interactions/answer-defs&#x27;;
+import {
+  AlgebraicExpressionRuleInputsWithPlaceholder,
+  AlgebraicExpressionRuleInputsWithoutPlaceholder
+} from &#x27;interactions/rule-input-defs&#x27;;
+
+@Injectable({
+  providedIn: &#x27;root&#x27;
+})
+export class AlgebraicExpressionInputRulesService {
+  MatchesExactlyWith(
+      answer: AlgebraicExpressionAnswer,
+      inputs: AlgebraicExpressionRuleInputsWithoutPlaceholder): boolean {
+    let mis = new MathInteractionsService();
+    // Inserting &#x27;*&#x27; signs between variables if not present.
+    answer = mis.insertMultiplicationSigns(answer);
+    inputs.x = mis.insertMultiplicationSigns(inputs.x);
+
+    // TODO(#13083): Remove the &#x27;as unknown as boolean&#x27; part after the library
+    // typing is fixed.
+    return nerdamer(
+      nerdamer(answer).text()
+    ).eq(nerdamer(inputs.x).text()) as unknown as boolean;
+  }
+
+  IsEquivalentTo(
+      answer: AlgebraicExpressionAnswer,
+      inputs: AlgebraicExpressionRuleInputsWithoutPlaceholder): boolean {
+    let mis = new MathInteractionsService();
+    // Inserting &#x27;*&#x27; signs between variables if not present.
+    answer = mis.insertMultiplicationSigns(answer);
+    inputs.x = mis.insertMultiplicationSigns(inputs.x);
+
+    let expandedLearnerAnswer = nerdamer(answer).expand().text();
+    let simplifiedLearnerAnswer = nerdamer(
+      `simplify(${expandedLearnerAnswer})`).text();
+
+    let expandedCreatorAnswer = nerdamer(inputs.x).expand().text();
+    let simplifiedCreatorAnswer = nerdamer(
+      `simplify(${expandedCreatorAnswer})`).text();
+
+    // TODO(#13083): Remove the &#x27;as unknown as boolean&#x27; part after the library
+    // typing is fixed.
+    return nerdamer(
+      simplifiedLearnerAnswer
+    ).eq(simplifiedCreatorAnswer) as unknown as boolean;
+  }
+
+  ContainsSomeOf(
+      answer: AlgebraicExpressionAnswer,
+      inputs: AlgebraicExpressionRuleInputsWithoutPlaceholder): boolean {
+    // At least one term should match between answer and input.
+    let mis = new MathInteractionsService();
+    // Inserting &#x27;*&#x27; signs between variables if not present.
+    answer = mis.insertMultiplicationSigns(answer);
+    inputs.x = mis.insertMultiplicationSigns(inputs.x);
+
+    // The expression is first split into terms by addition and subtraction.
+    let answerTerms = mis.getTerms(answer);
+    let inputTerms = mis.getTerms(inputs.x);
+
+    for (let answerTerm of answerTerms) {
+      for (let inputTerm of inputTerms) {
+        if (mis.termsMatch(answerTerm, inputTerm)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  OmitsSomeOf(
+      answer: AlgebraicExpressionAnswer,
+      inputs: AlgebraicExpressionRuleInputsWithoutPlaceholder): boolean {
+    // There must be at least one term in the input that is not present in the
+    // answer.
+    let mis = new MathInteractionsService();
+    // Inserting &#x27;*&#x27; signs between variables if not present.
+    answer = mis.insertMultiplicationSigns(answer);
+    inputs.x = mis.insertMultiplicationSigns(inputs.x);
+
+    // The expression is first split into terms by addition and subtraction.
+    let answerTerms = mis.getTerms(answer);
+    let inputTerms = mis.getTerms(inputs.x);
+
+    for (let inputTerm of inputTerms) {
+      let matched = false;
+      for (let answerTerm of answerTerms) {
+        if (mis.termsMatch(answerTerm, inputTerm)) {
+          matched = true;
+          break;
+        }
+      }
+      if (!matched) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  MatchesWithGeneralForm(
+      answer: AlgebraicExpressionAnswer,
+      inputs: AlgebraicExpressionRuleInputsWithPlaceholder): boolean {
+    let mis = new MathInteractionsService();
+    // Inserting &#x27;*&#x27; signs between variables if not present.
+    answer = mis.insertMultiplicationSigns(answer);
+    inputs.x = mis.insertMultiplicationSigns(inputs.x);
+
+    let placeholders = inputs.y;
+
+    return mis.expressionMatchWithPlaceholders(inputs.x, answer, placeholders);
+  }
+}
+
+angular.module(&#x27;oppia&#x27;).factory(
+  &#x27;AlgebraicExpressionInputRulesService&#x27;,
+  downgradeInjectable(AlgebraicExpressionInputRulesService));
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;extensions/interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service.ts&quot;,&quot;line&quot;:44,&quot;character&quot;:11,&quot;text&quot;:&quot;nerdamer(\n      nerdamer(answer).text()\n    ).eq(nerdamer(inputs.x).text()) as unknown as boolean&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;extensions/interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service.ts&quot;,&quot;line&quot;:67,&quot;character&quot;:11,&quot;text&quot;:&quot;nerdamer(\n      simplifiedLearnerAnswer\n    ).eq(simplifiedCreatorAnswer) as unknown as boolean&quot;,&quot;kind&quot;:3}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:54 GMT</p>
+    </body>
+  </html>
+  

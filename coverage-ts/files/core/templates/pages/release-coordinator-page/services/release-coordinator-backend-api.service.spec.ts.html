@@ -1,0 +1,366 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>release-coordinator-backend-api.service.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts</td><td class="">87.91%</td><td class="">100%</td><td class="">554</td><td class="">487</td><td class="">67</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2021 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for ReleaseCoordinatorBackendApiService.
+ */
+
+import { HttpClientTestingModule, HttpTestingController } from
+  &#x27;@angular/common/http/testing&#x27;;
+import { TestBed, fakeAsync, flushMicrotasks } from &#x27;@angular/core/testing&#x27;;
+
+import { JobsData, JobsDataBackendDict, ReleaseCoordinatorBackendApiService } from &#x27;./release-coordinator-backend-api.service&#x27;;
+import { ComputationData } from &#x27;domain/admin/computation-data.model&#x27;;
+import { Job } from &#x27;domain/admin/job.model&#x27;;
+import { JobStatusSummary } from &#x27;domain/admin/job-status-summary.model&#x27;;
+import { CsrfTokenService } from &#x27;services/csrf-token.service&#x27;;
+
+describe(&#x27;Release coordinator backend api service&#x27;, () =&gt; {
+  let rcbas: ReleaseCoordinatorBackendApiService;
+  let httpTestingController: HttpTestingController;
+  let csrfService: CsrfTokenService = null;
+  let successHandler = null;
+  let failHandler = null;
+  let jobsDataBackendResponse: JobsDataBackendDict = {
+    unfinished_job_data: [],
+    one_off_job_status_summaries: [],
+    human_readable_current_time: &#x27;June 03 15:31:20&#x27;,
+    audit_job_status_summaries: [],
+    recent_job_data: [],
+    continuous_computations_data: [
+      {
+        is_startable: true,
+        status_code: &#x27;never_started&#x27;,
+        computation_type: &#x27;FeedbackAnalyticsAggregator&#x27;,
+        last_started_msec: null,
+        active_realtime_layer_index: null,
+        last_stopped_msec: null,
+        is_stoppable: false,
+        last_finished_msec: null
+      }
+    ]
+  };
+  let jobsData: JobsData;
+
+  beforeEach(() =&gt; {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+
+    rcbas = TestBed.get(ReleaseCoordinatorBackendApiService);
+    httpTestingController = TestBed.get(HttpTestingController);
+    csrfService = TestBed.get(CsrfTokenService);
+    successHandler = jasmine.createSpy(&#x27;success&#x27;);
+    failHandler = jasmine.createSpy(&#x27;fail&#x27;);
+    jobsData = {
+      oneOffJobStatusSummaries:
+       jobsDataBackendResponse.one_off_job_status_summaries.map(
+         JobStatusSummary.createFromBackendDict),
+      humanReadableCurrentTime:
+       jobsDataBackendResponse.human_readable_current_time,
+      auditJobStatusSummaries:
+       jobsDataBackendResponse.audit_job_status_summaries.map(
+         JobStatusSummary.createFromBackendDict),
+      unfinishedJobData: jobsDataBackendResponse.unfinished_job_data.map(
+        Job.createFromBackendDict),
+      recentJobData: jobsDataBackendResponse.recent_job_data.map(
+        Job.createFromBackendDict),
+      continuousComputationsData:
+       jobsDataBackendResponse.continuous_computations_data.map(
+         ComputationData.createFromBackendDict)
+    };
+
+    spyOn(csrfService, &#x27;getTokenAsync&#x27;).and.callFake(async() =&gt; {
+      return Promise.resolve(&#x27;sample-csrf-token&#x27;);
+    });
+  });
+
+  afterEach(() =&gt; {
+    httpTestingController.verify();
+  });
+
+  it(&#x27;should fetch the jobs data&#x27;, fakeAsync(() =&gt; {
+    rcbas.getJobsDataAsync().then((adminData) =&gt; {
+      expect(adminData).toEqual(jobsData);
+    });
+
+    let req = httpTestingController.expectOne(&#x27;/jobshandler&#x27;);
+    expect(req.request.method).toEqual(&#x27;GET&#x27;);
+    req.flush(jobsDataBackendResponse);
+
+    flushMicrotasks();
+  }));
+
+  it(&#x27;should use the rejection handler if the backend request failed.&#x27;,
+    fakeAsync(() =&gt; {
+      rcbas.getJobsDataAsync().then(successHandler, failHandler);
+
+      var req = httpTestingController.expectOne(
+        &#x27;/jobshandler&#x27;);
+      expect(req.request.method).toEqual(&#x27;GET&#x27;);
+
+      req.flush({
+        error: &#x27;Some error in the backend.&#x27;
+      }, {
+        status: 500, statusText: &#x27;Internal Server Error&#x27;
+      });
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(&#x27;Some error in the backend.&#x27;);
+    })
+  );
+
+  it(&#x27;should request to start a new job when calling startNewJobAsync&#x27;,
+    fakeAsync(() =&gt; {
+      let jobType = &#x27;ActivityContributorsSummaryOneOffJob&#x27;;
+      let payload = {
+        action: &#x27;start_new_job&#x27;,
+        job_type: jobType
+      };
+      rcbas.startNewJobAsync(jobType).then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(&#x27;/jobshandler&#x27;);
+      expect(req.request.method).toEqual(&#x27;POST&#x27;);
+      expect(req.request.body).toEqual(payload);
+      req.flush(200);
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }));
+
+  it(&#x27;should request to cancel the job given its id&#x27; +
+   &#x27;and type when calling cancelJobAsync&#x27;, fakeAsync(() =&gt; {
+    let jobId = &#x27;AuditContributorsOneOffJob-1608291840709-843&#x27;;
+    let jobType = &#x27;AuditContributorsOneOffJob&#x27;;
+    let payload = {
+      action: &#x27;cancel_job&#x27;,
+      job_id: jobId,
+      job_type: jobType
+    };
+    rcbas.cancelJobAsync(jobId, jobType).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(&#x27;/jobshandler&#x27;);
+    expect(req.request.method).toEqual(&#x27;POST&#x27;);
+    expect(req.request.body).toEqual(payload);
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it(&#x27;should request to start computation given the job&#x27; +
+   &#x27;name when calling startComputationAsync&#x27;, fakeAsync(() =&gt; {
+    let computationType = &#x27;FeedbackAnalyticsAggregator&#x27;;
+    let payload = {
+      action: &#x27;start_computation&#x27;,
+      computation_type: computationType
+    };
+    rcbas.startComputationAsync(computationType)
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(&#x27;/jobshandler&#x27;);
+    expect(req.request.method).toEqual(&#x27;POST&#x27;);
+    expect(req.request.body).toEqual(payload);
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it(&#x27;should request to stop computation given the job&#x27; +
+   &#x27;name when calling stopComputationAsync&#x27;, fakeAsync(() =&gt; {
+    let computationType = &#x27;FeedbackAnalyticsAggregator&#x27;;
+    let payload = {
+      action: &#x27;stop_computation&#x27;,
+      computation_type: computationType
+    };
+    rcbas.stopComputationAsync(computationType)
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(&#x27;/jobshandler&#x27;);
+    expect(req.request.method).toEqual(&#x27;POST&#x27;);
+    expect(req.request.body).toEqual(payload);
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it(&#x27;should fail to stop computation given the job&#x27; +
+   &#x27;name when calling stopComputationAsync&#x27;, fakeAsync(() =&gt; {
+    let computationType = &#x27;InvalidComputaionType&#x27;;
+    let payload = {
+      action: &#x27;stop_computation&#x27;,
+      computation_type: computationType
+    };
+    rcbas.stopComputationAsync(computationType)
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(&#x27;/jobshandler&#x27;);
+    expect(req.request.method).toEqual(&#x27;POST&#x27;);
+    expect(req.request.body).toEqual(payload);
+    req.flush({
+      error: &#x27;Some error in the backend.&#x27;
+    }, {
+      status: 500, statusText: &#x27;Internal Server Error&#x27;
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(&#x27;Some error in the backend.&#x27;);
+  }));
+
+  it(&#x27;should request to show the output of valid&#x27; +
+   &#x27;jobs when calling showJobOutputAsync&#x27;, fakeAsync(() =&gt; {
+    let jobId = &#x27;UserSettingsModelAuditOneOffJob-1609088541992-314&#x27;;
+    let adminJobOutputUrl = &#x27;/joboutputhandler?job_id=&#x27; +
+     &#x27;UserSettingsModelAuditOneOffJob-1609088541992-314&#x27;;
+    let jobOutput = {output: [&#x27;[u\&#x27;fully-validated UserSettingsModel\&#x27;, 1]&#x27;]};
+    rcbas.fetchJobOutputAsync(jobId).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(adminJobOutputUrl);
+    expect(req.request.method).toEqual(&#x27;GET&#x27;);
+    req.flush(jobOutput);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(jobOutput.output);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it(&#x27;should request to show the sorted output of valid&#x27; +
+   &#x27;jobs when calling showJobOutputAsync&#x27;, fakeAsync(() =&gt; {
+    let jobId = &#x27;UserSettingsModelAuditOneOffJob-1609088541992-314&#x27;;
+    let adminJobOutputUrl = &#x27;/joboutputhandler?job_id=&#x27; +
+     &#x27;UserSettingsModelAuditOneOffJob-1609088541992-314&#x27;;
+    let jobOutput = {output: [&#x27;[u\&#x27;SUCCESS_KEPT\&#x27;, 1]&#x27;,
+      &#x27;[u\&#x27;SUCCESS_DELETED\&#x27;, 1]&#x27;]};
+    rcbas.fetchJobOutputAsync(jobId).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(adminJobOutputUrl);
+    expect(req.request.method).toEqual(&#x27;GET&#x27;);
+    req.flush(jobOutput);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(jobOutput.output.sort());
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it(&#x27;should fail to show the output of invalid&#x27; +
+   &#x27;jobs when calling showJobOutputAsync&#x27;, fakeAsync(() =&gt; {
+    let jobId = &#x27;Invalid jobId&#x27;;
+    let adminJobOutputUrl = &#x27;/joboutputhandler?job_id=Invalid%20jobId&#x27;;
+    rcbas.fetchJobOutputAsync(jobId).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(adminJobOutputUrl);
+    expect(req.request.method).toEqual(&#x27;GET&#x27;);
+    req.flush({
+      error: &#x27;Internal Server Error&#x27;
+    }, {
+      status: 500, statusText: &#x27;NoneType object has no attribute output&#x27;
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(&#x27;Internal Server Error&#x27;);
+  }));
+
+  it(&#x27;should flush the memory cache when calling&#x27; +
+   &#x27;flushMemoryCacheAsync&#x27;, fakeAsync(() =&gt; {
+    rcbas.flushMemoryCacheAsync()
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      &#x27;/memorycachehandler&#x27;);
+    expect(req.request.method).toEqual(&#x27;DELETE&#x27;);
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it(&#x27;should fail to flush the memory cache when calling&#x27; +
+   &#x27;flushMemoryCacheAsync&#x27;, fakeAsync(() =&gt; {
+    rcbas.flushMemoryCacheAsync()
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      &#x27;/memorycachehandler&#x27;);
+    expect(req.request.method).toEqual(&#x27;DELETE&#x27;);
+    req.flush({
+      error: &#x27;Failed to flush memory cache.&#x27;
+    }, {
+      status: 500, statusText: &#x27;Internal Server Error&#x27;
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(&#x27;Failed to flush memory cache.&#x27;);
+  }));
+
+  it(&#x27;should get the data of memory cache profile when&#x27; +
+   &#x27;calling getMemoryCacheProfileAsync&#x27;, fakeAsync(() =&gt; {
+    rcbas.getMemoryCacheProfileAsync()
+      .then(successHandler, failHandler);
+    let req = httpTestingController.expectOne(
+      &#x27;/memorycachehandler&#x27;);
+    expect(req.request.method).toEqual(&#x27;GET&#x27;);
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it(&#x27;should fail to get the data of memory cache profile&#x27; +
+   &#x27;when calling getMemoryCacheProfileAsync&#x27;, fakeAsync(() =&gt; {
+    rcbas.getMemoryCacheProfileAsync()
+      .then(successHandler, failHandler);
+    let req = httpTestingController.expectOne(
+      &#x27;/memorycachehandler&#x27;);
+    expect(req.request.method).toEqual(&#x27;GET&#x27;);
+    req.flush({
+      error: &#x27;Failed to get data.&#x27;
+    }, {
+      status: 500, statusText: &#x27;Internal Server Error&#x27;
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(&#x27;Failed to get data.&#x27;);
+  }));
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:32,&quot;character&quot;:6,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:33,&quot;character&quot;:6,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:63,&quot;character&quot;:4,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:64,&quot;character&quot;:4,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:98,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:110,&quot;character&quot;:17,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:119,&quot;character&quot;:13,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:119,&quot;character&quot;:29,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:120,&quot;character&quot;:13,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:134,&quot;character&quot;:17,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:135,&quot;character&quot;:17,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:135,&quot;character&quot;:25,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:139,&quot;character&quot;:13,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:140,&quot;character&quot;:13,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:140,&quot;character&quot;:26,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:155,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:156,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:156,&quot;character&quot;:23,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:160,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:161,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:161,&quot;character&quot;:24,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:175,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:176,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:176,&quot;character&quot;:23,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:180,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:181,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:181,&quot;character&quot;:24,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:195,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:196,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:196,&quot;character&quot;:23,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:200,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:201,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:201,&quot;character&quot;:24,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:215,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:216,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:216,&quot;character&quot;:23,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:224,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:224,&quot;character&quot;:27,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:225,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:237,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:241,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:242,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:242,&quot;character&quot;:24,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:255,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:259,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:260,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:260,&quot;character&quot;:24,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:270,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:278,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:278,&quot;character&quot;:27,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:279,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:289,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:293,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:294,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:294,&quot;character&quot;:24,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:304,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:312,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:312,&quot;character&quot;:27,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:313,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:322,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:326,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:327,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:327,&quot;character&quot;:24,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:336,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:344,&quot;character&quot;:11,&quot;text&quot;:&quot;successHandler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:344,&quot;character&quot;:27,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/services/release-coordinator-backend-api.service.spec.ts&quot;,&quot;line&quot;:345,&quot;character&quot;:11,&quot;text&quot;:&quot;failHandler&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:59 GMT</p>
+    </body>
+  </html>
+  

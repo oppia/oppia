@@ -1,0 +1,199 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>question-opportunities.component.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts</td><td class="">33.15%</td><td class="">100%</td><td class="">178</td><td class="">59</td><td class="">119</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2019 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Component for question opportunities.
+ */
+
+require(&#x27;components/ck-editor-helpers/ck-editor-4-rte.component.ts&#x27;);
+require(&#x27;components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts&#x27;);
+require(
+  &#x27;components/common-layout-directives/common-elements/&#x27; +
+  &#x27;confirm-or-cancel-modal.controller.ts&#x27;);
+require(
+  &#x27;components/forms/schema-based-editors/schema-based-editor.directive.ts&#x27;);
+require(
+  &#x27;components/question-difficulty-selector/&#x27; +
+  &#x27;question-difficulty-selector.directive.ts&#x27;);
+require(
+  &#x27;components/question-directives/question-editor/&#x27; +
+  &#x27;question-editor.directive.ts&#x27;);
+require(
+  &#x27;pages/contributor-dashboard-page/login-required-message/&#x27; +
+  &#x27;login-required-message.component.ts&#x27;);
+require(
+  &#x27;pages/contributor-dashboard-page/opportunities-list/&#x27; +
+  &#x27;opportunities-list.component.ts&#x27;);
+require(
+  &#x27;pages/contributor-dashboard-page/modal-templates/&#x27; +
+  &#x27;question-suggestion-editor-modal.controller.ts&#x27;);
+require(
+  &#x27;pages/topic-editor-page/modal-templates/&#x27; +
+  &#x27;question-opportunities-select-skill-and-difficulty-modal.controller.ts&#x27;);
+
+require(
+  &#x27;components/question-directives/questions-list/&#x27; +
+  &#x27;questions-list.constants.ajs.ts&#x27;);
+require(&#x27;directives/angular-html-bind.directive.ts&#x27;);
+require(&#x27;directives/mathjax-bind.directive.ts&#x27;);
+require(&#x27;domain/editor/undo_redo/question-undo-redo.service.ts&#x27;);
+require(&#x27;domain/question/QuestionObjectFactory.ts&#x27;);
+require(&#x27;third-party-imports/ui-codemirror.import.ts&#x27;);
+require(
+  &#x27;pages/contributor-dashboard-page/opportunities-list/&#x27; +
+  &#x27;opportunities-list.component.ts&#x27;);
+require(
+  &#x27;pages/contributor-dashboard-page/services/&#x27; +
+  &#x27;contribution-opportunities.service.ts&#x27;);
+require(&#x27;services/alerts.service.ts&#x27;);
+require(&#x27;services/context.service.ts&#x27;);
+require(&#x27;services/site-analytics.service.ts&#x27;);
+
+angular.module(&#x27;oppia&#x27;).component(&#x27;questionOpportunities&#x27;, {
+  template: require(&#x27;./question-opportunities.component.html&#x27;),
+  controller: [
+    &#x27;$rootScope&#x27;, &#x27;$uibModal&#x27;, &#x27;AlertsService&#x27;, &#x27;ContextService&#x27;,
+    &#x27;ContributionOpportunitiesService&#x27;, &#x27;QuestionObjectFactory&#x27;,
+    &#x27;QuestionUndoRedoService&#x27;, &#x27;SiteAnalyticsService&#x27;,
+    &#x27;UrlInterpolationService&#x27;, &#x27;UserService&#x27;, &#x27;MAX_QUESTIONS_PER_SKILL&#x27;,
+    function(
+        $rootScope, $uibModal, AlertsService, ContextService,
+        ContributionOpportunitiesService, QuestionObjectFactory,
+        QuestionUndoRedoService, SiteAnalyticsService,
+        UrlInterpolationService, UserService, MAX_QUESTIONS_PER_SKILL) {
+      const ctrl = this;
+      let userIsLoggedIn = false;
+      let allOpportunities = [];
+
+      var getPresentableOpportunitiesData = function({opportunities, more}) {
+        let opportunitiesDicts = [];
+        for (let index in opportunities) {
+          const opportunity = opportunities[index];
+          const heading = opportunity.getOpportunityHeading();
+          const subheading = opportunity.getOpportunitySubheading();
+          const progressPercentage = (
+            (opportunity.getQuestionCount() / MAX_QUESTIONS_PER_SKILL) *
+            100).toFixed(2);
+          var opportunityDict = {
+            id: opportunity.id,
+            heading: heading,
+            subheading: subheading,
+            progressPercentage: progressPercentage,
+            actionButtonTitle: &#x27;Suggest Question&#x27;,
+          };
+          allOpportunities[opportunityDict.id] = opportunityDict;
+          opportunitiesDicts.push(opportunityDict);
+        }
+        return {opportunitiesDicts, more};
+      };
+
+      ctrl.createQuestion = function(skill, skillDifficulty) {
+        const skillId = skill.getId();
+        const question =
+          QuestionObjectFactory.createDefaultQuestion([skillId]);
+        const questionId = question.getId();
+        const questionStateData = question.getStateData();
+        QuestionUndoRedoService.clearChanges();
+        $uibModal.open({
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            &#x27;/pages/contributor-dashboard-page/modal-templates/&#x27; +
+            &#x27;question-suggestion-editor-modal.directive.html&#x27;),
+          size: &#x27;lg&#x27;,
+          backdrop: &#x27;static&#x27;,
+          keyboard: false,
+          resolve: {
+            question: () =&gt; question,
+            questionId: () =&gt; questionId,
+            questionStateData: () =&gt; questionStateData,
+            skill: () =&gt; skill,
+            skillDifficulty: () =&gt; skillDifficulty
+          },
+          controller: &#x27;QuestionSuggestionEditorModalController&#x27;
+        }).result.then(function() {}, function() {
+          ContextService.resetImageSaveDestination();
+          // Note to developers:
+          // This callback is triggered when the Cancel button is clicked.
+          // No further action is needed.
+        });
+      };
+
+      ctrl.$onInit = function() {
+        UserService.getUserInfoAsync().then(function(userInfo) {
+          userIsLoggedIn = userInfo.isLoggedIn();
+          // TODO(#8521): Remove the use of $rootScope.$apply()
+          // once the controller is migrated to angular.
+          $rootScope.$applyAsync();
+        });
+      };
+
+      ctrl.loadMoreOpportunities = function() {
+        return ContributionOpportunitiesService.getMoreSkillOpportunitiesAsync()
+          .then(getPresentableOpportunitiesData);
+      };
+
+      ctrl.loadOpportunities = function() {
+        return ContributionOpportunitiesService.getSkillOpportunitiesAsync()
+          .then(getPresentableOpportunitiesData);
+      };
+
+      ctrl.onClickSuggestQuestionButton = function(skillId) {
+        if (!userIsLoggedIn) {
+          ContributionOpportunitiesService.showRequiresLoginModal();
+          return;
+        }
+
+        SiteAnalyticsService.registerContributorDashboardSuggestEvent(
+          &#x27;Question&#x27;);
+
+        $uibModal.open({
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            &#x27;/pages/topic-editor-page/modal-templates/&#x27; +
+            &#x27;select-skill-and-difficulty-modal.template.html&#x27;),
+          backdrop: true,
+          resolve: {
+            skillId: () =&gt; skillId
+          },
+          controller: (
+            &#x27;QuestionsOpportunitiesSelectSkillAndDifficultyModalController&#x27;)
+        }).result.then(function(result) {
+          if (AlertsService.warnings.length === 0) {
+            ctrl.createQuestion(result.skill, result.skillDifficulty);
+          }
+        }, function() {
+          // Note to developers:
+          // This callback is triggered when the Cancel button is clicked.
+          // No further action is needed.
+        });
+      };
+    }
+  ]
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:70,&quot;character&quot;:8,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:70,&quot;character&quot;:20,&quot;text&quot;:&quot;$uibModal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:70,&quot;character&quot;:31,&quot;text&quot;:&quot;AlertsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:70,&quot;character&quot;:46,&quot;text&quot;:&quot;ContextService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:71,&quot;character&quot;:8,&quot;text&quot;:&quot;ContributionOpportunitiesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:71,&quot;character&quot;:42,&quot;text&quot;:&quot;QuestionObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:72,&quot;character&quot;:8,&quot;text&quot;:&quot;QuestionUndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:72,&quot;character&quot;:33,&quot;text&quot;:&quot;SiteAnalyticsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:73,&quot;character&quot;:8,&quot;text&quot;:&quot;UrlInterpolationService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:73,&quot;character&quot;:33,&quot;text&quot;:&quot;UserService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:73,&quot;character&quot;:46,&quot;text&quot;:&quot;MAX_QUESTIONS_PER_SKILL&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:74,&quot;character&quot;:12,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:74,&quot;character&quot;:19,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:76,&quot;character&quot;:10,&quot;text&quot;:&quot;allOpportunities&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:78,&quot;character&quot;:54,&quot;text&quot;:&quot;opportunities&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:78,&quot;character&quot;:69,&quot;text&quot;:&quot;more&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:79,&quot;character&quot;:12,&quot;text&quot;:&quot;opportunitiesDicts&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:80,&quot;character&quot;:26,&quot;text&quot;:&quot;opportunities&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:81,&quot;character&quot;:16,&quot;text&quot;:&quot;opportunity&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:81,&quot;character&quot;:30,&quot;text&quot;:&quot;opportunities&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:82,&quot;character&quot;:16,&quot;text&quot;:&quot;heading&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:82,&quot;character&quot;:26,&quot;text&quot;:&quot;opportunity&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:82,&quot;character&quot;:38,&quot;text&quot;:&quot;getOpportunityHeading&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:83,&quot;character&quot;:16,&quot;text&quot;:&quot;subheading&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:83,&quot;character&quot;:29,&quot;text&quot;:&quot;opportunity&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:83,&quot;character&quot;:41,&quot;text&quot;:&quot;getOpportunitySubheading&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:85,&quot;character&quot;:13,&quot;text&quot;:&quot;opportunity&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:85,&quot;character&quot;:25,&quot;text&quot;:&quot;getQuestionCount&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:85,&quot;character&quot;:46,&quot;text&quot;:&quot;MAX_QUESTIONS_PER_SKILL&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:88,&quot;character&quot;:12,&quot;text&quot;:&quot;id&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:88,&quot;character&quot;:16,&quot;text&quot;:&quot;opportunity&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:88,&quot;character&quot;:28,&quot;text&quot;:&quot;id&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:89,&quot;character&quot;:12,&quot;text&quot;:&quot;heading&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:89,&quot;character&quot;:21,&quot;text&quot;:&quot;heading&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:90,&quot;character&quot;:12,&quot;text&quot;:&quot;subheading&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:90,&quot;character&quot;:24,&quot;text&quot;:&quot;subheading&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:94,&quot;character&quot;:10,&quot;text&quot;:&quot;allOpportunities&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:94,&quot;character&quot;:43,&quot;text&quot;:&quot;id&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:95,&quot;character&quot;:10,&quot;text&quot;:&quot;opportunitiesDicts&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:97,&quot;character&quot;:16,&quot;text&quot;:&quot;opportunitiesDicts&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:97,&quot;character&quot;:36,&quot;text&quot;:&quot;more&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:100,&quot;character&quot;:6,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:100,&quot;character&quot;:11,&quot;text&quot;:&quot;createQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:100,&quot;character&quot;:37,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:100,&quot;character&quot;:44,&quot;text&quot;:&quot;skillDifficulty&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:101,&quot;character&quot;:14,&quot;text&quot;:&quot;skillId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:101,&quot;character&quot;:24,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:101,&quot;character&quot;:30,&quot;text&quot;:&quot;getId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:102,&quot;character&quot;:14,&quot;text&quot;:&quot;question&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:103,&quot;character&quot;:10,&quot;text&quot;:&quot;QuestionObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:103,&quot;character&quot;:32,&quot;text&quot;:&quot;createDefaultQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:103,&quot;character&quot;:55,&quot;text&quot;:&quot;skillId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:104,&quot;character&quot;:14,&quot;text&quot;:&quot;questionId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:104,&quot;character&quot;:27,&quot;text&quot;:&quot;question&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:104,&quot;character&quot;:36,&quot;text&quot;:&quot;getId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:105,&quot;character&quot;:14,&quot;text&quot;:&quot;questionStateData&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:105,&quot;character&quot;:34,&quot;text&quot;:&quot;question&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:105,&quot;character&quot;:43,&quot;text&quot;:&quot;getStateData&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:106,&quot;character&quot;:8,&quot;text&quot;:&quot;QuestionUndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:106,&quot;character&quot;:32,&quot;text&quot;:&quot;clearChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:107,&quot;character&quot;:8,&quot;text&quot;:&quot;$uibModal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:107,&quot;character&quot;:18,&quot;text&quot;:&quot;open&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:108,&quot;character&quot;:10,&quot;text&quot;:&quot;templateUrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:108,&quot;character&quot;:23,&quot;text&quot;:&quot;UrlInterpolationService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:108,&quot;character&quot;:47,&quot;text&quot;:&quot;getDirectiveTemplateUrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:115,&quot;character&quot;:28,&quot;text&quot;:&quot;question&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:116,&quot;character&quot;:30,&quot;text&quot;:&quot;questionId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:117,&quot;character&quot;:37,&quot;text&quot;:&quot;questionStateData&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:118,&quot;character&quot;:25,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:119,&quot;character&quot;:35,&quot;text&quot;:&quot;skillDifficulty&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:122,&quot;character&quot;:11,&quot;text&quot;:&quot;result&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:122,&quot;character&quot;:18,&quot;text&quot;:&quot;then&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:123,&quot;character&quot;:10,&quot;text&quot;:&quot;ContextService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:123,&quot;character&quot;:25,&quot;text&quot;:&quot;resetImageSaveDestination&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:130,&quot;character&quot;:6,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:130,&quot;character&quot;:11,&quot;text&quot;:&quot;$onInit&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:131,&quot;character&quot;:8,&quot;text&quot;:&quot;UserService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:131,&quot;character&quot;:20,&quot;text&quot;:&quot;getUserInfoAsync&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:131,&quot;character&quot;:39,&quot;text&quot;:&quot;then&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:131,&quot;character&quot;:53,&quot;text&quot;:&quot;userInfo&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:132,&quot;character&quot;:27,&quot;text&quot;:&quot;userInfo&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:132,&quot;character&quot;:36,&quot;text&quot;:&quot;isLoggedIn&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:135,&quot;character&quot;:10,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:135,&quot;character&quot;:21,&quot;text&quot;:&quot;$applyAsync&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:139,&quot;character&quot;:6,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:139,&quot;character&quot;:11,&quot;text&quot;:&quot;loadMoreOpportunities&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:140,&quot;character&quot;:15,&quot;text&quot;:&quot;ContributionOpportunitiesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:140,&quot;character&quot;:48,&quot;text&quot;:&quot;getMoreSkillOpportunitiesAsync&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:141,&quot;character&quot;:11,&quot;text&quot;:&quot;then&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:144,&quot;character&quot;:6,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:144,&quot;character&quot;:11,&quot;text&quot;:&quot;loadOpportunities&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:145,&quot;character&quot;:15,&quot;text&quot;:&quot;ContributionOpportunitiesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:145,&quot;character&quot;:48,&quot;text&quot;:&quot;getSkillOpportunitiesAsync&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:146,&quot;character&quot;:11,&quot;text&quot;:&quot;then&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:149,&quot;character&quot;:6,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:149,&quot;character&quot;:11,&quot;text&quot;:&quot;onClickSuggestQuestionButton&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:149,&quot;character&quot;:51,&quot;text&quot;:&quot;skillId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:151,&quot;character&quot;:10,&quot;text&quot;:&quot;ContributionOpportunitiesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:151,&quot;character&quot;:43,&quot;text&quot;:&quot;showRequiresLoginModal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:155,&quot;character&quot;:8,&quot;text&quot;:&quot;SiteAnalyticsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:155,&quot;character&quot;:29,&quot;text&quot;:&quot;registerContributorDashboardSuggestEvent&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:158,&quot;character&quot;:8,&quot;text&quot;:&quot;$uibModal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:158,&quot;character&quot;:18,&quot;text&quot;:&quot;open&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:159,&quot;character&quot;:10,&quot;text&quot;:&quot;templateUrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:159,&quot;character&quot;:23,&quot;text&quot;:&quot;UrlInterpolationService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:159,&quot;character&quot;:47,&quot;text&quot;:&quot;getDirectiveTemplateUrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:164,&quot;character&quot;:27,&quot;text&quot;:&quot;skillId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:168,&quot;character&quot;:11,&quot;text&quot;:&quot;result&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:168,&quot;character&quot;:18,&quot;text&quot;:&quot;then&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:168,&quot;character&quot;:32,&quot;text&quot;:&quot;result&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:169,&quot;character&quot;:14,&quot;text&quot;:&quot;AlertsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:169,&quot;character&quot;:28,&quot;text&quot;:&quot;warnings&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:169,&quot;character&quot;:37,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:170,&quot;character&quot;:12,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:170,&quot;character&quot;:17,&quot;text&quot;:&quot;createQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:170,&quot;character&quot;:32,&quot;text&quot;:&quot;result&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:170,&quot;character&quot;:39,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:170,&quot;character&quot;:46,&quot;text&quot;:&quot;result&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/question-opportunities/question-opportunities.component.ts&quot;,&quot;line&quot;:170,&quot;character&quot;:53,&quot;text&quot;:&quot;skillDifficulty&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:59 GMT</p>
+    </body>
+  </html>
+  

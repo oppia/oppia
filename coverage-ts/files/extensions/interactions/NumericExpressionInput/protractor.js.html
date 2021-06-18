@@ -1,0 +1,110 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>protractor.js</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">extensions/interactions/NumericExpressionInput/protractor.js</td><td class="">65.93%</td><td class="">100%</td><td class="">91</td><td class="">60</td><td class="">31</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview End-to-end testing utilities for Numeric Expression Input
+ * interaction
+ */
+
+var objects = require(process.cwd() + &#x27;/extensions/objects/protractor.js&#x27;);
+var waitFor = require(
+  process.cwd() + &#x27;/core/tests/protractor_utils/waitFor.js&#x27;);
+
+var customizeInteraction = async function(elem, placeholderText) {
+  await objects.UnicodeStringEditor(
+    elem.element(by.tagName(&#x27;schema-based-unicode-editor&#x27;))
+  ).setValue(placeholderText);
+};
+
+var expectInteractionDetailsToMatch = async function(elem, placeholderText) {
+  await waitFor.presenceOf(
+    elem.element(by.tagName(&#x27;oppia-interactive-numeric-expression-input&#x27;)),
+    &#x27;The numeric expression input editor took too long to load.&#x27;);
+  if (placeholderText) {
+    expect(
+      await objects.MathEditor(elem.element(by.tagName(
+        &#x27;oppia-interactive-numeric-expression-input&#x27;))).getValue()
+    ).toBe(
+      &#x27;\\color{grey}{\\text{\\small{&#x27; + placeholderText + &#x27;}}}&#x27;);
+  }
+};
+
+var submitAnswer = async function(elem, answer) {
+  await objects.MathEditor(elem.element(by.tagName(
+    &#x27;oppia-interactive-numeric-expression-input&#x27;))).setValue(answer);
+  await element(by.css(&#x27;.protractor-test-submit-answer-button&#x27;)).click();
+};
+
+var answerObjectType = &#x27;NumericExpression&#x27;;
+
+var testSuite = [{
+  interactionArguments: [&#x27;Type an expression here, using only numbers.&#x27;],
+  ruleArguments: [&#x27;MatchesExactlyWith&#x27;, &#x27;6-(-4)&#x27;],
+  expectedInteractionDetails: [&#x27;Type an expression here, using only numbers.&#x27;],
+  wrongAnswers: [&#x27;10&#x27;, &#x27;3*2-(-4)&#x27;],
+  correctAnswers: [&#x27;6-(-4)&#x27;, &#x27;-(-4)+6&#x27;, &#x27;6+4&#x27;]
+}, {
+  interactionArguments: [
+    &#x27;Type an expression here, using numbers and the addition sign.&#x27;],
+  ruleArguments: [&#x27;IsEquivalentTo&#x27;, &#x27;3*10^(-5)&#x27;],
+  expectedInteractionDetails: [
+    &#x27;Type an expression here, using numbers and the addition sign.&#x27;],
+  wrongAnswers: [&#x27;3*10^5&#x27;, &#x27;2*10^(-5)&#x27;, &#x27;5*10^(-3)&#x27;],
+  correctAnswers: [&#x27;3*10^(-5)&#x27;, &#x27;0.00003&#x27;]
+}, {
+  interactionArguments: [
+    &#x27;Type an expression here, using numbers and arithmetic signs.&#x27;],
+  ruleArguments: [&#x27;ContainsSomeOf&#x27;, &#x27;1000 + 200 + 30 + 4 + 0.5 + 0.06&#x27;],
+  expectedInteractionDetails: [
+    &#x27;Type an expression here, using numbers and arithmetic signs.&#x27;],
+  wrongAnswers: [&#x27;1234.56&#x27;, &#x27;123456/100&#x27;],
+  correctAnswers: [
+    &#x27;1000 + 200 + 30 + 4 + 0.5 + 0.06&#x27;,
+    &#x27;1000 + 200 + 4 + 0.5&#x27;,
+    &#x27;1000 + 234.56&#x27;,
+    &#x27;0.06&#x27;]
+}, {
+  interactionArguments: [&#x27;Type an expression here, using only numbers.&#x27;],
+  ruleArguments: [&#x27;OmitsSomeOf&#x27;, &#x27;1000 + 200 + 30 + 4 + 0.5 + 0.06&#x27;],
+  expectedInteractionDetails: [&#x27;Type an expression here, using only numbers.&#x27;],
+  wrongAnswers: [
+    &#x27;1000 + 200 + 30 + 4 + 0.5 + 0.06&#x27;,
+    &#x27;1000 + 200 + 30 + 4 + 0.5 + 0.06 + 0.07&#x27;,
+    &#x27;0.06 + 0.5 + 4 + 30 + 200 + 1000&#x27;],
+  correctAnswers: [&#x27;1000 + 200 + 30 + 4 + 0.56&#x27;, &#x27;1000 + 200 + 30 + 0.5 + 0.06&#x27;]
+}];
+
+exports.customizeInteraction = customizeInteraction;
+exports.expectInteractionDetailsToMatch = expectInteractionDetailsToMatch;
+exports.submitAnswer = submitAnswer;
+exports.answerObjectType = answerObjectType;
+exports.testSuite = testSuite;
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;extensions/interactions/NumericExpressionInput/protractor.js&quot;,&quot;line&quot;:19,&quot;character&quot;:4,&quot;text&quot;:&quot;objects&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericExpressionInput/protractor.js&quot;,&quot;line&quot;:20,&quot;character&quot;:4,&quot;text&quot;:&quot;waitFor&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericExpressionInput/protractor.js&quot;,&quot;line&quot;:23,&quot;character&quot;:42,&quot;text&quot;:&quot;elem&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericExpressionInput/protractor.js&quot;,&quot;line&quot;:23,&quot;character&quot;:48,&quot;text&quot;:&quot;placeholderText&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericExpressionInput/protractor.js&quot;,&quot;line&quot;:24,&quot;character&quot;:8,&quot;text&quot;:&quot;objects&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericExpressionInput/protractor.js&quot;,&quot;line&quot;:24,&quot;character&quot;:16,&quot;text&quot;:&quot;UnicodeStringEditor&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericExpressionInput/protractor.js&quot;,&quot;line&quot;:25,&quot;character&quot;:4,&quot;text&quot;:&quot;elem&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericExpressionInput/protractor.js&quot;,&quot;line&quot;:25,&quot;character&quot;:9,&quot;text&quot;:&quot;element&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericExpressionInput/protractor.js&quot;,&quot;line&quot;:26,&quot;character&quot;:4,&quot;text&quot;:&quot;setValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericExpressionInput/protractor.js&quot;,&quot;line&quot;:26,&quot;character&quot;:13,&quot;text&quot;:&quot;placeholderText&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericExpressionInput/protractor.js&quot;,&quot;line&quot;:29,&quot;character&quot;:53,&quot;text&quot;:&quot;elem&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericExpressionInput/protractor.js&quot;,&quot;line&quot;:29,&quot;character&quot;:59,&quot;text&quot;:&quot;placeholderText&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericExpressionInput/protractor.js&quot;,&quot;line&quot;:30,&quot;character&quot;:8,&quot;text&quot;:&quot;waitFor&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericExpressionInput/protractor.js&quot;,&quot;line&quot;:30,&quot;character&quot;:16,&quot;text&quot;:&quot;presenceOf&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericExpressionInput/protractor.js&quot;,&quot;line&quot;:31,&quot;character&quot;:4,&quot;text&quot;:&quot;elem&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericExpressionInput/protractor.js&quot;,&quot;line&quot;:31,&quot;character&quot;:9,&quot;text&quot;:&quot;element&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericExpressionInput/protractor.js&quot;,&quot;line&quot;:33,&quot;character&quot;:6,&quot;text&quot;:&quot;placeholderText&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericExpressionInput/protractor.js&quot;,&quot;line&quot;:35,&quot;character&quot;:12,&quot;text&quot;:&quot;objects&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericExpressionInput/protractor.js&quot;,&quot;line&quot;:35,&quot;character&quot;:20,&quot;text&quot;:&quot;MathEditor&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericExpressionInput/protractor.js&quot;,&quot;line&quot;:35,&quot;character&quot;:31,&quot;text&quot;:&quot;elem&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericExpressionInput/protractor.js&quot;,&quot;line&quot;:35,&quot;character&quot;:36,&quot;text&quot;:&quot;element&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericExpressionInput/protractor.js&quot;,&quot;line&quot;:36,&quot;character&quot;:56,&quot;text&quot;:&quot;getValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericExpressionInput/protractor.js&quot;,&quot;line&quot;:38,&quot;character&quot;:40,&quot;text&quot;:&quot;placeholderText&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericExpressionInput/protractor.js&quot;,&quot;line&quot;:42,&quot;character&quot;:34,&quot;text&quot;:&quot;elem&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericExpressionInput/protractor.js&quot;,&quot;line&quot;:42,&quot;character&quot;:40,&quot;text&quot;:&quot;answer&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericExpressionInput/protractor.js&quot;,&quot;line&quot;:43,&quot;character&quot;:8,&quot;text&quot;:&quot;objects&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericExpressionInput/protractor.js&quot;,&quot;line&quot;:43,&quot;character&quot;:16,&quot;text&quot;:&quot;MathEditor&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericExpressionInput/protractor.js&quot;,&quot;line&quot;:43,&quot;character&quot;:27,&quot;text&quot;:&quot;elem&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericExpressionInput/protractor.js&quot;,&quot;line&quot;:43,&quot;character&quot;:32,&quot;text&quot;:&quot;element&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericExpressionInput/protractor.js&quot;,&quot;line&quot;:44,&quot;character&quot;:52,&quot;text&quot;:&quot;setValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericExpressionInput/protractor.js&quot;,&quot;line&quot;:44,&quot;character&quot;:61,&quot;text&quot;:&quot;answer&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:44:00 GMT</p>
+    </body>
+  </html>
+  

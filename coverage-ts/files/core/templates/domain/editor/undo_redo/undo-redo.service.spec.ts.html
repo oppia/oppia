@@ -1,0 +1,367 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>undo-redo.service.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts</td><td class="">70.03%</td><td class="">100%</td><td class="">574</td><td class="">402</td><td class="">172</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2016 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Tests for UndoRedoService.
+ */
+
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// undo-redo.service.ts is upgraded to Angular 8.
+import { Change } from &#x27;domain/editor/undo_redo/change.model&#x27;;
+import { UpgradedServices } from &#x27;services/UpgradedServices&#x27;;
+import { importAllAngularServices } from &#x27;tests/unit-test-utils&#x27;;
+// ^^^ This block is to be removed.
+
+describe(&#x27;Undo/Redo Service&#x27;, function() {
+  var UndoRedoService = null;
+
+  beforeEach(angular.mock.module(&#x27;oppia&#x27;));
+  importAllAngularServices();
+  beforeEach(angular.mock.module(&#x27;oppia&#x27;, function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
+
+  beforeEach(angular.mock.inject(function($injector) {
+    UndoRedoService = $injector.get(&#x27;UndoRedoService&#x27;);
+  }));
+
+  var _createBackendChangeObject = function(value) {
+    return {
+      roperty_name: value
+    };
+  };
+
+  var _createChangeDomainObject = function(
+      backendObj, applyFunc = function() {}, reverseFunc = function() {}) {
+    return new Change(backendObj, applyFunc, reverseFunc);
+  };
+
+  var _createNoOpChangeDomainObject = function(value) {
+    var backendObject = _createBackendChangeObject(value);
+    return _createChangeDomainObject(backendObject);
+  };
+
+  it(&#x27;should apply a single change&#x27;, function() {
+    var applyFunc = jasmine.createSpy(&#x27;applyChange&#x27;);
+
+    expect(UndoRedoService.hasChanges()).toBeFalsy();
+
+    var fakeDomainObject = {
+      domain_property_name: &#x27;fake value&#x27;
+    };
+    var backendChangeObject = _createBackendChangeObject(&#x27;value&#x27;);
+    var changeDomainObject = _createChangeDomainObject(
+      backendChangeObject, applyFunc, function() {});
+    UndoRedoService.applyChange(changeDomainObject, fakeDomainObject);
+
+    expect(UndoRedoService.hasChanges()).toBeTruthy();
+    expect(applyFunc).toHaveBeenCalledWith(
+      backendChangeObject, fakeDomainObject);
+  });
+
+  it(&#x27;should be able to undo an applied change&#x27;, function() {
+    var applyFunc = jasmine.createSpy(&#x27;applyChange&#x27;);
+    var reverseFunc = jasmine.createSpy(&#x27;reverseChange&#x27;);
+
+    expect(UndoRedoService.hasChanges()).toBeFalsy();
+
+    // Apply the initial change.
+    var fakeDomainObject = {
+      domain_property_name: &#x27;fake value&#x27;
+    };
+    var backendChangeObject = _createBackendChangeObject(&#x27;value&#x27;);
+    var changeDomainObject = _createChangeDomainObject(
+      backendChangeObject, applyFunc, reverseFunc);
+    UndoRedoService.applyChange(changeDomainObject, fakeDomainObject);
+
+    expect(UndoRedoService.hasChanges()).toBeTruthy();
+    expect(applyFunc).toHaveBeenCalledWith(
+      backendChangeObject, fakeDomainObject);
+
+    expect(UndoRedoService.undoChange(fakeDomainObject)).toBeTruthy();
+    expect(UndoRedoService.hasChanges()).toBeFalsy();
+    expect(reverseFunc).toHaveBeenCalledWith(
+      backendChangeObject, fakeDomainObject);
+  });
+
+  it(&#x27;should be able to redo an undone change&#x27;, function() {
+    var applyFunc = jasmine.createSpy(&#x27;applyChange&#x27;);
+    var reverseFunc = jasmine.createSpy(&#x27;reverseChange&#x27;);
+
+    expect(UndoRedoService.hasChanges()).toBeFalsy();
+
+    // Apply the initial change.
+    var fakeDomainObject = {
+      domain_property_name: &#x27;fake value&#x27;
+    };
+    var backendChangeObject = _createBackendChangeObject(&#x27;value&#x27;);
+    var changeDomainObject = _createChangeDomainObject(
+      backendChangeObject, applyFunc, reverseFunc);
+    UndoRedoService.applyChange(changeDomainObject, fakeDomainObject);
+    expect(UndoRedoService.undoChange(fakeDomainObject)).toBeTruthy();
+
+    expect(reverseFunc).toHaveBeenCalledWith(
+      backendChangeObject, fakeDomainObject);
+    expect(UndoRedoService.hasChanges()).toBeFalsy();
+
+    expect(UndoRedoService.redoChange(fakeDomainObject)).toBeTruthy();
+    expect(UndoRedoService.hasChanges()).toBeTruthy();
+    expect(applyFunc).toHaveBeenCalledWith(
+      backendChangeObject, fakeDomainObject);
+
+    // Apply must be called twice (once for the first apply and once for redo).
+    expect(applyFunc.calls.count()).toEqual(2);
+  });
+
+  it(&#x27;should not undo anything if no changes are applied&#x27;, function() {
+    var fakeDomainObject = {
+      domain_property_name: &#x27;fake value&#x27;
+    };
+
+    expect(UndoRedoService.hasChanges()).toBeFalsy();
+    expect(UndoRedoService.undoChange(fakeDomainObject)).toBeFalsy();
+  });
+
+  it(&#x27;should not redo anything if no changes are undone&#x27;, function() {
+    var fakeDomainObject = {
+      domain_property_name: &#x27;fake value&#x27;
+    };
+
+    expect(UndoRedoService.hasChanges()).toBeFalsy();
+    expect(UndoRedoService.redoChange(fakeDomainObject)).toBeFalsy();
+
+    var changeDomainObject = _createNoOpChangeDomainObject(&#x27;value&#x27;);
+    UndoRedoService.applyChange(changeDomainObject, fakeDomainObject);
+    expect(UndoRedoService.redoChange(fakeDomainObject)).toBeFalsy();
+  });
+
+  it(&#x27;should only clear the list on clear and not undo changes&#x27;, function() {
+    var applyFunc = jasmine.createSpy(&#x27;applyChange&#x27;);
+    var reverseFunc = jasmine.createSpy(&#x27;reverseChange&#x27;);
+
+    var fakeDomainObject = {
+      domain_property_name: &#x27;fake value&#x27;
+    };
+    var backendChangeObject = _createBackendChangeObject(&#x27;value&#x27;);
+    var changeDomainObject = _createChangeDomainObject(
+      backendChangeObject, applyFunc, reverseFunc);
+
+    expect(UndoRedoService.getChangeCount()).toEqual(0);
+
+    UndoRedoService.applyChange(changeDomainObject, fakeDomainObject);
+    expect(UndoRedoService.getChangeCount()).toEqual(1);
+
+    UndoRedoService.clearChanges();
+    expect(UndoRedoService.getChangeCount()).toEqual(0);
+
+    expect(applyFunc).toHaveBeenCalled();
+    expect(reverseFunc).not.toHaveBeenCalled();
+    expect(applyFunc.calls.count()).toEqual(1);
+  });
+
+  it(&#x27;should undo changes in the reverse order of applying&#x27;, function() {
+    var appliedChanges = [];
+    var reversedChanges = [];
+
+    var fakeDomainObject = {
+      domain_property_name: &#x27;fake value&#x27;
+    };
+    var backendChangeObject1 = _createBackendChangeObject(&#x27;value1&#x27;);
+    var changeDomainObject1 = _createChangeDomainObject(
+      backendChangeObject1, function() {
+        appliedChanges.push(&#x27;change1&#x27;);
+      }, function() {
+        reversedChanges.push(&#x27;change1&#x27;);
+      });
+
+    var backendChangeObject2 = _createBackendChangeObject(&#x27;value2&#x27;);
+    var changeDomainObject2 = _createChangeDomainObject(
+      backendChangeObject2, function() {
+        appliedChanges.push(&#x27;change2&#x27;);
+      }, function() {
+        reversedChanges.push(&#x27;change2&#x27;);
+      });
+
+    var backendChangeObject3 = _createBackendChangeObject(&#x27;value3&#x27;);
+    var changeDomainObject3 = _createChangeDomainObject(
+      backendChangeObject3, function() {
+        appliedChanges.push(&#x27;change3&#x27;);
+      }, function() {
+        reversedChanges.push(&#x27;change3&#x27;);
+      });
+
+    expect(appliedChanges).toEqual([]);
+    expect(reversedChanges).toEqual([]);
+
+    UndoRedoService.applyChange(changeDomainObject1, fakeDomainObject);
+    UndoRedoService.applyChange(changeDomainObject2, fakeDomainObject);
+    UndoRedoService.applyChange(changeDomainObject3, fakeDomainObject);
+
+    expect(appliedChanges).toEqual([&#x27;change1&#x27;, &#x27;change2&#x27;, &#x27;change3&#x27;]);
+    expect(reversedChanges).toEqual([]);
+    expect(UndoRedoService.getChangeCount()).toEqual(3);
+
+    expect(UndoRedoService.undoChange(fakeDomainObject)).toBeTruthy();
+    expect(UndoRedoService.undoChange(fakeDomainObject)).toBeTruthy();
+    expect(UndoRedoService.undoChange(fakeDomainObject)).toBeTruthy();
+
+    expect(appliedChanges).toEqual([&#x27;change1&#x27;, &#x27;change2&#x27;, &#x27;change3&#x27;]);
+    expect(reversedChanges).toEqual([&#x27;change3&#x27;, &#x27;change2&#x27;, &#x27;change1&#x27;]);
+    expect(UndoRedoService.getChangeCount()).toEqual(0);
+  });
+
+  it(&#x27;should not be able to redo after applying a new change after undo&#x27;,
+    function() {
+      expect(UndoRedoService.getChangeCount()).toEqual(0);
+
+      var fakeDomainObject = {
+        domain_property_name: &#x27;fake value&#x27;
+      };
+      var changeDomainObject1 = _createNoOpChangeDomainObject(&#x27;value1&#x27;);
+      var changeDomainObject2 = _createNoOpChangeDomainObject(&#x27;value2&#x27;);
+      var changeDomainObject3 = _createNoOpChangeDomainObject(&#x27;value3&#x27;);
+
+      UndoRedoService.applyChange(changeDomainObject1, fakeDomainObject);
+      UndoRedoService.applyChange(changeDomainObject2, fakeDomainObject);
+      expect(UndoRedoService.undoChange(fakeDomainObject)).toBeTruthy();
+
+      UndoRedoService.applyChange(changeDomainObject3, fakeDomainObject);
+      expect(UndoRedoService.redoChange(fakeDomainObject)).toBeFalsy();
+
+      expect(UndoRedoService.getChangeCount()).toEqual(2);
+    }
+  );
+
+  it(&#x27;should have an empty change list with no changes&#x27;, function() {
+    expect(UndoRedoService.hasChanges()).toBeFalsy();
+    expect(UndoRedoService.getChangeList()).toEqual([]);
+  });
+
+  it(&#x27;should build a change list from only applied changes&#x27;, function() {
+    expect(UndoRedoService.getChangeCount()).toEqual(0);
+
+    var fakeDomainObject = {
+      domain_property_name: &#x27;fake value&#x27;
+    };
+    var changeDomainObject1 = _createNoOpChangeDomainObject(&#x27;value1&#x27;);
+    var changeDomainObject2 = _createNoOpChangeDomainObject(&#x27;value2&#x27;);
+    var changeDomainObject3 = _createNoOpChangeDomainObject(&#x27;value3&#x27;);
+
+    UndoRedoService.applyChange(changeDomainObject2, fakeDomainObject);
+    UndoRedoService.applyChange(changeDomainObject3, fakeDomainObject);
+    expect(UndoRedoService.undoChange(fakeDomainObject)).toBeTruthy();
+
+    UndoRedoService.applyChange(changeDomainObject1, fakeDomainObject);
+    expect(UndoRedoService.getChangeCount()).toEqual(2);
+
+    var changeList = UndoRedoService.getChangeList();
+    expect(changeList).toEqual([changeDomainObject2, changeDomainObject1]);
+  });
+
+  it(&#x27;should return a change list whose mutations do not change the service&#x27;,
+    function() {
+      var fakeDomainObject = {
+        domain_property_name: &#x27;fake value&#x27;
+      };
+      var changeDomainObject1 = _createNoOpChangeDomainObject(&#x27;value1&#x27;);
+      var changeDomainObject2 = _createNoOpChangeDomainObject(&#x27;value2&#x27;);
+
+      UndoRedoService.applyChange(changeDomainObject1, fakeDomainObject);
+      UndoRedoService.applyChange(changeDomainObject2, fakeDomainObject);
+
+      var changeList = UndoRedoService.getChangeList();
+      expect(changeList).toEqual([changeDomainObject1, changeDomainObject2]);
+      expect(UndoRedoService.getChangeCount()).toEqual(2);
+
+      // Change the returned change list, which should be a copy.
+      changeList.splice(0, 1);
+      expect(UndoRedoService.getChangeCount()).toEqual(2);
+
+      var origChangeList = UndoRedoService.getChangeList();
+      expect(origChangeList)
+        .toEqual([changeDomainObject1, changeDomainObject2]);
+    }
+  );
+
+  it(&#x27;should build a committable change list with one change&#x27;, function() {
+    var fakeDomainObject = {
+      domain_property_name: &#x27;fake value&#x27;
+    };
+    var backendChangeObject = _createBackendChangeObject(&#x27;value&#x27;);
+    var changeDomainObject = _createChangeDomainObject(backendChangeObject);
+
+    expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
+
+    UndoRedoService.applyChange(changeDomainObject, fakeDomainObject);
+    expect(UndoRedoService.getCommittableChangeList()).toEqual([
+      backendChangeObject
+    ]);
+  });
+
+  it(&#x27;should build a committable change list in the order of applied changes&#x27;,
+    function() {
+      // Perform a series of complex operations to build the committable change
+      // list. Apply 3 changes, undo two, redo one, and apply one.
+      var fakeDomainObject = {
+        domain_property_name: &#x27;fake value&#x27;
+      };
+      var backendChangeObject1 = _createBackendChangeObject(&#x27;value1&#x27;);
+      var backendChangeObject2 = _createBackendChangeObject(&#x27;value2&#x27;);
+      var backendChangeObject3 = _createBackendChangeObject(&#x27;value3&#x27;);
+      var backendChangeObject4 = _createBackendChangeObject(&#x27;value4&#x27;);
+      var changeDomainObject1 = _createChangeDomainObject(backendChangeObject1);
+      var changeDomainObject2 = _createChangeDomainObject(backendChangeObject2);
+      var changeDomainObject3 = _createChangeDomainObject(backendChangeObject3);
+      var changeDomainObject4 = _createChangeDomainObject(backendChangeObject4);
+
+      expect(UndoRedoService.getChangeCount()).toEqual(0);
+
+      UndoRedoService.applyChange(changeDomainObject4, fakeDomainObject);
+      UndoRedoService.applyChange(changeDomainObject2, fakeDomainObject);
+      UndoRedoService.applyChange(changeDomainObject3, fakeDomainObject);
+
+      expect(UndoRedoService.undoChange(fakeDomainObject)).toBeTruthy();
+      expect(UndoRedoService.undoChange(fakeDomainObject)).toBeTruthy();
+      expect(UndoRedoService.redoChange(fakeDomainObject)).toBeTruthy();
+
+      UndoRedoService.applyChange(changeDomainObject1, fakeDomainObject);
+      expect(UndoRedoService.getChangeCount()).toEqual(3);
+
+      expect(UndoRedoService.getCommittableChangeList()).toEqual([
+        backendChangeObject4, backendChangeObject2, backendChangeObject1
+      ]);
+    }
+  );
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:26,&quot;character&quot;:6,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:30,&quot;character&quot;:51,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:33,&quot;character&quot;:6,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:33,&quot;character&quot;:15,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:37,&quot;character&quot;:42,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:38,&quot;character&quot;:4,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:38,&quot;character&quot;:22,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:38,&quot;character&quot;:32,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:41,&quot;character&quot;:44,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:43,&quot;character&quot;:6,&quot;text&quot;:&quot;roperty_name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:43,&quot;character&quot;:20,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:48,&quot;character&quot;:6,&quot;text&quot;:&quot;backendObj&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:52,&quot;character&quot;:47,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:53,&quot;character&quot;:51,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:60,&quot;character&quot;:11,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:60,&quot;character&quot;:27,&quot;text&quot;:&quot;hasChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:68,&quot;character&quot;:4,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:68,&quot;character&quot;:20,&quot;text&quot;:&quot;applyChange&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:70,&quot;character&quot;:11,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:70,&quot;character&quot;:27,&quot;text&quot;:&quot;hasChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:79,&quot;character&quot;:11,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:79,&quot;character&quot;:27,&quot;text&quot;:&quot;hasChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:88,&quot;character&quot;:4,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:88,&quot;character&quot;:20,&quot;text&quot;:&quot;applyChange&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:90,&quot;character&quot;:11,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:90,&quot;character&quot;:27,&quot;text&quot;:&quot;hasChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:94,&quot;character&quot;:11,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:94,&quot;character&quot;:27,&quot;text&quot;:&quot;undoChange&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:95,&quot;character&quot;:11,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:95,&quot;character&quot;:27,&quot;text&quot;:&quot;hasChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:104,&quot;character&quot;:11,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:104,&quot;character&quot;:27,&quot;text&quot;:&quot;hasChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:113,&quot;character&quot;:4,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:113,&quot;character&quot;:20,&quot;text&quot;:&quot;applyChange&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:114,&quot;character&quot;:11,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:114,&quot;character&quot;:27,&quot;text&quot;:&quot;undoChange&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:118,&quot;character&quot;:11,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:118,&quot;character&quot;:27,&quot;text&quot;:&quot;hasChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:120,&quot;character&quot;:11,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:120,&quot;character&quot;:27,&quot;text&quot;:&quot;redoChange&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:121,&quot;character&quot;:11,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:121,&quot;character&quot;:27,&quot;text&quot;:&quot;hasChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:134,&quot;character&quot;:11,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:134,&quot;character&quot;:27,&quot;text&quot;:&quot;hasChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:135,&quot;character&quot;:11,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:135,&quot;character&quot;:27,&quot;text&quot;:&quot;undoChange&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:143,&quot;character&quot;:11,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:143,&quot;character&quot;:27,&quot;text&quot;:&quot;hasChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:144,&quot;character&quot;:11,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:144,&quot;character&quot;:27,&quot;text&quot;:&quot;redoChange&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:147,&quot;character&quot;:4,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:147,&quot;character&quot;:20,&quot;text&quot;:&quot;applyChange&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:148,&quot;character&quot;:11,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:148,&quot;character&quot;:27,&quot;text&quot;:&quot;redoChange&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:162,&quot;character&quot;:11,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:162,&quot;character&quot;:27,&quot;text&quot;:&quot;getChangeCount&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:164,&quot;character&quot;:4,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:164,&quot;character&quot;:20,&quot;text&quot;:&quot;applyChange&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:165,&quot;character&quot;:11,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:165,&quot;character&quot;:27,&quot;text&quot;:&quot;getChangeCount&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:167,&quot;character&quot;:4,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:167,&quot;character&quot;:20,&quot;text&quot;:&quot;clearChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:168,&quot;character&quot;:11,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:168,&quot;character&quot;:27,&quot;text&quot;:&quot;getChangeCount&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:176,&quot;character&quot;:8,&quot;text&quot;:&quot;appliedChanges&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:177,&quot;character&quot;:8,&quot;text&quot;:&quot;reversedChanges&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:185,&quot;character&quot;:8,&quot;text&quot;:&quot;appliedChanges&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:187,&quot;character&quot;:8,&quot;text&quot;:&quot;reversedChanges&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:193,&quot;character&quot;:8,&quot;text&quot;:&quot;appliedChanges&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:195,&quot;character&quot;:8,&quot;text&quot;:&quot;reversedChanges&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:201,&quot;character&quot;:8,&quot;text&quot;:&quot;appliedChanges&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:203,&quot;character&quot;:8,&quot;text&quot;:&quot;reversedChanges&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:206,&quot;character&quot;:11,&quot;text&quot;:&quot;appliedChanges&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:207,&quot;character&quot;:11,&quot;text&quot;:&quot;reversedChanges&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:209,&quot;character&quot;:4,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:209,&quot;character&quot;:20,&quot;text&quot;:&quot;applyChange&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:210,&quot;character&quot;:4,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:210,&quot;character&quot;:20,&quot;text&quot;:&quot;applyChange&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:211,&quot;character&quot;:4,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:211,&quot;character&quot;:20,&quot;text&quot;:&quot;applyChange&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:213,&quot;character&quot;:11,&quot;text&quot;:&quot;appliedChanges&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:214,&quot;character&quot;:11,&quot;text&quot;:&quot;reversedChanges&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:215,&quot;character&quot;:11,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:215,&quot;character&quot;:27,&quot;text&quot;:&quot;getChangeCount&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:217,&quot;character&quot;:11,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:217,&quot;character&quot;:27,&quot;text&quot;:&quot;undoChange&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:218,&quot;character&quot;:11,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:218,&quot;character&quot;:27,&quot;text&quot;:&quot;undoChange&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:219,&quot;character&quot;:11,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:219,&quot;character&quot;:27,&quot;text&quot;:&quot;undoChange&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:221,&quot;character&quot;:11,&quot;text&quot;:&quot;appliedChanges&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:222,&quot;character&quot;:11,&quot;text&quot;:&quot;reversedChanges&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:223,&quot;character&quot;:11,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:223,&quot;character&quot;:27,&quot;text&quot;:&quot;getChangeCount&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:228,&quot;character&quot;:13,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:228,&quot;character&quot;:29,&quot;text&quot;:&quot;getChangeCount&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:237,&quot;character&quot;:6,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:237,&quot;character&quot;:22,&quot;text&quot;:&quot;applyChange&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:238,&quot;character&quot;:6,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:238,&quot;character&quot;:22,&quot;text&quot;:&quot;applyChange&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:239,&quot;character&quot;:13,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:239,&quot;character&quot;:29,&quot;text&quot;:&quot;undoChange&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:241,&quot;character&quot;:6,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:241,&quot;character&quot;:22,&quot;text&quot;:&quot;applyChange&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:242,&quot;character&quot;:13,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:242,&quot;character&quot;:29,&quot;text&quot;:&quot;redoChange&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:244,&quot;character&quot;:13,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:244,&quot;character&quot;:29,&quot;text&quot;:&quot;getChangeCount&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:249,&quot;character&quot;:11,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:249,&quot;character&quot;:27,&quot;text&quot;:&quot;hasChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:250,&quot;character&quot;:11,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:250,&quot;character&quot;:27,&quot;text&quot;:&quot;getChangeList&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:254,&quot;character&quot;:11,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:254,&quot;character&quot;:27,&quot;text&quot;:&quot;getChangeCount&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:263,&quot;character&quot;:4,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:263,&quot;character&quot;:20,&quot;text&quot;:&quot;applyChange&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:264,&quot;character&quot;:4,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:264,&quot;character&quot;:20,&quot;text&quot;:&quot;applyChange&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:265,&quot;character&quot;:11,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:265,&quot;character&quot;:27,&quot;text&quot;:&quot;undoChange&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:267,&quot;character&quot;:4,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:267,&quot;character&quot;:20,&quot;text&quot;:&quot;applyChange&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:268,&quot;character&quot;:11,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:268,&quot;character&quot;:27,&quot;text&quot;:&quot;getChangeCount&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:270,&quot;character&quot;:8,&quot;text&quot;:&quot;changeList&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:270,&quot;character&quot;:21,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:270,&quot;character&quot;:37,&quot;text&quot;:&quot;getChangeList&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:271,&quot;character&quot;:11,&quot;text&quot;:&quot;changeList&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:282,&quot;character&quot;:6,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:282,&quot;character&quot;:22,&quot;text&quot;:&quot;applyChange&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:283,&quot;character&quot;:6,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:283,&quot;character&quot;:22,&quot;text&quot;:&quot;applyChange&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:285,&quot;character&quot;:10,&quot;text&quot;:&quot;changeList&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:285,&quot;character&quot;:23,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:285,&quot;character&quot;:39,&quot;text&quot;:&quot;getChangeList&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:286,&quot;character&quot;:13,&quot;text&quot;:&quot;changeList&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:287,&quot;character&quot;:13,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:287,&quot;character&quot;:29,&quot;text&quot;:&quot;getChangeCount&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:290,&quot;character&quot;:6,&quot;text&quot;:&quot;changeList&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:290,&quot;character&quot;:17,&quot;text&quot;:&quot;splice&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:291,&quot;character&quot;:13,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:291,&quot;character&quot;:29,&quot;text&quot;:&quot;getChangeCount&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:293,&quot;character&quot;:10,&quot;text&quot;:&quot;origChangeList&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:293,&quot;character&quot;:27,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:293,&quot;character&quot;:43,&quot;text&quot;:&quot;getChangeList&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:294,&quot;character&quot;:13,&quot;text&quot;:&quot;origChangeList&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:306,&quot;character&quot;:11,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:306,&quot;character&quot;:27,&quot;text&quot;:&quot;getCommittableChangeList&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:308,&quot;character&quot;:4,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:308,&quot;character&quot;:20,&quot;text&quot;:&quot;applyChange&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:309,&quot;character&quot;:11,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:309,&quot;character&quot;:27,&quot;text&quot;:&quot;getCommittableChangeList&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:330,&quot;character&quot;:13,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:330,&quot;character&quot;:29,&quot;text&quot;:&quot;getChangeCount&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:332,&quot;character&quot;:6,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:332,&quot;character&quot;:22,&quot;text&quot;:&quot;applyChange&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:333,&quot;character&quot;:6,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:333,&quot;character&quot;:22,&quot;text&quot;:&quot;applyChange&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:334,&quot;character&quot;:6,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:334,&quot;character&quot;:22,&quot;text&quot;:&quot;applyChange&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:336,&quot;character&quot;:13,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:336,&quot;character&quot;:29,&quot;text&quot;:&quot;undoChange&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:337,&quot;character&quot;:13,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:337,&quot;character&quot;:29,&quot;text&quot;:&quot;undoChange&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:338,&quot;character&quot;:13,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:338,&quot;character&quot;:29,&quot;text&quot;:&quot;redoChange&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:340,&quot;character&quot;:6,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:340,&quot;character&quot;:22,&quot;text&quot;:&quot;applyChange&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:341,&quot;character&quot;:13,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:341,&quot;character&quot;:29,&quot;text&quot;:&quot;getChangeCount&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:343,&quot;character&quot;:13,&quot;text&quot;:&quot;UndoRedoService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts&quot;,&quot;line&quot;:343,&quot;character&quot;:29,&quot;text&quot;:&quot;getCommittableChangeList&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:59 GMT</p>
+    </body>
+  </html>
+  

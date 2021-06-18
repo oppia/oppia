@@ -1,0 +1,395 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>math-equation-input-rules.service.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">extensions/interactions/MathEquationInput/directives/math-equation-input-rules.service.spec.ts</td><td class="">98.10%</td><td class="">100%</td><td class="">1052</td><td class="">1032</td><td class="">20</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for math equation input interaction rules.
+ */
+
+import { MathEquationInputRulesService } from
+// eslint-disable-next-line max-len
+  &#x27;interactions/MathEquationInput/directives/math-equation-input-rules.service&#x27;;
+
+describe(&#x27;Math equation input rules service&#x27;, () =&gt; {
+  let meirs: MathEquationInputRulesService;
+  let inputString, positionOfTerms;
+
+  beforeEach(() =&gt; {
+    meirs = new MathEquationInputRulesService();
+  });
+
+  it(&#x27;should have a correct MatchesExactlyWith rule&#x27;, () =&gt; {
+    inputString = &#x27;y=m*x+c&#x27;;
+
+    positionOfTerms = &#x27;lhs&#x27;;
+    // Accepted cases.
+    expect(meirs.MatchesExactlyWith(
+      &#x27;y=m*x+c&#x27;, {x: inputString, y: positionOfTerms})).toBeTrue();
+    expect(meirs.MatchesExactlyWith(
+      &#x27;y=m*x^2+c&#x27;, {x: inputString, y: positionOfTerms})).toBeTrue();
+    expect(meirs.MatchesExactlyWith(
+      &#x27;(y^2)/y=m*x+c&#x27;, {x: inputString, y: positionOfTerms})).toBeTrue();
+    expect(meirs.MatchesExactlyWith(
+      &#x27;y=0&#x27;, {x: inputString, y: positionOfTerms})).toBeTrue();
+    expect(meirs.MatchesExactlyWith(
+      &#x27;y=m*x-c&#x27;, {x: inputString, y: positionOfTerms})).toBeTrue();
+    // Rejected cases.
+    expect(meirs.MatchesExactlyWith(
+      &#x27;y-m*x=c&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.MatchesExactlyWith(
+      &#x27;m*x+c=y&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.MatchesExactlyWith(
+      &#x27;y^2=m*x&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.MatchesExactlyWith(
+      &#x27;x=m*y+c&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.MatchesExactlyWith(
+      &#x27;y/(m*x+c)=1&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.MatchesExactlyWith(
+      &#x27;y^2=m*x*y+c*y&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+
+    positionOfTerms = &#x27;rhs&#x27;;
+    // Accepted cases.
+    expect(meirs.MatchesExactlyWith(
+      &#x27;y=m*x+c&#x27;, {x: inputString, y: positionOfTerms})).toBeTrue();
+    expect(meirs.MatchesExactlyWith(
+      &#x27;y^2=m*x+c&#x27;, {x: inputString, y: positionOfTerms})).toBeTrue();
+    expect(meirs.MatchesExactlyWith(
+      &#x27;0=m*x+c&#x27;, {x: inputString, y: positionOfTerms})).toBeTrue();
+    expect(meirs.MatchesExactlyWith(
+      &#x27;0=c+m*x&#x27;, {x: inputString, y: positionOfTerms})).toBeTrue();
+    // Rejected cases.
+    expect(meirs.MatchesExactlyWith(
+      &#x27;y-m*x=c&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.MatchesExactlyWith(
+      &#x27;m*x+c=y&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.MatchesExactlyWith(
+      &#x27;y^2=m*x&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.MatchesExactlyWith(
+      &#x27;x=m*y+c&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.MatchesExactlyWith(
+      &#x27;y/(m*x+c)=1&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.MatchesExactlyWith(
+      &#x27;y^2=m*x*y+c*y&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+
+    positionOfTerms = &#x27;both&#x27;;
+    // Accepted cases.
+    expect(meirs.MatchesExactlyWith(
+      &#x27;y=m*x+c&#x27;,
+      {x: inputString, y: positionOfTerms})).toBeTrue();
+    expect(meirs.MatchesExactlyWith(
+      &#x27;y=c+m*x&#x27;, {x: inputString, y: positionOfTerms})).toBeTrue();
+    expect(meirs.MatchesExactlyWith(
+      &#x27;(y^2)/y=m*x+c&#x27;, {x: inputString, y: positionOfTerms})).toBeTrue();
+    // Rejected cases.
+    expect(meirs.MatchesExactlyWith(
+      &#x27;y-m*x=c&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.MatchesExactlyWith(
+      &#x27;m*x+c=y&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.MatchesExactlyWith(
+      &#x27;y=m*x&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.MatchesExactlyWith(
+      &#x27;x=m*y+c&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.MatchesExactlyWith(
+      &#x27;y/(m*x+c)=1&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.MatchesExactlyWith(
+      &#x27;y^2=m*x*y+c*y&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+
+    positionOfTerms = &#x27;irrelevant&#x27;;
+    // Accepted cases.
+    expect(meirs.MatchesExactlyWith(
+      &#x27;y=m*x+c&#x27;, {x: inputString, y: positionOfTerms})).toBeTrue();
+    expect(meirs.MatchesExactlyWith(
+      &#x27;y=c+m*x&#x27;, {x: inputString, y: positionOfTerms})).toBeTrue();
+    expect(meirs.MatchesExactlyWith(
+      &#x27;(y^2)/y=m*x+c&#x27;, {x: inputString, y: positionOfTerms})).toBeTrue();
+    expect(meirs.MatchesExactlyWith(
+      &#x27;y-m*x=c&#x27;, {x: inputString, y: positionOfTerms})).toBeTrue();
+    expect(meirs.MatchesExactlyWith(
+      &#x27;y-m*x-2*c=-c&#x27;, {x: inputString, y: positionOfTerms})).toBeTrue();
+    // Rejected cases.
+    expect(meirs.MatchesExactlyWith(
+      &#x27;y^2-m*x=c&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.MatchesExactlyWith(
+      &#x27;m*x-c=y&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.MatchesExactlyWith(
+      &#x27;y=m*x&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.MatchesExactlyWith(
+      &#x27;x=m*y+c&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.MatchesExactlyWith(
+      &#x27;y/(m*x+c)=1&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.MatchesExactlyWith(
+      &#x27;y^2=m*x*y+c*y&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+  });
+
+  it(&#x27;should have a correct IsEquivalentTo rule&#x27;, () =&gt; {
+    inputString = &#x27;(2*x+1)*(x-3)=0&#x27;;
+
+    // Accepted cases.
+    expect(meirs.IsEquivalentTo(
+      &#x27;0=(2*x+1)*(x-3)&#x27;, {x: inputString})).toBeTrue();
+    expect(meirs.IsEquivalentTo(
+      &#x27;2*x^2-6*x+x-3=0&#x27;, {x: inputString})).toBeTrue();
+    expect(meirs.IsEquivalentTo(
+      &#x27;2*x^2-6*x=3-x&#x27;, {x: inputString})).toBeTrue();
+    expect(meirs.IsEquivalentTo(
+      &#x27;-2*x^2+5*x+3=0&#x27;, {x: inputString})).toBeTrue();
+    expect(meirs.IsEquivalentTo(
+      &#x27;(2*x+1)*(-x+3)=0&#x27;, {x: inputString})).toBeTrue();
+
+    // Rejected cases.
+    expect(meirs.IsEquivalentTo(
+      &#x27;x-y=x-y&#x27;, {x: inputString})).toBeFalse();
+    expect(meirs.IsEquivalentTo(
+      &#x27;x=3&#x27;, {x: inputString})).toBeFalse();
+    expect(meirs.IsEquivalentTo(
+      &#x27;2*x+1=0&#x27;, {x: inputString})).toBeFalse();
+    expect(meirs.IsEquivalentTo(
+      &#x27;x-3=0&#x27;, {x: inputString})).toBeFalse();
+    expect(meirs.IsEquivalentTo(
+      &#x27;x=-1/2&#x27;, {x: inputString})).toBeFalse();
+
+
+    inputString = &#x27;13 + 2*w = 34&#x27;;
+
+    // Accepted cases.
+    expect(meirs.IsEquivalentTo(
+      &#x27;13 + 2*w = 34&#x27;, {x: inputString})).toBeTrue();
+    expect(meirs.IsEquivalentTo(
+      &#x27;26 + 4*w = 68&#x27;, {x: inputString})).toBeTrue();
+    expect(meirs.IsEquivalentTo(
+      &#x27;6.5 + w = 17&#x27;, {x: inputString})).toBeTrue();
+    expect(meirs.IsEquivalentTo(
+      &#x27;13 + 2*w - 34 = 0&#x27;, {x: inputString})).toBeTrue();
+    expect(meirs.IsEquivalentTo(
+      &#x27;2*w = 21&#x27;, {x: inputString})).toBeTrue();
+    expect(meirs.IsEquivalentTo(
+      &#x27;21 = 2*w&#x27;, {x: inputString})).toBeTrue();
+    expect(meirs.IsEquivalentTo(
+      &#x27;(13 + 2*w)/34 = 1&#x27;, {x: inputString})).toBeTrue();
+
+    // Rejected cases.
+    expect(meirs.IsEquivalentTo(
+      &#x27;13 + 2*w = 0&#x27;, {x: inputString})).toBeFalse();
+    expect(meirs.IsEquivalentTo(
+      &#x27;13 - 2*w = 34&#x27;, {x: inputString})).toBeFalse();
+    expect(meirs.IsEquivalentTo(
+      &#x27;(13 + 2*w)^2 = 1156&#x27;, {x: inputString})).toBeFalse();
+  });
+
+  it(&#x27;should have a correct ContainsSomeOf rule&#x27;, () =&gt; {
+    inputString = &#x27;y=m*x+c&#x27;;
+
+    positionOfTerms = &#x27;lhs&#x27;;
+    // Accepted cases.
+    expect(meirs.ContainsSomeOf(
+      &#x27;y=m*x+c&#x27;, {x: inputString, y: positionOfTerms})).toBeTrue();
+    expect(meirs.ContainsSomeOf(
+      &#x27;y=m*x^2+c&#x27;, {x: inputString, y: positionOfTerms})).toBeTrue();
+    expect(meirs.ContainsSomeOf(
+      &#x27;y=0&#x27;, {x: inputString, y: positionOfTerms})).toBeTrue();
+    expect(meirs.ContainsSomeOf(
+      &#x27;y=m*x-c&#x27;, {x: inputString, y: positionOfTerms})).toBeTrue();
+    // Rejected cases.
+    expect(meirs.ContainsSomeOf(
+      &#x27;-y-m*x=c&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.ContainsSomeOf(
+      &#x27;m*x+c=y&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.ContainsSomeOf(
+      &#x27;y^2=m*x&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.ContainsSomeOf(
+      &#x27;x=m*y+c&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.ContainsSomeOf(
+      &#x27;y/(m*x+c)=1&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.ContainsSomeOf(
+      &#x27;y^2=m*x*y+c*y&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+
+    positionOfTerms = &#x27;rhs&#x27;;
+    // Accepted cases.
+    expect(meirs.ContainsSomeOf(
+      &#x27;y=m*x+c&#x27;, {x: inputString, y: positionOfTerms})).toBeTrue();
+    expect(meirs.ContainsSomeOf(
+      &#x27;y^2=m*x&#x27;, {x: inputString, y: positionOfTerms})).toBeTrue();
+    expect(meirs.ContainsSomeOf(
+      &#x27;0=m*x+c&#x27;, {x: inputString, y: positionOfTerms})).toBeTrue();
+    expect(meirs.ContainsSomeOf(
+      &#x27;0=c-m*x&#x27;, {x: inputString, y: positionOfTerms})).toBeTrue();
+    // Rejected cases.
+    expect(meirs.ContainsSomeOf(
+      &#x27;c-m*x=y&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.ContainsSomeOf(
+      &#x27;m*x+c=y&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.ContainsSomeOf(
+      &#x27;y^2=m*x^2&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.ContainsSomeOf(
+      &#x27;x=m*y-c&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.ContainsSomeOf(
+      &#x27;y/(m*x+c)=1&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.ContainsSomeOf(
+      &#x27;y^2=m*x*y+c*y&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+
+    positionOfTerms = &#x27;both&#x27;;
+    // Accepted cases.
+    expect(meirs.ContainsSomeOf(
+      &#x27;y=m*x+c&#x27;, {x: inputString, y: positionOfTerms})).toBeTrue();
+    expect(meirs.ContainsSomeOf(
+      &#x27;y+x=c+m*x&#x27;, {x: inputString, y: positionOfTerms})).toBeTrue();
+    expect(meirs.ContainsSomeOf(
+      &#x27;y-y^2=m*x^2+c&#x27;, {x: inputString, y: positionOfTerms})).toBeTrue();
+    // Rejected cases.
+    expect(meirs.ContainsSomeOf(
+      &#x27;-y-m*x=c^2&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.ContainsSomeOf(
+      &#x27;m*x+c=y&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.ContainsSomeOf(
+      &#x27;x=m*y-c&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.ContainsSomeOf(
+      &#x27;y/(m*x+c)=1&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.ContainsSomeOf(
+      &#x27;y^2=m*x*y+c*y&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+
+    positionOfTerms = &#x27;irrelevant&#x27;;
+    // Accepted cases.
+    expect(meirs.ContainsSomeOf(
+      &#x27;y=m*x+c&#x27;, {x: inputString, y: positionOfTerms})).toBeTrue();
+    expect(meirs.ContainsSomeOf(
+      &#x27;y=c+m*x&#x27;, {x: inputString, y: positionOfTerms})).toBeTrue();
+    expect(meirs.ContainsSomeOf(
+      &#x27;y-mx-c=0&#x27;, {x: inputString, y: positionOfTerms})).toBeTrue();
+    expect(meirs.ContainsSomeOf(
+      &#x27;0=-y+mx+c&#x27;, {x: inputString, y: positionOfTerms})).toBeTrue();
+    expect(meirs.ContainsSomeOf(
+      &#x27;y-m*x=c&#x27;, {x: inputString, y: positionOfTerms})).toBeTrue();
+    expect(meirs.ContainsSomeOf(
+      &#x27;y-m*x-2*c=-c&#x27;, {x: inputString, y: positionOfTerms})).toBeTrue();
+    // Rejected cases.
+    expect(meirs.ContainsSomeOf(
+      &#x27;y^2+m*x=-c&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.ContainsSomeOf(
+      &#x27;m*x^2+c=y&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.ContainsSomeOf(
+      &#x27;y/2=m*c&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.ContainsSomeOf(
+      &#x27;x=m*y-c&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.ContainsSomeOf(
+      &#x27;y/(m*x+c)=1&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.ContainsSomeOf(
+      &#x27;y^2=m*x*y+c*y&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+  });
+
+  it(&#x27;should have a correct OmitsSomeOf rule&#x27;, () =&gt; {
+    inputString = &#x27;y=m*x+c&#x27;;
+
+    positionOfTerms = &#x27;lhs&#x27;;
+    // Accepted cases.
+    expect(meirs.OmitsSomeOf(
+      &#x27;0=m*x+c&#x27;, {x: inputString, y: positionOfTerms})).toBeTrue();
+    expect(meirs.OmitsSomeOf(
+      &#x27;y^2=m*x^2+c&#x27;, {x: inputString, y: positionOfTerms})).toBeTrue();
+    expect(meirs.OmitsSomeOf(
+      &#x27;-y=m*x+c&#x27;, {x: inputString, y: positionOfTerms})).toBeTrue();
+    expect(meirs.OmitsSomeOf(
+      &#x27;y/2=0&#x27;, {x: inputString, y: positionOfTerms})).toBeTrue();
+    expect(meirs.OmitsSomeOf(
+      &#x27;y*y=m*x-c&#x27;, {x: inputString, y: positionOfTerms})).toBeTrue();
+    // Rejected cases.
+    expect(meirs.OmitsSomeOf(
+      &#x27;y-m*x=c&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.OmitsSomeOf(
+      &#x27;y+m*x+c=y&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.OmitsSomeOf(
+      &#x27;y=m*x&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.OmitsSomeOf(
+      &#x27;x+y=m*y+c&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.OmitsSomeOf(
+      &#x27;y=1&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+
+    positionOfTerms = &#x27;rhs&#x27;;
+    // Accepted cases.
+    expect(meirs.OmitsSomeOf(
+      &#x27;y=m*x&#x27;, {x: inputString, y: positionOfTerms})).toBeTrue();
+    expect(meirs.OmitsSomeOf(
+      &#x27;y^2=m*x&#x27;, {x: inputString, y: positionOfTerms})).toBeTrue();
+    expect(meirs.OmitsSomeOf(
+      &#x27;0=c&#x27;, {x: inputString, y: positionOfTerms})).toBeTrue();
+    expect(meirs.OmitsSomeOf(
+      &#x27;0=c-m*x&#x27;, {x: inputString, y: positionOfTerms})).toBeTrue();
+    // Rejected cases.
+    expect(meirs.OmitsSomeOf(
+      &#x27;c-m*x=mx+c&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.OmitsSomeOf(
+      &#x27;y^2=m*x+c&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.OmitsSomeOf(
+      &#x27;y^2=m*x^2+mx+c&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.OmitsSomeOf(
+      &#x27;x=m*x+c&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.OmitsSomeOf(
+      &#x27;y^2=m*x+c&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+
+    positionOfTerms = &#x27;both&#x27;;
+    // Accepted cases.
+    expect(meirs.OmitsSomeOf(
+      &#x27;0=m*x-c&#x27;, {x: inputString, y: positionOfTerms})).toBeTrue();
+    expect(meirs.OmitsSomeOf(
+      &#x27;-y+x=-c+m*x&#x27;, {x: inputString, y: positionOfTerms})).toBeTrue();
+    expect(meirs.OmitsSomeOf(
+      &#x27;mx+c=y&#x27;, {x: inputString, y: positionOfTerms})).toBeTrue();
+    // Rejected cases.
+    expect(meirs.OmitsSomeOf(
+      &#x27;y=mx+c&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+    expect(meirs.OmitsSomeOf(
+      &#x27;y+y^2=mx+b+c&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+
+    positionOfTerms = &#x27;irrelevant&#x27;;
+    // Accepted cases.
+    expect(meirs.OmitsSomeOf(
+      &#x27;y=m*x-c&#x27;, {x: inputString, y: positionOfTerms})).toBeTrue();
+    expect(meirs.OmitsSomeOf(
+      &#x27;y=c+m*x^2&#x27;, {x: inputString, y: positionOfTerms})).toBeTrue();
+    expect(meirs.OmitsSomeOf(
+      &#x27;y^2=m*x+c&#x27;, {x: inputString, y: positionOfTerms})).toBeTrue();
+    expect(meirs.OmitsSomeOf(
+      &#x27;y-m*x=-c&#x27;, {x: inputString, y: positionOfTerms})).toBeTrue();
+    expect(meirs.OmitsSomeOf(
+      &#x27;y-m*x+2*c=-c&#x27;, {x: inputString, y: positionOfTerms})).toBeTrue();
+    // Rejected cases.
+    expect(meirs.OmitsSomeOf(
+      &#x27;y-mx=c&#x27;, {x: inputString, y: positionOfTerms})).toBeFalse();
+  });
+
+  it(&#x27;should have a correct MatchesWithGeneralForm rule&#x27;, () =&gt; {
+    inputString = &#x27;y = mx + c&#x27;;
+
+    expect(meirs.MatchesWithGeneralForm(
+      &#x27;y = 3x + 5&#x27;, {x: &#x27;y = mx + c&#x27;, y: [&#x27;m&#x27;, &#x27;c&#x27;]})).toBeTrue();
+    expect(meirs.MatchesWithGeneralForm(
+      &#x27;3x + 5 = y&#x27;, {x: &#x27;y = mx + c&#x27;, y: [&#x27;m&#x27;, &#x27;c&#x27;]})).toBeFalse();
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;extensions/interactions/MathEquationInput/directives/math-equation-input-rules.service.spec.ts&quot;,&quot;line&quot;:24,&quot;character&quot;:6,&quot;text&quot;:&quot;inputString&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MathEquationInput/directives/math-equation-input-rules.service.spec.ts&quot;,&quot;line&quot;:24,&quot;character&quot;:19,&quot;text&quot;:&quot;positionOfTerms&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MathEquationInput/directives/math-equation-input-rules.service.spec.ts&quot;,&quot;line&quot;:31,&quot;character&quot;:4,&quot;text&quot;:&quot;inputString&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MathEquationInput/directives/math-equation-input-rules.service.spec.ts&quot;,&quot;line&quot;:33,&quot;character&quot;:4,&quot;text&quot;:&quot;positionOfTerms&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MathEquationInput/directives/math-equation-input-rules.service.spec.ts&quot;,&quot;line&quot;:59,&quot;character&quot;:4,&quot;text&quot;:&quot;positionOfTerms&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MathEquationInput/directives/math-equation-input-rules.service.spec.ts&quot;,&quot;line&quot;:83,&quot;character&quot;:4,&quot;text&quot;:&quot;positionOfTerms&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MathEquationInput/directives/math-equation-input-rules.service.spec.ts&quot;,&quot;line&quot;:106,&quot;character&quot;:4,&quot;text&quot;:&quot;positionOfTerms&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MathEquationInput/directives/math-equation-input-rules.service.spec.ts&quot;,&quot;line&quot;:134,&quot;character&quot;:4,&quot;text&quot;:&quot;inputString&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MathEquationInput/directives/math-equation-input-rules.service.spec.ts&quot;,&quot;line&quot;:161,&quot;character&quot;:4,&quot;text&quot;:&quot;inputString&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MathEquationInput/directives/math-equation-input-rules.service.spec.ts&quot;,&quot;line&quot;:189,&quot;character&quot;:4,&quot;text&quot;:&quot;inputString&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MathEquationInput/directives/math-equation-input-rules.service.spec.ts&quot;,&quot;line&quot;:191,&quot;character&quot;:4,&quot;text&quot;:&quot;positionOfTerms&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MathEquationInput/directives/math-equation-input-rules.service.spec.ts&quot;,&quot;line&quot;:215,&quot;character&quot;:4,&quot;text&quot;:&quot;positionOfTerms&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MathEquationInput/directives/math-equation-input-rules.service.spec.ts&quot;,&quot;line&quot;:239,&quot;character&quot;:4,&quot;text&quot;:&quot;positionOfTerms&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MathEquationInput/directives/math-equation-input-rules.service.spec.ts&quot;,&quot;line&quot;:259,&quot;character&quot;:4,&quot;text&quot;:&quot;positionOfTerms&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MathEquationInput/directives/math-equation-input-rules.service.spec.ts&quot;,&quot;line&quot;:289,&quot;character&quot;:4,&quot;text&quot;:&quot;inputString&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MathEquationInput/directives/math-equation-input-rules.service.spec.ts&quot;,&quot;line&quot;:291,&quot;character&quot;:4,&quot;text&quot;:&quot;positionOfTerms&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MathEquationInput/directives/math-equation-input-rules.service.spec.ts&quot;,&quot;line&quot;:315,&quot;character&quot;:4,&quot;text&quot;:&quot;positionOfTerms&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MathEquationInput/directives/math-equation-input-rules.service.spec.ts&quot;,&quot;line&quot;:337,&quot;character&quot;:4,&quot;text&quot;:&quot;positionOfTerms&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MathEquationInput/directives/math-equation-input-rules.service.spec.ts&quot;,&quot;line&quot;:351,&quot;character&quot;:4,&quot;text&quot;:&quot;positionOfTerms&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/MathEquationInput/directives/math-equation-input-rules.service.spec.ts&quot;,&quot;line&quot;:369,&quot;character&quot;:4,&quot;text&quot;:&quot;inputString&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:44:00 GMT</p>
+    </body>
+  </html>
+  

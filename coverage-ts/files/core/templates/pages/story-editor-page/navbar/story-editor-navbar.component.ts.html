@@ -1,0 +1,272 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>story-editor-navbar.component.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/story-editor-page/navbar/story-editor-navbar.component.ts</td><td class="">95.56%</td><td class="">100%</td><td class="">360</td><td class="">344</td><td class="">16</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2018 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Component for the navbar of the story editor.
+ */
+
+import { NgbModal } from &#x27;@ng-bootstrap/ng-bootstrap&#x27;;
+import { UndoRedoService } from &#x27;domain/editor/undo_redo/undo-redo.service&#x27;;
+import { EditableStoryBackendApiService } from &#x27;domain/story/editable-story-backend-api.service&#x27;;
+import { StoryValidationService } from &#x27;domain/story/story-validation.service&#x27;;
+import { Story } from &#x27;domain/story/StoryObjectFactory&#x27;;
+import { Subscription } from &#x27;rxjs&#x27;;
+import { AlertsService } from &#x27;services/alerts.service&#x27;;
+import { StoryEditorStateService } from &#x27;../services/story-editor-state.service&#x27;;
+import { StoryEditorSaveModalComponent } from &#x27;../modal-templates/story-editor-save-modal.component&#x27;;
+import { Component, Input, OnInit } from &#x27;@angular/core&#x27;;
+import { downgradeComponent } from &#x27;@angular/upgrade/static&#x27;;
+import { StoryEditorNavigationService } from &#x27;../services/story-editor-navigation.service&#x27;;
+
+@Component({
+  selector: &#x27;oppia-story-editor-navbar&#x27;,
+  templateUrl: &#x27;./story-editor-navbar.component.html&#x27;
+})
+export class StoryEditorNavbarComponent implements OnInit {
+  @Input() commitMessage;
+  validationIssues: string[];
+  prepublishValidationIssues: string | string[];
+  story: Story;
+  forceValidateExplorations: boolean;
+  storyIsPublished: boolean;
+  warningsAreShown: boolean;
+  showNavigationOptions: boolean;
+  showStoryEditOptions: boolean;
+  activeTab: string;
+  constructor(
+    private storyEditorStateService: StoryEditorStateService,
+    private undoRedoService: UndoRedoService,
+    private storyValidationService: StoryValidationService,
+    private editableStoryBackendApiService: EditableStoryBackendApiService,
+    private ngbModal: NgbModal,
+    private alertsService: AlertsService,
+    private storyEditorNavigationService: StoryEditorNavigationService
+  ) {}
+
+  EDITOR = &#x27;Editor&#x27;;
+  PREVIEW = &#x27;Preview&#x27;;
+  directiveSubscriptions = new Subscription();
+  explorationValidationIssues = [];
+
+  isStoryPublished(): boolean {
+    return this.storyEditorStateService.isStoryPublished();
+  }
+
+  isSaveInProgress(): boolean {
+    return this.storyEditorStateService.isSavingStory();
+  }
+
+  getChangeListLength(): number {
+    return this.undoRedoService.getChangeCount();
+  }
+
+  getWarningsCount(): number {
+    return this.validationIssues.length;
+  }
+
+  getTotalWarningsCount(): number {
+    return (
+      this.validationIssues.length +
+      this.explorationValidationIssues.length +
+      this.prepublishValidationIssues.length);
+  }
+
+  isStorySaveable(): boolean {
+    if (this.storyEditorStateService.isStoryPublished()) {
+      return (
+        this.getChangeListLength() &gt; 0 &amp;&amp;
+        this.getTotalWarningsCount() === 0);
+    }
+    return (
+      this.getChangeListLength() &gt; 0 &amp;&amp;
+      this.getWarningsCount() === 0);
+  }
+
+  discardChanges(): void {
+    this.undoRedoService.clearChanges();
+    this.storyEditorStateService.loadStory(this.story.getId());
+    this._validateStory();
+    this.forceValidateExplorations = true;
+  }
+
+  private _validateStory(): void {
+    this.validationIssues = this.story.validate();
+    let nodes = this.story.getStoryContents().getNodes();
+    let skillIdsInTopic = (
+      this.storyEditorStateService.getSkillSummaries().map(
+        skill =&gt; skill.id));
+    if (this.validationIssues.length === 0 &amp;&amp; nodes.length &gt; 0) {
+      let prerequisiteSkillValidationIssues = (
+        this.storyValidationService
+          .validatePrerequisiteSkillsInStoryContents(
+            skillIdsInTopic, this.story.getStoryContents()));
+      this.validationIssues = (
+        this.validationIssues.concat(
+          prerequisiteSkillValidationIssues));
+    }
+    if (this.storyEditorStateService.getStoryWithUrlFragmentExists()) {
+      this.validationIssues.push(
+        &#x27;Story URL fragment already exists.&#x27;);
+    }
+    this.forceValidateExplorations = true;
+    this._validateExplorations();
+    let storyPrepublishValidationIssues = (
+      this.story.prepublishValidate());
+    let nodePrepublishValidationIssues = (
+      [].concat.apply([], nodes.map(
+        (node) =&gt; node.prepublishValidate())));
+    this.prepublishValidationIssues = (
+      storyPrepublishValidationIssues.concat(
+        nodePrepublishValidationIssues));
+  }
+
+  private _validateExplorations(): void {
+    let nodes = this.story.getStoryContents().getNodes();
+    let explorationIds = [];
+
+    if (
+      this.storyEditorStateService.areAnyExpIdsChanged() ||
+      this.forceValidateExplorations) {
+      this.explorationValidationIssues = [];
+      for (let i = 0; i &lt; nodes.length; i++) {
+        if (nodes[i].getExplorationId() !== null) {
+          explorationIds.push(nodes[i].getExplorationId());
+        } else {
+          this.explorationValidationIssues.push(
+            &#x27;Some chapters don\&#x27;t have exploration IDs provided.&#x27;);
+        }
+      }
+      this.forceValidateExplorations = false;
+      if (explorationIds.length &gt; 0) {
+        this.editableStoryBackendApiService.validateExplorationsAsync(
+          this.story.getId(), explorationIds
+        ).then((validationIssues) =&gt; {
+          this.explorationValidationIssues =
+            this.explorationValidationIssues.concat(validationIssues);
+        });
+      }
+    }
+    this.storyEditorStateService.resetExpIdsChanged();
+  }
+
+  saveChanges(): void {
+    const modalRef = this.ngbModal.open(
+      StoryEditorSaveModalComponent,
+      { backdrop: &#x27;static&#x27; });
+    modalRef.componentInstance.bindedMessage = this.commitMessage;
+    modalRef.result.then((commitMessage) =&gt; {
+      this.storyEditorStateService.saveStory(
+        commitMessage, () =&gt; {
+        }, (errorMessage: string) =&gt; {
+          this.alertsService.addInfoMessage(errorMessage, 5000);
+        }
+      );
+    }, () =&gt; {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
+    });
+  }
+
+  publishStory(): void {
+    this.storyEditorStateService.changeStoryPublicationStatus(
+      true, () =&gt; {
+        this.storyIsPublished =
+          this.storyEditorStateService.isStoryPublished();
+      });
+  }
+
+  unpublishStory(): void {
+    this.storyEditorStateService.changeStoryPublicationStatus(
+      false, () =&gt; {
+        this.storyIsPublished =
+          this.storyEditorStateService.isStoryPublished();
+        this.forceValidateExplorations = true;
+        this._validateStory();
+      });
+  }
+
+  toggleWarningText(): void {
+    this.warningsAreShown = !this.warningsAreShown;
+  }
+
+  toggleNavigationOptions(): void {
+    this.showNavigationOptions = !this.showNavigationOptions;
+  }
+
+  toggleStoryEditOptions(): void {
+    this.showStoryEditOptions = !this.showStoryEditOptions;
+  }
+
+  selectMainTab(): void {
+    this.activeTab = this.EDITOR;
+    this.storyEditorNavigationService.navigateToStoryEditor();
+    this.showNavigationOptions = false;
+  }
+
+  selectPreviewTab(): void {
+    this.activeTab = this.PREVIEW;
+    this.storyEditorNavigationService.navigateToStoryPreviewTab();
+    this.showNavigationOptions = false;
+  }
+
+  ngOnInit(): void {
+    this.directiveSubscriptions.add(
+      this.storyEditorStateService.onStoryInitialized.subscribe(
+        () =&gt; this._validateStory()
+      ));
+    this.directiveSubscriptions.add(
+      this.storyEditorStateService.onStoryReinitialized.subscribe(
+        () =&gt; this._validateStory()
+      ));
+    this.forceValidateExplorations = true;
+    this.warningsAreShown = false;
+    this.activeTab = this.EDITOR;
+    this.showNavigationOptions = false;
+    this.showStoryEditOptions = false;
+    this.story = this.storyEditorStateService.getStory();
+    this.validationIssues = [];
+    this.prepublishValidationIssues = [];
+    this.directiveSubscriptions.add(
+      this.undoRedoService.onUndoRedoChangeApplied$().subscribe(
+        () =&gt; this._validateStory()
+      )
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
+  }
+}
+
+angular.module(&#x27;oppia&#x27;).directive(&#x27;oppiaStoryEditorNavbar&#x27;,
+  downgradeComponent({component: StoryEditorNavbarComponent}));
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/navbar/story-editor-navbar.component.ts&quot;,&quot;line&quot;:36,&quot;character&quot;:11,&quot;text&quot;:&quot;commitMessage&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/navbar/story-editor-navbar.component.ts&quot;,&quot;line&quot;:59,&quot;character&quot;:2,&quot;text&quot;:&quot;explorationValidationIssues&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/navbar/story-editor-navbar.component.ts&quot;,&quot;line&quot;:80,&quot;character&quot;:11,&quot;text&quot;:&quot;explorationValidationIssues&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/navbar/story-editor-navbar.component.ts&quot;,&quot;line&quot;:125,&quot;character&quot;:8,&quot;text&quot;:&quot;nodePrepublishValidationIssues&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/navbar/story-editor-navbar.component.ts&quot;,&quot;line&quot;:135,&quot;character&quot;:8,&quot;text&quot;:&quot;explorationIds&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/navbar/story-editor-navbar.component.ts&quot;,&quot;line&quot;:140,&quot;character&quot;:11,&quot;text&quot;:&quot;explorationValidationIssues&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/navbar/story-editor-navbar.component.ts&quot;,&quot;line&quot;:143,&quot;character&quot;:10,&quot;text&quot;:&quot;explorationIds&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/navbar/story-editor-navbar.component.ts&quot;,&quot;line&quot;:145,&quot;character&quot;:15,&quot;text&quot;:&quot;explorationValidationIssues&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/navbar/story-editor-navbar.component.ts&quot;,&quot;line&quot;:150,&quot;character&quot;:10,&quot;text&quot;:&quot;explorationIds&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/navbar/story-editor-navbar.component.ts&quot;,&quot;line&quot;:154,&quot;character&quot;:15,&quot;text&quot;:&quot;explorationValidationIssues&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/navbar/story-editor-navbar.component.ts&quot;,&quot;line&quot;:155,&quot;character&quot;:17,&quot;text&quot;:&quot;explorationValidationIssues&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/navbar/story-editor-navbar.component.ts&quot;,&quot;line&quot;:166,&quot;character&quot;:13,&quot;text&quot;:&quot;componentInstance&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/navbar/story-editor-navbar.component.ts&quot;,&quot;line&quot;:166,&quot;character&quot;:31,&quot;text&quot;:&quot;bindedMessage&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/navbar/story-editor-navbar.component.ts&quot;,&quot;line&quot;:166,&quot;character&quot;:52,&quot;text&quot;:&quot;commitMessage&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/navbar/story-editor-navbar.component.ts&quot;,&quot;line&quot;:167,&quot;character&quot;:13,&quot;text&quot;:&quot;result&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/story-editor-page/navbar/story-editor-navbar.component.ts&quot;,&quot;line&quot;:167,&quot;character&quot;:26,&quot;text&quot;:&quot;commitMessage&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:58 GMT</p>
+    </body>
+  </html>
+  

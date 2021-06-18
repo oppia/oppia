@@ -1,0 +1,143 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>graph-data.service.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/exploration-editor-page/services/graph-data.service.spec.ts</td><td class="">75.73%</td><td class="">100%</td><td class="">103</td><td class="">78</td><td class="">25</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for GraphDataService.
+ */
+import { importAllAngularServices } from &#x27;tests/unit-test-utils&#x27;;
+
+require(&#x27;pages/exploration-editor-page/services/graph-data.service&#x27;);
+require(&#x27;pages/exploration-editor-page/services/exploration-property.service&#x27;);
+/* eslint-disable-next-line max-len */
+require(&#x27;pages/exploration-editor-page/services/exploration-init-state-name.service&#x27;);
+
+describe(&#x27;Graph Data Service&#x27;, function() {
+  var GraphDataService;
+  var ExplorationInitStateNameService;
+  var ExplorationStatesService;
+
+  beforeEach(angular.mock.module(&#x27;oppia&#x27;));
+  importAllAngularServices();
+  beforeEach(angular.mock.inject(function($injector) {
+    GraphDataService = $injector.get(&#x27;GraphDataService&#x27;);
+    ExplorationInitStateNameService = $injector.get(
+      &#x27;ExplorationInitStateNameService&#x27;);
+    ExplorationStatesService = $injector.get(&#x27;ExplorationStatesService&#x27;);
+
+    ExplorationStatesService.init({
+      Hola: {
+        content: {content_id: &#x27;content&#x27;, html: &#x27;&#x27;},
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {},
+          },
+        },
+        param_changes: [],
+        interaction: {
+          answer_groups: [{
+            rule_specs: [{
+              rule_type: &#x27;Contains&#x27;,
+              inputs: {
+                x: {
+                  contentId: &#x27;rule_input&#x27;,
+                  normalizedStrSet: [&#x27;hola&#x27;]
+                }
+              }
+            }],
+            outcome: {
+              dest: &#x27;Me Llamo&#x27;,
+              feedback: {
+                content_id: &#x27;feedback_1&#x27;,
+                html: &#x27;buen trabajo!&#x27;,
+              },
+              labelled_as_correct: true,
+            },
+          }],
+          customization_args: {
+            placeholder: {
+              value: {
+                content_id: &#x27;ca_placeholder_0&#x27;,
+                unicode_str: &#x27;&#x27;
+              }
+            },
+            rows: { value: 1 }
+          },
+          default_outcome: {
+            dest: &#x27;Hola&#x27;,
+            feedback: {
+              content_id: &#x27;default_outcome&#x27;,
+              html: &#x27;try again!&#x27;,
+            },
+            labelled_as_correct: false,
+          },
+          hints: [],
+          id: &#x27;TextInput&#x27;,
+          solution: null,
+        },
+        linked_skill_id: null,
+        solicit_answer_details: false,
+        written_translations: {
+          translations_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {},
+          },
+        },
+        classifier_model_id: 0,
+      },
+    });
+  }));
+
+  it(&#x27;should recompute graph data&#x27;, function() {
+    var graphData = {
+      finalStateIds: [],
+      initStateId: &#x27;property_1&#x27;,
+      links: [{
+        source: &#x27;Hola&#x27;,
+        target: &#x27;Me Llamo&#x27;
+      }, {
+        source: &#x27;Hola&#x27;,
+        target: &#x27;Hola&#x27;
+      }],
+      nodes: { Hola: &#x27;Hola&#x27; }
+    };
+
+    GraphDataService.recompute();
+    expect(GraphDataService.getGraphData()).toBeNull();
+
+    ExplorationInitStateNameService.init(&#x27;property_1&#x27;);
+    GraphDataService.recompute();
+    expect(GraphDataService.getGraphData()).toEqual(graphData);
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/graph-data.service.spec.ts&quot;,&quot;line&quot;:25,&quot;character&quot;:6,&quot;text&quot;:&quot;GraphDataService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/graph-data.service.spec.ts&quot;,&quot;line&quot;:26,&quot;character&quot;:6,&quot;text&quot;:&quot;ExplorationInitStateNameService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/graph-data.service.spec.ts&quot;,&quot;line&quot;:27,&quot;character&quot;:6,&quot;text&quot;:&quot;ExplorationStatesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/graph-data.service.spec.ts&quot;,&quot;line&quot;:31,&quot;character&quot;:42,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/graph-data.service.spec.ts&quot;,&quot;line&quot;:32,&quot;character&quot;:4,&quot;text&quot;:&quot;GraphDataService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/graph-data.service.spec.ts&quot;,&quot;line&quot;:32,&quot;character&quot;:23,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/graph-data.service.spec.ts&quot;,&quot;line&quot;:32,&quot;character&quot;:33,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/graph-data.service.spec.ts&quot;,&quot;line&quot;:33,&quot;character&quot;:4,&quot;text&quot;:&quot;ExplorationInitStateNameService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/graph-data.service.spec.ts&quot;,&quot;line&quot;:33,&quot;character&quot;:38,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/graph-data.service.spec.ts&quot;,&quot;line&quot;:33,&quot;character&quot;:48,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/graph-data.service.spec.ts&quot;,&quot;line&quot;:35,&quot;character&quot;:4,&quot;text&quot;:&quot;ExplorationStatesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/graph-data.service.spec.ts&quot;,&quot;line&quot;:35,&quot;character&quot;:31,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/graph-data.service.spec.ts&quot;,&quot;line&quot;:35,&quot;character&quot;:41,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/graph-data.service.spec.ts&quot;,&quot;line&quot;:37,&quot;character&quot;:4,&quot;text&quot;:&quot;ExplorationStatesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/graph-data.service.spec.ts&quot;,&quot;line&quot;:37,&quot;character&quot;:29,&quot;text&quot;:&quot;init&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/graph-data.service.spec.ts&quot;,&quot;line&quot;:117,&quot;character&quot;:4,&quot;text&quot;:&quot;GraphDataService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/graph-data.service.spec.ts&quot;,&quot;line&quot;:117,&quot;character&quot;:21,&quot;text&quot;:&quot;recompute&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/graph-data.service.spec.ts&quot;,&quot;line&quot;:118,&quot;character&quot;:11,&quot;text&quot;:&quot;GraphDataService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/graph-data.service.spec.ts&quot;,&quot;line&quot;:118,&quot;character&quot;:28,&quot;text&quot;:&quot;getGraphData&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/graph-data.service.spec.ts&quot;,&quot;line&quot;:120,&quot;character&quot;:4,&quot;text&quot;:&quot;ExplorationInitStateNameService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/graph-data.service.spec.ts&quot;,&quot;line&quot;:120,&quot;character&quot;:36,&quot;text&quot;:&quot;init&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/graph-data.service.spec.ts&quot;,&quot;line&quot;:121,&quot;character&quot;:4,&quot;text&quot;:&quot;GraphDataService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/graph-data.service.spec.ts&quot;,&quot;line&quot;:121,&quot;character&quot;:21,&quot;text&quot;:&quot;recompute&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/graph-data.service.spec.ts&quot;,&quot;line&quot;:122,&quot;character&quot;:11,&quot;text&quot;:&quot;GraphDataService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/graph-data.service.spec.ts&quot;,&quot;line&quot;:122,&quot;character&quot;:28,&quot;text&quot;:&quot;getGraphData&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:59 GMT</p>
+    </body>
+  </html>
+  

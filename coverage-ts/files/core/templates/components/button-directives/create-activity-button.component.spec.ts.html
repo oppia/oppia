@@ -1,0 +1,351 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>create-activity-button.component.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/components/button-directives/create-activity-button.component.spec.ts</td><td class="">95.87%</td><td class="">100%</td><td class="">436</td><td class="">418</td><td class="">18</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2021 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+import { HttpClientTestingModule } from &#x27;@angular/common/http/testing&#x27;;
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from &#x27;@angular/core/testing&#x27;;
+import { NgbModal, NgbModalRef } from &#x27;@ng-bootstrap/ng-bootstrap&#x27;;
+
+import { ExplorationCreationService } from &#x27;components/entity-creation-services/exploration-creation.service&#x27;;
+import { CreateActivityModalComponent } from &#x27;pages/creator-dashboard-page/modal-templates/create-activity-modal.component&#x27;;
+import { UrlParamsType, UrlService } from &#x27;services/contextual/url.service&#x27;;
+import { WindowRef } from &#x27;services/contextual/window-ref.service&#x27;;
+import { SiteAnalyticsService } from &#x27;services/site-analytics.service&#x27;;
+import { UserService } from &#x27;services/user.service&#x27;;
+import { MockTranslatePipe } from &#x27;tests/unit-test-utils&#x27;;
+import { CreateActivityButtonComponent } from &#x27;./create-activity-button.component&#x27;;
+
+/**
+ * @fileoverview Unit tests for CreateActivityButtonComponent.
+ */
+
+class MockWindowRef {
+  _window = {
+    location: {
+      _href: &#x27;&#x27;,
+      get href() {
+        return this._href;
+      },
+      set href(val) {
+        this._href = val;
+      },
+      replace: (val) =&gt; {}
+    },
+  };
+  get nativeWindow() {
+    return this._window;
+  }
+}
+
+class MockUrlService {
+  getPathname(): string {
+    return &#x27;/creator-dashboard&#x27;;
+  }
+
+  getUrlParams(): UrlParamsType {
+    return {
+      mode: &#x27;create&#x27;
+    };
+  }
+}
+
+describe(&#x27;CreateActivityButtonComponent&#x27;, () =&gt; {
+  let component: CreateActivityButtonComponent;
+  let fixture: ComponentFixture&lt;CreateActivityButtonComponent&gt;;
+  let userService: UserService;
+  let urlService: MockUrlService;
+  let explorationCreationService: ExplorationCreationService;
+  let siteAnalyticsService: SiteAnalyticsService;
+  let windowRef: MockWindowRef;
+  let ngbModal: NgbModal;
+
+  let userInfoForCollectionCreator = {
+    _isModerator: true,
+    _isAdmin: false,
+    _isTopicManager: false,
+    _isSuperAdmin: false,
+    _canCreateCollections: true,
+    _preferredSiteLanguageCode: &#x27;en&#x27;,
+    _username: &#x27;username1&#x27;,
+    _email: &#x27;tester@example.org&#x27;,
+    _isLoggedIn: true,
+    isModerator: () =&gt; true,
+    isAdmin: () =&gt; false,
+    isSuperAdmin: () =&gt; false,
+    isTopicManager: () =&gt; false,
+    canCreateCollections: () =&gt; true,
+    getPreferredSiteLanguageCode: () =&gt;&#x27;en&#x27;,
+    getUsername: () =&gt; &#x27;username1&#x27;,
+    getEmail: () =&gt; &#x27;tester@example.org&#x27;,
+    isLoggedIn: () =&gt; true
+  };
+
+  let userInfoForNonCollectionCreator = {
+    _isModerator: true,
+    _isAdmin: false,
+    _isTopicManager: false,
+    _isSuperAdmin: false,
+    _canCreateCollections: true,
+    _preferredSiteLanguageCode: &#x27;en&#x27;,
+    _username: &#x27;username1&#x27;,
+    _email: &#x27;tester@example.org&#x27;,
+    _isLoggedIn: true,
+    isModerator: () =&gt; true,
+    isAdmin: () =&gt; false,
+    isSuperAdmin: () =&gt; false,
+    isTopicManager: () =&gt; false,
+    canCreateCollections: () =&gt; false,
+    getPreferredSiteLanguageCode: () =&gt;&#x27;en&#x27;,
+    getUsername: () =&gt; &#x27;username1&#x27;,
+    getEmail: () =&gt; &#x27;tester@example.org&#x27;,
+    isLoggedIn: () =&gt; true
+  };
+
+  beforeEach(waitForAsync(() =&gt; {
+    windowRef = new MockWindowRef();
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      declarations: [
+        CreateActivityButtonComponent,
+        MockTranslatePipe
+      ],
+      providers: [
+        UserService,
+        {
+          provide: UrlService,
+          useClass: MockUrlService
+        },
+        {
+          provide: WindowRef,
+          useValue: windowRef
+        },
+        ExplorationCreationService,
+        SiteAnalyticsService
+      ]
+    }).compileComponents();
+  }));
+
+  beforeEach(() =&gt; {
+    fixture = TestBed.createComponent(CreateActivityButtonComponent);
+    component = fixture.componentInstance;
+    userService = TestBed.inject(UserService);
+    urlService = TestBed.inject(UrlService);
+    explorationCreationService = TestBed.inject(ExplorationCreationService);
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
+    ngbModal = TestBed.inject(NgbModal);
+    fixture.detectChanges();
+  });
+
+  it(&#x27;should successfully instantiate the component from beforeEach block&#x27;,
+    () =&gt; {
+      expect(component).toBeDefined();
+    });
+
+  describe(&#x27;when user can create collections&#x27;, () =&gt; {
+    it(&#x27;should begin activity creation process if the&#x27; +
+      &#x27; url parameter \&#x27;mode\&#x27; is set as \&#x27;create\&#x27;&#x27;, fakeAsync(() =&gt; {
+      spyOn(userService, &#x27;getUserInfoAsync&#x27;)
+        .and.returnValue(Promise.resolve(userInfoForCollectionCreator));
+      spyOn(urlService, &#x27;getUrlParams&#x27;).and.returnValue({
+        mode: &#x27;create&#x27;
+      });
+      spyOn(component, &#x27;initCreationProcess&#x27;);
+
+      expect(component.userIsLoggedIn).toBe(false);
+      expect(component.canCreateCollections).toBe(false);
+
+      component.ngOnInit();
+      tick();
+      fixture.detectChanges();
+
+      expect(component.userIsLoggedIn).toBe(true);
+      expect(component.canCreateCollections).toBe(true);
+      expect(urlService.getUrlParams).toHaveBeenCalled();
+      expect(component.initCreationProcess).toHaveBeenCalled();
+    }));
+
+    it(&#x27;should redirect user to creator dashboard page when the user&#x27; +
+      &#x27; clicks on the create button&#x27;, () =&gt; {
+      component.creationInProgress = false;
+      component.canCreateCollections = true;
+      spyOn(urlService, &#x27;getPathname&#x27;).and.returnValue(&#x27;not/creator-dashboard&#x27;);
+      spyOnProperty(windowRef, &#x27;nativeWindow&#x27;).and.returnValue({
+        location: {
+          replace: (val: string) =&gt; {}
+        }
+      });
+      const modalSpy = spyOn(ngbModal, &#x27;open&#x27;).and.callFake((dlg, opt) =&gt; {
+        return &lt;NgbModalRef&gt;({
+          result: Promise.resolve(&#x27;success&#x27;)
+        });
+      });
+      const replaceSpy = spyOn(windowRef.nativeWindow.location, &#x27;replace&#x27;);
+
+      component.initCreationProcess();
+
+      expect(replaceSpy).toHaveBeenCalledWith(&#x27;/creator-dashboard?mode=create&#x27;);
+      expect(modalSpy).not.toHaveBeenCalled();
+    });
+
+    it(&#x27;should not redirect user but open a create activity modal if user&#x27; +
+      &#x27; is on the creator dashboard page&#x27;, () =&gt; {
+      component.creationInProgress = false;
+      component.canCreateCollections = true;
+      spyOn(urlService, &#x27;getPathname&#x27;).and.returnValue(
+        &#x27;/creator-dashboard&#x27;);
+      const modalSpy = spyOn(ngbModal, &#x27;open&#x27;).and.callFake((dlg, opt) =&gt; {
+        return &lt;NgbModalRef&gt;({
+          result: Promise.resolve(&#x27;success&#x27;)
+        });
+      });
+      const replaceSpy = spyOn(windowRef.nativeWindow.location, &#x27;replace&#x27;);
+
+      component.initCreationProcess();
+
+      expect(replaceSpy).not.toHaveBeenCalled();
+      expect(modalSpy).toHaveBeenCalled();
+    });
+
+    it(&#x27;should stop the creation process when there is an error with&#x27; +
+    &#x27; the create activity modal opening&#x27;, fakeAsync(() =&gt; {
+      component.creationInProgress = false;
+      component.canCreateCollections = true;
+      spyOn(urlService, &#x27;getPathname&#x27;).and.returnValue(
+        &#x27;/creator-dashboard&#x27;);
+      const modalSpy = spyOn(ngbModal, &#x27;open&#x27;).and.callFake((dlg, opt) =&gt; {
+        return &lt;NgbModalRef&gt;({
+          result: Promise.reject(&#x27;cancel&#x27;)
+        });
+      });
+
+      component.initCreationProcess();
+      tick();
+
+      expect(modalSpy).toHaveBeenCalledWith(
+        CreateActivityModalComponent,
+        {
+          backdrop: true
+        }
+      );
+      expect(component.creationInProgress).toBe(false);
+    }));
+  });
+
+  describe(&#x27;when user cannot create collection&#x27;, () =&gt; {
+    it(&#x27;should create a new exploration automatically if&#x27; +
+      &#x27; url parameter \&#x27;mode\&#x27; is set as \&#x27;create\&#x27;&#x27;, fakeAsync(() =&gt; {
+      spyOn(userService, &#x27;getUserInfoAsync&#x27;)
+        .and.returnValue(Promise.resolve(userInfoForNonCollectionCreator));
+      const explorationCreationServiceSpy = spyOn(
+        explorationCreationService, &#x27;createNewExploration&#x27;);
+      spyOn(urlService, &#x27;getUrlParams&#x27;).and.returnValue({
+        mode: &#x27;create&#x27;
+      });
+
+      expect(component.userIsLoggedIn).toBe(false);
+      expect(component.canCreateCollections).toBe(false);
+
+      component.ngOnInit();
+      tick();
+      fixture.detectChanges();
+
+      expect(component.userIsLoggedIn).toBe(true);
+      expect(component.canCreateCollections).toBe(false);
+      expect(urlService.getUrlParams).toHaveBeenCalled();
+      expect(explorationCreationServiceSpy).toHaveBeenCalled();
+    }));
+
+    it(&#x27;should create new exploration when the user clicks&#x27; +
+      &#x27; on the create button&#x27;, () =&gt; {
+      component.creationInProgress = false;
+      component.canCreateCollections = false;
+      const explorationCreationServiceSpy = spyOn(
+        explorationCreationService, &#x27;createNewExploration&#x27;);
+
+      component.initCreationProcess();
+
+      expect(explorationCreationServiceSpy).toHaveBeenCalled();
+    });
+  });
+
+  it(&#x27;should not start a new creation process if another&#x27; +
+    &#x27; creation is in progress&#x27;, () =&gt; {
+    component.canCreateCollections = false;
+    component.creationInProgress = false;
+
+    const explorationCreationServiceSpy = spyOn(
+      explorationCreationService, &#x27;createNewExploration&#x27;);
+
+    component.initCreationProcess();
+    expect(component.creationInProgress).toBe(true);
+    expect(explorationCreationServiceSpy).toHaveBeenCalledTimes(1);
+
+    component.initCreationProcess();
+    expect(explorationCreationServiceSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it(&#x27;should show upload exploration modal&#x27;, () =&gt; {
+    const showUploadExplorationModalSpy = spyOn(
+      explorationCreationService, &#x27;showUploadExplorationModal&#x27;);
+
+    component.showUploadExplorationModal();
+
+    expect(showUploadExplorationModalSpy).toHaveBeenCalled();
+  });
+
+  it(&#x27;should redirect to login page when user creates exploration&#x27; +
+    &#x27; and is not logged in&#x27;, fakeAsync(() =&gt; {
+    windowRef.nativeWindow.location.href = &#x27;&#x27;;
+    const siteAnalyticsServiceSpy = spyOn(
+      siteAnalyticsService, &#x27;registerStartLoginEvent&#x27;);
+
+    component.onRedirectToLogin(&#x27;login-url&#x27;);
+    tick(150);
+    fixture.detectChanges();
+
+    expect(siteAnalyticsServiceSpy).toHaveBeenCalledWith(
+      &#x27;createActivityButton&#x27;);
+    expect(windowRef.nativeWindow.location.href).toBe(&#x27;login-url&#x27;);
+  }));
+
+  it(&#x27;should call the site analytics service on redirect&#x27; +
+    &#x27; to login&#x27;, fakeAsync(() =&gt; {
+    const siteAnalyticsServiceSpy = spyOn(
+      siteAnalyticsService, &#x27;registerStartLoginEvent&#x27;);
+
+    component.onRedirectToLogin(&#x27;login-url&#x27;);
+    tick(150);
+    fixture.detectChanges();
+
+    expect(siteAnalyticsServiceSpy).toHaveBeenCalledWith(
+      &#x27;createActivityButton&#x27;);
+  }));
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/components/button-directives/create-activity-button.component.spec.ts&quot;,&quot;line&quot;:35,&quot;character&quot;:10,&quot;text&quot;:&quot;href&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/button-directives/create-activity-button.component.spec.ts&quot;,&quot;line&quot;:36,&quot;character&quot;:15,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/button-directives/create-activity-button.component.spec.ts&quot;,&quot;line&quot;:36,&quot;character&quot;:20,&quot;text&quot;:&quot;_href&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/button-directives/create-activity-button.component.spec.ts&quot;,&quot;line&quot;:38,&quot;character&quot;:10,&quot;text&quot;:&quot;href&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/button-directives/create-activity-button.component.spec.ts&quot;,&quot;line&quot;:38,&quot;character&quot;:15,&quot;text&quot;:&quot;val&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/button-directives/create-activity-button.component.spec.ts&quot;,&quot;line&quot;:39,&quot;character&quot;:8,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/button-directives/create-activity-button.component.spec.ts&quot;,&quot;line&quot;:39,&quot;character&quot;:13,&quot;text&quot;:&quot;_href&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/button-directives/create-activity-button.component.spec.ts&quot;,&quot;line&quot;:39,&quot;character&quot;:21,&quot;text&quot;:&quot;val&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/button-directives/create-activity-button.component.spec.ts&quot;,&quot;line&quot;:41,&quot;character&quot;:16,&quot;text&quot;:&quot;val&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/button-directives/create-activity-button.component.spec.ts&quot;,&quot;line&quot;:186,&quot;character&quot;:61,&quot;text&quot;:&quot;dlg&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/button-directives/create-activity-button.component.spec.ts&quot;,&quot;line&quot;:187,&quot;character&quot;:15,&quot;text&quot;:&quot;&lt;NgbModalRef&gt;({\n          result: Promise.resolve(&#x27;success&#x27;)\n        })&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;core/templates/components/button-directives/create-activity-button.component.spec.ts&quot;,&quot;line&quot;:205,&quot;character&quot;:61,&quot;text&quot;:&quot;dlg&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/button-directives/create-activity-button.component.spec.ts&quot;,&quot;line&quot;:206,&quot;character&quot;:15,&quot;text&quot;:&quot;&lt;NgbModalRef&gt;({\n          result: Promise.resolve(&#x27;success&#x27;)\n        })&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;core/templates/components/button-directives/create-activity-button.component.spec.ts&quot;,&quot;line&quot;:224,&quot;character&quot;:61,&quot;text&quot;:&quot;dlg&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/button-directives/create-activity-button.component.spec.ts&quot;,&quot;line&quot;:225,&quot;character&quot;:15,&quot;text&quot;:&quot;&lt;NgbModalRef&gt;({\n          result: Promise.reject(&#x27;cancel&#x27;)\n        })&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;core/templates/components/button-directives/create-activity-button.component.spec.ts&quot;,&quot;line&quot;:226,&quot;character&quot;:10,&quot;text&quot;:&quot;result&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/components/button-directives/create-activity-button.component.spec.ts&quot;,&quot;line&quot;:307,&quot;character&quot;:36,&quot;text&quot;:&quot;href&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/button-directives/create-activity-button.component.spec.ts&quot;,&quot;line&quot;:317,&quot;character&quot;:43,&quot;text&quot;:&quot;href&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:57 GMT</p>
+    </body>
+  </html>
+  

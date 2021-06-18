@@ -1,0 +1,392 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>skill-editor-state.service.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/skill-editor-page/services/skill-editor-state.service.spec.ts</td><td class="">89.68%</td><td class="">100%</td><td class="">465</td><td class="">417</td><td class="">48</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for SkillEditorStateService.js
+ */
+
+import { HttpClientTestingModule } from &#x27;@angular/common/http/testing&#x27;;
+import { fakeAsync, TestBed, tick } from &#x27;@angular/core/testing&#x27;;
+
+import { SkillBackendApiService } from &#x27;domain/skill/skill-backend-api.service&#x27;;
+import { SkillRights } from &#x27;domain/skill/skill-rights.model&#x27;;
+import { SkillRightsBackendApiService } from &#x27;domain/skill/skill-rights-backend-api.service&#x27;;
+import { SkillUpdateService } from &#x27;domain/skill/skill-update.service&#x27;;
+import {
+  SkillBackendDict,
+  SkillObjectFactory,
+} from &#x27;domain/skill/SkillObjectFactory&#x27;;
+import { SkillEditorStateService } from &#x27;pages/skill-editor-page/services/skill-editor-state.service&#x27;;
+
+const skillContentsDict = {
+  explanation: {
+    html: &#x27;test explanation&#x27;,
+    content_id: &#x27;explanation&#x27;,
+  },
+  worked_examples: [],
+  recorded_voiceovers: {
+    voiceovers_mapping: {
+      explanation: {},
+      worked_example_q_1: {},
+      worked_example_e_1: {},
+      worked_example_q_2: {},
+      worked_example_e_2: {},
+    },
+  },
+};
+
+const skillDict: SkillBackendDict = {
+  id: &#x27;skill_id_1&#x27;,
+  description: &#x27;Description&#x27;,
+  misconceptions: [{
+    id: &#x27;2&#x27;,
+    name: &#x27;test name&#x27;,
+    notes: &#x27;test notes&#x27;,
+    feedback: &#x27;test feedback&#x27;,
+    must_be_addressed: true,
+  }],
+  rubrics: [{
+    difficulty: &#x27;Easy&#x27;,
+    explanations: [&#x27;explanation&#x27;],
+  }],
+  skill_contents: skillContentsDict,
+  language_code: &#x27;en&#x27;,
+  version: 3,
+  prerequisite_skill_ids: [],
+  all_questions_merged: true,
+  superseding_skill_id: &#x27;2&#x27;,
+  next_misconception_id: 3,
+};
+
+class FakeSkillBackendApiService {
+  skillDictProp = {
+    ...skillDict,
+    getId: () =&gt; skillDict.id,
+    getDescription: () =&gt; skillDict.description,
+    getMisconceptions: () =&gt; skillDict.misconceptions,
+    getRubrics: () =&gt; skillDict.rubrics,
+    getConceptCard: () =&gt; skillDict.skill_contents,
+    getLanguageCode: () =&gt; skillDict.language_code,
+    getVersion: () =&gt; skillDict.version,
+    getPrerequisiteSkillIds: () =&gt; skillDict.prerequisite_skill_ids,
+    getNextMisconceptionId: () =&gt; skillDict.next_misconception_id,
+    getSupersedingSkillId: () =&gt; skillDict.superseding_skill_id,
+    getAllQuestionsMerged: () =&gt; skillDict.all_questions_merged,
+  };
+
+  newBackendSkillObject = null;
+  skillObject = null;
+  failure = null;
+
+  async fetchSkillAsync() {
+    return new Promise((resolve, reject) =&gt; {
+      if (!this.failure) {
+        resolve({
+          skill: this.skillObject,
+          groupedSkillSummaries: {
+            Name: [
+              {
+                id: &#x27;skill_id_1&#x27;,
+                description: &#x27;Description 1&#x27;,
+              },
+              {
+                id: &#x27;skill_id_2&#x27;,
+                description: &#x27;Description 2&#x27;,
+              },
+            ],
+          },
+          assignedSkillTopicData: {
+            topicName: [&#x27;tester&#x27;],
+          },
+        });
+      } else {
+        reject();
+      }
+    });
+  }
+
+  async updateSkillAsync() {
+    return new Promise((resolve, reject) =&gt; {
+      if (!this.failure) {
+        resolve(this.skillObject);
+      } else {
+        reject();
+      }
+    });
+  }
+}
+
+class FakeSkillRightsBackendApiService {
+  self = {
+    backendSkillRightsObject: {
+      skill_id: &#x27;skill_id_1&#x27;,
+      can_edit_skill_description: true,
+      getSkillId: () =&gt; &#x27;skill_id_1&#x27;,
+      canEditSkillDescription: () =&gt; false,
+    },
+    failure: null,
+    fetchSkillRightsAsync: null,
+  };
+
+  async fetchSkillRightsAsync() {
+    return new Promise((resolve, reject) =&gt; {
+      if (!this.self.failure) {
+        resolve(this.self.backendSkillRightsObject);
+      } else {
+        reject();
+      }
+    });
+  }
+}
+
+describe(&#x27;Skill editor state service&#x27;, () =&gt; {
+  let fakeSkillBackendApiService = null;
+  let fakeSkillRightsBackendApiService = null;
+  let skillEditorStateService: SkillEditorStateService = null;
+  let skillObjectFactory: SkillObjectFactory = null;
+  let skillRightsObject = null;
+  let skillUpdateService: SkillUpdateService = null;
+
+  beforeEach(() =&gt; {
+    fakeSkillBackendApiService = new FakeSkillBackendApiService();
+    fakeSkillRightsBackendApiService = new FakeSkillRightsBackendApiService();
+
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [
+        {
+          provide: SkillBackendApiService,
+          useValue: fakeSkillBackendApiService,
+        },
+        {
+          provide: SkillRightsBackendApiService,
+          useValue: fakeSkillRightsBackendApiService,
+        },
+      ],
+    }).compileComponents();
+
+    skillEditorStateService = TestBed.get(SkillEditorStateService);
+    skillObjectFactory = TestBed.get(SkillObjectFactory);
+    skillUpdateService = TestBed.get(SkillUpdateService);
+
+    skillRightsObject = {
+      skill_id: &#x27;skill_id_1&#x27;,
+      can_edit_skill_description: true,
+    };
+    fakeSkillRightsBackendApiService.backendSkillRightsObject =
+    skillRightsObject;
+
+    fakeSkillBackendApiService.newBackendSkillObject = skillDict;
+    fakeSkillBackendApiService.skillObject =
+    skillObjectFactory.createFromBackendDict(
+      skillDict
+    );
+  });
+
+  it(&#x27;should request to load the skill from the backend&#x27;, () =&gt; {
+    spyOn(fakeSkillBackendApiService, &#x27;fetchSkillAsync&#x27;).and.callThrough();
+    skillEditorStateService.loadSkill(&#x27;skill_id_1&#x27;);
+    expect(fakeSkillBackendApiService.fetchSkillAsync).toHaveBeenCalled();
+  });
+
+  it(&#x27;should track whether it is currently loading the skill&#x27;, fakeAsync(() =&gt; {
+    expect(skillEditorStateService.isLoadingSkill()).toBe(false);
+    skillEditorStateService.loadSkill(&#x27;skill_id_1&#x27;);
+    expect(skillEditorStateService.isLoadingSkill()).toBe(true);
+    tick(1000);
+    expect(skillEditorStateService.isLoadingSkill()).toBe(false);
+  }));
+
+  it(&#x27;should indicate a collection is no longer loading after an error&#x27;,
+    fakeAsync(() =&gt; {
+      expect(skillEditorStateService.isLoadingSkill()).toBe(false);
+      fakeSkillBackendApiService.failure = &#x27;Internal 500 error&#x27;;
+      skillEditorStateService.loadSkill(&#x27;skill_id_1&#x27;);
+      expect(skillEditorStateService.isLoadingSkill()).toBe(true);
+      tick(1000);
+      expect(skillEditorStateService.isLoadingSkill()).toBe(false);
+    }));
+
+  it(&#x27;should report that a skill has loaded through loadSkill()&#x27;,
+    fakeAsync(() =&gt; {
+      spyOn(
+        fakeSkillRightsBackendApiService,
+        &#x27;fetchSkillRightsAsync&#x27;
+      ).and.callThrough();
+      expect(skillEditorStateService.hasLoadedSkill()).toBe(false);
+      skillEditorStateService.loadSkill(&#x27;skill_id_1&#x27;);
+      expect(skillEditorStateService.hasLoadedSkill()).toBe(false);
+      tick(1000);
+      expect(skillEditorStateService.hasLoadedSkill()).toBe(true);
+      const groupedSkillSummaries =
+    skillEditorStateService.getGroupedSkillSummaries();
+      expect(groupedSkillSummaries.current.length).toEqual(2);
+      expect(groupedSkillSummaries.others.length).toEqual(0);
+
+      expect(groupedSkillSummaries.current[0].id).toEqual(&#x27;skill_id_1&#x27;);
+      expect(groupedSkillSummaries.current[1].id).toEqual(&#x27;skill_id_2&#x27;);
+    }));
+
+  it(&#x27;should return the last skill loaded as the same object&#x27;,
+    fakeAsync(() =&gt; {
+      const previousSkill = skillEditorStateService.getSkill();
+      const expectedSkill = skillObjectFactory.createFromBackendDict(
+        fakeSkillBackendApiService.newBackendSkillObject
+      );
+      expect(previousSkill).not.toEqual(expectedSkill);
+      skillEditorStateService.loadSkill(&#x27;skill_id_1&#x27;);
+      tick(1000);
+      const actualSkill = skillEditorStateService.getSkill();
+      expect(actualSkill).toEqual(expectedSkill);
+      expect(actualSkill).toBe(previousSkill);
+      expect(actualSkill).not.toBe(expectedSkill);
+    }));
+
+  it(&#x27;should fail to load a skill without first loading one&#x27;, () =&gt; {
+    expect(() =&gt; {
+      skillEditorStateService.saveSkill(&#x27;commit message&#x27;, () =&gt; {});
+    }).toThrowError(&#x27;Cannot save a skill before one is loaded.&#x27;);
+  });
+
+  it(&#x27;should not save the skill if there are no pending changes&#x27;,
+    fakeAsync(() =&gt; {
+      skillEditorStateService.loadSkill(&#x27;skill_id_1&#x27;);
+      tick(1000);
+      expect(skillEditorStateService.saveSkill(
+        &#x27;commit message&#x27;,
+        () =&gt; &#x27;Cannot save a skill before one is loaded.&#x27;)).toBe(
+        false
+      );
+    }));
+
+  it(&#x27;should be able to save the collection and pending changes&#x27;, fakeAsync(
+    () =&gt; {
+      spyOn(fakeSkillBackendApiService, &#x27;updateSkillAsync&#x27;).and.callThrough();
+
+      skillEditorStateService.loadSkill(&#x27;skill_id_1&#x27;);
+      skillUpdateService.setSkillDescription(
+        skillEditorStateService.getSkill(),
+        &#x27;new description&#x27;
+      );
+      tick(1000);
+
+      expect(skillEditorStateService.saveSkill(&#x27;commit message&#x27;, () =&gt; {}));
+      tick(1000);
+
+      const expectedId = &#x27;skill_id_1&#x27;;
+      const expectedVersion = 3;
+      const expectedCommitMessage = &#x27;commit message&#x27;;
+      const updateSkillSpy = fakeSkillBackendApiService.updateSkillAsync;
+      expect(updateSkillSpy).toHaveBeenCalledWith(
+        expectedId,
+        expectedVersion,
+        expectedCommitMessage,
+        [
+          {
+            property_name: &#x27;description&#x27;,
+            new_value: &#x27;new description&#x27;,
+            old_value: &#x27;Skill description loading&#x27;,
+            cmd: &#x27;update_skill_property&#x27;,
+          },
+        ]
+      );
+    }));
+
+  it(&#x27;should track whether it is currently saving the skill&#x27;, fakeAsync(() =&gt; {
+    skillEditorStateService.loadSkill(&#x27;skill_id_1&#x27;);
+    skillUpdateService.setSkillDescription(
+      skillEditorStateService.getSkill(),
+      &#x27;new description&#x27;
+    );
+    tick(1000);
+
+    expect(skillEditorStateService.isSavingSkill()).toBe(false);
+    skillEditorStateService.saveSkill(&#x27;commit message&#x27;, () =&gt; {});
+    expect(skillEditorStateService.isSavingSkill()).toBe(true);
+    tick(1000);
+    expect(skillEditorStateService.isSavingSkill()).toBe(false);
+  }));
+
+  it(&#x27;should indicate a skill is no longer saving after an error&#x27;,
+    fakeAsync(() =&gt; {
+      skillEditorStateService.loadSkill(&#x27;skill_id_1&#x27;);
+      skillUpdateService.setSkillDescription(
+        skillEditorStateService.getSkill(),
+        &#x27;new description&#x27;
+      );
+      tick(1000);
+
+      expect(skillEditorStateService.isSavingSkill()).toBe(false);
+      fakeSkillBackendApiService.failure = &#x27;Internal 500 error&#x27;;
+
+      skillEditorStateService.saveSkill(&#x27;commit message&#x27;, () =&gt; {});
+
+      expect(skillEditorStateService.isSavingSkill()).toBe(true);
+      tick(1000);
+
+      expect(skillEditorStateService.isSavingSkill()).toBe(false);
+    }));
+
+  it(&#x27;should request to load the skill rights from the backend&#x27;, () =&gt; {
+    spyOn(
+      fakeSkillRightsBackendApiService,
+      &#x27;fetchSkillRightsAsync&#x27;
+    ).and.callThrough();
+
+    skillEditorStateService.loadSkill(&#x27;skill_id_1&#x27;);
+    expect(
+      fakeSkillRightsBackendApiService.fetchSkillRightsAsync
+    ).toHaveBeenCalled();
+  });
+
+  it(&#x27;should initially return an interstitial skill rights object&#x27;, () =&gt; {
+    const skillRights = skillEditorStateService.getSkillRights();
+    expect(skillRights.getSkillId()).toEqual(null);
+    expect(skillRights.canEditSkillDescription()).toEqual(false);
+  });
+
+  it(&#x27;should be able to set a new skill rights with an in-place copy&#x27;, () =&gt; {
+    const previousSkillRights = skillEditorStateService.getSkillRights();
+    const expectedSkillRights = SkillRights.createFromBackendDict(
+      skillRightsObject
+    );
+    expect(previousSkillRights).not.toEqual(expectedSkillRights);
+
+    skillEditorStateService.setSkillRights(expectedSkillRights);
+
+    const actualSkillRights = skillEditorStateService.getSkillRights();
+    expect(actualSkillRights).toEqual(expectedSkillRights);
+
+    expect(actualSkillRights).toBe(previousSkillRights);
+    expect(actualSkillRights).not.toBe(expectedSkillRights);
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.spec.ts&quot;,&quot;line&quot;:87,&quot;character&quot;:2,&quot;text&quot;:&quot;newBackendSkillObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.spec.ts&quot;,&quot;line&quot;:88,&quot;character&quot;:2,&quot;text&quot;:&quot;skillObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.spec.ts&quot;,&quot;line&quot;:89,&quot;character&quot;:2,&quot;text&quot;:&quot;failure&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.spec.ts&quot;,&quot;line&quot;:93,&quot;character&quot;:16,&quot;text&quot;:&quot;failure&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.spec.ts&quot;,&quot;line&quot;:95,&quot;character&quot;:10,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.spec.ts&quot;,&quot;line&quot;:95,&quot;character&quot;:22,&quot;text&quot;:&quot;skillObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.spec.ts&quot;,&quot;line&quot;:120,&quot;character&quot;:16,&quot;text&quot;:&quot;failure&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.spec.ts&quot;,&quot;line&quot;:121,&quot;character&quot;:21,&quot;text&quot;:&quot;skillObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.spec.ts&quot;,&quot;line&quot;:143,&quot;character&quot;:21,&quot;text&quot;:&quot;failure&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.spec.ts&quot;,&quot;line&quot;:153,&quot;character&quot;:6,&quot;text&quot;:&quot;fakeSkillBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.spec.ts&quot;,&quot;line&quot;:154,&quot;character&quot;:6,&quot;text&quot;:&quot;fakeSkillRightsBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.spec.ts&quot;,&quot;line&quot;:157,&quot;character&quot;:6,&quot;text&quot;:&quot;skillRightsObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.spec.ts&quot;,&quot;line&quot;:161,&quot;character&quot;:4,&quot;text&quot;:&quot;fakeSkillBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.spec.ts&quot;,&quot;line&quot;:162,&quot;character&quot;:4,&quot;text&quot;:&quot;fakeSkillRightsBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.spec.ts&quot;,&quot;line&quot;:169,&quot;character&quot;:10,&quot;text&quot;:&quot;useValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.spec.ts&quot;,&quot;line&quot;:169,&quot;character&quot;:20,&quot;text&quot;:&quot;fakeSkillBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.spec.ts&quot;,&quot;line&quot;:173,&quot;character&quot;:10,&quot;text&quot;:&quot;useValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.spec.ts&quot;,&quot;line&quot;:173,&quot;character&quot;:20,&quot;text&quot;:&quot;fakeSkillRightsBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.spec.ts&quot;,&quot;line&quot;:182,&quot;character&quot;:4,&quot;text&quot;:&quot;skillRightsObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.spec.ts&quot;,&quot;line&quot;:186,&quot;character&quot;:4,&quot;text&quot;:&quot;fakeSkillRightsBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.spec.ts&quot;,&quot;line&quot;:186,&quot;character&quot;:37,&quot;text&quot;:&quot;backendSkillRightsObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.spec.ts&quot;,&quot;line&quot;:187,&quot;character&quot;:4,&quot;text&quot;:&quot;skillRightsObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.spec.ts&quot;,&quot;line&quot;:189,&quot;character&quot;:4,&quot;text&quot;:&quot;fakeSkillBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.spec.ts&quot;,&quot;line&quot;:189,&quot;character&quot;:31,&quot;text&quot;:&quot;newBackendSkillObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.spec.ts&quot;,&quot;line&quot;:190,&quot;character&quot;:4,&quot;text&quot;:&quot;fakeSkillBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.spec.ts&quot;,&quot;line&quot;:190,&quot;character&quot;:31,&quot;text&quot;:&quot;skillObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.spec.ts&quot;,&quot;line&quot;:197,&quot;character&quot;:10,&quot;text&quot;:&quot;fakeSkillBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.spec.ts&quot;,&quot;line&quot;:197,&quot;character&quot;:57,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.spec.ts&quot;,&quot;line&quot;:199,&quot;character&quot;:11,&quot;text&quot;:&quot;fakeSkillBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.spec.ts&quot;,&quot;line&quot;:199,&quot;character&quot;:38,&quot;text&quot;:&quot;fetchSkillAsync&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.spec.ts&quot;,&quot;line&quot;:213,&quot;character&quot;:6,&quot;text&quot;:&quot;fakeSkillBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.spec.ts&quot;,&quot;line&quot;:213,&quot;character&quot;:33,&quot;text&quot;:&quot;failure&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.spec.ts&quot;,&quot;line&quot;:223,&quot;character&quot;:8,&quot;text&quot;:&quot;fakeSkillRightsBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.spec.ts&quot;,&quot;line&quot;:225,&quot;character&quot;:8,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.spec.ts&quot;,&quot;line&quot;:244,&quot;character&quot;:8,&quot;text&quot;:&quot;fakeSkillBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.spec.ts&quot;,&quot;line&quot;:244,&quot;character&quot;:35,&quot;text&quot;:&quot;newBackendSkillObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.spec.ts&quot;,&quot;line&quot;:274,&quot;character&quot;:12,&quot;text&quot;:&quot;fakeSkillBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.spec.ts&quot;,&quot;line&quot;:274,&quot;character&quot;:60,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.spec.ts&quot;,&quot;line&quot;:289,&quot;character&quot;:12,&quot;text&quot;:&quot;updateSkillSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.spec.ts&quot;,&quot;line&quot;:289,&quot;character&quot;:29,&quot;text&quot;:&quot;fakeSkillBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.spec.ts&quot;,&quot;line&quot;:289,&quot;character&quot;:56,&quot;text&quot;:&quot;updateSkillAsync&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.spec.ts&quot;,&quot;line&quot;:290,&quot;character&quot;:13,&quot;text&quot;:&quot;updateSkillSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.spec.ts&quot;,&quot;line&quot;:330,&quot;character&quot;:6,&quot;text&quot;:&quot;fakeSkillBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.spec.ts&quot;,&quot;line&quot;:330,&quot;character&quot;:33,&quot;text&quot;:&quot;failure&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.spec.ts&quot;,&quot;line&quot;:342,&quot;character&quot;:6,&quot;text&quot;:&quot;fakeSkillRightsBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.spec.ts&quot;,&quot;line&quot;:344,&quot;character&quot;:6,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.spec.ts&quot;,&quot;line&quot;:348,&quot;character&quot;:6,&quot;text&quot;:&quot;fakeSkillRightsBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/skill-editor-state.service.spec.ts&quot;,&quot;line&quot;:348,&quot;character&quot;:39,&quot;text&quot;:&quot;fetchSkillRightsAsync&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:59 GMT</p>
+    </body>
+  </html>
+  

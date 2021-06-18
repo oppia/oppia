@@ -1,0 +1,63 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>mathjax-bind.directive.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/directives/mathjax-bind.directive.ts</td><td class="">50.00%</td><td class="">100%</td><td class="">36</td><td class="">18</td><td class="">18</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2019 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview MathjaxBind Directive (not associated with reusable
+ * components.)
+ * NB: Reusable component directives should go in the components/ folder.
+ */
+
+require(&#x27;mathjaxConfig.ts&#x27;);
+
+angular.module(&#x27;oppia&#x27;).directive(&#x27;mathjaxBind&#x27;, [function() {
+  return {
+    restrict: &#x27;E&#x27;,
+    controller: [
+      &#x27;$attrs&#x27;, &#x27;$element&#x27;, &#x27;$scope&#x27;, function($attrs, $element, $scope) {
+        var ctrl = this;
+        ctrl.$onInit = function() {
+          $scope.$watch($attrs.mathjaxData, function(value) {
+            // TODO(#10197): Upgrade to MathJax 3, after proper investigation
+            // and testing. MathJax 3 provides a faster and more cleaner way to
+            // convert a LaTeX string to an SVG.
+            var $script = angular.element(
+              &#x27;&lt;script type=&quot;math/tex&quot;&gt;&#x27;
+            ).html(value === undefined ? &#x27;&#x27; : value);
+            $element.html(&#x27;&#x27;);
+            $element.append($script);
+            MathJax.Hub.Queue([&#x27;Reprocess&#x27;, MathJax.Hub, $element[0]]);
+          });
+        };
+      }
+    ]
+  };
+}]);
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/directives/mathjax-bind.directive.ts&quot;,&quot;line&quot;:26,&quot;character&quot;:47,&quot;text&quot;:&quot;$attrs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/directives/mathjax-bind.directive.ts&quot;,&quot;line&quot;:26,&quot;character&quot;:55,&quot;text&quot;:&quot;$element&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/directives/mathjax-bind.directive.ts&quot;,&quot;line&quot;:26,&quot;character&quot;:65,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/directives/mathjax-bind.directive.ts&quot;,&quot;line&quot;:27,&quot;character&quot;:12,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/directives/mathjax-bind.directive.ts&quot;,&quot;line&quot;:27,&quot;character&quot;:19,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/directives/mathjax-bind.directive.ts&quot;,&quot;line&quot;:28,&quot;character&quot;:8,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/directives/mathjax-bind.directive.ts&quot;,&quot;line&quot;:28,&quot;character&quot;:13,&quot;text&quot;:&quot;$onInit&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/directives/mathjax-bind.directive.ts&quot;,&quot;line&quot;:29,&quot;character&quot;:10,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/directives/mathjax-bind.directive.ts&quot;,&quot;line&quot;:29,&quot;character&quot;:17,&quot;text&quot;:&quot;$watch&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/directives/mathjax-bind.directive.ts&quot;,&quot;line&quot;:29,&quot;character&quot;:24,&quot;text&quot;:&quot;$attrs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/directives/mathjax-bind.directive.ts&quot;,&quot;line&quot;:29,&quot;character&quot;:31,&quot;text&quot;:&quot;mathjaxData&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/directives/mathjax-bind.directive.ts&quot;,&quot;line&quot;:29,&quot;character&quot;:53,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/directives/mathjax-bind.directive.ts&quot;,&quot;line&quot;:35,&quot;character&quot;:19,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/directives/mathjax-bind.directive.ts&quot;,&quot;line&quot;:36,&quot;character&quot;:12,&quot;text&quot;:&quot;$element&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/directives/mathjax-bind.directive.ts&quot;,&quot;line&quot;:36,&quot;character&quot;:21,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/directives/mathjax-bind.directive.ts&quot;,&quot;line&quot;:37,&quot;character&quot;:12,&quot;text&quot;:&quot;$element&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/directives/mathjax-bind.directive.ts&quot;,&quot;line&quot;:37,&quot;character&quot;:21,&quot;text&quot;:&quot;append&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/directives/mathjax-bind.directive.ts&quot;,&quot;line&quot;:38,&quot;character&quot;:57,&quot;text&quot;:&quot;$element&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:56 GMT</p>
+    </body>
+  </html>
+  

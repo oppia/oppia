@@ -1,0 +1,142 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>custom-osk-letters-editor.component.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">extensions/objects/templates/custom-osk-letters-editor.component.ts</td><td class="">89.71%</td><td class="">100%</td><td class="">175</td><td class="">157</td><td class="">18</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Component for custom OSK letters editor.
+ */
+
+// Every editor directive should implement an alwaysEditable option. There
+// may be additional customization options for the editor that should be passed
+// in via initArgs.
+
+import { Component, EventEmitter, Input, OnInit, Output } from &#x27;@angular/core&#x27;;
+import { downgradeComponent } from &#x27;@angular/upgrade/static&#x27;;
+import { AppConstants } from &#x27;app.constants&#x27;;
+import { WindowRef } from &#x27;services/contextual/window-ref.service&#x27;;
+import { GuppyInitializationService } from &#x27;services/guppy-initialization.service&#x27;;
+
+@Component({
+  selector: &#x27;custom-osk-letters-editor&#x27;,
+  templateUrl: &#x27;./custom-osk-letters-editor.component.html&#x27;,
+  styleUrls: []
+})
+export class CustomOskLettersEditorComponent implements OnInit {
+  @Input() value;
+  @Output() valueChanged = new EventEmitter();
+  latinLowerCase = [
+    &#x27;qwertyuiop&#x27;.split(&#x27;&#x27;), &#x27;asdfghjkl&#x27;.split(&#x27;&#x27;), &#x27;zxcvbnm&#x27;.split(&#x27;&#x27;)];
+  latinUpperCase = this.latinLowerCase.map((x) =&gt; x.map(y =&gt; y.toUpperCase()));
+  private greekSymbolsLowercase = Object.values(
+    AppConstants.GREEK_LETTER_NAMES_TO_SYMBOLS).slice(0, 23);
+  greekLowerCase = [
+    this.greekSymbolsLowercase.slice(0, 8),
+    this.greekSymbolsLowercase.slice(8, 16),
+    this.greekSymbolsLowercase.slice(16, 23),
+  ];
+  private greekSymbolsUppercase = Object.values(
+    AppConstants.GREEK_LETTER_NAMES_TO_SYMBOLS).slice(23, 33);
+  greekUpperCase = [
+    this.greekSymbolsUppercase.slice(0, 5),
+    this.greekSymbolsUppercase.slice(5, 10)
+  ];
+
+  latinTab = AppConstants.CUSTOM_LETTERS_LATIN_TAB;
+  greekTab = AppConstants.CUSTOM_LETTERS_GREEK_TAB;
+
+  alwaysEditable = true;
+  lettersAreLowercase = true;
+  currentTab = this.latinTab;
+
+  constructor(
+    private guppyInitializationService: GuppyInitializationService,
+    private windowRef: WindowRef
+  ) {}
+
+  updateLettersList(letter: string): void {
+    let index = this.value.indexOf(letter);
+    if (index === -1) {
+      this.value.push(letter);
+    } else {
+      this.value.splice(index, 1);
+    }
+    this.guppyInitializationService.setCustomOskLetters(this.value);
+  }
+
+  getRemainingLettersCount(): number {
+    return Math.max(
+      AppConstants.MAX_CUSTOM_LETTERS_FOR_OSK - this.value.length, 0);
+  }
+
+  isCustomizationArgOpen(): boolean {
+    return document.getElementsByClassName(
+      &#x27;custom-letters-div&#x27;).length !== 0;
+  }
+
+  keyDownCallBack(e: KeyboardEvent): void {
+    if (this.isCustomizationArgOpen()) {
+      let keyPressed = e.key;
+      if (keyPressed === &#x27;Shift&#x27;) {
+        this.lettersAreLowercase = false;
+      } else if (keyPressed === &#x27;Backspace&#x27;) {
+        this.value.pop();
+      } else if (
+        this.latinLowerCase.join(&#x27;&#x27;).replace(/,/g, &#x27;&#x27;).indexOf(
+          keyPressed.toLowerCase()) !== -1 &amp;&amp;
+        this.value.indexOf(keyPressed) === -1) {
+        this.updateLettersList(keyPressed);
+      }
+    }
+  }
+
+  keyUpCallBack(e: KeyboardEvent): void {
+    if (this.isCustomizationArgOpen()) {
+      let keyPressed = e.key;
+      if (keyPressed === &#x27;Shift&#x27;) {
+        this.lettersAreLowercase = true;
+      }
+    }
+  }
+
+  ngOnInit(): void {
+    this.windowRef.nativeWindow.addEventListener(
+      &#x27;keydown&#x27;, (e) =&gt; this.keyDownCallBack(e));
+    this.windowRef.nativeWindow.addEventListener(
+      &#x27;keyup&#x27;, (e) =&gt; this.keyUpCallBack(e));
+  }
+}
+
+require(&#x27;services/guppy-initialization.service.ts&#x27;);
+
+angular.module(&#x27;oppia&#x27;).directive(
+  &#x27;customOskLettersEditor&#x27;, downgradeComponent({
+    component: CustomOskLettersEditorComponent
+  }));
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;extensions/objects/templates/custom-osk-letters-editor.component.ts&quot;,&quot;line&quot;:34,&quot;character&quot;:11,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/custom-osk-letters-editor.component.ts&quot;,&quot;line&quot;:35,&quot;character&quot;:12,&quot;text&quot;:&quot;valueChanged&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/objects/templates/custom-osk-letters-editor.component.ts&quot;,&quot;line&quot;:66,&quot;character&quot;:8,&quot;text&quot;:&quot;index&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/custom-osk-letters-editor.component.ts&quot;,&quot;line&quot;:66,&quot;character&quot;:21,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/custom-osk-letters-editor.component.ts&quot;,&quot;line&quot;:66,&quot;character&quot;:27,&quot;text&quot;:&quot;indexOf&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/custom-osk-letters-editor.component.ts&quot;,&quot;line&quot;:67,&quot;character&quot;:8,&quot;text&quot;:&quot;index&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/custom-osk-letters-editor.component.ts&quot;,&quot;line&quot;:68,&quot;character&quot;:11,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/custom-osk-letters-editor.component.ts&quot;,&quot;line&quot;:68,&quot;character&quot;:17,&quot;text&quot;:&quot;push&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/custom-osk-letters-editor.component.ts&quot;,&quot;line&quot;:70,&quot;character&quot;:11,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/custom-osk-letters-editor.component.ts&quot;,&quot;line&quot;:70,&quot;character&quot;:17,&quot;text&quot;:&quot;splice&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/custom-osk-letters-editor.component.ts&quot;,&quot;line&quot;:70,&quot;character&quot;:24,&quot;text&quot;:&quot;index&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/custom-osk-letters-editor.component.ts&quot;,&quot;line&quot;:72,&quot;character&quot;:61,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/custom-osk-letters-editor.component.ts&quot;,&quot;line&quot;:77,&quot;character&quot;:53,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/custom-osk-letters-editor.component.ts&quot;,&quot;line&quot;:77,&quot;character&quot;:59,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/custom-osk-letters-editor.component.ts&quot;,&quot;line&quot;:91,&quot;character&quot;:13,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/custom-osk-letters-editor.component.ts&quot;,&quot;line&quot;:91,&quot;character&quot;:19,&quot;text&quot;:&quot;pop&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/custom-osk-letters-editor.component.ts&quot;,&quot;line&quot;:95,&quot;character&quot;:13,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/custom-osk-letters-editor.component.ts&quot;,&quot;line&quot;:95,&quot;character&quot;:19,&quot;text&quot;:&quot;indexOf&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:56 GMT</p>
+    </body>
+  </html>
+  

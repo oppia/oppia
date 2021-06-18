@@ -1,0 +1,588 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>question-creation-service.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts</td><td class="">63.59%</td><td class="">100%</td><td class="">629</td><td class="">400</td><td class="">229</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for QuestionCreationService.
+ */
+
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { importAllAngularServices } from &#x27;tests/unit-test-utils&#x27;;
+// ^^^ This block is to be removed.
+import { SkillDifficulty } from &#x27;domain/skill/skill-difficulty.model&#x27;;
+
+describe(&#x27;Question Creation Service&#x27;, function() {
+  var $rootScope = null;
+  var qcs = null;
+  var SkillEditorStateService = null;
+  var $q = null;
+  var QuestionObjectFactory = null;
+  var EditableQuestionBackendApiService = null;
+  var SkillBackendApiService = null;
+  var $uibModal = null;
+
+  var SkillObjectFactory = null;
+  var skillSummaryDict = {
+    id: &#x27;skillId1&#x27;,
+    description: &#x27;description1&#x27;,
+    language_code: &#x27;en&#x27;,
+    version: 1,
+    misconception_count: 3,
+    worked_examples_count: 3,
+    skill_model_created_on: 1593138898626.193,
+    skill_model_last_updated: 1593138898626.193
+  };
+
+  beforeEach(angular.mock.module(&#x27;oppia&#x27;));
+
+  importAllAngularServices();
+
+  describe(&#x27;when fetching skills is successful&#x27;, function() {
+    beforeEach(angular.mock.inject(function($injector) {
+      qcs = $injector.get(&#x27;QuestionCreationService&#x27;);
+      SkillEditorStateService = $injector.get(&#x27;SkillEditorStateService&#x27;);
+      SkillObjectFactory = $injector.get(&#x27;SkillObjectFactory&#x27;);
+      $q = $injector.get(&#x27;$q&#x27;);
+      SkillBackendApiService = $injector.get(&#x27;SkillBackendApiService&#x27;);
+      EditableQuestionBackendApiService = $injector.get(
+        &#x27;EditableQuestionBackendApiService&#x27;);
+      $uibModal = $injector.get(&#x27;$uibModal&#x27;);
+      var misconceptionDict = {
+        feedback: &#x27;feedback&#x27;,
+        id: &#x27;id1&#x27;,
+        must_be_addressed: false,
+        name: &#x27;name1&#x27;,
+        notes: &#x27;notes1&#x27;
+      };
+      var rubricDict1 = {
+        difficulty: &#x27;Easy&#x27;,
+        explanations: [&#x27;Easy&#x27;]
+      };
+      var rubricDict2 = {
+        difficulty: &#x27;Medium&#x27;,
+        explanations: [&#x27;Medium 1&#x27;, &#x27;Medium 2&#x27;]
+      };
+      var conceptCardDict = {
+        explanation: {content_id: &#x27;content&#x27;,
+          html: &#x27;html_data&#x27;},
+        worked_examples: [],
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            explanation: {},
+            worked_example_1: {},
+            worked_example_2: {}
+          }
+        } };
+      var skillBackendDict = {
+        all_questions_merged: true,
+        description: &#x27;description1&#x27;,
+        id: &#x27;skillId1&#x27;,
+        language_code: &#x27;en&#x27;,
+        misconceptions: [misconceptionDict],
+        next_misconception_id: &#x27;2&#x27;,
+        prerequisite_skill_ids: [],
+        rubrics: [rubricDict1, rubricDict2],
+        skill_contents: conceptCardDict,
+        superseding_skill_id: &#x27;skillId2&#x27;,
+        version: 2,
+      };
+
+      spyOn(SkillBackendApiService, &#x27;fetchSkillAsync&#x27;).and.returnValue({
+        skill: skillBackendDict,
+        topicName: &#x27;topic1&#x27;,
+        subtopicName: &#x27;subtopic2&#x27;,
+      });
+      var deferred = $q.defer();
+      deferred.resolve([skillBackendDict]);
+      spyOn(SkillBackendApiService, &#x27;fetchMultiSkillsAsync&#x27;).and.returnValue(
+        deferred.promise);
+      spyOn(
+        SkillEditorStateService, &#x27;getGroupedSkillSummaries&#x27;).and.returnValue({
+        current: [],
+        others: [skillSummaryDict]
+      });
+      var skillObject = SkillObjectFactory.createFromBackendDict(
+        skillBackendDict);
+      spyOn(SkillEditorStateService, &#x27;getSkill&#x27;).and.returnValue(skillObject);
+
+      QuestionObjectFactory = $injector.get(&#x27;QuestionObjectFactory&#x27;);
+
+      var sampleQuestionBackendDict = {
+        id: &#x27;question_id&#x27;,
+        question_state_data: {
+          content: {
+            html: &#x27;Question 1&#x27;,
+            content_id: &#x27;content_1&#x27;
+          },
+          interaction: {
+            answer_groups: [{
+              outcome: {
+                dest: &#x27;outcome 1&#x27;,
+                feedback: {
+                  content_id: &#x27;content_5&#x27;,
+                  html: &#x27;&#x27;
+                },
+                labelled_as_correct: true,
+                param_changes: [],
+                refresher_exploration_id: null
+              },
+              rule_specs: [{
+                rule_type: &#x27;Equals&#x27;,
+                inputs: {x: {
+                  contentId: &#x27;rule_input&#x27;,
+                  normalizedStrSet: [&#x27;10&#x27;]
+                }}
+              }],
+            }],
+            confirmed_unclassified_answers: [],
+            customization_args: {
+              placeholder: {
+                value: {
+                  content_id: &#x27;ca_placeholder_0&#x27;,
+                  unicode_str: &#x27;&#x27;
+                }
+              },
+              rows: { value: 1 }
+            },
+            default_outcome: {
+              dest: null,
+              feedback: {
+                html: &#x27;Correct Answer&#x27;,
+                content_id: &#x27;content_2&#x27;
+              },
+              param_changes: [],
+              labelled_as_correct: false
+            },
+            hints: [
+              {
+                hint_content: {
+                  html: &#x27;Hint 1&#x27;,
+                  content_id: &#x27;content_3&#x27;
+                }
+              }
+            ],
+            solution: {
+              correct_answer: &#x27;This is the correct answer&#x27;,
+              answer_is_exclusive: false,
+              explanation: {
+                html: &#x27;Solution explanation&#x27;,
+                content_id: &#x27;content_4&#x27;
+              }
+            },
+            id: &#x27;TextInput&#x27;
+          },
+          param_changes: [],
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content_1: {}
+            }
+          },
+          written_translations: {
+            translations_mapping: {
+              content_1: {}
+            }
+          },
+          solicit_answer_details: false
+        },
+        language_code: &#x27;en&#x27;,
+        version: 1,
+        inapplicable_skill_misconception_ids: [&#x27;skillId1-Id1&#x27;]
+      };
+      var sampleQuestion = QuestionObjectFactory.createFromBackendDict(
+        sampleQuestionBackendDict);
+      spyOn(QuestionObjectFactory, &#x27;createDefaultQuestion&#x27;).and.returnValue(
+        sampleQuestion);
+      $rootScope = $injector.get(&#x27;$rootScope&#x27;);
+    }));
+
+    it(&#x27;should create question&#x27;, function() {
+      var skillDiff = SkillDifficulty.create(
+        &#x27;skillId1&#x27;, &#x27;description&#x27;, 0.3);
+      var modalSpy = spyOn($uibModal, &#x27;open&#x27;).and.returnValue(
+        {result: Promise.resolve([skillDiff])});
+      qcs.createQuestion();
+      expect(modalSpy).toHaveBeenCalled();
+    });
+
+    it(&#x27;should open question editor modal&#x27;, function() {
+      qcs.createQuestion();
+      qcs.initializeNewQuestionCreation();
+
+      var modalSpy = spyOn($uibModal, &#x27;open&#x27;).and.returnValue({
+        result: Promise.resolve()});
+      qcs.openQuestionEditor(0.3);
+      expect(modalSpy).toHaveBeenCalled();
+    });
+
+    it(&#x27;should call question backend api service to create the question&#x27;,
+      function() {
+        qcs.createQuestion();
+        qcs.initializeNewQuestionCreation();
+        qcs.populateMisconceptions();
+
+        var questionSpy = (
+          spyOn(EditableQuestionBackendApiService, &#x27;createQuestionAsync&#x27;));
+        qcs.saveAndPublishQuestion();
+        expect(questionSpy).toHaveBeenCalled();
+      });
+  });
+
+  describe(&#x27;when question interaction validation fails&#x27;, function() {
+    var AlertsService = null;
+    beforeEach(angular.mock.inject(function($injector) {
+      qcs = $injector.get(&#x27;QuestionCreationService&#x27;);
+      SkillEditorStateService = $injector.get(&#x27;SkillEditorStateService&#x27;);
+      AlertsService = $injector.get(&#x27;AlertsService&#x27;);
+      SkillObjectFactory = $injector.get(&#x27;SkillObjectFactory&#x27;);
+      SkillBackendApiService = $injector.get(&#x27;SkillBackendApiService&#x27;);
+      EditableQuestionBackendApiService = $injector.get(
+        &#x27;EditableQuestionBackendApiService&#x27;);
+      $uibModal = $injector.get(&#x27;$uibModal&#x27;);
+      var misconceptionDict = {
+        feedback: &#x27;feedback&#x27;,
+        id: &#x27;id1&#x27;,
+        must_be_addressed: false,
+        name: &#x27;name1&#x27;,
+        notes: &#x27;notes1&#x27;
+      };
+      var rubricDict = {
+        difficulty: &#x27;Easy&#x27;,
+        explanations: [&#x27;Easy&#x27;]
+      };
+      var conceptCardDict = {
+        explanation: {content_id: &#x27;content&#x27;,
+          html: &#x27;html_data&#x27;},
+        worked_examples: [],
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            explanation: {},
+            worked_example_1: {},
+            worked_example_2: {}
+          }
+        } };
+      var skillBackendDict = {
+        all_questions_merged: true,
+        description: &#x27;description1&#x27;,
+        id: &#x27;skillId1&#x27;,
+        language_code: &#x27;en&#x27;,
+        misconceptions: [misconceptionDict],
+        next_misconception_id: &#x27;2&#x27;,
+        prerequisite_skill_ids: [],
+        rubrics: [rubricDict],
+        skill_contents: conceptCardDict,
+        superseding_skill_id: &#x27;skillId2&#x27;,
+        version: 2,
+      };
+
+      spyOn(SkillBackendApiService, &#x27;fetchSkillAsync&#x27;).and.returnValue({
+        skill: skillBackendDict,
+        topicName: &#x27;topic1&#x27;,
+        subtopicName: &#x27;subtopic2&#x27;,
+      });
+      spyOn(SkillBackendApiService, &#x27;fetchMultiSkillsAsync&#x27;).and.returnValue(
+        Promise.reject());
+      spyOn(
+        SkillEditorStateService, &#x27;getGroupedSkillSummaries&#x27;).and.returnValue({
+        current: [],
+        others: [skillSummaryDict]
+      });
+      var skillObject = SkillObjectFactory.createFromBackendDict(
+        skillBackendDict);
+      spyOn(
+        SkillEditorStateService, &#x27;getSkill&#x27;).and.returnValue(skillObject);
+
+      QuestionObjectFactory = $injector.get(&#x27;QuestionObjectFactory&#x27;);
+
+      var sampleQuestionBackendDict = {
+        id: &#x27;question_id&#x27;,
+        question_state_data: {
+          content: {
+            html: &#x27;Question 1&#x27;,
+            content_id: &#x27;content_1&#x27;
+          },
+          interaction: {
+            answer_groups: [{
+              outcome: {
+                dest: &#x27;outcome 1&#x27;,
+                feedback: {
+                  content_id: &#x27;content_5&#x27;,
+                  html: &#x27;&#x27;
+                },
+                labelled_as_correct: true,
+                param_changes: [],
+                refresher_exploration_id: null
+              },
+              rule_specs: [],
+            }],
+            confirmed_unclassified_answers: [],
+            customization_args: {},
+            default_outcome: {
+              dest: null,
+              feedback: {
+                html: &#x27;Correct Answer&#x27;,
+                content_id: &#x27;content_2&#x27;
+              },
+              param_changes: [],
+              labelled_as_correct: false
+            },
+            hints: [
+              {
+                hint_content: {
+                  html: &#x27;Hint 1&#x27;,
+                  content_id: &#x27;content_3&#x27;
+                }
+              }
+            ],
+            solution: {
+              correct_answer: &#x27;This is the correct answer&#x27;,
+              answer_is_exclusive: false,
+              explanation: {
+                html: &#x27;Solution explanation&#x27;,
+                content_id: &#x27;content_4&#x27;
+              }
+            },
+            id: null
+          },
+          param_changes: [],
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content_1: {}
+            }
+          },
+          written_translations: {
+            translations_mapping: {
+              content_1: {}
+            }
+          },
+          solicit_answer_details: false
+        },
+        language_code: &#x27;en&#x27;,
+        version: 1
+      };
+      var sampleQuestion = QuestionObjectFactory.createFromBackendDict(
+        sampleQuestionBackendDict);
+      spyOn(QuestionObjectFactory, &#x27;createDefaultQuestion&#x27;).and.returnValue(
+        sampleQuestion);
+      $rootScope = $injector.get(&#x27;$rootScope&#x27;);
+    }));
+
+    it(&#x27;should Alerts Service if populating misconceptions fails&#x27;, function() {
+      var alertsSpy = spyOn(AlertsService, &#x27;addWarning&#x27;).and.callThrough();
+      qcs.populateMisconceptions();
+      $rootScope.$apply();
+      expect(alertsSpy).toHaveBeenCalled();
+    });
+
+    it(&#x27;should not call question backend api service to create the question&#x27;,
+      function() {
+        qcs.createQuestion();
+        qcs.initializeNewQuestionCreation();
+        qcs.populateMisconceptions();
+        var questionSpy = (
+          spyOn(EditableQuestionBackendApiService, &#x27;createQuestionAsync&#x27;));
+        qcs.saveAndPublishQuestion();
+        expect(questionSpy).not.toHaveBeenCalled();
+      });
+  });
+
+  describe(&#x27;when question misconceptions validation fails&#x27;, function() {
+    var $q = null;
+    beforeEach(angular.mock.inject(function($injector) {
+      qcs = $injector.get(&#x27;QuestionCreationService&#x27;);
+      $q = $injector.get(&#x27;$q&#x27;);
+      SkillEditorStateService = $injector.get(&#x27;SkillEditorStateService&#x27;);
+      SkillObjectFactory = $injector.get(&#x27;SkillObjectFactory&#x27;);
+      SkillBackendApiService = $injector.get(&#x27;SkillBackendApiService&#x27;);
+      EditableQuestionBackendApiService = $injector.get(
+        &#x27;EditableQuestionBackendApiService&#x27;);
+      $uibModal = $injector.get(&#x27;$uibModal&#x27;);
+      var misconceptionDict = {
+        feedback: &#x27;feedback&#x27;,
+        id: &#x27;id1&#x27;,
+        must_be_addressed: true,
+        name: &#x27;name1&#x27;,
+        notes: &#x27;notes1&#x27;
+      };
+      var rubricDict = {
+        difficulty: &#x27;Easy&#x27;,
+        explanations: [&#x27;Easy&#x27;]
+      };
+      var conceptCardDict = {
+        explanation: {content_id: &#x27;content&#x27;,
+          html: &#x27;html_data&#x27;},
+        worked_examples: [],
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            explanation: {},
+            worked_example_1: {},
+            worked_example_2: {}
+          }
+        } };
+      var skillBackendDict = {
+        all_questions_merged: true,
+        description: &#x27;description1&#x27;,
+        id: &#x27;skillId1&#x27;,
+        language_code: &#x27;en&#x27;,
+        misconceptions: [misconceptionDict],
+        next_misconception_id: &#x27;2&#x27;,
+        prerequisite_skill_ids: [],
+        rubrics: [rubricDict],
+        skill_contents: conceptCardDict,
+        superseding_skill_id: &#x27;skillId2&#x27;,
+        version: 2,
+      };
+
+      spyOn(SkillBackendApiService, &#x27;fetchSkillAsync&#x27;).and.returnValue({
+        skill: SkillObjectFactory.createFromBackendDict(skillBackendDict),
+        topicName: &#x27;topic1&#x27;,
+        subtopicName: &#x27;subtopic2&#x27;,
+      });
+      var deferred = $q.defer();
+      deferred.resolve(
+        [SkillObjectFactory.createFromBackendDict(skillBackendDict)]
+      );
+      spyOn(SkillBackendApiService, &#x27;fetchMultiSkillsAsync&#x27;).and.returnValue(
+        deferred.promise);
+      spyOn(
+        SkillEditorStateService, &#x27;getGroupedSkillSummaries&#x27;).and.returnValue({
+        current: [],
+        others: [skillSummaryDict]
+      });
+      var skillObject = SkillObjectFactory.createFromBackendDict(
+        skillBackendDict);
+      spyOn(
+        SkillEditorStateService, &#x27;getSkill&#x27;).and.returnValue(skillObject);
+
+      QuestionObjectFactory = $injector.get(&#x27;QuestionObjectFactory&#x27;);
+
+      var sampleQuestionBackendDict = {
+        id: &#x27;question_id&#x27;,
+        question_state_data: {
+          content: {
+            html: &#x27;Question 1&#x27;,
+            content_id: &#x27;content_1&#x27;
+          },
+          interaction: {
+            answer_groups: [{
+              outcome: {
+                dest: &#x27;outcome 1&#x27;,
+                feedback: {
+                  content_id: &#x27;content_5&#x27;,
+                  html: &#x27;&#x27;
+                },
+                labelled_as_correct: true,
+                param_changes: [],
+                refresher_exploration_id: null
+              },
+              rule_specs: [{
+                rule_type: &#x27;Equals&#x27;,
+                inputs: {x: {
+                  contentId: &#x27;rule_input&#x27;,
+                  normalizedStrSet: [&#x27;10&#x27;]
+                }}
+              }],
+            }],
+            confirmed_unclassified_answers: [],
+            customization_args: {
+              placeholder: {
+                value: {
+                  content_id: &#x27;ca_placeholder_0&#x27;,
+                  unicode_str: &#x27;&#x27;
+                }
+              },
+              rows: { value: 1 }
+            },
+            default_outcome: {
+              dest: null,
+              feedback: {
+                html: &#x27;Correct Answer&#x27;,
+                content_id: &#x27;content_2&#x27;
+              },
+              param_changes: [],
+              labelled_as_correct: false
+            },
+            hints: [
+              {
+                hint_content: {
+                  html: &#x27;Hint 1&#x27;,
+                  content_id: &#x27;content_3&#x27;
+                }
+              }
+            ],
+            solution: {
+              correct_answer: &#x27;This is the correct answer&#x27;,
+              answer_is_exclusive: false,
+              explanation: {
+                html: &#x27;Solution explanation&#x27;,
+                content_id: &#x27;content_4&#x27;
+              }
+            },
+            id: &#x27;TextInput&#x27;
+          },
+          param_changes: [],
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content_1: {}
+            }
+          },
+          written_translations: {
+            translations_mapping: {
+              content_1: {}
+            }
+          },
+          solicit_answer_details: false
+        },
+        language_code: &#x27;en&#x27;,
+        version: 1,
+        inapplicable_skill_misconception_ids: []
+      };
+
+      var sampleQuestion = QuestionObjectFactory.createFromBackendDict(
+        sampleQuestionBackendDict);
+      spyOn(QuestionObjectFactory, &#x27;createDefaultQuestion&#x27;).and.returnValue(
+        sampleQuestion);
+      $rootScope = $injector.get(&#x27;$rootScope&#x27;);
+    }));
+
+    it(&#x27;should not call question backend api service to create the question&#x27;,
+      function() {
+        qcs.createQuestion();
+        qcs.initializeNewQuestionCreation();
+        qcs.populateMisconceptions();
+        $rootScope.$apply();
+        var questionSpy = (
+          spyOn(EditableQuestionBackendApiService, &#x27;createQuestionAsync&#x27;));
+        qcs.saveAndPublishQuestion();
+        expect(questionSpy).not.toHaveBeenCalled();
+      });
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:25,&quot;character&quot;:6,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:26,&quot;character&quot;:6,&quot;text&quot;:&quot;qcs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:27,&quot;character&quot;:6,&quot;text&quot;:&quot;SkillEditorStateService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:28,&quot;character&quot;:6,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:29,&quot;character&quot;:6,&quot;text&quot;:&quot;QuestionObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:30,&quot;character&quot;:6,&quot;text&quot;:&quot;EditableQuestionBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:31,&quot;character&quot;:6,&quot;text&quot;:&quot;SkillBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:32,&quot;character&quot;:6,&quot;text&quot;:&quot;$uibModal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:34,&quot;character&quot;:6,&quot;text&quot;:&quot;SkillObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:51,&quot;character&quot;:44,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:52,&quot;character&quot;:6,&quot;text&quot;:&quot;qcs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:52,&quot;character&quot;:12,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:52,&quot;character&quot;:22,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:53,&quot;character&quot;:6,&quot;text&quot;:&quot;SkillEditorStateService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:53,&quot;character&quot;:32,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:53,&quot;character&quot;:42,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:54,&quot;character&quot;:6,&quot;text&quot;:&quot;SkillObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:54,&quot;character&quot;:27,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:54,&quot;character&quot;:37,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:55,&quot;character&quot;:6,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:55,&quot;character&quot;:11,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:55,&quot;character&quot;:21,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:56,&quot;character&quot;:6,&quot;text&quot;:&quot;SkillBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:56,&quot;character&quot;:31,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:56,&quot;character&quot;:41,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:57,&quot;character&quot;:6,&quot;text&quot;:&quot;EditableQuestionBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:57,&quot;character&quot;:42,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:57,&quot;character&quot;:52,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:59,&quot;character&quot;:6,&quot;text&quot;:&quot;$uibModal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:59,&quot;character&quot;:18,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:59,&quot;character&quot;:28,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:100,&quot;character&quot;:12,&quot;text&quot;:&quot;SkillBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:100,&quot;character&quot;:55,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:105,&quot;character&quot;:10,&quot;text&quot;:&quot;deferred&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:105,&quot;character&quot;:21,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:105,&quot;character&quot;:24,&quot;text&quot;:&quot;defer&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:106,&quot;character&quot;:6,&quot;text&quot;:&quot;deferred&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:106,&quot;character&quot;:15,&quot;text&quot;:&quot;resolve&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:107,&quot;character&quot;:12,&quot;text&quot;:&quot;SkillBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:107,&quot;character&quot;:61,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:108,&quot;character&quot;:8,&quot;text&quot;:&quot;deferred&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:108,&quot;character&quot;:17,&quot;text&quot;:&quot;promise&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:110,&quot;character&quot;:8,&quot;text&quot;:&quot;SkillEditorStateService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:110,&quot;character&quot;:61,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:114,&quot;character&quot;:10,&quot;text&quot;:&quot;skillObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:114,&quot;character&quot;:24,&quot;text&quot;:&quot;SkillObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:114,&quot;character&quot;:43,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:116,&quot;character&quot;:12,&quot;text&quot;:&quot;SkillEditorStateService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:116,&quot;character&quot;:49,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:116,&quot;character&quot;:65,&quot;text&quot;:&quot;skillObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:118,&quot;character&quot;:6,&quot;text&quot;:&quot;QuestionObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:118,&quot;character&quot;:30,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:118,&quot;character&quot;:40,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:201,&quot;character&quot;:10,&quot;text&quot;:&quot;sampleQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:201,&quot;character&quot;:27,&quot;text&quot;:&quot;QuestionObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:201,&quot;character&quot;:49,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:203,&quot;character&quot;:12,&quot;text&quot;:&quot;QuestionObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:203,&quot;character&quot;:60,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:204,&quot;character&quot;:8,&quot;text&quot;:&quot;sampleQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:205,&quot;character&quot;:6,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:205,&quot;character&quot;:19,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:205,&quot;character&quot;:29,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:211,&quot;character&quot;:10,&quot;text&quot;:&quot;modalSpy&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:211,&quot;character&quot;:27,&quot;text&quot;:&quot;$uibModal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:211,&quot;character&quot;:46,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:213,&quot;character&quot;:6,&quot;text&quot;:&quot;qcs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:213,&quot;character&quot;:10,&quot;text&quot;:&quot;createQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:214,&quot;character&quot;:13,&quot;text&quot;:&quot;modalSpy&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:218,&quot;character&quot;:6,&quot;text&quot;:&quot;qcs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:218,&quot;character&quot;:10,&quot;text&quot;:&quot;createQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:219,&quot;character&quot;:6,&quot;text&quot;:&quot;qcs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:219,&quot;character&quot;:10,&quot;text&quot;:&quot;initializeNewQuestionCreation&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:221,&quot;character&quot;:10,&quot;text&quot;:&quot;modalSpy&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:221,&quot;character&quot;:27,&quot;text&quot;:&quot;$uibModal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:221,&quot;character&quot;:46,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:223,&quot;character&quot;:6,&quot;text&quot;:&quot;qcs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:223,&quot;character&quot;:10,&quot;text&quot;:&quot;openQuestionEditor&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:224,&quot;character&quot;:13,&quot;text&quot;:&quot;modalSpy&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:229,&quot;character&quot;:8,&quot;text&quot;:&quot;qcs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:229,&quot;character&quot;:12,&quot;text&quot;:&quot;createQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:230,&quot;character&quot;:8,&quot;text&quot;:&quot;qcs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:230,&quot;character&quot;:12,&quot;text&quot;:&quot;initializeNewQuestionCreation&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:231,&quot;character&quot;:8,&quot;text&quot;:&quot;qcs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:231,&quot;character&quot;:12,&quot;text&quot;:&quot;populateMisconceptions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:233,&quot;character&quot;:12,&quot;text&quot;:&quot;questionSpy&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:234,&quot;character&quot;:16,&quot;text&quot;:&quot;EditableQuestionBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:235,&quot;character&quot;:8,&quot;text&quot;:&quot;qcs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:235,&quot;character&quot;:12,&quot;text&quot;:&quot;saveAndPublishQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:236,&quot;character&quot;:15,&quot;text&quot;:&quot;questionSpy&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:241,&quot;character&quot;:8,&quot;text&quot;:&quot;AlertsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:242,&quot;character&quot;:44,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:243,&quot;character&quot;:6,&quot;text&quot;:&quot;qcs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:243,&quot;character&quot;:12,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:243,&quot;character&quot;:22,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:244,&quot;character&quot;:6,&quot;text&quot;:&quot;SkillEditorStateService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:244,&quot;character&quot;:32,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:244,&quot;character&quot;:42,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:245,&quot;character&quot;:6,&quot;text&quot;:&quot;AlertsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:245,&quot;character&quot;:22,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:245,&quot;character&quot;:32,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:246,&quot;character&quot;:6,&quot;text&quot;:&quot;SkillObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:246,&quot;character&quot;:27,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:246,&quot;character&quot;:37,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:247,&quot;character&quot;:6,&quot;text&quot;:&quot;SkillBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:247,&quot;character&quot;:31,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:247,&quot;character&quot;:41,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:248,&quot;character&quot;:6,&quot;text&quot;:&quot;EditableQuestionBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:248,&quot;character&quot;:42,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:248,&quot;character&quot;:52,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:250,&quot;character&quot;:6,&quot;text&quot;:&quot;$uibModal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:250,&quot;character&quot;:18,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:250,&quot;character&quot;:28,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:287,&quot;character&quot;:12,&quot;text&quot;:&quot;SkillBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:287,&quot;character&quot;:55,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:292,&quot;character&quot;:12,&quot;text&quot;:&quot;SkillBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:292,&quot;character&quot;:61,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:295,&quot;character&quot;:8,&quot;text&quot;:&quot;SkillEditorStateService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:295,&quot;character&quot;:61,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:299,&quot;character&quot;:10,&quot;text&quot;:&quot;skillObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:299,&quot;character&quot;:24,&quot;text&quot;:&quot;SkillObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:299,&quot;character&quot;:43,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:302,&quot;character&quot;:8,&quot;text&quot;:&quot;SkillEditorStateService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:302,&quot;character&quot;:45,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:302,&quot;character&quot;:61,&quot;text&quot;:&quot;skillObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:304,&quot;character&quot;:6,&quot;text&quot;:&quot;QuestionObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:304,&quot;character&quot;:30,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:304,&quot;character&quot;:40,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:372,&quot;character&quot;:10,&quot;text&quot;:&quot;sampleQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:372,&quot;character&quot;:27,&quot;text&quot;:&quot;QuestionObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:372,&quot;character&quot;:49,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:374,&quot;character&quot;:12,&quot;text&quot;:&quot;QuestionObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:374,&quot;character&quot;:60,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:375,&quot;character&quot;:8,&quot;text&quot;:&quot;sampleQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:376,&quot;character&quot;:6,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:376,&quot;character&quot;:19,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:376,&quot;character&quot;:29,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:380,&quot;character&quot;:10,&quot;text&quot;:&quot;alertsSpy&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:380,&quot;character&quot;:28,&quot;text&quot;:&quot;AlertsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:380,&quot;character&quot;:57,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:381,&quot;character&quot;:6,&quot;text&quot;:&quot;qcs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:381,&quot;character&quot;:10,&quot;text&quot;:&quot;populateMisconceptions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:382,&quot;character&quot;:6,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:382,&quot;character&quot;:17,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:383,&quot;character&quot;:13,&quot;text&quot;:&quot;alertsSpy&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:388,&quot;character&quot;:8,&quot;text&quot;:&quot;qcs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:388,&quot;character&quot;:12,&quot;text&quot;:&quot;createQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:389,&quot;character&quot;:8,&quot;text&quot;:&quot;qcs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:389,&quot;character&quot;:12,&quot;text&quot;:&quot;initializeNewQuestionCreation&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:390,&quot;character&quot;:8,&quot;text&quot;:&quot;qcs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:390,&quot;character&quot;:12,&quot;text&quot;:&quot;populateMisconceptions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:391,&quot;character&quot;:12,&quot;text&quot;:&quot;questionSpy&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:392,&quot;character&quot;:16,&quot;text&quot;:&quot;EditableQuestionBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:393,&quot;character&quot;:8,&quot;text&quot;:&quot;qcs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:393,&quot;character&quot;:12,&quot;text&quot;:&quot;saveAndPublishQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:394,&quot;character&quot;:15,&quot;text&quot;:&quot;questionSpy&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:394,&quot;character&quot;:28,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:399,&quot;character&quot;:8,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:400,&quot;character&quot;:44,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:401,&quot;character&quot;:6,&quot;text&quot;:&quot;qcs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:401,&quot;character&quot;:12,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:401,&quot;character&quot;:22,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:402,&quot;character&quot;:6,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:402,&quot;character&quot;:11,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:402,&quot;character&quot;:21,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:403,&quot;character&quot;:6,&quot;text&quot;:&quot;SkillEditorStateService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:403,&quot;character&quot;:32,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:403,&quot;character&quot;:42,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:404,&quot;character&quot;:6,&quot;text&quot;:&quot;SkillObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:404,&quot;character&quot;:27,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:404,&quot;character&quot;:37,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:405,&quot;character&quot;:6,&quot;text&quot;:&quot;SkillBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:405,&quot;character&quot;:31,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:405,&quot;character&quot;:41,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:406,&quot;character&quot;:6,&quot;text&quot;:&quot;EditableQuestionBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:406,&quot;character&quot;:42,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:406,&quot;character&quot;:52,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:408,&quot;character&quot;:6,&quot;text&quot;:&quot;$uibModal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:408,&quot;character&quot;:18,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:408,&quot;character&quot;:28,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:445,&quot;character&quot;:12,&quot;text&quot;:&quot;SkillBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:445,&quot;character&quot;:55,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:446,&quot;character&quot;:8,&quot;text&quot;:&quot;skill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:446,&quot;character&quot;:15,&quot;text&quot;:&quot;SkillObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:446,&quot;character&quot;:34,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:450,&quot;character&quot;:10,&quot;text&quot;:&quot;deferred&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:450,&quot;character&quot;:21,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:450,&quot;character&quot;:24,&quot;text&quot;:&quot;defer&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:451,&quot;character&quot;:6,&quot;text&quot;:&quot;deferred&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:451,&quot;character&quot;:15,&quot;text&quot;:&quot;resolve&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:452,&quot;character&quot;:9,&quot;text&quot;:&quot;SkillObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:452,&quot;character&quot;:28,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:454,&quot;character&quot;:12,&quot;text&quot;:&quot;SkillBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:454,&quot;character&quot;:61,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:455,&quot;character&quot;:8,&quot;text&quot;:&quot;deferred&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:455,&quot;character&quot;:17,&quot;text&quot;:&quot;promise&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:457,&quot;character&quot;:8,&quot;text&quot;:&quot;SkillEditorStateService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:457,&quot;character&quot;:61,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:461,&quot;character&quot;:10,&quot;text&quot;:&quot;skillObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:461,&quot;character&quot;:24,&quot;text&quot;:&quot;SkillObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:461,&quot;character&quot;:43,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:464,&quot;character&quot;:8,&quot;text&quot;:&quot;SkillEditorStateService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:464,&quot;character&quot;:45,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:464,&quot;character&quot;:61,&quot;text&quot;:&quot;skillObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:466,&quot;character&quot;:6,&quot;text&quot;:&quot;QuestionObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:466,&quot;character&quot;:30,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:466,&quot;character&quot;:40,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:550,&quot;character&quot;:10,&quot;text&quot;:&quot;sampleQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:550,&quot;character&quot;:27,&quot;text&quot;:&quot;QuestionObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:550,&quot;character&quot;:49,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:552,&quot;character&quot;:12,&quot;text&quot;:&quot;QuestionObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:552,&quot;character&quot;:60,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:553,&quot;character&quot;:8,&quot;text&quot;:&quot;sampleQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:554,&quot;character&quot;:6,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:554,&quot;character&quot;:19,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:554,&quot;character&quot;:29,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:559,&quot;character&quot;:8,&quot;text&quot;:&quot;qcs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:559,&quot;character&quot;:12,&quot;text&quot;:&quot;createQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:560,&quot;character&quot;:8,&quot;text&quot;:&quot;qcs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:560,&quot;character&quot;:12,&quot;text&quot;:&quot;initializeNewQuestionCreation&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:561,&quot;character&quot;:8,&quot;text&quot;:&quot;qcs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:561,&quot;character&quot;:12,&quot;text&quot;:&quot;populateMisconceptions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:562,&quot;character&quot;:8,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:562,&quot;character&quot;:19,&quot;text&quot;:&quot;$apply&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:563,&quot;character&quot;:12,&quot;text&quot;:&quot;questionSpy&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:564,&quot;character&quot;:16,&quot;text&quot;:&quot;EditableQuestionBackendApiService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:565,&quot;character&quot;:8,&quot;text&quot;:&quot;qcs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:565,&quot;character&quot;:12,&quot;text&quot;:&quot;saveAndPublishQuestion&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:566,&quot;character&quot;:15,&quot;text&quot;:&quot;questionSpy&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/skill-editor-page/services/question-creation-service.spec.ts&quot;,&quot;line&quot;:566,&quot;character&quot;:28,&quot;text&quot;:&quot;not&quot;,&quot;kind&quot;:2}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:59 GMT</p>
+    </body>
+  </html>
+  

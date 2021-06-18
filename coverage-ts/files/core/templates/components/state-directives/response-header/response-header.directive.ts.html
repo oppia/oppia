@@ -1,0 +1,118 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>response-header.directive.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/components/state-directives/response-header/response-header.directive.ts</td><td class="">25.00%</td><td class="">100%</td><td class="">96</td><td class="">24</td><td class="">72</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2014 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Directive for the header of the response tiles.
+ */
+
+require(&#x27;domain/utilities/url-interpolation.service.ts&#x27;);
+require(
+  &#x27;components/state-editor/state-editor-properties-services/&#x27; +
+  &#x27;state-editor.service.ts&#x27;);
+require(
+  &#x27;components/state-editor/state-editor-properties-services/&#x27; +
+  &#x27;state-interaction-id.service&#x27;);
+require(
+  &#x27;components/state-editor/state-editor-properties-services/&#x27; +
+  &#x27;state-property.service.ts&#x27;);
+require(&#x27;services/editability.service.ts&#x27;);
+
+angular.module(&#x27;oppia&#x27;).directive(&#x27;responseHeader&#x27;, [
+  &#x27;UrlInterpolationService&#x27;, function(UrlInterpolationService) {
+    return {
+      restrict: &#x27;E&#x27;,
+      scope: {},
+      bindToController: {
+        getIndex: &#x27;&amp;index&#x27;,
+        getOutcome: &#x27;&amp;outcome&#x27;,
+        getSummary: &#x27;&amp;summary&#x27;,
+        getShortSummary: &#x27;&amp;shortSummary&#x27;,
+        isActive: &#x27;&amp;isActive&#x27;,
+        getOnDeleteFn: &#x27;&amp;onDeleteFn&#x27;,
+        getNumRules: &#x27;&amp;numRules&#x27;,
+        isResponse: &#x27;&amp;isResponse&#x27;,
+        showWarning: &#x27;&amp;showWarning&#x27;,
+        navigateToState: &#x27;=&#x27;
+      },
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        &#x27;/components/state-directives/response-header/&#x27; +
+        &#x27;response-header.directive.html&#x27;),
+      controllerAs: &#x27;$ctrl&#x27;,
+      controller: [
+        &#x27;EditabilityService&#x27;, &#x27;StateEditorService&#x27;, &#x27;StateInteractionIdService&#x27;,
+        &#x27;INTERACTION_SPECS&#x27;, &#x27;PLACEHOLDER_OUTCOME_DEST&#x27;,
+        function(
+            EditabilityService, StateEditorService, StateInteractionIdService,
+            INTERACTION_SPECS, PLACEHOLDER_OUTCOME_DEST) {
+          var ctrl = this;
+          ctrl.isInQuestionMode = function() {
+            return StateEditorService.isInQuestionMode();
+          };
+
+          ctrl.getCurrentInteractionId = function() {
+            return StateInteractionIdService.savedMemento;
+          };
+
+          ctrl.isCorrectnessFeedbackEnabled = function() {
+            return StateEditorService.getCorrectnessFeedbackEnabled();
+          };
+          // This returns false if the current interaction ID is null.
+          ctrl.isCurrentInteractionLinear = function() {
+            var interactionId = ctrl.getCurrentInteractionId();
+            return interactionId &amp;&amp; INTERACTION_SPECS[interactionId].is_linear;
+          };
+
+          ctrl.isCorrect = function() {
+            return ctrl.getOutcome() &amp;&amp; ctrl.getOutcome().labelledAsCorrect;
+          };
+
+          ctrl.isOutcomeLooping = function() {
+            var outcome = ctrl.getOutcome();
+            var activeStateName = StateEditorService.getActiveStateName();
+            return outcome &amp;&amp; (outcome.dest === activeStateName);
+          };
+
+          ctrl.isCreatingNewState = function() {
+            var outcome = ctrl.getOutcome();
+            return outcome &amp;&amp; outcome.dest === PLACEHOLDER_OUTCOME_DEST;
+          };
+
+          ctrl.deleteResponse = function(evt) {
+            ctrl.getOnDeleteFn()(ctrl.getIndex(), evt);
+          };
+          ctrl.$onInit = function() {
+            ctrl.EditabilityService = EditabilityService;
+          };
+        }
+      ]
+    };
+  }]);
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:31,&quot;character&quot;:38,&quot;text&quot;:&quot;UrlInterpolationService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:47,&quot;character&quot;:19,&quot;text&quot;:&quot;UrlInterpolationService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:47,&quot;character&quot;:43,&quot;text&quot;:&quot;getDirectiveTemplateUrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:55,&quot;character&quot;:12,&quot;text&quot;:&quot;EditabilityService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:55,&quot;character&quot;:32,&quot;text&quot;:&quot;StateEditorService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:55,&quot;character&quot;:52,&quot;text&quot;:&quot;StateInteractionIdService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:56,&quot;character&quot;:12,&quot;text&quot;:&quot;INTERACTION_SPECS&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:56,&quot;character&quot;:31,&quot;text&quot;:&quot;PLACEHOLDER_OUTCOME_DEST&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:57,&quot;character&quot;:14,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:57,&quot;character&quot;:21,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:58,&quot;character&quot;:10,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:58,&quot;character&quot;:15,&quot;text&quot;:&quot;isInQuestionMode&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:59,&quot;character&quot;:19,&quot;text&quot;:&quot;StateEditorService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:59,&quot;character&quot;:38,&quot;text&quot;:&quot;isInQuestionMode&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:62,&quot;character&quot;:10,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:62,&quot;character&quot;:15,&quot;text&quot;:&quot;getCurrentInteractionId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:63,&quot;character&quot;:19,&quot;text&quot;:&quot;StateInteractionIdService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:63,&quot;character&quot;:45,&quot;text&quot;:&quot;savedMemento&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:66,&quot;character&quot;:10,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:66,&quot;character&quot;:15,&quot;text&quot;:&quot;isCorrectnessFeedbackEnabled&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:67,&quot;character&quot;:19,&quot;text&quot;:&quot;StateEditorService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:67,&quot;character&quot;:38,&quot;text&quot;:&quot;getCorrectnessFeedbackEnabled&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:70,&quot;character&quot;:10,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:70,&quot;character&quot;:15,&quot;text&quot;:&quot;isCurrentInteractionLinear&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:71,&quot;character&quot;:16,&quot;text&quot;:&quot;interactionId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:71,&quot;character&quot;:32,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:71,&quot;character&quot;:37,&quot;text&quot;:&quot;getCurrentInteractionId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:72,&quot;character&quot;:19,&quot;text&quot;:&quot;interactionId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:72,&quot;character&quot;:36,&quot;text&quot;:&quot;INTERACTION_SPECS&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:72,&quot;character&quot;:54,&quot;text&quot;:&quot;interactionId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:72,&quot;character&quot;:69,&quot;text&quot;:&quot;is_linear&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:75,&quot;character&quot;:10,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:75,&quot;character&quot;:15,&quot;text&quot;:&quot;isCorrect&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:76,&quot;character&quot;:19,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:76,&quot;character&quot;:24,&quot;text&quot;:&quot;getOutcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:76,&quot;character&quot;:40,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:76,&quot;character&quot;:45,&quot;text&quot;:&quot;getOutcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:76,&quot;character&quot;:58,&quot;text&quot;:&quot;labelledAsCorrect&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:79,&quot;character&quot;:10,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:79,&quot;character&quot;:15,&quot;text&quot;:&quot;isOutcomeLooping&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:80,&quot;character&quot;:16,&quot;text&quot;:&quot;outcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:80,&quot;character&quot;:26,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:80,&quot;character&quot;:31,&quot;text&quot;:&quot;getOutcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:81,&quot;character&quot;:16,&quot;text&quot;:&quot;activeStateName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:81,&quot;character&quot;:34,&quot;text&quot;:&quot;StateEditorService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:81,&quot;character&quot;:53,&quot;text&quot;:&quot;getActiveStateName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:82,&quot;character&quot;:19,&quot;text&quot;:&quot;outcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:82,&quot;character&quot;:31,&quot;text&quot;:&quot;outcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:82,&quot;character&quot;:39,&quot;text&quot;:&quot;dest&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:82,&quot;character&quot;:48,&quot;text&quot;:&quot;activeStateName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:85,&quot;character&quot;:10,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:85,&quot;character&quot;:15,&quot;text&quot;:&quot;isCreatingNewState&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:86,&quot;character&quot;:16,&quot;text&quot;:&quot;outcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:86,&quot;character&quot;:26,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:86,&quot;character&quot;:31,&quot;text&quot;:&quot;getOutcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:87,&quot;character&quot;:19,&quot;text&quot;:&quot;outcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:87,&quot;character&quot;:30,&quot;text&quot;:&quot;outcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:87,&quot;character&quot;:38,&quot;text&quot;:&quot;dest&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:87,&quot;character&quot;:47,&quot;text&quot;:&quot;PLACEHOLDER_OUTCOME_DEST&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:90,&quot;character&quot;:10,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:90,&quot;character&quot;:15,&quot;text&quot;:&quot;deleteResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:90,&quot;character&quot;:41,&quot;text&quot;:&quot;evt&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:91,&quot;character&quot;:12,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:91,&quot;character&quot;:17,&quot;text&quot;:&quot;getOnDeleteFn&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:91,&quot;character&quot;:33,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:91,&quot;character&quot;:38,&quot;text&quot;:&quot;getIndex&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:91,&quot;character&quot;:50,&quot;text&quot;:&quot;evt&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:93,&quot;character&quot;:10,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:93,&quot;character&quot;:15,&quot;text&quot;:&quot;$onInit&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:94,&quot;character&quot;:12,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:94,&quot;character&quot;:17,&quot;text&quot;:&quot;EditabilityService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/state-directives/response-header/response-header.directive.ts&quot;,&quot;line&quot;:94,&quot;character&quot;:38,&quot;text&quot;:&quot;EditabilityService&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:58 GMT</p>
+    </body>
+  </html>
+  

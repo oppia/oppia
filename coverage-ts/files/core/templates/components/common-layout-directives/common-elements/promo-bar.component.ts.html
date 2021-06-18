@@ -1,0 +1,107 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>promo-bar.component.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/components/common-layout-directives/common-elements/promo-bar.component.ts</td><td class="">94.25%</td><td class="">100%</td><td class="">87</td><td class="">82</td><td class="">5</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2021 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Component for a promo bar that appears at the top of the
+ * screen. The bar is configurable with a message and whether the promo is
+ * dismissible.
+ */
+
+import { Component, OnInit } from &#x27;@angular/core&#x27;;
+import { downgradeComponent } from &#x27;@angular/upgrade/static&#x27;;
+
+import { WindowRef } from &#x27;services/contextual/window-ref.service&#x27;;
+import { PromoBarBackendApiService } from &#x27;services/promo-bar-backend-api.service&#x27;;
+
+@Component({
+  selector: &#x27;oppia-promo-bar&#x27;,
+  templateUrl: &#x27;./promo-bar.component.html&#x27;
+})
+export class PromoBarComponent implements OnInit {
+  promoIsVisible: boolean;
+  promoBarIsEnabled: boolean;
+  promoBarMessage: string;
+
+  constructor(
+    private promoBarBackendApiService: PromoBarBackendApiService,
+    private windowRef: WindowRef
+  ) {}
+
+  ngOnInit(): void {
+    this.promoBarBackendApiService.getPromoBarDataAsync()
+      .then((promoBar) =&gt; {
+        this.promoBarIsEnabled = promoBar.promoBarEnabled;
+        this.promoBarMessage = promoBar.promoBarMessage;
+      });
+    this.promoIsVisible = !this.isPromoDismissed();
+  }
+
+  isPromoDismissed(): boolean {
+    if (!this.isSessionStorageAvailable()) {
+      return false;
+    }
+    let promoIsDismissed =
+      this.windowRef.nativeWindow.sessionStorage.promoIsDismissed;
+    if (typeof (promoIsDismissed) !== &#x27;undefined&#x27;) {
+      return JSON.parse(promoIsDismissed);
+    }
+  }
+
+  setPromoDismissed(promoIsDismissed: boolean): boolean {
+    if (!this.isSessionStorageAvailable()) {
+      return false;
+    }
+    this.windowRef.nativeWindow.sessionStorage.promoIsDismissed =
+      JSON.stringify(promoIsDismissed);
+  }
+
+  isSessionStorageAvailable(): boolean {
+    // This is to ensure sessionStorage is accessible.
+    const testKey = &#x27;Oppia&#x27;;
+    try {
+      this.windowRef.nativeWindow.sessionStorage.setItem(testKey, testKey);
+      this.windowRef.nativeWindow.sessionStorage.removeItem(testKey);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  dismissPromo(): void {
+    this.promoIsVisible = false;
+    this.setPromoDismissed(true);
+  }
+}
+
+angular.module(&#x27;oppia&#x27;).directive(
+  &#x27;oppiaPromoBar&#x27;, downgradeComponent(
+    {component: PromoBarComponent}));
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/components/common-layout-directives/common-elements/promo-bar.component.ts&quot;,&quot;line&quot;:53,&quot;character&quot;:8,&quot;text&quot;:&quot;promoIsDismissed&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/common-layout-directives/common-elements/promo-bar.component.ts&quot;,&quot;line&quot;:54,&quot;character&quot;:49,&quot;text&quot;:&quot;promoIsDismissed&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/common-layout-directives/common-elements/promo-bar.component.ts&quot;,&quot;line&quot;:55,&quot;character&quot;:16,&quot;text&quot;:&quot;promoIsDismissed&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/common-layout-directives/common-elements/promo-bar.component.ts&quot;,&quot;line&quot;:64,&quot;character&quot;:47,&quot;text&quot;:&quot;promoIsDismissed&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/common-layout-directives/common-elements/promo-bar.component.ts&quot;,&quot;line&quot;:75,&quot;character&quot;:13,&quot;text&quot;:&quot;e&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:56 GMT</p>
+    </body>
+  </html>
+  

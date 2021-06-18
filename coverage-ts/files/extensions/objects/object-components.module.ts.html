@@ -1,0 +1,242 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>object-components.module.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">extensions/objects/object-components.module.ts</td><td class="">100.00%</td><td class="">100%</td><td class="">197</td><td class="">197</td><td class="">0</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2021 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Module for the object components.
+ */
+import &#x27;core-js/es7/reflect&#x27;;
+import &#x27;zone.js&#x27;;
+
+import { CommonModule } from &#x27;@angular/common&#x27;;
+import { NgModule } from &#x27;@angular/core&#x27;;
+import { BrowserModule } from &#x27;@angular/platform-browser&#x27;;
+import { LeafletModule } from &#x27;@asymmetrik/ngx-leaflet&#x27;;
+import { NgxTrimDirectiveModule } from &#x27;ngx-trim-directive&#x27;;
+import { MatProgressSpinnerModule } from &#x27;@angular/material/progress-spinner&#x27;;
+import { AlgebraicExpressionEditorComponent } from &#x27;./templates/algebraic-expression-editor.component&#x27;;
+import { BooleanEditorComponent } from &#x27;./templates/boolean-editor.component&#x27;;
+import { CodeStringEditorComponent } from &#x27;./templates/code-string-editor.component&#x27;;
+import { CoordTwoDimEditorComponent } from &#x27;./templates/coord-two-dim-editor.component&#x27;;
+import { CustomOskLettersEditorComponent } from &#x27;./templates/custom-osk-letters-editor.component&#x27;;
+import { DragAndDropPositiveIntEditorComponent } from &#x27;./templates/drag-and-drop-positive-int-editor.component&#x27;;
+import { FractionEditorComponent } from &#x27;./templates/fraction-editor.component&#x27;;
+import { FormsModule } from &#x27;@angular/forms&#x27;;
+import { FilepathEditorComponent } from &#x27;./templates/filepath-editor.component&#x27;;
+import { GraphInputInteractionModule } from &#x27;interactions/GraphInput/graph-input-interactions.module&#x27;;
+import { GraphEditorComponent } from &#x27;./templates/graph-editor.component&#x27;;
+import { SharedFormsModule } from &#x27;components/forms/shared-forms.module&#x27;;
+import { HtmlEditorComponent } from &#x27;./templates/html-editor.component&#x27;;
+import { NgbModalModule, NgbTooltipModule } from &#x27;@ng-bootstrap/ng-bootstrap&#x27;;
+import { ImageWithRegionsEditorComponent } from &#x27;./templates/image-with-regions-editor.component&#x27;;
+import { ImageWithRegionsResetConfirmationModalComponent } from &#x27;./templates/image-with-regions-reset-confirmation.component&#x27;;
+import { IntEditorComponent } from &#x27;./templates/int-editor.component&#x27;;
+import { DynamicContentModule } from &#x27;components/angular-html-bind/dynamic-content.module&#x27;;
+import { ListOfSetsOfTranslatableHtmlContentIdsEditorComponent } from &#x27;./templates/list-of-sets-of-translatable-html-content-ids-editor.component&#x27;;
+import { DirectivesModule } from &#x27;directives/directives.module&#x27;;
+import { ListOfTabsEditorComponent } from &#x27;./templates/list-of-tabs-editor.component&#x27;;
+import { ListOfUnicodeStringEditorComponent } from &#x27;./templates/list-of-unicode-string-editor.component&#x27;;
+import { SetOfUnicodeStringEditorComponent } from &#x27;./templates/set-of-unicode-string-editor.component&#x27;;
+import { MathEquationEditorComponent } from &#x27;./templates/math-equation-editor.component&#x27;;
+import { LogicErrorCategoryEditorComponent } from &#x27;./templates/logic-error-category-editor.component&#x27;;
+import { LogicQuestionEditorComponent } from &#x27;./templates/logic-question-editor.component&#x27;;
+import { MathExpressionContentEditorComponent } from &#x27;./templates/math-expression-content-editor.component&#x27;;
+import { MusicPhraseEditorComponent } from &#x27;./templates/music-phrase-editor.component&#x27;;
+import { NonnegativeIntEditorComponent } from &#x27;./templates/nonnegative-int-editor.component&#x27;;
+import { NumberWithUnitsEditorComponent } from &#x27;./templates/number-with-units-editor.component&#x27;;
+import { NumericExpressionEditorComponent } from &#x27;./templates/numeric-expression-editor.component&#x27;;
+import { PositionOfTermsEditorComponent } from &#x27;./templates/position-of-terms-editor.component&#x27;;
+import { PositiveIntEditorComponent } from &#x27;./templates/positive-int-editor.component&#x27;;
+import { RatioExpressionEditorComponent } from &#x27;./templates/ratio-expression-editor.component&#x27;;
+import { RealEditorComponent } from &#x27;./templates/real-editor.component&#x27;;
+import { SanitizedUrlEditorComponent } from &#x27;./templates/sanitized-url-editor.component&#x27;;
+import { SetOfAlgebraicIdentifierEditorComponent } from &#x27;./templates/set-of-algebraic-identifier-editor.component&#x27;;
+import { SetOfTranslatableHtmlContentIdsEditorComponent } from &#x27;./templates/set-of-translatable-html-content-ids-editor.component&#x27;;
+import { MatCheckboxModule } from &#x27;@angular/material/checkbox&#x27;;
+import { SubtitledHtmlEditorComponent } from &#x27;./templates/subtitled-html-editor.component&#x27;;
+import { SvgFilenameEditorComponent } from &#x27;./templates/svg-filename-editor.component&#x27;;
+import { NormalizedStringEditorComponent } from &#x27;./templates/normalized-string-editor.component&#x27;;
+import { UnicodeStringEditorComponent } from &#x27;./templates/unicode-string-editor.component&#x27;;
+import { SkillSelectorEditorComponent } from &#x27;./templates/skill-selector-editor.component&#x27;;
+import { CommonElementsModule } from &#x27;components/common-layout-directives/common-elements/common-elements.module&#x27;;
+import { MatCardModule } from &#x27;@angular/material/card&#x27;;
+import { SubtitledUnicodeEditorComponent } from &#x27;./templates/subtitled-unicode-editor.component&#x27;;
+import { TranslatableSetOfNormalizedStringEditorComponent } from &#x27;./templates/translatable-set-of-normalized-string-editor.component&#x27;;
+import { TranslatableSetOfUnicodeStringEditorComponent } from &#x27;./templates/translatable-set-of-unicode-string-editor.component&#x27;;
+
+
+@NgModule({
+  imports: [
+    CommonModule,
+    BrowserModule,
+    CommonElementsModule,
+    FormsModule,
+    LeafletModule,
+    SharedFormsModule,
+    GraphInputInteractionModule,
+    DynamicContentModule,
+    DirectivesModule,
+    MatProgressSpinnerModule,
+    MatCardModule,
+    MatCheckboxModule,
+    NgbModalModule,
+    NgbTooltipModule,
+    NgxTrimDirectiveModule
+  ],
+  declarations: [
+    AlgebraicExpressionEditorComponent,
+    BooleanEditorComponent,
+    CodeStringEditorComponent,
+    CoordTwoDimEditorComponent,
+    CustomOskLettersEditorComponent,
+    DragAndDropPositiveIntEditorComponent,
+    FilepathEditorComponent,
+    FractionEditorComponent,
+    GraphEditorComponent,
+    HtmlEditorComponent,
+    ImageWithRegionsEditorComponent,
+    ImageWithRegionsResetConfirmationModalComponent,
+    IntEditorComponent,
+    ListOfSetsOfTranslatableHtmlContentIdsEditorComponent,
+    ListOfTabsEditorComponent,
+    ListOfUnicodeStringEditorComponent,
+    LogicErrorCategoryEditorComponent,
+    LogicQuestionEditorComponent,
+    MathEquationEditorComponent,
+    MathExpressionContentEditorComponent,
+    MusicPhraseEditorComponent,
+    NonnegativeIntEditorComponent,
+    NormalizedStringEditorComponent,
+    NumberWithUnitsEditorComponent,
+    NumericExpressionEditorComponent,
+    PositionOfTermsEditorComponent,
+    PositiveIntEditorComponent,
+    RatioExpressionEditorComponent,
+    RealEditorComponent,
+    SanitizedUrlEditorComponent,
+    SetOfAlgebraicIdentifierEditorComponent,
+    SetOfTranslatableHtmlContentIdsEditorComponent,
+    SetOfUnicodeStringEditorComponent,
+    SkillSelectorEditorComponent,
+    SubtitledHtmlEditorComponent,
+    SubtitledUnicodeEditorComponent,
+    SvgFilenameEditorComponent,
+    TranslatableSetOfNormalizedStringEditorComponent,
+    TranslatableSetOfUnicodeStringEditorComponent,
+    UnicodeStringEditorComponent
+  ],
+  entryComponents: [
+    AlgebraicExpressionEditorComponent,
+    BooleanEditorComponent,
+    CodeStringEditorComponent,
+    CoordTwoDimEditorComponent,
+    CustomOskLettersEditorComponent,
+    DragAndDropPositiveIntEditorComponent,
+    FilepathEditorComponent,
+    FractionEditorComponent,
+    GraphEditorComponent,
+    HtmlEditorComponent,
+    ImageWithRegionsEditorComponent,
+    ImageWithRegionsResetConfirmationModalComponent,
+    IntEditorComponent,
+    ListOfSetsOfTranslatableHtmlContentIdsEditorComponent,
+    ListOfTabsEditorComponent,
+    ListOfUnicodeStringEditorComponent,
+    LogicErrorCategoryEditorComponent,
+    LogicQuestionEditorComponent,
+    MathEquationEditorComponent,
+    MathExpressionContentEditorComponent,
+    MusicPhraseEditorComponent,
+    NonnegativeIntEditorComponent,
+    NormalizedStringEditorComponent,
+    NumberWithUnitsEditorComponent,
+    NumericExpressionEditorComponent,
+    PositionOfTermsEditorComponent,
+    PositiveIntEditorComponent,
+    RatioExpressionEditorComponent,
+    RealEditorComponent,
+    SanitizedUrlEditorComponent,
+    SetOfAlgebraicIdentifierEditorComponent,
+    SetOfTranslatableHtmlContentIdsEditorComponent,
+    SetOfUnicodeStringEditorComponent,
+    SkillSelectorEditorComponent,
+    SubtitledHtmlEditorComponent,
+    SubtitledUnicodeEditorComponent,
+    SvgFilenameEditorComponent,
+    TranslatableSetOfNormalizedStringEditorComponent,
+    TranslatableSetOfUnicodeStringEditorComponent,
+    UnicodeStringEditorComponent
+  ],
+  exports: [
+    AlgebraicExpressionEditorComponent,
+    BooleanEditorComponent,
+    CodeStringEditorComponent,
+    CoordTwoDimEditorComponent,
+    CustomOskLettersEditorComponent,
+    DragAndDropPositiveIntEditorComponent,
+    FilepathEditorComponent,
+    FractionEditorComponent,
+    GraphEditorComponent,
+    HtmlEditorComponent,
+    ImageWithRegionsEditorComponent,
+    ImageWithRegionsResetConfirmationModalComponent,
+    IntEditorComponent,
+    ListOfSetsOfTranslatableHtmlContentIdsEditorComponent,
+    ListOfTabsEditorComponent,
+    ListOfUnicodeStringEditorComponent,
+    LogicErrorCategoryEditorComponent,
+    LogicQuestionEditorComponent,
+    MathEquationEditorComponent,
+    MathExpressionContentEditorComponent,
+    MusicPhraseEditorComponent,
+    NonnegativeIntEditorComponent,
+    NormalizedStringEditorComponent,
+    NumberWithUnitsEditorComponent,
+    NumericExpressionEditorComponent,
+    PositionOfTermsEditorComponent,
+    PositiveIntEditorComponent,
+    RatioExpressionEditorComponent,
+    RealEditorComponent,
+    SanitizedUrlEditorComponent,
+    SetOfAlgebraicIdentifierEditorComponent,
+    SetOfTranslatableHtmlContentIdsEditorComponent,
+    SetOfUnicodeStringEditorComponent,
+    SkillSelectorEditorComponent,
+    SubtitledHtmlEditorComponent,
+    SubtitledUnicodeEditorComponent,
+    SvgFilenameEditorComponent,
+    TranslatableSetOfNormalizedStringEditorComponent,
+    TranslatableSetOfUnicodeStringEditorComponent,
+    UnicodeStringEditorComponent
+  ],
+})
+
+export class ObjectComponentsModule { }
+</textarea><pre id="annotations" style="display:none">[]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:56 GMT</p>
+    </body>
+  </html>
+  

@@ -1,0 +1,150 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>playthrough-issues-backend-api.service.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/services/playthrough-issues-backend-api.service.ts</td><td class="">84.71%</td><td class="">100%</td><td class="">170</td><td class="">144</td><td class="">26</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2018 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Service for fetching issues and playthroughs from the backend.
+ */
+
+import { downgradeInjectable } from &#x27;@angular/upgrade/static&#x27;;
+import { HttpClient } from &#x27;@angular/common/http&#x27;;
+import { Injectable } from &#x27;@angular/core&#x27;;
+
+export interface FetchIssuesResponseBackendDict {
+  &#x27;unresolved_issues&#x27;: PlaythroughIssueBackendDict[],
+}
+
+import {
+  PlaythroughIssueBackendDict,
+  PlaythroughIssue,
+  PlaythroughIssueObjectFactory
+} from &#x27;domain/statistics/PlaythroughIssueObjectFactory&#x27;;
+import { ServicesConstants } from &#x27;services/services.constants&#x27;;
+import { UrlInterpolationService } from
+  &#x27;domain/utilities/url-interpolation.service&#x27;;
+
+@Injectable({ providedIn: &#x27;root&#x27; })
+export class PlaythroughIssuesBackendApiService {
+  private cachedIssues = null;
+
+  constructor(
+      private httpClient: HttpClient,
+      private playthroughIssueObjectFactory: PlaythroughIssueObjectFactory,
+      private urlInterpolationService: UrlInterpolationService) {}
+
+  async fetchIssuesAsync(
+      explorationId: string,
+      explorationVersion: number): Promise&lt;PlaythroughIssue[]&gt; {
+    if (this.cachedIssues !== null) {
+      return Promise.resolve(this.cachedIssues);
+    }
+
+    return new Promise((resolve, reject) =&gt; {
+      this.httpClient.get&lt;FetchIssuesResponseBackendDict&gt;(
+        this.getFetchIssuesUrl(explorationId), {
+          params: { exp_version: explorationVersion.toString() }}).toPromise()
+        .then(response =&gt; {
+          resolve(this.cachedIssues = response.unresolved_issues.map(
+            this.playthroughIssueObjectFactory.createFromBackendDict));
+        }, errorResponse =&gt; {
+          reject(errorResponse.error.error);
+        });
+    });
+  }
+
+  async fetchPlaythroughAsync(
+      explorationId: string,
+      playthroughId: string): Promise&lt;PlaythroughIssue&gt; {
+    return new Promise((resolve, reject) =&gt; {
+      this.httpClient.get&lt;PlaythroughIssueBackendDict&gt;(
+        this.getFetchPlaythroughUrl(explorationId, playthroughId)).toPromise()
+        .then(response =&gt; {
+          resolve(this.playthroughIssueObjectFactory.createFromBackendDict(
+            response));
+        }, errorResponse =&gt; {
+          reject(errorResponse.error.error);
+        });
+    });
+  }
+
+  async resolveIssueAsync(
+      issueToResolve: PlaythroughIssue,
+      explorationId: string, explorationVersion: number): Promise&lt;void&gt; {
+    return new Promise((resolve, reject) =&gt; {
+      this.httpClient.post(this.getResolveIssueUrl(explorationId), {
+        exp_issue_dict: issueToResolve.toBackendDict(),
+        exp_version: explorationVersion
+      }).toPromise()
+        .then(() =&gt; {
+          if (this.cachedIssues !== null) {
+            const issueIndex = this.cachedIssues.findIndex(
+              issue =&gt; angular.equals(issue, issueToResolve));
+            if (issueIndex !== -1) {
+              this.cachedIssues.splice(issueIndex, 1);
+              resolve();
+            }
+          }
+          reject(
+            &#x27;An issue which was not fetched from the backend &#x27; +
+            &#x27;has been resolved&#x27;);
+        }, errorResponse =&gt; {
+          reject(errorResponse.error.error);
+        });
+    });
+  }
+
+  private getFetchIssuesUrl(explorationId: string): string {
+    return this.urlInterpolationService.interpolateUrl(
+      ServicesConstants.FETCH_ISSUES_URL, {
+        exploration_id: explorationId
+      });
+  }
+
+  private getFetchPlaythroughUrl(
+      explorationId: string, playthroughId: string): string {
+    return this.urlInterpolationService.interpolateUrl(
+      ServicesConstants.FETCH_PLAYTHROUGH_URL, {
+        exploration_id: explorationId,
+        playthrough_id: playthroughId
+      });
+  }
+
+  private getResolveIssueUrl(explorationId: string): string {
+    return this.urlInterpolationService.interpolateUrl(
+      ServicesConstants.RESOLVE_ISSUE_URL, {
+        exploration_id: explorationId
+      });
+  }
+}
+
+angular.module(&#x27;oppia&#x27;).factory(
+  &#x27;PlaythroughIssuesBackendApiService&#x27;,
+  downgradeInjectable(PlaythroughIssuesBackendApiService));
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/services/playthrough-issues-backend-api.service.ts&quot;,&quot;line&quot;:37,&quot;character&quot;:10,&quot;text&quot;:&quot;cachedIssues&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues-backend-api.service.ts&quot;,&quot;line&quot;:47,&quot;character&quot;:13,&quot;text&quot;:&quot;cachedIssues&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues-backend-api.service.ts&quot;,&quot;line&quot;:48,&quot;character&quot;:34,&quot;text&quot;:&quot;cachedIssues&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues-backend-api.service.ts&quot;,&quot;line&quot;:56,&quot;character&quot;:23,&quot;text&quot;:&quot;cachedIssues&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues-backend-api.service.ts&quot;,&quot;line&quot;:58,&quot;character&quot;:11,&quot;text&quot;:&quot;errorResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues-backend-api.service.ts&quot;,&quot;line&quot;:59,&quot;character&quot;:17,&quot;text&quot;:&quot;errorResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues-backend-api.service.ts&quot;,&quot;line&quot;:59,&quot;character&quot;:31,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues-backend-api.service.ts&quot;,&quot;line&quot;:59,&quot;character&quot;:37,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues-backend-api.service.ts&quot;,&quot;line&quot;:73,&quot;character&quot;:11,&quot;text&quot;:&quot;errorResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues-backend-api.service.ts&quot;,&quot;line&quot;:74,&quot;character&quot;:17,&quot;text&quot;:&quot;errorResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues-backend-api.service.ts&quot;,&quot;line&quot;:74,&quot;character&quot;:31,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues-backend-api.service.ts&quot;,&quot;line&quot;:74,&quot;character&quot;:37,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues-backend-api.service.ts&quot;,&quot;line&quot;:88,&quot;character&quot;:19,&quot;text&quot;:&quot;cachedIssues&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues-backend-api.service.ts&quot;,&quot;line&quot;:89,&quot;character&quot;:18,&quot;text&quot;:&quot;issueIndex&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues-backend-api.service.ts&quot;,&quot;line&quot;:89,&quot;character&quot;:36,&quot;text&quot;:&quot;cachedIssues&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues-backend-api.service.ts&quot;,&quot;line&quot;:89,&quot;character&quot;:49,&quot;text&quot;:&quot;findIndex&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues-backend-api.service.ts&quot;,&quot;line&quot;:90,&quot;character&quot;:14,&quot;text&quot;:&quot;issue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues-backend-api.service.ts&quot;,&quot;line&quot;:90,&quot;character&quot;:38,&quot;text&quot;:&quot;issue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues-backend-api.service.ts&quot;,&quot;line&quot;:91,&quot;character&quot;:16,&quot;text&quot;:&quot;issueIndex&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues-backend-api.service.ts&quot;,&quot;line&quot;:92,&quot;character&quot;:19,&quot;text&quot;:&quot;cachedIssues&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues-backend-api.service.ts&quot;,&quot;line&quot;:92,&quot;character&quot;:32,&quot;text&quot;:&quot;splice&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues-backend-api.service.ts&quot;,&quot;line&quot;:92,&quot;character&quot;:39,&quot;text&quot;:&quot;issueIndex&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues-backend-api.service.ts&quot;,&quot;line&quot;:99,&quot;character&quot;:11,&quot;text&quot;:&quot;errorResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues-backend-api.service.ts&quot;,&quot;line&quot;:100,&quot;character&quot;:17,&quot;text&quot;:&quot;errorResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues-backend-api.service.ts&quot;,&quot;line&quot;:100,&quot;character&quot;:31,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/playthrough-issues-backend-api.service.ts&quot;,&quot;line&quot;:100,&quot;character&quot;:37,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:55 GMT</p>
+    </body>
+  </html>
+  

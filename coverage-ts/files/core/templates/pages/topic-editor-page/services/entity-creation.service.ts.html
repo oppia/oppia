@@ -1,0 +1,100 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>entity-creation.service.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/topic-editor-page/services/entity-creation.service.ts</td><td class="">52.83%</td><td class="">100%</td><td class="">53</td><td class="">28</td><td class="">25</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Service to help with creating various entities. This is needed
+ * so that we don&#x27;t have to write redundant code every time we want to create
+ * an entity.
+ */
+
+require(&#x27;base-components/base-content.component.ts&#x27;);
+require(
+  &#x27;components/common-layout-directives/common-elements/&#x27; +
+    &#x27;background-banner.component.ts&#x27;);
+require(
+  &#x27;components/review-material-editor/review-material-editor.directive.ts&#x27;);
+require(
+  &#x27;components/forms/custom-forms-directives/select2-dropdown.directive.ts&#x27;);
+require(&#x27;components/entity-creation-services/skill-creation.service.ts&#x27;);
+require(&#x27;components/rubrics-editor/rubrics-editor.component.ts&#x27;);
+require(
+  &#x27;pages/topics-and-skills-dashboard-page/&#x27; +
+  &#x27;create-new-skill-modal.component.ts&#x27;);
+require(&#x27;pages/topic-editor-page/services/topic-editor-routing.service.ts&#x27;);
+require(&#x27;pages/topic-editor-page/services/topic-editor-state.service.ts&#x27;);
+require(
+  &#x27;pages/topic-editor-page/modal-templates/&#x27; +
+  &#x27;create-new-subtopic-modal.controller.ts&#x27;);
+require(&#x27;services/context.service.ts&#x27;);
+require(&#x27;services/image-local-storage.service.ts&#x27;);
+require(&#x27;pages/topic-editor-page/services/create-new-skill-modal.service&#x27;);
+
+angular.module(&#x27;oppia&#x27;).factory(&#x27;EntityCreationService&#x27;, [
+  &#x27;$uibModal&#x27;, &#x27;CreateNewSkillModalService&#x27;,
+  &#x27;TopicEditorRoutingService&#x27;, &#x27;TopicEditorStateService&#x27;,
+  &#x27;UrlInterpolationService&#x27;,
+  function(
+      $uibModal, CreateNewSkillModalService,
+      TopicEditorRoutingService, TopicEditorStateService,
+      UrlInterpolationService) {
+    var createSubtopic = function(topic) {
+      $uibModal.open({
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          &#x27;/pages/topic-editor-page/modal-templates/&#x27; +
+          &#x27;create-new-subtopic-modal.template.html&#x27;),
+        backdrop: &#x27;static&#x27;,
+        resolve: {
+          topic: () =&gt; topic
+        },
+        controllerAs: &#x27;$ctrl&#x27;,
+        windowClass: &#x27;create-new-subtopic&#x27;,
+        controller: &#x27;CreateNewSubtopicModalController&#x27;
+      }).result.then(function(subtopicId) {
+        TopicEditorRoutingService.navigateToSubtopicEditorWithId(subtopicId);
+      }, function() {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
+      });
+    };
+
+    var createSkill = function() {
+      var topicId = TopicEditorStateService.getTopic().getId();
+      CreateNewSkillModalService.createNewSkill([topicId]);
+    };
+
+    return {
+      createSubtopic: createSubtopic,
+      createSkill: createSkill
+    };
+  }
+]);
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/services/entity-creation.service.ts&quot;,&quot;line&quot;:47,&quot;character&quot;:6,&quot;text&quot;:&quot;$uibModal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/services/entity-creation.service.ts&quot;,&quot;line&quot;:47,&quot;character&quot;:17,&quot;text&quot;:&quot;CreateNewSkillModalService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/services/entity-creation.service.ts&quot;,&quot;line&quot;:48,&quot;character&quot;:6,&quot;text&quot;:&quot;TopicEditorRoutingService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/services/entity-creation.service.ts&quot;,&quot;line&quot;:48,&quot;character&quot;:33,&quot;text&quot;:&quot;TopicEditorStateService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/services/entity-creation.service.ts&quot;,&quot;line&quot;:49,&quot;character&quot;:6,&quot;text&quot;:&quot;UrlInterpolationService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/services/entity-creation.service.ts&quot;,&quot;line&quot;:50,&quot;character&quot;:34,&quot;text&quot;:&quot;topic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/services/entity-creation.service.ts&quot;,&quot;line&quot;:51,&quot;character&quot;:6,&quot;text&quot;:&quot;$uibModal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/services/entity-creation.service.ts&quot;,&quot;line&quot;:51,&quot;character&quot;:16,&quot;text&quot;:&quot;open&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/services/entity-creation.service.ts&quot;,&quot;line&quot;:52,&quot;character&quot;:8,&quot;text&quot;:&quot;templateUrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/services/entity-creation.service.ts&quot;,&quot;line&quot;:52,&quot;character&quot;:21,&quot;text&quot;:&quot;UrlInterpolationService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/services/entity-creation.service.ts&quot;,&quot;line&quot;:52,&quot;character&quot;:45,&quot;text&quot;:&quot;getDirectiveTemplateUrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/services/entity-creation.service.ts&quot;,&quot;line&quot;:57,&quot;character&quot;:23,&quot;text&quot;:&quot;topic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/services/entity-creation.service.ts&quot;,&quot;line&quot;:62,&quot;character&quot;:9,&quot;text&quot;:&quot;result&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/services/entity-creation.service.ts&quot;,&quot;line&quot;:62,&quot;character&quot;:16,&quot;text&quot;:&quot;then&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/services/entity-creation.service.ts&quot;,&quot;line&quot;:62,&quot;character&quot;:30,&quot;text&quot;:&quot;subtopicId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/services/entity-creation.service.ts&quot;,&quot;line&quot;:63,&quot;character&quot;:8,&quot;text&quot;:&quot;TopicEditorRoutingService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/services/entity-creation.service.ts&quot;,&quot;line&quot;:63,&quot;character&quot;:34,&quot;text&quot;:&quot;navigateToSubtopicEditorWithId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/services/entity-creation.service.ts&quot;,&quot;line&quot;:63,&quot;character&quot;:65,&quot;text&quot;:&quot;subtopicId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/services/entity-creation.service.ts&quot;,&quot;line&quot;:72,&quot;character&quot;:10,&quot;text&quot;:&quot;topicId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/services/entity-creation.service.ts&quot;,&quot;line&quot;:72,&quot;character&quot;:20,&quot;text&quot;:&quot;TopicEditorStateService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/services/entity-creation.service.ts&quot;,&quot;line&quot;:72,&quot;character&quot;:44,&quot;text&quot;:&quot;getTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/services/entity-creation.service.ts&quot;,&quot;line&quot;:72,&quot;character&quot;:55,&quot;text&quot;:&quot;getId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/services/entity-creation.service.ts&quot;,&quot;line&quot;:73,&quot;character&quot;:6,&quot;text&quot;:&quot;CreateNewSkillModalService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/services/entity-creation.service.ts&quot;,&quot;line&quot;:73,&quot;character&quot;:33,&quot;text&quot;:&quot;createNewSkill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/services/entity-creation.service.ts&quot;,&quot;line&quot;:73,&quot;character&quot;:49,&quot;text&quot;:&quot;topicId&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:59 GMT</p>
+    </body>
+  </html>
+  

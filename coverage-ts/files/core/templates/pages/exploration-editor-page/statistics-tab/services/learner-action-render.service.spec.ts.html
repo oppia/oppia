@@ -1,0 +1,157 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>learner-action-render.service.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/exploration-editor-page/statistics-tab/services/learner-action-render.service.spec.ts</td><td class="">80.92%</td><td class="">100%</td><td class="">131</td><td class="">106</td><td class="">25</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2018 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for the learner action render service.
+ *
+ * NOTE: To make tests shorter, we skip some elements and simply check
+ * jasmine.any(Object).
+ */
+
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// learner-action-render.service.ts is upgraded to Angular 8.
+import { importAllAngularServices } from &#x27;tests/unit-test-utils&#x27;;
+// ^^^ This block is to be removed.
+
+import { LearnerActionObjectFactory } from
+  &#x27;domain/statistics/LearnerActionObjectFactory&#x27;;
+import { SubtitledUnicode } from
+  &#x27;domain/exploration/SubtitledUnicodeObjectFactory&#x27;;
+import { SubtitledHtml } from
+  &#x27;domain/exploration/subtitled-html.model&#x27;;
+
+require(&#x27;pages/exploration-editor-page/services/exploration-states.service&#x27;);
+require(
+  &#x27;pages/exploration-editor-page/statistics-tab/services/&#x27; +
+  &#x27;learner-action-render.service.ts&#x27;);
+
+describe(&#x27;Learner Action Render Service&#x27;, function() {
+  let explorationStatesService = null;
+  let learnerActionObjectFactory: LearnerActionObjectFactory = null;
+  let learnerActionRenderService = null;
+
+  importAllAngularServices();
+  beforeEach(angular.mock.inject(function($injector) {
+    explorationStatesService = $injector.get(&#x27;ExplorationStatesService&#x27;);
+    learnerActionObjectFactory = $injector.get(&#x27;LearnerActionObjectFactory&#x27;);
+    learnerActionRenderService = $injector.get(&#x27;LearnerActionRenderService&#x27;);
+  }));
+
+  beforeEach(() =&gt; {
+    spyOn(explorationStatesService, &#x27;getState&#x27;)
+      .withArgs(&#x27;stateName1&#x27;).and.returnValue({
+        interaction: {
+          id: &#x27;Continue&#x27;,
+          customizationArgs: {
+            buttonText: {value: new SubtitledUnicode(&#x27;&#x27;, &#x27;&#x27;)}
+          }
+        }
+      })
+      .withArgs(&#x27;stateName2&#x27;).and.returnValue({
+        interaction: {
+          id: &#x27;TextInput&#x27;,
+          customizationArgs: {
+            placeholder: {value: new SubtitledUnicode(&#x27;&#x27;, &#x27;&#x27;)},
+            rows: {value: 1}
+          }
+        }
+      })
+      .withArgs(&#x27;stateName3&#x27;).and.returnValue({
+        interaction: {
+          id: &#x27;MultipleChoiceInput&#x27;,
+          customizationArgs: {
+            choices: {value: [
+              new SubtitledHtml(&#x27;Choice1&#x27;, &#x27;&#x27;),
+              new SubtitledHtml(&#x27;Choice2&#x27;, &#x27;&#x27;),
+              new SubtitledHtml(&#x27;Choice3&#x27;, &#x27;&#x27;)
+            ]},
+            showChoicesInShuffledOrder: {value: true}
+          }
+        }
+      });
+  });
+
+  describe(&#x27;Test learner action render service functions&#x27;, () =&gt; {
+    it(&#x27;should render correct learner actions&#x27;, () =&gt; {
+      let actions = [
+        learnerActionObjectFactory.createNewExplorationStartAction({
+          state_name: {value: &#x27;stateName1&#x27;},
+        }),
+        learnerActionObjectFactory.createNewAnswerSubmitAction({
+          state_name: {value: &#x27;stateName1&#x27;},
+          dest_state_name: {value: &#x27;stateName2&#x27;},
+          interaction_id: {value: &#x27;Continue&#x27;},
+          submitted_answer: {value: &#x27;&#x27;},
+          feedback: {value: &#x27;Welcome&#x27;},
+          time_spent_state_in_msecs: {value: 30000},
+        }),
+        learnerActionObjectFactory.createNewAnswerSubmitAction({
+          state_name: {value: &#x27;stateName2&#x27;},
+          dest_state_name: {value: &#x27;stateName2&#x27;},
+          interaction_id: {value: &#x27;TextInput&#x27;},
+          submitted_answer: {value: &#x27;Hello&#x27;},
+          feedback: {value: &#x27;Try again&#x27;},
+          time_spent_state_in_msecs: {value: 30000},
+        }),
+        learnerActionObjectFactory.createNewExplorationQuitAction({
+          state_name: {value: &#x27;stateName2&#x27;},
+          time_spent_in_state_in_msecs: {value: 120000},
+        }),
+      ];
+
+      let renderedStatements = actions.map(
+        (a, i) =&gt; learnerActionRenderService.renderLearnerAction(a, i + 1));
+
+      expect(renderedStatements[0]).toEqual(
+        &#x27;1. Started exploration at card &quot;stateName1&quot;.&#x27;);
+      expect(renderedStatements[1]).toEqual(
+        &#x27;2. Pressed &quot;Continue&quot; to move to card &quot;stateName2&quot; after 30 seconds.&#x27;);
+      expect(renderedStatements[3]).toEqual(
+        &#x27;4. Left the exploration after spending a total of 120 seconds on &#x27; +
+        &#x27;card &quot;stateName2&quot;.&#x27;);
+    });
+
+    it(&#x27;should render the table for a Multiple Incorrect Submissions issue&#x27;,
+      () =&gt; {
+        // We pass a sample learner actions array just to find out whether
+        // the directive rendered is being initialised with the right values.
+        let learnerActions = [{key: &#x27;value&#x27;}];
+        let tableDirective = (
+          learnerActionRenderService.renderFinalDisplayBlockForMISIssueHTML(
+            learnerActions, 1));
+        expect(tableDirective).toEqual(
+          &#x27;&lt;multiple-incorrect-submissions-issue final-block=&quot;[{&amp;amp;quot;ke&#x27; +
+          &#x27;y&amp;amp;quot;:&amp;amp;quot;value&amp;amp;quot;}]&quot; action-start-index=&quot;1&quot;&gt;&lt;&#x27; +
+          &#x27;/multiple-incorrect-submissions-issue&gt;&#x27;);
+      });
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/services/learner-action-render.service.spec.ts&quot;,&quot;line&quot;:39,&quot;character&quot;:6,&quot;text&quot;:&quot;explorationStatesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/services/learner-action-render.service.spec.ts&quot;,&quot;line&quot;:41,&quot;character&quot;:6,&quot;text&quot;:&quot;learnerActionRenderService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/services/learner-action-render.service.spec.ts&quot;,&quot;line&quot;:44,&quot;character&quot;:42,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/services/learner-action-render.service.spec.ts&quot;,&quot;line&quot;:45,&quot;character&quot;:4,&quot;text&quot;:&quot;explorationStatesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/services/learner-action-render.service.spec.ts&quot;,&quot;line&quot;:45,&quot;character&quot;:31,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/services/learner-action-render.service.spec.ts&quot;,&quot;line&quot;:45,&quot;character&quot;:41,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/services/learner-action-render.service.spec.ts&quot;,&quot;line&quot;:46,&quot;character&quot;:33,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/services/learner-action-render.service.spec.ts&quot;,&quot;line&quot;:46,&quot;character&quot;:43,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/services/learner-action-render.service.spec.ts&quot;,&quot;line&quot;:47,&quot;character&quot;:4,&quot;text&quot;:&quot;learnerActionRenderService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/services/learner-action-render.service.spec.ts&quot;,&quot;line&quot;:47,&quot;character&quot;:33,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/services/learner-action-render.service.spec.ts&quot;,&quot;line&quot;:47,&quot;character&quot;:43,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/services/learner-action-render.service.spec.ts&quot;,&quot;line&quot;:51,&quot;character&quot;:10,&quot;text&quot;:&quot;explorationStatesService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/services/learner-action-render.service.spec.ts&quot;,&quot;line&quot;:52,&quot;character&quot;:30,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/services/learner-action-render.service.spec.ts&quot;,&quot;line&quot;:60,&quot;character&quot;:30,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/services/learner-action-render.service.spec.ts&quot;,&quot;line&quot;:69,&quot;character&quot;:30,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/services/learner-action-render.service.spec.ts&quot;,&quot;line&quot;:112,&quot;character&quot;:10,&quot;text&quot;:&quot;renderedStatements&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/services/learner-action-render.service.spec.ts&quot;,&quot;line&quot;:113,&quot;character&quot;:18,&quot;text&quot;:&quot;learnerActionRenderService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/services/learner-action-render.service.spec.ts&quot;,&quot;line&quot;:113,&quot;character&quot;:45,&quot;text&quot;:&quot;renderLearnerAction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/services/learner-action-render.service.spec.ts&quot;,&quot;line&quot;:115,&quot;character&quot;:13,&quot;text&quot;:&quot;renderedStatements&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/services/learner-action-render.service.spec.ts&quot;,&quot;line&quot;:117,&quot;character&quot;:13,&quot;text&quot;:&quot;renderedStatements&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/services/learner-action-render.service.spec.ts&quot;,&quot;line&quot;:119,&quot;character&quot;:13,&quot;text&quot;:&quot;renderedStatements&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/services/learner-action-render.service.spec.ts&quot;,&quot;line&quot;:129,&quot;character&quot;:12,&quot;text&quot;:&quot;tableDirective&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/services/learner-action-render.service.spec.ts&quot;,&quot;line&quot;:130,&quot;character&quot;:10,&quot;text&quot;:&quot;learnerActionRenderService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/services/learner-action-render.service.spec.ts&quot;,&quot;line&quot;:130,&quot;character&quot;:37,&quot;text&quot;:&quot;renderFinalDisplayBlockForMISIssueHTML&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/statistics-tab/services/learner-action-render.service.spec.ts&quot;,&quot;line&quot;:132,&quot;character&quot;:15,&quot;text&quot;:&quot;tableDirective&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:59 GMT</p>
+    </body>
+  </html>
+  

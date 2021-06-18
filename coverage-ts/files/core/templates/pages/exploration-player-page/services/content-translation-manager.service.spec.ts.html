@@ -1,0 +1,562 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>content-translation-manager.service.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">core/templates/pages/exploration-player-page/services/content-translation-manager.service.spec.ts</td><td class="">100.00%</td><td class="">100%</td><td class="">600</td><td class="">600</td><td class="">0</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for the content translation manager service.
+ */
+
+import { TestBed } from &#x27;@angular/core/testing&#x27;;
+
+import { InteractionObjectFactory } from
+  &#x27;domain/exploration/InteractionObjectFactory&#x27;;
+import { RecordedVoiceovers } from
+  &#x27;domain/exploration/recorded-voiceovers.model&#x27;;
+import { SubtitledHtml } from &#x27;domain/exploration/subtitled-html.model&#x27;;
+import { SubtitledUnicodeObjectFactory } from
+  &#x27;domain/exploration/SubtitledUnicodeObjectFactory&#x27;;
+import { WrittenTranslations, WrittenTranslationsObjectFactory } from
+  &#x27;domain/exploration/WrittenTranslationsObjectFactory&#x27;;
+import { StateCardObjectFactory } from
+  &#x27;domain/state_card/StateCardObjectFactory&#x27;;
+import { ContentTranslationManagerService } from
+  &#x27;pages/exploration-player-page/services/content-translation-manager.service&#x27;;
+import { PlayerTranscriptService } from
+  &#x27;pages/exploration-player-page/services/player-transcript.service&#x27;;
+import INTERACTION_SPECS from &#x27;pages/interaction-specs.constants.ajs&#x27;;
+import { ExplorationHtmlFormatterService } from
+  &#x27;services/exploration-html-formatter.service&#x27;;
+
+describe(&#x27;Content translation manager service&#x27;, () =&gt; {
+  let ctms: ContentTranslationManagerService;
+  let ehfs: ExplorationHtmlFormatterService;
+  let iof: InteractionObjectFactory;
+  let pts: PlayerTranscriptService;
+  let scof: StateCardObjectFactory;
+  let suof: SubtitledUnicodeObjectFactory;
+  let wtof: WrittenTranslationsObjectFactory;
+
+  let writtenTranslations: WrittenTranslations;
+
+  beforeEach(() =&gt; {
+    ctms = TestBed.get(ContentTranslationManagerService);
+    ehfs = TestBed.get(ExplorationHtmlFormatterService);
+    iof = TestBed.get(InteractionObjectFactory);
+    pts = TestBed.get(PlayerTranscriptService);
+    scof = TestBed.get(StateCardObjectFactory);
+    suof = TestBed.get(SubtitledUnicodeObjectFactory);
+    wtof = TestBed.get(WrittenTranslationsObjectFactory);
+
+    let defaultOutcomeDict = {
+      dest: &#x27;dest_default&#x27;,
+      feedback: {
+        content_id: &#x27;default_outcome&#x27;,
+        html: &#x27;&lt;p&gt;en default outcome&lt;/p&gt;&#x27;
+      },
+      labelled_as_correct: false,
+      param_changes: [],
+      refresher_exploration_id: null,
+      missing_prerequisite_skill_id: null
+    };
+    let answerGroupsDict = [{
+      rule_specs: [{
+        inputs: {
+          x: {
+            contentId: &#x27;rule_input_3&#x27;,
+            normalizedStrSet: [&#x27;InputString&#x27;]
+          }
+        },
+        rule_type: &#x27;Equals&#x27;
+      }],
+      outcome: {
+        dest: &#x27;dest_1&#x27;,
+        feedback: {
+          content_id: &#x27;outcome_1&#x27;,
+          html: &#x27;&lt;p&gt;en feedback&lt;/p&gt;&#x27;
+        },
+        labelled_as_correct: false,
+        param_changes: [],
+        refresher_exploration_id: null,
+        missing_prerequisite_skill_id: null
+      },
+      training_data: [&#x27;training_data&#x27;],
+      tagged_skill_misconception_id: &#x27;skill_id-1&#x27;
+    }];
+    let hintsDict = [
+      {
+        hint_content: {
+          html: &#x27;&lt;p&gt;en hint&lt;/p&gt;&#x27;,
+          content_id: &#x27;hint_0&#x27;
+        }
+      }
+    ];
+
+    let solutionDict = {
+      answer_is_exclusive: false,
+      correct_answer: &#x27;This is a correct answer!&#x27;,
+      explanation: {
+        content_id: &#x27;solution&#x27;,
+        html: &#x27;&lt;p&gt;en solution&lt;/p&gt;&#x27;
+      }
+    };
+
+    let interactionDict = {
+      answer_groups: answerGroupsDict,
+      confirmed_unclassified_answers: [],
+      customization_args: {
+        placeholder: {
+          value: {
+            content_id: &#x27;ca_placeholder_0&#x27;,
+            unicode_str: &#x27;en placeholder&#x27;
+          }
+        },
+        rows: { value: 1 }
+      },
+      default_outcome: defaultOutcomeDict,
+      hints: hintsDict,
+      id: &#x27;TextInput&#x27;,
+      solution: solutionDict
+    };
+
+    writtenTranslations = wtof.createFromBackendDict({
+      translations_mapping: {
+        content: {
+          fr: {
+            data_format: &#x27;html&#x27;,
+            translation: &#x27;&lt;p&gt;fr content&lt;/p&gt;&#x27;,
+            needs_update: false
+          }
+        },
+        hint_0: {
+          fr: {
+            data_format: &#x27;html&#x27;,
+            translation: &#x27;&lt;p&gt;fr hint&lt;/p&gt;&#x27;,
+            needs_update: false
+          }
+        },
+        solution: {
+          fr: {
+            data_format: &#x27;html&#x27;,
+            translation: &#x27;&lt;p&gt;fr solution&lt;/p&gt;&#x27;,
+            needs_update: false
+          }
+        },
+        ca_placeholder_0: {
+          fr: {
+            data_format: &#x27;html&#x27;,
+            translation: &#x27;fr placeholder&#x27;,
+            needs_update: false
+          }
+        },
+        outcome_1: {
+          fr: {
+            data_format: &#x27;html&#x27;,
+            translation: &#x27;&lt;p&gt;fr feedback&lt;/p&gt;&#x27;,
+            needs_update: false
+          }
+        },
+        default_outcome: {
+          fr: {
+            data_format: &#x27;html&#x27;,
+            translation: &#x27;&lt;p&gt;fr default outcome&lt;/p&gt;&#x27;,
+            needs_update: false
+          }
+        },
+        rule_input_3: {
+          fr: {
+            data_format: &#x27;set_of_normalized_string&#x27;,
+            translation: [&#x27;fr rule input 1&#x27;, &#x27;fr rule input 2&#x27;],
+            needs_update: false
+          }
+        }
+      }
+    });
+
+    const interaction = iof.createFromBackendDict(interactionDict);
+
+    pts.addNewCard(
+      scof.createNewCard(
+        &#x27;State 1&#x27;,
+        &#x27;&lt;p&gt;en content&lt;/p&gt;&#x27;,
+        ehfs.getInteractionHtml(
+          interaction.id, interaction.customizationArgs, true, null, null),
+        interaction,
+        RecordedVoiceovers.createEmpty(),
+        writtenTranslations,
+        &#x27;content&#x27;
+      )
+    );
+  });
+
+  it(&#x27;should switch to a new language&#x27;, () =&gt; {
+    ctms.init(&#x27;en&#x27;);
+    ctms.displayTranslations(&#x27;fr&#x27;);
+
+    const card = pts.transcript[0];
+    const interaction = card.getInteraction();
+    const translatedCustomizationArgs = {
+      placeholder: {
+        value: suof.createFromBackendDict({
+          unicode_str: &#x27;fr placeholder&#x27;,
+          content_id: &#x27;ca_placeholder_0&#x27;
+        })
+      },
+      rows: {value: 1}
+    };
+
+    expect(card.contentHtml).toBe(&#x27;&lt;p&gt;fr content&lt;/p&gt;&#x27;);
+    expect(interaction.hints[0].hintContent.html).toBe(&#x27;&lt;p&gt;fr hint&lt;/p&gt;&#x27;);
+    expect(interaction.solution.explanation.html).toBe(&#x27;&lt;p&gt;fr solution&lt;/p&gt;&#x27;);
+    expect(interaction.customizationArgs).toEqual(translatedCustomizationArgs);
+    expect(interaction.answerGroups[0].outcome.feedback.html).toBe(
+      &#x27;&lt;p&gt;fr feedback&lt;/p&gt;&#x27;);
+    expect(interaction.answerGroups[0].rules[0].inputs.x).toEqual({
+      contentId: &#x27;rule_input_3&#x27;,
+      normalizedStrSet: [&#x27;fr rule input 1&#x27;, &#x27;fr rule input 2&#x27;]
+    });
+    expect(interaction.defaultOutcome.feedback.html).toBe(
+      &#x27;&lt;p&gt;fr default outcome&lt;/p&gt;&#x27;);
+  });
+
+  it(&#x27;should switch to a new language expect invalid translations&#x27;, () =&gt; {
+    ctms.init(&#x27;en&#x27;);
+
+    const card = pts.transcript[0];
+    const interaction = card.getInteraction();
+    const translatedCustomizationArgs = {
+      placeholder: {
+        value: suof.createFromBackendDict({
+          unicode_str: &#x27;fr placeholder&#x27;,
+          content_id: &#x27;ca_placeholder_0&#x27;
+        })
+      },
+      rows: {value: 1}
+    };
+
+    writtenTranslations.toggleNeedsUpdateAttribute(&#x27;hint_0&#x27;, &#x27;fr&#x27;);
+    ctms.displayTranslations(&#x27;fr&#x27;);
+
+    expect(card.contentHtml).toBe(&#x27;&lt;p&gt;fr content&lt;/p&gt;&#x27;);
+    expect(interaction.hints[0].hintContent.html).toBe(&#x27;&lt;p&gt;en hint&lt;/p&gt;&#x27;);
+    expect(interaction.solution.explanation.html).toBe(&#x27;&lt;p&gt;fr solution&lt;/p&gt;&#x27;);
+    expect(interaction.customizationArgs).toEqual(translatedCustomizationArgs);
+    expect(interaction.answerGroups[0].outcome.feedback.html).toBe(
+      &#x27;&lt;p&gt;fr feedback&lt;/p&gt;&#x27;);
+    expect(interaction.answerGroups[0].rules[0].inputs.x).toEqual({
+      contentId: &#x27;rule_input_3&#x27;,
+      normalizedStrSet: [&#x27;fr rule input 1&#x27;, &#x27;fr rule input 2&#x27;]
+    });
+    expect(interaction.defaultOutcome.feedback.html).toBe(
+      &#x27;&lt;p&gt;fr default outcome&lt;/p&gt;&#x27;);
+  });
+
+  it(&#x27;should switch back to the original language&#x27;, () =&gt; {
+    ctms.init(&#x27;en&#x27;);
+    ctms.displayTranslations(&#x27;fr&#x27;);
+    ctms.displayTranslations(&#x27;en&#x27;);
+
+    const card = pts.transcript[0];
+    const interaction = card.getInteraction();
+    const originalCustomizationArgs = {
+      placeholder: {
+        value: suof.createFromBackendDict({
+          unicode_str: &#x27;en placeholder&#x27;,
+          content_id: &#x27;ca_placeholder_0&#x27;
+        })
+      },
+      rows: {value: 1}
+    };
+
+    expect(card.contentHtml).toBe(&#x27;&lt;p&gt;en content&lt;/p&gt;&#x27;);
+    expect(interaction.hints[0].hintContent.html).toBe(&#x27;&lt;p&gt;en hint&lt;/p&gt;&#x27;);
+    expect(interaction.solution.explanation.html).toBe(&#x27;&lt;p&gt;en solution&lt;/p&gt;&#x27;);
+    expect(interaction.customizationArgs).toEqual(originalCustomizationArgs);
+    expect(interaction.answerGroups[0].outcome.feedback.html).toBe(
+      &#x27;&lt;p&gt;en feedback&lt;/p&gt;&#x27;);
+    expect(interaction.answerGroups[0].rules[0].inputs.x).toEqual({
+      contentId: &#x27;rule_input_3&#x27;,
+      normalizedStrSet: [&#x27;InputString&#x27;]
+    });
+    expect(interaction.defaultOutcome.feedback.html).toBe(
+      &#x27;&lt;p&gt;en default outcome&lt;/p&gt;&#x27;);
+  });
+
+  it(&#x27;should emit to onStateCardContentUpdateEmitter when the &#x27; +
+     &#x27;language is changed&#x27;, () =&gt; {
+    const onStateCardContentUpdate = spyOn(
+      ctms.onStateCardContentUpdate, &#x27;emit&#x27;);
+    ctms.init(&#x27;en&#x27;);
+    ctms.displayTranslations(&#x27;fr&#x27;);
+    expect(onStateCardContentUpdate).toHaveBeenCalled();
+  });
+
+  it(&#x27;should return default content HTML if translation is invalid&#x27;, () =&gt; {
+    let writtenTranslations = wtof.createFromBackendDict({
+      translations_mapping: {
+        content: {
+          fr: {
+            data_format: &#x27;html&#x27;,
+            translation: &#x27;&lt;p&gt;fr content&lt;/p&gt;&#x27;,
+            needs_update: true
+          }
+        }
+      }
+    });
+    let content = new SubtitledHtml(&#x27;&lt;p&gt;en content&lt;/p&gt;&#x27;, &#x27;content&#x27;);
+    let translatedHtml = ctms.getTranslatedHtml(
+      writtenTranslations, &#x27;fr&#x27;, content);
+    expect(translatedHtml).toEqual(&#x27;&lt;p&gt;en content&lt;/p&gt;&#x27;);
+  });
+
+  it(&#x27;should return default content HTML if translation is nonexistent&#x27;, () =&gt; {
+    let writtenTranslations = wtof.createFromBackendDict({
+      translations_mapping: {
+        content: {
+          fr: {
+            data_format: &#x27;html&#x27;,
+            translation: &#x27;&lt;p&gt;fr content&lt;/p&gt;&#x27;,
+            needs_update: true
+          }
+        }
+      }
+    });
+    let content = new SubtitledHtml(&#x27;&lt;p&gt;en content&lt;/p&gt;&#x27;, &#x27;content&#x27;);
+    let translatedHtml = ctms.getTranslatedHtml(
+      writtenTranslations, &#x27;pt&#x27;, content);
+    expect(translatedHtml).toEqual(&#x27;&lt;p&gt;en content&lt;/p&gt;&#x27;);
+  });
+
+  it(&#x27;should return valid translated content HTML&#x27;, () =&gt; {
+    let writtenTranslations = wtof.createFromBackendDict({
+      translations_mapping: {
+        content: {
+          fr: {
+            data_format: &#x27;html&#x27;,
+            translation: &#x27;&lt;p&gt;fr content&lt;/p&gt;&#x27;,
+            needs_update: false
+          }
+        }
+      }
+    });
+    let content = new SubtitledHtml(&#x27;&lt;p&gt;en content&lt;/p&gt;&#x27;, &#x27;content&#x27;);
+    let translatedHtml = ctms.getTranslatedHtml(
+      writtenTranslations, &#x27;fr&#x27;, content);
+    expect(translatedHtml).toEqual(&#x27;&lt;p&gt;fr content&lt;/p&gt;&#x27;);
+  });
+
+  it(&#x27;should not switch rules if the replacement is empty&#x27;, () =&gt; {
+    // This simulates the invalid case where the &quot;fr&quot; translation for the rule
+    // input is an empty list.
+    let newWrittenTranslations = wtof.createFromBackendDict({
+      translations_mapping: {
+        content: {
+          fr: {
+            data_format: &#x27;html&#x27;,
+            translation: &#x27;&lt;p&gt;fr content&lt;/p&gt;&#x27;,
+            needs_update: false
+          }
+        },
+        ca_placeholder_0: {
+          fr: {
+            data_format: &#x27;html&#x27;,
+            translation: &#x27;fr placeholder&#x27;,
+            needs_update: false
+          }
+        },
+        outcome_1: {
+          fr: {
+            data_format: &#x27;html&#x27;,
+            translation: &#x27;&lt;p&gt;fr feedback&lt;/p&gt;&#x27;,
+            needs_update: false
+          }
+        },
+        rule_input_3: {
+          fr: {
+            data_format: &#x27;set_of_normalized_string&#x27;,
+            translation: [],
+            needs_update: false
+          }
+        }
+      }
+    });
+
+    let newInteractionDict = {
+      answer_groups: [{
+        rule_specs: [{
+          inputs: {
+            x: {
+              contentId: &#x27;rule_input_3&#x27;,
+              normalizedStrSet: [&#x27;InputString&#x27;]
+            }
+          },
+          rule_type: &#x27;Equals&#x27;
+        }],
+        outcome: {
+          dest: &#x27;dest_1&#x27;,
+          feedback: {
+            content_id: &#x27;outcome_1&#x27;,
+            html: &#x27;&lt;p&gt;en feedback&lt;/p&gt;&#x27;
+          },
+          labelled_as_correct: false,
+          param_changes: [],
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null
+        },
+        training_data: [],
+        tagged_skill_misconception_id: null
+      }],
+      confirmed_unclassified_answers: [],
+      customization_args: {
+        placeholder: {
+          value: {
+            content_id: &#x27;ca_placeholder_0&#x27;,
+            unicode_str: &#x27;en placeholder&#x27;
+          }
+        },
+        rows: { value: 1 }
+      },
+      default_outcome: null,
+      hints: [],
+      id: &#x27;TextInput&#x27;,
+      solution: null
+    };
+
+    pts.init();
+    const newInteraction = iof.createFromBackendDict(newInteractionDict);
+    pts.addNewCard(
+      scof.createNewCard(
+        &#x27;State 1&#x27;,
+        &#x27;&lt;p&gt;en content&lt;/p&gt;&#x27;,
+        ehfs.getInteractionHtml(
+          newInteraction.id, newInteraction.customizationArgs, true, null,
+          null),
+        newInteraction,
+        RecordedVoiceovers.createEmpty(),
+        newWrittenTranslations,
+        &#x27;content&#x27;
+      )
+    );
+
+    ctms.init(&#x27;en&#x27;);
+    ctms.displayTranslations(&#x27;fr&#x27;);
+    expect(newInteraction.answerGroups[0].rules[0].inputs.x).toEqual({
+      contentId: &#x27;rule_input_3&#x27;,
+      normalizedStrSet: [&#x27;InputString&#x27;]
+    });
+  });
+
+  describe(&#x27;with custom INTERACTION_SPECS cases&#x27;, () =&gt; {
+    beforeAll(() =&gt; {
+      // This throws a error. We need to suppress this error because
+      // &quot;Property &#x27;DummyInteraction&#x27; does not exist on type&quot;.
+      // @ts-expect-error
+      INTERACTION_SPECS.DummyInteraction = {
+        customization_arg_specs: [{
+          name: &#x27;dummyCustArg&#x27;,
+          schema: {
+            type: &#x27;list&#x27;,
+            items: {
+              type: &#x27;dict&#x27;,
+              properties: [{
+                name: &#x27;content&#x27;,
+                schema: {
+                  type: &#x27;custom&#x27;,
+                  obj_type: &#x27;SubtitledUnicode&#x27;
+                }
+              }, {
+                name: &#x27;show&#x27;,
+                schema: {
+                  type: &#x27;boolean&#x27;
+                }
+              }]
+            }
+          }
+        }]
+      };
+    });
+
+    afterAll(() =&gt; {
+      // This throws a error. We need to suppress this error because
+      // &quot;Property &#x27;DummyInteraction&#x27; does not exist on type&quot;.
+      // @ts-expect-error
+      delete INTERACTION_SPECS.DummyInteraction;
+    });
+
+    it(&#x27;should replace translatable customization args&#x27;, () =&gt; {
+      const card = pts.transcript[0];
+      const interaction = card.getInteraction();
+
+      writtenTranslations.addContentId(&#x27;ca_0&#x27;);
+      writtenTranslations.addWrittenTranslation(
+        &#x27;ca_0&#x27;, &#x27;fr&#x27;, &#x27;unicode&#x27;, &#x27;fr 1&#x27;);
+      writtenTranslations.addContentId(&#x27;ca_1&#x27;);
+      writtenTranslations.addWrittenTranslation(
+        &#x27;ca_1&#x27;, &#x27;fr&#x27;, &#x27;unicode&#x27;, &#x27;fr 2&#x27;);
+
+      interaction.id = &#x27;DummyInteraction&#x27;;
+      interaction.customizationArgs = {
+        dummyCustArg: {value: [{
+          content: suof.createFromBackendDict({
+            unicode_str: &#x27;first&#x27;,
+            content_id: &#x27;ca_0&#x27;
+          }),
+          show: true
+        },
+        {
+          content: suof.createFromBackendDict({
+            unicode_str: &#x27;first&#x27;,
+            content_id: &#x27;ca_1&#x27;
+          }),
+          show: true
+        }]}
+      };
+
+      ctms.init(&#x27;en&#x27;);
+      ctms.displayTranslations(&#x27;fr&#x27;);
+      expect(interaction.customizationArgs).toEqual({
+        dummyCustArg: {value: [{
+          content: suof.createFromBackendDict({
+            unicode_str: &#x27;fr 1&#x27;,
+            content_id: &#x27;ca_0&#x27;
+          }),
+          show: true
+        },
+        {
+          content: suof.createFromBackendDict({
+            unicode_str: &#x27;fr 2&#x27;,
+            content_id: &#x27;ca_1&#x27;
+          }),
+          show: true
+        }]}
+      });
+    });
+  });
+});
+</textarea><pre id="annotations" style="display:none">[]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:59 GMT</p>
+    </body>
+  </html>
+  

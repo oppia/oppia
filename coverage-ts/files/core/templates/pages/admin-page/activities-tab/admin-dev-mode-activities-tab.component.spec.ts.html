@@ -1,0 +1,477 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>admin-dev-mode-activities-tab.component.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/admin-page/activities-tab/admin-dev-mode-activities-tab.component.spec.ts</td><td class="">99.85%</td><td class="">100%</td><td class="">671</td><td class="">670</td><td class="">1</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2021 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for the admin dev mode activities tab component.
+ */
+
+import { HttpClientTestingModule } from &#x27;@angular/common/http/testing&#x27;;
+import { async, ComponentFixture, TestBed } from &#x27;@angular/core/testing&#x27;;
+import { FormsModule } from &#x27;@angular/forms&#x27;;
+import { MaterialModule } from &#x27;components/material.module&#x27;;
+
+import { AdminBackendApiService, AdminPageData } from &#x27;domain/admin/admin-backend-api.service&#x27;;
+import { WindowRef } from &#x27;services/contextual/window-ref.service&#x27;;
+import { AdminDataService } from &#x27;../services/admin-data.service&#x27;;
+import { AdminTaskManagerService } from &#x27;../services/admin-task-manager.service&#x27;;
+import { AdminDevModeActivitiesTabComponent } from &#x27;./admin-dev-mode-activities-tab.component&#x27;;
+
+describe(&#x27;Admin dev mode activities tab&#x27;, () =&gt; {
+  let component: AdminDevModeActivitiesTabComponent;
+  let fixture: ComponentFixture&lt;AdminDevModeActivitiesTabComponent&gt;;
+  let adminBackendApiService: AdminBackendApiService;
+  let adminDataService: AdminDataService;
+  let adminTaskManagerService: AdminTaskManagerService;
+  let windowRef: WindowRef;
+  let adminDataObject = {
+    demoExplorationIds: [&#x27;expId&#x27;],
+    demoExplorations: [
+      [
+        &#x27;0&#x27;,
+        &#x27;welcome.yaml&#x27;
+      ]
+    ],
+    demoCollections: [
+      [&#x27;collectionId&#x27;]
+    ],
+  } as AdminPageData;
+  let mockConfirmResult: (val: boolean) =&gt; void;
+
+  beforeEach(async(() =&gt; {
+    TestBed.configureTestingModule({
+      imports: [
+        MaterialModule,
+        FormsModule,
+        HttpClientTestingModule
+      ],
+      declarations: [
+        AdminDevModeActivitiesTabComponent
+      ]
+    }).compileComponents();
+  }));
+
+  beforeEach(async(() =&gt; {
+    fixture = TestBed.createComponent(AdminDevModeActivitiesTabComponent);
+    component = fixture.componentInstance;
+    adminBackendApiService = TestBed.get(AdminBackendApiService);
+    adminDataService = TestBed.get(AdminDataService);
+    adminTaskManagerService = TestBed.get(AdminTaskManagerService);
+    windowRef = TestBed.get(WindowRef);
+
+    spyOn(adminDataService, &#x27;getDataAsync&#x27;).and.resolveTo(adminDataObject);
+
+    let confirmResult = true;
+    spyOnProperty(windowRef, &#x27;nativeWindow&#x27;).and.returnValue({
+      confirm: () =&gt; confirmResult
+    });
+
+    mockConfirmResult = (val) =&gt; {
+      confirmResult = val;
+    };
+
+    fixture.detectChanges();
+    component.ngOnInit();
+  }));
+
+  it(&#x27;should create&#x27;, () =&gt; {
+    expect(component).toBeDefined();
+  });
+
+  it(&#x27;should initialize data correctly&#x27;, () =&gt; {
+    expect(component.reloadingAllExplorationPossible).toEqual(true);
+    expect(component.demoExplorationIds).toEqual([&#x27;expId&#x27;]);
+    expect(component.DEMO_COLLECTIONS).toEqual([[&#x27;collectionId&#x27;]]);
+    expect(component.DEMO_EXPLORATIONS).toEqual([[&#x27;0&#x27;, &#x27;welcome.yaml&#x27;]]);
+  });
+
+  describe(&#x27;.reloadExploration&#x27;, () =&gt; {
+    it(&#x27;should not reload a specific exploration if task is running&#x27;, () =&gt; {
+      let adminBackendSpy = spyOn(
+        adminBackendApiService, &#x27;reloadExplorationAsync&#x27;);
+      spyOn(
+        adminTaskManagerService, &#x27;isTaskRunning&#x27;).and.returnValue(true);
+      expect(component.reloadExploration(&#x27;expId&#x27;)).toBeUndefined();
+      expect(adminBackendSpy).not.toHaveBeenCalled();
+    });
+
+    it(&#x27;should not procees if user doesn\&#x27;t confirm&#x27;, () =&gt; {
+      mockConfirmResult(false);
+
+      let adminBackendSpy = spyOn(
+        adminBackendApiService, &#x27;reloadExplorationAsync&#x27;);
+
+      expect(component.reloadExploration(&#x27;expId&#x27;)).toBeUndefined();
+      expect(adminBackendSpy).not.toHaveBeenCalled();
+    });
+
+    it(&#x27;should load explorations&#x27;, async(() =&gt; {
+      const expId = component.demoExplorationIds[0];
+
+      spyOn(adminBackendApiService, &#x27;reloadExplorationAsync&#x27;)
+        .and.returnValue(Promise.resolve());
+      spyOn(adminTaskManagerService, &#x27;isTaskRunning&#x27;).and.returnValue(false);
+      spyOn(component.setStatusMessage, &#x27;emit&#x27;);
+
+      mockConfirmResult(true);
+      component.reloadExploration(expId);
+
+      expect(component.setStatusMessage.emit)
+        .toHaveBeenCalledWith(&#x27;Processing...&#x27;);
+
+      fixture.whenStable().then(() =&gt; {
+        expect(component.setStatusMessage.emit)
+          .toHaveBeenCalledWith(&#x27;Data reloaded successfully.&#x27;);
+      });
+    }));
+
+    it(&#x27;should not load explorations with wrong exploration ID&#x27;, async(() =&gt; {
+      const expId = &#x27;wrong-exp-id&#x27;;
+
+      spyOn(adminBackendApiService, &#x27;reloadExplorationAsync&#x27;)
+        .and.returnValue(Promise.reject(&#x27;Exploration not found.&#x27;));
+      spyOn(adminTaskManagerService, &#x27;isTaskRunning&#x27;).and.returnValue(false);
+      spyOn(component.setStatusMessage, &#x27;emit&#x27;);
+
+      mockConfirmResult(true);
+      component.reloadExploration(expId);
+
+      expect(component.setStatusMessage.emit)
+        .toHaveBeenCalledWith(&#x27;Processing...&#x27;);
+
+      fixture.whenStable().then(() =&gt; {
+        expect(component.setStatusMessage.emit)
+          .toHaveBeenCalledWith(&#x27;Server error: Exploration not found.&#x27;);
+      });
+    }));
+  });
+
+  describe(&#x27;.printResult&#x27;, () =&gt; {
+    it(&#x27;should print correct message when numTried&#x27; +
+      &#x27;is less the number of exploration&#x27;, () =&gt; {
+      const numSucceeded = 0;
+      const numFailed = 0;
+      const numTried = 0;
+
+      spyOn(component.setStatusMessage, &#x27;emit&#x27;);
+
+      component.printResult(numSucceeded, numFailed, numTried);
+
+      expect(component.setStatusMessage.emit)
+        .toHaveBeenCalledWith(&#x27;Processing...0/1&#x27;);
+    });
+
+    it(&#x27;should print correct message when numTried&#x27; +
+      &#x27;is not less than the number of exploration&#x27;, () =&gt; {
+      const numSucceeded = 1;
+      const numFailed = 0;
+      const numTried = 1;
+
+      spyOn(component.setStatusMessage, &#x27;emit&#x27;);
+
+      component.printResult(numSucceeded, numFailed, numTried);
+
+      expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+        &#x27;Reloaded 1 explorations: 1 succeeded, 0 failed.&#x27;);
+    });
+  });
+
+  describe(&#x27;.reloadAllExplorations&#x27;, () =&gt; {
+    it(&#x27;should not reload all exploration if&#x27; +
+      &#x27;reloading all exploration is not possible&#x27;, () =&gt; {
+      component.reloadingAllExplorationPossible = false;
+      let adminBackendSpy = spyOn(
+        adminBackendApiService, &#x27;reloadExplorationAsync&#x27;);
+
+      component.reloadAllExplorations();
+
+      expect(adminBackendSpy).not.toHaveBeenCalled();
+      expect(component.reloadAllExplorations()).toBeUndefined();
+    });
+
+    it(&#x27;should not reload all exploration if any task is running&#x27;, () =&gt; {
+      let adminBackendSpy = spyOn(
+        adminBackendApiService, &#x27;reloadExplorationAsync&#x27;);
+      spyOn(adminTaskManagerService, &#x27;isTaskRunning&#x27;).and.returnValue(true);
+
+      component.reloadAllExplorations();
+
+      expect(component.reloadAllExplorations()).toBeUndefined();
+      expect(adminBackendSpy).not.toHaveBeenCalled();
+    });
+
+    it(&#x27;should not reload all exploration without user\&#x27;s confirmation&#x27;, () =&gt; {
+      let adminBackendSpy = spyOn(
+        adminBackendApiService, &#x27;reloadExplorationAsync&#x27;);
+      spyOn(adminTaskManagerService, &#x27;isTaskRunning&#x27;).and.returnValue(false);
+
+      component.reloadingAllExplorationPossible = true;
+      mockConfirmResult(false);
+
+      component.reloadAllExplorations();
+
+      expect(component.reloadAllExplorations()).toBeUndefined();
+      expect(adminBackendSpy).not.toHaveBeenCalled();
+    });
+
+    it(&#x27;should reload all explorations&#x27;, async(() =&gt; {
+      const demoExplorationIds = [&#x27;expId&#x27;];
+      component.demoExplorationIds = demoExplorationIds;
+      component.reloadingAllExplorationPossible = true;
+
+      spyOn(adminBackendApiService, &#x27;reloadExplorationAsync&#x27;)
+        .and.returnValue(Promise.resolve());
+      spyOn(adminTaskManagerService, &#x27;isTaskRunning&#x27;).and.returnValue(false);
+      spyOn(component.setStatusMessage, &#x27;emit&#x27;);
+
+      mockConfirmResult(true);
+      component.reloadAllExplorations();
+
+      expect(component.setStatusMessage.emit)
+        .toHaveBeenCalledWith(&#x27;Processing...&#x27;);
+
+      fixture.whenStable().then(() =&gt; {
+        expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+          &#x27;Reloaded 1 explorations: 1 succeeded, 0 failed.&#x27;);
+      });
+    }));
+
+    it(&#x27;should not reload all exploration if exploration ID is wrong&#x27;,
+      async(() =&gt; {
+        const demoExplorationIds = [&#x27;wrongId&#x27;];
+        component.demoExplorationIds = demoExplorationIds;
+        component.reloadingAllExplorationPossible = true;
+
+        spyOn(adminBackendApiService, &#x27;reloadExplorationAsync&#x27;)
+          .and.returnValue(Promise.reject(&#x27;Exploration not found.&#x27;));
+        spyOn(adminTaskManagerService, &#x27;isTaskRunning&#x27;).and.returnValue(false);
+        spyOn(component.setStatusMessage, &#x27;emit&#x27;);
+
+        mockConfirmResult(true);
+        component.reloadAllExplorations();
+
+        expect(component.setStatusMessage.emit)
+          .toHaveBeenCalledWith(&#x27;Processing...&#x27;);
+
+        fixture.whenStable().then(() =&gt; {
+          expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+            &#x27;Reloaded 1 explorations: 0 succeeded, 1 failed.&#x27;);
+        });
+      }));
+  });
+
+  describe(&#x27;.generateDummyExploration&#x27;, () =&gt; {
+    it(&#x27;should not generate dummy exploration if publish count is greater&#x27; +
+      &#x27;than generate count&#x27;, () =&gt; {
+      let adminBackendSpy = spyOn(
+        adminBackendApiService, &#x27;generateDummyExplorationsAsync&#x27;);
+
+      component.numDummyExpsToPublish = 2;
+      component.numDummyExpsToGenerate = 1;
+
+      spyOn(component.setStatusMessage, &#x27;emit&#x27;);
+
+      component.generateDummyExplorations();
+
+      expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+        &#x27;Publish count should be less than or equal to generate count&#x27;);
+      expect(adminBackendSpy).not.toHaveBeenCalled();
+    });
+
+    it(&#x27;should generate dummy explorations&#x27;, async(() =&gt; {
+      component.numDummyExpsToPublish = 1;
+      component.numDummyExpsToGenerate = 2;
+
+      spyOn(adminBackendApiService, &#x27;generateDummyExplorationsAsync&#x27;)
+        .and.returnValue(Promise.resolve());
+      spyOn(component.setStatusMessage, &#x27;emit&#x27;);
+
+      component.generateDummyExplorations();
+
+      expect(component.setStatusMessage.emit)
+        .toHaveBeenCalledWith(&#x27;Processing...&#x27;);
+
+      fixture.whenStable().then(() =&gt; {
+        expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+          &#x27;Dummy explorations generated successfully.&#x27;);
+      });
+    }));
+
+    it(&#x27;should show error message when dummy explorations&#x27; +
+      &#x27;are not generated&#x27;, async(() =&gt; {
+      component.numDummyExpsToPublish = 2;
+      component.numDummyExpsToGenerate = 2;
+
+      spyOn(adminBackendApiService, &#x27;generateDummyExplorationsAsync&#x27;)
+        .and.returnValue(Promise.reject(&#x27;Dummy explorations not generated.&#x27;));
+      spyOn(component.setStatusMessage, &#x27;emit&#x27;);
+
+      component.generateDummyExplorations();
+
+      expect(component.setStatusMessage.emit)
+        .toHaveBeenCalledWith(&#x27;Processing...&#x27;);
+
+      fixture.whenStable().then(() =&gt; {
+        expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+          &#x27;Server error: Dummy explorations not generated.&#x27;);
+      });
+    }));
+  });
+
+  describe(&#x27;.loadNewStructuresData&#x27;, () =&gt; {
+    it(&#x27;should generate structures data&#x27;, async(() =&gt; {
+      spyOn(adminBackendApiService, &#x27;generateDummyNewStructuresDataAsync&#x27;)
+        .and.returnValue(Promise.resolve());
+      spyOn(component.setStatusMessage, &#x27;emit&#x27;);
+      component.loadNewStructuresData();
+
+      expect(component.setStatusMessage.emit)
+        .toHaveBeenCalledWith(&#x27;Processing...&#x27;);
+
+      fixture.whenStable().then(() =&gt; {
+        expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+          &#x27;Dummy new structures data generated successfully.&#x27;);
+      });
+    }));
+
+    it(&#x27;should show error message if new structues data&#x27; +
+      &#x27;is not generated&#x27;, async(() =&gt; {
+      spyOn(adminBackendApiService, &#x27;generateDummyNewStructuresDataAsync&#x27;)
+        .and.returnValue(Promise.reject(&#x27;New structures not generated.&#x27;));
+      spyOn(component.setStatusMessage, &#x27;emit&#x27;);
+      component.loadNewStructuresData();
+
+      expect(component.setStatusMessage.emit)
+        .toHaveBeenCalledWith(&#x27;Processing...&#x27;);
+
+      fixture.whenStable().then(() =&gt; {
+        expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+          &#x27;Server error: New structures not generated.&#x27;);
+      });
+    }));
+  });
+
+  describe(&#x27;.generateNewSkillData&#x27;, () =&gt; {
+    it(&#x27;should generate structures data&#x27;, async(() =&gt; {
+      spyOn(adminBackendApiService, &#x27;generateDummyNewSkillDataAsync&#x27;)
+        .and.returnValue(Promise.resolve());
+      spyOn(component.setStatusMessage, &#x27;emit&#x27;);
+      component.generateNewSkillData();
+
+      expect(component.setStatusMessage.emit)
+        .toHaveBeenCalledWith(&#x27;Processing...&#x27;);
+
+      fixture.whenStable().then(() =&gt; {
+        expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+          &#x27;Dummy new skill and questions generated successfully.&#x27;);
+      });
+    }));
+
+    it(&#x27;should show error message if new structues data&#x27; +
+      &#x27;is not generated&#x27;, async(() =&gt; {
+      spyOn(adminBackendApiService, &#x27;generateDummyNewSkillDataAsync&#x27;)
+        .and.returnValue(Promise.reject(&#x27;New skill data not generated.&#x27;));
+      spyOn(component.setStatusMessage, &#x27;emit&#x27;);
+      component.generateNewSkillData();
+
+      expect(component.setStatusMessage.emit)
+        .toHaveBeenCalledWith(&#x27;Processing...&#x27;);
+
+      fixture.whenStable().then(() =&gt; {
+        expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+          &#x27;Server error: New skill data not generated.&#x27;);
+      });
+    }));
+  });
+
+  describe(&#x27;.reloadCollection&#x27;, () =&gt; {
+    it(&#x27;should not reload collection if a task is already running&#x27;, () =&gt; {
+      let adminBackendSpy = spyOn(
+        adminBackendApiService, &#x27;reloadCollectionAsync&#x27;);
+      spyOn(adminTaskManagerService, &#x27;isTaskRunning&#x27;).and.returnValue(true);
+
+      expect(component.reloadCollection(component.DEMO_COLLECTIONS[0][0]))
+        .toBeUndefined();
+      expect(adminBackendSpy).not.toHaveBeenCalled();
+    });
+
+    it(&#x27;should not reload collection without user\&#x27;s confirmation&#x27;, () =&gt; {
+      let adminBackendSpy = spyOn(
+        adminBackendApiService, &#x27;reloadCollectionAsync&#x27;);
+      spyOn(adminTaskManagerService, &#x27;isTaskRunning&#x27;).and.returnValue(false);
+
+      mockConfirmResult(false);
+      component.reloadCollection(component.DEMO_COLLECTIONS[0][0]);
+
+      expect(component.reloadCollection(component.DEMO_COLLECTIONS[0][0]))
+        .toBeUndefined();
+      expect(adminBackendSpy).not.toHaveBeenCalled();
+    });
+
+    it(&#x27;should reload collection&#x27;, async(() =&gt; {
+      spyOn(adminBackendApiService, &#x27;reloadCollectionAsync&#x27;)
+        .and.returnValue(Promise.resolve());
+      spyOn(component.setStatusMessage, &#x27;emit&#x27;);
+      spyOn(adminTaskManagerService, &#x27;isTaskRunning&#x27;).and.returnValue(false);
+
+      mockConfirmResult(true);
+      component.reloadCollection(component.DEMO_COLLECTIONS[0][0]);
+
+      expect(component.setStatusMessage.emit)
+        .toHaveBeenCalledWith(&#x27;Processing...&#x27;);
+
+      fixture.whenStable().then(() =&gt; {
+        expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+          &#x27;Data reloaded successfully.&#x27;);
+      });
+    }));
+
+    it(&#x27;should show error message is collection is not reloaded&#x27;, async(() =&gt; {
+      const wrongCollectionId = &#x27;wrongCollectionId&#x27;;
+
+      spyOn(adminBackendApiService, &#x27;reloadCollectionAsync&#x27;)
+        .and.returnValue(Promise.reject(&#x27;Wrong collection ID.&#x27;));
+      spyOn(component.setStatusMessage, &#x27;emit&#x27;);
+      spyOn(adminTaskManagerService, &#x27;isTaskRunning&#x27;).and.returnValue(false);
+
+      mockConfirmResult(true);
+      component.reloadCollection(wrongCollectionId);
+
+      expect(component.setStatusMessage.emit)
+        .toHaveBeenCalledWith(&#x27;Processing...&#x27;);
+
+      fixture.whenStable().then(() =&gt; {
+        expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+          &#x27;Server error: Wrong collection ID.&#x27;);
+      });
+    }));
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/admin-page/activities-tab/admin-dev-mode-activities-tab.component.spec.ts&quot;,&quot;line&quot;:36,&quot;character&quot;:24,&quot;text&quot;:&quot;{\n    demoExplorationIds: [&#x27;expId&#x27;],\n    demoExplorations: [\n      [\n        &#x27;0&#x27;,\n        &#x27;welcome.yaml&#x27;\n      ]\n    ],\n    demoCollections: [\n      [&#x27;collectionId&#x27;]\n    ],\n  } as AdminPageData&quot;,&quot;kind&quot;:3}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:59 GMT</p>
+    </body>
+  </html>
+  

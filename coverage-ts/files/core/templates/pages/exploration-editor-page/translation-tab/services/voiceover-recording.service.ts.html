@@ -1,0 +1,188 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>voiceover-recording.service.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts</td><td class="">35.67%</td><td class="">100%</td><td class="">157</td><td class="">56</td><td class="">101</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2019 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &#x27;License&#x27;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &#x27;AS-IS&#x27; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Service for handling microphone data and mp3 audio processing.
+ */
+
+angular.module(&#x27;oppia&#x27;).factory(&#x27;VoiceoverRecordingService&#x27;, [
+  &#x27;$log&#x27;, &#x27;$q&#x27;, &#x27;$window&#x27;, function($log, $q, $window) {
+    var audioContextAvailable = null,
+      defer = null,
+      definedAudioContext = null, // Will be defined audio context.
+      isAvailable = null,
+      isRecording = false,
+      microphone = null,
+      microphoneStream = null,
+      mp3Worker = null,
+      processor = null;
+
+
+    var _initWorker = function() {
+      if (!$window.Worker) {
+        $log.warn(&#x27;Worker API not supported in this browser.&#x27;);
+        return;
+      }
+      if (mp3Worker === null) {
+        var lameWorkerFileUrl = &#x27;/third_party/static/lamejs-1.2.0/&#x27; +
+          &#x27;worker-example/worker-realtime.js&#x27;;
+        // Config the mp3 encoding worker.
+        var config = {sampleRate: 44100, bitRate: 128};
+        mp3Worker = new Worker(lameWorkerFileUrl);
+        mp3Worker.onmessage = function(e) {
+          // Async data flow.
+          defer.resolve(e.data.buf);
+        };
+        mp3Worker.postMessage({cmd: &#x27;init&#x27;, config: config});
+      }
+    };
+
+    var _postMessage = function(buffer) {
+      // Ensure the mp3Worker is available when this is run.
+      if (mp3Worker) {
+        mp3Worker.postMessage({cmd: &#x27;encode&#x27;, buf: buffer});
+      }
+    };
+
+    var _stopWorker = function() {
+      if (mp3Worker) {
+        mp3Worker.terminate();
+        $log.log(&#x27;Ending mp3 worker&#x27;);
+        mp3Worker = null;
+      }
+    };
+
+    var _initRecorder = function() {
+      // Browser agnostic AudioContext API check.
+      audioContextAvailable = $window.AudioContext ||
+        $window.webkitAudioContext;
+      if (audioContextAvailable) {
+        // Promise required because angular is async with worker.
+        defer = $q.defer();
+        isAvailable = true;
+        _initWorker();
+      } else {
+        isAvailable = false;
+      }
+    };
+
+
+    // Setup microphone inputs for mp3 audio processing.
+    var _processMicAudio = function(stream) {
+      definedAudioContext = new audioContextAvailable();
+      // Settings a bufferSize of 0 instructs the browser
+      // to choose the best bufferSize.
+      processor = definedAudioContext.createScriptProcessor(0, 1, 1);
+      // Process microphone to mp3 encoding.
+      processor.onaudioprocess = _onAudioProcess;
+
+      microphone = definedAudioContext.createMediaStreamSource(stream);
+      // Connect custom processor to microphone.
+      microphone.connect(processor);
+      // Connect to speakers as destination.
+      processor.connect(definedAudioContext.destination);
+    };
+
+    // Convert directly from mic input to mp3.
+    var _onAudioProcess = function(event) {
+      var array = event.inputBuffer.getChannelData(0);
+      _postMessage(array);
+    };
+
+    var _startMicrophoneAsync = async function() {
+      return navigator.mediaDevices.getUserMedia({audio: true, video: false});
+    };
+
+    var _stopRecord = function() {
+      if (microphone &amp;&amp; processor &amp;&amp; mp3Worker) {
+        // Disconnect mic and processor and stop processing.
+        microphone.disconnect();
+        processor.disconnect();
+        processor.onaudioprocess = null;
+        // Issue command to retrieve converted audio.
+        mp3Worker.postMessage({cmd: &#x27;finish&#x27;});
+        // Stop microphone stream.
+        microphoneStream.getTracks().forEach(function(track) {
+          track.stop();
+        });
+        isRecording = false;
+      }
+    };
+
+    var _closeRecorder = function() {
+      _stopWorker();
+    };
+
+    return {
+      initRecorder: function() {
+        _initRecorder();
+      },
+      status: function() {
+        return {
+          isAvailable: isAvailable,
+          isRecording: isRecording
+        };
+      },
+      startRecordingAsync: async function() {
+        // If worker is not available then do not start recording.
+        if (mp3Worker === null) {
+          return null;
+        }
+        var navigator = _startMicrophoneAsync();
+        navigator.then(function(stream) {
+          isRecording = true;
+          // Set microphone stream will be used for stopping track
+          // stream in another function.
+          microphoneStream = stream;
+          _processMicAudio(stream);
+        }, function() {
+          $log.warn(
+            &#x27;Microphone was not started because ofuser denied permission.&#x27;);
+          isRecording = false;
+        });
+
+        return navigator;
+      },
+      stopRecord: function() {
+        if (mp3Worker !== null) {
+          _stopRecord();
+        }
+      },
+      getMp3Data: function() {
+        return defer.promise;
+      },
+      closeRecorder: function() {
+        _closeRecorder();
+      }
+    };
+  }
+]);
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:19,&quot;character&quot;:36,&quot;text&quot;:&quot;$log&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:19,&quot;character&quot;:42,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:19,&quot;character&quot;:46,&quot;text&quot;:&quot;$window&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:20,&quot;character&quot;:8,&quot;text&quot;:&quot;audioContextAvailable&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:21,&quot;character&quot;:6,&quot;text&quot;:&quot;defer&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:22,&quot;character&quot;:6,&quot;text&quot;:&quot;definedAudioContext&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:23,&quot;character&quot;:6,&quot;text&quot;:&quot;isAvailable&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:25,&quot;character&quot;:6,&quot;text&quot;:&quot;microphone&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:26,&quot;character&quot;:6,&quot;text&quot;:&quot;microphoneStream&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:27,&quot;character&quot;:6,&quot;text&quot;:&quot;mp3Worker&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:28,&quot;character&quot;:6,&quot;text&quot;:&quot;processor&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:32,&quot;character&quot;:11,&quot;text&quot;:&quot;$window&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:32,&quot;character&quot;:19,&quot;text&quot;:&quot;Worker&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:33,&quot;character&quot;:8,&quot;text&quot;:&quot;$log&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:33,&quot;character&quot;:13,&quot;text&quot;:&quot;warn&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:36,&quot;character&quot;:10,&quot;text&quot;:&quot;mp3Worker&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:41,&quot;character&quot;:8,&quot;text&quot;:&quot;mp3Worker&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:42,&quot;character&quot;:8,&quot;text&quot;:&quot;mp3Worker&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:42,&quot;character&quot;:18,&quot;text&quot;:&quot;onmessage&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:42,&quot;character&quot;:39,&quot;text&quot;:&quot;e&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:44,&quot;character&quot;:10,&quot;text&quot;:&quot;defer&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:44,&quot;character&quot;:16,&quot;text&quot;:&quot;resolve&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:44,&quot;character&quot;:24,&quot;text&quot;:&quot;e&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:44,&quot;character&quot;:26,&quot;text&quot;:&quot;data&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:44,&quot;character&quot;:31,&quot;text&quot;:&quot;buf&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:46,&quot;character&quot;:8,&quot;text&quot;:&quot;mp3Worker&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:46,&quot;character&quot;:18,&quot;text&quot;:&quot;postMessage&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:50,&quot;character&quot;:32,&quot;text&quot;:&quot;buffer&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:52,&quot;character&quot;:10,&quot;text&quot;:&quot;mp3Worker&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:53,&quot;character&quot;:8,&quot;text&quot;:&quot;mp3Worker&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:53,&quot;character&quot;:18,&quot;text&quot;:&quot;postMessage&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:53,&quot;character&quot;:46,&quot;text&quot;:&quot;buf&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:53,&quot;character&quot;:51,&quot;text&quot;:&quot;buffer&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:58,&quot;character&quot;:10,&quot;text&quot;:&quot;mp3Worker&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:59,&quot;character&quot;:8,&quot;text&quot;:&quot;mp3Worker&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:59,&quot;character&quot;:18,&quot;text&quot;:&quot;terminate&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:60,&quot;character&quot;:8,&quot;text&quot;:&quot;$log&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:60,&quot;character&quot;:13,&quot;text&quot;:&quot;log&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:61,&quot;character&quot;:8,&quot;text&quot;:&quot;mp3Worker&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:67,&quot;character&quot;:6,&quot;text&quot;:&quot;audioContextAvailable&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:67,&quot;character&quot;:30,&quot;text&quot;:&quot;$window&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:67,&quot;character&quot;:38,&quot;text&quot;:&quot;AudioContext&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:68,&quot;character&quot;:8,&quot;text&quot;:&quot;$window&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:68,&quot;character&quot;:16,&quot;text&quot;:&quot;webkitAudioContext&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:69,&quot;character&quot;:10,&quot;text&quot;:&quot;audioContextAvailable&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:71,&quot;character&quot;:8,&quot;text&quot;:&quot;defer&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:71,&quot;character&quot;:16,&quot;text&quot;:&quot;$q&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:71,&quot;character&quot;:19,&quot;text&quot;:&quot;defer&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:72,&quot;character&quot;:8,&quot;text&quot;:&quot;isAvailable&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:75,&quot;character&quot;:8,&quot;text&quot;:&quot;isAvailable&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:81,&quot;character&quot;:36,&quot;text&quot;:&quot;stream&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:82,&quot;character&quot;:6,&quot;text&quot;:&quot;definedAudioContext&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:82,&quot;character&quot;:32,&quot;text&quot;:&quot;audioContextAvailable&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:85,&quot;character&quot;:6,&quot;text&quot;:&quot;processor&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:85,&quot;character&quot;:18,&quot;text&quot;:&quot;definedAudioContext&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:85,&quot;character&quot;:38,&quot;text&quot;:&quot;createScriptProcessor&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:87,&quot;character&quot;:6,&quot;text&quot;:&quot;processor&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:87,&quot;character&quot;:16,&quot;text&quot;:&quot;onaudioprocess&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:89,&quot;character&quot;:6,&quot;text&quot;:&quot;microphone&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:89,&quot;character&quot;:19,&quot;text&quot;:&quot;definedAudioContext&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:89,&quot;character&quot;:39,&quot;text&quot;:&quot;createMediaStreamSource&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:89,&quot;character&quot;:63,&quot;text&quot;:&quot;stream&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:91,&quot;character&quot;:6,&quot;text&quot;:&quot;microphone&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:91,&quot;character&quot;:17,&quot;text&quot;:&quot;connect&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:91,&quot;character&quot;:25,&quot;text&quot;:&quot;processor&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:93,&quot;character&quot;:6,&quot;text&quot;:&quot;processor&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:93,&quot;character&quot;:16,&quot;text&quot;:&quot;connect&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:93,&quot;character&quot;:24,&quot;text&quot;:&quot;definedAudioContext&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:93,&quot;character&quot;:44,&quot;text&quot;:&quot;destination&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:97,&quot;character&quot;:35,&quot;text&quot;:&quot;event&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:98,&quot;character&quot;:10,&quot;text&quot;:&quot;array&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:98,&quot;character&quot;:18,&quot;text&quot;:&quot;event&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:98,&quot;character&quot;:24,&quot;text&quot;:&quot;inputBuffer&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:98,&quot;character&quot;:36,&quot;text&quot;:&quot;getChannelData&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:99,&quot;character&quot;:19,&quot;text&quot;:&quot;array&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:107,&quot;character&quot;:10,&quot;text&quot;:&quot;microphone&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:107,&quot;character&quot;:24,&quot;text&quot;:&quot;processor&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:107,&quot;character&quot;:37,&quot;text&quot;:&quot;mp3Worker&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:109,&quot;character&quot;:8,&quot;text&quot;:&quot;microphone&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:109,&quot;character&quot;:19,&quot;text&quot;:&quot;disconnect&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:110,&quot;character&quot;:8,&quot;text&quot;:&quot;processor&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:110,&quot;character&quot;:18,&quot;text&quot;:&quot;disconnect&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:111,&quot;character&quot;:8,&quot;text&quot;:&quot;processor&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:111,&quot;character&quot;:18,&quot;text&quot;:&quot;onaudioprocess&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:113,&quot;character&quot;:8,&quot;text&quot;:&quot;mp3Worker&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:113,&quot;character&quot;:18,&quot;text&quot;:&quot;postMessage&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:115,&quot;character&quot;:8,&quot;text&quot;:&quot;microphoneStream&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:115,&quot;character&quot;:25,&quot;text&quot;:&quot;getTracks&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:115,&quot;character&quot;:37,&quot;text&quot;:&quot;forEach&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:115,&quot;character&quot;:54,&quot;text&quot;:&quot;track&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:116,&quot;character&quot;:10,&quot;text&quot;:&quot;track&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:116,&quot;character&quot;:16,&quot;text&quot;:&quot;stop&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:132,&quot;character&quot;:10,&quot;text&quot;:&quot;isAvailable&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:132,&quot;character&quot;:23,&quot;text&quot;:&quot;isAvailable&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:138,&quot;character&quot;:12,&quot;text&quot;:&quot;mp3Worker&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:146,&quot;character&quot;:10,&quot;text&quot;:&quot;microphoneStream&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:149,&quot;character&quot;:10,&quot;text&quot;:&quot;$log&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:149,&quot;character&quot;:15,&quot;text&quot;:&quot;warn&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:157,&quot;character&quot;:12,&quot;text&quot;:&quot;mp3Worker&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:162,&quot;character&quot;:15,&quot;text&quot;:&quot;defer&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/translation-tab/services/voiceover-recording.service.ts&quot;,&quot;line&quot;:162,&quot;character&quot;:21,&quot;text&quot;:&quot;promise&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:44:00 GMT</p>
+    </body>
+  </html>
+  

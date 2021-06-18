@@ -1,0 +1,817 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>InteractionObjectFactorySpec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/domain/exploration/InteractionObjectFactorySpec.ts</td><td class="">59.93%</td><td class="">100%</td><td class="">921</td><td class="">552</td><td class="">369</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2019 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for Interaction object factory.
+ */
+
+import { TestBed } from &#x27;@angular/core/testing&#x27;;
+
+import { AnswerGroupObjectFactory } from
+  &#x27;domain/exploration/AnswerGroupObjectFactory&#x27;;
+import { CamelCaseToHyphensPipe } from
+  &#x27;filters/string-utility-filters/camel-case-to-hyphens.pipe&#x27;;
+import { HintObjectFactory } from &#x27;domain/exploration/HintObjectFactory&#x27;;
+import { InteractionObjectFactory, Interaction } from
+  &#x27;domain/exploration/InteractionObjectFactory&#x27;;
+import { OutcomeObjectFactory } from
+  &#x27;domain/exploration/OutcomeObjectFactory&#x27;;
+import { SolutionObjectFactory } from
+  &#x27;domain/exploration/SolutionObjectFactory&#x27;;
+import { SubtitledUnicode } from
+  &#x27;domain/exploration/SubtitledUnicodeObjectFactory&#x27;;
+import { SubtitledHtml } from &#x27;domain/exploration/subtitled-html.model&#x27;;
+
+import INTERACTION_SPECS from &#x27;interactions/interaction_specs.json&#x27;;
+
+describe(&#x27;Interaction object factory&#x27;, () =&gt; {
+  let iof = null;
+  let oof = null;
+  let agof = null;
+  let hof = null;
+  let sof = null;
+  let answerGroupsDict = null;
+  let defaultOutcomeDict = null;
+  let solutionDict = null;
+  let hintsDict = null;
+  let interactionDict = null;
+
+  beforeEach(() =&gt; {
+    TestBed.configureTestingModule({
+      providers: [CamelCaseToHyphensPipe]
+    });
+    iof = TestBed.get(InteractionObjectFactory);
+    oof = TestBed.get(OutcomeObjectFactory);
+    agof = TestBed.get(AnswerGroupObjectFactory);
+    hof = TestBed.get(HintObjectFactory);
+    sof = TestBed.get(SolutionObjectFactory);
+    defaultOutcomeDict = {
+      dest: &#x27;dest_default&#x27;,
+      feedback: {
+        content_id: &#x27;default_outcome&#x27;,
+        html: &#x27;&#x27;
+      },
+      labelled_as_correct: false,
+      param_changes: [],
+      refresher_exploration_id: null,
+      missing_prerequisite_skill_id: null
+    };
+    answerGroupsDict = [{
+      rule_specs: [],
+      outcome: {
+        dest: &#x27;dest_1&#x27;,
+        feedback: {
+          content_id: &#x27;outcome_1&#x27;,
+          html: &#x27;&#x27;
+        },
+        labelled_as_correct: false,
+        param_changes: [],
+        refresher_exploration_id: null,
+        missing_prerequisite_skill_id: null
+      },
+      training_data: [&#x27;training_data&#x27;],
+      tagged_skill_misconception_id: &#x27;skill_id-1&#x27;
+    }];
+    hintsDict = [
+      {
+        hint_content: {
+          html: &#x27;&lt;p&gt;First Hint&lt;/p&gt;&#x27;,
+          content_id: &#x27;content_id1&#x27;
+        }
+      },
+      {
+        hint_content: {
+          html: &#x27;&lt;p&gt;Second Hint&lt;/p&gt;&#x27;,
+          content_id: &#x27;content_id2&#x27;
+        }
+      }
+    ];
+
+    solutionDict = {
+      answer_is_exclusive: false,
+      correct_answer: &#x27;This is a correct answer!&#x27;,
+      explanation: {
+        content_id: &#x27;solution&#x27;,
+        html: &#x27;This is the explanation to the answer&#x27;
+      }
+    };
+
+    interactionDict = {
+      answer_groups: answerGroupsDict,
+      confirmed_unclassified_answers: [],
+      customization_args: {
+        placeholder: {
+          value: {
+            content_id: &#x27;ca_placeholder_0&#x27;,
+            unicode_str: &#x27;Enter text&#x27;
+          }
+        },
+        rows: { value: 1 }
+      },
+      default_outcome: defaultOutcomeDict,
+      hints: hintsDict,
+      id: &#x27;TextInput&#x27;,
+      solution: solutionDict
+    };
+  });
+
+  it(&#x27;should correctly set customization arguments for TextInput&#x27;, () =&gt; {
+    const copyInteractionDict = { ...interactionDict };
+    const testInteraction = iof.createFromBackendDict(copyInteractionDict);
+
+    expect(testInteraction.customizationArgs).toEqual({
+      placeholder: {
+        value: new SubtitledUnicode(&#x27;Enter text&#x27;, &#x27;ca_placeholder_0&#x27;)
+      },
+      rows: {
+        value: 1
+      }
+    });
+  });
+
+  it(&#x27;should correctly set customization arguments for &#x27; +
+     &#x27;AlgebraicExpressionInput&#x27;, () =&gt; {
+    const testInteraction = iof.createFromBackendDict({
+      answer_groups: answerGroupsDict,
+      confirmed_unclassified_answers: [],
+      customization_args: {},
+      default_outcome: defaultOutcomeDict,
+      hints: hintsDict,
+      id: &#x27;AlgebraicExpressionInput&#x27;,
+      solution: solutionDict
+    });
+
+    expect(testInteraction.customizationArgs).toEqual({});
+  });
+
+  it(&#x27;should correctly set customization arguments for &#x27; +
+     &#x27;CodeRepl&#x27;, () =&gt; {
+    const testInteraction = iof.createFromBackendDict({
+      answer_groups: answerGroupsDict,
+      confirmed_unclassified_answers: [],
+      customization_args: {
+        language: {value: &#x27;&#x27;},
+        placeholder: {value: &#x27;&#x27;},
+        preCode: {value: &#x27;&#x27;},
+        postCode: {value: &#x27;&#x27;}
+      },
+      default_outcome: defaultOutcomeDict,
+      hints: hintsDict,
+      id: &#x27;CodeRepl&#x27;,
+      solution: solutionDict
+    });
+
+    expect(testInteraction.customizationArgs).toEqual({
+      language: {value: &#x27;&#x27;},
+      placeholder: {value: &#x27;&#x27;},
+      preCode: {value: &#x27;&#x27;},
+      postCode: {value: &#x27;&#x27;}
+    });
+  });
+
+  it(&#x27;should correctly set customization arguments for &#x27; +
+     &#x27;CodeRepl&#x27;, () =&gt; {
+    const testInteraction = iof.createFromBackendDict({
+      answer_groups: answerGroupsDict,
+      confirmed_unclassified_answers: [],
+      customization_args: {
+        language: {value: &#x27;&#x27;},
+        placeholder: {value: &#x27;&#x27;},
+        preCode: {value: &#x27;&#x27;},
+        postCode: {value: &#x27;&#x27;}
+      },
+      default_outcome: defaultOutcomeDict,
+      hints: hintsDict,
+      id: &#x27;CodeRepl&#x27;,
+      solution: solutionDict
+    });
+
+    expect(testInteraction.customizationArgs).toEqual({
+      language: {value: &#x27;&#x27;},
+      placeholder: {value: &#x27;&#x27;},
+      preCode: {value: &#x27;&#x27;},
+      postCode: {value: &#x27;&#x27;}
+    });
+  });
+
+  it(&#x27;should correctly set customization arguments for &#x27; +
+     &#x27;DragAndDropSortInput&#x27;, () =&gt; {
+    const testInteraction = iof.createFromBackendDict({
+      answer_groups: answerGroupsDict,
+      confirmed_unclassified_answers: [],
+      customization_args: {
+        choices: {value: [{
+          content_id: &#x27;ca_choices&#x27;,
+          html: &#x27;&lt;p&gt;first&lt;/p&gt;&#x27;
+        }]},
+        allowMultipleItemsInSamePosition: {value: true}
+      },
+      default_outcome: defaultOutcomeDict,
+      hints: hintsDict,
+      id: &#x27;DragAndDropSortInput&#x27;,
+      solution: solutionDict
+    });
+
+    expect(testInteraction.customizationArgs).toEqual({
+      choices: {value: [new SubtitledHtml(&#x27;&lt;p&gt;first&lt;/p&gt;&#x27;, &#x27;ca_choices&#x27;)]},
+      allowMultipleItemsInSamePosition: {value: true}
+    });
+  });
+
+  it(&#x27;should correctly set customization arguments for &#x27; +
+     &#x27;GraphInput&#x27;, () =&gt; {
+    const testInteraction = iof.createFromBackendDict({
+      answer_groups: answerGroupsDict,
+      confirmed_unclassified_answers: [],
+      customization_args: {
+        graph: {value: {}},
+        canAddVertex: {value: true},
+        canDeleteVertex: {value: true},
+        canMoveVertex: {value: true},
+        canEditVertexLabel: {value: true},
+        canAddEdge: {value: true},
+        canDeleteEdge: {value: true},
+        canEditEdgeWeight: {value: true}
+      },
+      default_outcome: defaultOutcomeDict,
+      hints: hintsDict,
+      id: &#x27;GraphInput&#x27;,
+      solution: solutionDict
+    });
+
+    expect(testInteraction.customizationArgs).toEqual({
+      graph: {value: {}},
+      canAddVertex: {value: true},
+      canDeleteVertex: {value: true},
+      canMoveVertex: {value: true},
+      canEditVertexLabel: {value: true},
+      canAddEdge: {value: true},
+      canDeleteEdge: {value: true},
+      canEditEdgeWeight: {value: true}
+    });
+  });
+
+  it(&#x27;should correctly set customization arguments for &#x27; +
+     &#x27;InteractiveMap&#x27;, () =&gt; {
+    const testInteraction = iof.createFromBackendDict({
+      answer_groups: answerGroupsDict,
+      confirmed_unclassified_answers: [],
+      customization_args: {
+        latitude: {value: 0.0},
+        longitude: {value: 0.0},
+        zoom: {value: 0.0},
+      },
+      default_outcome: defaultOutcomeDict,
+      hints: hintsDict,
+      id: &#x27;InteractiveMap&#x27;,
+      solution: solutionDict
+    });
+
+    expect(testInteraction.customizationArgs).toEqual({
+      latitude: {value: 0.0},
+      longitude: {value: 0.0},
+      zoom: {value: 0.0},
+    });
+  });
+
+  it(&#x27;should correctly set customization arguments for &#x27; +
+     &#x27;MathEquationInput&#x27;, () =&gt; {
+    const testInteraction = iof.createFromBackendDict({
+      answer_groups: answerGroupsDict,
+      confirmed_unclassified_answers: [],
+      customization_args: {},
+      default_outcome: defaultOutcomeDict,
+      hints: hintsDict,
+      id: &#x27;MathEquationInput&#x27;,
+      solution: solutionDict
+    });
+
+    expect(testInteraction.customizationArgs).toEqual({});
+  });
+
+  it(&#x27;should correctly set customization arguments for &#x27; +
+     &#x27;MusicNotesInput&#x27;, () =&gt; {
+    const testInteraction = iof.createFromBackendDict({
+      answer_groups: answerGroupsDict,
+      confirmed_unclassified_answers: [],
+      customization_args: {
+        sequenceToGuess: {value: []},
+        initialSequence: {value: []}
+      },
+      default_outcome: defaultOutcomeDict,
+      hints: hintsDict,
+      id: &#x27;MusicNotesInput&#x27;,
+      solution: solutionDict
+    });
+
+    expect(testInteraction.customizationArgs).toEqual({
+      sequenceToGuess: {value: []},
+      initialSequence: {value: []}
+    });
+  });
+
+  it(&#x27;should correctly set customization arguments for &#x27; +
+     &#x27;NumericExpressionInput&#x27;, () =&gt; {
+    const testInteraction = iof.createFromBackendDict({
+      answer_groups: answerGroupsDict,
+      confirmed_unclassified_answers: [],
+      customization_args: {
+        useFractionForDivision: false,
+        placeholder: {
+          value: {
+            content_id: &#x27;ca_placeholder_0&#x27;,
+            unicode_str: &#x27;Type an expression here, using only numbers.&#x27;
+          }
+        }
+      },
+      default_outcome: defaultOutcomeDict,
+      hints: hintsDict,
+      id: &#x27;NumericExpressionInput&#x27;,
+      solution: solutionDict
+    });
+
+    expect(testInteraction.customizationArgs).toEqual({
+      useFractionForDivision: false,
+      placeholder: {
+        value: new SubtitledUnicode(
+          &#x27;Type an expression here, using only numbers.&#x27;, &#x27;ca_placeholder_0&#x27;)
+      }
+    });
+  });
+
+  it(&#x27;should correctly set customization arguments for &#x27; +
+     &#x27;NumericInput&#x27;, () =&gt; {
+    const testInteraction = iof.createFromBackendDict({
+      answer_groups: answerGroupsDict,
+      confirmed_unclassified_answers: [],
+      customization_args: {},
+      default_outcome: defaultOutcomeDict,
+      hints: hintsDict,
+      id: &#x27;NumericInput&#x27;,
+      solution: solutionDict
+    });
+
+    expect(testInteraction.customizationArgs).toEqual({});
+  });
+
+  it(&#x27;should correctly set customization arguments for &#x27; +
+     &#x27;NumericInput&#x27;, () =&gt; {
+    const testInteraction = iof.createFromBackendDict({
+      answer_groups: answerGroupsDict,
+      confirmed_unclassified_answers: [],
+      customization_args: {},
+      default_outcome: defaultOutcomeDict,
+      hints: hintsDict,
+      id: &#x27;NumericInput&#x27;,
+      solution: solutionDict
+    });
+
+    expect(testInteraction.customizationArgs).toEqual({});
+  });
+
+  it(&#x27;should correctly set customization arguments for &#x27; +
+     &#x27;PencilCodeEditor&#x27;, () =&gt; {
+    const testInteraction = iof.createFromBackendDict({
+      answer_groups: answerGroupsDict,
+      confirmed_unclassified_answers: [],
+      customization_args: {
+        initialCode: {value: &#x27;&#x27;}
+      },
+      default_outcome: defaultOutcomeDict,
+      hints: hintsDict,
+      id: &#x27;PencilCodeEditor&#x27;,
+      solution: solutionDict
+    });
+
+    expect(testInteraction.customizationArgs).toEqual({
+      initialCode: {value: &#x27;&#x27;}
+    });
+  });
+
+  it(&#x27;should correctly set customization arguments for &#x27; +
+     &#x27;SetInput&#x27;, () =&gt; {
+    const testInteraction = iof.createFromBackendDict({
+      answer_groups: answerGroupsDict,
+      confirmed_unclassified_answers: [],
+      customization_args: {
+        buttonText: {value: {
+          content_id: &#x27;ca_buttonText&#x27;,
+          unicode_str: &#x27;&#x27;
+        }}
+      },
+      default_outcome: defaultOutcomeDict,
+      hints: hintsDict,
+      id: &#x27;SetInput&#x27;,
+      solution: solutionDict
+    });
+
+    expect(testInteraction.customizationArgs).toEqual({
+      buttonText: {value: new SubtitledUnicode(&#x27;&#x27;, &#x27;ca_buttonText&#x27;)}
+    });
+  });
+
+  it(&#x27;should throw error when trying to set customization arguments for &#x27; +
+     &#x27;interaction id that does not exist&#x27;, () =&gt; {
+    expect(() =&gt; {
+      iof.createFromBackendDict({
+        answer_groups: answerGroupsDict,
+        confirmed_unclassified_answers: [],
+        customization_args: {},
+        default_outcome: defaultOutcomeDict,
+        hints: hintsDict,
+        id: &#x27;InteractionIDThatDNE&#x27;,
+        solution: solutionDict
+      });
+    }).toThrowError(&#x27;Unrecognized interaction id InteractionIDThatDNE&#x27;);
+  });
+
+  it(&#x27;should create an object when default outcome is null&#x27;, () =&gt; {
+    const copyInteractionDict = { ...interactionDict };
+    copyInteractionDict.default_outcome = null;
+
+    const testInteraction = iof.createFromBackendDict(copyInteractionDict);
+
+    expect(testInteraction.defaultOutcome).toBe(null);
+  });
+
+  it(&#x27;should correctly set the new ID&#x27;, () =&gt; {
+    const testInteraction = iof.createFromBackendDict(interactionDict);
+
+    expect(testInteraction.id).toEqual(&#x27;TextInput&#x27;);
+    testInteraction.setId(&#x27;new_interaction_id&#x27;);
+    expect(testInteraction.id).toEqual(&#x27;new_interaction_id&#x27;);
+  });
+
+  it(&#x27;should correctly set the new answer group&#x27;, () =&gt; {
+    const testInteraction = iof.createFromBackendDict(interactionDict);
+
+    let newAnswerGroup = {
+      rule_specs: [],
+      outcome: {
+        dest: &#x27;dest_3&#x27;,
+        feedback: {
+          content_id: &#x27;outcome_3&#x27;,
+          html: &#x27;&#x27;
+        },
+        labelled_as_correct: false,
+        param_changes: [],
+        refresher_exploration_id: null,
+        missing_prerequisite_skill_id: null
+      },
+      training_data: [&#x27;training_data&#x27;],
+      tagged_skill_misconception_id: &#x27;skill_id-1&#x27;
+    };
+    expect(testInteraction.answerGroups).toEqual([agof.createFromBackendDict({
+      rule_specs: [],
+      outcome: {
+        dest: &#x27;dest_1&#x27;,
+        feedback: {
+          content_id: &#x27;outcome_1&#x27;,
+          html: &#x27;&#x27;
+        },
+        labelled_as_correct: false,
+        param_changes: [],
+        refresher_exploration_id: null,
+        missing_prerequisite_skill_id: null
+      },
+      training_data: [&#x27;training_data&#x27;],
+      tagged_skill_misconception_id: &#x27;skill_id-1&#x27;
+    }, &#x27;TextInput&#x27;)]);
+    newAnswerGroup = agof.createFromBackendDict(newAnswerGroup, &#x27;TextInput&#x27;);
+    testInteraction.setAnswerGroups([newAnswerGroup]);
+    expect(testInteraction.answerGroups).toEqual([newAnswerGroup]);
+  });
+
+  it(&#x27;should correctly set the new default outcome&#x27;, () =&gt; {
+    const testInteraction = iof.createFromBackendDict(interactionDict);
+
+    const newDefaultOutcomeDict = {
+      dest: &#x27;dest_default_new&#x27;,
+      feedback: {
+        content_id: &#x27;default_outcome_new&#x27;,
+        html: &#x27;&#x27;
+      },
+      labelled_as_correct: false,
+      param_changes: [],
+      refresher_exploration_id: null,
+      missing_prerequisite_skill_id: null
+    };
+    const newDefaultOutcome = oof.createFromBackendDict(newDefaultOutcomeDict);
+    expect(testInteraction.defaultOutcome).toEqual(
+      oof.createFromBackendDict({
+        dest: &#x27;dest_default&#x27;,
+        feedback: {
+          content_id: &#x27;default_outcome&#x27;,
+          html: &#x27;&#x27;
+        },
+        labelled_as_correct: false,
+        param_changes: [],
+        refresher_exploration_id: null,
+        missing_prerequisite_skill_id: null
+      }));
+    testInteraction.setDefaultOutcome(newDefaultOutcome);
+    expect(testInteraction.defaultOutcome).toEqual(newDefaultOutcome);
+  });
+
+  it(&#x27;should correctly set the new customization args&#x27;, () =&gt; {
+    const testInteraction = iof.createFromBackendDict(interactionDict);
+
+    const newCustomizationArgs = {
+      placeholder: {
+        value: new SubtitledUnicode(&#x27;New&#x27;, &#x27;ca_placeholder_1&#x27;)
+      },
+      rows: { value: 2 }
+    };
+    expect(testInteraction.customizationArgs).toEqual({
+      placeholder: {
+        value: new SubtitledUnicode(&#x27;Enter text&#x27;, &#x27;ca_placeholder_0&#x27;)
+      },
+      rows: { value: 1 }
+    });
+    testInteraction.setCustomizationArgs(newCustomizationArgs);
+    expect(testInteraction.customizationArgs).toEqual(newCustomizationArgs);
+  });
+
+  it(&#x27;should correctly set the new solution&#x27;, () =&gt; {
+    const testInteraction = iof.createFromBackendDict(interactionDict);
+
+    const newSolutionDict = {
+      answer_is_exclusive: false,
+      correct_answer: &#x27;This is a new correct answer!&#x27;,
+      explanation: {
+        content_id: &#x27;solution_new&#x27;,
+        html: &#x27;This is the new explanation to the answer&#x27;
+      }
+    };
+    const newSolution = sof.createFromBackendDict(newSolutionDict);
+    expect(testInteraction.solution).toEqual(
+      sof.createFromBackendDict({
+        answer_is_exclusive: false,
+        correct_answer: &#x27;This is a correct answer!&#x27;,
+        explanation: {
+          content_id: &#x27;solution&#x27;,
+          html: &#x27;This is the explanation to the answer&#x27;
+        }
+      }));
+    testInteraction.setSolution(newSolution);
+    expect(testInteraction.solution).toEqual(newSolution);
+  });
+
+  it(&#x27;should correctly set the new hint&#x27;, () =&gt; {
+    const testInteraction = iof.createFromBackendDict(interactionDict);
+
+    const newHintDict = {
+      hint_content: {
+        html: &#x27;&lt;p&gt;New Hint&lt;/p&gt;&#x27;,
+        content_id: &#x27;content_id_new&#x27;
+      }
+    };
+    const newHint = hof.createFromBackendDict(newHintDict);
+    expect(testInteraction.hints).toEqual(hintsDict.map(function(hintDict) {
+      return hof.createFromBackendDict(hintDict);
+    }));
+    testInteraction.setHints([newHint]);
+    expect(testInteraction.hints).toEqual([newHint]);
+  });
+
+  it(&#x27;should correctly copy from other interaction&#x27;, () =&gt; {
+    const testInteraction = iof.createFromBackendDict(interactionDict);
+
+    const newAnswerGroups = [{
+      rule_specs: [],
+      outcome: {
+        dest: &#x27;dest_1_new&#x27;,
+        feedback: {
+          content_id: &#x27;outcome_1_new&#x27;,
+          html: &#x27;&#x27;
+        },
+        labelled_as_correct: false,
+        param_changes: [],
+        refresher_exploration_id: null,
+        missing_prerequisite_skill_id: null
+      },
+      training_data: [&#x27;training_data_new&#x27;],
+      tagged_skill_misconception_id: &#x27;skill_id-2&#x27;
+    }];
+    const newDefaultOutcome = {
+      dest: &#x27;dest_default_new&#x27;,
+      feedback: {
+        content_id: &#x27;default_outcome_new&#x27;,
+        html: &#x27;&#x27;
+      },
+      labelled_as_correct: false,
+      param_changes: [],
+      refresher_exploration_id: null,
+      missing_prerequisite_skill_id: null
+    };
+    const newHintDict = [
+      {
+        hint_content: {
+          html: &#x27;&lt;p&gt;New Hint&lt;/p&gt;&#x27;,
+          content_id: &#x27;content_id1_new&#x27;
+        }
+      }
+    ];
+    const newSolutionDict = {
+      answer_is_exclusive: false,
+      correct_answer: &#x27;This is a new correct answer!&#x27;,
+      explanation: {
+        content_id: &#x27;solution_new&#x27;,
+        html: &#x27;This is the new explanation to the answer&#x27;
+      }
+    };
+    const otherInteractionDict = {
+      answer_groups: newAnswerGroups,
+      confirmed_unclassified_answers: [],
+      customization_args: {
+        showChoicesInShuffledOrder: {
+          value: true
+        },
+        choices: {
+          value: [{
+            html: &#x27;&lt;p&gt;Choice 1&lt;/p&gt;&#x27;,
+            content_id: &#x27;ca_choices_0&#x27;
+          }, {
+            html: &#x27;&lt;p&gt;Choice 2&lt;/p&gt;&#x27;,
+            content_id: &#x27;ca_choices_1&#x27;
+          }]
+        }
+      },
+      default_outcome: newDefaultOutcome,
+      hints: newHintDict,
+      id: &#x27;MultipleChoiceInput&#x27;,
+      solution: newSolutionDict
+    };
+    const otherInteraction = iof.createFromBackendDict(otherInteractionDict);
+    testInteraction.copy(otherInteraction);
+    expect(testInteraction).toEqual(otherInteraction);
+    otherInteraction.customizationArgs.showChoicesInShuffledOrder.value = false;
+    expect(testInteraction).toEqual(iof.createFromBackendDict({
+      answer_groups: newAnswerGroups,
+      confirmed_unclassified_answers: [],
+      customization_args: {
+        showChoicesInShuffledOrder: {
+          value: true
+        },
+        choices: {
+          value: [{
+            html: &#x27;&lt;p&gt;Choice 1&lt;/p&gt;&#x27;,
+            content_id: &#x27;ca_choices_0&#x27;
+          }, {
+            html: &#x27;&lt;p&gt;Choice 2&lt;/p&gt;&#x27;,
+            content_id: &#x27;ca_choices_1&#x27;
+          }]
+        }
+      },
+      default_outcome: newDefaultOutcome,
+      hints: newHintDict,
+      id: &#x27;MultipleChoiceInput&#x27;,
+      solution: newSolutionDict
+    }));
+  });
+
+  it(&#x27;should correctly convert an Interaction to backend dict&#x27;, () =&gt; {
+    const testInteraction = iof.createFromBackendDict(interactionDict);
+
+    expect(testInteraction.toBackendDict()).toEqual(interactionDict);
+  });
+
+  it(&#x27;should correctly convert an Interaction with MultipleChoice to a &#x27; +
+     &#x27;backend dict&#x27;, () =&gt; {
+    let mcInteractionDict = {
+      answer_groups: answerGroupsDict,
+      confirmed_unclassified_answers: [],
+      customization_args: {
+        showChoicesInShuffledOrder: {
+          value: true
+        },
+        choices: {
+          value: [{
+            html: &#x27;&lt;p&gt;Choice 1&lt;/p&gt;&#x27;,
+            content_id: &#x27;ca_choices_0&#x27;
+          }, {
+            html: &#x27;&lt;p&gt;Choice 2&lt;/p&gt;&#x27;,
+            content_id: &#x27;ca_choices_1&#x27;
+          }]
+        }
+      },
+      default_outcome: defaultOutcomeDict,
+      hints: hintsDict,
+      id: &#x27;MultipleChoiceInput&#x27;,
+      solution: solutionDict
+    };
+    const testInteraction = iof.createFromBackendDict(mcInteractionDict);
+
+    expect(testInteraction.toBackendDict()).toEqual(mcInteractionDict);
+  });
+
+  it(&#x27;should create customization arguments from backend dict and convert &#x27; +
+     &#x27;to backend dict for complex nested customization arguments&#x27;, () =&gt; {
+    const ca = {
+      testCA: {
+        value: [{
+          content: new SubtitledUnicode(&#x27;first&#x27;, &#x27;ca_dummyCustArg_content_0&#x27;),
+          show: true
+        },
+        {
+          content: new SubtitledUnicode(&#x27;second&#x27;, &#x27;ca_dummyCustArg_content_1&#x27;),
+          show: true
+        }]
+      }
+    };
+
+    const expectedCaBackendDict = {
+      testCA: {
+        value: [{
+          content: {
+            unicode_str: &#x27;first&#x27;,
+            content_id: &#x27;ca_dummyCustArg_content_0&#x27;
+          },
+          show: true
+        },
+        {
+          content: {
+            unicode_str: &#x27;second&#x27;,
+            content_id: &#x27;ca_dummyCustArg_content_1&#x27;
+          },
+          show: true
+        }]
+      }
+    };
+
+    const caBackendDict = Interaction.convertCustomizationArgsToBackendDict(ca);
+    expect(caBackendDict).toEqual(expectedCaBackendDict);
+  });
+
+  it(&#x27;should get all content ids for complex nested customization &#x27; +
+     &#x27;arguments&#x27;, () =&gt; {
+    const ca = {
+      testCA: {
+        value: [{
+          content: new SubtitledUnicode(&#x27;first&#x27;, &#x27;ca_dummyCustArg_content_0&#x27;),
+          show: true
+        },
+        {
+          content: new SubtitledUnicode(&#x27;second&#x27;, &#x27;ca_dummyCustArg_content_1&#x27;),
+          show: true
+        }]
+      }
+    };
+
+    expect(Interaction.getCustomizationArgContentIds(ca)).toEqual(
+      [&#x27;ca_dummyCustArg_content_0&#x27;, &#x27;ca_dummyCustArg_content_1&#x27;]);
+  });
+
+  it(&#x27;should fully cover constructing customization arguments for all &#x27; +
+     &#x27;interactions&#x27;, () =&gt; {
+    Object.keys(INTERACTION_SPECS).forEach(interactionId =&gt; {
+      expect(() =&gt; {
+        const defaultCa = {};
+        const caSpecs = INTERACTION_SPECS[
+          interactionId].customization_arg_specs;
+        caSpecs.forEach(caSpec =&gt; {
+          defaultCa[caSpec.name] = {value: caSpec.default_value};
+        });
+
+        iof.createFromBackendDict({
+          answer_groups: answerGroupsDict,
+          confirmed_unclassified_answers: [],
+          customization_args: defaultCa,
+          default_outcome: defaultOutcomeDict,
+          hints: hintsDict,
+          id: interactionId,
+          solution: solutionDict
+        });
+      }).not.toThrowError();
+    });
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:38,&quot;character&quot;:6,&quot;text&quot;:&quot;iof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:39,&quot;character&quot;:6,&quot;text&quot;:&quot;oof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:40,&quot;character&quot;:6,&quot;text&quot;:&quot;agof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:41,&quot;character&quot;:6,&quot;text&quot;:&quot;hof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:42,&quot;character&quot;:6,&quot;text&quot;:&quot;sof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:43,&quot;character&quot;:6,&quot;text&quot;:&quot;answerGroupsDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:44,&quot;character&quot;:6,&quot;text&quot;:&quot;defaultOutcomeDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:45,&quot;character&quot;:6,&quot;text&quot;:&quot;solutionDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:46,&quot;character&quot;:6,&quot;text&quot;:&quot;hintsDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:47,&quot;character&quot;:6,&quot;text&quot;:&quot;interactionDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:53,&quot;character&quot;:4,&quot;text&quot;:&quot;iof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:54,&quot;character&quot;:4,&quot;text&quot;:&quot;oof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:55,&quot;character&quot;:4,&quot;text&quot;:&quot;agof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:56,&quot;character&quot;:4,&quot;text&quot;:&quot;hof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:57,&quot;character&quot;:4,&quot;text&quot;:&quot;sof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:58,&quot;character&quot;:4,&quot;text&quot;:&quot;defaultOutcomeDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:69,&quot;character&quot;:4,&quot;text&quot;:&quot;answerGroupsDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:85,&quot;character&quot;:4,&quot;text&quot;:&quot;hintsDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:100,&quot;character&quot;:4,&quot;text&quot;:&quot;solutionDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:109,&quot;character&quot;:4,&quot;text&quot;:&quot;interactionDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:110,&quot;character&quot;:6,&quot;text&quot;:&quot;answer_groups&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:110,&quot;character&quot;:21,&quot;text&quot;:&quot;answerGroupsDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:121,&quot;character&quot;:6,&quot;text&quot;:&quot;default_outcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:121,&quot;character&quot;:23,&quot;text&quot;:&quot;defaultOutcomeDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:122,&quot;character&quot;:6,&quot;text&quot;:&quot;hints&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:122,&quot;character&quot;:13,&quot;text&quot;:&quot;hintsDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:124,&quot;character&quot;:6,&quot;text&quot;:&quot;solution&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:124,&quot;character&quot;:16,&quot;text&quot;:&quot;solutionDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:129,&quot;character&quot;:10,&quot;text&quot;:&quot;copyInteractionDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:129,&quot;character&quot;:37,&quot;text&quot;:&quot;interactionDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:130,&quot;character&quot;:10,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:130,&quot;character&quot;:28,&quot;text&quot;:&quot;iof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:130,&quot;character&quot;:32,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:130,&quot;character&quot;:54,&quot;text&quot;:&quot;copyInteractionDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:132,&quot;character&quot;:11,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:132,&quot;character&quot;:27,&quot;text&quot;:&quot;customizationArgs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:144,&quot;character&quot;:10,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:144,&quot;character&quot;:28,&quot;text&quot;:&quot;iof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:144,&quot;character&quot;:32,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:145,&quot;character&quot;:6,&quot;text&quot;:&quot;answer_groups&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:145,&quot;character&quot;:21,&quot;text&quot;:&quot;answerGroupsDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:148,&quot;character&quot;:6,&quot;text&quot;:&quot;default_outcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:148,&quot;character&quot;:23,&quot;text&quot;:&quot;defaultOutcomeDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:149,&quot;character&quot;:6,&quot;text&quot;:&quot;hints&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:149,&quot;character&quot;:13,&quot;text&quot;:&quot;hintsDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:151,&quot;character&quot;:6,&quot;text&quot;:&quot;solution&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:151,&quot;character&quot;:16,&quot;text&quot;:&quot;solutionDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:154,&quot;character&quot;:11,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:154,&quot;character&quot;:27,&quot;text&quot;:&quot;customizationArgs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:159,&quot;character&quot;:10,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:159,&quot;character&quot;:28,&quot;text&quot;:&quot;iof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:159,&quot;character&quot;:32,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:160,&quot;character&quot;:6,&quot;text&quot;:&quot;answer_groups&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:160,&quot;character&quot;:21,&quot;text&quot;:&quot;answerGroupsDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:168,&quot;character&quot;:6,&quot;text&quot;:&quot;default_outcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:168,&quot;character&quot;:23,&quot;text&quot;:&quot;defaultOutcomeDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:169,&quot;character&quot;:6,&quot;text&quot;:&quot;hints&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:169,&quot;character&quot;:13,&quot;text&quot;:&quot;hintsDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:171,&quot;character&quot;:6,&quot;text&quot;:&quot;solution&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:171,&quot;character&quot;:16,&quot;text&quot;:&quot;solutionDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:174,&quot;character&quot;:11,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:174,&quot;character&quot;:27,&quot;text&quot;:&quot;customizationArgs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:184,&quot;character&quot;:10,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:184,&quot;character&quot;:28,&quot;text&quot;:&quot;iof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:184,&quot;character&quot;:32,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:185,&quot;character&quot;:6,&quot;text&quot;:&quot;answer_groups&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:185,&quot;character&quot;:21,&quot;text&quot;:&quot;answerGroupsDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:193,&quot;character&quot;:6,&quot;text&quot;:&quot;default_outcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:193,&quot;character&quot;:23,&quot;text&quot;:&quot;defaultOutcomeDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:194,&quot;character&quot;:6,&quot;text&quot;:&quot;hints&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:194,&quot;character&quot;:13,&quot;text&quot;:&quot;hintsDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:196,&quot;character&quot;:6,&quot;text&quot;:&quot;solution&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:196,&quot;character&quot;:16,&quot;text&quot;:&quot;solutionDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:199,&quot;character&quot;:11,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:199,&quot;character&quot;:27,&quot;text&quot;:&quot;customizationArgs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:209,&quot;character&quot;:10,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:209,&quot;character&quot;:28,&quot;text&quot;:&quot;iof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:209,&quot;character&quot;:32,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:210,&quot;character&quot;:6,&quot;text&quot;:&quot;answer_groups&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:210,&quot;character&quot;:21,&quot;text&quot;:&quot;answerGroupsDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:219,&quot;character&quot;:6,&quot;text&quot;:&quot;default_outcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:219,&quot;character&quot;:23,&quot;text&quot;:&quot;defaultOutcomeDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:220,&quot;character&quot;:6,&quot;text&quot;:&quot;hints&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:220,&quot;character&quot;:13,&quot;text&quot;:&quot;hintsDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:222,&quot;character&quot;:6,&quot;text&quot;:&quot;solution&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:222,&quot;character&quot;:16,&quot;text&quot;:&quot;solutionDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:225,&quot;character&quot;:11,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:225,&quot;character&quot;:27,&quot;text&quot;:&quot;customizationArgs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:233,&quot;character&quot;:10,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:233,&quot;character&quot;:28,&quot;text&quot;:&quot;iof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:233,&quot;character&quot;:32,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:234,&quot;character&quot;:6,&quot;text&quot;:&quot;answer_groups&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:234,&quot;character&quot;:21,&quot;text&quot;:&quot;answerGroupsDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:246,&quot;character&quot;:6,&quot;text&quot;:&quot;default_outcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:246,&quot;character&quot;:23,&quot;text&quot;:&quot;defaultOutcomeDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:247,&quot;character&quot;:6,&quot;text&quot;:&quot;hints&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:247,&quot;character&quot;:13,&quot;text&quot;:&quot;hintsDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:249,&quot;character&quot;:6,&quot;text&quot;:&quot;solution&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:249,&quot;character&quot;:16,&quot;text&quot;:&quot;solutionDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:252,&quot;character&quot;:11,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:252,&quot;character&quot;:27,&quot;text&quot;:&quot;customizationArgs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:266,&quot;character&quot;:10,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:266,&quot;character&quot;:28,&quot;text&quot;:&quot;iof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:266,&quot;character&quot;:32,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:267,&quot;character&quot;:6,&quot;text&quot;:&quot;answer_groups&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:267,&quot;character&quot;:21,&quot;text&quot;:&quot;answerGroupsDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:274,&quot;character&quot;:6,&quot;text&quot;:&quot;default_outcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:274,&quot;character&quot;:23,&quot;text&quot;:&quot;defaultOutcomeDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:275,&quot;character&quot;:6,&quot;text&quot;:&quot;hints&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:275,&quot;character&quot;:13,&quot;text&quot;:&quot;hintsDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:277,&quot;character&quot;:6,&quot;text&quot;:&quot;solution&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:277,&quot;character&quot;:16,&quot;text&quot;:&quot;solutionDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:280,&quot;character&quot;:11,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:280,&quot;character&quot;:27,&quot;text&quot;:&quot;customizationArgs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:289,&quot;character&quot;:10,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:289,&quot;character&quot;:28,&quot;text&quot;:&quot;iof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:289,&quot;character&quot;:32,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:290,&quot;character&quot;:6,&quot;text&quot;:&quot;answer_groups&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:290,&quot;character&quot;:21,&quot;text&quot;:&quot;answerGroupsDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:293,&quot;character&quot;:6,&quot;text&quot;:&quot;default_outcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:293,&quot;character&quot;:23,&quot;text&quot;:&quot;defaultOutcomeDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:294,&quot;character&quot;:6,&quot;text&quot;:&quot;hints&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:294,&quot;character&quot;:13,&quot;text&quot;:&quot;hintsDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:296,&quot;character&quot;:6,&quot;text&quot;:&quot;solution&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:296,&quot;character&quot;:16,&quot;text&quot;:&quot;solutionDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:299,&quot;character&quot;:11,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:299,&quot;character&quot;:27,&quot;text&quot;:&quot;customizationArgs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:304,&quot;character&quot;:10,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:304,&quot;character&quot;:28,&quot;text&quot;:&quot;iof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:304,&quot;character&quot;:32,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:305,&quot;character&quot;:6,&quot;text&quot;:&quot;answer_groups&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:305,&quot;character&quot;:21,&quot;text&quot;:&quot;answerGroupsDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:311,&quot;character&quot;:6,&quot;text&quot;:&quot;default_outcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:311,&quot;character&quot;:23,&quot;text&quot;:&quot;defaultOutcomeDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:312,&quot;character&quot;:6,&quot;text&quot;:&quot;hints&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:312,&quot;character&quot;:13,&quot;text&quot;:&quot;hintsDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:314,&quot;character&quot;:6,&quot;text&quot;:&quot;solution&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:314,&quot;character&quot;:16,&quot;text&quot;:&quot;solutionDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:317,&quot;character&quot;:11,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:317,&quot;character&quot;:27,&quot;text&quot;:&quot;customizationArgs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:325,&quot;character&quot;:10,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:325,&quot;character&quot;:28,&quot;text&quot;:&quot;iof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:325,&quot;character&quot;:32,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:326,&quot;character&quot;:6,&quot;text&quot;:&quot;answer_groups&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:326,&quot;character&quot;:21,&quot;text&quot;:&quot;answerGroupsDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:337,&quot;character&quot;:6,&quot;text&quot;:&quot;default_outcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:337,&quot;character&quot;:23,&quot;text&quot;:&quot;defaultOutcomeDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:338,&quot;character&quot;:6,&quot;text&quot;:&quot;hints&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:338,&quot;character&quot;:13,&quot;text&quot;:&quot;hintsDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:340,&quot;character&quot;:6,&quot;text&quot;:&quot;solution&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:340,&quot;character&quot;:16,&quot;text&quot;:&quot;solutionDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:343,&quot;character&quot;:11,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:343,&quot;character&quot;:27,&quot;text&quot;:&quot;customizationArgs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:354,&quot;character&quot;:10,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:354,&quot;character&quot;:28,&quot;text&quot;:&quot;iof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:354,&quot;character&quot;:32,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:355,&quot;character&quot;:6,&quot;text&quot;:&quot;answer_groups&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:355,&quot;character&quot;:21,&quot;text&quot;:&quot;answerGroupsDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:358,&quot;character&quot;:6,&quot;text&quot;:&quot;default_outcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:358,&quot;character&quot;:23,&quot;text&quot;:&quot;defaultOutcomeDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:359,&quot;character&quot;:6,&quot;text&quot;:&quot;hints&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:359,&quot;character&quot;:13,&quot;text&quot;:&quot;hintsDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:361,&quot;character&quot;:6,&quot;text&quot;:&quot;solution&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:361,&quot;character&quot;:16,&quot;text&quot;:&quot;solutionDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:364,&quot;character&quot;:11,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:364,&quot;character&quot;:27,&quot;text&quot;:&quot;customizationArgs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:369,&quot;character&quot;:10,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:369,&quot;character&quot;:28,&quot;text&quot;:&quot;iof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:369,&quot;character&quot;:32,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:370,&quot;character&quot;:6,&quot;text&quot;:&quot;answer_groups&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:370,&quot;character&quot;:21,&quot;text&quot;:&quot;answerGroupsDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:373,&quot;character&quot;:6,&quot;text&quot;:&quot;default_outcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:373,&quot;character&quot;:23,&quot;text&quot;:&quot;defaultOutcomeDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:374,&quot;character&quot;:6,&quot;text&quot;:&quot;hints&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:374,&quot;character&quot;:13,&quot;text&quot;:&quot;hintsDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:376,&quot;character&quot;:6,&quot;text&quot;:&quot;solution&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:376,&quot;character&quot;:16,&quot;text&quot;:&quot;solutionDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:379,&quot;character&quot;:11,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:379,&quot;character&quot;:27,&quot;text&quot;:&quot;customizationArgs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:384,&quot;character&quot;:10,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:384,&quot;character&quot;:28,&quot;text&quot;:&quot;iof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:384,&quot;character&quot;:32,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:385,&quot;character&quot;:6,&quot;text&quot;:&quot;answer_groups&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:385,&quot;character&quot;:21,&quot;text&quot;:&quot;answerGroupsDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:390,&quot;character&quot;:6,&quot;text&quot;:&quot;default_outcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:390,&quot;character&quot;:23,&quot;text&quot;:&quot;defaultOutcomeDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:391,&quot;character&quot;:6,&quot;text&quot;:&quot;hints&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:391,&quot;character&quot;:13,&quot;text&quot;:&quot;hintsDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:393,&quot;character&quot;:6,&quot;text&quot;:&quot;solution&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:393,&quot;character&quot;:16,&quot;text&quot;:&quot;solutionDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:396,&quot;character&quot;:11,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:396,&quot;character&quot;:27,&quot;text&quot;:&quot;customizationArgs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:403,&quot;character&quot;:10,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:403,&quot;character&quot;:28,&quot;text&quot;:&quot;iof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:403,&quot;character&quot;:32,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:404,&quot;character&quot;:6,&quot;text&quot;:&quot;answer_groups&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:404,&quot;character&quot;:21,&quot;text&quot;:&quot;answerGroupsDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:412,&quot;character&quot;:6,&quot;text&quot;:&quot;default_outcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:412,&quot;character&quot;:23,&quot;text&quot;:&quot;defaultOutcomeDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:413,&quot;character&quot;:6,&quot;text&quot;:&quot;hints&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:413,&quot;character&quot;:13,&quot;text&quot;:&quot;hintsDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:415,&quot;character&quot;:6,&quot;text&quot;:&quot;solution&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:415,&quot;character&quot;:16,&quot;text&quot;:&quot;solutionDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:418,&quot;character&quot;:11,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:418,&quot;character&quot;:27,&quot;text&quot;:&quot;customizationArgs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:426,&quot;character&quot;:6,&quot;text&quot;:&quot;iof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:426,&quot;character&quot;:10,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:427,&quot;character&quot;:8,&quot;text&quot;:&quot;answer_groups&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:427,&quot;character&quot;:23,&quot;text&quot;:&quot;answerGroupsDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:430,&quot;character&quot;:8,&quot;text&quot;:&quot;default_outcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:430,&quot;character&quot;:25,&quot;text&quot;:&quot;defaultOutcomeDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:431,&quot;character&quot;:8,&quot;text&quot;:&quot;hints&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:431,&quot;character&quot;:15,&quot;text&quot;:&quot;hintsDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:433,&quot;character&quot;:8,&quot;text&quot;:&quot;solution&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:433,&quot;character&quot;:18,&quot;text&quot;:&quot;solutionDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:439,&quot;character&quot;:10,&quot;text&quot;:&quot;copyInteractionDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:439,&quot;character&quot;:37,&quot;text&quot;:&quot;interactionDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:440,&quot;character&quot;:4,&quot;text&quot;:&quot;copyInteractionDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:440,&quot;character&quot;:24,&quot;text&quot;:&quot;default_outcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:442,&quot;character&quot;:10,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:442,&quot;character&quot;:28,&quot;text&quot;:&quot;iof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:442,&quot;character&quot;:32,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:442,&quot;character&quot;:54,&quot;text&quot;:&quot;copyInteractionDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:444,&quot;character&quot;:11,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:444,&quot;character&quot;:27,&quot;text&quot;:&quot;defaultOutcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:448,&quot;character&quot;:10,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:448,&quot;character&quot;:28,&quot;text&quot;:&quot;iof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:448,&quot;character&quot;:32,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:448,&quot;character&quot;:54,&quot;text&quot;:&quot;interactionDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:450,&quot;character&quot;:11,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:450,&quot;character&quot;:27,&quot;text&quot;:&quot;id&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:451,&quot;character&quot;:4,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:451,&quot;character&quot;:20,&quot;text&quot;:&quot;setId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:452,&quot;character&quot;:11,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:452,&quot;character&quot;:27,&quot;text&quot;:&quot;id&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:456,&quot;character&quot;:10,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:456,&quot;character&quot;:28,&quot;text&quot;:&quot;iof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:456,&quot;character&quot;:32,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:456,&quot;character&quot;:54,&quot;text&quot;:&quot;interactionDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:474,&quot;character&quot;:11,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:474,&quot;character&quot;:27,&quot;text&quot;:&quot;answerGroups&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:474,&quot;character&quot;:50,&quot;text&quot;:&quot;agof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:474,&quot;character&quot;:55,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:490,&quot;character&quot;:21,&quot;text&quot;:&quot;agof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:490,&quot;character&quot;:26,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:491,&quot;character&quot;:4,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:491,&quot;character&quot;:20,&quot;text&quot;:&quot;setAnswerGroups&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:492,&quot;character&quot;:11,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:492,&quot;character&quot;:27,&quot;text&quot;:&quot;answerGroups&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:496,&quot;character&quot;:10,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:496,&quot;character&quot;:28,&quot;text&quot;:&quot;iof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:496,&quot;character&quot;:32,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:496,&quot;character&quot;:54,&quot;text&quot;:&quot;interactionDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:509,&quot;character&quot;:10,&quot;text&quot;:&quot;newDefaultOutcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:509,&quot;character&quot;:30,&quot;text&quot;:&quot;oof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:509,&quot;character&quot;:34,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:510,&quot;character&quot;:11,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:510,&quot;character&quot;:27,&quot;text&quot;:&quot;defaultOutcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:511,&quot;character&quot;:6,&quot;text&quot;:&quot;oof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:511,&quot;character&quot;:10,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:522,&quot;character&quot;:4,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:522,&quot;character&quot;:20,&quot;text&quot;:&quot;setDefaultOutcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:522,&quot;character&quot;:38,&quot;text&quot;:&quot;newDefaultOutcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:523,&quot;character&quot;:11,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:523,&quot;character&quot;:27,&quot;text&quot;:&quot;defaultOutcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:523,&quot;character&quot;:51,&quot;text&quot;:&quot;newDefaultOutcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:527,&quot;character&quot;:10,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:527,&quot;character&quot;:28,&quot;text&quot;:&quot;iof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:527,&quot;character&quot;:32,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:527,&quot;character&quot;:54,&quot;text&quot;:&quot;interactionDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:535,&quot;character&quot;:11,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:535,&quot;character&quot;:27,&quot;text&quot;:&quot;customizationArgs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:541,&quot;character&quot;:4,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:541,&quot;character&quot;:20,&quot;text&quot;:&quot;setCustomizationArgs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:542,&quot;character&quot;:11,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:542,&quot;character&quot;:27,&quot;text&quot;:&quot;customizationArgs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:546,&quot;character&quot;:10,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:546,&quot;character&quot;:28,&quot;text&quot;:&quot;iof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:546,&quot;character&quot;:32,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:546,&quot;character&quot;:54,&quot;text&quot;:&quot;interactionDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:556,&quot;character&quot;:10,&quot;text&quot;:&quot;newSolution&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:556,&quot;character&quot;:24,&quot;text&quot;:&quot;sof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:556,&quot;character&quot;:28,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:557,&quot;character&quot;:11,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:557,&quot;character&quot;:27,&quot;text&quot;:&quot;solution&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:558,&quot;character&quot;:6,&quot;text&quot;:&quot;sof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:558,&quot;character&quot;:10,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:566,&quot;character&quot;:4,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:566,&quot;character&quot;:20,&quot;text&quot;:&quot;setSolution&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:566,&quot;character&quot;:32,&quot;text&quot;:&quot;newSolution&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:567,&quot;character&quot;:11,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:567,&quot;character&quot;:27,&quot;text&quot;:&quot;solution&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:567,&quot;character&quot;:45,&quot;text&quot;:&quot;newSolution&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:571,&quot;character&quot;:10,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:571,&quot;character&quot;:28,&quot;text&quot;:&quot;iof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:571,&quot;character&quot;:32,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:571,&quot;character&quot;:54,&quot;text&quot;:&quot;interactionDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:579,&quot;character&quot;:10,&quot;text&quot;:&quot;newHint&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:579,&quot;character&quot;:20,&quot;text&quot;:&quot;hof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:579,&quot;character&quot;:24,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:580,&quot;character&quot;:11,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:580,&quot;character&quot;:27,&quot;text&quot;:&quot;hints&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:580,&quot;character&quot;:42,&quot;text&quot;:&quot;hintsDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:580,&quot;character&quot;:52,&quot;text&quot;:&quot;map&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:580,&quot;character&quot;:65,&quot;text&quot;:&quot;hintDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:581,&quot;character&quot;:13,&quot;text&quot;:&quot;hof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:581,&quot;character&quot;:17,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:581,&quot;character&quot;:39,&quot;text&quot;:&quot;hintDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:583,&quot;character&quot;:4,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:583,&quot;character&quot;:20,&quot;text&quot;:&quot;setHints&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:583,&quot;character&quot;:30,&quot;text&quot;:&quot;newHint&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:584,&quot;character&quot;:11,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:584,&quot;character&quot;:27,&quot;text&quot;:&quot;hints&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:584,&quot;character&quot;:43,&quot;text&quot;:&quot;newHint&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:588,&quot;character&quot;:10,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:588,&quot;character&quot;:28,&quot;text&quot;:&quot;iof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:588,&quot;character&quot;:32,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:588,&quot;character&quot;:54,&quot;text&quot;:&quot;interactionDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:655,&quot;character&quot;:10,&quot;text&quot;:&quot;otherInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:655,&quot;character&quot;:29,&quot;text&quot;:&quot;iof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:655,&quot;character&quot;:33,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:656,&quot;character&quot;:4,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:656,&quot;character&quot;:20,&quot;text&quot;:&quot;copy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:656,&quot;character&quot;:25,&quot;text&quot;:&quot;otherInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:657,&quot;character&quot;:11,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:657,&quot;character&quot;:36,&quot;text&quot;:&quot;otherInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:658,&quot;character&quot;:4,&quot;text&quot;:&quot;otherInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:658,&quot;character&quot;:21,&quot;text&quot;:&quot;customizationArgs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:658,&quot;character&quot;:39,&quot;text&quot;:&quot;showChoicesInShuffledOrder&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:658,&quot;character&quot;:66,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:659,&quot;character&quot;:11,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:659,&quot;character&quot;:36,&quot;text&quot;:&quot;iof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:659,&quot;character&quot;:40,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:684,&quot;character&quot;:10,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:684,&quot;character&quot;:28,&quot;text&quot;:&quot;iof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:684,&quot;character&quot;:32,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:684,&quot;character&quot;:54,&quot;text&quot;:&quot;interactionDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:686,&quot;character&quot;:11,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:686,&quot;character&quot;:27,&quot;text&quot;:&quot;toBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:686,&quot;character&quot;:52,&quot;text&quot;:&quot;interactionDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:692,&quot;character&quot;:6,&quot;text&quot;:&quot;answer_groups&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:692,&quot;character&quot;:21,&quot;text&quot;:&quot;answerGroupsDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:708,&quot;character&quot;:6,&quot;text&quot;:&quot;default_outcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:708,&quot;character&quot;:23,&quot;text&quot;:&quot;defaultOutcomeDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:709,&quot;character&quot;:6,&quot;text&quot;:&quot;hints&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:709,&quot;character&quot;:13,&quot;text&quot;:&quot;hintsDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:711,&quot;character&quot;:6,&quot;text&quot;:&quot;solution&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:711,&quot;character&quot;:16,&quot;text&quot;:&quot;solutionDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:713,&quot;character&quot;:10,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:713,&quot;character&quot;:28,&quot;text&quot;:&quot;iof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:713,&quot;character&quot;:32,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:715,&quot;character&quot;:11,&quot;text&quot;:&quot;testInteraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:715,&quot;character&quot;:27,&quot;text&quot;:&quot;toBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:782,&quot;character&quot;:24,&quot;text&quot;:&quot;caSpec&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:783,&quot;character&quot;:20,&quot;text&quot;:&quot;caSpec&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:783,&quot;character&quot;:27,&quot;text&quot;:&quot;name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:783,&quot;character&quot;:36,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:783,&quot;character&quot;:43,&quot;text&quot;:&quot;caSpec&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:783,&quot;character&quot;:50,&quot;text&quot;:&quot;default_value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:786,&quot;character&quot;:8,&quot;text&quot;:&quot;iof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:786,&quot;character&quot;:12,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:787,&quot;character&quot;:10,&quot;text&quot;:&quot;answer_groups&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:787,&quot;character&quot;:25,&quot;text&quot;:&quot;answerGroupsDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:790,&quot;character&quot;:10,&quot;text&quot;:&quot;default_outcome&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:790,&quot;character&quot;:27,&quot;text&quot;:&quot;defaultOutcomeDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:791,&quot;character&quot;:10,&quot;text&quot;:&quot;hints&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:791,&quot;character&quot;:17,&quot;text&quot;:&quot;hintsDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:793,&quot;character&quot;:10,&quot;text&quot;:&quot;solution&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactorySpec.ts&quot;,&quot;line&quot;:793,&quot;character&quot;:20,&quot;text&quot;:&quot;solutionDict&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:57 GMT</p>
+    </body>
+  </html>
+  

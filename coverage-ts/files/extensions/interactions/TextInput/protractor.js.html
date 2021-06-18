@@ -1,0 +1,111 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>protractor.js</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">extensions/interactions/TextInput/protractor.js</td><td class="">57.94%</td><td class="">100%</td><td class="">126</td><td class="">73</td><td class="">53</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2014 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview End-to-end testing utilities for the Text interaction.
+ */
+var waitFor = require(
+  process.cwd() + &#x27;/core/tests/protractor_utils/waitFor.js&#x27;);
+var objects = require(process.cwd() + &#x27;/extensions/objects/protractor.js&#x27;);
+
+var customizeInteraction = async function(elem, placeholderText, heightOfBox) {
+  await objects.UnicodeStringEditor(
+    elem.element(by.tagName(&#x27;schema-based-unicode-editor&#x27;))
+  ).setValue(placeholderText);
+  await objects.IntEditor(
+    elem.element(by.tagName(&#x27;schema-based-int-editor&#x27;))
+  ).setValue(heightOfBox);
+};
+
+var expectInteractionDetailsToMatch = async function(
+    elem, placeholderText, heightOfBox) {
+  const textInputInteraction = (
+    element(by.tagName(&#x27;oppia-interactive-text-input&#x27;)));
+  // We use presenceOf here instead of visibilityOf because the container
+  // has a height and width of 0.
+  await waitFor.presenceOf(
+    textInputInteraction,
+    &#x27;TextInput interaction taking too long to appear&#x27;);
+  if (placeholderText) {
+    placeholderValue = await textInputInteraction.getAttribute(
+      &#x27;placeholder-with-value&#x27;);
+    placeholderValueUnicode = JSON.parse(
+      placeholderValue.replace(/&amp;quot;/g, &#x27;&quot;&#x27;)
+    ).unicode_str;
+    expect(placeholderValueUnicode).toEqual(placeholderText);
+  }
+  if (heightOfBox) {
+    expect(textInputInteraction.getAttribute(&#x27;rows-with-value&#x27;))
+      .toEqual(heightOfBox.toString());
+  }
+  expect(
+    await elem.element(by.tagName(&#x27;oppia-interactive-text-input&#x27;)).isPresent()
+  ).toBe(true);
+};
+
+var submitAnswer = async function(elem, answer) {
+  // Try to get the text area element. If it doesn&#x27;t exist, try input instead.
+  // They are different depending on the height of the box.
+  var textInputElem = elem.element(by.tagName(&#x27;oppia-interactive-text-input&#x27;));
+  var textAreaElem = textInputElem.element(by.tagName(&#x27;textarea&#x27;));
+  var inputElem = textInputElem.element(by.tagName(&#x27;input&#x27;));
+  if (await textAreaElem.isPresent()) {
+    await textAreaElem.sendKeys(answer);
+    await element(by.css(&#x27;.protractor-test-submit-answer-button&#x27;)).click();
+  } else {
+    // This must be chained in here due to the textInputElem possibly being
+    // invisible after the longer text area submits, causing the instantiation
+    // of this promise object to throw a validation error due to it referring
+    // to an element which does not exist.
+    if (await inputElem.isPresent()) {
+      await inputElem.clear();
+      await inputElem.sendKeys(answer);
+      await element(by.css(&#x27;.protractor-test-submit-answer-button&#x27;)).click();
+    }
+  }
+};
+
+var answerObjectType = &#x27;NormalizedString&#x27;;
+
+var testSuite = [{
+  interactionArguments: [&#x27;placeholder&#x27;, 4],
+  ruleArguments: [&#x27;StartsWith&#x27;, [&#x27;valid&#x27;]],
+  expectedInteractionDetails: [&#x27;placeholder&#x27;, 4],
+  wrongAnswers: [&#x27;invalid&#x27;],
+  correctAnswers: [&#x27;valid&#x27;]
+}];
+
+exports.customizeInteraction = customizeInteraction;
+exports.expectInteractionDetailsToMatch = expectInteractionDetailsToMatch;
+exports.submitAnswer = submitAnswer;
+exports.answerObjectType = answerObjectType;
+exports.testSuite = testSuite;
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;extensions/interactions/TextInput/protractor.js&quot;,&quot;line&quot;:17,&quot;character&quot;:4,&quot;text&quot;:&quot;waitFor&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/TextInput/protractor.js&quot;,&quot;line&quot;:19,&quot;character&quot;:4,&quot;text&quot;:&quot;objects&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/TextInput/protractor.js&quot;,&quot;line&quot;:21,&quot;character&quot;:42,&quot;text&quot;:&quot;elem&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/TextInput/protractor.js&quot;,&quot;line&quot;:21,&quot;character&quot;:48,&quot;text&quot;:&quot;placeholderText&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/TextInput/protractor.js&quot;,&quot;line&quot;:21,&quot;character&quot;:65,&quot;text&quot;:&quot;heightOfBox&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/TextInput/protractor.js&quot;,&quot;line&quot;:22,&quot;character&quot;:8,&quot;text&quot;:&quot;objects&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/TextInput/protractor.js&quot;,&quot;line&quot;:22,&quot;character&quot;:16,&quot;text&quot;:&quot;UnicodeStringEditor&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/TextInput/protractor.js&quot;,&quot;line&quot;:23,&quot;character&quot;:4,&quot;text&quot;:&quot;elem&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/TextInput/protractor.js&quot;,&quot;line&quot;:23,&quot;character&quot;:9,&quot;text&quot;:&quot;element&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/TextInput/protractor.js&quot;,&quot;line&quot;:24,&quot;character&quot;:4,&quot;text&quot;:&quot;setValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/TextInput/protractor.js&quot;,&quot;line&quot;:24,&quot;character&quot;:13,&quot;text&quot;:&quot;placeholderText&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/TextInput/protractor.js&quot;,&quot;line&quot;:25,&quot;character&quot;:8,&quot;text&quot;:&quot;objects&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/TextInput/protractor.js&quot;,&quot;line&quot;:25,&quot;character&quot;:16,&quot;text&quot;:&quot;IntEditor&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/TextInput/protractor.js&quot;,&quot;line&quot;:26,&quot;character&quot;:4,&quot;text&quot;:&quot;elem&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/TextInput/protractor.js&quot;,&quot;line&quot;:26,&quot;character&quot;:9,&quot;text&quot;:&quot;element&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/TextInput/protractor.js&quot;,&quot;line&quot;:27,&quot;character&quot;:4,&quot;text&quot;:&quot;setValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/TextInput/protractor.js&quot;,&quot;line&quot;:27,&quot;character&quot;:13,&quot;text&quot;:&quot;heightOfBox&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/TextInput/protractor.js&quot;,&quot;line&quot;:31,&quot;character&quot;:4,&quot;text&quot;:&quot;elem&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/TextInput/protractor.js&quot;,&quot;line&quot;:31,&quot;character&quot;:10,&quot;text&quot;:&quot;placeholderText&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/TextInput/protractor.js&quot;,&quot;line&quot;:31,&quot;character&quot;:27,&quot;text&quot;:&quot;heightOfBox&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/TextInput/protractor.js&quot;,&quot;line&quot;:36,&quot;character&quot;:8,&quot;text&quot;:&quot;waitFor&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/TextInput/protractor.js&quot;,&quot;line&quot;:36,&quot;character&quot;:16,&quot;text&quot;:&quot;presenceOf&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/TextInput/protractor.js&quot;,&quot;line&quot;:39,&quot;character&quot;:6,&quot;text&quot;:&quot;placeholderText&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/TextInput/protractor.js&quot;,&quot;line&quot;:44,&quot;character&quot;:6,&quot;text&quot;:&quot;unicode_str&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/TextInput/protractor.js&quot;,&quot;line&quot;:45,&quot;character&quot;:44,&quot;text&quot;:&quot;placeholderText&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/TextInput/protractor.js&quot;,&quot;line&quot;:47,&quot;character&quot;:6,&quot;text&quot;:&quot;heightOfBox&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/TextInput/protractor.js&quot;,&quot;line&quot;:49,&quot;character&quot;:15,&quot;text&quot;:&quot;heightOfBox&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/TextInput/protractor.js&quot;,&quot;line&quot;:52,&quot;character&quot;:10,&quot;text&quot;:&quot;elem&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/TextInput/protractor.js&quot;,&quot;line&quot;:52,&quot;character&quot;:15,&quot;text&quot;:&quot;element&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/TextInput/protractor.js&quot;,&quot;line&quot;:52,&quot;character&quot;:67,&quot;text&quot;:&quot;isPresent&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/TextInput/protractor.js&quot;,&quot;line&quot;:56,&quot;character&quot;:34,&quot;text&quot;:&quot;elem&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/TextInput/protractor.js&quot;,&quot;line&quot;:56,&quot;character&quot;:40,&quot;text&quot;:&quot;answer&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/TextInput/protractor.js&quot;,&quot;line&quot;:59,&quot;character&quot;:6,&quot;text&quot;:&quot;textInputElem&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/TextInput/protractor.js&quot;,&quot;line&quot;:59,&quot;character&quot;:22,&quot;text&quot;:&quot;elem&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/TextInput/protractor.js&quot;,&quot;line&quot;:59,&quot;character&quot;:27,&quot;text&quot;:&quot;element&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/TextInput/protractor.js&quot;,&quot;line&quot;:60,&quot;character&quot;:6,&quot;text&quot;:&quot;textAreaElem&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/TextInput/protractor.js&quot;,&quot;line&quot;:60,&quot;character&quot;:21,&quot;text&quot;:&quot;textInputElem&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/TextInput/protractor.js&quot;,&quot;line&quot;:60,&quot;character&quot;:35,&quot;text&quot;:&quot;element&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/TextInput/protractor.js&quot;,&quot;line&quot;:61,&quot;character&quot;:6,&quot;text&quot;:&quot;inputElem&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/TextInput/protractor.js&quot;,&quot;line&quot;:61,&quot;character&quot;:18,&quot;text&quot;:&quot;textInputElem&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/TextInput/protractor.js&quot;,&quot;line&quot;:61,&quot;character&quot;:32,&quot;text&quot;:&quot;element&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/TextInput/protractor.js&quot;,&quot;line&quot;:62,&quot;character&quot;:12,&quot;text&quot;:&quot;textAreaElem&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/TextInput/protractor.js&quot;,&quot;line&quot;:62,&quot;character&quot;:25,&quot;text&quot;:&quot;isPresent&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/TextInput/protractor.js&quot;,&quot;line&quot;:63,&quot;character&quot;:10,&quot;text&quot;:&quot;textAreaElem&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/TextInput/protractor.js&quot;,&quot;line&quot;:63,&quot;character&quot;:23,&quot;text&quot;:&quot;sendKeys&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/TextInput/protractor.js&quot;,&quot;line&quot;:63,&quot;character&quot;:32,&quot;text&quot;:&quot;answer&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/TextInput/protractor.js&quot;,&quot;line&quot;:70,&quot;character&quot;:14,&quot;text&quot;:&quot;inputElem&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/TextInput/protractor.js&quot;,&quot;line&quot;:70,&quot;character&quot;:24,&quot;text&quot;:&quot;isPresent&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/TextInput/protractor.js&quot;,&quot;line&quot;:71,&quot;character&quot;:12,&quot;text&quot;:&quot;inputElem&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/TextInput/protractor.js&quot;,&quot;line&quot;:71,&quot;character&quot;:22,&quot;text&quot;:&quot;clear&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/TextInput/protractor.js&quot;,&quot;line&quot;:72,&quot;character&quot;:12,&quot;text&quot;:&quot;inputElem&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/TextInput/protractor.js&quot;,&quot;line&quot;:72,&quot;character&quot;:22,&quot;text&quot;:&quot;sendKeys&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/TextInput/protractor.js&quot;,&quot;line&quot;:72,&quot;character&quot;:31,&quot;text&quot;:&quot;answer&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:44:00 GMT</p>
+    </body>
+  </html>
+  

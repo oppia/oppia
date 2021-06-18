@@ -1,0 +1,367 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>svg-sanitizer.service.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">core/templates/services/svg-sanitizer.service.spec.ts</td><td class="">100.00%</td><td class="">100%</td><td class="">209</td><td class="">209</td><td class="">0</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit test for SVGSanitizationService.
+ */
+
+import { HttpClientTestingModule } from &#x27;@angular/common/http/testing&#x27;;
+import { TestBed } from &#x27;@angular/core/testing&#x27;;
+import { DomSanitizer } from &#x27;@angular/platform-browser&#x27;;
+import { SvgSanitizerService } from &#x27;./svg-sanitizer.service&#x27;;
+
+
+describe(&#x27;SvgSanitizerService&#x27;, () =&gt; {
+  let svgSanitizerService: SvgSanitizerService;
+  let domParser: DOMParser = new DOMParser();
+  class MockDomSanitizer {
+    bypassSecurityTrustResourceUrl(str: string): string {
+      return str;
+    }
+  }
+
+  /**
+   * Safe SVG Decoded
+   * &lt;svg version=&quot;1.1&quot; baseProfile=&quot;full&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;&gt;
+   *  &lt;polygon id=&quot;triangle&quot;
+   *           points=&quot;0,0 0,50 50,0&quot; fill=&quot;#009900&quot; stroke=&quot;#004400&quot; /&gt;
+   * &lt;/svg&gt;
+   */
+  const safeSvg = (
+    &#x27;data:image/svg+xml;base64,PHN2ZyBpZD0ic291cmNlIiB2ZXJzaW9uPSIxLjEiIGJhc2&#x27; +
+    &#x27;VQcm9maWxlPSJmdWxsIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgogID&#x27; +
+    &#x27;xwb2x5Z29uIGlkPSJ0cmlhbmdsZSIgcG9pbnRzPSIwLDAgMCw1MCA1MCwwIiBmaWxsPSIjMD&#x27; +
+    &#x27;A5OTAwIiBzdHJva2U9IiMwMDQ0MDAiPjwvcG9seWdvbj4KPC9zdmc+&#x27;
+  );
+
+  /**
+   * Malicious SVG Decoded
+   * &lt;svg version=&quot;1.1&quot; baseProfile=&quot;full&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;&gt;
+   * &lt;polygon id=&quot;triangle&quot;
+   *           points=&quot;0,0 0,50 50,0&quot; fill=&quot;#009900&quot; stroke=&quot;#004400&quot; /&gt;
+   * &lt;script type=&quot;text/javascript&quot;&gt;
+   *   alert(&#x27;This app is probably vulnerable to XSS attacks!&#x27;);
+   * &lt;/script&gt;
+   * &lt;/svg&gt;
+   */
+  const maliciousSvg = (
+    &#x27;data:image/svg+xml;base64,PHN2ZyBpZD0ic291cmNlIiB2ZXJzaW9uPSIxLjEiIGJhc2&#x27; +
+    &#x27;VQcm9maWxlPSJmdWxsIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgogID&#x27; +
+    &#x27;xwb2x5Z29uIGlkPSJ0cmlhbmdsZSIgcG9pbnRzPSIwLDAgMCw1MCA1MCwwIiBmaWxsPSIjMD&#x27; +
+    &#x27;A5OTAwIiBzdHJva2U9IiMwMDQ0MDAiPjwvcG9seWdvbj4KICA8c2NyaXB0IHR5cGU9InRleH&#x27; +
+    &#x27;QvamF2YXNjcmlwdCI+CiAgICBhbGVydCgnVGhpcyBhcHAgaXMgcHJvYmFibHkgdnVsbmVyYW&#x27; +
+    &#x27;JsZSB0byBYU1MgYXR0YWNrcyEnKTsKICA8L3NjcmlwdD4KPC9zdmc+&#x27;
+  );
+
+  const invalidBase64data = &#x27;data:image/svg+xml;base64,This is invalid %3D&#x27;;
+
+  beforeEach(() =&gt; {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [
+        {
+          provide: DomSanitizer,
+          useClass: MockDomSanitizer
+        }
+      ]
+    });
+    svgSanitizerService = TestBed.inject(SvgSanitizerService);
+  });
+
+  it(&#x27;should check for invalid base64 images&#x27;, () =&gt; {
+    expect(svgSanitizerService.isValidBase64Svg(invalidBase64data)).toBe(false);
+  });
+
+  it(
+    &#x27;should return null when malicious SVG is requested as SafeResourceUrl&#x27;,
+    () =&gt; {
+      expect(svgSanitizerService.getTrustedSvgResourceUrl(maliciousSvg)).toBe(
+        null);
+    });
+
+  it(
+    &#x27;should return SafeResourceUrl when a safe SVG is requested as&#x27; +
+    &#x27;SafeResourceUrl&#x27;,
+    () =&gt; {
+      expect(svgSanitizerService.getTrustedSvgResourceUrl(safeSvg)).toBe(
+        safeSvg);
+    });
+
+  it(&#x27;should remove the role attribute from the Math SVG string&#x27;, () =&gt; {
+    let svgString = (
+      &#x27;&lt;svg width=&quot;1.33ex&quot; height=&quot;1.429ex&quot; viewBox=&quot;0 -511.5 572.5 615.4&quot; &#x27; +
+      &#x27;focusable=&quot;false&quot; role= &quot;img&quot; style=&quot;vertical-align: -0.241ex;&quot; xmln&#x27; +
+      &#x27;s=&quot;http://www.w3.org/2000/svg&quot;&gt;&lt;g stroke=&quot;currentColor&quot; fill=&quot;curren&#x27; +
+      &#x27;tColor&quot; stroke-width=&quot;0&quot; transform=&quot;matrix(1 0 0 -1 0 0)&quot;&gt;&lt;path stro&#x27; +
+      &#x27;ke-width=&quot;1&quot; d=&quot;M52 289Q59 331 106 386T222 442Q257 442 2864Q412 404 &#x27; +
+      &#x27;406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 4&#x27; +
+      &#x27;14 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145284 52 289Z&#x27; +
+      &#x27;&quot;/&gt;&lt;/g&gt;&lt;/svg&gt;&#x27;
+    );
+    let cleanedSvgString = (
+      svgSanitizerService.cleanMathExpressionSvgString(svgString));
+    let expectedCleanSvgString = (
+      &#x27;&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;1.33ex&quot; height=&quot;1.429e&#x27; +
+      &#x27;x&quot; viewBox=&quot;0 -511.5 572.5 615.4&quot; focusable=&quot;false&quot; style=&quot;vertical-a&#x27; +
+      &#x27;lign: -0.241ex;&quot;&gt;&lt;g stroke=&quot;currentColor&quot; fill=&quot;currentColor&quot; stro&#x27; +
+      &#x27;ke-width=&quot;0&quot; transform=&quot;matrix(1 0 0 -1 0 0)&quot;&gt;&lt;path stroke-width=&quot;1&quot;&#x27; +
+      &#x27; d=&quot;M52 289Q59 331 106 386T222 442Q257 442 2864Q412 404 406 402Q368 &#x27; +
+      &#x27;386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T463 14&#x27; +
+      &#x27;0Q466 150 469 151T485 153H489Q504 153 504 145284 52 289Z&quot;/&gt;&lt;/g&gt;&lt;/svg&gt;&#x27;
+    );
+    expect(cleanedSvgString).toEqual(expectedCleanSvgString);
+  });
+
+  it(&#x27;should remove custom data attribute from the SVG string&#x27;, function() {
+    var svgString = (
+      &#x27;&lt;svg width=&quot;1.33ex&quot; height=&quot;1.429ex&quot; viewBox=&quot;0 -511.5 572.5 615.4&quot; &#x27; +
+      &#x27;focusable=&quot;false&quot; role= &quot;img&quot; style=&quot;vertical-align: -0.241ex;&quot; xmln&#x27; +
+      &#x27;s=&quot;http://www.w3.org/2000/svg&quot;&gt;&lt;g stroke=&quot;currentColor&quot; fill=&quot;curren&#x27; +
+      &#x27;tColor&quot; stroke-width=&quot;0&quot; transform=&quot;matrix(1 0 0 -1 0 0)&quot;&gt;&lt;path stro&#x27; +
+      &#x27;ke-width=&quot;1&quot; d=&quot;M52 289Q59 331 106 386T222 442Q257 442 2864Q412 404 &#x27; +
+      &#x27;406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 4&#x27; +
+      &#x27;14 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145284 52 289Z&#x27; +
+      &#x27;&quot; data-custom=&quot;datacustom&quot;/&gt;&lt;/g&gt;&lt;/svg&gt;&#x27;
+    );
+    var cleanedSvgString = (
+      svgSanitizerService.cleanMathExpressionSvgString(svgString));
+    var expectedCleanSvgString = (
+      &#x27;&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;1.33ex&quot; height=&quot;1.429e&#x27; +
+      &#x27;x&quot; viewBox=&quot;0 -511.5 572.5 615.4&quot; focusable=&quot;false&quot; style=&quot;vertical-a&#x27; +
+      &#x27;lign: -0.241ex;&quot;&gt;&lt;g stroke=&quot;currentColor&quot; fill=&quot;currentColor&quot; stro&#x27; +
+      &#x27;ke-width=&quot;0&quot; transform=&quot;matrix(1 0 0 -1 0 0)&quot;&gt;&lt;path stroke-width=&quot;1&quot;&#x27; +
+      &#x27; d=&quot;M52 289Q59 331 106 386T222 442Q257 442 2864Q412 404 406 402Q368 &#x27; +
+      &#x27;386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T463 14&#x27; +
+      &#x27;0Q466 150 469 151T485 153H489Q504 153 504 145284 52 289Z&quot;/&gt;&lt;/g&gt;&lt;/svg&gt;&#x27;
+    );
+    expect(cleanedSvgString).toEqual(expectedCleanSvgString);
+  });
+
+  it(&#x27;should replace xmlns:xlink with xmlns in a Math SVG string&#x27;, () =&gt; {
+    let svgString = (
+      &#x27;&lt;svg xmlns:xlink=&quot;http://www.w3.org/1999/xlink&quot; width=&quot;1.33ex&quot; height&#x27; +
+      &#x27;=&quot;1.429ex&quot; viewBox=&quot;0 -511.5 572.5 615.4&quot; focusable=&quot;false&quot; style=&quot;ve&#x27; +
+      &#x27;rtical-align: -0.241ex;&quot;&gt;&lt;g stroke=&quot;currentColor&quot; fill=&quot;currentColor&quot;&#x27; +
+      &#x27; stroke-width=&quot;0&quot; transform=&quot;matrix(1 0 0 -1 0 0)&quot;&gt;&lt;path stroke-width&#x27; +
+      &#x27;=&quot;1&quot; d=&quot;M52 289Q59 331 106 386T222 442Q257 442 2864Q412 404 406 402Q3&#x27; +
+      &#x27;68 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T463 &#x27; +
+      &#x27;140Q466 150 469 151T485 153H489Q504 153 504 145284 52 289Z&quot;&gt;&lt;/path&gt;&lt;/&#x27; +
+      &#x27;g&gt;&lt;/svg&gt;&#x27;
+    );
+    let cleanedSvgString = (
+      svgSanitizerService.cleanMathExpressionSvgString(svgString));
+    let expectedCleanSvgString = (
+      &#x27;&lt;svg width=&quot;1.33ex&quot; height=&quot;1.429ex&quot; viewBox=&quot;0 -511.5 572.5 615.4&quot; &#x27; +
+      &#x27;focusable=&quot;false&quot; style=&quot;vertical-align: -0.241ex;&quot; xmlns=&quot;http://ww&#x27; +
+      &#x27;w.w3.org/2000/svg&quot;&gt;&lt;g stroke=&quot;currentColor&quot; fill=&quot;currentColor&quot; stro&#x27; +
+      &#x27;ke-width=&quot;0&quot; transform=&quot;matrix(1 0 0 -1 0 0)&quot;&gt;&lt;path stroke-width=&quot;1&quot;&#x27; +
+      &#x27; d=&quot;M52 289Q59 331 106 386T222 442Q257 442 2864Q412 404 406 402Q368 &#x27; +
+      &#x27;386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T463 14&#x27; +
+      &#x27;0Q466 150 469 151T485 153H489Q504 153 504 145284 52 289Z&quot;/&gt;&lt;/g&gt;&lt;/svg&gt;&#x27;
+    );
+    expect(cleanedSvgString).toEqual(expectedCleanSvgString);
+  });
+
+  it(&#x27;should extract dimensions from an math SVG string&#x27;, () =&gt; {
+    let svgString = (
+      &#x27;&lt;svg width=&quot;1.33ex&quot; height=&quot;1.429ex&quot; viewBox=&quot;0 -511.5 572.5 615.4&quot; &#x27; +
+      &#x27;focusable=&quot;false&quot; style=&quot;vertical-align: -0.241ex;&quot; xmlns=&quot;http://ww&#x27; +
+      &#x27;w.w3.org/2000/svg&quot;&gt;&lt;g stroke=&quot;currentColor&quot; fill=&quot;currentColor&quot; stro&#x27; +
+      &#x27;ke-width=&quot;0&quot; transform=&quot;matrix(1 0 0 -1 0 0)&quot;&gt;&lt;path stroke-width=&quot;1&quot;&#x27; +
+      &#x27; d=&quot;M52 289Q59 331 106 386T222 442Q257 442 2864Q412 404 406 402Q368 &#x27; +
+      &#x27;386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T463 14&#x27; +
+      &#x27;0Q466 150 469 151T485 153H489Q504 153 504 145284 52 289Z&quot;/&gt;&lt;/g&gt;&lt;/svg&gt;&#x27;
+    );
+    let dimensions = (
+      svgSanitizerService.extractDimensionsFromMathExpressionSvgString(
+        svgString));
+    let expectedDimension = {
+      height: &#x27;1d429&#x27;,
+      width: &#x27;1d33&#x27;,
+      verticalPadding: &#x27;0d241&#x27;
+    };
+    expect(dimensions).toEqual(expectedDimension);
+  });
+
+  it(&#x27;should extract dimensions from SVG string without style&#x27;, function() {
+    var svgString = (
+      &#x27;&lt;svg width=&quot;1.33ex&quot; height=&quot;1.429ex&quot; viewBox=&quot;0 -511.5 572.5 615.4&quot; &#x27; +
+      &#x27;focusable=&quot;false&quot; style=&quot;&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;&gt;&lt;g str&#x27; +
+      &#x27;oke=&quot;currentColor&quot; fill=&quot;currentColor&quot; stroke-width=&quot;0&quot; transform=&quot;m&#x27; +
+      &#x27;atrix(1 0 0 -1 0 0)&quot;&gt;&lt;path stroke-width=&quot;1&quot; d=&quot;M52 289Q59 331 106 38&#x27; +
+      &#x27;6T222 442Q257 442 2864Q412 404 406 402Q368 386 350 336Q290 115 290 7&#x27; +
+      &#x27;8Q290 50 306 38T341 26Q378 26 414 59T463 140Q466 150 469 151T485 153&#x27; +
+      &#x27;H489Q504 153 504 145284 52 289Z&quot;/&gt;&lt;/g&gt;&lt;/svg&gt;&#x27;
+    );
+    var dimensions = (
+      svgSanitizerService.extractDimensionsFromMathExpressionSvgString(
+        svgString));
+    var expectedDimension = {
+      height: &#x27;1d429&#x27;,
+      width: &#x27;1d33&#x27;,
+      verticalPadding: &#x27;0&#x27;
+    };
+    expect(dimensions).toEqual(expectedDimension);
+  });
+
+  it(&#x27;should get invalid svg tags and attributes&#x27;, function() {
+    var dataURI = (
+      &#x27;data:image/svg+xml;base64,&#x27; +
+      btoa(unescape(encodeURIComponent(
+        &#x27;&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; widdth=&quot;1.33ex&quot; height=&quot;1.4&#x27; +
+        &#x27;29ex&quot; viewBox=&quot;0 -511.5 572.5 615.4&quot; focusable=&quot;false&quot; style=&quot;verti&#x27; +
+        &#x27;cal-align: -0.241ex;&quot;&gt;&lt;g stroke=&quot;currentColor&quot; fill=&quot;currentColor&quot; &#x27; +
+        &#x27;stroke-width=&quot;0&quot; transform=&quot;matrix(1 0 0 -1 0 0)&quot;&gt;&lt;path stroke-widt&#x27; +
+        &#x27;h=&quot;1&quot; d=&quot;M52289Q59 331 106 386T222 442Q257 442 2864Q412 404 406 402&#x27; +
+        &#x27;Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T&#x27; +
+        &#x27;463 140Q466 150 469 151T485 153H489Q504 153 504 145284 52 289Z&quot;/&gt;&lt;/&#x27; +
+        &#x27;g&gt;&lt;circel&gt;&lt;/circel&gt;&lt;/svg&gt;&#x27;
+      ))));
+    var invalidSvgTagsAndAttrs = (
+      svgSanitizerService.getInvalidSvgTagsAndAttrsFromDataUri(dataURI));
+    var expectedInvalidSvgTagsAndAttrs = {
+      tags: [&#x27;circel&#x27;],
+      attrs: [&#x27;svg:widdth&#x27;]
+    };
+    expect(invalidSvgTagsAndAttrs).toEqual(expectedInvalidSvgTagsAndAttrs);
+  });
+
+  it(&#x27;should catch malicious SVGs&#x27;, () =&gt; {
+    const testCases: {
+      title: string, payload: string, expected: [number, number]}[] = [{
+        title: &#x27;DOM clobbering attack using name=body&#x27;,
+        payload: &#x27;&lt;image name=body&gt;&lt;image name=adoptNode&gt;@mmrupp&lt;image name=&#x27; +
+        &#x27;firstElementChild&gt;&lt;svg onload=alert(1)&gt;&#x27;,
+        expected: [0, 6]
+      },
+      {
+        title: &#x27;DOM clobbering attack using activeElement&#x27;,
+        payload: &#x27;&lt;image name=activeElement&gt;&lt;svg onload=alert(1)&gt;&#x27;,
+        expected: [0, 6]
+      },
+      {
+        title: &#x27;DOM clobbering attack using name=body and injecting SVG + ke&#x27; +
+        &#x27;ygen&#x27;,
+        payload: &#x27;&lt;image name=body&gt;&lt;img src=x&gt;&lt;svg onload=alert(1); autofocu&#x27; +
+        &#x27;s&gt;,&lt;keygen onfocus=alert(1); autofocus&gt;&#x27;,
+        expected: [0, 6]
+      },
+      {
+        title: &#x27;XSS attack using onerror&#x27;,
+        payload: &#x27;&lt;div id=&quot;128&quot;&gt;&lt;svg&gt;&lt;style&gt;&lt;img/src=x onerror=alert(128)// &#x27; +
+        &#x27;&lt;/b&gt;//[&quot;\&#x27;`--&gt;]]&gt;]&lt;/div&gt;&#x27;,
+        expected: [0, 5]
+      },
+      {
+        title: &#x27;Inline SVG (data-uri)&#x27;,
+        payload: &#x27;&lt;div id=&quot;129&quot;&gt;&lt;svg&gt;&lt;image style=\&#x27;filter:url(&quot;data:image/sv&#x27; +
+        &#x27;g+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22&gt;&lt;script&gt;parent.al&#x27; +
+        &#x27;ert(129)&lt;/script&gt;&lt;/svg&gt;&quot;)\&#x27;&gt;\n&lt;!--\nSame effect with\n&lt;image filter=&#x27; +
+        &#x27;\&#x27;...\&#x27;&gt;\n--&gt;\n&lt;/svg&gt;//[&quot;\&#x27;`--&gt;]]&gt;]&lt;/div&gt;&#x27;,
+        expected: [0, 5]
+      },
+      {
+        title: &#x27;from=&quot;javascript:Malicious code&quot;&#x27;,
+        payload: &#x27;&lt;div id=&quot;137&quot;&gt;&lt;svg&gt;\n&lt;a xmlns:xlink=&quot;http://www.w3.org/199&#x27; +
+        &#x27;9/xlink&quot; xlink:href=&quot;?&quot;&gt;\n&lt;circle r=&quot;400&quot;&gt;&lt;/circle&gt;\n&lt;animate attri&#x27; +
+        &#x27;buteName=&quot;xlink:href&quot; begin=&quot;0&quot; from=&quot;javascript:alert(137)&quot; to=&quot;&amp;&quot;&#x27; +
+        &#x27; /&gt;\n&lt;/a&gt;//[&quot;\&#x27;`--&gt;]]&gt;]&lt;/div&gt;&#x27;,
+        expected: [2, 5]
+      },
+      {
+        title: &#x27;mXSS behavior with SVG in Chrome 77 and alike 1/2&#x27;,
+        payload: &#x27;&lt;svg&gt;&lt;/p&gt;&lt;textarea&gt;&lt;title&gt;&lt;style&gt;&lt;/textarea&gt;&lt;img src=x one&#x27; +
+        &#x27;rror=alert(1)&gt;&lt;/style&gt;&lt;/title&gt;&lt;/svg&gt;&#x27;,
+        expected: [0, 4]
+      },
+      {
+        title: &#x27;mXSS behavior with SVG in Chrome 77 and alike 2/2&#x27;,
+        payload: &#x27;&lt;svg&gt;&lt;/p&gt;&lt;title&gt;&lt;a id=&quot;&lt;/title&gt;&lt;img src=x onerror=alert()&gt;&#x27; +
+        &#x27;&quot;&gt;&lt;/textarea&gt;&lt;/svg&gt;&#x27;,
+        expected: [0, 4]
+      },
+      {
+        title: &#x27;mXSS behavior with SVG Templates in Chrome 77 and alike&#x27;,
+        payload: &#x27;&lt;svg&gt;&lt;/p&gt;&lt;title&gt;&lt;template&gt;&lt;style&gt;&lt;/title&gt;&lt;img src=x onerro&#x27; +
+        &#x27;r=alert(1)&gt;&#x27;,
+        expected: [0, 4]
+      },
+      {
+        title: &#x27;mXSS behavior with embedded MathML/SVG&#x27;,
+        payload: &#x27;&lt;svg&gt;&lt;/p&gt;&lt;math&gt;&lt;title&gt;&lt;style&gt;&lt;img src=x onerror=alert(1)&gt;&lt;&#x27; +
+        &#x27;/style&gt;&lt;/title&gt;&#x27;,
+        expected: [0, 4]
+      },
+      {
+        title: &#x27;attribute-based mXSS behavior 1/3&#x27;,
+        payload: &#x27;&lt;svg&gt;&lt;p&gt;&lt;style&gt;&lt;g title=&quot;&lt;/style&gt;&lt;img src=x onerror=alert(&#x27; +
+        &#x27;1)&gt;&quot;&gt;&#x27;,
+        expected: [0, 5]
+      },
+      {
+        title: &#x27;attribute-based mXSS behavior 2/3&#x27;,
+        payload: &#x27;&lt;svg&gt;&lt;foreignobject&gt;&lt;p&gt;&lt;style&gt;&lt;p title=&quot;&lt;/style&gt;&lt;iframe on&#x27; +
+        &#x27;load&amp;#x3d;alert(1)&lt;!--&quot;&gt;&lt;/style&gt;&#x27;,
+        expected: [0, 6]
+      },
+      {
+        title: &#x27;removal-based mXSS behavior 1/2&#x27;,
+        payload: &#x27;&lt;xmp&gt;&lt;svg&gt;&lt;b&gt;&lt;style&gt;&lt;b title=\&#x27;&lt;/style&gt;&lt;img&gt;\&#x27;&gt;&#x27;,
+        expected: [0, 6]
+      },
+      {
+        title: &#x27;removal-based mXSS behavior 2/2&#x27;,
+        payload: &#x27;&lt;noembed&gt;&lt;svg&gt;&lt;b&gt;&lt;style&gt;&lt;b title=\&#x27;&lt;/style&gt;&lt;img&gt;\&#x27;&gt;&#x27;,
+        expected: [0, 6]
+      },
+      {
+        title: &#x27;nesting-based mXSS behavior 4/5&#x27;,
+        payload: &#x27;&lt;form&gt;&lt;math&gt;&lt;mtext&gt;&lt;/form&gt;&lt;form&gt;&lt;mglyph&gt;&lt;svg&gt;&lt;mtext&gt;&lt;style&#x27; +
+        &#x27;&gt;&lt;path id=&quot;&lt;/style&gt;&lt;img onerror=alert(1) src&gt;&quot;&gt;&#x27;,
+        expected: [0, 7]
+      },
+      {
+        title: &#x27;nesting-based mXSS behavior 5/5&#x27;,
+        payload: &#x27;&lt;math&gt;&lt;mtext&gt;&lt;table&gt;&lt;mglyph&gt;&lt;svg&gt;&lt;mtext&gt;&lt;style&gt;&lt;path id=&quot;&lt;&#x27; +
+        &#x27;/style&gt;&lt;img onerror=alert(1) src&gt;&quot;&gt;&#x27;,
+        expected: [0, 9]
+      }];
+    testCases.forEach((testCase, index) =&gt; {
+      const testCaseResult = svgSanitizerService.getInvalidSvgTagsAndAttrs(
+        domParser.parseFromString(testCase.payload, &#x27;image/svg+xml&#x27;));
+      expect(testCaseResult.attrs.length).toEqual(
+        testCase.expected[0], &#x27;Attributes - Case:&#x27; + testCase.title);
+      expect(testCaseResult.tags.length).toEqual(
+        testCase.expected[1], &#x27;Tags - Case:&#x27; + testCase.title);
+    });
+  });
+});
+</textarea><pre id="annotations" style="display:none">[]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:56 GMT</p>
+    </body>
+  </html>
+  

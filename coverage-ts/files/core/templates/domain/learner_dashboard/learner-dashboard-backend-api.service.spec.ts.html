@@ -1,0 +1,402 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>learner-dashboard-backend-api.service.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/domain/learner_dashboard/learner-dashboard-backend-api.service.spec.ts</td><td class="">94.62%</td><td class="">100%</td><td class="">409</td><td class="">387</td><td class="">22</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2021 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for LearnerDashboardBackendApiService.
+ */
+
+import { HttpClientTestingModule, HttpTestingController } from
+  &#x27;@angular/common/http/testing&#x27;;
+import { TestBed, fakeAsync, flushMicrotasks } from &#x27;@angular/core/testing&#x27;;
+
+import { LearnerDashboardBackendApiService } from
+  &#x27;domain/learner_dashboard/learner-dashboard-backend-api.service&#x27;;
+
+describe(&#x27;Learner Dashboard Backend API Service&#x27;, () =&gt; {
+  let learnerDashboardBackendApiService:
+    LearnerDashboardBackendApiService = null;
+  let httpTestingController: HttpTestingController;
+
+  let sampleDataResults = {
+    incomplete_explorations_list: [{
+      category: &#x27;Arithmetic&#x27;,
+      created_on_msec: 1515553584276.8,
+      community_owned: false,
+      thumbnail_bg_color: &#x27;#d68453&#x27;,
+      title: &#x27;Equality of Fractions (Recap)&#x27;,
+      num_views: 760,
+      tags: [
+        &#x27;recap&#x27;,
+        &#x27;fractions&#x27;,
+        &#x27;mixed numbers&#x27;,
+        &#x27;improper fractions&#x27;,
+        &#x27;equivalent fractions&#x27;,
+        &#x27;fractions of a group&#x27;
+      ],
+      last_updated_msec: 1593864269236.194,
+      human_readable_contributors_summary: {},
+      status: &#x27;public&#x27;,
+      language_code: &#x27;en&#x27;,
+      objective: &#x27;Practice the skills from lessons 1-7.&#x27;,
+      thumbnail_icon_url: &#x27;/subjects/Arithmetic.svg&#x27;,
+      ratings: {
+        1: 0,
+        2: 1,
+        3: 0,
+        4: 0,
+        5: 5
+      },
+      id: &#x27;-tMgcP1i_4au&#x27;,
+      activity_type: &#x27;exploration&#x27;
+    }],
+    exploration_playlist: [{
+      category: &#x27;Welcome&#x27;,
+      created_on_msec: 1564183471833.675,
+      community_owned: true,
+      thumbnail_bg_color: &#x27;#992a2b&#x27;,
+      title: &#x27;Welcome to Oppia!&#x27;,
+      num_views: 14897,
+      tags: [],
+      last_updated_msec: 1571653541705.924,
+      human_readable_contributors_summary: {},
+      status: &#x27;public&#x27;,
+      language_code: &#x27;en&#x27;,
+      objective: &quot;become familiar with Oppia&#x27;s capabilities&quot;,
+      thumbnail_icon_url: &#x27;/subjects/Welcome.svg&#x27;,
+      ratings: {
+        1: 1,
+        2: 1,
+        3: 3,
+        4: 24,
+        5: 46
+      },
+      id: &#x27;0&#x27;,
+      activity_type: &#x27;exploration&#x27;
+    }],
+    number_of_unread_threads: 0,
+    thread_summaries: [
+      {
+        status: &#x27;open&#x27;,
+        author_second_last_message: null,
+        exploration_id: &#x27;JctD1Xvtg1eC&#x27;,
+        last_message_is_read: true,
+        thread_id:
+          &#x27;exploration.JctD1Xvtg1eC.WzE1OTIyMjMzMDM3ODMuMTldWzEyOTk3XQ==&#x27;,
+        author_last_message: &#x27;nishantwrp&#x27;,
+        last_updated_msecs: 1592223304062.665,
+        last_message_text: &#x27;&#x27;,
+        original_author_id: &#x27;uid_oijrdjajpkgegqmqqttxsxbbiobexugg&#x27;,
+        exploration_title: &#x27;What is a negative number?&#x27;,
+        second_last_message_is_read: false,
+        total_message_count: 1
+      }
+    ],
+    completed_collections_list: [{
+      status: &#x27;public&#x27;,
+      thumbnail_bg_color: &#x27;#d68453&#x27;,
+      community_owned: false,
+      created_on: 1558593739415.726,
+      thumbnail_icon_url: &#x27;/subjects/Arithmetic.svg&#x27;,
+      language_code: &#x27;en&#x27;,
+      id: &#x27;GdYIgsfRZwG7&#x27;,
+      category: &#x27;Arithmetic&#x27;,
+      title: &#x27;Negative Numbers&#x27;,
+      last_updated_msec: 1558593926486.329,
+      objective: &#x27;Learn what negative numbers are, and how to use them.&#x27;,
+      node_count: 5
+    }],
+    collection_playlist: [{
+      status: &#x27;public&#x27;,
+      thumbnail_bg_color: &#x27;#d68453&#x27;,
+      community_owned: false,
+      created_on: 1558593739415.726,
+      thumbnail_icon_url: &#x27;/subjects/Arithmetic.svg&#x27;,
+      language_code: &#x27;en&#x27;,
+      id: &#x27;GdYIgsfRZwG7&#x27;,
+      category: &#x27;Arithmetic&#x27;,
+      title: &#x27;Negative Numbers&#x27;,
+      last_updated_msec: 1558593926486.329,
+      objective: &#x27;Learn what negative numbers are, and how to use them.&#x27;,
+      node_count: 5
+    }],
+    incomplete_collections_list: [{
+      status: &#x27;public&#x27;,
+      thumbnail_bg_color: &#x27;#d68453&#x27;,
+      community_owned: false,
+      created_on: 1491118537846.88,
+      thumbnail_icon_url: &#x27;/subjects/Arithmetic.svg&#x27;,
+      language_code: &#x27;en&#x27;,
+      id: &#x27;4UgTQUc1tala&#x27;,
+      category: &#x27;Arithmetic&#x27;,
+      title: &#x27;Fractions&#x27;,
+      last_updated_msec: 1527227142150.33,
+      objective:
+        &#x27;Learn the basics of fractions with Matthew as he explores a bakery.&#x27;,
+      node_count: 12
+    }],
+    number_of_nonexistent_activities: {
+      completed_collections: 0,
+      incomplete_collections: 0,
+      collection_playlist: 0,
+      incomplete_explorations: 0,
+      exploration_playlist: 0,
+      completed_explorations: 0
+    },
+    completed_explorations_list: [{
+      category: &#x27;Welcome&#x27;,
+      created_on_msec: 1564183471833.675,
+      community_owned: true,
+      thumbnail_bg_color: &#x27;#992a2b&#x27;,
+      title: &#x27;Welcome to Oppia!&#x27;,
+      num_views: 14897,
+      tags: [],
+      last_updated_msec: 1571653541705.924,
+      human_readable_contributors_summary: {},
+      status: &#x27;public&#x27;,
+      language_code: &#x27;en&#x27;,
+      objective: &quot;become familiar with Oppia&#x27;s capabilities&quot;,
+      thumbnail_icon_url: &#x27;/subjects/Welcome.svg&#x27;,
+      ratings: {
+        1: 1,
+        2: 1,
+        3: 3,
+        4: 24,
+        5: 46
+      },
+      id: &#x27;0&#x27;,
+      activity_type: &#x27;exploration&#x27;
+    }],
+    subscription_list: [{
+      creator_username: &#x27;user&#x27;,
+      creator_impact: 0,
+      creator_picture_data_url: &#x27;path/to/img&#x27;
+    }],
+    user_email: &#x27;user@example.com&#x27;,
+    completed_to_incomplete_collections: []
+  };
+
+  let LEARNER_DASHBOARD_DATA_URL = &#x27;/learnerdashboardhandler/data&#x27;;
+  let ERROR_STATUS_CODE = 400;
+
+  beforeEach(() =&gt; {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [LearnerDashboardBackendApiService]
+    });
+    learnerDashboardBackendApiService = TestBed.get(
+      LearnerDashboardBackendApiService);
+
+    httpTestingController = TestBed.get(HttpTestingController);
+  });
+
+  afterEach(() =&gt; {
+    httpTestingController.verify();
+  });
+
+  it(&#x27;should successfully fetch learner dashboard data from the&#x27; +
+    &#x27; backend&#x27;, fakeAsync(() =&gt; {
+    let successHandler = jasmine.createSpy(&#x27;success&#x27;);
+    let failHandler = jasmine.createSpy(&#x27;fail&#x27;);
+
+    learnerDashboardBackendApiService.fetchLearnerDashboardDataAsync()
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(LEARNER_DASHBOARD_DATA_URL);
+    expect(req.request.method).toEqual(&#x27;GET&#x27;);
+    req.flush(sampleDataResults);
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it(&#x27;should use rejection handler if learner dashboard data&#x27; +
+    &#x27; backend request failed&#x27;, fakeAsync(() =&gt; {
+    let successHandler = jasmine.createSpy(&#x27;success&#x27;);
+    let failHandler = jasmine.createSpy(&#x27;fail&#x27;);
+
+    learnerDashboardBackendApiService.fetchLearnerDashboardDataAsync()
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(LEARNER_DASHBOARD_DATA_URL);
+    expect(req.request.method).toEqual(&#x27;GET&#x27;);
+    req.flush({
+      error: &#x27;Error loading dashboard data.&#x27;
+    }, {
+      status: ERROR_STATUS_CODE, statusText: &#x27;Invalid Request&#x27;
+    });
+
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(400);
+  }
+  ));
+
+  it(&#x27;should add current message to the feedback updates thread&#x27; +
+    &#x27; when calling addNewMessageAsync&#x27;, fakeAsync(() =&gt; {
+    let successHandler = jasmine.createSpy(&#x27;success&#x27;);
+    let failHandler = jasmine.createSpy(&#x27;fail&#x27;);
+
+    let updatedStatus = null;
+    let updatedSubject = null;
+    let text = &#x27;Sending message&#x27;;
+    let url = &#x27;/threadhandler/exploration.4.Wfafsafd&#x27;;
+    let payload = {
+      updated_status: updatedStatus,
+      updated_subject: updatedSubject,
+      text: text
+    };
+
+    learnerDashboardBackendApiService.addNewMessageAsync(
+      url, payload
+    ).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      &#x27;/threadhandler/exploration.4.Wfafsafd&#x27;);
+    expect(req.request.method).toEqual(&#x27;POST&#x27;);
+    expect(req.request.body).toEqual(payload);
+
+    req.flush(
+      { status: 200, statusText: &#x27;Success.&#x27;});
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it(&#x27;should fail to add current message to the feedback updates thread&#x27; +
+    &#x27; when calling addNewMessageAsync&#x27;, fakeAsync(() =&gt; {
+    let successHandler = jasmine.createSpy(&#x27;success&#x27;);
+    let failHandler = jasmine.createSpy(&#x27;fail&#x27;);
+
+    let updatedStatus = null;
+    let updatedSubject = null;
+    let text = &#x27;Sending message&#x27;;
+    let invalidUrl = &#x27;/invalidUrl&#x27;;
+    let payload = {
+      updated_status: updatedStatus,
+      updated_subject: updatedSubject,
+      text: text
+    };
+    learnerDashboardBackendApiService.addNewMessageAsync(
+      invalidUrl, payload
+    ).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      &#x27;/invalidUrl&#x27;);
+    expect(req.request.method).toEqual(&#x27;POST&#x27;);
+    expect(req.request.body).toEqual(payload);
+
+    req.flush(
+      { error: &#x27;Given URL is invalid.&#x27;},
+      { status: 500, statusText: &#x27;Internal Server Error&#x27;});
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      &#x27;Given URL is invalid.&#x27;);
+  }
+  ));
+
+  it(&#x27;should get the data of current feedback updates thread&#x27; +
+    &#x27; when calling addNewMessageAsync&#x27;, fakeAsync(() =&gt; {
+    let successHandler = jasmine.createSpy(&#x27;success&#x27;);
+    let failHandler = jasmine.createSpy(&#x27;fail&#x27;);
+
+    let url = &#x27;/threadhandler/exploration.4.Wfafsafd&#x27;;
+    let result = [{
+      author_picture_data_url:
+        &#x27;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYA&#x27;,
+      author_username: &#x27;User&#x27;,
+      created_on_msecs: 1617712024611.706,
+      message_id: 1,
+      text: &#x27;test&#x27;,
+      updated_status: null
+    }];
+
+    learnerDashboardBackendApiService.onClickThreadAsync(
+      url
+    ).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      &#x27;/threadhandler/exploration.4.Wfafsafd&#x27;);
+    expect(req.request.method).toEqual(&#x27;GET&#x27;);
+
+    req.flush(
+      {
+        message_summary_list: [{
+          author_picture_data_url:
+            &#x27;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYA&#x27;,
+          author_username: &#x27;User&#x27;,
+          created_on_msecs: 1617712024611.706,
+          message_id: 1,
+          text: &#x27;test&#x27;,
+          updated_status: null
+        }]
+      },
+      { status: 200, statusText: &#x27;Success.&#x27;});
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(result);
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it(&#x27;should fail to get the data of current feedback updates thread&#x27; +
+    &#x27; when calling addNewMessageAsync&#x27;, fakeAsync(() =&gt; {
+    let successHandler = jasmine.createSpy(&#x27;success&#x27;);
+    let failHandler = jasmine.createSpy(&#x27;fail&#x27;);
+
+    let invalidUrl = &#x27;/invalidUrl&#x27;;
+    learnerDashboardBackendApiService.onClickThreadAsync(
+      invalidUrl
+    ).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      &#x27;/invalidUrl&#x27;);
+    expect(req.request.method).toEqual(&#x27;GET&#x27;);
+
+    req.flush(
+      { error: &#x27;Given URL is invalid.&#x27;},
+      { status: 500, statusText: &#x27;Internal Server Error&#x27;});
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      &#x27;Given URL is invalid.&#x27;);
+  }
+  ));
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/domain/learner_dashboard/learner-dashboard-backend-api.service.spec.ts&quot;,&quot;line&quot;:215,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/learner_dashboard/learner-dashboard-backend-api.service.spec.ts&quot;,&quot;line&quot;:234,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/learner_dashboard/learner-dashboard-backend-api.service.spec.ts&quot;,&quot;line&quot;:253,&quot;character&quot;:8,&quot;text&quot;:&quot;updatedStatus&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/learner_dashboard/learner-dashboard-backend-api.service.spec.ts&quot;,&quot;line&quot;:254,&quot;character&quot;:8,&quot;text&quot;:&quot;updatedSubject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/learner_dashboard/learner-dashboard-backend-api.service.spec.ts&quot;,&quot;line&quot;:258,&quot;character&quot;:6,&quot;text&quot;:&quot;updated_status&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/learner_dashboard/learner-dashboard-backend-api.service.spec.ts&quot;,&quot;line&quot;:258,&quot;character&quot;:22,&quot;text&quot;:&quot;updatedStatus&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/learner_dashboard/learner-dashboard-backend-api.service.spec.ts&quot;,&quot;line&quot;:259,&quot;character&quot;:6,&quot;text&quot;:&quot;updated_subject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/learner_dashboard/learner-dashboard-backend-api.service.spec.ts&quot;,&quot;line&quot;:259,&quot;character&quot;:23,&quot;text&quot;:&quot;updatedSubject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/learner_dashboard/learner-dashboard-backend-api.service.spec.ts&quot;,&quot;line&quot;:269,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/learner_dashboard/learner-dashboard-backend-api.service.spec.ts&quot;,&quot;line&quot;:270,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/learner_dashboard/learner-dashboard-backend-api.service.spec.ts&quot;,&quot;line&quot;:270,&quot;character&quot;:23,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/learner_dashboard/learner-dashboard-backend-api.service.spec.ts&quot;,&quot;line&quot;:286,&quot;character&quot;:8,&quot;text&quot;:&quot;updatedStatus&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/learner_dashboard/learner-dashboard-backend-api.service.spec.ts&quot;,&quot;line&quot;:287,&quot;character&quot;:8,&quot;text&quot;:&quot;updatedSubject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/learner_dashboard/learner-dashboard-backend-api.service.spec.ts&quot;,&quot;line&quot;:291,&quot;character&quot;:6,&quot;text&quot;:&quot;updated_status&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/learner_dashboard/learner-dashboard-backend-api.service.spec.ts&quot;,&quot;line&quot;:291,&quot;character&quot;:22,&quot;text&quot;:&quot;updatedStatus&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/learner_dashboard/learner-dashboard-backend-api.service.spec.ts&quot;,&quot;line&quot;:292,&quot;character&quot;:6,&quot;text&quot;:&quot;updated_subject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/learner_dashboard/learner-dashboard-backend-api.service.spec.ts&quot;,&quot;line&quot;:292,&quot;character&quot;:23,&quot;text&quot;:&quot;updatedSubject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/learner_dashboard/learner-dashboard-backend-api.service.spec.ts&quot;,&quot;line&quot;:301,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/learner_dashboard/learner-dashboard-backend-api.service.spec.ts&quot;,&quot;line&quot;:302,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/learner_dashboard/learner-dashboard-backend-api.service.spec.ts&quot;,&quot;line&quot;:302,&quot;character&quot;:23,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/learner_dashboard/learner-dashboard-backend-api.service.spec.ts&quot;,&quot;line&quot;:337,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/learner_dashboard/learner-dashboard-backend-api.service.spec.ts&quot;,&quot;line&quot;:371,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:57 GMT</p>
+    </body>
+  </html>
+  

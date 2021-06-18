@@ -1,0 +1,362 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>jobs-tab.component.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/release-coordinator-page/jobs-tab/jobs-tab.component.spec.ts</td><td class="">97.43%</td><td class="">100%</td><td class="">428</td><td class="">417</td><td class="">11</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2021 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for JobsTabComponent
+ */
+
+import { ComponentFixture, TestBed, waitForAsync } from &#x27;@angular/core/testing&#x27;;
+import { MatCardModule } from &#x27;@angular/material/card&#x27;;
+
+import { ReleaseCoordinatorBackendApiService, JobsData } from &#x27;../services/release-coordinator-backend-api.service&#x27;;
+import { ComputationData } from &#x27;domain/admin/computation-data.model&#x27;;
+import { JobStatusSummary } from &#x27;domain/admin/job-status-summary.model&#x27;;
+import { Job } from &#x27;domain/admin/job.model&#x27;;
+import { InterpolationValuesType, UrlInterpolationService } from &#x27;domain/utilities/url-interpolation.service&#x27;;
+import { WindowRef } from &#x27;services/contextual/window-ref.service&#x27;;
+import { JobsTabComponent } from &#x27;./jobs-tab.component&#x27;;
+
+
+interface FakeThen {
+  then: (
+        successCallback: (responseData?: object) =&gt; void,
+        errorCallback: (errorData?: object) =&gt; void) =&gt; void
+}
+
+interface FakeWindowRefDict {
+  location: {
+    reload: () =&gt; void
+  }
+}
+
+interface RequestData {
+  action: string,
+  &#x27;job_type&#x27;?: string,
+  &#x27;computation_type&#x27;?: string,
+  &#x27;job_id&#x27;?: string,
+}
+
+describe(&#x27;Jobs Tab Component&#x27;, () =&gt; {
+  let componentInstance: JobsTabComponent;
+  let fixture: ComponentFixture&lt;JobsTabComponent&gt;;
+  let urlInterpolationService: UrlInterpolationService;
+  let mockJobId: string = &#x27;testJobId&#x27;;
+  let mockComputationData: ComputationData = new ComputationData(
+    123, true, &#x27;idle&#x27;, 123, true, 123, &#x27;0&#x27;, &#x27;testComputation&#x27;
+  );
+  let mockJobStatusSummary: JobStatusSummary = new JobStatusSummary(
+    &#x27;testJob&#x27;, false,
+  );
+  let mockJob: Job = new Job(
+    &#x27;testTime&#x27;, 24243, &#x27;testJob&#x27;, &#x27;idle&#x27;, &#x27;none&#x27;, false,
+    true, &#x27;23&#x27;, 3123, &#x27;testTime&#x27;,
+  );
+  let mockJobsData: JobsData = {
+    humanReadableCurrentTime: &#x27;testReadableTime&#x27;,
+    continuousComputationsData: [mockComputationData],
+    oneOffJobStatusSummaries: [mockJobStatusSummary],
+    unfinishedJobData: [mockJob],
+    auditJobStatusSummaries: [mockJobStatusSummary],
+    recentJobData: [mockJob],
+  };
+
+  class MockReleaseCoordinatorBackendApiService {
+    private get(url: string): FakeThen {
+      return {
+        then: (
+            successCallback: (responseData?: object) =&gt; void,
+            errorCallback: (errorData?: object) =&gt; void) =&gt; {
+          if (url === &#x27;success&#x27;) {
+            successCallback([&#x27;1&#x27;, &#x27;2&#x27;, &#x27;3&#x27;]);
+            return;
+          }
+          if (errorCallback) {
+            errorCallback({
+              error: &#x27;test error&#x27;
+            });
+          }
+        }
+      };
+    }
+
+    private post(url: string, requestData: RequestData): FakeThen {
+      return {
+        then: (
+            successCallback: (responseData?: object) =&gt; void,
+            errorCallback: (errorData?: object) =&gt; void
+        ) =&gt; {
+          if (&#x27;job_type&#x27; in requestData) {
+            if (requestData.job_type === &#x27;error&#x27;) {
+              if (errorCallback) {
+                errorCallback({
+                  error: &#x27;test error&#x27;
+                });
+              }
+              return;
+            }
+          } else if (&#x27;computation_type&#x27; in requestData) {
+            if (requestData.computation_type === &#x27;error&#x27;) {
+              if (errorCallback) {
+                errorCallback({
+                  error: &#x27;test error&#x27;
+                });
+              }
+              return;
+            }
+          }
+          successCallback();
+        }
+      };
+    }
+
+    fetchJobOutputAsync(jobId: string): FakeThen {
+      let adminJobOutputUrl = urlInterpolationService.interpolateUrl(
+        &#x27;/fetchJobOutputAsync/&lt;job_id&gt;&#x27;, {
+          jobId: jobId
+        });
+      return this.get(adminJobOutputUrl);
+    }
+
+    getJobsDataAsync(): FakeThen {
+      return {
+        then: (callback: (adminDataObject: JobsData) =&gt; void) =&gt; {
+          callback(mockJobsData);
+        }
+      };
+    }
+
+    startNewJobAsync(jobType: string): FakeThen {
+      return this.post(&#x27;/startNewJobAsync&#x27;, {
+        action: &#x27;start_new_job&#x27;,
+        job_type: jobType
+      });
+    }
+
+    startComputationAsync(computationType: string): FakeThen {
+      return this.post(&#x27;/startComputationAsync&#x27;, {
+        action: &#x27;start_computation&#x27;,
+        computation_type: computationType
+      });
+    }
+
+    stopComputationAsync(computationType: string): FakeThen {
+      return this.post(&#x27;/stopComputationAsync&#x27;, {
+        action: &#x27;stop_computation&#x27;,
+        computation_type: computationType
+      });
+    }
+
+    cancelJobAsync(jobId: string, jobType: string): FakeThen {
+      return this.post(&#x27;/cancelJobAsync&#x27;, {
+        action: &#x27;cancel_job&#x27;,
+        job_id: jobId,
+        job_type: jobType
+      });
+    }
+  }
+
+  class MockUrlInterpolationService {
+    interpolateUrl(
+        urlTemplate: string,
+        interpolationValues: InterpolationValuesType): string {
+      if (&#x27;jobId&#x27; in interpolationValues) {
+        if (interpolationValues.jobId === &#x27;error&#x27;) {
+          return &#x27;error&#x27;;
+        }
+        return &#x27;success&#x27;;
+      }
+    }
+  }
+
+  class MockWindowRef {
+    _window(): FakeWindowRefDict {
+      return {
+        location: {
+          reload: () =&gt; {}
+        }
+      };
+    }
+  }
+
+  beforeEach(waitForAsync(() =&gt; {
+    TestBed.configureTestingModule({
+      declarations: [JobsTabComponent],
+      imports: [
+        MatCardModule
+      ],
+      providers: [
+        {
+          provide: WindowRef,
+          useClass: MockWindowRef
+        },
+        {
+          provide: ReleaseCoordinatorBackendApiService,
+          useClass: MockReleaseCoordinatorBackendApiService
+        },
+        {
+          provide: UrlInterpolationService,
+          useClass: MockUrlInterpolationService
+        }
+      ]
+    }).compileComponents();
+  }));
+
+  beforeEach(() =&gt; {
+    fixture = TestBed.createComponent(JobsTabComponent);
+    componentInstance = fixture.componentInstance;
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
+    fixture.detectChanges();
+  });
+
+
+  it(&#x27;should create&#x27;, () =&gt; {
+    expect(componentInstance).toBeDefined();
+  });
+
+  it(&#x27;should initialize&#x27;, () =&gt; {
+    componentInstance.ngOnInit();
+    expect(componentInstance.HUMAN_READABLE_CURRENT_TIME)
+      .toEqual(mockJobsData.humanReadableCurrentTime);
+    expect(componentInstance.CONTINUOUS_COMPUTATIONS_DATA)
+      .toEqual(mockJobsData.continuousComputationsData);
+    expect(componentInstance.ONE_OFF_JOB_SPECS)
+      .toEqual(mockJobsData.oneOffJobStatusSummaries);
+    expect(componentInstance.UNFINISHED_JOB_DATA)
+      .toEqual(mockJobsData.unfinishedJobData);
+    expect(componentInstance.AUDIT_JOB_SPECS)
+      .toEqual(mockJobsData.auditJobStatusSummaries);
+    expect(componentInstance.RECENT_JOB_DATA)
+      .toEqual(mockJobsData.recentJobData);
+    expect(componentInstance.showingJobOutput).toBeFalse();
+  });
+
+  it(&#x27;should work as expected when showJobOutput is called&#x27;, () =&gt; {
+    componentInstance = (
+      componentInstance as unknown) as jasmine.SpyObj&lt;JobsTabComponent&gt;;
+    let element: HTMLElement = document.createElement(&#x27;div&#x27;);
+    spyOn(document, &#x27;querySelector&#x27;).and.returnValue(element);
+    spyOn(element, &#x27;scrollIntoView&#x27;);
+
+    componentInstance.showJobOutput(mockJobId);
+    expect(componentInstance.showingJobOutput).toBeTrue();
+    expect(componentInstance.jobOutput).toEqual([&#x27;1&#x27;, &#x27;2&#x27;, &#x27;3&#x27;]);
+    expect(element.scrollIntoView).toHaveBeenCalled();
+  });
+
+  it(&#x27;should expect error when showJobOuput is called&#x27;, () =&gt; {
+    componentInstance = (
+      componentInstance as unknown) as jasmine.SpyObj&lt;JobsTabComponent&gt;;
+    spyOn(componentInstance.setStatusMessage, &#x27;emit&#x27;);
+    componentInstance.showJobOutput(&#x27;error&#x27;);
+    expect(componentInstance.setStatusMessage.emit)
+      .toHaveBeenCalledWith(&#x27;Server error: test error&#x27;);
+  });
+
+  it(&#x27;should work as expected when startNewJob is called&#x27;, () =&gt;{
+    componentInstance = (
+      componentInstance as unknown) as jasmine.SpyObj&lt;JobsTabComponent&gt;;
+    spyOn(componentInstance.setStatusMessage, &#x27;emit&#x27;);
+    componentInstance.startNewJob(&#x27;testJob&#x27;);
+    expect(componentInstance.setStatusMessage.emit)
+      .toHaveBeenCalledWith(&#x27;Job started successfully.&#x27;);
+  });
+
+  it(&#x27;should expect error when startNewJob is called&#x27;, () =&gt; {
+    componentInstance = (
+      componentInstance as unknown) as jasmine.SpyObj&lt;JobsTabComponent&gt;;
+    spyOn(componentInstance.setStatusMessage, &#x27;emit&#x27;);
+    componentInstance.startNewJob(&#x27;error&#x27;);
+    expect(componentInstance.setStatusMessage.emit)
+      .toHaveBeenCalledWith(&#x27;Server error: test error&#x27;);
+  });
+
+  it(&#x27;should start computation&#x27;, () =&gt; {
+    componentInstance = (
+      componentInstance as unknown) as jasmine.SpyObj&lt;JobsTabComponent&gt;;
+    spyOn(componentInstance.setStatusMessage, &#x27;emit&#x27;);
+    componentInstance
+      .startComputation(&#x27;testComputation&#x27;);
+    expect(componentInstance.setStatusMessage.emit)
+      .toHaveBeenCalledWith(&#x27;Computation started successfully.&#x27;);
+  });
+
+  it(&#x27;should expect error when startCompuation is called&#x27;, () =&gt; {
+    componentInstance = (
+      componentInstance as unknown) as jasmine.SpyObj&lt;JobsTabComponent&gt;;
+    spyOn(componentInstance.setStatusMessage, &#x27;emit&#x27;);
+    componentInstance
+      .startComputation(&#x27;error&#x27;);
+    expect(componentInstance.setStatusMessage.emit)
+      .toHaveBeenCalledWith(&#x27;Server error: test error&#x27;);
+  });
+
+  it(&#x27;should stop computation&#x27;, () =&gt; {
+    componentInstance = (
+      componentInstance as unknown) as jasmine.SpyObj&lt;JobsTabComponent&gt;;
+    spyOn(componentInstance.setStatusMessage, &#x27;emit&#x27;);
+
+    componentInstance
+      .stopComputation(&#x27;testComputation&#x27;);
+    expect(componentInstance.setStatusMessage.emit)
+      .toHaveBeenCalledWith(&#x27;Abort signal sent to computation.&#x27;);
+  });
+
+  it(&#x27;should expect error when stopComputation is called&#x27;, () =&gt; {
+    componentInstance = (
+      componentInstance as unknown) as jasmine.SpyObj&lt;JobsTabComponent&gt;;
+    spyOn(componentInstance.setStatusMessage, &#x27;emit&#x27;);
+    componentInstance
+      .stopComputation(&#x27;error&#x27;);
+    expect(componentInstance.setStatusMessage.emit)
+      .toHaveBeenCalledWith(&#x27;Server error: test error&#x27;);
+  });
+
+  it(&#x27;should cancel job&#x27;, () =&gt; {
+    componentInstance = (
+      componentInstance as unknown) as jasmine.SpyObj&lt;JobsTabComponent&gt;;
+    spyOn(componentInstance.setStatusMessage, &#x27;emit&#x27;);
+    componentInstance
+      .cancelJob(&#x27;jobId&#x27;, &#x27;jobType&#x27;);
+    expect(componentInstance.setStatusMessage.emit)
+      .toHaveBeenCalledWith(&#x27;Abort signal sent to job.&#x27;);
+  });
+
+  it(&#x27;should expect error when cancelJob is called&#x27;, () =&gt; {
+    componentInstance = (
+      componentInstance as unknown) as jasmine.SpyObj&lt;JobsTabComponent&gt;;
+    spyOn(componentInstance.setStatusMessage, &#x27;emit&#x27;);
+    componentInstance
+      .cancelJob(&#x27;error&#x27;, &#x27;error&#x27;);
+    expect(componentInstance.setStatusMessage.emit)
+      .toHaveBeenCalledWith(&#x27;Server error: test error&#x27;);
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/jobs-tab/jobs-tab.component.spec.ts&quot;,&quot;line&quot;:244,&quot;character&quot;:24,&quot;text&quot;:&quot;(\n      componentInstance as unknown) as jasmine.SpyObj&lt;JobsTabComponent&gt;&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/jobs-tab/jobs-tab.component.spec.ts&quot;,&quot;line&quot;:252,&quot;character&quot;:29,&quot;text&quot;:&quot;jobOutput&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/jobs-tab/jobs-tab.component.spec.ts&quot;,&quot;line&quot;:257,&quot;character&quot;:24,&quot;text&quot;:&quot;(\n      componentInstance as unknown) as jasmine.SpyObj&lt;JobsTabComponent&gt;&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/jobs-tab/jobs-tab.component.spec.ts&quot;,&quot;line&quot;:266,&quot;character&quot;:24,&quot;text&quot;:&quot;(\n      componentInstance as unknown) as jasmine.SpyObj&lt;JobsTabComponent&gt;&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/jobs-tab/jobs-tab.component.spec.ts&quot;,&quot;line&quot;:275,&quot;character&quot;:24,&quot;text&quot;:&quot;(\n      componentInstance as unknown) as jasmine.SpyObj&lt;JobsTabComponent&gt;&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/jobs-tab/jobs-tab.component.spec.ts&quot;,&quot;line&quot;:284,&quot;character&quot;:24,&quot;text&quot;:&quot;(\n      componentInstance as unknown) as jasmine.SpyObj&lt;JobsTabComponent&gt;&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/jobs-tab/jobs-tab.component.spec.ts&quot;,&quot;line&quot;:294,&quot;character&quot;:24,&quot;text&quot;:&quot;(\n      componentInstance as unknown) as jasmine.SpyObj&lt;JobsTabComponent&gt;&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/jobs-tab/jobs-tab.component.spec.ts&quot;,&quot;line&quot;:304,&quot;character&quot;:24,&quot;text&quot;:&quot;(\n      componentInstance as unknown) as jasmine.SpyObj&lt;JobsTabComponent&gt;&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/jobs-tab/jobs-tab.component.spec.ts&quot;,&quot;line&quot;:315,&quot;character&quot;:24,&quot;text&quot;:&quot;(\n      componentInstance as unknown) as jasmine.SpyObj&lt;JobsTabComponent&gt;&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/jobs-tab/jobs-tab.component.spec.ts&quot;,&quot;line&quot;:325,&quot;character&quot;:24,&quot;text&quot;:&quot;(\n      componentInstance as unknown) as jasmine.SpyObj&lt;JobsTabComponent&gt;&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;core/templates/pages/release-coordinator-page/jobs-tab/jobs-tab.component.spec.ts&quot;,&quot;line&quot;:335,&quot;character&quot;:24,&quot;text&quot;:&quot;(\n      componentInstance as unknown) as jasmine.SpyObj&lt;JobsTabComponent&gt;&quot;,&quot;kind&quot;:3}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:59 GMT</p>
+    </body>
+  </html>
+  

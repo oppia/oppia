@@ -1,0 +1,118 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>stopwatch.model.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/domain/utilities/stopwatch.model.spec.ts</td><td class="">95.60%</td><td class="">100%</td><td class="">159</td><td class="">152</td><td class="">7</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2014 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for Stopwatch model.
+ */
+
+import { Stopwatch } from &#x27;domain/utilities/stopwatch.model&#x27;;
+
+describe(&#x27;Stopwatch model&#x27;, () =&gt; {
+  let nowSpy = null;
+
+  beforeEach(() =&gt; {
+    nowSpy = spyOn(Date, &#x27;now&#x27;);
+  });
+
+  const changeCurrentTime = (desiredCurrentTime) =&gt; {
+    nowSpy.and.returnValue(desiredCurrentTime);
+  };
+
+  it(&#x27;should correctly record time intervals&#x27;, () =&gt; {
+    let stopwatch = Stopwatch.create();
+    changeCurrentTime(0);
+    expect(stopwatch._getCurrentTime()).toBe(0);
+    stopwatch.reset();
+    changeCurrentTime(500);
+    expect(stopwatch._getCurrentTime()).toBe(500);
+    expect(stopwatch.getTimeInSecs()).toEqual(0.5);
+  });
+
+  it(&#x27;should not reset stopwatch when current time is retrieved&#x27;, () =&gt; {
+    let stopwatch = Stopwatch.create();
+    changeCurrentTime(0);
+    expect(stopwatch._getCurrentTime()).toBe(0);
+    stopwatch.reset();
+    changeCurrentTime(500);
+    expect(stopwatch._getCurrentTime()).toBe(500);
+    expect(stopwatch.getTimeInSecs()).toEqual(0.5);
+    expect(stopwatch.getTimeInSecs()).toEqual(0.5);
+  });
+
+  it(&#x27;should correctly reset the stopwatch&#x27;, () =&gt; {
+    let stopwatch = Stopwatch.create();
+    changeCurrentTime(0);
+    expect(stopwatch._getCurrentTime()).toBe(0);
+    stopwatch.reset();
+    changeCurrentTime(500);
+    expect(stopwatch._getCurrentTime()).toBe(500);
+    expect(stopwatch.getTimeInSecs()).toEqual(0.5);
+    stopwatch.reset();
+    expect(stopwatch.getTimeInSecs()).toEqual(0);
+    changeCurrentTime(800);
+    expect(stopwatch._getCurrentTime()).toBe(800);
+    expect(stopwatch.getTimeInSecs()).toEqual(0.3);
+  });
+
+  it(&#x27;should error if getTimeInSecs() is called before reset()&#x27;, () =&gt; {
+    // LoggerService is private, so to check if it&#x27;s being called
+    // console.error needs to be spied.
+    const errorLog = spyOn(console, &#x27;error&#x27;).and.callThrough();
+    let stopwatch = Stopwatch.create();
+    changeCurrentTime(29);
+    expect(stopwatch._getCurrentTime()).toBe(29);
+    expect(stopwatch.getTimeInSecs()).toBeNull();
+    expect(errorLog).toHaveBeenCalledWith(
+      &#x27;Tried to retrieve the elapsed time, but no start time was set.&#x27;);
+  });
+
+  it(&#x27;should instantiate independent stopwatches&#x27;, () =&gt; {
+    let stopwatch1 = Stopwatch.create();
+    let stopwatch2 = Stopwatch.create();
+
+    changeCurrentTime(0);
+    expect(stopwatch1._getCurrentTime()).toBe(0);
+    expect(stopwatch2._getCurrentTime()).toBe(0);
+    stopwatch1.reset();
+
+    changeCurrentTime(50);
+    expect(stopwatch1._getCurrentTime()).toBe(50);
+    expect(stopwatch2._getCurrentTime()).toBe(50);
+    stopwatch2.reset();
+
+    changeCurrentTime(100);
+    expect(stopwatch1._getCurrentTime()).toBe(100);
+    expect(stopwatch2._getCurrentTime()).toBe(100);
+    expect(stopwatch1.getTimeInSecs()).toEqual(0.1);
+    expect(stopwatch2.getTimeInSecs()).toEqual(0.05);
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/domain/utilities/stopwatch.model.spec.ts&quot;,&quot;line&quot;:21,&quot;character&quot;:6,&quot;text&quot;:&quot;nowSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/utilities/stopwatch.model.spec.ts&quot;,&quot;line&quot;:24,&quot;character&quot;:4,&quot;text&quot;:&quot;nowSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/utilities/stopwatch.model.spec.ts&quot;,&quot;line&quot;:27,&quot;character&quot;:29,&quot;text&quot;:&quot;desiredCurrentTime&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/utilities/stopwatch.model.spec.ts&quot;,&quot;line&quot;:28,&quot;character&quot;:4,&quot;text&quot;:&quot;nowSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/utilities/stopwatch.model.spec.ts&quot;,&quot;line&quot;:28,&quot;character&quot;:11,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/utilities/stopwatch.model.spec.ts&quot;,&quot;line&quot;:28,&quot;character&quot;:15,&quot;text&quot;:&quot;returnValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/utilities/stopwatch.model.spec.ts&quot;,&quot;line&quot;:28,&quot;character&quot;:27,&quot;text&quot;:&quot;desiredCurrentTime&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:57 GMT</p>
+    </body>
+  </html>
+  

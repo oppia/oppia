@@ -1,0 +1,113 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>learner-dashboard-suggestion-modal.component.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/learner-dashboard-page/suggestion-modal/learner-dashboard-suggestion-modal.component.spec.ts</td><td class="">99.07%</td><td class="">100%</td><td class="">107</td><td class="">106</td><td class="">1</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+
+/**
+ * @fileoverview Unit tests for LearnerDashboardSuggestionModalComponent.
+ */
+
+import { Component, Directive } from &#x27;@angular/core&#x27;;
+import { async, ComponentFixture, TestBed } from &#x27;@angular/core/testing&#x27;;
+import { NgbActiveModal } from &#x27;@ng-bootstrap/ng-bootstrap&#x27;;
+import { MockTranslatePipe } from &#x27;tests/unit-test-utils&#x27;;
+
+import { LearnerDashboardSuggestionModalComponent } from &#x27;./learner-dashboard-suggestion-modal.component&#x27;;
+
+let MockAngularHtmlBindWrapperDirective = function(
+    options: Component): Directive {
+  const metadata: Directive = {
+    selector: options.selector,
+    inputs: options.inputs,
+    outputs: options.outputs
+  };
+  return &lt;undefined&gt;Directive(metadata)(class _ { });
+};
+
+class MockActiveModal {
+  close(): void {
+    return;
+  }
+
+  dismiss(): void {
+    return;
+  }
+}
+
+
+describe(&#x27;Learner Dashboard Suggestion Modal Component&#x27;, () =&gt; {
+  let description = &#x27;This is a description string&#x27;;
+  let newContent = &#x27;new content&#x27;;
+  let oldContent = &#x27;old content&#x27;;
+
+  let component: LearnerDashboardSuggestionModalComponent;
+  let fixture: ComponentFixture&lt;LearnerDashboardSuggestionModalComponent&gt;;
+  let ngbActiveModal: NgbActiveModal;
+
+  beforeEach(async(() =&gt; {
+    TestBed.configureTestingModule({
+      declarations: [
+        LearnerDashboardSuggestionModalComponent,
+        MockTranslatePipe,
+        MockAngularHtmlBindWrapperDirective({
+          selector: &#x27;angular-html-bind-wrapper&#x27;,
+          inputs: [&#x27;htmlData&#x27;] })
+      ],
+      providers: [
+        {
+          provide: NgbActiveModal, useClass: MockActiveModal
+        },
+      ]
+    }).compileComponents();
+  }));
+
+  beforeEach(() =&gt; {
+    fixture = TestBed.createComponent(LearnerDashboardSuggestionModalComponent);
+    component = fixture.componentInstance;
+    ngbActiveModal = TestBed.inject(NgbActiveModal);
+    component.newContent = newContent;
+    component.oldContent = oldContent;
+    component.description = description;
+    fixture.detectChanges();
+  });
+
+  it(&#x27;should initialize componentInstance properties&#x27;, () =&gt; {
+    expect(component.newContent).toBe(newContent);
+    expect(component.oldContent).toBe(oldContent);
+    expect(component.description).toBe(description);
+  });
+
+  it(&#x27;should dismiss the modal on clicking cancel button&#x27;, () =&gt; {
+    const dismissSpy = spyOn(ngbActiveModal, &#x27;dismiss&#x27;).and.callThrough();
+    component.cancel();
+    expect(dismissSpy).toHaveBeenCalled();
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/learner-dashboard-page/suggestion-modal/learner-dashboard-suggestion-modal.component.spec.ts&quot;,&quot;line&quot;:33,&quot;character&quot;:9,&quot;text&quot;:&quot;&lt;undefined&gt;Directive(metadata)(class _ { })&quot;,&quot;kind&quot;:4}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:59 GMT</p>
+    </body>
+  </html>
+  

@@ -1,0 +1,190 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>exploration-html-formatter.service.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/services/exploration-html-formatter.service.ts</td><td class="">96.20%</td><td class="">100%</td><td class="">158</td><td class="">152</td><td class="">6</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2014 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Utility services for explorations which may be shared by both
+ * the learner and editor views.
+ */
+import { downgradeInjectable } from &#x27;@angular/upgrade/static&#x27;;
+import { Injectable } from &#x27;@angular/core&#x27;;
+
+import { CamelCaseToHyphensPipe } from
+  &#x27;filters/string-utility-filters/camel-case-to-hyphens.pipe&#x27;;
+import { ExtensionTagAssemblerService } from
+  &#x27;services/extension-tag-assembler.service&#x27;;
+import { HtmlEscaperService } from &#x27;services/html-escaper.service&#x27;;
+import { InteractionAnswer } from &#x27;interactions/answer-defs&#x27;;
+import { InteractionCustomizationArgs } from
+  &#x27;interactions/customization-args-defs&#x27;;
+
+
+// A service that provides a number of utility functions useful to both the
+// editor and player.
+@Injectable({
+  providedIn: &#x27;root&#x27;
+})
+export class ExplorationHtmlFormatterService {
+  private readonly migratedInteractions: string[] = [
+    &#x27;AlgebraicExpressionInput&#x27;,
+    &#x27;CodeRepl&#x27;,
+    &#x27;Continue&#x27;,
+    &#x27;FractionInput&#x27;,
+    &#x27;GraphInput&#x27;,
+    &#x27;ImageClickInput&#x27;,
+    &#x27;InteractiveMap&#x27;,
+    &#x27;LogicProof&#x27;,
+    &#x27;MultipleChoiceInput&#x27;,
+    &#x27;SetInput&#x27;,
+    &#x27;TextInput&#x27;,
+  ];
+
+  constructor(
+      private camelCaseToHyphens: CamelCaseToHyphensPipe,
+      private extensionTagAssembler: ExtensionTagAssemblerService,
+      private htmlEscaper: HtmlEscaperService
+  ) {}
+  /**
+   * @param {string} interactionId - The interaction id.
+   * @param {object} interactionCustomizationArgSpecs - The various
+   *   attributes that the interaction depends on.
+   * @param {boolean} parentHasLastAnswerProperty - If this function is
+   *   called in the exploration_player view (including the preview mode),
+   *   callers should ensure that parentHasLastAnswerProperty is set to
+   *   true and $scope.lastAnswer =
+   *   PlayerTranscriptService.getLastAnswerOnDisplayedCard(index) is set on
+   *   the parent controller of the returned tag.
+   *   Otherwise, parentHasLastAnswerProperty should be set to false.
+   * @param {string} labelForFocusTarget - The label for setting focus on
+   *   the interaction.
+   * @param {string} savedSolution - The name of property that needs to be bound
+   *   containing the savedSolution in the scope. The scope here is the
+   *   scope where the return value of this function is compiled.
+   */
+  getInteractionHtml(
+      interactionId: string,
+      interactionCustomizationArgs: InteractionCustomizationArgs,
+      parentHasLastAnswerProperty: boolean,
+      labelForFocusTarget: string,
+      savedSolution: string | null): string {
+    var htmlInteractionId = this.camelCaseToHyphens.transform(interactionId);
+    var element = $(&#x27;&lt;oppia-interactive-&#x27; + htmlInteractionId + &#x27;&gt;&#x27;);
+
+    element = (
+      this.extensionTagAssembler.formatCustomizationArgAttrs(
+        element, interactionCustomizationArgs));
+    const tagEnd = &#x27;&gt;&lt;/oppia-interactive-&#x27; + htmlInteractionId + &#x27;&gt;&#x27;;
+    let directiveOuterHtml = element.get(0).outerHTML.replace(tagEnd, &#x27;&#x27;);
+    let spaceToBeAdded = true;
+    const getLastAnswer = (): string =&gt; {
+      let propValue = parentHasLastAnswerProperty ? &#x27;lastAnswer&#x27; : &#x27;null&#x27;;
+      if (this.migratedInteractions.indexOf(interactionId) &gt;= 0) {
+        return &#x27;[last-answer]=&quot;&#x27; + propValue + &#x27;&quot;&#x27;;
+      } else {
+        return &#x27;last-answer=&quot;&#x27; + propValue + &#x27;&quot;&#x27;;
+      }
+    };
+    if (savedSolution) {
+      // TODO(#12292): Refactor this once all interactions have been migrated to
+      // Angular 2+, such that we don&#x27;t need to parse the string in the
+      // interaction directives/components.
+      if (spaceToBeAdded) {
+        directiveOuterHtml += &#x27; &#x27;;
+      }
+      if (this.migratedInteractions.indexOf(interactionId) &gt;= 0) {
+        directiveOuterHtml += &#x27;[saved-solution]=&quot;&#x27; + savedSolution + &#x27;&quot; &#x27;;
+      } else {
+        directiveOuterHtml += &#x27;saved-solution=&quot;&#x27; + savedSolution + &#x27;&quot; &#x27;;
+      }
+      spaceToBeAdded = false;
+    }
+    if (labelForFocusTarget) {
+      if (spaceToBeAdded) {
+        directiveOuterHtml += &#x27; &#x27;;
+      }
+      directiveOuterHtml += (
+        &#x27;label-for-focus-target=&quot;&#x27; + labelForFocusTarget + &#x27;&quot; &#x27;);
+      spaceToBeAdded = false;
+    }
+    if (spaceToBeAdded) {
+      directiveOuterHtml += &#x27; &#x27;;
+    }
+    directiveOuterHtml += getLastAnswer() + tagEnd;
+    return directiveOuterHtml;
+  }
+
+  getAnswerHtml(
+      answer: string, interactionId: string,
+      interactionCustomizationArgs: InteractionCustomizationArgs): string {
+    // TODO(sll): Get rid of this special case for multiple choice.
+    var interactionChoices = null;
+
+    if (&#x27;choices&#x27; in interactionCustomizationArgs) {
+      interactionChoices = interactionCustomizationArgs.choices.value;
+    }
+
+    var el = $(
+      &#x27;&lt;oppia-response-&#x27; + this.camelCaseToHyphens.transform(
+        interactionId) + &#x27;&gt;&#x27;);
+    el.attr(&#x27;answer&#x27;, this.htmlEscaper.objToEscapedJson(answer));
+    if (interactionChoices) {
+      el.attr(&#x27;choices&#x27;, this.htmlEscaper.objToEscapedJson(
+        interactionChoices));
+    }
+    return ($(&#x27;&lt;div&gt;&#x27;).append(el)).html();
+  }
+
+  getShortAnswerHtml(
+      answer: InteractionAnswer, interactionId: string,
+      interactionCustomizationArgs: InteractionCustomizationArgs): string {
+    var interactionChoices = null;
+
+    // TODO(sll): Get rid of this special case for multiple choice.
+    if (&#x27;choices&#x27; in interactionCustomizationArgs) {
+      interactionChoices = interactionCustomizationArgs.choices.value.map(
+        choice =&gt; choice.html);
+    }
+
+    var el = $(
+      &#x27;&lt;oppia-short-response-&#x27; + this.camelCaseToHyphens.transform(
+        interactionId) + &#x27;&gt;&#x27;);
+    el.attr(&#x27;answer&#x27;, this.htmlEscaper.objToEscapedJson(answer));
+    if (interactionChoices) {
+      el.attr(&#x27;choices&#x27;, this.htmlEscaper.objToEscapedJson(
+        interactionChoices));
+    }
+    return ($(&#x27;&lt;span&gt;&#x27;).append(el)).html();
+  }
+}
+
+angular.module(&#x27;oppia&#x27;).factory(
+  &#x27;ExplorationHtmlFormatterService&#x27;,
+  downgradeInjectable(ExplorationHtmlFormatterService));
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/services/exploration-html-formatter.service.ts&quot;,&quot;line&quot;:129,&quot;character&quot;:8,&quot;text&quot;:&quot;interactionChoices&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-html-formatter.service.ts&quot;,&quot;line&quot;:132,&quot;character&quot;:6,&quot;text&quot;:&quot;interactionChoices&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-html-formatter.service.ts&quot;,&quot;line&quot;:139,&quot;character&quot;:8,&quot;text&quot;:&quot;interactionChoices&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-html-formatter.service.ts&quot;,&quot;line&quot;:149,&quot;character&quot;:8,&quot;text&quot;:&quot;interactionChoices&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-html-formatter.service.ts&quot;,&quot;line&quot;:153,&quot;character&quot;:6,&quot;text&quot;:&quot;interactionChoices&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/exploration-html-formatter.service.ts&quot;,&quot;line&quot;:161,&quot;character&quot;:8,&quot;text&quot;:&quot;interactionChoices&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:54 GMT</p>
+    </body>
+  </html>
+  

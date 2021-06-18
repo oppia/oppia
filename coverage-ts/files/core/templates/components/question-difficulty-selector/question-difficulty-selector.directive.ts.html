@@ -1,0 +1,66 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>question-difficulty-selector.directive.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/components/question-difficulty-selector/question-difficulty-selector.directive.ts</td><td class="">42.86%</td><td class="">100%</td><td class="">28</td><td class="">12</td><td class="">16</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Controller for the question difficulty selector.
+ */
+
+require(&#x27;domain/utilities/url-interpolation.service.ts&#x27;);
+
+angular.module(&#x27;oppia&#x27;).directive(&#x27;questionDifficultySelector&#x27;, [
+  &#x27;UrlInterpolationService&#x27;, function(UrlInterpolationService) {
+    return {
+      restrict: &#x27;E&#x27;,
+      scope: {
+        getSkillIdToRubricsObject: &#x27;&amp;skillIdToRubricsObject&#x27;,
+        skillWithDifficulty: &#x27;=&#x27;
+      },
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        &#x27;/components/question-difficulty-selector/&#x27; +
+        &#x27;question-difficulty-selector.directive.html&#x27;),
+      controller: [
+        &#x27;$scope&#x27;, &#x27;SKILL_DIFFICULTY_LABEL_TO_FLOAT&#x27;,
+        function(
+            $scope, SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
+          var ctrl = this;
+
+          ctrl.$onInit = function() {
+            $scope.availableDifficultyValues = [];
+            for (var difficulty in SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
+              $scope.availableDifficultyValues.push(
+                SKILL_DIFFICULTY_LABEL_TO_FLOAT[difficulty]);
+            }
+          };
+        }
+      ]
+    };
+  }]);
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/components/question-difficulty-selector/question-difficulty-selector.directive.ts&quot;,&quot;line&quot;:21,&quot;character&quot;:38,&quot;text&quot;:&quot;UrlInterpolationService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/question-difficulty-selector/question-difficulty-selector.directive.ts&quot;,&quot;line&quot;:28,&quot;character&quot;:19,&quot;text&quot;:&quot;UrlInterpolationService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/question-difficulty-selector/question-difficulty-selector.directive.ts&quot;,&quot;line&quot;:28,&quot;character&quot;:43,&quot;text&quot;:&quot;getDirectiveTemplateUrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/question-difficulty-selector/question-difficulty-selector.directive.ts&quot;,&quot;line&quot;:34,&quot;character&quot;:12,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/question-difficulty-selector/question-difficulty-selector.directive.ts&quot;,&quot;line&quot;:34,&quot;character&quot;:20,&quot;text&quot;:&quot;SKILL_DIFFICULTY_LABEL_TO_FLOAT&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/question-difficulty-selector/question-difficulty-selector.directive.ts&quot;,&quot;line&quot;:35,&quot;character&quot;:14,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/question-difficulty-selector/question-difficulty-selector.directive.ts&quot;,&quot;line&quot;:35,&quot;character&quot;:21,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/question-difficulty-selector/question-difficulty-selector.directive.ts&quot;,&quot;line&quot;:37,&quot;character&quot;:10,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/question-difficulty-selector/question-difficulty-selector.directive.ts&quot;,&quot;line&quot;:37,&quot;character&quot;:15,&quot;text&quot;:&quot;$onInit&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/question-difficulty-selector/question-difficulty-selector.directive.ts&quot;,&quot;line&quot;:38,&quot;character&quot;:12,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/question-difficulty-selector/question-difficulty-selector.directive.ts&quot;,&quot;line&quot;:38,&quot;character&quot;:19,&quot;text&quot;:&quot;availableDifficultyValues&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/question-difficulty-selector/question-difficulty-selector.directive.ts&quot;,&quot;line&quot;:39,&quot;character&quot;:35,&quot;text&quot;:&quot;SKILL_DIFFICULTY_LABEL_TO_FLOAT&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/question-difficulty-selector/question-difficulty-selector.directive.ts&quot;,&quot;line&quot;:40,&quot;character&quot;:14,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/question-difficulty-selector/question-difficulty-selector.directive.ts&quot;,&quot;line&quot;:40,&quot;character&quot;:21,&quot;text&quot;:&quot;availableDifficultyValues&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/question-difficulty-selector/question-difficulty-selector.directive.ts&quot;,&quot;line&quot;:40,&quot;character&quot;:47,&quot;text&quot;:&quot;push&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/question-difficulty-selector/question-difficulty-selector.directive.ts&quot;,&quot;line&quot;:41,&quot;character&quot;:16,&quot;text&quot;:&quot;SKILL_DIFFICULTY_LABEL_TO_FLOAT&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:57 GMT</p>
+    </body>
+  </html>
+  

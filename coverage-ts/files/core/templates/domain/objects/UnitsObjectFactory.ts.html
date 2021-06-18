@@ -1,0 +1,286 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>UnitsObjectFactory.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/domain/objects/UnitsObjectFactory.ts</td><td class="">92.56%</td><td class="">100%</td><td class="">390</td><td class="">361</td><td class="">29</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2019 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Factory for creating instances of Units domain objects.
+ */
+
+import { downgradeInjectable } from &#x27;@angular/upgrade/static&#x27;;
+import { Injectable } from &#x27;@angular/core&#x27;;
+
+import { createUnit, unit } from &#x27;mathjs&#x27;;
+import { ObjectsDomainConstants } from
+  &#x27;domain/objects/objects-domain.constants&#x27;;
+import { Unit } from
+  &#x27;interactions/answer-defs&#x27;;
+
+interface UnitsBackendDict {
+  units: Unit[];
+}
+
+interface UnitsDict {
+  [unit: string]: number;
+}
+
+type CurrencyUnitsKeys = (
+  keyof typeof ObjectsDomainConstants.CURRENCY_UNITS)[];
+
+export class Units {
+  units: Unit[];
+  constructor(unitsList: Unit[]) {
+    this.units = unitsList;
+  }
+
+  toDict(): UnitsBackendDict {
+    return {
+      units: this.units
+    };
+  }
+
+  toString(): string {
+    var unit = &#x27;&#x27;;
+    for (var i = 0; i &lt; this.units.length; i++) {
+      var d = this.units[i];
+      if (d.exponent === 1) {
+        unit += d.unit + &#x27; &#x27;;
+      } else {
+        unit += d.unit + &#x27;^&#x27; + d.exponent.toString() + &#x27; &#x27;;
+      }
+    }
+    return unit.trim();
+  }
+}
+
+@Injectable({
+  providedIn: &#x27;root&#x27;
+})
+export class UnitsObjectFactory {
+  isunit(unit: string): boolean {
+    return !(&#x27;/*() &#x27;.includes(unit));
+  }
+
+  isLastElementUnit(unitList: string[]): boolean {
+    return (
+      unitList.length &gt; 0 &amp;&amp;
+      this.isunit(&lt;string&gt; unitList.slice(-1).pop())
+    );
+  }
+
+  stringToLexical(units: string): string[] {
+    units += &#x27;#&#x27;;
+    var unitList = [];
+    var unit = &#x27;&#x27;;
+    for (var i = 0; i &lt; units.length; i++) {
+      if (&#x27;*/()# &#x27;.includes(units[i]) &amp;&amp; unit !== &#x27;per&#x27;) {
+        if (unit.length &gt; 0) {
+          if (this.isLastElementUnit(unitList)) {
+            unitList.push(&#x27;*&#x27;);
+          }
+          unitList.push(unit);
+          unit = &#x27;&#x27;;
+        }
+        if (!(&#x27;# &#x27;.includes(units[i]))) {
+          unitList.push(units[i]);
+        }
+      } else if (units[i] === &#x27; &#x27; &amp;&amp; unit === &#x27;per&#x27;) {
+        unitList.push(&#x27;/&#x27;);
+        unit = &#x27;&#x27;;
+      } else {
+        unit += units[i];
+      }
+    }
+    return unitList;
+  }
+
+  unitWithMultiplier(unitList: string[]): [string, number][] {
+    var multiplier = 1;
+    var unitsWithMultiplier: [string, number][] = [];
+    var parenthesisStack = [];
+
+    for (var ind = 0; ind &lt; unitList.length; ind++) {
+      if (unitList[ind] === &#x27;/&#x27;) {
+        multiplier = -multiplier;
+      } else if (unitList[ind] === &#x27;(&#x27;) {
+        if (unitList[ind - 1] === &#x27;/&#x27;) {
+          // If previous element was division then we need to inverse
+          // multiplier when we find its corresponsing closing parenthesis.
+          // Second element of pushed element is used for this purpose.
+          parenthesisStack.push([&#x27;(&#x27;, -1]);
+        } else {
+          // If previous element was not division then we don&#x27;t need to
+          // invert the multiplier.
+          parenthesisStack.push([&#x27;(&#x27;, 1]);
+        }
+      } else if (unitList[ind] === &#x27;)&#x27;) {
+        var elem = parenthesisStack.pop();
+        if (elem) {
+          multiplier = parseInt(&lt;string&gt; elem[1]) * multiplier;
+        } else {
+          throw new Error(&#x27;Close parenthesis with no open parenthesis&#x27;);
+        }
+      } else if (this.isunit(unitList[ind])) {
+        unitsWithMultiplier.push([unitList[ind], multiplier]);
+        // If previous element was division then we need to invert
+        // multiplier.
+        if (unitList[ind - 1] === &#x27;/&#x27;) {
+          multiplier = -multiplier;
+        }
+      }
+    }
+    return unitsWithMultiplier;
+  }
+
+  convertUnitDictToList(unitDict: UnitsDict): Unit[] {
+    var unitList: Unit[] = [];
+    for (var key in unitDict) {
+      unitList.push({ unit: key, exponent: unitDict[key] });
+    }
+    return unitList;
+  }
+
+  unitToList(unitsWithMultiplier: [string, number][]): Unit[] {
+    var unitDict: UnitsDict = {};
+    for (var i = 0; i &lt; unitsWithMultiplier.length; i++) {
+      var unit = unitsWithMultiplier[i][0];
+      var multiplier = unitsWithMultiplier[i][1];
+      var ind = unit.indexOf(&#x27;^&#x27;);
+      var s = null;
+      var power = null;
+      if (ind &gt; -1) {
+        s = unit.substr(0, ind);
+        power = parseInt(unit.substr(ind + 1));
+      } else {
+        s = unit;
+        power = 1;
+      }
+      if (!(s in unitDict)) {
+        unitDict[s] = 0;
+      }
+      unitDict[s] += multiplier * power;
+    }
+    return this.convertUnitDictToList(unitDict);
+  }
+
+  fromList(unitsList: Unit[]): Units {
+    return new Units(unitsList);
+  }
+
+  fromStringToList(unitsString: string): Unit[] {
+    return this.unitToList(
+      this.unitWithMultiplier(this.stringToLexical(unitsString)));
+  }
+
+  createCurrencyUnits(): void {
+    var keys = (
+      &lt;CurrencyUnitsKeys&gt; Object.keys(ObjectsDomainConstants.CURRENCY_UNITS)
+    );
+    for (var i = 0; i &lt; keys.length; i++) {
+      let baseUnitValue = (
+        ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].base_unit);
+      if (baseUnitValue !== null) {
+        // Sub unit (like: paise, cents etc.).
+        createUnit(ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].name, {
+          definition: baseUnitValue,
+          aliases: Object.values(
+            ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].aliases
+          ),
+        });
+      } else {
+        // Base unit (like: rupees, dollar etc.).
+        createUnit(ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].name, {
+          aliases: Object.values(
+            ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].aliases
+          ),
+        });
+      }
+    }
+  }
+
+  toMathjsCompatibleString(units: string): string {
+    // Makes the units compatible with the math.js allowed format.
+    units = units.replace(/per/g, &#x27;/&#x27;);
+
+    // Special symbols need to be replaced as math.js doesn&#x27;t support custom
+    // units starting with special symbols. Also, it doesn&#x27;t allow units
+    // followed by a number as in the case of currency units.
+    var keys = (
+      &lt;CurrencyUnitsKeys&gt; Object.keys(ObjectsDomainConstants.CURRENCY_UNITS)
+    );
+    for (var i = 0; i &lt; keys.length; i++) {
+      for (
+        var j = 0;
+        j &lt; ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].front_units.length;
+        j++) {
+        if (
+          units.includes(
+            ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].front_units[j])) {
+          units = units.replace(
+            ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].front_units[j], &#x27;&#x27;);
+          units = ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].name + units;
+        }
+      }
+
+      for (
+        var j = 0;
+        j &lt; ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].aliases.length;
+        j++) {
+        if (
+          units.includes(
+            ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].aliases[j])) {
+          units = units.replace(
+            ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].aliases[j],
+            ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].name);
+        }
+      }
+    }
+    return units.trim();
+  }
+
+  fromRawInputString(units: string): Units {
+    try {
+      this.createCurrencyUnits();
+    } catch (parsingError) {}
+
+    var compatibleUnits = this.toMathjsCompatibleString(units);
+    if (compatibleUnits !== &#x27;&#x27;) {
+      try {
+        unit(compatibleUnits);
+      } catch (err) {
+        throw new Error(err);
+      }
+    }
+    return new Units(this.fromStringToList(units));
+  }
+}
+
+angular.module(&#x27;oppia&#x27;).factory(
+  &#x27;UnitsObjectFactory&#x27;, downgradeInjectable(UnitsObjectFactory));
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/domain/objects/UnitsObjectFactory.ts&quot;,&quot;line&quot;:81,&quot;character&quot;:8,&quot;text&quot;:&quot;unitList&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/objects/UnitsObjectFactory.ts&quot;,&quot;line&quot;:87,&quot;character&quot;:12,&quot;text&quot;:&quot;unitList&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/objects/UnitsObjectFactory.ts&quot;,&quot;line&quot;:89,&quot;character&quot;:10,&quot;text&quot;:&quot;unitList&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/objects/UnitsObjectFactory.ts&quot;,&quot;line&quot;:93,&quot;character&quot;:10,&quot;text&quot;:&quot;unitList&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/objects/UnitsObjectFactory.ts&quot;,&quot;line&quot;:96,&quot;character&quot;:8,&quot;text&quot;:&quot;unitList&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/objects/UnitsObjectFactory.ts&quot;,&quot;line&quot;:108,&quot;character&quot;:8,&quot;text&quot;:&quot;parenthesisStack&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/objects/UnitsObjectFactory.ts&quot;,&quot;line&quot;:118,&quot;character&quot;:10,&quot;text&quot;:&quot;parenthesisStack&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/objects/UnitsObjectFactory.ts&quot;,&quot;line&quot;:122,&quot;character&quot;:10,&quot;text&quot;:&quot;parenthesisStack&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/objects/UnitsObjectFactory.ts&quot;,&quot;line&quot;:125,&quot;character&quot;:12,&quot;text&quot;:&quot;elem&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/objects/UnitsObjectFactory.ts&quot;,&quot;line&quot;:125,&quot;character&quot;:19,&quot;text&quot;:&quot;parenthesisStack&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/objects/UnitsObjectFactory.ts&quot;,&quot;line&quot;:126,&quot;character&quot;:12,&quot;text&quot;:&quot;elem&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/objects/UnitsObjectFactory.ts&quot;,&quot;line&quot;:127,&quot;character&quot;:41,&quot;text&quot;:&quot;elem&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/objects/UnitsObjectFactory.ts&quot;,&quot;line&quot;:157,&quot;character&quot;:10,&quot;text&quot;:&quot;s&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/objects/UnitsObjectFactory.ts&quot;,&quot;line&quot;:158,&quot;character&quot;:10,&quot;text&quot;:&quot;power&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/objects/UnitsObjectFactory.ts&quot;,&quot;line&quot;:160,&quot;character&quot;:8,&quot;text&quot;:&quot;s&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/objects/UnitsObjectFactory.ts&quot;,&quot;line&quot;:161,&quot;character&quot;:8,&quot;text&quot;:&quot;power&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/objects/UnitsObjectFactory.ts&quot;,&quot;line&quot;:163,&quot;character&quot;:8,&quot;text&quot;:&quot;s&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/objects/UnitsObjectFactory.ts&quot;,&quot;line&quot;:164,&quot;character&quot;:8,&quot;text&quot;:&quot;power&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/objects/UnitsObjectFactory.ts&quot;,&quot;line&quot;:166,&quot;character&quot;:12,&quot;text&quot;:&quot;s&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/objects/UnitsObjectFactory.ts&quot;,&quot;line&quot;:167,&quot;character&quot;:17,&quot;text&quot;:&quot;s&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/objects/UnitsObjectFactory.ts&quot;,&quot;line&quot;:169,&quot;character&quot;:15,&quot;text&quot;:&quot;s&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/objects/UnitsObjectFactory.ts&quot;,&quot;line&quot;:169,&quot;character&quot;:34,&quot;text&quot;:&quot;power&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/objects/UnitsObjectFactory.ts&quot;,&quot;line&quot;:185,&quot;character&quot;:6,&quot;text&quot;:&quot;&lt;CurrencyUnitsKeys&gt; Object.keys(ObjectsDomainConstants.CURRENCY_UNITS)&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;core/templates/domain/objects/UnitsObjectFactory.ts&quot;,&quot;line&quot;:188,&quot;character&quot;:10,&quot;text&quot;:&quot;baseUnitValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/objects/UnitsObjectFactory.ts&quot;,&quot;line&quot;:189,&quot;character&quot;:55,&quot;text&quot;:&quot;base_unit&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/objects/UnitsObjectFactory.ts&quot;,&quot;line&quot;:190,&quot;character&quot;:10,&quot;text&quot;:&quot;baseUnitValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/objects/UnitsObjectFactory.ts&quot;,&quot;line&quot;:217,&quot;character&quot;:6,&quot;text&quot;:&quot;&lt;CurrencyUnitsKeys&gt; Object.keys(ObjectsDomainConstants.CURRENCY_UNITS)&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;core/templates/domain/objects/UnitsObjectFactory.ts&quot;,&quot;line&quot;:252,&quot;character&quot;:13,&quot;text&quot;:&quot;parsingError&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/objects/UnitsObjectFactory.ts&quot;,&quot;line&quot;:258,&quot;character&quot;:15,&quot;text&quot;:&quot;err&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:54 GMT</p>
+    </body>
+  </html>
+  

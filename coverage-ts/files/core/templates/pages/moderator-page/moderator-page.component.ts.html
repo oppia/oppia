@@ -1,0 +1,178 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>moderator-page.component.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">core/templates/pages/moderator-page/moderator-page.component.ts</td><td class="">100.00%</td><td class="">100%</td><td class="">188</td><td class="">188</td><td class="">0</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2021 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Component for the Oppia moderator page.
+ */
+
+import { ChangeDetectorRef, Component } from &#x27;@angular/core&#x27;;
+import { downgradeComponent } from &#x27;@angular/upgrade/static&#x27;;
+import { AppConstants } from &#x27;app.constants&#x27;;
+import { ThreadMessage } from &#x27;domain/feedback_message/ThreadMessage.model&#x27;;
+import isEqual from &#x27;lodash/isEqual&#x27;;
+import { AlertsService } from &#x27;services/alerts.service&#x27;;
+import { DateTimeFormatService } from &#x27;services/date-time-format.service&#x27;;
+import { LoaderService } from &#x27;services/loader.service&#x27;;
+import { Schema } from &#x27;services/schema-default-value.service&#x27;;
+import { ActivityIdTypeDict, CommitMessage,
+  ExplorationDict, ModeratorPageBackendApiService }
+  from &#x27;./services/moderator-page-backend-api.service&#x27;;
+
+@Component({
+  selector: &#x27;oppia-moderator-page&#x27;,
+  templateUrl: &#x27;./moderator-page.component.html&#x27;
+})
+export class ModeratorPageComponent {
+  allCommits: CommitMessage[] = [];
+  allFeedbackMessages: ThreadMessage[] = [];
+  // Map of exploration ids to objects containing a single key: title.
+  explorationData: ExplorationDict[] = [];
+
+  displayedFeaturedActivityReferences: ActivityIdTypeDict[] = [];
+  lastSavedFeaturedActivityReferences: ActivityIdTypeDict[] = [];
+
+  FEATURED_ACTIVITY_REFERENCES_SCHEMA: Schema = {
+    type: &#x27;list&#x27;,
+    items: {
+      type: &#x27;dict&#x27;,
+      properties: [{
+        name: &#x27;type&#x27;,
+        schema: {
+          type: &#x27;unicode&#x27;,
+          choices: [AppConstants.ENTITY_TYPE.EXPLORATION,
+            AppConstants.ENTITY_TYPE.COLLECTION]
+        }
+      }, {
+        name: &#x27;id&#x27;,
+        schema: {
+          type: &#x27;unicode&#x27;
+        }
+      }]
+    }
+  };
+
+  constructor(
+    private alertsService: AlertsService,
+    private dateTimeFormatService: DateTimeFormatService,
+    private loaderService: LoaderService,
+    private moderatorPageBackendApiService: ModeratorPageBackendApiService,
+    private changeDetectorRef: ChangeDetectorRef
+  ) {}
+
+  updateDisplayedFeaturedActivityReferences(
+      newValue: ActivityIdTypeDict[]): void {
+    if (this.displayedFeaturedActivityReferences !== newValue) {
+      this.displayedFeaturedActivityReferences = newValue;
+      this.changeDetectorRef.detectChanges();
+    }
+  }
+
+  ngOnInit(): void {
+    this.loaderService.showLoadingScreen(&#x27;Loading&#x27;);
+    this.moderatorPageBackendApiService.getRecentCommitsAsync()
+      .then((response) =&gt; {
+        // Update the explorationData object with information about newly-
+        // discovered explorations.
+        let explorationIdsToExplorationData = response.exp_ids_to_exp_data;
+        for (let expId in explorationIdsToExplorationData) {
+          if (!this.explorationData.hasOwnProperty(expId)) {
+            this.explorationData[expId] = (
+              explorationIdsToExplorationData[expId]);
+          }
+        }
+        this.allCommits = response.results;
+        this.loaderService.hideLoadingScreen();
+      });
+
+    this.moderatorPageBackendApiService.getRecentFeedbackMessagesAsync()
+      .then((response) =&gt; {
+        this.allFeedbackMessages = response.results.map(
+          d =&gt; ThreadMessage.createFromBackendDict(d));
+      });
+
+    this.moderatorPageBackendApiService.getFeaturedActivityReferencesAsync()
+      .then((response) =&gt; {
+        this.displayedFeaturedActivityReferences = response
+          .featured_activity_references;
+        this.lastSavedFeaturedActivityReferences =
+          [...this.displayedFeaturedActivityReferences];
+      });
+  }
+
+  getDatetimeAsString(millisSinceEpoch: number): string {
+    return this.dateTimeFormatService
+      .getLocaleAbbreviatedDatetimeString(millisSinceEpoch);
+  }
+
+  isMessageFromExploration(message: ThreadMessage): boolean {
+    return message.entityType === AppConstants.ENTITY_TYPE.EXPLORATION;
+  }
+
+  getExplorationCreateUrl(explorationId: string): string {
+    return &#x27;/create/&#x27; + explorationId;
+  }
+
+  getActivityCreateUrl(reference: ActivityIdTypeDict): string {
+    let path: string = (
+          reference.type === AppConstants.ENTITY_TYPE.EXPLORATION ?
+          &#x27;/create&#x27; :
+          &#x27;/create_collection&#x27;);
+    return path + &#x27;/&#x27; + reference.id;
+  }
+
+  isSaveFeaturedActivitiesButtonDisabled(): boolean {
+    return isEqual(
+      this.displayedFeaturedActivityReferences,
+      this.lastSavedFeaturedActivityReferences);
+  }
+
+  saveFeaturedActivityReferences(): void {
+    this.alertsService.clearWarnings();
+
+    let activityReferencesToSave =
+      [...this.displayedFeaturedActivityReferences];
+
+    this.moderatorPageBackendApiService
+      .saveFeaturedActivityReferencesAsync(activityReferencesToSave)
+      .then(() =&gt; {
+        this.lastSavedFeaturedActivityReferences = activityReferencesToSave;
+        this.alertsService.addSuccessMessage(&#x27;Featured activities saved.&#x27;);
+      });
+  }
+
+  getSchema(): Schema {
+    return this.FEATURED_ACTIVITY_REFERENCES_SCHEMA;
+  }
+}
+
+angular.module(&#x27;oppia&#x27;).directive(&#x27;oppiaModeratorPage&#x27;,
+  downgradeComponent({ component: ModeratorPageComponent }));
+</textarea><pre id="annotations" style="display:none">[]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:58 GMT</p>
+    </body>
+  </html>
+  

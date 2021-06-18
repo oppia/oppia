@@ -1,0 +1,121 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>edit-profile-picture-modal.controller.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/preferences-page/modal-templates/edit-profile-picture-modal.controller.spec.ts</td><td class="">62.79%</td><td class="">100%</td><td class="">129</td><td class="">81</td><td class="">48</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for EditProfilePictureModalController.
+ */
+
+import Cropper from &#x27;cropperjs&#x27;;
+
+describe(&#x27;EditProfilePictureModalController&#x27;, function() {
+  var $scope = null;
+  var $timeout = null;
+  var $uibModalInstance = null;
+
+  beforeEach(angular.mock.module(&#x27;oppia&#x27;));
+  beforeEach(angular.mock.inject(function($injector, $controller) {
+    var $rootScope = $injector.get(&#x27;$rootScope&#x27;);
+    $timeout = $injector.get(&#x27;$timeout&#x27;);
+
+    $uibModalInstance = jasmine.createSpyObj(
+      &#x27;$uibModalInstance&#x27;, [&#x27;close&#x27;, &#x27;dismiss&#x27;]);
+
+    $scope = $rootScope.$new();
+    $controller(&#x27;EditProfilePictureModalController&#x27;, {
+      $scope: $scope,
+      $uibModalInstance: $uibModalInstance
+    });
+  }));
+
+  it(&#x27;should initialize $scope properties after controller is initialized&#x27;,
+    function() {
+      expect($scope.uploadedImage).toBe(null);
+      expect($scope.croppedImageDataUrl).toBe(&#x27;&#x27;);
+      expect($scope.invalidImageWarningIsShown).toBe(false);
+    });
+
+  it(&#x27;should save new file and close the modal when file is changed&#x27;,
+    function(done) {
+      spyOn(document, &#x27;getElementById&#x27;).and.callFake(function() {
+        return document.createElement(&#x27;img&#x27;);
+      });
+
+      let dummyDiv = document.createElement(&#x27;div&#x27;);
+      dummyDiv.className = &#x27;oppia-profile-image-uploader&#x27;;
+      document.body.append(dummyDiv);
+
+      // This is just a mock base 64 in order to test the FileReader event.
+      var dataBase64Mock = &#x27;VEhJUyBJUyBUSEUgQU5TV0VSCg==&#x27;;
+      const arrayBuffer = Uint8Array.from(
+        window.atob(dataBase64Mock), c =&gt; c.charCodeAt(0));
+      var file = new File([arrayBuffer], &#x27;filename.mp3&#x27;);
+
+
+      $scope.onInvalidImageLoaded();
+
+      expect($scope.uploadedImage).toBe(null);
+      expect($scope.croppedImageDataUrl).toBe(&#x27;&#x27;);
+      expect($scope.invalidImageWarningIsShown).toBe(true);
+
+      $scope.onFileChanged(file);
+
+      // Function setTimeout is being used here to not conflict with
+      // $timeout.flush for fadeIn Jquery method. This first setTimeout is to
+      // wait the default time for fadeOut Jquery method to complete, which is
+      // 400 miliseconds. 800ms is being used instead of 400ms just to be sure
+      // that fadeOut callbak is already executed.
+      // Ref: https://api.jquery.com/fadeout/
+      setTimeout(function() {
+        $timeout.flush();
+
+        expect($scope.invalidImageWarningIsShown).toBe(false);
+        expect($scope.uploadedImage).toBe(
+          &#x27;data:application/octet-stream;base64,&#x27; + dataBase64Mock);
+
+        var mockUrl = &#x27;mock-url&#x27;;
+        // This throws &quot;Argument of type &#x27;{ toDataURL: () =&gt; string; }&#x27; is
+        // not assignable to parameter of type &#x27;HTMLCanvasElement&#x27;&quot;&quot;. We need to
+        // suppress this error because &#x27;HTMLCanvasElement&#x27; has around 250 more
+        // properties. We only need to define one for testing purposes.
+        // @ts-expect-error
+        spyOn(Cropper.prototype, &#x27;getCroppedCanvas&#x27;).and.returnValue({
+          toDataURL: () =&gt; mockUrl
+        });
+        $scope.confirm();
+
+        expect($scope.croppedImageDataUrl).toBe(mockUrl);
+        expect($uibModalInstance.close).toHaveBeenCalledWith(mockUrl);
+        document.body.removeChild(dummyDiv);
+        done();
+      }, 800);
+    });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/preferences-page/modal-templates/edit-profile-picture-modal.controller.spec.ts&quot;,&quot;line&quot;:21,&quot;character&quot;:6,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/preferences-page/modal-templates/edit-profile-picture-modal.controller.spec.ts&quot;,&quot;line&quot;:22,&quot;character&quot;:6,&quot;text&quot;:&quot;$timeout&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/preferences-page/modal-templates/edit-profile-picture-modal.controller.spec.ts&quot;,&quot;line&quot;:23,&quot;character&quot;:6,&quot;text&quot;:&quot;$uibModalInstance&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/preferences-page/modal-templates/edit-profile-picture-modal.controller.spec.ts&quot;,&quot;line&quot;:26,&quot;character&quot;:42,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/preferences-page/modal-templates/edit-profile-picture-modal.controller.spec.ts&quot;,&quot;line&quot;:26,&quot;character&quot;:53,&quot;text&quot;:&quot;$controller&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/preferences-page/modal-templates/edit-profile-picture-modal.controller.spec.ts&quot;,&quot;line&quot;:27,&quot;character&quot;:8,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/preferences-page/modal-templates/edit-profile-picture-modal.controller.spec.ts&quot;,&quot;line&quot;:27,&quot;character&quot;:21,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/preferences-page/modal-templates/edit-profile-picture-modal.controller.spec.ts&quot;,&quot;line&quot;:27,&quot;character&quot;:31,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/preferences-page/modal-templates/edit-profile-picture-modal.controller.spec.ts&quot;,&quot;line&quot;:28,&quot;character&quot;:4,&quot;text&quot;:&quot;$timeout&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/preferences-page/modal-templates/edit-profile-picture-modal.controller.spec.ts&quot;,&quot;line&quot;:28,&quot;character&quot;:15,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/preferences-page/modal-templates/edit-profile-picture-modal.controller.spec.ts&quot;,&quot;line&quot;:28,&quot;character&quot;:25,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/preferences-page/modal-templates/edit-profile-picture-modal.controller.spec.ts&quot;,&quot;line&quot;:30,&quot;character&quot;:4,&quot;text&quot;:&quot;$uibModalInstance&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/preferences-page/modal-templates/edit-profile-picture-modal.controller.spec.ts&quot;,&quot;line&quot;:33,&quot;character&quot;:4,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/preferences-page/modal-templates/edit-profile-picture-modal.controller.spec.ts&quot;,&quot;line&quot;:33,&quot;character&quot;:13,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/preferences-page/modal-templates/edit-profile-picture-modal.controller.spec.ts&quot;,&quot;line&quot;:33,&quot;character&quot;:24,&quot;text&quot;:&quot;$new&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/preferences-page/modal-templates/edit-profile-picture-modal.controller.spec.ts&quot;,&quot;line&quot;:34,&quot;character&quot;:4,&quot;text&quot;:&quot;$controller&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/preferences-page/modal-templates/edit-profile-picture-modal.controller.spec.ts&quot;,&quot;line&quot;:35,&quot;character&quot;:6,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/preferences-page/modal-templates/edit-profile-picture-modal.controller.spec.ts&quot;,&quot;line&quot;:35,&quot;character&quot;:14,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/preferences-page/modal-templates/edit-profile-picture-modal.controller.spec.ts&quot;,&quot;line&quot;:36,&quot;character&quot;:6,&quot;text&quot;:&quot;$uibModalInstance&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/preferences-page/modal-templates/edit-profile-picture-modal.controller.spec.ts&quot;,&quot;line&quot;:36,&quot;character&quot;:25,&quot;text&quot;:&quot;$uibModalInstance&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/preferences-page/modal-templates/edit-profile-picture-modal.controller.spec.ts&quot;,&quot;line&quot;:42,&quot;character&quot;:13,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/preferences-page/modal-templates/edit-profile-picture-modal.controller.spec.ts&quot;,&quot;line&quot;:42,&quot;character&quot;:20,&quot;text&quot;:&quot;uploadedImage&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/preferences-page/modal-templates/edit-profile-picture-modal.controller.spec.ts&quot;,&quot;line&quot;:43,&quot;character&quot;:13,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/preferences-page/modal-templates/edit-profile-picture-modal.controller.spec.ts&quot;,&quot;line&quot;:43,&quot;character&quot;:20,&quot;text&quot;:&quot;croppedImageDataUrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/preferences-page/modal-templates/edit-profile-picture-modal.controller.spec.ts&quot;,&quot;line&quot;:44,&quot;character&quot;:13,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/preferences-page/modal-templates/edit-profile-picture-modal.controller.spec.ts&quot;,&quot;line&quot;:44,&quot;character&quot;:20,&quot;text&quot;:&quot;invalidImageWarningIsShown&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/preferences-page/modal-templates/edit-profile-picture-modal.controller.spec.ts&quot;,&quot;line&quot;:64,&quot;character&quot;:6,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/preferences-page/modal-templates/edit-profile-picture-modal.controller.spec.ts&quot;,&quot;line&quot;:64,&quot;character&quot;:13,&quot;text&quot;:&quot;onInvalidImageLoaded&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/preferences-page/modal-templates/edit-profile-picture-modal.controller.spec.ts&quot;,&quot;line&quot;:66,&quot;character&quot;:13,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/preferences-page/modal-templates/edit-profile-picture-modal.controller.spec.ts&quot;,&quot;line&quot;:66,&quot;character&quot;:20,&quot;text&quot;:&quot;uploadedImage&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/preferences-page/modal-templates/edit-profile-picture-modal.controller.spec.ts&quot;,&quot;line&quot;:67,&quot;character&quot;:13,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/preferences-page/modal-templates/edit-profile-picture-modal.controller.spec.ts&quot;,&quot;line&quot;:67,&quot;character&quot;:20,&quot;text&quot;:&quot;croppedImageDataUrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/preferences-page/modal-templates/edit-profile-picture-modal.controller.spec.ts&quot;,&quot;line&quot;:68,&quot;character&quot;:13,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/preferences-page/modal-templates/edit-profile-picture-modal.controller.spec.ts&quot;,&quot;line&quot;:68,&quot;character&quot;:20,&quot;text&quot;:&quot;invalidImageWarningIsShown&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/preferences-page/modal-templates/edit-profile-picture-modal.controller.spec.ts&quot;,&quot;line&quot;:70,&quot;character&quot;:6,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/preferences-page/modal-templates/edit-profile-picture-modal.controller.spec.ts&quot;,&quot;line&quot;:70,&quot;character&quot;:13,&quot;text&quot;:&quot;onFileChanged&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/preferences-page/modal-templates/edit-profile-picture-modal.controller.spec.ts&quot;,&quot;line&quot;:79,&quot;character&quot;:8,&quot;text&quot;:&quot;$timeout&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/preferences-page/modal-templates/edit-profile-picture-modal.controller.spec.ts&quot;,&quot;line&quot;:79,&quot;character&quot;:17,&quot;text&quot;:&quot;flush&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/preferences-page/modal-templates/edit-profile-picture-modal.controller.spec.ts&quot;,&quot;line&quot;:81,&quot;character&quot;:15,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/preferences-page/modal-templates/edit-profile-picture-modal.controller.spec.ts&quot;,&quot;line&quot;:81,&quot;character&quot;:22,&quot;text&quot;:&quot;invalidImageWarningIsShown&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/preferences-page/modal-templates/edit-profile-picture-modal.controller.spec.ts&quot;,&quot;line&quot;:82,&quot;character&quot;:15,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/preferences-page/modal-templates/edit-profile-picture-modal.controller.spec.ts&quot;,&quot;line&quot;:82,&quot;character&quot;:22,&quot;text&quot;:&quot;uploadedImage&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/preferences-page/modal-templates/edit-profile-picture-modal.controller.spec.ts&quot;,&quot;line&quot;:94,&quot;character&quot;:8,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/preferences-page/modal-templates/edit-profile-picture-modal.controller.spec.ts&quot;,&quot;line&quot;:94,&quot;character&quot;:15,&quot;text&quot;:&quot;confirm&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/preferences-page/modal-templates/edit-profile-picture-modal.controller.spec.ts&quot;,&quot;line&quot;:96,&quot;character&quot;:15,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/preferences-page/modal-templates/edit-profile-picture-modal.controller.spec.ts&quot;,&quot;line&quot;:96,&quot;character&quot;:22,&quot;text&quot;:&quot;croppedImageDataUrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/preferences-page/modal-templates/edit-profile-picture-modal.controller.spec.ts&quot;,&quot;line&quot;:97,&quot;character&quot;:15,&quot;text&quot;:&quot;$uibModalInstance&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/preferences-page/modal-templates/edit-profile-picture-modal.controller.spec.ts&quot;,&quot;line&quot;:97,&quot;character&quot;:33,&quot;text&quot;:&quot;close&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:59 GMT</p>
+    </body>
+  </html>
+  

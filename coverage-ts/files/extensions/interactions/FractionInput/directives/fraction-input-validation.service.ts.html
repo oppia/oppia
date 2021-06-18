@@ -1,0 +1,345 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>fraction-input-validation.service.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts</td><td class="">73.15%</td><td class="">100%</td><td class="">499</td><td class="">365</td><td class="">134</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2014 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Validator service for the fraction interaction.
+ */
+
+import { Injectable } from &#x27;@angular/core&#x27;;
+import { downgradeInjectable } from &#x27;@angular/upgrade/static&#x27;;
+
+import { FractionAnswer } from &#x27;interactions/answer-defs&#x27;;
+import { Fraction, FractionObjectFactory } from
+  &#x27;domain/objects/FractionObjectFactory&#x27;;
+import { baseInteractionValidationService } from
+  &#x27;interactions/base-interaction-validation.service&#x27;;
+import { AppConstants } from &#x27;app.constants&#x27;;
+import { Warning } from &#x27;services/alerts.service&#x27;;
+import { FractionInputCustomizationArgs } from
+  &#x27;interactions/customization-args-defs&#x27;;
+import { AnswerGroup } from &#x27;domain/exploration/AnswerGroupObjectFactory&#x27;;
+import { Outcome } from &#x27;domain/exploration/OutcomeObjectFactory&#x27;;
+
+interface FractionWarning {
+  type: string;
+  message: string;
+}
+
+@Injectable({
+  providedIn: &#x27;root&#x27;
+})
+export class FractionInputValidationService {
+  constructor(
+    private fof: FractionObjectFactory,
+    private bivs: baseInteractionValidationService) {}
+
+  getNonIntegerInputWarning(i: number, j: number): FractionWarning {
+    return {
+      type: AppConstants.WARNING_TYPES.ERROR,
+      message: (
+        &#x27;Rule &#x27; + (j + 1) + &#x27; from answer group &#x27; +
+        (i + 1) + &#x27; is invalid: input should be an &#x27; +
+        &#x27;integer.&#x27;)
+    };
+  }
+  getCustomizationArgsWarnings(
+      customizationArgs: FractionInputCustomizationArgs): Warning[] {
+    return [];
+  }
+  getAllWarnings(
+      stateName: string, customizationArgs: FractionInputCustomizationArgs,
+      answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
+    var warningsList = [];
+    var shouldBeInSimplestForm =
+      customizationArgs.requireSimplestForm.value;
+    var allowImproperFraction =
+        customizationArgs.allowImproperFraction.value;
+    var allowNonzeroIntegerPart =
+      customizationArgs.allowNonzeroIntegerPart.value;
+
+    warningsList = warningsList.concat(
+      this.getCustomizationArgsWarnings(customizationArgs));
+
+    var toFloat = function(fraction) {
+      return this.fof.fromDict(fraction).toFloat();
+    };
+    /**
+     * Store an answer range for every rule, then check for redundant
+     * ranges. A range is an object of the form:
+     * {
+     *   lb: float, lower bound
+     *   ub: float, upper bound
+     *   lbi: bool, is lower bound inclusive
+     *   ubi: bool, is upper bound inclusive
+     * }
+     */
+    var setLowerAndUpperBounds = function(range, lb, ub, lbi, ubi) {
+      range.lb = lb;
+      range.ub = ub;
+      range.lbi = lbi;
+      range.ubi = ubi;
+    };
+    var isEnclosedBy = function(ra, rb) {
+      if ((ra.lb === null &amp;&amp; ra.ub === null) ||
+        (rb.lb === null &amp;&amp; rb.ub === null)) {
+        return false;
+      }
+
+      // Checks if range ra is enclosed by range rb.
+      var lowerBoundConditionIsSatisfied =
+        (rb.lb &lt; ra.lb) || (rb.lb === ra.lb &amp;&amp; (!ra.lbi || rb.lbi));
+      var upperBoundConditionIsSatisfied =
+        (rb.ub &gt; ra.ub) || (rb.ub === ra.ub &amp;&amp; (!ra.ubi || rb.ubi));
+      return lowerBoundConditionIsSatisfied &amp;&amp;
+        upperBoundConditionIsSatisfied;
+    };
+
+    var shouldCheckRangeCriteria = function(earlierRule, laterRule) {
+      if (
+        (earlierRule.type === &#x27;IsExactlyEqualTo&#x27; &amp;&amp;
+        laterRule.type === &#x27;IsExactlyEqualTo&#x27;) ||
+        (earlierRule.type === &#x27;IsExactlyEqualTo&#x27; &amp;&amp;
+        laterRule.type === &#x27;IsEquivalentTo&#x27;) ||
+        (earlierRule.type === &#x27;IsExactlyEqualTo&#x27; &amp;&amp;
+        laterRule.type === &#x27;IsEquivalentToAndInSimplestForm&#x27;)) {
+        return false;
+      }
+      return true;
+    };
+
+    var ranges = [];
+    var matchedDenominators = [];
+
+    for (var i = 0; i &lt; answerGroups.length; i++) {
+      var rules = answerGroups[i].rules;
+      for (var j = 0; j &lt; rules.length; j++) {
+        var rule = rules[j];
+        var range = {
+          answerGroupIndex: i,
+          ruleIndex: j,
+          lb: null,
+          ub: null,
+          lbi: false,
+          ubi: false,
+        };
+
+        var matchedDenominator = {
+          answerGroupIndex: i,
+          ruleIndex: j,
+          denominator: null,
+        };
+
+        switch (rule.type) {
+          case &#x27;IsExactlyEqualTo&#x27;:
+            if (shouldBeInSimplestForm) {
+              var fractionDict = &lt;FractionAnswer&gt; rule.inputs.f;
+              var fractionInSimplestForm = this.fof.fromDict(
+                fractionDict).convertToSimplestForm();
+              if (!angular.equals(fractionDict, fractionInSimplestForm)) {
+                warningsList.push({
+                  type: AppConstants.WARNING_TYPES.ERROR,
+                  message: (
+                    &#x27;Rule &#x27; + (j + 1) + &#x27; from answer group &#x27; +
+                    (i + 1) +
+                    &#x27; will never be matched because it is not &#x27; +
+                    &#x27;in simplest form.&#x27;)
+                });
+              }
+            }
+            if (!allowImproperFraction) {
+              var fraction: Fraction = this.fof.fromDict(
+                &lt;FractionAnswer&gt; rule.inputs.f);
+              if (fraction.isImproperFraction()) {
+                warningsList.push({
+                  type: AppConstants.WARNING_TYPES.ERROR,
+                  message: (
+                    &#x27;Rule &#x27; + (j + 1) + &#x27; from answer group &#x27; +
+                    (i + 1) +
+                    &#x27; will never be matched because it is an &#x27; +
+                    &#x27;improper fraction&#x27;)
+                });
+              }
+            }
+            if (!allowNonzeroIntegerPart) {
+              var fraction: Fraction = this.fof.fromDict(
+                &lt;FractionAnswer&gt; rule.inputs.f);
+              if (fraction.hasNonzeroIntegerPart()) {
+                warningsList.push({
+                  type: AppConstants.WARNING_TYPES.ERROR,
+                  message: (
+                    &#x27;Rule &#x27; + (j + 1) + &#x27; from answer group &#x27; +
+                    (i + 1) +
+                    &#x27; will never be matched because it has a &#x27; +
+                    &#x27;non zero integer part&#x27;)
+                });
+              }
+            }
+            var f = toFloat.call(this, rule.inputs.f);
+            setLowerAndUpperBounds(range, f, f, true, true);
+            break;
+          case &#x27;IsEquivalentTo&#x27;: // fall-through.
+          case &#x27;IsEquivalentToAndInSimplestForm&#x27;:
+            var f = toFloat.call(this, rule.inputs.f);
+            setLowerAndUpperBounds(range, f, f, true, true);
+            break;
+          case &#x27;IsGreaterThan&#x27;:
+            var f = toFloat.call(this, rule.inputs.f);
+            setLowerAndUpperBounds(range, f, Infinity, false, false);
+            break;
+          case &#x27;IsLessThan&#x27;:
+            var f = toFloat.call(this, rule.inputs.f);
+            setLowerAndUpperBounds(range, -Infinity, f, false, false);
+            break;
+          case &#x27;HasNumeratorEqualTo&#x27;:
+            if (!Number.isInteger(rule.inputs.x)) {
+              warningsList.push(this.getNonIntegerInputWarning(i, j));
+            }
+            break;
+          case &#x27;HasIntegerPartEqualTo&#x27;:
+            if (!allowNonzeroIntegerPart &amp;&amp; rule.inputs.x !== 0) {
+              warningsList.push({
+                type: AppConstants.WARNING_TYPES.ERROR,
+                message: (
+                  &#x27;Rule &#x27; + (j + 1) + &#x27; from answer group &#x27; +
+                  (i + 1) +
+                  &#x27; will never be matched because integer part &#x27; +
+                  &#x27;has to be zero&#x27;)
+              });
+            }
+            if (!Number.isInteger(rule.inputs.x)) {
+              warningsList.push(this.getNonIntegerInputWarning(i, j));
+            }
+            break;
+          case &#x27;HasDenominatorEqualTo&#x27;:
+            if (!Number.isInteger(rule.inputs.x)) {
+              warningsList.push(this.getNonIntegerInputWarning(i, j));
+            }
+            if (rule.inputs.x === 0) {
+              warningsList.push({
+                type: AppConstants.WARNING_TYPES.ERROR,
+                message: (
+                  &#x27;Rule &#x27; + (j + 1) + &#x27; from answer group &#x27; +
+                  (i + 1) + &#x27; is invalid: denominator &#x27; +
+                  &#x27;should be greater than zero.&#x27;)
+              });
+            }
+            matchedDenominator.denominator = rule.inputs.x;
+            break;
+          case &#x27;HasFractionalPartExactlyEqualTo&#x27;:
+            if ((&lt;FractionAnswer&gt; rule.inputs.f).wholeNumber !== 0) {
+              warningsList.push({
+                type: AppConstants.WARNING_TYPES.ERROR,
+                message: (
+                  &#x27;Rule &#x27; + (j + 1) + &#x27; from answer group &#x27; +
+                  (i + 1) +
+                  &#x27; is invalid as integer part should be zero&#x27;)
+              });
+            }
+            if ((&lt;FractionAnswer&gt; rule.inputs.f).isNegative !== false) {
+              warningsList.push({
+                type: AppConstants.WARNING_TYPES.ERROR,
+                message: (
+                  &#x27;Rule &#x27; + (j + 1) + &#x27; from answer group &#x27; +
+                  (i + 1) +
+                  &#x27; is invalid as sign should be positive&#x27;)
+              });
+            }
+            if (!allowImproperFraction) {
+              var fraction: Fraction = this.fof.fromDict(
+                &lt;FractionAnswer&gt; rule.inputs.f);
+              if (fraction.isImproperFraction()) {
+                warningsList.push({
+                  type: AppConstants.WARNING_TYPES.ERROR,
+                  message: (
+                    &#x27;Rule &#x27; + (j + 1) + &#x27; from answer group &#x27; +
+                    (i + 1) +
+                    &#x27; is invalid as improper fractions are not allowed&#x27;)
+                });
+              }
+            }
+            break;
+          default:
+            break;
+        }
+        for (var k = 0; k &lt; ranges.length; k++) {
+          if (isEnclosedBy(range, ranges[k])) {
+            var earlierRule = answerGroups[ranges[k].answerGroupIndex]
+              .rules[ranges[k].ruleIndex];
+            if (shouldCheckRangeCriteria(earlierRule, rule)) {
+              warningsList.push({
+                type: AppConstants.WARNING_TYPES.ERROR,
+                message: (
+                  &#x27;Rule &#x27; + (j + 1) + &#x27; from answer group &#x27; +
+                  (i + 1) + &#x27; will never be matched because it &#x27; +
+                  &#x27;is made redundant by rule &#x27; + (ranges[k].ruleIndex + 1) +
+                  &#x27; from answer group &#x27; + (ranges[k].answerGroupIndex + 1) +
+                  &#x27;.&#x27;)
+              });
+            }
+          }
+        }
+
+        for (var k = 0; k &lt; matchedDenominators.length; k++) {
+          if (matchedDenominators[k].denominator !== null &amp;&amp;
+            rule.type === &#x27;HasFractionalPartExactlyEqualTo&#x27;) {
+            if (matchedDenominators[k].denominator ===
+              (&lt;FractionAnswer&gt; rule.inputs.f).denominator) {
+              warningsList.push({
+                type: AppConstants.WARNING_TYPES.ERROR,
+                message: (
+                  &#x27;Rule &#x27; + (j + 1) + &#x27; from answer group &#x27; +
+                  (i + 1) + &#x27; will never be matched because it &#x27; +
+                  &#x27;is made redundant by rule &#x27; +
+                  (matchedDenominators[k].ruleIndex + 1) +
+                  &#x27; from answer group &#x27; +
+                  (matchedDenominators[k].answerGroupIndex + 1) + &#x27;.&#x27;)
+              });
+            }
+          }
+        }
+
+        ranges.push(range);
+        matchedDenominators.push(matchedDenominator);
+      }
+    }
+
+    warningsList = warningsList.concat(
+      this.bivs.getAllOutcomeWarnings(
+        answerGroups, defaultOutcome, stateName));
+
+    return warningsList;
+  }
+}
+
+angular.module(&#x27;oppia&#x27;).factory(
+  &#x27;FractionInputValidationService&#x27;, downgradeInjectable(
+    FractionInputValidationService));
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:62,&quot;character&quot;:8,&quot;text&quot;:&quot;warningsList&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:70,&quot;character&quot;:4,&quot;text&quot;:&quot;warningsList&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:70,&quot;character&quot;:19,&quot;text&quot;:&quot;warningsList&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:73,&quot;character&quot;:27,&quot;text&quot;:&quot;fraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:74,&quot;character&quot;:13,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:74,&quot;character&quot;:18,&quot;text&quot;:&quot;fof&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:74,&quot;character&quot;:22,&quot;text&quot;:&quot;fromDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:74,&quot;character&quot;:31,&quot;text&quot;:&quot;fraction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:74,&quot;character&quot;:41,&quot;text&quot;:&quot;toFloat&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:86,&quot;character&quot;:42,&quot;text&quot;:&quot;range&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:86,&quot;character&quot;:49,&quot;text&quot;:&quot;lb&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:86,&quot;character&quot;:53,&quot;text&quot;:&quot;ub&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:86,&quot;character&quot;:57,&quot;text&quot;:&quot;lbi&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:86,&quot;character&quot;:62,&quot;text&quot;:&quot;ubi&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:87,&quot;character&quot;:6,&quot;text&quot;:&quot;range&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:87,&quot;character&quot;:12,&quot;text&quot;:&quot;lb&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:87,&quot;character&quot;:17,&quot;text&quot;:&quot;lb&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:88,&quot;character&quot;:6,&quot;text&quot;:&quot;range&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:88,&quot;character&quot;:12,&quot;text&quot;:&quot;ub&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:88,&quot;character&quot;:17,&quot;text&quot;:&quot;ub&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:89,&quot;character&quot;:6,&quot;text&quot;:&quot;range&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:89,&quot;character&quot;:12,&quot;text&quot;:&quot;lbi&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:89,&quot;character&quot;:18,&quot;text&quot;:&quot;lbi&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:90,&quot;character&quot;:6,&quot;text&quot;:&quot;range&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:90,&quot;character&quot;:12,&quot;text&quot;:&quot;ubi&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:90,&quot;character&quot;:18,&quot;text&quot;:&quot;ubi&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:92,&quot;character&quot;:32,&quot;text&quot;:&quot;ra&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:92,&quot;character&quot;:36,&quot;text&quot;:&quot;rb&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:93,&quot;character&quot;:11,&quot;text&quot;:&quot;ra&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:93,&quot;character&quot;:14,&quot;text&quot;:&quot;lb&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:93,&quot;character&quot;:29,&quot;text&quot;:&quot;ra&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:93,&quot;character&quot;:32,&quot;text&quot;:&quot;ub&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:94,&quot;character&quot;:9,&quot;text&quot;:&quot;rb&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:94,&quot;character&quot;:12,&quot;text&quot;:&quot;lb&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:94,&quot;character&quot;:27,&quot;text&quot;:&quot;rb&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:94,&quot;character&quot;:30,&quot;text&quot;:&quot;ub&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:99,&quot;character&quot;:10,&quot;text&quot;:&quot;lowerBoundConditionIsSatisfied&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:100,&quot;character&quot;:9,&quot;text&quot;:&quot;rb&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:100,&quot;character&quot;:12,&quot;text&quot;:&quot;lb&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:100,&quot;character&quot;:17,&quot;text&quot;:&quot;ra&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:100,&quot;character&quot;:20,&quot;text&quot;:&quot;lb&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:100,&quot;character&quot;:28,&quot;text&quot;:&quot;rb&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:100,&quot;character&quot;:31,&quot;text&quot;:&quot;lb&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:100,&quot;character&quot;:38,&quot;text&quot;:&quot;ra&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:100,&quot;character&quot;:41,&quot;text&quot;:&quot;lb&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:100,&quot;character&quot;:49,&quot;text&quot;:&quot;ra&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:100,&quot;character&quot;:52,&quot;text&quot;:&quot;lbi&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:100,&quot;character&quot;:59,&quot;text&quot;:&quot;rb&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:100,&quot;character&quot;:62,&quot;text&quot;:&quot;lbi&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:101,&quot;character&quot;:10,&quot;text&quot;:&quot;upperBoundConditionIsSatisfied&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:102,&quot;character&quot;:9,&quot;text&quot;:&quot;rb&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:102,&quot;character&quot;:12,&quot;text&quot;:&quot;ub&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:102,&quot;character&quot;:17,&quot;text&quot;:&quot;ra&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:102,&quot;character&quot;:20,&quot;text&quot;:&quot;ub&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:102,&quot;character&quot;:28,&quot;text&quot;:&quot;rb&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:102,&quot;character&quot;:31,&quot;text&quot;:&quot;ub&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:102,&quot;character&quot;:38,&quot;text&quot;:&quot;ra&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:102,&quot;character&quot;:41,&quot;text&quot;:&quot;ub&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:102,&quot;character&quot;:49,&quot;text&quot;:&quot;ra&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:102,&quot;character&quot;:52,&quot;text&quot;:&quot;ubi&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:102,&quot;character&quot;:59,&quot;text&quot;:&quot;rb&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:102,&quot;character&quot;:62,&quot;text&quot;:&quot;ubi&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:103,&quot;character&quot;:13,&quot;text&quot;:&quot;lowerBoundConditionIsSatisfied&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:104,&quot;character&quot;:8,&quot;text&quot;:&quot;upperBoundConditionIsSatisfied&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:107,&quot;character&quot;:44,&quot;text&quot;:&quot;earlierRule&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:107,&quot;character&quot;:57,&quot;text&quot;:&quot;laterRule&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:109,&quot;character&quot;:9,&quot;text&quot;:&quot;earlierRule&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:109,&quot;character&quot;:21,&quot;text&quot;:&quot;type&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:110,&quot;character&quot;:8,&quot;text&quot;:&quot;laterRule&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:110,&quot;character&quot;:18,&quot;text&quot;:&quot;type&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:111,&quot;character&quot;:9,&quot;text&quot;:&quot;earlierRule&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:111,&quot;character&quot;:21,&quot;text&quot;:&quot;type&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:112,&quot;character&quot;:8,&quot;text&quot;:&quot;laterRule&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:112,&quot;character&quot;:18,&quot;text&quot;:&quot;type&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:113,&quot;character&quot;:9,&quot;text&quot;:&quot;earlierRule&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:113,&quot;character&quot;:21,&quot;text&quot;:&quot;type&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:114,&quot;character&quot;:8,&quot;text&quot;:&quot;laterRule&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:114,&quot;character&quot;:18,&quot;text&quot;:&quot;type&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:120,&quot;character&quot;:8,&quot;text&quot;:&quot;ranges&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:121,&quot;character&quot;:8,&quot;text&quot;:&quot;matchedDenominators&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:145,&quot;character&quot;:33,&quot;text&quot;:&quot;&lt;FractionAnswer&gt; rule.inputs.f&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:149,&quot;character&quot;:16,&quot;text&quot;:&quot;warningsList&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:161,&quot;character&quot;:16,&quot;text&quot;:&quot;&lt;FractionAnswer&gt; rule.inputs.f&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:163,&quot;character&quot;:16,&quot;text&quot;:&quot;warningsList&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:175,&quot;character&quot;:16,&quot;text&quot;:&quot;&lt;FractionAnswer&gt; rule.inputs.f&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:177,&quot;character&quot;:16,&quot;text&quot;:&quot;warningsList&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:187,&quot;character&quot;:16,&quot;text&quot;:&quot;f&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:188,&quot;character&quot;:42,&quot;text&quot;:&quot;f&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:188,&quot;character&quot;:45,&quot;text&quot;:&quot;f&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:192,&quot;character&quot;:16,&quot;text&quot;:&quot;f&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:193,&quot;character&quot;:42,&quot;text&quot;:&quot;f&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:193,&quot;character&quot;:45,&quot;text&quot;:&quot;f&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:196,&quot;character&quot;:16,&quot;text&quot;:&quot;f&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:197,&quot;character&quot;:42,&quot;text&quot;:&quot;f&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:200,&quot;character&quot;:16,&quot;text&quot;:&quot;f&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:201,&quot;character&quot;:53,&quot;text&quot;:&quot;f&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:205,&quot;character&quot;:14,&quot;text&quot;:&quot;warningsList&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:210,&quot;character&quot;:14,&quot;text&quot;:&quot;warningsList&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:220,&quot;character&quot;:14,&quot;text&quot;:&quot;warningsList&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:225,&quot;character&quot;:14,&quot;text&quot;:&quot;warningsList&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:228,&quot;character&quot;:14,&quot;text&quot;:&quot;warningsList&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:236,&quot;character&quot;:31,&quot;text&quot;:&quot;denominator&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:239,&quot;character&quot;:17,&quot;text&quot;:&quot;&lt;FractionAnswer&gt; rule.inputs.f&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:240,&quot;character&quot;:14,&quot;text&quot;:&quot;warningsList&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:248,&quot;character&quot;:17,&quot;text&quot;:&quot;&lt;FractionAnswer&gt; rule.inputs.f&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:249,&quot;character&quot;:14,&quot;text&quot;:&quot;warningsList&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:259,&quot;character&quot;:16,&quot;text&quot;:&quot;&lt;FractionAnswer&gt; rule.inputs.f&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:261,&quot;character&quot;:16,&quot;text&quot;:&quot;warningsList&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:274,&quot;character&quot;:28,&quot;text&quot;:&quot;ranges&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:275,&quot;character&quot;:34,&quot;text&quot;:&quot;ranges&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:276,&quot;character&quot;:43,&quot;text&quot;:&quot;ranges&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:276,&quot;character&quot;:53,&quot;text&quot;:&quot;answerGroupIndex&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:277,&quot;character&quot;:21,&quot;text&quot;:&quot;ranges&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:277,&quot;character&quot;:31,&quot;text&quot;:&quot;ruleIndex&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:279,&quot;character&quot;:14,&quot;text&quot;:&quot;warningsList&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:284,&quot;character&quot;:50,&quot;text&quot;:&quot;ranges&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:284,&quot;character&quot;:60,&quot;text&quot;:&quot;ruleIndex&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:285,&quot;character&quot;:43,&quot;text&quot;:&quot;ranges&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:285,&quot;character&quot;:53,&quot;text&quot;:&quot;answerGroupIndex&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:292,&quot;character&quot;:28,&quot;text&quot;:&quot;matchedDenominators&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:293,&quot;character&quot;:14,&quot;text&quot;:&quot;matchedDenominators&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:293,&quot;character&quot;:37,&quot;text&quot;:&quot;denominator&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:295,&quot;character&quot;:16,&quot;text&quot;:&quot;matchedDenominators&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:295,&quot;character&quot;:39,&quot;text&quot;:&quot;denominator&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:296,&quot;character&quot;:15,&quot;text&quot;:&quot;&lt;FractionAnswer&gt; rule.inputs.f&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:297,&quot;character&quot;:14,&quot;text&quot;:&quot;warningsList&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:303,&quot;character&quot;:19,&quot;text&quot;:&quot;matchedDenominators&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:303,&quot;character&quot;:42,&quot;text&quot;:&quot;ruleIndex&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:305,&quot;character&quot;:19,&quot;text&quot;:&quot;matchedDenominators&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:305,&quot;character&quot;:42,&quot;text&quot;:&quot;answerGroupIndex&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:311,&quot;character&quot;:8,&quot;text&quot;:&quot;ranges&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:312,&quot;character&quot;:8,&quot;text&quot;:&quot;matchedDenominators&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:316,&quot;character&quot;:4,&quot;text&quot;:&quot;warningsList&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/FractionInput/directives/fraction-input-validation.service.ts&quot;,&quot;line&quot;:316,&quot;character&quot;:19,&quot;text&quot;:&quot;warningsList&quot;,&quot;kind&quot;:2}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:55 GMT</p>
+    </body>
+  </html>
+  

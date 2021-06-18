@@ -1,0 +1,313 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>story-node.model.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/domain/story/story-node.model.ts</td><td class="">97.85%</td><td class="">100%</td><td class="">372</td><td class="">364</td><td class="">8</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2018 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Model class for creating and mutating instances of frontend
+ * story node domain objects.
+ */
+
+import { StoryEditorPageConstants } from
+  &#x27;pages/story-editor-page/story-editor-page.constants&#x27;;
+
+export interface StoryNodeBackendDict {
+  &#x27;id&#x27;: string;
+  &#x27;title&#x27;: string;
+  &#x27;description&#x27;: string;
+  &#x27;destination_node_ids&#x27;: string[];
+  &#x27;prerequisite_skill_ids&#x27;: string[];
+  &#x27;acquired_skill_ids&#x27;: string[];
+  &#x27;outline&#x27;: string;
+  &#x27;outline_is_finalized&#x27;: boolean;
+  &#x27;exploration_id&#x27;: string | null;
+  &#x27;thumbnail_bg_color&#x27;: string | null;
+  &#x27;thumbnail_filename&#x27;: string | null;
+}
+
+export class StoryNode {
+  _id: string;
+  _title: string;
+  _description: string;
+  _destinationNodeIds: string[];
+  _prerequisiteSkillIds: string[];
+  _acquiredSkillIds: string[];
+  _outline: string;
+  _outlineIsFinalized: boolean;
+  _explorationId: string | null;
+  _thumbnailBgColor: string | null;
+  _thumbnailFilename: string | null;
+  constructor(
+      id: string, title: string, description: string,
+      destinationNodeIds: string[], prerequisiteSkillIds: string[],
+      acquiredSkillIds: string[], outline: string,
+      outlineIsFinalized: boolean, explorationId: string | null,
+      thumbnailBgColor: string | null, thumbnailFilename: string | null) {
+    this._id = id;
+    this._title = title;
+    this._description = description;
+    this._destinationNodeIds = destinationNodeIds;
+    this._prerequisiteSkillIds = prerequisiteSkillIds;
+    this._acquiredSkillIds = acquiredSkillIds;
+    this._outline = outline;
+    this._outlineIsFinalized = outlineIsFinalized;
+    this._explorationId = explorationId;
+    this._thumbnailBgColor = thumbnailBgColor;
+    this._thumbnailFilename = thumbnailFilename;
+  }
+
+  _checkValidNodeId(nodeId: string): boolean {
+    if (typeof nodeId !== &#x27;string&#x27;) {
+      return false;
+    }
+    var nodeIdPattern = new RegExp(
+      StoryEditorPageConstants.NODE_ID_PREFIX + &#x27;[0-9]+&#x27;, &#x27;g&#x27;);
+    if (!nodeId.match(nodeIdPattern)) {
+      return false;
+    }
+    return true;
+  }
+
+  getId(): string {
+    return this._id;
+  }
+
+  getTitle(): string {
+    return this._title;
+  }
+
+  getDescription(): string {
+    return this._description;
+  }
+
+  getExplorationId(): string | null {
+    return this._explorationId;
+  }
+
+  setExplorationId(explorationId: string): void {
+    this._explorationId = explorationId;
+  }
+
+  getOutline(): string {
+    return this._outline;
+  }
+
+  setOutline(outline: string): void {
+    this._outline = outline;
+  }
+
+  setTitle(title: string): void {
+    this._title = title;
+  }
+
+  setDescription(description: string): void {
+    this._description = description;
+  }
+
+  getOutlineStatus(): boolean {
+    return this._outlineIsFinalized;
+  }
+
+  markOutlineAsFinalized(): void {
+    this._outlineIsFinalized = true;
+  }
+
+  markOutlineAsNotFinalized(): void {
+    this._outlineIsFinalized = false;
+  }
+
+  getThumbnailFilename(): string | null {
+    return this._thumbnailFilename;
+  }
+
+  setThumbnailFilename(thumbnailFilename: string): void {
+    this._thumbnailFilename = thumbnailFilename;
+  }
+
+  getThumbnailBgColor(): string | null {
+    return this._thumbnailBgColor;
+  }
+
+  setThumbnailBgColor(thumbnailBgColor: string): void {
+    this._thumbnailBgColor = thumbnailBgColor;
+  }
+
+  prepublishValidate(): string[] {
+    let issues = [];
+    if (!this._thumbnailFilename) {
+      issues.push(&#x27;Chapter &#x27; + this._title + &#x27; should have a thumbnail.&#x27;);
+    }
+    return issues;
+  }
+
+  validate(): string[] {
+    var issues = [];
+
+    if (!this._checkValidNodeId(this._id)) {
+      throw new Error(&#x27;The node id &#x27; + this._id + &#x27; is invalid.&#x27;);
+    }
+    var prerequisiteSkillIds = this._prerequisiteSkillIds;
+    var acquiredSkillIds = this._acquiredSkillIds;
+    var destinationNodeIds = this._destinationNodeIds;
+
+    for (var i = 0; i &lt; prerequisiteSkillIds.length; i++) {
+      var skillId = prerequisiteSkillIds[i];
+      if (prerequisiteSkillIds.indexOf(skillId) &lt;
+        prerequisiteSkillIds.lastIndexOf(skillId)) {
+        issues.push(
+          &#x27;The prerequisite skill with id &#x27; + skillId + &#x27; is duplicated in&#x27; +
+          &#x27; node with id &#x27; + this._id);
+      }
+    }
+    for (var i = 0; i &lt; acquiredSkillIds.length; i++) {
+      var skillId = acquiredSkillIds[i];
+      if (acquiredSkillIds.indexOf(skillId) &lt;
+        acquiredSkillIds.lastIndexOf(skillId)) {
+        issues.push(
+          &#x27;The acquired skill with id &#x27; + skillId + &#x27; is duplicated in&#x27; +
+          &#x27; node with id &#x27; + this._id);
+      }
+    }
+    for (var i = 0; i &lt; prerequisiteSkillIds.length; i++) {
+      if (acquiredSkillIds.indexOf(prerequisiteSkillIds[i]) !== -1) {
+        issues.push(
+          &#x27;The skill with id &#x27; + prerequisiteSkillIds[i] + &#x27; is common &#x27; +
+          &#x27;to both the acquired and prerequisite skill id list in node with&#x27; +
+          &#x27; id &#x27; + this._id);
+      }
+    }
+    for (var i = 0; i &lt; destinationNodeIds.length; i++) {
+      if (!this._checkValidNodeId(destinationNodeIds[i])) {
+        throw new Error(
+          &#x27;The destination node id &#x27; + destinationNodeIds[i] + &#x27; is &#x27; +
+          &#x27;invalid in node with id &#x27; + this._id);
+      }
+    }
+
+    var currentNodeId = this._id;
+    if (
+      destinationNodeIds.some((nodeId) =&gt; {
+        return nodeId === currentNodeId;
+      })) {
+      issues.push(
+        &#x27;The destination node id of node with id &#x27; + this._id +
+        &#x27; points to itself.&#x27;);
+    }
+    for (var i = 0; i &lt; destinationNodeIds.length; i++) {
+      var nodeId = destinationNodeIds[i];
+      if (destinationNodeIds.indexOf(nodeId) &lt;
+        destinationNodeIds.lastIndexOf(nodeId)) {
+        issues.push(
+          &#x27;The destination node with id &#x27; + nodeId + &#x27; is duplicated in&#x27; +
+          &#x27; node with id &#x27; + this._id);
+      }
+    }
+    return issues;
+  }
+
+  getDestinationNodeIds(): string[] {
+    return this._destinationNodeIds.slice();
+  }
+
+  addDestinationNodeId(destinationNodeid: string): void {
+    if (this._destinationNodeIds.indexOf(destinationNodeid) !== -1) {
+      throw new Error(&#x27;The given node is already a destination node.&#x27;);
+    }
+    this._destinationNodeIds.push(destinationNodeid);
+  }
+
+  removeDestinationNodeId(destinationNodeid: string): void {
+    var index = this._destinationNodeIds.indexOf(destinationNodeid);
+    if (index === -1) {
+      throw new Error(&#x27;The given node is not a destination node.&#x27;);
+    }
+    this._destinationNodeIds.splice(index, 1);
+  }
+
+  getAcquiredSkillIds(): string[] {
+    return this._acquiredSkillIds.slice();
+  }
+
+  addAcquiredSkillId(acquiredSkillid: string): void {
+    if (this._acquiredSkillIds.indexOf(acquiredSkillid) !== -1) {
+      throw new Error(&#x27;The given skill is already an acquired skill.&#x27;);
+    }
+    this._acquiredSkillIds.push(acquiredSkillid);
+  }
+
+  removeAcquiredSkillId(skillId: string): void {
+    var index = this._acquiredSkillIds.indexOf(skillId);
+    if (index === -1) {
+      throw new Error(&#x27;The given skill is not an acquired skill.&#x27;);
+    }
+    this._acquiredSkillIds.splice(index, 1);
+  }
+
+  getPrerequisiteSkillIds(): string[] {
+    return this._prerequisiteSkillIds.slice();
+  }
+
+  addPrerequisiteSkillId(skillId: string): void {
+    if (this._prerequisiteSkillIds.indexOf(skillId) !== -1) {
+      throw new Error(&#x27;The given skill id is already a prerequisite skill.&#x27;);
+    }
+    this._prerequisiteSkillIds.push(skillId);
+  }
+
+  removePrerequisiteSkillId(skillId: string): void {
+    var index = this._prerequisiteSkillIds.indexOf(skillId);
+    if (index === -1) {
+      throw new Error(&#x27;The given skill id is not a prerequisite skill.&#x27;);
+    }
+    this._prerequisiteSkillIds.splice(index, 1);
+  }
+
+  static createFromBackendDict(
+      storyNodeBackendObject: StoryNodeBackendDict): StoryNode {
+    return new StoryNode(
+      storyNodeBackendObject.id, storyNodeBackendObject.title,
+      storyNodeBackendObject.description,
+      storyNodeBackendObject.destination_node_ids,
+      storyNodeBackendObject.prerequisite_skill_ids,
+      storyNodeBackendObject.acquired_skill_ids,
+      storyNodeBackendObject.outline,
+      storyNodeBackendObject.outline_is_finalized,
+      storyNodeBackendObject.exploration_id,
+      storyNodeBackendObject.thumbnail_bg_color,
+      storyNodeBackendObject.thumbnail_filename
+    );
+  }
+
+  static createFromIdAndTitle(nodeId: string, title: string): StoryNode {
+    return new StoryNode(
+      nodeId, title, &#x27;&#x27;, [], [], [], &#x27;&#x27;, false, null,
+      null, null);
+  }
+}
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/domain/story/story-node.model.ts&quot;,&quot;line&quot;:144,&quot;character&quot;:8,&quot;text&quot;:&quot;issues&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/story/story-node.model.ts&quot;,&quot;line&quot;:146,&quot;character&quot;:6,&quot;text&quot;:&quot;issues&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/story/story-node.model.ts&quot;,&quot;line&quot;:152,&quot;character&quot;:8,&quot;text&quot;:&quot;issues&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/story/story-node.model.ts&quot;,&quot;line&quot;:165,&quot;character&quot;:8,&quot;text&quot;:&quot;issues&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/story/story-node.model.ts&quot;,&quot;line&quot;:174,&quot;character&quot;:8,&quot;text&quot;:&quot;issues&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/story/story-node.model.ts&quot;,&quot;line&quot;:181,&quot;character&quot;:8,&quot;text&quot;:&quot;issues&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/story/story-node.model.ts&quot;,&quot;line&quot;:200,&quot;character&quot;:6,&quot;text&quot;:&quot;issues&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/story/story-node.model.ts&quot;,&quot;line&quot;:208,&quot;character&quot;:8,&quot;text&quot;:&quot;issues&quot;,&quot;kind&quot;:2}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:55 GMT</p>
+    </body>
+  </html>
+  

@@ -1,0 +1,222 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>exploration-recommendations.service.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/exploration-player-page/services/exploration-recommendations.service.spec.ts</td><td class="">98.26%</td><td class="">100%</td><td class="">230</td><td class="">226</td><td class="">4</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for ExplorationRecommendationsService.
+ */
+
+import { HttpClientTestingModule } from &#x27;@angular/common/http/testing&#x27;;
+import { async, TestBed } from &#x27;@angular/core/testing&#x27;;
+
+import { ExplorationRecommendationsBackendApiService } from &#x27;domain/recommendations/exploration-recommendations-backend-api.service&#x27;;
+import { LearnerExplorationSummary } from &#x27;domain/summary/learner-exploration-summary.model&#x27;;
+import { ExplorationRecommendationsService } from &#x27;pages/exploration-player-page/services/exploration-recommendations.service&#x27;;
+import { ContextService } from &#x27;services/context.service&#x27;;
+import { UrlService } from &#x27;services/contextual/url.service&#x27;;
+import { ServicesConstants } from &#x27;services/services.constants&#x27;;
+
+
+describe(&#x27;Exploration Recommendations Service&#x27;, () =&gt; {
+  let expRecsService: ExplorationRecommendationsService;
+  let urlService: UrlService;
+  let contextService: ContextService;
+
+  const STORY_ID = &#x27;1&#x27;;
+  const COLLECTION_ID = &#x27;2&#x27;;
+  const NODE_ID = &#x27;3&#x27;;
+  const EXPLORATION_ID = &#x27;4&#x27;;
+
+  beforeEach(async(() =&gt; {
+    TestBed.configureTestingModule({
+      imports: [
+        HttpClientTestingModule,
+      ],
+      providers: [
+        ExplorationRecommendationsService,
+      ]
+    });
+  }));
+
+  beforeEach(() =&gt; {
+    urlService = TestBed.get(UrlService);
+    contextService = TestBed.get(ContextService);
+
+    spyOn(urlService, &#x27;getCollectionIdFromExplorationUrl&#x27;).and.returnValue(
+      COLLECTION_ID);
+
+    spyOn(urlService, &#x27;getUrlParams&#x27;).and.returnValue({
+      story_id: STORY_ID,
+      node_id: NODE_ID
+    });
+
+    spyOn(contextService, &#x27;getExplorationId&#x27;).and.returnValue(EXPLORATION_ID);
+  });
+
+  describe(&#x27;when used in the editor page&#x27;, () =&gt; {
+    beforeEach(() =&gt; {
+      spyOn(contextService, &#x27;getPageContext&#x27;).and.returnValue(
+        ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR
+      );
+    });
+
+    it(&#x27;should initialize with editor context&#x27;, () =&gt; {
+      expRecsService = TestBed.get(ExplorationRecommendationsService);
+      expect(expRecsService.isInEditorPage).toBeTrue();
+    });
+
+    describe(&#x27;in the Preview tab&#x27;, () =&gt; {
+      beforeEach(() =&gt; {
+        spyOn(contextService, &#x27;getEditorTabContext&#x27;).and.returnValue(
+          ServicesConstants.EXPLORATION_EDITOR_TAB_CONTEXT.PREVIEW
+        );
+      });
+
+      it(&#x27;should initialize with editor preview context&#x27;, () =&gt; {
+        expRecsService = TestBed.get(ExplorationRecommendationsService);
+        expect(expRecsService.isInEditorPage).toBeTrue();
+        expect(expRecsService.isInEditorPreviewMode).toBeTrue();
+      });
+    });
+  });
+
+  describe(&#x27;when used outside of the editor&#x27;, () =&gt; {
+    beforeEach(() =&gt; {
+      spyOn(contextService, &#x27;getPageContext&#x27;).and.returnValue(
+        ServicesConstants.PAGE_CONTEXT.OTHER
+      );
+    });
+
+    it(&#x27;should not initialize with editor context&#x27;, () =&gt; {
+      expRecsService = TestBed.get(ExplorationRecommendationsService);
+      expect(expRecsService.isInEditorPage).toBeFalse();
+    });
+  });
+
+  describe(&#x27;getRecommendedSummaryDicts&#x27;, () =&gt; {
+    let expRecsBackendApiService: ExplorationRecommendationsBackendApiService;
+    const AUTHOR_REC_IDS = [&#x27;author_rec_1&#x27;, &#x27;author_rec_2&#x27;];
+
+    class MockExplorationSummary {
+      id: string;
+      constructor(id?: string) {
+        this.id = id;
+      }
+    }
+
+    let authorRecommendations: LearnerExplorationSummary[];
+    let systemRecommendations: LearnerExplorationSummary[];
+
+    beforeEach(() =&gt; {
+      systemRecommendations = [
+        new MockExplorationSummary(&#x27;system_rec_1&#x27;) as LearnerExplorationSummary,
+        new MockExplorationSummary(&#x27;system_rec_2&#x27;) as LearnerExplorationSummary
+      ];
+
+      authorRecommendations = [
+        new MockExplorationSummary(&#x27;author_rec_1&#x27;) as LearnerExplorationSummary,
+        new MockExplorationSummary(&#x27;author_rec_2&#x27;) as LearnerExplorationSummary
+      ];
+
+      expRecsBackendApiService = TestBed.get(
+        ExplorationRecommendationsBackendApiService
+      );
+
+      spyOn(
+        expRecsBackendApiService,
+        &#x27;getRecommendedSummaryDictsAsync&#x27;).and.callFake(
+        async(_, includeSystemRecommendations: string) =&gt; {
+          return Promise.resolve(
+            includeSystemRecommendations === &#x27;true&#x27; ?
+            systemRecommendations.concat(authorRecommendations) :
+            authorRecommendations);
+        });
+    });
+
+    describe(&#x27;when used in other page context&#x27;, () =&gt; {
+      beforeEach(() =&gt; {
+        spyOn(contextService, &#x27;getPageContext&#x27;).and.returnValue(
+          ServicesConstants.PAGE_CONTEXT.OTHER
+        );
+        expRecsService = TestBed.get(ExplorationRecommendationsService);
+      });
+
+      it(&#x27;should include author recommendations&#x27;, () =&gt; {
+        expRecsService.getRecommendedSummaryDicts(
+          AUTHOR_REC_IDS, true,
+          (expSummaries) =&gt; {
+            expect(expSummaries).toEqual(
+              jasmine.arrayContaining(authorRecommendations));
+          }
+        );
+      });
+
+      it(&#x27;should include system recommendations&#x27;, () =&gt; {
+        expRecsService.getRecommendedSummaryDicts(
+          AUTHOR_REC_IDS, true,
+          (expSummaries) =&gt; {
+            expect(expSummaries).toEqual(
+              jasmine.arrayContaining(systemRecommendations));
+          }
+        );
+      });
+    });
+
+    describe(&#x27;when used in the editor&#x27;, () =&gt; {
+      beforeEach(() =&gt; {
+        spyOn(contextService, &#x27;getPageContext&#x27;).and.returnValue(
+          ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR
+        );
+        expRecsService = TestBed.get(ExplorationRecommendationsService);
+      });
+
+      it(&#x27;should include author recommendations&#x27;, () =&gt; {
+        expRecsService.getRecommendedSummaryDicts(
+          AUTHOR_REC_IDS, true,
+          (expSummaries) =&gt; {
+            expect(expSummaries).toEqual(
+              jasmine.arrayContaining(authorRecommendations));
+          }
+        );
+      });
+
+      it(&#x27;should not include system recommendations&#x27;, () =&gt; {
+        expRecsService.getRecommendedSummaryDicts(
+          AUTHOR_REC_IDS, true,
+          (expSummaries) =&gt; {
+            expect(expSummaries).not.toEqual(
+              jasmine.arrayContaining(systemRecommendations));
+          }
+        );
+      });
+    });
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/exploration-recommendations.service.spec.ts&quot;,&quot;line&quot;:121,&quot;character&quot;:8,&quot;text&quot;:&quot;new MockExplorationSummary(&#x27;system_rec_1&#x27;) as LearnerExplorationSummary&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/exploration-recommendations.service.spec.ts&quot;,&quot;line&quot;:122,&quot;character&quot;:8,&quot;text&quot;:&quot;new MockExplorationSummary(&#x27;system_rec_2&#x27;) as LearnerExplorationSummary&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/exploration-recommendations.service.spec.ts&quot;,&quot;line&quot;:126,&quot;character&quot;:8,&quot;text&quot;:&quot;new MockExplorationSummary(&#x27;author_rec_1&#x27;) as LearnerExplorationSummary&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;core/templates/pages/exploration-player-page/services/exploration-recommendations.service.spec.ts&quot;,&quot;line&quot;:127,&quot;character&quot;:8,&quot;text&quot;:&quot;new MockExplorationSummary(&#x27;author_rec_2&#x27;) as LearnerExplorationSummary&quot;,&quot;kind&quot;:3}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:59 GMT</p>
+    </body>
+  </html>
+  

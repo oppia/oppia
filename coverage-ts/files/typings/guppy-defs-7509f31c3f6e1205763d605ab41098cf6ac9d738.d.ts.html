@@ -1,0 +1,129 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>guppy-defs-7509f31c3f6e1205763d605ab41098cf6ac9d738.d.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">typings/guppy-defs-7509f31c3f6e1205763d605ab41098cf6ac9d738.d.ts</td><td class="">100.00%</td><td class="">100%</td><td class="">174</td><td class="">174</td><td class="">0</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Code - third_party/static/guppy-7509f3/src/guppy.js
+// This guppy version corresponds to the commit on Aug 19 2020.
+// For reference, visit:
+// https://github.com/oppia/guppy/tree/7509f31c3f6e1205763d605ab41098cf6ac9d738
+
+interface GuppyConfig {
+  events?: Object;
+  settings?: Object;
+}
+
+interface GuppyInitConfig {
+  symbols?: string[];
+  path?: string;
+  osk?: Object;
+  events?: {
+    ready?: Function;
+    change?: Function;
+    left_end?: Function;
+    done?: Function;
+    completion?: Function;
+    debug?: Function;
+    error?: Function;
+    focus?: Function;
+  }
+  settings?: {
+    xml_content?: string;
+    autoreplace?: string;
+    blank_caret?: string;
+    empty_content?: string;
+    blacklist?: string[];
+    buttons?: string[];
+    cliptype?: string;
+  }
+  callback?: Function;
+}
+
+interface GuppySymbols {
+  symbols?: Object;
+  templates?: Object;
+  validate: Function;
+  symbol_to_node: Function;
+  split_output: Function;
+  make_template_symbol: Function;
+  lookup_type: Function;
+  eval_template: Function;
+  add_symbols: Function;
+  add_blanks: Function;
+}
+
+declare class Guppy {
+  activate: () =&gt; void;
+  asciimath: () =&gt; void;
+  configure: () =&gt; void;
+  deactivate: () =&gt; void;
+  doc: () =&gt; Object;
+  equations: () =&gt; Object[];
+  evaluate: (evaluators?: Object) =&gt; Object;
+  event: (name: string, handler: Function) =&gt; void;
+  func: (evaluators?: Object) =&gt; Function;
+  import_latex: (text: string) =&gt; void;
+  import_syntax_tree: (tree: Object) =&gt; void;
+  import_text: (text: string) =&gt; void;
+  import_xml: (xml: string) =&gt; void;
+  is_changed: () =&gt; boolean;
+  latex: () =&gt; string;
+  recompute_locations_paths: () =&gt; void;
+  render: (updated?: boolean) =&gt; void;
+  render_node: (t: string) =&gt; string;
+  select_to: (x: number, y: number, mouse: Object) =&gt; void;
+  symbols_used: (groups?: string[]) =&gt; string[];
+  syntax_tree: () =&gt; Object;
+  text: () =&gt; string;
+  vars: () =&gt; string[];
+  xml: () =&gt; string;
+
+  constructor(id: string, config: GuppyConfig);
+}
+
+declare class GuppyOSK {
+  attach: (guppy?: Guppy) =&gt; void;
+  detach: () =&gt; void;
+
+  constructor(config: Object);
+}
+
+declare namespace Guppy {
+  export function init(config: GuppyInitConfig): void;
+  export let instances: Object;
+  export let active_guppy: Object;
+  export let Symbols: GuppySymbols;
+  export let Doc: Function;
+  export function add_global_symbol(
+    name: string, symbol: Object, template?: string): void;
+  export function get_loc(
+    x: number, y: number, current_node?: Object, current_caret?: Object): {
+      current: Object,
+      caret: number,
+      pos: string
+    };
+  export let kb: Object;
+  export function make_button(url: string, cb: Function): HTMLImageElement;
+  export function mouse_down(e: Object): void;
+  export function mouse_move(e: Object): void;
+  export function mouse_up(): void;
+  export let ready: boolean;
+  export function register_keyboard_handlers(): void;
+  export function remove_global_symbol(name: string): void;
+  export function use_osk(osk: GuppyOSK): void;
+  export function event(name: string, handler: Function): void;
+  export function configure(name: string, val: Object): void;
+}
+</textarea><pre id="annotations" style="display:none">[]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:44:00 GMT</p>
+    </body>
+  </html>
+  

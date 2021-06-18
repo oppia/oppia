@@ -1,0 +1,192 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>StoryObjectFactorySpec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">core/templates/domain/story/StoryObjectFactorySpec.ts</td><td class="">100.00%</td><td class="">100%</td><td class="">199</td><td class="">199</td><td class="">0</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2018 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Tests for StoryObjectFactory.
+ */
+
+import { TestBed } from &#x27;@angular/core/testing&#x27;;
+
+import { Story, StoryObjectFactory } from &#x27;domain/story/StoryObjectFactory&#x27;;
+
+describe(&#x27;Story object factory&#x27;, () =&gt; {
+  let storyObjectFactory: StoryObjectFactory = null;
+  let _sampleStory: Story = null;
+
+  beforeEach(() =&gt; {
+    TestBed.configureTestingModule({
+      providers: [StoryObjectFactory]
+    });
+
+    storyObjectFactory = TestBed.get(StoryObjectFactory);
+
+    var sampleStoryBackendDict = {
+      id: &#x27;sample_story_id&#x27;,
+      title: &#x27;Story title&#x27;,
+      description: &#x27;Story description&#x27;,
+      notes: &#x27;Notes&#x27;,
+      version: 1,
+      corresponding_topic_id: &#x27;topic_id&#x27;,
+      story_contents: {
+        initial_node_id: &#x27;node_1&#x27;,
+        nodes: [{
+          id: &#x27;node_1&#x27;,
+          title: &#x27;Title 1&#x27;,
+          description: &#x27;Description&#x27;,
+          prerequisite_skill_ids: [],
+          acquired_skill_ids: [],
+          destination_node_ids: [],
+          outline: &#x27;Outline&#x27;,
+          exploration_id: null,
+          outline_is_finalized: false,
+          thumbnail_filename: &#x27;img.png&#x27;,
+          thumbnail_bg_color: &#x27;#a33f40&#x27;
+        }],
+        next_node_id: &#x27;node_3&#x27;
+      },
+      language_code: &#x27;en&#x27;,
+      url_fragment: &#x27;story-title&#x27;,
+      meta_tag_content: &#x27;story meta tag content&#x27;
+    };
+    _sampleStory = storyObjectFactory.createFromBackendDict(
+      // This throws &quot;Argument of type &#x27;{ id: string; ... }&#x27;
+      // is not assignable to parameter of type &#x27;StoryBackendDict&#x27;.&quot;.
+      // We need to suppress this error because &#x27;sampleStoryBackendDict&#x27;
+      // should have a property &#x27;thumbnail&#x27; but we didn&#x27;t add that property in
+      // order to test validations.
+      // @ts-expect-error
+      sampleStoryBackendDict);
+  });
+
+  it(&#x27;should be able to create an interstitial story object&#x27;, () =&gt; {
+    var story = storyObjectFactory.createInterstitialStory();
+    expect(story.getId()).toEqual(null);
+    expect(story.getThumbnailFilename()).toEqual(null);
+    expect(story.getThumbnailBgColor()).toEqual(null);
+    expect(story.getTitle()).toEqual(&#x27;Story title loading&#x27;);
+    expect(story.getDescription()).toEqual(&#x27;Story description loading&#x27;);
+    expect(story.getLanguageCode()).toBe(&#x27;en&#x27;);
+    expect(story.getStoryContents()).toEqual(null);
+    expect(story.getNotes()).toEqual(&#x27;Story notes loading&#x27;);
+    expect(story.getCorrespondingTopicId()).toEqual(null);
+    expect(story.getUrlFragment()).toEqual(null);
+  });
+
+  it(&#x27;should correctly validate a valid story&#x27;, () =&gt; {
+    expect(_sampleStory.validate()).toEqual([]);
+  });
+
+  it(&#x27;should correctly prepublish validate a story&#x27;, () =&gt; {
+    _sampleStory.setMetaTagContent(&#x27;a&#x27;.repeat(200));
+    expect(_sampleStory.prepublishValidate()).toEqual([
+      &#x27;Story should have a thumbnail.&#x27;,
+      &#x27;Story meta tag content should not be longer than 160 characters.&#x27;
+    ]);
+    _sampleStory.setThumbnailFilename(&#x27;image.png&#x27;);
+    _sampleStory.setThumbnailBgColor(&#x27;#F8BF74&#x27;);
+    _sampleStory.setMetaTagContent(&#x27;&#x27;);
+    expect(_sampleStory.prepublishValidate()).toEqual([
+      &#x27;Story should have meta tag content.&#x27;
+    ]);
+    _sampleStory.setMetaTagContent(&#x27;abc&#x27;);
+    expect(_sampleStory.prepublishValidate()).toEqual([]);
+  });
+
+  it(&#x27;should correctly validate a story with empty title&#x27;, () =&gt; {
+    _sampleStory.setTitle(&#x27;&#x27;);
+    expect(_sampleStory.validate()).toEqual([
+      &#x27;Story title should not be empty&#x27;
+    ]);
+  });
+
+  it(&#x27;should fail validation for empty url fragment&#x27;, () =&gt; {
+    _sampleStory.setUrlFragment(&#x27;&#x27;);
+    expect(_sampleStory.validate()).toEqual([
+      &#x27;Url Fragment should not be empty.&#x27;
+    ]);
+  });
+
+  it(&#x27;should fail validation for invalid url fragment&#x27;, () =&gt; {
+    _sampleStory.setUrlFragment(&#x27; aBc inv4lid-&#x27;);
+    expect(_sampleStory.validate()).toEqual([
+      &#x27;Url Fragment contains invalid characters. &#x27; +
+      &#x27;Only lowercase words separated by hyphens are allowed.&#x27;
+    ]);
+  });
+
+  it(&#x27;should fail validation for lengthy url fragment&#x27;, () =&gt; {
+    _sampleStory.setUrlFragment(&#x27;abcde-abcde-abcde-abcde-abcde-abcde-abcde&#x27;);
+    expect(_sampleStory.validate()).toEqual([
+      &#x27;Url Fragment should not be greater than 30 characters&#x27;
+    ]);
+  });
+
+  it(&#x27;should be able to copy from another story&#x27;, () =&gt; {
+    var secondStory = storyObjectFactory.createFromBackendDict({
+      id: &#x27;sample_story_id_2s&#x27;,
+      title: &#x27;Story title 2&#x27;,
+      description: &#x27;Story description 2&#x27;,
+      notes: &#x27;Notes 2&#x27;,
+      version: 1,
+      corresponding_topic_id: &#x27;topic_id_2&#x27;,
+      story_contents: {
+        initial_node_id: &#x27;node_2&#x27;,
+        nodes: [{
+          id: &#x27;node_2&#x27;,
+          title: &#x27;Title 2&#x27;,
+          prerequisite_skill_ids: [],
+          acquired_skill_ids: [],
+          destination_node_ids: [],
+          outline: &#x27;Outline&#x27;,
+          exploration_id: null,
+          outline_is_finalized: false,
+          description: &#x27;Description&#x27;,
+          thumbnail_filename: &#x27;img.png&#x27;,
+          thumbnail_bg_color: &#x27;#a33f40&#x27;
+        }],
+        next_node_id: &#x27;node_3&#x27;
+      },
+      language_code: &#x27;en&#x27;,
+      thumbnail_filename: &#x27;img.png&#x27;,
+      thumbnail_bg_color: &#x27;#a33f40&#x27;,
+      url_fragment: &#x27;story&#x27;,
+      meta_tag_content: &#x27;story meta tag content&#x27;
+    });
+
+    expect(_sampleStory).not.toBe(secondStory);
+    expect(_sampleStory).not.toEqual(secondStory);
+
+    _sampleStory.copyFromStory(secondStory);
+    expect(_sampleStory).not.toBe(secondStory);
+    expect(_sampleStory).toEqual(secondStory);
+  });
+});
+</textarea><pre id="annotations" style="display:none">[]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:57 GMT</p>
+    </body>
+  </html>
+  

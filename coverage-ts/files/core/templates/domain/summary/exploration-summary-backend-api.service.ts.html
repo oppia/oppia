@@ -1,0 +1,132 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>exploration-summary-backend-api.service.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/domain/summary/exploration-summary-backend-api.service.ts</td><td class="">94.50%</td><td class="">100%</td><td class="">109</td><td class="">103</td><td class="">6</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2016 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Service to retrieve information about exploration summaries
+ * from the backend.
+ */
+
+import { HttpClient } from &#x27;@angular/common/http&#x27;;
+import { Injectable } from &#x27;@angular/core&#x27;;
+import { downgradeInjectable } from &#x27;@angular/upgrade/static&#x27;;
+
+import { AppConstants } from &#x27;app.constants&#x27;;
+import { AlertsService } from &#x27;services/alerts.service&#x27;;
+import { ValidatorsService } from &#x27;services/validators.service&#x27;;
+
+export interface ExplorationSummaryBackendDict {
+  &#x27;summaries&#x27;: [{
+    &#x27;category&#x27;: string,
+    &#x27;community_owned&#x27;: boolean,
+    &#x27;human_readable_contributors_summary&#x27;: (
+      HumanReadableContributorSummaryBackendDict)
+    &#x27;id&#x27;: string,
+    &#x27;language_code&#x27;: string,
+    &#x27;num_views&#x27;: number,
+    &#x27;objective&#x27;: string,
+    &#x27;status&#x27;: string,
+    &#x27;tags&#x27;: [],
+    &#x27;thumbnail_bg_color&#x27;: string,
+    &#x27;thumbnail_icon_url&#x27;: string,
+    &#x27;title&#x27;: string
+  }]
+}
+
+interface HumanReadableContributorSummaryBackendDict {
+  &#x27;num_commits&#x27;: number
+}
+
+@Injectable({
+  providedIn: &#x27;root&#x27;
+})
+export class ExplorationSummaryBackendApiService {
+  constructor(
+    private httpClient: HttpClient,
+    private alertsService: AlertsService,
+    private validatorsService: ValidatorsService) {}
+
+  private _fetchExpSummaries(
+      explorationIds: string[],
+      includePrivateExplorations: boolean,
+      successCallback: (
+        value?: ExplorationSummaryBackendDict |
+        Promise&lt;ExplorationSummaryBackendDict&gt;) =&gt; void,
+      errorCallback: (reason?: string | string[]) =&gt; void): void {
+    if (!explorationIds.every(expId =&gt;
+      this.validatorsService.isValidExplorationId(expId, true))) {
+      this.alertsService.addWarning(&#x27;Please enter a valid exploration ID.&#x27;);
+      let returnValue = [];
+      for (let i = 0; i &lt; explorationIds.length; i++) {
+        returnValue.push(null);
+      }
+      errorCallback(returnValue);
+      return;
+    }
+    const explorationSummaryDataUrl =
+    AppConstants.EXPLORATION_SUMMARY_DATA_URL_TEMPLATE;
+    this.httpClient.get(explorationSummaryDataUrl, {
+      params: {
+        stringified_exp_ids: JSON.stringify(explorationIds),
+        include_private_explorations: JSON.stringify(
+          includePrivateExplorations)
+      }
+    }).toPromise().then((summaries: ExplorationSummaryBackendDict) =&gt; {
+      if (summaries === null) {
+        const summariesError = (
+          &#x27;Summaries fetched are null for explorationIds: &#x27; + explorationIds
+        );
+        errorCallback(summariesError);
+      }
+      successCallback(summaries);
+    }, (errorResponse) =&gt;{
+      errorCallback(errorResponse.error.error);
+    });
+  }
+
+  async loadPublicAndPrivateExplorationSummariesAsync(
+      explorationIds: string[]): Promise&lt;ExplorationSummaryBackendDict&gt; {
+    return new Promise((resolve, reject) =&gt; {
+      this._fetchExpSummaries(explorationIds, true, resolve, reject);
+    });
+  }
+
+  async loadPublicExplorationSummariesAsync(
+      explorationIds: string[]): Promise&lt;ExplorationSummaryBackendDict&gt; {
+    return new Promise((resolve, reject) =&gt; {
+      this._fetchExpSummaries(explorationIds, false, resolve, reject);
+    });
+  }
+}
+
+angular.module(&#x27;oppia&#x27;).factory(
+  &#x27;ExplorationSummaryBackendApiService&#x27;,
+  downgradeInjectable(ExplorationSummaryBackendApiService));
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/domain/summary/exploration-summary-backend-api.service.ts&quot;,&quot;line&quot;:68,&quot;character&quot;:10,&quot;text&quot;:&quot;returnValue&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/summary/exploration-summary-backend-api.service.ts&quot;,&quot;line&quot;:70,&quot;character&quot;:8,&quot;text&quot;:&quot;returnValue&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/summary/exploration-summary-backend-api.service.ts&quot;,&quot;line&quot;:91,&quot;character&quot;:8,&quot;text&quot;:&quot;errorResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/summary/exploration-summary-backend-api.service.ts&quot;,&quot;line&quot;:92,&quot;character&quot;:20,&quot;text&quot;:&quot;errorResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/summary/exploration-summary-backend-api.service.ts&quot;,&quot;line&quot;:92,&quot;character&quot;:34,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/summary/exploration-summary-backend-api.service.ts&quot;,&quot;line&quot;:92,&quot;character&quot;:40,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:55 GMT</p>
+    </body>
+  </html>
+  

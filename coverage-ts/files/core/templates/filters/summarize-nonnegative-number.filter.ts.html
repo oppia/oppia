@@ -1,0 +1,54 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>summarize-nonnegative-number.filter.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/filters/summarize-nonnegative-number.filter.ts</td><td class="">41.18%</td><td class="">100%</td><td class="">17</td><td class="">7</td><td class="">10</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2019 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview SummarizeNonnegativeNumber filter for Oppia.
+ */
+
+// Filter that summarizes a large number to a decimal followed by
+// the appropriate metric prefix (K, M or B). For example, 167656
+// becomes 167.7K.
+// Users of this filter should ensure that the input is a non-negative number.
+angular.module(&#x27;oppia&#x27;).filter(&#x27;summarizeNonnegativeNumber&#x27;, [function() {
+  return function(input) {
+    input = Number(input);
+    // Nine zeros for billions (e.g. 146008788788 --&gt; 146.0B).
+    // Six zeros for millions (e.g. 146008788 --&gt; 146.0M).
+    // Three zeros for thousands (e.g. 146008 --&gt; 146.0K).
+    // No change for small numbers (e.g. 12 --&gt; 12).
+    return (
+      input &gt;= 1.0e+9 ? (input / 1.0e+9).toFixed(1) + &#x27;B&#x27; :
+      input &gt;= 1.0e+6 ? (input / 1.0e+6).toFixed(1) + &#x27;M&#x27; :
+      input &gt;= 1.0e+3 ? (input / 1.0e+3).toFixed(1) + &#x27;K&#x27; :
+      input);
+  };
+}]);
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/filters/summarize-nonnegative-number.filter.ts&quot;,&quot;line&quot;:23,&quot;character&quot;:18,&quot;text&quot;:&quot;input&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/filters/summarize-nonnegative-number.filter.ts&quot;,&quot;line&quot;:24,&quot;character&quot;:4,&quot;text&quot;:&quot;input&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/filters/summarize-nonnegative-number.filter.ts&quot;,&quot;line&quot;:24,&quot;character&quot;:19,&quot;text&quot;:&quot;input&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/filters/summarize-nonnegative-number.filter.ts&quot;,&quot;line&quot;:30,&quot;character&quot;:6,&quot;text&quot;:&quot;input&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/filters/summarize-nonnegative-number.filter.ts&quot;,&quot;line&quot;:30,&quot;character&quot;:25,&quot;text&quot;:&quot;input&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/filters/summarize-nonnegative-number.filter.ts&quot;,&quot;line&quot;:31,&quot;character&quot;:6,&quot;text&quot;:&quot;input&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/filters/summarize-nonnegative-number.filter.ts&quot;,&quot;line&quot;:31,&quot;character&quot;:25,&quot;text&quot;:&quot;input&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/filters/summarize-nonnegative-number.filter.ts&quot;,&quot;line&quot;:32,&quot;character&quot;:6,&quot;text&quot;:&quot;input&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/filters/summarize-nonnegative-number.filter.ts&quot;,&quot;line&quot;:32,&quot;character&quot;:25,&quot;text&quot;:&quot;input&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/filters/summarize-nonnegative-number.filter.ts&quot;,&quot;line&quot;:33,&quot;character&quot;:6,&quot;text&quot;:&quot;input&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:56 GMT</p>
+    </body>
+  </html>
+  

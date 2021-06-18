@@ -1,0 +1,503 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>InteractionObjectFactory.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/domain/exploration/InteractionObjectFactory.ts</td><td class="">96.80%</td><td class="">100%</td><td class="">657</td><td class="">636</td><td class="">21</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2017 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Factory for creating new frontend instances of Interaction
+ * domain objects.
+ */
+import { downgradeInjectable } from &#x27;@angular/upgrade/static&#x27;;
+import { Injectable } from &#x27;@angular/core&#x27;;
+
+import cloneDeep from &#x27;lodash/cloneDeep&#x27;;
+
+import { AnswerGroup, AnswerGroupBackendDict, AnswerGroupObjectFactory } from
+  &#x27;domain/exploration/AnswerGroupObjectFactory&#x27;;
+import { HintBackendDict, Hint, HintObjectFactory } from
+  &#x27;domain/exploration/HintObjectFactory&#x27;;
+import { OutcomeBackendDict, Outcome, OutcomeObjectFactory } from
+  &#x27;domain/exploration/OutcomeObjectFactory&#x27;;
+import { SolutionBackendDict, Solution, SolutionObjectFactory } from
+  &#x27;domain/exploration/SolutionObjectFactory&#x27;;
+import { InteractionAnswer } from &#x27;interactions/answer-defs&#x27;;
+import {
+  AlgebraicExpressionInputCustomizationArgs,
+  CodeReplCustomizationArgs,
+  ContinueCustomizationArgs,
+  ContinueCustomizationArgsBackendDict,
+  DragAndDropSortInputCustomizationArgs,
+  DragAndDropSortInputCustomizationArgsBackendDict,
+  EndExplorationCustomizationArgs,
+  FractionInputCustomizationArgs,
+  FractionInputCustomizationArgsBackendDict,
+  GraphInputCustomizationArgs,
+  ImageClickInputCustomizationArgs,
+  InteractionCustomizationArgs,
+  InteractionCustomizationArgsBackendDict,
+  InteractiveMapCustomizationArgs,
+  ItemSelectionInputCustomizationArgs,
+  ItemSelectionInputCustomizationArgsBackendDict,
+  LogicProofCustomizationArgs,
+  MathEquationInputCustomizationArgs,
+  MultipleChoiceInputCustomizationArgs,
+  MultipleChoiceInputCustomizationArgsBackendDict,
+  MusicNotesInputCustomizationArgs,
+  NumberWithUnitsCustomizationArgs,
+  NumericExpressionInputCustomizationArgs,
+  NumericInputCustomizationArgs,
+  PencilCodeEditorCustomizationArgs,
+  RatioExpressionInputCustomizationArgs,
+  RatioExpressionInputCustomizationArgsBackendDict,
+  SetInputCustomizationArgs,
+  SetInputCustomizationArgsBackendDict,
+  TextInputCustomizationArgs,
+  TextInputCustomizationArgsBackendDict,
+  NumericExpressionInputCustomizationArgsBackendDict
+} from &#x27;interactions/customization-args-defs&#x27;;
+import {
+  SubtitledUnicodeObjectFactory, SubtitledUnicode
+} from &#x27;domain/exploration/SubtitledUnicodeObjectFactory&#x27;;
+import { SubtitledHtml } from &#x27;domain/exploration/subtitled-html.model&#x27;;
+
+
+export interface InteractionBackendDict {
+  &#x27;default_outcome&#x27;: OutcomeBackendDict;
+  &#x27;answer_groups&#x27;: readonly AnswerGroupBackendDict[];
+  &#x27;confirmed_unclassified_answers&#x27;: readonly InteractionAnswer[];
+  &#x27;customization_args&#x27;: InteractionCustomizationArgsBackendDict;
+  &#x27;hints&#x27;: readonly HintBackendDict[];
+  &#x27;id&#x27;: string;
+  &#x27;solution&#x27;: SolutionBackendDict;
+}
+
+export class Interaction {
+  answerGroups: AnswerGroup[];
+  confirmedUnclassifiedAnswers: readonly InteractionAnswer[];
+  customizationArgs: InteractionCustomizationArgs;
+  defaultOutcome: Outcome;
+  hints: Hint[];
+  id: string;
+  solution: Solution;
+  constructor(
+      answerGroups: AnswerGroup[],
+      confirmedUnclassifiedAnswers: readonly InteractionAnswer[],
+      customizationArgs: InteractionCustomizationArgs,
+      defaultOutcome: Outcome, hints: Hint[], id: string, solution: Solution) {
+    this.answerGroups = answerGroups;
+    this.confirmedUnclassifiedAnswers = confirmedUnclassifiedAnswers;
+    this.customizationArgs = customizationArgs;
+    this.defaultOutcome = defaultOutcome;
+    this.hints = hints;
+    this.id = id;
+    this.solution = solution;
+  }
+
+  setId(newValue: string): void {
+    this.id = newValue;
+  }
+
+  setAnswerGroups(newValue: AnswerGroup[]): void {
+    this.answerGroups = newValue;
+  }
+
+  setDefaultOutcome(newValue: Outcome): void {
+    this.defaultOutcome = newValue;
+  }
+
+  setCustomizationArgs(newValue: InteractionCustomizationArgs): void {
+    this.customizationArgs = newValue;
+  }
+
+  setSolution(newValue: Solution): void {
+    this.solution = newValue;
+  }
+
+  setHints(newValue: Hint[]): void {
+    this.hints = newValue;
+  }
+
+  copy(otherInteraction: Interaction): void {
+    this.answerGroups = cloneDeep(otherInteraction.answerGroups);
+    this.confirmedUnclassifiedAnswers =
+      cloneDeep(otherInteraction.confirmedUnclassifiedAnswers);
+    this.customizationArgs = cloneDeep(otherInteraction.customizationArgs);
+    this.defaultOutcome = cloneDeep(otherInteraction.defaultOutcome);
+    this.hints = cloneDeep(otherInteraction.hints);
+    this.id = cloneDeep(otherInteraction.id);
+    this.solution = cloneDeep(otherInteraction.solution);
+  }
+
+  static convertCustomizationArgsToBackendDict(
+      customizationArgs: InteractionCustomizationArgs
+  ): InteractionCustomizationArgsBackendDict {
+    const traverseSchemaAndConvertSubtitledToDicts = (
+        value: Object[] | Object
+    ): Object[] | Object =&gt; {
+      let result: Object[] | Object;
+
+      if (value instanceof SubtitledUnicode || value instanceof SubtitledHtml) {
+        result = value.toBackendDict();
+      } else if (value instanceof Array) {
+        result = value.map(
+          element =&gt; traverseSchemaAndConvertSubtitledToDicts(element));
+      } else if (value instanceof Object) {
+        result = {};
+        Object.keys(value).forEach(key =&gt; {
+          result[key] = traverseSchemaAndConvertSubtitledToDicts(value[key]);
+        });
+      }
+
+      return result || value;
+    };
+
+    const customizationArgsBackendDict:
+      InteractionCustomizationArgsBackendDict = {};
+    Object.keys(customizationArgs).forEach(caName =&gt; {
+      customizationArgsBackendDict[caName] = {
+        value: traverseSchemaAndConvertSubtitledToDicts(
+          customizationArgs[caName].value)
+      };
+    });
+
+    return customizationArgsBackendDict;
+  }
+
+  /**
+   * This function is used to properly set state in Questions. The state in
+   * Questions must handle its own WrittenTranslations and RecordedVoiceovers,
+   * so it must get all content ids in the state. See
+   * question-update.service.ts _updateContentIdsInAssets method for more
+   * details.
+   * @param {InteractionCustomizationArgs} customizationArgs The customization
+   *  arguments to get content ids for.
+   * @returns {string[]} List of content ids in customization args.
+   */
+  static getCustomizationArgContentIds(
+      customizationArgs: InteractionCustomizationArgs
+  ): string[] {
+    const contentIds = [];
+
+    const traverseValueAndRetrieveContentIdsFromSubtitled = (
+        value: Object[] | Object
+    ): void =&gt; {
+      if (value instanceof SubtitledUnicode || value instanceof SubtitledHtml) {
+        contentIds.push(value.contentId);
+      } else if (value instanceof Array) {
+        value.forEach(
+          element =&gt; traverseValueAndRetrieveContentIdsFromSubtitled(element));
+      } else if (value instanceof Object) {
+        Object.keys(value).forEach(key =&gt; {
+          traverseValueAndRetrieveContentIdsFromSubtitled(value[key]);
+        });
+      }
+    };
+
+    Object.keys(customizationArgs).forEach(
+      caName =&gt; traverseValueAndRetrieveContentIdsFromSubtitled(
+        customizationArgs[caName].value)
+    );
+
+    return contentIds;
+  }
+
+  toBackendDict(): InteractionBackendDict {
+    return {
+      answer_groups: this.answerGroups.map(function(answerGroup) {
+        return answerGroup.toBackendDict();
+      }),
+      confirmed_unclassified_answers: this.confirmedUnclassifiedAnswers,
+      customization_args: Interaction.convertCustomizationArgsToBackendDict(
+        this.customizationArgs),
+      default_outcome:
+        this.defaultOutcome ? this.defaultOutcome.toBackendDict() : null,
+      hints: this.hints.map(function(hint) {
+        return hint.toBackendDict();
+      }),
+      id: this.id,
+      solution: this.solution ? this.solution.toBackendDict() : null
+    };
+  }
+}
+
+@Injectable({
+  providedIn: &#x27;root&#x27;
+})
+export class InteractionObjectFactory {
+  constructor(
+      private answerGroupFactory: AnswerGroupObjectFactory,
+      private hintFactory: HintObjectFactory,
+      private solutionFactory: SolutionObjectFactory,
+      private outcomeFactory: OutcomeObjectFactory,
+      private subtitledUnicodeFactory: SubtitledUnicodeObjectFactory,
+  ) {}
+
+  _createFromContinueCustomizationArgsBackendDict(
+      caBackendDict: ContinueCustomizationArgsBackendDict
+  ): ContinueCustomizationArgs {
+    const { buttonText } = caBackendDict;
+    return {
+      buttonText: {
+        value: this.subtitledUnicodeFactory.createFromBackendDict(
+          buttonText.value)
+      }
+    };
+  }
+
+  _createFromDragAndDropSortInputCustomizationArgsBackendDict(
+      caBackendDict: DragAndDropSortInputCustomizationArgsBackendDict
+  ): DragAndDropSortInputCustomizationArgs {
+    const { choices, allowMultipleItemsInSamePosition } = caBackendDict;
+    return {
+      allowMultipleItemsInSamePosition,
+      choices: {
+        value: choices.value.map(
+          subtitledHtmlDict =&gt;
+            SubtitledHtml.createFromBackendDict(subtitledHtmlDict))
+      }
+    };
+  }
+
+  _createFromFractionInputCustomizationArgsBackendDict(
+      caBackendDict: FractionInputCustomizationArgsBackendDict
+  ): FractionInputCustomizationArgs {
+    const {
+      requireSimplestForm, allowImproperFraction, allowNonzeroIntegerPart,
+      customPlaceholder
+    } = caBackendDict;
+    return {
+      requireSimplestForm, allowImproperFraction, allowNonzeroIntegerPart,
+      customPlaceholder: {
+        value: this.subtitledUnicodeFactory.createFromBackendDict(
+          customPlaceholder.value)
+      }
+    };
+  }
+
+  _createFromItemSelectionInputCustomizationArgsBackendDict(
+      caBackendDict: ItemSelectionInputCustomizationArgsBackendDict
+  ): ItemSelectionInputCustomizationArgs {
+    const {
+      choices, maxAllowableSelectionCount, minAllowableSelectionCount
+    } = caBackendDict;
+    return {
+      minAllowableSelectionCount,
+      maxAllowableSelectionCount,
+      choices: {
+        value: choices.value.map(
+          subtitledHtmlDict =&gt;
+            SubtitledHtml.createFromBackendDict(subtitledHtmlDict))
+      }
+    };
+  }
+
+  _createFromIMultipleChoiceInputCustomizationArgsBackendDict(
+      caBackendDict: MultipleChoiceInputCustomizationArgsBackendDict
+  ): MultipleChoiceInputCustomizationArgs {
+    const {
+      choices, showChoicesInShuffledOrder
+    } = caBackendDict;
+    return {
+      showChoicesInShuffledOrder,
+      choices: {
+        value: choices.value.map(
+          subtitledHtmlDict =&gt;
+            SubtitledHtml.createFromBackendDict(subtitledHtmlDict))
+      }
+    };
+  }
+
+  _createFromSetInputCustomizationArgsBackendDict(
+      caBackendDict: SetInputCustomizationArgsBackendDict
+  ): SetInputCustomizationArgs {
+    const { buttonText } = caBackendDict;
+    return {
+      buttonText: {
+        value: this.subtitledUnicodeFactory.createFromBackendDict(
+          buttonText.value)
+      }
+    };
+  }
+
+  _createFromTextInputCustomizationArgsBackendDict(
+      caBackendDict: TextInputCustomizationArgsBackendDict
+  ): TextInputCustomizationArgs {
+    const { rows, placeholder } = caBackendDict;
+    return {
+      rows,
+      placeholder: {
+        value: this.subtitledUnicodeFactory.createFromBackendDict(
+          placeholder.value)
+      }
+    };
+  }
+
+  _createFromNumericExpressionInputCustomizationArgsBackendDict(
+      caBackendDict: NumericExpressionInputCustomizationArgsBackendDict
+  ): NumericExpressionInputCustomizationArgs {
+    const { useFractionForDivision, placeholder } = caBackendDict;
+    return {
+      useFractionForDivision,
+      placeholder: {
+        value: this.subtitledUnicodeFactory.createFromBackendDict(
+          placeholder.value)
+      }
+    };
+  }
+
+  _createFromRatioExpressionInputCustomizationArgsBackendDict(
+      caBackendDict: RatioExpressionInputCustomizationArgsBackendDict
+  ): RatioExpressionInputCustomizationArgs {
+    const { numberOfTerms, placeholder } = caBackendDict;
+    return {
+      numberOfTerms,
+      placeholder: {
+        value: this.subtitledUnicodeFactory.createFromBackendDict(
+          placeholder.value)
+      }
+    };
+  }
+
+  convertFromCustomizationArgsBackendDict(
+      interactionId: string,
+      caBackendDict: InteractionCustomizationArgsBackendDict
+  ): InteractionCustomizationArgs {
+    if (interactionId === null) {
+      return {};
+    }
+    switch (interactionId) {
+      case &#x27;AlgebraicExpressionInput&#x27;:
+        return (
+          &lt;AlgebraicExpressionInputCustomizationArgs&gt; cloneDeep(caBackendDict));
+      case &#x27;CodeRepl&#x27;:
+        return &lt;CodeReplCustomizationArgs&gt; cloneDeep(caBackendDict);
+      case &#x27;Continue&#x27;:
+        return this._createFromContinueCustomizationArgsBackendDict(
+          &lt;ContinueCustomizationArgsBackendDict&gt; caBackendDict);
+      case &#x27;DragAndDropSortInput&#x27;:
+        return this._createFromDragAndDropSortInputCustomizationArgsBackendDict(
+          &lt;DragAndDropSortInputCustomizationArgsBackendDict&gt; caBackendDict);
+      case &#x27;EndExploration&#x27;:
+        return &lt;EndExplorationCustomizationArgs&gt; cloneDeep(caBackendDict);
+      case &#x27;FractionInput&#x27;:
+        return this._createFromFractionInputCustomizationArgsBackendDict(
+          &lt;FractionInputCustomizationArgsBackendDict&gt; caBackendDict);
+      case &#x27;GraphInput&#x27;:
+        return (
+          &lt;GraphInputCustomizationArgs&gt; cloneDeep(caBackendDict));
+      case &#x27;ImageClickInput&#x27;:
+        return &lt;ImageClickInputCustomizationArgs&gt; cloneDeep(caBackendDict);
+      case &#x27;InteractiveMap&#x27;:
+        return &lt;InteractiveMapCustomizationArgs&gt; cloneDeep(caBackendDict);
+      case &#x27;ItemSelectionInput&#x27;:
+        return this._createFromItemSelectionInputCustomizationArgsBackendDict(
+          &lt;ItemSelectionInputCustomizationArgsBackendDict&gt; caBackendDict);
+      case &#x27;LogicProof&#x27;:
+        return &lt;LogicProofCustomizationArgs&gt; cloneDeep(caBackendDict);
+      case &#x27;MathEquationInput&#x27;:
+        return &lt;MathEquationInputCustomizationArgs&gt; cloneDeep(caBackendDict);
+      case &#x27;MultipleChoiceInput&#x27;:
+        return this._createFromIMultipleChoiceInputCustomizationArgsBackendDict(
+          &lt;MultipleChoiceInputCustomizationArgsBackendDict&gt; caBackendDict);
+      case &#x27;MusicNotesInput&#x27;:
+        return &lt;MusicNotesInputCustomizationArgs&gt; cloneDeep(caBackendDict);
+      case &#x27;NumberWithUnits&#x27;:
+        return &lt;NumberWithUnitsCustomizationArgs&gt; cloneDeep(caBackendDict);
+      case &#x27;NumericExpressionInput&#x27;:
+        return (
+          this._createFromNumericExpressionInputCustomizationArgsBackendDict(
+            &lt;NumericExpressionInputCustomizationArgsBackendDict&gt; caBackendDict)
+        );
+      case &#x27;NumericInput&#x27;:
+        return &lt;NumericInputCustomizationArgs&gt; cloneDeep(caBackendDict);
+      case &#x27;PencilCodeEditor&#x27;:
+        return &lt;PencilCodeEditorCustomizationArgs&gt; cloneDeep(caBackendDict);
+      case &#x27;RatioExpressionInput&#x27;:
+        return this._createFromRatioExpressionInputCustomizationArgsBackendDict(
+          &lt;RatioExpressionInputCustomizationArgsBackendDict&gt; caBackendDict);
+      case &#x27;SetInput&#x27;:
+        return this._createFromSetInputCustomizationArgsBackendDict(
+          &lt;SetInputCustomizationArgsBackendDict&gt; caBackendDict);
+      case &#x27;TextInput&#x27;:
+        return this._createFromTextInputCustomizationArgsBackendDict(
+          &lt;TextInputCustomizationArgsBackendDict&gt; caBackendDict);
+      default:
+        throw new Error(`Unrecognized interaction id ${interactionId}`);
+    }
+  }
+
+  createFromBackendDict(interactionDict: InteractionBackendDict): Interaction {
+    return new Interaction(
+      this.createAnswerGroupsFromBackendDict(
+        interactionDict.answer_groups,
+        interactionDict.id),
+      interactionDict.confirmed_unclassified_answers,
+      this.convertFromCustomizationArgsBackendDict(
+        interactionDict.id, interactionDict.customization_args),
+      interactionDict.default_outcome ? this.createOutcomeFromBackendDict(
+        interactionDict.default_outcome) : null,
+      this.createHintsFromBackendDict(interactionDict.hints),
+      interactionDict.id,
+      interactionDict.solution ? this.createSolutionFromBackendDict(
+        interactionDict.solution) : null);
+  }
+
+  createAnswerGroupsFromBackendDict(
+      answerGroupBackendDicts: readonly AnswerGroupBackendDict[],
+      interactionId: string
+  ): AnswerGroup[] {
+    return answerGroupBackendDicts.map((
+        answerGroupBackendDict) =&gt; {
+      return this.answerGroupFactory.createFromBackendDict(
+        answerGroupBackendDict, interactionId);
+    });
+  }
+
+  createHintsFromBackendDict(
+      hintBackendDicts: readonly HintBackendDict[]): Hint[] {
+    return hintBackendDicts.map((hintBackendDict) =&gt; {
+      return this.hintFactory.createFromBackendDict(hintBackendDict);
+    });
+  }
+
+  createOutcomeFromBackendDict(
+      outcomeBackendDict: OutcomeBackendDict): Outcome {
+    return this.outcomeFactory.createFromBackendDict(outcomeBackendDict);
+  }
+
+  createSolutionFromBackendDict(
+      solutionBackendDict: SolutionBackendDict): Solution {
+    return this.solutionFactory.createFromBackendDict(solutionBackendDict);
+  }
+}
+
+angular.module(&#x27;oppia&#x27;).factory(
+  &#x27;InteractionObjectFactory&#x27;,
+  downgradeInjectable(InteractionObjectFactory));
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactory.ts&quot;,&quot;line&quot;:187,&quot;character&quot;:10,&quot;text&quot;:&quot;contentIds&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactory.ts&quot;,&quot;line&quot;:193,&quot;character&quot;:8,&quot;text&quot;:&quot;contentIds&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactory.ts&quot;,&quot;line&quot;:379,&quot;character&quot;:10,&quot;text&quot;:&quot;&lt;AlgebraicExpressionInputCustomizationArgs&gt; cloneDeep(caBackendDict)&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactory.ts&quot;,&quot;line&quot;:381,&quot;character&quot;:15,&quot;text&quot;:&quot;&lt;CodeReplCustomizationArgs&gt; cloneDeep(caBackendDict)&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactory.ts&quot;,&quot;line&quot;:384,&quot;character&quot;:10,&quot;text&quot;:&quot;&lt;ContinueCustomizationArgsBackendDict&gt; caBackendDict&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactory.ts&quot;,&quot;line&quot;:387,&quot;character&quot;:10,&quot;text&quot;:&quot;&lt;DragAndDropSortInputCustomizationArgsBackendDict&gt; caBackendDict&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactory.ts&quot;,&quot;line&quot;:389,&quot;character&quot;:15,&quot;text&quot;:&quot;&lt;EndExplorationCustomizationArgs&gt; cloneDeep(caBackendDict)&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactory.ts&quot;,&quot;line&quot;:392,&quot;character&quot;:10,&quot;text&quot;:&quot;&lt;FractionInputCustomizationArgsBackendDict&gt; caBackendDict&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactory.ts&quot;,&quot;line&quot;:395,&quot;character&quot;:10,&quot;text&quot;:&quot;&lt;GraphInputCustomizationArgs&gt; cloneDeep(caBackendDict)&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactory.ts&quot;,&quot;line&quot;:397,&quot;character&quot;:15,&quot;text&quot;:&quot;&lt;ImageClickInputCustomizationArgs&gt; cloneDeep(caBackendDict)&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactory.ts&quot;,&quot;line&quot;:399,&quot;character&quot;:15,&quot;text&quot;:&quot;&lt;InteractiveMapCustomizationArgs&gt; cloneDeep(caBackendDict)&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactory.ts&quot;,&quot;line&quot;:402,&quot;character&quot;:10,&quot;text&quot;:&quot;&lt;ItemSelectionInputCustomizationArgsBackendDict&gt; caBackendDict&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactory.ts&quot;,&quot;line&quot;:404,&quot;character&quot;:15,&quot;text&quot;:&quot;&lt;LogicProofCustomizationArgs&gt; cloneDeep(caBackendDict)&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactory.ts&quot;,&quot;line&quot;:406,&quot;character&quot;:15,&quot;text&quot;:&quot;&lt;MathEquationInputCustomizationArgs&gt; cloneDeep(caBackendDict)&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactory.ts&quot;,&quot;line&quot;:409,&quot;character&quot;:10,&quot;text&quot;:&quot;&lt;MultipleChoiceInputCustomizationArgsBackendDict&gt; caBackendDict&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactory.ts&quot;,&quot;line&quot;:411,&quot;character&quot;:15,&quot;text&quot;:&quot;&lt;MusicNotesInputCustomizationArgs&gt; cloneDeep(caBackendDict)&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactory.ts&quot;,&quot;line&quot;:417,&quot;character&quot;:12,&quot;text&quot;:&quot;&lt;NumericExpressionInputCustomizationArgsBackendDict&gt; caBackendDict&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactory.ts&quot;,&quot;line&quot;:422,&quot;character&quot;:15,&quot;text&quot;:&quot;&lt;PencilCodeEditorCustomizationArgs&gt; cloneDeep(caBackendDict)&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactory.ts&quot;,&quot;line&quot;:425,&quot;character&quot;:10,&quot;text&quot;:&quot;&lt;RatioExpressionInputCustomizationArgsBackendDict&gt; caBackendDict&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactory.ts&quot;,&quot;line&quot;:428,&quot;character&quot;:10,&quot;text&quot;:&quot;&lt;SetInputCustomizationArgsBackendDict&gt; caBackendDict&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;core/templates/domain/exploration/InteractionObjectFactory.ts&quot;,&quot;line&quot;:431,&quot;character&quot;:10,&quot;text&quot;:&quot;&lt;TextInputCustomizationArgsBackendDict&gt; caBackendDict&quot;,&quot;kind&quot;:4}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:54 GMT</p>
+    </body>
+  </html>
+  

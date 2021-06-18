@@ -1,0 +1,199 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>on-screen-keyboard.component.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/components/on-screen-keyboard/on-screen-keyboard.component.spec.ts</td><td class="">99.31%</td><td class="">100%</td><td class="">288</td><td class="">286</td><td class="">2</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for the on screen keyboard component.
+ */
+
+import { DeviceInfoService } from &#x27;services/contextual/device-info.service&#x27;;
+import { GuppyInitializationService, GuppyObject } from
+  &#x27;services/guppy-initialization.service&#x27;;
+import { ComponentFixture, TestBed, waitForAsync } from &#x27;@angular/core/testing&#x27;;
+import { OnScreenKeyboardComponent } from &#x27;./on-screen-keyboard.component&#x27;;
+
+describe(&#x27;On Screen Keyboard&#x27;, () =&gt; {
+  let guppyInitializationService: GuppyInitializationService;
+  let deviceInfoService: DeviceInfoService;
+  let fixture: ComponentFixture&lt;OnScreenKeyboardComponent&gt;;
+  let componentInstance: OnScreenKeyboardComponent;
+  let guppy: {isActive: boolean} = {
+    isActive: false
+  };
+
+  class MockGuppy implements Guppy {
+    asciimath: () =&gt; void;
+    configure: () =&gt; void;
+    deactivate: () =&gt; void;
+    doc: () =&gt; Object;
+    equations: () =&gt; Object[];
+    evaluate: (evaluators?: Object) =&gt; Object;
+    event: (name: string, handler: Function) =&gt; void;
+    func: (evaluators?: Object) =&gt; Function;
+    &#x27;import_latex&#x27;: (text: string) =&gt; void;
+    &#x27;import_syntax_tree&#x27;: (tree: Object) =&gt; void;
+    &#x27;import_text&#x27;: (text: string) =&gt; void;
+    &#x27;import_xml&#x27;: (xml: string) =&gt; void;
+    &#x27;is_changed&#x27;: () =&gt; boolean;
+    latex: () =&gt; string;
+    &#x27;recompute_locations_paths&#x27;: () =&gt; void;
+    render: (updated?: boolean) =&gt; void;
+    &#x27;render_node&#x27;: (t: string) =&gt; string;
+    &#x27;select_to&#x27;: (x: number, y: number, mouse: Object) =&gt; void;
+    &#x27;symbols_used&#x27;: (groups?: string[]) =&gt; string[];
+    &#x27;syntax_tree&#x27;: () =&gt; Object;
+    text: () =&gt; string;
+    vars: () =&gt; string[];
+    xml: () =&gt; string;
+    engine = {
+      insert_string: (_: string) =&gt; {},
+      insert_symbol: (_: string) =&gt; {},
+      backspace: () =&gt; {},
+      left: () =&gt; {},
+      right: () =&gt; {},
+    };
+
+    activate(): void {
+      guppy.isActive = true;
+    }
+  }
+
+  beforeEach(waitForAsync(() =&gt; {
+    TestBed.configureTestingModule({
+      declarations: [
+        OnScreenKeyboardComponent
+      ]
+    });
+  }));
+
+  beforeEach(() =&gt; {
+    fixture = TestBed.createComponent(OnScreenKeyboardComponent);
+    componentInstance = fixture.componentInstance;
+    guppyInitializationService = TestBed.inject(GuppyInitializationService);
+    guppyInitializationService = (guppyInitializationService as unknown) as
+    jasmine.SpyObj&lt;GuppyInitializationService&gt;;
+    deviceInfoService = TestBed.inject(DeviceInfoService);
+    deviceInfoService = (deviceInfoService as unknown) as
+    jasmine.SpyObj&lt;DeviceInfoService&gt;;
+    guppyInitializationService.setShowOSK(true);
+  });
+
+  it(&#x27;should create&#x27;, () =&gt; {
+    expect(componentInstance).toBeDefined();
+  });
+
+  it(&#x27;should only show the OSK for mobile devices&#x27;, () =&gt; {
+    spyOn(deviceInfoService, &#x27;isMobileUserAgent&#x27;).and.returnValue(false);
+    spyOn(deviceInfoService, &#x27;hasTouchEvents&#x27;).and.returnValue(false);
+    expect(componentInstance.showOSK()).toBeFalse();
+  });
+
+  it(&#x27;should only show the OSK if there is an active guppy object&#x27;, () =&gt; {
+    spyOn(deviceInfoService, &#x27;isMobileUserAgent&#x27;).and.returnValue(true);
+    spyOn(deviceInfoService, &#x27;hasTouchEvents&#x27;).and.returnValue(true);
+    spyOn(guppyInitializationService, &#x27;findActiveGuppyObject&#x27;).and.returnValue(
+      undefined);
+    expect(componentInstance.showOSK()).toBeFalse();
+  });
+
+  it(&#x27;should set showOSK value to false upon hiding the OSK&#x27;, () =&gt; {
+    spyOn(deviceInfoService, &#x27;isMobileUserAgent&#x27;).and.returnValue(true);
+    spyOn(deviceInfoService, &#x27;hasTouchEvents&#x27;).and.returnValue(true);
+    spyOn(guppyInitializationService, &#x27;findActiveGuppyObject&#x27;).and
+      .returnValue(new GuppyObject(null, new MockGuppy()));
+    expect(guppyInitializationService.getShowOSK()).toBeTrue();
+    componentInstance.hideOSK();
+    expect(guppyInitializationService.getShowOSK()).toBeFalse();
+  });
+
+  it(&#x27;should activate the instance upon each key press function call&#x27;,
+    () =&gt; {
+      spyOn(deviceInfoService, &#x27;isMobileUserAgent&#x27;).and.returnValue(true);
+      spyOn(deviceInfoService, &#x27;hasTouchEvents&#x27;).and.returnValue(true);
+      spyOn(guppyInitializationService, &#x27;findActiveGuppyObject&#x27;)
+        .and.returnValue(new GuppyObject(null, new MockGuppy()));
+      expect(componentInstance.showOSK()).toBeTrue();
+
+      expect(guppy.isActive).toBeFalse();
+      componentInstance.activateGuppy();
+      expect(guppy.isActive).toBeTrue();
+
+      guppy.isActive = false;
+
+      expect(guppy.isActive).toBeFalse();
+      componentInstance.changeTab(&#x27;newTab&#x27;);
+      expect(guppy.isActive).toBeTrue();
+
+      guppy.isActive = false;
+
+      expect(guppy.isActive).toBeFalse();
+      componentInstance.insertString(&#x27;x&#x27;);
+      componentInstance.insertString(&#x27;α&#x27;);
+      expect(guppy.isActive).toBeTrue();
+
+      guppy.isActive = false;
+
+      expect(guppy.isActive).toBeFalse();
+      componentInstance.insertSymbol(&#x27;x&#x27;);
+      expect(guppy.isActive).toBeTrue();
+
+      guppy.isActive = false;
+
+      expect(guppy.isActive).toBeFalse();
+      componentInstance.backspace();
+      expect(guppy.isActive).toBeTrue();
+
+      guppy.isActive = false;
+
+      expect(guppy.isActive).toBeFalse();
+      componentInstance.left();
+      expect(guppy.isActive).toBeTrue();
+
+      guppy.isActive = false;
+
+      expect(guppy.isActive).toBeFalse();
+      componentInstance.right();
+      expect(guppy.isActive).toBeTrue();
+
+      guppy.isActive = false;
+
+      expect(guppy.isActive).toBeFalse();
+      componentInstance.exponent(&#x27;2&#x27;);
+      expect(guppy.isActive).toBeTrue();
+    }
+  );
+
+  it(&#x27;should get static image url&#x27;, () =&gt; {
+    let imagePath = &#x27;/path/to/image.png&#x27;;
+    expect(componentInstance.getStaticImageUrl(imagePath)).toBe(
+      &#x27;/assets/images/path/to/image.png&#x27;);
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/components/on-screen-keyboard/on-screen-keyboard.component.spec.ts&quot;,&quot;line&quot;:82,&quot;character&quot;:33,&quot;text&quot;:&quot;(guppyInitializationService as unknown) as\n    jasmine.SpyObj&lt;GuppyInitializationService&gt;&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;core/templates/components/on-screen-keyboard/on-screen-keyboard.component.spec.ts&quot;,&quot;line&quot;:85,&quot;character&quot;:24,&quot;text&quot;:&quot;(deviceInfoService as unknown) as\n    jasmine.SpyObj&lt;DeviceInfoService&gt;&quot;,&quot;kind&quot;:3}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:57 GMT</p>
+    </body>
+  </html>
+  

@@ -1,0 +1,209 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>exploration-property.service.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts</td><td class="">43.15%</td><td class="">100%</td><td class="">241</td><td class="">104</td><td class="">137</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for ExplorationPropertyService.
+ */
+
+import { UpgradedServices } from &#x27;services/UpgradedServices&#x27;;
+
+require(&#x27;pages/exploration-editor-page/services/exploration-property.service&#x27;);
+require(&#x27;pages/exploration-editor-page/services/change-list.service&#x27;);
+require(&#x27;domain/exploration/ParamChangesObjectFactory&#x27;);
+require(&#x27;domain/exploration/ParamSpecsObjectFactory&#x27;);
+require(&#x27;domain/exploration/ParamSpecObjectFactory&#x27;);
+
+
+describe(&#x27;Exploration Property Service&#x27;, function() {
+  var ExplorationPropertyService;
+  var ParamChangesObjectFactory;
+  var ParamSpecsObjectFactory;
+  var ParamSpecObjectFactory;
+  var ChangeListService;
+  var editExplorationPropertySpy;
+
+  beforeEach(angular.mock.module(&#x27;oppia&#x27;));
+  beforeEach(function() {
+    angular.mock.module(&#x27;oppia&#x27;, function($provide) {
+      $provide.value(&#x27;ExplorationDataService&#x27;, {
+        autosaveChangeListAsync: function() {}
+      });
+    });
+  });
+  beforeEach(angular.mock.module(&#x27;oppia&#x27;, function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
+  beforeEach(angular.mock.inject(function($injector) {
+    ExplorationPropertyService = $injector.get(&#x27;ExplorationPropertyService&#x27;);
+    ParamChangesObjectFactory = $injector.get(&#x27;ParamChangesObjectFactory&#x27;);
+    ParamSpecsObjectFactory = $injector.get(&#x27;ParamSpecsObjectFactory&#x27;);
+    ParamSpecObjectFactory = $injector.get(&#x27;ParamSpecObjectFactory&#x27;);
+    ChangeListService = $injector.get(&#x27;ChangeListService&#x27;);
+
+    editExplorationPropertySpy = spyOn(
+      ChangeListService, &#x27;editExplorationProperty&#x27;).and.callThrough();
+  }));
+
+  it(&#x27;should create a new exploration properties object&#x27;, function() {
+    expect(function() {
+      ExplorationPropertyService.init(&#x27;initial value&#x27;);
+    }).toThrowError(&#x27;Exploration property name cannot be null.&#x27;);
+
+    ExplorationPropertyService.propertyName = &#x27;property_1&#x27;;
+    ExplorationPropertyService.init(&#x27;initial value&#x27;);
+
+    expect(ExplorationPropertyService.hasChanged()).toBe(false);
+  });
+
+  it(&#x27;should overrides _normalize and _isValid methods&#x27;, function() {
+    var childToOverride = Object.create(ExplorationPropertyService);
+
+    childToOverride._isValid = function(value) {
+      return !!value;
+    };
+
+    childToOverride._normalize = function(value) {
+      return value;
+    };
+
+    var overrideIsValidSpy = spyOn(childToOverride, &#x27;_isValid&#x27;).and
+      .callThrough();
+    var overrideNormalizeSpy = spyOn(childToOverride, &#x27;_normalize&#x27;).and
+      .callThrough();
+
+    childToOverride.propertyName = &#x27;property_1&#x27;;
+    childToOverride.saveDisplayedValue();
+
+    expect(overrideIsValidSpy).toHaveBeenCalled();
+    expect(overrideNormalizeSpy).toHaveBeenCalled();
+  });
+
+  it(&#x27;should save the displayed value when init is not called&#x27;, function() {
+    expect(function() {
+      ExplorationPropertyService.saveDisplayedValue();
+    }).toThrowError(&#x27;Exploration property name cannot be null.&#x27;);
+
+    ExplorationPropertyService.propertyName = &#x27;property_1&#x27;;
+    ExplorationPropertyService.saveDisplayedValue();
+
+    ExplorationPropertyService.hasChanged(false);
+  });
+
+  it(&#x27;should not save the displayed value when it\&#x27;s empty&#x27;, function() {
+    var child = Object.create(ExplorationPropertyService);
+    child.propertyName = &#x27;property_1&#x27;;
+
+    child._isValid = function(value) {
+      if (!value) {
+        throw new Error(&#x27;this.displayed should have a valid value.&#x27;);
+      }
+      return Boolean(value);
+    };
+
+    child.init();
+    expect(function() {
+      child.saveDisplayedValue();
+    }).toThrowError(&#x27;this.displayed should have a valid value.&#x27;);
+
+    // Then init with a value.
+    child.init(&#x27;initial value&#x27;);
+    child.saveDisplayedValue();
+    expect(child.hasChanged()).toBe(false);
+  });
+
+  it(&#x27;should save displayed value when is ParamChanges object&#x27;, function() {
+    var child = Object.create(ExplorationPropertyService);
+    child.propertyName = &#x27;param_changes&#x27;;
+    child._normalize = function(paramChanges) {
+      // Changing paramChanges so hasChanged() turns to be true on line 87.
+      paramChanges.forEach(function(paramChange) {
+        paramChange.resetCustomizationArgs();
+      });
+      return paramChanges;
+    };
+
+    var normalizeSpy = spyOn(child, &#x27;_normalize&#x27;).and
+      .callThrough();
+
+    child.init(ParamChangesObjectFactory.createFromBackendList([{
+      customization_args: {
+        parse_with_jinja: true,
+        value: &#x27;&#x27;
+      },
+      generator_id: &#x27;Copier&#x27;,
+      name: &#x27;Param change 1&#x27;
+    }, {
+      customization_args: {
+        parse_with_jinja: true,
+        value: &#x27;&#x27;
+      },
+      generator_id: &#x27;RandomSelector&#x27;,
+      name: &#x27;Param change 2&#x27;
+    }]));
+    child.saveDisplayedValue();
+
+    expect(normalizeSpy).toHaveBeenCalled();
+    expect(editExplorationPropertySpy).toHaveBeenCalled();
+    expect(child.hasChanged()).toBe(false);
+  });
+
+  it(&#x27;should save displayed value when is ParamSpecs object&#x27;, function() {
+    var child = Object.create(ExplorationPropertyService);
+    child.propertyName = &#x27;param_specs&#x27;;
+    child._normalize = function(paramSpecs) {
+      // Changing paramSpecs so hasChanged() turns to be true on line 87.
+      var paramSpec = ParamSpecObjectFactory.createDefault();
+      paramSpecs.addParamIfNew(&#x27;z&#x27;, paramSpec);
+      return paramSpecs;
+    };
+
+    var normalizeSpy = spyOn(child, &#x27;_normalize&#x27;).and
+      .callThrough();
+
+    child.init(ParamSpecsObjectFactory.createFromBackendDict({
+      x: {
+        obj_type: &#x27;UnicodeString&#x27;
+      },
+      y: {
+        obj_type: &#x27;UnicodeString&#x27;
+      }
+    }));
+    child.saveDisplayedValue();
+
+    expect(normalizeSpy).toHaveBeenCalled();
+    expect(editExplorationPropertySpy).toHaveBeenCalled();
+    expect(child.hasChanged()).toBe(false);
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:28,&quot;character&quot;:6,&quot;text&quot;:&quot;ExplorationPropertyService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:29,&quot;character&quot;:6,&quot;text&quot;:&quot;ParamChangesObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:30,&quot;character&quot;:6,&quot;text&quot;:&quot;ParamSpecsObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:31,&quot;character&quot;:6,&quot;text&quot;:&quot;ParamSpecObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:32,&quot;character&quot;:6,&quot;text&quot;:&quot;ChangeListService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:33,&quot;character&quot;:6,&quot;text&quot;:&quot;editExplorationPropertySpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:37,&quot;character&quot;:42,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:38,&quot;character&quot;:6,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:38,&quot;character&quot;:15,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:43,&quot;character&quot;:51,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:46,&quot;character&quot;:6,&quot;text&quot;:&quot;$provide&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:46,&quot;character&quot;:15,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:49,&quot;character&quot;:42,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:50,&quot;character&quot;:4,&quot;text&quot;:&quot;ExplorationPropertyService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:50,&quot;character&quot;:33,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:50,&quot;character&quot;:43,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:51,&quot;character&quot;:4,&quot;text&quot;:&quot;ParamChangesObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:51,&quot;character&quot;:32,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:51,&quot;character&quot;:42,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:52,&quot;character&quot;:4,&quot;text&quot;:&quot;ParamSpecsObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:52,&quot;character&quot;:30,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:52,&quot;character&quot;:40,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:53,&quot;character&quot;:4,&quot;text&quot;:&quot;ParamSpecObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:53,&quot;character&quot;:29,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:53,&quot;character&quot;:39,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:54,&quot;character&quot;:4,&quot;text&quot;:&quot;ChangeListService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:54,&quot;character&quot;:24,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:54,&quot;character&quot;:34,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:56,&quot;character&quot;:4,&quot;text&quot;:&quot;editExplorationPropertySpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:57,&quot;character&quot;:6,&quot;text&quot;:&quot;ChangeListService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:57,&quot;character&quot;:52,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:62,&quot;character&quot;:6,&quot;text&quot;:&quot;ExplorationPropertyService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:62,&quot;character&quot;:33,&quot;text&quot;:&quot;init&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:65,&quot;character&quot;:4,&quot;text&quot;:&quot;ExplorationPropertyService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:65,&quot;character&quot;:31,&quot;text&quot;:&quot;propertyName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:66,&quot;character&quot;:4,&quot;text&quot;:&quot;ExplorationPropertyService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:66,&quot;character&quot;:31,&quot;text&quot;:&quot;init&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:68,&quot;character&quot;:11,&quot;text&quot;:&quot;ExplorationPropertyService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:68,&quot;character&quot;:38,&quot;text&quot;:&quot;hasChanged&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:72,&quot;character&quot;:8,&quot;text&quot;:&quot;childToOverride&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:74,&quot;character&quot;:4,&quot;text&quot;:&quot;childToOverride&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:74,&quot;character&quot;:20,&quot;text&quot;:&quot;_isValid&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:74,&quot;character&quot;:40,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:75,&quot;character&quot;:15,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:78,&quot;character&quot;:4,&quot;text&quot;:&quot;childToOverride&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:78,&quot;character&quot;:20,&quot;text&quot;:&quot;_normalize&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:78,&quot;character&quot;:42,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:79,&quot;character&quot;:13,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:82,&quot;character&quot;:8,&quot;text&quot;:&quot;overrideIsValidSpy&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:82,&quot;character&quot;:35,&quot;text&quot;:&quot;childToOverride&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:82,&quot;character&quot;:64,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:84,&quot;character&quot;:8,&quot;text&quot;:&quot;overrideNormalizeSpy&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:84,&quot;character&quot;:37,&quot;text&quot;:&quot;childToOverride&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:84,&quot;character&quot;:68,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:87,&quot;character&quot;:4,&quot;text&quot;:&quot;childToOverride&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:87,&quot;character&quot;:20,&quot;text&quot;:&quot;propertyName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:88,&quot;character&quot;:4,&quot;text&quot;:&quot;childToOverride&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:88,&quot;character&quot;:20,&quot;text&quot;:&quot;saveDisplayedValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:90,&quot;character&quot;:11,&quot;text&quot;:&quot;overrideIsValidSpy&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:91,&quot;character&quot;:11,&quot;text&quot;:&quot;overrideNormalizeSpy&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:96,&quot;character&quot;:6,&quot;text&quot;:&quot;ExplorationPropertyService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:96,&quot;character&quot;:33,&quot;text&quot;:&quot;saveDisplayedValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:99,&quot;character&quot;:4,&quot;text&quot;:&quot;ExplorationPropertyService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:99,&quot;character&quot;:31,&quot;text&quot;:&quot;propertyName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:100,&quot;character&quot;:4,&quot;text&quot;:&quot;ExplorationPropertyService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:100,&quot;character&quot;:31,&quot;text&quot;:&quot;saveDisplayedValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:102,&quot;character&quot;:4,&quot;text&quot;:&quot;ExplorationPropertyService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:102,&quot;character&quot;:31,&quot;text&quot;:&quot;hasChanged&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:106,&quot;character&quot;:8,&quot;text&quot;:&quot;child&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:107,&quot;character&quot;:4,&quot;text&quot;:&quot;child&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:107,&quot;character&quot;:10,&quot;text&quot;:&quot;propertyName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:109,&quot;character&quot;:4,&quot;text&quot;:&quot;child&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:109,&quot;character&quot;:10,&quot;text&quot;:&quot;_isValid&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:109,&quot;character&quot;:30,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:110,&quot;character&quot;:11,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:113,&quot;character&quot;:21,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:116,&quot;character&quot;:4,&quot;text&quot;:&quot;child&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:116,&quot;character&quot;:10,&quot;text&quot;:&quot;init&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:118,&quot;character&quot;:6,&quot;text&quot;:&quot;child&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:118,&quot;character&quot;:12,&quot;text&quot;:&quot;saveDisplayedValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:122,&quot;character&quot;:4,&quot;text&quot;:&quot;child&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:122,&quot;character&quot;:10,&quot;text&quot;:&quot;init&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:123,&quot;character&quot;:4,&quot;text&quot;:&quot;child&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:123,&quot;character&quot;:10,&quot;text&quot;:&quot;saveDisplayedValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:124,&quot;character&quot;:11,&quot;text&quot;:&quot;child&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:124,&quot;character&quot;:17,&quot;text&quot;:&quot;hasChanged&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:128,&quot;character&quot;:8,&quot;text&quot;:&quot;child&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:129,&quot;character&quot;:4,&quot;text&quot;:&quot;child&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:129,&quot;character&quot;:10,&quot;text&quot;:&quot;propertyName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:130,&quot;character&quot;:4,&quot;text&quot;:&quot;child&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:130,&quot;character&quot;:10,&quot;text&quot;:&quot;_normalize&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:130,&quot;character&quot;:32,&quot;text&quot;:&quot;paramChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:132,&quot;character&quot;:6,&quot;text&quot;:&quot;paramChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:132,&quot;character&quot;:19,&quot;text&quot;:&quot;forEach&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:132,&quot;character&quot;:36,&quot;text&quot;:&quot;paramChange&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:133,&quot;character&quot;:8,&quot;text&quot;:&quot;paramChange&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:133,&quot;character&quot;:20,&quot;text&quot;:&quot;resetCustomizationArgs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:135,&quot;character&quot;:13,&quot;text&quot;:&quot;paramChanges&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:138,&quot;character&quot;:8,&quot;text&quot;:&quot;normalizeSpy&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:138,&quot;character&quot;:29,&quot;text&quot;:&quot;child&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:138,&quot;character&quot;:50,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:141,&quot;character&quot;:4,&quot;text&quot;:&quot;child&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:141,&quot;character&quot;:10,&quot;text&quot;:&quot;init&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:141,&quot;character&quot;:15,&quot;text&quot;:&quot;ParamChangesObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:141,&quot;character&quot;:41,&quot;text&quot;:&quot;createFromBackendList&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:156,&quot;character&quot;:4,&quot;text&quot;:&quot;child&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:156,&quot;character&quot;:10,&quot;text&quot;:&quot;saveDisplayedValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:158,&quot;character&quot;:11,&quot;text&quot;:&quot;normalizeSpy&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:159,&quot;character&quot;:11,&quot;text&quot;:&quot;editExplorationPropertySpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:160,&quot;character&quot;:11,&quot;text&quot;:&quot;child&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:160,&quot;character&quot;:17,&quot;text&quot;:&quot;hasChanged&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:164,&quot;character&quot;:8,&quot;text&quot;:&quot;child&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:165,&quot;character&quot;:4,&quot;text&quot;:&quot;child&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:165,&quot;character&quot;:10,&quot;text&quot;:&quot;propertyName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:166,&quot;character&quot;:4,&quot;text&quot;:&quot;child&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:166,&quot;character&quot;:10,&quot;text&quot;:&quot;_normalize&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:166,&quot;character&quot;:32,&quot;text&quot;:&quot;paramSpecs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:168,&quot;character&quot;:10,&quot;text&quot;:&quot;paramSpec&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:168,&quot;character&quot;:22,&quot;text&quot;:&quot;ParamSpecObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:168,&quot;character&quot;:45,&quot;text&quot;:&quot;createDefault&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:169,&quot;character&quot;:6,&quot;text&quot;:&quot;paramSpecs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:169,&quot;character&quot;:17,&quot;text&quot;:&quot;addParamIfNew&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:169,&quot;character&quot;:36,&quot;text&quot;:&quot;paramSpec&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:170,&quot;character&quot;:13,&quot;text&quot;:&quot;paramSpecs&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:173,&quot;character&quot;:8,&quot;text&quot;:&quot;normalizeSpy&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:173,&quot;character&quot;:29,&quot;text&quot;:&quot;child&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:173,&quot;character&quot;:50,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:176,&quot;character&quot;:4,&quot;text&quot;:&quot;child&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:176,&quot;character&quot;:10,&quot;text&quot;:&quot;init&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:176,&quot;character&quot;:15,&quot;text&quot;:&quot;ParamSpecsObjectFactory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:176,&quot;character&quot;:39,&quot;text&quot;:&quot;createFromBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:184,&quot;character&quot;:4,&quot;text&quot;:&quot;child&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:184,&quot;character&quot;:10,&quot;text&quot;:&quot;saveDisplayedValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:186,&quot;character&quot;:11,&quot;text&quot;:&quot;normalizeSpy&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:187,&quot;character&quot;:11,&quot;text&quot;:&quot;editExplorationPropertySpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:188,&quot;character&quot;:11,&quot;text&quot;:&quot;child&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/services/exploration-property.service.spec.ts&quot;,&quot;line&quot;:188,&quot;character&quot;:17,&quot;text&quot;:&quot;hasChanged&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:59 GMT</p>
+    </body>
+  </html>
+  

@@ -1,0 +1,144 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>questions-list-select-skill-and-difficulty-modal.controller.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts</td><td class="">55.00%</td><td class="">100%</td><td class="">180</td><td class="">99</td><td class="">81</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for
+ * QuestionsListSelectSkillAndDifficultyModalController.
+ */
+
+import { ShortSkillSummary } from
+  &#x27;domain/skill/short-skill-summary.model&#x27;;
+import { SkillDifficulty } from
+  &#x27;domain/skill/skill-difficulty.model&#x27;;
+
+describe(&#x27;Questions List Select Skill And Difficulty Modal Controller&#x27;,
+  function() {
+    var $scope = null;
+    var $uibModalInstance = null;
+
+    var allSkillSummaries = [{
+      id: &#x27;1&#x27;,
+      description: &#x27;Skill 1 description&#x27;
+    }, {
+      id: &#x27;2&#x27;,
+      description: &#x27;Skill 2 description&#x27;
+    }, {
+      id: &#x27;3&#x27;,
+      description: &#x27;Skill 3 description&#x27;
+    }];
+    var countOfSkillsToPrioritize = 2;
+    var currentMode = null;
+    var linkedSkillsWithDifficulty = [];
+    var skillIdToRubricsObject = {};
+
+    beforeEach(angular.mock.module(&#x27;oppia&#x27;));
+
+    beforeEach(angular.mock.inject(function($injector, $controller) {
+      var $rootScope = $injector.get(&#x27;$rootScope&#x27;);
+
+      $uibModalInstance = jasmine.createSpyObj(
+        &#x27;$uibModalInstance&#x27;, [&#x27;close&#x27;, &#x27;dismiss&#x27;]);
+
+      allSkillSummaries.map(summary =&gt; (
+        ShortSkillSummary.create(summary.id, summary.description)));
+
+      $scope = $rootScope.$new();
+      $controller(&#x27;QuestionsListSelectSkillAndDifficultyModalController&#x27;, {
+        $scope: $scope,
+        $uibModalInstance: $uibModalInstance,
+        allSkillSummaries: allSkillSummaries,
+        countOfSkillsToPrioritize: countOfSkillsToPrioritize,
+        currentMode: currentMode,
+        linkedSkillsWithDifficulty: linkedSkillsWithDifficulty,
+        skillIdToRubricsObject: skillIdToRubricsObject
+      });
+    }));
+
+    it(&#x27;should initialize $scope properties after controller&#x27; +
+      &#x27; is initialized&#x27;, function() {
+      expect($scope.countOfSkillsToPrioritize).toBe(countOfSkillsToPrioritize);
+      expect($scope.instructionMessage).toBe(
+        &#x27;Select the skill(s) to link the question to:&#x27;);
+      expect($scope.currentMode).toBe(currentMode);
+      expect($scope.linkedSkillsWithDifficulty).toEqual(
+        linkedSkillsWithDifficulty);
+      expect($scope.skillSummaries).toEqual(allSkillSummaries);
+      expect($scope.skillSummariesInitial.length).toBe(2);
+      expect($scope.skillSummariesFinal.length).toBe(1);
+      expect($scope.skillIdToRubricsObject).toEqual(skillIdToRubricsObject);
+    });
+
+    it(&#x27;should toggle skill selection when clicking on it&#x27;, function() {
+      expect($scope.linkedSkillsWithDifficulty.length).toBe(0);
+      var summary = allSkillSummaries[0];
+      $scope.selectOrDeselectSkill(summary);
+
+      expect($scope.isSkillSelected(summary.id)).toBe(true);
+      expect($scope.linkedSkillsWithDifficulty.length).toBe(1);
+
+      $scope.selectOrDeselectSkill(summary);
+      expect($scope.isSkillSelected(summary.id)).toBe(false);
+      expect($scope.linkedSkillsWithDifficulty.length).toBe(0);
+    });
+
+    it(&#x27;should change view mode to select skill when changing view&#x27;,
+      function() {
+        expect($scope.currentMode).toBe(currentMode);
+
+        $scope.goToSelectSkillView();
+        expect($scope.currentMode).toBe(&#x27;MODE_SELECT_SKILL&#x27;);
+      });
+
+    it(&#x27;should change view mode to select difficulty after selecting a skill&#x27;,
+      function() {
+        expect($scope.currentMode).toBe(currentMode);
+
+        $scope.goToNextStep();
+        expect($scope.currentMode).toBe(&#x27;MODE_SELECT_DIFFICULTY&#x27;);
+      });
+
+    it(&#x27;should select skill and its difficulty proerly when closing the modal&#x27;,
+      function() {
+        var summary = allSkillSummaries[1];
+        $scope.selectOrDeselectSkill(summary);
+
+        $scope.startQuestionCreation();
+
+        expect($uibModalInstance.close).toHaveBeenCalledWith([
+          SkillDifficulty.create(
+            allSkillSummaries[1].id, allSkillSummaries[1].description, 0.3)
+        ]);
+
+        // Remove summary to not affect other specs.
+        $scope.selectOrDeselectSkill(summary);
+      });
+  });
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:26,&quot;character&quot;:8,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:27,&quot;character&quot;:8,&quot;text&quot;:&quot;$uibModalInstance&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:40,&quot;character&quot;:8,&quot;text&quot;:&quot;currentMode&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:41,&quot;character&quot;:8,&quot;text&quot;:&quot;linkedSkillsWithDifficulty&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:46,&quot;character&quot;:44,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:46,&quot;character&quot;:55,&quot;text&quot;:&quot;$controller&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:47,&quot;character&quot;:10,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:47,&quot;character&quot;:23,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:47,&quot;character&quot;:33,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:49,&quot;character&quot;:6,&quot;text&quot;:&quot;$uibModalInstance&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:55,&quot;character&quot;:6,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:55,&quot;character&quot;:15,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:55,&quot;character&quot;:26,&quot;text&quot;:&quot;$new&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:56,&quot;character&quot;:6,&quot;text&quot;:&quot;$controller&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:57,&quot;character&quot;:8,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:57,&quot;character&quot;:16,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:58,&quot;character&quot;:8,&quot;text&quot;:&quot;$uibModalInstance&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:58,&quot;character&quot;:27,&quot;text&quot;:&quot;$uibModalInstance&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:61,&quot;character&quot;:8,&quot;text&quot;:&quot;currentMode&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:61,&quot;character&quot;:21,&quot;text&quot;:&quot;currentMode&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:62,&quot;character&quot;:8,&quot;text&quot;:&quot;linkedSkillsWithDifficulty&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:62,&quot;character&quot;:36,&quot;text&quot;:&quot;linkedSkillsWithDifficulty&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:69,&quot;character&quot;:13,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:69,&quot;character&quot;:20,&quot;text&quot;:&quot;countOfSkillsToPrioritize&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:70,&quot;character&quot;:13,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:70,&quot;character&quot;:20,&quot;text&quot;:&quot;instructionMessage&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:72,&quot;character&quot;:13,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:72,&quot;character&quot;:20,&quot;text&quot;:&quot;currentMode&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:72,&quot;character&quot;:38,&quot;text&quot;:&quot;currentMode&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:73,&quot;character&quot;:13,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:73,&quot;character&quot;:20,&quot;text&quot;:&quot;linkedSkillsWithDifficulty&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:74,&quot;character&quot;:8,&quot;text&quot;:&quot;linkedSkillsWithDifficulty&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:75,&quot;character&quot;:13,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:75,&quot;character&quot;:20,&quot;text&quot;:&quot;skillSummaries&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:76,&quot;character&quot;:13,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:76,&quot;character&quot;:20,&quot;text&quot;:&quot;skillSummariesInitial&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:76,&quot;character&quot;:42,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:77,&quot;character&quot;:13,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:77,&quot;character&quot;:20,&quot;text&quot;:&quot;skillSummariesFinal&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:77,&quot;character&quot;:40,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:78,&quot;character&quot;:13,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:78,&quot;character&quot;:20,&quot;text&quot;:&quot;skillIdToRubricsObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:82,&quot;character&quot;:13,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:82,&quot;character&quot;:20,&quot;text&quot;:&quot;linkedSkillsWithDifficulty&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:82,&quot;character&quot;:47,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:84,&quot;character&quot;:6,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:84,&quot;character&quot;:13,&quot;text&quot;:&quot;selectOrDeselectSkill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:86,&quot;character&quot;:13,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:86,&quot;character&quot;:20,&quot;text&quot;:&quot;isSkillSelected&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:87,&quot;character&quot;:13,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:87,&quot;character&quot;:20,&quot;text&quot;:&quot;linkedSkillsWithDifficulty&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:87,&quot;character&quot;:47,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:89,&quot;character&quot;:6,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:89,&quot;character&quot;:13,&quot;text&quot;:&quot;selectOrDeselectSkill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:90,&quot;character&quot;:13,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:90,&quot;character&quot;:20,&quot;text&quot;:&quot;isSkillSelected&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:91,&quot;character&quot;:13,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:91,&quot;character&quot;:20,&quot;text&quot;:&quot;linkedSkillsWithDifficulty&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:91,&quot;character&quot;:47,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:96,&quot;character&quot;:15,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:96,&quot;character&quot;:22,&quot;text&quot;:&quot;currentMode&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:96,&quot;character&quot;:40,&quot;text&quot;:&quot;currentMode&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:98,&quot;character&quot;:8,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:98,&quot;character&quot;:15,&quot;text&quot;:&quot;goToSelectSkillView&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:99,&quot;character&quot;:15,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:99,&quot;character&quot;:22,&quot;text&quot;:&quot;currentMode&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:104,&quot;character&quot;:15,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:104,&quot;character&quot;:22,&quot;text&quot;:&quot;currentMode&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:104,&quot;character&quot;:40,&quot;text&quot;:&quot;currentMode&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:106,&quot;character&quot;:8,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:106,&quot;character&quot;:15,&quot;text&quot;:&quot;goToNextStep&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:107,&quot;character&quot;:15,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:107,&quot;character&quot;:22,&quot;text&quot;:&quot;currentMode&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:113,&quot;character&quot;:8,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:113,&quot;character&quot;:15,&quot;text&quot;:&quot;selectOrDeselectSkill&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:115,&quot;character&quot;:8,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:115,&quot;character&quot;:15,&quot;text&quot;:&quot;startQuestionCreation&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:117,&quot;character&quot;:15,&quot;text&quot;:&quot;$uibModalInstance&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:117,&quot;character&quot;:33,&quot;text&quot;:&quot;close&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:123,&quot;character&quot;:8,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.controller.spec.ts&quot;,&quot;line&quot;:123,&quot;character&quot;:15,&quot;text&quot;:&quot;selectOrDeselectSkill&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:59 GMT</p>
+    </body>
+  </html>
+  

@@ -1,0 +1,128 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>skill-creation-backend-api.service.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/domain/skill/skill-creation-backend-api.service.spec.ts</td><td class="">92.81%</td><td class="">100%</td><td class="">153</td><td class="">142</td><td class="">11</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit test for SkillCreationBackendApiService.
+ */
+
+import { HttpErrorResponse } from &#x27;@angular/common/http&#x27;;
+import { HttpClientTestingModule, HttpTestingController }
+  from &#x27;@angular/common/http/testing&#x27;;
+import { TestBed, fakeAsync, flushMicrotasks } from &#x27;@angular/core/testing&#x27;;
+
+import {
+  RubricBackendDict,
+  SkillCreationBackendApiService,
+  SkillCreationBackendDict
+} from &#x27;domain/skill/skill-creation-backend-api.service&#x27;;
+
+describe(&#x27;Skill creation backend api service&#x27;, () =&gt; {
+  let httpTestingController: HttpTestingController = null;
+  let skillCreationBackendApiService: SkillCreationBackendApiService = null;
+  let rubricDict: RubricBackendDict = null;
+  let postData: SkillCreationBackendDict = null;
+
+  beforeEach(() =&gt; {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+
+    httpTestingController = TestBed.get(HttpTestingController);
+    skillCreationBackendApiService = TestBed.get(
+      SkillCreationBackendApiService);
+
+    rubricDict = {
+      explanations: [&#x27;test-explanation&#x27;],
+      difficulty: &#x27;test-difficulty&#x27;
+    };
+    postData = {
+      description: &#x27;test-description&#x27;,
+      linked_topic_ids: [&#x27;test_id&#x27;],
+      explanation_dict: &#x27;test_dictionary&#x27;,
+      rubrics: rubricDict
+    };
+  });
+
+  afterEach(()=&gt; {
+    httpTestingController.verify();
+  });
+
+  it(&#x27;should successfully create a new skill and obtain the skill ID&#x27;,
+    fakeAsync(() =&gt; {
+      let successHandler = jasmine.createSpy(&#x27;success&#x27;);
+      let failHandler = jasmine.createSpy(&#x27;fail&#x27;);
+      let imageBlob = new Blob(
+        [&#x27;data:image/png;base64,xyz&#x27;], {type: &#x27;image/png&#x27;});
+      let imageData = {
+        filename: &#x27;image.png&#x27;,
+        imageBlob: imageBlob
+      };
+      skillCreationBackendApiService.createSkillAsync(
+        &#x27;test-description&#x27;, rubricDict, &#x27;test_dictionary&#x27;, [&#x27;test_id&#x27;],
+        [imageData]
+      ).then(successHandler);
+      let req = httpTestingController.expectOne(
+        &#x27;/skill_editor_handler/create_new&#x27;);
+      expect(req.request.method).toEqual(&#x27;POST&#x27;);
+      expect(req.request.body.get(&#x27;payload&#x27;)).toEqual(JSON.stringify(postData));
+      let sampleFormData = new FormData();
+      sampleFormData.append(&#x27;image&#x27;, imageBlob);
+      expect(
+        req.request.body.get(&#x27;image.png&#x27;)).toEqual(sampleFormData.get(&#x27;image&#x27;));
+      req.flush(postData);
+      flushMicrotasks();
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }));
+
+  it(&#x27;should fail to create a new skill and call the fail handler&#x27;,
+    fakeAsync(() =&gt; {
+      let successHandler = jasmine.createSpy(&#x27;success&#x27;);
+      let failHandler = jasmine.createSpy(&#x27;fail&#x27;);
+      skillCreationBackendApiService.createSkillAsync(
+        &#x27;test-description&#x27;, rubricDict, &#x27;test_dictionary&#x27;, [&#x27;test_id&#x27;], []
+      ).then(successHandler, failHandler);
+      let errorResponse = new HttpErrorResponse({
+        error: &#x27;test 404 error&#x27;,
+        status: 404,
+        statusText: &#x27;Not Found&#x27;
+      });
+      let req = httpTestingController.expectOne(
+        &#x27;/skill_editor_handler/create_new&#x27;);
+      req.error(new ErrorEvent(&#x27;Error&#x27;), errorResponse);
+      expect(req.request.method).toEqual(&#x27;POST&#x27;);
+      expect(req.request.body.get(&#x27;payload&#x27;)).toEqual(JSON.stringify(postData));
+      flushMicrotasks();
+      expect(failHandler).toHaveBeenCalled();
+      expect(successHandler).not.toHaveBeenCalled();
+    }));
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/domain/skill/skill-creation-backend-api.service.spec.ts&quot;,&quot;line&quot;:76,&quot;character&quot;:17,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-creation-backend-api.service.spec.ts&quot;,&quot;line&quot;:77,&quot;character&quot;:17,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-creation-backend-api.service.spec.ts&quot;,&quot;line&quot;:77,&quot;character&quot;:25,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-creation-backend-api.service.spec.ts&quot;,&quot;line&quot;:77,&quot;character&quot;:30,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-creation-backend-api.service.spec.ts&quot;,&quot;line&quot;:81,&quot;character&quot;:12,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-creation-backend-api.service.spec.ts&quot;,&quot;line&quot;:81,&quot;character&quot;:20,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-creation-backend-api.service.spec.ts&quot;,&quot;line&quot;:81,&quot;character&quot;:25,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-creation-backend-api.service.spec.ts&quot;,&quot;line&quot;:103,&quot;character&quot;:17,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-creation-backend-api.service.spec.ts&quot;,&quot;line&quot;:104,&quot;character&quot;:17,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-creation-backend-api.service.spec.ts&quot;,&quot;line&quot;:104,&quot;character&quot;:25,&quot;text&quot;:&quot;body&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/skill/skill-creation-backend-api.service.spec.ts&quot;,&quot;line&quot;:104,&quot;character&quot;:30,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:57 GMT</p>
+    </body>
+  </html>
+  

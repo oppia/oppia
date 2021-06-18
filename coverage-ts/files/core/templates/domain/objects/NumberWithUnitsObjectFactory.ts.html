@@ -1,0 +1,281 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>NumberWithUnitsObjectFactory.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/domain/objects/NumberWithUnitsObjectFactory.ts</td><td class="">99.73%</td><td class="">100%</td><td class="">371</td><td class="">370</td><td class="">1</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2018 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Factory for creating instances of NumberWithUnits
+ * domain objects.
+ */
+
+import { Injectable } from &#x27;@angular/core&#x27;;
+import { downgradeInjectable } from &#x27;@angular/upgrade/static&#x27;;
+
+import { Fraction, FractionObjectFactory } from
+  &#x27;domain/objects/FractionObjectFactory&#x27;;
+import { ObjectsDomainConstants } from
+  &#x27;domain/objects/objects-domain.constants&#x27;;
+import { Units, UnitsObjectFactory } from
+  &#x27;domain/objects/UnitsObjectFactory&#x27;;
+import { Unit, NumberWithUnitsAnswer } from
+  &#x27;interactions/answer-defs&#x27;;
+
+/* Guidelines for adding new custom currency units in Number with Units
+  interaction:
+  Simply add currency unit to the dict of CURRENCY_UNITS constant and it will
+  be automatically added to the allowed custom units. Following are the keys
+  to be defined within the unit dict:
+    name:  The name of the custom currency unit.
+    aliases: Other allowed canonical forms of the currency unit.
+    front_units: A list of all the currency symbols that are added to the front
+      (like- $, Rs, ₹). Keep it an empty list if no symbol is needed.
+    base_unit: Define the unit in terms of base unit only if the defined custom
+      unit is a sub unit else assign it &#x27;null&#x27; value.*/
+export class NumberWithUnits {
+  type: string;
+  real: number;
+  fraction: Fraction;
+  units: Unit[];
+
+  constructor(
+      type: string, real: number, fractionObj: Fraction,
+      unitsObj: Units) {
+    this.type = type;
+    this.real = real;
+    this.fraction = fractionObj;
+    this.units = unitsObj.units;
+  }
+
+  toString(): string {
+    var numberWithUnitsString: string = &#x27;&#x27;;
+    // The NumberWithUnits class is allowed to have 4 properties namely
+    // type, real, fraction and units. Hence, we cannot inject
+    // UnitsObjectFactory, since that&#x27;ll lead to creation of 5th property
+    // which isn&#x27;t allowed. Refer objects.py L#956.
+    var unitsString: string = (new UnitsObjectFactory()).fromList(
+      this.units).toString();
+    if (unitsString.includes(&#x27;$&#x27;)) {
+      unitsString = unitsString.replace(&#x27;$&#x27;, &#x27;&#x27;);
+      numberWithUnitsString += &#x27;$&#x27; + &#x27; &#x27;;
+    }
+    if (unitsString.includes(&#x27;Rs&#x27;)) {
+      unitsString = unitsString.replace(&#x27;Rs&#x27;, &#x27;&#x27;);
+      numberWithUnitsString += &#x27;Rs&#x27; + &#x27; &#x27;;
+    }
+    if (unitsString.includes(&#x27;₹&#x27;)) {
+      unitsString = unitsString.replace(&#x27;₹&#x27;, &#x27;&#x27;);
+      numberWithUnitsString += &#x27;₹&#x27; + &#x27; &#x27;;
+    }
+
+    if (this.type === &#x27;real&#x27;) {
+      numberWithUnitsString += this.real + &#x27; &#x27;;
+    } else if (this.type === &#x27;fraction&#x27;) {
+      numberWithUnitsString += this.fraction.toString() + &#x27; &#x27;;
+    }
+    numberWithUnitsString += unitsString.trim();
+    numberWithUnitsString = numberWithUnitsString.trim();
+    return numberWithUnitsString;
+  }
+
+  toMathjsCompatibleString(): string {
+    var numberWithUnitsString: string = &#x27;&#x27;;
+    var unitsString: string = (new UnitsObjectFactory()).fromList(
+      this.units).toString();
+    unitsString = (new UnitsObjectFactory()).toMathjsCompatibleString(
+      unitsString);
+
+    if (this.type === &#x27;real&#x27;) {
+      numberWithUnitsString += this.real + &#x27; &#x27;;
+    } else if (this.type === &#x27;fraction&#x27;) {
+      numberWithUnitsString += this.fraction.toString() + &#x27; &#x27;;
+    }
+    numberWithUnitsString += unitsString.trim();
+    numberWithUnitsString = numberWithUnitsString.trim();
+
+    return numberWithUnitsString;
+  }
+
+  toDict(): NumberWithUnitsAnswer {
+    return {
+      type: this.type,
+      real: this.real,
+      fraction: this.fraction.toDict(),
+      units: this.units
+    };
+  }
+}
+
+@Injectable({
+  providedIn: &#x27;root&#x27;
+})
+export class NumberWithUnitsObjectFactory {
+  constructor(
+    private unitsFactory: UnitsObjectFactory,
+    private fractionFactory: FractionObjectFactory) {}
+  createCurrencyUnits(): void {
+    try {
+      this.unitsFactory.createCurrencyUnits();
+    } catch (parsingError) {}
+  }
+
+  fromRawInputString(rawInput: string): NumberWithUnits {
+    rawInput = rawInput.trim();
+    var type = &#x27;&#x27;;
+    var real = 0.0;
+    // Default fraction value.
+    var fractionObj = this.fractionFactory.fromRawInputString(&#x27;0/1&#x27;);
+    var units = &#x27;&#x27;;
+    var value = &#x27;&#x27;;
+
+    // Allow validation only when rawInput is not null or an empty string.
+    if (rawInput !== &#x27;&#x27; &amp;&amp; rawInput !== null) {
+      // Start with digit when there is no currency unit.
+      if (rawInput.match(/^\d/)) {
+        var ind = rawInput.indexOf(String(rawInput.match(/[a-z(₹$]/i)));
+        if (ind === -1) {
+          // There is value with no units.
+          value = rawInput;
+          units = &#x27;&#x27;;
+        } else {
+          value = rawInput.substr(0, ind).trim();
+          units = rawInput.substr(ind).trim();
+        }
+
+        var keys = Object.keys(ObjectsDomainConstants.CURRENCY_UNITS);
+        for (var i = 0; i &lt; keys.length; i++) {
+          for (var j = 0;
+            j &lt; (
+              ObjectsDomainConstants.CURRENCY_UNITS[
+                keys[i]].front_units.length); j++) {
+            if (units.indexOf(
+              ObjectsDomainConstants.CURRENCY_UNITS[
+                keys[i]].front_units[j]) !== -1) {
+              throw new Error(
+                // eslint-disable-next-line max-len
+                ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_CURRENCY_FORMAT);
+            }
+          }
+        }
+      } else {
+        var startsWithCorrectCurrencyUnit = false;
+        var keys = Object.keys(ObjectsDomainConstants.CURRENCY_UNITS);
+        for (var i = 0; i &lt; keys.length; i++) {
+          for (var j = 0;
+            j &lt; ObjectsDomainConstants.CURRENCY_UNITS[
+              keys[i]].front_units.length; j++) {
+            if (rawInput.startsWith(ObjectsDomainConstants.CURRENCY_UNITS[
+              keys[i]].front_units[j])) {
+              startsWithCorrectCurrencyUnit = true;
+              break;
+            }
+          }
+        }
+        if (startsWithCorrectCurrencyUnit === false) {
+          throw new Error(
+            // eslint-disable-next-line max-len
+            ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_CURRENCY);
+        }
+        var ind = rawInput.indexOf(String(rawInput.match(/[0-9]/)));
+        if (ind === -1) {
+          throw new Error(
+            // eslint-disable-next-line max-len
+            ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_CURRENCY);
+        }
+        units = rawInput.substr(0, ind).trim();
+
+        startsWithCorrectCurrencyUnit = false;
+        for (var i = 0; i &lt; keys.length; i++) {
+          for (var j = 0;
+            j &lt; ObjectsDomainConstants.CURRENCY_UNITS[
+              keys[i]].front_units.length; j++) {
+            if (units === ObjectsDomainConstants.CURRENCY_UNITS[
+              keys[i]].front_units[j].trim()) {
+              startsWithCorrectCurrencyUnit = true;
+              break;
+            }
+          }
+        }
+        if (startsWithCorrectCurrencyUnit === false) {
+          throw new Error(
+            // eslint-disable-next-line max-len
+            ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_CURRENCY);
+        }
+        units = units + &#x27; &#x27;;
+
+        var ind2 = rawInput.indexOf(String(
+          rawInput.substr(ind).match(/[a-z(]/i)));
+        if (ind2 !== -1) {
+          value = rawInput.substr(ind, ind2 - ind).trim();
+          units += rawInput.substr(ind2).trim();
+        } else {
+          value = rawInput.substr(ind).trim();
+          units = units.trim();
+        }
+      }
+      // Checking invalid characters in value.
+      if (value.match(/[a-z]/i) || value.match(/[*^$₹()#@]/)) {
+        throw new Error(
+          // eslint-disable-next-line max-len
+          ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_VALUE);
+      }
+
+      if (value.includes(&#x27;/&#x27;)) {
+        type = &#x27;fraction&#x27;;
+        fractionObj = this.fractionFactory.fromRawInputString(value);
+      } else {
+        type = &#x27;real&#x27;;
+        real = parseFloat(value);
+      }
+      if (units !== &#x27;&#x27;) {
+        // Checking invalid characters in units.
+        if (units.match(/[^0-9a-z/* ^()₹$-]/i)) {
+          throw new Error(
+            // eslint-disable-next-line max-len
+            ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_UNIT_CHARS);
+        }
+      }
+    }
+
+    var unitsObj = this.unitsFactory.fromRawInputString(units);
+    return new NumberWithUnits(type, real, fractionObj, unitsObj);
+  }
+
+  fromDict(numberWithUnitsDict: NumberWithUnitsAnswer): NumberWithUnits {
+    return new NumberWithUnits(
+      numberWithUnitsDict.type,
+      numberWithUnitsDict.real,
+      this.fractionFactory.fromDict(numberWithUnitsDict.fraction),
+      this.unitsFactory.fromList(numberWithUnitsDict.units));
+  }
+}
+
+angular.module(&#x27;oppia&#x27;).factory(
+  &#x27;NumberWithUnitsObjectFactory&#x27;, downgradeInjectable(
+    NumberWithUnitsObjectFactory));
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/domain/objects/NumberWithUnitsObjectFactory.ts&quot;,&quot;line&quot;:126,&quot;character&quot;:13,&quot;text&quot;:&quot;parsingError&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:54 GMT</p>
+    </body>
+  </html>
+  

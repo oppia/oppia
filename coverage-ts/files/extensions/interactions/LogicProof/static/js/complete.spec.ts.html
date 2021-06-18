@@ -1,0 +1,162 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>complete.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">extensions/interactions/LogicProof/static/js/complete.spec.ts</td><td class="">75.00%</td><td class="">100%</td><td class="">96</td><td class="">72</td><td class="">24</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2014 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Complete tests for LogicProof interaction JS.
+ */
+
+import logicProofStudent from &#x27;interactions/LogicProof/static/js/student&#x27;;
+import logicProofTeacher from &#x27;interactions/LogicProof/static/js/teacher&#x27;;
+import LOGIC_PROOF_DEFAULT_QUESTION_DATA from
+  &#x27;interactions/LogicProof/static/js/generatedDefaultData&#x27;;
+
+describe(&#x27;Full system&#x27;, function() {
+  var sharedErrorWrapper = function(message, line, code, category) {
+    return {
+      message: message,
+      line: line,
+      code: code,
+      category: category
+    };
+  };
+  var completeCheck = function(assumptionsString, targetString, proofString) {
+    var questionInstance = logicProofStudent.buildInstance(
+      LOGIC_PROOF_DEFAULT_QUESTION_DATA);
+    var question = logicProofTeacher.buildQuestion(
+      assumptionsString, targetString, questionInstance.vocabulary);
+    questionInstance.assumptions = question.assumptions;
+    questionInstance.results = question.results;
+    questionInstance.language.operators = question.operators;
+
+    var proof = logicProofStudent.buildProof(proofString, questionInstance);
+    logicProofStudent.checkProof(proof, questionInstance);
+  };
+
+  it(&#x27;should accept fully correct proofs&#x27;, function() {
+    expect(completeCheck(&#x27;p&#x27;, &#x27;p&#x27;, &#x27;we know p&#x27;)).toBeUndefined();
+
+    // TODO(kevinlee12 @vojtechjelinek): Add back additional tests from
+    // commit 2d9335019521 when speed issues are fixed.
+
+    expect(
+      completeCheck(&#x27;∀x.(A(x)∧B(x))&#x27;, &#x27;(∀x.A(x))∧(∀x.B(x))&#x27;, [
+        &#x27;given c&#x27;,
+        &#x27;  from ∀x.(A(x)∧B(x)) at c we have A(c)∧B(c)&#x27;,
+        &#x27;  from A(c)∧B(c) we have A(c)&#x27;,
+        &#x27;c was arbitrary so ∀x.A(x)&#x27;,
+        &#x27;given d&#x27;,
+        &#x27;  from ∀x.(A(x)∧B(x)) at d we have A(d)∧B(d)&#x27;,
+        &#x27;  from A(d)∧B(d) we have B(d)&#x27;,
+        &#x27;d was arbitrary so ∀x.B(x)&#x27;,
+        &#x27;from ∀x.A(x) and ∀x.B(x) have (∀x.A(x))∧(∀x.B(x))&#x27;].join(&#x27;\n&#x27;))
+    ).toBeUndefined();
+  });
+
+  it(&#x27;should reject proofs with any error&#x27;, function() {
+    expect(function() {
+      completeCheck(&#x27;p&#x27;, &#x27;p&#x27;, &#x27;we knew p&#x27;);
+    }).toThrow(
+      sharedErrorWrapper(
+        &#x27;The phrase starting \&#x27;we\&#x27; could not be identified; please &#x27; +
+          &#x27;make sure you are only using phrases from the given list of &#x27; +
+          &#x27;vocabulary.&#x27;, 0, &#x27;unidentified_phrase_starting_at&#x27;, &#x27;formattting&#x27;)
+    );
+
+    expect(function() {
+      completeCheck(&#x27;p&#x27;, &#x27;p&#x27;, &#x27;we know q&#x27;);
+    }).toThrow(
+      sharedErrorWrapper(
+        &#x27;This line uses q, so you need to have an earlier line proving &#x27; +
+        &#x27;that q is true.&#x27;, 0, &#x27;missing_antecedent&#x27;, &#x27;logic&#x27;));
+
+    expect(function() {
+      completeCheck(&#x27;∀x.(A(x)∧B(x)), p&#x27;, &#x27;(∀x.A(x))&#x27;, [
+        &#x27;given c&#x27;,
+        &#x27;  from ∀x.(A(x)∧B(x)) at c we have A(c)∧B(c)&#x27;,
+        &#x27;  from A(c)∧B(c) we have A(c)&#x27;,
+        &#x27;c was arbitrary so ∀x.A(x)&#x27;,
+        &#x27;from ∀x.A(x) and p have (∀x.A(x))∧p&#x27;].join(&#x27;\n&#x27;));
+    }).toThrow(
+      sharedErrorWrapper(
+        &#x27;We are trying to prove ∀x.A(x) so it should be given by the &#x27; +
+        &#x27;final line of the proof.&#x27;, 4, &#x27;last_line_not_target&#x27;, &#x27;target&#x27;));
+
+    expect(function() {
+      completeCheck(&#x27;∀x.(A(x)∧B(x))&#x27;, &#x27;(∀x.A(x))&#x27;, [
+        &#x27;given c&#x27;,
+        &#x27;  from ∀x.(A(x)∧B(x)) at c we have A(c)∧B(c)&#x27;,
+        &#x27;  from A(c)∧B(c) we have A(c)&#x27;,
+        &#x27;d was arbitrary so ∀x.A(x)&#x27;].join(&#x27;\n&#x27;));
+    }).toThrow(
+      sharedErrorWrapper(
+        &#x27;You haven\&#x27;t said where d comes from; if you want it to be &#x27; +
+        &#x27;arbitrary then add a preceding line saying \&#x27;Given d\&#x27;; &#x27; +
+        &#x27;alternatively you might want to take a particular d witnessing &#x27; +
+        &#x27;some existential formula.&#x27;, 3, &#x27;unspecified_variable&#x27;, &#x27;variables&#x27;));
+  });
+
+  it(&#x27;should check proofs in less than 10 seconds&#x27;, function() {
+    var startTime = new Date().getTime();
+
+    expect(
+      completeCheck(&#x27;&#x27;, &#x27;~(A∨B)&lt;=&gt;~A∧~B&#x27;, [
+        &#x27;If ~(A∨B)&#x27;,
+        &#x27;  If A&#x27;,
+        &#x27;    from A we have A∨B&#x27;,
+        &#x27;    from A∨B and ~(A∨B) we have contradiction&#x27;,
+        &#x27;  Hence ~A&#x27;,
+        &#x27;  If B&#x27;,
+        &#x27;    from B we have A∨B&#x27;,
+        &#x27;    from A∨B and ~(A∨B) we have contradiction&#x27;,
+        &#x27;  Hence ~B&#x27;,
+        &#x27;  From ~A and ~B we have ~A∧~B&#x27;,
+        &#x27;Hence ~(A∨B)=&gt;~A∧~B&#x27;,
+        &#x27;If ~A∧~B&#x27;,
+        &#x27;  If A∨B&#x27;,
+        &#x27;    If A&#x27;,
+        &#x27;      from ~A∧~B we have ~A&#x27;,
+        &#x27;      from A and ~A we have contradiction&#x27;,
+        &#x27;    If B&#x27;,
+        &#x27;      from ~A∧~B we have ~B&#x27;,
+        &#x27;      from B and ~B we have contradiction&#x27;,
+        &#x27;    we know A∨B and whichever is true we have ~(A∨B)&#x27;,
+        &#x27;    From A∨B and ~(A∨B) we have contradiction&#x27;,
+        &#x27;  Hence ~(A∨B)&#x27;,
+        &#x27;Hence (~A∧~B)=&gt;~(A∨B)&#x27;,
+        &#x27;From ~(A∨B)=&gt;~A∧~B and (~A∧~B)=&gt;~(A∨B) we have ~(A∨B)&lt;=&gt;~A∧~B&#x27;
+      ].join(&#x27;\n&#x27;))
+    ).toBeUndefined();
+
+    var endTime = new Date().getTime();
+    expect(endTime &lt; startTime + 20000).toBe(true);
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/complete.spec.ts&quot;,&quot;line&quot;:24,&quot;character&quot;:36,&quot;text&quot;:&quot;message&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/complete.spec.ts&quot;,&quot;line&quot;:24,&quot;character&quot;:45,&quot;text&quot;:&quot;line&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/complete.spec.ts&quot;,&quot;line&quot;:24,&quot;character&quot;:51,&quot;text&quot;:&quot;code&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/complete.spec.ts&quot;,&quot;line&quot;:24,&quot;character&quot;:57,&quot;text&quot;:&quot;category&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/complete.spec.ts&quot;,&quot;line&quot;:26,&quot;character&quot;:6,&quot;text&quot;:&quot;message&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/complete.spec.ts&quot;,&quot;line&quot;:26,&quot;character&quot;:15,&quot;text&quot;:&quot;message&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/complete.spec.ts&quot;,&quot;line&quot;:27,&quot;character&quot;:6,&quot;text&quot;:&quot;line&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/complete.spec.ts&quot;,&quot;line&quot;:27,&quot;character&quot;:12,&quot;text&quot;:&quot;line&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/complete.spec.ts&quot;,&quot;line&quot;:28,&quot;character&quot;:6,&quot;text&quot;:&quot;code&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/complete.spec.ts&quot;,&quot;line&quot;:28,&quot;character&quot;:12,&quot;text&quot;:&quot;code&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/complete.spec.ts&quot;,&quot;line&quot;:29,&quot;character&quot;:6,&quot;text&quot;:&quot;category&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/complete.spec.ts&quot;,&quot;line&quot;:29,&quot;character&quot;:16,&quot;text&quot;:&quot;category&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/complete.spec.ts&quot;,&quot;line&quot;:32,&quot;character&quot;:31,&quot;text&quot;:&quot;assumptionsString&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/complete.spec.ts&quot;,&quot;line&quot;:32,&quot;character&quot;:50,&quot;text&quot;:&quot;targetString&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/complete.spec.ts&quot;,&quot;line&quot;:32,&quot;character&quot;:64,&quot;text&quot;:&quot;proofString&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/complete.spec.ts&quot;,&quot;line&quot;:36,&quot;character&quot;:6,&quot;text&quot;:&quot;assumptionsString&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/complete.spec.ts&quot;,&quot;line&quot;:36,&quot;character&quot;:25,&quot;text&quot;:&quot;targetString&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/complete.spec.ts&quot;,&quot;line&quot;:36,&quot;character&quot;:56,&quot;text&quot;:&quot;vocabulary&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/complete.spec.ts&quot;,&quot;line&quot;:37,&quot;character&quot;:21,&quot;text&quot;:&quot;assumptions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/complete.spec.ts&quot;,&quot;line&quot;:37,&quot;character&quot;:44,&quot;text&quot;:&quot;assumptions&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/complete.spec.ts&quot;,&quot;line&quot;:38,&quot;character&quot;:21,&quot;text&quot;:&quot;results&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/complete.spec.ts&quot;,&quot;line&quot;:39,&quot;character&quot;:30,&quot;text&quot;:&quot;operators&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/complete.spec.ts&quot;,&quot;line&quot;:39,&quot;character&quot;:51,&quot;text&quot;:&quot;operators&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/complete.spec.ts&quot;,&quot;line&quot;:41,&quot;character&quot;:45,&quot;text&quot;:&quot;proofString&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:44:00 GMT</p>
+    </body>
+  </html>
+  

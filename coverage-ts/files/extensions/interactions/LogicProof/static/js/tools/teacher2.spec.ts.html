@@ -1,0 +1,549 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>teacher2.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">extensions/interactions/LogicProof/static/js/tools/teacher2.spec.ts</td><td class="">90.60%</td><td class="">100%</td><td class="">415</td><td class="">376</td><td class="">39</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2014 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for LogicProof interaction teacher2 components.
+ */
+
+import logicProofShared from &#x27;interactions/LogicProof/static/js/shared&#x27;;
+import logicProofTeacher from &#x27;interactions/LogicProof/static/js/teacher&#x27;;
+import logicProofData from &#x27;interactions/LogicProof/static/js/data&#x27;;
+import logicProofTeacher2 from
+  &#x27;interactions/LogicProof/static/js/tools/teacher2&#x27;;
+
+describe(&#x27;Build line templates&#x27;, function() {
+  var errorWrapper2 = function(
+      dubiousFunction, ...input) {
+    return function() {
+      try {
+        dubiousFunction(...input);
+      } catch (err) {
+        throw new Error(logicProofShared.renderError(
+          err, logicProofTeacher.TEACHER_ERROR_MESSAGES,
+          logicProofData.BASE_STUDENT_LANGUAGE));
+      }
+    };
+  };
+  var buildThenDisplay = function(
+      nameString, readerViewString, antecedentsString, resultsString,
+      variablesString, errorStrings) {
+    return logicProofTeacher2.displayLineTemplate(
+      logicProofTeacher2.buildLineTemplate(
+        nameString, readerViewString, antecedentsString, resultsString,
+        variablesString, errorStrings, logicProofData.BASE_STUDENT_LANGUAGE,
+        logicProofData.BASE_VOCABULARY
+      ), logicProofData.BASE_STUDENT_LANGUAGE.operators,
+      logicProofData.BASE_VOCABULARY
+    );
+  };
+
+  it(&#x27;should build then display examples correctly&#x27;, function() {
+    expect(
+      buildThenDisplay(
+        &#x27;and_introduce&#x27;, &#x27;from p and q we have p\u2227q&#x27;, &#x27;p, q&#x27;, &#x27;p\u2227q&#x27;,
+        &#x27;&#x27;, [])).toEqual({
+      name: &#x27;and_introduce&#x27;,
+      reader_view: &#x27;from p and q we have p\u2227q&#x27;,
+      antecedents: &#x27;p, q&#x27;,
+      results: &#x27;p\u2227q&#x27;,
+      variables: &#x27;&#x27;,
+      error: []
+    });
+
+    expect(
+      buildThenDisplay(
+        &#x27;and_introduce&#x27;, &#x27;from p we have p\u2227q&#x27;, &#x27;p&#x27;, &#x27;p\u2227q&#x27;, &#x27;&#x27;, [
+          &#x27;Should this be &quot;from {{p}} and {{q}} we have {{p\u2227q}}&quot;?&#x27;,
+          &#x27;To prove {{p\u2227q}} you need to have shown {{q}} as well&#x27;
+        ])).toEqual({
+      name: &#x27;and_introduce&#x27;,
+      reader_view: &#x27;from p we have p\u2227q&#x27;,
+      antecedents: &#x27;p&#x27;,
+      results: &#x27;p\u2227q&#x27;,
+      variables: &#x27;&#x27;,
+      error: [
+        &#x27;Should this be &quot;from {{p}} and {{q}} we have {{p\u2227q}}&quot;?&#x27;,
+        &#x27;To prove {{p\u2227q}} you need to have shown {{q}} as well&#x27;
+      ]
+    });
+
+    expect(
+      buildThenDisplay(
+        &#x27;for_all_introduce&#x27;, &#x27;{{a|element}} was arbitrary hence \u2200x.p&#x27;,
+        &#x27;p[x-&gt;a]&#x27;, &#x27;\u2200x.p&#x27;, &#x27;a&#x27;, []
+      )).toEqual({
+      name: &#x27;for_all_introduce&#x27;,
+      reader_view: &#x27;{{a|element}} was arbitrary hence \u2200x.p&#x27;,
+      antecedents: &#x27;p[x-&gt;a]&#x27;,
+      results: &#x27;\u2200x.p&#x27;,
+      variables: &#x27;a&#x27;,
+      error: []
+    });
+  });
+
+  it(&#x27;should reject templates with hidden operators&#x27;, function() {
+    expect(
+      errorWrapper2(
+        buildThenDisplay, &#x27;name&#x27;, &#x27;from q we have r&#x27;, &#x27;q&#x27;, &#x27;p&#x27;, &#x27;&#x27;, [])
+    ).toThrowError(
+      &#x27;It will not be possible to uniquely identify p from a line of this &#x27; +
+      &#x27;form.&#x27;);
+
+    // FUTURE: render this test passable.
+    expect(
+      errorWrapper2(
+        buildThenDisplay, &#x27;exists_introduce&#x27;,
+        &#x27;from p[x-&gt;a] we have \u2203x.p&#x27;, &#x27;p[x-&gt;a]&#x27;, &#x27;\u2203x.p&#x27;, &#x27;a&#x27;, [])
+    ).toThrowError(
+      &#x27;It will not be possible to uniquely identify a from a line of this &#x27; +
+      &#x27;form.&#x27;);
+  });
+
+  it(&#x27;should reject mis-typed expressions&#x27;, function() {
+    expect(
+      errorWrapper2(
+        buildThenDisplay, &#x27;name&#x27;, &#x27;take p satisfying q[x-&gt;p]&#x27;, &#x27;&#x27;, &#x27;&#x27;, &#x27;&#x27;, [])
+    ).toThrowError(
+      &#x27;p yields a boolean but you are trying to use it to give a element.&#x27;);
+  });
+  describe(&#x27;Build mistake entry&#x27;, function() {
+    var buildThenDisplay = function(nameString, occursString, messageStrings) {
+      return logicProofTeacher2.displayMistakeEntry(
+        logicProofTeacher2.buildMistakeEntry(
+          nameString, occursString, messageStrings,
+          logicProofData.BASE_CONTROL_LANGUAGE
+        ), logicProofData.BASE_CONTROL_LANGUAGE.operators
+      );
+    };
+
+    it(&#x27;should build entries correctly&#x27;, function() {
+      expect(
+        logicProofTeacher2.buildMistakeEntry(
+          &#x27;name&#x27;, &#x27;~target()\u2208results(n)&#x27;, [&#x27;{{num_lines()-1}}&#x27;],
+          logicProofData.BASE_CONTROL_LANGUAGE)).toEqual({
+        name: &#x27;name&#x27;,
+        occurs: {
+          top_operator_name: &#x27;not&#x27;,
+          top_kind_name: &#x27;unary_connective&#x27;,
+          arguments: [{
+            top_operator_name: &#x27;is_in&#x27;,
+            top_kind_name: &#x27;binary_relation&#x27;,
+            arguments: [{
+              top_operator_name: &#x27;target&#x27;,
+              top_kind_name: &#x27;prefix_function&#x27;,
+              arguments: [],
+              dummies: [],
+              type: &#x27;formula&#x27;
+            }, {
+              top_operator_name: &#x27;results&#x27;,
+              top_kind_name: &#x27;prefix_function&#x27;,
+              arguments: [{
+                top_operator_name: &#x27;n&#x27;,
+                top_kind_name: &#x27;variable&#x27;,
+                arguments: [],
+                dummies: [],
+                type: &#x27;integer&#x27;
+              }],
+              dummies: [],
+              type: &#x27;set_of_formulas&#x27;
+            }],
+            dummies: [],
+            type: &#x27;boolean&#x27;
+          }],
+          dummies: [],
+          type: &#x27;boolean&#x27;
+        },
+        message: [[{
+          format: &#x27;expression&#x27;,
+          content: {
+            top_operator_name: &#x27;subtraction&#x27;,
+            top_kind_name: &#x27;binary_function&#x27;,
+            arguments: [{
+              top_operator_name: &#x27;num_lines&#x27;,
+              top_kind_name: &#x27;prefix_function&#x27;,
+              arguments: [],
+              dummies: [],
+              type: &#x27;integer&#x27;
+            }, {
+              top_operator_name: 1,
+              top_kind_name: &#x27;constant&#x27;,
+              arguments: [],
+              dummies: [],
+              type: &#x27;integer&#x27;
+            }],
+            dummies: [],
+            type: &#x27;integer&#x27;
+          }
+        }]]
+      });
+    });
+
+    it(&#x27;should build then display entries correctly&#x27;, function() {
+      expect(
+        buildThenDisplay(
+          &#x27;name&#x27;, &#x27;n=1 \u2227 indentation(n)&gt;0&#x27;, [
+            &#x27;The first line of a proof should not be indented&#x27;,
+            &#x27;Don\&#x27;t indent the first line of your proof&#x27;
+          ])
+      ).toEqual({
+        name: &#x27;name&#x27;,
+        occurs: &#x27;(n=1)\u2227(indentation(n)&gt;0)&#x27;,
+        message: [
+          &#x27;The first line of a proof should not be indented&#x27;,
+          &#x27;Don\&#x27;t indent the first line of your proof&#x27;
+        ]
+      });
+    });
+
+    it(&#x27;should reject mis-typed combinations of expressions&#x27;, function() {
+      expect(
+        errorWrapper2(
+          buildThenDisplay, &#x27;name&#x27;, &#x27;template(n) = \&#x27;given\&#x27;&#x27;,
+          [&#x27;examine {{antecedents(n-1)+1}}&#x27;])
+      ).toThrowError(
+        &#x27;antecedents yields a set_of_formulas but you are trying to use &#x27; +
+        &#x27;it to give a integer.&#x27;
+      );
+    });
+  });
+  describe(&#x27;Build control function&#x27;, function() {
+    var buildThenDisplay = function(LHSstring, RHSstring, descriptionString) {
+      return logicProofTeacher2.displayControlFunction(
+        logicProofTeacher2.buildControlFunction(
+          LHSstring, RHSstring, descriptionString,
+          logicProofData.BASE_CONTROL_LANGUAGE),
+        logicProofData.BASE_CONTROL_LANGUAGE.operators);
+    };
+
+    it(&#x27;should build examples correctly&#x27;, function() {
+      expect(
+        logicProofTeacher2.buildControlFunction(
+          &#x27;f(x)&#x27;, &#x27;x+2&#x27;, &#x27;a description&#x27;, logicProofData.BASE_CONTROL_LANGUAGE)
+      ).toEqual({
+        name: &#x27;f&#x27;,
+        variables: [{
+          top_kind_name: &#x27;variable&#x27;,
+          top_operator_name: &#x27;x&#x27;,
+          arguments: [],
+          dummies: []
+        }],
+        typing: [{
+          arguments: [{
+            type: &#x27;integer&#x27;,
+            arbitrarily_many: false
+          }],
+          dummies: [],
+          output: &#x27;integer&#x27;
+        }],
+        definition: {
+          top_operator_name: &#x27;addition&#x27;,
+          top_kind_name: &#x27;binary_function&#x27;,
+          arguments: [{
+            top_operator_name: &#x27;x&#x27;,
+            top_kind_name: &#x27;variable&#x27;,
+            arguments: [],
+            dummies: [],
+            type: &#x27;integer&#x27;
+          }, {
+            top_operator_name: 2,
+            top_kind_name: &#x27;constant&#x27;,
+            arguments: [],
+            dummies: [],
+            type: &#x27;integer&#x27;
+          }],
+          dummies: [],
+          type: &#x27;integer&#x27;
+        },
+        description: &#x27;a description&#x27;
+      });
+    });
+
+    it(&#x27;should build then display examples correctly&#x27;, function() {
+      expect(buildThenDisplay(&#x27;f(n)&#x27;, &#x27;n+2&#x27;, &#x27;a&#x27;)).toEqual({
+        LHS: &#x27;f(n)&#x27;,
+        RHS: &#x27;n+2&#x27;,
+        description: &#x27;a&#x27;
+      });
+
+      expect(
+        buildThenDisplay(
+          &#x27;is_scope_creator(n)&#x27;,
+          &#x27;template(n)=\&#x27;given\&#x27; \u2228 template(n)=\&#x27;assumption\&#x27;&#x27;, &#x27;&#x27;)
+      ).toEqual({
+        LHS: &#x27;is_scope_creator(n)&#x27;,
+        RHS: &#x27;(template(n)=\&#x27;given\&#x27;)\u2228(template(n)=\&#x27;assumption\&#x27;)&#x27;,
+        description: &#x27;&#x27;
+      });
+    });
+
+    it(&#x27;should reject undefined functions&#x27;, function() {
+      expect(
+        errorWrapper2(
+          buildThenDisplay, &#x27;bad_function(x,y)&#x27;, &#x27;missing_function(x-y, x+y)&#x27;,
+          &#x27;&#x27;)
+      ).toThrowError(&#x27;The operator missing_function could not be identified.&#x27;);
+    });
+
+    it(&#x27;should forbid type mismatches&#x27;, function() {
+      expect(
+        errorWrapper2(
+          buildThenDisplay, &#x27;f(n)&#x27;, &#x27;template(n) + 3&#x27;, &#x27;&#x27;)
+      ).toThrowError(
+        &#x27;template yields a string but you are trying to use it to give a &#x27; +
+        &#x27;integer.&#x27;);
+    });
+
+    it(&#x27;should forbid ambiguous typings&#x27;, function() {
+      expect(
+        errorWrapper2(
+          buildThenDisplay, &#x27;f(n)&#x27;, &#x27;n&#x27;, &#x27;&#x27;)
+      ).toThrowError(
+        &#x27;Unfortunately this cannot be accepted as it has multiple possible &#x27; +
+        &#x27;typings.&#x27;);
+    });
+
+    it(&#x27;should not allow n as a function name&#x27;, function() {
+      expect(
+        errorWrapper2(
+          buildThenDisplay, &#x27;n(x,y)&#x27;, &#x27;x-y&#x27;, &#x27;&#x27;)
+      ).toThrowError(
+        &#x27;You cannot use n as a function name; it is reserved to refer to &#x27; +
+        &#x27;line numbers&#x27;);
+    });
+  });
+  describe(&#x27;Parse messages describing student mistakes&#x27;, function() {
+    it(&#x27;should parse then display control-language messages correctly&#x27;,
+      function() {
+        expect(logicProofTeacher2.displayControlMessage(
+          logicProofTeacher2.parseMessage(
+            &#x27;stuff {{p\u2227q}} thingies&#x27;, &#x27;control&#x27;),
+          logicProofData.BASE_CONTROL_LANGUAGE.operators)
+        ).toEqual(&#x27;stuff {{p\u2227q}} thingies&#x27;);
+      });
+
+    it(&#x27;should parse general messages correctly&#x27;, function() {
+      expect(
+        logicProofTeacher2.parseMessage(
+          &#x27;Your use of {{item}} is wrong.&#x27;, &#x27;general&#x27;)
+      ).toEqual([{
+        isFixed: true,
+        content: &#x27;Your use of &#x27;
+      }, {
+        isFixed: false,
+        content: &#x27;item&#x27;
+      }, {
+        isFixed: true,
+        content: &#x27; is wrong.&#x27;
+      }]);
+    });
+
+    it(&#x27;should forbid unparseable expression templates&#x27;, function() {
+      expect(
+        errorWrapper2(
+          logicProofTeacher2.parseMessage,
+          &#x27;By lack of arbitraryness this fails for {{p[[x-&gt;a]}}.&#x27;, &#x27;line&#x27;)
+      ).toThrowError(&#x27;It was not possible to parse {{p[[x-&gt;a]}}.&#x27;);
+    });
+
+    it(&#x27;should forbid unmatched {{&#x27;, function() {
+      expect(
+        errorWrapper2(
+          logicProofTeacher2.parseMessage,
+          &#x27;of {{result(scoper(n))}}.{{d)&#x27;, &#x27;control&#x27;)
+      ).toThrowError(&#x27;This has an unmatched {{.&#x27;);
+    });
+  });
+});
+
+describe(&#x27;Build line template table&#x27;, function() {
+  var buildThenDisplay = function(inputStrings) {
+    return logicProofTeacher2.displayLineTemplateTable(
+      logicProofTeacher2.buildLineTemplateTable(
+        inputStrings, logicProofData.BASE_VOCABULARY),
+      logicProofData.BASE_VOCABULARY);
+  };
+
+  it(&#x27;should build and display examples correctly&#x27;, function() {
+    expect(buildThenDisplay([{
+      name: &#x27;a&#x27;,
+      reader_view: &#x27;p hence q&#x27;,
+      antecedents: &#x27;p&#x27;,
+      results: &#x27;q&#x27;,
+      variables: &#x27;&#x27;,
+      error: []
+    }, {
+      name: &#x27;b&#x27;,
+      reader_view: &#x27;\u2203x.p\u2227q if contradiction we have from r&#x27;,
+      antecedents: &#x27;r, p, q&#x27;,
+      results: &#x27;&#x27;,
+      variables: &#x27;x&#x27;,
+      error: [&#x27;How unwise {{x|variable}}.&#x27;]
+    }])).toEqual([{
+      name: &#x27;a&#x27;,
+      reader_view: &#x27;p hence q&#x27;,
+      antecedents: &#x27;p&#x27;,
+      results: &#x27;q&#x27;,
+      variables: &#x27;&#x27;,
+      error: []
+    }, {
+      name: &#x27;b&#x27;,
+      reader_view: &#x27;\u2203x.(p\u2227q) if contradiction we have from r&#x27;,
+      antecedents: &#x27;r, p, q&#x27;,
+      results: &#x27;&#x27;,
+      variables: &#x27;x&#x27;,
+      error: [&#x27;How unwise {{x|variable}}.&#x27;]
+    }]);
+  });
+
+  it(&#x27;should reject tables with erroneous lines&#x27;, function() {
+    expect((function() {
+      try {
+        buildThenDisplay([{
+          name: &#x27;a&#x27;,
+          reader_view: &#x27;p hence q&#x27;,
+          antecedents: &#x27;p&#x27;,
+          results: &#x27;q&#x27;,
+          variables: &#x27;&#x27;,
+          error: []
+        }, {
+          name: &#x27;a&#x27;,
+          reader_view: &#x27;\u2203x.p\u2227 if contradiction we have from r&#x27;,
+          antecedents: &#x27;r, p, q&#x27;,
+          results: &#x27;&#x27;,
+          variables: &#x27;x&#x27;,
+          error: [&#x27;How unwise {{x|variable}}.&#x27;]
+        }]);
+      } catch (err) {
+        return err;
+      }
+    })()[1]).toEqual(
+      &#x27;The name \&#x27;if\&#x27; is reserved for vocabulary and so cannot be used here.&#x27;);
+  });
+});
+
+describe(&#x27;Build mistake section&#x27;, function() {
+  it(&#x27;should build then display sections correctly&#x27;, function() {
+    expect(
+      logicProofTeacher2.displayMistakeSection(
+        logicProofTeacher2.buildMistakeSection(
+          &#x27;layout&#x27;,
+          [{
+            name: &#x27;mistake_1&#x27;,
+            occurs: &#x27;entry(1,antecedents(n))\u2208assumptions()&#x27;,
+            message: [&#x27;wrong&#x27;]
+          }, {
+            name: &#x27;mistake_2&#x27;,
+            occurs: &#x27;num_lines()&gt;3&#x27;,
+            message: [&#x27;Try to assess {{indentation(22)}}&#x27;]
+          }], []
+        ), logicProofData.BASE_CONTROL_LANGUAGE.operators)
+    ).toEqual({
+      name: &#x27;layout&#x27;,
+      entries: [{
+        name: &#x27;mistake_1&#x27;,
+        occurs: &#x27;entry(1,antecedents(n))\u2208assumptions()&#x27;,
+        message: [&#x27;wrong&#x27;]
+      }, {
+        name: &#x27;mistake_2&#x27;,
+        occurs: &#x27;num_lines()&gt;3&#x27;,
+        message: [&#x27;Try to assess {{indentation(22)}}&#x27;]
+      }]
+    });
+  });
+
+  it(&#x27;should reject invalid entries&#x27;, function() {
+    expect((function() {
+      try {
+        logicProofTeacher2.buildMistakeSection(&#x27;variables&#x27;, [{
+          name: &#x27;a mistake&#x27;,
+          occurs: &#x27;operator(n)=\&#x27;and\&#x27;&#x27;,
+          message: [&#x27;Dear dear&#x27;]
+        }], []);
+      } catch (err) {
+        return err;
+      }
+    })()[0]).toEqual(&#x27;The operator operator could not be identified.&#x27;);
+  });
+});
+
+describe(&#x27;Build control function table&#x27;, function() {
+  it(&#x27;should build then display examples correctly&#x27;, function() {
+    expect(
+      logicProofTeacher2.displayControlFunctionTable(
+        logicProofTeacher2.buildControlFunctionTable(
+          [
+            {
+              LHS: &#x27;is_scope_creator(n)&#x27;,
+              RHS: &#x27;template(n)=\&#x27;given\&#x27; \u2228 template(n)=\&#x27;assumption\&#x27;&#x27;,
+              description: &#x27;a&#x27;
+            }, {
+              LHS: &#x27;is_in_scope(m,n)&#x27;,
+              RHS: &#x27;(~is_scope_creator(m)\u2227indentation(n)&gt;=indentation(m)&#x27; +
+                &#x27;\u2227~\u2203k&lt;=n.(k&gt;=m\u2227indentation(k)&lt;indentation(m)))&#x27; +
+                &#x27;\u2228(indentation(n)&gt;indentation(m)\u2227~\u2203&#x27; +
+                &#x27;k&lt;=n.(k&gt;=m\u2227indentation(k)&lt;=indentation(m)))&#x27;,
+              description: &#x27;b&#x27;
+            }
+          ]
+        ))
+    ).toEqual([{
+      LHS: &#x27;is_scope_creator(n)&#x27;,
+      RHS: &#x27;(template(n)=\&#x27;given\&#x27;)\u2228(template(n)=\&#x27;assumption\&#x27;)&#x27;,
+      description: &#x27;a&#x27;
+    }, {
+      LHS: &#x27;is_in_scope(m,n)&#x27;,
+      RHS: &#x27;((~is_scope_creator(m))\u2227((indentation(n)&gt;=indentation(m))&#x27; +
+        &#x27;\u2227(~\u2203k&lt;=n.(k&gt;=m)\u2227(indentation(k)&lt;indentation(m)))))&#x27; +
+        &#x27;\u2228((indentation(n)&gt;indentation(m))\u2227(~\u2203k&lt;=n.(k&gt;=m)&#x27; +
+        &#x27;\u2227(indentation(k)&lt;=indentation(m))))&#x27;,
+      description: &#x27;b&#x27;
+    }]);
+  });
+
+  it(&#x27;should reject tables with invalid lines&#x27;, function() {
+    expect((function() {
+      try {
+        logicProofTeacher2.buildControlFunctionTable([{
+          LHS: &#x27;f(n)&#x27;,
+          RHS: &#x27;indentation(n) - 2&#x27;,
+          description: &#x27;&#x27;
+        }, {
+          LHS: &#x27;f(n)&#x27;,
+          RHS: &#x27;indentation(n) - 2&#x27;,
+          description: &#x27;&#x27;
+        }]);
+      } catch (err) {
+        return err.message;
+      }
+    })()).toEqual(&#x27;The function f has already been defined.&#x27;);
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/tools/teacher2.spec.ts&quot;,&quot;line&quot;:26,&quot;character&quot;:6,&quot;text&quot;:&quot;dubiousFunction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/tools/teacher2.spec.ts&quot;,&quot;line&quot;:26,&quot;character&quot;:26,&quot;text&quot;:&quot;input&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/tools/teacher2.spec.ts&quot;,&quot;line&quot;:29,&quot;character&quot;:8,&quot;text&quot;:&quot;dubiousFunction&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/tools/teacher2.spec.ts&quot;,&quot;line&quot;:29,&quot;character&quot;:27,&quot;text&quot;:&quot;input&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/tools/teacher2.spec.ts&quot;,&quot;line&quot;:32,&quot;character&quot;:10,&quot;text&quot;:&quot;err&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/tools/teacher2.spec.ts&quot;,&quot;line&quot;:30,&quot;character&quot;:15,&quot;text&quot;:&quot;err&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/tools/teacher2.spec.ts&quot;,&quot;line&quot;:38,&quot;character&quot;:6,&quot;text&quot;:&quot;nameString&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/tools/teacher2.spec.ts&quot;,&quot;line&quot;:38,&quot;character&quot;:18,&quot;text&quot;:&quot;readerViewString&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/tools/teacher2.spec.ts&quot;,&quot;line&quot;:38,&quot;character&quot;:36,&quot;text&quot;:&quot;antecedentsString&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/tools/teacher2.spec.ts&quot;,&quot;line&quot;:38,&quot;character&quot;:55,&quot;text&quot;:&quot;resultsString&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/tools/teacher2.spec.ts&quot;,&quot;line&quot;:39,&quot;character&quot;:6,&quot;text&quot;:&quot;variablesString&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/tools/teacher2.spec.ts&quot;,&quot;line&quot;:39,&quot;character&quot;:23,&quot;text&quot;:&quot;errorStrings&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/tools/teacher2.spec.ts&quot;,&quot;line&quot;:42,&quot;character&quot;:8,&quot;text&quot;:&quot;nameString&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/tools/teacher2.spec.ts&quot;,&quot;line&quot;:42,&quot;character&quot;:20,&quot;text&quot;:&quot;readerViewString&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/tools/teacher2.spec.ts&quot;,&quot;line&quot;:42,&quot;character&quot;:38,&quot;text&quot;:&quot;antecedentsString&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/tools/teacher2.spec.ts&quot;,&quot;line&quot;:42,&quot;character&quot;:57,&quot;text&quot;:&quot;resultsString&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/tools/teacher2.spec.ts&quot;,&quot;line&quot;:43,&quot;character&quot;:8,&quot;text&quot;:&quot;variablesString&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/tools/teacher2.spec.ts&quot;,&quot;line&quot;:43,&quot;character&quot;:25,&quot;text&quot;:&quot;errorStrings&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/tools/teacher2.spec.ts&quot;,&quot;line&quot;:120,&quot;character&quot;:36,&quot;text&quot;:&quot;nameString&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/tools/teacher2.spec.ts&quot;,&quot;line&quot;:120,&quot;character&quot;:48,&quot;text&quot;:&quot;occursString&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/tools/teacher2.spec.ts&quot;,&quot;line&quot;:120,&quot;character&quot;:62,&quot;text&quot;:&quot;messageStrings&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/tools/teacher2.spec.ts&quot;,&quot;line&quot;:123,&quot;character&quot;:10,&quot;text&quot;:&quot;nameString&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/tools/teacher2.spec.ts&quot;,&quot;line&quot;:123,&quot;character&quot;:22,&quot;text&quot;:&quot;occursString&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/tools/teacher2.spec.ts&quot;,&quot;line&quot;:123,&quot;character&quot;:36,&quot;text&quot;:&quot;messageStrings&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/tools/teacher2.spec.ts&quot;,&quot;line&quot;:220,&quot;character&quot;:36,&quot;text&quot;:&quot;LHSstring&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/tools/teacher2.spec.ts&quot;,&quot;line&quot;:220,&quot;character&quot;:47,&quot;text&quot;:&quot;RHSstring&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/tools/teacher2.spec.ts&quot;,&quot;line&quot;:220,&quot;character&quot;:58,&quot;text&quot;:&quot;descriptionString&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/tools/teacher2.spec.ts&quot;,&quot;line&quot;:223,&quot;character&quot;:10,&quot;text&quot;:&quot;LHSstring&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/tools/teacher2.spec.ts&quot;,&quot;line&quot;:223,&quot;character&quot;:21,&quot;text&quot;:&quot;RHSstring&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/tools/teacher2.spec.ts&quot;,&quot;line&quot;:223,&quot;character&quot;:32,&quot;text&quot;:&quot;descriptionString&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/tools/teacher2.spec.ts&quot;,&quot;line&quot;:369,&quot;character&quot;:34,&quot;text&quot;:&quot;inputStrings&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/tools/teacher2.spec.ts&quot;,&quot;line&quot;:372,&quot;character&quot;:8,&quot;text&quot;:&quot;inputStrings&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/tools/teacher2.spec.ts&quot;,&quot;line&quot;:427,&quot;character&quot;:15,&quot;text&quot;:&quot;err&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/tools/teacher2.spec.ts&quot;,&quot;line&quot;:426,&quot;character&quot;:15,&quot;text&quot;:&quot;err&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/tools/teacher2.spec.ts&quot;,&quot;line&quot;:473,&quot;character&quot;:15,&quot;text&quot;:&quot;err&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/tools/teacher2.spec.ts&quot;,&quot;line&quot;:472,&quot;character&quot;:15,&quot;text&quot;:&quot;err&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/tools/teacher2.spec.ts&quot;,&quot;line&quot;:526,&quot;character&quot;:15,&quot;text&quot;:&quot;err&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/tools/teacher2.spec.ts&quot;,&quot;line&quot;:526,&quot;character&quot;:19,&quot;text&quot;:&quot;message&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/LogicProof/static/js/tools/teacher2.spec.ts&quot;,&quot;line&quot;:525,&quot;character&quot;:15,&quot;text&quot;:&quot;err&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:44:00 GMT</p>
+    </body>
+  </html>
+  

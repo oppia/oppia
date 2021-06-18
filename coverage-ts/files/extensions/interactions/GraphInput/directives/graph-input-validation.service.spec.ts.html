@@ -1,0 +1,222 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>graph-input-validation.service.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">extensions/interactions/GraphInput/directives/graph-input-validation.service.spec.ts</td><td class="">97.93%</td><td class="">100%</td><td class="">241</td><td class="">236</td><td class="">5</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2014 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for graph input validation service.
+ */
+
+import cloneDeep from &#x27;lodash/cloneDeep&#x27;;
+
+import { TestBed } from &#x27;@angular/core/testing&#x27;;
+
+import { AnswerGroup, AnswerGroupObjectFactory } from
+  &#x27;domain/exploration/AnswerGroupObjectFactory&#x27;;
+import { GraphInputValidationService } from
+  &#x27;interactions/GraphInput/directives/graph-input-validation.service&#x27;;
+import { Outcome, OutcomeObjectFactory } from
+  &#x27;domain/exploration/OutcomeObjectFactory&#x27;;
+import { RuleObjectFactory } from &#x27;domain/exploration/RuleObjectFactory&#x27;;
+import { GraphAnswer } from &#x27;interactions/answer-defs&#x27;;
+
+import { AppConstants } from &#x27;app.constants&#x27;;
+import { GraphInputCustomizationArgs } from
+  &#x27;interactions/customization-args-defs&#x27;;
+
+describe(&#x27;GraphInputValidationService&#x27;, () =&gt; {
+  let WARNING_TYPES: typeof AppConstants.WARNING_TYPES;
+  let validatorService: GraphInputValidationService;
+  let currentState: string;
+  let customizationArguments: GraphInputCustomizationArgs;
+  let answerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
+  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
+  let rof: RuleObjectFactory;
+
+  beforeEach(() =&gt; {
+    TestBed.configureTestingModule({
+      providers: [GraphInputValidationService]
+    });
+
+    WARNING_TYPES = AppConstants.WARNING_TYPES;
+    validatorService = TestBed.get(GraphInputValidationService);
+    oof = TestBed.get(OutcomeObjectFactory);
+    agof = TestBed.get(AnswerGroupObjectFactory);
+    rof = TestBed.get(RuleObjectFactory);
+    currentState = &#x27;First State&#x27;;
+    goodDefaultOutcome = oof.createFromBackendDict({
+      dest: &#x27;Second State&#x27;,
+      feedback: {
+        html: &#x27;&#x27;,
+        content_id: &#x27;&#x27;
+      },
+      labelled_as_correct: false,
+      param_changes: [],
+      refresher_exploration_id: null,
+      missing_prerequisite_skill_id: null
+    });
+
+    customizationArguments = {
+      graph: {
+        value: {
+          vertices: new Array(10),
+          isWeighted: false,
+          isLabeled: false,
+          isDirected: false,
+          edges: []
+        }
+      },
+      canEditEdgeWeight: {
+        value: false
+      },
+      canEditVertexLabel: {
+        value: false
+      },
+      canMoveVertex: {
+        value: false
+      },
+      canDeleteVertex: {
+        value: false
+      },
+      canDeleteEdge: {
+        value: false
+      },
+      canAddVertex: {
+        value: false
+      },
+      canAddEdge: {
+        value: false
+      }
+    };
+
+    var answerGroup = agof.createNew(
+      [rof.createFromBackendDict({
+        inputs: {
+          g: {
+            vertices: new Array(10)
+          }
+        },
+        rule_type: &#x27;IsIsomorphicTo&#x27;
+      }, &#x27;GraphInput&#x27;), rof.createFromBackendDict({
+        inputs: {
+          g: {
+            vertices: new Array(10)
+          }
+        },
+        rule_type: &#x27;IsIsomorphicTo&#x27;
+      }, &#x27;GraphInput&#x27;)],
+      goodDefaultOutcome,
+      null,
+      null);
+    answerGroups = [answerGroup, cloneDeep(answerGroup)];
+  });
+
+  it(&#x27;should be able to perform basic validation&#x27;, () =&gt; {
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([]);
+  });
+
+  it(&#x27;should expect graph and edit customization arguments&#x27;, () =&gt; {
+    expect(() =&gt; {
+      validatorService.getAllWarnings(
+        // This throws &quot;Argument of type &#x27;{}&#x27;. We need to suppress this error
+        // because ..  oppia/comment-style is not assignable to parameter of
+        // type &#x27;GraphInputCustomizationArgs&#x27;.&quot; We are purposely assigning the
+        // wrong type of customization args in order to test validations.
+        // @ts-expect-error
+        currentState, {}, answerGroups, goodDefaultOutcome);
+    }).toThrowError(
+      &#x27;Expected customization arguments to have properties: &#x27; +
+      &#x27;graph, canEditEdgeWeight, canEditVertexLabel&#x27;);
+  });
+
+  it(&#x27;should validate the maximum number of vertices in the graph&#x27;, () =&gt; {
+    customizationArguments.graph.value.vertices = new Array(51);
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.CRITICAL,
+      message: &#x27;The graph used in customization exceeds supported maximum &#x27; +
+          &#x27;number of vertices of 50.&#x27;
+    }]);
+  });
+
+  it(&#x27;should validate the maximum number of vertices in the graph for an &#x27; +
+    &#x27;isomorphism check&#x27;, () =&gt; {
+    (&lt;GraphAnswer&gt; answerGroups[0].rules[0].inputs.g).vertices = new Array(11);
+    (&lt;GraphAnswer&gt; answerGroups[0].rules[1].inputs.g).vertices = new Array(11);
+    (&lt;GraphAnswer&gt; answerGroups[1].rules[0].inputs.g).vertices = new Array(11);
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.CRITICAL,
+      message: &#x27;The graph used in the rule 1 in group 1 exceeds supported &#x27; +
+          &#x27;maximum number of vertices of 10 for isomorphism check.&#x27;
+    }, {
+      type: WARNING_TYPES.CRITICAL,
+      message: &#x27;The graph used in the rule 2 in group 1 exceeds supported &#x27; +
+          &#x27;maximum number of vertices of 10 for isomorphism check.&#x27;
+    }, {
+      type: WARNING_TYPES.CRITICAL,
+      message: &#x27;The graph used in the rule 1 in group 2 exceeds supported &#x27; +
+          &#x27;maximum number of vertices of 10 for isomorphism check.&#x27;
+    }]);
+  });
+
+  it(&#x27;should verify edge weight edit permissions make sense&#x27;, () =&gt; {
+    customizationArguments.graph.value.isWeighted = false;
+    customizationArguments.canEditEdgeWeight.value = true;
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.CRITICAL,
+      message: (
+        &#x27;The learner cannot edit edge weights for an unweighted graph.&#x27;)
+    }]);
+  });
+
+  it(&#x27;should verify vertex label edit permissions make sense&#x27;, () =&gt; {
+    customizationArguments.graph.value.isLabeled = false;
+    customizationArguments.canEditVertexLabel.value = true;
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.CRITICAL,
+      message: (
+        &#x27;The learner cannot edit vertex labels for an unlabeled graph.&#x27;)
+    }]);
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;extensions/interactions/GraphInput/directives/graph-input-validation.service.spec.ts&quot;,&quot;line&quot;:104,&quot;character&quot;:12,&quot;text&quot;:&quot;vertices&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/GraphInput/directives/graph-input-validation.service.spec.ts&quot;,&quot;line&quot;:111,&quot;character&quot;:12,&quot;text&quot;:&quot;vertices&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/GraphInput/directives/graph-input-validation.service.spec.ts&quot;,&quot;line&quot;:157,&quot;character&quot;:5,&quot;text&quot;:&quot;&lt;GraphAnswer&gt; answerGroups[0].rules[0].inputs.g&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;extensions/interactions/GraphInput/directives/graph-input-validation.service.spec.ts&quot;,&quot;line&quot;:158,&quot;character&quot;:5,&quot;text&quot;:&quot;&lt;GraphAnswer&gt; answerGroups[0].rules[1].inputs.g&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;extensions/interactions/GraphInput/directives/graph-input-validation.service.spec.ts&quot;,&quot;line&quot;:159,&quot;character&quot;:5,&quot;text&quot;:&quot;&lt;GraphAnswer&gt; answerGroups[1].rules[0].inputs.g&quot;,&quot;kind&quot;:4}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:44:00 GMT</p>
+    </body>
+  </html>
+  

@@ -1,0 +1,246 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>guest-collection-progress.service.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/domain/collection/guest-collection-progress.service.spec.ts</td><td class="">72.69%</td><td class="">100%</td><td class="">249</td><td class="">181</td><td class="">68</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2018 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Tests for GuestCollectionProgressService.
+ */
+
+import { TestBed } from &#x27;@angular/core/testing&#x27;;
+
+import { CollectionNode } from
+  &#x27;domain/collection/collection-node.model&#x27;;
+import { Collection } from
+  &#x27;domain/collection/collection.model&#x27;;
+import { GuestCollectionProgressService } from
+  &#x27;domain/collection/guest-collection-progress.service&#x27;;
+
+describe(&#x27;Guest collection progress service&#x27;, () =&gt; {
+  let guestCollectionProgressService = null;
+  let _collectionId0: string = null;
+  let _collectionId1: string = null;
+  let _expId0: string = null;
+  let _expTitle0: string = null;
+  let _expId1: string = null;
+  let _expTitle1: string = null;
+  let _expId2: string = null;
+  let _expTitle2: string = null;
+  let _collection0: Collection = null;
+
+  beforeEach(() =&gt; {
+    TestBed.configureTestingModule({
+      providers: [GuestCollectionProgressService]
+    });
+
+    guestCollectionProgressService = TestBed.get(
+      GuestCollectionProgressService);
+
+    _collectionId0 = &#x27;sample_collection_id0&#x27;;
+    _collectionId1 = &#x27;sample_collection_id1&#x27;;
+    _expId0 = &#x27;exp_id0&#x27;;
+    _expTitle0 = &#x27;Exp 0&#x27;;
+    _expId1 = &#x27;exp_id1&#x27;;
+    _expTitle1 = &#x27;Exp 1&#x27;;
+    _expId2 = &#x27;exp_id2&#x27;;
+    _expTitle2 = &#x27;Exp 2&#x27;;
+    _collection0 = _createCollection(_collectionId0, &#x27;a title&#x27;);
+    _collection0.addCollectionNode(
+      CollectionNode.createFromExplorationId(_expId0));
+  });
+
+  afterEach(() =&gt; {
+    // Reset localStorage to ensure state is not shared between the tests.
+    window.localStorage.clear();
+  });
+
+  var _createCollection = function(collectionId, title) {
+    var collectionBackendObject = {
+      id: collectionId,
+      title: title,
+      objective: &#x27;an objective&#x27;,
+      category: &#x27;a category&#x27;,
+      version: 1,
+      nodes: [],
+      playthrough_dict: {
+        next_exploration_id: &#x27;expId&#x27;,
+        completed_exploration_ids: [&#x27;expId2&#x27;]
+      },
+      tags: null,
+      language_code: null,
+      schema_version: null
+    };
+    return Collection.create(collectionBackendObject);
+  };
+
+  var _createCollectionNode = function(expId, expTitle) {
+    var collectionNodeBackendObject = {
+      exploration_id: expId,
+      exploration_summary: {
+        last_updated_msec: 1591296737470.528,
+        community_owned: false,
+        objective: &#x27;Test Objective&#x27;,
+        id: &#x27;44LKoKLlIbGe&#x27;,
+        num_views: 0,
+        thumbnail_icon_url: &#x27;/subjects/Algebra.svg&#x27;,
+        human_readable_contributors_summary: {},
+        language_code: &#x27;en&#x27;,
+        thumbnail_bg_color: &#x27;#cd672b&#x27;,
+        created_on_msec: 1591296635736.666,
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0
+        },
+        status: &#x27;public&#x27;,
+        tags: [],
+        activity_type: &#x27;exploration&#x27;,
+        category: &#x27;Algebra&#x27;,
+        title: expTitle
+      }
+    };
+    return CollectionNode.create(collectionNodeBackendObject);
+  };
+
+
+  // TODO(bhenning): Find a way to de-duplicate &amp; share this with
+  // CollectionLinearizerServiceSpec.
+  // The linear order of explorations is: exp_id0 -&gt; exp_id1 -&gt; exp_id2.
+  var _createLinearCollection = function(collectionId) {
+    var collection = _createCollection(collectionId, &#x27;Collection title&#x27;);
+
+    var collectionNode0 = _createCollectionNode(_expId0, _expTitle0);
+    var collectionNode1 = _createCollectionNode(_expId1, _expTitle1);
+    var collectionNode2 = _createCollectionNode(_expId2, _expTitle2);
+
+    collection.addCollectionNode(collectionNode0);
+    collection.addCollectionNode(collectionNode1);
+    collection.addCollectionNode(collectionNode2);
+    return collection;
+  };
+
+  describe(&#x27;hasCompletedSomeExploration&#x27;, () =&gt; {
+    it(&#x27;should initially not have any stored progress&#x27;, () =&gt; {
+      var hasProgress = (
+        guestCollectionProgressService.hasCompletedSomeExploration(
+          _collectionId0));
+      expect(hasProgress).toBe(false);
+    });
+
+    it(&#x27;should have progress after recording an exploration&#x27;, () =&gt; {
+      guestCollectionProgressService.recordExplorationCompletedInCollection(
+        _collectionId0, _expId0);
+      var hasProgress = (
+        guestCollectionProgressService.hasCompletedSomeExploration(
+          _collectionId0));
+      expect(hasProgress).toBe(true);
+    });
+
+    it(&#x27;should not have progress after exp completed for another collection&#x27;,
+      () =&gt; {
+        guestCollectionProgressService.recordExplorationCompletedInCollection(
+          _collectionId1, _expId0);
+        var hasProgress = (
+          guestCollectionProgressService.hasCompletedSomeExploration(
+            _collectionId0));
+        expect(hasProgress).toBe(false);
+      }
+    );
+  });
+
+  describe(&#x27;getCompletedExplorationIds&#x27;, () =&gt; {
+    it(&#x27;should initially provide no completed exploration ids&#x27;, () =&gt; {
+      var completedIds = (
+        guestCollectionProgressService.getCompletedExplorationIds(
+          _collection0));
+      expect(completedIds).toEqual([]);
+    });
+
+    it(&#x27;should provide completed exploration ID after completion&#x27;, () =&gt; {
+      guestCollectionProgressService.recordExplorationCompletedInCollection(
+        _collectionId0, _expId0);
+      var completedIds = (
+        guestCollectionProgressService.getCompletedExplorationIds(
+          _collection0));
+      expect(completedIds).toEqual([_expId0]);
+    });
+
+    it(&#x27;should not provide completed ID for exp not in collection&#x27;, () =&gt; {
+      guestCollectionProgressService.recordExplorationCompletedInCollection(
+        _collectionId0, _expId1);
+      var completedIds = (
+        guestCollectionProgressService.getCompletedExplorationIds(
+          _collection0));
+      expect(completedIds).toEqual([]);
+    });
+
+    it(&#x27;should provide multiple completed exploration IDs&#x27;, () =&gt; {
+      var collection = _createLinearCollection(_collectionId1);
+      guestCollectionProgressService.recordExplorationCompletedInCollection(
+        _collectionId1, _expId0);
+      guestCollectionProgressService.recordExplorationCompletedInCollection(
+        _collectionId1, _expId2);
+      var completedIds = (
+        guestCollectionProgressService.getCompletedExplorationIds(collection));
+      expect(completedIds).toEqual([_expId0, _expId2]);
+    });
+  });
+
+  describe(&#x27;getNextExplorationId&#x27;, () =&gt; {
+    it(&#x27;should provide the first exploration ID with no progress&#x27;, () =&gt; {
+      var collection = _createLinearCollection(_collectionId1);
+      var nextExplorationId = (
+        guestCollectionProgressService.getNextExplorationId(collection, []));
+      expect(nextExplorationId).toEqual(_expId0);
+    });
+
+    it(&#x27;should provide the third exp ID with first two exps done&#x27;, () =&gt; {
+      var collection = _createLinearCollection(_collectionId1);
+      var nextExplorationId = (
+        guestCollectionProgressService.getNextExplorationId(
+          collection, [_expId0, _expId1]));
+
+      // First two explorations are completed, so return the third.
+      expect(nextExplorationId).toEqual(_expId2);
+    });
+
+    it(&#x27;should return null for fully completed collection&#x27;, () =&gt; {
+      var collection = _createLinearCollection(_collectionId1);
+      var nextExplorationId = (
+        guestCollectionProgressService.getNextExplorationId(
+          collection, [_expId0, _expId1, _expId2]));
+
+      // There are no explorations left to play.
+      expect(nextExplorationId).toEqual(null);
+    });
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:28,&quot;character&quot;:6,&quot;text&quot;:&quot;guestCollectionProgressService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:44,&quot;character&quot;:4,&quot;text&quot;:&quot;guestCollectionProgressService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:65,&quot;character&quot;:35,&quot;text&quot;:&quot;collectionId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:65,&quot;character&quot;:49,&quot;text&quot;:&quot;title&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:67,&quot;character&quot;:6,&quot;text&quot;:&quot;id&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:67,&quot;character&quot;:10,&quot;text&quot;:&quot;collectionId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:68,&quot;character&quot;:6,&quot;text&quot;:&quot;title&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:68,&quot;character&quot;:13,&quot;text&quot;:&quot;title&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:84,&quot;character&quot;:39,&quot;text&quot;:&quot;expId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:84,&quot;character&quot;:46,&quot;text&quot;:&quot;expTitle&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:86,&quot;character&quot;:6,&quot;text&quot;:&quot;exploration_id&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:86,&quot;character&quot;:22,&quot;text&quot;:&quot;expId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:109,&quot;character&quot;:8,&quot;text&quot;:&quot;title&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:109,&quot;character&quot;:15,&quot;text&quot;:&quot;expTitle&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:119,&quot;character&quot;:41,&quot;text&quot;:&quot;collectionId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:120,&quot;character&quot;:39,&quot;text&quot;:&quot;collectionId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:134,&quot;character&quot;:10,&quot;text&quot;:&quot;hasProgress&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:135,&quot;character&quot;:8,&quot;text&quot;:&quot;guestCollectionProgressService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:135,&quot;character&quot;:39,&quot;text&quot;:&quot;hasCompletedSomeExploration&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:137,&quot;character&quot;:13,&quot;text&quot;:&quot;hasProgress&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:141,&quot;character&quot;:6,&quot;text&quot;:&quot;guestCollectionProgressService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:141,&quot;character&quot;:37,&quot;text&quot;:&quot;recordExplorationCompletedInCollection&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:143,&quot;character&quot;:10,&quot;text&quot;:&quot;hasProgress&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:144,&quot;character&quot;:8,&quot;text&quot;:&quot;guestCollectionProgressService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:144,&quot;character&quot;:39,&quot;text&quot;:&quot;hasCompletedSomeExploration&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:146,&quot;character&quot;:13,&quot;text&quot;:&quot;hasProgress&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:151,&quot;character&quot;:8,&quot;text&quot;:&quot;guestCollectionProgressService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:151,&quot;character&quot;:39,&quot;text&quot;:&quot;recordExplorationCompletedInCollection&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:153,&quot;character&quot;:12,&quot;text&quot;:&quot;hasProgress&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:154,&quot;character&quot;:10,&quot;text&quot;:&quot;guestCollectionProgressService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:154,&quot;character&quot;:41,&quot;text&quot;:&quot;hasCompletedSomeExploration&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:156,&quot;character&quot;:15,&quot;text&quot;:&quot;hasProgress&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:163,&quot;character&quot;:10,&quot;text&quot;:&quot;completedIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:164,&quot;character&quot;:8,&quot;text&quot;:&quot;guestCollectionProgressService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:164,&quot;character&quot;:39,&quot;text&quot;:&quot;getCompletedExplorationIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:166,&quot;character&quot;:13,&quot;text&quot;:&quot;completedIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:170,&quot;character&quot;:6,&quot;text&quot;:&quot;guestCollectionProgressService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:170,&quot;character&quot;:37,&quot;text&quot;:&quot;recordExplorationCompletedInCollection&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:172,&quot;character&quot;:10,&quot;text&quot;:&quot;completedIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:173,&quot;character&quot;:8,&quot;text&quot;:&quot;guestCollectionProgressService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:173,&quot;character&quot;:39,&quot;text&quot;:&quot;getCompletedExplorationIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:175,&quot;character&quot;:13,&quot;text&quot;:&quot;completedIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:179,&quot;character&quot;:6,&quot;text&quot;:&quot;guestCollectionProgressService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:179,&quot;character&quot;:37,&quot;text&quot;:&quot;recordExplorationCompletedInCollection&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:181,&quot;character&quot;:10,&quot;text&quot;:&quot;completedIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:182,&quot;character&quot;:8,&quot;text&quot;:&quot;guestCollectionProgressService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:182,&quot;character&quot;:39,&quot;text&quot;:&quot;getCompletedExplorationIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:184,&quot;character&quot;:13,&quot;text&quot;:&quot;completedIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:189,&quot;character&quot;:6,&quot;text&quot;:&quot;guestCollectionProgressService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:189,&quot;character&quot;:37,&quot;text&quot;:&quot;recordExplorationCompletedInCollection&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:191,&quot;character&quot;:6,&quot;text&quot;:&quot;guestCollectionProgressService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:191,&quot;character&quot;:37,&quot;text&quot;:&quot;recordExplorationCompletedInCollection&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:193,&quot;character&quot;:10,&quot;text&quot;:&quot;completedIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:194,&quot;character&quot;:8,&quot;text&quot;:&quot;guestCollectionProgressService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:194,&quot;character&quot;:39,&quot;text&quot;:&quot;getCompletedExplorationIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:195,&quot;character&quot;:13,&quot;text&quot;:&quot;completedIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:202,&quot;character&quot;:10,&quot;text&quot;:&quot;nextExplorationId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:203,&quot;character&quot;:8,&quot;text&quot;:&quot;guestCollectionProgressService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:203,&quot;character&quot;:39,&quot;text&quot;:&quot;getNextExplorationId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:204,&quot;character&quot;:13,&quot;text&quot;:&quot;nextExplorationId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:209,&quot;character&quot;:10,&quot;text&quot;:&quot;nextExplorationId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:210,&quot;character&quot;:8,&quot;text&quot;:&quot;guestCollectionProgressService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:210,&quot;character&quot;:39,&quot;text&quot;:&quot;getNextExplorationId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:214,&quot;character&quot;:13,&quot;text&quot;:&quot;nextExplorationId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:219,&quot;character&quot;:10,&quot;text&quot;:&quot;nextExplorationId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:220,&quot;character&quot;:8,&quot;text&quot;:&quot;guestCollectionProgressService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:220,&quot;character&quot;:39,&quot;text&quot;:&quot;getNextExplorationId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/guest-collection-progress.service.spec.ts&quot;,&quot;line&quot;:224,&quot;character&quot;:13,&quot;text&quot;:&quot;nextExplorationId&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:57 GMT</p>
+    </body>
+  </html>
+  

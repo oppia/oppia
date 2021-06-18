@@ -1,0 +1,377 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>ck-editor-4-rte.component.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts</td><td class="">77.00%</td><td class="">100%</td><td class="">426</td><td class="">328</td><td class="">98</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2018 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Directive for CK Editor.
+ */
+
+import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnDestroy, Output } from &#x27;@angular/core&#x27;;
+import { downgradeComponent } from &#x27;@angular/upgrade/static&#x27;;
+import { AppConstants } from &#x27;app.constants&#x27;;
+import { OppiaAngularRootComponent } from &#x27;components/oppia-angular-root.component&#x27;;
+import { ContextService } from &#x27;services/context.service&#x27;;
+import { CkEditorCopyContentService } from &#x27;./ck-editor-copy-content-service&#x27;;
+
+interface UiConfig {
+  (): UiConfig;
+  &#x27;hide_complex_extensions&#x27;: boolean;
+  &#x27;startupFocusEnabled&#x27;?: boolean;
+  &#x27;language&#x27;?: string;
+  &#x27;languageDirection&#x27;?: string;
+}
+
+@Component({
+  selector: &#x27;ck-editor-4-rte&#x27;,
+  template: &#x27;&lt;div&gt;&lt;div&gt;&lt;/div&gt;&#x27; +
+            &#x27;&lt;div contenteditable=&quot;true&quot; &#x27; +
+            &#x27;class=&quot;oppia-rte-resizer oppia-rte&quot;&gt;&#x27; +
+            &#x27;&lt;/div&gt;&lt;/div&gt;&#x27;,
+  styleUrls: []
+})
+export class CkEditor4RteComponent implements AfterViewInit, OnDestroy {
+  @Input() uiConfig: UiConfig;
+  @Input() value;
+  @Output() valueChange: EventEmitter&lt;string&gt; = new EventEmitter();
+  rteHelperService;
+  ck: CKEDITOR.editor;
+  constructor(
+    private ckEditorCopyContentService: CkEditorCopyContentService,
+    private contextService: ContextService,
+    private elementRef: ElementRef
+  ) {
+    this.rteHelperService = OppiaAngularRootComponent.rteHelperService;
+  }
+
+  /**
+   * Creates a CKEditor configuration.
+   * @param config CKEditor config to add to
+   * @param uiConfig Parameters to add to CKEditor config
+   * @param pluginNames Comma separated list of plugin names
+   * @param buttonNames Array of button names for RTE components
+   * @param extraAllowedContentRules Additional allowed content rules for
+   * CKEDITOR.editor.filter
+   * @param sharedSpaces IDs of the page elements that will store the editor
+   * UI elements
+   */
+  private _createCKEditorConfig(
+      uiConfig: UiConfig,
+      pluginNames: string,
+      buttonNames: string[],
+      extraAllowedContentRules: string,
+      sharedSpaces: CKEDITOR.sharedSpace
+  ): CKEDITOR.config {
+    // Language configs use default language when undefined.
+    const ckConfig: CKEDITOR.config = {
+      extraPlugins: &#x27;pre,sharedspace,&#x27; + pluginNames,
+      startupFocus: true,
+      removePlugins: &#x27;indentblock&#x27;,
+      title: false,
+      floatSpaceDockedOffsetY: 15,
+      extraAllowedContent: extraAllowedContentRules,
+      forcePasteAsPlainText: true,
+      sharedSpaces: sharedSpaces,
+      skin: (
+        &#x27;bootstrapck,&#x27; +
+      &#x27;/third_party/static/ckeditor-bootstrapck-1.0.0/skins/bootstrapck/&#x27;
+      ),
+      toolbar: [
+        {
+          name: &#x27;basicstyles&#x27;,
+          items: [&#x27;Bold&#x27;, &#x27;-&#x27;, &#x27;Italic&#x27;]
+        },
+        {
+          name: &#x27;paragraph&#x27;,
+          items: [
+            &#x27;NumberedList&#x27;, &#x27;-&#x27;,
+            &#x27;BulletedList&#x27;, &#x27;-&#x27;,
+            &#x27;Pre&#x27;, &#x27;-&#x27;,
+            &#x27;Blockquote&#x27;, &#x27;-&#x27;,
+            &#x27;Indent&#x27;, &#x27;-&#x27;,
+            &#x27;Outdent&#x27;
+          ]
+        },
+        {
+          name: &#x27;rtecomponents&#x27;,
+          items: buttonNames
+        },
+        {
+          name: &#x27;document&#x27;,
+          items: [&#x27;Source&#x27;]
+        }
+      ]
+    };
+
+    if (!uiConfig) {
+      return ckConfig;
+    }
+
+    if (uiConfig.language) {
+      ckConfig.language = uiConfig.language;
+      ckConfig.contentsLanguage = uiConfig.language;
+    }
+    if (uiConfig.languageDirection) {
+      ckConfig.contentsLangDirection = (
+        uiConfig.languageDirection);
+    }
+    if (uiConfig.startupFocusEnabled !== undefined) {
+      ckConfig.startupFocus = uiConfig.startupFocusEnabled;
+    }
+
+    return ckConfig;
+  }
+
+  ngAfterViewInit(): void {
+    var _RICH_TEXT_COMPONENTS = this.rteHelperService.getRichTextComponents();
+    var names = [];
+    var icons = [];
+
+    _RICH_TEXT_COMPONENTS.forEach((componentDefn) =&gt; {
+      var hideComplexExtensionFlag = (
+        this.uiConfig &amp;&amp;
+              this.uiConfig.hide_complex_extensions &amp;&amp;
+              componentDefn.isComplex);
+      var notSupportedOnAndroidFlag = (
+        this.contextService.isExplorationLinkedToStory() &amp;&amp;
+              AppConstants.VALID_RTE_COMPONENTS_FOR_ANDROID.indexOf(
+                componentDefn.id) === -1);
+      if (!(hideComplexExtensionFlag || notSupportedOnAndroidFlag)) {
+        names.push(componentDefn.id);
+        icons.push(componentDefn.iconDataUrl);
+      }
+    });
+
+    var editable = document.querySelectorAll(&#x27;.oppia-rte-resizer&#x27;);
+    var resize = () =&gt; {
+      // TODO(#12882): Remove the use of jQuery.
+      $(&#x27;.oppia-rte-resizer&#x27;).css({
+        width: &#x27;100%&#x27;
+      });
+    };
+    for (let i of Object.keys(editable)) {
+      (&lt;HTMLElement&gt;editable[i]).onchange = () =&gt; {
+        resize();
+      };
+      (&lt;HTMLElement&gt;editable[i]).onclick = () =&gt; {
+        resize();
+      };
+    }
+
+    /**
+       * Create rules to whitelist all the rich text components and
+       * their wrappers and overlays.
+       * See format of filtering rules here:
+       * http://docs.ckeditor.com/#!/guide/dev_allowed_content_rules
+       */
+    // Whitelist the component tags with any attributes and classes.
+    var componentRule = names.map((name) =&gt; {
+      return &#x27;oppia-noninteractive-&#x27; + name;
+    }).join(&#x27; &#x27;) + &#x27;(*)[*];&#x27;;
+      // Whitelist the inline component wrapper, which is a
+      // span with a &quot;type&quot; attribute.
+    var inlineWrapperRule = &#x27; span[type];&#x27;;
+    // Whitelist the block component wrapper, which is a div
+    // with a &quot;type&quot; attribute and a CSS class.
+    var blockWrapperRule = &#x27; div(oppia-rte-component-container)[type];&#x27;;
+    // Whitelist the transparent block component overlay, which is
+    // a div with a CSS class.
+    var blockOverlayRule = &#x27; div(oppia-rte-component-overlay);&#x27;;
+    // Put all the rules together.
+    var extraAllowedContentRules = componentRule +
+                                         inlineWrapperRule +
+                                         blockWrapperRule +
+                                         blockOverlayRule;
+    var pluginNames = names.map((name) =&gt; {
+      return &#x27;oppia&#x27; + name;
+    }).join(&#x27;,&#x27;);
+    var buttonNames = [];
+    if (this.contextService.canAddOrEditComponents()) {
+      names.forEach((name) =&gt; {
+        buttonNames.push(&#x27;Oppia&#x27; + name);
+        buttonNames.push(&#x27;-&#x27;);
+      });
+    }
+    buttonNames.pop();
+
+    // Add external plugins.
+    CKEDITOR.plugins.addExternal(
+      &#x27;sharedspace&#x27;,
+      &#x27;/third_party/static/ckeditor-4.12.1/plugins/sharedspace/&#x27;,
+      &#x27;plugin.js&#x27;);
+    // Pre plugin is not available for 4.12.1 version of CKEditor. This is
+    // a self created plugin (other plugins are provided by CKEditor).
+    CKEDITOR.plugins.addExternal(
+      &#x27;pre&#x27;, &#x27;/extensions/ckeditor_plugins/pre/&#x27;, &#x27;plugin.js&#x27;);
+
+    const sharedSpaces = {
+      top: (
+          &lt;HTMLElement&gt; this.elementRef.nativeElement.children[0].children[0])
+    };
+
+    const ckConfig = this._createCKEditorConfig(
+      this.uiConfig, pluginNames, buttonNames, extraAllowedContentRules,
+      sharedSpaces);
+
+    // Initialize CKEditor.
+    var ck = CKEDITOR.inline(
+            &lt;HTMLElement&gt;(
+              this.elementRef.nativeElement.children[0].children[1]
+              ),
+            ckConfig
+    );
+
+    // Hide the editor until it is fully loaded after `instanceReady`
+    // is fired. This sets the style for `ck-editor-4-rte`.
+    this.elementRef.nativeElement.setAttribute(&#x27;style&#x27;, &#x27;display: None&#x27;);
+    // Show the loading text.
+    let loadingDiv = document.createElement(&#x27;div&#x27;);
+    loadingDiv.innerText = &#x27;Loading...&#x27;;
+    // This div is placed as a child of `schema-based-editor`.
+    this.elementRef.nativeElement.parentElement.appendChild(loadingDiv);
+
+    // A RegExp for matching rich text components.
+    var componentRe = (
+      /(&lt;(oppia-noninteractive-(.+?))\b[^&gt;]*&gt;)[\s\S]*?&lt;\/\2&gt;/g
+    );
+
+    /**
+       * Before data is loaded into CKEditor, we need to wrap every rte
+       * component in a span (inline) or div (block).
+       * For block elements, we add an overlay div as well.
+       */
+    var wrapComponents = (html) =&gt; {
+      if (html === undefined) {
+        return html;
+      }
+      return html.replace(componentRe, (match, p1, p2, p3) =&gt; {
+        if (this.rteHelperService.isInlineComponent(p3)) {
+          return &#x27;&lt;span type=&quot;oppia-noninteractive-&#x27; + p3 + &#x27;&quot;&gt;&#x27; +
+                      match + &#x27;&lt;/span&gt;&#x27;;
+        } else {
+          return &#x27;&lt;div type=&quot;oppia-noninteractive-&#x27; + p3 + &#x27;&quot;&#x27; +
+                       &#x27;class=&quot;oppia-rte-component-container&quot;&gt;&#x27; + match +
+                       &#x27;&lt;/div&gt;&#x27;;
+        }
+      });
+    };
+
+    ck.on(&#x27;instanceReady&#x27;, () =&gt; {
+      // Show the editor now that it is fully loaded.
+      (
+        &lt;HTMLElement&gt; this.elementRef.nativeElement
+      ).setAttribute(&#x27;style&#x27;, &#x27;display: block&#x27;);
+      // Focus on the CK editor text box.
+      (
+        &lt;HTMLElement&gt; this.elementRef.nativeElement.children[0].children[1]
+      ).focus();
+      // Remove the loading text.
+      this.elementRef.nativeElement.parentElement.removeChild(loadingDiv);
+      // Set the css and icons for each toolbar button.
+      names.forEach((name, index) =&gt; {
+        var icon = icons[index];
+        // TODO(#12882): Remove the use of jQuery.
+        $(&#x27;.cke_button__oppia&#x27; + name)
+          .css(&#x27;background-image&#x27;, &#x27;url(&quot;/extensions&#x27; + icon + &#x27;&quot;)&#x27;)
+          .css(&#x27;background-position&#x27;, &#x27;center&#x27;)
+          .css(&#x27;background-repeat&#x27;, &#x27;no-repeat&#x27;)
+          .css(&#x27;height&#x27;, &#x27;24px&#x27;)
+          .css(&#x27;width&#x27;, &#x27;24px&#x27;)
+          .css(&#x27;padding&#x27;, &#x27;0px 0px&#x27;);
+      });
+
+      // TODO(#12882): Remove the use of jQuery.
+      $(&#x27;.cke_toolbar_separator&#x27;)
+        .css(&#x27;height&#x27;, &#x27;22px&#x27;);
+
+      // TODO(#12882): Remove the use of jQuery.
+      $(&#x27;.cke_button_icon&#x27;)
+        .css(&#x27;height&#x27;, &#x27;24px&#x27;)
+        .css(&#x27;width&#x27;, &#x27;24px&#x27;);
+      ck.setData(wrapComponents(this.value));
+    });
+
+    // Angular rendering of components confuses CKEditor&#x27;s undo system, so
+    // we hide all of that stuff away from CKEditor.
+    ck.on(&#x27;getSnapshot&#x27;, (event) =&gt; {
+      if (event.data === undefined) {
+        return;
+      }
+      event.data = event.data.replace(componentRe, (match, p1, p2) =&gt; {
+        return p1 + &#x27;&lt;/&#x27; + p2 + &#x27;&gt;&#x27;;
+      });
+    }, null, null, 20);
+
+    ck.on(&#x27;change&#x27;, () =&gt; {
+      if (ck.getData() === this.value) {
+        return;
+      }
+
+      // TODO(#12882): Remove the use of jQuery.
+      var elt = $(&#x27;&lt;div&gt;&#x27; + ck.getData() + &#x27;&lt;/div&gt;&#x27;);
+      var textElt = elt[0].childNodes;
+      for (var i = textElt.length; i &gt; 0; i--) {
+        for (var j = textElt[i - 1].childNodes.length; j &gt; 0; j--) {
+          if (textElt[i - 1].childNodes[j - 1].nodeName === &#x27;BR&#x27; ||
+                  (textElt[i - 1].childNodes[j - 1].nodeName === &#x27;#text&#x27; &amp;&amp;
+                    textElt[i - 1].childNodes[j - 1].nodeValue.trim() === &#x27;&#x27;)) {
+            textElt[i - 1].childNodes[j - 1].remove();
+          } else {
+            break;
+          }
+        }
+        if (textElt[i - 1].childNodes.length === 0) {
+          if (textElt[i - 1].nodeName === &#x27;BR&#x27; ||
+                  (textElt[i - 1].nodeName === &#x27;#text&#x27; &amp;&amp;
+                    textElt[i - 1].nodeValue.trim() === &#x27;&#x27;) ||
+                    textElt[i - 1].nodeName === &#x27;P&#x27;) {
+            textElt[i - 1].remove();
+            continue;
+          }
+        } else {
+          break;
+        }
+      }
+      this.valueChange.emit(elt.html());
+      this.value = elt.html();
+    });
+    ck.setData(this.value);
+    this.ck = ck;
+    this.ckEditorCopyContentService.bindPasteHandler(ck);
+  }
+
+  ngOnDestroy(): void {
+    this.ck.destroy();
+  }
+}
+
+angular.module(&#x27;oppia&#x27;).directive(&#x27;ckEditor4Rte&#x27;, downgradeComponent({
+  component: CkEditor4RteComponent
+}));
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:43,&quot;character&quot;:11,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:45,&quot;character&quot;:2,&quot;text&quot;:&quot;rteHelperService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:50,&quot;character&quot;:12,&quot;text&quot;:&quot;elementRef&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:52,&quot;character&quot;:9,&quot;text&quot;:&quot;rteHelperService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:52,&quot;character&quot;:54,&quot;text&quot;:&quot;rteHelperService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:134,&quot;character&quot;:8,&quot;text&quot;:&quot;_RICH_TEXT_COMPONENTS&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:134,&quot;character&quot;:37,&quot;text&quot;:&quot;rteHelperService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:134,&quot;character&quot;:54,&quot;text&quot;:&quot;getRichTextComponents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:135,&quot;character&quot;:8,&quot;text&quot;:&quot;names&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:136,&quot;character&quot;:8,&quot;text&quot;:&quot;icons&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:138,&quot;character&quot;:4,&quot;text&quot;:&quot;_RICH_TEXT_COMPONENTS&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:138,&quot;character&quot;:26,&quot;text&quot;:&quot;forEach&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:138,&quot;character&quot;:35,&quot;text&quot;:&quot;componentDefn&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:139,&quot;character&quot;:10,&quot;text&quot;:&quot;hideComplexExtensionFlag&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:142,&quot;character&quot;:14,&quot;text&quot;:&quot;componentDefn&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:142,&quot;character&quot;:28,&quot;text&quot;:&quot;isComplex&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:146,&quot;character&quot;:16,&quot;text&quot;:&quot;componentDefn&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:146,&quot;character&quot;:30,&quot;text&quot;:&quot;id&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:147,&quot;character&quot;:12,&quot;text&quot;:&quot;hideComplexExtensionFlag&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:148,&quot;character&quot;:8,&quot;text&quot;:&quot;names&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:148,&quot;character&quot;:19,&quot;text&quot;:&quot;componentDefn&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:148,&quot;character&quot;:33,&quot;text&quot;:&quot;id&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:149,&quot;character&quot;:8,&quot;text&quot;:&quot;icons&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:149,&quot;character&quot;:19,&quot;text&quot;:&quot;componentDefn&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:149,&quot;character&quot;:33,&quot;text&quot;:&quot;iconDataUrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:176,&quot;character&quot;:24,&quot;text&quot;:&quot;names&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:176,&quot;character&quot;:35,&quot;text&quot;:&quot;name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:177,&quot;character&quot;:39,&quot;text&quot;:&quot;name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:193,&quot;character&quot;:22,&quot;text&quot;:&quot;names&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:193,&quot;character&quot;:33,&quot;text&quot;:&quot;name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:194,&quot;character&quot;:23,&quot;text&quot;:&quot;name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:196,&quot;character&quot;:8,&quot;text&quot;:&quot;buttonNames&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:198,&quot;character&quot;:6,&quot;text&quot;:&quot;names&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:198,&quot;character&quot;:21,&quot;text&quot;:&quot;name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:199,&quot;character&quot;:8,&quot;text&quot;:&quot;buttonNames&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:199,&quot;character&quot;:35,&quot;text&quot;:&quot;name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:200,&quot;character&quot;:8,&quot;text&quot;:&quot;buttonNames&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:203,&quot;character&quot;:4,&quot;text&quot;:&quot;buttonNames&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:217,&quot;character&quot;:29,&quot;text&quot;:&quot;elementRef&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:217,&quot;character&quot;:40,&quot;text&quot;:&quot;nativeElement&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:217,&quot;character&quot;:54,&quot;text&quot;:&quot;children&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:217,&quot;character&quot;:66,&quot;text&quot;:&quot;children&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:227,&quot;character&quot;:19,&quot;text&quot;:&quot;elementRef&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:227,&quot;character&quot;:30,&quot;text&quot;:&quot;nativeElement&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:227,&quot;character&quot;:44,&quot;text&quot;:&quot;children&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:227,&quot;character&quot;:56,&quot;text&quot;:&quot;children&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:234,&quot;character&quot;:9,&quot;text&quot;:&quot;elementRef&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:234,&quot;character&quot;:20,&quot;text&quot;:&quot;nativeElement&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:234,&quot;character&quot;:34,&quot;text&quot;:&quot;setAttribute&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:239,&quot;character&quot;:9,&quot;text&quot;:&quot;elementRef&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:239,&quot;character&quot;:20,&quot;text&quot;:&quot;nativeElement&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:239,&quot;character&quot;:34,&quot;text&quot;:&quot;parentElement&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:239,&quot;character&quot;:48,&quot;text&quot;:&quot;appendChild&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:251,&quot;character&quot;:26,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:252,&quot;character&quot;:10,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:253,&quot;character&quot;:15,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:255,&quot;character&quot;:13,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:255,&quot;character&quot;:18,&quot;text&quot;:&quot;replace&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:255,&quot;character&quot;:40,&quot;text&quot;:&quot;match&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:255,&quot;character&quot;:47,&quot;text&quot;:&quot;p1&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:255,&quot;character&quot;:51,&quot;text&quot;:&quot;p2&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:255,&quot;character&quot;:55,&quot;text&quot;:&quot;p3&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:256,&quot;character&quot;:17,&quot;text&quot;:&quot;rteHelperService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:256,&quot;character&quot;:34,&quot;text&quot;:&quot;isInlineComponent&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:256,&quot;character&quot;:52,&quot;text&quot;:&quot;p3&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:257,&quot;character&quot;:55,&quot;text&quot;:&quot;p3&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:258,&quot;character&quot;:22,&quot;text&quot;:&quot;match&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:260,&quot;character&quot;:54,&quot;text&quot;:&quot;p3&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:261,&quot;character&quot;:66,&quot;text&quot;:&quot;match&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:270,&quot;character&quot;:27,&quot;text&quot;:&quot;elementRef&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:270,&quot;character&quot;:38,&quot;text&quot;:&quot;nativeElement&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:274,&quot;character&quot;:27,&quot;text&quot;:&quot;elementRef&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:274,&quot;character&quot;:38,&quot;text&quot;:&quot;nativeElement&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:274,&quot;character&quot;:52,&quot;text&quot;:&quot;children&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:274,&quot;character&quot;:64,&quot;text&quot;:&quot;children&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:277,&quot;character&quot;:11,&quot;text&quot;:&quot;elementRef&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:277,&quot;character&quot;:22,&quot;text&quot;:&quot;nativeElement&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:277,&quot;character&quot;:36,&quot;text&quot;:&quot;parentElement&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:277,&quot;character&quot;:50,&quot;text&quot;:&quot;removeChild&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:279,&quot;character&quot;:6,&quot;text&quot;:&quot;names&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:279,&quot;character&quot;:21,&quot;text&quot;:&quot;name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:280,&quot;character&quot;:12,&quot;text&quot;:&quot;icon&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:280,&quot;character&quot;:19,&quot;text&quot;:&quot;icons&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:282,&quot;character&quot;:33,&quot;text&quot;:&quot;name&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:283,&quot;character&quot;:56,&quot;text&quot;:&quot;icon&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:299,&quot;character&quot;:37,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:305,&quot;character&quot;:16,&quot;text&quot;:&quot;data&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:308,&quot;character&quot;:12,&quot;text&quot;:&quot;data&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:308,&quot;character&quot;:25,&quot;text&quot;:&quot;data&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:308,&quot;character&quot;:30,&quot;text&quot;:&quot;replace&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:308,&quot;character&quot;:52,&quot;text&quot;:&quot;match&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:308,&quot;character&quot;:59,&quot;text&quot;:&quot;p1&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:308,&quot;character&quot;:63,&quot;text&quot;:&quot;p2&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:309,&quot;character&quot;:15,&quot;text&quot;:&quot;p1&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:309,&quot;character&quot;:27,&quot;text&quot;:&quot;p2&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:314,&quot;character&quot;:32,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:344,&quot;character&quot;:11,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts&quot;,&quot;line&quot;:346,&quot;character&quot;:20,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:56 GMT</p>
+    </body>
+  </html>
+  

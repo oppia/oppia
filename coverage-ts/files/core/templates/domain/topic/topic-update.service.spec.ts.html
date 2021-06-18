@@ -1,0 +1,1206 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>topic-update.service.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/domain/topic/topic-update.service.spec.ts</td><td class="">76.42%</td><td class="">100%</td><td class="">1713</td><td class="">1309</td><td class="">404</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Tests for Topic update service.
+ */
+
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// topic-update.service.ts is upgraded to Angular 8.
+import { ShortSkillSummary } from
+  &#x27;domain/skill/short-skill-summary.model&#x27;;
+import { SubtitledHtml } from
+  &#x27;domain/exploration/subtitled-html.model&#x27;;
+// ^^^ This block is to be removed.
+import { UndoRedoService } from &#x27;domain/editor/undo_redo/undo-redo.service&#x27;;
+import { TopicObjectFactory, TopicBackendDict} from &#x27;domain/topic/TopicObjectFactory&#x27;;
+import { TopicUpdateService } from &#x27;domain/topic/topic-update.service&#x27;;
+import { TestBed } from &#x27;@angular/core/testing&#x27;;
+import { SubtopicPage } from &#x27;./subtopic-page.model&#x27;;
+import { RecordedVoiceovers } from &#x27;domain/exploration/recorded-voiceovers.model&#x27;;
+
+describe(&#x27;Topic update service&#x27;, function() {
+  let topicUpdateService: TopicUpdateService;
+  let topicObjectFactory: TopicObjectFactory = null;
+  let undoRedoService: UndoRedoService = null;
+  let _sampleTopic = null;
+  let _firstSkillSummary = null;
+  let _secondSkillSummary = null;
+  let _thirdSkillSummary = null;
+  let _sampleSubtopicPage = null;
+
+  let sampleTopicBackendObject = {
+    topicDict: {
+      id: &#x27;sample_topic_id&#x27;,
+      name: &#x27;Topic name&#x27;,
+      description: &#x27;Topic description&#x27;,
+      version: 1,
+      uncategorized_skill_ids: [&#x27;skill_1&#x27;],
+      canonical_story_references: [{
+        story_id: &#x27;story_1&#x27;,
+        story_is_published: true
+      }, {
+        story_id: &#x27;story_2&#x27;,
+        story_is_published: true
+      }, {
+        story_id: &#x27;story_3&#x27;,
+        story_is_published: true
+      }],
+      additional_story_references: [{
+        story_id: &#x27;story_2&#x27;,
+        story_is_published: true
+      }],
+      subtopics: [{
+        id: 1,
+        title: &#x27;Title&#x27;,
+        skill_ids: [&#x27;skill_2&#x27;]
+      }],
+      next_subtopic_id: 2,
+      language_code: &#x27;en&#x27;,
+    },
+    skillIdToDescriptionDict: {
+      skill_1: &#x27;Description 1&#x27;,
+      skill_2: &#x27;Description 2&#x27;
+    }
+  };
+  let sampleSubtopicPageObject = {
+    id: &#x27;topic_id-1&#x27;,
+    topic_id: &#x27;topic_id&#x27;,
+    page_contents: {
+      subtitled_html: {
+        html: &#x27;test content&#x27;,
+        content_id: &#x27;content&#x27;
+      },
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          content: {
+            en: {
+              filename: &#x27;test.mp3&#x27;,
+              file_size_bytes: 100,
+              needs_update: false,
+              duration_secs: 0.1
+            }
+          }
+        }
+      }
+    },
+    language_code: &#x27;en&#x27;
+  };
+
+  beforeEach(() =&gt; {
+    topicUpdateService = TestBed.get(TopicUpdateService);
+    topicObjectFactory = TestBed.get(TopicObjectFactory);
+    undoRedoService = TestBed.get(UndoRedoService);
+
+    _firstSkillSummary = ShortSkillSummary.create(
+      &#x27;skill_1&#x27;, &#x27;Description 1&#x27;);
+    _secondSkillSummary = ShortSkillSummary.create(
+      &#x27;skill_2&#x27;, &#x27;Description 2&#x27;);
+    _thirdSkillSummary = ShortSkillSummary.create(
+      &#x27;skill_3&#x27;, &#x27;Description 3&#x27;);
+
+    _sampleSubtopicPage = SubtopicPage.createFromBackendDict(
+      sampleSubtopicPageObject);
+    _sampleTopic = topicObjectFactory.create(
+      sampleTopicBackendObject.topicDict as TopicBackendDict,
+      sampleTopicBackendObject.skillIdToDescriptionDict);
+  });
+
+  it(&#x27;should remove/add an additional story id from/to a topic&#x27;, () =&gt; {
+    expect(_sampleTopic.getAdditionalStoryIds()).toEqual([&#x27;story_2&#x27;]);
+    topicUpdateService.removeAdditionalStory(_sampleTopic, &#x27;story_2&#x27;);
+    expect(_sampleTopic.getAdditionalStoryIds()).toEqual([]);
+
+    undoRedoService.undoChange(_sampleTopic);
+    expect(_sampleTopic.getAdditionalStoryIds()).toEqual([&#x27;story_2&#x27;]);
+  }
+  );
+
+  it(&#x27;should create a proper backend change dict for removing an additional &#x27; +
+    &#x27;story id&#x27;, () =&gt; {
+    topicUpdateService.removeAdditionalStory(_sampleTopic, &#x27;story_2&#x27;);
+    expect(undoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: &#x27;delete_additional_story&#x27;,
+      story_id: &#x27;story_2&#x27;
+    }]);
+  });
+
+  it(&#x27;should not create a backend change dict for removing an additional &#x27; +
+    &#x27;story id when an error is encountered&#x27;, () =&gt; {
+    expect(() =&gt; {
+      topicUpdateService.removeAdditionalStory(_sampleTopic, &#x27;story_5&#x27;);
+    }).toThrowError(&#x27;Given story id not present in additional story ids.&#x27;);
+    expect(undoRedoService.getCommittableChangeList()).toEqual([]);
+  });
+
+  it(&#x27;should remove/add a canonical story id from/to a topic&#x27;, () =&gt; {
+    let canonicalStoryIds = _sampleTopic.getCanonicalStoryIds();
+    expect(canonicalStoryIds).toEqual(
+      [&#x27;story_1&#x27;, &#x27;story_2&#x27;, &#x27;story_3&#x27;]);
+    topicUpdateService.removeCanonicalStory(_sampleTopic, &#x27;story_1&#x27;);
+    canonicalStoryIds = _sampleTopic.getCanonicalStoryIds();
+    expect(canonicalStoryIds).toEqual([&#x27;story_2&#x27;, &#x27;story_3&#x27;]);
+
+    undoRedoService.undoChange(_sampleTopic);
+    canonicalStoryIds = _sampleTopic.getCanonicalStoryIds();
+    expect(canonicalStoryIds).toEqual(
+      [&#x27;story_2&#x27;, &#x27;story_3&#x27;, &#x27;story_1&#x27;]);
+  });
+
+  it(&#x27;should create a proper backend change dict for removing a canonical &#x27; +
+    &#x27;story id&#x27;, () =&gt; {
+    topicUpdateService.removeCanonicalStory(_sampleTopic, &#x27;story_1&#x27;);
+    expect(undoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: &#x27;delete_canonical_story&#x27;,
+      story_id: &#x27;story_1&#x27;
+    }]);
+  });
+
+  it(&#x27;should not create a backend change dict for removing a canonical &#x27; +
+    &#x27;story id when an error is encountered&#x27;, () =&gt; {
+    expect(() =&gt; {
+      topicUpdateService.removeCanonicalStory(_sampleTopic, &#x27;story_10&#x27;);
+    }).toThrowError(&#x27;Given story id not present in canonical story ids.&#x27;);
+    expect(undoRedoService.getCommittableChangeList()).toEqual([]);
+  });
+
+  it(&#x27;should remove/add an uncategorized skill id from/to a topic&#x27;, () =&gt; {
+    expect(_sampleTopic.getUncategorizedSkillSummaries()).toEqual([
+      _firstSkillSummary
+    ]);
+    topicUpdateService.removeUncategorizedSkill(
+      _sampleTopic, _firstSkillSummary
+    );
+    expect(_sampleTopic.getUncategorizedSkillSummaries()).toEqual([]);
+
+    undoRedoService.undoChange(_sampleTopic);
+    expect(_sampleTopic.getUncategorizedSkillSummaries()).toEqual([
+      _firstSkillSummary
+    ]);
+  }
+  );
+
+  it(&#x27;should create a proper backend change dict for removing an &#x27; +
+    &#x27;uncategorized skill id&#x27;, () =&gt; {
+    topicUpdateService.removeUncategorizedSkill(
+      _sampleTopic, _firstSkillSummary);
+    expect(undoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: &#x27;remove_uncategorized_skill_id&#x27;,
+      uncategorized_skill_id: &#x27;skill_1&#x27;
+    }]);
+  });
+
+  it(&#x27;should not create a backend change dict for removing an uncategorized &#x27; +
+    &#x27;skill id when an error is encountered&#x27;, () =&gt; {
+    expect(() =&gt; {
+      topicUpdateService.removeUncategorizedSkill(
+        _sampleTopic, _thirdSkillSummary);
+    }).toThrowError(&#x27;Given skillId is not an uncategorized skill.&#x27;);
+    expect(undoRedoService.getCommittableChangeList()).toEqual([]);
+  });
+
+  it(&#x27;should set/unset changes to a topic\&#x27;s name&#x27;, () =&gt; {
+    expect(_sampleTopic.getName()).toEqual(&#x27;Topic name&#x27;);
+
+    topicUpdateService.setTopicName(_sampleTopic, &#x27;new unique value&#x27;);
+    expect(_sampleTopic.getName()).toEqual(&#x27;new unique value&#x27;);
+
+    undoRedoService.undoChange(_sampleTopic);
+    expect(_sampleTopic.getName()).toEqual(&#x27;Topic name&#x27;);
+  });
+
+  it(&#x27;should create a proper backend change dict &#x27; +
+    &#x27;for changing a topic\&#x27;s name&#x27;, () =&gt; {
+    topicUpdateService.setTopicName(_sampleTopic, &#x27;new unique value&#x27;);
+    expect(undoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: &#x27;update_topic_property&#x27;,
+      property_name: &#x27;name&#x27;,
+      new_value: &#x27;new unique value&#x27;,
+      old_value: &#x27;Topic name&#x27;
+    }]);
+  });
+
+  it(&#x27;should set/unset changes to a topic\&#x27;s description&#x27;, () =&gt; {
+    expect(_sampleTopic.getDescription()).toEqual(&#x27;Topic description&#x27;);
+
+    topicUpdateService.setTopicDescription(_sampleTopic, &#x27;new unique value&#x27;);
+    expect(_sampleTopic.getDescription()).toEqual(&#x27;new unique value&#x27;);
+
+    undoRedoService.undoChange(_sampleTopic);
+    expect(_sampleTopic.getDescription()).toEqual(&#x27;Topic description&#x27;);
+  });
+
+  it(&#x27;should create a proper backend change dict &#x27; +
+    &#x27;for changing a topic\&#x27;s description&#x27;, () =&gt; {
+    topicUpdateService.setTopicDescription(_sampleTopic, &#x27;new unique value&#x27;);
+    expect(undoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: &#x27;update_topic_property&#x27;,
+      property_name: &#x27;description&#x27;,
+      new_value: &#x27;new unique value&#x27;,
+      old_value: &#x27;Topic description&#x27;
+    }]);
+  });
+
+  it(&#x27;should set/unset changes to a topic\&#x27;s abbreviated name&#x27;, () =&gt; {
+    expect(_sampleTopic.getAbbreviatedName()).toEqual(undefined);
+
+    topicUpdateService.setAbbreviatedTopicName(
+      _sampleTopic, &#x27;new unique value&#x27;);
+    expect(_sampleTopic.getAbbreviatedName()).toEqual(&#x27;new unique value&#x27;);
+
+    undoRedoService.undoChange(_sampleTopic);
+    expect(_sampleTopic.getAbbreviatedName()).toEqual(undefined);
+  });
+
+  it(&#x27;should create a proper backend change dict &#x27; +
+    &#x27;for changing a topic\&#x27;s abbreviated name&#x27;, () =&gt; {
+    topicUpdateService.setAbbreviatedTopicName(
+      _sampleTopic, &#x27;new unique value&#x27;);
+    expect(undoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: &#x27;update_topic_property&#x27;,
+      property_name: &#x27;abbreviated_name&#x27;,
+      new_value: &#x27;new unique value&#x27;,
+      old_value: null
+    }]);
+  });
+
+  it(&#x27;should set/unset changes to a topic\&#x27;s meta tag content&#x27;, () =&gt; {
+    expect(_sampleTopic.getMetaTagContent()).toEqual(undefined);
+
+    topicUpdateService.setMetaTagContent(
+      _sampleTopic, &#x27;new meta tag content&#x27;);
+    expect(_sampleTopic.getMetaTagContent()).toEqual(&#x27;new meta tag content&#x27;);
+
+    undoRedoService.undoChange(_sampleTopic);
+    expect(_sampleTopic.getMetaTagContent()).toEqual(undefined);
+  });
+
+  it(&#x27;should create a proper backend change dict &#x27; +
+    &#x27;for changing a topic\&#x27;s meta tag content&#x27;, () =&gt; {
+    topicUpdateService.setMetaTagContent(
+      _sampleTopic, &#x27;new meta tag content&#x27;);
+    expect(undoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: &#x27;update_topic_property&#x27;,
+      property_name: &#x27;meta_tag_content&#x27;,
+      new_value: &#x27;new meta tag content&#x27;,
+      old_value: null
+    }]);
+  });
+
+  it(&#x27;should set/unset changes to a topic\&#x27;s page title&#x27;, function() {
+    expect(_sampleTopic.getPageTitleFragmentForWeb()).toBeUndefined();
+    topicUpdateService.setPageTitleFragmentForWeb(
+      _sampleTopic, &#x27;new page title&#x27;);
+    expect(_sampleTopic.getPageTitleFragmentForWeb()).toEqual(
+      &#x27;new page title&#x27;);
+
+    undoRedoService.undoChange(_sampleTopic);
+    expect(_sampleTopic.getPageTitleFragmentForWeb()).toBeUndefined();
+  });
+
+  it(&#x27;should create a proper backend change dict &#x27; +
+    &#x27;for changing a topic\&#x27;s page title&#x27;, function() {
+    topicUpdateService.setPageTitleFragmentForWeb(
+      _sampleTopic, &#x27;new page title&#x27;);
+    expect(undoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: &#x27;update_topic_property&#x27;,
+      property_name: &#x27;page_title_fragment_for_web&#x27;,
+      new_value: &#x27;new page title&#x27;,
+      old_value: null
+    }]);
+  });
+
+  it(&#x27;should set/unset changes to a topic\&#x27;s practice tab is &#x27; +
+    &#x27;displayed property&#x27;, () =&gt; {
+    expect(_sampleTopic.getPracticeTabIsDisplayed()).toBeUndefined();
+
+    topicUpdateService.setPracticeTabIsDisplayed(_sampleTopic, true);
+    expect(_sampleTopic.getPracticeTabIsDisplayed()).toEqual(true);
+
+    undoRedoService.undoChange(_sampleTopic);
+    expect(_sampleTopic.getPracticeTabIsDisplayed()).toBeUndefined();
+  });
+
+  it(&#x27;should create a proper backend change dict &#x27; +
+    &#x27;for changing a topic\&#x27;s practice tab is displayed property&#x27;, () =&gt; {
+    topicUpdateService.setPracticeTabIsDisplayed(_sampleTopic, true);
+    expect(undoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: &#x27;update_topic_property&#x27;,
+      property_name: &#x27;practice_tab_is_displayed&#x27;,
+      new_value: true,
+      old_value: null
+    }]);
+  });
+
+  it(&#x27;should set/unset changes to a topic\&#x27;s url fragment&#x27;, () =&gt; {
+    expect(_sampleTopic.getUrlFragment()).toEqual(undefined);
+
+    topicUpdateService.setTopicUrlFragment(_sampleTopic, &#x27;new-unique-value&#x27;);
+    expect(_sampleTopic.getUrlFragment()).toEqual(&#x27;new-unique-value&#x27;);
+
+    undoRedoService.undoChange(_sampleTopic);
+    expect(_sampleTopic.getUrlFragment()).toEqual(undefined);
+  });
+
+  it(&#x27;should create a proper backend change dict &#x27; +
+    &#x27;for changing a topic\&#x27;s url fragment&#x27;, () =&gt; {
+    topicUpdateService.setTopicUrlFragment(_sampleTopic, &#x27;new-unique-value&#x27;);
+    expect(undoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: &#x27;update_topic_property&#x27;,
+      property_name: &#x27;url_fragment&#x27;,
+      new_value: &#x27;new-unique-value&#x27;,
+      old_value: null
+    }]);
+  });
+
+  it(&#x27;should set/unset changes to a topic\&#x27;s thumbnail filename&#x27;, () =&gt; {
+    expect(_sampleTopic.getThumbnailFilename()).toEqual(undefined);
+
+    topicUpdateService.setTopicThumbnailFilename(
+      _sampleTopic, &#x27;new unique value&#x27;);
+    expect(_sampleTopic.getThumbnailFilename()).toEqual(&#x27;new unique value&#x27;);
+
+    undoRedoService.undoChange(_sampleTopic);
+    expect(_sampleTopic.getThumbnailFilename()).toEqual(undefined);
+  });
+
+  it(&#x27;should create a proper backend change dict &#x27; +
+    &#x27;for changing a topic\&#x27;s thumbnail filename&#x27;, () =&gt; {
+    topicUpdateService.setTopicThumbnailFilename(
+      _sampleTopic, &#x27;new unique value&#x27;);
+    expect(undoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: &#x27;update_topic_property&#x27;,
+      property_name: &#x27;thumbnail_filename&#x27;,
+      new_value: &#x27;new unique value&#x27;,
+      old_value: null
+    }]);
+  });
+
+  it(&#x27;should set/unset changes to a topic\&#x27;s thumbnail bg color&#x27;, () =&gt; {
+    expect(_sampleTopic.getThumbnailBgColor()).toEqual(undefined);
+
+    topicUpdateService.setTopicThumbnailBgColor(
+      _sampleTopic, &#x27;#ffffff&#x27;);
+    expect(_sampleTopic.getThumbnailBgColor()).toEqual(&#x27;#ffffff&#x27;);
+
+    undoRedoService.undoChange(_sampleTopic);
+    expect(_sampleTopic.getThumbnailBgColor()).toEqual(undefined);
+  });
+
+  it(&#x27;should create a proper backend change dict &#x27; +
+    &#x27;for changing a topic\&#x27;s thumbnail bg color&#x27;, () =&gt; {
+    topicUpdateService.setTopicThumbnailBgColor(
+      _sampleTopic, &#x27;new unique value&#x27;);
+    expect(undoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: &#x27;update_topic_property&#x27;,
+      property_name: &#x27;thumbnail_bg_color&#x27;,
+      new_value: &#x27;new unique value&#x27;,
+      old_value: null
+    }]);
+  });
+
+  it(&#x27;should set/unset changes to a topic\&#x27;s language code&#x27;, () =&gt; {
+    expect(_sampleTopic.getLanguageCode()).toEqual(&#x27;en&#x27;);
+
+    topicUpdateService.setTopicLanguageCode(_sampleTopic, &#x27;fr&#x27;);
+    expect(_sampleTopic.getLanguageCode()).toEqual(&#x27;fr&#x27;);
+
+    undoRedoService.undoChange(_sampleTopic);
+    expect(_sampleTopic.getLanguageCode()).toEqual(&#x27;en&#x27;);
+  });
+
+  it(&#x27;should create a proper backend change dict &#x27; +
+    &#x27;for changing a topic\&#x27;s language code&#x27;, () =&gt; {
+    topicUpdateService.setTopicLanguageCode(_sampleTopic, &#x27;fr&#x27;);
+    expect(undoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: &#x27;update_topic_property&#x27;,
+      property_name: &#x27;language_code&#x27;,
+      new_value: &#x27;fr&#x27;,
+      old_value: &#x27;en&#x27;
+    }]);
+  });
+
+  it(&#x27;should not create a backend change dict for changing subtopic title &#x27; +
+    &#x27;when the subtopic does not exist&#x27;, () =&gt; {
+    expect(() =&gt; {
+      topicUpdateService.setSubtopicTitle(_sampleTopic, 10, &#x27;whatever&#x27;);
+    }).toThrowError(&#x27;Subtopic with id 10 doesn\&#x27;t exist&#x27;);
+    expect(undoRedoService.getCommittableChangeList()).toEqual([]);
+  });
+
+  it(&#x27;should set/unset changes to a subtopic\&#x27;s title&#x27;, () =&gt; {
+    expect(_sampleTopic.getSubtopics()[0].getTitle())
+      .toEqual(&#x27;Title&#x27;);
+    topicUpdateService.setSubtopicTitle(_sampleTopic, 1, &#x27;new unique value&#x27;);
+    expect(_sampleTopic.getSubtopics()[0].getTitle())
+      .toEqual(&#x27;new unique value&#x27;);
+
+    undoRedoService.undoChange(_sampleTopic);
+    expect(_sampleTopic.getSubtopics()[0].getTitle())
+      .toEqual(&#x27;Title&#x27;);
+  });
+
+  it(&#x27;should create a proper backend change dict for changing subtopic &#x27; +
+    &#x27;title&#x27;, () =&gt; {
+    topicUpdateService.setSubtopicTitle(_sampleTopic, 1, &#x27;new unique value&#x27;);
+    expect(undoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: &#x27;update_subtopic_property&#x27;,
+      subtopic_id: 1,
+      property_name: &#x27;title&#x27;,
+      new_value: &#x27;new unique value&#x27;,
+      old_value: &#x27;Title&#x27;
+    }]);
+  }
+  );
+
+  it(&#x27;should not create a backend change dict for changing subtopic &#x27; +
+    &#x27;thumbnail filename when the subtopic does not exist&#x27;, () =&gt; {
+    expect(() =&gt; {
+      topicUpdateService
+        .setSubtopicThumbnailFilename(_sampleTopic, 10, &#x27;whatever&#x27;);
+    }).toThrowError(&#x27;Subtopic with id 10 doesn\&#x27;t exist&#x27;);
+    expect(undoRedoService.getCommittableChangeList()).toEqual([]);
+  });
+
+  it(&#x27;should set/unset changes to a subtopic\&#x27;s thumbnail&#x27; +
+    &#x27;filename&#x27;, () =&gt; {
+    expect(_sampleTopic.getSubtopics()[0].getThumbnailFilename())
+      .toEqual(undefined);
+
+    topicUpdateService
+      .setSubtopicThumbnailFilename(_sampleTopic, 1, &#x27;filename&#x27;);
+    expect(_sampleTopic.getSubtopics()[0].getThumbnailFilename())
+      .toEqual(&#x27;filename&#x27;);
+
+    undoRedoService.undoChange(_sampleTopic);
+    expect(_sampleTopic.getSubtopics()[0].getThumbnailFilename())
+      .toEqual(undefined);
+  });
+
+  it(&#x27;should create a proper backend change dict for changing subtopic &#x27; +
+    &#x27;thumbnail filename&#x27;, () =&gt; {
+    topicUpdateService
+      .setSubtopicThumbnailFilename(_sampleTopic, 1, &#x27;filename&#x27;);
+    expect(undoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: &#x27;update_subtopic_property&#x27;,
+      subtopic_id: 1,
+      property_name: &#x27;thumbnail_filename&#x27;,
+      new_value: &#x27;filename&#x27;,
+      old_value: undefined
+    }]);
+  }
+  );
+
+  it(&#x27;should not create a backend change dict for changing subtopic &#x27; +
+    &#x27;thumbnail bg color when the subtopic does not exist&#x27;, () =&gt; {
+    expect(() =&gt; {
+      topicUpdateService
+        .setSubtopicThumbnailBgColor(_sampleTopic, 10, &#x27;whatever&#x27;);
+    }).toThrowError(&#x27;Subtopic with id 10 doesn\&#x27;t exist&#x27;);
+    expect(undoRedoService.getCommittableChangeList()).toEqual([]);
+  });
+
+  it(&#x27;should create a proper backend change dict for changing subtopic &#x27; +
+    &#x27;url fragment&#x27;, () =&gt; {
+    topicUpdateService.setSubtopicUrlFragment(_sampleTopic, 1, &#x27;subtopic-url&#x27;);
+    expect(undoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: &#x27;update_subtopic_property&#x27;,
+      subtopic_id: 1,
+      property_name: &#x27;url_fragment&#x27;,
+      new_value: &#x27;subtopic-url&#x27;,
+      old_value: undefined
+    }]);
+  });
+
+  it(&#x27;should not create a backend change dict for changing subtopic &#x27; +
+    &#x27;url fragment when the subtopic does not exist&#x27;, () =&gt; {
+    expect(() =&gt; {
+      topicUpdateService.setSubtopicUrlFragment(_sampleTopic, 10, &#x27;whatever&#x27;);
+    }).toThrowError(&#x27;Subtopic with id 10 doesn\&#x27;t exist&#x27;);
+    expect(undoRedoService.getCommittableChangeList()).toEqual([]);
+  });
+
+  it(&#x27;should set/unset changes to a subtopic\&#x27;s url fragment&#x27;, () =&gt; {
+    expect(_sampleTopic.getSubtopics()[0].getUrlFragment()).toEqual(undefined);
+
+    topicUpdateService.setSubtopicUrlFragment(_sampleTopic, 1, &#x27;test-url&#x27;);
+    expect(_sampleTopic.getSubtopics()[0].getUrlFragment()).toEqual(
+      &#x27;test-url&#x27;);
+
+    undoRedoService.undoChange(_sampleTopic);
+    expect(_sampleTopic.getSubtopics()[0].getUrlFragment())
+      .toEqual(undefined);
+  });
+
+  it(&#x27;should set/unset changes to a subtopic\&#x27;s thumbnail bg &#x27; +
+    &#x27;color&#x27;, () =&gt; {
+    expect(_sampleTopic.getSubtopics()[0].getThumbnailBgColor())
+      .toEqual(undefined);
+
+    topicUpdateService
+      .setSubtopicThumbnailBgColor(_sampleTopic, 1, &#x27;#ffffff&#x27;);
+    expect(_sampleTopic.getSubtopics()[0].getThumbnailBgColor())
+      .toEqual(&#x27;#ffffff&#x27;);
+
+    undoRedoService.undoChange(_sampleTopic);
+    expect(_sampleTopic.getSubtopics()[0].getThumbnailBgColor())
+      .toEqual(undefined);
+  });
+
+  it(&#x27;should create a proper backend change dict for changing subtopic &#x27; +
+    &#x27;thumbnail bg color&#x27;, () =&gt; {
+    topicUpdateService
+      .setSubtopicThumbnailBgColor(_sampleTopic, 1, &#x27;#ffffff&#x27;);
+    expect(undoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: &#x27;update_subtopic_property&#x27;,
+      subtopic_id: 1,
+      property_name: &#x27;thumbnail_bg_color&#x27;,
+      new_value: &#x27;#ffffff&#x27;,
+      old_value: undefined
+    }]);
+  });
+
+  it(&#x27;should add/remove a subtopic&#x27;, () =&gt; {
+    expect(_sampleTopic.getSubtopics().length).toEqual(1);
+    topicUpdateService.addSubtopic(_sampleTopic, &#x27;Title2&#x27;);
+    expect(_sampleTopic.getSubtopics().length).toEqual(2);
+    expect(_sampleTopic.getNextSubtopicId()).toEqual(3);
+    expect(_sampleTopic.getSubtopics()[1].getTitle()).toEqual(&#x27;Title2&#x27;);
+    expect(_sampleTopic.getSubtopics()[1].getId()).toEqual(2);
+
+    undoRedoService.undoChange(_sampleTopic);
+    expect(_sampleTopic.getSubtopics().length).toEqual(1);
+  });
+
+  it(&#x27;should rearrange a canonical story&#x27;, () =&gt; {
+    let canonicalStoryIds = _sampleTopic.getCanonicalStoryIds();
+    expect(canonicalStoryIds.length).toEqual(3);
+    expect(canonicalStoryIds[0]).toEqual(&#x27;story_1&#x27;);
+    expect(canonicalStoryIds[1]).toEqual(&#x27;story_2&#x27;);
+    expect(canonicalStoryIds[2]).toEqual(&#x27;story_3&#x27;);
+
+    topicUpdateService.rearrangeCanonicalStory(_sampleTopic, 1, 0);
+    canonicalStoryIds = _sampleTopic.getCanonicalStoryIds();
+    expect(canonicalStoryIds[0]).toEqual(&#x27;story_2&#x27;);
+    expect(canonicalStoryIds[1]).toEqual(&#x27;story_1&#x27;);
+    expect(canonicalStoryIds[2]).toEqual(&#x27;story_3&#x27;);
+
+    topicUpdateService.rearrangeCanonicalStory(_sampleTopic, 2, 1);
+    canonicalStoryIds = _sampleTopic.getCanonicalStoryIds();
+    expect(canonicalStoryIds[0]).toEqual(&#x27;story_2&#x27;);
+    expect(canonicalStoryIds[1]).toEqual(&#x27;story_3&#x27;);
+    expect(canonicalStoryIds[2]).toEqual(&#x27;story_1&#x27;);
+
+    topicUpdateService.rearrangeCanonicalStory(_sampleTopic, 2, 0);
+    canonicalStoryIds = _sampleTopic.getCanonicalStoryIds();
+    expect(canonicalStoryIds[0]).toEqual(&#x27;story_1&#x27;);
+    expect(canonicalStoryIds[1]).toEqual(&#x27;story_2&#x27;);
+    expect(canonicalStoryIds[2]).toEqual(&#x27;story_3&#x27;);
+
+    undoRedoService.undoChange(_sampleTopic);
+    expect(_sampleTopic.getCanonicalStoryIds().length).toEqual(3);
+    canonicalStoryIds = _sampleTopic.getCanonicalStoryIds();
+    expect(canonicalStoryIds[0]).toEqual(&#x27;story_2&#x27;);
+    expect(canonicalStoryIds[1]).toEqual(&#x27;story_3&#x27;);
+    expect(canonicalStoryIds[2]).toEqual(&#x27;story_1&#x27;);
+
+    topicUpdateService.rearrangeCanonicalStory(_sampleTopic, 2, 0);
+    canonicalStoryIds = _sampleTopic.getCanonicalStoryIds();
+    expect(canonicalStoryIds[0]).toEqual(&#x27;story_1&#x27;);
+    expect(canonicalStoryIds[1]).toEqual(&#x27;story_2&#x27;);
+    expect(canonicalStoryIds[2]).toEqual(&#x27;story_3&#x27;);
+  });
+
+  it(&#x27;should rearrange a skill in a subtopic&#x27;, () =&gt; {
+    sampleTopicBackendObject.topicDict.subtopics[0].skill_ids = [
+      &#x27;skill_id_1&#x27;, &#x27;skill_id_2&#x27;, &#x27;skill_id_3&#x27;];
+    _sampleTopic = topicObjectFactory.create(
+      sampleTopicBackendObject.topicDict as TopicBackendDict,
+      sampleTopicBackendObject.skillIdToDescriptionDict);
+    let skills = _sampleTopic.getSubtopicById(1).getSkillSummaries();
+    expect(skills.length).toEqual(3);
+    expect(skills[0].getId()).toEqual(&#x27;skill_id_1&#x27;);
+    expect(skills[1].getId()).toEqual(&#x27;skill_id_2&#x27;);
+    expect(skills[2].getId()).toEqual(&#x27;skill_id_3&#x27;);
+
+    topicUpdateService.rearrangeSkillInSubtopic(_sampleTopic, 1, 1, 0);
+    skills = _sampleTopic.getSubtopicById(1).getSkillSummaries();
+    expect(skills[0].getId()).toEqual(&#x27;skill_id_2&#x27;);
+    expect(skills[1].getId()).toEqual(&#x27;skill_id_1&#x27;);
+    expect(skills[2].getId()).toEqual(&#x27;skill_id_3&#x27;);
+
+    topicUpdateService.rearrangeSkillInSubtopic(_sampleTopic, 1, 2, 1);
+    skills = _sampleTopic.getSubtopicById(1).getSkillSummaries();
+    expect(skills[0].getId()).toEqual(&#x27;skill_id_2&#x27;);
+    expect(skills[1].getId()).toEqual(&#x27;skill_id_3&#x27;);
+    expect(skills[2].getId()).toEqual(&#x27;skill_id_1&#x27;);
+
+    topicUpdateService.rearrangeSkillInSubtopic(_sampleTopic, 1, 2, 0);
+    skills = _sampleTopic.getSubtopicById(1).getSkillSummaries();
+    expect(skills[0].getId()).toEqual(&#x27;skill_id_1&#x27;);
+    expect(skills[1].getId()).toEqual(&#x27;skill_id_2&#x27;);
+    expect(skills[2].getId()).toEqual(&#x27;skill_id_3&#x27;);
+
+    undoRedoService.undoChange(_sampleTopic);
+    skills = _sampleTopic.getSubtopicById(1).getSkillSummaries();
+    expect(skills[0].getId()).toEqual(&#x27;skill_id_2&#x27;);
+    expect(skills[1].getId()).toEqual(&#x27;skill_id_3&#x27;);
+    expect(skills[2].getId()).toEqual(&#x27;skill_id_1&#x27;);
+    sampleTopicBackendObject.topicDict.subtopics[0].skill_ids = [&#x27;skill_2&#x27;];
+  });
+
+  it(&#x27;should rearrange a subtopic&#x27;, () =&gt; {
+    var subtopicsDict = [{id: 2, title: &#x27;Title2&#x27;, skill_ids: []},
+      {id: 3, title: &#x27;Title3&#x27;, skill_ids: []}];
+    sampleTopicBackendObject.topicDict.subtopics.push(...subtopicsDict);
+
+    _sampleTopic = topicObjectFactory.create(
+      sampleTopicBackendObject.topicDict as TopicBackendDict,
+      sampleTopicBackendObject.skillIdToDescriptionDict);
+    var subtopics = _sampleTopic.getSubtopics();
+    expect(subtopics.length).toEqual(3);
+    expect(subtopics[0].getId()).toEqual(1);
+    expect(subtopics[1].getId()).toEqual(2);
+    expect(subtopics[2].getId()).toEqual(3);
+
+    topicUpdateService.rearrangeSubtopic(_sampleTopic, 1, 0);
+    subtopics = _sampleTopic.getSubtopics();
+    expect(subtopics[0].getId()).toEqual(2);
+    expect(subtopics[1].getId()).toEqual(1);
+    expect(subtopics[2].getId()).toEqual(3);
+
+    topicUpdateService.rearrangeSubtopic(_sampleTopic, 2, 1);
+    subtopics = _sampleTopic.getSubtopics();
+    expect(subtopics[0].getId()).toEqual(2);
+    expect(subtopics[1].getId()).toEqual(3);
+    expect(subtopics[2].getId()).toEqual(1);
+
+    topicUpdateService.rearrangeSubtopic(_sampleTopic, 2, 0);
+    subtopics = _sampleTopic.getSubtopics();
+    expect(subtopics[0].getId()).toEqual(1);
+    expect(subtopics[1].getId()).toEqual(2);
+    expect(subtopics[2].getId()).toEqual(3);
+
+    undoRedoService.undoChange(_sampleTopic);
+    subtopics = _sampleTopic.getSubtopics();
+    expect(subtopics[0].getId()).toEqual(2);
+    expect(subtopics[1].getId()).toEqual(3);
+    expect(subtopics[2].getId()).toEqual(1);
+    sampleTopicBackendObject.topicDict.subtopics = [{
+      id: 1,
+      title: &#x27;Title&#x27;,
+      skill_ids: [&#x27;skill_2&#x27;]
+    }];
+  });
+
+  it(&#x27;should create a proper backend change dict for adding a subtopic&#x27;,
+    () =&gt; {
+      topicUpdateService.addSubtopic(_sampleTopic, &#x27;Title2&#x27;);
+      expect(undoRedoService.getCommittableChangeList()).toEqual([{
+        cmd: &#x27;add_subtopic&#x27;,
+        subtopic_id: 2,
+        title: &#x27;Title2&#x27;
+      }]);
+    }
+  );
+
+  it(&#x27;should remove/add a subtopic&#x27;, () =&gt; {
+    expect(_sampleTopic.getSubtopics().length).toEqual(1);
+    topicUpdateService.deleteSubtopic(_sampleTopic, 1);
+    expect(_sampleTopic.getSubtopics()).toEqual([]);
+    expect(_sampleTopic.getUncategorizedSkillSummaries()).toEqual([
+      _firstSkillSummary, _secondSkillSummary
+    ]);
+
+    expect(() =&gt; {
+      undoRedoService.undoChange(_sampleTopic);
+    }).toThrowError(&#x27;A deleted subtopic cannot be restored&#x27;);
+  });
+
+  it(&#x27;should properly remove/add a newly created subtopic&#x27;, () =&gt; {
+    topicUpdateService.addSubtopic(_sampleTopic, &#x27;Title2&#x27;);
+    topicUpdateService.addSubtopic(_sampleTopic, &#x27;Title3&#x27;);
+    expect(_sampleTopic.getSubtopics()[1].getId()).toEqual(2);
+    expect(_sampleTopic.getSubtopics()[2].getId()).toEqual(3);
+    expect(_sampleTopic.getNextSubtopicId()).toEqual(4);
+
+    topicUpdateService.deleteSubtopic(_sampleTopic, 2);
+    expect(_sampleTopic.getSubtopics().length).toEqual(2);
+    expect(_sampleTopic.getSubtopics()[1].getTitle()).toEqual(&#x27;Title3&#x27;);
+    expect(_sampleTopic.getSubtopics()[1].getId()).toEqual(2);
+    expect(_sampleTopic.getNextSubtopicId()).toEqual(3);
+
+    expect(undoRedoService.getChangeCount()).toEqual(1);
+  });
+
+  it(&#x27;should create a proper backend change dict for deleting &#x27; +
+    &#x27;a subtopic&#x27;, () =&gt; {
+    topicUpdateService.deleteSubtopic(_sampleTopic, 1);
+    expect(undoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: &#x27;delete_subtopic&#x27;,
+      subtopic_id: 1
+    }]);
+  }
+  );
+
+  it(&#x27;should not create a backend change dict for deleting a subtopic &#x27; +
+    &#x27;when an error is encountered&#x27;, () =&gt; {
+    expect(() =&gt; {
+      topicUpdateService.deleteSubtopic(_sampleTopic, 10);
+    }).toThrowError(&#x27;Subtopic with id 10 doesn\&#x27;t exist&#x27;);
+    expect(undoRedoService.getCommittableChangeList()).toEqual([]);
+  });
+
+  it(&#x27;should not create a backend change dict for moving subtopic&#x27; +
+    &#x27;when error is thrown&#x27;, () =&gt; {
+    expect(() =&gt; {
+      topicUpdateService.moveSkillToSubtopic(_sampleTopic, 1, null, undefined);
+    }).toThrowError(&#x27;New subtopic cannot be null&#x27;);
+    expect(undoRedoService.getCommittableChangeList()).toEqual([]);
+  });
+
+  it(&#x27;should move/undo move a skill id to a subtopic&#x27;, () =&gt; {
+    expect(_sampleTopic.getUncategorizedSkillSummaries()).toEqual([
+      _firstSkillSummary
+    ]);
+    expect(_sampleTopic.getSubtopics()[0].getSkillSummaries()).toEqual([
+      _secondSkillSummary
+    ]);
+    topicUpdateService.moveSkillToSubtopic(
+      _sampleTopic, null, 1, _firstSkillSummary);
+    expect(_sampleTopic.getUncategorizedSkillSummaries()).toEqual([]);
+    expect(_sampleTopic.getSubtopics()[0].getSkillSummaries()).toEqual([
+      _secondSkillSummary, _firstSkillSummary
+    ]);
+
+    /** Undo back to uncategorized */
+    undoRedoService.undoChange(_sampleTopic);
+    expect(_sampleTopic.getUncategorizedSkillSummaries()).toEqual([
+      _firstSkillSummary
+    ]);
+    expect(_sampleTopic.getSubtopics()[0].getSkillSummaries()).toEqual([
+      _secondSkillSummary
+    ]);
+
+    /**
+     * Undo back to old subtopic
+     *  Move to _sampleTopic, move to _sampleTopic2, then undo
+     */
+    topicUpdateService.addSubtopic(_sampleTopic, &#x27;Title 2&#x27;);
+
+    topicUpdateService.moveSkillToSubtopic(
+      _sampleTopic, null, 1, _firstSkillSummary);
+    expect(_sampleTopic.getUncategorizedSkillSummaries()).toEqual([]);
+    expect(_sampleTopic.getSubtopics()[0].getSkillSummaries()).toEqual([
+      _secondSkillSummary, _firstSkillSummary
+    ]);
+
+    topicUpdateService.moveSkillToSubtopic(
+      _sampleTopic, 1, 2, _firstSkillSummary);
+    expect(_sampleTopic.getSubtopics()[0].getSkillSummaries()).toEqual(
+      [_secondSkillSummary]);
+    expect(_sampleTopic.getSubtopics()[1].getSkillSummaries()).toEqual(
+      [_firstSkillSummary]);
+
+    undoRedoService.undoChange(_sampleTopic);
+    expect(_sampleTopic.getUncategorizedSkillSummaries()).toEqual([]);
+    expect(_sampleTopic.getSubtopics()[0].getSkillSummaries()).toEqual([
+      _secondSkillSummary, _firstSkillSummary
+    ]);
+  });
+
+  it(&#x27;should correctly create changelists when moving a skill to a newly &#x27; +
+    &#x27;created subtopic that has since been deleted&#x27;, () =&gt; {
+    topicUpdateService.addSubtopic(_sampleTopic, &#x27;Title 2&#x27;);
+    topicUpdateService.moveSkillToSubtopic(
+      _sampleTopic, null, 2, _firstSkillSummary
+    );
+    topicUpdateService.removeSkillFromSubtopic(
+      _sampleTopic, 2, _firstSkillSummary
+    );
+    topicUpdateService.deleteSubtopic(_sampleTopic, 2);
+    expect(undoRedoService.getCommittableChangeList()).toEqual([]);
+
+    topicUpdateService.addSubtopic(_sampleTopic, &#x27;Title 2&#x27;);
+    topicUpdateService.moveSkillToSubtopic(
+      _sampleTopic, 1, 2, _secondSkillSummary
+    );
+    topicUpdateService.moveSkillToSubtopic(
+      _sampleTopic, 2, 1, _secondSkillSummary
+    );
+    topicUpdateService.deleteSubtopic(_sampleTopic, 2);
+
+    expect(undoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: &#x27;remove_skill_id_from_subtopic&#x27;,
+      skill_id: &#x27;skill_2&#x27;,
+      subtopic_id: 1
+    }, {
+      cmd: &#x27;move_skill_id_to_subtopic&#x27;,
+      skill_id: &#x27;skill_2&#x27;,
+      new_subtopic_id: 1,
+      old_subtopic_id: null
+    }]);
+    undoRedoService.clearChanges();
+
+    topicUpdateService.addSubtopic(_sampleTopic, &#x27;Title 2&#x27;);
+    topicUpdateService.moveSkillToSubtopic(
+      _sampleTopic, null, 2, _firstSkillSummary
+    );
+    topicUpdateService.moveSkillToSubtopic(
+      _sampleTopic, 1, 2, _secondSkillSummary
+    );
+    topicUpdateService.deleteSubtopic(_sampleTopic, 2);
+    expect(undoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: &#x27;remove_skill_id_from_subtopic&#x27;,
+      skill_id: &#x27;skill_2&#x27;,
+      subtopic_id: 1
+    }]);
+  });
+
+  it(&#x27;should create properly decrement subtopic ids of later subtopics when &#x27; +
+    &#x27;a newly created subtopic is deleted&#x27;, () =&gt; {
+    topicUpdateService.addSubtopic(_sampleTopic, &#x27;Title 2&#x27;);
+    topicUpdateService.addSubtopic(_sampleTopic, &#x27;Title 3&#x27;);
+    topicUpdateService.moveSkillToSubtopic(
+      _sampleTopic, 1, 3, _secondSkillSummary
+    );
+    topicUpdateService.deleteSubtopic(_sampleTopic, 2);
+    expect(undoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: &#x27;add_subtopic&#x27;,
+      title: &#x27;Title 3&#x27;,
+      subtopic_id: 2
+    }, {
+      cmd: &#x27;move_skill_id_to_subtopic&#x27;,
+      old_subtopic_id: 1,
+      new_subtopic_id: 2,
+      skill_id: &#x27;skill_2&#x27;
+    }]);
+  });
+
+  it(&#x27;should properly decrement subtopic ids of moved subtopics &#x27; +
+    &#x27;when a newly created subtopic is deleted&#x27;, () =&gt; {
+    topicUpdateService.addSubtopic(_sampleTopic, &#x27;Title 2&#x27;);
+    topicUpdateService.addSubtopic(_sampleTopic, &#x27;Title 3&#x27;);
+    topicUpdateService.addSubtopic(_sampleTopic, &#x27;Title 4&#x27;);
+
+    topicUpdateService.moveSkillToSubtopic(
+      _sampleTopic, 1, 3, _secondSkillSummary
+    );
+    topicUpdateService.moveSkillToSubtopic(
+      _sampleTopic, 3, 4, _secondSkillSummary
+    );
+    topicUpdateService.deleteSubtopic(_sampleTopic, 2);
+    expect(undoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: &#x27;add_subtopic&#x27;,
+      title: &#x27;Title 3&#x27;,
+      subtopic_id: 2
+    }, {
+      cmd: &#x27;add_subtopic&#x27;,
+      title: &#x27;Title 4&#x27;,
+      subtopic_id: 3
+    }, {
+      cmd: &#x27;move_skill_id_to_subtopic&#x27;,
+      old_subtopic_id: 1,
+      new_subtopic_id: 2,
+      skill_id: &#x27;skill_2&#x27;
+    }, {
+      cmd: &#x27;move_skill_id_to_subtopic&#x27;,
+      old_subtopic_id: 2,
+      new_subtopic_id: 3,
+      skill_id: &#x27;skill_2&#x27;
+    }]);
+  });
+
+  it(&#x27;should create a proper backend change dict for moving a skill id to a &#x27; +
+    &#x27;subtopic&#x27;, () =&gt; {
+    topicUpdateService.moveSkillToSubtopic(
+      _sampleTopic, null, 1, _firstSkillSummary);
+    expect(undoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: &#x27;move_skill_id_to_subtopic&#x27;,
+      old_subtopic_id: null,
+      new_subtopic_id: 1,
+      skill_id: &#x27;skill_1&#x27;
+    }]);
+  });
+
+  it(&#x27;should not create a backend change dict for moving a skill id to a&#x27; +
+    &#x27;subtopic when an error is encountered&#x27;, () =&gt; {
+    expect(() =&gt; {
+      topicUpdateService.moveSkillToSubtopic(
+        _sampleTopic, null, 1, _secondSkillSummary);
+    }).toThrowError(&#x27;Given skillId is not an uncategorized skill.&#x27;);
+    expect(() =&gt; {
+      topicUpdateService.moveSkillToSubtopic(
+        _sampleTopic, 1, 2, _secondSkillSummary);
+    }).toThrowError(&#x27;Cannot read property \&#x27;addSkill\&#x27; of null&#x27;);
+    expect(undoRedoService.getCommittableChangeList()).toEqual([]);
+  });
+
+  it(&#x27;should remove a skill id from a subtopic&#x27;, () =&gt; {
+    expect(_sampleTopic.getUncategorizedSkillSummaries()).toEqual([
+      _firstSkillSummary
+    ]);
+    expect(_sampleTopic.getSubtopics()[0].getSkillSummaries()).toEqual([
+      _secondSkillSummary
+    ]);
+    topicUpdateService.removeSkillFromSubtopic(
+      _sampleTopic, 1, _secondSkillSummary);
+    expect(_sampleTopic.getUncategorizedSkillSummaries()).toEqual([
+      _firstSkillSummary, _secondSkillSummary
+    ]);
+    expect(_sampleTopic.getSubtopics()[0].getSkillSummaries()).toEqual([]);
+
+    undoRedoService.undoChange(_sampleTopic);
+    expect(_sampleTopic.getUncategorizedSkillSummaries()).toEqual([
+      _firstSkillSummary
+    ]);
+    expect(_sampleTopic.getSubtopics()[0].getSkillSummaries()).toEqual([
+      _secondSkillSummary
+    ]);
+  });
+
+  it(&#x27;should create a proper backend change dict for removing a skill id &#x27; +
+    &#x27;from a subtopic&#x27;, () =&gt; {
+    topicUpdateService.removeSkillFromSubtopic(
+      _sampleTopic, 1, _secondSkillSummary);
+    expect(undoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: &#x27;remove_skill_id_from_subtopic&#x27;,
+      subtopic_id: 1,
+      skill_id: &#x27;skill_2&#x27;
+    }]);
+  });
+
+  it(&#x27;should not create a backend change dict for removing a skill id from a&#x27; +
+    &#x27;subtopic when an error is encountered&#x27;, () =&gt; {
+    expect(() =&gt; {
+      topicUpdateService.removeSkillFromSubtopic(
+        _sampleTopic, 1, _firstSkillSummary);
+    }).toThrowError(&#x27;The given skill doesn\&#x27;t exist in the subtopic&#x27;);
+    expect(undoRedoService.getCommittableChangeList()).toEqual([]);
+  });
+
+  it(&#x27;should set/unset changes to a subtopic page\&#x27;s page content&#x27;, () =&gt; {
+    var newSampleSubtitledHtmlDict = {
+      html: &#x27;new content&#x27;,
+      content_id: &#x27;content&#x27;
+    };
+    var newSampleSubtitledHtml =
+      SubtitledHtml.createFromBackendDict(
+        newSampleSubtitledHtmlDict);
+    expect(_sampleSubtopicPage.getPageContents().toBackendDict()).toEqual({
+      subtitled_html: {
+        html: &#x27;test content&#x27;,
+        content_id: &#x27;content&#x27;
+      },
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          content: {
+            en: {
+              filename: &#x27;test.mp3&#x27;,
+              file_size_bytes: 100,
+              needs_update: false,
+              duration_secs: 0.1
+            }
+          }
+        }
+      }
+    });
+    topicUpdateService.setSubtopicPageContentsHtml(
+      _sampleSubtopicPage, 1, newSampleSubtitledHtml);
+    expect(_sampleSubtopicPage.getPageContents().toBackendDict()).toEqual({
+      subtitled_html: {
+        html: &#x27;new content&#x27;,
+        content_id: &#x27;content&#x27;
+      },
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          content: {
+            en: {
+              filename: &#x27;test.mp3&#x27;,
+              file_size_bytes: 100,
+              needs_update: false,
+              duration_secs: 0.1
+            }
+          }
+        }
+      }
+    });
+
+    undoRedoService.undoChange(_sampleSubtopicPage);
+    expect(_sampleSubtopicPage.getPageContents().toBackendDict()).toEqual({
+      subtitled_html: {
+        html: &#x27;test content&#x27;,
+        content_id: &#x27;content&#x27;
+      },
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          content: {
+            en: {
+              filename: &#x27;test.mp3&#x27;,
+              file_size_bytes: 100,
+              needs_update: false,
+              duration_secs: 0.1
+            }
+          }
+        }
+      }
+    });
+  });
+
+  it(&#x27;should create a proper backend change dict for changing &#x27; +
+    &#x27;html data&#x27;, () =&gt; {
+    let newSampleSubtitledHtmlDict = {
+      html: &#x27;new content&#x27;,
+      content_id: &#x27;content&#x27;
+    };
+    let newSampleSubtitledHtml =
+      SubtitledHtml.createFromBackendDict(
+        newSampleSubtitledHtmlDict);
+    topicUpdateService.setSubtopicPageContentsHtml(
+      _sampleSubtopicPage, 1, newSampleSubtitledHtml);
+    expect(undoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: &#x27;update_subtopic_page_property&#x27;,
+      property_name: &#x27;page_contents_html&#x27;,
+      subtopic_id: 1,
+      new_value: newSampleSubtitledHtml.toBackendDict(),
+      old_value: {
+        html: &#x27;test content&#x27;,
+        content_id: &#x27;content&#x27;
+      }
+    }]);
+  }
+  );
+
+  it(&#x27;should set/unset changes to a subtopic page\&#x27;s audio data&#x27;, () =&gt; {
+    var newRecordedVoiceoversDict = {
+      voiceovers_mapping: {
+        content: {
+          en: {
+            filename: &#x27;test_2.mp3&#x27;,
+            file_size_bytes: 1000,
+            needs_update: false,
+            duration_secs: 1.0
+          }
+        }
+      }
+    };
+    let newVoiceovers = RecordedVoiceovers.createFromBackendDict(
+      newRecordedVoiceoversDict);
+
+    expect(_sampleSubtopicPage.getPageContents().toBackendDict()).toEqual({
+      subtitled_html: {
+        html: &#x27;test content&#x27;,
+        content_id: &#x27;content&#x27;
+      },
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          content: {
+            en: {
+              filename: &#x27;test.mp3&#x27;,
+              file_size_bytes: 100,
+              needs_update: false,
+              duration_secs: 0.1
+            }
+          }
+        }
+      }
+    });
+
+    topicUpdateService.setSubtopicPageContentsAudio(
+      _sampleSubtopicPage, 1, newVoiceovers);
+    expect(_sampleSubtopicPage.getPageContents().toBackendDict()).toEqual({
+      subtitled_html: {
+        html: &#x27;test content&#x27;,
+        content_id: &#x27;content&#x27;
+      },
+      recorded_voiceovers: newRecordedVoiceoversDict
+    });
+
+    undoRedoService.undoChange(_sampleSubtopicPage);
+    expect(_sampleSubtopicPage.getPageContents().toBackendDict()).toEqual({
+      subtitled_html: {
+        html: &#x27;test content&#x27;,
+        content_id: &#x27;content&#x27;
+      },
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          content: {
+            en: {
+              filename: &#x27;test.mp3&#x27;,
+              file_size_bytes: 100,
+              needs_update: false,
+              duration_secs: 0.1
+            }
+          }
+        }
+      }
+    });
+  });
+
+  it(&#x27;should create a proper backend change dict for changing subtopic &#x27; +
+     &#x27;page audio data&#x27;, () =&gt; {
+    var newRecordedVoiceoversDict = {
+      voiceovers_mapping: {
+        content: {
+          en: {
+            filename: &#x27;test_2.mp3&#x27;,
+            file_size_bytes: 1000,
+            needs_update: false,
+            duration_secs: 1.0
+          }
+        }
+      }
+    };
+    var newVoiceovers = RecordedVoiceovers.createFromBackendDict(
+      newRecordedVoiceoversDict);
+    topicUpdateService.setSubtopicPageContentsAudio(
+      _sampleSubtopicPage, 1, newVoiceovers);
+    expect(undoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: &#x27;update_subtopic_page_property&#x27;,
+      property_name: &#x27;page_contents_audio&#x27;,
+      subtopic_id: 1,
+      new_value: newVoiceovers.toBackendDict(),
+      old_value: {
+        voiceovers_mapping: {
+          content: {
+            en: {
+              filename: &#x27;test.mp3&#x27;,
+              file_size_bytes: 100,
+              needs_update: false,
+              duration_secs: 0.1
+            }
+          }
+        }
+      }
+    }]);
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:36,&quot;character&quot;:6,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:37,&quot;character&quot;:6,&quot;text&quot;:&quot;_firstSkillSummary&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:38,&quot;character&quot;:6,&quot;text&quot;:&quot;_secondSkillSummary&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:39,&quot;character&quot;:6,&quot;text&quot;:&quot;_thirdSkillSummary&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:40,&quot;character&quot;:6,&quot;text&quot;:&quot;_sampleSubtopicPage&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:105,&quot;character&quot;:4,&quot;text&quot;:&quot;_firstSkillSummary&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:107,&quot;character&quot;:4,&quot;text&quot;:&quot;_secondSkillSummary&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:109,&quot;character&quot;:4,&quot;text&quot;:&quot;_thirdSkillSummary&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:112,&quot;character&quot;:4,&quot;text&quot;:&quot;_sampleSubtopicPage&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:114,&quot;character&quot;:4,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:115,&quot;character&quot;:6,&quot;text&quot;:&quot;sampleTopicBackendObject.topicDict as TopicBackendDict&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:120,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:120,&quot;character&quot;:24,&quot;text&quot;:&quot;getAdditionalStoryIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:122,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:122,&quot;character&quot;:24,&quot;text&quot;:&quot;getAdditionalStoryIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:125,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:125,&quot;character&quot;:24,&quot;text&quot;:&quot;getAdditionalStoryIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:147,&quot;character&quot;:8,&quot;text&quot;:&quot;canonicalStoryIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:147,&quot;character&quot;:28,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:147,&quot;character&quot;:41,&quot;text&quot;:&quot;getCanonicalStoryIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:148,&quot;character&quot;:11,&quot;text&quot;:&quot;canonicalStoryIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:151,&quot;character&quot;:4,&quot;text&quot;:&quot;canonicalStoryIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:151,&quot;character&quot;:24,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:151,&quot;character&quot;:37,&quot;text&quot;:&quot;getCanonicalStoryIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:152,&quot;character&quot;:11,&quot;text&quot;:&quot;canonicalStoryIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:155,&quot;character&quot;:4,&quot;text&quot;:&quot;canonicalStoryIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:155,&quot;character&quot;:24,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:155,&quot;character&quot;:37,&quot;text&quot;:&quot;getCanonicalStoryIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:156,&quot;character&quot;:11,&quot;text&quot;:&quot;canonicalStoryIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:178,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:178,&quot;character&quot;:24,&quot;text&quot;:&quot;getUncategorizedSkillSummaries&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:179,&quot;character&quot;:6,&quot;text&quot;:&quot;_firstSkillSummary&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:184,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:184,&quot;character&quot;:24,&quot;text&quot;:&quot;getUncategorizedSkillSummaries&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:187,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:187,&quot;character&quot;:24,&quot;text&quot;:&quot;getUncategorizedSkillSummaries&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:188,&quot;character&quot;:6,&quot;text&quot;:&quot;_firstSkillSummary&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:213,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:213,&quot;character&quot;:24,&quot;text&quot;:&quot;getName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:216,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:216,&quot;character&quot;:24,&quot;text&quot;:&quot;getName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:219,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:219,&quot;character&quot;:24,&quot;text&quot;:&quot;getName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:234,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:234,&quot;character&quot;:24,&quot;text&quot;:&quot;getDescription&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:237,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:237,&quot;character&quot;:24,&quot;text&quot;:&quot;getDescription&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:240,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:240,&quot;character&quot;:24,&quot;text&quot;:&quot;getDescription&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:255,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:255,&quot;character&quot;:24,&quot;text&quot;:&quot;getAbbreviatedName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:259,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:259,&quot;character&quot;:24,&quot;text&quot;:&quot;getAbbreviatedName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:262,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:262,&quot;character&quot;:24,&quot;text&quot;:&quot;getAbbreviatedName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:278,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:278,&quot;character&quot;:24,&quot;text&quot;:&quot;getMetaTagContent&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:282,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:282,&quot;character&quot;:24,&quot;text&quot;:&quot;getMetaTagContent&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:285,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:285,&quot;character&quot;:24,&quot;text&quot;:&quot;getMetaTagContent&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:301,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:301,&quot;character&quot;:24,&quot;text&quot;:&quot;getPageTitleFragmentForWeb&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:304,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:304,&quot;character&quot;:24,&quot;text&quot;:&quot;getPageTitleFragmentForWeb&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:308,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:308,&quot;character&quot;:24,&quot;text&quot;:&quot;getPageTitleFragmentForWeb&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:325,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:325,&quot;character&quot;:24,&quot;text&quot;:&quot;getPracticeTabIsDisplayed&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:328,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:328,&quot;character&quot;:24,&quot;text&quot;:&quot;getPracticeTabIsDisplayed&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:331,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:331,&quot;character&quot;:24,&quot;text&quot;:&quot;getPracticeTabIsDisplayed&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:346,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:346,&quot;character&quot;:24,&quot;text&quot;:&quot;getUrlFragment&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:349,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:349,&quot;character&quot;:24,&quot;text&quot;:&quot;getUrlFragment&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:352,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:352,&quot;character&quot;:24,&quot;text&quot;:&quot;getUrlFragment&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:367,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:367,&quot;character&quot;:24,&quot;text&quot;:&quot;getThumbnailFilename&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:371,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:371,&quot;character&quot;:24,&quot;text&quot;:&quot;getThumbnailFilename&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:374,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:374,&quot;character&quot;:24,&quot;text&quot;:&quot;getThumbnailFilename&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:390,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:390,&quot;character&quot;:24,&quot;text&quot;:&quot;getThumbnailBgColor&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:394,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:394,&quot;character&quot;:24,&quot;text&quot;:&quot;getThumbnailBgColor&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:397,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:397,&quot;character&quot;:24,&quot;text&quot;:&quot;getThumbnailBgColor&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:413,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:413,&quot;character&quot;:24,&quot;text&quot;:&quot;getLanguageCode&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:416,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:416,&quot;character&quot;:24,&quot;text&quot;:&quot;getLanguageCode&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:419,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:419,&quot;character&quot;:24,&quot;text&quot;:&quot;getLanguageCode&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:442,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:442,&quot;character&quot;:24,&quot;text&quot;:&quot;getSubtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:442,&quot;character&quot;:42,&quot;text&quot;:&quot;getTitle&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:445,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:445,&quot;character&quot;:24,&quot;text&quot;:&quot;getSubtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:445,&quot;character&quot;:42,&quot;text&quot;:&quot;getTitle&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:449,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:449,&quot;character&quot;:24,&quot;text&quot;:&quot;getSubtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:449,&quot;character&quot;:42,&quot;text&quot;:&quot;getTitle&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:477,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:477,&quot;character&quot;:24,&quot;text&quot;:&quot;getSubtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:477,&quot;character&quot;:42,&quot;text&quot;:&quot;getThumbnailFilename&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:482,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:482,&quot;character&quot;:24,&quot;text&quot;:&quot;getSubtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:482,&quot;character&quot;:42,&quot;text&quot;:&quot;getThumbnailFilename&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:486,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:486,&quot;character&quot;:24,&quot;text&quot;:&quot;getSubtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:486,&quot;character&quot;:42,&quot;text&quot;:&quot;getThumbnailFilename&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:534,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:534,&quot;character&quot;:24,&quot;text&quot;:&quot;getSubtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:534,&quot;character&quot;:42,&quot;text&quot;:&quot;getUrlFragment&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:537,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:537,&quot;character&quot;:24,&quot;text&quot;:&quot;getSubtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:537,&quot;character&quot;:42,&quot;text&quot;:&quot;getUrlFragment&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:541,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:541,&quot;character&quot;:24,&quot;text&quot;:&quot;getSubtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:541,&quot;character&quot;:42,&quot;text&quot;:&quot;getUrlFragment&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:547,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:547,&quot;character&quot;:24,&quot;text&quot;:&quot;getSubtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:547,&quot;character&quot;:42,&quot;text&quot;:&quot;getThumbnailBgColor&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:552,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:552,&quot;character&quot;:24,&quot;text&quot;:&quot;getSubtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:552,&quot;character&quot;:42,&quot;text&quot;:&quot;getThumbnailBgColor&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:556,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:556,&quot;character&quot;:24,&quot;text&quot;:&quot;getSubtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:556,&quot;character&quot;:42,&quot;text&quot;:&quot;getThumbnailBgColor&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:574,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:574,&quot;character&quot;:24,&quot;text&quot;:&quot;getSubtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:574,&quot;character&quot;:39,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:576,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:576,&quot;character&quot;:24,&quot;text&quot;:&quot;getSubtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:576,&quot;character&quot;:39,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:577,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:577,&quot;character&quot;:24,&quot;text&quot;:&quot;getNextSubtopicId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:578,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:578,&quot;character&quot;:24,&quot;text&quot;:&quot;getSubtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:578,&quot;character&quot;:42,&quot;text&quot;:&quot;getTitle&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:579,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:579,&quot;character&quot;:24,&quot;text&quot;:&quot;getSubtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:579,&quot;character&quot;:42,&quot;text&quot;:&quot;getId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:582,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:582,&quot;character&quot;:24,&quot;text&quot;:&quot;getSubtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:582,&quot;character&quot;:39,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:586,&quot;character&quot;:8,&quot;text&quot;:&quot;canonicalStoryIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:586,&quot;character&quot;:28,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:586,&quot;character&quot;:41,&quot;text&quot;:&quot;getCanonicalStoryIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:587,&quot;character&quot;:11,&quot;text&quot;:&quot;canonicalStoryIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:587,&quot;character&quot;:29,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:588,&quot;character&quot;:11,&quot;text&quot;:&quot;canonicalStoryIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:589,&quot;character&quot;:11,&quot;text&quot;:&quot;canonicalStoryIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:590,&quot;character&quot;:11,&quot;text&quot;:&quot;canonicalStoryIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:593,&quot;character&quot;:4,&quot;text&quot;:&quot;canonicalStoryIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:593,&quot;character&quot;:24,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:593,&quot;character&quot;:37,&quot;text&quot;:&quot;getCanonicalStoryIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:594,&quot;character&quot;:11,&quot;text&quot;:&quot;canonicalStoryIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:595,&quot;character&quot;:11,&quot;text&quot;:&quot;canonicalStoryIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:596,&quot;character&quot;:11,&quot;text&quot;:&quot;canonicalStoryIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:599,&quot;character&quot;:4,&quot;text&quot;:&quot;canonicalStoryIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:599,&quot;character&quot;:24,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:599,&quot;character&quot;:37,&quot;text&quot;:&quot;getCanonicalStoryIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:600,&quot;character&quot;:11,&quot;text&quot;:&quot;canonicalStoryIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:601,&quot;character&quot;:11,&quot;text&quot;:&quot;canonicalStoryIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:602,&quot;character&quot;:11,&quot;text&quot;:&quot;canonicalStoryIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:605,&quot;character&quot;:4,&quot;text&quot;:&quot;canonicalStoryIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:605,&quot;character&quot;:24,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:605,&quot;character&quot;:37,&quot;text&quot;:&quot;getCanonicalStoryIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:606,&quot;character&quot;:11,&quot;text&quot;:&quot;canonicalStoryIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:607,&quot;character&quot;:11,&quot;text&quot;:&quot;canonicalStoryIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:608,&quot;character&quot;:11,&quot;text&quot;:&quot;canonicalStoryIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:611,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:611,&quot;character&quot;:24,&quot;text&quot;:&quot;getCanonicalStoryIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:611,&quot;character&quot;:47,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:612,&quot;character&quot;:4,&quot;text&quot;:&quot;canonicalStoryIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:612,&quot;character&quot;:24,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:612,&quot;character&quot;:37,&quot;text&quot;:&quot;getCanonicalStoryIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:613,&quot;character&quot;:11,&quot;text&quot;:&quot;canonicalStoryIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:614,&quot;character&quot;:11,&quot;text&quot;:&quot;canonicalStoryIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:615,&quot;character&quot;:11,&quot;text&quot;:&quot;canonicalStoryIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:618,&quot;character&quot;:4,&quot;text&quot;:&quot;canonicalStoryIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:618,&quot;character&quot;:24,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:618,&quot;character&quot;:37,&quot;text&quot;:&quot;getCanonicalStoryIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:619,&quot;character&quot;:11,&quot;text&quot;:&quot;canonicalStoryIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:620,&quot;character&quot;:11,&quot;text&quot;:&quot;canonicalStoryIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:621,&quot;character&quot;:11,&quot;text&quot;:&quot;canonicalStoryIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:627,&quot;character&quot;:4,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:628,&quot;character&quot;:6,&quot;text&quot;:&quot;sampleTopicBackendObject.topicDict as TopicBackendDict&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:630,&quot;character&quot;:8,&quot;text&quot;:&quot;skills&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:630,&quot;character&quot;:17,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:630,&quot;character&quot;:30,&quot;text&quot;:&quot;getSubtopicById&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:630,&quot;character&quot;:49,&quot;text&quot;:&quot;getSkillSummaries&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:631,&quot;character&quot;:11,&quot;text&quot;:&quot;skills&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:631,&quot;character&quot;:18,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:632,&quot;character&quot;:11,&quot;text&quot;:&quot;skills&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:632,&quot;character&quot;:21,&quot;text&quot;:&quot;getId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:633,&quot;character&quot;:11,&quot;text&quot;:&quot;skills&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:633,&quot;character&quot;:21,&quot;text&quot;:&quot;getId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:634,&quot;character&quot;:11,&quot;text&quot;:&quot;skills&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:634,&quot;character&quot;:21,&quot;text&quot;:&quot;getId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:637,&quot;character&quot;:4,&quot;text&quot;:&quot;skills&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:637,&quot;character&quot;:13,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:637,&quot;character&quot;:26,&quot;text&quot;:&quot;getSubtopicById&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:637,&quot;character&quot;:45,&quot;text&quot;:&quot;getSkillSummaries&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:638,&quot;character&quot;:11,&quot;text&quot;:&quot;skills&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:638,&quot;character&quot;:21,&quot;text&quot;:&quot;getId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:639,&quot;character&quot;:11,&quot;text&quot;:&quot;skills&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:639,&quot;character&quot;:21,&quot;text&quot;:&quot;getId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:640,&quot;character&quot;:11,&quot;text&quot;:&quot;skills&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:640,&quot;character&quot;:21,&quot;text&quot;:&quot;getId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:643,&quot;character&quot;:4,&quot;text&quot;:&quot;skills&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:643,&quot;character&quot;:13,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:643,&quot;character&quot;:26,&quot;text&quot;:&quot;getSubtopicById&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:643,&quot;character&quot;:45,&quot;text&quot;:&quot;getSkillSummaries&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:644,&quot;character&quot;:11,&quot;text&quot;:&quot;skills&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:644,&quot;character&quot;:21,&quot;text&quot;:&quot;getId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:645,&quot;character&quot;:11,&quot;text&quot;:&quot;skills&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:645,&quot;character&quot;:21,&quot;text&quot;:&quot;getId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:646,&quot;character&quot;:11,&quot;text&quot;:&quot;skills&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:646,&quot;character&quot;:21,&quot;text&quot;:&quot;getId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:649,&quot;character&quot;:4,&quot;text&quot;:&quot;skills&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:649,&quot;character&quot;:13,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:649,&quot;character&quot;:26,&quot;text&quot;:&quot;getSubtopicById&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:649,&quot;character&quot;:45,&quot;text&quot;:&quot;getSkillSummaries&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:650,&quot;character&quot;:11,&quot;text&quot;:&quot;skills&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:650,&quot;character&quot;:21,&quot;text&quot;:&quot;getId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:651,&quot;character&quot;:11,&quot;text&quot;:&quot;skills&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:651,&quot;character&quot;:21,&quot;text&quot;:&quot;getId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:652,&quot;character&quot;:11,&quot;text&quot;:&quot;skills&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:652,&quot;character&quot;:21,&quot;text&quot;:&quot;getId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:655,&quot;character&quot;:4,&quot;text&quot;:&quot;skills&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:655,&quot;character&quot;:13,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:655,&quot;character&quot;:26,&quot;text&quot;:&quot;getSubtopicById&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:655,&quot;character&quot;:45,&quot;text&quot;:&quot;getSkillSummaries&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:656,&quot;character&quot;:11,&quot;text&quot;:&quot;skills&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:656,&quot;character&quot;:21,&quot;text&quot;:&quot;getId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:657,&quot;character&quot;:11,&quot;text&quot;:&quot;skills&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:657,&quot;character&quot;:21,&quot;text&quot;:&quot;getId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:658,&quot;character&quot;:11,&quot;text&quot;:&quot;skills&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:658,&quot;character&quot;:21,&quot;text&quot;:&quot;getId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:667,&quot;character&quot;:4,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:668,&quot;character&quot;:6,&quot;text&quot;:&quot;sampleTopicBackendObject.topicDict as TopicBackendDict&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:670,&quot;character&quot;:8,&quot;text&quot;:&quot;subtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:670,&quot;character&quot;:20,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:670,&quot;character&quot;:33,&quot;text&quot;:&quot;getSubtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:671,&quot;character&quot;:11,&quot;text&quot;:&quot;subtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:671,&quot;character&quot;:21,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:672,&quot;character&quot;:11,&quot;text&quot;:&quot;subtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:672,&quot;character&quot;:24,&quot;text&quot;:&quot;getId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:673,&quot;character&quot;:11,&quot;text&quot;:&quot;subtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:673,&quot;character&quot;:24,&quot;text&quot;:&quot;getId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:674,&quot;character&quot;:11,&quot;text&quot;:&quot;subtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:674,&quot;character&quot;:24,&quot;text&quot;:&quot;getId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:677,&quot;character&quot;:4,&quot;text&quot;:&quot;subtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:677,&quot;character&quot;:16,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:677,&quot;character&quot;:29,&quot;text&quot;:&quot;getSubtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:678,&quot;character&quot;:11,&quot;text&quot;:&quot;subtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:678,&quot;character&quot;:24,&quot;text&quot;:&quot;getId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:679,&quot;character&quot;:11,&quot;text&quot;:&quot;subtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:679,&quot;character&quot;:24,&quot;text&quot;:&quot;getId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:680,&quot;character&quot;:11,&quot;text&quot;:&quot;subtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:680,&quot;character&quot;:24,&quot;text&quot;:&quot;getId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:683,&quot;character&quot;:4,&quot;text&quot;:&quot;subtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:683,&quot;character&quot;:16,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:683,&quot;character&quot;:29,&quot;text&quot;:&quot;getSubtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:684,&quot;character&quot;:11,&quot;text&quot;:&quot;subtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:684,&quot;character&quot;:24,&quot;text&quot;:&quot;getId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:685,&quot;character&quot;:11,&quot;text&quot;:&quot;subtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:685,&quot;character&quot;:24,&quot;text&quot;:&quot;getId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:686,&quot;character&quot;:11,&quot;text&quot;:&quot;subtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:686,&quot;character&quot;:24,&quot;text&quot;:&quot;getId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:689,&quot;character&quot;:4,&quot;text&quot;:&quot;subtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:689,&quot;character&quot;:16,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:689,&quot;character&quot;:29,&quot;text&quot;:&quot;getSubtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:690,&quot;character&quot;:11,&quot;text&quot;:&quot;subtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:690,&quot;character&quot;:24,&quot;text&quot;:&quot;getId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:691,&quot;character&quot;:11,&quot;text&quot;:&quot;subtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:691,&quot;character&quot;:24,&quot;text&quot;:&quot;getId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:692,&quot;character&quot;:11,&quot;text&quot;:&quot;subtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:692,&quot;character&quot;:24,&quot;text&quot;:&quot;getId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:695,&quot;character&quot;:4,&quot;text&quot;:&quot;subtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:695,&quot;character&quot;:16,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:695,&quot;character&quot;:29,&quot;text&quot;:&quot;getSubtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:696,&quot;character&quot;:11,&quot;text&quot;:&quot;subtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:696,&quot;character&quot;:24,&quot;text&quot;:&quot;getId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:697,&quot;character&quot;:11,&quot;text&quot;:&quot;subtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:697,&quot;character&quot;:24,&quot;text&quot;:&quot;getId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:698,&quot;character&quot;:11,&quot;text&quot;:&quot;subtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:698,&quot;character&quot;:24,&quot;text&quot;:&quot;getId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:718,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:718,&quot;character&quot;:24,&quot;text&quot;:&quot;getSubtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:718,&quot;character&quot;:39,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:720,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:720,&quot;character&quot;:24,&quot;text&quot;:&quot;getSubtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:721,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:721,&quot;character&quot;:24,&quot;text&quot;:&quot;getUncategorizedSkillSummaries&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:722,&quot;character&quot;:6,&quot;text&quot;:&quot;_firstSkillSummary&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:722,&quot;character&quot;:26,&quot;text&quot;:&quot;_secondSkillSummary&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:733,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:733,&quot;character&quot;:24,&quot;text&quot;:&quot;getSubtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:733,&quot;character&quot;:42,&quot;text&quot;:&quot;getId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:734,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:734,&quot;character&quot;:24,&quot;text&quot;:&quot;getSubtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:734,&quot;character&quot;:42,&quot;text&quot;:&quot;getId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:735,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:735,&quot;character&quot;:24,&quot;text&quot;:&quot;getNextSubtopicId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:738,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:738,&quot;character&quot;:24,&quot;text&quot;:&quot;getSubtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:738,&quot;character&quot;:39,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:739,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:739,&quot;character&quot;:24,&quot;text&quot;:&quot;getSubtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:739,&quot;character&quot;:42,&quot;text&quot;:&quot;getTitle&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:740,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:740,&quot;character&quot;:24,&quot;text&quot;:&quot;getSubtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:740,&quot;character&quot;:42,&quot;text&quot;:&quot;getId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:741,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:741,&quot;character&quot;:24,&quot;text&quot;:&quot;getNextSubtopicId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:773,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:773,&quot;character&quot;:24,&quot;text&quot;:&quot;getUncategorizedSkillSummaries&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:774,&quot;character&quot;:6,&quot;text&quot;:&quot;_firstSkillSummary&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:776,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:776,&quot;character&quot;:24,&quot;text&quot;:&quot;getSubtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:776,&quot;character&quot;:42,&quot;text&quot;:&quot;getSkillSummaries&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:777,&quot;character&quot;:6,&quot;text&quot;:&quot;_secondSkillSummary&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:781,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:781,&quot;character&quot;:24,&quot;text&quot;:&quot;getUncategorizedSkillSummaries&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:782,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:782,&quot;character&quot;:24,&quot;text&quot;:&quot;getSubtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:782,&quot;character&quot;:42,&quot;text&quot;:&quot;getSkillSummaries&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:783,&quot;character&quot;:6,&quot;text&quot;:&quot;_secondSkillSummary&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:783,&quot;character&quot;:27,&quot;text&quot;:&quot;_firstSkillSummary&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:788,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:788,&quot;character&quot;:24,&quot;text&quot;:&quot;getUncategorizedSkillSummaries&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:789,&quot;character&quot;:6,&quot;text&quot;:&quot;_firstSkillSummary&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:791,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:791,&quot;character&quot;:24,&quot;text&quot;:&quot;getSubtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:791,&quot;character&quot;:42,&quot;text&quot;:&quot;getSkillSummaries&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:792,&quot;character&quot;:6,&quot;text&quot;:&quot;_secondSkillSummary&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:803,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:803,&quot;character&quot;:24,&quot;text&quot;:&quot;getUncategorizedSkillSummaries&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:804,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:804,&quot;character&quot;:24,&quot;text&quot;:&quot;getSubtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:804,&quot;character&quot;:42,&quot;text&quot;:&quot;getSkillSummaries&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:805,&quot;character&quot;:6,&quot;text&quot;:&quot;_secondSkillSummary&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:805,&quot;character&quot;:27,&quot;text&quot;:&quot;_firstSkillSummary&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:810,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:810,&quot;character&quot;:24,&quot;text&quot;:&quot;getSubtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:810,&quot;character&quot;:42,&quot;text&quot;:&quot;getSkillSummaries&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:811,&quot;character&quot;:7,&quot;text&quot;:&quot;_secondSkillSummary&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:812,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:812,&quot;character&quot;:24,&quot;text&quot;:&quot;getSubtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:812,&quot;character&quot;:42,&quot;text&quot;:&quot;getSkillSummaries&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:813,&quot;character&quot;:7,&quot;text&quot;:&quot;_firstSkillSummary&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:816,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:816,&quot;character&quot;:24,&quot;text&quot;:&quot;getUncategorizedSkillSummaries&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:817,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:817,&quot;character&quot;:24,&quot;text&quot;:&quot;getSubtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:817,&quot;character&quot;:42,&quot;text&quot;:&quot;getSkillSummaries&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:818,&quot;character&quot;:6,&quot;text&quot;:&quot;_secondSkillSummary&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:818,&quot;character&quot;:27,&quot;text&quot;:&quot;_firstSkillSummary&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:950,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:950,&quot;character&quot;:24,&quot;text&quot;:&quot;getUncategorizedSkillSummaries&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:951,&quot;character&quot;:6,&quot;text&quot;:&quot;_firstSkillSummary&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:953,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:953,&quot;character&quot;:24,&quot;text&quot;:&quot;getSubtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:953,&quot;character&quot;:42,&quot;text&quot;:&quot;getSkillSummaries&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:954,&quot;character&quot;:6,&quot;text&quot;:&quot;_secondSkillSummary&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:958,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:958,&quot;character&quot;:24,&quot;text&quot;:&quot;getUncategorizedSkillSummaries&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:959,&quot;character&quot;:6,&quot;text&quot;:&quot;_firstSkillSummary&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:959,&quot;character&quot;:26,&quot;text&quot;:&quot;_secondSkillSummary&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:961,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:961,&quot;character&quot;:24,&quot;text&quot;:&quot;getSubtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:961,&quot;character&quot;:42,&quot;text&quot;:&quot;getSkillSummaries&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:964,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:964,&quot;character&quot;:24,&quot;text&quot;:&quot;getUncategorizedSkillSummaries&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:965,&quot;character&quot;:6,&quot;text&quot;:&quot;_firstSkillSummary&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:967,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:967,&quot;character&quot;:24,&quot;text&quot;:&quot;getSubtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:967,&quot;character&quot;:42,&quot;text&quot;:&quot;getSkillSummaries&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:968,&quot;character&quot;:6,&quot;text&quot;:&quot;_secondSkillSummary&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:1000,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleSubtopicPage&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:1000,&quot;character&quot;:31,&quot;text&quot;:&quot;getPageContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:1000,&quot;character&quot;:49,&quot;text&quot;:&quot;toBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:1020,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleSubtopicPage&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:1020,&quot;character&quot;:31,&quot;text&quot;:&quot;getPageContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:1020,&quot;character&quot;:49,&quot;text&quot;:&quot;toBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:1040,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleSubtopicPage&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:1040,&quot;character&quot;:31,&quot;text&quot;:&quot;getPageContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:1040,&quot;character&quot;:49,&quot;text&quot;:&quot;toBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:1100,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleSubtopicPage&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:1100,&quot;character&quot;:31,&quot;text&quot;:&quot;getPageContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:1100,&quot;character&quot;:49,&quot;text&quot;:&quot;toBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:1121,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleSubtopicPage&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:1121,&quot;character&quot;:31,&quot;text&quot;:&quot;getPageContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:1121,&quot;character&quot;:49,&quot;text&quot;:&quot;toBackendDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:1130,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleSubtopicPage&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:1130,&quot;character&quot;:31,&quot;text&quot;:&quot;getPageContents&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/topic/topic-update.service.spec.ts&quot;,&quot;line&quot;:1130,&quot;character&quot;:49,&quot;text&quot;:&quot;toBackendDict&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:57 GMT</p>
+    </body>
+  </html>
+  

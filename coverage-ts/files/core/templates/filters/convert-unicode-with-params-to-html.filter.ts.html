@@ -1,0 +1,116 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>convert-unicode-with-params-to-html.filter.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/filters/convert-unicode-with-params-to-html.filter.ts</td><td class="">61.80%</td><td class="">100%</td><td class="">89</td><td class="">55</td><td class="">34</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2019 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Converts {{name}} substrings to
+ * &lt;oppia-parameter&gt;name&lt;/oppia-parameter&gt; tags and unescapes the
+ * {, } and \ characters. This is done by reading the given string from
+ * left to right: if we see a backslash, we use the following character;
+ * if we see a &#x27;{{&#x27;, this is the start of a parameter; if we see a &#x27;}}&#x27;;
+ * this is the end of a parameter.
+ */
+
+require(&#x27;filters/convert-unicode-to-html.filter.ts&#x27;);
+
+angular.module(&#x27;oppia&#x27;).filter(&#x27;convertUnicodeWithParamsToHtml&#x27;, [
+  &#x27;$filter&#x27;, function($filter) {
+    var assert = function(text) {
+      if (!text) {
+        throw new Error(&#x27;Invalid unicode-string-with-parameters: &#x27; + text);
+      }
+    };
+
+    return function(text) {
+      // The parsing here needs to be done with more care because we are
+      // replacing two-character strings. We can&#x27;t naively break by {{ because
+      // in strings like \{{{ the second and third characters will be taken as
+      // the opening brackets, which is wrong. We can&#x27;t unescape characters
+      // because then the { characters that remain will be ambiguous (they may
+      // either be the openings of parameters or literal &#x27;{&#x27; characters entered
+      // by the user. So we build a standard left-to-right parser which examines
+      // each character of the string in turn, and processes it accordingly.
+      var textFragments = [];
+      var currentFragment = &#x27;&#x27;;
+      var currentFragmentIsParam = false;
+      for (var i = 0; i &lt; text.length; i++) {
+        if (text[i] === &#x27;\\&#x27;) {
+          assert(!currentFragmentIsParam &amp;&amp; text.length &gt; i + 1 &amp;&amp; {
+            &#x27;{&#x27;: true,
+            &#x27;}&#x27;: true,
+            &#x27;\\&#x27;: true
+          }[text[i + 1]]);
+          currentFragment += text[i + 1];
+          i++;
+        } else if (text[i] === &#x27;{&#x27;) {
+          assert(
+            text.length &gt; i + 1 &amp;&amp; !currentFragmentIsParam &amp;&amp;
+            text[i + 1] === &#x27;{&#x27;);
+          textFragments.push({
+            type: &#x27;text&#x27;,
+            data: currentFragment
+          });
+          currentFragment = &#x27;&#x27;;
+          currentFragmentIsParam = true;
+          i++;
+        } else if (text[i] === &#x27;}&#x27;) {
+          assert(
+            text.length &gt; i + 1 &amp;&amp; currentFragmentIsParam &amp;&amp;
+            text[i + 1] === &#x27;}&#x27;);
+          textFragments.push({
+            type: &#x27;parameter&#x27;,
+            data: currentFragment
+          });
+          currentFragment = &#x27;&#x27;;
+          currentFragmentIsParam = false;
+          i++;
+        } else {
+          currentFragment += text[i];
+        }
+      }
+
+      assert(!currentFragmentIsParam);
+      textFragments.push({
+        type: &#x27;text&#x27;,
+        data: currentFragment
+      });
+
+      var result = &#x27;&#x27;;
+      textFragments.forEach(function(fragment) {
+        result += (
+          fragment.type === &#x27;text&#x27; ?
+          $filter(&#x27;convertUnicodeToHtml&#x27;)(fragment.data) :
+          &#x27;&lt;oppia-parameter&gt;&#x27; + fragment.data +
+          &#x27;&lt;/oppia-parameter&gt;&#x27;);
+      });
+      return result;
+    };
+  }]);
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/filters/convert-unicode-with-params-to-html.filter.ts&quot;,&quot;line&quot;:26,&quot;character&quot;:22,&quot;text&quot;:&quot;$filter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/filters/convert-unicode-with-params-to-html.filter.ts&quot;,&quot;line&quot;:27,&quot;character&quot;:26,&quot;text&quot;:&quot;text&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/filters/convert-unicode-with-params-to-html.filter.ts&quot;,&quot;line&quot;:28,&quot;character&quot;:11,&quot;text&quot;:&quot;text&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/filters/convert-unicode-with-params-to-html.filter.ts&quot;,&quot;line&quot;:29,&quot;character&quot;:69,&quot;text&quot;:&quot;text&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/filters/convert-unicode-with-params-to-html.filter.ts&quot;,&quot;line&quot;:33,&quot;character&quot;:20,&quot;text&quot;:&quot;text&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/filters/convert-unicode-with-params-to-html.filter.ts&quot;,&quot;line&quot;:42,&quot;character&quot;:10,&quot;text&quot;:&quot;textFragments&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/filters/convert-unicode-with-params-to-html.filter.ts&quot;,&quot;line&quot;:45,&quot;character&quot;:26,&quot;text&quot;:&quot;text&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/filters/convert-unicode-with-params-to-html.filter.ts&quot;,&quot;line&quot;:45,&quot;character&quot;:31,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/filters/convert-unicode-with-params-to-html.filter.ts&quot;,&quot;line&quot;:46,&quot;character&quot;:12,&quot;text&quot;:&quot;text&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/filters/convert-unicode-with-params-to-html.filter.ts&quot;,&quot;line&quot;:47,&quot;character&quot;:44,&quot;text&quot;:&quot;text&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/filters/convert-unicode-with-params-to-html.filter.ts&quot;,&quot;line&quot;:47,&quot;character&quot;:49,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/filters/convert-unicode-with-params-to-html.filter.ts&quot;,&quot;line&quot;:51,&quot;character&quot;:12,&quot;text&quot;:&quot;text&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/filters/convert-unicode-with-params-to-html.filter.ts&quot;,&quot;line&quot;:52,&quot;character&quot;:29,&quot;text&quot;:&quot;text&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/filters/convert-unicode-with-params-to-html.filter.ts&quot;,&quot;line&quot;:54,&quot;character&quot;:19,&quot;text&quot;:&quot;text&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/filters/convert-unicode-with-params-to-html.filter.ts&quot;,&quot;line&quot;:56,&quot;character&quot;:12,&quot;text&quot;:&quot;text&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/filters/convert-unicode-with-params-to-html.filter.ts&quot;,&quot;line&quot;:56,&quot;character&quot;:17,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/filters/convert-unicode-with-params-to-html.filter.ts&quot;,&quot;line&quot;:57,&quot;character&quot;:12,&quot;text&quot;:&quot;text&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/filters/convert-unicode-with-params-to-html.filter.ts&quot;,&quot;line&quot;:58,&quot;character&quot;:10,&quot;text&quot;:&quot;textFragments&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/filters/convert-unicode-with-params-to-html.filter.ts&quot;,&quot;line&quot;:65,&quot;character&quot;:19,&quot;text&quot;:&quot;text&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/filters/convert-unicode-with-params-to-html.filter.ts&quot;,&quot;line&quot;:67,&quot;character&quot;:12,&quot;text&quot;:&quot;text&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/filters/convert-unicode-with-params-to-html.filter.ts&quot;,&quot;line&quot;:67,&quot;character&quot;:17,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/filters/convert-unicode-with-params-to-html.filter.ts&quot;,&quot;line&quot;:68,&quot;character&quot;:12,&quot;text&quot;:&quot;text&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/filters/convert-unicode-with-params-to-html.filter.ts&quot;,&quot;line&quot;:69,&quot;character&quot;:10,&quot;text&quot;:&quot;textFragments&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/filters/convert-unicode-with-params-to-html.filter.ts&quot;,&quot;line&quot;:77,&quot;character&quot;:29,&quot;text&quot;:&quot;text&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/filters/convert-unicode-with-params-to-html.filter.ts&quot;,&quot;line&quot;:82,&quot;character&quot;:6,&quot;text&quot;:&quot;textFragments&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/filters/convert-unicode-with-params-to-html.filter.ts&quot;,&quot;line&quot;:88,&quot;character&quot;:6,&quot;text&quot;:&quot;textFragments&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/filters/convert-unicode-with-params-to-html.filter.ts&quot;,&quot;line&quot;:88,&quot;character&quot;:37,&quot;text&quot;:&quot;fragment&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/filters/convert-unicode-with-params-to-html.filter.ts&quot;,&quot;line&quot;:90,&quot;character&quot;:10,&quot;text&quot;:&quot;fragment&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/filters/convert-unicode-with-params-to-html.filter.ts&quot;,&quot;line&quot;:90,&quot;character&quot;:19,&quot;text&quot;:&quot;type&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/filters/convert-unicode-with-params-to-html.filter.ts&quot;,&quot;line&quot;:91,&quot;character&quot;:10,&quot;text&quot;:&quot;$filter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/filters/convert-unicode-with-params-to-html.filter.ts&quot;,&quot;line&quot;:91,&quot;character&quot;:42,&quot;text&quot;:&quot;fragment&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/filters/convert-unicode-with-params-to-html.filter.ts&quot;,&quot;line&quot;:91,&quot;character&quot;:51,&quot;text&quot;:&quot;data&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/filters/convert-unicode-with-params-to-html.filter.ts&quot;,&quot;line&quot;:92,&quot;character&quot;:32,&quot;text&quot;:&quot;fragment&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/filters/convert-unicode-with-params-to-html.filter.ts&quot;,&quot;line&quot;:92,&quot;character&quot;:41,&quot;text&quot;:&quot;data&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:56 GMT</p>
+    </body>
+  </html>
+  

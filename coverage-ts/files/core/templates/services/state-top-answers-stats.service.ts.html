@@ -1,0 +1,180 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>state-top-answers-stats.service.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/services/state-top-answers-stats.service.ts</td><td class="">98.67%</td><td class="">100%</td><td class="">226</td><td class="">223</td><td class="">3</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Factory for maintaining the statistics of the top answers for
+ * each state of an exploration.
+ */
+
+import { Injectable } from &#x27;@angular/core&#x27;;
+import { downgradeInjectable } from &#x27;@angular/upgrade/static&#x27;;
+
+import { AnswerStats } from
+  &#x27;domain/exploration/answer-stats.model&#x27;;
+import { States } from &#x27;domain/exploration/StatesObjectFactory&#x27;;
+import { AnswerClassificationService } from
+  &#x27;pages/exploration-player-page/services/answer-classification.service&#x27;;
+import { InteractionRulesRegistryService } from
+  &#x27;services/interaction-rules-registry.service&#x27;;
+import { StateTopAnswersStatsBackendApiService } from
+  &#x27;services/state-top-answers-stats-backend-api.service&#x27;;
+import { State } from &#x27;domain/state/StateObjectFactory&#x27;;
+
+export class AnswerStatsEntry {
+  constructor(
+      public readonly answers: readonly AnswerStats[],
+      public readonly interactionId: string) {}
+}
+
+@Injectable({
+  providedIn: &#x27;root&#x27;
+})
+export class StateTopAnswersStatsService {
+  private initializationHasStarted: boolean;
+  private topAnswersStatsByStateName: Map&lt;string, AnswerStatsEntry&gt;;
+
+  private resolveInitPromise: () =&gt; void;
+  private rejectInitPromise: (_) =&gt; void;
+  private initPromise: Promise&lt;void&gt;;
+
+  constructor(
+      private answerClassificationService: AnswerClassificationService,
+      private interactionRulesRegistryService: InteractionRulesRegistryService,
+      private stateTopAnswersStatsBackendApiService:
+        StateTopAnswersStatsBackendApiService) {
+    this.initializationHasStarted = false;
+    this.topAnswersStatsByStateName = new Map();
+    this.initPromise = new Promise((resolve, reject) =&gt; {
+      this.resolveInitPromise = resolve;
+      this.rejectInitPromise = reject;
+    });
+  }
+
+  /**
+   * Calls the backend asynchronously to setup the answer statistics of each
+   * state this exploration contains.
+   */
+  async initAsync(explorationId: string, states: States): Promise&lt;void&gt; {
+    if (!this.initializationHasStarted) {
+      this.initializationHasStarted = true;
+      try {
+        const {answers, interactionIds} = (
+          await this.stateTopAnswersStatsBackendApiService.fetchStatsAsync(
+            explorationId));
+        for (const stateName of Object.keys(answers)) {
+          this.topAnswersStatsByStateName.set(
+            stateName, new AnswerStatsEntry(
+              answers[stateName], interactionIds[stateName]));
+          this.refreshAddressedInfo(states.getState(stateName));
+        }
+        this.resolveInitPromise();
+      } catch (error) {
+        this.rejectInitPromise(error);
+      }
+    }
+    return this.initPromise;
+  }
+
+  async getInitPromiseAsync(): Promise&lt;void&gt; {
+    return this.initPromise;
+  }
+
+  getStateNamesWithStats(): string[] {
+    return [...this.topAnswersStatsByStateName.keys()];
+  }
+
+  hasStateStats(stateName: string): boolean {
+    return this.topAnswersStatsByStateName.has(stateName);
+  }
+
+  getStateStats(stateName: string): AnswerStats[] {
+    if (!this.hasStateStats(stateName)) {
+      throw new Error(stateName + &#x27; does not exist.&#x27;);
+    }
+    return [...this.topAnswersStatsByStateName.get(stateName).answers];
+  }
+
+  getUnresolvedStateStats(stateName: string): AnswerStats[] {
+    return this.getStateStats(stateName).filter(a =&gt; !a.isAddressed);
+  }
+
+  async getTopAnswersByStateNameAsync(): Promise&lt;
+      Map&lt;string, readonly AnswerStats[]&gt;&gt; {
+    await this.initPromise;
+    return new Map([...this.topAnswersStatsByStateName].map(
+      ([stateName, cachedStats]) =&gt; [stateName, cachedStats.answers]));
+  }
+
+  onStateAdded(stateName: string): void {
+    this.topAnswersStatsByStateName.set(
+      stateName, new AnswerStatsEntry([], null));
+  }
+
+  onStateDeleted(stateName: string): void {
+    this.topAnswersStatsByStateName.delete(stateName);
+  }
+
+  onStateRenamed(oldStateName: string, newStateName: string): void {
+    this.topAnswersStatsByStateName.set(
+      newStateName, this.topAnswersStatsByStateName.get(oldStateName));
+    this.topAnswersStatsByStateName.delete(oldStateName);
+  }
+
+  onStateInteractionSaved(updatedState: State): void {
+    this.refreshAddressedInfo(updatedState);
+  }
+
+  private refreshAddressedInfo(updatedState: State): void {
+    const stateName = updatedState.name;
+
+    if (!this.topAnswersStatsByStateName.has(stateName)) {
+      throw new Error(stateName + &#x27; does not exist.&#x27;);
+    }
+
+    const stateStats = this.topAnswersStatsByStateName.get(stateName);
+
+    if (stateStats.interactionId !== updatedState.interaction.id) {
+      this.topAnswersStatsByStateName.set(
+        stateName, new AnswerStatsEntry([], updatedState.interaction.id));
+    } else {
+      stateStats.answers.forEach(a =&gt; a.isAddressed = (
+        this.answerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
+          stateName, updatedState, a.answer,
+          this.interactionRulesRegistryService.getRulesServiceByInteractionId(
+            stateStats.interactionId))));
+    }
+  }
+}
+
+angular.module(&#x27;oppia&#x27;).factory(
+  &#x27;StateTopAnswersStatsService&#x27;,
+  downgradeInjectable(StateTopAnswersStatsService));
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/services/state-top-answers-stats.service.ts&quot;,&quot;line&quot;:47,&quot;character&quot;:30,&quot;text&quot;:&quot;_&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/state-top-answers-stats.service.ts&quot;,&quot;line&quot;:82,&quot;character&quot;:31,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/services/state-top-answers-stats.service.ts&quot;,&quot;line&quot;:81,&quot;character&quot;:15,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:55 GMT</p>
+    </body>
+  </html>
+  

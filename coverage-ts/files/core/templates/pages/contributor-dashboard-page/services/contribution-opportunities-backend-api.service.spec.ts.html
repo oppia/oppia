@@ -1,0 +1,228 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>contribution-opportunities-backend-api.service.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service.spec.ts</td><td class="">93.36%</td><td class="">100%</td><td class="">241</td><td class="">225</td><td class="">16</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2018 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for ContributionOpportunitiesBackendApiService.
+ */
+
+import { HttpClientTestingModule, HttpTestingController } from
+  &#x27;@angular/common/http/testing&#x27;;
+import { TestBed, fakeAsync, flushMicrotasks } from &#x27;@angular/core/testing&#x27;;
+
+import { ContributionOpportunitiesBackendApiService } from
+  // eslint-disable-next-line max-len
+  &#x27;pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service&#x27;;
+import { SkillOpportunity } from
+  &#x27;domain/opportunity/skill-opportunity.model&#x27;;
+import { UrlInterpolationService } from
+  &#x27;domain/utilities/url-interpolation.service&#x27;;
+import { FeaturedTranslationLanguage } from &#x27;domain/opportunity/featured-translation-language.model&#x27;;
+import { ExplorationOpportunitySummary } from &#x27;domain/opportunity/exploration-opportunity-summary.model&#x27;;
+
+describe(&#x27;Contribution Opportunities backend API service&#x27;, function() {
+  let contributionOpportunitiesBackendApiService:
+    ContributionOpportunitiesBackendApiService = null;
+  let httpTestingController: HttpTestingController;
+  let urlInterpolationService:
+    UrlInterpolationService = null;
+  const skillOpportunityResponse = {
+    opportunities: [{
+      id: &#x27;skill_id&#x27;,
+      skill_description: &#x27;A new skill for question&#x27;,
+      topic_name: &#x27;A new topic&#x27;,
+      question_count: 30
+    }],
+    next_cursor: &#x27;6&#x27;,
+    more: true
+  };
+  const skillOpportunity = {
+    opportunities: [{
+      id: &#x27;exp_id&#x27;,
+      topic_name: &#x27;Topic&#x27;,
+      story_title: &#x27;A new story&#x27;,
+      chapter_title: &#x27;Introduction&#x27;,
+      content_count: 100,
+      translation_counts: {
+        hi: 15
+      }
+    }],
+    next_cursor: &#x27;6&#x27;,
+    more: true
+  };
+  let sampleSkillOpportunitiesResponse = null;
+  let sampleTranslationOpportunitiesResponse = null;
+  let sampleVoiceoverOpportunitiesResponse = null;
+
+  beforeEach(() =&gt; {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+    contributionOpportunitiesBackendApiService =
+      TestBed.get(ContributionOpportunitiesBackendApiService);
+    httpTestingController = TestBed.get(HttpTestingController);
+    urlInterpolationService = TestBed.get(UrlInterpolationService);
+    sampleSkillOpportunitiesResponse = [
+      SkillOpportunity.createFromBackendDict(
+        skillOpportunityResponse.opportunities[0])
+    ];
+    sampleTranslationOpportunitiesResponse = [
+      ExplorationOpportunitySummary.createFromBackendDict(
+        skillOpportunity.opportunities[0]
+      )
+    ];
+    sampleVoiceoverOpportunitiesResponse = [
+      ExplorationOpportunitySummary.createFromBackendDict(
+        skillOpportunity.opportunities[0]
+      )
+    ];
+  });
+
+  afterEach(() =&gt; {
+    httpTestingController.verify();
+  });
+
+  it(&#x27;should successfully fetch the skill opportunities data&#x27;,
+    fakeAsync(() =&gt; {
+      const successHandler = jasmine.createSpy(&#x27;success&#x27;);
+      const failHandler = jasmine.createSpy(&#x27;fail&#x27;);
+
+      contributionOpportunitiesBackendApiService.fetchSkillOpportunitiesAsync(
+        &#x27;&#x27;).then(
+        successHandler, failHandler
+      );
+      const req = httpTestingController.expectOne(
+        urlInterpolationService.interpolateUrl(
+          &#x27;/opportunitiessummaryhandler/&lt;opportunityType&gt;&#x27;,
+          { opportunityType: &#x27;skill&#x27; }
+        ) + &#x27;?cursor=&#x27;
+      );
+      expect(req.request.method).toEqual(&#x27;GET&#x27;);
+      req.flush(skillOpportunityResponse);
+
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalledWith({
+        opportunities: sampleSkillOpportunitiesResponse,
+        nextCursor: skillOpportunityResponse.next_cursor,
+        more: skillOpportunityResponse.more
+      });
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
+
+  it(&#x27;should successfully fetch the translation opportunities data&#x27;,
+    fakeAsync(() =&gt; {
+      const successHandler = jasmine.createSpy(&#x27;success&#x27;);
+      const failHandler = jasmine.createSpy(&#x27;fail&#x27;);
+
+      contributionOpportunitiesBackendApiService
+        .fetchTranslationOpportunitiesAsync(&#x27;hi&#x27;, &#x27;&#x27;,).then(
+          successHandler, failHandler
+        );
+      const req = httpTestingController.expectOne(
+        urlInterpolationService.interpolateUrl(
+          &#x27;/opportunitiessummaryhandler/&lt;opportunityType&gt;&#x27;,
+          { opportunityType: &#x27;translation&#x27; }
+        ) + &#x27;?language_code=hi&amp;cursor=&#x27;
+      );
+      expect(req.request.method).toEqual(&#x27;GET&#x27;);
+      req.flush(skillOpportunity);
+
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalledWith({
+        opportunities: sampleTranslationOpportunitiesResponse,
+        nextCursor: skillOpportunity.next_cursor,
+        more: skillOpportunity.more
+      });
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
+
+  it(&#x27;should successfully fetch the voiceover opportunities data&#x27;,
+    fakeAsync(() =&gt; {
+      const successHandler = jasmine.createSpy(&#x27;success&#x27;);
+      const failHandler = jasmine.createSpy(&#x27;fail&#x27;);
+
+      contributionOpportunitiesBackendApiService
+        .fetchVoiceoverOpportunitiesAsync(&#x27;hi&#x27;, &#x27;&#x27;,).then(
+          successHandler, failHandler
+        );
+      const req = httpTestingController.expectOne(
+        urlInterpolationService.interpolateUrl(
+          &#x27;/opportunitiessummaryhandler/&lt;opportunityType&gt;&#x27;,
+          { opportunityType: &#x27;voiceover&#x27; }
+        ) + &#x27;?language_code=hi&amp;cursor=&#x27;
+      );
+      expect(req.request.method).toEqual(&#x27;GET&#x27;);
+      req.flush(skillOpportunity);
+
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalledWith({
+        opportunities: sampleVoiceoverOpportunitiesResponse,
+        nextCursor: skillOpportunity.next_cursor,
+        more: skillOpportunity.more
+      });
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
+
+  it(&#x27;should successfully fetch the featured translation languages&#x27;,
+    fakeAsync(() =&gt; {
+      const successHandler = jasmine.createSpy(&#x27;success&#x27;);
+      const failHandler = jasmine.createSpy(&#x27;fail&#x27;);
+
+      contributionOpportunitiesBackendApiService
+        .fetchFeaturedTranslationLanguagesAsync()
+        .then(successHandler, failHandler);
+
+      const req = httpTestingController.expectOne(
+        &#x27;/retrivefeaturedtranslationlanguages&#x27;
+      );
+      expect(req.request.method).toEqual(&#x27;GET&#x27;);
+      req.flush({
+        featured_translation_languages:
+          [{ language_code: &#x27;en&#x27;, explanation: &#x27;English&#x27; }]
+      });
+
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalledWith([
+        FeaturedTranslationLanguage.createFromBackendDict(
+          { language_code: &#x27;en&#x27;, explanation: &#x27;English&#x27; }
+        )
+      ]);
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service.spec.ts&quot;,&quot;line&quot;:62,&quot;character&quot;:6,&quot;text&quot;:&quot;sampleSkillOpportunitiesResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service.spec.ts&quot;,&quot;line&quot;:63,&quot;character&quot;:6,&quot;text&quot;:&quot;sampleTranslationOpportunitiesResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service.spec.ts&quot;,&quot;line&quot;:64,&quot;character&quot;:6,&quot;text&quot;:&quot;sampleVoiceoverOpportunitiesResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service.spec.ts&quot;,&quot;line&quot;:74,&quot;character&quot;:4,&quot;text&quot;:&quot;sampleSkillOpportunitiesResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service.spec.ts&quot;,&quot;line&quot;:78,&quot;character&quot;:4,&quot;text&quot;:&quot;sampleTranslationOpportunitiesResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service.spec.ts&quot;,&quot;line&quot;:83,&quot;character&quot;:4,&quot;text&quot;:&quot;sampleVoiceoverOpportunitiesResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service.spec.ts&quot;,&quot;line&quot;:109,&quot;character&quot;:17,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service.spec.ts&quot;,&quot;line&quot;:115,&quot;character&quot;:8,&quot;text&quot;:&quot;opportunities&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service.spec.ts&quot;,&quot;line&quot;:115,&quot;character&quot;:23,&quot;text&quot;:&quot;sampleSkillOpportunitiesResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service.spec.ts&quot;,&quot;line&quot;:138,&quot;character&quot;:17,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service.spec.ts&quot;,&quot;line&quot;:144,&quot;character&quot;:8,&quot;text&quot;:&quot;opportunities&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service.spec.ts&quot;,&quot;line&quot;:144,&quot;character&quot;:23,&quot;text&quot;:&quot;sampleTranslationOpportunitiesResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service.spec.ts&quot;,&quot;line&quot;:167,&quot;character&quot;:17,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service.spec.ts&quot;,&quot;line&quot;:173,&quot;character&quot;:8,&quot;text&quot;:&quot;opportunities&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service.spec.ts&quot;,&quot;line&quot;:173,&quot;character&quot;:23,&quot;text&quot;:&quot;sampleVoiceoverOpportunitiesResponse&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service.spec.ts&quot;,&quot;line&quot;:193,&quot;character&quot;:17,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:59 GMT</p>
+    </body>
+  </html>
+  

@@ -1,0 +1,185 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>TopicObjectFactorySpec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">core/templates/domain/topic/TopicObjectFactorySpec.ts</td><td class="">100.00%</td><td class="">100%</td><td class="">195</td><td class="">195</td><td class="">0</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2018 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Tests for TopicObjectFactory.
+ */
+
+import { TestBed } from &#x27;@angular/core/testing&#x27;;
+
+import { Topic, TopicObjectFactory } from &#x27;domain/topic/TopicObjectFactory&#x27;;
+
+describe(&#x27;Topic object factory&#x27;, () =&gt; {
+  let topicObjectFactory: TopicObjectFactory;
+  let _sampleTopic: Topic;
+
+  beforeEach(() =&gt; {
+    topicObjectFactory = TestBed.get(TopicObjectFactory);
+
+    let sampleTopicBackendObject = {
+      id: &#x27;sample_topic_id&#x27;,
+      name: &#x27;Topic name&#x27;,
+      abbreviated_name: &#x27;abbrev&#x27;,
+      url_fragment: &#x27;topic-one&#x27;,
+      thumbnail_filename: &#x27;img.png&#x27;,
+      thumbnail_bg_color: &#x27;#a33f40&#x27;,
+      description: &#x27;Topic description&#x27;,
+      version: 1,
+      uncategorized_skill_ids: [&#x27;skill_1&#x27;, &#x27;skill_2&#x27;],
+      canonical_story_references: [{
+        story_id: &#x27;story_1&#x27;,
+        story_is_published: true
+      }, {
+        story_id: &#x27;story_4&#x27;,
+        story_is_published: false
+      }],
+      additional_story_references: [{
+        story_id: &#x27;story_2&#x27;,
+        story_is_published: true
+      }, {
+        story_id: &#x27;story_3&#x27;,
+        story_is_published: false
+      }],
+      subtopics: [{
+        id: 1,
+        title: &#x27;Title&#x27;,
+        skill_ids: [&#x27;skill_3&#x27;],
+        thumbnail_filename: &#x27;img.png&#x27;,
+        thumbnail_bg_color: &#x27;#a33f40&#x27;,
+        url_fragment: &#x27;title&#x27;
+      }],
+      next_subtopic_id: 1,
+      language_code: &#x27;en&#x27;,
+      meta_tag_content: &#x27;topic meta tag content&#x27;,
+      practice_tab_is_displayed: false,
+      page_title_fragment_for_web: &#x27;topic page title&#x27;
+    };
+    let skillIdToDescriptionDict = {
+      skill_1: &#x27;Description 1&#x27;,
+      skill_2: &#x27;Description 2&#x27;,
+      skill_3: &#x27;Description 3&#x27;
+    };
+    _sampleTopic = topicObjectFactory.create(
+      sampleTopicBackendObject, skillIdToDescriptionDict);
+  });
+
+  it(&#x27;should not find issues with a valid topic&#x27;, () =&gt; {
+    expect(_sampleTopic.validate()).toEqual([]);
+  });
+
+  it(&#x27;should validate the topic&#x27;, () =&gt; {
+    _sampleTopic.setName(&#x27;&#x27;);
+    _sampleTopic.setAbbreviatedName(&#x27;&#x27;),
+    _sampleTopic.addCanonicalStory(&#x27;story_2&#x27;);
+    _sampleTopic.getSubtopics()[0].addSkill(&#x27;skill_1&#x27;, &#x27;&#x27;);
+
+    expect(_sampleTopic.validate()).toEqual([
+      &#x27;Topic name should not be empty.&#x27;,
+      &#x27;The story with id story_2 is present in both canonical &#x27; +
+      &#x27;and additional stories.&#x27;,
+      &#x27;The skill with id skill_1 is duplicated in the topic&#x27;
+    ]);
+  });
+
+  it(&#x27;should be able to create an interstitial topic object&#x27;, () =&gt; {
+    let topic = topicObjectFactory.createInterstitialTopic();
+    expect(topic.getId()).toEqual(null);
+    expect(topic.getName()).toEqual(&#x27;Topic name loading&#x27;);
+    expect(topic.getDescription()).toEqual(&#x27;Topic description loading&#x27;);
+    expect(topic.getLanguageCode()).toBe(&#x27;en&#x27;);
+    expect(topic.getSubtopics()).toEqual([]);
+    expect(topic.getAdditionalStoryReferences()).toEqual([]);
+    expect(topic.getCanonicalStoryReferences()).toEqual([]);
+    expect(topic.getUncategorizedSkillSummaries()).toEqual([]);
+  });
+
+  it(&#x27;should correctly remove the various array elements&#x27;, () =&gt; {
+    _sampleTopic.removeCanonicalStory(&#x27;story_1&#x27;);
+    _sampleTopic.removeAdditionalStory(&#x27;story_2&#x27;);
+    _sampleTopic.removeUncategorizedSkill(&#x27;skill_1&#x27;);
+    expect(_sampleTopic.getAdditionalStoryIds()).toEqual([&#x27;story_3&#x27;]);
+    expect(_sampleTopic.getCanonicalStoryIds()).toEqual([&#x27;story_4&#x27;]);
+    expect(_sampleTopic.getUncategorizedSkillSummaries().length).toEqual(1);
+    expect(
+      _sampleTopic.getUncategorizedSkillSummaries()[0].getId()
+    ).toEqual(&#x27;skill_2&#x27;);
+    expect(
+      _sampleTopic.getUncategorizedSkillSummaries()[0].getDescription()
+    ).toEqual(&#x27;Description 2&#x27;);
+  });
+
+  it(&#x27;should be able to copy from another topic&#x27;, () =&gt; {
+    let secondTopic = topicObjectFactory.create({
+      id: &#x27;topic_id_2&#x27;,
+      name: &#x27;Another name&#x27;,
+      abbreviated_name: &#x27;abbrev&#x27;,
+      url_fragment: &#x27;topic-two&#x27;,
+      thumbnail_filename: &#x27;img.png&#x27;,
+      thumbnail_bg_color: &#x27;#a33f40&#x27;,
+      description: &#x27;Another description&#x27;,
+      language_code: &#x27;en&#x27;,
+      version: 15,
+      canonical_story_references: [{
+        story_id: &#x27;story_10&#x27;,
+        story_is_published: true
+      }],
+      additional_story_references: [{
+        story_id: &#x27;story_5&#x27;,
+        story_is_published: true
+      }],
+      uncategorized_skill_ids: [&#x27;skill_2&#x27;, &#x27;skill_3&#x27;],
+      next_subtopic_id: 2,
+      subtopics: [{
+        id: 1,
+        title: &#x27;Title&#x27;,
+        skill_ids: [&#x27;skill_1&#x27;],
+        thumbnail_filename: &#x27;img.png&#x27;,
+        thumbnail_bg_color: &#x27;#a33f40&#x27;,
+        url_fragment: &#x27;title&#x27;
+      }],
+      practice_tab_is_displayed: false,
+      meta_tag_content: &#x27;second topic meta tag content&#x27;,
+      page_title_fragment_for_web: &#x27;topic page title&#x27;
+    }, {
+      skill_1: &#x27;Description 1&#x27;,
+      skill_2: &#x27;Description 2&#x27;,
+      skill_3: &#x27;Description 3&#x27;
+    });
+
+    expect(_sampleTopic).not.toBe(secondTopic);
+    expect(_sampleTopic).not.toEqual(secondTopic);
+
+    _sampleTopic.copyFromTopic(secondTopic);
+    expect(_sampleTopic).not.toBe(secondTopic);
+    expect(_sampleTopic).toEqual(secondTopic);
+  });
+});
+</textarea><pre id="annotations" style="display:none">[]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:57 GMT</p>
+    </body>
+  </html>
+  

@@ -1,0 +1,260 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>collection-update.service.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/domain/collection/collection-update.service.spec.ts</td><td class="">84.29%</td><td class="">100%</td><td class="">280</td><td class="">236</td><td class="">44</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2021 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Tests for Collection update service.
+ */
+
+import { TestBed } from &#x27;@angular/core/testing&#x27;;
+
+import { Collection, CollectionBackendDict } from &#x27;domain/collection/collection.model&#x27;;
+import { CollectionUpdateService } from &#x27;domain/collection/collection-update.service&#x27;;
+import { UndoRedoService } from &#x27;domain/editor/undo_redo/undo-redo.service&#x27;;
+import { LearnerExplorationSummaryBackendDict } from &#x27;domain/summary/learner-exploration-summary.model&#x27;;
+
+describe(&#x27;Collection update service&#x27;, () =&gt; {
+  let collectionUpdateService: CollectionUpdateService = null;
+  let undoRedoService: UndoRedoService = null;
+  let learnerExplorationSummaryBackendDict:
+    LearnerExplorationSummaryBackendDict = null;
+  let _sampleCollection = null;
+
+  beforeEach(() =&gt; {
+    TestBed.configureTestingModule({
+      imports: []
+    });
+    collectionUpdateService = TestBed.get(CollectionUpdateService);
+    undoRedoService = TestBed.get(UndoRedoService);
+  });
+
+  beforeEach(() =&gt; {
+    learnerExplorationSummaryBackendDict = {
+      activity_type: &#x27;exploration&#x27;,
+      category: &#x27;a category&#x27;,
+      community_owned: false,
+      created_on_msec: 1591296635736.666,
+      id: &#x27;collection_id&#x27;,
+      last_updated_msec: 1591296737470.528,
+      ratings: {
+        1: 0,
+        2: 0,
+        3: 0,
+        4: 0,
+        5: 0
+      },
+      human_readable_contributors_summary: {},
+      language_code: &#x27;en&#x27;,
+      num_views: 0,
+      objective: &#x27;Test Objective&#x27;,
+      status: &#x27;public&#x27;,
+      tags: [],
+      thumbnail_bg_color: &#x27;#cd672b&#x27;,
+      thumbnail_icon_url: &#x27;/subjects/Algebra.svg&#x27;,
+      title: &#x27;a title&#x27;
+    };
+    let sampleCollectionBackendObject: CollectionBackendDict = {
+      id: &#x27;collection_id&#x27;,
+      title: &#x27;a title&#x27;,
+      objective: &#x27;an objective&#x27;,
+      language_code: &#x27;en&#x27;,
+      tags: [],
+      category: &#x27;a category&#x27;,
+      version: 1,
+      schema_version: 1,
+      nodes: [{
+        exploration_id: &#x27;exp_id0&#x27;,
+        exploration_summary: learnerExplorationSummaryBackendDict
+      }],
+      playthrough_dict: {
+        next_exploration_id: &#x27;expId&#x27;,
+        completed_exploration_ids: [&#x27;expId2&#x27;]
+      }
+    };
+    _sampleCollection = Collection.create(
+      sampleCollectionBackendObject);
+  });
+
+  it(&#x27;should add/remove a new collection node to/from a collection&#x27;,
+    () =&gt; {
+      expect(_sampleCollection.getExplorationIds()).toEqual([&#x27;exp_id0&#x27;]);
+      collectionUpdateService.addCollectionNode(
+        _sampleCollection, &#x27;exp_id1&#x27;, learnerExplorationSummaryBackendDict);
+      expect(_sampleCollection.getExplorationIds()).toEqual([
+        &#x27;exp_id0&#x27;, &#x27;exp_id1&#x27;
+      ]);
+
+      undoRedoService.undoChange(_sampleCollection);
+      expect(_sampleCollection.getExplorationIds()).toEqual([&#x27;exp_id0&#x27;]);
+    }
+  );
+
+  it(&#x27;should create a proper backend change dict for adding collection nodes&#x27;,
+    () =&gt; {
+      collectionUpdateService.addCollectionNode(
+        _sampleCollection, &#x27;exp_id1&#x27;, learnerExplorationSummaryBackendDict);
+      expect(undoRedoService.getCommittableChangeList()).toEqual([{
+        cmd: &#x27;add_collection_node&#x27;,
+        exploration_id: &#x27;exp_id1&#x27;
+      }]);
+    }
+  );
+
+  it(&#x27;should remove/add a collection node from/to a collection&#x27;, ()=&gt; {
+    expect(_sampleCollection.getExplorationIds()).toEqual([&#x27;exp_id0&#x27;]);
+    collectionUpdateService.deleteCollectionNode(_sampleCollection, &#x27;exp_id0&#x27;);
+    expect(_sampleCollection.getExplorationIds()).toEqual([]);
+
+    undoRedoService.undoChange(_sampleCollection);
+    expect(_sampleCollection.getExplorationIds()).toEqual([&#x27;exp_id0&#x27;]);
+  });
+
+  it(&#x27;should create a proper backend change dict for deleting collection nodes&#x27;,
+    () =&gt; {
+      collectionUpdateService
+        .deleteCollectionNode(_sampleCollection, &#x27;exp_id0&#x27;);
+      expect(undoRedoService.getCommittableChangeList()).toEqual([{
+        cmd: &#x27;delete_collection_node&#x27;,
+        exploration_id: &#x27;exp_id0&#x27;
+      }]);
+    }
+  );
+
+  it(&#x27;should set/unset changes to a collection\&#x27;s title&#x27;, () =&gt; {
+    expect(_sampleCollection.getTitle()).toEqual(&#x27;a title&#x27;);
+    collectionUpdateService.setCollectionTitle(_sampleCollection, &#x27;new title&#x27;);
+    expect(_sampleCollection.getTitle()).toEqual(&#x27;new title&#x27;);
+
+    undoRedoService.undoChange(_sampleCollection);
+    expect(_sampleCollection.getTitle()).toEqual(&#x27;a title&#x27;);
+  });
+
+  it(&#x27;should create a proper backend change dict for changing titles&#x27;,
+    () =&gt; {
+      collectionUpdateService
+        .setCollectionTitle(_sampleCollection, &#x27;new title&#x27;);
+      expect(undoRedoService.getCommittableChangeList()).toEqual([{
+        cmd: &#x27;edit_collection_property&#x27;,
+        property_name: &#x27;title&#x27;,
+        new_value: &#x27;new title&#x27;,
+        old_value: &#x27;a title&#x27;
+      }]);
+    }
+  );
+
+  it(&#x27;should set/unset changes to a collection\&#x27;s category&#x27;, () =&gt; {
+    expect(_sampleCollection.getCategory()).toEqual(&#x27;a category&#x27;);
+    collectionUpdateService.setCollectionCategory(
+      _sampleCollection, &#x27;new category&#x27;);
+    expect(_sampleCollection.getCategory()).toEqual(&#x27;new category&#x27;);
+
+    undoRedoService.undoChange(_sampleCollection);
+    expect(_sampleCollection.getCategory()).toEqual(&#x27;a category&#x27;);
+  });
+
+  it(&#x27;should create a proper backend change dict for changing categories&#x27;,
+    () =&gt; {
+      collectionUpdateService.setCollectionCategory(
+        _sampleCollection, &#x27;new category&#x27;);
+      expect(undoRedoService.getCommittableChangeList()).toEqual([{
+        cmd: &#x27;edit_collection_property&#x27;,
+        property_name: &#x27;category&#x27;,
+        new_value: &#x27;new category&#x27;,
+        old_value: &#x27;a category&#x27;
+      }]);
+    }
+  );
+
+  it(&#x27;should set/unset changes to a collection\&#x27;s objective&#x27;, () =&gt; {
+    expect(_sampleCollection.getObjective()).toEqual(&#x27;an objective&#x27;);
+    collectionUpdateService.setCollectionObjective(
+      _sampleCollection, &#x27;new objective&#x27;);
+    expect(_sampleCollection.getObjective()).toEqual(&#x27;new objective&#x27;);
+
+    undoRedoService.undoChange(_sampleCollection);
+    expect(_sampleCollection.getObjective()).toEqual(&#x27;an objective&#x27;);
+  });
+
+  it(&#x27;should create a proper backend change dict for changing objectives&#x27;,
+    () =&gt; {
+      collectionUpdateService.setCollectionObjective(
+        _sampleCollection, &#x27;new objective&#x27;);
+      expect(undoRedoService.getCommittableChangeList()).toEqual([{
+        cmd: &#x27;edit_collection_property&#x27;,
+        property_name: &#x27;objective&#x27;,
+        new_value: &#x27;new objective&#x27;,
+        old_value: &#x27;an objective&#x27;
+      }]);
+    }
+  );
+
+  it(&#x27;should set/unset changes to a collection\&#x27;s language code&#x27;, () =&gt; {
+    expect(_sampleCollection.getLanguageCode()).toEqual(&#x27;en&#x27;);
+    collectionUpdateService.setCollectionLanguageCode(_sampleCollection, &#x27;fi&#x27;);
+    expect(_sampleCollection.getLanguageCode()).toEqual(&#x27;fi&#x27;);
+
+    undoRedoService.undoChange(_sampleCollection);
+    expect(_sampleCollection.getLanguageCode()).toEqual(&#x27;en&#x27;);
+  });
+
+  it(&#x27;should create a proper backend change dict for changing language codes&#x27;,
+    () =&gt; {
+      collectionUpdateService
+        .setCollectionLanguageCode(_sampleCollection, &#x27;fi&#x27;);
+      expect(undoRedoService.getCommittableChangeList()).toEqual([{
+        cmd: &#x27;edit_collection_property&#x27;,
+        property_name: &#x27;language_code&#x27;,
+        new_value: &#x27;fi&#x27;,
+        old_value: &#x27;en&#x27;
+      }]);
+    }
+  );
+
+  it(&#x27;should set/unset changes to a collection\&#x27;s tags&#x27;, () =&gt; {
+    expect(_sampleCollection.getTags()).toEqual([]);
+    collectionUpdateService.setCollectionTags(_sampleCollection, [&#x27;test&#x27;]);
+    expect(_sampleCollection.getTags()).toEqual([&#x27;test&#x27;]);
+
+    undoRedoService.undoChange(_sampleCollection);
+    expect(_sampleCollection.getTags()).toEqual([]);
+  });
+
+  it(&#x27;should create a proper backend change dict for changing tags&#x27;,
+    () =&gt; {
+      collectionUpdateService.setCollectionTags(_sampleCollection, [&#x27;test&#x27;]);
+      expect(undoRedoService.getCommittableChangeList()).toEqual([{
+        cmd: &#x27;edit_collection_property&#x27;,
+        property_name: &#x27;tags&#x27;,
+        new_value: [&#x27;test&#x27;],
+        old_value: []
+      }]);
+    });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/domain/collection/collection-update.service.spec.ts&quot;,&quot;line&quot;:30,&quot;character&quot;:6,&quot;text&quot;:&quot;_sampleCollection&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/collection-update.service.spec.ts&quot;,&quot;line&quot;:83,&quot;character&quot;:4,&quot;text&quot;:&quot;_sampleCollection&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/collection-update.service.spec.ts&quot;,&quot;line&quot;:89,&quot;character&quot;:13,&quot;text&quot;:&quot;_sampleCollection&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/collection-update.service.spec.ts&quot;,&quot;line&quot;:89,&quot;character&quot;:31,&quot;text&quot;:&quot;getExplorationIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/collection-update.service.spec.ts&quot;,&quot;line&quot;:92,&quot;character&quot;:13,&quot;text&quot;:&quot;_sampleCollection&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/collection-update.service.spec.ts&quot;,&quot;line&quot;:92,&quot;character&quot;:31,&quot;text&quot;:&quot;getExplorationIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/collection-update.service.spec.ts&quot;,&quot;line&quot;:97,&quot;character&quot;:13,&quot;text&quot;:&quot;_sampleCollection&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/collection-update.service.spec.ts&quot;,&quot;line&quot;:97,&quot;character&quot;:31,&quot;text&quot;:&quot;getExplorationIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/collection-update.service.spec.ts&quot;,&quot;line&quot;:113,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleCollection&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/collection-update.service.spec.ts&quot;,&quot;line&quot;:113,&quot;character&quot;:29,&quot;text&quot;:&quot;getExplorationIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/collection-update.service.spec.ts&quot;,&quot;line&quot;:115,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleCollection&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/collection-update.service.spec.ts&quot;,&quot;line&quot;:115,&quot;character&quot;:29,&quot;text&quot;:&quot;getExplorationIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/collection-update.service.spec.ts&quot;,&quot;line&quot;:118,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleCollection&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/collection-update.service.spec.ts&quot;,&quot;line&quot;:118,&quot;character&quot;:29,&quot;text&quot;:&quot;getExplorationIds&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/collection-update.service.spec.ts&quot;,&quot;line&quot;:133,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleCollection&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/collection-update.service.spec.ts&quot;,&quot;line&quot;:133,&quot;character&quot;:29,&quot;text&quot;:&quot;getTitle&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/collection-update.service.spec.ts&quot;,&quot;line&quot;:135,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleCollection&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/collection-update.service.spec.ts&quot;,&quot;line&quot;:135,&quot;character&quot;:29,&quot;text&quot;:&quot;getTitle&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/collection-update.service.spec.ts&quot;,&quot;line&quot;:138,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleCollection&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/collection-update.service.spec.ts&quot;,&quot;line&quot;:138,&quot;character&quot;:29,&quot;text&quot;:&quot;getTitle&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/collection-update.service.spec.ts&quot;,&quot;line&quot;:155,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleCollection&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/collection-update.service.spec.ts&quot;,&quot;line&quot;:155,&quot;character&quot;:29,&quot;text&quot;:&quot;getCategory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/collection-update.service.spec.ts&quot;,&quot;line&quot;:158,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleCollection&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/collection-update.service.spec.ts&quot;,&quot;line&quot;:158,&quot;character&quot;:29,&quot;text&quot;:&quot;getCategory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/collection-update.service.spec.ts&quot;,&quot;line&quot;:161,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleCollection&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/collection-update.service.spec.ts&quot;,&quot;line&quot;:161,&quot;character&quot;:29,&quot;text&quot;:&quot;getCategory&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/collection-update.service.spec.ts&quot;,&quot;line&quot;:178,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleCollection&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/collection-update.service.spec.ts&quot;,&quot;line&quot;:178,&quot;character&quot;:29,&quot;text&quot;:&quot;getObjective&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/collection-update.service.spec.ts&quot;,&quot;line&quot;:181,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleCollection&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/collection-update.service.spec.ts&quot;,&quot;line&quot;:181,&quot;character&quot;:29,&quot;text&quot;:&quot;getObjective&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/collection-update.service.spec.ts&quot;,&quot;line&quot;:184,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleCollection&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/collection-update.service.spec.ts&quot;,&quot;line&quot;:184,&quot;character&quot;:29,&quot;text&quot;:&quot;getObjective&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/collection-update.service.spec.ts&quot;,&quot;line&quot;:201,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleCollection&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/collection-update.service.spec.ts&quot;,&quot;line&quot;:201,&quot;character&quot;:29,&quot;text&quot;:&quot;getLanguageCode&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/collection-update.service.spec.ts&quot;,&quot;line&quot;:203,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleCollection&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/collection-update.service.spec.ts&quot;,&quot;line&quot;:203,&quot;character&quot;:29,&quot;text&quot;:&quot;getLanguageCode&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/collection-update.service.spec.ts&quot;,&quot;line&quot;:206,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleCollection&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/collection-update.service.spec.ts&quot;,&quot;line&quot;:206,&quot;character&quot;:29,&quot;text&quot;:&quot;getLanguageCode&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/collection-update.service.spec.ts&quot;,&quot;line&quot;:223,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleCollection&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/collection-update.service.spec.ts&quot;,&quot;line&quot;:223,&quot;character&quot;:29,&quot;text&quot;:&quot;getTags&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/collection-update.service.spec.ts&quot;,&quot;line&quot;:225,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleCollection&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/collection-update.service.spec.ts&quot;,&quot;line&quot;:225,&quot;character&quot;:29,&quot;text&quot;:&quot;getTags&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/collection-update.service.spec.ts&quot;,&quot;line&quot;:228,&quot;character&quot;:11,&quot;text&quot;:&quot;_sampleCollection&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/collection/collection-update.service.spec.ts&quot;,&quot;line&quot;:228,&quot;character&quot;:29,&quot;text&quot;:&quot;getTags&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:57 GMT</p>
+    </body>
+  </html>
+  

@@ -1,0 +1,80 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>exploration-save-modal.controller.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/exploration-editor-page/modal-templates/exploration-save-modal.controller.spec.ts</td><td class="">50.00%</td><td class="">100%</td><td class="">76</td><td class="">38</td><td class="">38</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for ExplorationSaveModalController.
+ */
+
+describe(&#x27;Exploration Save Modal Controller&#x27;, function() {
+  var $scope = null;
+  var $uibModalInstance = null;
+  var SiteAnalyticsService = null;
+
+  var diffData = &#x27;exp1&#x27;;
+  var isExplorationPrivate = true;
+
+  beforeEach(angular.mock.module(&#x27;oppia&#x27;));
+  beforeEach(angular.mock.inject(function($injector, $controller) {
+    var $rootScope = $injector.get(&#x27;$rootScope&#x27;);
+
+    $uibModalInstance = jasmine.createSpyObj(
+      &#x27;$uibModalInstance&#x27;, [&#x27;close&#x27;, &#x27;dismiss&#x27;]);
+
+    spyOnAllFunctions(SiteAnalyticsService);
+
+    $scope = $rootScope.$new();
+    $controller(&#x27;ExplorationSaveModalController&#x27;, {
+      $scope: $scope,
+      $uibModalInstance: $uibModalInstance,
+      diffData: diffData,
+      isExplorationPrivate: isExplorationPrivate
+    });
+  }));
+
+  it(&#x27;should initialize $scope properties after controller is initialized&#x27;,
+    function() {
+      expect($scope.showDiff).toBe(false);
+      expect($scope.diffData).toBe(diffData);
+      expect($scope.isExplorationPrivate).toBe(isExplorationPrivate);
+      expect($scope.earlierVersionHeader).toBe(&#x27;Last saved&#x27;);
+      expect($scope.laterVersionHeader).toBe(&#x27;New changes&#x27;);
+    });
+
+  it(&#x27;should toggle exploration diff visibility when clicking on toggle diff&#x27; +
+    &#x27; button&#x27;, function() {
+    expect($scope.showDiff).toBe(false);
+    $scope.onClickToggleDiffButton();
+    expect($scope.showDiff).toBe(true);
+    $scope.onClickToggleDiffButton();
+    expect($scope.showDiff).toBe(false);
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/exploration-save-modal.controller.spec.ts&quot;,&quot;line&quot;:19,&quot;character&quot;:6,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/exploration-save-modal.controller.spec.ts&quot;,&quot;line&quot;:20,&quot;character&quot;:6,&quot;text&quot;:&quot;$uibModalInstance&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/exploration-save-modal.controller.spec.ts&quot;,&quot;line&quot;:21,&quot;character&quot;:6,&quot;text&quot;:&quot;SiteAnalyticsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/exploration-save-modal.controller.spec.ts&quot;,&quot;line&quot;:27,&quot;character&quot;:42,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/exploration-save-modal.controller.spec.ts&quot;,&quot;line&quot;:27,&quot;character&quot;:53,&quot;text&quot;:&quot;$controller&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/exploration-save-modal.controller.spec.ts&quot;,&quot;line&quot;:28,&quot;character&quot;:8,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/exploration-save-modal.controller.spec.ts&quot;,&quot;line&quot;:28,&quot;character&quot;:21,&quot;text&quot;:&quot;$injector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/exploration-save-modal.controller.spec.ts&quot;,&quot;line&quot;:28,&quot;character&quot;:31,&quot;text&quot;:&quot;get&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/exploration-save-modal.controller.spec.ts&quot;,&quot;line&quot;:30,&quot;character&quot;:4,&quot;text&quot;:&quot;$uibModalInstance&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/exploration-save-modal.controller.spec.ts&quot;,&quot;line&quot;:33,&quot;character&quot;:22,&quot;text&quot;:&quot;SiteAnalyticsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/exploration-save-modal.controller.spec.ts&quot;,&quot;line&quot;:35,&quot;character&quot;:4,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/exploration-save-modal.controller.spec.ts&quot;,&quot;line&quot;:35,&quot;character&quot;:13,&quot;text&quot;:&quot;$rootScope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/exploration-save-modal.controller.spec.ts&quot;,&quot;line&quot;:35,&quot;character&quot;:24,&quot;text&quot;:&quot;$new&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/exploration-save-modal.controller.spec.ts&quot;,&quot;line&quot;:36,&quot;character&quot;:4,&quot;text&quot;:&quot;$controller&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/exploration-save-modal.controller.spec.ts&quot;,&quot;line&quot;:37,&quot;character&quot;:6,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/exploration-save-modal.controller.spec.ts&quot;,&quot;line&quot;:37,&quot;character&quot;:14,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/exploration-save-modal.controller.spec.ts&quot;,&quot;line&quot;:38,&quot;character&quot;:6,&quot;text&quot;:&quot;$uibModalInstance&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/exploration-save-modal.controller.spec.ts&quot;,&quot;line&quot;:38,&quot;character&quot;:25,&quot;text&quot;:&quot;$uibModalInstance&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/exploration-save-modal.controller.spec.ts&quot;,&quot;line&quot;:46,&quot;character&quot;:13,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/exploration-save-modal.controller.spec.ts&quot;,&quot;line&quot;:46,&quot;character&quot;:20,&quot;text&quot;:&quot;showDiff&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/exploration-save-modal.controller.spec.ts&quot;,&quot;line&quot;:47,&quot;character&quot;:13,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/exploration-save-modal.controller.spec.ts&quot;,&quot;line&quot;:47,&quot;character&quot;:20,&quot;text&quot;:&quot;diffData&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/exploration-save-modal.controller.spec.ts&quot;,&quot;line&quot;:48,&quot;character&quot;:13,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/exploration-save-modal.controller.spec.ts&quot;,&quot;line&quot;:48,&quot;character&quot;:20,&quot;text&quot;:&quot;isExplorationPrivate&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/exploration-save-modal.controller.spec.ts&quot;,&quot;line&quot;:49,&quot;character&quot;:13,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/exploration-save-modal.controller.spec.ts&quot;,&quot;line&quot;:49,&quot;character&quot;:20,&quot;text&quot;:&quot;earlierVersionHeader&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/exploration-save-modal.controller.spec.ts&quot;,&quot;line&quot;:50,&quot;character&quot;:13,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/exploration-save-modal.controller.spec.ts&quot;,&quot;line&quot;:50,&quot;character&quot;:20,&quot;text&quot;:&quot;laterVersionHeader&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/exploration-save-modal.controller.spec.ts&quot;,&quot;line&quot;:55,&quot;character&quot;:11,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/exploration-save-modal.controller.spec.ts&quot;,&quot;line&quot;:55,&quot;character&quot;:18,&quot;text&quot;:&quot;showDiff&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/exploration-save-modal.controller.spec.ts&quot;,&quot;line&quot;:56,&quot;character&quot;:4,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/exploration-save-modal.controller.spec.ts&quot;,&quot;line&quot;:56,&quot;character&quot;:11,&quot;text&quot;:&quot;onClickToggleDiffButton&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/exploration-save-modal.controller.spec.ts&quot;,&quot;line&quot;:57,&quot;character&quot;:11,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/exploration-save-modal.controller.spec.ts&quot;,&quot;line&quot;:57,&quot;character&quot;:18,&quot;text&quot;:&quot;showDiff&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/exploration-save-modal.controller.spec.ts&quot;,&quot;line&quot;:58,&quot;character&quot;:4,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/exploration-save-modal.controller.spec.ts&quot;,&quot;line&quot;:58,&quot;character&quot;:11,&quot;text&quot;:&quot;onClickToggleDiffButton&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/exploration-save-modal.controller.spec.ts&quot;,&quot;line&quot;:59,&quot;character&quot;:11,&quot;text&quot;:&quot;$scope&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/exploration-editor-page/modal-templates/exploration-save-modal.controller.spec.ts&quot;,&quot;line&quot;:59,&quot;character&quot;:18,&quot;text&quot;:&quot;showDiff&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:59 GMT</p>
+    </body>
+  </html>
+  

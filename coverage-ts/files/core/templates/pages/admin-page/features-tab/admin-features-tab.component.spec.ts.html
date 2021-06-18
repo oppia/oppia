@@ -1,0 +1,729 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>admin-features-tab.component.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/admin-page/features-tab/admin-features-tab.component.spec.ts</td><td class="">99.47%</td><td class="">100%</td><td class="">940</td><td class="">935</td><td class="">5</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for the feature tab in admin page.
+ */
+
+import { HttpClientTestingModule } from &#x27;@angular/common/http/testing&#x27;;
+import { ComponentFixture, fakeAsync, async, TestBed, flushMicrotasks } from
+  &#x27;@angular/core/testing&#x27;;
+import { FormsModule } from &#x27;@angular/forms&#x27;;
+
+import cloneDeep from &#x27;lodash/cloneDeep&#x27;;
+
+import { AdminPageData } from &#x27;domain/admin/admin-backend-api.service&#x27;;
+import { AdminFeaturesTabComponent } from
+  &#x27;pages/admin-page/features-tab/admin-features-tab.component&#x27;;
+import { AdminDataService } from &#x27;pages/admin-page/services/admin-data.service&#x27;;
+import { AdminTaskManagerService } from
+  &#x27;pages/admin-page/services/admin-task-manager.service&#x27;;
+import { PlatformFeatureAdminBackendApiService } from
+  &#x27;domain/platform_feature/platform-feature-admin-backend-api.service&#x27;;
+import { PlatformFeatureDummyBackendApiService } from
+  &#x27;domain/platform_feature/platform-feature-dummy-backend-api.service&#x27;;
+import { WindowRef } from &#x27;services/contextual/window-ref.service&#x27;;
+import { PlatformParameterFilterType, ServerMode } from
+  &#x27;domain/platform_feature/platform-parameter-filter.model&#x27;;
+import { FeatureStage, PlatformParameter } from &#x27;domain/platform_feature/platform-parameter.model&#x27;;
+import { PlatformFeatureService } from &#x27;services/platform-feature.service&#x27;;
+
+
+let dummyFeatureStatus = false;
+const mockDummyFeatureStatus = (status: boolean) =&gt; dummyFeatureStatus = status;
+
+class MockPlatformFeatureService {
+  get status() {
+    return {
+      DummyFeature: {
+        get isEnabled() {
+          return dummyFeatureStatus;
+        }
+      }
+    };
+  }
+}
+
+describe(&#x27;Admin page feature tab&#x27;, function() {
+  let component: AdminFeaturesTabComponent;
+  let fixture: ComponentFixture&lt;AdminFeaturesTabComponent&gt;;
+  let adminDataService: AdminDataService;
+  let featureApiService: PlatformFeatureAdminBackendApiService;
+  let adminTaskManagerService: AdminTaskManagerService;
+  let windowRef: WindowRef;
+
+  let updateApiSpy: jasmine.Spy;
+
+  let mockConfirmResult: (val: boolean) =&gt; void;
+  let mockPromptResult: (msg: string) =&gt; void;
+
+  beforeEach(async(() =&gt; {
+    TestBed
+      .configureTestingModule({
+        imports: [FormsModule, HttpClientTestingModule],
+        declarations: [AdminFeaturesTabComponent],
+        providers: [
+          {
+            provide: PlatformFeatureService,
+            useClass: MockPlatformFeatureService
+          }
+        ]
+      })
+      .compileComponents();
+
+    fixture = TestBed.createComponent(AdminFeaturesTabComponent);
+    component = fixture.componentInstance;
+    adminDataService = TestBed.get(AdminDataService);
+    featureApiService = TestBed.get(PlatformFeatureAdminBackendApiService);
+    windowRef = TestBed.get(WindowRef);
+    adminTaskManagerService = TestBed.get(AdminTaskManagerService);
+
+    let confirmResult = true;
+    let promptResult = &#x27;mock msg&#x27;;
+    spyOnProperty(windowRef, &#x27;nativeWindow&#x27;).and.returnValue({
+      confirm: () =&gt; confirmResult,
+      prompt: () =&gt; promptResult,
+      alert: () =&gt; null
+    });
+    mockConfirmResult = val =&gt; confirmResult = val;
+    mockPromptResult = msg =&gt; promptResult = msg;
+
+    spyOn(adminDataService, &#x27;getDataAsync&#x27;).and.resolveTo({
+      featureFlags: [
+        PlatformParameter.createFromBackendDict({
+          data_type: &#x27;bool&#x27;,
+          default_value: false,
+          description: &#x27;This is a dummy feature flag.&#x27;,
+          feature_stage: FeatureStage.DEV,
+          is_feature: true,
+          name: &#x27;dummy_feature&#x27;,
+          rule_schema_version: 1,
+          rules: [{
+            filters: [
+              {
+                type: PlatformParameterFilterType.ServerMode,
+                conditions: [[&#x27;=&#x27;, ServerMode.Dev]]
+              }
+            ],
+            // This does not match the data type of feature flags, but this is
+            // intended as string values are more suitable for
+            // identifying rules in the following tests.
+            value_when_matched: &#x27;original&#x27;,
+          }],
+        })
+      ]
+    } as AdminPageData);
+
+    updateApiSpy = spyOn(featureApiService, &#x27;updateFeatureFlag&#x27;)
+      .and.resolveTo(null);
+
+    component.ngOnInit();
+  }));
+
+  it(&#x27;should load feature flags on init&#x27;, () =&gt; {
+    expect(component.featureFlags.length).toBe(1);
+    expect(component.featureFlags[0].name).toEqual(&#x27;dummy_feature&#x27;);
+  });
+
+  describe(&#x27;.addNewRuleToTop&#x27;, () =&gt; {
+    it(&#x27;should add new rule to top of rule list&#x27;, () =&gt; {
+      const featureFlag = component.featureFlags[0];
+
+      expect(featureFlag.rules.length).toBe(1);
+
+      component.addNewRuleToTop(featureFlag);
+      expect(featureFlag.rules.length).toBe(2);
+      expect(featureFlag.rules[1].valueWhenMatched).toEqual(&#x27;original&#x27;);
+    });
+  });
+
+  describe(&#x27;.addNewRuleToBottom&#x27;, () =&gt; {
+    it(&#x27;should add new rule to bottom of rule list&#x27;, () =&gt; {
+      const featureFlag = component.featureFlags[0];
+
+      expect(featureFlag.rules.length).toBe(1);
+
+      component.addNewRuleToBottom(featureFlag);
+      expect(featureFlag.rules.length).toBe(2);
+      expect(featureFlag.rules[0].valueWhenMatched).toEqual(&#x27;original&#x27;);
+    });
+  });
+
+  describe(&#x27;.removeRule&#x27;, () =&gt; {
+    it(&#x27;should remove rule&#x27;, () =&gt; {
+      const featureFlag = component.featureFlags[0];
+      component.addNewRuleToBottom(featureFlag);
+      featureFlag.rules[1].valueWhenMatched = &#x27;1&#x27;;
+
+      component.removeRule(featureFlag, 0);
+
+      // Original rules order: [&#x27;original&#x27;, &#x27;1&#x27;]
+      // Verifies it&#x27;s [&#x27;1&#x27;] after removing &#x27;original&#x27;.
+      expect(featureFlag.rules.length).toBe(1);
+      expect(featureFlag.rules[0].valueWhenMatched).toEqual(&#x27;1&#x27;);
+    });
+  });
+
+  describe(&#x27;.moveRuleUp&#x27;, () =&gt; {
+    it(&#x27;should move rule up&#x27;, () =&gt; {
+      const featureFlag = component.featureFlags[0];
+      component.addNewRuleToBottom(featureFlag);
+      featureFlag.rules[1].valueWhenMatched = &#x27;1&#x27;;
+      component.addNewRuleToBottom(featureFlag);
+      featureFlag.rules[2].valueWhenMatched = &#x27;2&#x27;;
+
+      component.moveRuleUp(featureFlag, 1);
+
+      // Original rules order: [&#x27;original&#x27;, &#x27;1&#x27;, &#x27;2&#x27;]
+      // Verifies it&#x27;s [&#x27;1&#x27;, &#x27;original&#x27;, &#x27;2&#x27;] after removing &#x27;1&#x27; up.
+      expect(featureFlag.rules[0].valueWhenMatched).toEqual(&#x27;1&#x27;);
+      expect(featureFlag.rules[1].valueWhenMatched).toEqual(&#x27;original&#x27;);
+      expect(featureFlag.rules[2].valueWhenMatched).toEqual(&#x27;2&#x27;);
+    });
+  });
+
+  describe(&#x27;.moveRuleDown&#x27;, () =&gt; {
+    it(&#x27;should move rule down&#x27;, () =&gt; {
+      const featureFlag = component.featureFlags[0];
+      component.addNewRuleToBottom(featureFlag);
+      featureFlag.rules[1].valueWhenMatched = &#x27;1&#x27;;
+      component.addNewRuleToBottom(featureFlag);
+      featureFlag.rules[2].valueWhenMatched = &#x27;2&#x27;;
+
+      component.moveRuleDown(featureFlag, 1);
+
+      // Original rules order: [&#x27;original&#x27;, &#x27;1&#x27;, &#x27;2&#x27;]
+      // Verifies it&#x27;s [&#x27;original&#x27;, &#x27;2&#x27;, &#x27;1&#x27;] after removing &#x27;1&#x27; down.
+      expect(featureFlag.rules[0].valueWhenMatched).toEqual(&#x27;original&#x27;);
+      expect(featureFlag.rules[1].valueWhenMatched).toEqual(&#x27;2&#x27;);
+      expect(featureFlag.rules[2].valueWhenMatched).toEqual(&#x27;1&#x27;);
+    });
+  });
+
+  describe(&#x27;.addNewFilter&#x27;, () =&gt; {
+    it(&#x27;should add new filter&#x27;, () =&gt; {
+      const rule = component.featureFlags[0].rules[0];
+
+      expect(rule.filters.length).toBe(1);
+
+      component.addNewFilter(rule);
+      rule.filters[1].type = PlatformParameterFilterType.AppVersion;
+
+      expect(rule.filters.length).toBe(2);
+      // Original filter list: [&#x27;server_mode&#x27;]
+      // Verifies it&#x27;s [&#x27;server_mode&#x27;, &#x27;app_version&#x27;] after adding a new filter
+      // to the end.
+      expect(rule.filters[0].type)
+        .toEqual(PlatformParameterFilterType.ServerMode);
+      expect(rule.filters[1].type)
+        .toEqual(PlatformParameterFilterType.AppVersion);
+    });
+  });
+
+  describe(&#x27;.removeFilter&#x27;, () =&gt; {
+    it(&#x27;should remove filter&#x27;, () =&gt; {
+      const rule = component.featureFlags[0].rules[0];
+      component.addNewFilter(rule);
+      rule.filters[1].type = PlatformParameterFilterType.AppVersion;
+
+      component.removeFilter(rule, 0);
+
+      // Original filter list: [&#x27;server_mode&#x27;, &#x27;app_version&#x27;]
+      // Verifies it&#x27;s [&#x27;app_version&#x27;] after removing the first filter.
+      expect(rule.filters.length).toBe(1);
+      expect(rule.filters[0].type)
+        .toEqual(PlatformParameterFilterType.AppVersion);
+    });
+  });
+
+  describe(&#x27;.addNewCondition&#x27;, () =&gt; {
+    it(&#x27;should add new condition&#x27;, () =&gt; {
+      const filter = component.featureFlags[0].rules[0].filters[0];
+
+      component.addNewCondition(filter);
+      filter.conditions[1] = [&#x27;=&#x27;, &#x27;mock&#x27;];
+
+      expect(filter.conditions.length).toBe(2);
+
+      // Original condition list: [&#x27;=dev&#x27;]
+      // Verifies it&#x27;s [&#x27;=dev&#x27;, &#x27;=mock&#x27;] after adding.
+      expect(filter.conditions[0])
+        .toEqual([&#x27;=&#x27;, ServerMode.Dev.toString()]);
+      expect(filter.conditions[1])
+        .toEqual([&#x27;=&#x27;, &#x27;mock&#x27;]);
+    });
+  });
+
+  describe(&#x27;.removeCondition&#x27;, () =&gt; {
+    it(&#x27;should remove condition&#x27;, () =&gt; {
+      const filter = component.featureFlags[0].rules[0].filters[0];
+      component.addNewCondition(filter);
+      filter.conditions[1] = [&#x27;=&#x27;, &#x27;mock&#x27;];
+
+      component.removeCondition(filter, 0);
+
+      // Original condition list: [&#x27;=dev&#x27;, &#x27;=mock&#x27;]
+      // Verifies it&#x27;s [&#x27;=mock&#x27;] after removing the first condition.
+      expect(filter.conditions.length).toBe(1);
+      expect(filter.conditions[0]).toEqual([&#x27;=&#x27;, &#x27;mock&#x27;]);
+    });
+  });
+
+  describe(&#x27;.clearFilterConditions&#x27;, () =&gt; {
+    it(&#x27;should clear existing conditions&#x27;, () =&gt; {
+      const filter = component.featureFlags[0].rules[0].filters[0];
+      component.addNewCondition(filter);
+      filter.conditions[1] = [&#x27;=&#x27;, &#x27;mock&#x27;];
+
+      component.clearFilterConditions(filter);
+      expect(filter.conditions.length).toBe(0);
+    });
+  });
+
+  describe(&#x27;.clearChanges&#x27;, () =&gt; {
+    it(&#x27;should clear changes&#x27;, () =&gt; {
+      const featureFlag = component.featureFlags[0];
+      const originalRules = cloneDeep(featureFlag.rules);
+
+      component.addNewRuleToTop(featureFlag);
+      component.clearChanges(featureFlag);
+
+      expect(featureFlag.rules.length).toBe(1);
+      expect(featureFlag.rules).toEqual(originalRules);
+    });
+
+    it(&#x27;should not proceed if the user doesn\&#x27;t confirm&#x27;, () =&gt; {
+      mockConfirmResult(false);
+      const featureFlag = component.featureFlags[0];
+
+      expect(featureFlag.rules.length).toBe(1);
+
+      component.addNewRuleToTop(featureFlag);
+      component.clearChanges(featureFlag);
+
+      expect(featureFlag.rules.length).toBe(2);
+    });
+  });
+
+  describe(&#x27;.updateFeatureRulesAsync&#x27;, () =&gt; {
+    let setStatusSpy: jasmine.Spy;
+
+    beforeEach(() =&gt; {
+      setStatusSpy = jasmine.createSpy();
+      setStatusSpy = spyOn(component.setStatusMessage, &#x27;emit&#x27;);
+
+      adminTaskManagerService.finishTask();
+    });
+
+    it(&#x27;should update feature rules&#x27;, fakeAsync(() =&gt; {
+      mockPromptResult(&#x27;mock msg&#x27;);
+
+      const featureFlag = component.featureFlags[0];
+
+      component.addNewRuleToTop(featureFlag);
+      component.updateFeatureRulesAsync(featureFlag);
+
+      flushMicrotasks();
+
+      expect(updateApiSpy).toHaveBeenCalledWith(
+        featureFlag.name, &#x27;mock msg&#x27;, featureFlag.rules);
+      expect(setStatusSpy).toHaveBeenCalledWith(&#x27;Saved successfully.&#x27;);
+    }));
+
+    it(&#x27;should update feature backup after update succeeds&#x27;, fakeAsync(() =&gt; {
+      mockPromptResult(&#x27;mock msg&#x27;);
+
+      const featureFlag = component.featureFlags[0];
+
+      component.addNewRuleToTop(featureFlag);
+      component.updateFeatureRulesAsync(featureFlag);
+
+      flushMicrotasks();
+
+      expect(component.featureFlagNameToBackupMap.get(featureFlag.name))
+        .toEqual(featureFlag);
+    }));
+
+    it(&#x27;should not update feature backup if update fails&#x27;, fakeAsync(() =&gt; {
+      mockPromptResult(&#x27;mock msg&#x27;);
+      updateApiSpy.and.rejectWith(&#x27;error&#x27;);
+
+      const featureFlag = component.featureFlags[0];
+      const originalFeatureFlag = cloneDeep(featureFlag);
+
+      component.addNewRuleToTop(featureFlag);
+      component.updateFeatureRulesAsync(featureFlag);
+
+      flushMicrotasks();
+
+      expect(component.featureFlagNameToBackupMap.get(featureFlag.name))
+        .toEqual(originalFeatureFlag);
+    }));
+
+    it(&#x27;should not proceed if there is another task running&#x27;, fakeAsync(() =&gt; {
+      mockPromptResult(&#x27;mock msg&#x27;);
+
+      adminTaskManagerService.startTask();
+
+      const featureFlag = component.featureFlags[0];
+
+      component.addNewRuleToTop(featureFlag);
+      component.updateFeatureRulesAsync(featureFlag);
+
+      flushMicrotasks();
+
+      expect(updateApiSpy).not.toHaveBeenCalled();
+      expect(setStatusSpy).not.toHaveBeenCalled();
+
+      // We need to do this at the end, otherwise the AdminTaskManager will
+      // still think that the task is running (and this can mess up other
+      // frontend tests that rely on the starting state to be &quot;nothing is
+      // happening&quot;).
+      adminTaskManagerService.finishTask();
+    }));
+
+    it(&#x27;should not proceed if the user cancels the prompt&#x27;, fakeAsync(
+      () =&gt; {
+        mockPromptResult(null);
+
+        const featureFlag = component.featureFlags[0];
+
+        component.addNewRuleToTop(featureFlag);
+        component.updateFeatureRulesAsync(featureFlag);
+
+        flushMicrotasks();
+
+        expect(updateApiSpy).not.toHaveBeenCalled();
+        expect(setStatusSpy).not.toHaveBeenCalled();
+      })
+    );
+
+    it(&#x27;should not proceed if there is any validation issue&#x27;, fakeAsync(() =&gt; {
+      mockPromptResult(null);
+
+      const featureFlag = component.featureFlags[0];
+
+      // Two identical rules.
+      component.addNewRuleToTop(featureFlag);
+      component.addNewRuleToTop(featureFlag);
+      component.updateFeatureRulesAsync(featureFlag);
+
+      flushMicrotasks();
+
+      expect(updateApiSpy).not.toHaveBeenCalled();
+      expect(setStatusSpy).not.toHaveBeenCalled();
+    }));
+
+    it(&#x27;should show error if the update fails&#x27;, fakeAsync(() =&gt; {
+      mockPromptResult(&#x27;mock msg&#x27;);
+
+      updateApiSpy.and.rejectWith(&#x27;unknown error&#x27;);
+      const featureFlag = component.featureFlags[0];
+
+      component.addNewRuleToTop(featureFlag);
+      component.updateFeatureRulesAsync(featureFlag);
+
+      flushMicrotasks();
+
+      expect(updateApiSpy).toHaveBeenCalled();
+      expect(setStatusSpy).toHaveBeenCalledWith(&#x27;Update failed.&#x27;);
+    }));
+
+    it(&#x27;should show error if the update fails&#x27;, fakeAsync(() =&gt; {
+      mockPromptResult(&#x27;mock msg&#x27;);
+
+      updateApiSpy.and.rejectWith({
+        error: {
+          error: &#x27;validation error.&#x27;
+        }
+      });
+      const featureFlag = component.featureFlags[0];
+
+      component.addNewRuleToTop(featureFlag);
+      component.updateFeatureRulesAsync(featureFlag);
+
+      flushMicrotasks();
+
+      expect(updateApiSpy).toHaveBeenCalled();
+      expect(setStatusSpy).toHaveBeenCalledWith(
+        &#x27;Update failed: validation error.&#x27;);
+    }));
+  });
+
+  describe(&#x27;server mode option filter&#x27;, () =&gt; {
+    let options: readonly string[];
+    let optionFilter: (feature: PlatformParameter, option: string) =&gt; boolean;
+
+    beforeEach(() =&gt; {
+      options = component
+        .filterTypeToContext[PlatformParameterFilterType.ServerMode]
+        .options;
+      optionFilter = component
+        .filterTypeToContext[PlatformParameterFilterType.ServerMode]
+        .optionFilter;
+    });
+
+    it(&#x27;should return [\&#x27;dev\&#x27;] for feature in dev stage&#x27;, () =&gt; {
+      expect(
+        options.filter(option =&gt; optionFilter(
+          &lt;PlatformParameter&gt;{featureStage: FeatureStage.DEV},
+          option))
+      )
+        .toEqual([&#x27;dev&#x27;]);
+    });
+
+    it(&#x27;should return [\&#x27;dev\&#x27;, \&#x27;test\&#x27;] for feature in test stage&#x27;, () =&gt; {
+      expect(
+        options.filter(option =&gt; optionFilter(
+          &lt;PlatformParameter&gt;{featureStage: FeatureStage.TEST},
+          option))
+      )
+        .toEqual([&#x27;dev&#x27;, &#x27;test&#x27;]);
+    });
+
+    it(&#x27;should return [\&#x27;dev\&#x27;, \&#x27;test\&#x27;, \&#x27;prod\&#x27;] for feature in prod stage&#x27;,
+      () =&gt; {
+        expect(
+          options.filter(option =&gt; optionFilter(
+            &lt;PlatformParameter&gt;{featureStage: FeatureStage.PROD},
+            option))
+        )
+          .toEqual([&#x27;dev&#x27;, &#x27;test&#x27;, &#x27;prod&#x27;]);
+      }
+    );
+
+    it(&#x27;should return empty array for feature in invalid stage&#x27;, () =&gt; {
+      expect(
+        options.filter(option =&gt; optionFilter(
+          &lt;PlatformParameter&gt;{featureStage: null},
+          option))
+      )
+        .toEqual([]);
+    });
+  });
+
+  describe(&#x27;.isFeatureFlagRulesChanged&#x27;, () =&gt; {
+    it(&#x27;should return false if the feature is the same as the backup instance&#x27;,
+      () =&gt; {
+        const featureFlag = component.featureFlags[0];
+
+        expect(component.isFeatureFlagRulesChanged(featureFlag))
+          .toBeFalse();
+      }
+    );
+
+    it(
+      &#x27;should return true if the feature is different from the backup instance&#x27;,
+      () =&gt; {
+        const featureFlag = component.featureFlags[0];
+
+        component.addNewRuleToTop(featureFlag);
+
+        expect(component.isFeatureFlagRulesChanged(featureFlag))
+          .toBeTrue();
+      }
+    );
+  });
+
+  describe(&#x27;.validateFeatureFlag&#x27;, () =&gt; {
+    it(&#x27;should return empty array if no issue&#x27;, () =&gt; {
+      const issues = component.validateFeatureFlag(
+        PlatformParameter.createFromBackendDict({
+          data_type: &#x27;bool&#x27;,
+          default_value: false,
+          description: &#x27;This is a dummy feature flag.&#x27;,
+          feature_stage: FeatureStage.DEV,
+          is_feature: true,
+          name: &#x27;dummy_feature&#x27;,
+          rule_schema_version: 1,
+          rules: [
+            {
+              filters: [
+                {
+                  type: PlatformParameterFilterType.ServerMode,
+                  conditions: [[&#x27;=&#x27;, ServerMode.Dev], [&#x27;=&#x27;, ServerMode.Test]]
+                },
+                {
+                  type: PlatformParameterFilterType.ServerMode,
+                  conditions: [[&#x27;=&#x27;, ServerMode.Prod]]
+                }
+              ],
+              value_when_matched: true,
+            },
+            {
+              filters: [],
+              value_when_matched: true
+            }
+          ],
+        })
+      );
+
+      expect(issues).toEqual([]);
+    });
+
+    it(&#x27;should return issues if there are identical rules&#x27;, () =&gt; {
+      const issues = component.validateFeatureFlag(
+        PlatformParameter.createFromBackendDict({
+          data_type: &#x27;bool&#x27;,
+          default_value: false,
+          description: &#x27;This is a dummy feature flag.&#x27;,
+          feature_stage: FeatureStage.DEV,
+          is_feature: true,
+          name: &#x27;dummy_feature&#x27;,
+          rule_schema_version: 1,
+          rules: [
+            {
+              filters: [],
+              value_when_matched: true
+            },
+            {
+              filters: [],
+              value_when_matched: true
+            },
+          ],
+        })
+      );
+
+      expect(issues).toEqual([&#x27;The 1-th &amp; 2-th rules are identical.&#x27;]);
+    });
+
+    it(&#x27;should return issues if there are identical filters&#x27;, () =&gt; {
+      const issues = component.validateFeatureFlag(
+        PlatformParameter.createFromBackendDict({
+          data_type: &#x27;bool&#x27;,
+          default_value: false,
+          description: &#x27;This is a dummy feature flag.&#x27;,
+          feature_stage: FeatureStage.DEV,
+          is_feature: true,
+          name: &#x27;dummy_feature&#x27;,
+          rule_schema_version: 1,
+          rules: [
+            {
+              filters: [
+                {
+                  type: PlatformParameterFilterType.ServerMode,
+                  conditions: [[&#x27;=&#x27;, ServerMode.Dev]]
+                },
+                {
+                  type: PlatformParameterFilterType.ServerMode,
+                  conditions: [[&#x27;=&#x27;, ServerMode.Dev]]
+                }
+              ],
+              value_when_matched: true
+            },
+          ],
+        })
+      );
+
+      expect(issues).toEqual([
+        &#x27;In the 1-th rule: the 1-th &amp; 2-th filters are identical.&#x27;]);
+    });
+
+    it(&#x27;should return issues if there are identical conditions&#x27;, () =&gt; {
+      const issues = component.validateFeatureFlag(
+        PlatformParameter.createFromBackendDict({
+          data_type: &#x27;bool&#x27;,
+          default_value: false,
+          description: &#x27;This is a dummy feature flag.&#x27;,
+          feature_stage: FeatureStage.DEV,
+          is_feature: true,
+          name: &#x27;dummy_feature&#x27;,
+          rule_schema_version: 1,
+          rules: [
+            {
+              filters: [
+                {
+                  type: PlatformParameterFilterType.ServerMode,
+                  conditions: [[&#x27;=&#x27;, ServerMode.Dev], [&#x27;=&#x27;, ServerMode.Dev]]
+                },
+              ],
+              value_when_matched: true
+            },
+          ],
+        })
+      );
+
+      expect(issues).toEqual([
+        &#x27;In the 1-th rule, 1-th filter: the 1-th &amp; 2-th conditions&#x27; +
+        &#x27; are identical.&#x27;]);
+    });
+  });
+
+  describe(&#x27;.isDummyFeatureEnabled&#x27;, () =&gt; {
+    it(&#x27;should return true when dummy feature is enabled&#x27;, () =&gt; {
+      mockDummyFeatureStatus(true);
+      expect(component.isDummyFeatureEnabled).toBeTrue();
+    });
+
+    it(&#x27;should return false when dummy feature is disabled&#x27;, () =&gt; {
+      mockDummyFeatureStatus(false);
+      expect(component.isDummyFeatureEnabled).toBeFalse();
+    });
+  });
+
+  describe(&#x27;.reloadDummyHandlerStatusAsync&#x27;, () =&gt; {
+    let dummyApiService: PlatformFeatureDummyBackendApiService;
+
+    let dummyApiSpy: jasmine.Spy;
+
+    beforeEach(() =&gt; {
+      dummyApiService = TestBed.get(PlatformFeatureDummyBackendApiService);
+
+      dummyApiSpy = spyOn(dummyApiService, &#x27;isHandlerEnabled&#x27;)
+        .and.resolveTo(null);
+    });
+
+    it(&#x27;should not request dummy handler if the dummy feature is disabled&#x27;,
+      fakeAsync(() =&gt; {
+        mockDummyFeatureStatus(false);
+
+        component.reloadDummyHandlerStatusAsync();
+
+        flushMicrotasks();
+
+        expect(dummyApiSpy).not.toHaveBeenCalled();
+      })
+    );
+
+    it(&#x27;should request dummy handler if the dummy feature is enabled&#x27;,
+      fakeAsync(() =&gt; {
+        mockDummyFeatureStatus(true);
+
+        component.reloadDummyHandlerStatusAsync();
+
+        flushMicrotasks();
+
+        expect(dummyApiSpy).toHaveBeenCalled();
+      })
+    );
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/admin-page/features-tab/admin-features-tab.component.spec.ts&quot;,&quot;line&quot;:101,&quot;character&quot;:58,&quot;text&quot;:&quot;{\n      featureFlags: [\n        PlatformParameter.createFromBackendDict({\n          data_type: &#x27;bool&#x27;,\n          default_value: false,\n          description: &#x27;This is a dummy feature flag.&#x27;,\n          feature_stage: FeatureStage.DEV,\n          is_feature: true,\n          name: &#x27;dummy_feature&#x27;,\n          rule_schema_version: 1,\n          rules: [{\n            filters: [\n              {\n                type: PlatformParameterFilterType.ServerMode,\n                conditions: [[&#x27;=&#x27;, ServerMode.Dev]]\n              }\n            ],\n            // This does not match the data type of feature flags, but this is\n            // intended as string values are more suitable for\n            // identifying rules in the following tests.\n            value_when_matched: &#x27;original&#x27;,\n          }],\n        })\n      ]\n    } as AdminPageData&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;core/templates/pages/admin-page/features-tab/admin-features-tab.component.spec.ts&quot;,&quot;line&quot;:479,&quot;character&quot;:10,&quot;text&quot;:&quot;&lt;PlatformParameter&gt;{featureStage: FeatureStage.DEV}&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;core/templates/pages/admin-page/features-tab/admin-features-tab.component.spec.ts&quot;,&quot;line&quot;:488,&quot;character&quot;:10,&quot;text&quot;:&quot;&lt;PlatformParameter&gt;{featureStage: FeatureStage.TEST}&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;core/templates/pages/admin-page/features-tab/admin-features-tab.component.spec.ts&quot;,&quot;line&quot;:498,&quot;character&quot;:12,&quot;text&quot;:&quot;&lt;PlatformParameter&gt;{featureStage: FeatureStage.PROD}&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;core/templates/pages/admin-page/features-tab/admin-features-tab.component.spec.ts&quot;,&quot;line&quot;:508,&quot;character&quot;:10,&quot;text&quot;:&quot;&lt;PlatformParameter&gt;{featureStage: null}&quot;,&quot;kind&quot;:4}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:59 GMT</p>
+    </body>
+  </html>
+  

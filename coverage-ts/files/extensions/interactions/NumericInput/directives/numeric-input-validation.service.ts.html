@@ -1,0 +1,221 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>numeric-input-validation.service.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts</td><td class="">72.03%</td><td class="">100%</td><td class="">286</td><td class="">206</td><td class="">80</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2014 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Validator service for the interaction.
+ */
+
+import { downgradeInjectable } from &#x27;@angular/upgrade/static&#x27;;
+import { Injectable } from &#x27;@angular/core&#x27;;
+
+import { AnswerGroup } from
+  &#x27;domain/exploration/AnswerGroupObjectFactory&#x27;;
+import { Warning, baseInteractionValidationService } from
+  &#x27;interactions/base-interaction-validation.service&#x27;;
+import { NumericInputCustomizationArgs } from
+  &#x27;interactions/customization-args-defs&#x27;;
+import { Outcome } from
+  &#x27;domain/exploration/OutcomeObjectFactory&#x27;;
+
+import { AppConstants } from &#x27;app.constants&#x27;;
+
+@Injectable({
+  providedIn: &#x27;root&#x27;
+})
+export class NumericInputValidationService {
+  constructor(
+      private baseInteractionValidationServiceInstance:
+        baseInteractionValidationService) {}
+
+  getCustomizationArgsWarnings(
+      customizationArgs: NumericInputCustomizationArgs): Warning[] {
+    return [];
+  }
+
+  getAllWarnings(
+      stateName: string,
+      customizationArgs: NumericInputCustomizationArgs,
+      answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
+    var warningsList = [];
+
+    warningsList = warningsList.concat(
+      this.getCustomizationArgsWarnings(customizationArgs));
+
+    /*
+    Store an answer range for every rule, then check for redundant
+    ranges. A range is an object of the form:
+    {
+      lb: float, lower bound
+      ub: float, upper bound
+      lbi: bool, is lower bound inclusive
+      ubi: bool, is upper bound inclusive
+    }
+    */
+    var setLowerAndUpperBounds = (range, lb, ub, lbi, ubi) =&gt; {
+      range.lb = lb;
+      range.ub = ub;
+      range.lbi = lbi;
+      range.ubi = ubi;
+    };
+    var isEnclosedBy = (ra, rb) =&gt; {
+      // Checks if range ra is enclosed by range rb.
+      var lowerBoundConditionIsSatisfied =
+          (rb.lb &lt; ra.lb) || (rb.lb === ra.lb &amp;&amp; (!ra.lbi || rb.lbi));
+      var upperBoundConditionIsSatisfied =
+          (rb.ub &gt; ra.ub) || (rb.ub === ra.ub &amp;&amp; (!ra.ubi || rb.ubi));
+      return lowerBoundConditionIsSatisfied &amp;&amp;
+          upperBoundConditionIsSatisfied;
+    };
+
+    var ranges = [];
+    var raiseWarningForRuleIsInclusivelyBetween = function(
+        ruleIndex, answerGroupIndex) {
+      warningsList.push({
+        type: AppConstants.WARNING_TYPES.ERROR,
+        message: (
+          &#x27;In Rule &#x27; + (ruleIndex + 1) + &#x27; from answer group &#x27; +
+          (answerGroupIndex + 1) + &#x27;, Please ensure that the second number &#x27; +
+          &#x27;is greater than the first number.&#x27;)
+      });
+    };
+    for (var i = 0; i &lt; answerGroups.length; i++) {
+      var rules = answerGroups[i].rules;
+      for (var j = 0; j &lt; rules.length; j++) {
+        var rule = rules[j];
+        var range = {
+          answerGroupIndex: i,
+          ruleIndex: j,
+          lb: null,
+          ub: null,
+          lbi: false,
+          ubi: false,
+        };
+        switch (rule.type) {
+          case &#x27;Equals&#x27;:
+            var x = (&lt;number&gt;rule.inputs.x);
+            setLowerAndUpperBounds(range, x, x, true, true);
+            break;
+          case &#x27;IsInclusivelyBetween&#x27;:
+            var a = rule.inputs.a;
+            var b = rule.inputs.b;
+            if (a &gt; b) {
+              raiseWarningForRuleIsInclusivelyBetween(j, i);
+            }
+            setLowerAndUpperBounds(range, a, b, true, true);
+            break;
+          case &#x27;IsGreaterThan&#x27;:
+            var x = (&lt;number&gt;rule.inputs.x);
+            setLowerAndUpperBounds(range, x, Infinity, false, false);
+            break;
+          case &#x27;IsGreaterThanOrEqualTo&#x27;:
+            var x = (&lt;number&gt;rule.inputs.x);
+            setLowerAndUpperBounds(range, x, Infinity, true, false);
+            break;
+          case &#x27;IsLessThan&#x27;:
+            var x = (&lt;number&gt;rule.inputs.x);
+            setLowerAndUpperBounds(range, -Infinity, x, false, false);
+            break;
+          case &#x27;IsLessThanOrEqualTo&#x27;:
+            var x = (&lt;number&gt;rule.inputs.x);
+            setLowerAndUpperBounds(range, -Infinity, x, false, true);
+            break;
+          case &#x27;IsWithinTolerance&#x27;:
+            var x = (&lt;number&gt;rule.inputs.x);
+            var tol = (&lt;number&gt;rule.inputs.tol);
+            setLowerAndUpperBounds(range, x - tol, x + tol, true, true);
+            break;
+          default:
+        }
+        for (var k = 0; k &lt; ranges.length; k++) {
+          if (isEnclosedBy(range, ranges[k])) {
+            warningsList.push({
+              type: AppConstants.WARNING_TYPES.ERROR,
+              message: (
+                &#x27;Rule &#x27; + (j + 1) + &#x27; from answer group &#x27; +
+                (i + 1) + &#x27; will never be matched because it &#x27; +
+                &#x27;is made redundant by rule &#x27; + (ranges[k].ruleIndex + 1) +
+                &#x27; from answer group &#x27; + (ranges[k].answerGroupIndex + 1) + &#x27;.&#x27;)
+            });
+          }
+        }
+        ranges.push(range);
+      }
+    }
+
+    warningsList = warningsList.concat(
+      this.baseInteractionValidationServiceInstance.getAllOutcomeWarnings(
+        answerGroups, defaultOutcome, stateName));
+
+    return warningsList;
+  }
+
+  getErrorString(value: number): string {
+    if (value === undefined || value === null) {
+      return &#x27;Please enter a valid number.&#x27;;
+    }
+    let stringValue = null;
+    // Convert exponential notation to decimal number.
+    // Logic derived from https://stackoverflow.com/a/16139848.
+    var data = String(value).split(/[eE]/);
+    if (data.length === 1) {
+      stringValue = data[0];
+    } else {
+      var z = &#x27;&#x27;;
+      var sign = value &lt; 0 ? &#x27;-&#x27; : &#x27;&#x27;;
+      var str = data[0].replace(&#x27;.&#x27;, &#x27;&#x27;);
+      var mag = Number(data[1]) + 1;
+
+      if (mag &lt; 0) {
+        z = sign + &#x27;0.&#x27;;
+        while (mag++) {
+          z += &#x27;0&#x27;;
+        }
+        stringValue = z + str.replace(/^\-/, &#x27;&#x27;);
+      } else {
+        mag -= str.length;
+        while (mag--) {
+          z += &#x27;0&#x27;;
+        }
+        stringValue = str + z;
+      }
+    }
+
+    if (stringValue.match(/\d/g).length &gt; 15) {
+      return &#x27;The answer can contain at most 15 digits (0-9) or symbols &#x27; +
+        &#x27;(. or -).&#x27;;
+    }
+  }
+}
+
+angular.module(&#x27;oppia&#x27;).factory(
+  &#x27;NumericInputValidationService&#x27;,
+  downgradeInjectable(NumericInputValidationService));
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:49,&quot;character&quot;:8,&quot;text&quot;:&quot;warningsList&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:51,&quot;character&quot;:4,&quot;text&quot;:&quot;warningsList&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:51,&quot;character&quot;:19,&quot;text&quot;:&quot;warningsList&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:64,&quot;character&quot;:34,&quot;text&quot;:&quot;range&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:64,&quot;character&quot;:41,&quot;text&quot;:&quot;lb&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:64,&quot;character&quot;:45,&quot;text&quot;:&quot;ub&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:64,&quot;character&quot;:49,&quot;text&quot;:&quot;lbi&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:64,&quot;character&quot;:54,&quot;text&quot;:&quot;ubi&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:65,&quot;character&quot;:6,&quot;text&quot;:&quot;range&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:65,&quot;character&quot;:12,&quot;text&quot;:&quot;lb&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:65,&quot;character&quot;:17,&quot;text&quot;:&quot;lb&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:66,&quot;character&quot;:6,&quot;text&quot;:&quot;range&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:66,&quot;character&quot;:12,&quot;text&quot;:&quot;ub&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:66,&quot;character&quot;:17,&quot;text&quot;:&quot;ub&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:67,&quot;character&quot;:6,&quot;text&quot;:&quot;range&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:67,&quot;character&quot;:12,&quot;text&quot;:&quot;lbi&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:67,&quot;character&quot;:18,&quot;text&quot;:&quot;lbi&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:68,&quot;character&quot;:6,&quot;text&quot;:&quot;range&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:68,&quot;character&quot;:12,&quot;text&quot;:&quot;ubi&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:68,&quot;character&quot;:18,&quot;text&quot;:&quot;ubi&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:70,&quot;character&quot;:24,&quot;text&quot;:&quot;ra&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:70,&quot;character&quot;:28,&quot;text&quot;:&quot;rb&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:72,&quot;character&quot;:10,&quot;text&quot;:&quot;lowerBoundConditionIsSatisfied&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:73,&quot;character&quot;:11,&quot;text&quot;:&quot;rb&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:73,&quot;character&quot;:14,&quot;text&quot;:&quot;lb&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:73,&quot;character&quot;:19,&quot;text&quot;:&quot;ra&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:73,&quot;character&quot;:22,&quot;text&quot;:&quot;lb&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:73,&quot;character&quot;:30,&quot;text&quot;:&quot;rb&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:73,&quot;character&quot;:33,&quot;text&quot;:&quot;lb&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:73,&quot;character&quot;:40,&quot;text&quot;:&quot;ra&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:73,&quot;character&quot;:43,&quot;text&quot;:&quot;lb&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:73,&quot;character&quot;:51,&quot;text&quot;:&quot;ra&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:73,&quot;character&quot;:54,&quot;text&quot;:&quot;lbi&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:73,&quot;character&quot;:61,&quot;text&quot;:&quot;rb&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:73,&quot;character&quot;:64,&quot;text&quot;:&quot;lbi&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:74,&quot;character&quot;:10,&quot;text&quot;:&quot;upperBoundConditionIsSatisfied&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:75,&quot;character&quot;:11,&quot;text&quot;:&quot;rb&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:75,&quot;character&quot;:14,&quot;text&quot;:&quot;ub&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:75,&quot;character&quot;:19,&quot;text&quot;:&quot;ra&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:75,&quot;character&quot;:22,&quot;text&quot;:&quot;ub&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:75,&quot;character&quot;:30,&quot;text&quot;:&quot;rb&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:75,&quot;character&quot;:33,&quot;text&quot;:&quot;ub&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:75,&quot;character&quot;:40,&quot;text&quot;:&quot;ra&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:75,&quot;character&quot;:43,&quot;text&quot;:&quot;ub&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:75,&quot;character&quot;:51,&quot;text&quot;:&quot;ra&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:75,&quot;character&quot;:54,&quot;text&quot;:&quot;ubi&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:75,&quot;character&quot;:61,&quot;text&quot;:&quot;rb&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:75,&quot;character&quot;:64,&quot;text&quot;:&quot;ubi&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:76,&quot;character&quot;:13,&quot;text&quot;:&quot;lowerBoundConditionIsSatisfied&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:77,&quot;character&quot;:10,&quot;text&quot;:&quot;upperBoundConditionIsSatisfied&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:80,&quot;character&quot;:8,&quot;text&quot;:&quot;ranges&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:82,&quot;character&quot;:8,&quot;text&quot;:&quot;ruleIndex&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:82,&quot;character&quot;:19,&quot;text&quot;:&quot;answerGroupIndex&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:83,&quot;character&quot;:6,&quot;text&quot;:&quot;warningsList&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:86,&quot;character&quot;:24,&quot;text&quot;:&quot;ruleIndex&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:87,&quot;character&quot;:11,&quot;text&quot;:&quot;answerGroupIndex&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:105,&quot;character&quot;:21,&quot;text&quot;:&quot;&lt;number&gt;rule.inputs.x&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:117,&quot;character&quot;:21,&quot;text&quot;:&quot;&lt;number&gt;rule.inputs.x&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:121,&quot;character&quot;:21,&quot;text&quot;:&quot;&lt;number&gt;rule.inputs.x&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:125,&quot;character&quot;:21,&quot;text&quot;:&quot;&lt;number&gt;rule.inputs.x&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:129,&quot;character&quot;:21,&quot;text&quot;:&quot;&lt;number&gt;rule.inputs.x&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:133,&quot;character&quot;:21,&quot;text&quot;:&quot;&lt;number&gt;rule.inputs.x&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:134,&quot;character&quot;:23,&quot;text&quot;:&quot;&lt;number&gt;rule.inputs.tol&quot;,&quot;kind&quot;:4},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:139,&quot;character&quot;:28,&quot;text&quot;:&quot;ranges&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:140,&quot;character&quot;:34,&quot;text&quot;:&quot;ranges&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:141,&quot;character&quot;:12,&quot;text&quot;:&quot;warningsList&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:146,&quot;character&quot;:48,&quot;text&quot;:&quot;ranges&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:146,&quot;character&quot;:58,&quot;text&quot;:&quot;ruleIndex&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:147,&quot;character&quot;:41,&quot;text&quot;:&quot;ranges&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:147,&quot;character&quot;:51,&quot;text&quot;:&quot;answerGroupIndex&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:151,&quot;character&quot;:8,&quot;text&quot;:&quot;ranges&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:155,&quot;character&quot;:4,&quot;text&quot;:&quot;warningsList&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:155,&quot;character&quot;:19,&quot;text&quot;:&quot;warningsList&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:166,&quot;character&quot;:8,&quot;text&quot;:&quot;stringValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:171,&quot;character&quot;:6,&quot;text&quot;:&quot;stringValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:183,&quot;character&quot;:8,&quot;text&quot;:&quot;stringValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:189,&quot;character&quot;:8,&quot;text&quot;:&quot;stringValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:193,&quot;character&quot;:8,&quot;text&quot;:&quot;stringValue&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:193,&quot;character&quot;:20,&quot;text&quot;:&quot;match&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts&quot;,&quot;line&quot;:193,&quot;character&quot;:33,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:55 GMT</p>
+    </body>
+  </html>
+  

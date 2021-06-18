@@ -1,0 +1,198 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>WrittenTranslationObjectFactorySpec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">core/templates/domain/exploration/WrittenTranslationObjectFactorySpec.ts</td><td class="">100.00%</td><td class="">100%</td><td class="">216</td><td class="">216</td><td class="">0</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2019 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for the WrittenTranslation object factory.
+ */
+
+import {
+  WrittenTranslationObjectFactory,
+  WrittenTranslation,
+  TRANSLATION_DATA_FORMAT_HTML,
+  TRANSLATION_DATA_FORMAT_UNICODE,
+  TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING,
+  TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING
+} from &#x27;domain/exploration/WrittenTranslationObjectFactory&#x27;;
+
+describe(&#x27;WrittenTranslation object factory&#x27;, () =&gt; {
+  let wtof: WrittenTranslationObjectFactory;
+  let writtenTranslation: WrittenTranslation;
+
+  beforeEach(() =&gt; {
+    wtof = new WrittenTranslationObjectFactory();
+    writtenTranslation = wtof.createFromBackendDict({
+      data_format: &#x27;html&#x27;,
+      translation: &#x27;&lt;p&gt;HTML&lt;/p&gt;&#x27;,
+      needs_update: false
+    });
+  });
+
+  it(&#x27;should set and get translation value correctly&#x27;, () =&gt; {
+    expect(writtenTranslation).toEqual(wtof.createFromBackendDict({
+      data_format: &#x27;html&#x27;,
+      translation: &#x27;&lt;p&gt;HTML&lt;/p&gt;&#x27;,
+      needs_update: false
+    }));
+    expect(writtenTranslation.getTranslation()).toEqual(&#x27;&lt;p&gt;HTML&lt;/p&gt;&#x27;);
+    expect(writtenTranslation.isHtml()).toBe(true);
+    expect(writtenTranslation.isUnicode()).toBe(false);
+    expect(writtenTranslation.isSetOfStrings()).toBe(false);
+
+    writtenTranslation.setTranslation(&#x27;&lt;p&gt;New HTML&lt;/p&gt;&#x27;);
+    expect(writtenTranslation.getTranslation()).toEqual(&#x27;&lt;p&gt;New HTML&lt;/p&gt;&#x27;);
+    expect(writtenTranslation).toEqual(wtof.createFromBackendDict({
+      data_format: &#x27;html&#x27;,
+      translation: &#x27;&lt;p&gt;New HTML&lt;/p&gt;&#x27;,
+      needs_update: false
+    }));
+
+    const unicodeWrittenTranslation = wtof.createFromBackendDict({
+      data_format: &#x27;unicode&#x27;,
+      translation: &#x27;unicode&#x27;,
+      needs_update: false
+    });
+    expect(unicodeWrittenTranslation.getTranslation()).toEqual(&#x27;unicode&#x27;);
+    expect(unicodeWrittenTranslation.isHtml()).toBe(false);
+    expect(unicodeWrittenTranslation.isUnicode()).toBe(true);
+    expect(unicodeWrittenTranslation.isSetOfStrings()).toBe(false);
+
+    const setOfStringsWrittenTranslation = wtof.createFromBackendDict({
+      data_format: &#x27;set_of_normalized_string&#x27;,
+      translation: [&#x27;a string&#x27;],
+      needs_update: false
+    });
+    expect(setOfStringsWrittenTranslation.getTranslation()).toEqual(
+      [&#x27;a string&#x27;]);
+    expect(setOfStringsWrittenTranslation.isHtml()).toBe(false);
+    expect(setOfStringsWrittenTranslation.isUnicode()).toBe(false);
+    expect(setOfStringsWrittenTranslation.isSetOfStrings()).toBe(true);
+  });
+
+  it(&#x27;should throw error for an invalid data format on creation&#x27;, () =&gt; {
+    expect(() =&gt; wtof.createNew(&#x27;invalid&#x27;)).toThrowError(
+      &#x27;Invalid translation data format: invalid&#x27;);
+  });
+
+  it(&#x27;should throw error if the wrong setter is used&#x27;, () =&gt; {
+    writtenTranslation = wtof.createFromBackendDict({
+      data_format: &#x27;unicode&#x27;,
+      translation: &#x27;unicode&#x27;,
+      needs_update: false
+    });
+    expect(
+      () =&gt; writtenTranslation.setTranslation([&#x27;abc&#x27;])
+    ).toThrowError(
+      &#x27;This translation is not of the correct type for data format unicode&#x27;);
+  });
+
+  it(&#x27;should correctly mark written translation as needing update&#x27;,
+    () =&gt; {
+      expect(writtenTranslation).toEqual(wtof.createFromBackendDict({
+        data_format: &#x27;html&#x27;,
+        translation: &#x27;&lt;p&gt;HTML&lt;/p&gt;&#x27;,
+        needs_update: false
+      }));
+      writtenTranslation.markAsNeedingUpdate();
+      expect(writtenTranslation).toEqual(wtof.createFromBackendDict({
+        data_format: &#x27;html&#x27;,
+        translation: &#x27;&lt;p&gt;HTML&lt;/p&gt;&#x27;,
+        needs_update: true
+      }));
+    });
+
+  it(&#x27;should toggle needs update attribute correctly&#x27;, () =&gt; {
+    expect(writtenTranslation).toEqual(wtof.createFromBackendDict({
+      data_format: &#x27;html&#x27;,
+      translation: &#x27;&lt;p&gt;HTML&lt;/p&gt;&#x27;,
+      needs_update: false
+    }));
+    writtenTranslation.toggleNeedsUpdateAttribute();
+    expect(writtenTranslation).toEqual(wtof.createFromBackendDict({
+      data_format: &#x27;html&#x27;,
+      translation: &#x27;&lt;p&gt;HTML&lt;/p&gt;&#x27;,
+      needs_update: true
+    }));
+
+    writtenTranslation.toggleNeedsUpdateAttribute();
+    expect(writtenTranslation).toEqual(wtof.createFromBackendDict({
+      data_format: &#x27;html&#x27;,
+      translation: &#x27;&lt;p&gt;HTML&lt;/p&gt;&#x27;,
+      needs_update: false
+    }));
+  });
+
+  it(&#x27;should convert to backend dict correctly&#x27;, () =&gt; {
+    expect(writtenTranslation.toBackendDict()).toEqual({
+      data_format: &#x27;html&#x27;,
+      translation: &#x27;&lt;p&gt;HTML&lt;/p&gt;&#x27;,
+      needs_update: false
+    });
+  });
+
+  it(&#x27;should create a new written translation translation&#x27;, () =&gt; {
+    expect(wtof.createNew(TRANSLATION_DATA_FORMAT_HTML)).toEqual(
+      wtof.createFromBackendDict({
+        data_format: &#x27;html&#x27;,
+        translation: &#x27;&#x27;,
+        needs_update: false
+      })
+    );
+
+    expect(wtof.createNew(TRANSLATION_DATA_FORMAT_UNICODE)).toEqual(
+      wtof.createFromBackendDict({
+        data_format: &#x27;unicode&#x27;,
+        translation: &#x27;&#x27;,
+        needs_update: false
+      })
+    );
+
+    expect(
+      wtof.createNew(TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING)
+    ).toEqual(
+      wtof.createFromBackendDict({
+        data_format: &#x27;set_of_unicode_string&#x27;,
+        translation: [],
+        needs_update: false
+      })
+    );
+
+    expect(
+      wtof.createNew(TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING)
+    ).toEqual(
+      wtof.createFromBackendDict({
+        data_format: &#x27;set_of_normalized_string&#x27;,
+        translation: [],
+        needs_update: false
+      })
+    );
+  });
+});
+</textarea><pre id="annotations" style="display:none">[]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:57 GMT</p>
+    </body>
+  </html>
+  

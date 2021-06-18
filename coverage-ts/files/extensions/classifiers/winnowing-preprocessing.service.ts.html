@@ -1,0 +1,102 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>winnowing-preprocessing.service.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">extensions/classifiers/winnowing-preprocessing.service.ts</td><td class="">97.35%</td><td class="">100%</td><td class="">113</td><td class="">110</td><td class="">3</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2017 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Winnowing preprocessing functions.
+ *
+ * IMPORTANT NOTE: The preprocessing functions are implemented according to
+ * winnowing preprocessing functions used on Oppia-ml. These functions
+ * are simple translation of Python code to JS code and they both do exact
+ * same task.
+ */
+
+import { downgradeInjectable } from &#x27;@angular/upgrade/static&#x27;;
+import { Injectable } from &#x27;@angular/core&#x27;;
+
+export interface TokenToId {
+  [x: string]: number;
+}
+
+@Injectable({
+  providedIn: &#x27;root&#x27;
+})
+export class WinnowingPreprocessingService {
+  static generateHashValue(tokens: string[], tokenToId: TokenToId): number {
+    var hashVal = 0;
+    var n = tokens.length - 1;
+    var base = Math.pow(Object.keys(tokenToId).length, n);
+
+    tokens.forEach((token: string) =&gt; {
+      hashVal += tokenToId[token] * base;
+      base /= Object.keys(tokenToId).length;
+    });
+
+    return hashVal;
+  }
+
+  getKGramHashes(
+      tokens: string[], tokenToId: TokenToId, K: number): number[] {
+    // Generate all possible k-gram hashes from tokens.
+    var kGramHashes = [];
+    var kTokens: string[];
+    for (var i = 0; i &lt; tokens.length - K + 1; i += 1) {
+      kTokens = tokens.slice(i, i + K);
+      kGramHashes.push(WinnowingPreprocessingService.generateHashValue(
+        kTokens, tokenToId));
+    }
+    return kGramHashes;
+  }
+
+  getFingerprintFromHashes(
+      kGramHashes: number[], T: number, K: number): number[][] {
+    // Generate fingerprint of a document from its k-gram hashes.
+    var windowSize = T - K + 1;
+    var fingerprintHashesIndex: Set&lt;number&gt; = new Set();
+    for (var i = 0; i &lt; kGramHashes.length - windowSize + 1; i += 1) {
+      var windowHashes = kGramHashes.slice(i, i + windowSize);
+      var minHashValue = Math.min.apply(Math, windowHashes);
+      var minHashIndex = i + windowHashes.indexOf(minHashValue);
+      fingerprintHashesIndex.add(minHashIndex);
+    }
+
+    var fingerprint: number[][] = [];
+    fingerprintHashesIndex.forEach((hashIndex: number) =&gt; {
+      fingerprint.push([kGramHashes[hashIndex], hashIndex]);
+    });
+
+    return fingerprint;
+  }
+}
+
+angular.module(&#x27;oppia&#x27;).factory(
+  &#x27;WinnowingPreprocessingService&#x27;,
+  downgradeInjectable(WinnowingPreprocessingService));
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;extensions/classifiers/winnowing-preprocessing.service.ts&quot;,&quot;line&quot;:50,&quot;character&quot;:8,&quot;text&quot;:&quot;kGramHashes&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/classifiers/winnowing-preprocessing.service.ts&quot;,&quot;line&quot;:54,&quot;character&quot;:6,&quot;text&quot;:&quot;kGramHashes&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/classifiers/winnowing-preprocessing.service.ts&quot;,&quot;line&quot;:67,&quot;character&quot;:10,&quot;text&quot;:&quot;minHashValue&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:55 GMT</p>
+    </body>
+  </html>
+  

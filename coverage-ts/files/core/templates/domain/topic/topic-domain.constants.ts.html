@@ -1,0 +1,88 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>topic-domain.constants.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">core/templates/domain/topic/topic-domain.constants.ts</td><td class="">100.00%</td><td class="">100%</td><td class="">37</td><td class="">37</td><td class="">0</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2018 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Constants for topic domain.
+ */
+
+export const TopicDomainConstants = {
+  TOPIC_EDITOR_STORY_URL_TEMPLATE: &#x27;/topic_editor_story_handler/&lt;topic_id&gt;&#x27;,
+
+  TOPIC_NAME_HANDLER_URL_TEMPLATE: (
+    &#x27;/topic_name_handler/&lt;topic_name&gt;&#x27;),
+
+  TOPIC_URL_FRAGMENT_HANDLER_URL_TEMPLATE: (
+    &#x27;/topic_url_fragment_handler/&lt;topic_url_fragment&gt;&#x27;),
+
+  TOPIC_EDITOR_QUESTION_URL_TEMPLATE:
+    &#x27;/topic_editor_question_handler/&lt;topic_id&gt;?cursor=&lt;cursor&gt;&#x27;,
+
+  TOPIC_MANAGER_RIGHTS_URL_TEMPLATE:
+    &#x27;/rightshandler/assign_topic_manager/&lt;topic_id&gt;/&lt;assignee_id&gt;&#x27;,
+  TOPIC_RIGHTS_URL_TEMPLATE: &#x27;/rightshandler/get_topic_rights/&lt;topic_id&gt;&#x27;,
+
+  // These should match the constants defined in core.domain.topic_domain.
+  CMD_ADD_SUBTOPIC: &#x27;add_subtopic&#x27;,
+  CMD_DELETE_ADDITIONAL_STORY: &#x27;delete_additional_story&#x27;,
+  CMD_DELETE_CANONICAL_STORY: &#x27;delete_canonical_story&#x27;,
+  CMD_DELETE_SUBTOPIC: &#x27;delete_subtopic&#x27;,
+  CMD_REARRANGE_CANONICAL_STORY: &#x27;rearrange_canonical_story&#x27;,
+  CMD_REARRANGE_SKILL_IN_SUBTOPIC: &#x27;rearrange_skill_in_subtopic&#x27;,
+  CMD_REARRANGE_SUBTOPIC: &#x27;rearrange_subtopic&#x27;,
+  CMD_REMOVE_UNCATEGORIZED_SKILL_ID: &#x27;remove_uncategorized_skill_id&#x27;,
+  CMD_MOVE_SKILL_ID_TO_SUBTOPIC: &#x27;move_skill_id_to_subtopic&#x27;,
+  CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC: &#x27;remove_skill_id_from_subtopic&#x27;,
+
+  CMD_UPDATE_TOPIC_PROPERTY: &#x27;update_topic_property&#x27;,
+  CMD_UPDATE_SUBTOPIC_PROPERTY: &#x27;update_subtopic_property&#x27;,
+  CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY: &#x27;update_subtopic_page_property&#x27;,
+
+  TOPIC_PROPERTY_NAME: &#x27;name&#x27;,
+  TOPIC_PROPERTY_ABBREVIATED_NAME: &#x27;abbreviated_name&#x27;,
+  TOPIC_PROPERTY_THUMBNAIL_FILENAME: &#x27;thumbnail_filename&#x27;,
+  TOPIC_PROPERTY_THUMBNAIL_BG_COLOR: &#x27;thumbnail_bg_color&#x27;,
+  TOPIC_PROPERTY_DESCRIPTION: &#x27;description&#x27;,
+  TOPIC_PROPERTY_LANGUAGE_CODE: &#x27;language_code&#x27;,
+  TOPIC_PROPERTY_URL_FRAGMENT: &#x27;url_fragment&#x27;,
+  TOPIC_PROPERTY_PRACTICE_TAB_IS_DISPLAYED: (
+    &#x27;practice_tab_is_displayed&#x27;),
+  TOPIC_PROPERTY_META_TAG_CONTENT: &#x27;meta_tag_content&#x27;,
+  TOPIC_PROPERTY_PAGE_TITLE_FRAGMENT_FOR_WEB: &#x27;page_title_fragment_for_web&#x27;,
+
+  SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME: &#x27;thumbnail_filename&#x27;,
+  SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR: &#x27;thumbnail_bg_color&#x27;,
+  SUBTOPIC_PROPERTY_TITLE: &#x27;title&#x27;,
+  SUBTOPIC_PROPERTY_URL_FRAGMENT: &#x27;url_fragment&#x27;,
+
+  SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML: &#x27;page_contents_html&#x27;,
+  SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO: &#x27;page_contents_audio&#x27;
+} as const;
+</textarea><pre id="annotations" style="display:none">[]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:55 GMT</p>
+    </body>
+  </html>
+  

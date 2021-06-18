@@ -1,0 +1,940 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>svg-filename-editor.component.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">extensions/objects/templates/svg-filename-editor.component.spec.ts</td><td class="">92.19%</td><td class="">100%</td><td class="">1422</td><td class="">1311</td><td class="">111</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for the svg filename editor.
+ */
+
+import { fabric } from &#x27;fabric&#x27;;
+import { AppConstants } from &#x27;app.constants&#x27;;
+import { SvgFilenameEditorConstants } from &#x27;./svg-filename-editor.constants&#x27;;
+import { PolyPoint, SvgFilenameEditorComponent } from &#x27;./svg-filename-editor.component&#x27;;
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from &#x27;@angular/core/testing&#x27;;
+import { NO_ERRORS_SCHEMA } from &#x27;@angular/core&#x27;;
+import { AssetsBackendApiService } from &#x27;services/assets-backend-api.service&#x27;;
+import { ImageLocalStorageService } from &#x27;services/image-local-storage.service&#x27;;
+import { ImagePreloaderService } from &#x27;pages/exploration-player-page/services/image-preloader.service&#x27;;
+import { ImageUploadHelperService } from &#x27;services/image-upload-helper.service&#x27;;
+import { SvgSanitizerService } from &#x27;services/svg-sanitizer.service&#x27;;
+import { ContextService } from &#x27;services/context.service&#x27;;
+import { AlertsService } from &#x27;services/alerts.service&#x27;;
+import { CsrfTokenService } from &#x27;services/csrf-token.service&#x27;;
+import { HttpClientTestingModule } from &#x27;@angular/common/http/testing&#x27;;
+import { SvgFileFetcherBackendApiService } from &#x27;./svg-file-fetcher-backend-api.service&#x27;;
+import { of } from &#x27;rxjs&#x27;;
+
+var initializeMockDocument = (svgFilenameCtrl: SvgFilenameEditorComponent) =&gt; {
+  var mockDocument = document.createElement(&#x27;div&#x27;);
+  var colors = [&#x27;stroke&#x27;, &#x27;fill&#x27;, &#x27;bg&#x27;];
+  for (var i = 0; i &lt; 3; i++) {
+    var colorDiv = document.createElement(&#x27;div&#x27;);
+    colorDiv.setAttribute(&#x27;id&#x27;, colors[i] + &#x27;-color&#x27;);
+    var topAlphaDiv = document.createElement(&#x27;div&#x27;);
+    topAlphaDiv.setAttribute(&#x27;id&#x27;, &#x27;top-&#x27; + colors[i] + &#x27;-alpha&#x27;);
+    var bottomAlphaDiv = document.createElement(&#x27;div&#x27;);
+    bottomAlphaDiv.setAttribute(&#x27;id&#x27;, &#x27;bottom-&#x27; + colors[i] + &#x27;-alpha&#x27;);
+    var pickerAlpha = document.createElement(&#x27;div&#x27;);
+    pickerAlpha.setAttribute(&#x27;class&#x27;, &#x27;picker_alpha&#x27;);
+    var pickerSlider = document.createElement(&#x27;div&#x27;);
+    pickerSlider.setAttribute(&#x27;class&#x27;, &#x27;picker_selector&#x27;);
+    pickerAlpha.append(pickerSlider);
+    colorDiv.appendChild(topAlphaDiv);
+    colorDiv.appendChild(bottomAlphaDiv);
+    mockDocument.appendChild(colorDiv);
+    mockDocument.appendChild(pickerAlpha);
+  }
+  var mockCanvas = document.createElement(&#x27;canvas&#x27;);
+
+  mockCanvas.setAttribute(&#x27;id&#x27;, svgFilenameCtrl.canvasID);
+  mockDocument.appendChild(mockCanvas);
+  document.getElementsByTagName(&#x27;body&#x27;)[0].appendChild(mockDocument);
+};
+
+describe(&#x27;SvgFilenameEditor&#x27;, () =&gt; {
+  var alertSpy = null;
+  let svgFileFetcherBackendApiService: SvgFileFetcherBackendApiService;
+  var contextService = null;
+  var csrfService = null;
+  let fixture: ComponentFixture&lt;SvgFilenameEditorComponent&gt;;
+  var component: SvgFilenameEditorComponent;
+  let svgSanitizerService: SvgSanitizerService;
+  // This sample SVG is generated using different tools present
+  // in the SVG editor.
+  var samplesvg = (
+    &#x27;&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; xmlns:xlink=&quot;http://www.w3.org/&#x27; +
+    &#x27;1999/xlink&quot; version=&quot;1.1&quot; width=&quot;494&quot; height=&quot;368&quot; viewBox=&quot;0 0 494 368&#x27; +
+    &#x27;&quot;&gt;&lt;desc&gt;Created with Fabric.js 4.4.0&lt;/desc&gt;&lt;defs&gt;&lt;/defs&gt;&lt;rect x=&quot;0&quot; y=&quot;&#x27; +
+    &#x27;0&quot; width=&quot;100%&quot; height=&quot;100%&quot; fill=&quot;rgba(109,106,234,0.937)&quot;/&gt;&lt;g transf&#x27; +
+    &#x27;orm=&quot;matrix(1 0 0 1 324 91)&quot;&gt;&lt;rect style=&quot;stroke: rgb(0,0,0); stroke-wi&#x27; +
+    &#x27;dth: 3; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset&#x27; +
+    &#x27;: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fi&#x27; +
+    &#x27;ll-opacity: 0; fill-rule: nonzero; opacity: 1; vector-effect: non-scali&#x27; +
+    &#x27;ng-stroke&quot; x=&quot;-30&quot; y=&quot;-35&quot; rx=&quot;0&quot; ry=&quot;0&quot; width=&quot;60&quot; height=&quot;70&quot;/&gt;&lt;/g&gt;&lt;g&#x27; +
+    &#x27; transform=&quot;matrix(1 0 0 1 321 209)&quot;&gt;&lt;circle style=&quot;stroke: rgb(0,0,0);&#x27; +
+    &#x27; stroke-width: 3; stroke-dasharray: none; stroke-linecap: butt; stroke-&#x27; +
+    &#x27;dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(&#x27; +
+    &#x27;0,0,0); fill-opacity: 0; fill-rule: nonzero; opacity: 1; vector-effect:&#x27; +
+    &#x27; non-scaling-stroke&quot; cx=&quot;0&quot; cy=&quot;0&quot; r=&quot;30&quot;/&gt;&lt;/g&gt;&lt;g transform=&quot;matrix(1 0&#x27; +
+    &#x27; 0 1 560 82)&quot; style=&quot;&quot;&gt;&lt;text font-family=&quot;helvetica&quot; font-size=&quot;18&quot; fon&#x27; +
+    &#x27;t-style=&quot;normal&quot; font-weight=&quot;normal&quot; style=&quot;stroke: none; stroke-width&#x27; +
+    &#x27;: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0&#x27; +
+    &#x27;; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-&#x27; +
+    &#x27;rule: nonzero; opacity: 1; white-space: pre;&quot;&gt;&lt;tspan x=&quot;-100&quot; y=&quot;-17.94&#x27; +
+    &#x27;&quot; style=&quot;stroke: rgb(0,0,0); stroke-width: 2; fill: rgb(255,0,0); &quot;&gt;▇&#x27; +
+    &#x27;&lt;/tspan&gt;&lt;tspan x=&quot;-86.16&quot; y=&quot;-17.94&quot; style=&quot;white-space: pre; &quot;&gt; - Data&#x27; +
+    &#x27; name 1 - 10&lt;/tspan&gt;&lt;tspan x=&quot;-100&quot; y=&quot;5.65&quot; style=&quot;stroke: rgb(0,0,0);&#x27; +
+    &#x27; stroke-width: 2; fill: rgb(0,255,0); &quot;&gt;▇&lt;/tspan&gt;&lt;tspan x=&quot;-86.16&quot; y=&#x27; +
+    &#x27;&quot;5.65&quot; style=&quot;white-space: pre; &quot;&gt; - Data name 2 - 10&lt;/tspan&gt;&lt;tspan x=&quot;&#x27; +
+    &#x27;-100&quot; y=&quot;29.25&quot; style=&quot;stroke: rgb(0,0,0); stroke-width: 2; fill: rgb(1&#x27; +
+    &#x27;90,65,65); &quot;&gt;▇&lt;/tspan&gt;&lt;tspan x=&quot;-86.16&quot; y=&quot;29.25&quot; style=&quot;white-space:&#x27; +
+    &#x27; pre; &quot;&gt; - Data name - 10&lt;/tspan&gt;&lt;/text&gt;&lt;/g&gt;&lt;g transform=&quot;matrix(1 0 0 &#x27; +
+    &#x27;1 113 222)&quot;&gt;&lt;g style=&quot;&quot;&gt;&lt;g transform=&quot;matrix(0.5 0.87 -0.87 0.5 0 0)&quot;&gt;&lt;&#x27; +
+    &#x27;g style=&quot;&quot;&gt;&lt;g transform=&quot;matrix(1 0 0 1 0 0)&quot; id=&quot;group0&quot;&gt;&lt;path d=&quot;M 15&#x27; +
+    &#x27;.000000000000004 -25.980762113533157 A 30 30 0 0 1 15.000000000000004 2&#x27; +
+    &#x27;5.980762113533157&quot; style=&quot;stroke: rgb(255,0,0); stroke-width: 1; stroke&#x27; +
+    &#x27;-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-li&#x27; +
+    &#x27;nejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: non&#x27; +
+    &#x27;zero; opacity: 1; vector-effect: non-scaling-stroke&quot; id=&quot;group0&quot;/&gt;&lt;/g&gt;&lt;&#x27; +
+    &#x27;g transform=&quot;matrix(1 0 0 1 7.5 0)&quot; id=&quot;group0&quot;&gt;&lt;polygon style=&quot;stroke:&#x27; +
+    &#x27; rgb(255,0,0); stroke-width: 1; stroke-dasharray: none; stroke-linecap:&#x27; +
+    &#x27; butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit:&#x27; +
+    &#x27; 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1; vector-effect: &#x27; +
+    &#x27;non-scaling-stroke&quot; points=&quot;-7.5,0 7.5,25.98 7.5,-25.98 -7.5,0 &quot; id=&quot;gr&#x27; +
+    &#x27;oup0&quot;/&gt;&lt;/g&gt;&lt;/g&gt;&lt;/g&gt;&lt;g transform=&quot;matrix(-1 0 0 -1 0 0)&quot;&gt;&lt;g style=&quot;&quot;&gt;&lt;g &#x27; +
+    &#x27;transform=&quot;matrix(1 0 0 1 0 0)&quot; id=&quot;group0&quot;&gt;&lt;path d=&quot;M 15.0000000000000&#x27; +
+    &#x27;04 -25.980762113533157 A 30 30 0 0 1 15.000000000000004 25.980762113533&#x27; +
+    &#x27;157&quot; style=&quot;stroke: rgb(0,255,0); stroke-width: 1; stroke-dasharray: no&#x27; +
+    &#x27;ne; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter;&#x27; +
+    &#x27; stroke-miterlimit: 4; fill: rgb(0,255,0); fill-rule: nonzero; opacity:&#x27; +
+    &#x27; 1; vector-effect: non-scaling-stroke&quot; id=&quot;group0&quot;/&gt;&lt;/g&gt;&lt;g transform=&quot;m&#x27; +
+    &#x27;atrix(1 0 0 1 7.5 0)&quot; id=&quot;group0&quot;&gt;&lt;polygon style=&quot;stroke: rgb(0,255,0);&#x27; +
+    &#x27; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-&#x27; +
+    &#x27;dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(&#x27; +
+    &#x27;0,255,0); fill-rule: nonzero; opacity: 1; vector-effect: non-scaling-st&#x27; +
+    &#x27;roke&quot; points=&quot;-7.5,0 7.5,25.98 7.5,-25.98 -7.5,0 &quot; id=&quot;group0&quot;/&gt;&lt;/g&gt;&lt;/g&#x27; +
+    &#x27;&gt;&lt;/g&gt;&lt;g transform=&quot;matrix(0.5 -0.87 0.87 0.5 0 0)&quot;&gt;&lt;g style=&quot;&quot;&gt;&lt;g trans&#x27; +
+    &#x27;form=&quot;matrix(1 0 0 1 0 0)&quot; id=&quot;group0&quot;&gt;&lt;path d=&quot;M 14.999999999999996 -2&#x27; +
+    &#x27;5.98076211353316 A 30 30 0 0 1 14.999999999999996 25.98076211353316&quot; st&#x27; +
+    &#x27;yle=&quot;stroke: rgb(190,65,65); stroke-width: 1; stroke-dasharray: none; s&#x27; +
+    &#x27;troke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stro&#x27; +
+    &#x27;ke-miterlimit: 4; fill: rgb(190,65,65); fill-rule: nonzero; opacity: 1;&#x27; +
+    &#x27; vector-effect: non-scaling-stroke&quot; id=&quot;group0&quot;/&gt;&lt;/g&gt;&lt;g transform=&quot;matr&#x27; +
+    &#x27;ix(1 0 0 1 7.5 0)&quot; id=&quot;group0&quot;&gt;&lt;polygon style=&quot;stroke: rgb(190,65,65); &#x27; +
+    &#x27;stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-d&#x27; +
+    &#x27;ashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(1&#x27; +
+    &#x27;90,65,65); fill-rule: nonzero; opacity: 1; vector-effect: non-scaling-s&#x27; +
+    &#x27;troke&quot; points=&quot;-7.5,0 7.5,25.98 7.5,-25.98 -7.5,0 &quot; id=&quot;group0&quot;/&gt;&lt;/g&gt;&lt;/&#x27; +
+    &#x27;g&gt;&lt;/g&gt;&lt;/g&gt;&lt;/g&gt;&lt;/svg&gt;&#x27;);
+  var dataUrl = &#x27;data:image/svg+xml;utf8,&#x27; + samplesvg;
+
+  var mockAssetsBackendApiService = {
+    getImageUrlForPreview: (contentType, contentId, filepath) =&gt; {
+      return dataUrl;
+    }
+  };
+
+  var mockImageUploadHelperService = {
+    convertImageDataToImageFile: (svgDataUri) =&gt; {
+      return new Blob();
+    },
+    generateImageFilename: (height, width, extension) =&gt; {
+      return height + &#x27;_&#x27; + width + &#x27;.&#x27; + extension;
+    }
+  };
+
+  var mockSvgSanitizerService = {
+    getInvalidSvgTagsAndAttrsFromDataUri: (dataUri) =&gt; {
+      return { tags: [], attrs: [] };
+    },
+    getTrustedSvgResourceUrl: (data) =&gt; {
+      return data;
+    }
+  };
+
+  var mockImagePreloaderService = {
+    getDimensionsOfImage: () =&gt; {
+      return {
+        width: 450,
+        height: 350
+      };
+    }
+  };
+
+  class mockReaderObject {
+    result = null;
+    onload = null;
+    constructor() {
+      this.onload = () =&gt; {
+        return &#x27;Fake onload executed&#x27;;
+      };
+    }
+    readAsDataURL(file) {
+      this.onload();
+      return &#x27;The file is loaded&#x27;;
+    }
+  }
+
+  class mockImageObject {
+    source = null;
+    onload = null;
+    constructor() {
+      this.onload = () =&gt; {
+        return &#x27;Fake onload executed&#x27;;
+      };
+    }
+    set src(url) {
+      this.onload();
+    }
+  }
+
+  beforeEach(waitForAsync(() =&gt; {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      declarations: [SvgFilenameEditorComponent],
+      schemas: [NO_ERRORS_SCHEMA],
+      providers: [
+        {
+          provide: AssetsBackendApiService,
+          useValue: mockAssetsBackendApiService
+        },
+        {
+          provide: ImageLocalStorageService,
+          useValue: {}
+        },
+        {
+          provide: ImagePreloaderService,
+          useValue: mockImagePreloaderService
+        },
+        {
+          provide: ImageUploadHelperService,
+          useValue: mockImageUploadHelperService
+        },
+        {
+          provide: SvgSanitizerService,
+          useValue: mockSvgSanitizerService
+        }
+      ]
+    }).compileComponents();
+    svgSanitizerService = TestBed.inject(SvgSanitizerService);
+    contextService = TestBed.inject(ContextService);
+    csrfService = TestBed.inject(CsrfTokenService);
+    const alertsService = TestBed.inject(AlertsService);
+
+    alertSpy = spyOn(alertsService, &#x27;addWarning&#x27;).and.callThrough();
+    spyOn(contextService, &#x27;getEntityType&#x27;).and.returnValue(&#x27;exploration&#x27;);
+    spyOn(contextService, &#x27;getEntityId&#x27;).and.returnValue(&#x27;1&#x27;);
+    spyOn(contextService, &#x27;getImageSaveDestination&#x27;).and.returnValue(
+      AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
+    spyOn(csrfService, &#x27;getTokenAsync&#x27;).and.callFake(() =&gt; {
+      return Promise.resolve(&#x27;sample-csrf-token&#x27;);
+    });
+    svgFileFetcherBackendApiService = (
+      TestBed.inject(SvgFileFetcherBackendApiService));
+    // This throws &quot;Argument of type &#x27;mockImageObject&#x27; is not assignable to
+    // parameter of type &#x27;HTMLImageElement&#x27;.&quot;. We need to suppress this error
+    // because &#x27;HTMLImageElement&#x27; has around 250 more properties.
+    // We have only defined the properties we need in &#x27;mockImageObject&#x27;.
+    // @ts-expect-error
+    spyOn(window, &#x27;Image&#x27;).and.returnValue(new mockImageObject());
+    // This throws &quot;Argument of type &#x27;mockReaderObject&#x27; is not assignable to
+    // parameter of type &#x27;HTMLImageElement&#x27;.&quot;. We need to suppress this error
+    // because &#x27;HTMLImageElement&#x27; has around 250 more properties.
+    // We have only defined the properties we need in &#x27;mockReaderObject&#x27;.
+    // @ts-expect-error
+    spyOn(window, &#x27;FileReader&#x27;).and.returnValue(new mockReaderObject());
+    fixture = TestBed.createComponent(SvgFilenameEditorComponent);
+    component = fixture.componentInstance;
+    initializeMockDocument(component);
+    component.ngOnInit();
+    component.canvas = new fabric.Canvas(
+      component.canvasID);
+    component.initializeMouseEvents();
+    var mockPicker = {
+      setOptions: (data) =&gt; {
+        return &#x27;The value is set.&#x27;;
+      }
+    };
+    component.fillPicker = mockPicker;
+    component.strokePicker = mockPicker;
+    component.bgPicker = mockPicker;
+  }));
+
+  it(
+    &#x27;should wait before updating diagram size when dom is loading&#x27;,
+    waitForAsync(fakeAsync(() =&gt; {
+      spyOnProperty(document, &#x27;readyState&#x27;).and.returnValue(&#x27;loading&#x27;);
+      spyOn(document, &#x27;addEventListener&#x27;).and.callFake((eventName, handler) =&gt; {
+        setTimeout(() =&gt; handler());
+      });
+      component.ngOnInit();
+      tick(10);
+      component.bgPicker.onOpen();
+      var WIDTH = 100;
+      var HEIGHT = 100;
+      component.diagramWidth = WIDTH;
+      component.diagramHeight = HEIGHT;
+      component.onWidthInputBlur();
+      expect(component.currentDiagramWidth).toBe(WIDTH);
+      component.onHeightInputBlur();
+      expect(component.currentDiagramHeight).toBe(HEIGHT);
+    })));
+
+  it(
+    &#x27;should update diagram size when dom had loaded&#x27;,
+    waitForAsync(fakeAsync(() =&gt; {
+      spyOnProperty(document, &#x27;readyState&#x27;).and.returnValue(&#x27;loaded&#x27;);
+      component.ngOnInit();
+      tick(100);
+      component.bgPicker.onOpen();
+      var WIDTH = 100;
+      var HEIGHT = 100;
+      component.diagramWidth = WIDTH;
+      component.diagramHeight = HEIGHT;
+      component.onWidthInputBlur();
+      expect(component.currentDiagramWidth).toBe(WIDTH);
+      component.onHeightInputBlur();
+      expect(component.currentDiagramHeight).toBe(HEIGHT);
+    })));
+
+  it(&#x27;should reset to maximum width correctly&#x27;, () =&gt; {
+    component.diagramWidth = 600;
+    component.onWidthInputBlur();
+    expect(component.currentDiagramWidth).toBe(
+      SvgFilenameEditorConstants.MAX_SVG_DIAGRAM_WIDTH);
+  });
+
+  it(&#x27;should reset to maximum height correctly&#x27;, () =&gt; {
+    component.diagramHeight = 600;
+    component.onHeightInputBlur();
+    expect(component.currentDiagramHeight).toBe(
+      SvgFilenameEditorConstants.MAX_SVG_DIAGRAM_HEIGHT);
+  });
+
+  it(&#x27;should reset to minimum width correctly&#x27;, () =&gt; {
+    component.diagramWidth = 0;
+    component.onWidthInputBlur();
+    expect(component.currentDiagramWidth).toBe(
+      SvgFilenameEditorConstants.MIN_SVG_DIAGRAM_WIDTH);
+  });
+
+  it(&#x27;should reset to minimum height correctly&#x27;, () =&gt; {
+    component.diagramHeight = 0;
+    component.onHeightInputBlur();
+    expect(component.currentDiagramHeight).toBe(
+      SvgFilenameEditorConstants.MIN_SVG_DIAGRAM_HEIGHT);
+  });
+
+  it(&#x27;should fail svg validation&#x27;, () =&gt; {
+    spyOn(
+      svgSanitizerService, &#x27;getInvalidSvgTagsAndAttrsFromDataUri&#x27;
+    ).and.callFake(() =&gt; {
+      return { tags: [], attrs: [&#x27;width&#x27;] };
+    });
+    spyOn(svgSanitizerService, &#x27;getTrustedSvgResourceUrl&#x27;).and.callFake(
+      (data) =&gt; data
+    );
+    var invalidWidthAttribute = (
+      &#x27;&lt;svg widht=&quot;100&quot; height=&quot;100&quot;&gt;&lt;rect id=&quot;rectangle-de569866-9c11-b553-&#x27; +
+      &#x27;f5b7-4194e2380d9f&quot; x=&quot;143&quot; y=&quot;97&quot; width=&quot;12&quot; height=&quot;29&quot; stroke=&quot;hsla&#x27; +
+      &#x27;(0, 0%, 0%, 1)&quot; fill=&quot;hsla(0, 0%, 100%, 1)&quot; stroke-width=&quot;1&quot;&gt;&lt;/rect&gt;&#x27; +
+      &#x27;&lt;/svg&gt;&#x27;);
+    expect(() =&gt; {
+      component.isSvgTagValid(invalidWidthAttribute);
+    }).toThrowError(&#x27;Invalid attributes in svg:width&#x27;);
+  });
+
+  it(&#x27;should fail svg validation&#x27;, () =&gt; {
+    spyOn(
+      svgSanitizerService, &#x27;getInvalidSvgTagsAndAttrsFromDataUri&#x27;
+    ).and.callFake(() =&gt; {
+      return { tags: [&#x27;script&#x27;], attrs: [] };
+    });
+    spyOn(svgSanitizerService, &#x27;getTrustedSvgResourceUrl&#x27;).and.callFake(
+      (data) =&gt; data
+    );
+    var invalidSvgTag = (
+      &#x27;&lt;svg width=&quot;100&quot; height=&quot;100&quot;&gt;&lt;rect id=&quot;rectangle-de569866-9c11-b553-&#x27; +
+      &#x27;f5b7-4194e2380d9f&quot; x=&quot;143&quot; y=&quot;97&quot; width=&quot;12&quot; height29&quot; stroke=&quot;hsla(0&#x27; +
+      &#x27;, 0%, 0%, 1)&quot; fill=&quot;hsla(0, 0%, 100%, 1)&quot; stroke-width=&quot;1&quot;&gt;&lt;/rect&gt;&#x27; +
+      &#x27;&lt;script src=&quot;evil.com&quot;&gt;&lt;/script&gt;&lt;/svg&gt;&#x27;);
+    expect(() =&gt; {
+      component.isSvgTagValid(invalidSvgTag);
+    }).toThrowError(&#x27;Invalid tags in svg:script&#x27;);
+  });
+
+  it(&#x27;should check if diagram is created&#x27;, () =&gt; {
+    var rect = new fabric.Rect({
+      top: 10,
+      left: 10,
+      width: 60,
+      height: 70,
+    });
+    component.canvas.add(rect);
+    expect(component.isDiagramCreated()).toBe(true);
+  });
+
+  it(&#x27;should create different shapes&#x27;, () =&gt; {
+    component.createRect();
+    component.createLine();
+    component.createCircle();
+    component.createText();
+    expect(component.canvas.getObjects()[0].get(&#x27;type&#x27;)).toBe(&#x27;rect&#x27;);
+    expect(component.canvas.getObjects()[1].get(&#x27;type&#x27;)).toBe(&#x27;line&#x27;);
+    expect(component.canvas.getObjects()[2].get(&#x27;type&#x27;)).toBe(&#x27;circle&#x27;);
+    expect(component.canvas.getObjects()[3].get(&#x27;type&#x27;)).toBe(&#x27;textbox&#x27;);
+
+    component.togglePencilDrawing();
+    expect(component.isPencilEnabled()).toBe(true);
+    component.togglePencilDrawing();
+    component.createOpenPolygon();
+    expect(component.isOpenPolygonEnabled()).toBe(true);
+    component.createOpenPolygon();
+    component.polyOptions.lines.push(new fabric.Line([10, 10, 50, 50]));
+    component.polyOptions.bboxPoints.push(new PolyPoint(10, 10));
+    component.createClosedPolygon();
+    expect(component.isClosedPolygonEnabled()).toBe(true);
+    component.createClosedPolygon();
+  });
+
+  it(&#x27;should change the order of shapes&#x27;, () =&gt; {
+    component.createCircle();
+    component.createRect();
+    expect(component.canvas.getObjects()[0].get(&#x27;type&#x27;)).toBe(&#x27;circle&#x27;);
+    expect(component.canvas.getObjects()[1].get(&#x27;type&#x27;)).toBe(&#x27;rect&#x27;);
+    component.canvas.setActiveObject(
+      component.canvas.getObjects()[0]);
+    component.bringObjectForward();
+    expect(component.canvas.getObjects()[0].get(&#x27;type&#x27;)).toBe(&#x27;rect&#x27;);
+    expect(component.canvas.getObjects()[1].get(&#x27;type&#x27;)).toBe(&#x27;circle&#x27;);
+    component.sendObjectBackward();
+    expect(component.canvas.getObjects()[0].get(&#x27;type&#x27;)).toBe(&#x27;circle&#x27;);
+    expect(component.canvas.getObjects()[1].get(&#x27;type&#x27;)).toBe(&#x27;rect&#x27;);
+  });
+
+  it(&#x27;should undo and redo the creation of shapes&#x27;, () =&gt; {
+    for (var i = 0; i &lt; 6; i++) {
+      component.createRect();
+    }
+    expect(component.canvas.getObjects().length).toBe(6);
+    expect(component.isUndoEnabled()).toBe(true);
+    component.onUndo();
+    expect(component.canvas.getObjects().length).toBe(5);
+    expect(component.isRedoEnabled()).toBe(true);
+    component.onRedo();
+    expect(component.canvas.getObjects().length).toBe(6);
+    component.canvas.setActiveObject(
+      component.canvas.getObjects()[5]);
+    component.removeShape();
+    expect(component.canvas.getObjects().length).toBe(5);
+    component.onUndo();
+    expect(component.canvas.getObjects().length).toBe(6);
+    component.onRedo();
+    expect(component.canvas.getObjects().length).toBe(5);
+    expect(component.isClearEnabled()).toBe(true);
+    component.onClear();
+    expect(component.objectUndoStack.length).toBe(0);
+  });
+
+  it(&#x27;should change properties of a shape&#x27;, () =&gt; {
+    component.createRect();
+    component.canvas.setActiveObject(
+      component.canvas.getObjects()[0]);
+    var color = &#x27;rgba(10, 10, 10, 1)&#x27;;
+    component.fabricjsOptions.stroke = color;
+    component.fabricjsOptions.fill = color;
+    component.fabricjsOptions.bg = color;
+    component.fabricjsOptions.size = &#x27;10px&#x27;;
+    component.onStrokeChange();
+    component.onFillChange();
+    component.onBgChange();
+    component.onSizeChange();
+    var rectShape = component.canvas.getObjects()[0];
+    expect(rectShape.get(&#x27;stroke&#x27;)).toBe(color);
+    expect(rectShape.get(&#x27;fill&#x27;)).toBe(color);
+    expect(component.canvas.backgroundColor).toBe(color);
+    expect(rectShape.get(&#x27;strokeWidth&#x27;)).toBe(10);
+    component.createText();
+    component.canvas.discardActiveObject();
+    component.canvas.setActiveObject(
+      component.canvas.getObjects()[1]);
+    component.fabricjsOptions.bold = true;
+    component.fabricjsOptions.italic = true;
+    component.fabricjsOptions.fontFamily = &#x27;comic sans ms&#x27;;
+    component.fabricjsOptions.size = &#x27;12px&#x27;;
+    component.onItalicToggle();
+    component.onBoldToggle();
+    component.onFontChange();
+    component.onSizeChange();
+    var textObj = component.canvas.getObjects()[1];
+    expect(textObj.get(&#x27;fontStyle&#x27; as keyof fabric.Object)).toBe(&#x27;italic&#x27;);
+    expect(textObj.get(&#x27;fontWeight&#x27; as keyof fabric.Object)).toBe(&#x27;bold&#x27;);
+    expect(textObj.get(
+      &#x27;fontFamily&#x27; as keyof fabric.Object)).toBe(&#x27;comic sans ms&#x27;);
+    expect(textObj.get(&#x27;fontSize&#x27; as keyof fabric.Object)).toBe(12);
+  });
+
+  it(&#x27;should draw polygon using mouse events&#x27;, () =&gt; {
+    component.createClosedPolygon();
+    component.canvas.fire(&#x27;mouse:down&#x27;, {
+      e: {
+        pageX: 0,
+        pageY: 0
+      }
+    });
+    component.canvas.fire(&#x27;mouse:move&#x27;, {
+      e: {
+        pageX: 100,
+        pageY: 100
+      }
+    });
+    component.canvas.fire(&#x27;mouse:dblclick&#x27;);
+    expect(component.canvas.getObjects()[0].get(&#x27;type&#x27;)).toBe(&#x27;polyline&#x27;);
+    component.createClosedPolygon();
+    component.isTouchDevice = true;
+    component.canvas.fire(&#x27;mouse:down&#x27;, {
+      e: {
+        pageX: 0,
+        pageY: 0
+      }
+    });
+    component.canvas.fire(&#x27;mouse:down&#x27;, {
+      e: {
+        pageX: 10,
+        pageY: 10
+      }
+    });
+    component.createClosedPolygon();
+    expect(component.canvas.getObjects()[1].get(&#x27;type&#x27;)).toBe(&#x27;polyline&#x27;);
+  });
+
+  it(&#x27;should create a bezier curve&#x27;, () =&gt; {
+    component.createRect();
+    component.createQuadraticBezier();
+    expect(component.isDrawModeBezier()).toBe(true);
+    component.canvas.fire(&#x27;object:moving&#x27;, {
+      target: {
+        name: &#x27;p0&#x27;,
+        left: 100,
+        top: 100
+      }
+    });
+    component.canvas.fire(&#x27;object:moving&#x27;, {
+      target: {
+        name: &#x27;p1&#x27;,
+        left: 200,
+        top: 200
+      }
+    });
+    component.canvas.fire(&#x27;object:moving&#x27;, {
+      target: {
+        name: &#x27;p2&#x27;,
+        left: 300,
+        top: 300
+      }
+    });
+    component.onStrokeChange();
+    component.onFillChange();
+    component.onSizeChange();
+    component.createQuadraticBezier();
+    expect(component.isDrawModeBezier()).toBe(false);
+    expect(component.canvas.getObjects()[1].get(
+      &#x27;path&#x27; as keyof fabric.Object)).toEqual(
+      [[&#x27;M&#x27;, 100, 100], [&#x27;Q&#x27;, 200, 200, 300, 300]]
+    );
+    expect(component.canvas.getObjects()[1].get(&#x27;type&#x27;)).toBe(&#x27;path&#x27;);
+  });
+
+  it(&#x27;should create a pie chart&#x27;, () =&gt; {
+    component.createPieChart();
+    expect(component.isPieChartEnabled()).toBe(true);
+    expect(component.isDrawModePieChart()).toBe(true);
+    component.onAddItem();
+    component.pieChartDataInput[2].data = 100;
+    component.createPieChart();
+    expect(component.isDrawModePieChart()).toBe(false);
+  });
+
+  it(&#x27;should upload an svg file&#x27;, () =&gt; {
+    var fileContent = (
+      &#x27;data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjA&#x27; +
+      &#x27;wMC9zdmciICB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCI+PGNpcmNsZSBjeD0iNTAiIGN5&#x27; +
+      &#x27;PSI1MCIgcj0iNDAiIHN0cm9rZT0iZ3JlZW4iIHN0cm9rZS13aWR0aD0iNCIgZmlsbD0ie&#x27; +
+      &#x27;WVsbG93IiAvPjwvc3ZnPg==&#x27;);
+    component.uploadSvgFile();
+    expect(component.isSvgUploadEnabled()).toBe(true);
+    expect(component.isDrawModeSvgUpload()).toBe(true);
+    var file = new File([fileContent], &#x27;circle.svg&#x27;, {type: &#x27;image/svg&#x27;});
+    component.onFileChanged(file, &#x27;circle.svg&#x27;);
+    component.uploadedSvgDataUrl = {
+      safeUrl: fileContent,
+      unsafeUrl: fileContent
+    };
+    expect(component.isFileUploaded()).toBe(true);
+    component.uploadSvgFile();
+    expect(component.canvas.getObjects()[0].get(&#x27;type&#x27;)).toBe(&#x27;group&#x27;);
+    component.canvas.setActiveObject(
+      component.canvas.getObjects()[0]);
+    expect(component.displayFontStyles).toBe(false);
+    component.uploadSvgFile();
+    expect(component.isDrawModeSvgUpload()).toBe(true);
+    var file = new File([fileContent], &#x27;circle.svg&#x27;, {type: &#x27;image/svg&#x27;});
+    component.onFileChanged(file, &#x27;circle.svg&#x27;);
+    component.uploadedSvgDataUrl = {
+      safeUrl: fileContent,
+      unsafeUrl: fileContent
+    };
+    expect(component.isFileUploaded()).toBe(true);
+    component.loadType = &#x27;nogroup&#x27;;
+    component.uploadSvgFile();
+    expect(component.canvas.getObjects()[1].get(&#x27;type&#x27;)).toBe(&#x27;circle&#x27;);
+  });
+
+  it(&#x27;should set title with onOpen color picker function&#x27;, waitForAsync(() =&gt; {
+    const domReady = new Promise((resolve, reject) =&gt; {
+      if (document.readyState === &#x27;loading&#x27;) {
+        document.addEventListener(&#x27;DOMContentLoaded&#x27;, resolve);
+      } else {
+        resolve(0);
+      }
+    });
+    domReady.then(() =&gt; {
+      fixture.detectChanges();
+      component.bgPicker.onOpen();
+      let alphaSliders = document.querySelectorAll(
+        &#x27;.picker_alpha .picker_selector&#x27;);
+      alphaSliders.forEach((element) =&gt; {
+        expect(element.getAttribute(&#x27;title&#x27;)).toBe(&#x27;Transparency Slider&#x27;);
+      });
+    });
+  }));
+
+  it(&#x27;should trigger object selection and scaling events&#x27;, () =&gt; {
+    component.createRect();
+    component.createText();
+    component.canvas.setActiveObject(
+      component.canvas.getObjects()[0]);
+    component.canvas.setActiveObject(
+      component.canvas.getObjects()[1]);
+    expect(component.isSizeVisible()).toBe(true);
+    expect(component.displayFontStyles).toBe(true);
+    component.canvas.fire(&#x27;object:scaling&#x27;);
+    expect(component.canvas.getObjects()[1].get(&#x27;scaleX&#x27;)).toBe(1);
+    expect(component.canvas.getObjects()[1].get(&#x27;scaleY&#x27;)).toBe(1);
+  });
+
+  it(&#x27;should save svg file created by the editor&#x27;, waitForAsync(
+    fakeAsync(() =&gt; {
+      component.createText();
+      spyOn(svgFileFetcherBackendApiService, &#x27;postSvgFile&#x27;).and.callFake(() =&gt; {
+        return of({filename: &#x27;imageFile1.svg&#x27;});
+      });
+      component.saveSvgFile();
+      tick(1);
+      fixture.detectChanges();
+      tick(1);
+      expect(component.data.savedSvgFileName).toBe(&#x27;imageFile1.svg&#x27;);
+      expect(component.data.savedSvgUrl.toString()).toBe(dataUrl);
+      expect(component.validate()).toBe(true);
+    })));
+
+  it(&#x27;should not save svg file when no diagram is created&#x27;, () =&gt; {
+    component.saveSvgFile();
+    expect(alertSpy).toHaveBeenCalledWith(&#x27;Custom Diagram not created.&#x27;);
+  });
+
+  it(&#x27;should handle rejection when saving an svg file fails&#x27;, waitForAsync(
+    fakeAsync(() =&gt; {
+      component.createRect();
+      var errorMessage = &#x27;Image exceeds file size limit of 100 KB.&#x27;;
+      spyOn(component, &#x27;postSvgToServer&#x27;).and.callFake(() =&gt; {
+        return Promise.reject({error: {error: errorMessage}});
+      });
+      component.saveSvgFile();
+      tick(1);
+      fixture.detectChanges();
+      tick(1);
+      expect(alertSpy).toHaveBeenCalledWith(errorMessage);
+    })));
+
+  it(
+    &#x27;should allow user to continue editing the diagram when dom loaded&#x27;,
+    waitForAsync(fakeAsync(() =&gt; {
+      spyOnProperty(document, &#x27;readyState&#x27;).and.returnValue(&#x27;loaded&#x27;);
+      component.savedSvgDiagram = &#x27;saved&#x27;;
+      component.savedSvgDiagram = samplesvg;
+      component.continueDiagramEditing();
+      tick(100);
+      var mocktoSVG = (arg) =&gt; {
+        return &#x27;&lt;path&gt;&lt;/path&gt;&#x27;;
+      };
+      var customToSVG = component.createCustomToSVG(
+      mocktoSVG as unknown as () =&gt; string, &#x27;path&#x27;, &#x27;group1&#x27;, component);
+      expect(customToSVG()).toBe(&#x27;&lt;path id=&quot;group1&quot;/&gt;&#x27;);
+      expect(component.diagramStatus).toBe(&#x27;editing&#x27;);
+    })));
+
+  it(
+    &#x27;should wait for the dom to load before allowing the user to continue &#x27; +
+    &#x27;editing the diagram&#x27;,
+    waitForAsync(fakeAsync(() =&gt; {
+      spyOnProperty(document, &#x27;readyState&#x27;).and.returnValue(&#x27;loading&#x27;);
+      spyOn(document, &#x27;addEventListener&#x27;).and.callFake((eventName, handler) =&gt; {
+        setTimeout(() =&gt; handler());
+      });
+      component.savedSvgDiagram = &#x27;saved&#x27;;
+      component.savedSvgDiagram = samplesvg;
+      component.continueDiagramEditing();
+      tick(10);
+      var mocktoSVG = (arg) =&gt; {
+        return &#x27;&lt;path&gt;&lt;/path&gt;&#x27;;
+      };
+      var customToSVG = component.createCustomToSVG(
+      mocktoSVG as unknown as () =&gt; string, &#x27;path&#x27;, &#x27;group1&#x27;, component);
+      expect(customToSVG()).toBe(&#x27;&lt;path id=&quot;group1&quot;/&gt;&#x27;);
+      expect(component.diagramStatus).toBe(&#x27;editing&#x27;);
+    })));
+});
+
+
+describe(&#x27;SvgFilenameEditor initialized with value attribute&#x27;, () =&gt; {
+  var component: SvgFilenameEditorComponent;
+  var contextService = null;
+  var samplesvg = (
+    &#x27;&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; xmlns:xlink=&quot;http://www.w3.or&#x27; +
+      &#x27;g/1999/xlink&quot; version=&quot;1.1&quot; width=&quot;494&quot; height=&quot;367&quot; viewBox=&quot;0 0 494&#x27; +
+      &#x27; 367&quot;&gt;&lt;desc&gt;Created with Fabric.js 3.6.3&lt;/desc&gt;&lt;rect x=&quot;0&quot; y=&quot;0&quot; &#x27; +
+      &#x27;width=&quot;100%&quot; height=&quot;100%&quot; fill=&quot;rgba(10,245,49,0.607)&quot;/&gt;&lt;/svg&gt;&#x27;);
+  var mockAssetsBackendApiService = {
+    getImageUrlForPreview: (contentType, contentId, filepath) =&gt; {
+      return &#x27;/imageurl_&#x27; + contentType + &#x27;_&#x27; + contentId + &#x27;_&#x27; + filepath;
+    }
+  };
+  var mockImagePreloaderService = {
+    getDimensionsOfImage: () =&gt; {
+      return {
+        width: 450,
+        height: 350
+      };
+    }
+  };
+  beforeEach(waitForAsync(() =&gt; {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      declarations: [SvgFilenameEditorComponent],
+      providers: [
+        {
+          provide: AssetsBackendApiService,
+          useValue: mockAssetsBackendApiService
+        },
+        {
+          provide: ImagePreloaderService,
+          useValue: mockImagePreloaderService
+        }
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
+    component = TestBed.createComponent(
+      SvgFilenameEditorComponent).componentInstance;
+    component.value = &#x27;svgimageFilename1.svg&#x27;;
+    contextService = TestBed.inject(ContextService);
+    const svgFileFetcherBackendApiService: SvgFileFetcherBackendApiService = (
+      TestBed.inject(SvgFileFetcherBackendApiService));
+    spyOn(svgFileFetcherBackendApiService, &#x27;fetchSvg&#x27;).and.returnValue(
+      of(samplesvg));
+    spyOn(contextService, &#x27;getEntityType&#x27;).and.returnValue(&#x27;exploration&#x27;);
+    spyOn(contextService, &#x27;getEntityId&#x27;).and.returnValue(&#x27;1&#x27;);
+    initializeMockDocument(component);
+  }));
+
+  it(&#x27;should load the svg file&#x27;, waitForAsync(fakeAsync(() =&gt; {
+    component.ngOnInit();
+    tick(10);
+    expect(component.diagramStatus).toBe(&#x27;saved&#x27;);
+    expect(component.savedSvgDiagram).toBe(samplesvg);
+  })));
+}
+);
+
+describe(
+  &#x27;SvgFilenameEditor with image save destination as local storage&#x27;,
+  () =&gt; {
+    var contextService = null;
+    let fixture: ComponentFixture&lt;SvgFilenameEditorComponent&gt;;
+    var component: SvgFilenameEditorComponent = null;
+    var samplesvg = (
+      &#x27;&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; xmlns:xlink=&quot;http://www.w3.or&#x27; +
+    &#x27;g/1999/xlink&quot; version=&quot;1.1&quot; width=&quot;494&quot; height=&quot;367&quot; viewBox=&quot;0 0 494&#x27; +
+    &#x27; 367&quot;&gt;&lt;desc&gt;Created with Fabric.js 3.6.3&lt;/desc&gt;&lt;rect x=&quot;0&quot; y=&quot;0&quot; &#x27; +
+    &#x27;width=&quot;100%&quot; height=&quot;100%&quot; fill=&quot;rgba(10,245,49,0.607)&quot;/&gt;&lt;/svg&gt;&#x27;);
+    var dataUrl = &#x27;data:image/svg+xml;utf8,&#x27; + samplesvg;
+
+    var mockilss = {
+      getRawImageData: (filename) =&gt; {
+        return dataUrl;
+      },
+      saveImage: (filename, imageData) =&gt; {
+        return &#x27;Image file save.&#x27;;
+      },
+      deleteImage: (filename) =&gt; {
+        return &#x27;Image file is deleted.&#x27;;
+      },
+      isInStorage: (filename) =&gt; {
+        return true;
+      }
+    };
+
+    var mockImageUploadHelperService = {
+      convertImageDataToImageFile: (svgDataUri) =&gt; {
+        return new Blob();
+      },
+      generateImageFilename: (height, widht, extension) =&gt; {
+        return height + &#x27;_&#x27; + widht + &#x27;.&#x27; + extension;
+      }
+    };
+
+    var mockSvgSanitizerService = {
+      getInvalidSvgTagsAndAttrsFromDataUri: (dataUri) =&gt; {
+        return { tags: [], attrs: [] };
+      },
+      getTrustedSvgResourceUrl: (data) =&gt; {
+        return data;
+      }
+    };
+
+    var mockImagePreloaderService = {
+      getDimensionsOfImage: () =&gt; {
+        return {
+          width: 450,
+          height: 350
+        };
+      }
+    };
+
+    class mockReaderObject {
+    result = null;
+    onload = null;
+    constructor() {
+      this.onload = () =&gt; {
+        return &#x27;Fake onload executed&#x27;;
+      };
+    }
+    readAsDataURL(file) {
+      this.onload();
+      return &#x27;The file is loaded&#x27;;
+    }
+    }
+
+    class mockImageObject {
+    source = null;
+    onload = null;
+    constructor() {
+      this.onload = () =&gt; {
+        return &#x27;Fake onload executed&#x27;;
+      };
+    }
+    set src(url) {
+      this.onload();
+    }
+    }
+
+    beforeEach(waitForAsync(() =&gt; {
+      TestBed.configureTestingModule({
+        imports: [HttpClientTestingModule],
+        declarations: [SvgFilenameEditorComponent],
+        providers: [
+          {
+            provide: AssetsBackendApiService,
+            useValue: {}
+          },
+          {
+            provide: ImageLocalStorageService,
+            useValue: mockilss
+          },
+          {
+            provide: ImagePreloaderService,
+            useValue: mockImagePreloaderService
+          },
+          {
+            provide: ImageUploadHelperService,
+            useValue: mockImageUploadHelperService
+          },
+          {
+            provide: SvgSanitizerService,
+            useValue: mockSvgSanitizerService
+          }
+        ],
+        schemas: [NO_ERRORS_SCHEMA]
+      }).compileComponents();
+      contextService = TestBed.inject(ContextService);
+      spyOn(contextService, &#x27;getImageSaveDestination&#x27;).and.returnValue(
+        AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
+
+      // This throws &quot;Argument of type &#x27;mockImageObject&#x27; is not assignable to
+      // parameter of type &#x27;HTMLImageElement&#x27;.&quot;. We need to suppress this error
+      // because &#x27;HTMLImageElement&#x27; has around 250 more properties. We have only
+      // defined the properties we need in &#x27;mockImageObject&#x27;.
+      // @ts-expect-error
+      spyOn(window, &#x27;Image&#x27;).and.returnValue(new mockImageObject());
+      // This throws &quot;Argument of type &#x27;mockReaderObject&#x27; is not assignable
+      // to parameter of type &#x27;FileReader&#x27;.&quot;. We need to suppress this error
+      // because &#x27;FileReader&#x27; has around 15 more properties. We have only
+      // defined the properties we need in &#x27;mockReaderObject&#x27;.
+      // @ts-expect-error
+      spyOn(window, &#x27;FileReader&#x27;).and.returnValue(new mockReaderObject());
+      fixture = TestBed.createComponent(SvgFilenameEditorComponent);
+      component = fixture.componentInstance;
+      initializeMockDocument(component);
+      component.ngOnInit();
+      component.canvas = new fabric.Canvas(component.canvasID);
+      component.initializeMouseEvents();
+    }));
+
+
+    it(&#x27;should save svg file to local storage created by the svg editor&#x27;,
+      () =&gt; {
+        component.createRect();
+        component.saveSvgFile();
+        expect(component.data.savedSvgFileName).toBe(&#x27;350_450.svg&#x27;);
+        expect(component.data.savedSvgUrl.toString()).toBe(dataUrl);
+        expect(component.validate()).toBe(true);
+      }
+    );
+
+    it(&#x27;should allow user to continue editing the diagram and delete the &#x27; +
+    &#x27;image from local storage&#x27;, () =&gt; {
+      component.data.savedSvgFileName = &#x27;image.svg&#x27;;
+      component.savedSvgDiagram = &#x27;saved&#x27;;
+      component.savedSvgDiagram = samplesvg;
+      component.continueDiagramEditing();
+      expect(component.diagramStatus).toBe(&#x27;editing&#x27;);
+    });
+  });
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:64,&quot;character&quot;:6,&quot;text&quot;:&quot;alertSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:66,&quot;character&quot;:6,&quot;text&quot;:&quot;contextService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:67,&quot;character&quot;:6,&quot;text&quot;:&quot;csrfService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:141,&quot;character&quot;:28,&quot;text&quot;:&quot;contentType&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:141,&quot;character&quot;:41,&quot;text&quot;:&quot;contentId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:141,&quot;character&quot;:52,&quot;text&quot;:&quot;filepath&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:147,&quot;character&quot;:34,&quot;text&quot;:&quot;svgDataUri&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:150,&quot;character&quot;:28,&quot;text&quot;:&quot;height&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:150,&quot;character&quot;:36,&quot;text&quot;:&quot;width&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:150,&quot;character&quot;:43,&quot;text&quot;:&quot;extension&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:151,&quot;character&quot;:13,&quot;text&quot;:&quot;height&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:151,&quot;character&quot;:28,&quot;text&quot;:&quot;width&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:151,&quot;character&quot;:42,&quot;text&quot;:&quot;extension&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:156,&quot;character&quot;:43,&quot;text&quot;:&quot;dataUri&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:159,&quot;character&quot;:31,&quot;text&quot;:&quot;data&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:160,&quot;character&quot;:13,&quot;text&quot;:&quot;data&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:174,&quot;character&quot;:4,&quot;text&quot;:&quot;result&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:175,&quot;character&quot;:4,&quot;text&quot;:&quot;onload&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:177,&quot;character&quot;:11,&quot;text&quot;:&quot;onload&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:181,&quot;character&quot;:18,&quot;text&quot;:&quot;file&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:182,&quot;character&quot;:11,&quot;text&quot;:&quot;onload&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:188,&quot;character&quot;:4,&quot;text&quot;:&quot;source&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:189,&quot;character&quot;:4,&quot;text&quot;:&quot;onload&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:191,&quot;character&quot;:11,&quot;text&quot;:&quot;onload&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:195,&quot;character&quot;:8,&quot;text&quot;:&quot;src&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:195,&quot;character&quot;:12,&quot;text&quot;:&quot;url&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:196,&quot;character&quot;:11,&quot;text&quot;:&quot;onload&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:229,&quot;character&quot;:4,&quot;text&quot;:&quot;contextService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:230,&quot;character&quot;:4,&quot;text&quot;:&quot;csrfService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:233,&quot;character&quot;:4,&quot;text&quot;:&quot;alertSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:234,&quot;character&quot;:10,&quot;text&quot;:&quot;contextService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:234,&quot;character&quot;:43,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:235,&quot;character&quot;:10,&quot;text&quot;:&quot;contextService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:235,&quot;character&quot;:41,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:236,&quot;character&quot;:10,&quot;text&quot;:&quot;contextService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:236,&quot;character&quot;:53,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:238,&quot;character&quot;:10,&quot;text&quot;:&quot;csrfService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:238,&quot;character&quot;:40,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:263,&quot;character&quot;:19,&quot;text&quot;:&quot;data&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:267,&quot;character&quot;:14,&quot;text&quot;:&quot;fillPicker&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:268,&quot;character&quot;:14,&quot;text&quot;:&quot;strokePicker&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:269,&quot;character&quot;:14,&quot;text&quot;:&quot;bgPicker&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:276,&quot;character&quot;:56,&quot;text&quot;:&quot;eventName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:276,&quot;character&quot;:67,&quot;text&quot;:&quot;handler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:277,&quot;character&quot;:25,&quot;text&quot;:&quot;handler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:281,&quot;character&quot;:16,&quot;text&quot;:&quot;bgPicker&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:281,&quot;character&quot;:25,&quot;text&quot;:&quot;onOpen&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:298,&quot;character&quot;:16,&quot;text&quot;:&quot;bgPicker&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:298,&quot;character&quot;:25,&quot;text&quot;:&quot;onOpen&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:402,&quot;character&quot;:26,&quot;text&quot;:&quot;lines&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:403,&quot;character&quot;:26,&quot;text&quot;:&quot;bboxPoints&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:445,&quot;character&quot;:21,&quot;text&quot;:&quot;objectUndoStack&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:479,&quot;character&quot;:23,&quot;text&quot;:&quot;&#x27;fontStyle&#x27; as keyof fabric.Object&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:480,&quot;character&quot;:23,&quot;text&quot;:&quot;&#x27;fontWeight&#x27; as keyof fabric.Object&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:482,&quot;character&quot;:6,&quot;text&quot;:&quot;&#x27;fontFamily&#x27; as keyof fabric.Object&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:483,&quot;character&quot;:23,&quot;text&quot;:&quot;&#x27;fontSize&#x27; as keyof fabric.Object&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:551,&quot;character&quot;:6,&quot;text&quot;:&quot;&#x27;path&#x27; as keyof fabric.Object&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:612,&quot;character&quot;:16,&quot;text&quot;:&quot;bgPicker&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:612,&quot;character&quot;:25,&quot;text&quot;:&quot;onOpen&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:652,&quot;character&quot;:11,&quot;text&quot;:&quot;alertSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:666,&quot;character&quot;:13,&quot;text&quot;:&quot;alertSpy&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:677,&quot;character&quot;:23,&quot;text&quot;:&quot;arg&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:681,&quot;character&quot;:6,&quot;text&quot;:&quot;mocktoSVG as unknown as () =&gt; string&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:691,&quot;character&quot;:56,&quot;text&quot;:&quot;eventName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:691,&quot;character&quot;:67,&quot;text&quot;:&quot;handler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:692,&quot;character&quot;:25,&quot;text&quot;:&quot;handler&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:698,&quot;character&quot;:23,&quot;text&quot;:&quot;arg&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:702,&quot;character&quot;:6,&quot;text&quot;:&quot;mocktoSVG as unknown as () =&gt; string&quot;,&quot;kind&quot;:3},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:711,&quot;character&quot;:6,&quot;text&quot;:&quot;contextService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:718,&quot;character&quot;:28,&quot;text&quot;:&quot;contentType&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:718,&quot;character&quot;:41,&quot;text&quot;:&quot;contentId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:718,&quot;character&quot;:52,&quot;text&quot;:&quot;filepath&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:719,&quot;character&quot;:28,&quot;text&quot;:&quot;contentType&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:719,&quot;character&quot;:48,&quot;text&quot;:&quot;contentId&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:719,&quot;character&quot;:66,&quot;text&quot;:&quot;filepath&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:748,&quot;character&quot;:14,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:749,&quot;character&quot;:4,&quot;text&quot;:&quot;contextService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:754,&quot;character&quot;:10,&quot;text&quot;:&quot;contextService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:754,&quot;character&quot;:43,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:755,&quot;character&quot;:10,&quot;text&quot;:&quot;contextService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:755,&quot;character&quot;:41,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:771,&quot;character&quot;:8,&quot;text&quot;:&quot;contextService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:782,&quot;character&quot;:24,&quot;text&quot;:&quot;filename&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:785,&quot;character&quot;:18,&quot;text&quot;:&quot;filename&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:785,&quot;character&quot;:28,&quot;text&quot;:&quot;imageData&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:788,&quot;character&quot;:20,&quot;text&quot;:&quot;filename&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:791,&quot;character&quot;:20,&quot;text&quot;:&quot;filename&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:797,&quot;character&quot;:36,&quot;text&quot;:&quot;svgDataUri&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:800,&quot;character&quot;:30,&quot;text&quot;:&quot;height&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:800,&quot;character&quot;:38,&quot;text&quot;:&quot;widht&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:800,&quot;character&quot;:45,&quot;text&quot;:&quot;extension&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:801,&quot;character&quot;:15,&quot;text&quot;:&quot;height&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:801,&quot;character&quot;:30,&quot;text&quot;:&quot;widht&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:801,&quot;character&quot;:44,&quot;text&quot;:&quot;extension&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:806,&quot;character&quot;:45,&quot;text&quot;:&quot;dataUri&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:809,&quot;character&quot;:33,&quot;text&quot;:&quot;data&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:810,&quot;character&quot;:15,&quot;text&quot;:&quot;data&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:824,&quot;character&quot;:4,&quot;text&quot;:&quot;result&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:825,&quot;character&quot;:4,&quot;text&quot;:&quot;onload&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:827,&quot;character&quot;:11,&quot;text&quot;:&quot;onload&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:831,&quot;character&quot;:18,&quot;text&quot;:&quot;file&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:832,&quot;character&quot;:11,&quot;text&quot;:&quot;onload&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:838,&quot;character&quot;:4,&quot;text&quot;:&quot;source&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:839,&quot;character&quot;:4,&quot;text&quot;:&quot;onload&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:841,&quot;character&quot;:11,&quot;text&quot;:&quot;onload&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:845,&quot;character&quot;:8,&quot;text&quot;:&quot;src&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:845,&quot;character&quot;:12,&quot;text&quot;:&quot;url&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:846,&quot;character&quot;:11,&quot;text&quot;:&quot;onload&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:878,&quot;character&quot;:6,&quot;text&quot;:&quot;contextService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:879,&quot;character&quot;:12,&quot;text&quot;:&quot;contextService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;extensions/objects/templates/svg-filename-editor.component.spec.ts&quot;,&quot;line&quot;:879,&quot;character&quot;:55,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:44:00 GMT</p>
+    </body>
+  </html>
+  

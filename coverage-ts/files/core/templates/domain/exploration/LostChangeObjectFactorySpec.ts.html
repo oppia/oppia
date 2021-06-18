@@ -1,0 +1,268 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>LostChangeObjectFactorySpec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">core/templates/domain/exploration/LostChangeObjectFactorySpec.ts</td><td class="">100.00%</td><td class="">100%</td><td class="">321</td><td class="">321</td><td class="">0</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for Lost Change Object Factory.
+ */
+
+import { TestBed } from &#x27;@angular/core/testing&#x27;;
+import { LostChangeObjectFactory } from
+  &#x27;domain/exploration/LostChangeObjectFactory&#x27;;
+import { OutcomeObjectFactory } from &#x27;./OutcomeObjectFactory&#x27;;
+
+describe(&#x27;Lost Change Object Factory&#x27;, () =&gt; {
+  let lcof: LostChangeObjectFactory = null;
+  let oof: OutcomeObjectFactory = null;
+  beforeEach(() =&gt; {
+    TestBed.configureTestingModule({
+      providers: [LostChangeObjectFactory]
+    });
+
+    lcof = TestBed.get(LostChangeObjectFactory);
+    oof = TestBed.get(OutcomeObjectFactory);
+  });
+
+  it(&#x27;should evaluate values from a Lost Change&#x27;, () =&gt; {
+    const lostChange = lcof.createNew({
+      cmd: &#x27;add_state&#x27;,
+      state_name: &#x27;State name&#x27;,
+    });
+
+    expect(lostChange.cmd).toBe(&#x27;add_state&#x27;);
+    expect(lostChange.stateName).toBe(&#x27;State name&#x27;);
+  });
+
+  it(&#x27;should evaluate values from a renaming Lost Change&#x27;, () =&gt; {
+    const lostChange = lcof.createNew({
+      cmd: &#x27;rename_state&#x27;,
+      old_state_name: &#x27;Old state name&#x27;,
+      new_state_name: &#x27;New state name&#x27;
+    });
+
+    expect(lostChange.cmd).toBe(&#x27;rename_state&#x27;);
+    expect(lostChange.oldStateName).toBe(&#x27;Old state name&#x27;);
+    expect(lostChange.newStateName).toBe(&#x27;New state name&#x27;);
+  });
+
+  it(&#x27;should evaluate values from a Lost Change with edition changes&#x27;, () =&gt; {
+    const lostChange = lcof.createNew({
+      cmd: &#x27;edit_state_property&#x27;,
+      state_name: &#x27;Edited state name&#x27;,
+      new_value: {
+        html: &#x27;newValue&#x27;,
+        content_id: &#x27;&#x27;
+      },
+      old_value: {
+        html: &#x27;oldValue&#x27;,
+        content_id: &#x27;&#x27;
+      },
+      property_name: &#x27;content&#x27;
+    });
+
+    expect(lostChange.getRelativeChangeToGroups()).toBe(&#x27;edited&#x27;);
+    expect(lostChange.getStatePropertyValue(lostChange.newValue)).toEqual({
+      html: &#x27;newValue&#x27;,
+      content_id: &#x27;&#x27;
+    });
+    expect(lostChange.getStatePropertyValue(lostChange.oldValue)).toEqual({
+      html: &#x27;oldValue&#x27;,
+      content_id: &#x27;&#x27;
+    });
+    expect(lostChange.isOutcomeFeedbackEqual()).toBe(false);
+    expect(lostChange.isFeedbackEqual()).toBe(false);
+  });
+
+  it(&#x27;should get state property value when it is an array from a Lost Change&#x27;,
+    () =&gt; {
+      const lostChange = lcof.createNew({
+        cmd: &#x27;edit_state_property&#x27;,
+        state_name: &#x27;Edited state name&#x27;,
+        new_value: [&#x27;value 1&#x27;, &#x27;value 2&#x27;],
+        old_value: [&#x27;value 2&#x27;, &#x27;value 1&#x27;],
+        property_name: &#x27;content&#x27;
+      });
+
+      expect(lostChange.getRelativeChangeToGroups()).toBe(&#x27;edited&#x27;);
+      expect(lostChange.isOldValueEmpty()).toBe(false);
+      expect(lostChange.isNewValueEmpty()).toBe(false);
+      expect(lostChange.getStatePropertyValue(lostChange.newValue)).toEqual(
+        &#x27;value 2&#x27;);
+      expect(lostChange.getStatePropertyValue(lostChange.oldValue)).toEqual(
+        &#x27;value 1&#x27;);
+    });
+
+  it(&#x27;should get relative changes when changes is awways from a Lost Change&#x27;,
+    () =&gt; {
+      const lostChange = lcof.createNew({
+        cmd: &#x27;edit_state_property&#x27;,
+        state_name: &#x27;Edited state name&#x27;,
+        new_value: [&#x27;value 1&#x27;, &#x27;value 2&#x27;, &#x27;value 3&#x27;],
+        old_value: [&#x27;value 2&#x27;, &#x27;value 1&#x27;],
+        property_name: &#x27;content&#x27;
+      });
+
+      expect(lostChange.getRelativeChangeToGroups()).toBe(&#x27;added&#x27;);
+      expect(lostChange.isOldValueEmpty()).toBe(false);
+      expect(lostChange.isNewValueEmpty()).toBe(false);
+
+      const lostChange2 = lcof.createNew({
+        cmd: &#x27;edit_state_property&#x27;,
+        state_name: &#x27;Edited state name&#x27;,
+        new_value: [&#x27;value 1&#x27;],
+        old_value: [&#x27;value 2&#x27;, &#x27;value 1&#x27;],
+        property_name: &#x27;content&#x27;
+      });
+
+      expect(lostChange2.getRelativeChangeToGroups()).toBe(&#x27;deleted&#x27;);
+      expect(lostChange2.isOldValueEmpty()).toBe(false);
+      expect(lostChange2.isNewValueEmpty()).toBe(false);
+    });
+
+  it(&#x27;should evaluate values from a EndExploration Lost Change&#x27;, () =&gt; {
+    const lostChange = lcof.createNew({
+      cmd: &#x27;edit_state_property&#x27;,
+      state_name: &#x27;Edited state name&#x27;,
+      new_value: &#x27;EndExploration&#x27;,
+      old_value: null,
+      property_name: &#x27;widget_id&#x27;
+    });
+
+    expect(lostChange.getRelativeChangeToGroups()).toBe(&#x27;added&#x27;);
+    expect(lostChange.isEndingExploration()).toBe(true);
+    expect(lostChange.isAddingInteraction()).toBe(false);
+    expect(lostChange.isOldValueEmpty()).toBe(true);
+    expect(lostChange.isNewValueEmpty()).toBe(false);
+  });
+
+  it(&#x27;should evaluate values from a Lost Change with deleted changes&#x27;, () =&gt; {
+    const lostChange = lcof.createNew({
+      cmd: &#x27;edit_state_property&#x27;,
+      state_name: &#x27;Edited state name&#x27;,
+      new_value: null,
+      old_value: &#x27;EndExploration&#x27;,
+      property_name: &#x27;widget_id&#x27;
+    });
+
+    expect(lostChange.getRelativeChangeToGroups()).toBe(&#x27;deleted&#x27;);
+    expect(lostChange.isEndingExploration()).toBe(false);
+    expect(lostChange.isAddingInteraction()).toBe(false);
+    expect(lostChange.isOldValueEmpty()).toBe(false);
+    expect(lostChange.isNewValueEmpty()).toBe(true);
+  });
+
+  it(&#x27;should evaluate values from a Lost Change with equal outcomes and&#x27; +
+    &#x27; rules&#x27;, () =&gt; {
+    const lostChange = lcof.createNew({
+      cmd: &#x27;edit_state_property&#x27;,
+      state_name: &#x27;Edited state name&#x27;,
+      new_value: {
+        outcome: oof.createFromBackendDict({
+          dest: &#x27;outcome 2&#x27;,
+          feedback: {
+            content_id: &#x27;feedback_2&#x27;,
+            html: &#x27;Html&#x27;
+          },
+          labelled_as_correct: false,
+          param_changes: [],
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null
+        }),
+        rules: [{
+          type: &#x27;Type1&#x27;,
+          inputs: {
+            input1: &#x27;input1&#x27;,
+            input2: &#x27;input2&#x27;
+          }
+        }]
+      },
+      old_value: {
+        outcome: oof.createFromBackendDict({
+          dest: &#x27;outcome 1&#x27;,
+          feedback: {
+            content_id: &#x27;feedback_2&#x27;,
+            html: &#x27;Html&#x27;
+          },
+          labelled_as_correct: false,
+          param_changes: [],
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null
+        }),
+        rules: [{
+          type: &#x27;Type1&#x27;,
+          inputs: {
+            input1: &#x27;input1&#x27;,
+            input2: &#x27;input2&#x27;
+          }
+        }]
+      },
+      property_name: &#x27;answer_groups&#x27;
+    });
+
+    expect(lostChange.isRulesEqual()).toBe(true);
+    expect(lostChange.isOutcomeFeedbackEqual()).toBe(true);
+    expect(lostChange.isOutcomeDestEqual()).toBe(false);
+  });
+
+  it(&#x27;should evaluate values from a Lost Change with equal outcomes&#x27;, () =&gt; {
+    const lostChange = lcof.createNew({
+      cmd: &#x27;edit_state_property&#x27;,
+      state_name: &#x27;Edited state name&#x27;,
+      new_value: oof.createFromBackendDict({
+        dest: &#x27;outcome 2&#x27;,
+        feedback: {
+          content_id: &#x27;feedback_2&#x27;,
+          html: &#x27;Html&#x27;
+        },
+        labelled_as_correct: false,
+        param_changes: [],
+        refresher_exploration_id: null,
+        missing_prerequisite_skill_id: null
+      }),
+      old_value: oof.createFromBackendDict({
+        dest: &#x27;outcome 1&#x27;,
+        feedback: {
+          content_id: &#x27;feedback_2&#x27;,
+          html: &#x27;Html&#x27;
+        },
+        labelled_as_correct: false,
+        param_changes: [],
+        refresher_exploration_id: null,
+        missing_prerequisite_skill_id: null
+      }),
+      property_name: &#x27;default_outcome&#x27;
+    });
+
+    expect(lostChange.isFeedbackEqual()).toBe(true);
+    expect(lostChange.isDestEqual()).toBe(false);
+    expect(lostChange.isOutcomeDestEqual()).toBe(false);
+  });
+});
+</textarea><pre id="annotations" style="display:none">[]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:57 GMT</p>
+    </body>
+  </html>
+  

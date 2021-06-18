@@ -1,0 +1,164 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>topic-landing-page.component.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/landing-pages/topic-landing-page/topic-landing-page.component.spec.ts</td><td class="">90.00%</td><td class="">100%</td><td class="">180</td><td class="">162</td><td class="">18</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for topicLandingPage.
+ */
+
+import { NO_ERRORS_SCHEMA } from &#x27;@angular/core&#x27;;
+import { ComponentFixture, TestBed, async, tick, fakeAsync }
+  from &#x27;@angular/core/testing&#x27;;
+
+import { UrlInterpolationService } from
+  &#x27;domain/utilities/url-interpolation.service&#x27;;
+import { TopicLandingPageComponent } from
+  &#x27;pages/landing-pages/topic-landing-page/topic-landing-page.component&#x27;;
+import { PageTitleService } from &#x27;services/page-title.service&#x27;;
+import { SiteAnalyticsService } from &#x27;services/site-analytics.service&#x27;;
+import { WindowRef } from &#x27;services/contextual/window-ref.service&#x27;;
+
+import constants from &#x27;assets/constants&#x27;;
+
+class MockWindowRef {
+  _window = {
+    location: {
+      _pathname: &#x27;/math/ratios&#x27;,
+      _href: &#x27;&#x27;,
+      get pathname(): string {
+        return this._pathname;
+      },
+      set pathname(val: string) {
+        this._pathname = val;
+      },
+      get href(): string {
+        return this._href;
+      },
+      set href(val) {
+        this._href = val;
+      }
+    }
+  };
+  get nativeWindow() {
+    return this._window;
+  }
+}
+
+class MockSiteAnalyticsService {
+  registerOpenCollectionFromLandingPageEvent(collectionId: string): void {
+    return;
+  }
+}
+
+let component: TopicLandingPageComponent;
+let fixture: ComponentFixture&lt;TopicLandingPageComponent&gt;;
+
+describe(&#x27;Topic Landing Page&#x27;, () =&gt; {
+  let siteAnalyticsService = null;
+  let windowRef: MockWindowRef;
+  let pageTitleService = null;
+
+  beforeEach(async(() =&gt; {
+    windowRef = new MockWindowRef();
+    TestBed.configureTestingModule({
+      declarations: [TopicLandingPageComponent],
+      providers: [
+        PageTitleService,
+        { provide: SiteAnalyticsService, useClass: MockSiteAnalyticsService },
+        UrlInterpolationService,
+        { provide: WindowRef, useValue: windowRef }
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
+    pageTitleService = TestBed.get(PageTitleService);
+    siteAnalyticsService = TestBed.get(SiteAnalyticsService);
+  }));
+
+  beforeEach(() =&gt; {
+    fixture = TestBed.createComponent(TopicLandingPageComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it(&#x27;should get topic title from topic id in pathname when component&#x27; +
+    &#x27; is initialized&#x27;, () =&gt; {
+    windowRef.nativeWindow.location.pathname = &#x27;/math/ratios&#x27;;
+    component.ngOnInit();
+    expect(component.topicTitle).toBe(&#x27;Ratios&#x27;);
+  });
+
+  it(&#x27;should click get started button&#x27;, fakeAsync(() =&gt; {
+    windowRef.nativeWindow.location.pathname = &#x27;/math/ratios&#x27;;
+    let analyticsSpy = spyOn(
+      siteAnalyticsService, &#x27;registerOpenCollectionFromLandingPageEvent&#x27;)
+      .and.callThrough();
+    // Get collection id from ratios.
+    component.ngOnInit();
+
+    windowRef.nativeWindow.location.href = &#x27;&#x27;;
+    component.onClickGetStartedButton();
+
+    let ratiosCollectionId = &#x27;53gXGLIR044l&#x27;;
+    expect(analyticsSpy).toHaveBeenCalledWith(ratiosCollectionId);
+    tick(150);
+    fixture.detectChanges();
+
+    expect(windowRef.nativeWindow.location.href).toBe(
+      &#x27;/learn/math/ratios&#x27;);
+  }));
+
+  it(&#x27;should click learn more button&#x27;, fakeAsync(() =&gt; {
+    windowRef.nativeWindow.location.href = &#x27;&#x27;;
+    component.goToClassroom();
+    tick(150);
+    fixture.detectChanges();
+
+    expect(windowRef.nativeWindow.location.href).toBe(
+      `/learn/${constants.DEFAULT_CLASSROOM_URL_FRAGMENT}`);
+  }));
+
+  it(&#x27;should have a tagline in the page title&#x27;, fakeAsync(() =&gt; {
+    windowRef.nativeWindow.location.pathname = &#x27;/math/fractions&#x27;;
+    component.ngOnInit();
+    tick(150);
+    fixture.detectChanges();
+    expect(pageTitleService.getPageTitle()).toBe(
+      &#x27;Fractions | Add, Subtract, Multiply and Divide | Oppia&#x27;);
+  }));
+
+  it(&#x27;should return correct lesson quality image src&#x27;, function() {
+    let imageSrc = component.getLessonQualityImageSrc(&#x27;someImage.png&#x27;);
+    expect(imageSrc).toBe(&#x27;/assets/images/landing/someImage.png&#x27;);
+
+    imageSrc = component.getLessonQualityImageSrc(&#x27;someOtherImage.png&#x27;);
+    expect(imageSrc).toBe(&#x27;/assets/images/landing/someOtherImage.png&#x27;);
+  });
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/landing-pages/topic-landing-page/topic-landing-page.component.spec.ts&quot;,&quot;line&quot;:38,&quot;character&quot;:15,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/landing-pages/topic-landing-page/topic-landing-page.component.spec.ts&quot;,&quot;line&quot;:38,&quot;character&quot;:20,&quot;text&quot;:&quot;_pathname&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/landing-pages/topic-landing-page/topic-landing-page.component.spec.ts&quot;,&quot;line&quot;:41,&quot;character&quot;:8,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/landing-pages/topic-landing-page/topic-landing-page.component.spec.ts&quot;,&quot;line&quot;:41,&quot;character&quot;:13,&quot;text&quot;:&quot;_pathname&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/landing-pages/topic-landing-page/topic-landing-page.component.spec.ts&quot;,&quot;line&quot;:44,&quot;character&quot;:15,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/landing-pages/topic-landing-page/topic-landing-page.component.spec.ts&quot;,&quot;line&quot;:44,&quot;character&quot;:20,&quot;text&quot;:&quot;_href&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/landing-pages/topic-landing-page/topic-landing-page.component.spec.ts&quot;,&quot;line&quot;:47,&quot;character&quot;:8,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/landing-pages/topic-landing-page/topic-landing-page.component.spec.ts&quot;,&quot;line&quot;:47,&quot;character&quot;:13,&quot;text&quot;:&quot;_href&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/landing-pages/topic-landing-page/topic-landing-page.component.spec.ts&quot;,&quot;line&quot;:66,&quot;character&quot;:6,&quot;text&quot;:&quot;siteAnalyticsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/landing-pages/topic-landing-page/topic-landing-page.component.spec.ts&quot;,&quot;line&quot;:68,&quot;character&quot;:6,&quot;text&quot;:&quot;pageTitleService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/landing-pages/topic-landing-page/topic-landing-page.component.spec.ts&quot;,&quot;line&quot;:82,&quot;character&quot;:4,&quot;text&quot;:&quot;pageTitleService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/landing-pages/topic-landing-page/topic-landing-page.component.spec.ts&quot;,&quot;line&quot;:83,&quot;character&quot;:4,&quot;text&quot;:&quot;siteAnalyticsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/landing-pages/topic-landing-page/topic-landing-page.component.spec.ts&quot;,&quot;line&quot;:101,&quot;character&quot;:8,&quot;text&quot;:&quot;analyticsSpy&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/landing-pages/topic-landing-page/topic-landing-page.component.spec.ts&quot;,&quot;line&quot;:102,&quot;character&quot;:6,&quot;text&quot;:&quot;siteAnalyticsService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/landing-pages/topic-landing-page/topic-landing-page.component.spec.ts&quot;,&quot;line&quot;:103,&quot;character&quot;:7,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/landing-pages/topic-landing-page/topic-landing-page.component.spec.ts&quot;,&quot;line&quot;:111,&quot;character&quot;:11,&quot;text&quot;:&quot;analyticsSpy&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/pages/landing-pages/topic-landing-page/topic-landing-page.component.spec.ts&quot;,&quot;line&quot;:134,&quot;character&quot;:11,&quot;text&quot;:&quot;pageTitleService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/landing-pages/topic-landing-page/topic-landing-page.component.spec.ts&quot;,&quot;line&quot;:134,&quot;character&quot;:28,&quot;text&quot;:&quot;getPageTitle&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:59 GMT</p>
+    </body>
+  </html>
+  

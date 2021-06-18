@@ -1,0 +1,343 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>editable-question-backend-api.service.spec.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/domain/question/editable-question-backend-api.service.spec.ts</td><td class="">87.42%</td><td class="">100%</td><td class="">461</td><td class="">403</td><td class="">58</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for EditableQuestionBackendApiService.
+ */
+
+import { fakeAsync, flushMicrotasks, TestBed } from &#x27;@angular/core/testing&#x27;;
+import { HttpClientTestingModule, HttpTestingController } from
+  &#x27;@angular/common/http/testing&#x27;;
+import { importAllAngularServices } from &#x27;tests/unit-test-utils&#x27;;
+import { QuestionObjectFactory } from &#x27;domain/question/QuestionObjectFactory&#x27;;
+import { EditableQuestionBackendApiService} from &#x27;domain/question/editable-question-backend-api.service&#x27;;
+import { CsrfTokenService } from &#x27;services/csrf-token.service&#x27;;
+
+describe(&#x27;Editable question backend API service&#x27;, function() {
+  let editableQuestionBackendApiService: EditableQuestionBackendApiService;
+  let questionObjectFactory: QuestionObjectFactory = null;
+  let sampleDataResults = null;
+  let sampleDataResultsObjects = null;
+  let httpTestingController: HttpTestingController = null;
+  let csrfService = null;
+
+  beforeEach(angular.mock.module(&#x27;oppia&#x27;));
+  importAllAngularServices();
+
+  beforeEach(() =&gt; {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [EditableQuestionBackendApiService]
+    });
+    editableQuestionBackendApiService = TestBed.get(
+      EditableQuestionBackendApiService);
+    questionObjectFactory = TestBed.get(QuestionObjectFactory);
+    httpTestingController = TestBed.get(HttpTestingController);
+    csrfService = TestBed.get(CsrfTokenService);
+    spyOn(csrfService, &#x27;getTokenAsync&#x27;).and.callFake(async() =&gt; {
+      return Promise.resolve(&#x27;sample-csrf-token&#x27;);
+    });
+    // Sample question object returnable from the backend.
+    sampleDataResults = {
+      questionDict: {
+        id: &#x27;0&#x27;,
+        question_state_data: {
+          content: {
+            html: &#x27;Question 1&#x27;
+          },
+          recorded_voiceovers: {
+            voiceovers_mapping: {}
+          },
+          interaction: {
+            answer_groups: [],
+            confirmed_unclassified_answers: [],
+            customization_args: {
+              placeholder: {
+                value: {
+                  content_id: &#x27;ca_placeholder_0&#x27;,
+                  unicode_str: &#x27;&#x27;
+                }
+              },
+              rows: { value: 1 }
+            },
+            default_outcome: {
+              dest: null,
+              feedback: {
+                html: &#x27;Correct Answer&#x27;
+              },
+              param_changes: [],
+              labelled_as_correct: true
+            },
+            hints: [
+              {
+                hint_content: {
+                  html: &#x27;Hint 1&#x27;
+                }
+              }
+            ],
+            solution: {
+              correct_answer: &#x27;This is the correct answer&#x27;,
+              answer_is_exclusive: false,
+              explanation: {
+                html: &#x27;Solution explanation&#x27;
+              }
+            },
+            id: &#x27;TextInput&#x27;
+          },
+          param_changes: [],
+          solicit_answer_details: false,
+          written_translations: {
+            translations_mapping: {}
+          },
+        },
+        language_code: &#x27;en&#x27;,
+        version: 1
+      },
+      associated_skill_dicts: []
+    };
+
+    sampleDataResultsObjects = {
+      questionObject:
+        questionObjectFactory.createFromBackendDict(
+          sampleDataResults.questionDict),
+      associated_skill_dicts: []
+    };
+  });
+
+  afterEach(() =&gt; {
+    httpTestingController.verify();
+  });
+
+  it(&#x27;should successfully create a new question&#x27;, fakeAsync(() =&gt; {
+    let successHandler = jasmine.createSpy(&#x27;success&#x27;);
+    let failHandler = jasmine.createSpy(&#x27;fail&#x27;);
+
+    let imageBlob = new Blob(
+      [&#x27;data:image/png;base64,xyz&#x27;], {type: &#x27;image/png&#x27;});
+    let imageData = {
+      filename: &#x27;image.png&#x27;,
+      imageBlob: imageBlob
+    };
+    let skillsId = [&#x27;0&#x27;, &#x27;01&#x27;, &#x27;02&#x27;];
+    let skillDifficulties = [1, 1, 2];
+    let questionObject = sampleDataResultsObjects.questionObject;
+
+    editableQuestionBackendApiService.createQuestionAsync(
+      skillsId, skillDifficulties, questionObject, [imageData]).then(
+      successHandler, failHandler);
+    var req = httpTestingController.expectOne(
+      &#x27;/question_editor_handler/create_new&#x27;);
+    expect(req.request.method).toEqual(&#x27;POST&#x27;);
+    req.flush({ question_id: &#x27;0&#x27; });
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith({questionId: &#x27;0&#x27;});
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it(&#x27;should use the rejection handler when create question fails&#x27;,
+    fakeAsync(()=&gt; {
+      let successHandler = jasmine.createSpy(&#x27;success&#x27;);
+      let failHandler = jasmine.createSpy(&#x27;fail&#x27;);
+
+      let skillsId = [&#x27;0&#x27;, &#x27;01&#x27;, &#x27;02&#x27;];
+      let skillDifficulties = [1, 1, 2];
+      let questionObject = sampleDataResultsObjects.questionObject;
+      let imageBlob = new Blob(
+        [&#x27;data:image/png;base64,xyz&#x27;], {type: &#x27;image/png&#x27;});
+      let imageData = {
+        filename: &#x27;image.png&#x27;,
+        imageBlob: imageBlob
+      };
+
+      editableQuestionBackendApiService.createQuestionAsync(
+        skillsId, skillDifficulties, questionObject, [imageData]).then(
+        successHandler, failHandler);
+      var req = httpTestingController.expectOne(
+        &#x27;/question_editor_handler/create_new&#x27;);
+      expect(req.request.method).toEqual(&#x27;POST&#x27;);
+
+      req.flush({
+        error: &#x27;Error creating a new question.&#x27;},
+      { status: 500, statusText: &#x27;Internal Server Error&#x27;});
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(
+        &#x27;Error creating a new question.&#x27;);
+    }));
+
+  it(&#x27;should successfully fetch an existing question from the backend&#x27;,
+    fakeAsync(()=&gt; {
+      let successHandler = jasmine.createSpy(&#x27;success&#x27;);
+      let failHandler = jasmine.createSpy(&#x27;fail&#x27;);
+      editableQuestionBackendApiService.fetchQuestionAsync(&#x27;0&#x27;).then(
+        successHandler, failHandler);
+      var req = httpTestingController.expectOne(
+        &#x27;/question_editor_handler/data/0&#x27;);
+      expect(req.request.method).toEqual(&#x27;GET&#x27;);
+      req.flush({
+        question_dict: sampleDataResults.questionDict,
+        associated_skill_dicts: sampleDataResults.associated_skill_dicts
+      });
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalledWith({
+        questionObject: sampleDataResultsObjects.questionObject,
+        associated_skill_dicts: sampleDataResults.associated_skill_dicts
+      });
+      expect(failHandler).not.toHaveBeenCalled();
+    }
+    ));
+
+  it(&#x27;should use the rejection handler if the backend request failed&#x27;,
+    fakeAsync(()=&gt; {
+      let successHandler = jasmine.createSpy(&#x27;success&#x27;);
+      let failHandler = jasmine.createSpy(&#x27;fail&#x27;);
+      editableQuestionBackendApiService.fetchQuestionAsync(&#x27;1&#x27;).then(
+        successHandler, failHandler);
+      var req = httpTestingController.expectOne(
+        &#x27;/question_editor_handler/data/1&#x27;);
+      expect(req.request.method).toEqual(&#x27;GET&#x27;);
+      req.flush({
+        error: &#x27;Error loading question 1.&#x27;},
+      {status: 500, statusText: &#x27;Internal Server Error&#x27;});
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(&#x27;Error loading question 1.&#x27;);
+    }
+    ));
+
+  it(&#x27;should update a question after fetching it from the backend&#x27;,
+    fakeAsync(()=&gt; {
+      let successHandler = jasmine.createSpy(&#x27;success&#x27;);
+      let failHandler = jasmine.createSpy(&#x27;fail&#x27;);
+      let question = null;
+
+      // Loading a question the first time should fetch it from the backend.
+      editableQuestionBackendApiService.fetchQuestionAsync(&#x27;0&#x27;).then(
+        data =&gt; {
+          question = data.questionObject.toBackendDict(false);
+        });
+      var req = httpTestingController.expectOne(
+        &#x27;/question_editor_handler/data/0&#x27;);
+      expect(req.request.method).toEqual(&#x27;GET&#x27;);
+      req.flush({
+        question_dict: sampleDataResults.questionDict,
+        associated_skill_dicts: sampleDataResults.associated_skill_dicts
+      });
+      flushMicrotasks();
+
+      question.question_state_data.content.html = &#x27;New Question Content&#x27;;
+      question.version = &#x27;2&#x27;;
+      let questionWrapper = {
+        questionDict: question
+      };
+
+      // Send a request to update question.
+      editableQuestionBackendApiService.updateQuestionAsync(
+        question.id, question.version, &#x27;Question Data is updated&#x27;, []
+      ).then(successHandler, failHandler);
+      req = httpTestingController.expectOne(
+        &#x27;/question_editor_handler/data/0&#x27;);
+      expect(req.request.method).toEqual(&#x27;PUT&#x27;);
+      req.flush(questionWrapper);
+      flushMicrotasks();
+      expect(successHandler).toHaveBeenCalledWith(question);
+      expect(failHandler).not.toHaveBeenCalled();
+    }
+    ));
+
+  it(&#x27;should use the rejection handler if the question to update &#x27; +
+     &#x27;doesn\&#x27;t exist&#x27;, fakeAsync(()=&gt; {
+    let successHandler = jasmine.createSpy(&#x27;success&#x27;);
+    let failHandler = jasmine.createSpy(&#x27;fail&#x27;);
+    editableQuestionBackendApiService.updateQuestionAsync(
+      &#x27;1&#x27;, &#x27;1&#x27;, &#x27;Update an invalid question.&#x27;, []
+    ).then(successHandler, failHandler);
+
+    var req = httpTestingController.expectOne(
+      &#x27;/question_editor_handler/data/1&#x27;);
+    expect(req.request.method).toEqual(&#x27;PUT&#x27;);
+    req.flush({
+      error: &#x27;Question with given id doesn\&#x27;t exist.&#x27;},
+    {status: 404, statusText: &#x27;Not Found&#x27;});
+    flushMicrotasks();
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      &#x27;Question with given id doesn\&#x27;t exist.&#x27;);
+  }));
+
+  it(&#x27;should edit an existing question&#x27;, fakeAsync(()=&gt; {
+    let successHandler = jasmine.createSpy(&#x27;success&#x27;);
+    let failHandler = jasmine.createSpy(&#x27;fail&#x27;);
+
+    let questionId = &#x27;0&#x27;;
+    let skillIdsTaskArray = [&#x27;1&#x27;, &#x27;2&#x27;, 1];
+
+    editableQuestionBackendApiService.editQuestionSkillLinksAsync(
+      questionId, skillIdsTaskArray).then(
+      successHandler, failHandler);
+    let req = httpTestingController.expectOne(
+      &#x27;/manage_question_skill_link/&#x27; + questionId);
+    expect(req.request.method).toEqual(&#x27;PUT&#x27;);
+    req.flush({status: 200});
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it(&#x27;should use the rejection handler when editing an existing&#x27; +
+    &#x27; question fails&#x27;, fakeAsync(()=&gt; {
+    let successHandler = jasmine.createSpy(&#x27;success&#x27;);
+    let failHandler = jasmine.createSpy(&#x27;fail&#x27;);
+
+    let questionId = &#x27;0&#x27;;
+    let skillIdsTaskArray = [&#x27;1&#x27;, &#x27;2&#x27;, 1];
+
+    editableQuestionBackendApiService.editQuestionSkillLinksAsync(
+      questionId, skillIdsTaskArray).then(
+      successHandler, failHandler);
+    let req = httpTestingController.expectOne(
+      &#x27;/manage_question_skill_link/&#x27; + questionId);
+    expect(req.request.method).toEqual(&#x27;PUT&#x27;);
+    req.flush({
+      error: &#x27;Error loading question 0.&#x27;},
+    {status: 500, statusText: &#x27;Internal Server Error&#x27;});
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(&#x27;Error loading question 0.&#x27;);
+  }));
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:29,&quot;character&quot;:6,&quot;text&quot;:&quot;sampleDataResults&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:30,&quot;character&quot;:6,&quot;text&quot;:&quot;sampleDataResultsObjects&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:32,&quot;character&quot;:6,&quot;text&quot;:&quot;csrfService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:46,&quot;character&quot;:4,&quot;text&quot;:&quot;csrfService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:47,&quot;character&quot;:10,&quot;text&quot;:&quot;csrfService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:47,&quot;character&quot;:40,&quot;text&quot;:&quot;and&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:51,&quot;character&quot;:4,&quot;text&quot;:&quot;sampleDataResults&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:109,&quot;character&quot;:4,&quot;text&quot;:&quot;sampleDataResultsObjects&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:112,&quot;character&quot;:10,&quot;text&quot;:&quot;sampleDataResults&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:112,&quot;character&quot;:28,&quot;text&quot;:&quot;questionDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:133,&quot;character&quot;:8,&quot;text&quot;:&quot;questionObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:133,&quot;character&quot;:25,&quot;text&quot;:&quot;sampleDataResultsObjects&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:133,&quot;character&quot;:50,&quot;text&quot;:&quot;questionObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:140,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:155,&quot;character&quot;:10,&quot;text&quot;:&quot;questionObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:155,&quot;character&quot;:27,&quot;text&quot;:&quot;sampleDataResultsObjects&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:155,&quot;character&quot;:52,&quot;text&quot;:&quot;questionObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:168,&quot;character&quot;:17,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:188,&quot;character&quot;:17,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:190,&quot;character&quot;:8,&quot;text&quot;:&quot;question_dict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:190,&quot;character&quot;:23,&quot;text&quot;:&quot;sampleDataResults&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:190,&quot;character&quot;:41,&quot;text&quot;:&quot;questionDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:191,&quot;character&quot;:8,&quot;text&quot;:&quot;associated_skill_dicts&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:191,&quot;character&quot;:32,&quot;text&quot;:&quot;sampleDataResults&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:191,&quot;character&quot;:50,&quot;text&quot;:&quot;associated_skill_dicts&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:196,&quot;character&quot;:8,&quot;text&quot;:&quot;questionObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:196,&quot;character&quot;:24,&quot;text&quot;:&quot;sampleDataResultsObjects&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:196,&quot;character&quot;:49,&quot;text&quot;:&quot;questionObject&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:197,&quot;character&quot;:8,&quot;text&quot;:&quot;associated_skill_dicts&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:197,&quot;character&quot;:32,&quot;text&quot;:&quot;sampleDataResults&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:197,&quot;character&quot;:50,&quot;text&quot;:&quot;associated_skill_dicts&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:211,&quot;character&quot;:17,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:226,&quot;character&quot;:10,&quot;text&quot;:&quot;question&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:231,&quot;character&quot;:10,&quot;text&quot;:&quot;question&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:235,&quot;character&quot;:17,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:237,&quot;character&quot;:8,&quot;text&quot;:&quot;question_dict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:237,&quot;character&quot;:23,&quot;text&quot;:&quot;sampleDataResults&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:237,&quot;character&quot;:41,&quot;text&quot;:&quot;questionDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:238,&quot;character&quot;:8,&quot;text&quot;:&quot;associated_skill_dicts&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:238,&quot;character&quot;:32,&quot;text&quot;:&quot;sampleDataResults&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:238,&quot;character&quot;:50,&quot;text&quot;:&quot;associated_skill_dicts&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:242,&quot;character&quot;:6,&quot;text&quot;:&quot;question&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:242,&quot;character&quot;:15,&quot;text&quot;:&quot;question_state_data&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:242,&quot;character&quot;:35,&quot;text&quot;:&quot;content&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:242,&quot;character&quot;:43,&quot;text&quot;:&quot;html&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:243,&quot;character&quot;:6,&quot;text&quot;:&quot;question&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:243,&quot;character&quot;:15,&quot;text&quot;:&quot;version&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:245,&quot;character&quot;:8,&quot;text&quot;:&quot;questionDict&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:245,&quot;character&quot;:22,&quot;text&quot;:&quot;question&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:250,&quot;character&quot;:8,&quot;text&quot;:&quot;question&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:250,&quot;character&quot;:17,&quot;text&quot;:&quot;id&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:250,&quot;character&quot;:21,&quot;text&quot;:&quot;question&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:250,&quot;character&quot;:30,&quot;text&quot;:&quot;version&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:254,&quot;character&quot;:17,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:257,&quot;character&quot;:50,&quot;text&quot;:&quot;question&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:272,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:294,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2},{&quot;file&quot;:&quot;core/templates/domain/question/editable-question-backend-api.service.spec.ts&quot;,&quot;line&quot;:315,&quot;character&quot;:15,&quot;text&quot;:&quot;request&quot;,&quot;kind&quot;:2}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:57 GMT</p>
+    </body>
+  </html>
+  

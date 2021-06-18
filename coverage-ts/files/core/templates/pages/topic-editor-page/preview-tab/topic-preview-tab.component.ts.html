@@ -1,0 +1,83 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>topic-preview-tab.component.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts</td><td class="">33.33%</td><td class="">100%</td><td class="">78</td><td class="">26</td><td class="">52</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Controller for the topic preview tab.
+ */
+
+require(&#x27;components/summary-tile/subtopic-summary-tile.directive.ts&#x27;);
+require(&#x27;pages/topic-editor-page/services/topic-editor-state.service.ts&#x27;);
+require(&#x27;pages/topic-viewer-page/subtopics-list/subtopics-list.component.ts&#x27;);
+require(
+  &#x27;pages/topic-viewer-page/stories-list/&#x27; +
+    &#x27;topic-viewer-stories-list.component.ts&#x27;);
+require(&#x27;pages/topic-viewer-page/practice-tab/practice-tab.component.ts&#x27;);
+require(&#x27;domain/utilities/url-interpolation.service.ts&#x27;);
+require(
+  &#x27;components/common-layout-directives/common-elements/&#x27; +
+    &#x27;background-banner.component.ts&#x27;);
+
+angular.module(&#x27;oppia&#x27;).component(&#x27;topicPreviewTab&#x27;, {
+  template: require(&#x27;./topic-preview-tab.component.html&#x27;),
+  controllerAs: &#x27;$ctrl&#x27;,
+  controller: [&#x27;TopicEditorStateService&#x27;, &#x27;UrlInterpolationService&#x27;,
+    function(TopicEditorStateService, UrlInterpolationService) {
+      var ctrl = this;
+      var TAB_STORY = &#x27;story&#x27;;
+      var TAB_SUBTOPIC = &#x27;subtopic&#x27;;
+      var TAB_PRACTICE = &#x27;practice&#x27;;
+      ctrl.$onInit = function() {
+        ctrl.topic = TopicEditorStateService.getTopic();
+        ctrl.topicName = ctrl.topic.getName();
+        ctrl.subtopics = ctrl.topic.getSubtopics();
+        ctrl.activeTab = TAB_STORY;
+        ctrl.canonicalStorySummaries = (
+          TopicEditorStateService.getCanonicalStorySummaries());
+        ctrl.chapterCount = 0;
+        for (var idx in ctrl.canonicalStorySummaries) {
+          ctrl.chapterCount += (
+            ctrl.canonicalStorySummaries[idx].getNodeTitles().length);
+        }
+      };
+      ctrl.getStaticImageUrl = function(imagePath) {
+        return UrlInterpolationService.getStaticImageUrl(imagePath);
+      };
+      ctrl.changePreviewTab = function(tabName) {
+        switch (tabName) {
+          case TAB_STORY: ctrl.activeTab = TAB_STORY; break;
+          case TAB_SUBTOPIC: ctrl.activeTab = TAB_SUBTOPIC; break;
+          case TAB_PRACTICE: ctrl.activeTab = TAB_PRACTICE; break;
+        }
+      };
+    }
+  ]
+});
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts&quot;,&quot;line&quot;:34,&quot;character&quot;:13,&quot;text&quot;:&quot;TopicEditorStateService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts&quot;,&quot;line&quot;:34,&quot;character&quot;:38,&quot;text&quot;:&quot;UrlInterpolationService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts&quot;,&quot;line&quot;:35,&quot;character&quot;:10,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts&quot;,&quot;line&quot;:35,&quot;character&quot;:17,&quot;text&quot;:&quot;this&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts&quot;,&quot;line&quot;:39,&quot;character&quot;:6,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts&quot;,&quot;line&quot;:39,&quot;character&quot;:11,&quot;text&quot;:&quot;$onInit&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts&quot;,&quot;line&quot;:40,&quot;character&quot;:8,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts&quot;,&quot;line&quot;:40,&quot;character&quot;:13,&quot;text&quot;:&quot;topic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts&quot;,&quot;line&quot;:40,&quot;character&quot;:21,&quot;text&quot;:&quot;TopicEditorStateService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts&quot;,&quot;line&quot;:40,&quot;character&quot;:45,&quot;text&quot;:&quot;getTopic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts&quot;,&quot;line&quot;:41,&quot;character&quot;:8,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts&quot;,&quot;line&quot;:41,&quot;character&quot;:13,&quot;text&quot;:&quot;topicName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts&quot;,&quot;line&quot;:41,&quot;character&quot;:25,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts&quot;,&quot;line&quot;:41,&quot;character&quot;:30,&quot;text&quot;:&quot;topic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts&quot;,&quot;line&quot;:41,&quot;character&quot;:36,&quot;text&quot;:&quot;getName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts&quot;,&quot;line&quot;:42,&quot;character&quot;:8,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts&quot;,&quot;line&quot;:42,&quot;character&quot;:13,&quot;text&quot;:&quot;subtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts&quot;,&quot;line&quot;:42,&quot;character&quot;:25,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts&quot;,&quot;line&quot;:42,&quot;character&quot;:30,&quot;text&quot;:&quot;topic&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts&quot;,&quot;line&quot;:42,&quot;character&quot;:36,&quot;text&quot;:&quot;getSubtopics&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts&quot;,&quot;line&quot;:43,&quot;character&quot;:8,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts&quot;,&quot;line&quot;:43,&quot;character&quot;:13,&quot;text&quot;:&quot;activeTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts&quot;,&quot;line&quot;:44,&quot;character&quot;:8,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts&quot;,&quot;line&quot;:44,&quot;character&quot;:13,&quot;text&quot;:&quot;canonicalStorySummaries&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts&quot;,&quot;line&quot;:45,&quot;character&quot;:10,&quot;text&quot;:&quot;TopicEditorStateService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts&quot;,&quot;line&quot;:45,&quot;character&quot;:34,&quot;text&quot;:&quot;getCanonicalStorySummaries&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts&quot;,&quot;line&quot;:46,&quot;character&quot;:8,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts&quot;,&quot;line&quot;:46,&quot;character&quot;:13,&quot;text&quot;:&quot;chapterCount&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts&quot;,&quot;line&quot;:47,&quot;character&quot;:24,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts&quot;,&quot;line&quot;:47,&quot;character&quot;:29,&quot;text&quot;:&quot;canonicalStorySummaries&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts&quot;,&quot;line&quot;:48,&quot;character&quot;:10,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts&quot;,&quot;line&quot;:48,&quot;character&quot;:15,&quot;text&quot;:&quot;chapterCount&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts&quot;,&quot;line&quot;:49,&quot;character&quot;:12,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts&quot;,&quot;line&quot;:49,&quot;character&quot;:17,&quot;text&quot;:&quot;canonicalStorySummaries&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts&quot;,&quot;line&quot;:49,&quot;character&quot;:46,&quot;text&quot;:&quot;getNodeTitles&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts&quot;,&quot;line&quot;:49,&quot;character&quot;:62,&quot;text&quot;:&quot;length&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts&quot;,&quot;line&quot;:52,&quot;character&quot;:6,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts&quot;,&quot;line&quot;:52,&quot;character&quot;:11,&quot;text&quot;:&quot;getStaticImageUrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts&quot;,&quot;line&quot;:52,&quot;character&quot;:40,&quot;text&quot;:&quot;imagePath&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts&quot;,&quot;line&quot;:53,&quot;character&quot;:15,&quot;text&quot;:&quot;UrlInterpolationService&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts&quot;,&quot;line&quot;:53,&quot;character&quot;:39,&quot;text&quot;:&quot;getStaticImageUrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts&quot;,&quot;line&quot;:53,&quot;character&quot;:57,&quot;text&quot;:&quot;imagePath&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts&quot;,&quot;line&quot;:55,&quot;character&quot;:6,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts&quot;,&quot;line&quot;:55,&quot;character&quot;:11,&quot;text&quot;:&quot;changePreviewTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts&quot;,&quot;line&quot;:55,&quot;character&quot;:39,&quot;text&quot;:&quot;tabName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts&quot;,&quot;line&quot;:56,&quot;character&quot;:16,&quot;text&quot;:&quot;tabName&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts&quot;,&quot;line&quot;:57,&quot;character&quot;:26,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts&quot;,&quot;line&quot;:57,&quot;character&quot;:31,&quot;text&quot;:&quot;activeTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts&quot;,&quot;line&quot;:58,&quot;character&quot;:29,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts&quot;,&quot;line&quot;:58,&quot;character&quot;:34,&quot;text&quot;:&quot;activeTab&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts&quot;,&quot;line&quot;:59,&quot;character&quot;:29,&quot;text&quot;:&quot;ctrl&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts&quot;,&quot;line&quot;:59,&quot;character&quot;:34,&quot;text&quot;:&quot;activeTab&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:59 GMT</p>
+    </body>
+  </html>
+  

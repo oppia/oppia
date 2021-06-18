@@ -1,0 +1,97 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>oppia-noninteractive-tabs.component.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="negative"><td class="">extensions/rich_text_components/Tabs/directives/oppia-noninteractive-tabs.component.ts</td><td class="">98.11%</td><td class="">100%</td><td class="">53</td><td class="">52</td><td class="">1</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">// Copyright 2014 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Directive for the Tabs rich-text component.
+ *
+ * IMPORTANT NOTE: The naming convention for customization args that are passed
+ * into the directive is: the name of the parameter, followed by &#x27;With&#x27;,
+ * followed by the name of the arg.
+ *
+ * All of the RTE components follow this pattern of updateView and ngOnChanges.
+ * This is because these are also web-components (So basically, we can create
+ * this component using document.createElement). CKEditor creates instances of
+ * these on the fly and runs ngOnInit before we can set the @Input properties.
+ * When the input properties are not set, we get errors in the console.
+ * The `if` condition in update view prevents that from happening.
+ * The `if` condition in the updateView and ngOnChanges might look like the
+ * literal opposite but that&#x27;s not the case. We know from the previous
+ * statements above that the if condition in the updateView is for preventing
+ * the code to run until all the values needed for successful execution are
+ * present. The if condition in ngOnChanges is to optimize the re-runs of
+ * updateView and only re-run when a property we care about has changed in
+ * value.
+ */
+
+import { Component, Input, OnChanges, OnInit, SimpleChanges } from &#x27;@angular/core&#x27;;
+import { downgradeComponent } from &#x27;@angular/upgrade/static&#x27;;
+import { HtmlEscaperService } from &#x27;services/html-escaper.service&#x27;;
+
+export interface TabContent {
+  title: string,
+  content: string;
+}
+
+@Component({
+  selector: &#x27;oppia-noninteractive-tabs&#x27;,
+  templateUrl: &#x27;./tabs.component.html&#x27;,
+  styleUrls: []
+})
+export class NoninteractiveTabs implements OnInit, OnChanges {
+  @Input() tabContentsWithValue: string;
+  tabContents: TabContent[] = [];
+
+  constructor(private htmlEscaperService: HtmlEscaperService) {}
+
+  private _updateViewOnTabContentChange(): void {
+    if (!this.tabContentsWithValue) {
+      return;
+    }
+    this.tabContents = this.htmlEscaperService.escapedJsonToObj(
+      this.tabContentsWithValue) as TabContent[];
+  }
+
+  ngOnInit(): void {
+    this._updateViewOnTabContentChange();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.tabContentsWithValue) {
+      this._updateViewOnTabContentChange();
+    }
+  }
+}
+
+angular.module(&#x27;oppia&#x27;).directive(
+  &#x27;oppiaNoninteractiveTabs&#x27;, downgradeComponent({
+    component: NoninteractiveTabs
+  }) as angular.IDirectiveFactory);
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;extensions/rich_text_components/Tabs/directives/oppia-noninteractive-tabs.component.ts&quot;,&quot;line&quot;:60,&quot;character&quot;:23,&quot;text&quot;:&quot;this.htmlEscaperService.escapedJsonToObj(\n      this.tabContentsWithValue) as TabContent[]&quot;,&quot;kind&quot;:3}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 17 Jun 2021 20:43:54 GMT</p>
+    </body>
+  </html>
+  
