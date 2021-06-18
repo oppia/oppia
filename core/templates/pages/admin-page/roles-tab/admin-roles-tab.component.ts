@@ -21,9 +21,61 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { AdminDataService } from '../services/admin-data.service';
 import { AdminTaskManagerService } from '../services/admin-task-manager.service';
+
+interface ViewUserRolesAction {
+    filterCriterion: string;
+    role: string;
+    username: string;
+    isValid: () => boolean;
+}
+
+interface UpdateRoleAction {
+    newRole: string;
+    username: string;
+    topicId: string;
+    isValid: () => boolean;
+}
+
+interface ViewContributionReviewersAction {
+  category: string;
+  filterCriterion: string;
+  isValid: () => boolean;
+  languageCode: string;
+  username: string;
+}
+
+interface AddContributionRightsAction {
+  category: string;
+  isValid: () => boolean;
+  languageCode: string;
+  username: string;
+}
+
+interface RemoveContributionRightsAction {
+  category: string;
+  isValid: () => boolean;
+  languageCode: string;
+  method: string;
+  username: string
+}
+
+interface FormData {
+  viewUserRoles: ViewUserRolesAction;
+  updateRole: UpdateRoleAction;
+  viewContributionReviewers: ViewContributionReviewersAction;
+  addContributionReviewer: AddContributionRightsAction;
+  removeContributionReviewer: RemoveContributionRightsAction;
+}
+
+interface ContributionReviewersResult {
+  usernames: string[] | null;
+  translationLanguages: string[];
+  voiceoverLanguages: string[];
+  questions: boolean | null;
+  'can_submit_questions': boolean | null;
+}
 
 @Component({
   selector: 'oppia-admin-roles-tab',
@@ -34,12 +86,11 @@ export class AdminRolesTabComponent {
   userRolesResult = {};
   resultRolesVisible: boolean = false;
   languageCodesAndDescriptions: { id: string; description: string; }[];
-  contributionReviewersResult = {};
+  contributionReviewersResult: ContributionReviewersResult;
   contributionReviewersDataFetched: boolean = false;
-  formData;
   topicSummaries = {};
   roleToActions;
-
+  formData: FormData;
   ACTION_REMOVE_ALL_REVIEW_RIGHTS = (
     AppConstants.ACTION_REMOVE_ALL_REVIEW_RIGHTS);
   ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS = (
@@ -61,7 +112,6 @@ export class AdminRolesTabComponent {
     private adminDataService: AdminDataService,
     private adminTaskManagerService: AdminTaskManagerService,
     private languageUtilService: LanguageUtilService,
-    private urlInterpolationService: UrlInterpolationService
   ) {}
 
   ngOnInit(): void {
@@ -101,7 +151,7 @@ export class AdminRolesTabComponent {
     return languageDescriptions;
   }
 
-  isLanguageSpecificReviewCategory(reviewCategory): boolean {
+  isLanguageSpecificReviewCategory(reviewCategory: string): boolean {
     return (
       reviewCategory ===
       AppConstants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION ||
@@ -109,7 +159,7 @@ export class AdminRolesTabComponent {
       AppConstants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER);
   }
 
-  submitRoleViewForm(formResponse): void {
+  submitRoleViewForm(formResponse: ViewUserRolesAction): void {
     if (this.adminTaskManagerService.isTaskRunning()) {
       return;
     }
@@ -135,8 +185,7 @@ export class AdminRolesTabComponent {
     this.adminTaskManagerService.finishTask();
   }
 
-
-  submitUpdateRoleForm(formResponse): void {
+  submitUpdateRoleForm(formResponse: UpdateRoleAction): void {
     if (this.adminTaskManagerService.isTaskRunning()) {
       return;
     }
@@ -154,7 +203,8 @@ export class AdminRolesTabComponent {
     this.adminTaskManagerService.finishTask();
   }
 
-  submitAddContributionRightsForm(formResponse): void {
+  submitAddContributionRightsForm(
+      formResponse: AddContributionRightsAction): void {
     if (this.adminTaskManagerService.isTaskRunning()) {
       return;
     }
@@ -172,19 +222,25 @@ export class AdminRolesTabComponent {
     this.adminTaskManagerService.finishTask();
   }
 
-  submitViewContributorUsersForm(formResponse): void {
+  submitViewContributorUsersForm(
+      formResponse: ViewContributionReviewersAction): void {
     if (this.adminTaskManagerService.isTaskRunning()) {
       return;
     }
     this.setStatusMessage.emit('Processing query...');
     this.adminTaskManagerService.startTask();
-    this.contributionReviewersResult = {};
+    this.contributionReviewersResult = {
+      usernames: null,
+      translationLanguages: [],
+      voiceoverLanguages: [],
+      questions: null,
+      can_submit_questions: null
+    };
     if (formResponse.filterCriterion ===
       AppConstants.USER_FILTER_CRITERION_ROLE) {
       this.adminBackendApiService.viewContributionReviewersAsync(
         formResponse.category, formResponse.languageCode
       ).then((usersObject) => {
-        console.log(usersObject);
         this.contributionReviewersResult.usernames = (
           usersObject.usernames);
         this.contributionReviewersDataFetched = true;
@@ -202,6 +258,7 @@ export class AdminRolesTabComponent {
         voiceoverLanguages = this.getLanguageDescriptions(
           contributionRights.can_review_voiceover_for_language_codes);
         this.contributionReviewersResult = {
+          usernames: null,
           translationLanguages: translationLanguages,
           voiceoverLanguages: voiceoverLanguages,
           questions: contributionRights.can_review_questions,
@@ -215,8 +272,8 @@ export class AdminRolesTabComponent {
     this.adminTaskManagerService.finishTask();
   }
 
-
-  submitRemoveContributionRightsForm(formResponse): void {
+  submitRemoveContributionRightsForm(
+      formResponse: RemoveContributionRightsAction): void {
     if (this.adminTaskManagerService.isTaskRunning()) {
       return;
     }
@@ -231,7 +288,6 @@ export class AdminRolesTabComponent {
     }, this.handleErrorResponse.bind(this));
     this.adminTaskManagerService.finishTask();
   }
-
 
   refreshFormData(): void {
     let that = this;
@@ -334,355 +390,11 @@ export class AdminRolesTabComponent {
     this.contributionReviewersDataFetched = false;
     this.resultRolesVisible = false;
     this.userRolesResult = {};
-    this.contributionReviewersResult = {};
-  };
+    this.contributionReviewersResult = null;
+  }
 }
 
 angular.module('oppia').directive('oppiaAdminRolesTab',
   downgradeComponent({
     component: AdminRolesTabComponent
   }) as angular.IDirectiveFactory);
-
-// angular.module('oppia').directive('adminRolesTab', [
-//   '$rootScope', 'AdminBackendApiService',
-//   'AdminDataService', 'AdminTaskManagerService',
-//   'LanguageUtilService', 'UrlInterpolationService',
-//   'ACTION_REMOVE_ALL_REVIEW_RIGHTS',
-//   'ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS',
-//   'CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION',
-//   'CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION',
-//   'CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER',
-//   'CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION',
-//   'USER_FILTER_CRITERION_ROLE', 'USER_FILTER_CRITERION_USERNAME',
-//   function(
-//       $rootScope, AdminBackendApiService,
-//       AdminDataService, AdminTaskManagerService,
-//       LanguageUtilService, UrlInterpolationService,
-//       ACTION_REMOVE_ALL_REVIEW_RIGHTS,
-//       ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS,
-//       CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
-//       CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
-//       CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
-//       CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION,
-//       USER_FILTER_CRITERION_ROLE, USER_FILTER_CRITERION_USERNAME,) {
-//     return {
-//       restrict: 'E',
-//       scope: {},
-//       bindToController: {
-//         setStatusMessage: '='
-//       },
-//       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-//         '/pages/admin-page/roles-tab/admin-roles-tab.directive.html'),
-//       controllerAs: '$ctrl',
-//       controller: [function() {
-//         var ctrl = this;
-
-//         var handleErrorResponse = function(errorResponse) {
-//           ctrl.setStatusMessage(
-//             'Server error: ' + errorResponse);
-//           // TODO(#8521): Remove the use of $rootScope.$apply()
-//           // once the directive is migrated to angular.
-//           $rootScope.$apply();
-//         };
-
-//         var getLanguageDescriptions = function(languageCodes) {
-//           var languageDescriptions = [];
-//           languageCodes.forEach(function(languageCode) {
-//             languageDescriptions.push(
-//               LanguageUtilService.getAudioLanguageDescription(
-//                 languageCode));
-//           });
-//           return languageDescriptions;
-//         };
-
-//         ctrl.isLanguageSpecificReviewCategory = function(reviewCategory) {
-//           return (
-//             reviewCategory === CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION ||
-//             reviewCategory === CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER);
-//         };
-
-//         ctrl.submitRoleViewForm = function(formResponse) {
-//           if (AdminTaskManagerService.isTaskRunning()) {
-//             return;
-//           }
-
-//           ctrl.setStatusMessage('Processing query...');
-
-//           AdminTaskManagerService.startTask();
-//           ctrl.userRolesResult = {};
-//           AdminBackendApiService.viewUsersRoleAsync(
-//             formResponse.filterCriterion, formResponse.role,
-//             formResponse.username
-//           ).then((userRoles) => {
-//             ctrl.userRolesResult = userRoles;
-//             if (Object.keys(ctrl.userRolesResult).length === 0) {
-//               ctrl.resultRolesVisible = false;
-//               ctrl.setStatusMessage('No results.');
-//             } else {
-//               ctrl.resultRolesVisible = true;
-//               ctrl.setStatusMessage('Success.');
-//             }
-//             // TODO(#8521): Remove the use of $rootScope.$apply()
-//             // once the directive is migrated to angular.
-//             $rootScope.$apply();
-//             refreshFormData();
-//           }, handleErrorResponse);
-//           AdminTaskManagerService.finishTask();
-//         };
-
-//         ctrl.submitUpdateRoleForm = function(formResponse) {
-//           if (AdminTaskManagerService.isTaskRunning()) {
-//             return;
-//           }
-//           ctrl.setStatusMessage('Updating User Role');
-//           AdminTaskManagerService.startTask();
-//           AdminBackendApiService.updateUserRoleAsync(
-//             formResponse.newRole, formResponse.username,
-//             formResponse.topicId
-//           ).then(() => {
-//             ctrl.setStatusMessage(
-//               'Role of ' + formResponse.username + ' successfully updated to ' +
-//               formResponse.newRole);
-//             refreshFormData();
-//             // TODO(#8521): Remove the use of $rootScope.$apply()
-//             // once the directive is migrated to angular.
-//             $rootScope.$apply();
-//           }, handleErrorResponse);
-//           AdminTaskManagerService.finishTask();
-//         };
-
-//         ctrl.submitAddContributionRightsForm = function(formResponse) {
-//           if (AdminTaskManagerService.isTaskRunning()) {
-//             return;
-//           }
-//           ctrl.setStatusMessage('Adding new reviewer...');
-//           AdminTaskManagerService.startTask();
-//           AdminBackendApiService.addContributionReviewerAsync(
-//             formResponse.category, formResponse.username,
-//             formResponse.languageCode
-//           ).then(() => {
-//             ctrl.setStatusMessage(
-//               'Successfully added "' + formResponse.username + '" as ' +
-//               formResponse.category + ' reviewer.');
-//             refreshFormData();
-//             // TODO(#8521): Remove the use of $rootScope.$apply()
-//             // once the directive is migrated to angular.
-//             $rootScope.$apply();
-//           }, handleErrorResponse);
-//           AdminTaskManagerService.finishTask();
-//         };
-
-//         ctrl.submitViewContributorUsersForm = function(formResponse) {
-//           if (AdminTaskManagerService.isTaskRunning()) {
-//             return;
-//           }
-//           ctrl.setStatusMessage('Processing query...');
-//           AdminTaskManagerService.startTask();
-//           ctrl.contributionReviewersResult = {};
-//           if (formResponse.filterCriterion === USER_FILTER_CRITERION_ROLE) {
-//             AdminBackendApiService.viewContributionReviewersAsync(
-//               formResponse.category, formResponse.languageCode
-//             ).then((usersObject) => {
-//               ctrl.contributionReviewersResult.usernames = (
-//                 usersObject.usernames);
-//               ctrl.contributionReviewersDataFetched = true;
-//               ctrl.setStatusMessage('Success.');
-//               refreshFormData();
-//               // TODO(#8521): Remove the use of $rootScope.$apply()
-//               // once the directive is migrated to angular.
-//               $rootScope.$apply();
-//             }, handleErrorResponse);
-//           } else {
-//             var translationLanguages = [];
-//             var voiceoverLanguages = [];
-//             AdminBackendApiService.contributionReviewerRightsAsync(
-//               formResponse.username
-//             ).then((contributionRights) => {
-//               translationLanguages = getLanguageDescriptions(
-//                 contributionRights.can_review_translation_for_language_codes);
-//               voiceoverLanguages = getLanguageDescriptions(
-//                 contributionRights.can_review_voiceover_for_language_codes);
-//               ctrl.contributionReviewersResult = {
-//                 translationLanguages: translationLanguages,
-//                 voiceoverLanguages: voiceoverLanguages,
-//                 questions: contributionRights.can_review_questions,
-//                 can_submit_questions: contributionRights.can_submit_questions
-//               };
-//               ctrl.contributionReviewersDataFetched = true;
-//               ctrl.setStatusMessage('Success.');
-//               // TODO(#8521): Remove the use of $rootScope.$apply()
-//               // once the directive is migrated to angular.
-//               $rootScope.$apply();
-//               refreshFormData();
-//             }, handleErrorResponse);
-//           }
-//           AdminTaskManagerService.finishTask();
-//         };
-
-//         ctrl.submitRemoveContributionRightsForm = function(formResponse) {
-//           if (AdminTaskManagerService.isTaskRunning()) {
-//             return;
-//           }
-//           ctrl.setStatusMessage('Processing query...');
-//           AdminTaskManagerService.startTask();
-//           AdminBackendApiService.removeContributionReviewerAsync(
-//             formResponse.username, formResponse.method,
-//             formResponse.category, formResponse.languageCode
-//           ).then(() => {
-//             ctrl.setStatusMessage('Success.');
-//             refreshFormData();
-//             // TODO(#8521): Remove the use of $rootScope.$apply()
-//             // once the directive is migrated to angular.
-//             $rootScope.$apply();
-//           }, handleErrorResponse);
-//           AdminTaskManagerService.finishTask();
-//         };
-
-//         var refreshFormData = function() {
-//           ctrl.formData = {
-//             viewUserRoles: {
-//               filterCriterion: USER_FILTER_CRITERION_ROLE,
-//               role: null,
-//               username: '',
-//               isValid: function() {
-//                 if (this.filterCriterion === USER_FILTER_CRITERION_ROLE) {
-//                   return Boolean(this.role);
-//                 }
-//                 if (this.filterCriterion === USER_FILTER_CRITERION_USERNAME) {
-//                   return Boolean(this.username);
-//                 }
-//                 return false;
-//               }
-//             },
-//             updateRole: {
-//               newRole: null,
-//               username: '',
-//               topicId: null,
-//               isValid: function() {
-//                 if (this.newRole === 'TOPIC_MANAGER') {
-//                   return Boolean(this.topicId);
-//                 } else if (this.newRole) {
-//                   return Boolean(this.username);
-//                 }
-//                 return false;
-//               }
-//             },
-//             viewContributionReviewers: {
-//               filterCriterion: USER_FILTER_CRITERION_ROLE,
-//               username: '',
-//               category: null,
-//               languageCode: null,
-//               isValid: function() {
-//                 if (this.filterCriterion === USER_FILTER_CRITERION_ROLE) {
-//                   if (this.category === null) {
-//                     return false;
-//                   }
-//                   if (ctrl.isLanguageSpecificReviewCategory(this.category)) {
-//                     return Boolean(this.languageCode);
-//                   }
-//                   return true;
-//                 }
-
-//                 if (this.filterCriterion === USER_FILTER_CRITERION_USERNAME) {
-//                   return Boolean(this.username);
-//                 }
-//               }
-//             },
-//             addContributionReviewer: {
-//               username: '',
-//               category: null,
-//               languageCode: null,
-//               isValid: function() {
-//                 if (this.username === '') {
-//                   return false;
-//                 }
-//                 if (this.category === null) {
-//                   return false;
-//                 }
-//                 if (ctrl.isLanguageSpecificReviewCategory(this.category)) {
-//                   return Boolean(this.languageCode);
-//                 }
-//                 return true;
-//               }
-//             },
-//             removeContributionReviewer: {
-//               username: '',
-//               method: ACTION_REMOVE_ALL_REVIEW_RIGHTS,
-//               category: null,
-//               languageCode: null,
-//               isValid: function() {
-//                 if (this.username === '') {
-//                   return false;
-//                 }
-//                 if (this.method === ACTION_REMOVE_ALL_REVIEW_RIGHTS) {
-//                   return Boolean(this.username);
-//                 } else {
-//                   if (this.category === null) {
-//                     return false;
-//                   }
-//                   if (ctrl.isLanguageSpecificReviewCategory(this.category)) {
-//                     return Boolean(this.languageCode);
-//                   }
-//                   return true;
-//                 }
-//               }
-//             }
-//           };
-//         };
-
-//         ctrl.$onInit = function() {
-//           ctrl.ACTION_REMOVE_ALL_REVIEW_RIGHTS = (
-//             ACTION_REMOVE_ALL_REVIEW_RIGHTS);
-//           ctrl.ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS = (
-//             ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS);
-//           ctrl.USER_FILTER_CRITERION_USERNAME = USER_FILTER_CRITERION_USERNAME;
-//           ctrl.USER_FILTER_CRITERION_ROLE = USER_FILTER_CRITERION_ROLE;
-//           ctrl.UPDATABLE_ROLES = {};
-//           ctrl.VIEWABLE_ROLES = {};
-//           ctrl.CONTRIBUTION_RIGHT_CATEGORIES = {
-//             REVIEW_TRANSLATION: CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
-//             REVIEW_VOICEOVER: CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
-//             REVIEW_QUESTION: CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
-//             SUBMIT_QUESTION: CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION
-//           };
-//           refreshFormData();
-//           ctrl.resultRolesVisible = false;
-//           ctrl.contributionReviewersDataFetched = false;
-//           ctrl.userRolesResult = {};
-//           ctrl.contributionReviewersResult = {};
-//           ctrl.setStatusMessage('');
-
-//           ctrl.languageCodesAndDescriptions = (
-//             LanguageUtilService.getAllVoiceoverLanguageCodes().map(
-//               function(languageCode) {
-//                 return {
-//                   id: languageCode,
-//                   description: (
-//                     LanguageUtilService.getAudioLanguageDescription(
-//                       languageCode))
-//                 };
-//               }));
-//           ctrl.topicSummaries = {};
-//           ctrl.roleToActions = null;
-//           AdminDataService.getDataAsync().then(function(adminDataObject) {
-//             ctrl.UPDATABLE_ROLES = adminDataObject.updatableRoles;
-//             ctrl.VIEWABLE_ROLES = adminDataObject.viewableRoles;
-//             ctrl.topicSummaries = adminDataObject.topicSummaries;
-//             ctrl.roleToActions = adminDataObject.roleToActions;
-
-//             // TODO(#8521): Remove the use of $rootScope.$apply()
-//             // once the directive is migrated to angular.
-//             $rootScope.$apply();
-//           });
-//         };
-
-//         ctrl.clearResults = function() {
-//           ctrl.contributionReviewersDataFetched = false;
-//           ctrl.resultRolesVisible = false;
-//           ctrl.userRolesResult = {};
-//           ctrl.contributionReviewersResult = {};
-//         };
-//       }]
-//     };
-//   }
-// ]);
