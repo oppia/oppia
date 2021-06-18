@@ -61,7 +61,7 @@ interface LearnerDashboardDataBackendDict {
   'completed_stories_list': StorySummaryBackendDict[];
   'learnt_topics_list': LearnerTopicSummaryBackendDict[];
   'partially_learnt_topics_list': LearnerTopicSummaryBackendDict[];
-  'topics_to_learn': LearnerTopicSummaryBackendDict[]
+  'topics_to_learn': LearnerTopicSummaryBackendDict[];
   'number_of_unread_threads': number;
   'thread_summaries': FeedbackThreadSummaryBackendDict[];
   'completed_to_incomplete_collections': string[];

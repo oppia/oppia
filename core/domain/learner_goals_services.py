@@ -139,5 +139,4 @@ def get_all_topic_ids_to_learn(user_id):
             learner_goals_model)
 
         return learner_goals.topic_ids_to_learn
-    else:
-        return []
+    return []

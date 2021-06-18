@@ -1405,7 +1405,6 @@ def _get_filtered_topics_to_learn_summaries(
                     set(completed_story_ids))):
                 learner_goals_services.remove_topic_from_learn(
                     user_id, topic_id)
-                mark_topic_as_learnt(user_id, topic_id)
             elif not topic_rights.topic_is_published:
                 nonexistent_topic_ids_to_learn.append(topic_ids[index])
             else:
