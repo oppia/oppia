@@ -1637,6 +1637,19 @@ class WrittenTranslations(python_utils.OBJECT):
         self.translations_mapping[content_id][language_code] = (
             written_translation)
 
+    def mark_written_translations_as_needing_update(self, content_id):
+        """Marks translation as needing update for the given content id in all
+        languages.
+
+        Args:
+            content_id: str. The id of the content.
+        """
+        for (language_code, written_translation) in (
+                self.translations_mapping[content_id].items()):
+            written_translation.needs_update = True
+            self.translations_mapping[content_id][language_code] = (
+                written_translation)
+
     def validate(self, expected_content_id_list):
         """Validates properties of the WrittenTranslations.
 
@@ -2710,6 +2723,31 @@ class State(python_utils.OBJECT):
         translation_html = html_cleaner.clean(translation_html)
         self.written_translations.add_translation(
             content_id, language_code, translation_html)
+
+    def add_written_translation(
+            self, content_id, language_code, translation, data_format):
+        """Adds a translation for the given content id in a given language.
+
+        Args:
+            content_id: str. The id of the content.
+            language_code: str. The language code of the translated html.
+            translation: str. The translated content.
+            data_format: str. The data format of the translated content.
+        """
+        written_translation = WrittenTranslation(
+            data_format, translation, False)
+        self.written_translations.translations_mapping[content_id][
+            language_code] = written_translation
+
+    def mark_written_translations_as_needing_update(self, content_id):
+        """Marks translation as needing update for the given content id in all
+        languages.
+
+        Args:
+            content_id: str. The id of the content.
+        """
+        self.written_translations.mark_written_translations_as_needing_update(
+            content_id)
 
     def update_content(self, content):
         """Update the content of this state.

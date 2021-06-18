@@ -45,7 +45,7 @@ class MockGuppy {
 }
 
 class MockComponent {
-  guppyConfigService: GuppyConfigurationService = null;
+  guppyConfigService: GuppyConfigurationService;
   constructor(guppyConfigService: GuppyConfigurationService) {
     this.guppyConfigService = guppyConfigService;
   }
@@ -67,7 +67,7 @@ class MockComponentB implements OnInit {
   }
 }
 
-let guppyConfigurationService: GuppyConfigurationService = null;
+let guppyConfigurationService: GuppyConfigurationService;
 
 describe('GuppyConfigurationService', () => {
   beforeAll(() => {
