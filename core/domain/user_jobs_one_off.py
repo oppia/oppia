@@ -235,7 +235,7 @@ class PopulateStoriesAndTopicsOneOffJob(
                     learner_progress_services.record_topic_started(
                         user_id, topic.id)
 
-        yield (user_id, 1)
+        yield ('SUCCESS', 1)
 
     @staticmethod
     def reduce(key, values):

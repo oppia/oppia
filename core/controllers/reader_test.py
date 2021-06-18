@@ -1368,7 +1368,6 @@ class LearnerProgressTest(test_utils.GenericTestBase):
 
         # If the exploration is played in context of an invalid story, raise
         # an error.
-
         def _mock_none_function(_):
             """Mocks None."""
             return None
@@ -1379,7 +1378,8 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         with story_fetchers_swap:
             with self.capture_logging(min_level=logging.ERROR) as captured_logs:
                 self.post_json(
-                    '/explorehandler/exploration_maybe_leave_event/%s' % self.EXP_ID_2_0, # pylint: disable=line-too-long
+                    '/explorehandler/exploration_maybe_leave_event'
+                    '/%s' % self.EXP_ID_2_0,
                     payload, csrf_token=csrf_token)
                 self.assertEqual(
                     captured_logs,
