@@ -308,9 +308,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                             if angularjs_constants_value.property:
                                 angularjs_constants_value = (
                                     angularjs_constants_value.property.name)
-                            else:
-                                angularjs_constants_value = (
-                                    angularjs_constants_value.name)
                             if angularjs_constants_value != (
                                     angularjs_constants_name):
                                 failed = True
