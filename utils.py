@@ -1058,7 +1058,8 @@ def compress_to_zlib(data):
         str. Compressed data string.
     """
     # Ignoring arg-type because we are preventing direct usage of 'str' for
-    # Python3 compatibilty.
+    # Python3 compatibilty. For details, refer to:
+    # https://github.com/oppia/oppia/wiki/Backend-Type-Annotations#1-use-typingtext-instead-of-str-and-unicode
     return zlib.compress(data) # type: ignore[arg-type]
 
 
