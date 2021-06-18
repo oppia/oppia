@@ -61,10 +61,6 @@ interface ListSchema {
   items: Schema | Schema[] | string;
 }
 
-interface InvalidSchema {
-  type: 'invalid';
-}
-
 export interface DictSchema {
   type: 'dict';
   properties: {
@@ -86,8 +82,7 @@ export type Schema = (
   FloatSchema |
   ListSchema |
   DictSchema |
-  CustomSchema |
-  InvalidSchema
+  CustomSchema
 );
 
 interface DictSchemaDefaultValue {
@@ -160,10 +155,7 @@ export class SchemaDefaultValueService {
         schema.type === SchemaConstants.SCHEMA_TYPE_FLOAT) {
       return 0;
     } else {
-      if (schema.type === 'invalid') {
-        this.logger.error('Invalid schema: ' + JSON.stringify(schema));
-      }
-      throw new Error('Invalid Schema');
+      this.logger.error('Invalid schema: ' + JSON.stringify(schema));
     }
   }
 }

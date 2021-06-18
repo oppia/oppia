@@ -19,11 +19,9 @@
 import { TestBed } from '@angular/core/testing';
 
 import { LoggerService } from 'services/contextual/logger.service';
-import { Schema, SchemaDefaultValueService } from
-  'services/schema-default-value.service';
+import { Schema, SchemaDefaultValueService } from 'services/schema-default-value.service';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
-import { SubtitledUnicode } from
-  'domain/exploration/SubtitledUnicodeObjectFactory';
+import { SubtitledUnicode } from 'domain/exploration/SubtitledUnicodeObjectFactory';
 
 describe('Schema Default Value Service', () => {
   let sdvs: SchemaDefaultValueService;
@@ -141,11 +139,9 @@ describe('Schema Default Value Service', () => {
     var loggerErrorSpy = spyOn(ls, 'error').and.callThrough();
     const schema = {
       type: 'invalid'
-    } as Schema;
+    } as unknown as Schema;
 
-    expect(() => {
-      sdvs.getDefaultValue(schema);
-    }).toThrowError('Invalid Schema');
+    expect(sdvs.getDefaultValue(schema)).toBeUndefined();
     expect(loggerErrorSpy).toHaveBeenCalledWith(
       'Invalid schema: ' + JSON.stringify(schema));
   });
