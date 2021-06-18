@@ -225,6 +225,7 @@ var ExplorationEditorPage = function() {
     }
     await action.click('Save draft button', saveDraftButton);
     //TODO(#13096): Remove browser.sleep from e2e tests once Angular migration finishes.
+<<<<<<< HEAD
     await browser.sleep(2500);
     await waitFor.textToBePresentInElement(
       saveDraftMessageButton, 'Save Draft',
@@ -244,6 +245,17 @@ var ExplorationEditorPage = function() {
     await waitFor.textToBePresentInElement(
       publishChangesMessageButton, 'Publish Changes',
       'Changes could not be saved');
+=======
+    browser.sleep(2500);
+    await waitFor.visibilityOf(
+      toastSuccessElement,
+      'Toast message is taking too long to appear after saving changes');
+    // This is necessary to give the page time to record the changes,
+    // so that it does not attempt to stop the user leaving.
+    await waitFor.invisibilityOf(
+      toastSuccessElement,
+      'Toast message is taking too long to disappear after saving changes');
+>>>>>>> 33df23c60237c5fd5432c831e0c0527ce0d25494
   };
 
   this.discardChanges = async function() {
