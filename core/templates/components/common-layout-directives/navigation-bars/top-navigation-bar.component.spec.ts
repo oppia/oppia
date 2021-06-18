@@ -16,19 +16,17 @@
  * @fileoverview Unit tests for TopNavigationBarComponent.
  */
 
+import { of } from 'rxjs';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { AppConstants } from 'app.constants';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { of } from 'rxjs';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { NavigationService } from 'services/navigation.service';
 import { SearchService } from 'services/search.service';
-import { SidebarStatusService } from 'services/sidebar-status.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UserService } from 'services/user.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
@@ -63,7 +61,7 @@ class MockWindowRef {
   }
 }
 
-fdescribe('TopNavigationBarComponent', () => {
+describe('TopNavigationBarComponent', () => {
   let fixture: ComponentFixture<TopNavigationBarComponent>;
   let component: TopNavigationBarComponent;
   let windowRef: MockWindowRef;
@@ -74,7 +72,6 @@ fdescribe('TopNavigationBarComponent', () => {
   let siteAnalyticsService: SiteAnalyticsService;
   let navigationService: NavigationService;
   let deviceInfoService: DeviceInfoService;
-  let sidebarStatusService: SidebarStatusService;
 
   let mockOnSearchBarLoadedEventEmitter = new EventEmitter();
   let resizeEvent = new Event('resize');
@@ -139,7 +136,6 @@ fdescribe('TopNavigationBarComponent', () => {
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     navigationService = TestBed.inject(NavigationService);
     deviceInfoService = TestBed.inject(DeviceInfoService);
-    sidebarStatusService = TestBed.inject(SidebarStatusService);
 
     spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo);
     spyOnProperty(searchService, 'onSearchBarLoaded').and.returnValue(
@@ -164,7 +160,8 @@ fdescribe('TopNavigationBarComponent', () => {
     tick();
 
     expect(component.currentUrl).toBe('learn');
-    expect(component.labelForClearingFocus).toBe(AppConstants.LABEL_FOR_CLEARING_FOCUS);
+    expect(component.labelForClearingFocus)
+      .toBe(AppConstants.LABEL_FOR_CLEARING_FOCUS);
     expect(component.logoutUrl).toBe(AppConstants.LOGOUT_URL);
     expect(component.userMenuIsShown).toBe(true);
     expect(component.inClassroomPage).toBe(true);
@@ -224,12 +221,13 @@ fdescribe('TopNavigationBarComponent', () => {
 
   it('should try displaying the hidden navbar elements if resized' +
     ' window is larger', () => {
+    let donateElement = 'I18N_TOPNAV_DONATE';
     spyOn(wds, 'getWidth').and.returnValue(700);
     component.currentWindowWidth = 600;
 
     component.ngOnInit();
 
-    component.navElementsVisibilityStatus['I18N_TOPNAV_DONATE'] = false;
+    component.navElementsVisibilityStatus[donateElement] = false;
 
     component.ngOnDestroy();
   });
@@ -382,22 +380,23 @@ fdescribe('TopNavigationBarComponent', () => {
 
   it('should check if i18n has been run', () => {
     spyOn(document, 'querySelectorAll')
-    .withArgs('.oppia-navbar-tab-content').and.returnValues(
-    [
-      {
-        // This throws "Type '{ innerText: string; }' is not assignable to type
-        // 'Element'.". We need to suppress this error because, if i18n has not
-        // run, then the tabs will not have text content and so their
-        // innerText.length value will be 0.
-        //@ts-expect-error
-        innerText: ''
-      }
-    ],
-    [
-      {
-        innerText: 'About'
-      }
-    ]);
+      .withArgs('.oppia-navbar-tab-content').and.returnValues(
+        [
+          {
+            // This throws "Type '{ innerText: string; }' is not assignable to
+            // type 'Element'.". We need to suppress this error because if i18n
+            // has not run, then the tabs will not have text content and so
+            // their innerText.length value will be 0.
+            // @ts-expect-error
+            innerText: ''
+          }
+        ],
+        [
+          {
+            innerText: 'About'
+          }
+        ]
+      );
 
     expect(component.checkIfI18NCompleted()).toBe(false);
     expect(component.checkIfI18NCompleted()).toBe(true);
@@ -420,6 +419,7 @@ fdescribe('TopNavigationBarComponent', () => {
   });
 
   it('should hide navbar if it\'s height more than 60px', () => {
+    let donateElement = 'I18N_TOPNAV_DONATE';
     spyOn(wds, 'isWindowNarrow').and.returnValue(false);
     spyOn(document, 'querySelector')
     // This throws "Type '{ clientWidth: number; }' is missing the following
@@ -429,20 +429,20 @@ fdescribe('TopNavigationBarComponent', () => {
     // (clientWidth). We need only one 'clientWidth' for
     // testing purposes.
     // @ts-expect-error
-    .withArgs('div.collapse.navbar-collapse').and.returnValue({
-      clientHeight: 61
-    });
+      .withArgs('div.collapse.navbar-collapse').and.returnValue({
+        clientHeight: 61
+      });
 
     component.ngOnInit();
 
     // The first element is hidden and then truncate navbar is called again, to
     // hide the next element if necessary.
-    expect(component.navElementsVisibilityStatus['I18N_TOPNAV_DONATE'])
+    expect(component.navElementsVisibilityStatus[donateElement])
       .toBe(true);
 
     component.truncateNavbar();
 
-    expect(component.navElementsVisibilityStatus['I18N_TOPNAV_DONATE'])
+    expect(component.navElementsVisibilityStatus[donateElement])
       .toBe(false);
   });
 });
