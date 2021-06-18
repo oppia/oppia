@@ -22,11 +22,13 @@ import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from './window-ref.service';
 
 describe('Url Service', () => {
-  let urlService: UrlService = null;
-  let windowRef: WindowRef = null;
+  let urlService: UrlService;
+  let windowRef: WindowRef;
   let sampleHash = 'sampleHash';
   let pathname = '/embed';
-  let mockLocation = null;
+  // Check https://www.typescriptlang.org/docs/handbook/utility-types.html#picktype-keys
+  let mockLocation:
+    Pick<Location, 'href' | 'origin' | 'pathname' | 'hash' | 'search'>;
   let origin = 'http://sample.com';
 
   beforeEach(() => {
