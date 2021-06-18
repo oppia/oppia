@@ -71,6 +71,7 @@ describe('Upload Activity Modal Component', () => {
       name: 'file.mp3'
     };
     // TODO(#10113): Refactor the code to not use the DOM methods.
+
     // This throws "Argument of type '() => { files: { size: number;
     // name: string; }[]; }' is not assignable to parameter of type
     // '(elementId: string) => HTMLElement'.". This is because the
@@ -93,6 +94,7 @@ describe('Upload Activity Modal Component', () => {
     const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
     spyOn(alertsService, 'addWarning').and.callThrough();
     // TODO(#10113): Refactor the code to not use the DOM methods.
+
     // This throws "Argument of type '() => { files: { size: number;
     // name: string; }[]; }' is not assignable to parameter of type
     // '(elementId: string) => HTMLElement'.". This is because the
