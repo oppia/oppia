@@ -80,6 +80,8 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.ExpSnapshotsDeletionJob,
     feedback_jobs_one_off.FeedbackThreadCacheOneOffJob,
     feedback_jobs_one_off.CleanUpFeedbackAnalyticsModelModelOneOffJob,
+    feedback_jobs_one_off.TextMessageLengthAuditOneOffJob,
+    feedback_jobs_one_off.TrimTextMessageLengthOneOffJob,
     feedback_jobs_one_off.CleanUpGeneralFeedbackThreadModelOneOffJob,
     (
         interaction_jobs_one_off
@@ -164,6 +166,9 @@ AUDIT_JOB_MANAGERS = [
     prod_validation_jobs_one_off.AppFeedbackReportStatsModelAuditOneOffJob,
     prod_validation_jobs_one_off.BeamJobRunModelAuditOneOffJob,
     prod_validation_jobs_one_off.BeamJobRunResultModelAuditOneOffJob,
+    prod_validation_jobs_one_off.BlogPostModelAuditOneOffJob,
+    prod_validation_jobs_one_off.BlogPostSummaryModelAuditOneOffJob,
+    prod_validation_jobs_one_off.BlogPostRightsModelAuditOneOffJob,
     prod_validation_jobs_one_off.BulkEmailModelAuditOneOffJob,
     prod_validation_jobs_one_off.ClassifierTrainingJobModelAuditOneOffJob,
     prod_validation_jobs_one_off.CollectionCommitLogEntryModelAuditOneOffJob,
