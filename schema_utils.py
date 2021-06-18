@@ -213,13 +213,8 @@ def normalize_against_schema(
                 'Expected unicode, received %s' % obj)
         normalized_obj = obj
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_OBJECT_DICT:
-        from core.controllers import domain_objects_validator
-        validate_method_name = schema[SCHEMA_KEY_VALIDATE_METHOD]
-        validate_method = domain_objects_validator.map_to_validate_method(
-            validate_method_name)
-
-        domain_object = domain_objects_validator.DomainObjectsValidationClass()
-        validate_method(domain_object, obj)
+        validate_method = schema[SCHEMA_KEY_VALIDATE_METHOD]
+        validate_method(obj)
         normalized_obj = obj
     else:
         raise Exception('Invalid schema type: %s' % schema[SCHEMA_KEY_TYPE])
