@@ -218,8 +218,11 @@ def get_blog_post_summary_by_title(title):
         BlogPostSummary or None. The domain object representing a blog post
         summary with the given title, or None if it does not exist.
     """
+
     blog_post_summary_model = (
-        blog_models.BlogPostSummaryModel.get_blog_post_summary_by_title(title))
+        blog_models.BlogPostSummaryModel.query().filter(
+            blog_models.BlogPostSummaryModel.title == (title)).filter(
+                blog_models.BlogPostSummaryModel.deleted == False).fetch()) # pylint: disable=singleton-comparison
     if blog_post_summary_model is None:
         return None
 
