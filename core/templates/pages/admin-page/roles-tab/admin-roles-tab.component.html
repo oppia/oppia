@@ -204,14 +204,16 @@
                     <span *ngIf="contributionReviewersResult.translationLanguages.length === 0"><i>None</i></span>
                     <span *ngFor="let language of contributionReviewersResult.translationLanguages; index as idx"
                           class="protractor-test-translation-reviewer-language">
-                      {{ language }}{{ idx === contributionReviewersResult.translationLanguages.length ? '' : ', ' }}
+                      <!-- {{ language }}{{ idx === contributionReviewersResult.translationLanguages.length ? '' : ', ' }} -->
+                      {{ language + ', ' }}
                     </span>
                   </td>
                   <td>
                     <span *ngIf="contributionReviewersResult.voiceoverLanguages.length === 0"><i>None</i></span>
                     <span *ngFor="let language of contributionReviewersResult.voiceoverLanguages; index as idx"
                           class="protractor-test-voiceover-reviewer-language">
-                      {{ language }}{{ idx === contributionReviewersResult.voiceoverLanguages.length ? '' : ', ' }}
+                          {{ idx }}
+                      {{ language + ', ' }}
                     </span>
                   </td>
                   <td>
@@ -256,7 +258,7 @@
                       class="form-control protractor-test-form-contribution-rights-category-select"
                       [(ngModel)]="formData.addContributionReviewer.category"
                       [ngModelOptions]="{standalone: true}">
-                <option *ngFor="let category of CONTRIBUTION_RIGHT_CATEGORIES | keyvalue" [value]="category.key">{{ category.value }}</option>
+                <option *ngFor="let category of CONTRIBUTION_RIGHT_CATEGORIES | keyvalue" [value]="category.value">{{ category.key }}</option>
               </select>
             </div>
           </div>
@@ -317,7 +319,7 @@
                       [(ngModel)]="formData.removeContributionReviewer.category"
                       [ngModelOptions]="{standalone: true}"
                       class="form-control">
-                <option *ngFor="let category of CONTRIBUTION_RIGHT_CATEGORIES | keyvalue" [value]="category.key">{{ category.value }}</option>
+                <option *ngFor="let category of CONTRIBUTION_RIGHT_CATEGORIES | keyvalue" [value]="category.value">{{ category.key }}</option>
               </select>
             </div>
           </div>

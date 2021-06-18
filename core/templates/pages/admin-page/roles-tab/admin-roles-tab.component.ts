@@ -36,23 +36,25 @@ export class AdminRolesTabComponent {
   languageCodesAndDescriptions: { id: string; description: string; }[];
   contributionReviewersResult = {};
   contributionReviewersDataFetched: boolean = false;
-  formData: { viewUserRoles: { filterCriterion: any; role: any; username: string; isValid: () => boolean; }; updateRole: { newRole: any; username: string; topicId: any; isValid: () => boolean; }; viewContributionReviewers: { ...; }; addContributionReviewer: { ...; }; removeContributionReviewer: { ...; }; };
+  formData;
   topicSummaries = {};
   roleToActions;
 
-  ACTION_REMOVE_ALL_REVIEW_RIGHTS = AppConstants.ACTION_REMOVE_ALL_REVIEW_RIGHTS;
-  ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS = AppConstants.ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS;
+  ACTION_REMOVE_ALL_REVIEW_RIGHTS = (
+    AppConstants.ACTION_REMOVE_ALL_REVIEW_RIGHTS);
+  ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS = (
+    AppConstants.ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS);
   USER_FILTER_CRITERION_USERNAME = AppConstants.USER_FILTER_CRITERION_USERNAME;
   USER_FILTER_CRITERION_ROLE = AppConstants.USER_FILTER_CRITERION_ROLE;
   UPDATABLE_ROLES = {};
   VIEWABLE_ROLES = {};
   CONTRIBUTION_RIGHT_CATEGORIES = {
-    REVIEW_TRANSLATION: AppConstants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+    REVIEW_TRANSLATION: (
+      AppConstants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION),
     REVIEW_VOICEOVER: AppConstants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
     REVIEW_QUESTION: AppConstants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
     SUBMIT_QUESTION: AppConstants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION
   };
-
 
   constructor(
     private adminBackendApiService: AdminBackendApiService,
@@ -62,9 +64,7 @@ export class AdminRolesTabComponent {
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
-
   ngOnInit(): void {
-    console.log('ngOnInit');
     this.refreshFormData();
     this.setStatusMessage.emit('');
 
@@ -80,7 +80,6 @@ export class AdminRolesTabComponent {
         }));
 
     this.adminDataService.getDataAsync().then((adminDataObject) => {
-      console.log(adminDataObject);
       this.UPDATABLE_ROLES = adminDataObject.updatableRoles;
       this.VIEWABLE_ROLES = adminDataObject.viewableRoles;
       this.topicSummaries = adminDataObject.topicSummaries;
@@ -94,7 +93,7 @@ export class AdminRolesTabComponent {
 
   getLanguageDescriptions(languageCodes: string[]): string[] {
     let languageDescriptions = [];
-    languageCodes.forEach(function(languageCode) {
+    languageCodes.forEach((languageCode) => {
       languageDescriptions.push(
         this.languageUtilService.getAudioLanguageDescription(
           languageCode));
@@ -104,8 +103,10 @@ export class AdminRolesTabComponent {
 
   isLanguageSpecificReviewCategory(reviewCategory): boolean {
     return (
-      reviewCategory === AppConstants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION ||
-      reviewCategory === AppConstants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER);
+      reviewCategory ===
+      AppConstants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION ||
+      reviewCategory ===
+      AppConstants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER);
   }
 
   submitRoleViewForm(formResponse): void {
@@ -130,7 +131,7 @@ export class AdminRolesTabComponent {
         this.setStatusMessage.emit('Success.');
       }
       this.refreshFormData();
-    }, this.handleErrorResponse);
+    }, this.handleErrorResponse.bind(this));
     this.adminTaskManagerService.finishTask();
   }
 
@@ -149,7 +150,7 @@ export class AdminRolesTabComponent {
         'Role of ' + formResponse.username + ' successfully updated to ' +
         formResponse.newRole);
       this.refreshFormData();
-    }, this.handleErrorResponse);
+    }, this.handleErrorResponse.bind(this));
     this.adminTaskManagerService.finishTask();
   }
 
@@ -167,7 +168,7 @@ export class AdminRolesTabComponent {
         'Successfully added "' + formResponse.username + '" as ' +
         formResponse.category + ' reviewer.');
       this.refreshFormData();
-    }, this.handleErrorResponse);
+    }, this.handleErrorResponse.bind(this));
     this.adminTaskManagerService.finishTask();
   }
 
@@ -178,19 +179,21 @@ export class AdminRolesTabComponent {
     this.setStatusMessage.emit('Processing query...');
     this.adminTaskManagerService.startTask();
     this.contributionReviewersResult = {};
-    if (formResponse.filterCriterion === AppConstants.USER_FILTER_CRITERION_ROLE) {
+    if (formResponse.filterCriterion ===
+      AppConstants.USER_FILTER_CRITERION_ROLE) {
       this.adminBackendApiService.viewContributionReviewersAsync(
         formResponse.category, formResponse.languageCode
       ).then((usersObject) => {
+        console.log(usersObject);
         this.contributionReviewersResult.usernames = (
           usersObject.usernames);
         this.contributionReviewersDataFetched = true;
         this.setStatusMessage.emit('Success.');
         this.refreshFormData();
-      }, this.handleErrorResponse);
+      }, this.handleErrorResponse.bind(this));
     } else {
-      var translationLanguages = [];
-      var voiceoverLanguages = [];
+      let translationLanguages = [];
+      let voiceoverLanguages = [];
       this.adminBackendApiService.contributionReviewerRightsAsync(
         formResponse.username
       ).then((contributionRights) => {
@@ -207,7 +210,7 @@ export class AdminRolesTabComponent {
         this.contributionReviewersDataFetched = true;
         this.setStatusMessage.emit('Success.');
         this.refreshFormData();
-      }, this.handleErrorResponse);
+      }, this.handleErrorResponse.bind(this));
     }
     this.adminTaskManagerService.finishTask();
   }
@@ -225,7 +228,7 @@ export class AdminRolesTabComponent {
     ).then(() => {
       this.setStatusMessage.emit('Success.');
       this.refreshFormData();
-    }, this.handleErrorResponse);
+    }, this.handleErrorResponse.bind(this));
     this.adminTaskManagerService.finishTask();
   }
 
@@ -238,10 +241,12 @@ export class AdminRolesTabComponent {
         role: null,
         username: '',
         isValid: function() {
-          if (this.filterCriterion === AppConstants.USER_FILTER_CRITERION_ROLE) {
+          if (this.filterCriterion ===
+            AppConstants.USER_FILTER_CRITERION_ROLE) {
             return Boolean(this.role);
           }
-          if (this.filterCriterion === AppConstants.USER_FILTER_CRITERION_USERNAME) {
+          if (this.filterCriterion ===
+            AppConstants.USER_FILTER_CRITERION_USERNAME) {
             return Boolean(this.username);
           }
           return false;
@@ -266,7 +271,8 @@ export class AdminRolesTabComponent {
         category: null,
         languageCode: null,
         isValid: function() {
-          if (this.filterCriterion === AppConstants.USER_FILTER_CRITERION_ROLE) {
+          if (this.filterCriterion ===
+            AppConstants.USER_FILTER_CRITERION_ROLE) {
             if (this.category === null) {
               return false;
             }
@@ -276,7 +282,8 @@ export class AdminRolesTabComponent {
             return true;
           }
 
-          if (this.filterCriterion === AppConstants.USER_FILTER_CRITERION_USERNAME) {
+          if (this.filterCriterion ===
+            AppConstants.USER_FILTER_CRITERION_USERNAME) {
             return Boolean(this.username);
           }
         }
@@ -323,7 +330,7 @@ export class AdminRolesTabComponent {
     };
   }
 
-  clearResults = function() {
+  clearResults(): void {
     this.contributionReviewersDataFetched = false;
     this.resultRolesVisible = false;
     this.userRolesResult = {};
