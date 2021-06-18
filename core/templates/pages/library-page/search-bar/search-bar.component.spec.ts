@@ -19,18 +19,21 @@
 import { EventEmitter, Pipe } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync}
   from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from
+import { HttpClientTestingModule } from
   '@angular/common/http/testing';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { SearchBarComponent } from 'pages/library-page/search-bar/search-bar.component'
+import { SearchBarComponent } from 'pages/library-page/search-bar/search-bar.component';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { UrlService } from 'services/contextual/url.service';
 import { NavigationService } from 'services/navigation.service';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 import { FormsModule } from '@angular/forms';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { TranslateService } from '@ngx-translate/core';
 import { SearchService } from 'services/search.service';
+import { ConstructTranslationIdsService } from 'services/construct-translation-ids.service';
+import { LanguageUtilService } from 'domain/utilities/language-util.service';
+import { UrlService } from 'services/contextual/url.service';
+
 
 @Pipe({name: 'truncate'})
 class MockTrunctePipe {
@@ -42,7 +45,7 @@ class MockTrunctePipe {
 class MockWindowRef {
   nativeWindow = {
     location: {
-      pathname: '',
+      pathname: '/search/find',
       href: '',
     },
     history: {
@@ -52,11 +55,35 @@ class MockWindowRef {
 }
 
 class MockTranslateService {
-  onLangChange: EventEmitter = new EventEmitter();
+  onLangChange: EventEmitter<string> = new EventEmitter();
 
-  instant(key: string | Array<string>, interpolateParams?: Object): string {
+  instant(key: string, interpolateParams?: Object): string {
     return key;
   }
+}
+
+class MockNavigationService {
+  KEYBOARD_EVENT_TO_KEY_CODES = {
+    enter: {
+      shiftKeyIsPressed: false,
+      keyCode: 13
+    },
+    tab: {
+      shiftKeyIsPressed: false,
+      keyCode: 9
+    },
+    shiftTab: {
+      shiftKeyIsPressed: true,
+      keyCode: 9
+    }
+  };
+
+  onMenuKeypress(): void {}
+
+  openSubmenu(evt: KeyboardEvent, menuName: string): void {}
+
+  ACTION_OPEN: string = 'open';
+  ACTION_CLOSE: string = 'close';
 }
 
 // eslint-disable-next-line oppia/no-test-blockers
@@ -65,7 +92,11 @@ fdescribe('Search bar component', () => {
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let navigationService: NavigationService;
   let searchService: SearchService;
+  let translateService: TranslateService;
+  let languageUtilService: LanguageUtilService;
+  let constructTranslationIdsService: ConstructTranslationIdsService;
   let windowRef: MockWindowRef;
+  let urlService: UrlService;
   let component: SearchBarComponent;
   let fixture: ComponentFixture<SearchBarComponent>;
   let initTranslationEmitter = new EventEmitter();
@@ -76,7 +107,7 @@ fdescribe('Search bar component', () => {
       itemsName: 'categories',
       masterList: [
         {
-          id: 'id_1',
+          id: 'id',
           text: 'category 1'
         },
         {
@@ -88,7 +119,7 @@ fdescribe('Search bar component', () => {
           text: 'category 3'
         }
       ],
-      selections: { id_1: true },
+      selections: { id: true, id_2: true, id_3: true },
       numSelections: 0,
       summary: 'all categories'
     },
@@ -121,6 +152,10 @@ fdescribe('Search bar component', () => {
         {
           provide: TranslateService,
           useClass: MockTranslateService
+        },
+        {
+          provide: NavigationService,
+          useClass: MockNavigationService
         }
       ],
     }).compileComponents();
@@ -132,7 +167,6 @@ fdescribe('Search bar component', () => {
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
     navigationService = TestBed.inject(NavigationService);
-    // urlService = TestBed.inject(UrlService);
     windowRef = TestBed.inject(WindowRef);
     spyOnProperty(
       classroomBackendApiService,
@@ -142,6 +176,12 @@ fdescribe('Search bar component', () => {
       'onPreferredLanguageCodesLoaded').and.returnValue(
       preferredLanguageCodesLoadedEmitter);
     searchService = TestBed.inject(SearchService);
+    translateService = TestBed.inject(TranslateService);
+    constructTranslationIdsService = (
+      TestBed.inject(ConstructTranslationIdsService));
+    languageUtilService = TestBed.inject(LanguageUtilService);
+    urlService = TestBed.inject(UrlService);
+    component.selectionDetails = selectionDetails;
   });
 
   it ('should search', () => {
@@ -174,9 +214,15 @@ fdescribe('Search bar component', () => {
   });
 
   it('should update selection details', () => {
-    component.selectionDetails = selectionDetails;
+    spyOn(translateService, 'instant').and.returnValue('key');
+    // component.selectionDetails = selectionDetails;
     component.updateSelectionDetails('categories');
-    expect(component.selectionDetails.categories.numSelections).toEqual(1);
+    expect(component.selectionDetails.categories.numSelections).toEqual(3);
+  });
+
+  it('should update selection details', () => {
+    spyOn(translateService, 'instant').and.returnValue('key');
+    // component.selectionDetails = selectionDetails;
     component.updateSelectionDetails('languageCodes');
     expect(component.selectionDetails.languageCodes.description).toEqual(
       'I18N_LIBRARY_ALL_LANGUAGES_SELECTED');
@@ -185,7 +231,7 @@ fdescribe('Search bar component', () => {
   it('should toggle selection', () => {
     spyOn(component, 'updateSelectionDetails');
     spyOn(component, 'onSearchQueryChangeExec');
-    component.selectionDetails = selectionDetails;
+    // component.selectionDetails = selectionDetails;
     component.toggleSelection('categories', 'id_1');
     expect(component.updateSelectionDetails).toHaveBeenCalled();
     expect(component.onSearchQueryChangeExec).toHaveBeenCalled();
@@ -194,7 +240,7 @@ fdescribe('Search bar component', () => {
   it('should deselectAll', () => {
     spyOn(component, 'updateSelectionDetails');
     spyOn(component, 'onSearchQueryChangeExec');
-    component.selectionDetails = selectionDetails;
+    // component.selectionDetails = selectionDetails;
     component.deselectAll('categories');
     expect(component.selectionDetails.categories.selections).toEqual({});
     expect(component.updateSelectionDetails).toHaveBeenCalled();
@@ -212,7 +258,7 @@ fdescribe('Search bar component', () => {
       'search_query');
     spyOn(windowRef.nativeWindow.history, 'pushState');
     windowRef.nativeWindow.location = new URL('http://localhost/search/find');
-    component.selectionDetails = selectionDetails;
+    // component.selectionDetails = selectionDetails;
 
     component.onSearchQueryChangeExec();
 
@@ -221,5 +267,68 @@ fdescribe('Search bar component', () => {
     component.onSearchQueryChangeExec();
     expect(windowRef.nativeWindow.location.href).toEqual(
       '/search/find?q=search_query');
+  });
+
+  it('should update search fields based on url query', () => {
+    spyOn(component, 'updateSelectionDetails');
+    spyOn(component, 'onSearchQueryChangeExec');
+    spyOn(searchService, 'updateSearchFieldsBasedOnUrlQuery')
+      .and.returnValue('test_query');
+    // component.selectionDetails = selectionDetails;
+    component.updateSearchFieldsBasedOnUrlQuery();
+    expect(component.updateSelectionDetails).toHaveBeenCalled();
+    expect(component.onSearchQueryChangeExec).toHaveBeenCalled();
+  });
+
+  it('should refresh search bar labels', () => {
+    let testLabel = 'test_label';
+    spyOn(translateService, 'instant').and.returnValue(testLabel);
+    // component.selectionDetails = selectionDetails;
+    component.refreshSearchBarLabels();
+    expect(component.searchBarPlaceholder).toEqual(testLabel);
+    expect(component.categoryButtonText).toEqual(testLabel);
+    expect(component.languageButtonText).toEqual(testLabel);
+  });
+
+  it('should search dropdown categories', () => {
+    spyOn(constructTranslationIdsService, 'getLibraryId');
+    expect(component.searchDropdownCategories()).toBeDefined();
+  });
+
+  it('should initialize', () => {
+    spyOn(component, 'searchDropdownCategories').and.returnValue([]);
+    spyOn(languageUtilService, 'getLanguageIdsAndTexts').and.returnValue([]);
+    spyOn(component, 'updateSelectionDetails');
+    spyOn(component, 'refreshSearchBarLabels');
+    spyOn(component, 'onSearchQueryChangeExec');
+    spyOn(component, 'updateSearchFieldsBasedOnUrlQuery');
+    spyOn(searchService.onSearchBarLoaded, 'emit');
+    spyOn(i18nLanguageCodeService.onPreferredLanguageCodesLoaded, 'subscribe')
+      .and.callFake((callb) => {
+        callb(['en', 'es']);
+        return null;
+      });
+    spyOn(translateService.onLangChange, 'subscribe').and.callFake((callb) => {
+      callb();
+      return null;
+    });
+    spyOn(classroomBackendApiService.onInitializeTranslation, 'subscribe')
+      .and.callFake((callb) => {
+        callb();
+        return null;
+      });
+    spyOn(urlService, 'getUrlParams').and.returnValue({ q: '' });
+    // component.selectionDetails = selectionDetails;
+    component.ngOnInit();
+    component.searchQueryChanged.next();
+  });
+
+  it('should tell searching status', () => {
+    spyOn(searchService, 'isSearchInProgress').and.returnValue(false);
+    expect(component.isSearchInProgress()).toBeFalse();
+  });
+
+  it('should open sub menu', () => {
+    component.openSubmenu(null, null);
   });
 });

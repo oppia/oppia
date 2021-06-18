@@ -86,7 +86,7 @@ module.exports = function(config) {
       }
     },
     autoWatch: true,
-    browsers: ['CI_Chrome'],
+    browsers: ['Chrome'],
     // Kill the browser if it does not capture in the given timeout [ms].
     captureTimeout: 60000,
     browserNoActivityTimeout: 120000,
@@ -101,7 +101,7 @@ module.exports = function(config) {
       terminal: true
     },
     // Continue running in the background after running tests.
-    singleRun: true,
+    singleRun: false,
     customLaunchers: {
       CI_Chrome: {
         base: 'ChromeHeadless',
