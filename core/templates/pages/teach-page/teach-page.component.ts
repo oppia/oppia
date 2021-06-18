@@ -137,7 +137,7 @@ export class TeachPageComponent implements OnInit {
 
   onClickBrowseLibraryButton(): void {
     this.siteAnalyticsService.registerClickBrowseLibraryButtonEvent();
-    this.windowRef.nativeWindow.location.href = this.libraryUrl;
+    this.windowRef.nativeWindow.location.href = '/community-library';
     return;
   }
 
