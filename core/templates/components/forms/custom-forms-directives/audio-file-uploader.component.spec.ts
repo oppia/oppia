@@ -19,7 +19,7 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { AudioFileUploaderComponent } from './audio-file-uploader.component';
 
-fdescribe('Audio File Uploader Component', () => {
+describe('Audio File Uploader Component', () => {
   let component: AudioFileUploaderComponent;
   let fixture:
     ComponentFixture<AudioFileUploaderComponent>;
@@ -90,7 +90,7 @@ fdescribe('Audio File Uploader Component', () => {
         file: new File(['foo'], 'video.mp4', {type: 'png'}),
         expected: 'This file is not recognized as an audio file.'
       }
-    ]
+    ];
 
     spyOn(component.fileClear, 'emit');
     spyOn(component.inputFormRef.nativeElement, 'reset');
@@ -98,7 +98,7 @@ fdescribe('Audio File Uploader Component', () => {
     testCases.forEach(testCase => {
       component.fileInputRef.nativeElement = {
         files: [testCase.file]
-      }
+      };
 
       component.addAudio(new Event('add'));
 
