@@ -40,6 +40,7 @@ SCHEMA_KEY_OBJ_TYPE = schema_utils.SCHEMA_KEY_OBJ_TYPE
 SCHEMA_KEY_VALIDATORS = schema_utils.SCHEMA_KEY_VALIDATORS
 SCHEMA_KEY_DEFAULT_VALUE = schema_utils.SCHEMA_KEY_DEFAULT_VALUE
 SCHEMA_KEY_VALIDATE_METHOD = schema_utils.SCHEMA_KEY_VALIDATE_METHOD
+SCHEMA_KEY_OBJECT_CLASS = schema_utils.SCHEMA_KEY_OBJECT_CLASS
 SCHEMA_KEY_DESCRIPTION = 'description'
 SCHEMA_KEY_UI_CONFIG = 'ui_config'
 # This key is used for 'type: custom' objects, as a way of indicating how
@@ -364,12 +365,10 @@ def validate_schema(schema):
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_OBJECT_DICT:
         _validate_dict_keys(
             schema,
-            [SCHEMA_KEY_TYPE, SCHEMA_KEY_VALIDATE_METHOD],
+            [SCHEMA_KEY_TYPE],
+            [SCHEMA_KEY_VALIDATE_METHOD, SCHEMA_KEY_OBJECT_CLASS] +
             OPTIONAL_SCHEMA_KEYS
         )
-        assert isinstance(
-            schema[SCHEMA_KEY_VALIDATE_METHOD], python_utils.BASESTRING), (
-                'Expected str, got %s' % schema[SCHEMA_KEY_VALIDATE_METHOD])
     else:
         _validate_dict_keys(schema, [SCHEMA_KEY_TYPE], OPTIONAL_SCHEMA_KEYS)
 
@@ -424,6 +423,15 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
     GLOBAL_VALIDATORS = [{
         'id': 'does_not_contain_email'
     }]
+
+    def arbitary_method(self, obj):
+        """Only required for testing.
+
+        Args:
+            obj: dict. Argument which needs to be validated.
+        """
+        if 'any_arg' not in obj:
+            raise Exception('Missing \'any_arg\'.')
 
     def test_schemas_are_correctly_validated(self):
         """Test validation of schemas."""
@@ -577,7 +585,7 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
             }
         }, {
             'type': 'object_dict',
-            'validate_method': 'arbitary_method'
+            'validate_method': self.arbitary_method
         }]
 
         for schema in valid_schemas:
@@ -997,7 +1005,7 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
 
     def test_dict_schema_with_default_value(self):
         schema = {
-            'type': schema_utils.SCHEMA_TYPE_DICT,
+            'type': SCHEMA_TYPE_DICT,
             'properties': [{
                 'name': 'arg_with_some_default',
                 'schema': {
@@ -1039,19 +1047,42 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
         self.check_normalization(
             schema, mappings, invalid_values_with_error_messages)
 
-    def test_object_dict_schema(self):
+    def test_object_dict_schema_with_validate_method_key(self):
         schema = {
-            'type': schema_utils.SCHEMA_TYPE_OBJECT_DICT,
-            'validate_method': 'validate_exploration_change'
-        }
-        exploration_change = {
-            'old_value': '',
-            'cmd': 'edit_exploration_property',
-            'property_name': 'title',
-            'new_value': 'newValue'
+            'type': SCHEMA_TYPE_OBJECT_DICT,
+            'validate_method': validate_method_for_testing
         }
 
-        mappings = [(exploration_change, exploration_change)]
+        mappings = [
+            ({
+                'arg_a': 'arbitary_argument_a',
+                'arg_b': 'arbitary_argument_b'
+            }, {
+                'arg_a': 'arbitary_argument_a',
+                'arg_b': 'arbitary_argument_b'
+            })
+        ]
+
+        invalid_values_with_error_messages = []
+
+        self.check_normalization(
+            schema, mappings, invalid_values_with_error_messages)
+
+    def test_object_dict_schema_with_object_class_key(self):
+        schema = {
+            'type': SCHEMA_TYPE_OBJECT_DICT,
+            'object_class': ValidateClassForTesting
+        }
+
+        mappings = [
+            ({
+                'arg_a': 'arbitary_argument_a',
+                'arg_b': 'arbitary_argument_b'
+            }, {
+                'arg_a': 'arbitary_argument_a',
+                'arg_b': 'arbitary_argument_b'
+            })
+        ]
 
         invalid_values_with_error_messages = []
 
@@ -1158,3 +1189,48 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
             'Invalid URL: Sanitized URL should start with \'http://\' or'
             ' \'https://\'; received www.oppia.org'):
             sanitize_url('www.oppia.org')
+
+
+def validate_method_for_testing(obj):
+    """Method to test 'validate_method' key of schema.
+
+    Args:
+        obj: dict. Dictionary form of the argument.
+    """
+    if 'arg_a' not in obj:
+        raise Exception('Missing arg_a in argument.')
+    if 'arg_b' not in obj:
+        raise Exception('Missing arg_b in argument.')
+
+
+class ValidateClassForTesting(python_utils.OBJECT):
+    """Class to test 'object_class' key of schema."""
+
+    def __init__(self, arg_a, arg_b):
+        """Initializes the object.
+
+        Args:
+            arg_a: str. Random first argument for testing.
+            arg_b: str. Random second argument for testing.
+        """
+        self.arg_a = arg_a
+        self.arg_b = arg_b
+
+    @classmethod
+    def from_dict(cls, obj):
+        """Return the ValidateClassForTesting object from a dict.
+
+        Args:
+            obj: dict. Dictionary representation of the object.
+
+        Returns:
+            ValidateClassForTesting. The correcponding test object.
+        """
+        return cls(obj['arg_a'], obj['arg_b'])
+
+    def validate(self):
+        """Method to validate the test object."""
+        if not isinstance(self.arg_a, python_utils.BASESTRING):
+            raise Exception('Invalid type arg_a.')
+        if not isinstance(self.arg_b, python_utils.BASESTRING):
+            raise Exception('Invalid type arg_b.')
