@@ -22,7 +22,7 @@ import { IdGenerationService } from 'services/id-generation.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { ImageUploaderComponent } from './image-uploader.component';
 
-fdescribe('ImageUploaderComponent', () => {
+describe('ImageUploaderComponent', () => {
   let component: ImageUploaderComponent;
   let fixture: ComponentFixture<ImageUploaderComponent>;
   let igs: IdGenerationService;
@@ -50,8 +50,8 @@ fdescribe('ImageUploaderComponent', () => {
     igs = TestBed.inject(IdGenerationService);
     fixture.detectChanges();
 
-    dropAreaRefSpy = spyOn(component.dropAreaRef.nativeElement,
-      'addEventListener');
+    dropAreaRefSpy = spyOn(
+      component.dropAreaRef.nativeElement, 'addEventListener');
     windowRefSpy = spyOn(windowRef.nativeWindow, 'addEventListener');
   });
 
