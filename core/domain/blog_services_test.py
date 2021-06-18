@@ -68,6 +68,29 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         blog_post = blog_services.get_blog_post_by_id(self.blog_post_a_id)
         self.assertEqual(blog_post.to_dict(), expected_blog_post)
 
+    def test_get_blog_post_by_ids(self):
+        blog_posts = blog_services.get_blog_post_by_ids([
+            self.blog_post_a_id, self.blog_post_b_id])
+        self.assertTrue(len(blog_posts) == 2)
+        blog_post_ids = [blog_posts[0].id, blog_posts[1].id]
+        self.assertTrue(self.blog_post_a_id in blog_post_ids)
+        self.assertTrue(self.blog_post_b_id in blog_post_ids)
+
+    def test_get_blog_post_summary_models_list_by_user_id(self):
+        blog_posts = (
+            blog_services.get_blog_post_summary_models_list_by_user_id(
+                self.user_id_a, True))
+        self.assertIsNone(blog_posts)
+        blog_posts = (
+            blog_services.get_blog_post_summary_models_list_by_user_id(
+                self.user_id_a, False))
+        self.assertEqual(self.blog_post_a_id, blog_posts[0].id)
+
+    def test_get_new_blog_post_id(self):
+        blog_post_id = blog_services.get_new_blog_post_id()
+        self.assertFalse(blog_post_id == self.blog_post_a_id)
+        self.assertFalse(blog_post_id == self.blog_post_b_id)
+
     def test_generate_summary_of_blog_post(self):
         html_content = '<a href="http://www.google.com">Hello, Oppia Blog</a>'
         expected_summary = 'Hello, Oppia Blog...'
@@ -198,26 +221,6 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         filtered_model_ids = (
             blog_services.filter_blog_post_ids(self.user_id_b, False))
         self.assertEqual(filtered_model_ids, [self.blog_post_b_id])
-
-    def test_get_blog_post_by_ids(self):
-        expected_blog_post = self.blog_post_a.to_dict()
-        blog_posts = blog_services.get_blog_posts_by_ids([self.blog_post_a_id])
-        self.assertEqual(blog_posts[0].to_dict(), expected_blog_post)
-        self.assertEqual(len(blog_posts), 1)
-
-        blog_posts = (
-            blog_services.get_blog_posts_by_ids([self.blog_post_a_id, 'blog']))
-        self.assertEqual(blog_posts[0].to_dict(), expected_blog_post)
-        self.assertIsNone(blog_posts[1])
-        self.assertEqual(len(blog_posts), 2)
-
-        blog_posts = blog_services.get_blog_posts_by_ids([
-            self.blog_post_a_id,
-            self.blog_post_b_id
-        ])
-        self.assertEqual(len(blog_posts), 2)
-        blog_post_ids = [blog_posts[0].id, blog_posts[1].id]
-        self.assertTrue(self.blog_post_a_id in blog_post_ids)
 
     def test_get_all_blog_posts(self):
         blog_posts = blog_services.get_all_blog_posts()

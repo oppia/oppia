@@ -180,10 +180,11 @@ def get_blog_post_summary_models_list_by_user_id(
     blog_post_ids = filter_blog_post_ids(user_id, blog_post_is_published)
     blog_post_summary_models = (
         blog_models.BlogPostSummaryModel.get_multi(blog_post_ids))
+    blog_post_summaries = []
     blog_post_summaries = [
         get_blog_post_summary_from_model(model) if model is not None else None
         for model in blog_post_summary_models]
-    return blog_post_summaries
+    return blog_post_summaries if len(blog_post_summaries) != 0 else None
 
 
 def filter_blog_post_ids(user_id, blog_post_is_published):

@@ -92,7 +92,7 @@ class BlogPostModelValidatorTests(test_utils.AuditJobsTestBase):
                 'of BlogPostModel\', '
                 '[u"Entity id %s: title %s matches with title '
                 'blog post models with ids [\'%s\']",'
-                'u"Entity id %s: title %s matches'
+                ' u"Entity id %s: title %s matches'
                 ' with title blog post models with ids [\'%s\']"]]' % (
                     self.blog_post_id_1, self.blog_post_model_1.title,
                     self.blog_post_id_2, self.blog_post_id_2,
@@ -485,7 +485,7 @@ class BlogPostSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
                 )
             )]
         self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
+            expected_output, sort=False, literal_eval=True)
 
 
 class BlogPostRightsModelValidatorTests(test_utils.AuditJobsTestBase):
