@@ -48,7 +48,7 @@ angular.module('oppia').controller('CreateNewTopicModalController', [
       topicPropertiesConstants.VALID_URL_FRAGMENT_REGEX);
 
     $scope.isValid = function() {
-      $rootScope.$apply();
+      $scope.$apply();
       return Boolean(
         $scope.newlyCreatedTopic.isValid() &&
         ImageLocalStorageService.getStoredImagesData().length > 0);

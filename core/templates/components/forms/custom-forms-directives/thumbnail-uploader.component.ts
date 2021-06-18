@@ -192,7 +192,7 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
     modalRef.componentInstance.previewFooter = this.previewFooter;
     modalRef.componentInstance.previewTitle = this.previewTitle;
     modalRef.componentInstance.openInUploadMode = this.openInUploadMode;
-    modalRef.componentInstance.uploadedImage = this.encodedImageURI;
+    modalRef.componentInstance.uploadedImage = this.uploadedImage;
     modalRef.componentInstance.uploadedImageMimeType =
      this.uploadedImageMimeType;
     modalRef.componentInstance.tempBgColor = this.tempBgColor;
