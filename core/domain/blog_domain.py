@@ -37,7 +37,7 @@ class BlogPost(python_utils.OBJECT):
     def __init__(
             self, blog_post_id, author_id, title, content, url_fragment, tags,
             thumbnail_filename=None, last_updated=None, published_on=None):
-        """Constructs a Blog domain object.
+        """Constructs a BlogPost domain object.
 
         Args:
             blog_post_id: str. The unique ID of the blog post.
@@ -106,7 +106,7 @@ class BlogPost(python_utils.OBJECT):
 
         if strict:
             self.require_valid_url_fragment(self.url_fragment)
-            if self.content == '':
+            if len(self.content) == 0:
                 raise utils.ValidationError('Content can not be empty')
 
     @classmethod
@@ -120,7 +120,7 @@ class BlogPost(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Blog Post ID should be a string, received: %s' % blog_post_id)
 
-        if len(blog_post_id) != 12:
+        if len(blog_post_id) != constants.BASE_MODELS_ID_LENGTH:
             raise utils.ValidationError('Invalid Blog Post ID.')
 
     @classmethod
@@ -144,6 +144,10 @@ class BlogPost(python_utils.OBJECT):
                 raise utils.ValidationError(
                     'Expected each tag in \'tags\' to be a string, received: '
                     '\'%s\'' % tag)
+
+            if len(tag) == 0:
+                raise utils.ValidationError(
+                    'Tag should not be empty received: \'\'')
 
             if not re.match(constants.TAG_REGEX, tag):
                 raise utils.ValidationError(
@@ -190,7 +194,7 @@ class BlogPost(python_utils.OBJECT):
                 % (title_limit, title))
 
         if strict:
-            if title == '':
+            if len(title) == 0:
                 raise utils.ValidationError('Title should not be empty')
             if not re.match(constants.VALID_BLOG_POST_TITLE_REGEX, title):
                 raise utils.ValidationError(
@@ -425,7 +429,7 @@ class BlogPostSummary(python_utils.OBJECT):
 
         if strict:
             self.require_valid_url_fragment(self.url_fragment)
-            if self.summary == '':
+            if len(self.summary) == 0:
                 raise utils.ValidationError('Summary can not be empty')
 
     @classmethod
@@ -439,7 +443,7 @@ class BlogPostSummary(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Blog Post ID should be a string, received: %s' % blog_post_id)
 
-        if len(blog_post_id) != 12:
+        if len(blog_post_id) != constants.BASE_MODELS_ID_LENGTH:
             raise utils.ValidationError('Invalid Blog Post ID.')
 
     @classmethod
@@ -474,7 +478,7 @@ class BlogPostSummary(python_utils.OBJECT):
                 % (title_limit, title))
 
         if strict:
-            if title == '':
+            if len(title) == 0:
                 raise utils.ValidationError('Title should not be empty')
 
     @classmethod
@@ -498,6 +502,10 @@ class BlogPostSummary(python_utils.OBJECT):
                     'Expected each tag in \'tags\' to be a string, received: '
                     '\'%s\'' % tag)
 
+            if len(tag) == 0:
+                raise utils.ValidationError(
+                    'Tag should not be empty received: \'\'')
+
             if not re.match(constants.TAG_REGEX, tag):
                 raise utils.ValidationError(
                     'Tags should only contain lowercase letters and spaces, '
@@ -513,6 +521,7 @@ class BlogPostSummary(python_utils.OBJECT):
                 raise utils.ValidationError(
                     'Adjacent whitespace in tags should be collapsed, '
                     'received: \'%s\'' % tag)
+
         if strict:
             if len(tags) == 0:
                 raise utils.ValidationError(
@@ -559,7 +568,7 @@ class BlogPostSummary(python_utils.OBJECT):
 
 
 class BlogPostRights(python_utils.OBJECT):
-    """Domain object for blog post rights."""
+    """Domain object for Blog Post rights."""
 
     def __init__(self, blog_post_id, editor_ids, blog_post_is_published=False):
         """Constructs a BlogPostRights domain object.

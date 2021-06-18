@@ -5491,6 +5491,10 @@ export default {
 
   "ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE": true,
 
+  // Maximum allowed length for generating IDs using get new ID method in
+  // in base models for storage models.
+  "BASE_MODELS_ID_LENGTH": 12,
+
   "MAX_SKILLS_PER_QUESTION": 3,
 
   "MAX_QUESTIONS_PER_SKILL": 50,

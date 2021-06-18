@@ -221,6 +221,8 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
             'received: \'%s\'' % 'a    b', ['a    b'])
         self._assert_valid_tags_for_blog_post(
             'Some tags duplicate each other', ['abc', 'abc'])
+        self._assert_valid_tags_for_blog_post(
+            'Tag should not be empty received: \'\'', ['abc', ''])
 
     def test_blog_post_passes_validate(self):
         """Tests validation for blog post."""
@@ -401,3 +403,32 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
             'Expected summary to be a string, received: 123')
         self.blog_post_summary.summary = 'Hello'
         self.blog_post_summary.validate(strict=True)
+
+    def test_tags_validation_for_blog_post(self):
+        """"Tests tags validation for blog post."""
+
+        self._assert_valid_tags_for_blog_post(
+            'Expected \'tags\' to be a list, received: this should be a list',
+            'this should be a list')
+        self._assert_valid_tags_for_blog_post(
+            'Expected each tag in \'tags\' to be a string,' +
+            ' received: ''\'%s\'' % 123, [123])
+        self._assert_valid_tags_for_blog_post(
+            'Expected each tag in \'tags\' to be a string,' +
+            ' received: ''\'%s\'' % 123, ['abc', 123])
+        self._assert_valid_tags_for_blog_post(
+            'Tags should only contain lowercase letters and spaces, '
+            'received: \'%s\'' % 'ABC', ['ABC'])
+        self._assert_valid_tags_for_blog_post(
+            'Tags should not start or end with whitespace, '
+            'received: \'%s\'' % ' a b', [' a b'])
+        self._assert_valid_tags_for_blog_post(
+            'Tags should not start or end with whitespace, '
+            'received: \'%s\'' % 'a b ', ['a b '])
+        self._assert_valid_tags_for_blog_post(
+            'Adjacent whitespace in tags should be collapsed, '
+            'received: \'%s\'' % 'a    b', ['a    b'])
+        self._assert_valid_tags_for_blog_post(
+            'Some tags duplicate each other', ['abc', 'abc'])
+        self._assert_valid_tags_for_blog_post(
+            'Tag should not be empty received: \'\'', ['abc', ''])

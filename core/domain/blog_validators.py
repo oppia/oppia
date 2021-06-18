@@ -119,7 +119,7 @@ class BlogPostSummaryModelValidator(base_model_validators.BaseModelValidator):
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
-        # Valid id: random_hash of 12 chars.
+        # Valid id: random_hash of constants.BASE_MODELS_ID_LENGTH chars.
         regex_string = '[A-Za-z0-9-_]{1,%s}$' % (base_models.ID_LENGTH)
         return regex_string
 
@@ -181,7 +181,7 @@ class BlogPostRightsModelValidator(base_model_validators.BaseModelValidator):
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
-        # Valid id: random_hash of 12 chars.
+        # Valid id: random_hash of constants.BASE_MODELS_ID_LENGTH chars.
         regex_string = '[A-Za-z0-9-_]{1,%s}$' % (base_models.ID_LENGTH)
         return regex_string
 
