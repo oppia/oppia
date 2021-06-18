@@ -249,7 +249,7 @@ def get_story_id_linked_to_exploration(exp_id):
         story, otherwise None.
     """
     exploration_context_model = exp_models.ExplorationContextModel.get(
-        exp_id)
+        exp_id, strict=False)
     if exploration_context_model is not None:
         return exploration_context_model.story_id
     return None
