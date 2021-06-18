@@ -24,8 +24,6 @@ from core.tests import test_utils
 class ValidateExplorationChangeTests(test_utils.GenericTestBase):
     """Tests to validate domain objects coming from API."""
 
-    validator_object = domain_objects_validator.DomainObjectsValidationClass()
-
     def test_incorrect_object_raises_exception(self):
         exploration_change = {
             'old_value': '',
@@ -34,5 +32,5 @@ class ValidateExplorationChangeTests(test_utils.GenericTestBase):
         }
         with self.assertRaisesRegexp(
             Exception, 'Missing cmd key in change dict'):
-            self.validator_object.validate_exploration_change(
+            domain_objects_validator.validate_exploration_change(
                 exploration_change)
