@@ -319,7 +319,7 @@
     "extensions/objects/templates/positive-int-editor.component.spec.ts",
     "extensions/objects/templates/sanitized-url-editor.component.ts",
     "extensions/objects/templates/set-of-unicode-string-editor.component.ts",
-    "extensions/objects/templates/svg-filename-editor.constants.ts",
+    "extensions/objects/templates/svg-filename-editor.constants.ts"
   ],
   "include": ["typings/*.ts"],
   "exclude": ["extensions/classifiers/proto"]
