@@ -168,9 +168,9 @@ describe('Pencil Code Editor Validation Service', () => {
         message: 'The initialCode must be a string.'
       });
       expect(pcevs.getAllWarnings(
-        // This throws "Type '1' is not assignable to type 'string'."
-        // Here we are assigning the wrong type of value to
-        // "customizationArguments" in order to test validations.
+        // This throws "Type '1'. We need to suppress this error because is not
+        // assignable to type 'string'." Here we are assigning the wrong type
+        // of value to "customizationArguments" in order to test validations.
         // @ts-expect-error
         statename, customizationArgs, [answergroup2], testOutcome2)
       ).toEqual(partialWarningsList);
