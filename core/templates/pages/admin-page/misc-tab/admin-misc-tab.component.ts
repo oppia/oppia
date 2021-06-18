@@ -17,10 +17,10 @@
  */
 
 import { Component, EventEmitter, Output } from '@angular/core';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { AdminPageConstants } from '../admin-page.constants';
 import { AdminTaskManagerService } from '../services/admin-task-manager.service';
@@ -48,13 +48,12 @@ export class AdminMiscTabComponent {
   MAX_USERNAME_LENGTH: number = AppConstants.MAX_USERNAME_LENGTH;
   regenerationMessage: string;
   missingExplorationStatsRegenerationMessage: string;
-  csvUri: string;
+  csvUri: SafeResourceUrl;
   csvFilename: string;
-  explorationIdsForRegeneratingMissingStats;
+  explorationIdsForRegeneratingMissingStats: string;
   showDataExtractionQueryStatus: boolean;
   dataExtractionQueryStatusMessage: string;
   memoryCacheDataFetched: boolean;
-  result;
   oldUsername: string;
   newUsername: string;
   usernameToGrant: string;
@@ -62,17 +61,17 @@ export class AdminMiscTabComponent {
   userIdToGet: string;
   userIdToDelete: string;
   usernameToDelete: string;
-  expVersion: string | number | boolean;
-  stateName: string | number | boolean;
-  numAnswers: string | number | boolean;
-  expId: string | number | boolean;
+  expVersion: number;
+  stateName: string;
+  numAnswers: number;
+  expId: string;
   topicIdForRegeneratingOpportunities: string;
 
   constructor(
     private windowRef: WindowRef,
     private adminBackendApiService: AdminBackendApiService,
     private adminTaskManagerService: AdminTaskManagerService,
-    private urlInterpolationService: UrlInterpolationService
+    private domSantizer: DomSanitizer
   ) {}
 
   resetExplorationStatsRegenerationUtilityCsvRows(): void {
@@ -100,7 +99,6 @@ export class AdminMiscTabComponent {
       });
   }
 
-
   regenerateOpportunitiesRelatedToTopic(): void {
     if (this.adminTaskManagerService.isTaskRunning()) {
       return;
@@ -123,9 +121,9 @@ export class AdminMiscTabComponent {
     if (expIds.length === 0) {
       let csvContent = this.explorationStatsRegenerationUtilityCsvRows.map(
         row => row.join(',')).join('\n');
-      // this.csvUri = $sce.trustAsResourceUrl(
-      //   window.URL.createObjectURL(
-      //     new Blob([csvContent], { type: 'text/csv' })));
+      this.csvUri = this.domSantizer.bypassSecurityTrustResourceUrl(
+        window.URL.createObjectURL(
+          new Blob([csvContent], { type: 'text/csv' })));
       this.csvFilename = (
         `missing-exp-stats-output-${(new Date()).getTime()}.csv`);
       this.missingExplorationStatsRegenerationMessage = (
@@ -142,8 +140,8 @@ export class AdminMiscTabComponent {
       ).then(response => {
         this.explorationStatsRegenerationUtilityCsvRows.push([
           expIdToRegenerate,
-          response.num_valid_exp_stats,
-          response.num_valid_state_stats,
+          response.num_valid_exp_stats.toString(),
+          response.num_valid_state_stats.toString(),
           `"${response.missing_exp_stats.join(', ') || 'NA'}"`,
           `"${response.missing_state_stats.join(', ') || 'NA'}"`,
           'NA'
@@ -170,8 +168,8 @@ export class AdminMiscTabComponent {
       return;
     }
     let expIds = (
-      this.explorationIdsForRegeneratingMissingStats.replaceAll(
-        ' ', '').split(','));
+      this.explorationIdsForRegeneratingMissingStats.replace(/\s/g, '')
+        .split(','));
     this.populateExplorationStatsRegenerationCsvResult(expIds);
   }
 
@@ -265,7 +263,6 @@ export class AdminMiscTabComponent {
       });
   }
 
-
   getModelsRelatedToUser(): void {
     this.setStatusMessage.emit('Getting the models related to user...');
     this.adminBackendApiService.getModelsRelatedToUserAsync(this.userIdToGet)
@@ -296,7 +293,6 @@ export class AdminMiscTabComponent {
       }
       );
   }
-
 
   submitQuery(): void {
     let STATUS_PENDING = (

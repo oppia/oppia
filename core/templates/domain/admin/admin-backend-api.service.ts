@@ -138,6 +138,13 @@ export interface AdminPageData {
   featureFlags: PlatformParameter[];
 }
 
+export interface PopulateStatsResult {
+  'missing_exp_stats': number[],
+  'missing_state_stats': number[],
+  'num_valid_exp_stats': number,
+  'num_valid_state_stats': number
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -172,9 +179,10 @@ export class AdminBackendApiService {
   }
 
   private async _postRequestAsync(
-      handlerUrl: string, payload?: Object, action?: string): Promise<void> {
+      handlerUrl: string, payload?: Object, action?: string):
+      Promise<PopulateStatsResult> {
     return new Promise((resolve, reject) => {
-      this.http.post<void>(
+      this.http.post<PopulateStatsResult>(
         handlerUrl, { action, ...payload }).toPromise()
         .then(response => {
           resolve(response);
@@ -304,13 +312,13 @@ export class AdminBackendApiService {
   }
 
   // Admin Misc Tab Services.
-  async clearSearchIndexAsync(): Promise<void> {
+  async clearSearchIndexAsync(): Promise<PopulateStatsResult> {
     return this._postRequestAsync (
       AdminPageConstants.ADMIN_HANDLER_URL);
   }
 
   async populateExplorationStatsRegenerationCsvResultAsync(
-      expIdToRegenerate: string): Promise<void> {
+      expIdToRegenerate: string): Promise<PopulateStatsResult> {
     let action = 'regenerate_missing_exploration_stats';
     let payload = {
       exp_id: expIdToRegenerate
@@ -320,7 +328,7 @@ export class AdminBackendApiService {
   }
 
   async regenerateOpportunitiesRelatedToTopicAsync(
-      topicId: string): Promise<void> {
+      topicId: string): Promise<PopulateStatsResult> {
     let action = 'regenerate_topic_related_opportunities';
     let payload = {
       topic_id: topicId
@@ -329,7 +337,8 @@ export class AdminBackendApiService {
       AdminPageConstants.ADMIN_HANDLER_URL, payload, action);
   }
 
-  async uploadTopicSimilaritiesAsync(data: string): Promise<void> {
+  async uploadTopicSimilaritiesAsync(data: string):
+  Promise<PopulateStatsResult> {
     let action = 'upload_topic_similarities';
     let payload = {
       data: data
@@ -338,7 +347,7 @@ export class AdminBackendApiService {
       AdminPageConstants.ADMIN_HANDLER_URL, payload, action);
   }
 
-  async sendDummyMailToAdminAsync(): Promise<void> {
+  async sendDummyMailToAdminAsync(): Promise<PopulateStatsResult> {
     return this._postRequestAsync (
       AdminPageConstants.ADMIN_SEND_DUMMY_MAIL_HANDLER_URL);
   }
@@ -420,7 +429,8 @@ export class AdminBackendApiService {
   }
 
   // Admin Config Tab Services.
-  async revertConfigPropertyAsync(configPropertyId: string): Promise<void> {
+  async revertConfigPropertyAsync(configPropertyId: string):
+  Promise<PopulateStatsResult> {
     let action = 'revert_config_property';
     let payload = {
       config_property_id: configPropertyId
@@ -430,7 +440,8 @@ export class AdminBackendApiService {
   }
 
   async saveConfigPropertiesAsync(
-      newConfigPropertyValues: ConfigPropertyValues): Promise<void> {
+      newConfigPropertyValues: ConfigPropertyValues):
+      Promise<PopulateStatsResult> {
     let action = 'save_config_properties';
     let payload = {
       new_config_property_values: newConfigPropertyValues
@@ -442,7 +453,7 @@ export class AdminBackendApiService {
   // Admin Dev Mode Activities Tab Services.
   async generateDummyExplorationsAsync(
       numDummyExpsToGenerate: number,
-      numDummyExpsToPublish: number): Promise<void> {
+      numDummyExpsToPublish: number): Promise<PopulateStatsResult> {
     return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
       action: 'generate_dummy_explorations',
       num_dummy_exps_to_generate: numDummyExpsToGenerate,
@@ -450,26 +461,28 @@ export class AdminBackendApiService {
     });
   }
 
-  async reloadExplorationAsync(explorationId: string): Promise<void> {
+  async reloadExplorationAsync(explorationId: string):
+  Promise<PopulateStatsResult> {
     return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
       action: 'reload_exploration',
       exploration_id: String(explorationId)
     });
   }
 
-  async generateDummyNewStructuresDataAsync(): Promise<void> {
+  async generateDummyNewStructuresDataAsync(): Promise<PopulateStatsResult> {
     return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
       action: 'generate_dummy_new_structures_data'
     });
   }
 
-  async generateDummyNewSkillDataAsync(): Promise<void> {
+  async generateDummyNewSkillDataAsync(): Promise<PopulateStatsResult> {
     return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
       action: 'generate_dummy_new_skill_data'
     });
   }
 
-  async reloadCollectionAsync(collectionId: string): Promise<void> {
+  async reloadCollectionAsync(collectionId: string):
+  Promise<PopulateStatsResult> {
     return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
       action: 'reload_collection',
       collection_id: String(collectionId)
