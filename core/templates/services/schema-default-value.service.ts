@@ -156,6 +156,7 @@ export class SchemaDefaultValueService {
       return 0;
     } else {
       this.logger.error('Invalid schema: ' + JSON.stringify(schema));
+      throw new Error('Invalid Schema');
     }
   }
 }

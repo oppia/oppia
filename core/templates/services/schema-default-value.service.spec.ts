@@ -141,7 +141,7 @@ describe('Schema Default Value Service', () => {
       type: 'invalid'
     } as unknown as Schema;
 
-    expect(sdvs.getDefaultValue(schema)).toBeUndefined();
+    expect(() => sdvs.getDefaultValue(schema)).toThrowError('Invalid Schema');
     expect(loggerErrorSpy).toHaveBeenCalledWith(
       'Invalid schema: ' + JSON.stringify(schema));
   });
