@@ -29,6 +29,7 @@ import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory'
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { SubtitledUnicodeObjectFactory } from 'domain/exploration/SubtitledUnicodeObjectFactory';
 import { SolutionValidityService } from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
+import { Subscription } from 'rxjs';
 
 describe('Editor state service', () => {
   let ecs: StateEditorService = null;
@@ -40,6 +41,17 @@ describe('Editor state service', () => {
   let outcomeObjectFactory: OutcomeObjectFactory = null;
   let solutionValidityService: SolutionValidityService = null;
   let mockInteraction: Interaction;
+
+  let stateEditorInitializedSpy = null;
+  let stateEditorDirectiveInitializedSpy = null;
+  let interactionEditorInitializedSpy = null;
+  let showTranslationTabBusyModalSpy = null;
+  let refreshStateTranslationSpy = null;
+  let updateAnswerChoicesSpy = null;
+  let saveOutcomeDestDetailsSpy = null;
+  let handleCustomArgsUpdateSpy = null;
+  let objectFormValidityChangeSpy = null;
+  let testSubscriptions = null;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -111,6 +123,46 @@ describe('Editor state service', () => {
         },
       },
     });
+  });
+
+  beforeEach(() => {
+    stateEditorInitializedSpy = jasmine.createSpy('stateEditorInitialized');
+    stateEditorDirectiveInitializedSpy = jasmine.createSpy(
+      'stateEditorDirectiveInitialized');
+    interactionEditorInitializedSpy = jasmine.createSpy(
+      'interactionEditorInitialized');
+    showTranslationTabBusyModalSpy = jasmine.createSpy(
+      'showTranslationTabBusyModal');
+    refreshStateTranslationSpy = jasmine.createSpy('refreshStateTranslation');
+    updateAnswerChoicesSpy = jasmine.createSpy('updateAnswerChoices');
+    saveOutcomeDestDetailsSpy = jasmine.createSpy('saveOutcomeDestDetails');
+    handleCustomArgsUpdateSpy = jasmine.createSpy('handleCustomArgsUpdate');
+    objectFormValidityChangeSpy = jasmine.createSpy('objectFormValidityChange');
+
+    testSubscriptions = new Subscription();
+
+    testSubscriptions.add(ecs.onStateEditorInitialized.subscribe(
+      stateEditorInitializedSpy));
+    testSubscriptions.add(ecs.onStateEditorDirectiveInitialized.subscribe(
+      stateEditorDirectiveInitializedSpy));
+    testSubscriptions.add(ecs.onInteractionEditorInitialized.subscribe(
+      interactionEditorInitializedSpy));
+    testSubscriptions.add(ecs.onShowTranslationTabBusyModal.subscribe(
+      showTranslationTabBusyModalSpy));
+    testSubscriptions.add(ecs.onRefreshStateTranslation.subscribe(
+      refreshStateTranslationSpy));
+    testSubscriptions.add(ecs.onUpdateAnswerChoices.subscribe(
+      updateAnswerChoicesSpy));
+    testSubscriptions.add(ecs.onSaveOutcomeDestDetails.subscribe(
+      saveOutcomeDestDetailsSpy));
+    testSubscriptions.add(ecs.onHandleCustomArgsUpdate.subscribe(
+      handleCustomArgsUpdateSpy));
+    testSubscriptions.add(ecs.onObjectFormValidityChange.subscribe(
+      objectFormValidityChangeSpy));
+  });
+
+  afterAll(() => {
+    testSubscriptions.unsubscribe();
   });
 
   it('should correctly set and get state names', () => {
@@ -504,70 +556,5 @@ describe('Editor state service', () => {
     expect(ecs.isCurrentSolutionValid()).toBe(true);
     ecs.deleteCurrentSolutionValidity();
     expect(ecs.isCurrentSolutionValid()).toBe(undefined);
-  });
-
-  it('should get event emitter on state editor initialization', () => {
-    spyOn(ecs.onStateEditorInitialized, 'subscribe');
-    ecs.onStateEditorInitialized.subscribe();
-    ecs.onStateEditorInitialized.emit();
-    expect(ecs.onStateEditorInitialized.subscribe).toHaveBeenCalled();
-  });
-
-  it('should get event emitter on state editor directive' +
-    ' initialization', () => {
-    spyOn(ecs.onStateEditorDirectiveInitialized, 'subscribe');
-    ecs.onStateEditorDirectiveInitialized.subscribe();
-    ecs.onStateEditorDirectiveInitialized.emit();
-    expect(ecs.onStateEditorDirectiveInitialized.subscribe).toHaveBeenCalled();
-  });
-
-  it('should get event emitter on interaction editor initialization', () => {
-    spyOn(ecs.onInteractionEditorInitialized, 'subscribe');
-    ecs.onInteractionEditorInitialized.subscribe();
-    ecs.onInteractionEditorInitialized.emit();
-    expect(ecs.onInteractionEditorInitialized.subscribe).toHaveBeenCalled();
-  });
-
-  it('should get event emitter on showing' +
-    ' translation tab busy modal', () => {
-    spyOn(ecs.onShowTranslationTabBusyModal, 'subscribe');
-    ecs.onShowTranslationTabBusyModal.subscribe();
-    ecs.onShowTranslationTabBusyModal.emit();
-    expect(ecs.onShowTranslationTabBusyModal.subscribe).toHaveBeenCalled();
-  });
-
-  it('should get event emitter on refreshing state translation', () => {
-    spyOn(ecs.onRefreshStateTranslation, 'subscribe');
-    ecs.onRefreshStateTranslation.subscribe();
-    ecs.onRefreshStateTranslation.emit();
-    expect(ecs.onRefreshStateTranslation.subscribe).toHaveBeenCalled();
-  });
-
-  it('should get event emitter on updating answer choice', () => {
-    spyOn(ecs.onUpdateAnswerChoices, 'subscribe');
-    ecs.onUpdateAnswerChoices.subscribe();
-    ecs.onUpdateAnswerChoices.emit();
-    expect(ecs.onUpdateAnswerChoices.subscribe).toHaveBeenCalled();
-  });
-
-  it('should get event emitter on saving outcome destination details', () => {
-    spyOn(ecs.onSaveOutcomeDestDetails, 'subscribe');
-    ecs.onSaveOutcomeDestDetails.subscribe();
-    ecs.onSaveOutcomeDestDetails.emit();
-    expect(ecs.onSaveOutcomeDestDetails.subscribe).toHaveBeenCalled();
-  });
-
-  it('should get event emitter on handling custom arguments update', () => {
-    spyOn(ecs.onHandleCustomArgsUpdate, 'subscribe');
-    ecs.onHandleCustomArgsUpdate.subscribe();
-    ecs.onHandleCustomArgsUpdate.emit();
-    expect(ecs.onHandleCustomArgsUpdate.subscribe).toHaveBeenCalled();
-  });
-
-  it('should get event emitter on object form validity change', () => {
-    spyOn(ecs.onObjectFormValidityChange, 'subscribe');
-    ecs.onObjectFormValidityChange.subscribe();
-    ecs.onObjectFormValidityChange.emit();
-    expect(ecs.onObjectFormValidityChange.subscribe).toHaveBeenCalled();
   });
 });

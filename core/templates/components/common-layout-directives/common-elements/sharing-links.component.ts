@@ -62,7 +62,7 @@ export class SharingLinksComponent implements OnInit {
       this.activityId = this.collectionId;
       this.activityUrlFragment = 'collection';
     } else {
-      // TODO(aishwary023): Remove this code to throw error. Remove @Input to
+      // TODO(#13122): Remove this code to throw error. Remove @Input to
       // this component and use ContextService directly to determine if the
       // collection or exploration page is active and render accordingly.
       throw new Error(
@@ -86,8 +86,12 @@ export class SharingLinksComponent implements OnInit {
     let classes = '';
     classes += this.smallFont ? 'font-small' : 'font-big';
     classes += ' fx-' + this.layoutType;
-    classes += ' fx-main-' + this.layoutAlignType.split('-')[0];
-    classes += ' fx-cross-' + this.layoutAlignType.split('-')[1];
+    if (this.layoutAlignType) {
+      classes += ' fx-main-' + this.layoutAlignType.split(' ')[0];
+      if (this.layoutAlignType.split(' ')[1]) {
+        classes += ' fx-cross-' + this.layoutAlignType.split(' ')[1];
+      }
+    }
     return classes;
   }
 

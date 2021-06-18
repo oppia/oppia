@@ -130,18 +130,34 @@ describe('SharingLinksComponent', () => {
   it('should get font and flex class according to font size', () => {
     component.smallFont = true;
     component.layoutType = 'row';
-    component.layoutAlignType = 'center-end';
+    component.layoutAlignType = 'center end';
 
     expect(component.getFontAndFlexClass()).toBe(
       'font-small fx-row fx-main-center fx-cross-end');
 
     component.smallFont = false;
+    component.layoutType = 'row-center';
+    component.layoutAlignType = 'center';
 
     expect(component.getFontAndFlexClass()).toBe(
-      'font-big fx-row fx-main-center fx-cross-end');
+      'font-big fx-row-center fx-main-center');
+
+    component.smallFont = true;
+    component.layoutType = 'row-center';
+    component.layoutAlignType = '';
+
+    expect(component.getFontAndFlexClass()).toBe(
+      'font-small fx-row-center');
   });
 
   it('should get social media URLs', () => {
+    expect(component.getUrl('facebook')).toBe(
+      'https://www.facebook.com/sharer/sharer.php?sdk=joey&u=undefined/undefined/undefined&display=popup&ref=plugin&src=share_button');
+    expect(component.getUrl('twitter')).toBe(
+      'https://twitter.com/share?text=undefined&url=undefined/undefined/undefined');
+    expect(component.getUrl('classroom')).toBe(
+      'https://classroom.google.com/share?url=undefined/undefined/undefined');
+
     component.serverName = 'https://www.oppia.org';
     component.activityUrlFragment = 'explore';
     component.activityId = 'exp1';
@@ -149,11 +165,9 @@ describe('SharingLinksComponent', () => {
       ' lesson on Oppia - a free platform for teaching and learning!';
 
     expect(component.getUrl('facebook')).toBe(
-      'https://www.facebook.com/sharer/sharer.php?sdk=joey&u=https://www.oppia.org/explore/exp1&display=popup&ref=plugin&src=share_button'
-    );
+      'https://www.facebook.com/sharer/sharer.php?sdk=joey&u=https://www.oppia.org/explore/exp1&display=popup&ref=plugin&src=share_button');
     expect(component.getUrl('twitter')).toBe(
-      'https://twitter.com/share?text=Check out this interactive lesson on Oppia - a free platform for teaching and learning!&url=https://www.oppia.org/explore/exp1'
-    );
+      'https://twitter.com/share?text=Check out this interactive lesson on Oppia - a free platform for teaching and learning!&url=https://www.oppia.org/explore/exp1');
     expect(component.getUrl('classroom')).toBe(
       'https://classroom.google.com/share?url=https://www.oppia.org/explore/exp1');
   });
