@@ -729,7 +729,7 @@ PYTHON3_CMD = 'python3'
 
 
 _PARSER = argparse.ArgumentParser(
-    description='Type checking script for Oppia codebase.'
+    description='Python type checking using mypy script.'
 )
 
 _PARSER.add_argument(
