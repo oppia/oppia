@@ -35,17 +35,17 @@ import python_utils
 import utils
 
 (
-    app_feedback_report_models, auth_models, base_models, collection_models,
-    config_models, email_models, exploration_models, feedback_models,
-    improvements_models, question_models, skill_models, story_models,
-    subtopic_models, suggestion_models, topic_models, user_models
+    app_feedback_report_models, auth_models, base_models, blog_models,
+    collection_models, config_models, email_models, exploration_models,
+    feedback_models, improvements_models, question_models, skill_models,
+    story_models, subtopic_models, suggestion_models, topic_models, user_models
 ) = models.Registry.import_models([
     models.NAMES.app_feedback_report, models.NAMES.auth,
-    models.NAMES.base_model, models.NAMES.collection, models.NAMES.config,
-    models.NAMES.email, models.NAMES.exploration, models.NAMES.feedback,
-    models.NAMES.improvements, models.NAMES.question, models.NAMES.skill,
-    models.NAMES.story, models.NAMES.subtopic, models.NAMES.suggestion,
-    models.NAMES.topic, models.NAMES.user
+    models.NAMES.base_model, models.NAMES.blog, models.NAMES.collection,
+    models.NAMES.config, models.NAMES.email, models.NAMES.exploration,
+    models.NAMES.feedback, models.NAMES.improvements, models.NAMES.question,
+    models.NAMES.skill, models.NAMES.story, models.NAMES.subtopic,
+    models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user
 ])
 
 
@@ -234,6 +234,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
     PROFILE_ID_1 = 'profile_1'
     THREAD_ID_1 = 'thread_id_1'
     THREAD_ID_2 = 'thread_id_2'
+    BLOG_POST_ID_1 = 'blog_post_id_1'
+    BLOG_POST_ID_2 = 'blog_post_id_2'
     TOPIC_ID_1 = 'topic_id_1'
     TOPIC_ID_2 = 'topic_id_2'
     USER_1_ROLE = feconf.ROLE_ID_ADMIN
@@ -360,6 +362,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         16) Creates two reply-to ids for feedback.
         17) Creates a task closed by the user.
         18) Simulates user_1 scrubbing a report.
+        19) Creates new BlogPostModel and BlogPostRightsModel.
         """
         # Setup for UserStatsModel.
         user_models.UserStatsModel(
@@ -758,6 +761,38 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         report_entity.update_timestamps()
         report_entity.put()
 
+        # Set-up for the BlogPostModel.
+        blog_post_model = blog_models.BlogPostModel(
+            id=self.BLOG_POST_ID_1,
+            author_id=self.USER_ID_1,
+            content='content sample',
+            title='sample title',
+            published_on=datetime.datetime.utcnow(),
+            url_fragment='sample-url-fragment',
+            tags=['tag', 'one'],
+            thumbnail_filename='thumbnail'
+        )
+        blog_post_model.update_timestamps()
+        blog_post_model.put()
+
+        blog_post_rights_for_post_1 = blog_models.BlogPostRightsModel(
+            id=self.BLOG_POST_ID_1,
+            editor_ids=[self.USER_ID_1],
+            blog_post_is_published=True,
+        )
+
+        blog_post_rights_for_post_1.update_timestamps()
+        blog_post_rights_for_post_1.put()
+
+        blog_post_rights_for_post_2 = blog_models.BlogPostRightsModel(
+            id=self.BLOG_POST_ID_2,
+            editor_ids=[self.USER_ID_1],
+            blog_post_is_published=False,
+        )
+
+        blog_post_rights_for_post_2.update_timestamps()
+        blog_post_rights_for_post_2.put()
+
     def set_up_trivial(self):
         """Setup for trivial test of export_data functionality."""
         user_models.UserSettingsModel(
@@ -868,9 +903,15 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_platform_parameter_sm = {}
         expected_user_auth_details = {}
         expected_user_email_preferences = {}
+        expected_blog_post_data = {}
+        expected_blog_post_rights = {
+            'editable_blog_post_ids': []
+        }
 
         expected_user_data = {
             'app_feedback_report': app_feedback_report,
+            'blog_post': expected_blog_post_data,
+            'blog_post_rights': expected_blog_post_rights,
             'user_stats': stats_data,
             'user_settings': user_settings_data,
             'user_subscriptions': subscriptions_data,
@@ -1129,6 +1170,19 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         )
         feedback_thread_model.update_timestamps()
         feedback_thread_model.put()
+
+        blog_post_model = blog_models.BlogPostModel(
+            id=self.BLOG_POST_ID_1,
+            author_id=self.USER_ID_1,
+            content='content sample',
+            title='sample title',
+            published_on=datetime.datetime.utcnow(),
+            url_fragment='sample-url-fragment',
+            tags=['tag', 'one'],
+            thumbnail_filename='thumbnail'
+        )
+        blog_post_model.update_timestamps()
+        blog_post_model.put()
 
         expected_stats_data = {
             'impact_score': self.USER_1_IMPACT_SCORE,
@@ -1446,7 +1500,21 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                     'report_type': self.REPORT_TYPE_SUGGESTION,
                     'category': self.CATEGORY_OTHER,
                     'platform_version': self.PLATFORM_VERSION}}
-
+        expected_blog_post_data = {
+            'content': 'content sample',
+            'title': 'sample title',
+            'published_on': utils.get_time_in_millisecs(
+                blog_post_model.published_on),
+            'url_fragment': 'sample-url-fragment',
+            'tags': ['tag', 'one'],
+            'thumbnail_filename': 'thumbnail'
+        }
+        expected_blog_post_rights = {
+            'editable_blog_post_ids': [
+                self.BLOG_POST_ID_1,
+                self.BLOG_POST_ID_2
+            ],
+        }
         expected_user_data = {
             'user_stats': expected_stats_data,
             'user_settings': expected_user_settings_data,
@@ -1498,7 +1566,9 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 expected_platform_parameter_sm,
             'user_email_preferences': expected_user_email_preferences,
             'user_auth_details': expected_user_auth_details,
-            'app_feedback_report': expected_app_feedback_report
+            'app_feedback_report': expected_app_feedback_report,
+            'blog_post': expected_blog_post_data,
+            'blog_post_rights': expected_blog_post_rights
         }
 
         user_takeout_object = takeout_service.export_data_for_user(
