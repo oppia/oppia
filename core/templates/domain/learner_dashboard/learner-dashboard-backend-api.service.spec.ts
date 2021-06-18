@@ -28,6 +28,20 @@ describe('Learner Dashboard Backend API Service', () => {
     LearnerDashboardBackendApiService = null;
   let httpTestingController: HttpTestingController;
 
+  let nodeDict = {
+    id: 'node_1',
+    thumbnail_filename: 'image.png',
+    title: 'Title 1',
+    description: 'Description 1',
+    prerequisite_skill_ids: ['skill_1'],
+    acquired_skill_ids: ['skill_2'],
+    destination_node_ids: ['node_2'],
+    outline: 'Outline',
+    exploration_id: null,
+    outline_is_finalized: false,
+    thumbnail_bg_color: '#a33f40'
+  };
+
   let sampleDataResults = {
     incomplete_explorations_list: [{
       category: 'Arithmetic',
@@ -145,13 +159,99 @@ describe('Learner Dashboard Backend API Service', () => {
         'Learn the basics of fractions with Matthew as he explores a bakery.',
       node_count: 12
     }],
+    completed_stories_list: [{
+      id: 'sample_story_id',
+      title: 'Story title',
+      node_titles: ['Chapter 1', 'Chapter 2'],
+      thumbnail_filename: 'image.svg',
+      thumbnail_bg_color: '#F8BF74',
+      description: 'Description',
+      story_is_published: true,
+      completed_node_titles: ['Chapter 1', 'Chapter 2'],
+      url_fragment: 'story-url-fragment',
+      all_node_dicts: [nodeDict]
+    }],
+    learnt_topics_list: [{
+      id: 'hyuy4GUlvTqJ',
+      name: 'Sample Name',
+      classroom: 'Math',
+      language_code: 'en',
+      version: 1,
+      canonical_story_count: 3,
+      additional_story_count: 0,
+      uncategorized_skill_count: 1,
+      subtopic_count: 1,
+      topic_model_created_on: 1466178691847.67,
+      topic_model_last_updated: 1466178759209.839,
+      description: 'description',
+      total_skill_count: 2,
+      total_published_node_count: 3,
+      thumbnail_filename: 'image.svg',
+      thumbnail_bg_color: '#C6DCDA',
+      url_fragment: 'sample-name',
+      subtopics: [{
+        skill_ids: ['skill_id_2'],
+        id: 1,
+        title: 'subtopic_name',
+        thumbnail_filename: 'image.svg',
+        thumbnail_bg_color: '#F8BF74',
+        url_fragment: 'subtopic-name'
+      }],
+      degrees_of_mastery: {
+        skill_id_1: 0.5,
+        skill_id_2: 0.3
+      },
+      skill_descriptions: {
+        skill_id_1: 'Skill Description 1',
+        skill_id_2: 'Skill Description 2'
+      }
+    }],
+    partially_learnt_topics_list: [{
+      id: 'fyuy4GUlvTqJ',
+      name: 'Sample Name',
+      classroom: 'Math',
+      language_code: 'en',
+      version: 1,
+      canonical_story_count: 3,
+      additional_story_count: 0,
+      uncategorized_skill_count: 1,
+      subtopic_count: 1,
+      topic_model_created_on: 1466178691847.67,
+      topic_model_last_updated: 1466178759209.839,
+      description: 'description',
+      total_skill_count: 2,
+      total_published_node_count: 3,
+      thumbnail_filename: 'image.svg',
+      thumbnail_bg_color: '#C6DCDA',
+      url_fragment: 'sample-name',
+      subtopics: [{
+        skill_ids: ['skill_id_2'],
+        id: 1,
+        title: 'subtopic_name',
+        thumbnail_filename: 'image.svg',
+        thumbnail_bg_color: '#F8BF74',
+        url_fragment: 'subtopic-name'
+      }],
+      degrees_of_mastery: {
+        skill_id_1: 0.5,
+        skill_id_2: 0.3
+      },
+      skill_descriptions: {
+        skill_id_1: 'Skill Description 1',
+        skill_id_2: 'Skill Description 2'
+      }
+    }],
     number_of_nonexistent_activities: {
       completed_collections: 0,
       incomplete_collections: 0,
       collection_playlist: 0,
       incomplete_explorations: 0,
       exploration_playlist: 0,
-      completed_explorations: 0
+      completed_explorations: 0,
+      completed_stories: 0,
+      incomplete_stories: 0,
+      learnt_topics: 0,
+      partially_learnt_topics: 0
     },
     completed_explorations_list: [{
       category: 'Welcome',
@@ -183,7 +283,9 @@ describe('Learner Dashboard Backend API Service', () => {
       creator_picture_data_url: 'path/to/img'
     }],
     user_email: 'user@example.com',
-    completed_to_incomplete_collections: []
+    completed_to_incomplete_collections: [],
+    completed_to_incomplete_stories: [],
+    learnt_to_partially_learnt_topics: []
   };
 
   let LEARNER_DASHBOARD_DATA_URL = '/learnerdashboardhandler/data';

@@ -39,6 +39,8 @@ export default {
     "Statistics", "Trigonometry", "Welcome"],
   "ACTIVITY_TYPE_EXPLORATION": "exploration",
   "ACTIVITY_TYPE_COLLECTION": "collection",
+  "ACTIVITY_TYPE_STORY": "story",
+  "ACTIVITY_TYPE_LEARN_TOPIC": "learn topic",
   "DISABLED_EXPLORATION_IDS": ["5"],
   "TESTING_CONSTANT": "test",
   "LIBRARY_TILE_WIDTH_PX": 208,

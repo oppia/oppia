@@ -372,6 +372,17 @@ class CompletedActivitiesModel(base_models.BaseModel):
     # IDs of all the collections completed by the user.
     collection_ids = (
         datastore_services.StringProperty(repeated=True, indexed=True))
+    # IDs of all the stories completed by the user.
+    story_ids = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
+    # IDs of all the topics learnt by the user (i.e. the topics in which the
+    # learner has completed all the stories).
+    learnt_topic_ids = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
+    # IDs of all the topics learnt by the user(i.e. the topics in which the
+    # learner has completed all the subtopics).
+    mastered_topic_ids = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
 
     @staticmethod
     def get_deletion_policy():
@@ -388,7 +399,10 @@ class CompletedActivitiesModel(base_models.BaseModel):
         """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'exploration_ids': base_models.EXPORT_POLICY.EXPORTED,
-            'collection_ids': base_models.EXPORT_POLICY.EXPORTED
+            'collection_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'story_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'learnt_topic_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'mastered_topic_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
@@ -420,11 +434,13 @@ class CompletedActivitiesModel(base_models.BaseModel):
             user_id: str. The user_id denotes which user's data to extract.
 
         Returns:
-            dict. A dict with two keys, 'completed_exploration_ids'
-            and 'completed_collection_ids'. The corresponding values are
-            lists of the IDs of the explorations and collections,
-            respectively, which the given user has completed. If there is no
-            model for the given user_id, the function returns an empty dict.
+            dict. A dict with four keys, 'completed_exploration_ids',
+            'completed_collection_ids', 'completed_story_ids' and
+            'learnt_topic_ids'. The corresponding values are
+            lists of the IDs of the explorations, collections, stories
+            and topics respectively, which the given user has completed.
+            If there is no model for the given user_id, the function
+            returns an empty dict.
         """
         user_model = CompletedActivitiesModel.get(user_id, strict=False)
         if user_model is None:
@@ -432,7 +448,9 @@ class CompletedActivitiesModel(base_models.BaseModel):
 
         return {
             'exploration_ids': user_model.exploration_ids,
-            'collection_ids': user_model.collection_ids
+            'collection_ids': user_model.collection_ids,
+            'story_ids': user_model.story_ids,
+            'learnt_topic_ids': user_model.learnt_topic_ids
         }
 
 
@@ -448,6 +466,17 @@ class IncompleteActivitiesModel(base_models.BaseModel):
         datastore_services.StringProperty(repeated=True, indexed=True))
     # The ids of the collections partially completed by the user.
     collection_ids = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
+    # IDs of all the stories partially completed by the user.
+    story_ids = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
+    # IDs of all the topics partially learnt by the user(i.e. the topics in
+    # which the learner has not completed all the stories).
+    partially_learnt_topic_ids = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
+    # IDs of all the topics partially mastered by the user(i.e. the topics in
+    # which the learner has not completed all the subtopics).
+    partially_mastered_topic_ids = (
         datastore_services.StringProperty(repeated=True, indexed=True))
 
     @staticmethod
@@ -465,7 +494,11 @@ class IncompleteActivitiesModel(base_models.BaseModel):
         """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'exploration_ids': base_models.EXPORT_POLICY.EXPORTED,
-            'collection_ids': base_models.EXPORT_POLICY.EXPORTED
+            'collection_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'story_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'partially_learnt_topic_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'partially_mastered_topic_ids': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE)
         })
 
     @classmethod
@@ -497,10 +530,11 @@ class IncompleteActivitiesModel(base_models.BaseModel):
             user_id: str. The user_id denotes which user's data to extract.
 
         Returns:
-            dict or None. A dict with two keys, 'incomplete_exploration_ids'
-            and 'incomplete_collection_ids'. The corresponding values are
-            lists of the IDs of the explorations and collections,
-            respectively, which the given user has not yet completed. If
+            dict or None. A dict with four keys, 'incomplete_exploration_ids',
+            'incomplete_collection_ids', 'incomplete_story_ids' and
+            'partially_learnt_topic_ids'. The corresponding values are
+            lists of the IDs of the explorations, collections, stories and
+            topics respectively, which the given user has not yet completed. If
             the user_id is invalid, returns None.
         """
         user_model = IncompleteActivitiesModel.get(user_id, strict=False)
@@ -509,7 +543,9 @@ class IncompleteActivitiesModel(base_models.BaseModel):
 
         return {
             'exploration_ids': user_model.exploration_ids,
-            'collection_ids': user_model.collection_ids
+            'collection_ids': user_model.collection_ids,
+            'story_ids': user_model.story_ids,
+            'partially_learnt_topic_ids': user_model.partially_learnt_topic_ids
         }
 
 

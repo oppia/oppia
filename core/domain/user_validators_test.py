@@ -38,6 +38,8 @@ from core.domain import state_domain
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import subscription_services
+from core.domain import subtopic_page_domain
+from core.domain import subtopic_page_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_domain
@@ -57,10 +59,12 @@ USER_NAME = 'username'
 
 (
     collection_models, email_models, exp_models,
-    skill_models, story_models, user_models
+    skill_models, story_models, topic_models,
+    user_models
 ) = models.Registry.import_models([
     models.NAMES.collection, models.NAMES.email, models.NAMES.exploration,
-    models.NAMES.skill, models.NAMES.story, models.NAMES.user
+    models.NAMES.skill, models.NAMES.story, models.NAMES.topic,
+    models.NAMES.user
 ])
 
 
@@ -283,12 +287,20 @@ class UserNormalizedNameAuditOneOffJobTests(test_utils.AuditJobsTestBase):
 
 class CompletedActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
 
+    STORY_ID_0 = 'story_0'
+    TOPIC_ID_0 = 'topic_0'
+    STORY_ID_1 = 'story_1'
+    TOPIC_ID_1 = 'topic_1'
+
     def setUp(self):
         super(CompletedActivitiesModelValidatorTests, self).setUp()
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.owner = user_services.get_user_actions_info(self.owner_id)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.set_admins([self.ADMIN_USERNAME])
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
         explorations = [exp_domain.Exploration.create_default_exploration(
             '%s' % i,
@@ -326,6 +338,66 @@ class CompletedActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
             collection_services.save_new_collection(self.owner_id, col)
             rights_manager.publish_collection(self.owner, col.id)
 
+        topic = topic_domain.Topic.create_default_topic(
+            self.TOPIC_ID_0, 'topic', 'abbrev', 'description')
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
+        topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_1'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                'dummy-subtopic-url')]
+        topic.next_subtopic_id = 2
+        subtopic_page = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                1, self.TOPIC_ID_0))
+        subtopic_page_services.save_subtopic_page(
+            self.owner_id, subtopic_page, 'Added subtopic',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': 1,
+                'title': 'Sample'
+            })]
+        )
+        topic_services.save_new_topic(self.owner_id, topic)
+        self.save_new_story(self.STORY_ID_0, self.owner_id, self.TOPIC_ID_0)
+        topic_services.add_canonical_story(
+            self.owner_id, self.TOPIC_ID_0, self.STORY_ID_0)
+
+        topic_services.publish_story(
+            self.TOPIC_ID_0, self.STORY_ID_0, self.admin_id)
+        topic_services.publish_topic(self.TOPIC_ID_0, self.admin_id)
+
+        topic = topic_domain.Topic.create_default_topic(
+            self.TOPIC_ID_1, 'topic 1', 'abbrev-one', 'description 1')
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
+        topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title 1', ['skill_id_1'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                'dummy-subtopic-url-one')]
+        topic.next_subtopic_id = 2
+        subtopic_page = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                1, self.TOPIC_ID_1))
+        subtopic_page_services.save_subtopic_page(
+            self.owner_id, subtopic_page, 'Added subtopic',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': 1,
+                'title': 'Sample'
+            })]
+        )
+        topic_services.save_new_topic(self.owner_id, topic)
+        self.save_new_story(self.STORY_ID_1, self.owner_id, self.TOPIC_ID_1)
+        topic_services.add_canonical_story(
+            self.owner_id, self.TOPIC_ID_1, self.STORY_ID_1)
+
+        topic_services.publish_story(
+            self.TOPIC_ID_1, self.STORY_ID_1, self.admin_id)
+        topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id)
+
         self.signup(USER_EMAIL, USER_NAME)
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
 
@@ -333,11 +405,19 @@ class CompletedActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
             self.user_id, '0', 'Introduction', 1)
         learner_progress_services.mark_collection_as_incomplete(
             self.user_id, '3')
+        learner_progress_services.record_story_started(
+            self.user_id, self.STORY_ID_0)
+        learner_progress_services.record_topic_started(
+            self.user_id, self.TOPIC_ID_0)
         for i in python_utils.RANGE(1, 3):
             learner_progress_services.mark_exploration_as_completed(
                 self.user_id, '%s' % i)
             learner_progress_services.mark_collection_as_completed(
                 self.user_id, '%s' % (i + 3))
+        learner_progress_services.mark_story_as_completed(
+            self.user_id, self.STORY_ID_1)
+        learner_progress_services.mark_topic_as_learnt(
+            self.user_id, self.TOPIC_ID_1)
 
         self.model_instance = user_models.CompletedActivitiesModel.get_by_id(
             self.user_id)
@@ -426,6 +506,32 @@ class CompletedActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
+    def test_missing_story_model_failure(self):
+        story_models.StoryModel.get_by_id(self.STORY_ID_1).delete(
+            feconf.SYSTEM_COMMITTER_ID, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for story_ids '
+                'field check of CompletedActivitiesModel\', '
+                '[u"Entity id %s: based on field story_ids having value '
+                'story_1, expected model StoryModel with id story_1 but it '
+                'doesn\'t exist"]]') % self.user_id]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_missing_topic_model_failure(self):
+        topic_models.TopicModel.get_by_id(self.TOPIC_ID_1).delete(
+            feconf.SYSTEM_COMMITTER_ID, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for learnt_topic_ids '
+                'field check of CompletedActivitiesModel\', '
+                '[u"Entity id %s: based on field learnt_topic_ids having value '
+                'topic_1, expected model TopicModel with id topic_1 but it '
+                'doesn\'t exist"]]') % self.user_id]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
     def test_common_exploration(self):
         self.model_instance.exploration_ids.append('0')
         self.model_instance.update_timestamps()
@@ -448,6 +554,33 @@ class CompletedActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
             'check of CompletedActivitiesModel\', '
             '[u"Entity id %s: Common values for collection_ids in entity '
             'and collection_ids in IncompleteActivitiesModel: [u\'3\']"]]') % (
+                self.user_id)]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_common_story(self):
+        self.model_instance.story_ids.append(self.STORY_ID_0)
+        self.model_instance.update_timestamps()
+        self.model_instance.put()
+        expected_output = [(
+            u'[u\'failed validation check for story_ids match '
+            'check of CompletedActivitiesModel\', '
+            '[u"Entity id %s: Common values for story_ids in entity '
+            'and story_ids in IncompleteActivitiesModel: [u\'story_0\']"]]') % (
+                self.user_id)]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_common_topic(self):
+        self.model_instance.learnt_topic_ids.append(self.TOPIC_ID_0)
+        self.model_instance.update_timestamps()
+        self.model_instance.put()
+        expected_output = [(
+            u'[u\'failed validation check for learnt_topic_ids match '
+            'check of CompletedActivitiesModel\', '
+            '[u"Entity id %s: Common values for learnt_topic_ids in entity '
+            'and partially_learnt_topic_ids in IncompleteActivitiesModel: '
+            '[u\'topic_0\']"]]') % (
                 self.user_id)]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
@@ -487,12 +620,20 @@ class CompletedActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
 
 class IncompleteActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
 
+    STORY_ID_0 = 'story_0'
+    TOPIC_ID_0 = 'topic_0'
+    STORY_ID_1 = 'story_1'
+    TOPIC_ID_1 = 'topic_1'
+
     def setUp(self):
         super(IncompleteActivitiesModelValidatorTests, self).setUp()
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.owner = user_services.get_user_actions_info(self.owner_id)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.set_admins([self.ADMIN_USERNAME])
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
         explorations = [exp_domain.Exploration.create_default_exploration(
             '%s' % i,
@@ -531,9 +672,73 @@ class IncompleteActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
             collection_services.save_new_collection(self.owner_id, col)
             rights_manager.publish_collection(self.owner, col.id)
 
+        topic = topic_domain.Topic.create_default_topic(
+            self.TOPIC_ID_0, 'topic', 'abbrev', 'description')
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
+        topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_1'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                'dummy-subtopic-url')]
+        topic.next_subtopic_id = 2
+        subtopic_page = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                1, self.TOPIC_ID_0))
+        subtopic_page_services.save_subtopic_page(
+            self.owner_id, subtopic_page, 'Added subtopic',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': 1,
+                'title': 'Sample'
+            })]
+        )
+        topic_services.save_new_topic(self.owner_id, topic)
+        self.save_new_story(self.STORY_ID_0, self.owner_id, self.TOPIC_ID_0)
+        topic_services.add_canonical_story(
+            self.owner_id, self.TOPIC_ID_0, self.STORY_ID_0)
+
+        topic_services.publish_story(
+            self.TOPIC_ID_0, self.STORY_ID_0, self.admin_id)
+        topic_services.publish_topic(self.TOPIC_ID_0, self.admin_id)
+
+        topic = topic_domain.Topic.create_default_topic(
+            self.TOPIC_ID_1, 'topic 1', 'abbrev-one', 'description 1')
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
+        topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title 1', ['skill_id_1'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                'dummy-subtopic-url-one')]
+        topic.next_subtopic_id = 2
+        subtopic_page = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                1, self.TOPIC_ID_1))
+        subtopic_page_services.save_subtopic_page(
+            self.owner_id, subtopic_page, 'Added subtopic',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': 1,
+                'title': 'Sample'
+            })]
+        )
+        topic_services.save_new_topic(self.owner_id, topic)
+        self.save_new_story(self.STORY_ID_1, self.owner_id, self.TOPIC_ID_1)
+        topic_services.add_canonical_story(
+            self.owner_id, self.TOPIC_ID_1, self.STORY_ID_1)
+
+        topic_services.publish_story(
+            self.TOPIC_ID_1, self.STORY_ID_1, self.admin_id)
+        topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id)
+
         self.signup(USER_EMAIL, USER_NAME)
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
 
+        learner_progress_services.mark_story_as_completed(
+            self.user_id, self.STORY_ID_0)
+        learner_progress_services.mark_topic_as_learnt(
+            self.user_id, self.TOPIC_ID_0)
         learner_progress_services.mark_exploration_as_completed(
             self.user_id, '0')
         learner_progress_services.mark_collection_as_completed(
@@ -543,6 +748,10 @@ class IncompleteActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
                 self.user_id, '%s' % i, 'Introduction', 1)
             learner_progress_services.mark_collection_as_incomplete(
                 self.user_id, '%s' % (i + 3))
+        learner_progress_services.record_story_started(
+            self.user_id, self.STORY_ID_1)
+        learner_progress_services.record_topic_started(
+            self.user_id, self.TOPIC_ID_1)
 
         self.model_instance = user_models.IncompleteActivitiesModel.get_by_id(
             self.user_id)
@@ -631,6 +840,32 @@ class IncompleteActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
+    def test_missing_story_model_failure(self):
+        story_models.StoryModel.get_by_id(self.STORY_ID_1).delete(
+            feconf.SYSTEM_COMMITTER_ID, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for story_ids '
+                'field check of IncompleteActivitiesModel\', '
+                '[u"Entity id %s: based on field story_ids having value '
+                'story_1, expected model StoryModel with id story_1 but it '
+                'doesn\'t exist"]]') % self.user_id]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_missing_topic_model_failure(self):
+        topic_models.TopicModel.get_by_id(self.TOPIC_ID_1).delete(
+            feconf.SYSTEM_COMMITTER_ID, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for partially_learnt_topic_ids '
+                'field check of IncompleteActivitiesModel\', '
+                '[u"Entity id %s: based on field partially_learnt_topic_ids '
+                'having value topic_1, expected model TopicModel with id '
+                'topic_1 but it doesn\'t exist"]]') % self.user_id]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
     def test_common_exploration(self):
         self.model_instance.exploration_ids.append('0')
         self.model_instance.update_timestamps()
@@ -653,6 +888,33 @@ class IncompleteActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
             'check of IncompleteActivitiesModel\', '
             '[u"Entity id %s: Common values for collection_ids in entity '
             'and collection_ids in CompletedActivitiesModel: [u\'3\']"]]') % (
+                self.user_id)]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_common_story(self):
+        self.model_instance.story_ids.append(self.STORY_ID_0)
+        self.model_instance.update_timestamps()
+        self.model_instance.put()
+        expected_output = [(
+            u'[u\'failed validation check for story_ids match '
+            'check of IncompleteActivitiesModel\', '
+            '[u"Entity id %s: Common values for story_ids in entity '
+            'and story_ids in CompletedActivitiesModel: [u\'story_0\']"]]') % (
+                self.user_id)]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_common_topic(self):
+        self.model_instance.partially_learnt_topic_ids.append(self.TOPIC_ID_0)
+        self.model_instance.update_timestamps()
+        self.model_instance.put()
+        expected_output = [(
+            u'[u\'failed validation check for partially_learnt_topic_ids match '
+            'check of IncompleteActivitiesModel\', '
+            '[u"Entity id %s: Common values for partially_learnt_topic_ids in '
+            'entity and learnt_topic_ids in CompletedActivitiesModel: '
+            '[u\'topic_0\']"]]') % (
                 self.user_id)]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)

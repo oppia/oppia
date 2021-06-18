@@ -338,6 +338,8 @@ class CronJobTests(test_utils.GenericTestBase):
             id=admin_user_id,
             exploration_ids=[],
             collection_ids=[],
+            story_ids=[],
+            learnt_topic_ids=[],
             last_updated=datetime.datetime.utcnow() - self.NINE_WEEKS,
             deleted=True
         )

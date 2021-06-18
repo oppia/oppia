@@ -561,7 +561,8 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
         wipeout_service.run_user_deletion(self.pending_deletion_request)
 
         user_models.CompletedActivitiesModel(
-            id=self.user_1_id, exploration_ids=[], collection_ids=[]
+            id=self.user_1_id, exploration_ids=[], collection_ids=[],
+            story_ids=[], learnt_topic_ids=[]
         ).put()
 
         email_content = (
@@ -4190,10 +4191,12 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
         user_models.CompletedActivitiesModel(
-            id=self.user_2_id, exploration_ids=[], collection_ids=[]
+            id=self.user_2_id, exploration_ids=[], collection_ids=[],
+            story_ids=[], learnt_topic_ids=[]
         ).put()
         user_models.IncompleteActivitiesModel(
-            id=self.user_2_id, exploration_ids=[], collection_ids=[]
+            id=self.user_2_id, exploration_ids=[], collection_ids=[],
+            story_ids=[], partially_learnt_topic_ids=[]
         ).put()
         user_models.LearnerPlaylistModel(
             id=self.user_2_id, exploration_ids=[], collection_ids=[]
@@ -4233,10 +4236,12 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
         )[0].user_id
 
         user_models.CompletedActivitiesModel(
-            id=self.profile_user_id, exploration_ids=[], collection_ids=[]
+            id=self.profile_user_id, exploration_ids=[], collection_ids=[],
+            story_ids=[], learnt_topic_ids=[]
         ).put()
         user_models.IncompleteActivitiesModel(
-            id=self.profile_user_id, exploration_ids=[], collection_ids=[]
+            id=self.profile_user_id, exploration_ids=[], collection_ids=[],
+            story_ids=[], partially_learnt_topic_ids=[]
         ).put()
         user_models.LearnerPlaylistModel(
             id=self.profile_user_id, exploration_ids=[], collection_ids=[]
@@ -4556,10 +4561,12 @@ class WipeoutServiceVerifyDeleteUserModelsTests(test_utils.GenericTestBase):
         self.assertTrue(wipeout_service.verify_user_deleted(self.user_2_id))
 
         user_models.CompletedActivitiesModel(
-            id=self.user_2_id, exploration_ids=[], collection_ids=[]
+            id=self.user_2_id, exploration_ids=[], collection_ids=[],
+            story_ids=[], learnt_topic_ids=[]
         ).put()
         user_models.IncompleteActivitiesModel(
-            id=self.user_2_id, exploration_ids=[], collection_ids=[]
+            id=self.user_2_id, exploration_ids=[], collection_ids=[],
+            story_ids=[], partially_learnt_topic_ids=[]
         ).put()
         user_models.LearnerPlaylistModel(
             id=self.user_2_id, exploration_ids=[], collection_ids=[]
@@ -4580,10 +4587,12 @@ class WipeoutServiceVerifyDeleteUserModelsTests(test_utils.GenericTestBase):
             wipeout_service.verify_user_deleted(self.profile_user_id))
 
         user_models.CompletedActivitiesModel(
-            id=self.profile_user_id, exploration_ids=[], collection_ids=[]
+            id=self.profile_user_id, exploration_ids=[], collection_ids=[],
+            story_ids=[], learnt_topic_ids=[]
         ).put()
         user_models.IncompleteActivitiesModel(
-            id=self.profile_user_id, exploration_ids=[], collection_ids=[]
+            id=self.profile_user_id, exploration_ids=[], collection_ids=[],
+            story_ids=[], partially_learnt_topic_ids=[]
         ).put()
         user_models.LearnerPlaylistModel(
             id=self.profile_user_id, exploration_ids=[], collection_ids=[]

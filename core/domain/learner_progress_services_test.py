@@ -29,6 +29,13 @@ from core.domain import exp_services
 from core.domain import learner_playlist_services
 from core.domain import learner_progress_services
 from core.domain import rights_manager
+from core.domain import story_domain
+from core.domain import story_services
+from core.domain import subtopic_page_domain
+from core.domain import subtopic_page_services
+from core.domain import topic_domain
+from core.domain import topic_fetchers
+from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -43,10 +50,17 @@ class LearnerProgressTests(test_utils.GenericTestBase):
     EXP_ID_1 = '1_fi_arch_sillat_suomi'
     EXP_ID_2 = '2_en_welcome_introduce_oppia'
     EXP_ID_3 = '3_welcome_oppia'
+    EXP_ID_4 = 'exp_4'
+    EXP_ID_5 = 'exp_5'
+    EXP_ID_6 = 'exp_6'
     COL_ID_0 = '0_arch_bridges_in_england'
     COL_ID_1 = '1_welcome_introduce_oppia'
     COL_ID_2 = '2_welcome_introduce_oppia_interactions'
     COL_ID_3 = '3_welcome_oppia_collection'
+    STORY_ID_0 = 'story_0'
+    TOPIC_ID_0 = 'topic_0'
+    STORY_ID_1 = 'story_1'
+    TOPIC_ID_1 = 'topic_1'
     USER_EMAIL = 'user@example.com'
     USER_USERNAME = 'user'
 
@@ -55,8 +69,11 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
         self.signup(self.USER_EMAIL, self.USER_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.set_admins([self.ADMIN_USERNAME])
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
         # Save a few explorations.
         self.save_new_valid_exploration(
@@ -75,6 +92,21 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.EXP_ID_3, self.owner_id, title='Welcome Oppia',
             category='Welcome', language_code='en')
         self.publish_exploration(self.owner_id, self.EXP_ID_3)
+        self.save_new_valid_exploration(
+            self.EXP_ID_4, self.owner_id, title='A title',
+            category='Art', language_code='en',
+            correctness_feedback_enabled=True)
+        self.publish_exploration(self.owner_id, self.EXP_ID_4)
+        self.save_new_valid_exploration(
+            self.EXP_ID_5, self.owner_id, title='Title',
+            category='Art', language_code='en',
+            correctness_feedback_enabled=True)
+        self.publish_exploration(self.owner_id, self.EXP_ID_5)
+        self.save_new_valid_exploration(
+            self.EXP_ID_6, self.owner_id, title='A title',
+            category='Art', language_code='en',
+            correctness_feedback_enabled=True)
+        self.publish_exploration(self.owner_id, self.EXP_ID_6)
 
         # Save a few collections.
         self.save_new_default_collection(
@@ -93,6 +125,103 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.COL_ID_3, self.owner_id, title='Welcome Oppia Collection',
             category='Welcome')
         self.publish_collection(self.owner_id, self.COL_ID_3)
+
+        # Save new topics and stories.
+        topic = topic_domain.Topic.create_default_topic(
+            self.TOPIC_ID_0, 'topic', 'abbrev', 'description')
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
+        topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_1'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                'dummy-subtopic-url')]
+        topic.next_subtopic_id = 2
+        subtopic_page = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                1, self.TOPIC_ID_0))
+        subtopic_page_services.save_subtopic_page(
+            self.owner_id, subtopic_page, 'Added subtopic',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': 1,
+                'title': 'Sample'
+            })]
+        )
+        topic_services.save_new_topic(self.owner_id, topic)
+        self.save_new_story(self.STORY_ID_0, self.owner_id, self.TOPIC_ID_0)
+        topic_services.add_canonical_story(
+            self.owner_id, self.TOPIC_ID_0, self.STORY_ID_0)
+
+        changelist = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_ADD_STORY_NODE,
+                'node_id': 'node_1',
+                'title': 'Title 1'
+            }), story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'old_value': None,
+                'new_value': self.EXP_ID_4,
+                'node_id': 'node_1'
+            })
+        ]
+        story_services.update_story(
+            self.owner_id, self.STORY_ID_0, changelist, 'Added node.')
+
+        topic = topic_domain.Topic.create_default_topic(
+            self.TOPIC_ID_1, 'topic 1', 'abbrev-one', 'description 1')
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
+        topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title 1', ['skill_id_1'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                'dummy-subtopic-url-one')]
+        topic.next_subtopic_id = 2
+        subtopic_page = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                1, self.TOPIC_ID_1))
+        subtopic_page_services.save_subtopic_page(
+            self.owner_id, subtopic_page, 'Added subtopic',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': 1,
+                'title': 'Sample'
+            })]
+        )
+        topic_services.save_new_topic(self.owner_id, topic)
+        self.save_new_story(self.STORY_ID_1, self.owner_id, self.TOPIC_ID_1)
+        topic_services.add_canonical_story(
+            self.owner_id, self.TOPIC_ID_1, self.STORY_ID_1)
+
+        changelist = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_ADD_STORY_NODE,
+                'node_id': 'node_1',
+                'title': 'Title 1'
+            }), story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'old_value': None,
+                'new_value': self.EXP_ID_5,
+                'node_id': 'node_1'
+            })
+        ]
+
+        story_services.update_story(
+            self.owner_id, self.STORY_ID_1, changelist, 'Added Node 1.')
+
+        # Publish topics and stories.
+        topic_services.publish_story(
+            self.TOPIC_ID_0, self.STORY_ID_0, self.admin_id)
+        topic_services.publish_topic(self.TOPIC_ID_0, self.admin_id)
+
+        topic_services.publish_story(
+            self.TOPIC_ID_1, self.STORY_ID_1, self.admin_id)
+        topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id)
 
     def _get_all_completed_exp_ids(self, user_id):
         """Gets the ids of all the explorations completed by the learner
@@ -116,6 +245,30 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
         return (
             completed_activities_model.collection_ids if
+            completed_activities_model else [])
+
+    def _get_all_completed_story_ids(self, user_id):
+        """Gets the ids of all the stories completed by the learner
+        corresponding to the given user id.
+        """
+        completed_activities_model = (
+            user_models.CompletedActivitiesModel.get(
+                user_id, strict=False))
+
+        return (
+            completed_activities_model.story_ids if
+            completed_activities_model else [])
+
+    def _get_all_learnt_topic_ids(self, user_id):
+        """Gets the ids of all the topics learnt by the learner
+        corresponding to the given user id.
+        """
+        completed_activities_model = (
+            user_models.CompletedActivitiesModel.get(
+                user_id, strict=False))
+
+        return (
+            completed_activities_model.learnt_topic_ids if
             completed_activities_model else [])
 
     def _get_all_incomplete_exp_ids(self, user_id):
@@ -173,6 +326,28 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
         return (
             incomplete_activities_model.collection_ids if
+            incomplete_activities_model else [])
+
+    def _get_all_incomplete_story_ids(self, user_id):
+        """Returns the list of all the story ids that are incompletely
+        played by the learner corresponding to the given user id.
+        """
+        incomplete_activities_model = (
+            user_models.IncompleteActivitiesModel.get(user_id, strict=False))
+
+        return (
+            incomplete_activities_model.story_ids if
+            incomplete_activities_model else [])
+
+    def _get_all_partially_learnt_topic_ids(self, user_id):
+        """Returns the list of all the topics ids that are partially
+        learnt by the learner corresponding to the given user id.
+        """
+        incomplete_activities_model = (
+            user_models.IncompleteActivitiesModel.get(user_id, strict=False))
+
+        return (
+            incomplete_activities_model.partially_learnt_topic_ids if
             incomplete_activities_model else [])
 
     def test_mark_exploration_as_completed(self):
@@ -286,6 +461,70 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.user_id, self.COL_ID_2)
         self.assertEqual(self._get_all_completed_collection_ids(
             self.user_id), [self.COL_ID_0, self.COL_ID_1, self.COL_ID_3])
+
+    def test_mark_story_as_completed(self):
+        self.assertEqual(
+            self._get_all_completed_story_ids(self.user_id), [])
+
+        # Add a story to the completed list.
+        learner_progress_services.mark_story_as_completed(
+            self.user_id, self.STORY_ID_0)
+        self.assertEqual(self._get_all_completed_story_ids(
+            self.user_id), [self.STORY_ID_0])
+
+        # Completing a story again has no effect.
+        learner_progress_services.mark_story_as_completed(
+            self.user_id, self.STORY_ID_0)
+        self.assertEqual(self._get_all_completed_story_ids(
+            self.user_id), [self.STORY_ID_0])
+
+        # Add a story to the incomplete list.
+        learner_progress_services.record_story_started(
+            self.user_id, self.STORY_ID_1)
+        self.assertEqual(self._get_all_incomplete_story_ids(
+            self.user_id), [self.STORY_ID_1])
+
+        # If the story is present in the incomplete list, on completion
+        # it is removed from the incomplete list and added to the complete
+        # list.
+        learner_progress_services.mark_story_as_completed(
+            self.user_id, self.STORY_ID_1)
+        self.assertEqual(self._get_all_incomplete_story_ids(
+            self.user_id), [])
+        self.assertEqual(self._get_all_completed_story_ids(
+            self.user_id), [self.STORY_ID_0, self.STORY_ID_1])
+
+    def test_mark_topic_as_learnt(self):
+        self.assertEqual(
+            self._get_all_learnt_topic_ids(self.user_id), [])
+
+        # Add a topic to the learnt list.
+        learner_progress_services.mark_topic_as_learnt(
+            self.user_id, self.TOPIC_ID_0)
+        self.assertEqual(self._get_all_learnt_topic_ids(
+            self.user_id), [self.TOPIC_ID_0])
+
+        # Completing a topic again has no effect.
+        learner_progress_services.mark_topic_as_learnt(
+            self.user_id, self.TOPIC_ID_0)
+        self.assertEqual(self._get_all_learnt_topic_ids(
+            self.user_id), [self.TOPIC_ID_0])
+
+        # Add a topic to the partially learnt list.
+        learner_progress_services.record_topic_started(
+            self.user_id, self.TOPIC_ID_1)
+        self.assertEqual(self._get_all_partially_learnt_topic_ids(
+            self.user_id), [self.TOPIC_ID_1])
+
+        # If the topic is present in the partially learnt list, on completion
+        # it is removed from the partially learnt list and added to the learnt
+        # list.
+        learner_progress_services.mark_topic_as_learnt(
+            self.user_id, self.TOPIC_ID_1)
+        self.assertEqual(self._get_all_partially_learnt_topic_ids(
+            self.user_id), [])
+        self.assertEqual(self._get_all_learnt_topic_ids(
+            self.user_id), [self.TOPIC_ID_0, self.TOPIC_ID_1])
 
     def test_mark_exploration_as_incomplete(self):
         self.assertEqual(self._get_all_incomplete_exp_ids(
@@ -409,6 +648,56 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(self._get_all_incomplete_collection_ids(
             self.user_id), [self.COL_ID_0, self.COL_ID_3])
 
+    def test_record_story_started(self):
+        self.assertEqual(self._get_all_incomplete_story_ids(
+            self.user_id), [])
+
+        # Add a story to the incomplete list of the learner.
+        learner_progress_services.record_story_started(
+            self.user_id, self.STORY_ID_0)
+        self.assertEqual(self._get_all_incomplete_story_ids(
+            self.user_id), [self.STORY_ID_0])
+
+        # Adding a story again has no effect.
+        learner_progress_services.record_story_started(
+            self.user_id, self.STORY_ID_0)
+        self.assertEqual(self._get_all_incomplete_story_ids(
+            self.user_id), [self.STORY_ID_0])
+
+        # If a story has been completed, it is not added to the incomplete
+        # list.
+        learner_progress_services.mark_story_as_completed(
+            self.user_id, self.STORY_ID_1)
+        learner_progress_services.record_story_started(
+            self.user_id, self.STORY_ID_1)
+        self.assertEqual(self._get_all_incomplete_story_ids(
+            self.user_id), [self.STORY_ID_0])
+
+    def test_record_topic_started(self):
+        self.assertEqual(self._get_all_partially_learnt_topic_ids(
+            self.user_id), [])
+
+        # Add a topic to the partially learnt list of the learner.
+        learner_progress_services.record_topic_started(
+            self.user_id, self.TOPIC_ID_0)
+        self.assertEqual(self._get_all_partially_learnt_topic_ids(
+            self.user_id), [self.TOPIC_ID_0])
+
+        # Adding a topic again has no effect.
+        learner_progress_services.record_topic_started(
+            self.user_id, self.TOPIC_ID_0)
+        self.assertEqual(self._get_all_partially_learnt_topic_ids(
+            self.user_id), [self.TOPIC_ID_0])
+
+        # If a topic has been learnt, it is not added to the partially learnt
+        # list.
+        learner_progress_services.mark_topic_as_learnt(
+            self.user_id, self.TOPIC_ID_1)
+        learner_progress_services.record_topic_started(
+            self.user_id, self.TOPIC_ID_1)
+        self.assertEqual(self._get_all_partially_learnt_topic_ids(
+            self.user_id), [self.TOPIC_ID_0])
+
     def test_remove_exp_from_incomplete_list(self):
         self.assertEqual(self._get_all_incomplete_exp_ids(
             self.user_id), [])
@@ -470,6 +759,126 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         learner_progress_services.remove_collection_from_incomplete_list(
             self.user_id, self.COL_ID_1)
         self.assertEqual(self._get_all_incomplete_collection_ids(
+            self.user_id), [])
+
+    def test_remove_story_from_incomplete_list(self):
+        self.assertEqual(self._get_all_incomplete_story_ids(
+            self.user_id), [])
+
+        # Add two stories to the incomplete list.
+        learner_progress_services.record_story_started(
+            self.user_id, self.STORY_ID_0)
+        learner_progress_services.record_story_started(
+            self.user_id, self.STORY_ID_1)
+        self.assertEqual(self._get_all_incomplete_story_ids(
+            self.user_id), [self.STORY_ID_0, self.STORY_ID_1])
+
+        # Remove one story.
+        learner_progress_services.remove_story_from_incomplete_list(
+            self.user_id, self.STORY_ID_0)
+        self.assertEqual(self._get_all_incomplete_story_ids(
+            self.user_id), [self.STORY_ID_1])
+
+        # Removing the same story again has no effect.
+        learner_progress_services.remove_story_from_incomplete_list(
+            self.user_id, self.STORY_ID_0)
+        self.assertEqual(self._get_all_incomplete_story_ids(
+            self.user_id), [self.STORY_ID_1])
+
+        # Removing another story.
+        learner_progress_services.remove_story_from_incomplete_list(
+            self.user_id, self.STORY_ID_1)
+        self.assertEqual(self._get_all_incomplete_story_ids(
+            self.user_id), [])
+
+    def test_remove_topic_from_partially_learnt_list(self):
+        self.assertEqual(self._get_all_partially_learnt_topic_ids(
+            self.user_id), [])
+
+        # Add two topics to the partially learnt list.
+        learner_progress_services.record_topic_started(
+            self.user_id, self.TOPIC_ID_0)
+        learner_progress_services.record_topic_started(
+            self.user_id, self.TOPIC_ID_1)
+        self.assertEqual(self._get_all_partially_learnt_topic_ids(
+            self.user_id), [self.TOPIC_ID_0, self.TOPIC_ID_1])
+
+        # Remove one topic.
+        learner_progress_services.remove_topic_from_partially_learnt_list(
+            self.user_id, self.TOPIC_ID_0)
+        self.assertEqual(self._get_all_partially_learnt_topic_ids(
+            self.user_id), [self.TOPIC_ID_1])
+
+        # Removing the same topic again has no effect.
+        learner_progress_services.remove_topic_from_partially_learnt_list(
+            self.user_id, self.TOPIC_ID_0)
+        self.assertEqual(self._get_all_partially_learnt_topic_ids(
+            self.user_id), [self.TOPIC_ID_1])
+
+        # Removing another topic.
+        learner_progress_services.remove_topic_from_partially_learnt_list(
+            self.user_id, self.TOPIC_ID_1)
+        self.assertEqual(self._get_all_partially_learnt_topic_ids(
+            self.user_id), [])
+
+    def test_remove_story_from_completed_list(self):
+        self.assertEqual(self._get_all_completed_story_ids(
+            self.user_id), [])
+
+        # Add two stories to the completed list.
+        learner_progress_services.mark_story_as_completed(
+            self.user_id, self.STORY_ID_0)
+        learner_progress_services.mark_story_as_completed(
+            self.user_id, self.STORY_ID_1)
+        self.assertEqual(self._get_all_completed_story_ids(
+            self.user_id), [self.STORY_ID_0, self.STORY_ID_1])
+
+        # Remove one story.
+        learner_progress_services.remove_story_from_completed_list(
+            self.user_id, self.STORY_ID_0)
+        self.assertEqual(self._get_all_completed_story_ids(
+            self.user_id), [self.STORY_ID_1])
+
+        # Removing the same story again has no effect.
+        learner_progress_services.remove_story_from_completed_list(
+            self.user_id, self.STORY_ID_0)
+        self.assertEqual(self._get_all_completed_story_ids(
+            self.user_id), [self.STORY_ID_1])
+
+        # Removing another story.
+        learner_progress_services.remove_story_from_completed_list(
+            self.user_id, self.STORY_ID_1)
+        self.assertEqual(self._get_all_completed_story_ids(
+            self.user_id), [])
+
+    def test_remove_topic_from_learnt_list(self):
+        self.assertEqual(self._get_all_learnt_topic_ids(
+            self.user_id), [])
+
+        # Add two topics to the learnt list.
+        learner_progress_services.mark_topic_as_learnt(
+            self.user_id, self.TOPIC_ID_0)
+        learner_progress_services.mark_topic_as_learnt(
+            self.user_id, self.TOPIC_ID_1)
+        self.assertEqual(self._get_all_learnt_topic_ids(
+            self.user_id), [self.TOPIC_ID_0, self.TOPIC_ID_1])
+
+        # Remove one topic.
+        learner_progress_services.remove_topic_from_learnt_list(
+            self.user_id, self.TOPIC_ID_0)
+        self.assertEqual(self._get_all_learnt_topic_ids(
+            self.user_id), [self.TOPIC_ID_1])
+
+        # Removing the same topic again has no effect.
+        learner_progress_services.remove_topic_from_learnt_list(
+            self.user_id, self.TOPIC_ID_0)
+        self.assertEqual(self._get_all_learnt_topic_ids(
+            self.user_id), [self.TOPIC_ID_1])
+
+        # Removing another topic.
+        learner_progress_services.remove_topic_from_learnt_list(
+            self.user_id, self.TOPIC_ID_1)
+        self.assertEqual(self._get_all_learnt_topic_ids(
             self.user_id), [])
 
     def test_get_all_completed_exp_ids(self):
@@ -588,6 +997,44 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             learner_progress_services.get_all_completed_collection_ids(
                 self.user_id), [self.COL_ID_0, self.COL_ID_1])
 
+    def test_get_all_completed_story_ids(self):
+        self.assertEqual(
+            learner_progress_services.get_all_completed_story_ids(
+                self.user_id), [])
+
+        # Add a story to the completed list.
+        learner_progress_services.mark_story_as_completed(
+            self.user_id, self.STORY_ID_0)
+        self.assertEqual(
+            learner_progress_services.get_all_completed_story_ids(
+                self.user_id), [self.STORY_ID_0])
+
+        # Add another story.
+        learner_progress_services.mark_story_as_completed(
+            self.user_id, self.STORY_ID_1)
+        self.assertEqual(
+            learner_progress_services.get_all_completed_story_ids(
+                self.user_id), [self.STORY_ID_0, self.STORY_ID_1])
+
+    def test_get_all_learnt_topic_ids(self):
+        self.assertEqual(
+            learner_progress_services.get_all_learnt_topic_ids(
+                self.user_id), [])
+
+        # Add a topic to the learnt list.
+        learner_progress_services.mark_topic_as_learnt(
+            self.user_id, self.TOPIC_ID_0)
+        self.assertEqual(
+            learner_progress_services.get_all_learnt_topic_ids(
+                self.user_id), [self.TOPIC_ID_0])
+
+        # Add another topic.
+        learner_progress_services.mark_topic_as_learnt(
+            self.user_id, self.TOPIC_ID_1)
+        self.assertEqual(
+            learner_progress_services.get_all_learnt_topic_ids(
+                self.user_id), [self.TOPIC_ID_0, self.TOPIC_ID_1])
+
     def test_unpublishing_completed_collection_filters_it_out(self):
         # Add collections to the completed list.
         learner_progress_services.mark_collection_as_completed(
@@ -668,6 +1115,142 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(
             completed_collection_summaries[0].id, '0_arch_bridges_in_england')
         self.assertEqual(len(completed_collection_summaries), 1)
+
+    def test_unpublishing_completed_story_filters_it_out(self):
+        # Add stories to the completed list.
+        story_services.record_completed_node_in_story_context(
+            self.user_id, self.STORY_ID_0, 'node_1')
+        learner_progress_services.mark_story_as_completed(
+            self.user_id, self.STORY_ID_0)
+        story_services.record_completed_node_in_story_context(
+            self.user_id, self.STORY_ID_1, 'node_1')
+        learner_progress_services.mark_story_as_completed(
+            self.user_id, self.STORY_ID_1)
+        self.assertEqual(
+            learner_progress_services.get_all_completed_story_ids(
+                self.user_id), [self.STORY_ID_0, self.STORY_ID_1])
+
+        # Unpublish STORY_ID_1.
+        topic_services.unpublish_story(
+            self.TOPIC_ID_1, self.STORY_ID_1, self.admin_id)
+
+        # Call get_activity_progress to get filtered progress.
+        user_activity = learner_progress_services.get_activity_progress(
+            self.user_id)
+        all_filtered_summaries = user_activity[0]
+        completed_story_summaries = (
+            all_filtered_summaries.completed_story_summaries)
+
+        # Test that completed story summaries don't include unpublished
+        # stories. Ensure that completed_story_summaries[0] matches
+        # STORY_ID_0.
+        self.assertEqual(
+            completed_story_summaries[0].id, self.STORY_ID_0)
+        self.assertEqual(len(completed_story_summaries), 1)
+
+    def test_unpublishing_learnt_topic_filters_it_out(self):
+        # Add topics to the learnt list.
+        story_services.record_completed_node_in_story_context(
+            self.user_id, self.STORY_ID_0, 'node_1')
+        learner_progress_services.mark_story_as_completed(
+            self.user_id, self.STORY_ID_0)
+        learner_progress_services.mark_topic_as_learnt(
+            self.user_id, self.TOPIC_ID_0)
+        story_services.record_completed_node_in_story_context(
+            self.user_id, self.STORY_ID_1, 'node_1')
+        learner_progress_services.mark_story_as_completed(
+            self.user_id, self.STORY_ID_1)
+        learner_progress_services.mark_topic_as_learnt(
+            self.user_id, self.TOPIC_ID_1)
+        self.assertEqual(
+            learner_progress_services.get_all_learnt_topic_ids(
+                self.user_id), [self.TOPIC_ID_0, self.TOPIC_ID_1])
+
+        # Unpublish TOPIC_ID_1.
+        topic_services.unpublish_topic(self.TOPIC_ID_1, self.admin_id)
+        topic_rights = topic_fetchers.get_topic_rights(self.TOPIC_ID_1)
+        self.assertEqual(
+            topic_rights.topic_is_published, False)
+
+        # Call get_activity_progress to get filtered progress.
+        user_activity = learner_progress_services.get_activity_progress(
+            self.user_id)
+        all_filtered_summaries = user_activity[0]
+        learnt_topic_summaries = (
+            all_filtered_summaries.learnt_topic_summaries)
+
+        # Test that learnt topic summaries don't include unpublished
+        # topics. Ensure that learnt_topic_summaries[0] matches
+        # TOPIC_ID_0.
+        self.assertEqual(
+            learnt_topic_summaries[0].id, self.TOPIC_ID_0)
+        self.assertEqual(len(learnt_topic_summaries), 1)
+
+    def test_deleting_a_story_filters_it_out_from_completed_list(self):
+        # Add stories to the completed list.
+        story_services.record_completed_node_in_story_context(
+            self.user_id, self.STORY_ID_0, 'node_1')
+        learner_progress_services.mark_story_as_completed(
+            self.user_id, self.STORY_ID_0)
+        story_services.record_completed_node_in_story_context(
+            self.user_id, self.STORY_ID_1, 'node_1')
+        learner_progress_services.mark_story_as_completed(
+            self.user_id, self.STORY_ID_1)
+        self.assertEqual(
+            learner_progress_services.get_all_completed_story_ids(
+                self.user_id), [self.STORY_ID_0, self.STORY_ID_1])
+
+        # Delete STORY_ID_1.
+        story_services.delete_story(self.admin_id, self.STORY_ID_1)
+
+        # Call get_activity_progress to get filtered progress.
+        user_activity = learner_progress_services.get_activity_progress(
+            self.user_id)
+        all_filtered_summaries = user_activity[0]
+        completed_story_summaries = (
+            all_filtered_summaries.completed_story_summaries)
+
+        # Test that completed story summaries don't include deleted
+        # stories. Ensure that completed_story_summaries[0] matches
+        # STORY_ID_0.
+        self.assertEqual(
+            completed_story_summaries[0].id, self.STORY_ID_0)
+        self.assertEqual(len(completed_story_summaries), 1)
+
+    def test_deleting_a_topic_filters_it_out_from_learnt_list(self):
+        # Add topics to the learnt list.
+        story_services.record_completed_node_in_story_context(
+            self.user_id, self.STORY_ID_0, 'node_1')
+        learner_progress_services.mark_story_as_completed(
+            self.user_id, self.STORY_ID_0)
+        learner_progress_services.mark_topic_as_learnt(
+            self.user_id, self.TOPIC_ID_0)
+        story_services.record_completed_node_in_story_context(
+            self.user_id, self.STORY_ID_1, 'node_1')
+        learner_progress_services.mark_story_as_completed(
+            self.user_id, self.STORY_ID_1)
+        learner_progress_services.mark_topic_as_learnt(
+            self.user_id, self.TOPIC_ID_1)
+        self.assertEqual(
+            learner_progress_services.get_all_learnt_topic_ids(
+                self.user_id), [self.TOPIC_ID_0, self.TOPIC_ID_1])
+
+        # Delete TOPIC_ID_1.
+        topic_services.delete_topic(self.admin_id, self.TOPIC_ID_1)
+
+        # Call get_activity_progress to get filtered progress.
+        user_activity = learner_progress_services.get_activity_progress(
+            self.user_id)
+        all_filtered_summaries = user_activity[0]
+        learnt_topic_summaries = (
+            all_filtered_summaries.learnt_topic_summaries)
+
+        # Test that learnt topic summaries don't include deleted
+        # stories. Ensure that learnt_topic_summaries[0] matches
+        # TOPIC_ID_0.
+        self.assertEqual(
+            learnt_topic_summaries[0].id, self.TOPIC_ID_0)
+        self.assertEqual(len(learnt_topic_summaries), 1)
 
     def test_get_all_incomplete_exp_ids(self):
         self.assertEqual(
@@ -797,6 +1380,44 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             learner_progress_services.get_all_incomplete_collection_ids(
                 self.user_id), [self.COL_ID_0, self.COL_ID_1])
 
+    def test_get_all_incomplete_story_ids(self):
+        self.assertEqual(
+            learner_progress_services.get_all_incomplete_story_ids(
+                self.user_id), [])
+
+        # Add a story to the incomplete list.
+        learner_progress_services.record_story_started(
+            self.user_id, self.STORY_ID_0)
+        self.assertEqual(
+            learner_progress_services.get_all_incomplete_story_ids(
+                self.user_id), [self.STORY_ID_0])
+
+        # Add another story.
+        learner_progress_services.record_story_started(
+            self.user_id, self.STORY_ID_1)
+        self.assertEqual(
+            learner_progress_services.get_all_incomplete_story_ids(
+                self.user_id), [self.STORY_ID_0, self.STORY_ID_1])
+
+    def test_get_all_partially_learnt_topic_ids(self):
+        self.assertEqual(
+            learner_progress_services.get_all_partially_learnt_topic_ids(
+                self.user_id), [])
+
+        # Add a topic to the partially learnt list.
+        learner_progress_services.record_topic_started(
+            self.user_id, self.TOPIC_ID_0)
+        self.assertEqual(
+            learner_progress_services.get_all_partially_learnt_topic_ids(
+                self.user_id), [self.TOPIC_ID_0])
+
+        # Add another topic.
+        learner_progress_services.record_topic_started(
+            self.user_id, self.TOPIC_ID_1)
+        self.assertEqual(
+            learner_progress_services.get_all_partially_learnt_topic_ids(
+                self.user_id), [self.TOPIC_ID_0, self.TOPIC_ID_1])
+
     def test_unpublishing_incomplete_collection_filters_it_out(self):
         # Add collections to the incomplete list.
         learner_progress_services.mark_collection_as_incomplete(
@@ -877,6 +1498,80 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(
             incomplete_collection_summaries[0].id, '0_arch_bridges_in_england')
         self.assertEqual(len(incomplete_collection_summaries), 1)
+
+    def test_unpublishing_partially_learnt_topic_filters_it_out(self):
+        # Add topics to the partially learnt list.
+        learner_progress_services.record_topic_started(
+            self.user_id, self.TOPIC_ID_0)
+        learner_progress_services.record_topic_started(
+            self.user_id, self.TOPIC_ID_1)
+        self.assertEqual(
+            learner_progress_services.get_all_partially_learnt_topic_ids(
+                self.user_id), [self.TOPIC_ID_0, self.TOPIC_ID_1])
+
+        # Unpublish TOPIC_ID_1.
+        topic_services.unpublish_topic(self.TOPIC_ID_1, self.admin_id)
+        topic_rights = topic_fetchers.get_topic_rights(self.TOPIC_ID_1)
+        self.assertEqual(
+            topic_rights.topic_is_published, False)
+
+        # Call get_activity_progress to get filtered progress.
+        user_activity = learner_progress_services.get_activity_progress(
+            self.user_id)
+        all_filtered_summaries = user_activity[0]
+        partially_learnt_topic_summaries = (
+            all_filtered_summaries.partially_learnt_topic_summaries)
+
+        # Test that partially learnt topic summaries don't include private
+        # topics. Ensure that partially_learnt_topic_summaries[0] matches
+        # TOPIC_ID_0.
+        self.assertEqual(
+            partially_learnt_topic_summaries[0].id, self.TOPIC_ID_0)
+        self.assertEqual(len(partially_learnt_topic_summaries), 1)
+
+    def test_republishing_partially_learnt_topic_filters_as_incomplete(self):
+        # Add topic to the partially learnt list.
+        learner_progress_services.record_topic_started(
+            self.user_id, self.TOPIC_ID_0)
+        self.assertEqual(
+            learner_progress_services.get_all_partially_learnt_topic_ids(
+                self.user_id), [self.TOPIC_ID_0])
+
+        # Unpublish TOPIC_ID_0.
+        topic_services.unpublish_topic(self.TOPIC_ID_0, self.admin_id)
+        topic_rights = topic_fetchers.get_topic_rights(self.TOPIC_ID_0)
+        self.assertEqual(
+            topic_rights.topic_is_published, False)
+
+        # Call get_activity_progress to get filtered progress.
+        user_activity = learner_progress_services.get_activity_progress(
+            self.user_id)
+        all_filtered_summaries = user_activity[0]
+        partially_learnt_topic_summaries = (
+            all_filtered_summaries.partially_learnt_topic_summaries)
+        # Test that partially learnt topic summaries don't include unpublished
+        # topic.
+        self.assertEqual(len(partially_learnt_topic_summaries), 0)
+
+        # Republish TOPIC_ID_0.
+        topic_services.publish_topic(self.TOPIC_ID_0, self.admin_id)
+        learner_progress_services.record_topic_started(
+            self.user_id, self.TOPIC_ID_0)
+        topic_rights = topic_fetchers.get_topic_rights(self.TOPIC_ID_0)
+        self.assertEqual(
+            topic_rights.topic_is_published, True)
+
+        # Call get_activity_progress to get filtered progress.
+        user_activity = learner_progress_services.get_activity_progress(
+            self.user_id)
+        all_filtered_summaries = user_activity[0]
+        partially_learnt_topic_summaries = (
+            all_filtered_summaries.partially_learnt_topic_summaries)
+        # Test that partially learnt topic summaries includes original
+        # TOPIC_ID_0.
+        self.assertEqual(
+            partially_learnt_topic_summaries[0].id, self.TOPIC_ID_0)
+        self.assertEqual(len(partially_learnt_topic_summaries), 1)
 
     def test_unpublishing_exploration_filters_it_out_from_playlist(self):
         # Add activities to the playlist section.
@@ -1034,6 +1729,10 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.user_id, self.EXP_ID_0)
         learner_progress_services.mark_collection_as_completed(
             self.user_id, self.COL_ID_0)
+        learner_progress_services.mark_story_as_completed(
+            self.user_id, self.STORY_ID_0)
+        learner_progress_services.mark_topic_as_learnt(
+            self.user_id, self.TOPIC_ID_0)
 
         # Add activities to the incomplete section.
         state_name = 'state name'
@@ -1042,6 +1741,10 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.user_id, self.EXP_ID_1, state_name, version)
         learner_progress_services.mark_collection_as_incomplete(
             self.user_id, self.COL_ID_1)
+        learner_progress_services.record_story_started(
+            self.user_id, self.STORY_ID_1)
+        learner_progress_services.record_topic_started(
+            self.user_id, self.TOPIC_ID_1)
 
         # Add activities to the playlist section.
         learner_progress_services.add_exp_to_learner_playlist(
@@ -1059,9 +1762,15 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(
             activity_ids.completed_collection_ids, [self.COL_ID_0])
         self.assertEqual(
+            activity_ids.completed_story_ids, [self.STORY_ID_0])
+        self.assertEqual(
+            activity_ids.learnt_topic_ids, [self.TOPIC_ID_0])
+        self.assertEqual(
             activity_ids.incomplete_exploration_ids, [self.EXP_ID_1])
         self.assertEqual(
             activity_ids.incomplete_collection_ids, [self.COL_ID_1])
+        self.assertEqual(
+            activity_ids.partially_learnt_topic_ids, [self.TOPIC_ID_1])
         self.assertEqual(
             activity_ids.exploration_playlist_ids, [self.EXP_ID_3])
         self.assertEqual(
@@ -1073,6 +1782,12 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.user_id, self.EXP_ID_0)
         learner_progress_services.mark_collection_as_completed(
             self.user_id, self.COL_ID_0)
+        story_services.record_completed_node_in_story_context(
+            self.user_id, self.STORY_ID_0, 'node_1')
+        learner_progress_services.mark_story_as_completed(
+            self.user_id, self.STORY_ID_0)
+        learner_progress_services.mark_topic_as_learnt(
+            self.user_id, self.TOPIC_ID_0)
 
         # Add activities to the incomplete section.
         state_name = 'state name'
@@ -1081,6 +1796,10 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.user_id, self.EXP_ID_1, state_name, version)
         learner_progress_services.mark_collection_as_incomplete(
             self.user_id, self.COL_ID_1)
+        learner_progress_services.record_story_started(
+            self.user_id, self.STORY_ID_1)
+        learner_progress_services.record_topic_started(
+            self.user_id, self.TOPIC_ID_1)
 
         # Add activities to the playlist section.
         learner_progress_services.add_exp_to_learner_playlist(
@@ -1096,10 +1815,16 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             activity_progress[0].incomplete_exp_summaries)
         incomplete_collection_summaries = (
             activity_progress[0].incomplete_collection_summaries)
+        partially_learnt_topic_summaries = (
+            activity_progress[0].partially_learnt_topic_summaries)
         completed_exp_summaries = (
             activity_progress[0].completed_exp_summaries)
         completed_collection_summaries = (
             activity_progress[0].completed_collection_summaries)
+        completed_story_summaries = (
+            activity_progress[0].completed_story_summaries)
+        learnt_topic_summaries = (
+            activity_progress[0].learnt_topic_summaries)
         exploration_playlist_summaries = (
             activity_progress[0].exploration_playlist_summaries)
         collection_playlist_summaries = (
@@ -1109,17 +1834,26 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(len(incomplete_collection_summaries), 1)
         self.assertEqual(len(completed_exp_summaries), 1)
         self.assertEqual(len(completed_collection_summaries), 1)
+        self.assertEqual(len(completed_story_summaries), 1)
+        self.assertEqual(len(learnt_topic_summaries), 1)
         self.assertEqual(len(exploration_playlist_summaries), 1)
         self.assertEqual(len(collection_playlist_summaries), 1)
+        self.assertEqual(len(partially_learnt_topic_summaries), 1)
 
         self.assertEqual(
             incomplete_exp_summaries[0].title, 'Sillat Suomi')
         self.assertEqual(
             incomplete_collection_summaries[0].title, 'Introduce Oppia')
         self.assertEqual(
+            partially_learnt_topic_summaries[0].name, 'topic 1')
+        self.assertEqual(
             completed_exp_summaries[0].title, 'Bridges in England')
         self.assertEqual(
             completed_collection_summaries[0].title, 'Bridges')
+        self.assertEqual(
+            completed_story_summaries[0].title, 'Title')
+        self.assertEqual(
+            learnt_topic_summaries[0].name, 'topic')
         self.assertEqual(
             exploration_playlist_summaries[0].title, 'Welcome Oppia')
         self.assertEqual(
@@ -1137,6 +1871,26 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
                 'exploration_id': self.EXP_ID_2
             }], 'Add new exploration')
+
+        # Add a node to a story that has already been completed.
+        changelist = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_ADD_STORY_NODE,
+                'node_id': 'node_2',
+                'title': 'Title 2'
+            }), story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'old_value': None,
+                'new_value': self.EXP_ID_6,
+                'node_id': 'node_2'
+            })
+        ]
+
+        # Update the story.
+        story_services.update_story(
+            self.owner_id, self.STORY_ID_0, changelist, 'Added node.')
 
         # Get the progress of the user.
         activity_progress = learner_progress_services.get_activity_progress(
@@ -1158,18 +1912,29 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
         incomplete_collection_summaries = (
             activity_progress[0].incomplete_collection_summaries)
+        completed_story_summaries = (
+            activity_progress[0].completed_story_summaries)
+        partially_learnt_topic_summaries = (
+            activity_progress[0].partially_learnt_topic_summaries)
 
         # Check that the collection to which a new exploration has been added
         # has been moved to the incomplete section.
         self.assertEqual(len(incomplete_collection_summaries), 2)
         self.assertEqual(incomplete_collection_summaries[1].title, 'Bridges')
-        # Check that the dashboard has recorded the change in the collection.
-        self.assertEqual(activity_progress[2], ['Bridges'])
 
         # Now suppose the user has completed the collection. It should be added
         # back to the completed section.
         learner_progress_services.mark_collection_as_completed(
             self.user_id, self.COL_ID_0)
+
+        # Check that the story to which a new node has been added has been
+        # removed from completed section.
+        self.assertEqual(len(completed_story_summaries), 0)
+
+        # Check that the topic in which a node has been added to one of
+        # its stories has been moved to the incomplete section.
+        self.assertEqual(len(partially_learnt_topic_summaries), 2)
+        self.assertEqual(partially_learnt_topic_summaries[1].name, 'topic')
 
         # Delete a collection in the completed section.
         collection_services.delete_collection(self.owner_id, self.COL_ID_0)
@@ -1177,6 +1942,9 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         collection_services.delete_collection(self.owner_id, self.COL_ID_1)
         # Delete a collection in the playlist section.
         collection_services.delete_collection(self.owner_id, self.COL_ID_3)
+
+        # Delete a topic from incomplete section.
+        topic_services.delete_topic(self.admin_id, self.TOPIC_ID_0)
 
         # Get the progress of the user.
         activity_progress = learner_progress_services.get_activity_progress(
@@ -1191,3 +1959,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         # Check that the dashboard records the collection deleted in the
         # playlist section.
         self.assertEqual(activity_progress[1]['collection_playlist'], 1)
+
+        # Check that the dashboard records the topic deleted in the incomplete
+        # section.
+        self.assertEqual(activity_progress[1]['partially_learnt_topics'], 1)

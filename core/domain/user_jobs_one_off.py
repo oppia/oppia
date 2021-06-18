@@ -27,8 +27,11 @@ from core import jobs
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import image_services
+from core.domain import learner_progress_services
 from core.domain import rights_manager
+from core.domain import story_fetchers
 from core.domain import subscription_services
+from core.domain import topic_fetchers
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -148,6 +151,95 @@ class LongUserBiosOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         """Implements the reduce function for this job."""
         if int(userbio_length) > 500:
             yield (userbio_length, stringified_usernames)
+
+
+class PopulateStoriesAndTopicsOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """One-off job to populate the story_ids and topic_ids
+    in Incomplete and Completed Activities Model."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        """Return a list of datastore class references to map over."""
+        return [user_models.UserSettingsModel]
+
+    @staticmethod
+    def map(item):
+        """Implements the map function for this job."""
+        user_id = item.id
+        activity_ids_in_learner_dashboard = (
+            learner_progress_services.get_learner_dashboard_activities(
+                user_id))
+        incomplete_exploration_ids = (
+            activity_ids_in_learner_dashboard.incomplete_exploration_ids)
+        completed_exploration_ids = (
+            activity_ids_in_learner_dashboard.completed_exploration_ids)
+
+        story_ids_linked_to_incomplete_explorations = (
+            list(set(exp_services.get_story_ids_linked_to_explorations(
+                incomplete_exploration_ids))))
+        stories_linked_to_incomplete_explorations = (
+            story_fetchers.get_stories_by_ids(
+                story_ids_linked_to_incomplete_explorations))
+
+        story_ids_linked_to_completed_explorations = (
+            list(set(exp_services.get_story_ids_linked_to_explorations(
+                completed_exploration_ids))))
+        stories_linked_to_completed_explorations = (
+            story_fetchers.get_stories_by_ids(
+                story_ids_linked_to_completed_explorations))
+        topic_ids_linked_to_stories_for_completed_exps = [
+            story.corresponding_topic_id for story in (
+                stories_linked_to_completed_explorations)]
+        topics_linked_to_stories_for_completed_exps = (
+            topic_fetchers.get_topics_by_ids(
+                topic_ids_linked_to_stories_for_completed_exps))
+        completed_story_ids = []
+
+        # Mark stories for completed explorations.
+        for story in stories_linked_to_completed_explorations:
+            if story:
+                completed_nodes = (
+                    story_fetchers.get_completed_nodes_in_story(
+                        user_id, story.id))
+                all_nodes = story.story_contents.nodes
+
+                if len(completed_nodes) != len(all_nodes):
+                    learner_progress_services.record_story_started(
+                        user_id, story.id)
+                else:
+                    learner_progress_services.mark_story_as_completed(
+                        user_id, story.id)
+                    completed_story_ids.append(story.id)
+
+        # Mark stories for incomplete explorations.
+        for story in stories_linked_to_incomplete_explorations:
+            if story:
+                learner_progress_services.record_story_started(
+                    user_id, story.id)
+                if story.corresponding_topic_id:
+                    learner_progress_services.record_topic_started(
+                        user_id, story.corresponding_topic_id)
+
+        # Mark topics for completed explorations.
+        for topic in topics_linked_to_stories_for_completed_exps:
+            if topic:
+                story_ids_in_topic = []
+                for canonical_story in topic.canonical_story_references:
+                    story_ids_in_topic.append(canonical_story.story_id)
+                if set(story_ids_in_topic).intersection(set(
+                        completed_story_ids)):
+                    learner_progress_services.mark_topic_as_learnt(
+                        user_id, topic.id)
+                else:
+                    learner_progress_services.record_topic_started(
+                        user_id, topic.id)
+
+        yield ('SUCCESS', 1)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, len(values))
 
 
 class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):

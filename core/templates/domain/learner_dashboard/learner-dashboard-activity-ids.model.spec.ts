@@ -28,10 +28,13 @@ describe('Learner dashboard activity ids model', () => {
     learnerDashboardActivityIdsDict = {
       incomplete_exploration_ids: ['0', '1'],
       incomplete_collection_ids: ['2', '3'],
-      completed_exploration_ids: ['4', '5'],
-      completed_collection_ids: ['6', '7'],
-      exploration_playlist_ids: ['8', '9'],
-      collection_playlist_ids: ['10', '11']
+      partially_learnt_topic_ids: ['4', '5'],
+      completed_exploration_ids: ['6', '7'],
+      completed_collection_ids: ['8', '9'],
+      completed_story_ids: ['10', '11'],
+      learnt_topic_ids: ['12', '13'],
+      exploration_playlist_ids: ['14', '15'],
+      collection_playlist_ids: ['16', '17']
     };
   });
 
@@ -45,9 +48,9 @@ describe('Learner dashboard activity ids model', () => {
     expect(learnerDashboardActivityIds.includesActivity('1')).toEqual(true);
     expect(learnerDashboardActivityIds.includesActivity('8')).toEqual(true);
 
-    expect(learnerDashboardActivityIds.includesActivity('12')).toEqual(false);
-    expect(learnerDashboardActivityIds.includesActivity('13')).toEqual(false);
-    expect(learnerDashboardActivityIds.includesActivity('14')).toEqual(false);
+    expect(learnerDashboardActivityIds.includesActivity('21')).toEqual(false);
+    expect(learnerDashboardActivityIds.includesActivity('22')).toEqual(false);
+    expect(learnerDashboardActivityIds.includesActivity('23')).toEqual(false);
   });
 
 
@@ -58,11 +61,11 @@ describe('Learner dashboard activity ids model', () => {
 
     learnerDashboardActivityIds.addToExplorationLearnerPlaylist('12');
     expect(learnerDashboardActivityIds.explorationPlaylistIds).toEqual(
-      ['8', '9', '12']);
+      ['14', '15', '12']);
 
     learnerDashboardActivityIds.addToExplorationLearnerPlaylist('13');
     expect(learnerDashboardActivityIds.explorationPlaylistIds).toEqual(
-      ['8', '9', '12', '13']);
+      ['14', '15', '12', '13']);
   });
 
   it('should add collection to learner playlist', () => {
@@ -72,11 +75,11 @@ describe('Learner dashboard activity ids model', () => {
 
     learnerDashboardActivityIds.addToCollectionLearnerPlaylist('12');
     expect(learnerDashboardActivityIds.collectionPlaylistIds).toEqual(
-      ['10', '11', '12']);
+      ['16', '17', '12']);
 
     learnerDashboardActivityIds.addToCollectionLearnerPlaylist('13');
     expect(learnerDashboardActivityIds.collectionPlaylistIds).toEqual(
-      ['10', '11', '12', '13']);
+      ['16', '17', '12', '13']);
   });
 
   it('should remove exploration from learner playlist', () => {
@@ -84,11 +87,11 @@ describe('Learner dashboard activity ids model', () => {
       LearnerDashboardActivityIds.createFromBackendDict(
         learnerDashboardActivityIdsDict));
 
-    learnerDashboardActivityIds.removeFromExplorationLearnerPlaylist('9');
+    learnerDashboardActivityIds.removeFromExplorationLearnerPlaylist('14');
     expect(learnerDashboardActivityIds.explorationPlaylistIds).toEqual(
-      ['8']);
+      ['15']);
 
-    learnerDashboardActivityIds.removeFromExplorationLearnerPlaylist('8');
+    learnerDashboardActivityIds.removeFromExplorationLearnerPlaylist('15');
     expect(learnerDashboardActivityIds.explorationPlaylistIds).toEqual([]);
   });
 
@@ -97,11 +100,11 @@ describe('Learner dashboard activity ids model', () => {
       LearnerDashboardActivityIds.createFromBackendDict(
         learnerDashboardActivityIdsDict));
 
-    learnerDashboardActivityIds.removeFromCollectionLearnerPlaylist('11');
+    learnerDashboardActivityIds.removeFromCollectionLearnerPlaylist('16');
     expect(learnerDashboardActivityIds.collectionPlaylistIds).toEqual(
-      ['10']);
+      ['17']);
 
-    learnerDashboardActivityIds.removeFromCollectionLearnerPlaylist('10');
+    learnerDashboardActivityIds.removeFromCollectionLearnerPlaylist('17');
     expect(learnerDashboardActivityIds.collectionPlaylistIds).toEqual([]);
   });
 
@@ -115,14 +118,20 @@ describe('Learner dashboard activity ids model', () => {
       ['0', '1']);
     expect(learnerDashboardActivityIds.incompleteCollectionIds).toEqual(
       ['2', '3']);
-    expect(learnerDashboardActivityIds.completedExplorationIds).toEqual(
+    expect(learnerDashboardActivityIds.partiallyLearntTopicIds).toEqual(
       ['4', '5']);
-    expect(learnerDashboardActivityIds.completedCollectionIds).toEqual(
+    expect(learnerDashboardActivityIds.completedExplorationIds).toEqual(
       ['6', '7']);
-    expect(learnerDashboardActivityIds.explorationPlaylistIds).toEqual(
+    expect(learnerDashboardActivityIds.completedCollectionIds).toEqual(
       ['8', '9']);
-    expect(learnerDashboardActivityIds.collectionPlaylistIds).toEqual(
+    expect(learnerDashboardActivityIds.completedStoryIds).toEqual(
       ['10', '11']);
+    expect(learnerDashboardActivityIds.learntTopicIds).toEqual(
+      ['12', '13']);
+    expect(learnerDashboardActivityIds.explorationPlaylistIds).toEqual(
+      ['14', '15']);
+    expect(learnerDashboardActivityIds.collectionPlaylistIds).toEqual(
+      ['16', '17']);
   });
 
   it('should check if explorationId belongs to exploration playlist', () => {
@@ -130,9 +139,9 @@ describe('Learner dashboard activity ids model', () => {
       LearnerDashboardActivityIds.createFromBackendDict(
         learnerDashboardActivityIdsDict));
 
-    expect(learnerDashboardActivityIds.belongsToExplorationPlaylist('8'))
+    expect(learnerDashboardActivityIds.belongsToExplorationPlaylist('14'))
       .toBe(true);
-    expect(learnerDashboardActivityIds.belongsToExplorationPlaylist('9'))
+    expect(learnerDashboardActivityIds.belongsToExplorationPlaylist('15'))
       .toBe(true);
 
     expect(learnerDashboardActivityIds.belongsToExplorationPlaylist('0'))
@@ -152,9 +161,9 @@ describe('Learner dashboard activity ids model', () => {
       LearnerDashboardActivityIds.createFromBackendDict(
         learnerDashboardActivityIdsDict));
 
-    expect(learnerDashboardActivityIds.belongsToCollectionPlaylist('10'))
+    expect(learnerDashboardActivityIds.belongsToCollectionPlaylist('16'))
       .toBe(true);
-    expect(learnerDashboardActivityIds.belongsToCollectionPlaylist('11'))
+    expect(learnerDashboardActivityIds.belongsToCollectionPlaylist('17'))
       .toBe(true);
 
     expect(learnerDashboardActivityIds.belongsToCollectionPlaylist('0'))
@@ -174,16 +183,16 @@ describe('Learner dashboard activity ids model', () => {
       LearnerDashboardActivityIds.createFromBackendDict(
         learnerDashboardActivityIdsDict));
 
-    expect(learnerDashboardActivityIds.belongsToCompletedExplorations('4'))
+    expect(learnerDashboardActivityIds.belongsToCompletedExplorations('6'))
       .toBe(true);
-    expect(learnerDashboardActivityIds.belongsToCompletedExplorations('5'))
+    expect(learnerDashboardActivityIds.belongsToCompletedExplorations('7'))
       .toBe(true);
 
     expect(learnerDashboardActivityIds.belongsToCompletedExplorations('0'))
       .toBe(false);
     expect(learnerDashboardActivityIds.belongsToCompletedExplorations('2'))
       .toBe(false);
-    expect(learnerDashboardActivityIds.belongsToCompletedExplorations('6'))
+    expect(learnerDashboardActivityIds.belongsToCompletedExplorations('5'))
       .toBe(false);
     expect(learnerDashboardActivityIds.belongsToCompletedExplorations('8'))
       .toBe(false);
@@ -196,9 +205,9 @@ describe('Learner dashboard activity ids model', () => {
       LearnerDashboardActivityIds.createFromBackendDict(
         learnerDashboardActivityIdsDict));
 
-    expect(learnerDashboardActivityIds.belongsToCompletedCollections('6'))
+    expect(learnerDashboardActivityIds.belongsToCompletedCollections('8'))
       .toBe(true);
-    expect(learnerDashboardActivityIds.belongsToCompletedCollections('7'))
+    expect(learnerDashboardActivityIds.belongsToCompletedCollections('9'))
       .toBe(true);
 
     expect(learnerDashboardActivityIds.belongsToCompletedCollections('0'))
@@ -207,9 +216,53 @@ describe('Learner dashboard activity ids model', () => {
       .toBe(false);
     expect(learnerDashboardActivityIds.belongsToCompletedCollections('4'))
       .toBe(false);
-    expect(learnerDashboardActivityIds.belongsToCompletedCollections('8'))
+    expect(learnerDashboardActivityIds.belongsToCompletedCollections('7'))
       .toBe(false);
-    expect(learnerDashboardActivityIds.belongsToCompletedCollections('10'))
+    expect(learnerDashboardActivityIds.belongsToCompletedCollections('12'))
+      .toBe(false);
+  });
+
+  it('should check if storyId belongs to completed stories', () => {
+    var learnerDashboardActivityIds = (
+      LearnerDashboardActivityIds.createFromBackendDict(
+        learnerDashboardActivityIdsDict));
+
+    expect(learnerDashboardActivityIds.belongsToCompletedStories('10'))
+      .toBe(true);
+    expect(learnerDashboardActivityIds.belongsToCompletedStories('11'))
+      .toBe(true);
+
+    expect(learnerDashboardActivityIds.belongsToCompletedStories('0'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToCompletedStories('2'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToCompletedStories('4'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToCompletedStories('8'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToCompletedStories('12'))
+      .toBe(false);
+  });
+
+  it('should check if topicId belongs to learnt topics', () => {
+    var learnerDashboardActivityIds = (
+      LearnerDashboardActivityIds.createFromBackendDict(
+        learnerDashboardActivityIdsDict));
+
+    expect(learnerDashboardActivityIds.belongsToLearntTopics('12'))
+      .toBe(true);
+    expect(learnerDashboardActivityIds.belongsToLearntTopics('13'))
+      .toBe(true);
+
+    expect(learnerDashboardActivityIds.belongsToLearntTopics('0'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToLearntTopics('2'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToLearntTopics('4'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToLearntTopics('8'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToLearntTopics('11'))
       .toBe(false);
   });
 
@@ -254,6 +307,28 @@ describe('Learner dashboard activity ids model', () => {
     expect(learnerDashboardActivityIds.belongsToIncompleteCollections('8'))
       .toBe(false);
     expect(learnerDashboardActivityIds.belongsToIncompleteCollections('10'))
+      .toBe(false);
+  });
+
+  it('should check if topicsId belongs to partially learnt topics', () => {
+    var learnerDashboardActivityIds = (
+      LearnerDashboardActivityIds.createFromBackendDict(
+        learnerDashboardActivityIdsDict));
+
+    expect(learnerDashboardActivityIds.belongsToPartiallyLearntTopics('4'))
+      .toBe(true);
+    expect(learnerDashboardActivityIds.belongsToPartiallyLearntTopics('5'))
+      .toBe(true);
+
+    expect(learnerDashboardActivityIds.belongsToPartiallyLearntTopics('0'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToPartiallyLearntTopics('2'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToPartiallyLearntTopics('3'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToPartiallyLearntTopics('8'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToPartiallyLearntTopics('10'))
       .toBe(false);
   });
 });

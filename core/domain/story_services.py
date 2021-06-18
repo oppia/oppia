@@ -473,7 +473,7 @@ def _save_story(
     story.version += 1
 
 
-def _is_story_published_and_present_in_topic(story):
+def is_story_published_and_present_in_topic(story):
     """Returns whether a story is published. Raises an exception if the story
     is not present in the corresponding topic's story references.
 
@@ -531,7 +531,7 @@ def update_story(
     old_story = story_fetchers.get_story_by_id(story_id)
     new_story, exp_ids_removed_from_story, exp_ids_added_to_story = (
         apply_change_list(story_id, change_list))
-    story_is_published = _is_story_published_and_present_in_topic(new_story)
+    story_is_published = is_story_published_and_present_in_topic(new_story)
     exploration_context_models_to_be_deleted = (
         exp_models.ExplorationContextModel.get_multi(
             exp_ids_removed_from_story))

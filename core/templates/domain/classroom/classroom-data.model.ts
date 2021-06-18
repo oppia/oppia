@@ -17,18 +17,18 @@
  */
 
 import {
-  TopicSummary,
-  TopicSummaryBackendDict
-} from 'domain/topic/topic-summary.model';
+  CreatorTopicSummary,
+  CreatorTopicSummaryBackendDict
+} from 'domain/topic/creator-topic-summary.model';
 
 export class ClassroomData {
   _name: string;
-  _topicSummaries: TopicSummary[];
+  _topicSummaries: CreatorTopicSummary[];
   _courseDetails: string;
   _topicListIntro: string;
 
   constructor(
-      name: string, topicSummaries: TopicSummary[],
+      name: string, topicSummaries: CreatorTopicSummary[],
       courseDetails: string, topicListIntro: string) {
     this._name = name;
     this._topicSummaries = topicSummaries;
@@ -37,11 +37,11 @@ export class ClassroomData {
   }
 
   static createFromBackendData(
-      name: string, topicSummaryDicts: TopicSummaryBackendDict[],
+      name: string, topicSummaryDicts: CreatorTopicSummaryBackendDict[],
       courseDetails: string, topicListIntro: string): ClassroomData {
     let topicSummaries = topicSummaryDicts.map(
       (summaryDict) => {
-        return TopicSummary.createFromBackendDict(
+        return CreatorTopicSummary.createFromBackendDict(
           summaryDict);
       }
     );
@@ -53,7 +53,7 @@ export class ClassroomData {
     return this._name;
   }
 
-  getTopicSummaries(): TopicSummary[] {
+  getTopicSummaries(): CreatorTopicSummary[] {
     return this._topicSummaries.slice();
   }
 

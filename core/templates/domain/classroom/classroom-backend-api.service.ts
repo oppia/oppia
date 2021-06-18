@@ -25,8 +25,8 @@ import { ClassroomDomainConstants } from
 import {
   ClassroomData
 } from 'domain/classroom/classroom-data.model';
-import { TopicSummaryBackendDict } from
-  'domain/topic/topic-summary.model';
+import { CreatorTopicSummaryBackendDict } from
+  'domain/topic/creator-topic-summary.model';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
@@ -36,7 +36,7 @@ interface ClassroomPromosStatusBackendDict {
 
 interface ClassroomDataBackendDict {
   'name': string,
-  'topic_summary_dicts': TopicSummaryBackendDict[],
+  'topic_summary_dicts': CreatorTopicSummaryBackendDict[],
   'course_details': string,
   'topic_list_intro': string
 }
