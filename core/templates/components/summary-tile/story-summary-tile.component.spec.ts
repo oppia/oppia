@@ -231,7 +231,8 @@ describe('StorySummaryTileComponent', () => {
     expect(component.showButton).toBe(true);
   });
 
-  it('should show user\'s progress', () => {
+  it('should show the number of completed chapters through' +
+    ' progress circle', () => {
     // StorySummary with 1 node with 0 completed stories.
     component.storySummary = StorySummary.createFromBackendDict({
       id: 'storyId',
