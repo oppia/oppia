@@ -58,8 +58,7 @@ describe('ImageUploaderComponent', () => {
   it('should generate a random input class name on initialization', () => {
     spyOn(igs, 'generateNewId').and.returnValue('-new-id');
 
-    expect(component.fileInputClassName).not.toBe(
-      'image-uploader-file-input-new-id');
+    component.fileInputClassName = '';
 
     component.ngOnInit();
 
