@@ -159,7 +159,7 @@ describe('Embedding', function() {
     await general.openEditor(explorationId, false);
     await explorationEditorMainTab.setContent(
       await forms.toRichText('Version 3'));
-    await explorationEditorPage.saveChanges('demonstration edit');
+    await explorationEditorPage.savePublishedChanges('demonstration edit');
 
     for (var i = 0; i < TEST_PAGES.length; i++) {
       // This is necessary as the pages are non-angular.

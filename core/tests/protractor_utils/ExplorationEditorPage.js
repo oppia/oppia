@@ -37,7 +37,6 @@ var ExplorationEditorTranslationTab = require(
   '../protractor_utils/ExplorationEditorTranslationTab.js');
 var ExplorationPlayerPage = require(
   '../protractor_utils/ExplorationPlayerPage.js');
-const { browser } = require('protractor');
 
 var ExplorationEditorPage = function() {
   /*

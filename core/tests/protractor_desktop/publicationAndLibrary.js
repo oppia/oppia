@@ -108,7 +108,7 @@ describe('Library index page', function() {
     await waitFor.pageToFullyLoad();
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setLanguage(LANGUAGE_FRANCAIS);
-    await explorationEditorPage.savePublishedChanges('change language');
+    await explorationEditorPage.saveChanges('change language');
     await users.logout();
 
     await users.login('celebrimor@publicationAndLibrary.com');
@@ -292,7 +292,7 @@ describe('Permissions for private explorations', function() {
     await explorationEditorMainTab.setContent(
       await forms.toRichText('I love you'));
     await explorationEditorMainTab.setInteraction('TextInput');
-    await explorationEditorPage.savePublishedChanges();
+    await explorationEditorPage.saveChanges();
     await users.logout();
 
     await users.login('eve@privileges.com');
