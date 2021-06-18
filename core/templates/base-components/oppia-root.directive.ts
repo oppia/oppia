@@ -21,7 +21,6 @@
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { angularServices } from 'services/angular-services.index';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 angular.module('oppia').directive('oppiaRoot', [
   '$translate', 'RteHelperService', function($translate, RteHelperService) {
@@ -118,11 +117,10 @@ angular.module('oppia').directive('oppiaRoot', [
               );
             }
 
-            I18nLanguageCodeService.languageCodeChangeEventEmitter.subscribe(
+            OppiaAngularRootComponent.translateService.onLangChange.subscribe(
               (code) => {
-                $translate.use(code);
-              }
-            );
+                $translate.use(code.lang);
+              });
 
             // The next line allows the transcluded content to start executing.
             $scope.initialized = true;
