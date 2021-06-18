@@ -744,7 +744,7 @@ def get_mypy_cmd(files):
     """Return the appropriate command to be run.
 
     Args:
-        files. list(list(str)). List having first element as list of string.
+        files: list(list(str)). List having first element as list of string.
 
     Returns:
         list(str). List of command line arguments.

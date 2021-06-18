@@ -67,16 +67,16 @@ class MypyScriptChecks(test_utils.GenericTestBase):
         with self.files_swap:
             with self.directories_swap:
                 cmd = run_mypy_checks.get_mypy_cmd(None)
-                self.assertEqual(cmd,
-                    ['mypy', '--exclude', 'file1.py|file2.py|dir1/|dir2/',
+                self.assertEqual(
+                    cmd, ['mypy', '--exclude', 'file1.py|file2.py|dir1/|dir2/',
                     '--config-file', './mypy.ini', '.'])
 
     def test_get_mypy_cmd_with_files(self):
         with self.files_swap:
             with self.directories_swap:
                 cmd = run_mypy_checks.get_mypy_cmd([['file1.py', 'file2.py']])
-                self.assertEqual(cmd,
-                    ['mypy', '--config-file', './mypy.ini',
+                self.assertEqual(
+                    cmd, ['mypy', '--config-file', './mypy.ini',
                     'file1.py', 'file2.py'])
 
     def test_install_mypy_prerequisites_success(self):
