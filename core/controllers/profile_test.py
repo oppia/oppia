@@ -440,7 +440,7 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
         csrf_token = self.get_new_csrf_token()
-        self.post_json(
+        json_response = self.post_json(
             feconf.SIGNUP_DATA_URL,
             {
                 'username': self.EDITOR_USERNAME,
@@ -448,6 +448,8 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
                 'can_receive_email_updates': True
             },
             csrf_token=csrf_token)
+        self.assertFalse(
+            json_response['bulk_email_signup_message_should_be_shown'])
 
         # The email update preference should be True in all cases.
         editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
@@ -475,6 +477,31 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
             self.assertEqual(
                 email_preferences.can_receive_subscription_email,
                 feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
+
+    def test_user_cannot_be_added_to_bulk_email_mailing_list(self):
+        self.login(self.EDITOR_EMAIL)
+        self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
+        csrf_token = self.get_new_csrf_token()
+
+        def _mock_true_function(*unused):
+            """Mock function that returns True.
+
+            Returns:
+                bool. True.
+            """
+            return True
+
+        with self.swap(
+            user_services, 'update_email_preferences', _mock_true_function):
+            json_response = self.post_json(
+                feconf.SIGNUP_DATA_URL,
+                {
+                    'username': self.EDITOR_USERNAME,
+                    'agreed_to_terms': True,
+                    'can_receive_email_updates': True
+                }, csrf_token=csrf_token)
+            self.assertTrue(
+                json_response['bulk_email_signup_message_should_be_shown'])
 
     def test_user_disallowing_emails_on_signup(self):
         self.login(self.EDITOR_EMAIL)

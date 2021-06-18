@@ -115,7 +115,8 @@ class PreferencesPage(base.BaseHandler):
 
 class BulkEmailWebhookEndpoint(base.BaseHandler):
     """The endpoint for the webhook that is triggered when a user
-    subscribes/unsubscribes to the bulk email service provider externally."""
+    subscribes/unsubscribes to the bulk email service provider externally.
+    """
 
     @acl_decorators.is_source_mailchimp
     def get(self, _):
@@ -135,7 +136,7 @@ class BulkEmailWebhookEndpoint(base.BaseHandler):
         email = self.request.get('data[email]')
         user_settings = user_services.get_user_settings_from_email(email)
 
-        # If user is not logged in with Oppia, ignore the request.
+        # Ignore the request if the user does not exist in Oppia.
         if user_settings is None:
             self.render_json({})
             return
@@ -342,6 +343,22 @@ class SignupHandler(base.BaseHandler):
         default_dashboard = self.payload.get('default_dashboard')
         can_receive_email_updates = self.payload.get(
             'can_receive_email_updates')
+        bulk_email_signup_message_should_be_shown = False
+
+        if can_receive_email_updates is not None:
+            bulk_email_signup_message_should_be_shown = (
+                user_services.update_email_preferences(
+                    self.user_id, can_receive_email_updates,
+                    feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+                    feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
+                    feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
+            )
+            if bulk_email_signup_message_should_be_shown:
+                self.render_json({
+                    'bulk_email_signup_message_should_be_shown': (
+                        bulk_email_signup_message_should_be_shown)
+                })
+                return
 
         has_ever_registered = user_services.has_ever_registered(self.user_id)
         has_fully_registered_account = (
@@ -364,13 +381,6 @@ class SignupHandler(base.BaseHandler):
             except utils.ValidationError as e:
                 raise self.InvalidInputException(e)
 
-        if can_receive_email_updates is not None:
-            user_services.update_email_preferences(
-                self.user_id, can_receive_email_updates,
-                feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
-                feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
-                feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
-
         # Note that an email is only sent when the user registers for the first
         # time.
         if feconf.CAN_SEND_EMAILS and not has_ever_registered:
@@ -383,7 +393,10 @@ class SignupHandler(base.BaseHandler):
             user_services.update_user_default_dashboard(
                 self.user_id, default_dashboard)
 
-        self.render_json({})
+        self.render_json({
+            'bulk_email_signup_message_should_be_shown': (
+                bulk_email_signup_message_should_be_shown)
+        })
 
 
 class DeleteAccountPage(base.BaseHandler):
