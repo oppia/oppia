@@ -143,13 +143,13 @@ export class TeachPageComponent implements OnInit {
 
   onClickGuideParentsButton(): void {
     this.siteAnalyticsService.registerClickGuideParentsButtonEvent();
-    this.windowRef.nativeWindow.location.href = ('/teach');
+    this.windowRef.nativeWindow.location.href = '/teach';
     return;
   }
 
   onClickTipforParentsButton(): void {
     this.siteAnalyticsService.registerClickTipforParentsButtonEvent();
-    this.windowRef.nativeWindow.location.href = ('/teach');
+    this.windowRef.nativeWindow.location.href = '/teach';
     return;
   }
 
