@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2020 The Oppia Authors. All Rights Reserved.
+# Copyright 2021 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -741,7 +741,14 @@ _PARSER.add_argument(
 
 
 def get_mypy_cmd(files):
-    """Return the appropriate command to be run."""
+    """Return the appropriate command to be run.
+
+    Args:
+        files. list(list(str)). List having first element as list of string.
+
+    Returns:
+        list(str). List of command line arguments.
+    """
     if files:
         cmd = [MYPY_CMD, '--config-file', CONFIG_FILE_PATH] + files[0]
     else:
@@ -755,7 +762,11 @@ def get_mypy_cmd(files):
 
 
 def install_mypy_prerequisites():
-    """Install mypy and type stubs from mypy_requirements.txt."""
+    """Install mypy and type stubs from mypy_requirements.txt.
+
+    Returns:
+        int. The return code from installing prerequisites.
+    """
     cmd = [PYTHON3_CMD, '-m', 'pip', 'install', '-r', MYPY_REQUIREMENTS_PATH]
     process = subprocess.call(
         cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
@@ -764,7 +775,7 @@ def install_mypy_prerequisites():
 
 def main(args=None):
     """Runs the MyPy type checks."""
-    unused_parsed_args = _PARSER.parse_args(args=args)
+    parsed_args = _PARSER.parse_args(args=args)
 
     python_utils.PRINT('Installing Mypy and stubs for third party libraries.')
     return_code = install_mypy_prerequisites()
@@ -772,12 +783,12 @@ def main(args=None):
         python_utils.PRINT(
             'Cannot install Mypy and stubs for third party libraries.')
         sys.exit(1)
-    else:
-        python_utils.PRINT(
-            'Installed Mypy and stubs for third party libraries.')
+
+    python_utils.PRINT(
+        'Installed Mypy and stubs for third party libraries.')
 
     python_utils.PRINT('Starting Mypy type checks.')
-    cmd = get_mypy_cmd(getattr(unused_parsed_args, 'files'))
+    cmd = get_mypy_cmd(getattr(parsed_args, 'files'))
     process = subprocess.call(cmd, stdin=subprocess.PIPE)
 
     if process == 0:
