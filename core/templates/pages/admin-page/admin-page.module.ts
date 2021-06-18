@@ -36,17 +36,21 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 import { RolesAndActionsVisualizerComponent } from './roles-tab/roles-and-actions-visualizer.component';
 import { AdminMiscTabComponent } from './misc-tab/admin-misc-tab.component';
+import { AdminConfigTabComponent } from './config-tab/admin-config-tab.component';
+import { SharedFormsModule } from 'components/forms/shared-forms.module';
 
 @NgModule({
   imports: [
     BrowserModule,
     FormsModule,
     HttpClientModule,
-    SharedComponentsModule
+    SharedComponentsModule,
+    SharedFormsModule
   ],
   declarations: [
     OppiaAdminProdModeActivitiesTabComponent,
     OppiaAngularRootComponent,
+    AdminConfigTabComponent,
     AdminFeaturesTabComponent,
     AdminMiscTabComponent,
     AdminNavbarComponent,
@@ -56,6 +60,7 @@ import { AdminMiscTabComponent } from './misc-tab/admin-misc-tab.component';
   entryComponents: [
     OppiaAdminProdModeActivitiesTabComponent,
     OppiaAngularRootComponent,
+    AdminConfigTabComponent,
     AdminFeaturesTabComponent,
     AdminMiscTabComponent,
     AdminNavbarComponent,

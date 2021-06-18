@@ -32,6 +32,7 @@ import {
 } from 'domain/platform_feature/platform-parameter.model';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+import { Schema } from 'services/schema-default-value.service';
 
 
 interface UserRolesBackendResponse {
@@ -42,8 +43,8 @@ interface RoleToActionsBackendResponse {
   [role: string]: string[];
 }
 
-interface ConfigPropertiesBackendResponse {
-  [property: string]: Object;
+export interface ConfigPropertiesBackendResponse {
+  [property: string]: ConfigProperty;
 }
 
 interface ViewContributionBackendResponse {
@@ -83,7 +84,13 @@ interface VmidSharedSecretKeyMapping {
   'vm_id': string
 }
 
-interface ConfigPropertyValues {
+export interface ConfigProperty {
+  description: string,
+  schema: Schema,
+  value: number | boolean | string | string[] | Object | Object[]
+}
+
+export interface ConfigPropertyValues {
   'always_ask_learners_for_answer_details': boolean,
   'classroom_pages_data': ClassroomPageData,
   'classroom_promos_are_enabled': boolean,
