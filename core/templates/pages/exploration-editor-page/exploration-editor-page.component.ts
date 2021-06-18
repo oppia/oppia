@@ -74,7 +74,7 @@ require(
   'conversation-skin.directive.ts');
 require(
   'pages/exploration-player-page/layout-directives/' +
-  'exploration-footer.directive.ts');
+  'exploration-footer.component.ts');
 require('value_generators/valueGeneratorsRequires.ts');
 
 require('interactions/interactionsRequires.ts');
@@ -464,7 +464,10 @@ angular.module('oppia').component('explorationEditorPage', {
       ctrl.getWarnings = () => ExplorationWarningsService.getWarnings();
       ctrl.hasCriticalWarnings = () => (
         ExplorationWarningsService.hasCriticalWarnings);
-      ctrl.selectMainTab = () => RouterService.navigateToMainTab();
+      ctrl.selectMainTab = () => {
+        RouterService.navigateToMainTab();
+        $rootScope.$applyAsync();
+      };
       ctrl.selectTranslationTab = (
         () => RouterService.navigateToTranslationTab());
       ctrl.selectPreviewTab = () => RouterService.navigateToPreviewTab();

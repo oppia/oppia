@@ -37,6 +37,9 @@ import { ToastrModule } from 'ngx-toastr';
 import { TranslateModule, TranslateLoader, TranslateService, TranslateDefaultParser, TranslateParser, MissingTranslationHandler } from '@ngx-translate/core';
 import { TranslateCacheModule, TranslateCacheService, TranslateCacheSettings } from 'ngx-translate-cache';
 import { CommonElementsModule } from './common-layout-directives/common-elements/common-elements.module';
+import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
+import { CodeMirrorModule } from './code-mirror/codemirror.module';
+import { OppiaCkEditor4Module } from './ck-editor-helpers/ckeditor4.module';
 
 
 // Components.
@@ -65,6 +68,7 @@ import { SummaryListHeaderComponent } from './state-directives/answer-group-edit
 import { LearnerDashboardIconsComponent } from 'pages/learner-dashboard-page/learner-dashboard-icons.component';
 import { OutcomeFeedbackEditorComponent } from './state-directives/outcome-editor/outcome-feedback-editor.component';
 import { OnScreenKeyboardComponent } from './on-screen-keyboard/on-screen-keyboard.component';
+import { OppiaFooterComponent } from '../base-components/oppia-footer.component';
 import { RubricsEditorComponent } from './rubrics-editor/rubrics-editor.component';
 import { CreateNewSkillModalComponent } from 'pages/topics-and-skills-dashboard-page/create-new-skill-modal.component';
 import { PromoBarComponent } from './common-layout-directives/common-elements/promo-bar.component';
@@ -75,18 +79,22 @@ import { LoadingMessageComponent } from '../base-components/loading-message.comp
 import { CreateActivityButtonComponent } from './button-directives/create-activity-button.component';
 import { CreateActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/create-activity-modal.component';
 import { UploadActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/upload-activity-modal.component';
+import { TopNavigationBarComponent } from './common-layout-directives/navigation-bars/top-navigation-bar.component';
 import { CorrectnessFooterComponent } from 'pages/exploration-player-page/layout-directives/correctness-footer.component';
 import { ContinueButtonComponent } from 'pages/exploration-player-page/learner-experience/continue-button.component';
-import { TopNavigationBarWrapperComponent } from 'pages/exploration-editor-page/top-navigation-bar-wrapper.component';
-import { SideNavigationBarWrapperComponent } from 'pages/exploration-editor-page/side-navigation-bar-wrapper.component';
 import { BaseContentComponent } from '../base-components/base-content.component';
 import { PreviewThumbnailComponent } from 'pages/topic-editor-page/modal-templates/preview-thumbnail.component';
 import { InputResponsePairComponent } from 'pages/exploration-player-page/learner-experience/input-response-pair.component';
 import { I18nLanguageSelectorComponent } from '../base-components/i18n-language-selector.component';
+import { StorySummaryTileComponent } from './summary-tile/story-summary-tile.component';
+import { ExplorationFooterComponent } from 'pages/exploration-player-page/layout-directives/exploration-footer.component';
+import { DisplaySolutionModalComponent } from 'pages/exploration-player-page/modals/display-solution-modal.component';
+import { DisplaySolutionInterstititalModalComponent } from 'pages/exploration-player-page/modals/display-solution-interstitial-modal.component';
+import { DisplayHintModalComponent } from 'pages/exploration-player-page/modals/display-hint-modal.component';
+import { HintAndSolutionButtonsComponent } from './button-directives/hint-and-solution-buttons.component';
 
 
 // Directives.
-import { StorySummaryTileDirective } from './summary-tile/story-summary-tile.directive';
 import { SubtopicSummaryTileDirective } from './summary-tile/subtopic-summary-tile.directive';
 
 
@@ -102,8 +110,6 @@ import { LimitToPipe } from 'filters/limit-to.pipe';
 
 // Services.
 import { AuthService } from 'services/auth.service';
-import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
-import { CodeMirrorModule } from './code-mirror/codemirror.module';
 import { HttpClient } from '@angular/common/http';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
@@ -166,6 +172,7 @@ const toastrConfig = {
     RichTextComponentsModule,
     ToastrModule.forRoot(toastrConfig),
     ObjectComponentsModule,
+    OppiaCkEditor4Module,
     SharedFormsModule,
     SharedPipesModule,
     /**
@@ -230,10 +237,15 @@ const toastrConfig = {
     CreateNewSkillModalComponent,
     CreateActivityButtonComponent,
     CreateActivityModalComponent,
+    DisplaySolutionModalComponent,
+    DisplaySolutionInterstititalModalComponent,
+    DisplayHintModalComponent,
+    ExplorationFooterComponent,
     ExplorationSummaryTileComponent,
     CollectionSummaryTileComponent,
     ExplorationEmbedButtonModalComponent,
     FilterForMatchingSubstringPipe,
+    HintAndSolutionButtonsComponent,
     I18nLanguageSelectorComponent,
     InputResponsePairComponent,
     KeyboardShortcutHelpModalComponent,
@@ -241,11 +253,11 @@ const toastrConfig = {
     LimitToPipe,
     LoadingMessageComponent,
     OnScreenKeyboardComponent,
+    OppiaFooterComponent,
     OutcomeFeedbackEditorComponent,
     PreviewThumbnailComponent,
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
-    SideNavigationBarWrapperComponent,
     PromoBarComponent,
     SelectSkillModalComponent,
     RubricsEditorComponent,
@@ -255,16 +267,16 @@ const toastrConfig = {
     SkillMasteryViewerComponent,
     StateSkillEditorComponent,
     SocialButtonsComponent,
-    StorySummaryTileDirective,
+    StorySummaryTileComponent,
     SubtopicSummaryTileDirective,
     SummaryListHeaderComponent,
     TakeBreakModalComponent,
+    TopNavigationBarComponent,
     WrapTextWithEllipsisPipe,
     WarningsAndAlertsComponent,
     ThumbnailDisplayComponent,
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
-    TopNavigationBarWrapperComponent,
     TruncateAndCapitalizePipe,
     SummarizeNonnegativeNumberPipe,
     TruncatePipe,
@@ -285,6 +297,7 @@ const toastrConfig = {
     CreateNewSkillModalComponent,
     CreateActivityButtonComponent,
     CreateActivityModalComponent,
+    ExplorationFooterComponent,
     ExplorationSummaryTileComponent,
     CollectionSummaryTileComponent,
     BaseContentComponent,
@@ -295,26 +308,31 @@ const toastrConfig = {
     OnScreenKeyboardComponent,
     ProfileLinkImageComponent, ProfileLinkTextComponent,
     // These elements will remain here even after migration.
+    DisplaySolutionModalComponent,
+    DisplaySolutionInterstititalModalComponent,
+    DisplayHintModalComponent,
     SelectSkillModalComponent,
     SkillSelectorComponent,
     TakeBreakModalComponent,
     StateSkillEditorComponent,
     ExplorationEmbedButtonModalComponent,
     OutcomeFeedbackEditorComponent,
+    HintAndSolutionButtonsComponent,
     InputResponsePairComponent,
     KeyboardShortcutHelpModalComponent,
     I18nLanguageSelectorComponent,
+    OppiaFooterComponent,
     PreviewThumbnailComponent,
     PromoBarComponent,
     RubricsEditorComponent,
     SideNavigationBarComponent,
-    SideNavigationBarWrapperComponent,
+    StorySummaryTileComponent,
     SummaryListHeaderComponent,
     ThumbnailDisplayComponent,
     UploadActivityModalComponent,
     ThreadTableComponent,
+    TopNavigationBarComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
-    TopNavigationBarWrapperComponent,
     WarningsAndAlertsComponent,
     LearnerDashboardIconsComponent
   ],
@@ -329,9 +347,10 @@ const toastrConfig = {
     MaterialModule,
     NgbTooltipModule,
     NgbNavModule,
-    RichTextComponentsModule,
     NgbModalModule,
+    RichTextComponentsModule,
     ObjectComponentsModule,
+    OppiaCkEditor4Module,
     SharedFormsModule,
     SharedPipesModule,
     TranslateModule,
@@ -348,8 +367,13 @@ const toastrConfig = {
     CreateNewSkillModalComponent,
     CreateActivityButtonComponent,
     CreateActivityModalComponent,
+    DisplaySolutionModalComponent,
+    DisplaySolutionInterstititalModalComponent,
+    DisplayHintModalComponent,
+    ExplorationFooterComponent,
     ExplorationSummaryTileComponent,
     CollectionSummaryTileComponent,
+    HintAndSolutionButtonsComponent,
     I18nLanguageSelectorComponent,
     InputResponsePairComponent,
     LazyLoadingComponent,
@@ -361,21 +385,21 @@ const toastrConfig = {
     RubricsEditorComponent,
     FilterForMatchingSubstringPipe,
     OnScreenKeyboardComponent,
+    OppiaFooterComponent,
     OutcomeFeedbackEditorComponent,
-    SideNavigationBarWrapperComponent,
     StateSkillEditorComponent,
     SelectSkillModalComponent,
     SideNavigationBarComponent,
     SharingLinksComponent,
     SkillSelectorComponent,
     SocialButtonsComponent,
-    StorySummaryTileDirective,
+    StorySummaryTileComponent,
     SubtopicSummaryTileDirective,
     SummaryListHeaderComponent,
     TakeBreakModalComponent,
     ThumbnailDisplayComponent,
+    TopNavigationBarComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
-    TopNavigationBarWrapperComponent,
     WarningsAndAlertsComponent,
     UploadActivityModalComponent,
     WrapTextWithEllipsisPipe,
