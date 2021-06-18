@@ -132,6 +132,7 @@ angular.module('oppia').factory('ExplorationStatesService', [
       hints: ['interaction', 'hints'],
       next_content_id_index: ['nextContentIdIndex'],
       solicit_answer_details: ['solicitAnswerDetails'],
+      card_is_checkpoint: ['cardIsCheckpoint'],
       solution: ['interaction', 'solution'],
       widget_id: ['interaction', 'id'],
       widget_customization_args: ['interaction', 'customizationArgs'],
@@ -310,6 +311,17 @@ angular.module('oppia').factory('ExplorationStatesService', [
       setState: function(stateName, stateData) {
         _setState(stateName, stateData, true);
       },
+      getCheckpointCount: function() {
+        var count: number = 0;
+        if (_states) {
+          _states.getStateNames().forEach(function(stateName) {
+            if (_states.getState(stateName).cardIsCheckpoint) {
+              count++;
+            }
+          });
+        }
+        return count;
+      },
       isNewStateNameValid: function(newStateName, showWarnings) {
         if (_states.hasState(newStateName)) {
           if (showWarnings) {
@@ -411,12 +423,41 @@ angular.module('oppia').factory('ExplorationStatesService', [
         saveStateProperty(
           stateName, 'solicit_answer_details', newSolicitAnswerDetails);
       },
-      getWrittenTranslationsMemento: function(stateName) {
-        return getStatePropertyMemento(stateName, 'written_translations');
+      getCardIsCheckpointMemento: function(stateName) {
+        return getStatePropertyMemento(stateName, 'card_is_checkpoint');
       },
-      saveWrittenTranslations: function(stateName, newWrittenTranslations) {
+      saveCardIsCheckpoint: function(stateName, newCardIsCheckpoint) {
         saveStateProperty(
-          stateName, 'written_translations', newWrittenTranslations);
+          stateName, 'card_is_checkpoint', newCardIsCheckpoint);
+      },
+      getWrittenTranslationsMemento: function(stateName) {
+        return _states.getState(stateName).writtenTranslations;
+      },
+      saveWrittenTranslation: function(
+          contentId, dataFormat, languageCode, stateName, translationHtml) {
+        ChangeListService.addWrittenTranslation(
+          contentId, dataFormat, languageCode, stateName, translationHtml);
+        let stateData = _states.getState(stateName);
+        if (stateData.writtenTranslations.hasWrittenTranslation(
+          contentId, languageCode)) {
+          stateData.writtenTranslations.updateWrittenTranslation(
+            contentId, languageCode, translationHtml);
+        } else {
+          stateData.writtenTranslations.addWrittenTranslation(
+            contentId, languageCode, dataFormat, translationHtml);
+        }
+        _states.setState(stateName, angular.copy(stateData));
+      },
+      markWrittenTranslationsAsNeedingUpdate: function(contentId, stateName) {
+        ChangeListService.markTranslationsAsNeedingUpdate(contentId, stateName);
+        let stateData = _states.getState(stateName);
+        const translationMapping = (
+          stateData.writtenTranslations.translationsMapping[contentId]);
+        for (const languageCode in translationMapping) {
+          stateData.writtenTranslations.translationsMapping[contentId][
+            languageCode].markAsNeedingUpdate();
+        }
+        _states.setState(stateName, angular.copy(stateData));
       },
       isInitialized: function() {
         return _states !== null;
