@@ -737,7 +737,7 @@ def require_valid_url_fragment(name, name_type, allowed_length):
             'received %s.' % (name_type, allowed_length, name))
 
     if not re.match(
-            constants.VALID_URL_FRAGMENT_REGEX, name): # type: ignore[attr-defined]
+            constants.VALID_URL_FRAGMENT_REGEX, name): # type: ignore[attr-defined] # pylint: disable=line-too-long
         raise ValidationError(
             '%s field contains invalid characters. Only lowercase words'
             ' separated by hyphens are allowed. Received %s.' % (
@@ -799,10 +799,10 @@ def require_valid_meta_tag_content(meta_tag_content):
             'Expected meta tag content to be a string, received %s'
             % meta_tag_content)
     if len(meta_tag_content) > (
-            constants.MAX_CHARS_IN_META_TAG_CONTENT): # type: ignore[attr-defined]
+            constants.MAX_CHARS_IN_META_TAG_CONTENT): # type: ignore[attr-defined] # pylint: disable=line-too-long
         raise ValidationError(
             'Meta tag content should not be longer than %s characters.'
-            % constants.MAX_CHARS_IN_META_TAG_CONTENT) # type: ignore[attr-defined]
+            % constants.MAX_CHARS_IN_META_TAG_CONTENT) # type: ignore[attr-defined] # pylint: disable=line-too-long
 
 
 def require_valid_page_title_fragment_for_web(page_title_fragment_for_web):
@@ -817,7 +817,7 @@ def require_valid_page_title_fragment_for_web(page_title_fragment_for_web):
         ValidationError. Page title fragment is too lengthy.
     """
     max_chars_in_page_title_frag_for_web = (
-        constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB) # type: ignore[attr-defined]
+        constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB) # type: ignore[attr-defined] # pylint: disable=line-too-long
     if not isinstance(page_title_fragment_for_web, python_utils.BASESTRING):
         raise ValidationError(
             'Expected page title fragment to be a string, received %s'
@@ -825,7 +825,7 @@ def require_valid_page_title_fragment_for_web(page_title_fragment_for_web):
     if len(page_title_fragment_for_web) > max_chars_in_page_title_frag_for_web:
         raise ValidationError(
             'Page title fragment should not be longer than %s characters.'
-            % constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB) # type: ignore[attr-defined]
+            % constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB) # type: ignore[attr-defined] # pylint: disable=line-too-long
 
 
 def capitalize_string(input_string):
@@ -1127,7 +1127,7 @@ def grouper(iterable, chunk_len, fillvalue=None):
 
 
 def partition(iterable, predicate=bool, enumerated=False):
-    # type: (Iterable[T], Callable[..., Any], bool) -> Tuple[Iterable[Union[T, Tuple[int,T]]], Iterable[Union[T, Tuple[int,T]]]]
+    # type: (Iterable[T], Callable[..., Any], bool) -> Tuple[Iterable[Union[T, Tuple[int,T]]], Iterable[Union[T, Tuple[int,T]]]] # pylint: disable=line-too-long
     """Returns two generators which split the iterable based on the predicate.
 
     NOTE: The predicate is called AT MOST ONCE per item.
@@ -1163,7 +1163,8 @@ def partition(iterable, predicate=bool, enumerated=False):
         themselves.
     """
     if enumerated:
-        new_iterable = enumerate(iterable) # type: Iterable[Union[T, Tuple[int, T]]]
+        new_iterable = enumerate(
+            iterable) # type: Iterable[Union[T, Tuple[int, T]]]
         old_predicate = predicate
         predicate = lambda pair: old_predicate(pair[1])
     else:
