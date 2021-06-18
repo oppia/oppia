@@ -70,6 +70,10 @@ class TakeoutServiceProfileUserUnitTests(test_utils.GenericTestBase):
     EXPLORATION_IDS_2 = ['exp_2']
     COLLECTION_IDS = ['23', '42', '4']
     COLLECTION_IDS_2 = ['32', '44', '6']
+    STORY_IDS = ['12', '22', '32']
+    STORY_IDS_2 = ['42', '52', '62']
+    TOPIC_IDS = ['11', '21', '31']
+    TOPIC_IDS_2 = ['41', '51', '61']
     SKILL_ID_1 = 'skill_id_1'
     SKILL_ID_2 = 'skill_id_2'
     SKILL_ID_3 = 'skill_id_3'
@@ -112,17 +116,23 @@ class TakeoutServiceProfileUserUnitTests(test_utils.GenericTestBase):
         user_models.CompletedActivitiesModel(
             id=self.USER_ID_1,
             exploration_ids=self.EXPLORATION_IDS_2,
-            collection_ids=self.COLLECTION_IDS_2).put()
+            collection_ids=self.COLLECTION_IDS_2,
+            story_ids=self.STORY_IDS_2,
+            learnt_topic_ids=self.TOPIC_IDS_2).put()
         user_models.CompletedActivitiesModel(
             id=self.PROFILE_ID_1,
             exploration_ids=self.EXPLORATION_IDS,
-            collection_ids=self.COLLECTION_IDS).put()
+            collection_ids=self.COLLECTION_IDS,
+            story_ids=self.STORY_IDS,
+            learnt_topic_ids=self.TOPIC_IDS).put()
 
         # Setup for IncompleteACtivitiesModel.
         user_models.IncompleteActivitiesModel(
             id=self.PROFILE_ID_1,
             exploration_ids=self.EXPLORATION_IDS,
-            collection_ids=self.COLLECTION_IDS).put()
+            collection_ids=self.COLLECTION_IDS,
+            story_ids=self.STORY_IDS_2,
+            partially_learnt_topic_ids=self.TOPIC_IDS).put()
 
         # Setup for ExpUserLastPlaythroughModel.
         user_models.ExpUserLastPlaythroughModel(
@@ -271,6 +281,10 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
     ]
     EXPLORATION_IDS = ['exp_1']
     EXPLORATION_IDS_2 = ['exp_2']
+    STORY_IDS = ['12', '22', '32']
+    STORY_IDS_2 = ['42', '52', '62']
+    TOPIC_IDS = ['11', '21', '31']
+    TOPIC_IDS_2 = ['41', '51', '61']
     CREATOR_IDS = ['4', '8', '16']
     CREATOR_USERNAMES = ['username4', 'username8', 'username16']
     COLLECTION_IDS = ['23', '42', '4']
@@ -436,17 +450,23 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         user_models.CompletedActivitiesModel(
             id=self.USER_ID_1,
             exploration_ids=self.EXPLORATION_IDS,
-            collection_ids=self.COLLECTION_IDS).put()
+            collection_ids=self.COLLECTION_IDS,
+            story_ids=self.STORY_IDS,
+            learnt_topic_ids=self.TOPIC_IDS).put()
         user_models.CompletedActivitiesModel(
             id=self.PROFILE_ID_1,
             exploration_ids=self.EXPLORATION_IDS_2,
-            collection_ids=self.COLLECTION_IDS_2).put()
+            collection_ids=self.COLLECTION_IDS_2,
+            story_ids=self.STORY_IDS_2,
+            learnt_topic_ids=self.TOPIC_IDS_2).put()
 
         # Setup for IncompleteACtivitiesModel.
         user_models.IncompleteActivitiesModel(
             id=self.USER_ID_1,
             exploration_ids=self.EXPLORATION_IDS,
-            collection_ids=self.COLLECTION_IDS).put()
+            collection_ids=self.COLLECTION_IDS,
+            story_ids=self.STORY_IDS,
+            partially_learnt_topic_ids=self.TOPIC_IDS).put()
 
         # Setup for ExpUserLastPlaythroughModel.
         user_models.ExpUserLastPlaythroughModel(
@@ -1215,11 +1235,15 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         }
         expected_completed_activities_data = {
             'completed_exploration_ids': self.EXPLORATION_IDS,
-            'completed_collection_ids': self.COLLECTION_IDS
+            'completed_collection_ids': self.COLLECTION_IDS,
+            'completed_story_ids': self.STORY_IDS,
+            'learnt_topic_ids': self.TOPIC_IDS
         }
         expected_incomplete_activities_data = {
             'incomplete_exploration_ids': self.EXPLORATION_IDS,
-            'incomplete_collection_ids': self.COLLECTION_IDS
+            'incomplete_collection_ids': self.COLLECTION_IDS,
+            'incomplete_story_ids': self.STORY_IDS,
+            'partially_learnt_topic_ids': self.TOPIC_IDS
         }
         expected_last_playthrough_data = {
             self.EXPLORATION_IDS[0]: {
@@ -1628,7 +1652,9 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         }
         completed_activities_data = {
             'completed_exploration_ids': self.EXPLORATION_IDS_2,
-            'completed_collection_ids': self.COLLECTION_IDS_2
+            'completed_collection_ids': self.COLLECTION_IDS_2,
+            'completed_story_ids': self.STORY_IDS,
+            'learnt_topic_ids': self.TOPIC_IDS
         }
         incomplete_activities_data = {}
         last_playthrough_data = {}
