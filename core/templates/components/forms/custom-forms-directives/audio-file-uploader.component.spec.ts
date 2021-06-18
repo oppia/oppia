@@ -19,7 +19,7 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { AudioFileUploaderComponent } from './audio-file-uploader.component';
 
-fdescribe('Audio File Uploader Component', () => {
+describe('Audio File Uploader Component', () => {
   let component: AudioFileUploaderComponent;
   let fixture:
     ComponentFixture<AudioFileUploaderComponent>;
