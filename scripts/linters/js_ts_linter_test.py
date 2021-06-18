@@ -121,13 +121,12 @@ class JsTsLintTests(test_utils.LinterTestBase):
             ).perform_all_lint_checks()
         shutil.rmtree(
             js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
-        expected_messages = ['Duplicate constant declaration found.']
-        expected_messages.extend([
+        expected_messages = [
             'Please ensure that the constant ADMIN_TABS is initialized '
             'from the value from the corresponding Angular constants file '
             '(the *.constants.ts file). Please create one in the Angular '
             'constants file if it does not exist there.'
-            ])
+            ]
         self.validate(lint_task_report, expected_messages, 1)
 
     def test_check_duplicate_constant_declaration_in_separate_files(self):
