@@ -255,6 +255,23 @@ def get_story_id_linked_to_exploration(exp_id):
     return None
 
 
+def get_story_ids_linked_to_explorations(exp_ids):
+    """Returns a list of IDs of the story that the explorations are a part of.
+
+    Args:
+        exp_ids: list(str). The IDs of the explorations.
+
+    Returns:
+        list(str). A list of IDs of the story that the exploration is linked to.
+    """
+    exploration_context_models = exp_models.ExplorationContextModel.get_multi(
+        exp_ids)
+    linked_story_ids = [
+        exp_context_model.story_id for exp_context_model in (
+            exploration_context_models) if exp_context_model is not None]
+    return linked_story_ids
+
+
 def get_all_exploration_summaries():
     """Returns a dict with all exploration summary domain objects,
     keyed by their id.
