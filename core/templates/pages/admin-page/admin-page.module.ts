@@ -36,7 +36,9 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 import { RolesAndActionsVisualizerComponent } from './roles-tab/roles-and-actions-visualizer.component';
 import { AdminMiscTabComponent } from './misc-tab/admin-misc-tab.component';
+import { AdminRolesTabComponent } from './roles-tab/admin-roles-tab.component';
 import { AdminConfigTabComponent } from './config-tab/admin-config-tab.component';
+import { AdminPageComponent } from './admin-page.component';
 import { SharedFormsModule } from 'components/forms/shared-forms.module';
 
 @NgModule({
@@ -54,6 +56,8 @@ import { SharedFormsModule } from 'components/forms/shared-forms.module';
     AdminFeaturesTabComponent,
     AdminMiscTabComponent,
     AdminNavbarComponent,
+    AdminPageComponent,
+    AdminRolesTabComponent,
     AdminDevModeActivitiesTabComponent,
     RolesAndActionsVisualizerComponent
   ],
@@ -64,6 +68,8 @@ import { SharedFormsModule } from 'components/forms/shared-forms.module';
     AdminFeaturesTabComponent,
     AdminMiscTabComponent,
     AdminNavbarComponent,
+    AdminPageComponent,
+    AdminRolesTabComponent,
     AdminDevModeActivitiesTabComponent,
     RolesAndActionsVisualizerComponent
   ],
