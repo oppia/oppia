@@ -1400,30 +1400,6 @@ def _get_filtered_collection_playlist_summaries(
         nonexistent_playlist_collection_ids)
 
 
-def get_all_topic_ids_to_learn(user_id):
-    """Returns a list with the ids of all the topics selected
-    by the user to learn.
-
-    Args:
-        user_id: str. The id of the learner.
-
-    Returns:
-        list(str). A list of the ids of the topics selected by the learner to
-        learn.
-    """
-    learner_goals_model = (
-        user_models.LearnerGoalsModel.get(
-            user_id, strict=False))
-
-    if learner_goals_model:
-        learner_goals = learner_goals_services.get_learner_goals_from_model(
-            learner_goals_model)
-
-        return learner_goals.topic_ids_to_learn
-    else:
-        return []
-
-
 def _get_filtered_topics_to_learn_summaries(
         user_id, topic_summaries, topic_ids):
     """Returns a list of summaries of the topics selected by the user ids

@@ -274,6 +274,11 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[self.subtopic_0], next_subtopic_id=1)
         topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id)
+        self.save_new_story(self.STORY_ID_2, self.owner_id, self.TOPIC_ID_1)
+        topic_services.add_canonical_story(
+            self.owner_id, self.TOPIC_ID_1, self.STORY_ID_2)
+        topic_services.publish_story(
+            self.TOPIC_ID_1, self.STORY_ID_2, self.admin_id)
 
         learner_progress_services.add_topic_to_learn(
             self.viewer_id, self.TOPIC_ID_1)

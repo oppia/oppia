@@ -620,7 +620,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
         learner_progress_services.add_topic_to_learn(
             self.viewer_id, self.TOPIC_ID)
         self.assertEqual(
-            len(learner_progress_services.get_all_topic_ids_to_learn(
+            len(learner_goals_services.get_all_topic_ids_to_learn(
                 self.viewer_id)), 1)
         csrf_token = self.get_new_csrf_token()
         story_services.record_completed_node_in_story_context(
@@ -636,5 +636,5 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
             )
 
         self.assertEqual(
-            len(learner_progress_services.get_all_topic_ids_to_learn(
+            len(learner_goals_services.get_all_topic_ids_to_learn(
                 self.viewer_id)), 0)
