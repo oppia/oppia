@@ -58,7 +58,7 @@ ruleTester.run('constant-declaration', rule, {
       'DEFAULT_SKILL_DIFFICULTY', QuestionListConstants.DEFAULT_SKILL_DIFFIC);`,
       filename: 'foo/bar.js',
       errors: [{
-        message: 'constant is used in non constant file.',
+        message: 'Constant is used in non constant file.',
       }],
     },
     {
@@ -69,7 +69,7 @@ ruleTester.run('constant-declaration', rule, {
       'MODE_SELECT_DIFFICULTY', QuestionsListConstants.MODE_SELECT_DIFFICULT);`,
       filename: 'foo/bar.constants.ajs.ts',
       errors: [{
-        message: 'There are two constants in this file.',
+        message: 'There are mutliple constants in this file.',
       }],
     },
     {
@@ -81,7 +81,7 @@ ruleTester.run('constant-declaration', rule, {
       errors: [{
         message: (
           'Please add \'as const\' at the end of the constant ' +
-          'deceleration. A constants file should have the following ' +
+          'declaration. A constants file should have the following ' +
           'structure:\n export const SomeConstants = { ... } as const;'),
       }],
     },

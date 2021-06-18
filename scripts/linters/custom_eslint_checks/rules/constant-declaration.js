@@ -14,8 +14,7 @@
 
 /**
  * @fileoverview Lint check to ensure that constants are not declared in files
- * other than *.constants.ajs.ts and that the constants are declared
- * only single time.
+ * other than *.constants.ajs.ts and there are no multiple constants.
  */
 
 'use strict';
@@ -26,19 +25,18 @@ module.exports = {
     docs: {
       description: (
         'Lint check to ensure that constants are not declared in files other' +
-        ' than *.constants.ajs.ts and that the constants are declared' +
-        ' only single time.'),
+        ' than *.constants.ajs.ts and there are no multiple constants'),
       category: 'Possible Errors',
       recommended: true,
     },
     fixable: null,
     schema: [],
     messages: {
-      nonConstantFile: 'constant is used in non constant file.',
-      multipleConstant: 'There are two constants in this file.',
+      nonConstantFile: 'Constant is used in non constant file.',
+      multipleConstant: 'There are mutliple constants in this file.',
       notFoundAsConst: (
         'Please add \'as const\' at the end of the constant ' +
-        'deceleration. A constants file should have the following ' +
+        'declaration. A constants file should have the following ' +
         'structure:\n export const SomeConstants = { ... } as const;')
     },
   },
