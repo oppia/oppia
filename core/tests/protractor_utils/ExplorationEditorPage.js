@@ -37,6 +37,7 @@ var ExplorationEditorTranslationTab = require(
   '../protractor_utils/ExplorationEditorTranslationTab.js');
 var ExplorationPlayerPage = require(
   '../protractor_utils/ExplorationPlayerPage.js');
+const { browser } = require('protractor');
 
 var ExplorationEditorPage = function() {
   /*
@@ -107,6 +108,8 @@ var ExplorationEditorPage = function() {
   var saveDiscardToggleButton = element(
     by.css('.protractor-test-save-discard-toggle'));
   var saveDraftButton = element(by.css('.protractor-test-save-draft-button'));
+  var saveDraftMessageButton = element(by.css('.protractor-test-save-draft'));
+  var publishChangesMessageButton = element(by.css('.protractor-test-publish-changes'));
   var publishExplorationButton = element(
     by.css('.protractor-test-publish-exploration'));
 
@@ -214,7 +217,6 @@ var ExplorationEditorPage = function() {
   };
 
   this.saveChanges = async function(commitMessage) {
-    var toastSuccessElement = element(by.css('.toast-success'));
     await action.waitForAutosave();
     await action.click('Save changes button', saveChangesButton);
     if (commitMessage) {
@@ -222,14 +224,26 @@ var ExplorationEditorPage = function() {
         'Commit message input', commitMessageInput, commitMessage);
     }
     await action.click('Save draft button', saveDraftButton);
-    await waitFor.visibilityOf(
-      toastSuccessElement,
-      'Toast message is taking too long to appear after saving changes');
-    // This is necessary to give the page time to record the changes,
-    // so that it does not attempt to stop the user leaving.
-    await waitFor.invisibilityOf(
-      toastSuccessElement,
-      'Toast message is taking too long to disappear after saving changes');
+    //TODO(#13096): Remove browser.sleep from e2e files once Angular Migration finishes. 
+    await browser.sleep(2500);
+    await waitFor.textToBePresentInElement(
+      saveDraftMessageButton, 'Save Draft',
+      'Changes could not be saved');
+  };
+
+  this.savePublishedChanges = async function(commitMessage) {
+    await action.waitForAutosave();
+    await action.click('Save changes button', saveChangesButton);
+    if (commitMessage) {
+      await action.sendKeys(
+        'Commit message input', commitMessageInput, commitMessage);
+    }
+    await action.click('Save draft button', saveDraftButton);
+    //TODO(#13096): Remove browser.sleep from e2e files once Angular Migration finishes. 
+    await browser.sleep(2500);
+    await waitFor.textToBePresentInElement(
+      publishChangesMessageButton, 'Publish Changes',
+      'Changes could not be saved');
   };
 
   this.discardChanges = async function() {
