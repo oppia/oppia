@@ -5837,9 +5837,9 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
         })]
 
         # Checking for the mergability of the fourth change list.
-        are_changes_mergeable = exp_services.are_changes_mergeable(
+        changes_are_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 2, change_list_4)
-        self.assertEqual(are_changes_mergeable, True)
+        self.assertEqual(changes_are_mergeable, True)
 
     def test_changes_are_mergeable_when_interaction_id_changes_do_not_conflict(self): # pylint: disable=line-too-long
         self.save_new_valid_exploration(
@@ -5937,8 +5937,8 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_0_ID, change_list_2,
             'Changed Contents and Hint')
 
-        # Changes to the properties related to the interaction
-        # id and in interaction_id itself.
+        # Changes to the properties affected by or affecting
+        # interaction id and in interaction_id itself.
         change_list_3 = [exp_domain.ExplorationChange({
             'new_value': None,
             'state_name': 'Introduction',
@@ -5988,9 +5988,9 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             'property_name': 'widget_customization_args'
         })]
 
-        are_changes_mergeable = exp_services.are_changes_mergeable(
+        changes_are_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 1, change_list_3)
-        self.assertEqual(are_changes_mergeable, True)
+        self.assertEqual(changes_are_mergeable, True)
 
         # Creating second exploration to test the scenario
         # when changes to same properties are made in two
@@ -6078,9 +6078,9 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             'old_value': [],
             'property_name': 'answer_groups'
         })]
-        are_changes_mergeable_1 = exp_services.are_changes_mergeable(
+        changes_are_mergeable_1 = exp_services.are_changes_mergeable(
             self.EXP_1_ID, 1, change_list_4)
-        self.assertEqual(are_changes_mergeable_1, True)
+        self.assertEqual(changes_are_mergeable_1, True)
 
     def test_changes_are_mergeable_when_customization_args_changes_do_not_conflict(self): # pylint: disable=line-too-long
         self.save_new_valid_exploration(
@@ -6163,10 +6163,11 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_0_ID, change_list,
             'Changed Contents and Hints')
 
-        # Changes to the properties affectiong customization_args
+        # Changes to the properties affecting customization_args
         # or are affected by customization_args in the same state.
-        # Also includes changes related to re-name state
-        # to check if after renaming the changes can we applied.
+        # This includes changes related to renaming a state in
+        # order to check that changes are applied even if states
+        # are renamed.
         change_list_2 = [exp_domain.ExplorationChange({
             'cmd': 'rename_state',
             'new_state_name': 'Intro-rename',
@@ -6289,9 +6290,9 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             'cmd': 'edit_state_property'
         })]
 
-        are_changes_mergeable = exp_services.are_changes_mergeable(
+        changes_are_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 1, change_list_2)
-        self.assertEqual(are_changes_mergeable, True)
+        self.assertEqual(changes_are_mergeable, True)
 
         # Creating second exploration to test the scenario
         # when changes to same properties are made in two
@@ -6427,9 +6428,9 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             ]
         })]
 
-        are_changes_mergeable_1 = exp_services.are_changes_mergeable(
+        changes_are_mergeable_1 = exp_services.are_changes_mergeable(
             self.EXP_1_ID, 1, change_list_3)
-        self.assertEqual(are_changes_mergeable_1, True)
+        self.assertEqual(changes_are_mergeable_1, True)
 
     def test_changes_are_mergeable_when_answer_groups_changes_do_not_conflict(self): # pylint: disable=line-too-long
         self.save_new_valid_exploration(
@@ -6749,9 +6750,9 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             }
         })]
 
-        are_changes_mergeable = exp_services.are_changes_mergeable(
+        changes_are_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 2, change_list_3)
-        self.assertEqual(are_changes_mergeable, True)
+        self.assertEqual(changes_are_mergeable, True)
 
         # Creating second exploration to test the scenario
         # when changes to same properties are made in two
@@ -6880,9 +6881,9 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             }]
         })]
 
-        are_changes_mergeable_1 = exp_services.are_changes_mergeable(
+        changes_are_mergeable_1 = exp_services.are_changes_mergeable(
             self.EXP_1_ID, 2, change_list_4)
-        self.assertEqual(are_changes_mergeable_1, True)
+        self.assertEqual(changes_are_mergeable_1, True)
 
     def test_changes_are_mergeable_when_solutions_changes_do_not_conflict(self):
         self.save_new_valid_exploration(
@@ -7022,8 +7023,8 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_0_ID, change_list_2,
             'Changed Contents and Hint')
 
-        # Changes to the solutions and the related properties
-        # to check for mergeability.
+        # Changes to the solutions and the properties that affects
+        # solutions to check for mergeability.
         change_list_3 = [exp_domain.ExplorationChange({
             'state_name': 'Introduction',
             'new_value': [{
@@ -7199,9 +7200,9 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             }
         })]
 
-        are_changes_mergeable = exp_services.are_changes_mergeable(
+        changes_are_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 2, change_list_3)
-        self.assertEqual(are_changes_mergeable, True)
+        self.assertEqual(changes_are_mergeable, True)
 
         # Creating second exploration to test the scenario
         # when changes to same properties are made in two
@@ -7346,9 +7347,9 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             'state_name': 'End'
         })]
 
-        are_changes_mergeable_1 = exp_services.are_changes_mergeable(
+        changes_are_mergeable_1 = exp_services.are_changes_mergeable(
             self.EXP_1_ID, 2, change_list_4)
-        self.assertEqual(are_changes_mergeable_1, True)
+        self.assertEqual(changes_are_mergeable_1, True)
 
     def test_changes_are_mergeable_when_hints_changes_do_not_conflict(self):
         self.save_new_valid_exploration(
@@ -7392,7 +7393,7 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_0_ID, change_list,
             'Added Hint and Solution in Introduction state')
 
-        # Changes to all the propeties other than the hints.
+        # Changes to all state propeties other than the hints.
         change_list_2 = [exp_domain.ExplorationChange({
             'property_name': 'content',
             'state_name': 'Introduction',
@@ -7657,9 +7658,9 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             'state_name': 'Introduction'
         })]
 
-        are_changes_mergeable = exp_services.are_changes_mergeable(
+        changes_are_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 2, change_list_3)
-        self.assertEqual(are_changes_mergeable, True)
+        self.assertEqual(changes_are_mergeable, True)
 
     def test_changes_are_mergeable_when_exploration_properties_changes_do_not_conflict(self): # pylint: disable=line-too-long
         self.save_new_valid_exploration(
@@ -7951,9 +7952,9 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             ]
         })]
 
-        are_changes_mergeable = exp_services.are_changes_mergeable(
+        changes_are_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 1, change_list_3)
-        self.assertEqual(are_changes_mergeable, True)
+        self.assertEqual(changes_are_mergeable, True)
 
     def test_changes_are_mergeable_when_translations_changes_do_not_conflict(self): # pylint: disable=line-too-long
         self.save_new_valid_exploration(
@@ -8191,13 +8192,13 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             'state_name': 'Introduction'
         })]
 
-        are_changes_mergeable = exp_services.are_changes_mergeable(
+        changes_are_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 2, change_list_3)
-        self.assertEqual(are_changes_mergeable, False)
+        self.assertEqual(changes_are_mergeable, False)
 
         # Adding translations to the second state to check
         # if they can be applied. They can be mergead as
-        # the changes are in the differents states.
+        # the changes are in differents states.
         change_list_4 = [exp_domain.ExplorationChange({
             'new_value': {
                 'translations_mapping': {
@@ -8220,14 +8221,13 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             'property_name': 'written_translations'
         })]
 
-        are_changes_mergeable_1 = exp_services.are_changes_mergeable(
+        changes_are_mergeable_1 = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 2, change_list_4)
-        self.assertEqual(are_changes_mergeable_1, True)
+        self.assertEqual(changes_are_mergeable_1, True)
 
-        # Changes to the content of first state to check
-        # that the changes in the contents of first state
-        # doesn't affects the changes to the translations in
-        # second state.
+        # Add changes to the content of first state to check
+        # that these changes doesn't affects the translations
+        # in the second state.
         change_list_5 = [exp_domain.ExplorationChange({
             'state_name': 'Introduction',
             'old_value': {
@@ -8245,9 +8245,9 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list_5,
             'Changing Content in First State.')
-        are_changes_mergeable_2 = exp_services.are_changes_mergeable(
+        changes_are_mergeable_3 = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 3, change_list_4)
-        self.assertEqual(are_changes_mergeable_2, True)
+        self.assertEqual(changes_are_mergeable_3, True)
 
         # Changes to the content of second state to check that
         # the changes to the translations can not be made in
@@ -8271,9 +8271,9 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_0_ID, change_list_6,
             'Changing Content in Second State.')
 
-        are_changes_mergeable_3 = exp_services.are_changes_mergeable(
+        changes_are_not_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 4, change_list_4)
-        self.assertEqual(are_changes_mergeable_3, False)
+        self.assertEqual(changes_are_not_mergeable, False)
 
     def test_changes_are_mergeable_when_voiceovers_changes_do_not_conflict(self): # pylint: disable=line-too-long
         self.save_new_valid_exploration(
@@ -8514,9 +8514,9 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             'state_name': 'Introduction'
         })]
 
-        are_changes_mergeable = exp_services.are_changes_mergeable(
+        changes_are_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 2, change_list_3)
-        self.assertEqual(are_changes_mergeable, False)
+        self.assertEqual(changes_are_mergeable, False)
 
         # Adding voiceovers to the second state to check
         # if they can be applied. They can be mergead as
@@ -8544,9 +8544,9 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             'state_name': 'End'
         })]
 
-        are_changes_mergeable_1 = exp_services.are_changes_mergeable(
+        changes_are_mergeable_1 = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 2, change_list_4)
-        self.assertEqual(are_changes_mergeable_1, True)
+        self.assertEqual(changes_are_mergeable_1, True)
 
         # Changes to the content of first state to check
         # that the changes in the contents of first state
@@ -8569,9 +8569,9 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list_5,
             'Changing Content in First State.')
-        are_changes_mergeable_2 = exp_services.are_changes_mergeable(
+        changes_are_mergeable_3 = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 3, change_list_4)
-        self.assertEqual(are_changes_mergeable_2, True)
+        self.assertEqual(changes_are_mergeable_3, True)
 
         # Changes to the content of second state to check that
         # the changes to the voiceovers can not be made in
@@ -8595,9 +8595,9 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_0_ID, change_list_6,
             'Changing Content in Second State.')
 
-        are_changes_mergeable_3 = exp_services.are_changes_mergeable(
+        changes_are_not_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 4, change_list_4)
-        self.assertEqual(are_changes_mergeable_3, False)
+        self.assertEqual(changes_are_not_mergeable, False)
 
     def test_changes_are_not_mergeable_when_state_added_or_deleted(self):
         self.save_new_valid_exploration(
@@ -8724,13 +8724,13 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             'cmd': 'edit_state_property'
         })]
 
-        are_changes_mergeable = exp_services.are_changes_mergeable(
+        changes_are_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 1, change_list_2)
-        self.assertEqual(are_changes_mergeable, True)
+        self.assertEqual(changes_are_mergeable, True)
 
-        # Deleting and Adding states to check if any state
-        # is deleted or added, then the second user cannot
-        # make any changes to the old_version.
+        # Deleting and Adding states to check that when any
+        # state is deleted or added, then the changes can not be
+        # merged.
         change_list_3 = [exp_domain.ExplorationChange({
             'cmd': 'delete_state',
             'state_name': 'End'
@@ -8859,9 +8859,9 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_0_ID, change_list_3,
             'Added and deleted states.')
 
-        # Again checking that old change which was able to
-        # merge before cannot be merged after addition or
-        # deletion of state.
-        are_changes_mergeable_1 = exp_services.are_changes_mergeable(
+        # Checking that old changes that could be
+        # merged previously can not be merged after
+        # addition or deletion of state.
+        changes_are_not_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 1, change_list_2)
-        self.assertEqual(are_changes_mergeable_1, False)
+        self.assertEqual(changes_are_not_mergeable, False)
