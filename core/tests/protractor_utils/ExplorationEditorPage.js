@@ -226,7 +226,9 @@ var ExplorationEditorPage = function() {
     await action.click('Save draft button', saveDraftButton);
     // TODO(#13096): Remove browser.sleep from e2e files 
     // once angular migration finishes. 
+    /* eslint-disable oppia/protractor-practices */
     await browser.sleep(2500);
+    /* eslint-enable oppia/protractor-practices */
     await waitFor.textToBePresentInElement(
       saveDraftMessageButton, 'Save Draft',
       'Changes could not be saved');
@@ -242,7 +244,9 @@ var ExplorationEditorPage = function() {
     await action.click('Save draft button', saveDraftButton);
     // TODO(#13096): Remove browser.sleep from e2e files 
     // once angular migration finishes. 
+    /* eslint-disable oppia/protractor-practices */
     await browser.sleep(2500);
+    /* eslint-enable oppia/protractor-practices */
     await waitFor.textToBePresentInElement(
       publishChangesMessageButton, 'Publish Changes',
       'Changes could not be saved');
