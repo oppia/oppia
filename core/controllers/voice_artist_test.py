@@ -375,20 +375,6 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
                 'voice_artist': self.VOICE_ARTIST_USERNAME})
         self.logout()
 
-    def test_cannot_assign_voice_artist_in_incorrect_activity(self):
-        self.login(self.VOICEOVER_ADMIN_EMAIL)
-        params = {
-            'username': self.VOICE_ARTIST_USERNAME
-        }
-        csrf_token = self.get_new_csrf_token()
-        response = self.post_json(
-            '/voice_artist_management_handler/incorrect_activity/%s'
-            % self.published_exp_id_1, params,
-            csrf_token=csrf_token, expected_status_int=400)
-        self.assertEqual(
-            response['error'], 'Invalid entity type.')
-        self.logout()
-
     def test_cannot_assign_voice_artist_to_random_user(self):
         self.login(self.VOICEOVER_ADMIN_EMAIL)
         params = {
@@ -401,24 +387,6 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
             csrf_token=csrf_token, expected_status_int=400)
         self.assertEqual(
             response['error'], 'Sorry, we could not find the specified user.')
-        self.logout()
-
-    def test_cannot_desaaign_voice_artist_in_incorrect_activity(self):
-        self.login(self.VOICEOVER_ADMIN_EMAIL)
-        params = {
-            'username': self.VOICE_ARTIST_USERNAME
-        }
-        csrf_token = self.get_new_csrf_token()
-        self.post_json(
-            '/voice_artist_management_handler/exploration/%s'
-            % self.published_exp_id_1, params, csrf_token=csrf_token)
-        response = self.delete_json(
-            '/voice_artist_management_handler/incorrect_activity/%s'
-            % self.published_exp_id_1, params={
-                'voice_artist': self.VOICE_ARTIST_USERNAME},
-            expected_status_int=400)
-        self.assertEqual(
-            response['error'], 'Invalid entity type.')
         self.logout()
 
     def test_cannot_deassign_random_user_from_voice_artist(self):

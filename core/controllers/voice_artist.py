@@ -139,10 +139,6 @@ class VoiceArtistManagementHandler(base.BaseHandler):
     @acl_decorators.can_manage_voice_artist
     def post(self, entity_type, entity_id):
         """Handles Post requests."""
-        if entity_type != feconf.ENTITY_TYPE_EXPLORATION:
-            raise self.InvalidInputException(
-                'Invalid entity type.')
-
         voice_artist = self.payload.get('username')
         voice_artist_id = user_services.get_user_id_from_username(
             voice_artist)
