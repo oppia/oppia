@@ -204,16 +204,14 @@
                     <span *ngIf="contributionReviewersResult.translationLanguages.length === 0"><i>None</i></span>
                     <span *ngFor="let language of contributionReviewersResult.translationLanguages; index as idx"
                           class="protractor-test-translation-reviewer-language">
-                      <!-- {{ language }}{{ idx === contributionReviewersResult.translationLanguages.length ? '' : ', ' }} -->
-                      {{ language + ', ' }}
+                      {{ language }}{{ idx === (contributionReviewersResult.translationLanguages.length - 1) ? '' : ', ' }}
                     </span>
                   </td>
                   <td>
                     <span *ngIf="contributionReviewersResult.voiceoverLanguages.length === 0"><i>None</i></span>
                     <span *ngFor="let language of contributionReviewersResult.voiceoverLanguages; index as idx"
                           class="protractor-test-voiceover-reviewer-language">
-                          {{ idx }}
-                      {{ language + ', ' }}
+                      {{ language }} {{ idx === (contributionReviewersResult.voiceoverLanguages.length - 1) ? '': ', ' }}
                     </span>
                   </td>
                   <td>

@@ -266,7 +266,6 @@ export class AdminRolesTabComponent {
         };
         this.contributionReviewersDataFetched = true;
         this.setStatusMessage.emit('Success.');
-        this.refreshFormData();
       }, this.handleErrorResponse.bind(this));
     }
     this.adminTaskManagerService.finishTask();
