@@ -33,5 +33,7 @@ EXCLUDED_BYPASS_SECURITY_TRUST_FILES = (
     # mechanism. The svg-sanitizer file is going to be a permanent member in
     # this list due to the aforementioned reason.
     'core/templates/services/svg-sanitizer.service.spec.ts',
-    'core/templates/services/svg-sanitizer.service.ts')
+    'core/templates/services/svg-sanitizer.service.ts',
+    'core/templates/pages/admin-page/roles-tab/admin-roles-tab.component.ts'
+    )
 EXCLUDED_BYPASS_SECURITY_TRUST_DIRECTORIES = ()
