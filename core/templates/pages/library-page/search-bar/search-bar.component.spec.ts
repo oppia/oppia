@@ -48,7 +48,7 @@ class MockWindowRef {
       pathname: '/search/find',
       href: '',
       toString() {
-        return 'http://localhost/test_path'
+        return 'http://localhost/test_path';
       }
     },
     history: {
