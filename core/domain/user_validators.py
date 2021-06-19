@@ -136,7 +136,13 @@ class CompletedActivitiesModelValidator(
                 item.exploration_ids),
             base_model_validators.ExternalModelFetcherDetails(
                 'collection_ids', collection_models.CollectionModel,
-                item.collection_ids)]
+                item.collection_ids),
+            base_model_validators.ExternalModelFetcherDetails(
+                'story_ids', story_models.StoryModel,
+                item.story_ids),
+            base_model_validators.ExternalModelFetcherDetails(
+                'learnt_topic_ids', topic_models.TopicModel,
+                item.learnt_topic_ids)]
 
     @classmethod
     def _get_common_properties_of_external_model_which_should_not_match(
@@ -153,6 +159,19 @@ class CompletedActivitiesModelValidator(
             item.collection_ids,
             'collection_ids',
             learner_progress_services.get_all_incomplete_collection_ids(item.id)
+        ), (
+            'IncompleteActivitiesModel',
+            'story_ids',
+            item.story_ids,
+            'story_ids',
+            learner_progress_services.get_all_incomplete_story_ids(item.id)
+        ), (
+            'IncompleteActivitiesModel',
+            'learnt_topic_ids',
+            item.learnt_topic_ids,
+            'partially_learnt_topic_ids',
+            learner_progress_services.get_all_partially_learnt_topic_ids(
+                item.id)
         )]
 
     @classmethod
@@ -183,7 +202,13 @@ class IncompleteActivitiesModelValidator(
                 item.exploration_ids),
             base_model_validators.ExternalModelFetcherDetails(
                 'collection_ids', collection_models.CollectionModel,
-                item.collection_ids)]
+                item.collection_ids),
+            base_model_validators.ExternalModelFetcherDetails(
+                'story_ids', story_models.StoryModel,
+                item.story_ids),
+            base_model_validators.ExternalModelFetcherDetails(
+                'partially_learnt_topic_ids', topic_models.TopicModel,
+                item.partially_learnt_topic_ids)]
 
     @classmethod
     def _get_common_properties_of_external_model_which_should_not_match(
@@ -200,6 +225,18 @@ class IncompleteActivitiesModelValidator(
             item.collection_ids,
             'collection_ids',
             learner_progress_services.get_all_completed_collection_ids(item.id)
+        ), (
+            'CompletedActivitiesModel',
+            'story_ids',
+            item.story_ids,
+            'story_ids',
+            learner_progress_services.get_all_completed_story_ids(item.id)
+        ), (
+            'CompletedActivitiesModel',
+            'partially_learnt_topic_ids',
+            item.partially_learnt_topic_ids,
+            'learnt_topic_ids',
+            learner_progress_services.get_all_learnt_topic_ids(item.id)
         )]
 
     @classmethod
