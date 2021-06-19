@@ -146,10 +146,6 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     let itemsName = this.selectionDetails[itemsType].itemsName;
     let masterList = this.selectionDetails[itemsType].masterList;
 
-    console.log(masterList);
-    console.log(this.selectionDetails);
-    alert();
-
     let selectedItems = [];
     for (let i = 0; i < masterList.length; i++) {
       if (this.selectionDetails[itemsType]
