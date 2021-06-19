@@ -1488,7 +1488,7 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
     wiki_page_link = (
         'https://github.com/oppia/oppia/wiki/Validation-of-handler-args')
 
-    def every_handler_class_has_schema(self, handler, handler_class_name):
+    def _every_handler_class_has_schema(self, handler, handler_class_name):
         """This test ensures that every child class of BaseHandler must have
         schema defined into it.
 
@@ -1511,7 +1511,7 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
         if handler_have_schemas is False:
             self.handlers_need_schema.append(handler_class_name)
 
-    def schema_keys_exactly_match_with_url_path_elements(
+    def _schema_keys_exactly_match_with_url_path_elements(
             self, handler, handler_class_name, url):
         """This test ensures that schema keys in URL_PATH_ARGS_SCHEMAS must
         exactly match with url path elements.
@@ -1541,7 +1541,7 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
                 'Missing key in URL_PATH_ARGS_SCHEMAS for %s: %s.' % (
                     handler_class_name, ', '.join(missing_schema_keys)))
 
-    def schema_keys_exactly_match_with_request_methods_in_handlers(
+    def _schema_keys_exactly_match_with_request_methods_in_handlers(
             self, handler, handler_class_name):
         """This test ensures that schema keys in URL_PATH_ARGS_SCHEMAS must
         exactly match with url path elements.
@@ -1576,7 +1576,7 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
                 'Missing key in HANDLER_ARGS_SCHEMAS for %s: %s.' % (
                     handler_class_name, ', '.join(missing_schema_keys)))
 
-    def default_value_in_schema_conforms_with_schema(
+    def _default_value_in_schema_conforms_with_schema(
             self, handler, handler_class_name):
         """This test check whether the default_value provided in schema
         conforms with the schema.
@@ -1611,17 +1611,17 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
                     self.handlers_with_non_conforming_default_schema.append(
                         handler_class_name)
 
-    def handlers_with_schema_are_not_in_the_schema_requiring_list(
-            self, handler, name):
+    def _handlers_with_schema_are_not_in_the_schema_requiring_list(
+            self, handler, handler_class_name):
         """This test checks if a handler contains schema then, handler class
         name should not be present in SCHEMA_REQUIRING_HANDLERS list.
 
         Args:
             handler: BaseHandler. A callable to handle the route.
-            name: str. Name of the handler class.
+            handler_class_name: str. Name of the handler class.
         """
 
-        if name in self.non_schema_requiring_handlers:
+        if handler_class_name in self.non_schema_requiring_handlers:
             return
 
         schema_written_for_request_methods = (
@@ -1632,9 +1632,12 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
                 base.BaseHandler.URL_PATH_ARGS_SCHEMAS)
         handler_have_schema = (schema_written_for_request_methods and
             schema_written_for_url_path_args)
+        handler_class_needs_removal = (
+            handler_have_schema and
+                handler_class_name in self.non_schema_handlers)
 
-        if handler_have_schema and name in self.non_schema_handlers:
-            self.handlers_to_remove.append(name)
+        if handler_class_needs_removal:
+            self.handlers_to_remove.append(handler_class_name)
 
     def test_general_functionality_of_schema_validation(self):
         """This method calls all the test functions written below, in
@@ -1649,19 +1652,19 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
 
             handler_class_name = handler.__name__
 
-            self.every_handler_class_has_schema(
+            self._every_handler_class_has_schema(
                 handler, handler_class_name)
 
-            self.schema_keys_exactly_match_with_url_path_elements(
+            self._schema_keys_exactly_match_with_url_path_elements(
                 handler, handler_class_name, route.name)
 
-            self.schema_keys_exactly_match_with_request_methods_in_handlers(
+            self._schema_keys_exactly_match_with_request_methods_in_handlers(
                 handler, handler_class_name)
 
-            self.default_value_in_schema_conforms_with_schema(
+            self._default_value_in_schema_conforms_with_schema(
                 handler, handler_class_name)
 
-            self.handlers_with_schema_are_not_in_the_schema_requiring_list(
+            self._handlers_with_schema_are_not_in_the_schema_requiring_list(
                 handler, handler_class_name)
 
         error_msg1 = (

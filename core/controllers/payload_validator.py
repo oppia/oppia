@@ -55,13 +55,13 @@ def construct_args_schema(arg_key, arg_schema, handler_args):
     return value, schema
 
 
-def validate(handler_args, handler_args_schema, allowed_extra_args):
+def validate(handler_args, handler_args_schemas, allowed_extra_args):
     """Calls schema utils for normalization of object against its schema
     and collects all the errors.
 
     Args:
         handler_args: *. Object for normalization.
-        handler_args_schema: dict. Schema for objects.
+        handler_args_schemas: dict. Schema for objects.
         allowed_extra_args: bool. Allows extra args.
 
     Returns:
@@ -69,7 +69,7 @@ def validate(handler_args, handler_args_schema, allowed_extra_args):
     """
     # Collect all errors and present them at once.
     errors = []
-    for arg_key, arg_schema in handler_args_schema.items():
+    for arg_key, arg_schema in handler_args_schemas.items():
         value, schema = construct_args_schema(arg_key, arg_schema, handler_args)
 
         try:
@@ -78,7 +78,7 @@ def validate(handler_args, handler_args_schema, allowed_extra_args):
             errors.append(
                 'Schema validation for \'%s\' failed: %s' % (arg_key, e))
 
-    extra_args = set(handler_args.keys()) - set(handler_args_schema.keys())
+    extra_args = set(handler_args.keys()) - set(handler_args_schemas.keys())
 
     if not allowed_extra_args and extra_args:
         errors.append('Found extra args: %s.' % (list(extra_args)))

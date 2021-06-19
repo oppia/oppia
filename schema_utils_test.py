@@ -303,9 +303,11 @@ def validate_schema(schema):
       property which specifies the len of the list.
     - 'dict' requires an additional 'properties' property, which specifies the
       names of the keys in the dict, and schema definitions for their values.
-    - 'object_dict' requires an additional 'validation_method' property,
-      which specifies the name of the validate method written in
-      domain_object_validator.
+    - 'object_dict' requires any of the one additional schema keys either
+      'validation_method' or 'object_class'.
+      validation_method, takes the method which is written in
+      domain_obejcts_vaildator.
+      object_class, takes a domain class as its value.
     There may also be an optional 'post_normalizers' key whose value is a list
     of normalizers.
 

@@ -656,8 +656,8 @@
 
 
 # Schema validation.
-/core/controllers/payload_validator* @aks681
-/core/controllers/domain_objects_validator* @aks681
+/core/controllers/payload_validator*.py @aks681
+/core/controllers/domain_objects_validator*.py @aks681
 
 
 # QA team.
