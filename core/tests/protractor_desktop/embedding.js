@@ -317,7 +317,7 @@ describe('Embedding', function() {
       await general.openEditor(explorationId, false);
       await explorationEditorPage.navigateToSettingsTab();
       await explorationEditorSettingsTab.setLanguage('ภาษาไทย');
-      await explorationEditorPage.saveChanges(
+      await explorationEditorPage.savePublishedChanges(
         'Changing the language to a not supported one.');
       // We expect the default language, English.
       await checkPlaceholder('Type a number');
@@ -326,7 +326,7 @@ describe('Embedding', function() {
       await general.openEditor(explorationId, false);
       await explorationEditorPage.navigateToSettingsTab();
       await explorationEditorSettingsTab.setLanguage('español');
-      await explorationEditorPage.saveChanges(
+      await explorationEditorPage.savePublishedChanges(
         'Changing the language to a supported one.');
       await checkPlaceholder('Ingresa un número');
 
