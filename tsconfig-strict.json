@@ -318,7 +318,7 @@
     "extensions/objects/templates/sanitized-url-editor.component.ts",
     "extensions/objects/templates/set-of-unicode-string-editor.component.ts",
     "extensions/objects/templates/svg-filename-editor.constants.ajs.ts",
-    "extensions/rich_text_components/Skillreview/directives/oppia-noninteractive-skillreview-concept-card-modal.component.spec.ts",
+    "extensions/rich_text_components/Skillreview/directives/oppia-noninteractive-skillreview-concept-card-modal.component.spec.ts"
   ],
   "include": ["typings/*.ts"],
   "exclude": ["extensions/classifiers/proto"]

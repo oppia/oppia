@@ -92,7 +92,7 @@ describe('User profile model', () => {
       expect(userProfile.createdExpSummaries).toEqual([exploration]);
       expect(userProfile.username).toEqual('user1');
       expect(userProfile.editedExpSummaries).toEqual([exploration]);
-      expect(userProfile.firstContributionMsec).toEqual(1),
+      expect(userProfile.firstContributionMsec).toEqual(null),
       expect(userProfile.isAlreadySubscribed).toEqual(false);
       expect(userProfile.isUserVisitingOwnProfile).toEqual(false);
       expect(userProfile.profileIsOfCurrentUser).toEqual(false);

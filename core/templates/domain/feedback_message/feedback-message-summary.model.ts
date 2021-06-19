@@ -19,6 +19,8 @@
 export interface FeedbackMessageSummaryBackendDict {
   'message_id': number;
   'text': string;
+  // Below properties are only non-null when entered by the
+  // user for a newly created message and null otherwise.
   'updated_status': string | null;
   'suggestion_html': string | null;
   'current_content_html': string | null;
