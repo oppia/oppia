@@ -148,8 +148,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
 
     let selectedItems = [];
     for (let i = 0; i < masterList.length; i++) {
-      if (this.selectionDetails[itemsType]
-        .selections[masterList[i].id]) {
+      if (this.selectionDetails[itemsType].selections[masterList[i].id]) {
         selectedItems.push(masterList[i].text);
       }
     }

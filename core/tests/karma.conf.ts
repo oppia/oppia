@@ -86,7 +86,7 @@ module.exports = function(config) {
       }
     },
     autoWatch: true,
-    browsers: ['Chrome'],
+    browsers: ['CI_Chrome'],
     // Kill the browser if it does not capture in the given timeout [ms].
     captureTimeout: 60000,
     browserNoActivityTimeout: 120000,
