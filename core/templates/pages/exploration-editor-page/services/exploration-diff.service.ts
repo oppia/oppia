@@ -22,7 +22,7 @@ import { Injectable } from '@angular/core';
 import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
 
-import INTERACTION_SPECS from 'pages/interaction-specs.constants.ajs';
+import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
 
 import {
   ExplorationChangeAddState,
@@ -151,12 +151,14 @@ export class ExplorationDiffService {
       if (oldState) {
         oldStateIsTerminal = (
           oldState.interaction.id &&
-            INTERACTION_SPECS[oldState.interaction.id].is_terminal);
+            InteractionSpecsConstants.INTERACTION_SPECS[
+              oldState.interaction.id].is_terminal);
       }
       if (newState) {
         newStateIsTerminal = (
           newState.interaction.id &&
-            INTERACTION_SPECS[newState.interaction.id].is_terminal);
+            InteractionSpecsConstants.INTERACTION_SPECS[
+              newState.interaction.id].is_terminal);
       }
       if (oldStateIsTerminal || newStateIsTerminal) {
         finalStateIds.push(stateId);
