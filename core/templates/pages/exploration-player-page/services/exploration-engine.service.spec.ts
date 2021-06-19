@@ -646,7 +646,7 @@ describe('Exploration engine service ', () => {
         answer, textInputService, submitAnswerSuccessCb);
 
       expect(alertsServiceSpy)
-        .toHaveBeenCalledWith('Question name should not be empty.');
+        .toHaveBeenCalledWith('Question content should not be empty.');
     });
   });
 
