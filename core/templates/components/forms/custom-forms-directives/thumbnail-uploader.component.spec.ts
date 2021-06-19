@@ -177,7 +177,7 @@ describe('ThumbnailUploaderComponent', () => {
     spyOn(imageUploadHelperService, 'generateImageFilename').and.returnValue(
       'image_file_name.svg');
     spyOn(imageUploadHelperService, 'convertImageDataToImageFile')
-      .and.returnValue(new File([''], "filename", {type: 'image/jpeg'}));
+      .and.returnValue(new File([''], 'filename', {type: 'image/jpeg'}));
     spyOn(assetsBackendApiService, 'postThumbnailFile')
       .and.returnValue(promise);
     spyOn(promise.toPromise(), 'then').and.resolveTo({filename: 'filename'});
@@ -238,7 +238,7 @@ describe('ThumbnailUploaderComponent', () => {
     spyOn(ngbModal, 'open').and.returnValue(
       <NgbModalRef>ngbModalRef);
     spyOn(imageUploadHelperService, 'convertImageDataToImageFile')
-      .and.returnValue(new File([''], "filename", {type: 'image/jpeg'}));
+      .and.returnValue(new File([''], 'filename', {type: 'image/jpeg'}));
 
     const updateFilenameSpy = spyOn(component.updateFilename, 'emit');
     const updateBgColorSpy = spyOn(component.updateBgColor, 'emit');
@@ -339,9 +339,9 @@ describe('ThumbnailUploaderComponent', () => {
 
     spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
       return <NgbModalRef>({
-          componentInstance: ngbModalRef,
-          result: Promise.reject('cancel')
-        })
+        componentInstance: ngbModalRef,
+        result: Promise.reject('cancel')
+      });
     });
 
     component.showEditThumbnailModal();
