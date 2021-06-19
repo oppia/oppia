@@ -20,12 +20,12 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { LearnerDashboardBackendApiService } from
+import { AddMessagePayload, LearnerDashboardBackendApiService } from
   'domain/learner_dashboard/learner-dashboard-backend-api.service';
 
 describe('Learner Dashboard Backend API Service', () => {
   let learnerDashboardBackendApiService:
-    LearnerDashboardBackendApiService = null;
+    LearnerDashboardBackendApiService;
   let httpTestingController: HttpTestingController;
 
   let sampleDataResults = {
@@ -251,15 +251,15 @@ describe('Learner Dashboard Backend API Service', () => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
 
-    let updatedStatus = null;
-    let updatedSubject = null;
+    let updatedStatus = true;
+    let updatedSubject = 'Updated Subject';
     let text = 'Sending message';
     let url = '/threadhandler/exploration.4.Wfafsafd';
     let payload = {
       updated_status: updatedStatus,
       updated_subject: updatedSubject,
       text: text
-    };
+    } as AddMessagePayload;
 
     learnerDashboardBackendApiService.addNewMessageAsync(
       url, payload
@@ -284,15 +284,15 @@ describe('Learner Dashboard Backend API Service', () => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
 
-    let updatedStatus = null;
-    let updatedSubject = null;
+    let updatedStatus = true;
+    let updatedSubject = 'Updated Subject';
     let text = 'Sending message';
     let invalidUrl = '/invalidUrl';
     let payload = {
       updated_status: updatedStatus,
       updated_subject: updatedSubject,
       text: text
-    };
+    } as AddMessagePayload;
     learnerDashboardBackendApiService.addNewMessageAsync(
       invalidUrl, payload
     ).then(successHandler, failHandler);

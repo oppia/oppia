@@ -71,7 +71,7 @@ interface LearnerDashboardData {
   subscriptionList: ProfileSummary[];
 }
 
-interface AddMessagePayload {
+export interface AddMessagePayload {
   'updated_status': boolean,
   'updated_subject': string,
   'text': string;
