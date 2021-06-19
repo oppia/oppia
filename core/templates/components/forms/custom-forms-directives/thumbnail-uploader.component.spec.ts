@@ -80,16 +80,17 @@ describe('ThumbnailUploaderComponent', () => {
       .toBe('/assetsdevhandler/exploration/expId/assets/thumbnail/thumbnail-1');
   });
 
-  it('should update the thumbnail image when thumbnail filename changes',() => {
+  it('should update the thumbnail image when thumbnail filename' +
+    ' changes', () => {
     component.filename = 'thumbnail-1';
-    let changes: SimpleChanges =  {
-      'filename': {
+    let changes: SimpleChanges = {
+      filename: {
         currentValue: 'thumbnail-2',
         previousValue: 'thumbnail-1',
         firstChange: false,
         isFirstChange: () => false
       }
-    }
+    };
     component.ngOnInit();
 
     expect(component.editableThumbnailDataUrl)
@@ -102,23 +103,23 @@ describe('ThumbnailUploaderComponent', () => {
   });
 
   it('should not update the thumbnail image when new thumbnail is same as' +
-    ' the old one',() => {
+    ' the old one', () => {
     spyOn(
       imageUploadHelperService, 'getTrustedResourceUrlForThumbnailFilename');
     component.filename = 'thumbnail-1';
-    let changes: SimpleChanges =  {
-      'filename': {
+    let changes: SimpleChanges = {
+      filename: {
         currentValue: 'thumbnail-1',
         previousValue: 'thumbnail-1',
         firstChange: true,
         isFirstChange: () => true
       }
-    }
+    };
 
     component.ngOnChanges(changes);
 
     expect(imageUploadHelperService.getTrustedResourceUrlForThumbnailFilename)
-    .not.toHaveBeenCalled();
+      .not.toHaveBeenCalled();
   });
 
   it('should not show edit thumbnail modal if editing thumbnail is' +
@@ -134,11 +135,11 @@ describe('ThumbnailUploaderComponent', () => {
     expect(component.openInUploadMode).toBe(undefined);
   });
 
-  it('should show edit thumbnail modal when user clicks on edit button and ' +
+  it('should show edit thumbnail modal when user clicks on edit button and' +
     ' post thumbnail to server if local storage is not used and modal is' +
     ' opened in upload mode', fakeAsync(() => {
     class MockNgbModalRef {
-      result =  Promise.resolve({
+      result = Promise.resolve({
         dimensions: {
           height: 50,
           width: 50
@@ -146,7 +147,7 @@ describe('ThumbnailUploaderComponent', () => {
         openInUploadMode: true,
         newThumbnailDataUrl: 'data:image/png;base64,xyz',
         newBgColor: '#newcol'
-      })
+      });
       componentInstance = {
         bgColor: null,
         allowedBgColors: null,
@@ -174,10 +175,9 @@ describe('ThumbnailUploaderComponent', () => {
     spyOn(ngbModal, 'open').and.returnValue(
       <NgbModalRef>ngbModalRef);
     spyOn(imageUploadHelperService, 'generateImageFilename').and.returnValue(
-      'image_file_name.svg'
-      );
+      'image_file_name.svg');
     spyOn(imageUploadHelperService, 'convertImageDataToImageFile')
-      .and.returnValue(new File([""], "filename", {type: 'image/jpeg'}));
+      .and.returnValue(new File([''], "filename", {type: 'image/jpeg'}));
     spyOn(assetsBackendApiService, 'postThumbnailFile')
       .and.returnValue(promise);
     spyOn(promise.toPromise(), 'then').and.resolveTo({filename: 'filename'});
@@ -204,9 +204,9 @@ describe('ThumbnailUploaderComponent', () => {
 
   it('should show edit thumbnail modal when user clicks on edit button and' +
     ' save background color if not opened in upload mode', fakeAsync(() => {
-    // Modal is not opened in upload mode
+    // Modal is not opened in upload mode.
     class MockNgbModalRef {
-      result =  Promise.resolve({
+      result = Promise.resolve({
         dimensions: {
           height: 50,
           width: 50
@@ -214,7 +214,7 @@ describe('ThumbnailUploaderComponent', () => {
         openInUploadMode: false,
         newThumbnailDataUrl: 'data:image/png;base64,xyz',
         newBgColor: '#newcol'
-      })
+      });
       componentInstance = {
         bgColor: null,
         allowedBgColors: null,
@@ -238,7 +238,7 @@ describe('ThumbnailUploaderComponent', () => {
     spyOn(ngbModal, 'open').and.returnValue(
       <NgbModalRef>ngbModalRef);
     spyOn(imageUploadHelperService, 'convertImageDataToImageFile')
-      .and.returnValue(new File([""], "filename", {type: 'image/jpeg'}));
+      .and.returnValue(new File([''], "filename", {type: 'image/jpeg'}));
 
     const updateFilenameSpy = spyOn(component.updateFilename, 'emit');
     const updateBgColorSpy = spyOn(component.updateBgColor, 'emit');
@@ -258,9 +258,9 @@ describe('ThumbnailUploaderComponent', () => {
 
   it('should show edit thumbnail modal when user clicks on edit button and' +
     ' save uploaded thumbnail to local storage if local storage' +
-    ' is used ', fakeAsync(() => {
+    ' is used', fakeAsync(() => {
     class MockNgbModalRef {
-      result =  Promise.resolve({
+      result = Promise.resolve({
         dimensions: {
           height: 50,
           width: 50
@@ -268,7 +268,7 @@ describe('ThumbnailUploaderComponent', () => {
         openInUploadMode: false,
         newThumbnailDataUrl: 'data:image/png;base64,xyz',
         newBgColor: '#newcol'
-      })
+      });
       componentInstance = {
         bgColor: null,
         allowedBgColors: null,
@@ -317,39 +317,39 @@ describe('ThumbnailUploaderComponent', () => {
 
   it('should close edit thumbnail modal when cancel button' +
     ' is clicked', fakeAsync(() => {
-      class MockNgbModalRef {
-        componentInstance = {
-          bgColor: null,
-          allowedBgColors: null,
-          aspectRatio: null,
-          dimensions: null,
-          previewDescription: null,
-          previewDescriptionBgColor: null,
-          previewFooter: null,
-          previewTitle: null,
-          uploadedImage: null,
-          uploadedImageMimeType: null,
-          tempBgColor: null,
-        };
-      }
-      let ngbModalRef = new MockNgbModalRef();
+    class MockNgbModalRef {
+      componentInstance = {
+        bgColor: null,
+        allowedBgColors: null,
+        aspectRatio: null,
+        dimensions: null,
+        previewDescription: null,
+        previewDescriptionBgColor: null,
+        previewFooter: null,
+        previewTitle: null,
+        uploadedImage: null,
+        uploadedImageMimeType: null,
+        tempBgColor: null,
+      };
+    }
+    let ngbModalRef = new MockNgbModalRef();
 
-      component.disabled = false;
-      component.allowedBgColors = ['#ff9933'];
+    component.disabled = false;
+    component.allowedBgColors = ['#ff9933'];
 
-      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        return <NgbModalRef>({
-            componentInstance: ngbModalRef,
-            result: Promise.reject('cancel')
-          })
-      });
+    spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return <NgbModalRef>({
+          componentInstance: ngbModalRef,
+          result: Promise.reject('cancel')
+        })
+    });
 
-      component.showEditThumbnailModal();
+    component.showEditThumbnailModal();
 
-      expect(ngbModal.open).toHaveBeenCalledWith(
-        EditThumbnailModalComponent,
-        {backdrop: 'static'}
-      );
+    expect(ngbModal.open).toHaveBeenCalledWith(
+      EditThumbnailModalComponent,
+      {backdrop: 'static'}
+    );
   }));
 
   it('should raise an alert if an empty file is uploaded', () => {
@@ -361,5 +361,5 @@ describe('ThumbnailUploaderComponent', () => {
 
     expect(alertsService.addWarning).toHaveBeenCalledWith(
       'Could not get resampled file.');
-  })
+  });
 });
