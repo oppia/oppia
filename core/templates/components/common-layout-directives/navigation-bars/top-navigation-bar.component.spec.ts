@@ -61,7 +61,7 @@ class MockWindowRef {
   }
 }
 
-fdescribe('TopNavigationBarComponent', () => {
+describe('TopNavigationBarComponent', () => {
   let fixture: ComponentFixture<TopNavigationBarComponent>;
   let component: TopNavigationBarComponent;
   let mockWindowRef: MockWindowRef;
@@ -302,8 +302,8 @@ fdescribe('TopNavigationBarComponent', () => {
 
     component.onLogoutButtonClicked();
 
-    expect(mockWindowRef.nativeWindow.localStorage.removeItem).toHaveBeenCalledWith(
-      'last_uploaded_audio_lang');
+    expect(mockWindowRef.nativeWindow.localStorage.removeItem)
+      .toHaveBeenCalledWith('last_uploaded_audio_lang');
   });
 
   it('should open submenu when user hovers over the menu button', () => {
