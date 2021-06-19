@@ -25,7 +25,6 @@
  */
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import 'firebase/auth';
-import 'hammerjs';
 import 'leaflet/dist/leaflet.css';
 import { ContextService } from 'services/context.service';
 require('app.constants.ajs.ts');
@@ -43,7 +42,7 @@ require(
   'side-navigation-bar.component.ts');
 require(
   'components/common-layout-directives/navigation-bars/' +
-  'top-navigation-bar.directive.ts');
+  'top-navigation-bar.component.ts');
 require('components/forms/custom-forms-directives/object-editor.directive.ts');
 
 require('directives/focus-on.directive.ts');
@@ -75,7 +74,7 @@ require('google-analytics.initializer.ts');
 
 // The following file uses constants in app.constants.ts and hence needs to be
 // loaded *after* app.constants.ts.
-require('I18nFooter.ts');
+require('base-components/i18n-language-selector.component.ts');
 
 // Default to passive event listeners.
 require('default-passive-events');
@@ -385,5 +384,42 @@ angular.module('oppia').factory('$exceptionHandler', [
       }
       $log.error(exception);
     };
+  }
+]);
+
+angular.module('oppia').config([
+  '$translateProvider', 'DEFAULT_TRANSLATIONS', 'SUPPORTED_SITE_LANGUAGES',
+  function(
+      $translateProvider, DEFAULT_TRANSLATIONS, SUPPORTED_SITE_LANGUAGES) {
+    var availableLanguageKeys = [];
+    var availableLanguageKeysMap = {};
+    SUPPORTED_SITE_LANGUAGES.forEach(function(language) {
+      availableLanguageKeys.push(language.id);
+      availableLanguageKeysMap[language.id + '*'] = language.id;
+    });
+    availableLanguageKeysMap['*'] = 'en';
+
+    $translateProvider
+      .registerAvailableLanguageKeys(
+        availableLanguageKeys, availableLanguageKeysMap)
+      .useLoader('TranslationFileHashLoaderBackendApiService', {
+        prefix: '/i18n/',
+        suffix: '.json'
+      })
+      // The use of default translation improves the loading time when English
+      // is selected.
+      .translations('en', DEFAULT_TRANSLATIONS)
+      .fallbackLanguage('en')
+      .determinePreferredLanguage()
+      // The messageformat interpolation method is necessary for pluralization.
+      // Is optional and should be passed as argument to the translate call. See
+      // https://angular-translate.github.io/docs/#/guide/14_pluralization
+      .addInterpolation('$translateMessageFormatInterpolation')
+      // The strategy 'sanitize' does not support utf-8 encoding.
+      // https://github.com/angular-translate/angular-translate/issues/1131
+      // The strategy 'escape' will brake strings with raw html, like
+      // hyperlinks.
+      .useSanitizeValueStrategy('sanitizeParameters')
+      .forceAsyncReload(true);
   }
 ]);

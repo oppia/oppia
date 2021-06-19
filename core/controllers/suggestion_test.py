@@ -163,12 +163,13 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 'target_id': 'exp1',
                 'target_version_at_submission': exploration.version,
                 'change': {
-                    'cmd': exp_domain.CMD_ADD_TRANSLATION,
+                    'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
                     'state_name': 'State 3',
                     'content_id': 'content',
                     'language_code': 'hi',
                     'content_html': '<p>old content html</p>',
-                    'translation_html': '<p>In Hindi</p>'
+                    'translation_html': '<p>In Hindi</p>',
+                    'data_format': 'html'
                 },
                 'description': 'change to state 3',
             }, csrf_token=csrf_token)
@@ -723,7 +724,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 'target_id': exp_id,
                 'target_version_at_submission': exploration.version,
                 'change': {
-                    'cmd': exp_domain.CMD_ADD_TRANSLATION,
+                    'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
                     'state_name': 'State 1',
                     'content_id': 'content',
                     'language_code': 'hi',
@@ -733,7 +734,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                         '"&quot;translation_image.png&quot;" '
                         'caption-with-value="&quot;&quot;" '
                         'alt-with-value="&quot;Image&quot;">'
-                        '</oppia-noninteractive-image>')
+                        '</oppia-noninteractive-image>'),
+                    'data_format': 'html'
                 },
             }, csrf_token=csrf_token,
             upload_files=(
@@ -1316,9 +1318,9 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
             suggestion_post_accept['status'],
             suggestion_models.STATUS_ACCEPTED)
         (
-            questions, merged_question_skill_links, _) = (
+            questions, merged_question_skill_links) = (
                 question_services.get_displayable_question_skill_link_details(
-                    1, [self.SKILL_ID], ''))
+                    1, [self.SKILL_ID], 0))
         self.assertEqual(len(questions), 1)
         self.assertEqual(
             merged_question_skill_links[0].skill_descriptions,
@@ -1875,12 +1877,13 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
                 'target_id': self.EXP_ID,
                 'target_version_at_submission': exploration.version,
                 'change': {
-                    'cmd': exp_domain.CMD_ADD_TRANSLATION,
+                    'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
                     'state_name': 'Introduction',
                     'content_id': 'content',
                     'language_code': 'hi',
                     'content_html': '<p>new content html</p>',
-                    'translation_html': '<p>new content html in Hindi</p>'
+                    'translation_html': '<p>new content html in Hindi</p>',
+                    'data_format': 'html'
                 },
                 'description': 'Adds translation',
             }, csrf_token=csrf_token)
@@ -2083,12 +2086,13 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
                 'target_id': self.EXP_ID,
                 'target_version_at_submission': exploration.version,
                 'change': {
-                    'cmd': exp_domain.CMD_ADD_TRANSLATION,
+                    'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
                     'state_name': 'Introduction',
                     'content_id': 'content',
                     'language_code': 'hi',
                     'content_html': '<p>new content html</p>',
-                    'translation_html': '<p>new content html in Hindi</p>'
+                    'translation_html': '<p>new content html in Hindi</p>',
+                    'data_format': 'html'
                 },
                 'description': 'Adds translation',
             }, csrf_token=csrf_token)

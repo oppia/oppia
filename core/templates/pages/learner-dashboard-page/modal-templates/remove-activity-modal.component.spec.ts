@@ -16,19 +16,12 @@
  * @fileoverview Unit tests for for RemoveActivityModalComponent.
  */
 
-import { Pipe } from '@angular/core';
 import { async, ComponentFixture, fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { RemoveActivityModalComponent } from './remove-activity-modal.component';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-
-@Pipe({name: 'translate'})
-class MockTranslatePipe {
-  transform(value: string, params: Object | undefined): string {
-    return value;
-  }
-}
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 class MockActiveModal {
   close(): void {

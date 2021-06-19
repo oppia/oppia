@@ -1,0 +1,98 @@
+<ng-template #popContent>
+  <div class="oppia-answer-popup-container">
+    <div class="oppia-answer-popup">
+      <angular-html-bind-wrapper [htmlData]="getAnswerHtml()">
+      </angular-html-bind-wrapper>
+    </div>
+  </div>
+</ng-template>
+
+<div class="conversation-skin-learner-answer-container">
+  <img class="conversation-skin-user-avatar rounded-circle" [src]="decodedProfilePicture ? decodedProfilePicture : ''" alt="">
+  <div *ngIf="!data.isHint">
+    <div *ngIf="getShortAnswerHtml()"
+         [ngbPopover]="popContent" triggers="manual" (click)="togglePopover()"
+         class="oppia-popover" #popover="ngbPopover" [autoClose]="false">
+      <angular-html-bind-wrapper classStr="oppia-rte-viewer conversation-skin-learner-answer-content"
+                                 [htmlData]="getShortAnswerHtml()">
+      </angular-html-bind-wrapper>
+    </div>
+    <div *ngIf="!getShortAnswerHtml()">
+      <angular-html-bind-wrapper classStr="oppia-rte-viewer conversation-skin-learner-answer-content"
+                                 [htmlData]="getAnswerHtml()">
+      </angular-html-bind-wrapper>
+    </div>
+  </div>
+  <div *ngIf="data.isHint">
+    <div class="oppia-rte-viewer conversation-skin-learner-answer-content">
+      {{ data.learnerInput | translate }}
+    </div>
+  </div>
+</div>
+
+<div class="conversation-skin-oppia-feedback-container" *ngIf="data.oppiaResponse !== ''">
+  <a [ngClass]="{'oppia-disabled-image-link': (OPPIA_AVATAR_LINK_URL === null)}"
+     [href]="OPPIA_AVATAR_LINK_URL"
+     target="_blank"
+     rel="noopener">
+    <img class="conversation-skin-oppia-avatar rounded-circle"
+         [src]="oppiaAvatarImageUrl" alt="">
+  </a>
+  <div *ngIf="!data.oppiaResponse && isCurrentCardAtEndOfTranscript()"
+       class="protractor-test-input-response-loading-dots">
+    <div class="conversation-skin-feedback-dot-one"></div>
+    <div class="conversation-skin-feedback-dot-two"></div>
+    <div class="conversation-skin-feedback-dot-three"></div>
+  </div>
+  <span id="getInputResponsePairId()"></span>
+  <div>
+    <angular-html-bind-wrapper *ngIf="data.oppiaResponse !== null"
+                               [htmlData]="data.oppiaResponse"
+                               classStr="oppia-rte-viewer conversation-skin-oppia-feedback-content protractor-test-conversation-feedback"
+                               [ngStyle]="{'min-width': (isVideoRteElementPresentInResponse() ? '75%': 'inherit')}"
+                               [ngClass]="getFeedbackAudioHighlightClass()">
+    </angular-html-bind-wrapper>
+  </div>
+</div>
+
+<style>
+  .conversation-skin-learner-answer-container,
+  .conversation-skin-oppia-feedback-container {
+    padding: 0 20px;
+    position: relative;
+  }
+
+  .conversation-skin-learner-answer-container {
+    text-align: right;
+  }
+
+  .conversation-skin-learner-answer-container .conversation-skin-user-avatar {
+    border: 2px solid #094142;
+    height: 100px;
+    right: -98px;
+    top: -33px;
+    width: 100px;
+  }
+
+  .conversation-skin-learner-answer-container:after {
+    border: 7px solid;
+    border-color: rgb(236, 239, 241) transparent transparent rgb(236, 239, 241);
+    content: ' ';
+    height: 0;
+    position: absolute;
+    top: 11%;
+    width: 0;
+  }
+
+  .conversation-skin-tutor-card-middle-section .conversation-skin-learner-answer-container:after {
+    border-color: rgba(236, 239, 241, 0.4) transparent transparent rgba(236, 239, 241, 0.4);
+  }
+
+  .oppia-popover {
+    cursor: pointer;
+  }
+  .oppia-answer-popup-container .oppia-answer-popup {
+    max-height: 300px;
+    overflow-y: scroll;
+  }
+</style>

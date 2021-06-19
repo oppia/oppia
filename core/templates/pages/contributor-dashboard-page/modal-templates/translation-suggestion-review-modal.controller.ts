@@ -23,27 +23,32 @@ require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/site-analytics.service.ts');
 require('services/suggestion-modal.service.ts');
+require('services/validators.service.ts');
 
 angular.module('oppia').controller(
   'TranslationSuggestionReviewModalController', [
     '$http', '$scope', '$uibModalInstance', 'AlertsService', 'ContextService',
     'ContributionAndReviewService', 'ContributionOpportunitiesService',
     'SiteAnalyticsService', 'UrlInterpolationService', 'UserService',
-    'initialSuggestionId', 'reviewable', 'subheading',
-    'suggestionIdToSuggestion', 'ACTION_ACCEPT_SUGGESTION',
-    'ACTION_REJECT_SUGGESTION', 'IMAGE_CONTEXT',
+    'ValidatorsService', 'initialSuggestionId', 'reviewable', 'subheading',
+    'suggestionIdToContribution', 'ACTION_ACCEPT_SUGGESTION',
+    'ACTION_REJECT_SUGGESTION', 'IMAGE_CONTEXT', 'MAX_REVIEW_MESSAGE_LENGTH',
     function(
         $http, $scope, $uibModalInstance, AlertsService, ContextService,
         ContributionAndReviewService, ContributionOpportunitiesService,
         SiteAnalyticsService, UrlInterpolationService, UserService,
-        initialSuggestionId, reviewable, subheading, suggestionIdToSuggestion,
-        ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION, IMAGE_CONTEXT) {
+        ValidatorsService, initialSuggestionId, reviewable, subheading,
+        suggestionIdToContribution, ACTION_ACCEPT_SUGGESTION,
+        ACTION_REJECT_SUGGESTION, IMAGE_CONTEXT, MAX_REVIEW_MESSAGE_LENGTH) {
       var resolvedSuggestionIds = [];
       $scope.reviewable = reviewable;
       $scope.activeSuggestionId = initialSuggestionId;
-      $scope.activeSuggestion = suggestionIdToSuggestion[
+      $scope.activeContribution = suggestionIdToContribution[
         $scope.activeSuggestionId];
+      $scope.activeSuggestion = $scope.activeContribution.suggestion;
+      $scope.activeContributionDetails = $scope.activeContribution.details;
       $scope.subheading = subheading;
+      $scope.MAX_REVIEW_MESSAGE_LENGTH = MAX_REVIEW_MESSAGE_LENGTH;
       $scope.startedEditing = false;
       $scope.translationUpdated = false;
       $scope.HTML_SCHEMA = {
@@ -67,8 +72,8 @@ angular.module('oppia').controller(
         $scope.startedEditing = false;
       };
 
-      delete suggestionIdToSuggestion[initialSuggestionId];
-      var remainingSuggestions = Object.entries(suggestionIdToSuggestion);
+      delete suggestionIdToContribution[initialSuggestionId];
+      var remainingContributions = Object.entries(suggestionIdToContribution);
 
       if (reviewable) {
         SiteAnalyticsService
@@ -120,7 +125,7 @@ angular.module('oppia').controller(
             );
           });
         $scope.resolvingSuggestion = false;
-        $scope.lastSuggestionToReview = remainingSuggestions.length <= 0;
+        $scope.lastSuggestionToReview = remainingContributions.length <= 0;
         $scope.translationHtml = (
           $scope.activeSuggestion.change.translation_html);
         $scope.status = $scope.activeSuggestion.status;
@@ -155,11 +160,17 @@ angular.module('oppia').controller(
           return;
         }
 
-        [$scope.activeSuggestionId, $scope.activeSuggestion] = (
-          remainingSuggestions.pop());
+        [$scope.activeSuggestionId, $scope.activeContribution] = (
+          remainingContributions.pop());
+        $scope.activeSuggestion = $scope.activeContribution.suggestion;
+        $scope.activeContributionDetails = $scope.activeContribution.details;
         ContextService.setCustomEntityContext(
           IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS,
           $scope.activeSuggestion.target_id);
+        $scope.subheading = (
+          $scope.activeContributionDetails.topic_name + ' / ' +
+          $scope.activeContributionDetails.story_title +
+          ' / ' + $scope.activeContributionDetails.chapter_title);
         $scope.init();
       };
 
@@ -185,14 +196,17 @@ angular.module('oppia').controller(
       };
 
       $scope.rejectAndReviewNext = function(reviewMessage) {
-        $scope.resolvingSuggestion = true;
-        SiteAnalyticsService.registerContributorDashboardRejectSuggestion(
-          'Translation');
+        if (ValidatorsService.isValidReviewMessage(reviewMessage,
+          /* ShowWarnings= */ true)) {
+          $scope.resolvingSuggestion = true;
+          SiteAnalyticsService.registerContributorDashboardRejectSuggestion(
+            'Translation');
 
-        ContributionAndReviewService.resolveSuggestionToExploration(
-          $scope.activeSuggestion.target_id, $scope.activeSuggestionId,
-          ACTION_REJECT_SUGGESTION, reviewMessage || $scope.reviewMessage,
-          generateCommitMessage(), $scope.showNextItemToReview);
+          ContributionAndReviewService.resolveSuggestionToExploration(
+            $scope.activeSuggestion.target_id, $scope.activeSuggestionId,
+            ACTION_REJECT_SUGGESTION, reviewMessage || $scope.reviewMessage,
+            generateCommitMessage(), $scope.showNextItemToReview);
+        }
       };
 
       $scope.editSuggestion = function() {

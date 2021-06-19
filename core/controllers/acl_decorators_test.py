@@ -982,6 +982,219 @@ class SendModeratorEmailsTests(test_utils.GenericTestBase):
         self.logout()
 
 
+class CanAccessReleaseCoordinatorPageDecoratorTests(test_utils.GenericTestBase):
+
+    username = 'user'
+    user_email = 'user@example.com'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+        @acl_decorators.can_access_release_coordinator_page
+        def get(self):
+            return self.render_json({'success': 1})
+
+    def setUp(self):
+        super(CanAccessReleaseCoordinatorPageDecoratorTests, self).setUp()
+        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.ADMIN_USERNAME)
+        self.signup(self.user_email, self.username)
+
+        self.signup(
+            self.RELEASE_COORDINATOR_EMAIL, self.RELEASE_COORDINATOR_USERNAME)
+
+        self.set_user_role(
+            self.RELEASE_COORDINATOR_USERNAME,
+            feconf.ROLE_ID_RELEASE_COORDINATOR)
+
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/release-coordinator', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_normal_user_cannot_access_release_coordinator_page(self):
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/release-coordinator', expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You do not have credentials to access release coordinator page.')
+        self.logout()
+
+    def test_guest_user_cannot_access_release_coordinator_page(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/release-coordinator', expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You must be logged in to access this resource.')
+        self.logout()
+
+    def test_super_admin_cannot_access_release_coordinator_page(self):
+        self.login(feconf.SYSTEM_EMAIL_ADDRESS)
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/release-coordinator', expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You do not have credentials to access release coordinator page.')
+        self.logout()
+
+    def test_release_coordinator_can_access_release_coordinator_page(self):
+        self.login(self.RELEASE_COORDINATOR_EMAIL)
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/release-coordinator')
+
+        self.assertEqual(response['success'], 1)
+        self.logout()
+
+
+class CanRunAnyJobDecoratorTests(test_utils.GenericTestBase):
+
+    username = 'user'
+    user_email = 'user@example.com'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+        @acl_decorators.can_run_any_job
+        def get(self):
+            return self.render_json({'success': 1})
+
+    def setUp(self):
+        super(CanRunAnyJobDecoratorTests, self).setUp()
+        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.ADMIN_USERNAME)
+        self.signup(self.user_email, self.username)
+
+        self.signup(
+            self.RELEASE_COORDINATOR_EMAIL, self.RELEASE_COORDINATOR_USERNAME)
+
+        self.set_user_role(
+            self.RELEASE_COORDINATOR_USERNAME,
+            feconf.ROLE_ID_RELEASE_COORDINATOR)
+
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/run-anny-job', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_normal_user_cannot_access_release_coordinator_page(self):
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/run-anny-job', expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You do not have credentials to run jobs.')
+        self.logout()
+
+    def test_guest_user_cannot_access_release_coordinator_page(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/run-anny-job', expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You must be logged in to access this resource.')
+        self.logout()
+
+    def test_super_admin_cannot_access_release_coordinator_page(self):
+        self.login(feconf.SYSTEM_EMAIL_ADDRESS)
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/run-anny-job', expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You do not have credentials to run jobs.')
+        self.logout()
+
+    def test_release_coordinator_can_run_any_job(self):
+        self.login(self.RELEASE_COORDINATOR_EMAIL)
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/run-anny-job')
+
+        self.assertEqual(response['success'], 1)
+        self.logout()
+
+
+class CanManageMemcacheDecoratorTests(test_utils.GenericTestBase):
+
+    username = 'user'
+    user_email = 'user@example.com'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+        @acl_decorators.can_manage_memcache
+        def get(self):
+            return self.render_json({'success': 1})
+
+    def setUp(self):
+        super(CanManageMemcacheDecoratorTests, self).setUp()
+        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.ADMIN_USERNAME)
+        self.signup(self.user_email, self.username)
+
+        self.signup(
+            self.RELEASE_COORDINATOR_EMAIL, self.RELEASE_COORDINATOR_USERNAME)
+
+        self.set_user_role(
+            self.RELEASE_COORDINATOR_USERNAME,
+            feconf.ROLE_ID_RELEASE_COORDINATOR)
+
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/manage-memcache', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_normal_user_cannot_access_release_coordinator_page(self):
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/manage-memcache', expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You do not have credentials to manage memcache.')
+        self.logout()
+
+    def test_guest_user_cannot_access_release_coordinator_page(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/manage-memcache', expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You must be logged in to access this resource.')
+        self.logout()
+
+    def test_super_admin_cannot_access_release_coordinator_page(self):
+        self.login(feconf.SYSTEM_EMAIL_ADDRESS)
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/manage-memcache', expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You do not have credentials to manage memcache.')
+        self.logout()
+
+    def test_release_coordinator_can_run_any_job(self):
+        self.login(self.RELEASE_COORDINATOR_EMAIL)
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/manage-memcache')
+
+        self.assertEqual(response['success'], 1)
+        self.logout()
+
+
 class DeleteAnyUserTests(test_utils.GenericTestBase):
 
     username = 'user'
@@ -3677,12 +3890,13 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
     exploration_id = 'exp_id'
     target_version_id = 1
     change_dict = {
-        'cmd': 'add_translation',
+        'cmd': 'add_written_translation',
         'content_id': 'content',
         'language_code': 'hi',
         'content_html': '<p>old content html</p>',
         'state_name': 'State 1',
-        'translation_html': '<p>Translation for content.</p>'
+        'translation_html': '<p>Translation for content.</p>',
+        'data_format': 'html'
     }
 
     class MockHandler(base.BaseHandler):
@@ -3719,7 +3933,6 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
             debug=feconf.DEBUG,
         ))
 
-        self.login(self.author_email)
         exploration = (
             self.save_new_linear_exp_with_state_names_and_interactions(
                 self.exploration_id, self.author_id, [
@@ -3786,19 +3999,24 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
             },
             'change to state 1')
 
-        translation_suggestion = suggestion_services.query_suggestions(
-            [('author_id', self.author_id),
-             ('target_id', self.exploration_id)])[0]
-        question_suggestion = suggestion_services.query_suggestions(
-            [('author_id', self.author_id),
-             ('target_id', 'skill_123')])[0]
-        edit_state_suggestion = suggestion_services.query_suggestions(
-            [('author_id', self.author_id),
-             ('target_id', self.exploration_id)])[1]
+        translation_suggestions = suggestion_services.get_submitted_suggestions(
+            self.author_id, feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT)
+        question_suggestions = suggestion_services.get_submitted_suggestions(
+            self.author_id, feconf.SUGGESTION_TYPE_ADD_QUESTION)
+        edit_state_suggestions = suggestion_services.get_submitted_suggestions(
+            self.author_id, feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT)
+
+        self.assertEqual(len(translation_suggestions), 1)
+        self.assertEqual(len(question_suggestions), 1)
+        self.assertEqual(len(edit_state_suggestions), 1)
+
+        translation_suggestion = translation_suggestions[0]
+        question_suggestion = question_suggestions[0]
+        edit_state_suggestion = edit_state_suggestions[0]
+
         self.translation_suggestion_id = translation_suggestion.suggestion_id
         self.question_suggestion_id = question_suggestion.suggestion_id
         self.edit_state_suggestion_id = edit_state_suggestion.suggestion_id
-        self.logout()
 
     def test_authors_cannot_update_suggestion_that_they_created(self):
         self.login(self.author_email)
@@ -3808,7 +4026,8 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
                 expected_status_int=401)
         self.assertEqual(
             response['error'],
-            'You are not allowed to update suggestions that you created.')
+            'The user, %s is not allowed to update self-created'
+            'suggestions.' % self.author_username)
         self.logout()
 
     def test_admin_can_update_any_given_translation_suggestion(self):

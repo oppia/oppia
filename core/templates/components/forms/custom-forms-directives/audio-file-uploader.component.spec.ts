@@ -47,8 +47,6 @@ describe('Audio File Uploader Component', () => {
     });
     expect(component.validateUploadedFile(mockFile))
       .toEqual(null);
-    expect(component.validateUploadedFile(null))
-      .toEqual('No audio file was uploaded.');
     mockFile = new File(['foo'], 'audio.mp3', {
       type: 'other than audio'
     });

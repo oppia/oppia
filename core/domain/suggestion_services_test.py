@@ -964,12 +964,13 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
     REVIEWER_EMAIL_2 = 'reviewer2@example.com'
 
     add_translation_change_dict = {
-        'cmd': exp_domain.CMD_ADD_TRANSLATION,
+        'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
         'state_name': 'state_1',
         'content_id': 'content',
         'language_code': 'hi',
         'content_html': '<p>State name: state_1, Content id: content</p>',
-        'translation_html': '<p>This is translated html.</p>'
+        'translation_html': '<p>This is translated html.</p>',
+        'data_format': 'html'
     }
 
     class MockExploration(python_utils.OBJECT):
@@ -1030,12 +1031,14 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         """Creates a translation suggestion with the language code given."""
 
         add_translation_change_dict = {
-            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': 'state_1',
             'content_id': 'content',
             'language_code': language_code,
-            'content_html': '<p>State name: state_1, Content id: content</p>',
-            'translation_html': '<p>This is translated html.</p>'
+            'content_html': (
+                '<p>State name: state_1, Content id: content</p>'),
+            'translation_html': '<p>This is translated html.</p>',
+            'data_format': 'html'
         }
 
         with self.swap(
@@ -1267,6 +1270,67 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
                 self.target_id_1, 'pt'))
 
         self.assertEqual(len(suggestions), 1)
+
+    def test_get_reviewable_translation_suggestions(self):
+        # Add few translation suggestions in different languages.
+        self._create_translation_suggestion_with_language_code('hi')
+        self._create_translation_suggestion_with_language_code('hi')
+        self._create_translation_suggestion_with_language_code('pt')
+        self._create_translation_suggestion_with_language_code('bn')
+        self._create_translation_suggestion_with_language_code('bn')
+        # Add few question suggestions.
+        self._create_question_suggestion_with_skill_id('skill1')
+        self._create_question_suggestion_with_skill_id('skill2')
+        # Provide the user permission to review suggestions in particular
+        # languages.
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_id_1, 'hi')
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_id_1, 'pt')
+        # Get all reviewable translation suggestions.
+        suggestions = suggestion_services.get_reviewable_suggestions(
+            self.reviewer_id_1, feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT)
+
+        # Expect that the results correspond to translation suggestions that the
+        # user has rights to review.
+        self.assertEqual(len(suggestions), 3)
+        actual_language_code_list = sorted([
+            suggestion.change.language_code
+            for suggestion in suggestions
+        ])
+        expected_language_code_list = ['hi', 'hi', 'pt']
+        self.assertEqual(actual_language_code_list, expected_language_code_list)
+
+    def test_get_reviewable_question_suggestions(self):
+        # Add few translation suggestions in different languages.
+        self._create_translation_suggestion_with_language_code('hi')
+        self._create_translation_suggestion_with_language_code('pt')
+        self._create_translation_suggestion_with_language_code('bn')
+        self._create_translation_suggestion_with_language_code('bn')
+        # Add few question suggestions.
+        self._create_question_suggestion_with_skill_id('skill1')
+        self._create_question_suggestion_with_skill_id('skill2')
+        # Provide the user permission to review suggestions in particular
+        # languages.
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_id_1, 'hi')
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_id_1, 'pt')
+        # Provide the user permission to review question suggestions.
+        user_services.allow_user_to_review_question(self.reviewer_id_1)
+        # Get all reviewable question suggestions.
+        suggestions = suggestion_services.get_reviewable_suggestions(
+            self.reviewer_id_1, feconf.SUGGESTION_TYPE_ADD_QUESTION)
+
+        # Expect that the results correspond to question suggestions.
+        self.assertEqual(len(suggestions), 2)
+        expected_suggestion_type_list = ['skill1', 'skill2']
+        actual_suggestion_type_list = [
+            suggestion.change.skill_id
+            for suggestion in suggestions
+        ]
+        self.assertEqual(
+            actual_suggestion_type_list, expected_suggestion_type_list)
 
     def test_get_translation_suggestions_waiting_longest_for_review_per_lang(
             self):
@@ -1580,12 +1644,13 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         content_html = exploration.states['State 1'].content.html
 
         add_translation_change_dict = {
-            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': 'State 1',
             'content_id': 'content',
             'language_code': 'hi',
             'content_html': content_html,
-            'translation_html': '<p>This is translated html.</p>'
+            'translation_html': '<p>This is translated html.</p>',
+            'data_format': 'html'
         }
 
         suggestion_services.create_suggestion(
@@ -1887,12 +1952,13 @@ class ReviewableSuggestionEmailInfoUnitTests(
             self, translation_html):
         """Creates a translation suggestion with the given translation_html."""
         add_translation_change_dict = {
-            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'content_id': feconf.DEFAULT_NEW_STATE_CONTENT_ID,
             'language_code': self.language_code,
             'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
-            'translation_html': translation_html
+            'translation_html': translation_html,
+            'data_format': 'html'
         }
 
         return suggestion_services.create_suggestion(
@@ -2529,12 +2595,13 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
         given author id.
         """
         add_translation_change_dict = {
-            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'content_id': feconf.DEFAULT_NEW_STATE_CONTENT_ID,
             'language_code': language_code,
             'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
-            'translation_html': '<p>This is the translated content.</p>'
+            'translation_html': '<p>This is the translated content.</p>',
+            'data_format': 'html'
         }
 
         return suggestion_services.create_suggestion(
@@ -3130,12 +3197,13 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
     def _create_translation_suggestion_with_language_code(self, language_code):
         """Creates a translation suggestion in the given language_code."""
         add_translation_change_dict = {
-            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'content_id': feconf.DEFAULT_NEW_STATE_CONTENT_ID,
             'language_code': language_code,
             'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
-            'translation_html': '<p>This is the translated content.</p>'
+            'translation_html': '<p>This is the translated content.</p>',
+            'data_format': 'html'
         }
 
         return suggestion_services.create_suggestion(
@@ -3639,12 +3707,13 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
     def _create_translation_suggestion(self):
         """Creates a translation suggestion."""
         add_translation_change_dict = {
-            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'content_id': feconf.DEFAULT_NEW_STATE_CONTENT_ID,
             'language_code': self.language_code,
             'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
-            'translation_html': '<p>This is the translated content.</p>'
+            'translation_html': '<p>This is the translated content.</p>',
+            'data_format': 'html'
         }
 
         return suggestion_services.create_suggestion(
@@ -3916,12 +3985,13 @@ class GetSuggestionTypesThatNeedReviewersUnitTests(test_utils.GenericTestBase):
     def _create_translation_suggestion_with_language_code(self, language_code):
         """Creates a translation suggestion in the given language_code."""
         add_translation_change_dict = {
-            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'content_id': feconf.DEFAULT_NEW_STATE_CONTENT_ID,
             'language_code': language_code,
             'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
-            'translation_html': '<p>This is the translated content.</p>'
+            'translation_html': '<p>This is the translated content.</p>',
+            'data_format': 'html'
         }
 
         return suggestion_services.create_suggestion(

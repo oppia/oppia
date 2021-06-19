@@ -19,8 +19,8 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { TopicSummary } from
-  'domain/topic/topic-summary.model';
+import { CreatorTopicSummary } from
+  'domain/topic/creator-topic-summary.model';
 // eslint-disable-next-line max-len
 import { TopicsAndSkillsDashboardFilter } from
   // eslint-disable-next-line max-len
@@ -40,8 +40,8 @@ export class TopicsAndSkillsDashboardPageService {
    * @returns {Array} filteredTopics - The filtered Topics array
    */
   getFilteredTopics(
-      topicsArray: TopicSummary[],
-      filterObject: TopicsAndSkillsDashboardFilter): TopicSummary[] {
+      topicsArray: CreatorTopicSummary[],
+      filterObject: TopicsAndSkillsDashboardFilter): CreatorTopicSummary[] {
     let ESortOptions = TopicsAndSkillsDashboardPageConstants.TOPIC_SORT_OPTIONS;
     let EPublishedOptions = (
       TopicsAndSkillsDashboardPageConstants.TOPIC_PUBLISHED_OPTIONS);
