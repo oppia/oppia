@@ -6,8 +6,7 @@ on:
       - labeled
   pull_request_target:
     branches:
-      - develop
-      - release-*
+      - cla-check-test
 
 jobs:
   oppiabot:
