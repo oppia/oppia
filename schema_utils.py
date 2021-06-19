@@ -48,7 +48,8 @@ SCHEMA_KEY_SCHEMA = 'schema'
 SCHEMA_KEY_OBJ_TYPE = 'obj_type'
 SCHEMA_KEY_VALIDATORS = 'validators'
 SCHEMA_KEY_DEFAULT_VALUE = 'default_value'
-SCHEMA_KEY_VALIDATE_METHOD = 'validate_method'
+SCHEMA_KEY_OBJECT_CLASS = 'object_class'
+SCHEMA_KEY_VALIDATION_METHOD = 'validation_method'
 
 SCHEMA_TYPE_BOOL = 'bool'
 SCHEMA_TYPE_CUSTOM = 'custom'
@@ -213,13 +214,24 @@ def normalize_against_schema(
                 'Expected unicode, received %s' % obj)
         normalized_obj = obj
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_OBJECT_DICT:
-        from core.controllers import domain_objects_validator
-        validate_method_name = schema[SCHEMA_KEY_VALIDATE_METHOD]
-        validate_method = domain_objects_validator.map_to_validate_method(
-            validate_method_name)
+        # The schema type 'object_dict' accepts any one of
+        # the keys either 'object_class' or 'validation_method'.
+        # 'object_class' key is the most commonly used case, when the object is
+        # initialized from_dict() method and the validation is done from
+        # validate() method.
+        # 'validation_method' key is used for some rare cases like if they have
+        # validate_dict method instead of validate method, or if they need some
+        # extra flags like for strict validation. The methods are written in the
+        # domain_objects_validator file.
 
-        domain_object = domain_objects_validator.DomainObjectsValidationClass()
-        validate_method(domain_object, obj)
+        if SCHEMA_KEY_OBJECT_CLASS in schema:
+            validate_class = schema[SCHEMA_KEY_OBJECT_CLASS]
+            domain_object = validate_class.from_dict(obj)
+            domain_object.validate()
+        else:
+            validation_method = schema[SCHEMA_KEY_VALIDATION_METHOD]
+            validation_method(obj)
+
         normalized_obj = obj
     else:
         raise Exception('Invalid schema type: %s' % schema[SCHEMA_KEY_TYPE])

@@ -22,8 +22,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import exp_domain
-from core.domain import exp_domain
-from core.domain import platform_parameter_domain
 
 def validate_exploration_change(obj):
     """Validates exploration change.
@@ -34,13 +32,3 @@ def validate_exploration_change(obj):
     # No explicit call to validate_dict method is necessary, because
     # ExplorationChange calls it while initialization.
     exp_domain.ExplorationChange(obj)
-
-def validate_new_rules_dict(obj):
-    """Validates new_rules_dict.
-
-    Args:
-        obj: dict. Data that needs to be validated.
-    """
-    domain_object = (
-        platform_parameter_domain.PlatformParameterRule.from_dict(obj))
-    domain_object.validate()
