@@ -1730,7 +1730,7 @@ def get_composite_change_list(exp_id, frontend_version, backend_version):
 
     snapshots_metadata = get_exploration_snapshots_metadata(exp_id)
     composite_change_list_dict = []
-    for i in python_utils.RANGE(frontend_version, new_version):
+    for i in python_utils.RANGE(frontend_version, backend_version):
         composite_change_list_dict += snapshots_metadata[i]['commit_cmds']
 
     composite_change_list = [
@@ -1917,7 +1917,7 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
                     if old_state_name in changed_properties:
-                        if (frontend_version_exploration.states[old_state_name].interaction.id ==
+                        if (frontend_version_exploration.states[old_state_name].interaction.id ==  # pylint: disable=line-too-long
                                 backend_version_exploration.states[new_state_name].interaction.id): # pylint: disable=line-too-long
                             if ('widget_customization_args' not in
                                     changed_properties[old_state_name] and
@@ -1955,7 +1955,7 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
                     if old_state_name in changed_properties:
-                        if (frontend_version_exploration.states[old_state_name].interaction.id ==
+                        if (frontend_version_exploration.states[old_state_name].interaction.id == # pylint: disable=line-too-long
                                 backend_version_exploration.states[new_state_name].interaction.id): # pylint: disable=line-too-long
                             if ('widget_customization_args' not in
                                     changed_properties[old_state_name] and
@@ -2050,8 +2050,8 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
                             backend_version_exploration.auto_tts_enabled):
                         change_is_mergeable = True
                 elif change.property_name == 'correctness_feedback_enabled':
-                    if (frontend_version_exploration.correctness_feedback_enabled ==
-                            backend_version_exploration.correctness_feedback_enabled):
+                    if (frontend_version_exploration.correctness_feedback_enabled == # pylint: disable=line-too-long
+                            backend_version_exploration.correctness_feedback_enabled): # pylint: disable=line-too-long
                         change_is_mergeable = True
 
             if change_is_mergeable:
