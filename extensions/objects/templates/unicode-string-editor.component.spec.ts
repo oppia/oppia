@@ -60,10 +60,9 @@ describe('UnicodeStringEditorComponent', () => {
 
     component.ngOnInit();
 
-    // We cannot test what componentSubscriptions.add has been called with since
-    // externalSaveService is a private variable and inside it is an anonymous
-    // function.
     expect(component.componentSubscriptions.add).toHaveBeenCalled();
+    expect(externalSaveService.onExternalSave).toEqual(
+      externalSaveEventEmitter);
     expect(component.componentSubscriptions.closed).toBe(false);
     expect(component.alwaysEditable).toBe(false);
     expect(component.closeEditor).toHaveBeenCalled();
