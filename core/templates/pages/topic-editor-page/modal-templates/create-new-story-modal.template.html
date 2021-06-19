@@ -63,7 +63,8 @@
                                 [use-local-storage]="true"
                                 [allowed-bg-colors]="allowedBgColors"
                                 [thumbnail-bg-color]="story.getThumbnailBgColor()"
-                                preview-description-bg-color="#2F6687">
+                                preview-description-bg-color="#2F6687"
+                                (image-save)="updateView()">
       </oppia-thumbnail-uploader>
     </div>
   </div>

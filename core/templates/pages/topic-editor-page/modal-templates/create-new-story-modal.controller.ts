@@ -68,8 +68,12 @@ angular.module('oppia').controller('CreateNewStoryModalController', [
         });
     };
 
+    $scope.updateView = function() {
+      $scope.$applyAsync();
+    };
+
     $scope.isValid = function() {
-      $scope.$apply();
+      $scope.updateView();
       return Boolean(
         $scope.story.isValid() &&
         ImageLocalStorageService.getStoredImagesData().length > 0 &&
