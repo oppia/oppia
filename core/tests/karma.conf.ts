@@ -76,7 +76,7 @@ module.exports = function(config) {
       'extensions/interactions/*.json': ['json_fixtures'],
       'core/tests/data/*.json': ['json_fixtures']
     },
-    reporters: ['progress', 'coverage-istanbul'],
+    reporters: ['coverage-istanbul'],
     coverageIstanbulReporter: {
       reports: ['html', 'json', 'lcovonly'],
       dir: '../karma_coverage_reports/',
@@ -101,7 +101,7 @@ module.exports = function(config) {
       terminal: true
     },
     // Continue running in the background after running tests.
-    singleRun: false,
+    singleRun: true,
     customLaunchers: {
       CI_Chrome: {
         base: 'ChromeHeadless',

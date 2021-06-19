@@ -89,8 +89,7 @@ class MockNavigationService {
   ACTION_CLOSE: string = 'close';
 }
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Search bar component', () => {
+describe('Search bar component', () => {
   let classroomBackendApiService: ClassroomBackendApiService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let navigationService: NavigationService;
