@@ -63,7 +63,7 @@ jobs:
         env: 
           VIDEO_RECORDING_IS_ENABLED: 0
       - name: Run e2e Release coordinator Page Test
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --prod_env --skip-install --skip-build --suite="releaseCoordinatorPageFeatures"
         env: 
           VIDEO_RECORDING_IS_ENABLED: 0
