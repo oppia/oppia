@@ -64,6 +64,7 @@ import { SetOfAlgebraicIdentifierEditorComponent } from './templates/set-of-alge
 import { SetOfTranslatableHtmlContentIdsEditorComponent } from './templates/set-of-translatable-html-content-ids-editor.component';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { SubtitledHtmlEditorComponent } from './templates/subtitled-html-editor.component';
+import { SvgFilenameEditorComponent } from './templates/svg-filename-editor.component';
 import { NormalizedStringEditorComponent } from './templates/normalized-string-editor.component';
 import { UnicodeStringEditorComponent } from './templates/unicode-string-editor.component';
 import { SkillSelectorEditorComponent } from './templates/skill-selector-editor.component';
@@ -129,6 +130,7 @@ import { TranslatableSetOfUnicodeStringEditorComponent } from './templates/trans
     SkillSelectorEditorComponent,
     SubtitledHtmlEditorComponent,
     SubtitledUnicodeEditorComponent,
+    SvgFilenameEditorComponent,
     TranslatableSetOfNormalizedStringEditorComponent,
     TranslatableSetOfUnicodeStringEditorComponent,
     UnicodeStringEditorComponent
@@ -170,6 +172,7 @@ import { TranslatableSetOfUnicodeStringEditorComponent } from './templates/trans
     SkillSelectorEditorComponent,
     SubtitledHtmlEditorComponent,
     SubtitledUnicodeEditorComponent,
+    SvgFilenameEditorComponent,
     TranslatableSetOfNormalizedStringEditorComponent,
     TranslatableSetOfUnicodeStringEditorComponent,
     UnicodeStringEditorComponent
@@ -211,6 +214,7 @@ import { TranslatableSetOfUnicodeStringEditorComponent } from './templates/trans
     SkillSelectorEditorComponent,
     SubtitledHtmlEditorComponent,
     SubtitledUnicodeEditorComponent,
+    SvgFilenameEditorComponent,
     TranslatableSetOfNormalizedStringEditorComponent,
     TranslatableSetOfUnicodeStringEditorComponent,
     UnicodeStringEditorComponent
