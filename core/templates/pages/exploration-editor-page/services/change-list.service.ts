@@ -267,8 +267,8 @@ export class ChangeListService implements OnInit {
   }
 
   addWrittenTranslation(
-    contentId: string, dataFormat: string, languageCode: string,
-    stateName: string, translationHtml: string): void {
+      contentId: string, dataFormat: string, languageCode: string,
+      stateName: string, translationHtml: string): void {
   // Written translations submitted via the translation tab in the
   // exploration editor need not pass content_html because
   // translations submitted via this method do not undergo a review. The
@@ -276,26 +276,26 @@ export class ChangeListService implements OnInit {
   // the contributor dashboard because such translation suggestions
   // undergo a manual review process where the reviewer will need to look
   // at the corresponding original content at the time of submission.
-  this.addChange({
-    cmd: 'add_written_translation',
-    content_id: contentId,
-    data_format: dataFormat,
-    language_code: languageCode,
-    state_name: stateName,
-    content_html: 'N/A',
-    translation_html: translationHtml
-  });
-}
+    this.addChange({
+      cmd: 'add_written_translation',
+      content_id: contentId,
+      data_format: dataFormat,
+      language_code: languageCode,
+      state_name: stateName,
+      content_html: 'N/A',
+      translation_html: translationHtml
+    });
+  }
 
-/**
- * Saves a change dict that represents marking a translation as needing
- * update.
- *
- * @param {string} contentId - The content id of the translated content.
- * @param {string} languageCode - The language code.
- * @param {string} stateName - The current state name.
- */
-  markTranslationsAsNeedingUpdate(contentId: string, stateName: string) {
+  /**
+   * Saves a change dict that represents marking a translation as needing
+   * update.
+   *
+   * @param {string} contentId - The content id of the translated content.
+   * @param {string} languageCode - The language code.
+   * @param {string} stateName - The current state name.
+   */
+  markTranslationsAsNeedingUpdate(contentId: string, stateName: string): void {
     this.addChange({
       cmd: 'mark_written_translations_as_needing_update',
       content_id: contentId,
