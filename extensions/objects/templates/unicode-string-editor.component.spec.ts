@@ -145,7 +145,10 @@ describe('UnicodeStringEditorComponent', () => {
   });
 
   it('should replace old value when new value is entered' +
-  'in the input field', () => {
+  ' in the input field', () => {
+    component.active = true;
+
+    // Pre-Check.
     expect(component.value).toBe('random value');
     expect(component.active).toBe(true);
 
