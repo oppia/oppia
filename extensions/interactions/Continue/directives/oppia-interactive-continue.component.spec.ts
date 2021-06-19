@@ -76,7 +76,7 @@ describe('OppiaInteractiveContinue', () => {
 
     beforeEach(() => {
       // The component needs to be created twice since each time a different
-      // mockCurrentInteractionService is used
+      // mockCurrentInteractionService is used.
       contextService = TestBed.get(ContextService);
       fixture = TestBed.createComponent(OppiaInteractiveContinue);
       component = fixture.componentInstance;
@@ -102,7 +102,6 @@ describe('OppiaInteractiveContinue', () => {
       registerCurrentInteraction: (
           submitAnswerFn: Function, validateExpressionFn) => {
         submitAnswerFn();
-        // Expect(validateExpressionFn).toBeNull();
       }
     };
 
@@ -126,7 +125,7 @@ describe('OppiaInteractiveContinue', () => {
 
     beforeEach(() => {
       // The component needs to be created twice since each time a different
-      // mockCurrentInteractionService is used
+      // mockCurrentInteractionService is used.
       contextService = TestBed.get(ContextService);
       fixture = TestBed.createComponent(OppiaInteractiveContinue);
       component = fixture.componentInstance;

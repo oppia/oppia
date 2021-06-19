@@ -57,4 +57,3 @@ describe('OppiaResponseContinueComponent', () => {
     expect(component.escapedAnswer).toBe('Continue button text');
   });
 });
-
