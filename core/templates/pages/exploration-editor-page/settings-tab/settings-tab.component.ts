@@ -350,7 +350,8 @@ angular.module('oppia').component('settingsTab', {
       };
 
       ctrl.editVoiseArtist = function(newVoiceArtistUsername) {
-        ExplorationRightsService.saveVoiceArtist(newVoiceArtistUsername);
+        ExplorationRightsService.assignVoiceArtistRoleAsync(
+          newVoiceArtistUsername);
         ctrl.closeVoiceoverForm();
         return;
       };

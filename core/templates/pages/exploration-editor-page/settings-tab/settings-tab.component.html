@@ -372,7 +372,7 @@
               No voice artists are assigned to this exploration.
             </div>
             <div ng-if="$ctrl.canAssignVoiceArtist" ng-hide="$ctrl.isVoiceoverFormOpen" class="oppia-edit-roles-btn-container">
-              <span ng-click="$ctrl.openVoiceoverRolesForm()" class="oppia-edit-roles-btn protractor-test-edit-roles">
+              <span ng-click="$ctrl.openVoiceoverRolesForm()" class="oppia-edit-roles-btn protractor-test-edit-voice-artist-roles">
                 EDIT
               </span>
             </div>
@@ -381,7 +381,7 @@
           <div ng-show="$ctrl.ExplorationRightsService.voiceArtistNames.length > 0">
             <ul>
               <li ng-repeat="voiceArtistName in $ctrl.ExplorationRightsService.voiceArtistNames track by $index">
-                <div class="oppia-user-list-item">
+                <div class="oppia-user-list-item protractor-test-voice-artist-{{voiceArtistName}}">
                   <span><[voiceArtistName]></span>
                   <span ng-show="$ctrl.isVoiceoverFormOpen" type="button" uib-tooltip="Remove user" class="material-icons" ng-click="$ctrl.removeVoiceArtist(voiceArtistName)">highlight_off
                   </span>
@@ -393,18 +393,18 @@
           <div ng-if="$ctrl.canAssignVoiceArtist" ng-show="$ctrl.isVoiceoverFormOpen">
             <div class="form-group">
               <form ng-submit="$ctrl.editVoiseArtist($ctrl.newVoicAartistUsername)">
-                <div class="nik">
-                  <label>Username: </label>
-                  <input id="$ctrl.newVoicAartistUsername" class="form-control" ng-model="$ctrl.newVoicAartistUsername" placeholder="username" type="text">
-                </div>
                 <div>
-                  <span class="form-text">
-                    <p></p>
-                  </span>
+                  <label>Add new voice artsit: </label>
+                  <input id="$ctrl.newVoicAartistUsername"
+                         class="form-control protractor-test-new-voice-artist-username"
+                         ng-model="$ctrl.newVoicAartistUsername"
+                         placeholder="Voice artist username"
+                         type="text">
                 </div>
-
-                <input type="submit" class="btn btn-secondary protractor-test-save-role" value="Save">
-                <button type="button" class="btn btn-secondary" ng-click="$ctrl.closeVoiceoverForm()" ng-show="$ctrl.isVoiceoverFormOpen">
+                <input type="submit" class="btn btn-secondary protractor-test-add-voice-artist-role-button" value="Save">
+                <button type="button"
+                        class="btn btn-secondary"
+                        ng-click="$ctrl.closeVoiceoverForm()">
                   Cancel
                 </button>
               </form>

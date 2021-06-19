@@ -671,11 +671,11 @@ describe('Settings Tab Component', () => {
       expect(ctrl.isVoiceoverFormOpen).toBe(true);
       expect(ctrl.newVoiceArtistUsername).toBe('');
 
-      spyOn(explorationRightsService, 'saveVoiceArtist');
+      spyOn(explorationRightsService, 'assignVoiceArtistRoleAsync');
       ctrl.editVoiseArtist('Username1');
 
-      expect(explorationRightsService.saveVoiceArtist).toHaveBeenCalledWith(
-        'Username1');
+      expect(explorationRightsService.assignVoiceArtistRoleAsync)
+        .toHaveBeenCalledWith('Username1');
       expect(ctrl.isVoiceoverFormOpen).toBe(false);
     });
 

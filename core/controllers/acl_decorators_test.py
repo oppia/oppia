@@ -1383,7 +1383,7 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-        @acl_decorators.can_assign_voice_artist
+        @acl_decorators.can_manage_voice_artist
         def post(self, entity_type, entity_id):
             self.render_json({
                 'entity_type': entity_type,
@@ -1430,13 +1430,27 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
         user_services.update_user_role(
             self.voiceover_admin_id, feconf.ROLE_ID_VOICEOVER_ADMIN)
 
-    def test_voiceover_admin_can_assign_voice_artist_in_public_exp(self):
+    def test_voiceover_admin_can_manage_voice_artist_in_public_exp(self):
         self.login(self.VOICEOVER_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         with self.swap(self, 'testapp', self.mock_testapp):
             self.post_json(
                 '/mock/exploration/%s' % self.published_exp_id_1,
                 {}, csrf_token=csrf_token)
+        self.logout()
+
+    def test_assigning_voice_artist_for_unsupported_entity_type_raise_400(self):
+        unsupported_entity_type = 'topic'
+        self.login(self.VOICEOVER_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.post_json(
+                '/mock/%s/%s' % (
+                    unsupported_entity_type, self.published_exp_id_1),
+                {}, csrf_token=csrf_token, expected_status_int=400)
+            self.assertEqual(
+                response['error'],
+                'Unsupported entity_type: topic')
         self.logout()
 
     def test_voiceover_admin_cannot_assign_voice_artist_in_private_exp(self):

@@ -136,7 +136,7 @@ class StartedTranslationTutorialEventHandler(base.BaseHandler):
 class VoiceArtistManagementHandler(base.BaseHandler):
     """Handles assignment of voice artists."""
 
-    @acl_decorators.can_assign_voice_artist
+    @acl_decorators.can_manage_voice_artist
     def post(self, entity_type, entity_id):
         """Handles Post requests."""
         if entity_type != feconf.ENTITY_TYPE_EXPLORATION:
@@ -153,12 +153,9 @@ class VoiceArtistManagementHandler(base.BaseHandler):
             self.user, entity_id, voice_artist_id,
             rights_domain.ROLE_VOICE_ARTIST)
 
-        self.render_json({
-            'rights': rights_manager.get_exploration_rights(
-                entity_id).to_dict()
-        })
+        self.render_json({})
 
-    @acl_decorators.can_assign_voice_artist
+    @acl_decorators.can_manage_voice_artist
     def delete(self, entity_type, entity_id):
         """Handles Delete requests."""
         if entity_type != feconf.ENTITY_TYPE_EXPLORATION:
@@ -174,7 +171,4 @@ class VoiceArtistManagementHandler(base.BaseHandler):
         rights_manager.deassign_role_for_exploration(
             self.user, entity_id, voice_artist_id)
 
-        self.render_json({
-            'rights': rights_manager.get_exploration_rights(
-                entity_id).to_dict()
-        })
+        self.render_json({})

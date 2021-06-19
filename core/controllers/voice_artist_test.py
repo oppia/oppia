@@ -349,7 +349,7 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
             csrf_token=csrf_token, expected_status_int=401)
         self.logout()
 
-    def test_voiceover_admin_can_assign_voice_artist(self):
+    def test_voiceover_admin_can_manage_voice_artist(self):
         self.login(self.VOICEOVER_ADMIN_EMAIL)
         params = {
             'username': self.VOICE_ARTIST_USERNAME

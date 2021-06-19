@@ -29,7 +29,7 @@ describe('Exploration permissions model', () => {
       can_delete: false,
       can_modify_roles: true,
       can_edit: true,
-      can_assign_voice_artist: true
+      can_manage_voice_artist: true
     };
 
     let permissionsObject = ExplorationPermissions.createFromBackendDict(

@@ -26,30 +26,33 @@ var CreatorDashboardPage = require(
   '../protractor_utils/CreatorDashboardPage.js');
 var ExplorationEditorPage = require(
   '../protractor_utils/ExplorationEditorPage.js');
+var AdminPage = require('../protractor_utils/AdminPage.js');
 
 describe('Exploration translation and voiceover tab', function() {
+  var adminPage = null;
   var creatorDashboardPage = null;
   var explorationEditorMainTab = null;
   var explorationEditorPage = null;
-  var explorationEditorSettingsTab = null;
   var explorationEditorTranslationTab = null;
   var YELLOW_STATE_PROGRESS_COLOR = 'rgb(233, 179, 48)';
   var GREEN_STATE_PROGRESS_COLOR = 'rgb(22, 167, 101)';
   var RED_STATE_PROGRESS_COLOR = 'rgb(209, 72, 54)';
 
   beforeAll(async function() {
+    adminPage = new AdminPage.AdminPage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
-    explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     explorationEditorTranslationTab = explorationEditorPage.getTranslationTab();
     explorationPreviewTab = explorationEditorPage.getPreviewTab();
 
     await users.createUser(
       'voiceArtist@translationTab.com', 'userVoiceArtist');
     await users.createUser('user@editorTab.com', 'userEditor');
+    await users.createUser('voiceoverAdmin@exp.com', 'voiceoverManager');
     await users.createAndLoginAdminUser(
       'superUser@translationTab.com', 'superUser');
+    await adminPage.updateRole('voiceoverManager', 'voiceover admin');
     await users.logout();
     await users.login('user@editorTab.com');
     await workflow.createExploration(true);
@@ -83,13 +86,15 @@ describe('Exploration translation and voiceover tab', function() {
     await explorationEditorMainTab.setContent(
       await forms.toRichText('This is final card.'));
     await explorationEditorMainTab.setInteraction('EndExploration');
-    await explorationEditorPage.navigateToSettingsTab();
-    await explorationEditorSettingsTab.setTitle('Test Exploration');
-    await explorationEditorSettingsTab.setCategory('Algorithms');
-    await explorationEditorSettingsTab.setLanguage('English');
-    await explorationEditorSettingsTab.setObjective(
-      'Run tests using same exploration.');
     await explorationEditorPage.saveChanges('Done!');
+    await explorationEditorPage.publishCardExploration(
+      'Test Exploration', 'Run tests using same exploration.', 'Algorithms',
+      'English', ['maths']);
+    var explorationId = await general.getExplorationIdFromEditor();
+    await users.logout();
+    await users.login('voiceoverAdmin@exp.com');
+    await general.openEditor(explorationId, true);
+    await explorationEditorPage.navigateToSettingsTab();
     await workflow.addExplorationVoiceArtist('userVoiceArtist');
     await users.logout();
   });

@@ -24,7 +24,7 @@ export interface ExplorationPermissionsBackendDict {
   'can_delete': boolean;
   'can_modify_roles': boolean;
   'can_edit': boolean;
-  'can_assign_voice_artist': boolean;
+  'can_manage_voice_artist': boolean;
 }
 
 export class ExplorationPermissions {
@@ -57,6 +57,6 @@ export class ExplorationPermissions {
       backendDict.can_unpublish, backendDict.can_release_ownership,
       backendDict.can_publish, backendDict.can_voiceover,
       backendDict.can_delete, backendDict.can_modify_roles,
-      backendDict.can_edit, backendDict.can_assign_voice_artist);
+      backendDict.can_edit, backendDict.can_manage_voice_artist);
   }
 }
