@@ -218,8 +218,11 @@ describe('Search bar component', () => {
   it('should update selection details', () => {
     spyOn(translateService, 'instant').and.returnValue('key');
     component.ngOnInit();
+    fixture.detectChanges();
     component.selectionDetails = selectionDetails;
     component.updateSelectionDetails('categories');
+    fixture.detectChanges();
+    expect(component.selectionDetails.categories.numSelections).toEqual(3);
   });
 
   it('should update selection details when they are no selections', () => {
