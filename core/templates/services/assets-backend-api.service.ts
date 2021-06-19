@@ -96,12 +96,16 @@ export class AssetsBackendApiService {
       explorationId: string, filename: string,
       rawAssetData: Blob): Promise<SaveAudioResponse> {
     const form = new FormData();
+    let audioUploadUrl = this.getAudioUploadUrl(explorationId);
+    if (audioUploadUrl === null) {
+      throw new Error('Failed to post Audio');
+    }
     form.append('raw_audio_file', rawAssetData);
     form.append('payload', JSON.stringify({filename}));
     form.append('csrf_token', await this.csrfTokenService.getTokenAsync());
     try {
       return await this.http.post<SaveAudioResponse>(
-        this.getAudioUploadUrl(explorationId), form).toPromise();
+        audioUploadUrl, form).toPromise();
     } catch (reason) {
       return Promise.reject(reason.error);
     }
@@ -111,13 +115,17 @@ export class AssetsBackendApiService {
       resampledFile: Blob, filename: string, entityType: string,
       entityId: string): Promise<SaveImageResponse> {
     const form = new FormData();
+    let imageUploadUrl = this.getImageUploadUrl(entityType, entityId);
+    if (imageUploadUrl === null) {
+      throw new Error('Failed to post Image');
+    }
     form.append('image', resampledFile);
     form.append(
       'payload', JSON.stringify({filename, filename_prefix: 'image'}));
     form.append('csrf_token', await this.csrfTokenService.getTokenAsync());
     try {
       return await this.http.post<SaveImageResponse>(
-        this.getImageUploadUrl(entityType, entityId), form).toPromise();
+        imageUploadUrl, form).toPromise();
     } catch (reason) {
       return Promise.reject(reason.error);
     }
@@ -134,13 +142,15 @@ export class AssetsBackendApiService {
     }));
     let imageUploadUrlTemplate = '/createhandler/imageupload/' +
     '<entity_type>/<entity_id>';
-    return this.http.post<{filename: string}>(
-      this.urlInterpolationService.interpolateUrl(
-        imageUploadUrlTemplate, {
-          entity_type: entityType,
-          entity_id: entityId
-        }
-      ), form);
+    let thumbnailFileUrl = this.urlInterpolationService.interpolateUrl(
+      imageUploadUrlTemplate, {
+        entity_type: entityType,
+        entity_id: entityId
+      });
+    if (thumbnailFileUrl === null) {
+      throw new Error('Failed to post thumbnail');
+    }
+    return this.http.post<{filename: string}>(thumbnailFileUrl, form);
   }
 
   isCached(filename: string): boolean {
@@ -181,7 +191,7 @@ export class AssetsBackendApiService {
       entityType, entityId, filename, AppConstants.ASSET_TYPE_THUMBNAIL);
   }
 
-  private getDownloadUrl(
+  getDownloadUrl(
       entityType: string, entityId: string, filename: string,
       assetType: string): string {
     let downloadUrl = this.urlInterpolationService.interpolateUrl(
@@ -250,25 +260,18 @@ export class AssetsBackendApiService {
     fileDownloadRequests.length = 0;
   }
 
-  private getAudioUploadUrl(explorationId: string): string {
-    let audioUploadUrl = this.urlInterpolationService.interpolateUrl(
+  private getAudioUploadUrl(explorationId: string): string | null {
+    return this.urlInterpolationService.interpolateUrl(
       AppConstants.AUDIO_UPLOAD_URL_TEMPLATE, {
         exploration_id: explorationId
       });
-    if (audioUploadUrl === null) {
-      throw new Error('Failed to Post Audio');
-    }
-    return audioUploadUrl;
   }
 
-  private getImageUploadUrl(entityType: string, entityId: string): string {
-    let imageUploadUrl = this.urlInterpolationService.interpolateUrl(
+  private getImageUploadUrl(
+      entityType: string, entityId: string): string | null {
+    return this.urlInterpolationService.interpolateUrl(
       AppConstants.IMAGE_UPLOAD_URL_TEMPLATE,
       { entity_type: entityType, entity_id: entityId });
-    if (imageUploadUrl === null) {
-      throw new Error('Failed to Post Image');
-    }
-    return imageUploadUrl;
   }
 }
 

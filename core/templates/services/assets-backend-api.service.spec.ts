@@ -43,9 +43,9 @@ describe('Assets Backend API Service', () => {
       TestBed.configureTestingModule({
         imports: [HttpClientTestingModule]
       });
-      assetsBackendApiService = TestBed.get(AssetsBackendApiService);
-      csrfTokenService = TestBed.get(CsrfTokenService);
-      httpTestingController = TestBed.get(HttpTestingController);
+      assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
+      csrfTokenService = TestBed.inject(CsrfTokenService);
+      httpTestingController = TestBed.inject(HttpTestingController);
 
       spyOn(csrfTokenService, 'getTokenAsync')
         .and.returnValue(Promise.resolve('token'));
