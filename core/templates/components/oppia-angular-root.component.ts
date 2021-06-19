@@ -61,7 +61,7 @@
  *       loading
  */
 
-import { Component, Output, AfterViewInit, EventEmitter, Injector, NgZone } from '@angular/core';
+import { Component, Output, AfterViewInit, EventEmitter, Injector, NgZone, ChangeDetectorRef } from '@angular/core';
 import { createCustomElement } from '@angular/elements';
 import { TranslateService } from '@ngx-translate/core';
 import { TranslateCacheService } from 'ngx-translate-cache';
@@ -148,6 +148,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static injector: Injector;
 
   constructor(
+    private changeDetectorRef: ChangeDetectorRef,
     private classroomBackendApiService: ClassroomBackendApiService,
     private documentAttributeCustomizationService:
       DocumentAttributeCustomizationService,
@@ -261,6 +262,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
           }
         }
         this.documentAttributeCustomizationService.addAttribute('lang', code);
+        this.changeDetectorRef.detectChanges();
       }
     );
     this.translateCacheService.init();
