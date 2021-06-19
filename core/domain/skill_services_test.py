@@ -1330,13 +1330,22 @@ class SkillMigrationTests(test_utils.GenericTestBase):
         explanation_content_id = feconf.DEFAULT_SKILL_EXPLANATION_CONTENT_ID
         html_content = (
             '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
-            'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
+            'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>'
+            '<oppia-noninteractive-image '
+            'alt-with-value="&amp;quot;Image1&amp;quot;" '
+            'caption-with-value="&amp;quot;xyz&amp;quot;" '
+            'filepath-with-value="&amp;quot;img123.svg&amp;quot;">'
+            '</oppia-noninteractive-image>')
 
         expected_html_content = (
             '<p>Value</p><oppia-noninteractive-math math_content-with-value='
             '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &'
             'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
-            '-noninteractive-math>')
+            '-noninteractive-math><oppia-noninteractive-image '
+            'alt-with-value="&amp;quot;Image1&amp;quot;" '
+            'caption-with-value="&amp;quot;xyz&amp;quot;" '
+            'filepath-with-value="&amp;quot;img123.svg&amp;quot;">'
+            '</oppia-noninteractive-image>')
 
         written_translations_dict = {
             'translations_mapping': {
@@ -1453,13 +1462,22 @@ class SkillMigrationTests(test_utils.GenericTestBase):
         explanation_content_id = feconf.DEFAULT_SKILL_EXPLANATION_CONTENT_ID
         html_content = (
             '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
-            'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
+            'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>'
+            '<oppia-noninteractive-image '
+            'alt-with-value="&amp;quot;Image1&amp;quot;" '
+            'caption-with-value="&amp;quot;xyz&amp;quot;" '
+            'filepath-with-value="&amp;quot;img123.svg&amp;quot;">'
+            '</oppia-noninteractive-image>')
 
         expected_html_content = (
             '<p>Value</p><oppia-noninteractive-math math_content-with-value='
             '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &'
             'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
-            '-noninteractive-math>')
+            '-noninteractive-math><oppia-noninteractive-image '
+            'alt-with-value="&amp;quot;Image1&amp;quot;" '
+            'caption-with-value="&amp;quot;xyz&amp;quot;" '
+            'filepath-with-value="&amp;quot;img123.svg&amp;quot;">'
+            '</oppia-noninteractive-image>')
 
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml(
@@ -1515,12 +1533,21 @@ class SkillMigrationTests(test_utils.GenericTestBase):
         explanation_content_id = feconf.DEFAULT_SKILL_EXPLANATION_CONTENT_ID
         html_content = (
             '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
-            'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
+            'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>'
+            '<oppia-noninteractive-image '
+            'alt-with-value="&amp;quot;Image1&amp;quot;" '
+            'caption-with-value="&amp;quot;xyz&amp;quot;" '
+            'filepath-with-value="&amp;quot;img123.svg&amp;quot;">'
+            '</oppia-noninteractive-image>')
         expected_html_content = (
             '<p>Value</p><oppia-noninteractive-math math_content-with-value='
             '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &'
             'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
-            '-noninteractive-math>')
+            '-noninteractive-math><oppia-noninteractive-image '
+            'alt-with-value="&amp;quot;Image1&amp;quot;" '
+            'caption-with-value="&amp;quot;xyz&amp;quot;" '
+            'filepath-with-value="&amp;quot;img123.svg&amp;quot;">'
+            '</oppia-noninteractive-image>')
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml(
                 explanation_content_id, feconf.DEFAULT_SKILL_EXPLANATION), [],

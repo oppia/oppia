@@ -104,6 +104,99 @@ class DraftUpgradeUtil(python_utils.OBJECT):
     """Wrapper class that contains util functions to upgrade drafts."""
 
     @classmethod
+    def _convert_states_v45_dict_to_v46_dict(cls, draft_change_list):
+        """Converts draft change list from state version 45 to 46.
+        Version 45 ensure that all oppia-noninteractive-svgdiagram
+        tags are converted into oppia-noninteractive-image tag.
+
+        Args:
+            draft_change_list: list(ExplorationChange). The list of
+                ExplorationChange domain objects to upgrade.
+
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+        """
+        conversion_fn = (
+            html_validation_service.convert_svg_diagram_tags_to_image_tags)
+        for i, change in enumerate(draft_change_list):
+            new_value = None
+            if not change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
+                continue
+            # The change object has the key 'new_value' only if the
+            # cmd is 'CMD_EDIT_STATE_PROPERTY' or
+            # 'CMD_EDIT_EXPLORATION_PROPERTY'.
+            new_value = change.new_value
+            if change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
+                new_value['html'] = conversion_fn(new_value['html'])
+            elif (change.property_name ==
+                  exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
+                if 'choices' in new_value.keys():
+                    for value_index, value in enumerate(
+                            new_value['choices']['value']):
+                        new_value['choices']['value'][value_index] = (
+                            conversion_fn(value))
+            elif (change.property_name ==
+                  exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
+                for content_id, language_code_to_written_translation in (
+                        new_value['translations_mapping'].items()):
+                    for language_code in (
+                            language_code_to_written_translation.keys()):
+                        new_value['translations_mapping'][
+                            content_id][language_code]['html'] = (
+                                conversion_fn(new_value[
+                                    'translations_mapping'][content_id][
+                                        language_code]['html'])
+                            )
+            elif (change.property_name ==
+                  exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME and
+                  new_value is not None):
+                new_value = (
+                    state_domain.Outcome.convert_html_in_outcome(
+                        new_value, conversion_fn))
+            elif (change.property_name ==
+                  exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
+                new_value = [
+                    (state_domain.Hint.convert_html_in_hint(
+                        hint_dict, conversion_fn))
+                    for hint_dict in new_value]
+            elif (change.property_name ==
+                  exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION and
+                  new_value is not None):
+                new_value['explanation']['html'] = (
+                    conversion_fn(new_value['explanation']['html']))
+                if new_value['correct_answer']:
+                    if isinstance(new_value['correct_answer'], list):
+                        for list_index, html_list in enumerate(
+                                new_value['correct_answer']):
+                            if isinstance(html_list, list):
+                                for answer_html_index, answer_html in enumerate(
+                                        html_list):
+                                    if isinstance(
+                                            answer_html, python_utils.UNICODE):
+                                        new_value['correct_answer'][list_index][
+                                            answer_html_index] = (
+                                                conversion_fn(answer_html))
+            elif (change.property_name ==
+                  exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
+                html_field_types_to_rule_specs = (
+                    rules_registry.Registry.get_html_field_types_to_rule_specs(
+                        state_schema_version=41))
+                new_value = [
+                    state_domain.AnswerGroup.convert_html_in_answer_group(
+                        answer_group, conversion_fn,
+                        html_field_types_to_rule_specs
+                    )
+                    for answer_group in new_value]
+            if new_value is not None:
+                draft_change_list[i] = exp_domain.ExplorationChange({
+                    'cmd': change.cmd,
+                    'property_name': change.property_name,
+                    'state_name': change.state_name,
+                    'new_value': new_value
+                })
+        return draft_change_list
+
+    @classmethod
     def _convert_states_v44_dict_to_v45_dict(cls, draft_change_list):
         """Converts draft change list from state version 44 to 45. State
         version 45 adds a linked skill id property to the

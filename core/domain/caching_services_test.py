@@ -46,7 +46,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         'objective': '',
         'init_state_name': 'Introduction',
         'author_notes': '',
-        'states_schema_version': 45,
+        'states_schema_version': 46,
         'param_specs': {},
         'param_changes': [],
         'id': 'h51Bu72rDIqO',
@@ -155,7 +155,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
     # unicode characters that is set to the memory cache.
     json_encoded_string_representing_an_exploration = (
         '{"param_changes": [], "category": "", "auto_tts_enabled": true, "tags"'
-        ': [], "states_schema_version": 45, "title": "", "param_specs": {}, "id'
+        ': [], "states_schema_version": 46, "title": "", "param_specs": {}, "id'
         '": "h51Bu72rDIqO", "states": {"Introduction": {"param_changes": [], "c'
         'ard_is_checkpoint": true, "interaction": {"solution": null, "answer_gr'
         'oups": [{"tagged_skill_misconception_id": null, "outcome": {"param_cha'

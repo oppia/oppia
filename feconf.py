@@ -247,7 +247,7 @@ EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION = 41
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATE_SCHEMA_VERSION = 45
+CURRENT_STATE_SCHEMA_VERSION = 46
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -259,13 +259,13 @@ CURRENT_COLLECTION_SCHEMA_VERSION = 6
 CURRENT_STORY_CONTENTS_SCHEMA_VERSION = 4
 
 # The current version of skill contents dict in the skill schema.
-CURRENT_SKILL_CONTENTS_SCHEMA_VERSION = 2
+CURRENT_SKILL_CONTENTS_SCHEMA_VERSION = 3
 
 # The current version of misconceptions dict in the skill schema.
-CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 3
+CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 4
 
 # The current version of rubric dict in the skill schema.
-CURRENT_RUBRIC_SCHEMA_VERSION = 3
+CURRENT_RUBRIC_SCHEMA_VERSION = 4
 
 # The current version of subtopics dict in the topic schema.
 CURRENT_SUBTOPIC_SCHEMA_VERSION = 3

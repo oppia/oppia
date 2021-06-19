@@ -42,7 +42,7 @@
  * `this.data.metadata.uploadedImageData`, make sure that you also update
  * imgData. Failing to do so could lead to unpredictable behavior.
  */
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { SafeResourceUrl } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
@@ -93,6 +93,13 @@ interface FilepathData {
 interface Dimensions {
   height: number;
   width: number;
+}
+
+class PolyPoint {
+  constructor(
+    public x: number,
+    public y: number
+  ) {}
 }
 
 interface SvgImageData {
@@ -167,7 +174,14 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
   processedImageIsTooLarge: boolean;
   entityId: string;
   entityType: string;
-  canvas = new fabric.Canvas()
+  // Dynamically assign a unique id to each lc editor to avoid clashes
+  // when there are multiple RTEs in the same page.
+  randomId = Math.floor(Math.random() * 100000).toString();
+  // The canvasId is used to identify the fabric js
+  // canvas element in the editor.
+  canvasID = 'canvas' + this.randomId;
+  canvas: fabric.Canvas;
+  filepath: string;
   initializedSvgImage: boolean = false;
   createSvgMode: boolean = false;
   drawMode = DRAW_MODE_NONE;
@@ -203,14 +217,6 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
     'Plaster',
     'Engagement'
   ];
-  // Dynamically assign a unique id to each lc editor to avoid clashes
-  // when there are multiple RTEs in the same page.
-  randomId: string = Math.floor(Math.random() * 100000).toString();
-  // The canvasId is used to identify the fabric js
-  // canvas element in the editor.
-  canvasID: string = 'canvas' + this.randomId;
-  // The following picker variables are used to store the objects returned
-  // from the vanilla color picker.
   fillPicker = null;
   strokePicker = null;
   bgPicker = null;
@@ -284,6 +290,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
     private alertsService: AlertsService,
     private assetsBackendApiService: AssetsBackendApiService,
     private contextService: ContextService,
+    private changeDetectorRef: ChangeDetectorRef,
     private csrfTokenService: CsrfTokenService,
     private imageLocalStorageService: ImageLocalStorageService,
     private imagePreloaderService: ImagePreloaderService,
@@ -369,11 +376,6 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
     this.isTouchDevice = this.deviceInfoService.hasTouchEvents();
   }
 
-  polyPoint = function(x, y) {
-    this.x = x;
-    this.y = y;
-  };
-
   initializeFabricJs(): void {
     this.canvas = new fabric.Canvas(this.canvasID);
     this.setCanvasDimensions();
@@ -409,19 +411,22 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
   };
 
   onBgChange(): void {
-    this.canvas.setBackgroundColor(this.fabricjsOptions.bg);
+    this.canvas.setBackgroundColor(
+      this.fabricjsOptions.bg, () => {
+        // This is a call back that runs when background is set.
+        // This is needed for ts checks.
+      });
     this.canvas.renderAll();
   };
 
   createColorPicker(value: string): void {
-    let parent = document.getElementById(value + '-color');
-    console.log(parent)
-    let onChangeFunc = {
-      stroke: this.onStrokeChange(),
-      fill: this.onFillChange(),
-      bg: this.onBgChange(),
-    };
+    var parent = document.getElementById(value + '-color');
 
+    var onChangeFunc = {
+      stroke: () => this.onStrokeChange(),
+      fill: () => this.onFillChange(),
+      bg: () => this.onBgChange()
+    };
     let onOpen = () => {
       // This DOM manipulation is necessary because the color picker is not
       // configurable in the third-party module.
@@ -441,9 +446,9 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
       topAlphaSquare.style.opacity = opacity.toString();
       bottomAlphaSquare.style.opacity = opacity.toString();
       this.fabricjsOptions[value] = color.rgbaString;
-      onChangeFunc;
+      onChangeFunc[value]();
     };
-    let picker = new Picker({
+    var picker = new Picker({
       parent: parent,
       color: this.fabricjsOptions[value],
       onOpen: onOpen,
@@ -459,7 +464,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
     if (value === 'bg') {
       this.bgPicker = picker;
     }
-  };
+  }
 
   getQuadraticBezierCurve = () => {
     if (this.drawMode === DRAW_MODE_BEZIER) {
@@ -495,13 +500,13 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
     this.canvas.renderAll();
   };
 
-  makePolygon(): void {
+  makePolygon(): fabric.Polyline {
     // The startPt is the initial point in the polygon and it is also the
     // last point if the polygon is closed.
-    let startPt = this.polyOptions.bboxPoints[0];
+    const startPt = this.polyOptions.bboxPoints[0];
     if (this.polygonMode === CLOSED_POLYGON_MODE) {
       this.polyOptions.bboxPoints.push(
-        new this.polyPoint(startPt.x, startPt.y));
+        new PolyPoint(startPt.x, startPt.y));
     }
     var shape = new fabric.Polyline(this.polyOptions.bboxPoints, {
       fill: this.fabricjsOptions.fill,
@@ -511,7 +516,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
       strokeLineCap: 'round'
     });
     return shape;
-  };
+  }
 
   getSize(): number {
     let size = this.fabricjsOptions.size;
@@ -563,7 +568,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
         this.setPolyStartingPoint(options);
         var x = this.polyOptions.x;
         var y = this.polyOptions.y;
-        this.polyOptions.bboxPoints.push(new this.polyPoint(x, y));
+        this.polyOptions.bboxPoints.push(new PolyPoint(x, y));
         var points = [x, y, x, y];
         var stroke = this.fabricjsOptions.stroke;
         // Ensures that the polygon lines are visible when
@@ -579,7 +584,8 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
         if (
           this.polyOptions.lines.length !== 0 &&
           this.drawMode === DRAW_MODE_POLY &&
-          this.isTouchDevice) {
+          this.isTouchDevice
+        ) {
           this.setPolyStartingPoint(options);
           this.polyOptions.lines[this.polyOptions.lineCounter - 1].set({
             x2: this.polyOptions.x,
@@ -593,13 +599,14 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
         this.polyOptions.lineCounter++;
       }
     });
-
+  
     this.canvas.on('mouse:move', (options) => {
       // Detects the mouse movement while drawing the polygon.
       if (
         this.polyOptions.lines.length !== 0 &&
         this.drawMode === DRAW_MODE_POLY &&
-        !this.isTouchDevice) {
+        !this.isTouchDevice
+      ) {
         this.setPolyStartingPoint(options);
         this.polyOptions.lines[this.polyOptions.lineCounter - 1].set({
           x2: this.polyOptions.x,
@@ -609,12 +616,13 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
       }
     });
 
-    this.canvas.on('object:moving',(e) => {
+    this.canvas.on('object:moving', (e) => {
       // Detects the movement in the control points when
       // drawing the bezier curve.
       if (this.drawMode === DRAW_MODE_BEZIER) {
         var pt = e.target;
-        var curve = this.getQuadraticBezierCurve();
+        var curve = this.getQuadraticBezierCurve() as unknown as {
+          path: number[][]};
         if (e.target.name === 'p0') {
           curve.path[0][1] = pt.left;
           curve.path[0][2] = pt.top;
@@ -692,10 +700,13 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
         } else if (shape.get('type') === 'textbox') {
           this.displayFontStyles = true;
           this.fabricjsOptions.size = (
-            shape.get('fontSize').toString() + 'px');
-          this.fabricjsOptions.fontFamily = shape.get('fontFamily');
-          this.fabricjsOptions.italic = shape.get('fontStyle') === 'italic';
-          this.fabricjsOptions.bold = shape.get('fontWeight') === 'bold';
+            shape.get('fontSize' as keyof fabric.Object).toString() + 'px');
+            this.fabricjsOptions.fontFamily = shape.get(
+              'fontFamily' as keyof fabric.Object);
+            this.fabricjsOptions.italic = shape.get(
+              'fontStyle' as keyof fabric.Object) === 'italic';
+            this.fabricjsOptions.bold = shape.get(
+              'fontWeight' as keyof fabric.Object) === 'bold';
         } else {
           this.displayFontStyles = false;
         }
@@ -760,7 +771,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
       this.pieChartDataInput[i].angle = (
         this.pieChartDataInput[i].data / total * Math.PI * 2);
       pieSlices.push(this.getPieSlice(
-        new this.polyPoint(
+        new PolyPoint(
           this.defaultTopCoordinate, this.defaultLeftCoordinate
         ), this.defaultRadius, currentAngle,
         currentAngle + this.pieChartDataInput[i].angle,
@@ -778,7 +789,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
     // This can be changed again using editor.
     let defaultTextSize = '18px';
     this.fabricjsOptions.size = defaultTextSize;
-    let text = new fabric.Textbox(legendText, {
+    var text = new fabric.Textbox(legendText, {
       top: 100,
       left: 120,
       fontFamily: this.fabricjsOptions.fontFamily,
@@ -790,7 +801,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
     });
     // Gives the color to the pie slice indicator which
     // is used to indentify the pie slice.
-    for (let i = 0; i < this.pieChartDataInput.length; i++) {
+    for (var i = 0; i < this.pieChartDataInput.length; i++) {
       text.setSelectionStart(this.getTextIndex(legendText, i, 0));
       text.setSelectionEnd(this.getTextIndex(legendText, i, 1));
       text.setSelectionStyles({
@@ -803,9 +814,14 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
     this.canvas.add(text);
     this.canvas.add(new fabric.Group(pieSlices));
     this.groupCount += 1;
-  };
+  }
 
-  getPieSlice(center, radius, startAngle, endAngle, color): void {
+  getPieSlice(
+      center: {x: number, y: number},
+      radius: number,
+      startAngle: number,
+      endAngle: number,
+      color: string): fabric.Group {
     // The pie slice is a combination of a semicircle and a triangle.
     // The following code is used to calculate the angle of the arc and
     // the points for drawing the polygon.
@@ -815,7 +831,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
     let height = Math.sqrt(Math.pow(radius, 2) - Math.pow(halfChord, 2));
     let radiansToDegrees = 180 / Math.PI;
 
-    let arc = new fabric.Circle({
+    const arc = new fabric.Circle({
       radius: radius,
       startAngle: -halfAngle,
       endAngle: halfAngle,
@@ -828,20 +844,22 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
       strokeWidth: 1,
       strokeUniform: true,
       id: 'group' + this.groupCount
-    });
-    arc.toSVG = this.createCustomToSVG(arc.toSVG, 'path', arc.id);
-    let p1 = new this.polyPoint (height + center.x, center.y + halfChord);
-    let p2 = new this.polyPoint (height + center.x, center.y - halfChord);
-    let tri = new fabric.Polygon([center, p1, p2, center], {
+    } as unknown as fabric.ICircleOptions);
+    arc.toSVG = this.createCustomToSVG(
+      arc.toSVG, 'path', (arc as unknown as {id: string}).id, arc);
+    const p1 = new PolyPoint (height + center.x, center.y + halfChord);
+    const p2 = new PolyPoint (height + center.x, center.y - halfChord);
+    const tri = new fabric.Polygon([center, p1, p2, center], {
       fill: color,
       stroke: color,
       strokeWidth: 1,
       strokeUniform: true,
       id: 'group' + this.groupCount
-    });
-    tri.toSVG = this.createCustomToSVG(tri.toSVG, tri.type, tri.id);
-    let rotationAngle = (startAngle + halfAngle) * radiansToDegrees;
-    let slice = new fabric.Group([arc, tri], {
+    } as unknown as fabric.IPolylineOptions);
+    tri.toSVG = this.createCustomToSVG(
+      tri.toSVG, tri.type, (tri as unknown as {id: string}).id, tri);
+    const rotationAngle = (startAngle + halfAngle) * radiansToDegrees;
+    const slice = new fabric.Group([arc, tri], {
       originX: 'center',
       originY: 'center',
       top: center.y,
@@ -849,8 +867,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
       angle: rotationAngle,
     });
     return slice;
-  };
-
+  }
 
   createPieChart(): void {
     if (this.drawMode === DRAW_MODE_NONE) {
@@ -889,7 +906,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
           id: 'group' + this.groupCount
         });
         obj.toSVG = this.createCustomToSVG(
-          obj.toSVG.bind(obj), obj.type, obj.id);
+          obj.toSVG, obj.type, obj.id, obj);
       });
       this.canvas.add(new fabric.Group(objects));
       this.groupCount += 1;
@@ -1012,24 +1029,24 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
   };
 
   onBoldToggle(): void {
-    let shape = this.canvas.getActiveObject();
+    var shape = this.canvas.getActiveObject();
     if (shape && shape.get('type') === 'textbox') {
       shape.set({
         fontWeight: this.fabricjsOptions.bold ? 'bold' : 'normal',
-      });
+      } as unknown as Partial<fabric.Object>);
       this.canvas.renderAll();
     }
-  };
+  }
 
   onFontChange(): void {
-    let shape = this.canvas.getActiveObject();
+    var shape = this.canvas.getActiveObject();
     if (shape && shape.get('type') === 'textbox') {
       shape.set({
         fontFamily: this.fabricjsOptions.fontFamily,
-      });
+      } as unknown as Partial<fabric.Object>);
       this.canvas.renderAll();
     }
-  };
+  }
 
   onSizeChange(): void {
     // Ensures that the size change is applied only to the curve and
@@ -1043,31 +1060,30 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
         (object) => {
           object.set({
             radius: this.getSize() + 2
-          });
+          } as unknown as Partial<fabric.Object>);
         });
-      this.getQuadraticBezierCurve().set({
-        strokeWidth: this.getSize()
-      });
-      this.canvas.renderAll();
-    } else {
-      var shape = this.canvas.getActiveObject();
-      this.canvas.freeDrawingBrush.width = this.getSize();
-      var strokeWidthShapes = [
-        'rect', 'circle', 'path', 'line', 'polyline'];
-      if (shape && strokeWidthShapes.indexOf(shape.get('type')) !== -1) {
-        shape.set({
+        this.getQuadraticBezierCurve().set({
           strokeWidth: this.getSize()
-        });
+        } as unknown as Partial<fabric.Object>);
         this.canvas.renderAll();
-      } else if (shape && shape.get('type') === 'textbox') {
-        shape.set({
-          fontSize: this.getSize()
-        });
-        this.canvas.renderAll();
+      } else {
+        var shape = this.canvas.getActiveObject();
+        this.canvas.freeDrawingBrush.width = this.getSize();
+        var strokeWidthShapes = [
+          'rect', 'circle', 'path', 'line', 'polyline'];
+        if (shape && strokeWidthShapes.indexOf(shape.get('type')) !== -1) {
+          shape.set({
+            strokeWidth: this.getSize()
+          } as unknown as Partial<fabric.Object>);
+          this.canvas.renderAll();
+        } else if (shape && shape.get('type') === 'textbox') {
+          shape.set({
+            fontSize: this.getSize()
+          } as unknown as Partial<fabric.Object>);
+          this.canvas.renderAll();
+        }
       }
     }
-  };
-
   isSizeVisible(): boolean {
     return Boolean(
       this.objectIsSelected || this.drawMode !== DRAW_MODE_NONE);
@@ -1402,6 +1418,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
       tags: [],
       attrs: []
     };
+    this.uploadedSvgDataUrl = null;
     this.validityChange.emit({empty: false});
   }
 
@@ -1710,7 +1727,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
     if (this.canvas.isDrawingMode) {
       this.drawMode = DRAW_MODE_PENCIL;
     }
-  };
+  }
 
   isDrawModePieChart(): boolean {
     return Boolean(this.drawMode === DRAW_MODE_PIECHART);
@@ -1721,43 +1738,49 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
       this.areAllToolsEnabled() || this.isDrawModePencil());
   };
 
-  createCustomToSVG(toSVG, type, id): () => string {
-    return ()  => {
-      let svgString = toSVG();
-      console.log(svgString)
-      let domParser = new DOMParser();
-      let doc = domParser.parseFromString(svgString, 'image/svg+xml');
-      console.log(doc)
-      console.log(type)
-      let parentG = doc.documentElement.querySelector(type);
+  createCustomToSVG(
+      toSVG: () => string, selector: string, id: string, ctx: unknown
+    ): () => string {
+    return (): string => {
+      const svgString = toSVG.call(ctx);
+      const domParser = new DOMParser();
+      const doc = domParser.parseFromString(svgString, 'image/svg+xml');
+      const parentG = doc.querySelector(selector);
       parentG.setAttribute('id', id);
       return doc.documentElement.outerHTML;
     };
-  };
+  }
 
-  loadGroupedObject(objId, obj, groupedObjects): typeof groupedObjects {
-    // Checks if the id starts with 'group' to identify whether the
-    // svg objects are grouped together.
-    if (objId.startsWith('group')) {
-      // The objId is of the form "group" + number.
-      const GROUP_ID_PREFIX_LENGTH = 5;
-      let groupId = parseInt(objId.slice(GROUP_ID_PREFIX_LENGTH));
-      // Checks whether the object belongs to an already existing group
-      // or not.
-      if (groupedObjects.length <= groupId) {
-        groupedObjects.push([]);
-      }
-      obj.toSVG = this.createCustomToSVG(
-        obj.toSVG.bind(obj), obj.type, obj.id);
-      groupedObjects[groupId].push(obj);
+  loadGroupedObject(
+    objId: string,
+    obj: fabric.Object,
+    groupedObjects: fabric.Object[][]
+): fabric.Object[][] {
+  // Checks if the id starts with 'group' to identify whether the
+  // svg objects are grouped together.
+  if (objId.startsWith('group')) {
+    // The objId is of the form "group" + number.
+    const GROUP_ID_PREFIX_LENGTH = 5;
+    const groupId = parseInt(objId.slice(GROUP_ID_PREFIX_LENGTH));
+    // Checks whether the object belongs to an already existing group
+    // or not.
+    if (groupedObjects.length <= groupId) {
+      groupedObjects.push([]);
     }
-    return groupedObjects;
-  };
+    obj.toSVG = this.createCustomToSVG(
+      obj.toSVG, obj.type, (obj as unknown as {id: string}).id, obj);
+    groupedObjects[groupId].push(obj);
+  }
+  return groupedObjects;
+}
 
-  loadTextObject(element, obj): void {
-    let childNodes = [].slice.call(element.childNodes);
+  loadTextObject(
+    element: Element,
+    obj: fabric.Object
+  ): void {
+    const childNodes = [].slice.call(element.childNodes);
     let value = '';
-    let coloredTextIndex = [];
+    const coloredTextIndex = [];
     // Extracts the text from the tspan tags and appends
     // with a \n tag to ensure that the texts are subsequent lines.
     childNodes.forEach((el, index) => {
@@ -1786,8 +1809,11 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
 
     obj.set({
       text: value,
-    });
-    let text = new fabric.Textbox(obj.text, obj.toObject());
+    } as unknown);
+    let text = new fabric.Textbox(
+      (obj as unknown as {text: string}).text,
+      obj.toObject()
+    );
     text.set({
       type: 'textbox',
       strokeUniform: true,
@@ -1811,7 +1837,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
       });
     });
     this.canvas.add(text);
-  };
+  }
 
   isFullRectangle(element): boolean {
     return (
@@ -1834,13 +1860,21 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
       this.imageLocalStorageService.deleteImage(this.data.metadata.uploadedFile.name);
     }
     this.diagramStatus = STATUS_EDITING;
-    angular.element(document).ready(() => {
+    const domReady = new Promise((resolve, reject) => {
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', resolve);
+      } else {
+        resolve(0);
+      }
+    });
+    this.changeDetectorRef.detectChanges();
+    domReady.then(() => {
       this.initializeFabricJs();
       fabric.loadSVGFromString(
-        this.savedSvgDiagram, (objects, options, elements) => {
-          var groupedObjects = [];
+        this.savedSvgDiagram,  ((objects, options, elements) => {
+          let groupedObjects = [];
           objects.forEach((obj, index) => {
-            var objId = elements[index].id;
+            const objId = elements[index].id;
             if (objId !== '') {
               groupedObjects = this.loadGroupedObject(
                 objId, obj, groupedObjects);
@@ -1849,26 +1883,27 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
               if (
                 obj.get('type') === 'rect' &&
                 this.isFullRectangle(elements[index])) {
-                this.canvas.setBackgroundColor(obj.get('fill'));
-                this.fabricjsOptions.bg = obj.get('fill');
-                this.bgPicker.setOptions({
-                  color: obj.get('fill')
-                });
-              } else if (obj.type === 'text') {
-                this.loadTextObject(elements[index], obj);
-              } else {
-                this.canvas.add(obj);
+                  this.canvas.setBackgroundColor(obj.get('fill'), () => {});
+                  this.fabricjsOptions.bg = obj.get('fill');
+                  this.bgPicker.setOptions({
+                    color: obj.get('fill')
+                  });
+                } else if (obj.type === 'text') {
+                  this.loadTextObject(elements[index], obj);
+                } else {
+                  this.canvas.add(obj);
+                }
               }
-            }
           });
           groupedObjects.forEach((objs) => {
             this.canvas.add(new fabric.Group(objs));
             this.groupCount += 1;
           });
-        }
+        }) as unknown as (results: Object[], options) => void
       );
+      this.changeDetectorRef.detectChanges();
     });
-  };
+  }
 
   isDiagramSaved(): boolean {
     return this.diagramStatus === STATUS_SAVED;
@@ -1877,25 +1912,26 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
 
   createRect(): void {
     this.canvas.discardActiveObject();
-    let defaultWidth = 60;
-    let defaultHeight = 70;
-    let rect = new fabric.Rect({
+    const defaultWidth = 60;
+    const defaultHeight = 70;
+    const rect = new fabric.Rect({
       top: this.defaultTopCoordinate,
       left: this.defaultLeftCoordinate,
       width: defaultWidth,
       height: defaultHeight,
       fill: this.fabricjsOptions.fill,
       stroke: this.fabricjsOptions.stroke,
-      strokeWidth:this.getSize(),
+      strokeWidth: this.getSize(),
       strokeUniform: true
     });
     this.canvas.add(rect);
-  };
+  }
+
   createLine(): void {
     this.canvas.discardActiveObject();
-    let defaultBottomCoordinate = 100;
-    let defaultRightCoordinate = 100;
-    let line = new fabric.Line(
+    const defaultBottomCoordinate = 100;
+    const defaultRightCoordinate = 100;
+    const line = new fabric.Line(
       [
         this.defaultTopCoordinate,
         this.defaultLeftCoordinate,
@@ -1903,25 +1939,25 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
         defaultRightCoordinate
       ], {
         stroke: this.fabricjsOptions.stroke,
-        strokeWidth:this.getSize(),
+        strokeWidth: this.getSize(),
         strokeUniform: true
       });
     this.canvas.add(line);
-  };
+  }
 
   createCircle(): void {
     this.canvas.discardActiveObject();
-    let circle = new fabric.Circle({
+    const circle = new fabric.Circle({
       top: this.defaultTopCoordinate,
       left: this.defaultLeftCoordinate,
       radius: this.defaultRadius,
       fill: this.fabricjsOptions.fill,
       stroke: this.fabricjsOptions.stroke,
-      strokeWidth:this.getSize(),
+      strokeWidth: this.getSize(),
       strokeUniform: true
     });
     this.canvas.add(circle);
-  };
+  }
 
   createText(): void {
     this.canvas.discardActiveObject();
@@ -1942,13 +1978,13 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
       fontStyle: this.fabricjsOptions.italic ? 'italic' : 'normal',
     });
     this.canvas.add(text);
-  };
+  }
 
   isDrawModeBezier(): boolean {
     return this.drawMode === DRAW_MODE_BEZIER;
   };
 
-  onAddItem() {
+  onAddItem(): void {
     if (this.pieChartDataInput.length < this.pieChartDataLimit) {
       var defaultData = 10;
       var dataInput = {
@@ -1959,7 +1995,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
       };
       this.pieChartDataInput.push(dataInput);
     }
-  };
+  }
 
   isSvgUploadEnabled(): boolean {
     return Boolean(
@@ -1968,7 +2004,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
   };
 
 
-  createPolygon(): void {
+  private createPolygon() {
     if (this.drawMode === DRAW_MODE_POLY) {
       this.drawMode = DRAW_MODE_NONE;
       this.createPolyShape();
@@ -1976,11 +2012,11 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
       this.canvas.discardActiveObject();
       this.drawMode = DRAW_MODE_POLY;
       this.canvas.hoverCursor = 'default';
-      this.canvas.forEachObject(function(object) {
+      this.canvas.forEachObject((object) => {
         object.selectable = false;
       });
     }
-  };
+  }
 
   createOpenPolygon(): void {
     this.polygonMode = OPEN_POLYGON_MODE;
@@ -1993,14 +2029,14 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
   };
 
   onItalicToggle(): void {
-    let shape = this.canvas.getActiveObject();
+    var shape = this.canvas.getActiveObject();
     if (shape && shape.get('type') === 'textbox') {
       shape.set({
         fontStyle: this.fabricjsOptions.italic ? 'italic' : 'normal',
-      });
+      } as unknown as Partial<fabric.Object>);
       this.canvas.renderAll();
     }
-  };
+  }
 
 
   uploadSvgFileInCanvas(): void {
@@ -2027,12 +2063,15 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
         this.imgData = (<FileReader>e.target).result;
         let imageData: string | SafeResourceUrl = (<FileReader>e.target).result;
         if (file.name.endsWith('.svg')) {
+          console.log('hello')
           imageData = this.svgSanitizerService.getTrustedSvgResourceUrl(
             imageData as string);
           if(imageData != null) {
-            this.initializeSvgFile();
             this.uploadedSvgDataUrl = (<FileReader>e.target).result;
-            this.uploadSvgFileInCanvas();
+            this.initializeSvgFile();
+            // To ensure that the initialization of SVG editor is complete
+            // before uploading image into it.
+            setTimeout(()=>this.uploadSvgFileInCanvas(), 5)
           }
         }
         this.data = {
@@ -2045,7 +2084,6 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
           },
           crop: file.type !== 'image/svg+xml'
         };
-        console.log(this.data)
         const dimensions = this.calculateTargetImageDimensions();
         this.cropArea = {
           x1: 0,
@@ -2061,16 +2099,16 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
   }
 
   getSvgString(): string {
-    let svgString = this.canvas.toSVG().replace('\t\t', '');
-    let domParser = new DOMParser();
-    let doc = domParser.parseFromString(svgString, 'text/xml');
-    let svg = doc.querySelector('svg');
+    const svgString = this.canvas.toSVG().replace('\t\t', '');
+    const domParser = new DOMParser();
+    const doc = domParser.parseFromString(svgString, 'text/xml');
+    const svg = doc.querySelector('svg');
     svg.removeAttribute('xml:space');
-    let textTags = doc.querySelectorAll('text');
-    textTags.forEach(function(obj) {
+    const textTags = doc.querySelectorAll('text');
+    textTags.forEach((obj) => {
       obj.removeAttribute('xml:space');
     });
-    let elements = svg.querySelectorAll('*');
+    const elements = svg.querySelectorAll('*');
     // Fabric js adds vector-effect as an attribute which is not part of
     // the svg attribute whitelist, so here it is removed
     // and added as part of the style attribute.
@@ -2084,25 +2122,25 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
       }
     }
     return svg.outerHTML;
-  };
+  }
 
-  isSvgTagValid(svgString): boolean {
-    let dataURI = (
+  isSvgTagValid(svgString: string): true {
+    const dataURI = (
       'data:image/svg+xml;base64,' +
       btoa(unescape(encodeURIComponent(svgString))));
-    var invalidTagsAndAttr = (
+    const invalidTagsAndAttr = (
       this.svgSanitizerService.getInvalidSvgTagsAndAttrsFromDataUri(dataURI));
     if (invalidTagsAndAttr.tags.length !== 0) {
-      var errorText = (
+      const errorText = (
         'Invalid tags in svg:' + invalidTagsAndAttr.tags.join());
       throw new Error(errorText);
     } else if (invalidTagsAndAttr.attrs.length !== 0) {
-      var errorText = (
+      const errorText = (
         'Invalid attributes in svg:' + invalidTagsAndAttr.attrs.join());
       throw new Error(errorText);
     }
     return true;
-  };
+  }
 
   saveSvgFile(): void {
     this.alertsService.clearWarnings();
@@ -2177,7 +2215,14 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
   }
 
   initializeSvgFile(): void {
-    this.initializedSvgImage = true;
+    const domReady = new Promise((resolve, reject) => {
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', resolve);
+      } else {
+        resolve(0);
+      }
+    });
+    this.initializedSvgImage = true
     if (this.value) {
       this.setSavedImageFilename(this.value, true);
       let dimensions = (
@@ -2187,8 +2232,9 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
         width: dimensions.width + 'px'
       };
     } else {
-      angular.element(document).ready(() => {
+      domReady.then(() => {
         this.initializeFabricJs();
+        this.changeDetectorRef.detectChanges();
       });
     }
   }
@@ -2212,7 +2258,8 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
       this.canvas.getObjects().slice(-3).forEach((item) => {
         this.canvas.remove(item);
       });
-      let path = this.canvas.getObjects().slice(-1)[0].get('path');
+      const path = this.canvas.getObjects().slice(-1)[0].get(
+        'path' as keyof fabric.Object);
       this.canvas.remove(this.canvas.getObjects().slice(-1)[0]);
       this.canvas.getObjects().forEach((item) => {
         item.set({
@@ -2224,24 +2271,24 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
       // cavasObjects array.
       this.drawMode = DRAW_MODE_NONE;
       // Adding a new path so that the bbox is computed correctly.
-      let curve = new fabric.Path(path, {
+      const curve = new fabric.Path(path, {
         stroke: this.fabricjsOptions.stroke,
         fill: this.fabricjsOptions.fill,
         strokeWidth: this.getSize(),
       });
       this.canvas.add(curve);
     }
-  };
+  }
 
-  drawQuadraticCurve(): void {
-    let defaultCurve = 'M 40 40 Q 95, 100, 150, 40';
-    let defaultP1TopCoordinate = 95;
-    let defaultP1LeftCoordinate = 100;
-    let defaultP0TopCoordinate = 40;
-    let defaultP0LeftCoordinate = 40;
-    let defaultP2TopCoordinate = 150;
-    let defaultP2LeftCoordinate = 40;
-    let curve = new fabric.Path(defaultCurve, {
+  private drawQuadraticCurve(): void {
+    const defaultCurve = 'M 40 40 Q 95, 100, 150, 40';
+    const defaultP1TopCoordinate = 95;
+    const defaultP1LeftCoordinate = 100;
+    const defaultP0TopCoordinate = 40;
+    const defaultP0LeftCoordinate = 40;
+    const defaultP2TopCoordinate = 150;
+    const defaultP2LeftCoordinate = 40;
+    const curve = new fabric.Path(defaultCurve, {
       stroke: this.fabricjsOptions.stroke,
       fill: this.fabricjsOptions.fill,
       strokeWidth: this.getSize(),
@@ -2249,8 +2296,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
       selectable: false
     });
     this.canvas.add(curve);
-
-    let p1 = this.createBezierControlPoints(
+    const p1 = this.createBezierControlPoints(
       defaultP1TopCoordinate, defaultP1LeftCoordinate);
     p1.name = 'p1';
     p1.set({
@@ -2260,23 +2306,23 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
     });
     this.canvas.add(p1);
 
-    let p0 = this.createBezierControlPoints(
+    const p0 = this.createBezierControlPoints(
       defaultP0TopCoordinate, defaultP0LeftCoordinate);
     p0.name = 'p0';
     this.canvas.add(p0);
 
-    var p2 = this.createBezierControlPoints(
+    const p2 = this.createBezierControlPoints(
       defaultP2TopCoordinate, defaultP2LeftCoordinate);
     p2.name = 'p2';
     this.canvas.add(p2);
-  };
+  }
 
-  createBezierControlPoints(left, top): typeof fabric.Circle {
+  private createBezierControlPoints(left: number, top: number): fabric.Circle {
     // This function is used to add the control points for the quadratic
     // bezier curve which is used to control the position of the curve.
     // A size 2 is added so that the control circles is not rendered
     // too small.
-    let circle = new fabric.Circle({
+    var circle = new fabric.Circle({
       left: left,
       top: top,
       radius: this.getSize() + 2,
@@ -2286,7 +2332,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
       hasControls: false
     });
     return circle;
-  };
+  }
 
   saveUploadedFile(): void {
     this.alertsService.clearWarnings();

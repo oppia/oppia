@@ -3565,7 +3565,7 @@ tags: []
 title: Title
 """)
 
-    _LATEST_YAML_CONTENT = YAML_CONTENT_V51 = (
+    YAML_CONTENT_V51 = (
         """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
@@ -4082,7 +4082,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-2: 41
+states_schema_version: 41
 tags: []
 title: Title
 """)

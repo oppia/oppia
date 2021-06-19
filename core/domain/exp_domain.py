@@ -32,6 +32,7 @@ import string
 
 from constants import constants
 from core.domain import change_domain
+from core.domain import html_validation_service
 from core.domain import param_domain
 from core.domain import state_domain
 from core.platform import models
@@ -1846,9 +1847,9 @@ class Exploration(python_utils.OBJECT):
 
     @classmethod
     def _convert_states_v45_dict_to_v46_dict(cls, states_dict):
-        """Converts from version 45 to 46. Version 46 ensures that all
+        """Converts from version 45 to 46. Version 46 ensure that all
         oppia-noninteractive-svgdiagram tags are converted into
-        oppia-noninteractive-image tags.
+        oppia-noninteractive-image tag.
 
         Args:
             states_dict: dict. A dict where each key-value pair represents,
@@ -1858,13 +1859,10 @@ class Exploration(python_utils.OBJECT):
         Returns:
             dict. The converted states_dict.
         """
-
-        for state_dict in states_dict.items():
-            state_dict[key] = state_domain.State.convert_html_fields_in_state(
+        for key, state_dict in states_dict.items():
+            states_dict[key] = state_domain.State.convert_html_fields_in_state(
                 state_dict,
-                html_validation_service.convert_svg_diagram_tags_to_image_tags,
-                state_uses_old_interaction_cust_args_schema=True,
-                state_uses_old_rule_template_schema=True)
+                html_validation_service.convert_svg_diagram_tags_to_image_tags)
         return states_dict
 
     @classmethod
@@ -1997,21 +1995,18 @@ class Exploration(python_utils.OBJECT):
 
         return exploration_dict
 
+    @classmethod
     def _convert_v50_dict_to_v51_dict(cls, exploration_dict):
         """Converts a v50 exploration dict into a v51 exploration dict.
-        Version 51 ensures that all oppia-noninteractive-svgdiagram tags are 
-        converted into oppia-noninteractive-image tags.
-
-
+        Version 51 ensure that all oppia-noninteractive-svgdiagram tags
+        are converted into oppia-noninteractive-image tag.
         Args:
             exploration_dict: dict. The dict representation of an exploration
                 with schema version v50.
-
         Returns:
             dict. The dict representation of the Exploration domain object,
             following schema version v51.
         """
-
         exploration_dict['schema_version'] = 51
 
         exploration_dict['states'] = cls._convert_states_v45_dict_to_v46_dict(
@@ -2075,7 +2070,7 @@ class Exploration(python_utils.OBJECT):
             exploration_dict = cls._convert_v49_dict_to_v50_dict(
                 exploration_dict)
             exploration_schema_version = 50
-        
+
         if exploration_schema_version == 50:
             exploration_dict = cls._convert_v50_dict_to_v51_dict(
                 exploration_dict)
