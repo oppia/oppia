@@ -222,9 +222,9 @@ describe('TopNavigationBarComponent', () => {
     ' window is larger', () => {
     let donateElement = 'I18N_TOPNAV_DONATE';
     spyOn(wds, 'getWidth').and.returnValue(700);
-    component.currentWindowWidth = 600;
     component.ngOnInit();
 
+    component.currentWindowWidth = 600;
     component.navElementsVisibilityStatus[donateElement] = false;
 
     window.dispatchEvent(new Event('resize'));
