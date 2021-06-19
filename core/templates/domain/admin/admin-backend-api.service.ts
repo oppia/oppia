@@ -44,7 +44,7 @@ interface RoleToActionsBackendResponse {
 }
 
 export interface ConfigPropertiesBackendResponse {
-  [property: string]: ConfigProperty;
+  [key: string]: ConfigProperty;
 }
 
 interface ViewContributionBackendResponse {

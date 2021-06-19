@@ -25,6 +25,7 @@ import { TopicSummary } from 'domain/topic/topic-summary.model';
 import { PlatformParameterFilterType } from 'domain/platform_feature/platform-parameter-filter.model';
 import { FeatureStage, PlatformParameter } from 'domain/platform_feature/platform-parameter.model';
 import { CsrfTokenService } from 'services/csrf-token.service';
+import { Schema } from 'services/schema-default-value.service';
 
 describe('Admin backend api service', () => {
   let abas: AdminBackendApiService;
@@ -62,7 +63,7 @@ describe('Admin backend api service', () => {
       oppia_csrf_secret: {
         schema: {
           type: 'unicode'
-        },
+        } as Schema,
         value: '3WHOWnD3sy0r1wukJ2lX4vBS_YA=',
         description: 'Text used to encrypt CSRF tokens.'
       }
