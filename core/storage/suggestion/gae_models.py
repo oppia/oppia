@@ -804,3 +804,137 @@ class CommunityContributionStatsModel(base_models.BaseModel):
             'question_suggestion_count':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
+
+
+class TranslationContributionStatsModel(base_models.BaseModel):
+    """Records the contributor dashboard translation contribution stats. There
+    is one instance of this model per (language_code, contributor_user_id,
+    topic_id) tuple. See related design doc for more details:
+    https://docs.google.com/document/d/1JEDiy-f1vnBLwibu8hsfuo3JObBWiaFvDTTU9L18zpY/edit#
+    """
+    # The ISO 639-1 language code for which the translation contributions were
+    # made.
+    language_code = datastore_services.StringProperty(
+        required=True, indexed=True)
+    # The user ID of the translation contributor.
+    contributor_user_id = datastore_services.StringProperty(
+        required=True, indexed=True)
+    # The topic ID of the translation contribution.
+    topic_id = datastore_services.StringProperty(required=True, indexed=True)
+    # The number of submitted translations.
+    submitted_translations_count = datastore_services.IntegerProperty(
+        required=True, indexed=True)
+    # The total word count of submitted translations. Excludes HTML tags and
+    # attributes.
+    submitted_translation_word_count = datastore_services.IntegerProperty(
+        required=True, indexed=True)
+    # The number of accepted translations.
+    accepted_translations_count = datastore_services.IntegerProperty(
+        required=True, indexed=True)
+    # The number of accepted translations without reviewer edits.
+    accepted_translations_without_reviewer_edits_count = (
+        datastore_services.IntegerProperty(required=True, indexed=True))
+    # The total word count of accepted translations. Excludes HTML tags and
+    # attributes.
+    accepted_translation_word_count = datastore_services.IntegerProperty(
+        required=True, indexed=True)
+    # The unique last_updated dates of the translation suggestions.
+    contribution_dates = datastore_services.DateProperty(
+        required=True, indexed=True, repeated=True)
+
+    @classmethod
+    def get(cls, language_code, contributor_user_id, topic_id):
+        """Gets all TranslationContributionStatsModels matching the supplied
+        language_code, contributor_user_id, topic_id.
+
+        Returns:
+            list(TranslationContributionStatsModel). List of
+            TranslationContributionStatsModel(s).
+        """
+        return (
+            cls.get_all()
+            .filter(cls.language_code == language_code)
+            .filter(cls.contributor_user_id == contributor_user_id)
+            .filter(cls.topic_id == topic_id)
+            .fetch(feconf.DEFAULT_QUERY_LIMIT))
+
+    @classmethod
+    def get_deletion_policy(cls):
+        """Model contains corresponding to a user: contributor_user_id."""
+        return base_models.DELETION_POLICY.DELETE
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model is exported as multiple instances per user since there are
+        multiple languages and topics relevant to a user.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
+
+    @classmethod
+    def get_export_policy(cls):
+        """Model contains data to export corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'language_code':
+                base_models.EXPORT_POLICY.EXPORTED,
+            # User ID is not exported in order to keep internal ids private.
+            'contributor_user_id':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'topic_id':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'submitted_translations_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'submitted_translation_word_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'accepted_translations_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'accepted_translations_without_reviewer_edits_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'accepted_translation_word_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'contribution_dates':
+                base_models.EXPORT_POLICY.EXPORTED
+        })
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id):
+        """Delete instances of TranslationContributionStatsModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        datastore_services.delete_multi(
+            cls.query(cls.contributor_user_id == user_id).fetch(keys_only=True))
+
+    @classmethod
+    def export_data(cls, user_id):
+        """Exports the data from TranslationContributionStatsModel into dict
+        format for Takeout.
+
+        Args:
+            user_id: str. The ID of the user whose data should be exported.
+
+        Returns:
+            dict. Dictionary of the data from TranslationContributionStatsModel.
+        """
+        user_data = dict()
+        models = (
+            cls.get_all()
+            .filter(cls.contributor_user_id == user_id).fetch())
+        for model in models:
+            user_data[model.id] = {
+                'language_code': model.language_code,
+                'topic_id': model.topic_id,
+                'target_id': model.target_id,
+                'submitted_translations_count': (
+                    model.submitted_translations_count),
+                'submitted_translation_word_count': (
+                    model.submitted_translation_word_count),
+                'accepted_translations_count': (
+                    model.accepted_translations_count),
+                'accepted_translations_without_reviewer_edits_count': (
+                    model.accepted_translations_without_reviewer_edits_count),
+                'accepted_translation_word_count': (
+                    model.accepted_translation_word_count),
+                'contribution_dates': model.contribution_dates
+            }
+        return user_data
