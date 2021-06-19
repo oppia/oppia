@@ -154,7 +154,8 @@ ONE_OFF_JOB_MANAGERS = [
     user_jobs_one_off.UserRolesPopulationOneOffJob,
     user_jobs_one_off.DeleteNonExistentExpUserDataOneOffJob,
     user_jobs_one_off.DeleteNonExistentExpsFromUserModelsOneOffJob,
-    user_jobs_one_off.DeleteNonExistentExpUserContributionsOneOffJob
+    user_jobs_one_off.DeleteNonExistentExpUserContributionsOneOffJob,
+    user_jobs_one_off.PopulateStoriesAndTopicsOneOffJob # pylint: disable=line-too-long
 ]
 
 # List of all manager classes for prod validation one-off batch jobs for which
@@ -166,6 +167,9 @@ AUDIT_JOB_MANAGERS = [
     prod_validation_jobs_one_off.AppFeedbackReportStatsModelAuditOneOffJob,
     prod_validation_jobs_one_off.BeamJobRunModelAuditOneOffJob,
     prod_validation_jobs_one_off.BeamJobRunResultModelAuditOneOffJob,
+    prod_validation_jobs_one_off.BlogPostModelAuditOneOffJob,
+    prod_validation_jobs_one_off.BlogPostSummaryModelAuditOneOffJob,
+    prod_validation_jobs_one_off.BlogPostRightsModelAuditOneOffJob,
     prod_validation_jobs_one_off.BulkEmailModelAuditOneOffJob,
     prod_validation_jobs_one_off.ClassifierTrainingJobModelAuditOneOffJob,
     prod_validation_jobs_one_off.CollectionCommitLogEntryModelAuditOneOffJob,
