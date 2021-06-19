@@ -29,7 +29,7 @@ class LearnerProgressUnitTests(test_utils.GenericTestBase):
     def test_initialization(self):
         """Tests init method."""
         user_learner_progress = (learner_progress_domain.LearnerProgress(
-            [], [], [], [], [], [], [], [], [], [], [], [], []))
+            [], [], [], [], [], [], [], [], [], [], [], [], [], [], []))
 
         self.assertEqual(
             user_learner_progress.incomplete_exp_summaries, [])
@@ -50,6 +50,10 @@ class LearnerProgressUnitTests(test_utils.GenericTestBase):
             user_learner_progress.exploration_playlist_summaries, [])
         self.assertEqual(
             user_learner_progress.collection_playlist_summaries, [])
+        self.assertEqual(
+            user_learner_progress.all_topic_summaries, [])
+        self.assertEqual(
+            user_learner_progress.new_topic_summaries, [])
 
 
 class ActivityIdsInLearnerDashboardUnitTests(test_utils.GenericTestBase):
