@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for TopNavigationBarComponent.
  */
 
-import { of } from 'rxjs';
+import { fromEvent, of } from 'rxjs';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed, tick, waitForAsync } from '@angular/core/testing';
@@ -61,7 +61,7 @@ class MockWindowRef {
   }
 }
 
-describe('TopNavigationBarComponent', () => {
+fdescribe('TopNavigationBarComponent', () => {
   let fixture: ComponentFixture<TopNavigationBarComponent>;
   let component: TopNavigationBarComponent;
   let windowRef: MockWindowRef;
@@ -117,13 +117,13 @@ describe('TopNavigationBarComponent', () => {
           provide: WindowDimensionsService,
           useValue: {
             getWidth: () => 700,
-            getResizeEvent: () => of(resizeEvent),
+            getResizeEvent: () => fromEvent(window, 'resize'),
             isWindowNarrow: () => true
           }
         }
       ],
       schemas: [NO_ERRORS_SCHEMA]
-    });
+    }).compileComponents();
   }));
 
   beforeEach(() => {
@@ -224,10 +224,13 @@ describe('TopNavigationBarComponent', () => {
     let donateElement = 'I18N_TOPNAV_DONATE';
     spyOn(wds, 'getWidth').and.returnValue(700);
     component.currentWindowWidth = 600;
-
     component.ngOnInit();
 
     component.navElementsVisibilityStatus[donateElement] = false;
+
+    window.dispatchEvent(resizeEvent);
+
+    component.navElementsVisibilityStatus[donateElement] = true;
 
     component.ngOnDestroy();
   });
