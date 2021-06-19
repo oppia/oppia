@@ -129,4 +129,8 @@ describe('Create new topic modal', function() {
         TopicEditorStateService.updateExistenceOfTopicName
       ).not.toHaveBeenCalled();
     });
+
+  it ('should update View when thumbnail has been uploaded', function() {
+    $scope.updateView();
+  });
 });
