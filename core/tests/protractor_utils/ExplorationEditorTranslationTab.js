@@ -538,7 +538,7 @@ var ExplorationEditorTranslationTab = function() {
   this.expectFeedbackTabToBeActive = function() {
     expect(
       element(by.css('.protractor-test-translation-feedback-tab'))[0]
-    ).toEqual(element(by.css('.oppia-active-translation-tab'))[0]);
+    ).toEqual(element(by.css('.protractor-test-active-translation-tab'))[0]);
   };
 
   this.moveToState = async function(targetName) {

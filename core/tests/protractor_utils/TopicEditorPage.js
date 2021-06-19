@@ -221,7 +221,7 @@ var TopicEditorPage = function() {
       '.protractor-test-edit-subtopic-page-contents'));
     await waitFor.visibilityOf(
       pageEditor, 'Subtopic html editor takes too long to appear');
-    var pageEditorInput = pageEditor.element(by.css('.oppia-rte'));
+    var pageEditorInput = pageEditor.element(by.css('.protractor-test-rte'));
     await pageEditorInput.click();
     await pageEditorInput.clear();
     await pageEditorInput.sendKeys(content);

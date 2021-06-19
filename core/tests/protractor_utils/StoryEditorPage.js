@@ -82,7 +82,7 @@ var StoryEditorPage = function() {
     by.css('.protractor-test-add-chapter-description'));
   var nodeOutlineEditor = element(
     by.css('.protractor-test-add-chapter-outline'));
-  var nodeOutlineEditorRteContent = element.all(by.css('.oppia-rte'));
+  var nodeOutlineEditorRteContent = element.all(by.css('.protractor-test-rte'));
   var nodeOutlineFinalizeCheckbox = element(
     by.css('.protractor-test-finalize-outline'));
   var nodeOutlineSaveButton = element(
