@@ -1978,7 +1978,7 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_SOLICIT_ANSWER_DETAILS):
                     if old_state_name in changed_properties:
-                        if (frontend_version_exploration.states[old_state_name].interaction.id ==
+                        if (frontend_version_exploration.states[old_state_name].interaction.id == # pylint: disable=line-too-long
                                 backend_version_exploration.states[new_state_name].interaction.id and # pylint: disable=line-too-long
                                 frontend_version_exploration.states[old_state_name].solicit_answer_details == # pylint: disable=line-too-long
                                 backend_version_exploration.states[new_state_name].solicit_answer_details): # pylint: disable=line-too-long
