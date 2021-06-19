@@ -61,10 +61,11 @@ class MockWindowRef {
   }
 }
 
-describe('TopNavigationBarComponent', () => {
+fdescribe('TopNavigationBarComponent', () => {
   let fixture: ComponentFixture<TopNavigationBarComponent>;
   let component: TopNavigationBarComponent;
-  let windowRef: MockWindowRef;
+  let mockWindowRef: MockWindowRef;
+  let windowRef: WindowRef;
   let cbas: ClassroomBackendApiService;
   let searchService: SearchService;
   let wds: WindowDimensionsService;
@@ -96,7 +97,8 @@ describe('TopNavigationBarComponent', () => {
   };
 
   beforeEach(waitForAsync(() => {
-    windowRef = new MockWindowRef();
+    mockWindowRef = new MockWindowRef();
+    windowRef = new WindowRef();
     TestBed.configureTestingModule({
       imports: [
         HttpClientTestingModule
@@ -110,13 +112,13 @@ describe('TopNavigationBarComponent', () => {
         UserService,
         {
           provide: WindowRef,
-          useValue: windowRef
+          useValue: mockWindowRef
         },
         {
           provide: WindowDimensionsService,
           useValue: {
             getWidth: () => 700,
-            getResizeEvent: () => fromEvent(window, 'resize'),
+            getResizeEvent: () => fromEvent(windowRef.nativeWindow, 'resize'),
             isWindowNarrow: () => true
           }
         }
@@ -227,7 +229,7 @@ describe('TopNavigationBarComponent', () => {
     component.currentWindowWidth = 600;
     component.navElementsVisibilityStatus[donateElement] = false;
 
-    window.dispatchEvent(new Event('resize'));
+    windowRef.nativeWindow.dispatchEvent(new Event('resize'));
 
     component.navElementsVisibilityStatus[donateElement] = true;
 
@@ -257,26 +259,26 @@ describe('TopNavigationBarComponent', () => {
     ' clicks on \'Sign In\'', fakeAsync((done) => {
     spyOn(userService, 'getLoginUrlAsync').and.resolveTo('/login/url');
 
-    expect(windowRef.nativeWindow.location.href).toBe('');
+    expect(mockWindowRef.nativeWindow.location.href).toBe('');
 
     component.onLoginButtonClicked();
     flushMicrotasks();
     tick(151);
 
-    expect(windowRef.nativeWindow.location.href).toBe('/login/url');
+    expect(mockWindowRef.nativeWindow.location.href).toBe('/login/url');
   }));
 
   it('should reload window if fetched login URL is null', fakeAsync(() => {
     spyOn(userService, 'getLoginUrlAsync').and.resolveTo('');
-    spyOn(windowRef.nativeWindow.location, 'reload');
+    spyOn(mockWindowRef.nativeWindow.location, 'reload');
 
-    expect(windowRef.nativeWindow.location.href).toBe('');
+    expect(mockWindowRef.nativeWindow.location.href).toBe('');
 
     component.onLoginButtonClicked();
     flushMicrotasks();
     tick(151);
 
-    expect(windowRef.nativeWindow.location.reload).toHaveBeenCalled();
+    expect(mockWindowRef.nativeWindow.location.reload).toHaveBeenCalled();
   }));
 
   it('should register start login event when user is being redirected to' +
@@ -293,14 +295,14 @@ describe('TopNavigationBarComponent', () => {
   }));
 
   it('should clear last uploaded audio language on logout', () => {
-    spyOn(windowRef.nativeWindow.localStorage, 'removeItem');
+    spyOn(mockWindowRef.nativeWindow.localStorage, 'removeItem');
 
-    expect(windowRef.nativeWindow.localStorage.last_uploaded_audio_lang)
+    expect(mockWindowRef.nativeWindow.localStorage.last_uploaded_audio_lang)
       .toBe('en');
 
     component.onLogoutButtonClicked();
 
-    expect(windowRef.nativeWindow.localStorage.removeItem).toHaveBeenCalledWith(
+    expect(mockWindowRef.nativeWindow.localStorage.removeItem).toHaveBeenCalledWith(
       'last_uploaded_audio_lang');
   });
 
@@ -361,13 +363,13 @@ describe('TopNavigationBarComponent', () => {
 
   it('should navigate to classroom page when user clicks' +
     ' on \'Basic Mathematics\'', fakeAsync(() => {
-    expect(windowRef.nativeWindow.location.href).toBe('');
+    expect(mockWindowRef.nativeWindow.location.href).toBe('');
 
     component.navigateToClassroomPage('/classroom/url');
     tick(151);
     flushMicrotasks();
 
-    expect(windowRef.nativeWindow.location.href).toBe('/classroom/url');
+    expect(mockWindowRef.nativeWindow.location.href).toBe('/classroom/url');
   }));
 
   it('should registers classroom header click event when user clicks' +
