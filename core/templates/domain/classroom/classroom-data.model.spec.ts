@@ -18,8 +18,8 @@
 
 import { ClassroomData} from
   'domain/classroom/classroom-data.model';
-import { TopicSummary } from
-  'domain/topic/topic-summary.model';
+import { CreatorTopicSummary } from
+  'domain/topic/creator-topic-summary.model';
 
 describe('Classroom data model', () => {
   let topicSummaryDicts;
@@ -46,6 +46,6 @@ describe('Classroom data model', () => {
     expect(classroomData.getCourseDetails()).toEqual('Course Details');
     expect(classroomData.getTopicListIntro()).toEqual('Topics Covered');
     expect(classroomData.getTopicSummaries()[0]).toEqual(
-      TopicSummary.createFromBackendDict(topicSummaryDicts[0]));
+      CreatorTopicSummary.createFromBackendDict(topicSummaryDicts[0]));
   });
 });
