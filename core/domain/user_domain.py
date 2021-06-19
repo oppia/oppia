@@ -806,7 +806,7 @@ class LearnerGoals(python_utils.OBJECT):
         self.topic_ids_to_learn = topic_ids_to_learn
 
     def add_topic_id_to_learn(self, topic_id):
-        """Adds the topic id to learn list.
+        """Adds the topic id to topic IDs to learn list.
 
         Args:
             topic_id: str. The topic id to be inserted to the learn

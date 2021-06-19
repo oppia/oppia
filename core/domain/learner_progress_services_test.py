@@ -1732,6 +1732,33 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             partially_learnt_topic_summaries[0].id, self.TOPIC_ID_0)
         self.assertEqual(len(partially_learnt_topic_summaries), 1)
 
+    def test_removes_a_topic_from_topics_to_learn_list_when_topic_is_learnt(
+            self):
+        self.assertEqual(
+            learner_goals_services.get_all_topic_ids_to_learn(
+                self.user_id), [])
+        learner_progress_services.add_topic_to_learn(
+            self.user_id, self.TOPIC_ID_0)
+        self.assertEqual(
+            learner_goals_services.get_all_topic_ids_to_learn(
+                self.user_id), [self.TOPIC_ID_0])
+
+        # Complete the story in TOPIC_ID_0.
+        story_services.record_completed_node_in_story_context(
+            self.user_id, self.STORY_ID_0, 'node_1')
+        learner_progress_services.mark_story_as_completed(
+            self.user_id, self.STORY_ID_0)
+
+        # Call get_activity_progress to get filtered progress.
+        user_activity = learner_progress_services.get_activity_progress(
+            self.user_id)
+        all_filtered_summaries = user_activity[0]
+        topics_to_learn = (
+            all_filtered_summaries.topics_to_learn_summaries)
+
+        # Test that topics to learn doesn't include completed topic.
+        self.assertEqual(len(topics_to_learn), 0)
+
     def test_unpublishing_topic_filters_it_out_from_topics_to_learn(self):
         # Add topics to learn section of the learner goals.
         learner_progress_services.add_topic_to_learn(
