@@ -186,7 +186,7 @@ PERIOD_TO_MARK_MODELS_AS_DELETED = datetime.timedelta(weeks=4)
 MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT = 10
 
 # The maximum number of goals allowed in the learner goals of the learner.
-MAX_CURRENT_GOALS_COUNT = 10
+MAX_CURRENT_GOALS_COUNT = 5
 
 # The minimum number of training samples required for training a classifier.
 MIN_TOTAL_TRAINING_EXAMPLES = 50
