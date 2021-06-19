@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for TopNavigationBarComponent.
  */
 
-import { fromEvent, of } from 'rxjs';
+import { fromEvent } from 'rxjs';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed, tick, waitForAsync } from '@angular/core/testing';
@@ -61,7 +61,7 @@ class MockWindowRef {
   }
 }
 
-fdescribe('TopNavigationBarComponent', () => {
+describe('TopNavigationBarComponent', () => {
   let fixture: ComponentFixture<TopNavigationBarComponent>;
   let component: TopNavigationBarComponent;
   let windowRef: MockWindowRef;
