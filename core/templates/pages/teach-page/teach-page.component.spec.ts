@@ -102,7 +102,7 @@ describe('Teach Page', () => {
     () => {
       expect(component).toBeDefined();
     });
-  it('should get static image url', function() {
+  it('should get static image url', () => {
     expect(component.getStaticImageUrl('/path/to/image')).toBe(
       '/assets/images/path/to/image');
   });
@@ -145,7 +145,7 @@ describe('Teach Page', () => {
     expect(component.userIsLoggedIn).toBe(true);
   }));
 
-  it('should record analytics when Start Learning is clicked', function() {
+  it('should record analytics when Start Learning is clicked', () => {
     spyOn(
       siteAnalyticsServiceStub, 'registerClickStartLearningButtonEvent')
       .and.callThrough();
@@ -154,7 +154,7 @@ describe('Teach Page', () => {
       .toHaveBeenCalled();
   });
 
-  it('should record analytics when Visit Classroom is clicked', function() {
+  it('should record analytics when Visit Classroom is clicked', () => {
     spyOn(
       siteAnalyticsServiceStub, 'registerClickVisitClassroomButtonEvent')
       .and.callThrough();
@@ -163,8 +163,16 @@ describe('Teach Page', () => {
       .toHaveBeenCalled();
   });
 
+  it('should redirect to library page when Browse Library is clicked',
+    () => {
+      component.onClickBrowseLibraryButton();
+      expect(
+        component.windowRef.nativeWindow.location.href
+      ).toBe('/community-library');
+    }
+  );
 
-  it('should record analytics when Browse Library is clicked', function() {
+  it('should record analytics when Browse Library is clicked', () => {
     spyOn(
       siteAnalyticsServiceStub, 'registerClickBrowseLibraryButtonEvent')
       .and.callThrough();
@@ -173,7 +181,16 @@ describe('Teach Page', () => {
       .toHaveBeenCalled();
   });
 
-  it('should record analytics when Guide For Parents is clicked', function() {
+  it('should redirect to teach page when Guide For Parents is clicked',
+    () => {
+      component.onClickGuideParentsButton();
+      expect(
+        component.windowRef.nativeWindow.location.href
+      ).toBe('/teach');
+    }
+  );
+
+  it('should record analytics when Guide For Parents is clicked', () => {
     spyOn(
       siteAnalyticsServiceStub, 'registerClickGuideParentsButtonEvent')
       .and.callThrough();
@@ -182,7 +199,16 @@ describe('Teach Page', () => {
       .toHaveBeenCalled();
   });
 
-  it('should record analytics when Tips For Parents is clicked', function() {
+  it('should redirect to teach page when Tips For Parents is clicked',
+    () => {
+      component.onClickTipforParentsButton();
+      expect(
+        component.windowRef.nativeWindow.location.href
+      ).toBe('/teach');
+    }
+  );
+
+  it('should record analytics when Tips For Parents is clicked', () => {
     spyOn(
       siteAnalyticsServiceStub, 'registerClickTipforParentsButtonEvent')
       .and.callThrough();
@@ -191,7 +217,7 @@ describe('Teach Page', () => {
       .toHaveBeenCalled();
   });
 
-  it('should record analytics when Explore Lessons is clicked', function() {
+  it('should record analytics when Explore Lessons is clicked', () => {
     spyOn(
       siteAnalyticsServiceStub, 'registerClickExploreLessonsButtonEvent')
       .and.callThrough();
@@ -200,7 +226,7 @@ describe('Teach Page', () => {
       .toHaveBeenCalled();
   });
 
-  it('should increment and decrement testimonial IDs correctly', function() {
+  it('should increment and decrement testimonial IDs correctly', () => {
     component.ngOnInit();
     expect(component.displayedTestimonialId).toBe(0);
     component.incrementDisplayedTestimonialId();
@@ -217,7 +243,7 @@ describe('Teach Page', () => {
     expect(component.displayedTestimonialId).toBe(1);
   });
 
-  it('should get testimonials correctly', function() {
+  it('should get testimonials correctly', () => {
     component.ngOnInit();
     expect(component.getTestimonials().length).toBe(component.testimonialCount);
   });

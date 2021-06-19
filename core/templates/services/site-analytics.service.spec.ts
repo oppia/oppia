@@ -21,9 +21,9 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 describe('Site Analytics Service', () => {
-  let sas = null;
-  let ws = null;
-  let gtagSpy: jasmine.Spy = null;
+  let sas: SiteAnalyticsService;
+  let ws: WindowRef;
+  let gtagSpy: jasmine.Spy;
 
   beforeEach(() => {
     sas = TestBed.get(SiteAnalyticsService);

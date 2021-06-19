@@ -25,7 +25,11 @@ export class TruncateAndCapitalizePipe implements PipeTransform {
     if (!input) {
       return input;
     }
-    let words = input.trim().match(/\S+/g);
+    // The following regexp match will only return 'null' on an empty input
+    // string, the empty string condition is already being checked above.
+    // Non-null assertion is used to make the TypeScript typing happy.
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    let words = input.trim().match(/\S+/g)!;
 
     // Capitalize the first word and add it to the result.
     let result = words[0].charAt(0).toUpperCase() + words[0].slice(1);
