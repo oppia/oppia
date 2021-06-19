@@ -47,6 +47,9 @@ class MockWindowRef {
     location: {
       pathname: '/search/find',
       href: '',
+      toString() {
+        return 'http://localhost/test_path'
+      }
     },
     history: {
       pushState(data, title: string, url?: string | null) {}
@@ -215,14 +218,20 @@ fdescribe('Search bar component', () => {
 
   it('should update selection details', () => {
     spyOn(translateService, 'instant').and.returnValue('key');
-    // component.selectionDetails = selectionDetails;
+    component.ngOnInit();
+    component.selectionDetails = selectionDetails;
     component.updateSelectionDetails('categories');
-    expect(component.selectionDetails.categories.numSelections).toEqual(3);
+  });
+
+  it('should update selection details when they are no selections', () => {
+    spyOn(translateService, 'instant').and.returnValue('key');
+    component.ngOnInit();
+    component.updateSelectionDetails('categories');
+    expect(component.selectionDetails.categories.numSelections).toEqual(0);
   });
 
   it('should update selection details', () => {
     spyOn(translateService, 'instant').and.returnValue('key');
-    // component.selectionDetails = selectionDetails;
     component.updateSelectionDetails('languageCodes');
     expect(component.selectionDetails.languageCodes.description).toEqual(
       'I18N_LIBRARY_ALL_LANGUAGES_SELECTED');
@@ -231,7 +240,6 @@ fdescribe('Search bar component', () => {
   it('should toggle selection', () => {
     spyOn(component, 'updateSelectionDetails');
     spyOn(component, 'onSearchQueryChangeExec');
-    // component.selectionDetails = selectionDetails;
     component.toggleSelection('categories', 'id_1');
     expect(component.updateSelectionDetails).toHaveBeenCalled();
     expect(component.onSearchQueryChangeExec).toHaveBeenCalled();
@@ -240,7 +248,6 @@ fdescribe('Search bar component', () => {
   it('should deselectAll', () => {
     spyOn(component, 'updateSelectionDetails');
     spyOn(component, 'onSearchQueryChangeExec');
-    // component.selectionDetails = selectionDetails;
     component.deselectAll('categories');
     expect(component.selectionDetails.categories.selections).toEqual({});
     expect(component.updateSelectionDetails).toHaveBeenCalled();
@@ -258,7 +265,6 @@ fdescribe('Search bar component', () => {
       'search_query');
     spyOn(windowRef.nativeWindow.history, 'pushState');
     windowRef.nativeWindow.location = new URL('http://localhost/search/find');
-    // component.selectionDetails = selectionDetails;
 
     component.onSearchQueryChangeExec();
 
@@ -274,7 +280,6 @@ fdescribe('Search bar component', () => {
     spyOn(component, 'onSearchQueryChangeExec');
     spyOn(searchService, 'updateSearchFieldsBasedOnUrlQuery')
       .and.returnValue('test_query');
-    // component.selectionDetails = selectionDetails;
     component.updateSearchFieldsBasedOnUrlQuery();
     expect(component.updateSelectionDetails).toHaveBeenCalled();
     expect(component.onSearchQueryChangeExec).toHaveBeenCalled();
@@ -283,7 +288,6 @@ fdescribe('Search bar component', () => {
   it('should refresh search bar labels', () => {
     let testLabel = 'test_label';
     spyOn(translateService, 'instant').and.returnValue(testLabel);
-    // component.selectionDetails = selectionDetails;
     component.refreshSearchBarLabels();
     expect(component.searchBarPlaceholder).toEqual(testLabel);
     expect(component.categoryButtonText).toEqual(testLabel);
@@ -318,7 +322,6 @@ fdescribe('Search bar component', () => {
         return null;
       });
     spyOn(urlService, 'getUrlParams').and.returnValue({ q: '' });
-    // component.selectionDetails = selectionDetails;
     component.ngOnInit();
     component.searchQueryChanged.next();
   });

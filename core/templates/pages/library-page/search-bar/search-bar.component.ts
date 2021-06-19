@@ -79,7 +79,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   SUPPORTED_CONTENT_LANGUAGES: LanguageIdAndText[];
   selectionDetails: SelectionDetails;
   translationData = {};
-  activeMenuName: string='';
+  activeMenuName: string = '';
   searchBarPlaceholder: string;
   categoryButtonText: string;
   languageButtonText: string;
@@ -132,7 +132,6 @@ export class SearchBarComponent implements OnInit, OnDestroy {
    * @example
    *  onMenuKeypress($event, 'category', {enter: 'open'})
    */
-
   onMenuKeypress(
       evt: KeyboardEvent,
       menuName: string,
@@ -146,6 +145,10 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   updateSelectionDetails(itemsType: string): void {
     let itemsName = this.selectionDetails[itemsType].itemsName;
     let masterList = this.selectionDetails[itemsType].masterList;
+
+    console.log(masterList);
+    console.log(this.selectionDetails);
+    alert();
 
     let selectedItems = [];
     for (let i = 0; i < masterList.length; i++) {
