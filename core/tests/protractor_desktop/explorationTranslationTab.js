@@ -22,11 +22,11 @@ var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
+var AdminPage = require('../protractor_utils/AdminPage.js');
 var CreatorDashboardPage = require(
   '../protractor_utils/CreatorDashboardPage.js');
 var ExplorationEditorPage = require(
   '../protractor_utils/ExplorationEditorPage.js');
-var AdminPage = require('../protractor_utils/AdminPage.js');
 
 describe('Exploration translation and voiceover tab', function() {
   var adminPage = null;

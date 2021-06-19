@@ -580,7 +580,7 @@ def check_can_manage_voice_artist_in_activity(user, activity_rights):
     """
     if activity_rights is None:
         return False
-    elif (role_services.ACTION_CAN_ASSIGN_VOICE_ARTIST in user.actions and (
+    elif (role_services.ACTION_CAN_MANAGE_VOICE_ARTIST in user.actions and (
             activity_rights.community_owned or activity_rights.is_published())):
         return True
     else:

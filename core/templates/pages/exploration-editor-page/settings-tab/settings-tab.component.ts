@@ -604,7 +604,7 @@ angular.module('oppia').component('settingsTab', {
         ctrl.canModifyRoles = false;
         ctrl.canReleaseOwnership = false;
         ctrl.canUnpublish = false;
-        ctrl.canAssignVoiceArtist = false;
+        ctrl.canManageVoiceArtist = false;
         ctrl.explorationId = ExplorationDataService.explorationId;
         ctrl.loggedInUser = null;
         UserService.getUserInfoAsync().then(function(userInfo) {
@@ -617,7 +617,7 @@ angular.module('oppia').component('settingsTab', {
             ctrl.canModifyRoles = permissions.canModifyRoles;
             ctrl.canReleaseOwnership = permissions.canReleaseOwnership;
             ctrl.canUnpublish = permissions.canUnpublish;
-            ctrl.canAssignVoiceArtist = permissions.canAssignVoiceArtist;
+            ctrl.canManageVoiceArtist = permissions.canManageVoiceArtist;
           });
 
         ctrl.explorationTitleService = ExplorationTitleService;

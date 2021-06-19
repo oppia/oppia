@@ -42,6 +42,6 @@ describe('Exploration permissions model', () => {
     expect(permissionsObject.canDelete).toEqual(false);
     expect(permissionsObject.canModifyRoles).toEqual(true);
     expect(permissionsObject.canEdit).toEqual(true);
-    expect(permissionsObject.canAssignVoiceArtist).toEqual(true);
+    expect(permissionsObject.canManageVoiceArtist).toEqual(true);
   });
 });
