@@ -1,4 +1,3 @@
-/* eslint-disable oppia/no-test-blockers */
 // Copyright 2017 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,7 +24,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ObjectsDomainConstants } from 'domain/objects/objects-domain.constants';
 
-fdescribe('InteractiveFractionInputComponent', () => {
+describe('InteractiveFractionInputComponent', () => {
   let component: InteractiveFractionInputComponent;
   let fixture: ComponentFixture<InteractiveFractionInputComponent>;
   let currentInteractionService: CurrentInteractionService;
