@@ -95,22 +95,18 @@ describe('UnicodeStringEditorComponent', () => {
     component.active = true;
     component.ngOnInit();
     spyOn(component, 'closeEditor').and.callThrough();
-    spyOn(component, 'replaceValue').and.callThrough();
     // After execution of component.ngOnInit();, component.active is set to
     // false. To test the subscribed observable, it needs to be set to true
-    // to make the code inside the run.
+    // to run the closeEditor function.
     component.active = true;
 
     // Pre-check.
     expect(component.active).toBe(true);
-    expect(component.value).toBe('random value');
 
     externalSaveEventEmitter.emit();
 
     // The this.value cannot be tested for changes since it set before the
     // emit and will reamin the same after the emit.
-    expect(component.replaceValue).toHaveBeenCalledWith('random value');
-    expect(component.value).toBe('random value');
     expect(component.closeEditor).toHaveBeenCalled();
     expect(component.active).toBe(false);
   });
