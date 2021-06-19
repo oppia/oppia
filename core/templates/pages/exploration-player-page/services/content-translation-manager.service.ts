@@ -34,8 +34,6 @@ import { SubtitledHtml } from
 import { Schema } from 'services/schema-default-value.service';
 import { SchemaConstants } from
   'components/forms/schema-based-editors/schema.constants';
-import INTERACTION_SPECS from 'pages/interaction-specs.constants.ajs';
-  'components/forms/schema-based-editors/schema-constants';
 import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
 import { WrittenTranslations } from
   'domain/exploration/WrittenTranslationsObjectFactory';
