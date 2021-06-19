@@ -615,7 +615,7 @@ export class TopicObjectFactory {
     return new Topic(
       null, 'Topic name loading', 'Abbrev. name loading',
       'Url Fragment loading', 'Topic description loading', 'en',
-      [], [], [], 1, 1, [], '', '', {},
+      [], [], [], 1, 1, [], null, '', {},
       this.storyReferenceObjectFactory, false, '', ''
     );
   }

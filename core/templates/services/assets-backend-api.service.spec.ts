@@ -41,7 +41,7 @@ describe('Assets Backend API Service', () => {
 
     beforeEach(() => {
       TestBed.configureTestingModule({
-        imports: [HttpClientTestingModule],
+        imports: [HttpClientTestingModule]
       });
       assetsBackendApiService = TestBed.get(AssetsBackendApiService);
       csrfTokenService = TestBed.get(CsrfTokenService);
@@ -172,6 +172,27 @@ describe('Assets Backend API Service', () => {
         '/createhandler/imageupload/exploration/expid12345'
       ).flush(successMessage);
       flushMicrotasks();
+
+      expect(onSuccess).toHaveBeenCalledWith(successMessage);
+      expect(onFailure).not.toHaveBeenCalled();
+    }));
+
+    it('should successfully post a thumbnail to server', fakeAsync(() => {
+      const successMessage = 'Thumbnail SVG was successfully saved.';
+      const onSuccess = jasmine.createSpy('onSuccess');
+      const onFailure = jasmine.createSpy('onFailure');
+
+      assetsBackendApiService.postThumbnailFile(
+        new Blob(['abc']),
+        'filename.svg',
+        'entity_type',
+        'entity_id'
+      ).subscribe(onSuccess, onFailure);
+      flushMicrotasks();
+
+      httpTestingController.expectOne(
+        '/createhandler/imageupload/entity_type/entity_id'
+      ).flush(successMessage);
 
       expect(onSuccess).toHaveBeenCalledWith(successMessage);
       expect(onFailure).not.toHaveBeenCalled();

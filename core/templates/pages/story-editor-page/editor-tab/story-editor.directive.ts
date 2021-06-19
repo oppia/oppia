@@ -20,7 +20,7 @@ require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 require(
-  'components/forms/custom-forms-directives/thumbnail-uploader.directive.ts');
+  'components/forms/custom-forms-directives/thumbnail-uploader.component.ts');
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require('pages/story-editor-page/editor-tab/story-node-editor.directive.ts');
@@ -309,6 +309,7 @@ angular.module('oppia').directive('storyEditor', [
               StoryUpdateService.setThumbnailFilename(
                 $scope.story, newThumbnailFilename);
             }
+            $scope.$applyAsync();
           };
 
           $scope.updateStoryThumbnailBgColor = function(

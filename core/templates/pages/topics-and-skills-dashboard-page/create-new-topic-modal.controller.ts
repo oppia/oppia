@@ -53,6 +53,10 @@ angular.module('oppia').controller('CreateNewTopicModalController', [
         ImageLocalStorageService.getStoredImagesData().length > 0);
     };
 
+    $scope.updateView = function() {
+      $scope.$applyAsync();
+    };
+
     ContextService.setImageSaveDestinationToLocalStorage();
     $scope.newlyCreatedTopic = (
       NewlyCreatedTopic.createDefault());

@@ -19,7 +19,7 @@
 require(
   'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
 require(
-  'components/forms/custom-forms-directives/thumbnail-uploader.directive.ts');
+  'components/forms/custom-forms-directives/thumbnail-uploader.component.ts');
 require('domain/topic/topic-update.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('domain/topic/topic-creation-backend-api.service.ts');

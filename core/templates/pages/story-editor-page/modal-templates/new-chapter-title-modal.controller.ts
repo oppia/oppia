@@ -63,6 +63,7 @@ angular.module('oppia').controller('CreateNewChapterModalController', [
       StoryUpdateService.setStoryNodeThumbnailFilename(
         $scope.story, $scope.nodeId, newThumbnailFilename);
       $scope.editableThumbnailFilename = newThumbnailFilename;
+      $scope.$applyAsync();
     };
 
     $scope.updateThumbnailBgColor = function(newThumbnailBgColor) {

@@ -17,7 +17,7 @@
  */
 
 require(
-  'components/forms/custom-forms-directives/thumbnail-uploader.directive.ts');
+  'components/forms/custom-forms-directives/thumbnail-uploader.component.ts');
 import { SelectSkillModalComponent } from 'components/skill-selector/select-skill-modal.component';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 require(
@@ -201,6 +201,7 @@ angular.module('oppia').directive('storyNodeEditor', [
                 $scope.story, $scope.getId(), newThumbnailFilename);
               $scope.editableThumbnailFilename = newThumbnailFilename;
             }
+            $scope.$applyAsync();
           };
 
           $scope.updateThumbnailBgColor = function(newThumbnailBgColor) {

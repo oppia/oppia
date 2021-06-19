@@ -88,6 +88,7 @@ angular.module('oppia').controller('CreateNewSubtopicModalController', [
       ctrl.editableThumbnailBgColor = newThumbnailBgColor;
       TopicUpdateService.setSubtopicThumbnailBgColor(
         ctrl.topic, ctrl.subtopicId, newThumbnailBgColor);
+      $scope.$applyAsync();
     };
 
     ctrl.resetErrorMsg = function() {

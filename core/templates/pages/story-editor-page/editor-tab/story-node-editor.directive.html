@@ -66,17 +66,15 @@
           </div>
           <div class="story-node-thumbnail">
             <label class="form-heading">Thumbnail Image*</label>
-            <thumbnail-uploader filename="getThumbnailFilename()"
-                                update-filename="updateThumbnailFilename"
-                                bg-color="getThumbnailBgColor()"
-                                update-bg-color="updateThumbnailBgColor"
-                                allowed-bg-colors="allowedBgColors"
-                                aspect-ratio="'16:9'"
-                                preview-title="editableTitle"
-                                preview-description="editableDescription"
-                                preview-description-bg-color=""
-                                preview-footer="">
-            </thumbnail-uploader>
+            <oppia-thumbnail-uploader [filename]="getThumbnailFilename()"
+                                      (update-filename)="updateThumbnailFilename($event)"
+                                      [bg-color]="getThumbnailBgColor()"
+                                      (update-bg-color)="updateThumbnailBgColor($event)"
+                                      [allowed-bg-colors]="allowedBgColors"
+                                      [aspect-ratio]="'4:3'"
+                                      [preview-title]="editableTitle"
+                                      [preview-description]="editableDescription">
+            </oppia-thumbnail-uploader>
           </div>
         </div>
         <div ng-if="mainChapterCardIsShown">

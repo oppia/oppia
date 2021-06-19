@@ -16,7 +16,7 @@
  * @fileoverview Component for the subtopic editor tab directive.
  */
 require(
-  'components/forms/custom-forms-directives/thumbnail-uploader.directive.ts');
+  'components/forms/custom-forms-directives/thumbnail-uploader.component.ts');
 
 require('domain/topic/topic-update.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
