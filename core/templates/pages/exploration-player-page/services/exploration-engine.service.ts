@@ -492,7 +492,8 @@ export class ExplorationEngineService {
      }]);
      if (questionHtml === null) {
        this.answerIsBeingProcessed = false;
-       this.alertsService.addWarning('Question name should not be empty.');
+       // TODO(#13133) Remove all question related naming conventions.
+       this.alertsService.addWarning('Question content should not be empty.');
        return;
      }
 
