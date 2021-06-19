@@ -1747,8 +1747,8 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
     Args:
         exp_id: str. The id of the exploration where the change_list is to
             be applied.
-        frontend_version: int. Version of an exploration from frontend on which a user
-            is working.
+        frontend_version: int. Version of an exploration from frontend on
+            which a user is working.
         change_list: list(ExplorationChange). List of the changes made by the
             user on the frontend, which needs to be checked for mergeability.
 
