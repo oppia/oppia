@@ -492,7 +492,7 @@ export class ExplorationEngineService {
      }]);
      if (questionHtml === null) {
        this.answerIsBeingProcessed = false;
-       // TODO(#13133) Remove all question related naming conventions.
+       // TODO(#13133): Remove all question related naming conventions.
        this.alertsService.addWarning('Question content should not be empty.');
        return;
      }
