@@ -402,7 +402,7 @@ class CompletedActivitiesModel(base_models.BaseModel):
             'collection_ids': base_models.EXPORT_POLICY.EXPORTED,
             'story_ids': base_models.EXPORT_POLICY.EXPORTED,
             'learnt_topic_ids': base_models.EXPORT_POLICY.EXPORTED,
-            'mastered_topic_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'mastered_topic_ids': base_models.EXPORT_POLICY.EXPORTED
         })
 
     @classmethod
@@ -450,7 +450,8 @@ class CompletedActivitiesModel(base_models.BaseModel):
             'exploration_ids': user_model.exploration_ids,
             'collection_ids': user_model.collection_ids,
             'story_ids': user_model.story_ids,
-            'learnt_topic_ids': user_model.learnt_topic_ids
+            'learnt_topic_ids': user_model.learnt_topic_ids,
+            'mastered_topic_ids': user_model.mastered_topic_ids
         }
 
 
@@ -498,7 +499,7 @@ class IncompleteActivitiesModel(base_models.BaseModel):
             'story_ids': base_models.EXPORT_POLICY.EXPORTED,
             'partially_learnt_topic_ids': base_models.EXPORT_POLICY.EXPORTED,
             'partially_mastered_topic_ids': (
-                base_models.EXPORT_POLICY.NOT_APPLICABLE)
+                base_models.EXPORT_POLICY.EXPORTED)
         })
 
     @classmethod
@@ -545,7 +546,10 @@ class IncompleteActivitiesModel(base_models.BaseModel):
             'exploration_ids': user_model.exploration_ids,
             'collection_ids': user_model.collection_ids,
             'story_ids': user_model.story_ids,
-            'partially_learnt_topic_ids': user_model.partially_learnt_topic_ids
+            'partially_learnt_topic_ids': (
+                user_model.partially_learnt_topic_ids),
+            'partially_mastered_topic_ids': (
+                user_model.partially_mastered_topic_ids)
         }
 
 
@@ -717,7 +721,7 @@ class LearnerGoalsModel(base_models.BaseModel):
         """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'topic_ids_to_learn': base_models.EXPORT_POLICY.EXPORTED,
-            'topic_ids_to_master': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'topic_ids_to_master': base_models.EXPORT_POLICY.EXPORTED
         })
 
     @classmethod
@@ -759,7 +763,8 @@ class LearnerGoalsModel(base_models.BaseModel):
             return {}
 
         return {
-            'topic_ids_to_learn': user_model.topic_ids_to_learn
+            'topic_ids_to_learn': user_model.topic_ids_to_learn,
+            'topic_ids_to_master': user_model.topic_ids_to_master
         }
 
 
