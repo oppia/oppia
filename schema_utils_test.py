@@ -39,7 +39,7 @@ SCHEMA_KEY_SCHEMA = schema_utils.SCHEMA_KEY_SCHEMA
 SCHEMA_KEY_OBJ_TYPE = schema_utils.SCHEMA_KEY_OBJ_TYPE
 SCHEMA_KEY_VALIDATORS = schema_utils.SCHEMA_KEY_VALIDATORS
 SCHEMA_KEY_DEFAULT_VALUE = schema_utils.SCHEMA_KEY_DEFAULT_VALUE
-SCHEMA_KEY_VALIDATE_METHOD = schema_utils.SCHEMA_KEY_VALIDATE_METHOD
+SCHEMA_KEY_VALIDATION_METHOD = schema_utils.SCHEMA_KEY_VALIDATION_METHOD
 SCHEMA_KEY_OBJECT_CLASS = schema_utils.SCHEMA_KEY_OBJECT_CLASS
 SCHEMA_KEY_DESCRIPTION = 'description'
 SCHEMA_KEY_UI_CONFIG = 'ui_config'
@@ -303,7 +303,7 @@ def validate_schema(schema):
       property which specifies the len of the list.
     - 'dict' requires an additional 'properties' property, which specifies the
       names of the keys in the dict, and schema definitions for their values.
-    - 'object_dict' requires an additional 'validate_method' property,
+    - 'object_dict' requires an additional 'validation_method' property,
       which specifies the name of the validate method written in
       domain_object_validator.
     There may also be an optional 'post_normalizers' key whose value is a list
@@ -366,7 +366,7 @@ def validate_schema(schema):
         _validate_dict_keys(
             schema,
             [SCHEMA_KEY_TYPE],
-            [SCHEMA_KEY_VALIDATE_METHOD, SCHEMA_KEY_OBJECT_CLASS] +
+            [SCHEMA_KEY_VALIDATION_METHOD, SCHEMA_KEY_OBJECT_CLASS] +
             OPTIONAL_SCHEMA_KEYS
         )
     else:
@@ -585,7 +585,7 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
             }
         }, {
             'type': 'object_dict',
-            'validate_method': self.arbitary_method
+            'validation_method': self.arbitary_method
         }]
 
         for schema in valid_schemas:
@@ -1047,10 +1047,10 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
         self.check_normalization(
             schema, mappings, invalid_values_with_error_messages)
 
-    def test_object_dict_schema_with_validate_method_key(self):
+    def test_object_dict_schema_with_validation_method_key(self):
         schema = {
             'type': SCHEMA_TYPE_OBJECT_DICT,
-            'validate_method': validate_method_for_testing
+            'validation_method': validation_method_for_testing
         }
 
         mappings = [
@@ -1191,8 +1191,8 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
             sanitize_url('www.oppia.org')
 
 
-def validate_method_for_testing(obj):
-    """Method to test 'validate_method' key of schema.
+def validation_method_for_testing(obj):
+    """Method to test 'validation_method' key of schema.
 
     Args:
         obj: dict. Dictionary form of the argument.

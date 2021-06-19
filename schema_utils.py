@@ -49,7 +49,7 @@ SCHEMA_KEY_OBJ_TYPE = 'obj_type'
 SCHEMA_KEY_VALIDATORS = 'validators'
 SCHEMA_KEY_DEFAULT_VALUE = 'default_value'
 SCHEMA_KEY_OBJECT_CLASS = 'object_class'
-SCHEMA_KEY_VALIDATE_METHOD = 'validate_method'
+SCHEMA_KEY_VALIDATION_METHOD = 'validation_method'
 
 SCHEMA_TYPE_BOOL = 'bool'
 SCHEMA_TYPE_CUSTOM = 'custom'
@@ -216,11 +216,11 @@ def normalize_against_schema(
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_OBJECT_DICT:
         # In future we are planning to have a common way to handle
         # domain_objects, thus schema type 'object_dict' accepts any one of
-        # the keys either 'object_class' or 'validate_method'.
+        # the keys either 'object_class' or 'validation_method'.
         # 'object_class' key is the most commonly used case, when the object is
         # initialized from_dict() method and the validation is done from
         # validate() method.
-        # 'validate_method' key is used for some rare cases like if they have
+        # 'validation_method' key is used for some rare cases like if they have
         # validate_dict method instead of validate method, or if they need some
         # extra flags like for strict validation. The methods are written in the
         # domain_objects_validator file.
@@ -230,8 +230,8 @@ def normalize_against_schema(
             domain_object = validate_class.from_dict(obj)
             domain_object.validate()
         else:
-            validate_method = schema[SCHEMA_KEY_VALIDATE_METHOD]
-            validate_method(obj)
+            validation_method = schema[SCHEMA_KEY_VALIDATION_METHOD]
+            validation_method(obj)
 
         normalized_obj = obj
     else:
