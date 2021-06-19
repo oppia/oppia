@@ -13,9 +13,22 @@
 // limitations under the License.
 
 /**
- * @fileoverview Valid syntax .ts file, used by scripts/linters/
- * js_ts_linter_test.py.
+ * @fileoverview Controller for non strict validation fail modal.
  */
+angular.module('oppia').controller('SaveValidationFailModalController', [
+  '$scope', '$timeout', '$uibModalInstance', 'WindowRef',
+  function(
+      $scope, $timeout, $uibModalInstance, WindowRef) {
+    var MSECS_TO_REFRESH = 20;
+    var _refreshPage = function(delay) {
+      $timeout(function() {
+        WindowRef.nativeWindow.location.reload();
+      }, delay);
+    };
 
-angular.module('oppia').constant('ACTIVITY_STATUS_PRIVATE',
-  AppConstants.ACTIVITY_STATUS_PRIVATE);
+    $scope.closeAndRefresh = function() {
+      $uibModalInstance.dismiss('cancel');
+      _refreshPage(MSECS_TO_REFRESH);
+    };
+  }
+]);
