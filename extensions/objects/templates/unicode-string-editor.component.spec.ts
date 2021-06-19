@@ -56,6 +56,7 @@ describe('UnicodeStringEditorComponent', () => {
     spyOn(component.componentSubscriptions, 'add');
     component.active = true;
 
+    // Pre-check.
     expect(component.active).toBe(true);
 
     component.ngOnInit();
@@ -63,7 +64,6 @@ describe('UnicodeStringEditorComponent', () => {
     expect(component.componentSubscriptions.add).toHaveBeenCalled();
     expect(externalSaveService.onExternalSave).toEqual(
       externalSaveEventEmitter);
-    expect(component.componentSubscriptions.closed).toBe(false);
     expect(component.alwaysEditable).toBe(false);
     expect(component.closeEditor).toHaveBeenCalled();
     expect(component.active).toBe(false);
@@ -75,7 +75,9 @@ describe('UnicodeStringEditorComponent', () => {
     component.alwaysEditable = true;
     component.active = true;
 
+    // Pre-check.
     expect(component.active).toBe(true);
+    expect(component.alwaysEditable).toBe(true);
 
     component.ngOnInit();
 
@@ -117,7 +119,7 @@ describe('UnicodeStringEditorComponent', () => {
     expect(component.value).toBe('new random value');
   });
 
-  it('should change active when editor is opened', () => {
+  it('should become active when editor is opened', () => {
     component.active = false;
 
     expect(component.active).toBe(false);
@@ -127,7 +129,7 @@ describe('UnicodeStringEditorComponent', () => {
     expect(component.active).toBe(true);
   });
 
-  it('should change active when editor is closed', () => {
+  it('should become inactive when editor is closed', () => {
     component.active = true;
 
     expect(component.active).toBe(true);
@@ -140,6 +142,7 @@ describe('UnicodeStringEditorComponent', () => {
   it('should replace old value when new value is entered' +
   'in the input field', () => {
     expect(component.value).toBe('random value');
+    expect(component.active).toBe(true);
 
     component.replaceValue('new random value');
 
