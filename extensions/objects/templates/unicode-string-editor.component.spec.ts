@@ -1,4 +1,3 @@
-/* eslint-disable oppia/no-test-blockers */
 // Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,7 +22,7 @@ import { FormsModule } from '@angular/forms';
 import { UnicodeStringEditorComponent } from './unicode-string-editor.component';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-fdescribe('UnicodeStringEditorComponent', () => {
+describe('UnicodeStringEditorComponent', () => {
   let component: UnicodeStringEditorComponent;
   let fixture: ComponentFixture<UnicodeStringEditorComponent>;
   let externalSaveService: ExternalSaveService;
@@ -56,7 +55,7 @@ fdescribe('UnicodeStringEditorComponent', () => {
     spyOn(component, 'closeEditor').and.callThrough();
     spyOn(component.componentSubscriptions, 'add');
     component.active = true;
-    component.alwaysEditable = true;
+    component.alwaysEditable = false;
 
     // Pre-check.
     expect(component.active).toBe(true);
@@ -193,6 +192,9 @@ fdescribe('UnicodeStringEditorComponent', () => {
       }
     };
     component.largeInput = false;
+
+    // Pre-check.
+    expect(component.largeInput).toBe(false);
 
     component.ngOnChanges(changes);
 
