@@ -74,7 +74,6 @@ describe('TopNavigationBarComponent', () => {
   let deviceInfoService: DeviceInfoService;
 
   let mockOnSearchBarLoadedEventEmitter = new EventEmitter();
-  let resizeEvent = new Event('resize');
   let userInfo = {
     _isModerator: true,
     _isAdmin: true,
@@ -228,7 +227,7 @@ describe('TopNavigationBarComponent', () => {
 
     component.navElementsVisibilityStatus[donateElement] = false;
 
-    window.dispatchEvent(resizeEvent);
+    window.dispatchEvent(new Event('resize'));
 
     component.navElementsVisibilityStatus[donateElement] = true;
 
