@@ -735,7 +735,7 @@ _PARSER = argparse.ArgumentParser(
 _PARSER.add_argument(
     '--files',
     help='Files to type-check',
-    action='append',
+    action='store',
     nargs='+'
 )
 
@@ -750,7 +750,7 @@ def get_mypy_cmd(files):
         list(str). List of command line arguments.
     """
     if files:
-        cmd = [MYPY_CMD, '--config-file', CONFIG_FILE_PATH] + files[0]
+        cmd = [MYPY_CMD, '--config-file', CONFIG_FILE_PATH] + files
     else:
         excluded_files_regex = (
             '|'.join(NOT_FULLY_COVERED_FILES + EXCLUDED_DIRECTORIES))
