@@ -108,7 +108,8 @@ var ExplorationEditorPage = function() {
     by.css('.protractor-test-save-discard-toggle'));
   var saveDraftButton = element(by.css('.protractor-test-save-draft-button'));
   var saveDraftMessageButton = element(by.css('.protractor-test-save-draft'));
-  var publishChangesMessageButton = element(by.css('.protractor-test-publish-changes'));
+  var publishChangesMessageButton = element(
+    by.css('.protractor-test-publish-changes'));
   var publishExplorationButton = element(
     by.css('.protractor-test-publish-exploration'));
 
@@ -223,7 +224,8 @@ var ExplorationEditorPage = function() {
         'Commit message input', commitMessageInput, commitMessage);
     }
     await action.click('Save draft button', saveDraftButton);
-    //TODO(#13096): Remove browser.sleep from e2e files once Angular Migration finishes. 
+    // TODO(#13096): Remove browser.sleep from e2e files 
+    // once angular migration finishes. 
     await browser.sleep(2500);
     await waitFor.textToBePresentInElement(
       saveDraftMessageButton, 'Save Draft',
@@ -238,7 +240,8 @@ var ExplorationEditorPage = function() {
         'Commit message input', commitMessageInput, commitMessage);
     }
     await action.click('Save draft button', saveDraftButton);
-    //TODO(#13096): Remove browser.sleep from e2e files once Angular Migration finishes. 
+    // TODO(#13096): Remove browser.sleep from e2e files 
+    // once angular migration finishes. 
     await browser.sleep(2500);
     await waitFor.textToBePresentInElement(
       publishChangesMessageButton, 'Publish Changes',
