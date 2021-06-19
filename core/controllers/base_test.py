@@ -1524,6 +1524,8 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
 
         if handler_class_name in self.non_schema_handlers:
             return
+        if handler.URL_PATH_ARGS_SCHEMAS is None:
+            return
 
         regex_pattern = r'<.*?>'
         url_path_elements = [
@@ -1550,6 +1552,8 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
         """
 
         if handler_class_name in self.non_schema_handlers:
+            return
+        if handler.HANDLER_ARGS_SCHEMAS is None:
             return
 
         handler_request_methods = []
@@ -1582,6 +1586,8 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
             handler_class_name: str. Name of the handler class.
         """
         if handler_class_name in self.non_schema_handlers:
+            return
+        if handler.HANDLER_ARGS_SCHEMAS is None:
             return
 
         schemas = handler.HANDLER_ARGS_SCHEMAS
