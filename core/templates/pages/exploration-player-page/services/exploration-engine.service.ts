@@ -90,14 +90,18 @@ export class ExplorationEngineService {
      private statsReportingService: StatsReportingService,
      private urlService: UrlService
    ) {
+     this.setExplorationProperties();
+   }
+
+   setExplorationProperties(): void {
      let pathnameArray = this.urlService.getPathname().split('/');
      let explorationContext = false;
 
      for (let i = 0; i < pathnameArray.length; i++) {
        if (pathnameArray[i] === 'explore' ||
-            pathnameArray[i] === 'create' ||
-            pathnameArray[i] === 'skill_editor' ||
-            pathnameArray[i] === 'embed') {
+             pathnameArray[i] === 'create' ||
+             pathnameArray[i] === 'skill_editor' ||
+             pathnameArray[i] === 'embed') {
          explorationContext = true;
          break;
        }
@@ -471,7 +475,7 @@ export class ExplorationEngineService {
        recordedVoiceovers.getBindableVoiceovers(feedbackContentId));
      if (feedbackHtml === null) {
        this.answerIsBeingProcessed = false;
-       this.alertsService.addWarning('Expression parsing error.');
+       this.alertsService.addWarning('Feedback content should not be empty.');
        return;
      }
      let newParams = (
@@ -479,7 +483,7 @@ export class ExplorationEngineService {
          oldParams, newState.paramChanges, [oldParams]) : oldParams);
      if (newParams === null) {
        this.answerIsBeingProcessed = false;
-       this.alertsService.addWarning('Expression parsing error.');
+       this.alertsService.addWarning('Parameters should not be empty.');
        return;
      }
 
@@ -488,7 +492,8 @@ export class ExplorationEngineService {
      }]);
      if (questionHtml === null) {
        this.answerIsBeingProcessed = false;
-       this.alertsService.addWarning('Expression parsing error.');
+       // TODO(#13133): Remove all question related naming conventions.
+       this.alertsService.addWarning('Question content should not be empty.');
        return;
      }
 
