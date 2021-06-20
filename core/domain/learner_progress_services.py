@@ -1693,12 +1693,16 @@ def get_learner_dashboard_activities(user_id):
     else:
         topic_ids_to_learn = []
 
+    all_topic_ids, new_topic_ids = get_all_and_new_topic_ids_for_user(
+            user_id, partially_learnt_topic_ids, learnt_topic_ids,
+            topic_ids_to_learn)
+
     activity_ids = learner_progress_domain.ActivityIdsInLearnerDashboard(
         completed_exploration_ids, completed_collection_ids,
         completed_story_ids, learnt_topic_ids,
         incomplete_exploration_ids, incomplete_collection_ids,
-        partially_learnt_topic_ids, topic_ids_to_learn,
-        exploration_playlist_ids, collection_playlist_ids)
+        partially_learnt_topic_ids, topic_ids_to_learn, all_topic_ids,
+        new_topic_ids, exploration_playlist_ids, collection_playlist_ids)
 
     return activity_ids
 
@@ -1749,14 +1753,14 @@ def get_activity_progress(user_id):
         activity_ids_in_learner_dashboard.partially_learnt_topic_ids)
     topic_ids_to_learn = (
         activity_ids_in_learner_dashboard.topic_ids_to_learn)
+    all_topic_ids = (
+        activity_ids_in_learner_dashboard.all_topic_ids)
+    new_topic_ids = (
+        activity_ids_in_learner_dashboard.new_topic_ids)
     exploration_playlist_ids = (
         activity_ids_in_learner_dashboard.exploration_playlist_ids)
     collection_playlist_ids = (
         activity_ids_in_learner_dashboard.collection_playlist_ids)
-    (
-        all_topic_ids, new_topic_ids) = get_all_and_new_topic_ids_for_user(
-            user_id, partially_learnt_topic_ids, learnt_topic_ids,
-            topic_ids_to_learn)
 
     activity_models = (
         datastore_services.fetch_multiple_entities_by_ids_and_models(

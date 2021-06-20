@@ -266,7 +266,7 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
         self.login(self.VIEWER_EMAIL)
 
         response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
-        self.assertEqual(len(response['topics_to_learn']), 0)
+        self.assertEqual(len(response['topics_to_learn_list']), 0)
 
         self.save_new_topic(
             self.TOPIC_ID_1, self.owner_id, name=self.TOPIC_NAME_1,
@@ -284,16 +284,16 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
         learner_progress_services.add_topic_to_learn(
             self.viewer_id, self.TOPIC_ID_1)
         response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
-        self.assertEqual(len(response['topics_to_learn']), 1)
+        self.assertEqual(len(response['topics_to_learn_list']), 1)
         self.assertEqual(
-            response['topics_to_learn'][0]['id'], self.TOPIC_ID_1)
+            response['topics_to_learn_list'][0]['id'], self.TOPIC_ID_1)
         self.logout()
 
     def test_can_see_all_topics(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
         response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
-        self.assertEqual(len(response['all_topics']), 0)
+        self.assertEqual(len(response['all_topics_list']), 0)
 
         self.save_new_topic(
             self.TOPIC_ID_1, self.owner_id, name=self.TOPIC_NAME_1,
@@ -328,16 +328,16 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
 
         self.login(self.VIEWER_EMAIL)
         response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
-        self.assertEqual(len(response['all_topics']), 1)
+        self.assertEqual(len(response['all_topics_list']), 1)
         self.assertEqual(
-            response['all_topics'][0]['id'], self.TOPIC_ID_1)
+            response['all_topics_list'][0]['id'], self.TOPIC_ID_1)
         self.logout()
 
     def test_can_see_new_topics(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
         response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
-        self.assertEqual(len(response['new_topics']), 0)
+        self.assertEqual(len(response['new_topics_list']), 0)
 
         self.save_new_topic(
             self.TOPIC_ID_1, self.owner_id, name=self.TOPIC_NAME_1,
@@ -372,9 +372,9 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
 
         self.login(self.VIEWER_EMAIL)        
         response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
-        self.assertEqual(len(response['new_topics']), 1)
+        self.assertEqual(len(response['new_topics_list']), 1)
         self.assertEqual(
-            response['new_topics'][0]['id'], self.TOPIC_ID_1)
+            response['new_topics_list'][0]['id'], self.TOPIC_ID_1)
         self.logout()
 
     def test_can_see_exploration_playlist(self):
