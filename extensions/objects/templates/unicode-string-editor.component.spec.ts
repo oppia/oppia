@@ -59,14 +59,14 @@ describe('UnicodeStringEditorComponent', () => {
 
     // Pre-check.
     expect(component.active).toBe(true);
-    // There is no pre-check for alwaysEditable since it's state does not change
-    // It is tested to make sure that the subscription.add can be called.
 
     component.ngOnInit();
 
     expect(component.componentSubscriptions.add).toHaveBeenCalled();
     expect(externalSaveService.onExternalSave).toEqual(
       externalSaveEventEmitter);
+    // The alwaysEditable variable is tested since it is a pre-condition
+    // for subscription.add.
     expect(component.alwaysEditable).toBe(false);
     expect(component.closeEditor).toHaveBeenCalled();
     expect(component.active).toBe(false);
