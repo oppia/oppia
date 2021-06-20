@@ -25,7 +25,7 @@ import { AssignedSkill } from 'domain/skill/assigned-skill.model';
 import { AugmentedSkillSummary } from 'domain/skill/augmented-skill-summary.model';
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { SkillSummary } from 'domain/skill/skill-summary.model';
-import { TopicSummary } from 'domain/topic/topic-summary.model';
+import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 // eslint-disable-next-line max-len
 import { AssignedSkillDataBackendDict, SkillsDashboardData, SkillsDashboardDataBackendDict, TopicsAndSkillDashboardData, TopicsAndSkillsDashboardBackendApiService, TopicsAndSkillsDashboardDataBackendDict } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { TopicsAndSkillsDashboardFilter } from './topics-and-skills-dashboard-filter.model';
@@ -188,9 +188,9 @@ describe('Topics and Skills Dashboard backend API service', () => {
       ],
       totalSkillCount: 3,
       topicSummaries: [
-        TopicSummary.createFromBackendDict(
+        CreatorTopicSummary.createFromBackendDict(
           topicAndSkillsDashboardDataBackendDict.topic_summary_dicts[0]),
-        TopicSummary.createFromBackendDict(
+        CreatorTopicSummary.createFromBackendDict(
           topicAndSkillsDashboardDataBackendDict.topic_summary_dicts[1])
       ],
       categorizedSkillsDict: {

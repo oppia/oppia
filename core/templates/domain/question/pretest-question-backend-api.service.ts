@@ -48,6 +48,10 @@ export class PretestQuestionBackendApiService {
       explorationId: string, storyUrlFragment: string,
       successCallback: (value: QuestionBackendDict[]) => void,
       errorCallback: (reason: string) => void): void {
+    console.log(!storyUrlFragment)
+    console.log(!storyUrlFragment.match(constants.VALID_URL_FRAGMENT_REGEX))
+    console.log(!storyUrlFragment || !storyUrlFragment.match(constants.VALID_URL_FRAGMENT_REGEX))
+
     if (
       !storyUrlFragment ||
       !storyUrlFragment.match(constants.VALID_URL_FRAGMENT_REGEX)) {
