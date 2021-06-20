@@ -58,8 +58,6 @@ import { WrapTextWithEllipsisPipe } from
   'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
 import { ConvertToPlainTextPipe } from
   'filters/string-utility-filters/convert-to-plain-text.pipe';
-import { FractionObjectFactory } from
-  'domain/objects/FractionObjectFactory';
 import { NumberWithUnitsObjectFactory } from
   'domain/objects/NumberWithUnitsObjectFactory';
 import { ContinueValidationService } from
@@ -415,7 +413,6 @@ describe('State translation component', function() {
     $provide.value(
       'ExplorationStatsService', TestBed.get(ExplorationStatsService));
     $provide.value('ExternalSaveService', TestBed.get(ExternalSaveService));
-    $provide.value('FractionObjectFactory', TestBed.get(FractionObjectFactory));
     $provide.value(
       'NumberWithUnitsObjectFactory',
       TestBed.get(NumberWithUnitsObjectFactory));

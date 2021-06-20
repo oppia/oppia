@@ -20,7 +20,6 @@ import { EventEmitter } from '@angular/core';
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { EditabilityService } from 'services/editability.service';
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
@@ -93,8 +92,6 @@ describe('History tab component', function() {
     $provide.value('EditabilityService', TestBed.get(EditabilityService));
     $provide.value(
       'ExplorationDiffService', TestBed.get(ExplorationDiffService));
-    $provide.value(
-      'FractionObjectFactory', TestBed.get(FractionObjectFactory));
     $provide.value('StatesObjectFactory', TestBed.get(StatesObjectFactory));
     $provide.value(
       'HintObjectFactory', TestBed.get(HintObjectFactory));

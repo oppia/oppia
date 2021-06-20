@@ -20,8 +20,7 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { FractionAnswer } from 'interactions/answer-defs';
-import { Fraction, FractionObjectFactory } from
-  'domain/objects/FractionObjectFactory';
+import { Fraction } from 'domain/objects/fraction.model';
 import { baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
 import { AppConstants } from 'app.constants';
@@ -41,7 +40,6 @@ interface FractionWarning {
 })
 export class FractionInputValidationService {
   constructor(
-    private fof: FractionObjectFactory,
     private bivs: baseInteractionValidationService) {}
 
   getNonIntegerInputWarning(i: number, j: number): FractionWarning {
@@ -72,7 +70,7 @@ export class FractionInputValidationService {
       this.getCustomizationArgsWarnings(customizationArgs));
 
     var toFloat = function(fraction) {
-      return this.fof.fromDict(fraction).toFloat();
+      return Fraction.fromDict(fraction).toFloat();
     };
     /**
      * Store an answer range for every rule, then check for redundant
@@ -144,7 +142,7 @@ export class FractionInputValidationService {
           case 'IsExactlyEqualTo':
             if (shouldBeInSimplestForm) {
               var fractionDict = <FractionAnswer> rule.inputs.f;
-              var fractionInSimplestForm = this.fof.fromDict(
+              var fractionInSimplestForm = Fraction.fromDict(
                 fractionDict).convertToSimplestForm();
               if (!angular.equals(fractionDict, fractionInSimplestForm)) {
                 warningsList.push({
@@ -158,7 +156,7 @@ export class FractionInputValidationService {
               }
             }
             if (!allowImproperFraction) {
-              var fraction: Fraction = this.fof.fromDict(
+              var fraction: Fraction = Fraction.fromDict(
                 <FractionAnswer> rule.inputs.f);
               if (fraction.isImproperFraction()) {
                 warningsList.push({
@@ -172,7 +170,7 @@ export class FractionInputValidationService {
               }
             }
             if (!allowNonzeroIntegerPart) {
-              var fraction: Fraction = this.fof.fromDict(
+              var fraction: Fraction = Fraction.fromDict(
                 <FractionAnswer> rule.inputs.f);
               if (fraction.hasNonzeroIntegerPart()) {
                 warningsList.push({
@@ -256,7 +254,7 @@ export class FractionInputValidationService {
               });
             }
             if (!allowImproperFraction) {
-              var fraction: Fraction = this.fof.fromDict(
+              var fraction: Fraction = Fraction.fromDict(
                 <FractionAnswer> rule.inputs.f);
               if (fraction.isImproperFraction()) {
                 warningsList.push({

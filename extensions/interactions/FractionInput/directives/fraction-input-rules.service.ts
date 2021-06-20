@@ -19,7 +19,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
+import { Fraction } from 'domain/objects/fraction.model';
 import { FractionAnswer } from 'interactions/answer-defs';
 import { UtilsService } from 'services/utils.service';
 import {
@@ -32,11 +32,10 @@ import {
 })
 export class FractionInputRulesService {
   constructor(
-    private fractionObjectFactory: FractionObjectFactory,
     private utilsService: UtilsService) {}
 
   toFloat(fractionDict: FractionAnswer): number {
-    return this.fractionObjectFactory.fromDict(fractionDict).toFloat();
+    return Fraction.fromDict(fractionDict).toFloat();
   }
   IsEquivalentTo(
       answer: FractionAnswer,
@@ -47,7 +46,7 @@ export class FractionInputRulesService {
       answer: FractionAnswer,
       inputs: FractionEquivalentRuleInputs): boolean {
     var simplestForm =
-      this.fractionObjectFactory.fromDict(inputs.f).convertToSimplestForm();
+      Fraction.fromDict(inputs.f).convertToSimplestForm();
     return this.toFloat(answer) === this.toFloat(inputs.f) &&
       this.utilsService.isEquivalent(answer, simplestForm);
   }
@@ -70,7 +69,7 @@ export class FractionInputRulesService {
   HasIntegerPartEqualTo(
       answer: FractionAnswer,
       inputs: FractionIntegerPartRuleInputs): boolean {
-    var answerFraction = this.fractionObjectFactory.fromDict(answer);
+    var answerFraction = Fraction.fromDict(answer);
     return answerFraction.getIntegerPart() === inputs.x;
   }
   HasNumeratorEqualTo(
