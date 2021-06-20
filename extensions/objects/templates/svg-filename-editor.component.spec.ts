@@ -242,15 +242,15 @@ describe('SvgFilenameEditor', () => {
     svgFileFetcherBackendApiService = (
       TestBed.inject(SvgFileFetcherBackendApiService));
     // This throws "Argument of type 'mockImageObject' is not assignable to
-    // parameter of type 'HTMLImageElement'.". This is because
-    // 'HTMLImageElement' has around 250 more properties. We have only defined
-    // the properties we need in 'mockImageObject'.
+    // parameter of type 'HTMLImageElement'.". We need to suppress this error
+    // because 'HTMLImageElement' has around 250 more properties.
+    // We have only defined the properties we need in 'mockImageObject'.
     // @ts-expect-error
     spyOn(window, 'Image').and.returnValue(new mockImageObject());
     // This throws "Argument of type 'mockReaderObject' is not assignable to
-    // parameter of type 'HTMLImageElement'.". This is because
-    // 'HTMLImageElement' has around 250 more properties. We have only defined
-    // the properties we need in 'mockReaderObject'.
+    // parameter of type 'HTMLImageElement'.". We need to suppress this error
+    // because 'HTMLImageElement' has around 250 more properties.
+    // We have only defined the properties we need in 'mockReaderObject'.
     // @ts-expect-error
     spyOn(window, 'FileReader').and.returnValue(new mockReaderObject());
     fixture = TestBed.createComponent(SvgFilenameEditorComponent);
@@ -881,15 +881,15 @@ describe(
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
 
       // This throws "Argument of type 'mockImageObject' is not assignable to
-      // parameter of type 'HTMLImageElement'.". This is because
-      // 'HTMLImageElement' has around 250 more properties. We have only defined
-      // the properties we need in 'mockImageObject'.
+      // parameter of type 'HTMLImageElement'.". We need to suppress this error
+      // because 'HTMLImageElement' has around 250 more properties. We have only
+      // defined the properties we need in 'mockImageObject'.
       // @ts-expect-error
       spyOn(window, 'Image').and.returnValue(new mockImageObject());
       // This throws "Argument of type 'mockReaderObject' is not assignable
-      // to parameter of type 'FileReader'.". This is because
-      // 'FileReader' has around 15 more properties. We have only defined
-      // the properties we need in 'mockReaderObject'.
+      // to parameter of type 'FileReader'.". We need to suppress this error
+      // because 'FileReader' has around 15 more properties. We have only
+      // defined the properties we need in 'mockReaderObject'.
       // @ts-expect-error
       spyOn(window, 'FileReader').and.returnValue(new mockReaderObject());
       fixture = TestBed.createComponent(SvgFilenameEditorComponent);
