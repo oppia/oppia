@@ -71,12 +71,12 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             self.user_id_admin)
         self.user_moderator = user_services.get_user_actions_info(
             self.user_id_moderator)
-        self.user_voiceover_admin = user_services.get_user_actions_info(
-            self.user_id_voiceover_admin)
         self.system_user = user_services.get_system_user()
         self.login(self.ADMIN_EMAIL)
         user_services.update_user_role(
             self.user_id_voiceover_admin, feconf.ROLE_ID_VOICEOVER_ADMIN)
+        self.user_voiceover_admin = user_services.get_user_actions_info(
+            self.user_id_voiceover_admin)
 
     def test_get_exploration_rights_for_nonexistent_exploration(self):
         non_exp_id = 'this_exp_does_not_exist_id'
@@ -293,8 +293,9 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.assertFalse(rights_manager.check_can_delete_activity(
             self.user_b, exp_rights))
 
+        rights_manager.publish_exploration(self.user_a, self.EXP_ID)
         rights_manager.assign_role_for_exploration(
-            self.user_a, self.EXP_ID, self.user_id_b,
+            self.user_voiceover_admin, self.EXP_ID, self.user_id_b,
             rights_domain.ROLE_VOICE_ARTIST)
         exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
 
@@ -356,15 +357,6 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
         rights_manager.assign_role_for_exploration(
             self.user_a, self.EXP_ID, self.user_id_b,
-            rights_domain.ROLE_VOICE_ARTIST)
-
-        with self.assertRaisesRegexp(Exception, 'Could not assign new role.'):
-            rights_manager.assign_role_for_exploration(
-                self.user_b, self.EXP_ID, self.user_id_c,
-                rights_domain.ROLE_VIEWER)
-
-        rights_manager.assign_role_for_exploration(
-            self.user_a, self.EXP_ID, self.user_id_b,
             rights_domain.ROLE_EDITOR)
 
         with self.assertRaisesRegexp(Exception, 'Could not assign new role.'):
@@ -382,9 +374,6 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         rights_manager.assign_role_for_exploration(
             self.user_b, self.EXP_ID, self.user_id_d,
             rights_domain.ROLE_EDITOR)
-        rights_manager.assign_role_for_exploration(
-            self.user_b, self.EXP_ID, self.user_id_e,
-            rights_domain.ROLE_VOICE_ARTIST)
         rights_manager.assign_role_for_exploration(
             self.user_b, self.EXP_ID, self.user_id_f,
             rights_domain.ROLE_VIEWER)
@@ -552,7 +541,6 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
     def test_check_exploration_rights(self):
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
         exp_services.save_new_exploration(self.user_id_a, exp)
-
         rights_manager.assign_role_for_exploration(
             self.user_a, self.EXP_ID, self.user_id_b,
             rights_domain.ROLE_VIEWER)
@@ -560,10 +548,6 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         rights_manager.assign_role_for_exploration(
             self.user_a, self.EXP_ID, self.user_id_c,
             rights_domain.ROLE_EDITOR)
-
-        rights_manager.assign_role_for_exploration(
-            self.user_a, self.EXP_ID, self.user_id_d,
-            rights_domain.ROLE_VOICE_ARTIST)
 
         exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
 
@@ -573,6 +557,13 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.assertFalse(exp_rights.is_viewer(self.user_id_a))
         self.assertFalse(exp_rights.is_owner(self.user_id_b))
         self.assertFalse(exp_rights.is_editor(self.user_id_b))
+
+        rights_manager.publish_exploration(self.user_a, self.EXP_ID)
+        rights_manager.assign_role_for_exploration(
+            self.user_voiceover_admin, self.EXP_ID, self.user_id_d,
+            rights_domain.ROLE_VOICE_ARTIST)
+        exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
+
         self.assertTrue(exp_rights.is_voice_artist(self.user_id_d))
         self.assertFalse(exp_rights.is_voice_artist(self.user_id_b))
 
@@ -617,49 +608,62 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
         self.assertTrue(exp_rights.is_owner(self.user_id_b))
 
-    def test_assign_voice_artist_to_role_owner(self):
+    def test_owner_cannot_assign_voice_artist(self):
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
         exp_services.save_new_exploration(self.user_id_a, exp)
+        rights_manager.publish_exploration(self.user_a, self.EXP_ID)
+
+        with self.assertRaisesRegexp(Exception, 'Could not assign new role.'):
+            rights_manager.assign_role_for_exploration(
+                self.user_a, self.EXP_ID, self.user_id_b,
+                rights_domain.ROLE_VOICE_ARTIST)
+
+    def test_voiceover_admin_can_modify_voice_artist_role(self):
+        exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
+        exp_services.save_new_exploration(self.user_id_a, exp)
+        rights_manager.publish_exploration(self.user_a, self.EXP_ID)
 
         rights_manager.assign_role_for_exploration(
-            self.user_a, self.EXP_ID, self.user_id_b,
+            self.user_voiceover_admin, self.EXP_ID, self.user_id_b,
+            rights_domain.ROLE_VOICE_ARTIST)
+        exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
+
+        self.assertTrue(exp_rights.is_voice_artist(self.user_id_b))
+
+        rights_manager.deassign_role_for_exploration(
+            self.user_voiceover_admin, self.EXP_ID, self.user_id_b)
+
+        self.assertFalse(exp_rights.is_voice_artist(self.user_id_b))
+
+    def test_owner_cannot_assign_voice_artist_to_core_role(self):
+        exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
+        exp_services.save_new_exploration(self.user_id_a, exp)
+        rights_manager.publish_exploration(self.user_a, self.EXP_ID)
+
+        rights_manager.assign_role_for_exploration(
+            self.user_voiceover_admin, self.EXP_ID, self.user_id_b,
             rights_domain.ROLE_VOICE_ARTIST)
         exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
 
         self.assertFalse(exp_rights.is_owner(self.user_id_b))
-
-        rights_manager.assign_role_for_exploration(
-            self.user_a, self.EXP_ID, self.user_id_b, rights_domain.ROLE_OWNER)
-        exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
-
-        self.assertTrue(exp_rights.is_owner(self.user_id_b))
-
-    def test_editor_cannot_be_reassigned_as_editor(self):
-        exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
-        exp_services.save_new_exploration(self.user_id_a, exp)
-
-        rights_manager.assign_role_for_exploration(
-            self.user_a, self.EXP_ID, self.user_id_b,
-            rights_domain.ROLE_EDITOR)
-
-        with self.assertRaisesRegexp(
-            Exception, 'This user already can edit this'):
+        with self.assertRaisesRegexp(Exception, 'Could not assign new role.'):
             rights_manager.assign_role_for_exploration(
                 self.user_a, self.EXP_ID, self.user_id_b,
-                rights_domain.ROLE_EDITOR)
+                rights_domain.ROLE_VOICE_ARTIST)
 
     def test_voice_artist_cannot_be_reassigned_as_voice_artist(self):
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
         exp_services.save_new_exploration(self.user_id_a, exp)
+        rights_manager.publish_exploration(self.user_a, self.EXP_ID)
 
         rights_manager.assign_role_for_exploration(
-            self.user_a, self.EXP_ID, self.user_id_b,
+            self.user_voiceover_admin, self.EXP_ID, self.user_id_b,
             rights_domain.ROLE_VOICE_ARTIST)
 
         with self.assertRaisesRegexp(
             Exception, 'This user already can voiceover this'):
             rights_manager.assign_role_for_exploration(
-                self.user_a, self.EXP_ID, self.user_id_b,
+                self.user_voiceover_admin, self.EXP_ID, self.user_id_b,
                 rights_domain.ROLE_VOICE_ARTIST)
 
     def test_viewer_cannot_be_reassigned_as_viewer(self):
@@ -718,24 +722,6 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             self.user_a, self.EXP_ID, self.user_id_b)
         exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
         self.assertFalse(exp_rights.is_viewer(self.user_id_b))
-
-    def test_deassign_voice_artist_is_successful(self):
-        exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
-        exp_services.save_new_exploration(self.user_id_a, exp)
-
-        rights_manager.assign_role_for_exploration(
-            self.user_a,
-            self.EXP_ID,
-            self.user_id_b,
-            rights_domain.ROLE_VOICE_ARTIST
-        )
-        exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
-        self.assertTrue(exp_rights.is_voice_artist(self.user_id_b))
-
-        rights_manager.deassign_role_for_exploration(
-            self.user_a, self.EXP_ID, self.user_id_b)
-        exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
-        self.assertFalse(exp_rights.is_voice_artist(self.user_id_b))
 
     def test_deassign_editor_is_successful(self):
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)

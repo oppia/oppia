@@ -478,7 +478,7 @@ def check_can_access_activity(user, activity_rights):
     Args:
         user: UserActionsInfo. Object having user_id, role and actions for
             given user.
-        activity_rights: AcitivityRights or None. Rights object for the given
+        activity_rights: ActivityRights or None. Rights object for the given
             activity.
 
     Returns:
@@ -572,7 +572,7 @@ def check_can_manage_voice_artist_in_activity(user, activity_rights):
     Args:
         user: UserActionInfo. Object having user_id, role, and actions for
             given user.
-        activity_rights: AcitivityRights or None. Rights object for the given
+        activity_rights: ActivityRights or None. Rights object for the given
             activity.
 
     Returns:
@@ -632,8 +632,9 @@ def check_can_delete_activity(user, activity_rights):
     return False
 
 
-def check_can_modify_activity_roles(user, activity_rights):
-    """Checks whether the user can modify roles for given activity.
+def check_can_modify_core_activity_roles(user, activity_rights):
+    """Checks whether the user can modify core roles for the given activity. The
+    core roles for an activity includes owner, editor etc.
 
     Args:
         user: UserActionsInfo. Object having user_id, role and actions for
@@ -651,10 +652,10 @@ def check_can_modify_activity_roles(user, activity_rights):
             activity_rights.cloned_from):
         return False
 
-    if (role_services.ACTION_MODIFY_ROLES_FOR_ANY_ACTIVITY in
+    if (role_services.ACTION_MODIFY_CORE_ROLES_FOR_ANY_ACTIVITY in
             user.actions):
         return True
-    if (role_services.ACTION_MODIFY_ROLES_FOR_OWNED_ACTIVITY in
+    if (role_services.ACTION_MODIFY_CORE_ROLES_FOR_OWNED_ACTIVITY in
             user.actions):
         if activity_rights.is_owner(user.user_id):
             return True
@@ -679,7 +680,7 @@ def check_can_release_ownership(user, activity_rights):
     if activity_rights.is_private():
         return False
 
-    return check_can_modify_activity_roles(
+    return check_can_modify_core_activity_roles(
         user, activity_rights)
 
 
@@ -774,13 +775,13 @@ def _assign_role(
     committer_id = committer.user_id
     activity_rights = _get_activity_rights(activity_type, activity_id)
 
-    role_is_voice_artist = new_role == constants.ROLE_VOICE_ARTIST
-    user_can_assigning_voice_artist = check_can_manage_voice_artist_in_activity(
-        committer, activity_rights)
-
-    user_can_assigning_role = (
-        check_can_modify_activity_roles(committer, activity_rights)) or (
-            role_is_voice_artist and user_can_assigning_voice_artist)
+    user_can_assigning_role = False
+    if new_role == rights_domain.ROLE_VOICE_ARTIST:
+        user_can_assigning_role = check_can_manage_voice_artist_in_activity(
+            committer, activity_rights)
+    else:
+        user_can_assigning_role = check_can_modify_core_activity_roles(
+            committer, activity_rights)
 
     if not user_can_assigning_role:
         logging.error(
@@ -902,15 +903,15 @@ def _deassign_role(committer, removed_user_id, activity_id, activity_type):
     committer_id = committer.user_id
     activity_rights = _get_activity_rights(activity_type, activity_id)
 
-    user_can_modify_activity_roles = (
-        check_can_modify_activity_roles(committer, activity_rights) or (
-            check_can_manage_voice_artist_in_activity(
-                committer, activity_rights) and (
-                    activity_rights.is_voice_artist(removed_user_id)
-                )
-            )
-        )
-    if not user_can_modify_activity_roles:
+    user_can_deassign_role = False
+    if activity_rights.is_voice_artist(removed_user_id):
+        user_can_deassign_role = check_can_manage_voice_artist_in_activity(
+            committer, activity_rights)
+    else:
+        user_can_deassign_role = check_can_modify_core_activity_roles(
+            committer, activity_rights)
+
+    if not user_can_deassign_role:
         logging.error(
             'User %s tried to remove user %s from an activity %s '
             'but was refused permission.' % (

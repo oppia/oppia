@@ -136,7 +136,7 @@ class ActivityRightsTests(test_utils.GenericTestBase):
             self.owner, None))
 
     def test_check_cannot_modify_activity_roles_with_no_activity_rights(self):
-        self.assertFalse(rights_manager.check_can_modify_activity_roles(
+        self.assertFalse(rights_manager.check_can_modify_core_activity_roles(
             self.owner, None))
 
     def test_check_cannot_release_ownership_with_no_activity_rights(self):

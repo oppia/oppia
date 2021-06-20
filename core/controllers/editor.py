@@ -196,7 +196,7 @@ class UserExplorationPermissionsHandler(EditorHandler):
             'can_edit': rights_manager.check_can_edit_activity(
                 self.user, exploration_rights),
             'can_modify_roles': (
-                rights_manager.check_can_modify_activity_roles(
+                rights_manager.check_can_modify_core_activity_roles(
                     self.user, exploration_rights)),
             'can_publish': rights_manager.check_can_publish_activity(
                 self.user, exploration_rights),

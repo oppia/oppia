@@ -1461,8 +1461,8 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
                 '/mock/exploration/%s' % self.private_exp_id_1, {},
                 csrf_token=csrf_token, expected_status_int=401)
             self.assertEqual(
-                response['error'], 'You do not have credentials to '
-                                   'assign voice artist.')
+                response['error'],
+                'You do not have credentials to manage voice artists.')
         self.logout()
 
     def test_owner_cannot_assign_voice_artist_in_public_exp(self):
@@ -1473,8 +1473,8 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
                 '/mock/exploration/%s' % self.private_exp_id_1, {},
                 csrf_token=csrf_token, expected_status_int=401)
             self.assertEqual(
-                response['error'], 'You do not have credentials to '
-                                   'assign voice artist.')
+                response['error'],
+                'You do not have credentials to manage voice artists.')
         self.logout()
 
     def test_random_user_cannot_assign_voice_artist_in_public_exp(self):
@@ -1485,8 +1485,8 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
                 '/mock/exploration/%s' % self.private_exp_id_1, {},
                 csrf_token=csrf_token, expected_status_int=401)
             self.assertEqual(
-                response['error'], 'You do not have credentials to '
-                                   'assign voice artist.')
+                response['error'],
+                'You do not have credentials to manage voice artists.')
         self.logout()
 
     def test_voiceover_admin_cannot_assign_voice_artist_in_invalid_exp(self):

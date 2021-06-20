@@ -1281,7 +1281,7 @@ def can_manage_voice_artist(handler):
             return handler(self, entity_type, entity_id, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
-                'You do not have credentials to manage voice artist.')
+                'You do not have credentials to manage voice artists.')
     test_can_manage_voice_artist.__wrapped__ = True
 
     return test_can_manage_voice_artist
@@ -1642,7 +1642,7 @@ def can_modify_exploration_roles(handler):
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
 
-        if rights_manager.check_can_modify_activity_roles(
+        if rights_manager.check_can_modify_core_activity_roles(
                 self.user, exploration_rights):
             return handler(self, exploration_id, **kwargs)
         else:
