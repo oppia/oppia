@@ -202,7 +202,7 @@ describe('Contribution Opportunities backend API service', function() {
     });
     flushMicrotasks();
 
-    expect(successHandler).not.toHaveBeenCalled()
+    expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalledWith(
       new Error('Failed to fetch translation opportunities data.'));
   }));
@@ -300,8 +300,9 @@ describe('Contribution Opportunities backend API service', function() {
     const failHandler = jasmine.createSpy('fail');
     let emptyList: FeaturedTranslationLanguage[] = [];
 
-    ontributionOpportunitiesBackendApiService
-      .fetchFeaturedTranslationLanguagesAsync().then(successHandler, failHandler);
+    contributionOpportunitiesBackendApiService
+      .fetchFeaturedTranslationLanguagesAsync()
+      .then(successHandler, failHandler);
 
     const req = httpTestingController.expectOne(
       '/retrivefeaturedtranslationlanguages'
@@ -311,7 +312,7 @@ describe('Contribution Opportunities backend API service', function() {
       error: 'Failed to fetch featured translation languages.'
     }, {
       status: 500, statusText: 'Internal Server Error'
-    });;
+    });
 
     flushMicrotasks();
 

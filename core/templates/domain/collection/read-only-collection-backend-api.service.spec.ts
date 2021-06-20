@@ -241,7 +241,7 @@ describe('Read only collection backend API service', () => {
   }));
 
   it('should return collection details from cache when calling ' +
-    '\'getCollectionDetails\'',fakeAsync(() => {
+    '\'getCollectionDetails\'', fakeAsync(() => {
     let collectionId = '0';
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
@@ -249,7 +249,7 @@ describe('Read only collection backend API service', () => {
       canEdit: false,
       title: 'Collection Under Test'
     };
-    
+
     // Loading collection and storing it in cache.
     readOnlyCollectionBackendApiService.loadCollectionAsync('0').then(
       successHandler, failHandler);
@@ -267,7 +267,7 @@ describe('Read only collection backend API service', () => {
   }));
 
   it('should throw error if we try to fetch collection ' +
-    'details which are not cached',() => {
+    'details which are not cached', () => {
     // Trying to get collection details of a collection with an invalid Id.
     let collectionId = 'invalid';
     expect(() => {
