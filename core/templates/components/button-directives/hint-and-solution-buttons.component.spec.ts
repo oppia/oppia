@@ -15,7 +15,7 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ChangeDetectorRef, EventEmitter } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTranslationsObjectFactory';
@@ -78,6 +78,7 @@ describe('HintAndSolutionButtonsComponent', () => {
     spyOn(hintsAndSolutionManagerService, 'onSolutionViewedEventEmitter')
       .and.returnValue(new EventEmitter<void>());
 
+    // A StateCard which supports hints.
     newCard = stateCardObjectFactory.createNewCard(
       'State 2', '<p>Content</p>', '<interaction></interaction>',
       interactionObjectFactory.createFromBackendDict({
@@ -139,17 +140,23 @@ describe('HintAndSolutionButtonsComponent', () => {
     spyOn(playerPositionService.onNewCardOpened, 'subscribe');
     spyOn(playerPositionService.onActiveCardChanged, 'subscribe');
     spyOn(hintsAndSolutionManagerService.onHintConsumed, 'subscribe');
-    spyOn(hintsAndSolutionManagerService.onSolutionViewedEventEmitter, 'subscribe');
+    spyOn(
+      hintsAndSolutionManagerService.onSolutionViewedEventEmitter, 'subscribe');
 
     component.ngOnInit();
 
     expect(playerPositionService.onNewCardOpened.subscribe).toHaveBeenCalled();
-    expect(playerPositionService.onActiveCardChanged.subscribe).toHaveBeenCalled();
-    expect(hintsAndSolutionManagerService.onHintConsumed.subscribe).toHaveBeenCalled();
-    expect(hintsAndSolutionManagerService.onSolutionViewedEventEmitter.subscribe).toHaveBeenCalled();
+    expect(playerPositionService.onActiveCardChanged.subscribe)
+      .toHaveBeenCalled();
+    expect(hintsAndSolutionManagerService.onHintConsumed.subscribe)
+      .toHaveBeenCalled();
+    expect(
+      hintsAndSolutionManagerService.onSolutionViewedEventEmitter.subscribe)
+        .toHaveBeenCalled();
   });
 
-  it('should reset hints and solutions when new card is opened', fakeAsync(() => {
+  it('should reset hints and solutions when new' +
+    ' card is opened', fakeAsync(() => {
     let oldCard: StateCard = stateCardObjectFactory.createNewCard(
       'State 1', '<p>Content</p>', '<interaction></interaction>',
       null, RecordedVoiceovers.createEmpty(),
@@ -192,10 +199,10 @@ describe('HintAndSolutionButtonsComponent', () => {
   }));
 
   it('should fire change detection when hint is used', fakeAsync(() => {
-  const changeDetectorRef =
-    fixture.debugElement.injector.get(ChangeDetectorRef);
-  const detectChangesSpy =
-    spyOn(changeDetectorRef.constructor.prototype, 'detectChanges');
+    const changeDetectorRef =
+      fixture.debugElement.injector.get(ChangeDetectorRef);
+    const detectChangesSpy =
+      spyOn(changeDetectorRef.constructor.prototype, 'detectChanges');
 
     component.ngOnInit();
     hintsAndSolutionManagerService.onHintConsumed.emit();
@@ -228,7 +235,7 @@ describe('HintAndSolutionButtonsComponent', () => {
 
     expect(component.isHintButtonVisible(0)).toBe(false);
 
-    // Card with EndExploration interaction, which does not supports hints.
+    // StateCard with EndExploration interaction, which does not supports hints.
     component.displayedCard = stateCardObjectFactory.createNewCard(
       'State 1', '<p>Content</p>', '<interaction></interaction>',
       interactionObjectFactory.createFromBackendDict({
@@ -242,12 +249,12 @@ describe('HintAndSolutionButtonsComponent', () => {
       }), RecordedVoiceovers.createEmpty(),
       writtenTranslationsObjectFactory.createEmpty(), 'content');
 
-      expect(component.isHintButtonVisible(0)).toBe(false);
+    expect(component.isHintButtonVisible(0)).toBe(false);
 
-      // Card which supports hints.
-      component.displayedCard = newCard;
+    // StateCard which supports hints.
+    component.displayedCard = newCard;
 
-      expect(component.isHintButtonVisible(0)).toBe(true);
+    expect(component.isHintButtonVisible(0)).toBe(true);
   });
 
   it('should show solution button if solution is released', () => {
@@ -319,7 +326,7 @@ describe('HintAndSolutionButtonsComponent', () => {
       <NgbModalRef>{
         result: Promise.resolve('success')
       }
-    )
+    );
 
     expect(component.solutionModalIsActive).toBe(false);
 
@@ -341,7 +348,7 @@ describe('HintAndSolutionButtonsComponent', () => {
       <NgbModalRef>{
         result: Promise.reject()
       }
-    )
+    );
 
     component.onClickSolutionButton();
     tick();
