@@ -126,7 +126,7 @@ describe('Editable story backend API service', () => {
     }
     ));
 
-  it('should not delete a story from the backend if' +
+  it('should not delete a story from the backend if ' +
   'the story Id does not exist', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');

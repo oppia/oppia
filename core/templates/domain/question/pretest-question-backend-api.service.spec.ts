@@ -134,7 +134,7 @@ describe('Pretest question backend API service', function() {
   );
 
   it('should return empty list if we fetch pretest ' +
-    'question with invalid url fragment2', fakeAsync(() => {
+    'question with invalid url fragment', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
     let invalidUrl = '-invalid-url-';
