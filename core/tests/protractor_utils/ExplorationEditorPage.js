@@ -224,7 +224,7 @@ var ExplorationEditorPage = function() {
         'Commit message input', commitMessageInput, commitMessage);
     }
     await action.click('Save draft button', saveDraftButton);
-    // TODO(13096): Remove browser.sleep from e2e files. 
+    // TODO(#13096): Remove browser.sleep from e2e files.
     /* eslint-disable-next-line oppia/protractor-practices */
     await browser.sleep(2500);
     await waitFor.textToBePresentInElement(
@@ -240,7 +240,7 @@ var ExplorationEditorPage = function() {
         'Commit message input', commitMessageInput, commitMessage);
     }
     await action.click('Save draft button', saveDraftButton);
-    // TODO(#13096): Remove browser.sleep from e2e files. 
+    // TODO(#13096): Remove browser.sleep from e2e files.
     /* eslint-disable-next-line oppia/protractor-practices */
     await browser.sleep(2500);
     await waitFor.textToBePresentInElement(
