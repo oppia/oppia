@@ -112,6 +112,7 @@
         "core.domain.beam_job_domain_test",
         "core.domain.beam_job_services_test",
         "core.domain.subtopic_validators_test",
+        "core.domain.blog_validators_test",
         "core.domain.skill_jobs_one_off_test",
         "core.domain.email_validators_test",
         "core.domain.exploration_validators_test",
@@ -239,7 +240,8 @@
         "core.domain.suggestion_jobs_one_off_test",
         "core.domain.image_validation_services_test",
         "core.storage.beam_job.gae_models_test",
-        "core.domain.beam_job_validators_test"
+        "core.domain.beam_job_validators_test",
+        "core.storage.blog.gae_models_test"
     ],
     "11": [
         "core.platform.taskqueue.cloud_taskqueue_services_test",
