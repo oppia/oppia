@@ -20,13 +20,8 @@ import { TestBed } from '@angular/core/testing';
 import { Subtopic } from 'domain/topic/subtopic.model';
 
 describe('Subtopic object factory', () => {
-<<<<<<< HEAD
-  var _sampleSubtopic: Subtopic;
-  var skillIds = ['skill_1', 'skill_2'];
-=======
   let _sampleSubtopic: Subtopic;
   let skillIds = ['skill_1', 'skill_2'];
->>>>>>> upstream/develop
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -72,17 +67,6 @@ describe('Subtopic object factory', () => {
     ).toEqual(['Subtopic title should not be empty']);
   });
 
-<<<<<<< HEAD
-=======
-  it('should be able to create a subtopic object with given title and id',
-    () => {
-      let subtopic = Subtopic.createFromTitle(2, 'Title2');
-      expect(subtopic.getId()).toBe(2);
-      expect(subtopic.getTitle()).toBe('Title2');
-      expect(subtopic.getSkillSummaries()).toEqual([]);
-    });
-
->>>>>>> upstream/develop
   it('should not add duplicate elements to skill ids list', () => {
     expect(_sampleSubtopic.addSkill('skill_1', 'Description 1')).toEqual(false);
   });

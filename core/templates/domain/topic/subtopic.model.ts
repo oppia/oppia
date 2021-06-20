@@ -13,32 +13,21 @@
 // limitations under the License.
 
 /**
-<<<<<<< HEAD
- * @fileoverview Model class for creating and mutating instances of frontend
-=======
  * @fileoverview Model for creating and mutating instances of frontend
->>>>>>> upstream/develop
  * subtopic domain objects.
  */
 
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
-<<<<<<< HEAD
-import { AppConstants } from 'app.constants';
-=======
 
 import constants from 'assets/constants';
->>>>>>> upstream/develop
 
 export interface SubtopicBackendDict {
   'id': number;
   'title': string;
   'skill_ids': string[];
-  // For a newly created subtopic, properties below are initialized
-  // with a null value and should be passed by user to create a subtopic.
-  // Here null implies that properties are yet to be assigned.
-  'thumbnail_filename': string | null;
-  'thumbnail_bg_color': string | null;
-  'url_fragment': string | null;
+  'thumbnail_filename': string;
+  'thumbnail_bg_color': string;
+  'url_fragment': string;
 }
 
 export interface SkillIdToDescriptionMap {
@@ -50,21 +39,14 @@ export class Subtopic {
   _title: string;
   _skillSummaries: ShortSkillSummary[];
   _skillIds: string[];
-<<<<<<< HEAD
-  _skillSummary: ShortSkillSummary | undefined;
-  _thumbnailFilename: string | null;
-  _thumbnailBgColor: string | null;
-  _urlFragment: string | null;
-=======
   _thumbnailFilename: string;
   _thumbnailBgColor: string;
   _urlFragment: string;
->>>>>>> upstream/develop
   constructor(
       subtopicId: number, title: string, skillIds: string[],
       skillIdToDescriptionMap: SkillIdToDescriptionMap,
-      thumbnailFilename: string | null, thumbnailBgColor: string | null,
-      urlFragment: string | null) {
+      thumbnailFilename: string, thumbnailBgColor: string,
+      urlFragment: string) {
     this._id = subtopicId;
     this._title = title;
     this._skillIds = skillIds;
@@ -99,34 +81,23 @@ export class Subtopic {
     this._title = title;
   }
 
-  getUrlFragment(): string | null {
+  getUrlFragment(): string {
     return this._urlFragment;
   }
 
-  setUrlFragment(urlFragment: string | null): void {
+  setUrlFragment(urlFragment: string): void {
     this._urlFragment = urlFragment;
   }
 
   validate(): string[] {
     let issues: string[] = [];
     const VALID_URL_FRAGMENT_REGEX = new RegExp(
-<<<<<<< HEAD
-      AppConstants.VALID_URL_FRAGMENT_REGEX);
-    if (this._urlFragment !== '' && this._urlFragment !== null) {
-      if (!VALID_URL_FRAGMENT_REGEX.test(this._urlFragment)) {
-        issues.push('Subtopic url fragment is invalid.');
-      }
-    } else {
-      issues.push('Subtopic URL fragment should not be empty');
-=======
       constants.VALID_URL_FRAGMENT_REGEX);
     if (this._urlFragment !== null) {
       if (!VALID_URL_FRAGMENT_REGEX.test(this._urlFragment)) {
         issues.push('Subtopic url fragment is invalid.');
       }
->>>>>>> upstream/develop
     }
-
     if (this._title === '') {
       issues.push('Subtopic title should not be empty');
     }
@@ -177,11 +148,7 @@ export class Subtopic {
   }
 
   removeSkill(skillId: string): void {
-<<<<<<< HEAD
-    let index = this._skillSummaries.map(function(skillSummary) {
-=======
     let index = this._skillSummaries.map((skillSummary) => {
->>>>>>> upstream/develop
       return skillSummary.getId();
     }).indexOf(skillId);
     if (index > -1) {
@@ -195,7 +162,7 @@ export class Subtopic {
     this._thumbnailFilename = thumbnailFilename;
   }
 
-  getThumbnailFilename(): string | null {
+  getThumbnailFilename(): string {
     return this._thumbnailFilename;
   }
 
@@ -203,7 +170,7 @@ export class Subtopic {
     this._thumbnailBgColor = thumbnailBgColor;
   }
 
-  getThumbnailBgColor(): string | null {
+  getThumbnailBgColor(): string {
     return this._thumbnailBgColor;
   }
 
