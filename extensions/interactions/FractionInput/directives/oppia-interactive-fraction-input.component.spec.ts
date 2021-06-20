@@ -259,7 +259,7 @@ describe('InteractiveFractionInputComponent', () => {
   });
 
   // This is to test the isAnswerValid function which is passed
-  // to currentInteractionService.registerCurrentInteraction
+  // to currentInteractionService.registerCurrentInteraction.
   it('should return true if answer is valid', () => {
     expect(component.allowNonzeroIntegerPart).toBe(true);
     component.isValid = true;
@@ -270,7 +270,7 @@ describe('InteractiveFractionInputComponent', () => {
   });
 
   // This is to test the isAnswerValid function which is passed
-  // to currentInteractionService.registerCurrentInteraction
+  // to currentInteractionService.registerCurrentInteraction.
   it('should return false if answer is invalid', () => {
     expect(component.allowNonzeroIntegerPart).toBe(true);
     component.isValid = false;
