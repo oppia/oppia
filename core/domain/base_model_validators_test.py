@@ -318,7 +318,6 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
             commit_cmds=[])
         model.update_timestamps()
         mock_validator = MockCommitLogEntryModelValidator()
-        mock_validator.errors.clear()
         mock_validator.validate(model)
         self.assertDictContainsSubset(
             {
@@ -337,7 +336,6 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
             commit_cmds=[])
         model.update_timestamps()
         mock_validator = MockCommitLogEntryModelValidator()
-        mock_validator.errors.clear()
         mock_validator.validate(model)
         self.assertDictContainsSubset(
             {
@@ -356,7 +354,6 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
             commit_cmds=[])
         model.update_timestamps()
         mock_validator = MockCommitLogEntryModelValidator()
-        mock_validator.errors.clear()
         mock_validator.validate(model)
         self.assertDictContainsSubset(
             {
@@ -377,7 +374,6 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
             commit_message='a' * (constants.MAX_COMMIT_MESSAGE_LENGTH + 1))
         model.update_timestamps()
         mock_validator = MockCommitLogEntryModelValidator()
-        mock_validator.errors.clear()
         mock_validator.validate(model)
         self.assertDictContainsSubset(
             {
@@ -402,7 +398,6 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
             post_commit_status='public')
         model.update_timestamps()
         mock_validator = MockCommitLogEntryModelValidator()
-        mock_validator.errors.clear()
         mock_validator.validate(model)
         self.assertEqual(mock_validator.errors, {})
 
@@ -416,7 +411,6 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
             commit_cmds=[commit_cmd])
         model.update_timestamps()
         mock_validator = MockCommitLogEntryModelValidator()
-        mock_validator.errors.clear()
         mock_validator.validate(model)
         self.assertDictContainsSubset(
             {
@@ -442,7 +436,6 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
             post_commit_status='public')
         model.update_timestamps()
         mock_validator = MockCommitLogEntryModelValidator()
-        mock_validator.errors.clear()
         mock_validator.validate(model)
         self.assertEqual(mock_validator.errors, {})
 
@@ -459,7 +452,6 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
             post_commit_status='public')
         model.update_timestamps()
         mock_validator = MockCommitLogEntryModelValidator()
-        mock_validator.errors.clear()
         mock_validator.validate(model)
         self.assertEqual(mock_validator.errors, {})
 
@@ -476,7 +468,6 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
             post_commit_status='public')
         model.update_timestamps()
         mock_validator = MockCommitLogEntryModelValidator()
-        mock_validator.errors.clear()
         mock_validator.validate(model)
         self.assertDictContainsSubset(
             {
