@@ -85,6 +85,9 @@ export class ExplorationPlayerStateService {
     private statsReportingService: StatsReportingService,
     private urlService: UrlService
   ) {
+    this.init();
+  }
+  init(): void {
     let pathnameArray = this.urlService.getPathname().split('/');
     let explorationContext = false;
 
@@ -102,7 +105,7 @@ export class ExplorationPlayerStateService {
       this.editorPreviewMode = this.contextService.isInExplorationEditorPage();
       this.questionPlayerMode = this.contextService.isInQuestionPlayerMode();
       this.explorationId = this.contextService.getExplorationId();
-      this.version = urlService.getExplorationVersionFromUrl();
+      this.version = this.urlService.getExplorationVersionFromUrl();
 
       if (!this.questionPlayerMode &&
       !('skill_editor' === this.urlService.getPathname()
