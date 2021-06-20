@@ -342,15 +342,17 @@ export class Topic {
   }
 
   // Adds a new frontend subtopic domain object to this topic.
-  addSubtopic(_title: string): void {
+  addSubtopic(_title: string, _subtopicUrlFragment: string,
+      _subtopicBgColor: string, _subtopicThumbnailFilename: string): void {
     let subtopicBackendDict: SubtopicBackendDict = {
       id: this._nextSubtopicId,
       title: _title,
       skill_ids: [],
-      thumbnail_filename: null,
-      thumbnail_bg_color: null,
-      url_fragment: null
+      thumbnail_filename: _subtopicThumbnailFilename,
+      thumbnail_bg_color: _subtopicBgColor,
+      url_fragment: _subtopicUrlFragment
     };
+    console.log(subtopicBackendDict);
     let newSubtopic = Subtopic.createFromBackendDict(
       subtopicBackendDict, {});
     this._subtopics.push(newSubtopic);

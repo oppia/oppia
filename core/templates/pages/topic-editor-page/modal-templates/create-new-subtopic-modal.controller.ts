@@ -69,7 +69,10 @@ angular.module('oppia').controller('CreateNewSubtopicModalController', [
       ctrl.subtopicTitle = '';
       ctrl.errorMsg = null;
       ctrl.subtopicUrlFragmentExists = false;
-      TopicUpdateService.addSubtopic(ctrl.topic, ctrl.subtopicTitle);
+      TopicUpdateService.addSubtopic(
+        ctrl.topic, ctrl.subtopicTitle,
+        ctrl.editableUrlFragment, ctrl.allowedBgColors,
+        ctrl.editableThumbnailFilename);
     };
 
     ctrl.showSchemaEditor = function() {

@@ -329,14 +329,17 @@ export class TopicUpdateService {
    * the undo/redo service.
    */
   addSubtopic(
-      topic: Topic, title: string): void {
+      topic: Topic, title: string, subtopicUrlFragment: string,
+      subtopicBgColor: string, subtopicThumbnailFilename: string): void {
     let nextSubtopicId = topic.getNextSubtopicId();
     this._applyChange(topic, TopicDomainConstants.CMD_ADD_SUBTOPIC, {
       subtopic_id: nextSubtopicId,
       title: title
     }, (changeDict, topic) => {
       // ---- Apply ----
-      topic.addSubtopic(title);
+      topic.addSubtopic(
+        title, subtopicUrlFragment,
+        subtopicBgColor, subtopicThumbnailFilename);
     }, (changeDict, topic) => {
       // ---- Undo ----
       let subtopicId = this._getSubtopicIdFromChangeDict(changeDict);
