@@ -85,9 +85,9 @@ describe('EditProfilePictureModalController', function() {
 
         var mockUrl = 'mock-url';
         // This throws "Argument of type '{ toDataURL: () => string; }' is
-        // not assignable to parameter of type 'HTMLCanvasElement'"". This
-        // is because 'HTMLCanvasElement' has around 250 more properties. We
-        // only need to define one for testing purposes.
+        // not assignable to parameter of type 'HTMLCanvasElement'"". We need to
+        // suppress this error because 'HTMLCanvasElement' has around 250 more
+        // properties. We only need to define one for testing purposes.
         // @ts-expect-error
         spyOn(Cropper.prototype, 'getCroppedCanvas').and.returnValue({
           toDataURL: () => mockUrl
