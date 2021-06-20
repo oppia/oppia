@@ -299,10 +299,16 @@ class BaseHandler(webapp2.RequestHandler):
                 self.handle_exception(e, self.app.debug)
                 return
 
+        handlers_has_passed_schema_validation = True
         try:
             self.validate_args_schema()
         except self.InvalidInputException as e:
             self.handle_exception(e, self.app.debug)
+            handlers_has_passed_schema_validation = False
+        except NotImplementedError as e:
+            self.handle_exception(e, self.app.debug)
+            handlers_has_passed_schema_validation = False
+        if handlers_has_passed_schema_validation is False:
             return
 
         super(BaseHandler, self).dispatch()
