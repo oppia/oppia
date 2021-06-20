@@ -21,7 +21,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service';
 import { StorySummary} from 'domain/story/story-summary.model';
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 describe('Topic preview tab', function() {
   var ctrl = null;

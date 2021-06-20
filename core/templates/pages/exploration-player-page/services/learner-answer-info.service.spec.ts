@@ -31,7 +31,6 @@ import { LearnerAnswerInfoService } from
   'pages/exploration-player-page/services/learner-answer-info.service';
 import { ExplorationPlayerConstants } from
   'pages/exploration-player-page/exploration-player-page.constants';
-import { importAllAngularServices } from 'tests/unit-test-utils';
 import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
 
@@ -48,8 +47,6 @@ describe('Learner answer info service', () =>{
   let learnerAnswerInfoService: LearnerAnswerInfoService;
   let answerClassificationService: AnswerClassificationService;
   let DEFAULT_OUTCOME_CLASSIFICATION: string;
-
-  importAllAngularServices();
 
   beforeEach(() => {
     stateDict = {

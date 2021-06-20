@@ -18,7 +18,7 @@
 
 import { destroyPlatform } from '@angular/core';
 import { waitForAsync } from '@angular/core/testing';
-import { setupAndGetUpgradedComponentAsync } from 'tests/unit-test-utils';
+import { setupAndGetUpgradedComponentAsync } from 'tests/unit-test-utils.ajs';
 import { AngularHtmlBindWrapperDirective } from './angular-html-bind-wrapper.directive';
 
 describe('Angular Html Bind Wrapper Directive', () => {

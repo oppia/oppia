@@ -34,6 +34,7 @@
     }
   },
   "files": [
+    "core/templates/pages/topic-viewer-page/topic-viewer-page.component.spec.ts",
     "assets/constants.ts",
     "assets/rich_text_components_definitions.ts",
     "core/templates/app-events/app-events.ts",
