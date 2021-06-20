@@ -214,8 +214,8 @@ def normalize_against_schema(
                 'Expected unicode, received %s' % obj)
         normalized_obj = obj
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_OBJECT_DICT:
-        # The schema type 'object_dict' accepts any one of
-        # the keys either 'object_class' or 'validation_method'.
+        # The schema type 'object_dict' accepts either of the keys
+        # 'object_class' or 'validation_method'.
         # 'object_class' key is the most commonly used case, when the object is
         # initialized from_dict() method and the validation is done from
         # validate() method.

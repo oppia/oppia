@@ -301,7 +301,7 @@ class BaseHandler(webapp2.RequestHandler):
 
         try:
             self.validate_args_schema()
-        except Exception as e:
+        except self.InvalidInputException as e:
             self.handle_exception(e, self.app.debug)
             return
 
@@ -318,28 +318,29 @@ class BaseHandler(webapp2.RequestHandler):
         request_method = self.request.environ['REQUEST_METHOD']
         handler_args = self.payload
         url_path_args = self.request.route_kwargs
-        non_schema_handlers = payload_validator.NON_SCHEMA_HANDLERS
+        handler_class_names_with_no_schema = (
+            payload_validator.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA)
 
-        if handler_class_name in non_schema_handlers:
+        if handler_class_name in handler_class_names_with_no_schema:
             return
 
         if self.URL_PATH_ARGS_SCHEMAS is None:
             raise NotImplementedError(
-                'Please provide schema for url path args in %s '
+                'Missing schema for url path args in %s '
                 'handler class' % (handler_class_name))
 
         # For html handlers, extra args are allowed (to accommodate
         # e.g. utm parameters which are not used by the backend but
         # needed for analytics).
-        allowed_extra_args = False
+        extra_args_are_allowed = False
         if (self.GET_HANDLER_ERROR_RETURN_TYPE == 'html' and
                 request_method == 'GET'):
-            allowed_extra_args = True
+            extra_args_are_allowed = True
 
         # Validation for url path elements.
         schema_for_url_path_args = self.URL_PATH_ARGS_SCHEMAS
         errors = payload_validator.validate(
-            url_path_args, schema_for_url_path_args, allowed_extra_args)
+            url_path_args, schema_for_url_path_args, extra_args_are_allowed)
         if errors:
             raise self.InvalidInputException('\n'.join(errors))
 
@@ -356,11 +357,11 @@ class BaseHandler(webapp2.RequestHandler):
             schema_for_request_method = schema_for_handler_args[request_method]
         except Exception:
             raise NotImplementedError(
-                'Provide schema for %s method in %s handler class.' % (
+                'Missing schema for %s method in %s handler class.' % (
                     request_method, handler_class_name))
 
         errors = payload_validator.validate(
-            handler_args, schema_for_request_method, allowed_extra_args)
+            handler_args, schema_for_request_method, extra_args_are_allowed)
         if errors:
             raise self.InvalidInputException('\n'.join(errors))
 

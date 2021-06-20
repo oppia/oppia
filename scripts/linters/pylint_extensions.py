@@ -2164,7 +2164,8 @@ class DisallowHandlerWithoutSchema(checkers.BaseChecker):
             'https://github.com/oppia/oppia/wiki/Validation-of-handler-args'
         )
     }
-    non_schema_handlers = payload_validator.NON_SCHEMA_HANDLERS
+    non_schema_requiring_handler_class_names = (
+        payload_validator.SCHEMA_REQUIRING_HANDLER_CLASS_NAMES)
 
     def check_parent_class_is_basehandler(self, node):
         """Checks whether a class is child class of BaseHandler."""
@@ -2187,7 +2188,7 @@ class DisallowHandlerWithoutSchema(checkers.BaseChecker):
         if basehandler_child_class is False:
             return
 
-        if node.name in self.non_schema_handlers:
+        if node.name in self.non_schema_requiring_handler_class_names:
             return
 
         if 'URL_PATH_ARGS_SCHEMAS' not in node.locals:

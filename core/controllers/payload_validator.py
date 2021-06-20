@@ -90,7 +90,7 @@ def validate(handler_args, handler_args_schemas, allowed_extra_args):
 # not have schema. In order to add schema incrementally this list is
 # maintained. Please remove the name of the handlers if they already
 # contains schema.
-SCHEMA_REQUIRING_HANDLERS = [
+SCHEMA_REQUIRING_HANDLER_CLASS_NAMES = [
     'AboutRedirectPage',
     'AddContributionRightsHandler',
     'AdminHandler',
@@ -341,7 +341,7 @@ SCHEMA_REQUIRING_HANDLERS = [
     ]
 
 # These handlers do not require any schema validation.
-NON_SCHEMA_REQUIRING_HANDLERS = [
+NON_SCHEMA_REQUIRING_HANDLER_CLASS_NAMES = [
     'SessionBeginHandler',
     'SessionEndHandler',
     'OppiaMLVMHandler',
@@ -354,7 +354,10 @@ NON_SCHEMA_REQUIRING_HANDLERS = [
     'SeedFirebaseHandler'
 ]
 
-# NON_SCHEMA_HANDLERS is addressed everywhere in the code since
-# SCHEMA_REQUIRING_HANDLERS is temporary and will be removed once every
-# handlers in controller layer will become ready for schema validation.
-NON_SCHEMA_HANDLERS = SCHEMA_REQUIRING_HANDLERS + NON_SCHEMA_REQUIRING_HANDLERS
+# HANDLER_CLASS_NAMES_WITH_NO_SCHEMA is addressed everywhere in the
+# code since, SCHEMA_REQUIRING_HANDLER_CLASS_NAMES is temporary and
+# will be removed once every handlers in controller layer will become
+# ready for schema validation.
+HANDLER_CLASS_NAMES_WITH_NO_SCHEMA = (
+    SCHEMA_REQUIRING_HANDLER_CLASS_NAMES +
+    NON_SCHEMA_REQUIRING_HANDLER_CLASS_NAMES)

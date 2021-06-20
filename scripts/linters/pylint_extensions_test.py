@@ -3405,8 +3405,8 @@ class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
             checker_test_object.checker.visit_classdef(schemaless_class_node)
 
     def test_list_of_non_schema_handlers_do_not_raise_errors(self):
-        """Handler class name in list of NON_SCHEMA_HANDLERS do not raise
-        error for missing schemas.
+        """Handler class name in list of SCHEMA_REQUIRING_HANDLER_CLASS_NAMES
+        do not raise error for missing schemas.
         """
         checker_test_object = testutils.CheckerTestCase()
         checker_test_object.CHECKER_CLASS = (
