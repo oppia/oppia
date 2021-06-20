@@ -58,6 +58,7 @@ import { SubtitledUnicode } from
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import { ExplorationDataService } from '../services/exploration-data.service';
 
 describe('Exploration editor tab component', function() {
   var ctrl;
@@ -86,7 +87,21 @@ describe('Exploration editor tab component', function() {
 
   importAllAngularServices();
 
-  beforeEach(function() {
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [
+        {
+          provide: ExplorationDataService,
+          useValue: {
+            explorationId: 0,
+            autosaveChangeListAsync() {
+              return;
+            }
+          }
+        }
+      ]
+    });
+
     answerGroupObjectFactory = TestBed.get(AnswerGroupObjectFactory);
     explorationFeaturesService = TestBed.get(ExplorationFeaturesService);
     hintObjectFactory = TestBed.get(HintObjectFactory);
@@ -129,9 +144,6 @@ describe('Exploration editor tab component', function() {
     $provide.value(
       'WrittenTranslationsObjectFactory',
       TestBed.get(WrittenTranslationsObjectFactory));
-    $provide.value('ExplorationDataService', {
-      autosaveChangeListAsync: function() {}
-    });
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
@@ -800,10 +812,10 @@ describe('Exploration editor tab component', function() {
       spyOn(angular, 'element')
         .withArgs('#tutorialStateContent').and.returnValue({
           // This throws "Type '{ top: number; }' is not assignable to type
-          // 'JQLite | Coordinates'." This is because the actual 'offset'
-          // functions returns more properties than the function we've
-          // defined. We have only returned the properties we need
-          // in 'offset' function.
+          // 'JQLite | Coordinates'.". We need to suppress this error because
+          // the actual 'offset' functions returns more properties than the
+          // function we've defined. We have only returned the properties we
+          // need in 'offset' function.
           // @ts-expect-error
           offset: () => ({
             top: 5
@@ -826,10 +838,10 @@ describe('Exploration editor tab component', function() {
       spyOn(angular, 'element')
         .withArgs('#tutorialStateInteraction').and.returnValue({
           // This throws "Type '{ top: number; }' is not assignable to type
-          // 'JQLite | Coordinates'." This is because the actual 'offset'
-          // functions returns more properties than the function we've
-          // defined. We have only returned the properties we need
-          // in 'offset' function.
+          // 'JQLite | Coordinates'.". We need to suppress this error because
+          // the actual 'offset' functions returns more properties than the
+          // function we've defined. We have only returned the properties we
+          // need in 'offset' function.
           // @ts-expect-error
           offset: () => ({
             top: 20
@@ -852,10 +864,10 @@ describe('Exploration editor tab component', function() {
       spyOn(angular, 'element')
         .withArgs('#tutorialPreviewTab').and.returnValue({
           // This throws "Type '{ top: number; }' is not assignable to type
-          // 'JQLite | Coordinates'." This is because the actual 'offset'
-          // functions returns more properties than the function we've
-          // defined. We have only returned the properties we need
-          // in 'offset' function.
+          // 'JQLite | Coordinates'.". We need to suppress this error because
+          // the actual 'offset' functions returns more properties than the
+          // function we've defined. We have only returned the properties we
+          // need in 'offset' function.
           // @ts-expect-error
           offset: () => ({
             top: 5
@@ -878,10 +890,10 @@ describe('Exploration editor tab component', function() {
       spyOn(angular, 'element')
         .withArgs('#tutorialStateInteraction').and.returnValue({
           // This throws "Type '{ top: number; }' is not assignable to type
-          // 'JQLite | Coordinates'." This is because the actual 'offset'
-          // functions returns more properties than the function we've
-          // defined. We have only returned the properties we need
-          // in 'offset' function.
+          // 'JQLite | Coordinates'.". We need to suppress this error because
+          // the actual 'offset' functions returns more properties than the
+          // function we've defined. We have only returned the properties we
+          // need in 'offset' function.
           // @ts-expect-error
           offset: () => ({
             top: 20
@@ -904,10 +916,10 @@ describe('Exploration editor tab component', function() {
       spyOn(angular, 'element')
         .withArgs('#tutorialPreviewTab').and.returnValue({
           // This throws "Type '{ top: number; }' is not assignable to type
-          // 'JQLite | Coordinates'." This is because the actual 'offset'
-          // functions returns more properties than the function we've
-          // defined. We have only returned the properties we need
-          // in 'offset' function.
+          // 'JQLite | Coordinates'.". We need to suppress this error because
+          // the actual 'offset' functions returns more properties than the
+          // function we've defined. We have only returned the properties we
+          // need in 'offset' function.
           // @ts-expect-error
           offset: () => ({
             top: 5
@@ -930,10 +942,10 @@ describe('Exploration editor tab component', function() {
       spyOn(angular, 'element')
         .withArgs('#tutorialStateInteraction').and.returnValue({
           // This throws "Type '{ top: number; }' is not assignable to type
-          // 'JQLite | Coordinates'." This is because the actual 'offset'
-          // functions returns more properties than the function we've
-          // defined. We have only returned the properties we need
-          // in 'offset' function.
+          // 'JQLite | Coordinates'.". We need to suppress this error because
+          // the actual 'offset' functions returns more properties than the
+          // function we've defined. We have only returned the properties we
+          // need in 'offset' function.
           // @ts-expect-error
           offset: () => ({
             top: 20
