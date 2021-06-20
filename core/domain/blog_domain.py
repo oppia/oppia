@@ -21,7 +21,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import json
 import re
-import string
 
 from constants import constants
 from core.domain import html_cleaner
@@ -106,7 +105,7 @@ class BlogPost(python_utils.OBJECT):
 
         if strict:
             self.require_valid_url_fragment(self.url_fragment)
-            if len(self.content) == 0:
+            if not self.content:
                 raise utils.ValidationError('Content can not be empty')
 
     @classmethod
@@ -145,7 +144,7 @@ class BlogPost(python_utils.OBJECT):
                     'Expected each tag in \'tags\' to be a string, received: '
                     '\'%s\'' % tag)
 
-            if len(tag) == 0:
+            if not tag:
                 raise utils.ValidationError(
                     'Tag should not be empty, received: \'\'')
 
@@ -154,8 +153,7 @@ class BlogPost(python_utils.OBJECT):
                     'Tags should only contain lowercase letters and spaces, '
                     'received: \'%s\'' % tag)
 
-            if (tag[0] not in string.ascii_lowercase or
-                    tag[-1] not in string.ascii_lowercase):
+            if not re.match(r'^[^\s]+(\s+[^\s]+)*$', tag):
                 raise utils.ValidationError(
                     'Tags should not start or end with whitespace, received: '
                     '\'%s\'' % tag)
@@ -166,7 +164,7 @@ class BlogPost(python_utils.OBJECT):
                     'received: \'%s\'' % tag)
 
         if strict:
-            if len(tags) == 0:
+            if not tags:
                 raise utils.ValidationError(
                     'Atleast one tag should be selected')
 
@@ -183,7 +181,6 @@ class BlogPost(python_utils.OBJECT):
             strict: bool. Enable strict checks on the blog post when the blog
                 post is published or is going to be published.
         """
-
         if not isinstance(title, python_utils.BASESTRING):
             raise utils.ValidationError('Title should be a string.')
 
@@ -194,7 +191,7 @@ class BlogPost(python_utils.OBJECT):
                 % (title_limit, title))
 
         if strict:
-            if len(title) == 0:
+            if not title:
                 raise utils.ValidationError('Title should not be empty')
             if not re.match(constants.VALID_BLOG_POST_TITLE_REGEX, title):
                 raise utils.ValidationError(
@@ -394,7 +391,6 @@ class BlogPostSummary(python_utils.OBJECT):
             strict: bool. Enable strict checks on the blog post summary when the
                 blog post is published or is going to be published.
         """
-
         if strict:
             if not isinstance(thumbnail_filename, python_utils.BASESTRING):
                 raise utils.ValidationError(
@@ -429,7 +425,7 @@ class BlogPostSummary(python_utils.OBJECT):
 
         if strict:
             self.require_valid_url_fragment(self.url_fragment)
-            if len(self.summary) == 0:
+            if not self.summary:
                 raise utils.ValidationError('Summary can not be empty')
 
     @classmethod
@@ -453,7 +449,6 @@ class BlogPostSummary(python_utils.OBJECT):
         Args:
             url_fragment: str. The url fragment to validate.
         """
-
         url_limit = constants.MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT
         utils.require_valid_url_fragment(
             url_fragment, 'Blog Post URL Fragment', url_limit)
@@ -467,7 +462,6 @@ class BlogPostSummary(python_utils.OBJECT):
             strict: bool. Enable strict checks on the blog post summary when the
                 blog post is published or is going to be published.
         """
-
         if not isinstance(title, python_utils.BASESTRING):
             raise utils.ValidationError('Title should be a string.')
 
@@ -478,7 +472,7 @@ class BlogPostSummary(python_utils.OBJECT):
                 % (title_limit, title))
 
         if strict:
-            if len(title) == 0:
+            if not title:
                 raise utils.ValidationError('Title should not be empty')
 
     @classmethod
@@ -502,7 +496,7 @@ class BlogPostSummary(python_utils.OBJECT):
                     'Expected each tag in \'tags\' to be a string, received: '
                     '\'%s\'' % tag)
 
-            if len(tag) == 0:
+            if not tag:
                 raise utils.ValidationError(
                     'Tag should not be empty, received: \'\'')
 
@@ -511,8 +505,7 @@ class BlogPostSummary(python_utils.OBJECT):
                     'Tags should only contain lowercase letters and spaces, '
                     'received: \'%s\'' % tag)
 
-            if (tag[0] not in string.ascii_lowercase or
-                    tag[-1] not in string.ascii_lowercase):
+            if not re.match(r'^[^\s]+(\s+[^\s]+)*$', tag):
                 raise utils.ValidationError(
                     'Tags should not start or end with whitespace, received: '
                     '\'%s\'' % tag)
@@ -523,7 +516,7 @@ class BlogPostSummary(python_utils.OBJECT):
                     'received: \'%s\'' % tag)
 
         if strict:
-            if len(tags) == 0:
+            if not tags:
                 raise utils.ValidationError(
                     'Atleast one tag should be selected')
 

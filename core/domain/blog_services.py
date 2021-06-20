@@ -72,8 +72,7 @@ def get_blog_post_by_id(blog_post_id, strict=True):
     """
     blog_post_model = blog_models.BlogPostModel.get(blog_post_id, strict=strict)
     if blog_post_model:
-        blog_post = get_blog_post_from_model(blog_post_model)
-        return blog_post
+        return get_blog_post_from_model(blog_post_model)
     else:
         return None
 
@@ -112,8 +111,7 @@ def get_blog_post_by_url_fragment(url_fragment):
     if blog_post_model is None:
         return None
 
-    blog_post = get_blog_post_from_model(blog_post_model)
-    return blog_post
+    return get_blog_post_from_model(blog_post_model)
 
 
 def get_blog_post_summary_from_model(blog_post_summary_model):
@@ -227,9 +225,7 @@ def get_blog_post_summary_by_title(title):
     if len(blog_post_summary_model) == 0:
         return None
 
-    blog_post_summary = (
-        get_blog_post_summary_from_model(blog_post_summary_model[0]))
-    return blog_post_summary
+    return get_blog_post_summary_from_model(blog_post_summary_model[0])
 
 
 def get_all_blog_posts():
@@ -240,10 +236,9 @@ def get_all_blog_posts():
         in the datastore.
     """
     backend_blog_post_models = blog_models.BlogPostModel.get_all()
-    blog_posts = [
+    return [
         get_blog_post_from_model(blog_post)
         for blog_post in backend_blog_post_models]
-    return blog_posts
 
 
 def get_new_blog_post_id():
