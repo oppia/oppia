@@ -51,7 +51,7 @@ interface Dimension {
   width: string;
 }
 @Component({
-  selector: 'oppia-noninteractive-image',
+  selector: 'oppia-non-interactive-image',
   templateUrl: './image.component.html',
   styleUrls: []
 })

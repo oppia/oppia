@@ -53,7 +53,7 @@ import { ServicesConstants } from 'services/services.constants';
 
 let apiLoaded = false;
 @Component({
-  selector: 'oppia-noninteractive-video',
+  selector: 'oppia-non-interactive-video',
   templateUrl: './video.component.html',
   styleUrls: []
 })

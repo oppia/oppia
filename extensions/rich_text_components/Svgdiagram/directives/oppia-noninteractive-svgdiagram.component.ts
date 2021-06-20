@@ -46,7 +46,7 @@ import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 
 @Component({
-  selector: 'oppia-noninteractive-svgdiagram',
+  selector: 'oppia-non-interactive-svgdiagram',
   templateUrl: './svgdiagram.component.html',
   styleUrls: []
 })

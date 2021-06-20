@@ -56,7 +56,7 @@ interface ImageContainerStyle {
   'vertical-align': string;
 }
 @Component({
-  selector: 'oppia-noninteractive-math',
+  selector: 'oppia-non-interactive-math',
   templateUrl: './math.component.html',
   styleUrls: []
 })

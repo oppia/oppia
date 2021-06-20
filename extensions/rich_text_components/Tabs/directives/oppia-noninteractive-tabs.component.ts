@@ -44,7 +44,7 @@ export interface TabContent {
 }
 
 @Component({
-  selector: 'oppia-noninteractive-tabs',
+  selector: 'oppia-non-interactive-tabs',
   templateUrl: './tabs.component.html',
   styleUrls: []
 })

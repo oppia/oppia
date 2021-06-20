@@ -33,15 +33,15 @@ interface CkEditorCopyEvent {
 })
 export class CkEditorCopyContentService {
   private readonly OUTPUT_VIEW_TAG_NAME = 'ANGULAR-HTML-BIND';
-  private readonly NON_INTERACTIVE_TAG = '-noninteractive-';
+  private readonly NON_INTERACTIVE_TAG = '-non-interactive-';
   private readonly ALLOWLISTED_WIDGETS = new Set([
-    'oppia-noninteractive-collapsible',
-    'oppia-noninteractive-image',
-    'oppia-noninteractive-link',
-    'oppia-noninteractive-math',
-    'oppia-noninteractive-tabs',
-    'oppia-noninteractive-video',
-    'oppia-noninteractive-skillreview'
+    'oppia-non-interactive-collapsible',
+    'oppia-non-interactive-image',
+    'oppia-non-interactive-link',
+    'oppia-non-interactive-math',
+    'oppia-non-interactive-tabs',
+    'oppia-non-interactive-video',
+    'oppia-non-interactive-skillreview'
   ]);
 
   private copyEventEmitter = new EventEmitter<CkEditorCopyEvent>();
@@ -72,7 +72,9 @@ export class CkEditorCopyContentService {
         break;
       }
 
-      if (currentElement.parentElement.tagName === this.OUTPUT_VIEW_TAG_NAME) {
+      if (
+        currentElement.parentElement.tagName === this.OUTPUT_VIEW_TAG_NAME ||
+        currentElement.parentElement.tagName === 'OPPIA-RTE-OUTPUT-DISPLAY') {
         break;
       }
 
@@ -119,11 +121,13 @@ export class CkEditorCopyContentService {
     let elementTagName = (
       containedWidgetTagName || element.tagName.toLowerCase());
     let html = element.outerHTML;
-
+    html = html.replace(/<oppia-non-interactive/g, '<oppia-noninteractive');
+    html = html.replace(/<\/oppia-non-interactive/g, '</oppia-noninteractive');
+    html = html.replace(/<!--[^>]*-->/g, '');
     if (!containedWidgetTagName) {
       editor.insertHtml(html);
     } else {
-      const widgetName = elementTagName.replace('-noninteractive-', '');
+      const widgetName = elementTagName.replace('-non-interactive-', '');
 
       // Look for x-with-value="y" to extract x and y.
       //  Group 1 (\w+): Any word containing [a-zA-Z0-9_] characters. This is
@@ -132,13 +136,16 @@ export class CkEditorCopyContentService {
       //  Group 3 ([^"]+): Matches any characters excluding ". This is the
       //    value of the property.
       //  Group 4 ("): Matches " literally.
-      const valueMatcher = /(\w+)(-with-value=")([^"]+)(")/g;
+      const valueMatcher = /([\w-]+)(-with-value=")([^"]+)(")/g;
 
       let match;
       let startupData: {[id: string]: string} = {};
 
       while ((match = valueMatcher.exec(html)) !== null) {
         const key = match[1];
+        if (key.startsWith('ng-reflect')) {
+          continue;
+        }
         // Must replace & for html escaper to properly work- html escaper
         // service depends on & already escaped.
         const value = match[3].replace(/&amp;/g, '&');
