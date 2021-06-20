@@ -3109,9 +3109,12 @@ class State(python_utils.OBJECT):
         for ca_dict in self.interaction.customization_args.values():
             subtitled_htmls = ca_dict.get_subtitled_html()
             for subtitled_html in subtitled_htmls:
-                if subtitled_html.html != '':
+                html_string = subtitled_html.html
+                # Make sure we don't include content that only consists of
+                # numbers. See issue #13055.
+                if html_string != '' and not html_string.isnumeric():
                     content_id_to_string[subtitled_html.content_id] = (
-                        subtitled_html.html)
+                        html_string)
 
             subtitled_unicodes = ca_dict.get_subtitled_unicode()
             for subtitled_unicode in subtitled_unicodes:
