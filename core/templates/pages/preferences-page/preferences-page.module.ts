@@ -36,10 +36,12 @@ import { PreferencesPageComponent } from './preferences-page.component';
     SharedComponentsModule
   ],
   declarations: [
+    EditProfilePictureModalComponent,
     OppiaAngularRootComponent,
     PreferencesPageComponent
   ],
   entryComponents: [
+    EditProfilePictureModalComponent,
     OppiaAngularRootComponent,
     PreferencesPageComponent
   ],
@@ -64,6 +66,7 @@ class PreferencesPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import { EditProfilePictureModalComponent } from './modal-templates/edit-profile-picture-modal.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

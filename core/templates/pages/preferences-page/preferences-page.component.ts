@@ -30,6 +30,7 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { LoaderService } from 'services/loader.service';
 import { PreventPageUnloadEventService } from 'services/prevent-page-unload-event.service';
 import { UserService } from 'services/user.service';
+import { EditProfilePictureModalComponent } from './modal-templates/edit-profile-picture-modal.component';
 require('cropperjs/dist/cropper.min.css');
 
 @Component({
@@ -44,7 +45,7 @@ export class PreferencesPageComponent {
   private _PREFERENCES_DATA_URL = '/preferenceshandler/data';
   subjectInterestsChangeAtLeastOnce: boolean;
   exportingData = false;
-  profilePictureDataUrl = '';
+  profilePictureDataUrl;
   DASHBOARD_TYPE_CREATOR = AppConstants.DASHBOARD_TYPE_CREATOR;
   DASHBOARD_TYPE_LEARNER = AppConstants.DASHBOARD_TYPE_LEARNER;
   username: string = '';
@@ -148,6 +149,23 @@ export class PreferencesPageComponent {
   }
 
   showEditProfilePictureModal(): void {
+    let modalRef = this.ngbModal.open(EditProfilePictureModalComponent, {
+      backdrop: 'static'
+    });
+
+    modalRef.result.then((newProfilePictureDataUrl) => {
+      this.userService.setProfileImageDataUrlAsync(newProfilePictureDataUrl)
+        .then(() => {
+          // The reload is needed in order to update the profile picture
+          // in the top-right corner.
+          this.windowRef.nativeWindow.location.reload();
+        }, () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
+        });
+    });
+
     // $uibModal.open({
     //   templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
     //     '/pages/preferences-page/modal-templates/' +
@@ -194,7 +212,8 @@ export class PreferencesPageComponent {
       this.userBio = data.user_bio;
       this.subjectInterests = data.subject_interests;
       this.preferredLanguageCodes = data.preferred_language_codes;
-      this.profilePictureDataUrl = data.profile_picture_data_url;
+      this.profilePictureDataUrl = decodeURIComponent(
+        data.profile_picture_data_url);
       this.defaultDashboard = data.default_dashboard;
       this.canReceiveEmailUpdates = data.can_receive_email_updates;
       this.canReceiveEditorRoleEmail =
