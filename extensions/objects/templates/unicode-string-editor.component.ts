@@ -43,7 +43,7 @@ export class UnicodeStringEditorComponent implements
       this.componentSubscriptions.add(
         this.externalSaveService.onExternalSave.subscribe(() => {
           if (this.active) {
-            this.replaceValue(this.value);
+            this.closeEditor();
           }
         })
       );
