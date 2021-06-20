@@ -224,7 +224,7 @@ def get_blog_post_summary_by_title(title):
         blog_models.BlogPostSummaryModel.title == title
     ).fetch() # pylint: disable=singleton-comparison
 
-    if blog_post_summary_model is None:
+    if len(blog_post_summary_model) == 0:
         return None
 
     blog_post_summary = (

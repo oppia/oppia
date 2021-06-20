@@ -384,6 +384,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(
             blog_post_summary.to_dict(), expected_blog_post_summary.to_dict())
+        self.assertIsNone(blog_services.get_blog_post_summary_by_title('Hello'))
 
     def test_get_blog_post_rights_by_user_id(self):
         blog_post_rights_models = (
