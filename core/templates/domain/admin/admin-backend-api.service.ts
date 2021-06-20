@@ -324,16 +324,6 @@ export class AdminBackendApiService {
       AdminPageConstants.ADMIN_HANDLER_URL);
   }
 
-  async populateExplorationStatsRegenerationCsvResultAsync(
-      expIdToRegenerate: string): Promise<PopulateStatsResult> {
-    let action = 'regenerate_missing_exploration_stats';
-    let payload = {
-      exp_id: expIdToRegenerate
-    };
-    return this._postRequestAsync (
-      AdminPageConstants.ADMIN_HANDLER_URL, payload, action);
-  }
-
   async regenerateOpportunitiesRelatedToTopicAsync(
       topicId: string): Promise<PopulateStatsResult> {
     let action = 'regenerate_topic_related_opportunities';

@@ -17,7 +17,6 @@
  */
 
 import { Component, EventEmitter, Output } from '@angular/core';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
@@ -35,25 +34,10 @@ export class AdminMiscTabComponent {
     '/explorationdataextractionhandler');
   irreversibleActionMessage: string = (
     'This action is irreversible. Are you sure?');
-  explorationStatsRegenerationUtilityCsvRows: string[][] = [
-    [
-      'Exploration ID',
-      'No. of valid Exploration Stats',
-      'No. of valid State Stats',
-      'Missing Exploration Stats',
-      'Missing State Stats',
-      'Errors'
-    ]
-  ];
   MAX_USERNAME_LENGTH: number = AppConstants.MAX_USERNAME_LENGTH;
   regenerationMessage: string;
-  missingExplorationStatsRegenerationMessage: string;
-  csvUri: SafeResourceUrl;
-  csvFilename: string;
-  explorationIdsForRegeneratingMissingStats: string;
   showDataExtractionQueryStatus: boolean;
   dataExtractionQueryStatusMessage: string;
-  memoryCacheDataFetched: boolean;
   oldUsername: string;
   newUsername: string;
   usernameToGrant: string;
@@ -70,13 +54,8 @@ export class AdminMiscTabComponent {
   constructor(
     private windowRef: WindowRef,
     private adminBackendApiService: AdminBackendApiService,
-    private adminTaskManagerService: AdminTaskManagerService,
-    private domSantizer: DomSanitizer
+    private adminTaskManagerService: AdminTaskManagerService
   ) {}
-
-  resetExplorationStatsRegenerationUtilityCsvRows(): void {
-    this.explorationStatsRegenerationUtilityCsvRows.length = 1;
-  }
 
   clearSearchIndex(): void {
     if (this.adminTaskManagerService.isTaskRunning()) {
@@ -115,62 +94,6 @@ export class AdminMiscTabComponent {
     }, errorResponse => {
       this.regenerationMessage = ('Server error: ' + errorResponse);
     });
-  }
-
-  populateExplorationStatsRegenerationCsvResult(expIds: string[]): void {
-    if (expIds.length === 0) {
-      let csvContent = this.explorationStatsRegenerationUtilityCsvRows.map(
-        row => row.join(',')).join('\n');
-      this.csvUri = this.domSantizer.bypassSecurityTrustResourceUrl(
-        window.URL.createObjectURL(
-          new Blob([csvContent], { type: 'text/csv' })));
-      this.csvFilename = (
-        `missing-exp-stats-output-${(new Date()).getTime()}.csv`);
-      this.missingExplorationStatsRegenerationMessage = (
-        'Process complete. Please download the CSV output.');
-      return;
-    }
-    let expIdToRegenerate = expIds.pop();
-    this.missingExplorationStatsRegenerationMessage = (
-      `Regenerating stats for Exploration id ${expIdToRegenerate}` +
-      '. Please wait.');
-    this.adminBackendApiService
-      .populateExplorationStatsRegenerationCsvResultAsync(
-        expIdToRegenerate
-      ).then(response => {
-        this.explorationStatsRegenerationUtilityCsvRows.push([
-          expIdToRegenerate,
-          response.num_valid_exp_stats.toString(),
-          response.num_valid_state_stats.toString(),
-          `"${response.missing_exp_stats.join(', ') || 'NA'}"`,
-          `"${response.missing_state_stats.join(', ') || 'NA'}"`,
-          'NA'
-        ]);
-        this.populateExplorationStatsRegenerationCsvResult(expIds);
-      }, errorResponse => {
-        this.explorationStatsRegenerationUtilityCsvRows.push([
-          expIdToRegenerate,
-          'NA',
-          'NA',
-          'NA',
-          'NA',
-          errorResponse]);
-        this.populateExplorationStatsRegenerationCsvResult(expIds);
-      });
-  }
-
-  regenerateMissingExplorationStats(): void {
-    this.csvUri = null;
-    if (this.adminTaskManagerService.isTaskRunning()) {
-      return;
-    }
-    if (!this.windowRef.nativeWindow.confirm(this.irreversibleActionMessage)) {
-      return;
-    }
-    let expIds = (
-      this.explorationIdsForRegeneratingMissingStats.replace(/\s/g, '')
-        .split(','));
-    this.populateExplorationStatsRegenerationCsvResult(expIds);
   }
 
   uploadTopicSimilaritiesFile(): void {
