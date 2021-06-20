@@ -39,6 +39,8 @@ export default {
     "Statistics", "Trigonometry", "Welcome"],
   "ACTIVITY_TYPE_EXPLORATION": "exploration",
   "ACTIVITY_TYPE_COLLECTION": "collection",
+  "ACTIVITY_TYPE_STORY": "story",
+  "ACTIVITY_TYPE_LEARN_TOPIC": "learn topic",
   "DISABLED_EXPLORATION_IDS": ["5"],
   "TESTING_CONSTANT": "test",
   "LIBRARY_TILE_WIDTH_PX": 208,
@@ -4799,6 +4801,10 @@ export default {
     "description": "Nederlands (Dutch)",
     "direction": "ltr"
   }, {
+    "code": "fat",
+    "description": "Fanti",
+    "direction": "ltr"
+  }, {
     "code": "tl",
     "description": "Filipino (Filipino)",
     "direction": "ltr"
@@ -4907,8 +4913,16 @@ export default {
     "description": "español (Spanish)",
     "direction": "ltr"
   }, {
+    "code": "sw",
+    "description": "kiswahili (Swahili)",
+    "direction": "ltr"
+  }, {
     "code": "sv",
     "description": "svenska (Swedish)",
+    "direction": "ltr"
+  }, {
+    "code": "ta",
+    "description": "தமிழ் (Tamil)",
     "direction": "ltr"
   }, {
     "code": "th",
@@ -5069,6 +5083,11 @@ export default {
     "relatedLanguages": ["ee"],
     "direction": "ltr"
   }, {
+    "id": "fat",
+    "description": "Fanti",
+    "relatedLanguages": ["ak", "fat"],
+    "direction": "ltr"
+  }, {
     "id": "tl",
     "description": "Filipino",
     "relatedLanguages": ["tl"],
@@ -5209,9 +5228,19 @@ export default {
     "relatedLanguages": ["es"],
     "direction": "ltr"
   }, {
+    "id": "sw",
+    "description": "Swahili",
+    "relatedLanguages": ["sw"],
+    "direction": "ltr"
+  }, {
     "id": "sv",
     "description": "Swedish",
-    "relatedLanguages": ["sw"],
+    "relatedLanguages": ["sv"],
+    "direction": "ltr"
+  }, {
+    "id": "ta",
+    "description": "Tamil",
+    "relatedLanguages": ["ta"],
     "direction": "ltr"
   }, {
     "id": "te",
@@ -5736,6 +5765,7 @@ export default {
   // fields must be at most 1500 bytes, and UTF-8 encoded characters can be
   // up to 4 bytes long.
   "MAX_COMMIT_MESSAGE_LENGTH": 375,
+  "MAX_REVIEW_MESSAGE_LENGTH": 10000,
 
   "EMAIL_DASHBOARD_PREDICATE_DEFINITION": [
     {

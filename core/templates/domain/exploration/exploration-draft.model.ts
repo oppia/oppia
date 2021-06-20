@@ -26,6 +26,8 @@ import { RecordedVoiceOverBackendDict } from './recorded-voiceovers.model';
 
 export type ExplorationChange = (
   ExplorationChangeAddState |
+  ExplorationChangeAddWrittenTranslation |
+  ExplorationChangeMarkWrittenTranslationsAsNeedingUpdate |
   ExplorationChangeRenameState |
   ExplorationChangeDeleteState |
   ExplorationChangeEditStateProperty |
@@ -35,23 +37,23 @@ export type ExplorationChange = (
   MigrateStatesVersionChangeList);
 
 export interface ExplorationChangeAddState {
-  cmd: 'add_state';
+  'cmd': 'add_state';
   'state_name': string;
 }
 
 export interface ExplorationChangeRenameState {
-  cmd: 'rename_state',
+  'cmd': 'rename_state',
   'new_state_name': string;
   'old_state_name': string;
 }
 
 export interface ExplorationChangeDeleteState {
-  cmd: 'delete_state';
+  'cmd': 'delete_state';
   'state_name': string;
 }
 
 export interface ExplorationChangeEditStateProperty {
-  cmd: 'edit_state_property',
+  'cmd': 'edit_state_property',
   'new_value': SubtitledHtmlBackendDict |
     InteractionBackendDict |
     ParamChangeBackendDict[] |
@@ -69,7 +71,7 @@ export interface ExplorationChangeEditStateProperty {
 }
 
 export interface ExplorationChangeEditExplorationProperty {
-  cmd: 'edit_exploration_property';
+  'cmd': 'edit_exploration_property';
   'new_value': ParamChangeBackendDict[] | ParamSpecBackendDict | string;
   'old_value': ParamChangeBackendDict[] | ParamSpecBackendDict | string;
   'property_name': string;
@@ -81,15 +83,31 @@ export interface RevertChangeList {
 }
 
 export interface CreateChangeList {
-  cmd: 'create_new';
-  category: string;
-  title: string;
+  'cmd': 'create_new';
+  'category': string;
+  'title': string;
 }
 
 export interface MigrateStatesVersionChangeList {
   'cmd': 'migrate_states_schema_to_latest_version';
   'from_version': number;
   'to_version': number;
+}
+
+export interface ExplorationChangeAddWrittenTranslation {
+  'cmd': 'add_written_translation';
+  'content_id': string;
+  'data_format': string;
+  'language_code': string;
+  'content_html': string;
+  'state_name': string;
+  'translation_html': string;
+}
+
+export interface ExplorationChangeMarkWrittenTranslationsAsNeedingUpdate {
+  'cmd': 'mark_written_translations_as_needing_update';
+  'content_id': string;
+  'state_name': string;
 }
 
 export interface ExplorationDraftDict {
