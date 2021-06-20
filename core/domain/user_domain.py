@@ -802,7 +802,7 @@ class LearnerGoals(python_utils.OBJECT):
 
     def __init__(
             self, user_id, topic_ids_to_learn,
-            topic_ids_to_master=None):
+            topic_ids_to_master):
         self.id = user_id
         self.topic_ids_to_learn = topic_ids_to_learn
         self.topic_ids_to_master = topic_ids_to_master
