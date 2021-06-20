@@ -152,7 +152,7 @@ describe('HintAndSolutionButtonsComponent', () => {
       .toHaveBeenCalled();
     expect(
       hintsAndSolutionManagerService.onSolutionViewedEventEmitter.subscribe)
-        .toHaveBeenCalled();
+      .toHaveBeenCalled();
   });
 
   it('should reset hints and solutions when new' +
