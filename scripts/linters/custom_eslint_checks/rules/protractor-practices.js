@@ -33,7 +33,8 @@ module.exports = {
     messages: {
       disallowSleep: 'Please do not use browser.sleep() in protractor files',
       disallowThen: 'Please do not use .then(), consider async/await instead',
-      constInAllCaps: 'Please make sure constant names are in all-caps'
+      constInAllCaps: (
+        'Please make constant name “{{constName}}” are in all-caps')
     },
   },
 
@@ -55,12 +56,15 @@ module.exports = {
 
     return {
       'VariableDeclaration[kind=const]': function(node) {
-        var constName = node.declarations[0].id.name;
+        var constantName = node.declarations[0].id.name;
         if ((node.declarations[0].id.type === 'Identifier') &&
-          (constName !== constName.toUpperCase())) {
+          (constantName !== constantName.toUpperCase())) {
           context.report({
             node: node,
-            messageId: 'constInAllCaps'
+            messageId: 'constInAllCaps',
+            data: {
+              constName: constantName
+            }
           });
         }
       },

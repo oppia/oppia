@@ -233,7 +233,6 @@ describe('Exploration translation and voiceover tab', function() {
 
   it('should allow adding translation and reflect the progress',
     async function() {
-      const expEditorTranslationTab = explorationEditorTranslationTab;
       await users.login('user@editorTab.com');
       await creatorDashboardPage.get();
       await creatorDashboardPage.editExploration('Test Exploration');
