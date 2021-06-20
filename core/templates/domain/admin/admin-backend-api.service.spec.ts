@@ -21,7 +21,7 @@ import { HttpClientTestingModule, HttpTestingController } from
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { AdminPageData, AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
-import { TopicSummary } from 'domain/topic/topic-summary.model';
+import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 import { PlatformParameterFilterType } from 'domain/platform_feature/platform-parameter-filter.model';
 import { FeatureStage, PlatformParameter } from 'domain/platform_feature/platform-parameter.model';
 import { CsrfTokenService } from 'services/csrf-token.service';
@@ -157,7 +157,7 @@ describe('Admin backend api service', () => {
       configProperties: adminBackendResponse.config_properties,
       viewableRoles: adminBackendResponse.viewable_roles,
       topicSummaries: adminBackendResponse.topic_summaries.map(
-        TopicSummary.createFromBackendDict),
+        CreatorTopicSummary.createFromBackendDict),
       featureFlags: adminBackendResponse.feature_flags.map(
         dict => PlatformParameter.createFromBackendDict(dict)
       )
