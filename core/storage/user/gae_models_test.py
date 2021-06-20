@@ -339,7 +339,8 @@ class CompletedActivitiesModelTests(test_utils.GenericTestBase):
             'exploration_ids': self.EXPLORATION_IDS_1,
             'collection_ids': self.COLLECTION_IDS_1,
             'story_ids': self.STORY_IDS_1,
-            'learnt_topic_ids': self.TOPIC_IDS_1
+            'learnt_topic_ids': self.TOPIC_IDS_1,
+            'mastered_topic_ids': []
         }
         self.assertEqual(expected_data, user_data)
 
@@ -418,7 +419,8 @@ class IncompleteActivitiesModelTests(test_utils.GenericTestBase):
             'exploration_ids': self.EXPLORATION_IDS_1,
             'collection_ids': self.COLLECTION_IDS_1,
             'story_ids': self.STORY_IDS_1,
-            'partially_learnt_topic_ids': self.TOPIC_IDS_1
+            'partially_learnt_topic_ids': self.TOPIC_IDS_1,
+            'partially_mastered_topic_ids': []
         }
         self.assertEqual(expected_data, user_data)
 
@@ -437,11 +439,13 @@ class LearnerGoalsModelTests(test_utils.GenericTestBase):
 
         user_models.LearnerGoalsModel(
             id=self.USER_1_ID,
-            topic_ids_to_learn=self.TOPIC_IDS
+            topic_ids_to_learn=self.TOPIC_IDS,
+            topic_ids_to_master=[]
         ).put()
         user_models.LearnerGoalsModel(
             id=self.USER_2_ID,
             topic_ids_to_learn=self.TOPIC_IDS,
+            topic_ids_to_master=[],
             deleted=True
         ).put()
 
@@ -485,7 +489,8 @@ class LearnerGoalsModelTests(test_utils.GenericTestBase):
         user_data = (
             user_models.LearnerGoalsModel.export_data(self.USER_1_ID))
         expected_data = {
-            'topic_ids_to_learn': self.TOPIC_IDS
+            'topic_ids_to_learn': self.TOPIC_IDS,
+            'topic_ids_to_master': []
         }
         self.assertEqual(expected_data, user_data)
 

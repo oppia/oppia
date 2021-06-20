@@ -16,7 +16,7 @@
  * @fileoverview Component for the chapter editor tab.
  */
 require(
-  'components/forms/custom-forms-directives/thumbnail-uploader.directive.ts');
+  'components/forms/custom-forms-directives/thumbnail-uploader.component.ts');
 
 require('pages/story-editor-page/services/story-editor-state.service.ts');
 require('pages/story-editor-page/services/story-editor-navigation.service');

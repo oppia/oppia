@@ -823,14 +823,16 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
 
     def test_initialization(self):
         """Testing init method."""
-        learner_goals = (user_domain.LearnerGoals('user_id0', ['topic_id0']))
+        learner_goals = (
+            user_domain.LearnerGoals('user_id0', ['topic_id0'], []))
 
         self.assertListEqual(
             learner_goals.topic_ids_to_learn, ['topic_id0'])
 
     def test_add_topic_id_to_learn(self):
         """Testing add_topic_id_to_learn."""
-        learner_goals = (user_domain.LearnerGoals('user_id0', ['topic_id0']))
+        learner_goals = (
+            user_domain.LearnerGoals('user_id0', ['topic_id0'], []))
 
         self.assertListEqual(
             learner_goals.topic_ids_to_learn, ['topic_id0'])
@@ -842,7 +844,8 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
 
     def test_remove_topic_id_to_learn(self):
         """Testing remove_topic_id_to_learn."""
-        learner_goals = (user_domain.LearnerGoals('user_id0', ['topic_id0']))
+        learner_goals = (
+            user_domain.LearnerGoals('user_id0', ['topic_id0'], []))
 
         self.assertListEqual(
             learner_goals.topic_ids_to_learn, ['topic_id0'])

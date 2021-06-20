@@ -42,7 +42,8 @@ def get_learner_goals_from_model(learner_goals_model):
     """
     return user_domain.LearnerGoals(
         learner_goals_model.id,
-        learner_goals_model.topic_ids_to_learn)
+        learner_goals_model.topic_ids_to_learn,
+        learner_goals_model.topic_ids_to_master)
 
 
 def save_learner_goals(learner_goals):
