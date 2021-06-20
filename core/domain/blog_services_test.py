@@ -198,6 +198,11 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
             Exception, ('Content can not be empty')):
             blog_services.publish_blog_post(self.blog_post_a_id)
 
+        blog_services.delete_blog_post(self.blog_post_a_id)
+        with self.assertRaisesRegexp(
+            Exception, ('The given blog post does not exist')):
+            blog_services.publish_blog_post(self.blog_post_a_id)
+
     def test_unpublish_blog_post(self):
         blog_services.update_blog_post(
             self.blog_post_a_id, self.change_dict_two)
@@ -210,6 +215,12 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         blog_post_rights = (
             blog_services.get_blog_post_rights(self.blog_post_a_id))
         self.assertFalse(blog_post_rights.blog_post_is_published)
+
+    def test_cannot_unpublish_invalid_blog_post(self):
+        blog_services.delete_blog_post(self.blog_post_a_id)
+        with self.assertRaisesRegexp(
+            Exception, ('The given blog post does not exist')):
+            blog_services.unpublish_blog_post(self.blog_post_a_id)
 
     def test_filter_blog_post_ids(self):
         blog_services.update_blog_post(
@@ -258,6 +269,18 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         blog_post = blog_services.get_blog_post_by_url_fragment('sample-title')
         self.assertEqual(blog_post.to_dict(), expected_blog_post.to_dict())
 
+    def test_get_blog_posy_by_invalid_url(self):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Blog Post URL fragment should be a string. Recieved:'
+            r'\[123\]'):
+            blog_services.does_blog_post_with_url_fragment_exist([123])
+        with self.assertRaisesRegexp(
+            Exception,
+            'Blog Post URL fragment should be a string. Recieved:'
+            '123'):
+            blog_services.does_blog_post_with_url_fragment_exist(123)
+
     def test_does_blog_post_with_url_fragment_exist(self):
         blog_services.update_blog_post(
             self.blog_post_a_id, self.change_dict_one)
@@ -287,10 +310,17 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
             blog_services.get_blog_post_rights(self.blog_post_a_id))
         user_info_a = user_services.get_user_actions_info(self.user_id_a)
         user_info_b = user_services.get_user_actions_info(self.user_id_b)
+
         self.assertFalse(blog_services.check_can_edit_blog_post(
             user_info_b, blog_post_rights))
         self.assertTrue(blog_services.check_can_edit_blog_post(
             user_info_a, blog_post_rights))
+        self.assertFalse(blog_services.check_can_edit_blog_post(
+            user_info_a, None))
+
+        user_info_b.actions.append(u'EDIT_ANY_BLOG_POST')
+        self.assertTrue(blog_services.check_can_edit_blog_post(
+            user_info_b, blog_post_rights))
 
     def test_deassign_user_from_all_blog_posts(self):
         blog_post_rights = (
@@ -341,8 +371,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         model.put()
 
         blog_post_summary = (
-            blog_services.get_blog_post_summary_by_id(
-                self.blog_post_a_id, strict=True))
+            blog_services.get_blog_post_summary_by_title('Hello Bloggers'))
         expected_blog_post_summary = (
             blog_domain.BlogPostSummary(
                 self.blog_post_a_id,
@@ -355,3 +384,13 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(
             blog_post_summary.to_dict(), expected_blog_post_summary.to_dict())
+
+    def test_get_blog_post_rights_by_user_id(self):
+        blog_post_rights_models = (
+            blog_services.get_blog_post_rights_by_user_id(self.user_id_a))
+        self.assertTrue(len(blog_post_rights_models) == 1)
+        self.assertEqual(blog_post_rights_models[0].id, self.blog_post_a_id)
+        blog_services.create_new_blog_post(self.user_id_a)
+        blog_post_rights_models = (
+            blog_services.get_blog_post_rights_by_user_id(self.user_id_a))
+        self.assertTrue(len(blog_post_rights_models) == 2)

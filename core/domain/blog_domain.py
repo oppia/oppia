@@ -147,7 +147,7 @@ class BlogPost(python_utils.OBJECT):
 
             if len(tag) == 0:
                 raise utils.ValidationError(
-                    'Tag should not be empty received: \'\'')
+                    'Tag should not be empty, received: \'\'')
 
             if not re.match(constants.TAG_REGEX, tag):
                 raise utils.ValidationError(
@@ -504,7 +504,7 @@ class BlogPostSummary(python_utils.OBJECT):
 
             if len(tag) == 0:
                 raise utils.ValidationError(
-                    'Tag should not be empty received: \'\'')
+                    'Tag should not be empty, received: \'\'')
 
             if not re.match(constants.TAG_REGEX, tag):
                 raise utils.ValidationError(

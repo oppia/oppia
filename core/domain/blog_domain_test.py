@@ -19,11 +19,13 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import datetime
+import json
+
 from constants import constants
 from core.domain import blog_domain
 from core.domain import blog_services
 from core.tests import test_utils
-
 import utils
 
 
@@ -126,14 +128,31 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
         self._assert_strict_valid_thumbnail_filename_for_blog_post(
             'Expected thumbnail filename to be a string, received: None.', None)
 
-    def test_title_validation(self):
+    def test_title_without_non_strict_validation(self):
         self._assert_valid_title_for_blog_post('Title should be a string', 50)
         self._assert_valid_title_for_blog_post(
             'Blog Post title should at most have 40 chars, received:'
             ' Very long and therefore an invalid blog post title',
             'Very long and therefore an invalid blog post title')
+
+    def test_title_with_strict_validation(self):
         self._assert_strict_valid_title_for_blog_post(
             'Title should not be empty', '')
+        self._assert_strict_valid_title_for_blog_post(
+            'Title field contains invalid characters. Only words'
+            r'\(a-zA-Z\) separated by spaces are allowed. Received %s'
+            % 'ABC12 heloo', 'ABC12 heloo')
+
+    def _assert_strict_valid_tags_for_blog_post(
+            self, expected_error_substring, tags):
+        """Checks that the blog post tags passes validation."""
+        with self.assertRaisesRegexp(
+            utils.ValidationError, expected_error_substring):
+            blog_domain.BlogPost.require_valid_tags(tags, True)
+
+    def test_tags_validation_in_strict_mode(self):
+        self._assert_strict_valid_tags_for_blog_post(
+            'Atleast one tag should be selected', [])
 
     def test_url_fragment_validation(self):
         self._assert_valid_url_fragment_for_blog_post(
@@ -153,6 +172,7 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
         """Checks that serializing and then deserializing a blog post works as
         intended by leaving the blog post unchanged.
         """
+        self.blog_post.published_on = datetime.datetime.utcnow()
         self.assertEqual(
             self.blog_post.to_dict(),
             blog_domain.BlogPost.deserialize(
@@ -222,18 +242,23 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
         self._assert_valid_tags_for_blog_post(
             'Some tags duplicate each other', ['abc', 'abc'])
         self._assert_valid_tags_for_blog_post(
-            'Tag should not be empty received: \'\'', ['abc', ''])
+            'Tag should not be empty, received: \'\'', ['abc', ''])
 
     def test_blog_post_passes_validate(self):
         """Tests validation for blog post."""
+        self.blog_post.validate(strict=False)
+        self.blog_post.content = 123
+        self._assert_validation_error(
+            'Expected contents to be a string, received: 123')
+
+    def test_blog_post_passes_strict_validation(self):
+        """Tests strict validation for blog post."""
         self.blog_post.title = 'Sample Title'
         self.blog_post.thumbnail_filename = 'thumbnail.svg'
         self.blog_post.tags = ['tag']
         self.blog_post.url_fragment = 'sample-title'
         self._assert_strict_validation_error('Content can not be empty')
-        self.blog_post.content = 123
-        self._assert_validation_error(
-            'Expected contents to be a string, received: 123')
+
         self.blog_post.content = '<p>Hello</p>'
         self.blog_post.validate(strict=True)
 
@@ -355,6 +380,13 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
             utils.ValidationError, expected_error_substring):
             blog_domain.BlogPostSummary.require_valid_tags(tags, False)
 
+    def _assert_strict_valid_tags_for_blog_post(
+            self, expected_error_substring, tags):
+        """Checks that the blog post tags passes validation."""
+        with self.assertRaisesRegexp(
+            utils.ValidationError, expected_error_substring):
+            blog_domain.BlogPostSummary.require_valid_tags(tags, True)
+
     def test_title_validation(self):
         self._assert_valid_title_for_blog_post('Title should be a string', 50)
         self._assert_valid_title_for_blog_post(
@@ -392,17 +424,32 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
 
     def test_blog_post_summary_passes_validate(self):
         """Tests validation for blog post summary."""
+        self.blog_post_summary.validate(strict=False)
+        self.blog_post_summary.summary = 123
+        self._assert_validation_error(
+            'Expected summary to be a string, received: 123')
+
+    def test_blog_post_summary_passes_strict_validation(self):
+        """Tests blog post summary passes validation in strict mode."""
         self.blog_post_summary.title = 'Sample Title'
         self.blog_post_summary.thumbnail_filename = 'thumbnail.svg'
         self.blog_post_summary.tags = ['tag']
         self.blog_post_summary.summary = ''
         self.blog_post_summary.url_fragment = 'sample-title'
         self._assert_strict_validation_error('Summary can not be empty')
-        self.blog_post_summary.summary = 123
-        self._assert_validation_error(
-            'Expected summary to be a string, received: 123')
+
         self.blog_post_summary.summary = 'Hello'
         self.blog_post_summary.validate(strict=True)
+
+    def test_blog_post_summary_serialization(self):
+        """Tests serialization of blog post summary."""
+
+        self.blog_post_summary.published_on = datetime.datetime.utcnow()
+        summary_serialized = self.blog_post_summary.serialize()
+        blog_post_summary_dict = (
+            json.loads(summary_serialized.decode('utf-8')))
+        self.assertEqual(blog_post_summary_dict['id'], self.blog_post_id)
+        self.assertEqual(blog_post_summary_dict['summary'], '...')
 
     def test_tags_validation_for_blog_post(self):
         """"Tests tags validation for blog post."""
@@ -431,4 +478,8 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
         self._assert_valid_tags_for_blog_post(
             'Some tags duplicate each other', ['abc', 'abc'])
         self._assert_valid_tags_for_blog_post(
-            'Tag should not be empty received: \'\'', ['abc', ''])
+            'Tag should not be empty, received: \'\'', ['abc', ''])
+
+    def test_tags_validation_in_strict_mode(self):
+        self._assert_strict_valid_tags_for_blog_post(
+            'Atleast one tag should be selected', [])

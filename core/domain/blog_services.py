@@ -220,15 +220,15 @@ def get_blog_post_summary_by_title(title):
         summary with the given title, or None if it does not exist.
     """
 
-    blog_post_summary_model = (
-        blog_models.BlogPostSummaryModel.query().filter(
-            blog_models.BlogPostSummaryModel.title == (title)).filter(
-                blog_models.BlogPostSummaryModel.deleted == False).fetch()) # pylint: disable=singleton-comparison
+    blog_post_summary_model = blog_models.BlogPostSummaryModel.query(
+        blog_models.BlogPostSummaryModel.title == title
+    ).fetch() # pylint: disable=singleton-comparison
+
     if blog_post_summary_model is None:
         return None
 
-    blog_post_summary = get_blog_post_summary_from_model(
-        blog_post_summary_model)
+    blog_post_summary = (
+        get_blog_post_summary_from_model(blog_post_summary_model[0]))
     return blog_post_summary
 
 
@@ -331,7 +331,8 @@ def does_blog_post_with_url_fragment_exist(url_fragment):
     """
     if not isinstance(url_fragment, python_utils.BASESTRING):
         raise utils.ValidationError(
-            'Blog Post URL fragment should be a string.')
+            'Blog Post URL fragment should be a string. Recieved:'
+            '%s' % url_fragment)
     existing_blog_post = get_blog_post_by_url_fragment(url_fragment)
     return existing_blog_post is not None
 
