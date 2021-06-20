@@ -101,6 +101,7 @@ module.exports = {
       commonPrefix + '/pages/learner-dashboard-page/' +
       'learner-dashboard-page.import.ts',
     library: commonPrefix + '/pages/library-page/library-page.import.ts',
+    license: commonPrefix + '/pages/license-page/license.import.ts',
     login: commonPrefix + '/pages/login-page/login-page.import.ts',
     logout: commonPrefix + '/pages/logout-page/logout-page.import.ts',
     maintenance:
@@ -430,6 +431,18 @@ module.exports = {
           'level you want.'
       },
       template: commonPrefix + '/pages/library-page/library-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['license'],
+      filename: 'license.mainpage.html',
+      meta: {
+        name: defaultMeta.name,
+        description: 'License terms that Oppia is attributed under.'
+      },
+      template:
+        commonPrefix + '/pages/license-page/license.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
