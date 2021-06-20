@@ -94,7 +94,7 @@ describe('InteractiveFractionInputComponent', () => {
   });
 
   it('should initialize component when fraction input interaction is' +
-  'added in the exploration editor', () => {
+  ' added in the exploration editor', () => {
     component.requireSimplestForm = false;
     component.allowImproperFraction = false;
     component.allowNonzeroIntegerPart = false;
@@ -109,7 +109,7 @@ describe('InteractiveFractionInputComponent', () => {
   });
 
   it('should initialize component when fraction input interaction is' +
-  'added in the exploration editor', () => {
+  ' added in the exploration editor', () => {
     component.savedSolution = {
       isNegative: false,
       wholeNumber: 0,
@@ -125,7 +125,8 @@ describe('InteractiveFractionInputComponent', () => {
   });
 
   it('should display INVALID_CHARS_LENGTH error message when input' +
-  ' fraction has more than 7 charaters in a number', fakeAsync(() => {
+  ' fraction has more than 7 charaters in a number while user is typing',
+  fakeAsync(() => {
     component.answer = '123';
     component.answerValueChanged();
     component.answer = '12345678';
@@ -142,7 +143,7 @@ describe('InteractiveFractionInputComponent', () => {
   }));
 
   it('should display INVALID_CHARS error message when input' +
-  ' fraction has invalid characters', fakeAsync(() => {
+  ' fraction has invalid characters while user is typing', fakeAsync(() => {
     component.answer = '?2';
     component.answerValueChanged();
     component.answer = '??2';
@@ -158,7 +159,7 @@ describe('InteractiveFractionInputComponent', () => {
   }));
 
   it('should display INVALID_FORMAT error message when input' +
-  ' fraction is in a incorrect format', fakeAsync(() => {
+  ' fraction is in a incorrect format while user is typing', fakeAsync(() => {
     component.answer = '2';
     component.answerValueChanged();
     component.answer = '2 / 4 / 5';
@@ -174,7 +175,7 @@ describe('InteractiveFractionInputComponent', () => {
   }));
 
   it('should not display error message when input' +
-  ' fraction is correct', fakeAsync(() => {
+  ' fraction is correct while user is typing', fakeAsync(() => {
     component.answer = '2';
     component.answerValueChanged();
     component.answer = '2/3';
@@ -189,7 +190,7 @@ describe('InteractiveFractionInputComponent', () => {
   }));
 
   it('should display simplest form error message when input' +
-  ' fraction is not in its simplest form', () => {
+  ' fraction is not in its simplest form after user submits', () => {
     component.requireSimplestForm = true;
     component.answer = '2/6';
 
@@ -203,7 +204,7 @@ describe('InteractiveFractionInputComponent', () => {
   });
 
   it('should display improper fraction error message when input' +
-  ' fraction is not a proper fraction', () => {
+  ' fraction is not a proper fraction after user submits', () => {
     component.allowImproperFraction = false;
     component.answer = '5/3';
 
@@ -217,7 +218,7 @@ describe('InteractiveFractionInputComponent', () => {
   });
 
   it('should display fraction error message when input' +
-  ' fraction has a non zero integer part', () => {
+  ' fraction has a non zero integer part after user submits', () => {
     component.allowNonzeroIntegerPart = false;
     component.answer = '1 1/3';
 
@@ -231,7 +232,7 @@ describe('InteractiveFractionInputComponent', () => {
   });
 
   it('should not display error message when input' +
-  ' fraction is valid.', () => {
+  ' fraction is valid after user submits.', () => {
     component.answer = '1/3';
     spyOn(currentInteractionService, 'onSubmit');
 
@@ -242,22 +243,23 @@ describe('InteractiveFractionInputComponent', () => {
     expect(component.isValid).toBe(true);
   });
 
-  it('should return I18N_INTERACTIONS_FRACTIONS_INPUT_PLACEHOLDER_NO_INTEGER' +
-  ' when ineraction loads', () => {
+  it('should get no integer placeholder text when interaction loads', () => {
     component.allowNonzeroIntegerPart = false;
 
     expect(component.getPlaceholderText())
       .toEqual('I18N_INTERACTIONS_FRACTIONS_INPUT_PLACEHOLDER_NO_INTEGER');
   });
 
-  it('should return I18N_INTERACTIONS_FRACTIONS_INPUT_PLACEHOLDER' +
-  ' when ineraction loads', () => {
+  it('should get fraction input placeholder text when interaction' +
+  ' loads', () => {
     expect(component.allowNonzeroIntegerPart).toBe(true);
 
     expect(component.getPlaceholderText())
       .toEqual('I18N_INTERACTIONS_FRACTIONS_INPUT_PLACEHOLDER');
   });
 
+  // This is to test the isAnswerValid function which is passed
+  // to currentInteractionService.registerCurrentInteraction
   it('should return true if answer is valid', () => {
     expect(component.allowNonzeroIntegerPart).toBe(true);
     component.isValid = true;
@@ -267,6 +269,8 @@ describe('InteractiveFractionInputComponent', () => {
       .toBe(true);
   });
 
+  // This is to test the isAnswerValid function which is passed
+  // to currentInteractionService.registerCurrentInteraction
   it('should return false if answer is invalid', () => {
     expect(component.allowNonzeroIntegerPart).toBe(true);
     component.isValid = false;

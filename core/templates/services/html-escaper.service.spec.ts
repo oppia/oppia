@@ -54,7 +54,8 @@ describe('HTML escaper service', () => {
     }
   });
 
-  it('should log an error if no', () => {
+  it('should log an error if an empty string was passed to' +
+  ' JSON decoder', () => {
     spyOn(loggerService, 'error');
 
     var escapedJsonToObjResponse = ohe.escapedJsonToObj('');

@@ -46,7 +46,7 @@ describe('ShortResponseFractionInput', () => {
     component = fixture.componentInstance;
   });
 
-  it('should create', () => {
+  it('should display user\'s response', () => {
     component.answer = '{' +
       '"isNegative": false,' +
       '"wholeNumber": 0,' +

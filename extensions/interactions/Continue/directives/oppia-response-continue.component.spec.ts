@@ -47,7 +47,9 @@ describe('OppiaResponseContinueComponent', () => {
     component = fixture.componentInstance;
   });
 
-  it('should create', () => {
+  // Note: The users response is the same as the Continue button placeholder
+  // text.
+  it('should display user\'s response', () => {
     component.answer = 'Continue button text';
 
     expect(component.escapedAnswer).toBe('');
