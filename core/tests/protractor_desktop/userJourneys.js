@@ -69,29 +69,14 @@ describe('Basic user journeys', function() {
     });
 
     it('should create moderators', async function() {
-      await general.checkForConsoleErrors([]);
-      console.log('Check 1 passed');
       await users.createModerator(
         'mod@userManagement.com', 'moderatorUserManagement');
-      await general.checkForConsoleErrors([]);
-      console.log('Check 2 passed');
       await users.login('mod@userManagement.com');
-      await general.checkForConsoleErrors([]);
-      console.log('Check 3 passed');
       await moderatorPage.get();
-      await general.checkForConsoleErrors([]);
-      console.log('Check 4 passed');
       await moderatorPage.expectModeratorPageToBeVisible();
-      await general.checkForConsoleErrors([]);
-      console.log('Check 5 passed');
       await general.openProfileDropdown();
-      await general.checkForConsoleErrors([]);
-      console.log('Check 6 passed');
       await users.logout();
       await general.checkForConsoleErrors([]);
-      console.log('Check 6 passed');
-      await general.checkForConsoleErrors([]);
-      console.log('Check 7 passed');
     });
 
     // Usernames containing "admin" are not permitted.
