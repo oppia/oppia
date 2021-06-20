@@ -161,12 +161,10 @@ describe('Topic and Story viewer functionality', function() {
 
     // Signing up with the login button should redirect the user back to the
     // exploration.
-    const LOGIN_BUTTON = element(by.css('.protractor-test-login-button'));
-    await action.click('Login button', LOGIN_BUTTON);
-    const USE_MANUAL_NAVIGATION = false;
+    var loginButton = element(by.css('.protractor-test-login-button'));
+    await action.click('Login button', loginButton);
     await users.createAndLoginUser(
-      'newStoryViewer@storyviewer.com', 'newStoryViewer',
-      USE_MANUAL_NAVIGATION);
+      'newStoryViewer@storyviewer.com', 'newStoryViewer', false);
 
     await explorationPlayerPage.submitAnswer('Continue', null);
     await topicAndStoryViewerPage.get(
