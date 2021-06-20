@@ -255,6 +255,23 @@ def get_story_id_linked_to_exploration(exp_id):
     return None
 
 
+def get_story_ids_linked_to_explorations(exp_ids):
+    """Returns a list of IDs of the story that the explorations are a part of.
+
+    Args:
+        exp_ids: list(str). The IDs of the explorations.
+
+    Returns:
+        list(str). A list of IDs of the story that the exploration is linked to.
+    """
+    exploration_context_models = exp_models.ExplorationContextModel.get_multi(
+        exp_ids)
+    linked_story_ids = [
+        exp_context_model.story_id for exp_context_model in (
+            exploration_context_models) if exp_context_model is not None]
+    return linked_story_ids
+
+
 def get_all_exploration_summaries():
     """Returns a dict with all exploration summary domain objects,
     keyed by their id.
@@ -488,10 +505,21 @@ def apply_change_list(exploration_id, change_list):
                         state_domain.WrittenTranslations.from_dict(
                             cleaned_written_translations_dict))
                     state.update_written_translations(written_translations)
-            elif change.cmd == exp_domain.CMD_ADD_TRANSLATION:
+            elif change.cmd == exp_domain.DEPRECATED_CMD_ADD_TRANSLATION:
+                # DEPRECATED: This command is deprecated. Please do not use.
+                # The command remains here to support old suggestions.
                 exploration.states[change.state_name].add_translation(
                     change.content_id, change.language_code,
                     change.translation_html)
+            elif change.cmd == exp_domain.CMD_ADD_WRITTEN_TRANSLATION:
+                exploration.states[change.state_name].add_written_translation(
+                    change.content_id, change.language_code,
+                    change.translation_html, change.data_format)
+            elif (change.cmd ==
+                  exp_domain.CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE):
+                exploration.states[
+                    change.state_name
+                ].mark_written_translations_as_needing_update(change.content_id)
             elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
                 if change.property_name == 'title':
                     exploration.update_title(change.new_value)

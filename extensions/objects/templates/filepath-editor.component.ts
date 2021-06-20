@@ -259,6 +259,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
         height: dimensions.height + 'px',
         width: dimensions.width + 'px'
       };
+      this.validityChange.emit({empty: true});
     }
   }
 
