@@ -1480,16 +1480,32 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
     wiki_page_link = (
         'https://github.com/oppia/oppia/wiki/Validation-of-handler-args')
 
-    def test_every_handler_class_has_schema(self):
-        """This test ensures that every child class of BaseHandler
-        has an associated schema.
+    def _get_list_of_routes_which_need_schemas(self):
+        """This method iterates over all the routes and returns those routes
+        which need schema.
+
+        Returns:
+            list_of_routes_which_needs_schema: list(RedirectRoute). A list of
+            RedirectRoute objects.
         """
-        list_of_handlers_which_need_schema = []
+        list_of_routes_which_needs_schema = []
         for route in main.URLS:
             # TODO(#13139): Remove below check once all the MAPREDUCE_HANDLERS
             # are removed from the codebase.
             if isinstance(route, tuple):
                 continue
+            list_of_routes_which_needs_schema.append(route)
+        return list_of_routes_which_needs_schema
+
+    def test_every_handler_class_has_schema(self):
+        """This test ensures that every child class of BaseHandler
+        has an associated schema.
+        """
+        list_of_handlers_which_need_schema = []
+        list_of_routes_which_needs_schema = (
+            self._get_list_of_routes_which_need_schemas())
+
+        for route in list_of_routes_which_needs_schema:
             handler = route.handler
 
             handler_class_name = handler.__name__
@@ -1519,11 +1535,10 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
         exactly match with url path elements.
         """
         handlers_with_missing_url_schema_keys = []
-        for route in main.URLS:
-            # TODO(#13139): Remove below check once all the MAPREDUCE_HANDLERS
-            # are removed from the codebase.
-            if isinstance(route, tuple):
-                continue
+        list_of_routes_which_needs_schema = (
+            self._get_list_of_routes_which_need_schemas())
+
+        for route in list_of_routes_which_needs_schema:
             handler = route.handler
 
             handler_class_name = handler.__name__
@@ -1558,11 +1573,10 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
         exactly match with request arguments.
         """
         handlers_with_missing_request_schema_keys = []
-        for route in main.URLS:
-            # TODO(#13139): Remove below check once all the MAPREDUCE_HANDLERS
-            # are removed from the codebase.
-            if isinstance(route, tuple):
-                continue
+        list_of_routes_which_needs_schema = (
+            self._get_list_of_routes_which_need_schemas())
+
+        for route in list_of_routes_which_needs_schema:
             handler = route.handler
 
             handler_class_name = handler.__name__
@@ -1605,11 +1619,10 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
         conforms with the schema.
         """
         handlers_with_non_conforming_default_schemas = []
-        for route in main.URLS:
-            # TODO(#13139): Remove below check once all the MAPREDUCE_HANDLERS
-            # are removed from the codebase.
-            if isinstance(route, tuple):
-                continue
+        list_of_routes_which_needs_schema = (
+            self._get_list_of_routes_which_need_schemas())
+
+        for route in list_of_routes_which_needs_schema:
             handler = route.handler
 
             handler_class_name = handler.__name__
@@ -1655,11 +1668,11 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
         list_of_handlers_to_remove = []
         non_schema_requiring_handler_class_names = (
             payload_validator.NON_SCHEMA_REQUIRING_HANDLER_CLASS_NAMES)
-        for route in main.URLS:
-            # TODO(#13139): Remove below check once all the MAPREDUCE_HANDLERS
-            # are removed from the codebase.
-            if isinstance(route, tuple):
-                continue
+        list_of_routes_which_needs_schema = (
+            self._get_list_of_routes_which_need_schemas())
+
+        for route in list_of_routes_which_needs_schema:
+            handler = route.handler
             handler = route.handler
 
             handler_class_name = handler.__name__
