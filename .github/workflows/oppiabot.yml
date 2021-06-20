@@ -9,7 +9,6 @@ on:
       - develop
       - release-*
 
-
 jobs:
   oppiabot:
     runs-on: ubuntu-latest
