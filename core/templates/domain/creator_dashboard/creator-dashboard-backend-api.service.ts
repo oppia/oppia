@@ -51,9 +51,9 @@ import {
   SuggestionThreadObjectFactory
 } from 'domain/suggestion/SuggestionThreadObjectFactory';
 import {
-  TopicSummary,
-  TopicSummaryBackendDict
-} from 'domain/topic/topic-summary.model';
+  CreatorTopicSummary,
+  CreatorTopicSummaryBackendDict
+} from 'domain/topic/creator-topic-summary.model';
 import { LoggerService } from 'services/contextual/logger.service';
 import { SuggestionsService } from
   'services/suggestions.service';
@@ -69,7 +69,7 @@ interface CreatorDashboardDataBackendDict {
   'suggestions_to_review_list': SuggestionBackendDict[];
   'explorations_list': CreatorExplorationSummaryBackendDict[];
   'collections_list': CollectionSummaryBackendDict[];
-  'topic_summary_dicts': TopicSummaryBackendDict[];
+  'topic_summary_dicts': CreatorTopicSummaryBackendDict[];
 }
 
 interface CreatorDashboardData {
@@ -85,7 +85,7 @@ interface CreatorDashboardData {
   suggestionThreadsToReviewList: SuggestionThread[];
   explorationsList: CreatorExplorationSummary[];
   collectionsList: CollectionSummary[];
-  topicSummaries: TopicSummary[];
+  topicSummaries: CreatorTopicSummary[];
 }
 
 @Injectable({
@@ -172,7 +172,7 @@ export class CreatorDashboardBackendApiService {
         topicSummaries: (
           dashboardData.topic_summary_dicts ? (
             dashboardData.topic_summary_dicts.map(
-              topicSummaryDict => TopicSummary.createFromBackendDict(
+              topicSummaryDict => CreatorTopicSummary.createFromBackendDict(
                 topicSummaryDict))) : null)
       };
     }, errorResponse => {
