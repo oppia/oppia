@@ -65,8 +65,9 @@ describe('UnicodeStringEditorComponent', () => {
     expect(component.componentSubscriptions.add).toHaveBeenCalled();
     expect(externalSaveService.onExternalSave).toEqual(
       externalSaveEventEmitter);
-    // The alwaysEditable variable is tested since it is a pre-condition
-    // for subscription.add.
+    // Subscription.add is called only if the text input is not always editable.
+    // Therefore, we verify that the value of alwaysEditable is false before
+    // checking subscription.add.
     expect(component.alwaysEditable).toBe(false);
     expect(component.closeEditor).toHaveBeenCalled();
     expect(component.active).toBe(false);
