@@ -83,9 +83,6 @@ class ValidateExplorationCommitLogEntryModel(
             rights_domain.ExplorationRightsChange|exp_domain.ExplorationChange.
             A domain object class for the changes made by commit commands of
             the model.
-
-        Raises:
-            Exception. Entity id does not match regex pattern.
         """
         model = job_utils.clone_model(input_model)
         if model.id.startswith('rights'):

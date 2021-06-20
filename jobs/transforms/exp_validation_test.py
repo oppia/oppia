@@ -495,7 +495,7 @@ class ValidateExplorationCommitLogEntryModelTests(
 
         self.assert_pcoll_equal(output, [])
 
-    def test_validate_other_model(self):
+    def test_raises_commit_cmd_none_error(self):
         invalid_commit_cmd_model = exp_models.ExplorationCommitLogEntryModel(
             id='model_id123',
             created_on=self.YEAR_AGO,
