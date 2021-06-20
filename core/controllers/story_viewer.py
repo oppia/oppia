@@ -17,9 +17,12 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import logging
+
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import learner_progress_services
 from core.domain import question_services
 from core.domain import skill_fetchers
 from core.domain import story_fetchers
@@ -170,6 +173,13 @@ class StoryProgressHandler(base.BaseHandler):
     @acl_decorators.can_access_story_viewer_page
     def post(self, story_id, node_id):
         story = story_fetchers.get_story_by_id(story_id)
+        if story is None:
+            logging.error(
+                'Could not find a story corresponding to '
+                '%s id.' % story_id)
+            self.render_json({})
+            return
+        topic = topic_fetchers.get_topic_by_id(story.corresponding_topic_id)
         completed_nodes = story_fetchers.get_completed_nodes_in_story(
             self.user_id, story_id)
         completed_node_ids = [
@@ -206,6 +216,34 @@ class StoryProgressHandler(base.BaseHandler):
         if questions_available and (
                 learner_at_review_point_in_story or learner_completed_story):
             ready_for_review_test = True
+
+        # If there is no next_node_id, the story is marked as completed else
+        # mark the story as incomplete.
+        if next_node_id is None:
+            learner_progress_services.mark_story_as_completed(
+                self.user_id, story_id)
+        else:
+            learner_progress_services.record_story_started(
+                self.user_id, story.id)
+
+        completed_story_ids = (
+            learner_progress_services.get_all_completed_story_ids(
+                self.user_id))
+        story_ids_in_topic = []
+        for story in topic.canonical_story_references:
+            story_ids_in_topic.append(story.story_id)
+
+        is_topic_completed = set(story_ids_in_topic).intersection(
+            set(completed_story_ids))
+
+        # If at least one story in the topic is completed,
+        # mark the topic as learnt else mark it as partially learnt.
+        if not is_topic_completed:
+            learner_progress_services.record_topic_started(
+                self.user_id, topic.id)
+        else:
+            learner_progress_services.mark_topic_as_learnt(
+                self.user_id, topic.id)
 
         return self.render_json({
             'summaries': exp_summaries,

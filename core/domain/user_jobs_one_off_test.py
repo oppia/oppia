@@ -23,6 +23,7 @@ import ast
 import datetime
 import re
 
+from constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import event_services
@@ -33,8 +34,14 @@ from core.domain import learner_progress_services
 from core.domain import rating_services
 from core.domain import rights_domain
 from core.domain import rights_manager
+from core.domain import story_domain
+from core.domain import story_services
 from core.domain import subscription_services
+from core.domain import subtopic_page_domain
+from core.domain import subtopic_page_services
 from core.domain import taskqueue_services
+from core.domain import topic_domain
+from core.domain import topic_services
 from core.domain import user_jobs_continuous
 from core.domain import user_jobs_one_off
 from core.domain import user_services
@@ -416,6 +423,341 @@ class LongUserBiosOneOffJobTests(test_utils.GenericTestBase):
         result = self._run_one_off_job()
 
         self.assertEqual(result, [])
+
+
+class PopulateStoriesAndTopicsOneOffJobTests(
+        test_utils.GenericTestBase):
+    """Tests for the one-off populate story_ids and partially_learnt_topics_ids
+    in IncompleteActivitiesModel job."""
+
+    EXP_ID_1 = 'exp_1'
+    EXP_ID_2 = 'exp_2'
+    EXP_ID_3 = 'exp_3'
+    EXP_ID_4 = 'exp_4'
+    STORY_ID_0 = 'story_0'
+    TOPIC_ID_0 = 'topic_0'
+    STORY_ID_1 = 'story_1'
+    TOPIC_ID_1 = 'topic_1'
+    STORY_ID_2 = 'story_2'
+    USER_EMAIL = 'user@example.com'
+    USER_USERNAME = 'user'
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            user_jobs_one_off.PopulateStoriesAndTopicsOneOffJob.create_new())
+        user_jobs_one_off.PopulateStoriesAndTopicsOneOffJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_mapreduce_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+    def setUp(self):
+        super(
+            PopulateStoriesAndTopicsOneOffJobTests,
+            self).setUp()
+
+        self.signup(self.USER_EMAIL, self.USER_USERNAME)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.set_admins([self.ADMIN_USERNAME])
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+
+        # Save a few explorations.
+        self.save_new_valid_exploration(
+            self.EXP_ID_1, self.owner_id, title='Title 1',
+            category='Art', language_code='en',
+            correctness_feedback_enabled=True)
+        self.publish_exploration(self.owner_id, self.EXP_ID_1)
+        self.save_new_valid_exploration(
+            self.EXP_ID_2, self.owner_id, title='Title 2',
+            category='Art', language_code='en',
+            correctness_feedback_enabled=True)
+        self.publish_exploration(self.owner_id, self.EXP_ID_2)
+        self.save_new_valid_exploration(
+            self.EXP_ID_3, self.owner_id, title='Title 3',
+            category='Art', language_code='en',
+            correctness_feedback_enabled=True)
+        self.publish_exploration(self.owner_id, self.EXP_ID_3)
+        self.save_new_valid_exploration(
+            self.EXP_ID_4, self.owner_id, title='Title 4',
+            category='Art', language_code='en',
+            correctness_feedback_enabled=True)
+        self.publish_exploration(self.owner_id, self.EXP_ID_4)
+
+        # Save new topics and stories.
+        topic = topic_domain.Topic.create_default_topic(
+            self.TOPIC_ID_0, 'topic', 'abbrev', 'description')
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
+        topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_1'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                'dummy-subtopic-url')]
+        topic.next_subtopic_id = 2
+        subtopic_page = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                1, self.TOPIC_ID_0))
+        subtopic_page_services.save_subtopic_page(
+            self.owner_id, subtopic_page, 'Added subtopic',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': 1,
+                'title': 'Sample'
+            })]
+        )
+        topic_services.save_new_topic(self.owner_id, topic)
+        self.save_new_story(self.STORY_ID_0, self.owner_id, self.TOPIC_ID_0)
+        topic_services.add_canonical_story(
+            self.owner_id, self.TOPIC_ID_0, self.STORY_ID_0)
+
+        changelist = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_ADD_STORY_NODE,
+                'node_id': 'node_1',
+                'title': 'Title 1'
+            }), story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'old_value': None,
+                'new_value': self.EXP_ID_1,
+                'node_id': 'node_1'
+            }), story_domain.StoryChange({
+                'cmd': story_domain.CMD_ADD_STORY_NODE,
+                'node_id': 'node_2',
+                'title': 'Title 2'
+            }), story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'old_value': None,
+                'new_value': self.EXP_ID_2,
+                'node_id': 'node_2'
+            })
+        ]
+        story_services.update_story(
+            self.owner_id, self.STORY_ID_0, changelist, 'Added node.')
+
+        topic = topic_domain.Topic.create_default_topic(
+            self.TOPIC_ID_1, 'topic 1', 'abbrev-one', 'description 1')
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
+        topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title 1', ['skill_id_1'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                'dummy-subtopic-url-one')]
+        topic.next_subtopic_id = 2
+        subtopic_page = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                1, self.TOPIC_ID_1))
+        subtopic_page_services.save_subtopic_page(
+            self.owner_id, subtopic_page, 'Added subtopic',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': 1,
+                'title': 'Sample'
+            })]
+        )
+        topic_services.save_new_topic(self.owner_id, topic)
+        self.save_new_story(self.STORY_ID_1, self.owner_id, self.TOPIC_ID_1)
+        topic_services.add_canonical_story(
+            self.owner_id, self.TOPIC_ID_1, self.STORY_ID_1)
+
+        changelist = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_ADD_STORY_NODE,
+                'node_id': 'node_1',
+                'title': 'Title 1'
+            }), story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'old_value': None,
+                'new_value': self.EXP_ID_3,
+                'node_id': 'node_1'
+            }), story_domain.StoryChange({
+                'cmd': story_domain.CMD_ADD_STORY_NODE,
+                'node_id': 'node_2',
+                'title': 'Title 2'
+            }), story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'old_value': None,
+                'new_value': self.EXP_ID_4,
+                'node_id': 'node_2'
+            })
+        ]
+
+        story_services.update_story(
+            self.owner_id, self.STORY_ID_1, changelist, 'Added nodes.')
+
+        # Publish topics and stories.
+        topic_services.publish_story(
+            self.TOPIC_ID_0, self.STORY_ID_0, self.admin_id)
+        topic_services.publish_topic(self.TOPIC_ID_0, self.admin_id)
+
+        topic_services.publish_story(
+            self.TOPIC_ID_1, self.STORY_ID_1, self.admin_id)
+        topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id)
+
+    def test_adds_story_and_topic_for_one_incomplete_exp(self):
+        # Mark an exploration as incomplete.
+        state_name = 'state_name'
+        version = 1
+        learner_progress_services.mark_exploration_as_incomplete(
+            self.user_id, self.EXP_ID_1, state_name, version)
+        self.assertEqual(len(
+            learner_progress_services.get_all_incomplete_exp_ids(
+                self.user_id)), 1)
+
+        self._run_one_off_job()
+        self.assertEqual(len(
+            learner_progress_services.get_all_incomplete_story_ids(
+                self.user_id)), 1)
+        self.assertEqual(len(
+            learner_progress_services.get_all_partially_learnt_topic_ids(
+                self.user_id)), 1)
+
+    def test_adds_story_and_topic_for_multiple_incomplete_exp(self):
+        # Mark 2 exploration in different stories as incomplete.
+        state_name = 'state_name'
+        version = 1
+        learner_progress_services.mark_exploration_as_incomplete(
+            self.user_id, self.EXP_ID_1, state_name, version)
+        learner_progress_services.mark_exploration_as_incomplete(
+            self.user_id, self.EXP_ID_3, state_name, version)
+        self.assertEqual(len(
+            learner_progress_services.get_all_incomplete_exp_ids(
+                self.user_id)), 2)
+
+        self._run_one_off_job()
+        self.assertEqual(len(
+            learner_progress_services.get_all_incomplete_story_ids(
+                self.user_id)), 2)
+        self.assertEqual(len(
+            learner_progress_services.get_all_partially_learnt_topic_ids(
+                self.user_id)), 2)
+
+    def test_adds_story_and_topic_for_one_completed_exp(self):
+        # Mark an exploration as completed.
+        story_services.record_completed_node_in_story_context(
+            self.user_id, self.STORY_ID_0, 'node_1')
+        learner_progress_services.mark_exploration_as_completed(
+            self.user_id, self.EXP_ID_1)
+        self.assertEqual(len(
+            learner_progress_services.get_all_completed_exp_ids(
+                self.user_id)), 1)
+
+        self._run_one_off_job()
+        self.assertEqual(len(
+            learner_progress_services.get_all_incomplete_story_ids(
+                self.user_id)), 1)
+        self.assertEqual(len(
+            learner_progress_services.get_all_partially_learnt_topic_ids(
+                self.user_id)), 1)
+
+    def test_adds_story_and_topic_for_multiple_completed_exp(self):
+        # Mark 2 explorations in different stories as completed.
+        story_services.record_completed_node_in_story_context(
+            self.user_id, self.STORY_ID_0, 'node_1')
+        learner_progress_services.mark_exploration_as_completed(
+            self.user_id, self.EXP_ID_1)
+        story_services.record_completed_node_in_story_context(
+            self.user_id, self.STORY_ID_1, 'node_1')
+        learner_progress_services.mark_exploration_as_completed(
+            self.user_id, self.EXP_ID_3)
+        self.assertEqual(len(
+            learner_progress_services.get_all_completed_exp_ids(
+                self.user_id)), 2)
+
+        self._run_one_off_job()
+        self.assertEqual(len(
+            learner_progress_services.get_all_incomplete_story_ids(
+                self.user_id)), 2)
+        self.assertEqual(len(
+            learner_progress_services.get_all_partially_learnt_topic_ids(
+                self.user_id)), 2)
+
+    def test_adds_story_and_topic_for_one_completed_and_one_incomplete_exp(
+            self):
+        # Mark an exploration as completed and other as incomplete in same
+        # story.
+        state_name = 'state_name'
+        version = 1
+        story_services.record_completed_node_in_story_context(
+            self.user_id, self.STORY_ID_0, 'node_1')
+        learner_progress_services.mark_exploration_as_completed(
+            self.user_id, self.EXP_ID_1)
+        learner_progress_services.mark_exploration_as_incomplete(
+            self.user_id, self.EXP_ID_2, state_name, version)
+        self.assertEqual(len(
+            learner_progress_services.get_all_completed_exp_ids(
+                self.user_id)), 1)
+        self.assertEqual(len(
+            learner_progress_services.get_all_incomplete_exp_ids(
+                self.user_id)), 1)
+
+        self._run_one_off_job()
+        self.assertEqual(len(
+            learner_progress_services.get_all_incomplete_story_ids(
+                self.user_id)), 1)
+        self.assertEqual(len(
+            learner_progress_services.get_all_partially_learnt_topic_ids(
+                self.user_id)), 1)
+
+    def test_adds_story_and_topic_for_both_incomplete_exp(self):
+        # Mark two exploration as incomplete in same story.
+        state_name = 'state_name'
+        version = 1
+        learner_progress_services.mark_exploration_as_incomplete(
+            self.user_id, self.EXP_ID_1, state_name, version)
+        learner_progress_services.mark_exploration_as_incomplete(
+            self.user_id, self.EXP_ID_2, state_name, version)
+        self.assertEqual(len(
+            learner_progress_services.get_all_incomplete_exp_ids(
+                self.user_id)), 2)
+
+        self._run_one_off_job()
+        self.assertEqual(len(
+            learner_progress_services.get_all_incomplete_story_ids(
+                self.user_id)), 1)
+        self.assertEqual(len(
+            learner_progress_services.get_all_partially_learnt_topic_ids(
+                self.user_id)), 1)
+
+    def test_does_not_add_story_and_topic_for_completed_exp(self):
+        # Mark 2 exp from the same story as completed.
+        story_services.record_completed_node_in_story_context(
+            self.user_id, self.STORY_ID_0, 'node_1')
+        learner_progress_services.mark_exploration_as_completed(
+            self.user_id, self.EXP_ID_1)
+        story_services.record_completed_node_in_story_context(
+            self.user_id, self.STORY_ID_0, 'node_2')
+        learner_progress_services.mark_exploration_as_completed(
+            self.user_id, self.EXP_ID_2)
+        self.assertEqual(len(
+            learner_progress_services.get_all_completed_exp_ids(
+                self.user_id)), 2)
+
+        self._run_one_off_job()
+        self.assertEqual(len(
+            learner_progress_services.get_all_incomplete_story_ids(
+                self.user_id)), 0)
+        self.assertEqual(len(
+            learner_progress_services.get_all_partially_learnt_topic_ids(
+                self.user_id)), 0)
+        self.assertEqual(len(
+            learner_progress_services.get_all_completed_story_ids(
+                self.user_id)), 1)
+        self.assertEqual(len(
+            learner_progress_services.get_all_learnt_topic_ids(
+                self.user_id)), 1)
 
 
 class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
