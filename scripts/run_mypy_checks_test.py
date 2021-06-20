@@ -79,7 +79,7 @@ class MypyScriptChecks(test_utils.GenericTestBase):
         ]
         with self.files_swap:
             with self.directories_swap:
-                cmd = run_mypy_checks.get_mypy_cmd([['file1.py', 'file2.py']])
+                cmd = run_mypy_checks.get_mypy_cmd(['file1.py', 'file2.py'])
                 self.assertEqual(cmd, expected_cmd)
 
     def test_install_mypy_prerequisites_success(self):
