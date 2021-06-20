@@ -34,8 +34,10 @@ var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 
 var _selectLanguage = async function(language) {
+  var languageDropdown = element(by.css('.protractor-test-language-dropdown'));
   var languageOption = element(
     by.css('.protractor-test-i18n-language-' + language));
+  await action.click('Language Dropdown', languageDropdown);
   await action.click('Language Option', languageOption);
   // Wait for the language-change request to reach the backend.
   await waitFor.pageToFullyLoad();
