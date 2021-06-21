@@ -1485,17 +1485,12 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
         which need schemas.
 
         Returns:
-            list_of_routes_which_need_schemas: list(RedirectRoute). A list of
-            RedirectRoute objects.
+            list(RedirectRoute). A list of RedirectRoute objects.
         """
         list_of_routes_which_need_schemas = []
-        for route in main.URLS:
-            # TODO(#13139): Remove below check once all the MAPREDUCE_HANDLERS
-            # are removed from the codebase.
-            if isinstance(route, tuple):
-                continue
-            list_of_routes_which_need_schemas.append(route)
-        return list_of_routes_which_need_schemas
+        # TODO(#13139): Remove if condition from the list comprehension,
+        # once all the MAPREDUCE_HANDLERS are removed from the codebase.
+        return [route for route in main.URLS if not isinstance(route, tuple)]
 
     def test_every_handler_class_has_schema(self):
         """This test ensures that every child class of BaseHandler
