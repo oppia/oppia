@@ -20,7 +20,7 @@ export class ImageFile {
   filename: string;
   // 'get' method from a 'Map' interface can return an undefined value
   // for a data.
-  // get(key: K): V | undefined; used at line 77 assets-backend-api.service.ts .
+  // get(key: K): V | undefined; in line 77 assets-backend-api.service.ts .
   data: Blob | undefined;
 
   constructor(filename: string, data: Blob | undefined) {

@@ -44,13 +44,13 @@ export class StorySummaryTileComponent implements OnInit {
   nodeCount!: number;
   completedStoriesCount!: number;
   storyProgress!: number;
-  thumbnailUrl!: string | null;
-  storyLink!: string | null;
   storyTitle!: string;
   strokeDashArrayValues!: string | number;
   completedStrokeDashArrayValues!: string;
   thumbnailBgColor!: string;
   nodeTitles!: string[];
+  storyLink!: string;
+  thumbnailUrl: string | null = null;
   showButton: boolean = false;
   circumference = (20 * 2 * Math.PI);
   gapLength = 5;
@@ -63,18 +63,22 @@ export class StorySummaryTileComponent implements OnInit {
     private assetsBackendApiService: AssetsBackendApiService
   ) {}
 
-  getStoryLink(): string | null {
+  getStoryLink(): string {
     // This component is being used in the topic editor as well and
     // we want to disable the linking in this case.
     if (!this.classroomUrlFragment || !this.topicUrlFragment) {
       return '#';
     }
-    return this.urlInterpolationService.interpolateUrl(
+    let storyLink = this.urlInterpolationService.interpolateUrl(
       TopicViewerDomainConstants.STORY_VIEWER_URL_TEMPLATE, {
         classroom_url_fragment: this.classroomUrlFragment,
         story_url_fragment: this.storySummary.getUrlFragment(),
         topic_url_fragment: this.topicUrlFragment
       });
+    if (storyLink === null) {
+      return '#';
+    }
+    return storyLink;
   }
 
   isChapterCompleted(title: string): boolean {
