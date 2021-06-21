@@ -1482,30 +1482,30 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
 
     def _get_list_of_routes_which_need_schemas(self):
         """This method iterates over all the routes and returns those routes
-        which need schema.
+        which need schemas.
 
         Returns:
-            list_of_routes_which_needs_schema: list(RedirectRoute). A list of
+            list_of_routes_which_need_schemas: list(RedirectRoute). A list of
             RedirectRoute objects.
         """
-        list_of_routes_which_needs_schema = []
+        list_of_routes_which_need_schemas = []
         for route in main.URLS:
             # TODO(#13139): Remove below check once all the MAPREDUCE_HANDLERS
             # are removed from the codebase.
             if isinstance(route, tuple):
                 continue
-            list_of_routes_which_needs_schema.append(route)
-        return list_of_routes_which_needs_schema
+            list_of_routes_which_need_schemas.append(route)
+        return list_of_routes_which_need_schemas
 
     def test_every_handler_class_has_schema(self):
         """This test ensures that every child class of BaseHandler
         has an associated schema.
         """
-        list_of_handlers_which_need_schema = []
-        list_of_routes_which_needs_schema = (
+        list_of_handlers_which_need_schemas = []
+        list_of_routes_which_need_schemas = (
             self._get_list_of_routes_which_need_schemas())
 
-        for route in list_of_routes_which_needs_schema:
+        for route in list_of_routes_which_need_schemas:
             handler = route.handler
 
             handler_class_name = handler.__name__
@@ -1520,25 +1520,25 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
                 schema_written_for_url_path_args)
 
             if handler_has_schemas is False:
-                list_of_handlers_which_need_schema.append(handler_class_name)
+                list_of_handlers_which_need_schemas.append(handler_class_name)
 
         error_msg = (
-            'Schema required in handlers: [ %s ].'
-            '\nVisit %s to know, how to write schema for handler args.' % (
+            'The following handlers have missing schemas: [ %s ].'
+            '\nVisit %s to learn how to write schemas for handler args.' % (
                 ', '.join(
-                    list_of_handlers_which_need_schema), self.wiki_page_link))
+                    list_of_handlers_which_need_schemas), self.wiki_page_link))
 
-        self.assertEqual(list_of_handlers_which_need_schema, [], error_msg)
+        self.assertEqual(list_of_handlers_which_need_schemas, [], error_msg)
 
     def test_schema_keys_exactly_match_with_url_path_elements(self):
         """This test ensures that schema keys in URL_PATH_ARGS_SCHEMAS must
         exactly match with url path elements.
         """
         handlers_with_missing_url_schema_keys = []
-        list_of_routes_which_needs_schema = (
+        list_of_routes_which_need_schemas = (
             self._get_list_of_routes_which_need_schemas())
 
-        for route in list_of_routes_which_needs_schema:
+        for route in list_of_routes_which_need_schemas:
             handler = route.handler
 
             handler_class_name = handler.__name__
@@ -1562,7 +1562,7 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
 
         error_msg = (
             'Missing schema keys in URL_PATH_ARGS_SCHEMAS for [ %s ] classes.'
-            '\nVisit %s to know, how to write schema for handler args.' % (
+            '\nVisit %s to learn how to write schemas for handler args.' % (
                 ', '.join(handlers_with_missing_url_schema_keys),
                     self.wiki_page_link))
 
@@ -1573,10 +1573,10 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
         exactly match with request arguments.
         """
         handlers_with_missing_request_schema_keys = []
-        list_of_routes_which_needs_schema = (
+        list_of_routes_which_need_schemas = (
             self._get_list_of_routes_which_need_schemas())
 
-        for route in list_of_routes_which_needs_schema:
+        for route in list_of_routes_which_need_schemas:
             handler = route.handler
 
             handler_class_name = handler.__name__
@@ -1594,10 +1594,10 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
                 handler_request_methods.append('POST')
             if handler.delete != base.BaseHandler.delete:
                 handler_request_methods.append('DELETE')
-            schema_keys = handler.HANDLER_ARGS_SCHEMAS.keys()
+            methods_defined_in_schema = handler.HANDLER_ARGS_SCHEMAS.keys()
 
             missing_schema_keys = (
-                set(handler_request_methods) - set(schema_keys))
+                set(handler_request_methods) - set(methods_defined_in_schema))
             if missing_schema_keys:
                 handlers_with_missing_request_schema_keys.append(
                     handler_class_name)
@@ -1607,7 +1607,7 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
 
         error_msg = (
             'Missing schema keys in HANDLER_ARGS_SCHEMAS for [ %s ] classes.'
-            '\nVisit %s to know, how to write schema for handler args.' % (
+            '\nVisit %s to learn how to write schemas for handler args.' % (
                 ', '.join(handlers_with_missing_request_schema_keys),
                     self.wiki_page_link))
 
@@ -1615,14 +1615,14 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
             handlers_with_missing_request_schema_keys, [], error_msg)
 
     def test_default_value_in_schema_conforms_with_schema(self):
-        """This test check whether the default_value provided in schema
-        conforms with the schema.
+        """This test checks whether the default_value provided in schema
+        conforms with the rest of the schema.
         """
         handlers_with_non_conforming_default_schemas = []
-        list_of_routes_which_needs_schema = (
+        list_of_routes_which_need_schemas = (
             self._get_list_of_routes_which_need_schemas())
 
-        for route in list_of_routes_which_needs_schema:
+        for route in list_of_routes_which_need_schemas:
             handler = route.handler
 
             handler_class_name = handler.__name__
@@ -1654,24 +1654,26 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
 
         error_msg = (
             'Schema validation for default values failed for handlers: [ %s ].'
-            '\nVisit %s to know, How to write schema for handler args.' % (
+            '\nVisit %s to learn how to write schemas for handler args.' % (
                 ', '.join(handlers_with_non_conforming_default_schemas),
                         self.wiki_page_link))
 
         self.assertEqual(
             handlers_with_non_conforming_default_schemas, [], error_msg)
 
-    def test_handlers_with_schema_are_not_in_the_schema_requiring_list(self):
+    def test_names_of_handlers_with_schema_should_not_be_in_the_schema_requiring_list(self): #pylint: disable=line-too-long
         """This test checks if a handler contains schema then, handler class
         name should not be present in SCHEMA_REQUIRING_HANDLER_CLASS_NAMES list.
         """
+        # The list contains names of the handlers which should be removed
+        # from the SCHEMA_REQUIRING_HANDLER_CLASS_NAMES list.
         list_of_handlers_to_remove = []
         non_schema_requiring_handler_class_names = (
             payload_validator.NON_SCHEMA_REQUIRING_HANDLER_CLASS_NAMES)
-        list_of_routes_which_needs_schema = (
+        list_of_routes_which_need_schemas = (
             self._get_list_of_routes_which_need_schemas())
 
-        for route in list_of_routes_which_needs_schema:
+        for route in list_of_routes_which_need_schemas:
             handler = route.handler
             handler = route.handler
 

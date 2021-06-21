@@ -299,16 +299,19 @@ class BaseHandler(webapp2.RequestHandler):
                 self.handle_exception(e, self.app.debug)
                 return
 
-        handlers_has_passed_schema_validation = True
+        schema_validation_succeeded = True
         try:
             self.validate_args_schema()
         except self.InvalidInputException as e:
             self.handle_exception(e, self.app.debug)
-            handlers_has_passed_schema_validation = False
+            schema_validation_succeeded = False
+        # TODO(#13155): Remove this clause once all the handlers have had
+        # schema validation implemented.
         except NotImplementedError as e:
             self.handle_exception(e, self.app.debug)
-            handlers_has_passed_schema_validation = False
-        if handlers_has_passed_schema_validation is False:
+            schema_validation_succeeded = False
+
+        if schema_validation_succeeded is False:
             return
 
         super(BaseHandler, self).dispatch()
