@@ -137,7 +137,7 @@ class VoiceArtistManagementHandler(base.BaseHandler):
     """Handles assignment of voice artists."""
 
     @acl_decorators.can_manage_voice_artist
-    def post(self, entity_type, entity_id):
+    def post(self, unused_entity_type, entity_id):
         """Handles Post requests."""
         voice_artist = self.payload.get('username')
         voice_artist_id = user_services.get_user_id_from_username(
@@ -152,11 +152,8 @@ class VoiceArtistManagementHandler(base.BaseHandler):
         self.render_json({})
 
     @acl_decorators.can_manage_voice_artist
-    def delete(self, entity_type, entity_id):
+    def delete(self, unused_entity_type, entity_id):
         """Handles Delete requests."""
-        if entity_type != feconf.ENTITY_TYPE_EXPLORATION:
-            raise self.InvalidInputException(
-                'Invalid entity type.')
         voice_artist = self.request.get('voice_artist')
         voice_artist_id = user_services.get_user_id_from_username(
             voice_artist)
