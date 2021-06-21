@@ -32,6 +32,10 @@ angular.module('oppia').factory('ExplorationTitleService', [
     var child = Object.create(ExplorationPropertyService);
     child.propertyName = 'title';
     child._normalize = $filter('normalizeWhitespace');
+    /**
+     * @param {string} value - The input to be validated.
+     * @returns {boolean} - True if title name is valid.
+     */
     child._isValid = function(value) {
       return ValidatorsService.isValidEntityName(
         value, true, ExplorationRightsService.isPrivate());

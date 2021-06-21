@@ -23,24 +23,32 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
+interface ErrorCategory {
+  name: string,
+  humanReadable: string
+}
+
 @Component({
   selector: 'logic-error-category-editor',
   templateUrl: './logic-error-category-editor.component.html',
   styleUrls: []
 })
 export class LogicErrorCategoryEditorComponent implements OnInit {
-  @Input() modalId: symbol;
-  @Input() value;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() modalId!: symbol;
+  @Input() value!: ErrorCategory;
   @Output() valueChanged = new EventEmitter();
 
-  get category(): { name: string; humanReadable: string; } {
+  get category(): ErrorCategory {
     return this.value;
   }
-  set category(value: { name: string; humanReadable: string; }) {
+  set category(value: ErrorCategory) {
     this.value = value;
     this.valueChanged.emit(this.value);
   }
-  errorCategories: { name: string; humanReadable: string; }[] = [
+  errorCategories: ErrorCategory[] = [
     {
       name: 'parsing',
       humanReadable: 'Unparseable'

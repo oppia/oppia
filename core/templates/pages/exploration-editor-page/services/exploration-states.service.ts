@@ -48,13 +48,13 @@ require('services/validators.service.ts');
 import { EventEmitter } from '@angular/core';
 
 angular.module('oppia').factory('ExplorationStatesService', [
-  '$filter', '$injector', '$location', '$q', '$uibModal',
+  '$filter', '$injector', '$location', '$q', '$rootScope', '$uibModal',
   'AlertsService', 'AngularNameService', 'AnswerClassificationService',
   'ChangeListService', 'ContextService', 'ExplorationInitStateNameService',
   'SolutionValidityService', 'StateEditorRefreshService', 'StateEditorService',
   'StatesObjectFactory', 'UrlInterpolationService', 'ValidatorsService',
   function(
-      $filter, $injector, $location, $q, $uibModal,
+      $filter, $injector, $location, $q, $rootScope, $uibModal,
       AlertsService, AngularNameService, AnswerClassificationService,
       ChangeListService, ContextService, ExplorationInitStateNameService,
       SolutionValidityService, StateEditorRefreshService, StateEditorService,
@@ -132,6 +132,7 @@ angular.module('oppia').factory('ExplorationStatesService', [
       hints: ['interaction', 'hints'],
       next_content_id_index: ['nextContentIdIndex'],
       solicit_answer_details: ['solicitAnswerDetails'],
+      card_is_checkpoint: ['cardIsCheckpoint'],
       solution: ['interaction', 'solution'],
       widget_id: ['interaction', 'id'],
       widget_customization_args: ['interaction', 'customizationArgs'],
@@ -209,6 +210,7 @@ angular.module('oppia').factory('ExplorationStatesService', [
           '\nChange list: ' + JSON.stringify(
             ChangeListService.getChangeList()) +
           '\nAll states names: ' + _states.getStateNames());
+        $rootScope.$applyAsync();
         e.message += additionalInfo;
         throw e;
       }
@@ -229,6 +231,7 @@ angular.module('oppia').factory('ExplorationStatesService', [
       if (!angular.equals(oldValue, newValue)) {
         ChangeListService.editStateProperty(
           stateName, backendName, newBackendValue, oldBackendValue);
+        $rootScope.$applyAsync();
 
         var newStateData = _states.getState(stateName);
         var accessorList = PROPERTY_REF_DATA[backendName];
@@ -309,6 +312,17 @@ angular.module('oppia').factory('ExplorationStatesService', [
       },
       setState: function(stateName, stateData) {
         _setState(stateName, stateData, true);
+      },
+      getCheckpointCount: function() {
+        var count: number = 0;
+        if (_states) {
+          _states.getStateNames().forEach(function(stateName) {
+            if (_states.getState(stateName).cardIsCheckpoint) {
+              count++;
+            }
+          });
+        }
+        return count;
       },
       isNewStateNameValid: function(newStateName, showWarnings) {
         if (_states.hasState(newStateName)) {
@@ -411,12 +425,41 @@ angular.module('oppia').factory('ExplorationStatesService', [
         saveStateProperty(
           stateName, 'solicit_answer_details', newSolicitAnswerDetails);
       },
-      getWrittenTranslationsMemento: function(stateName) {
-        return getStatePropertyMemento(stateName, 'written_translations');
+      getCardIsCheckpointMemento: function(stateName) {
+        return getStatePropertyMemento(stateName, 'card_is_checkpoint');
       },
-      saveWrittenTranslations: function(stateName, newWrittenTranslations) {
+      saveCardIsCheckpoint: function(stateName, newCardIsCheckpoint) {
         saveStateProperty(
-          stateName, 'written_translations', newWrittenTranslations);
+          stateName, 'card_is_checkpoint', newCardIsCheckpoint);
+      },
+      getWrittenTranslationsMemento: function(stateName) {
+        return _states.getState(stateName).writtenTranslations;
+      },
+      saveWrittenTranslation: function(
+          contentId, dataFormat, languageCode, stateName, translationHtml) {
+        ChangeListService.addWrittenTranslation(
+          contentId, dataFormat, languageCode, stateName, translationHtml);
+        let stateData = _states.getState(stateName);
+        if (stateData.writtenTranslations.hasWrittenTranslation(
+          contentId, languageCode)) {
+          stateData.writtenTranslations.updateWrittenTranslation(
+            contentId, languageCode, translationHtml);
+        } else {
+          stateData.writtenTranslations.addWrittenTranslation(
+            contentId, languageCode, dataFormat, translationHtml);
+        }
+        _states.setState(stateName, angular.copy(stateData));
+      },
+      markWrittenTranslationsAsNeedingUpdate: function(contentId, stateName) {
+        ChangeListService.markTranslationsAsNeedingUpdate(contentId, stateName);
+        let stateData = _states.getState(stateName);
+        const translationMapping = (
+          stateData.writtenTranslations.translationsMapping[contentId]);
+        for (const languageCode in translationMapping) {
+          stateData.writtenTranslations.translationsMapping[contentId][
+            languageCode].markAsNeedingUpdate();
+        }
+        _states.setState(stateName, angular.copy(stateData));
       },
       isInitialized: function() {
         return _states !== null;
@@ -435,6 +478,7 @@ angular.module('oppia').factory('ExplorationStatesService', [
         _states.addState(newStateName);
 
         ChangeListService.addState(newStateName);
+        $rootScope.$applyAsync();
         stateAddedCallbacks.forEach(function(callback) {
           callback(newStateName);
         });
@@ -469,6 +513,7 @@ angular.module('oppia').factory('ExplorationStatesService', [
           _states.deleteState(deleteStateName);
 
           ChangeListService.deleteState(deleteStateName);
+          $rootScope.$applyAsync();
 
           if (StateEditorService.getActiveStateName() === deleteStateName) {
             StateEditorService.setActiveStateName(
@@ -507,6 +552,7 @@ angular.module('oppia').factory('ExplorationStatesService', [
         // will raise an error because the new initial state name does not
         // exist.
         ChangeListService.renameState(newStateName, oldStateName);
+        $rootScope.$applyAsync();
         SolutionValidityService.onRenameState(newStateName, oldStateName);
         // Amend initStateName appropriately, if necessary. Note that this
         // must come after the state renaming, otherwise saving will lead to

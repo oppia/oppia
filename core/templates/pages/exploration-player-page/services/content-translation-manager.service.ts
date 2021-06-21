@@ -34,7 +34,7 @@ import { SubtitledHtml } from
 import { Schema } from 'services/schema-default-value.service';
 import { SchemaConstants } from
   'components/forms/schema-based-editors/schema-constants';
-import INTERACTION_SPECS from 'pages/interaction-specs.constants.ajs';
+import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
 import { WrittenTranslations } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 import { SubtitledUnicode } from
@@ -220,7 +220,8 @@ export class ContentTranslationManagerService {
       }
     };
 
-    const caSpecs = INTERACTION_SPECS[interactionId].customization_arg_specs;
+    const caSpecs = InteractionSpecsConstants.INTERACTION_SPECS[
+      interactionId].customization_arg_specs;
     for (const caSpec of caSpecs) {
       const name = caSpec.name;
       if (caValues.hasOwnProperty(name)) {

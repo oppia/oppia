@@ -173,7 +173,6 @@ import { FractionInputRulesService } from
   'interactions/FractionInput/directives/fraction-input-rules.service';
 import { FractionInputValidationService } from
   'interactions/FractionInput/directives/fraction-input-validation.service';
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { GraphDetailService } from
   'interactions/GraphInput/directives/graph-detail.service';
@@ -480,8 +479,6 @@ import { TopicsAndSkillsDashboardPageService } from
   'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service';
 import { TopicViewerBackendApiService } from
   'domain/topic_viewer/topic-viewer-backend-api.service';
-import { TranslationsBackendApiService } from
-  'services/translations-backend-api.service';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
@@ -566,7 +563,6 @@ export class UpgradedServices {
       new ExplorationFeaturesService();
     upgradedServices['ExpressionParserService'] = new ExpressionParserService();
     upgradedServices['ExternalSaveService'] = new ExternalSaveService();
-    upgradedServices['FractionObjectFactory'] = new FractionObjectFactory();
     upgradedServices['GraphDetailService'] = new GraphDetailService();
     upgradedServices['GraphUtilsService'] = new GraphUtilsService();
     upgradedServices['I18nLanguageCodeService'] = new I18nLanguageCodeService();
@@ -688,11 +684,9 @@ export class UpgradedServices {
       new FeedbackThreadObjectFactory();
     upgradedServices['FractionInputRulesService'] =
       new FractionInputRulesService(
-        upgradedServices['FractionObjectFactory'],
         upgradedServices['UtilsService']);
     upgradedServices['FractionInputValidationService'] =
       new FractionInputValidationService(
-        upgradedServices['FractionObjectFactory'],
         upgradedServices['baseInteractionValidationService']);
     upgradedServices['GraphInputRulesService'] =
       new GraphInputRulesService(
@@ -746,8 +740,7 @@ export class UpgradedServices {
         upgradedServices['baseInteractionValidationService']);
     upgradedServices['NumberWithUnitsObjectFactory'] =
       new NumberWithUnitsObjectFactory(
-        upgradedServices['UnitsObjectFactory'],
-        upgradedServices['FractionObjectFactory']);
+        upgradedServices['UnitsObjectFactory']);
     upgradedServices['NumericExpressionInputValidationService'] =
       new NumericExpressionInputValidationService(
         upgradedServices['baseInteractionValidationService']);
@@ -1146,11 +1139,11 @@ export class UpgradedServices {
       new TopicViewerBackendApiService(
         upgradedServices['HttpClient'],
         upgradedServices['UrlInterpolationService']);
-    upgradedServices['TranslationsBackendApiService'] =
-      new TranslationsBackendApiService(
-        upgradedServices['HttpClient']);
-    upgradedServices['UserBackendApiService'] = new UserBackendApiService(
-      upgradedServices['HttpClient']);
+    upgradedServices['UserBackendApiService'] =
+      new UserBackendApiService(
+        upgradedServices['HttpClient'],
+        upgradedServices['WindowRef'],
+        upgradedServices['Title']);
     upgradedServices['UserService'] = new UserService(
       upgradedServices['UrlInterpolationService'],
       upgradedServices['UrlService'],
@@ -1237,7 +1230,6 @@ export class UpgradedServices {
     upgradedServices['StateInteractionStatsService'] =
       new StateInteractionStatsService(
         upgradedServices['AnswerClassificationService'],
-        upgradedServices['FractionObjectFactory'],
         upgradedServices['InteractionRulesRegistryService'],
         upgradedServices['StateInteractionStatsBackendApiService']);
     upgradedServices['StateTopAnswersStatsService'] =

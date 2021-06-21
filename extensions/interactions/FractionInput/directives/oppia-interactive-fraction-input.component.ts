@@ -20,7 +20,7 @@ import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
+import { Fraction } from 'domain/objects/fraction.model';
 import { ObjectsDomainConstants } from 'domain/objects/objects-domain.constants';
 import { FractionInputCustomizationArgs } from 'interactions/customization-args-defs';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
@@ -61,7 +61,6 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
   constructor(
     private currentInteractionService: CurrentInteractionService,
     private fractionInputRulesService: FractionInputRulesService,
-    private fractionObjectFactory: FractionObjectFactory,
     private focusManagerService: FocusManagerService,
     private interactionAttributesExtractorService:
       InteractionAttributesExtractorService
@@ -128,7 +127,7 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
     this.customPlaceholder = customPlaceholder.value.unicode;
     if (this.savedSolution !== undefined) {
       let savedSolution = this.savedSolution;
-      savedSolution = this.fractionObjectFactory.fromDict(
+      savedSolution = Fraction.fromDict(
         savedSolution as FractionAnswer).toString();
       this.answer = savedSolution;
     }
@@ -156,8 +155,7 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
   submitAnswer(): void {
     const answer: string = this.answer;
     try {
-      const fraction = this.fractionObjectFactory.fromRawInputString(
-        answer);
+      const fraction = Fraction.fromRawInputString(answer);
       if (this.requireSimplestForm &&
         !fraction.isEqualTo(fraction.convertToSimplestForm())
       ) {

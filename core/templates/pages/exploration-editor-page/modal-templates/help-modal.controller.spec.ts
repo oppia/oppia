@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { importAllAngularServices } from 'tests/unit-test-utils';
+
 /**
  * @fileoverview Unit tests for HelpModalController.
  */
-
-import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Help Modal Controller', function() {
   var $scope = null;
