@@ -21,7 +21,7 @@
 var rule = require('./protractor-practices');
 var RuleTester = require('eslint').RuleTester;
 
-var ruleTester = new RuleTester();
+var ruleTester = new RuleTester({ parserOptions: { ecmaVersion: 2016 } });
 ruleTester.run('protractor-practices', rule, {
   valid: [{
     code:
@@ -42,6 +42,8 @@ ruleTester.run('protractor-practices', rule, {
   }, {
     code: `var profileLink = element(by.css(
           '.protractor-test-profile-link'));`
+  }, {
+    code: 'const SKILL_DESCRIPTIONS = 1;'
   }],
 
   invalid: [
@@ -72,6 +74,13 @@ ruleTester.run('protractor-practices', rule, {
       });`,
       errors: [{
         message: 'Please do not use .then(), consider async/await instead',
+      }],
+    },
+    {
+      code:
+      'const Value = 5;',
+      errors: [{
+        message: 'Please make constant name “Value” are in all-caps',
       }],
     },
   ]

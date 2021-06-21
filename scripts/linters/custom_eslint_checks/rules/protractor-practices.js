@@ -35,7 +35,9 @@ module.exports = {
       disallowThen: 'Please do not use .then(), consider async/await instead',
       useProtractorTest: (
         'Please use “.protractor-test-” prefix classname selector instead of ' +
-        '“{{incorrectClassname}}”')
+        '“{{incorrectClassname}}”'),
+      constInAllCaps: (
+        'Please make constant name “{{constName}}” are in all-caps')
     },
   },
 
@@ -57,7 +59,24 @@ module.exports = {
       }
     };
 
+    var checkConstName = function(node) {
+      var constantName = node.declarations[0].id.name;
+      if ((node.declarations[0].id.type === 'Identifier') &&
+        (constantName !== constantName.toUpperCase())) {
+        context.report({
+          node: node,
+          messageId: 'constInAllCaps',
+          data: {
+            constName: constantName
+          }
+        });
+      }
+    };
+
     return {
+      'VariableDeclaration[kind=const]': function(node) {
+        checkConstName(node);
+      },
       CallExpression: function(node) {
         checkSleepCall(node);
       },

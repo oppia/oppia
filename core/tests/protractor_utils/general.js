@@ -62,8 +62,8 @@ var checkForConsoleErrors = async function(errorsToIgnore) {
     errorsToIgnore.push(_.escapeRegExp(' Slow network is detected.'));
   }
 
-  const browserLogs = await browser.manage().logs().get('browser');
-  const browserErrors = browserLogs.filter(logEntry => (
+  var browserLogs = await browser.manage().logs().get('browser');
+  var browserErrors = browserLogs.filter(logEntry => (
     logEntry.level.value > CONSOLE_LOG_THRESHOLD &&
     errorsToIgnore.every(e => logEntry.message.match(e) === null)));
   expect(browserErrors).toEqual([]);
@@ -172,7 +172,7 @@ var ensurePageHasNoTranslationIds = async function() {
 
 var acceptPrompt = async function(promptResponse) {
   await waitFor.alertToBePresent();
-  const alert = await browser.switchTo().alert();
+  var alert = await browser.switchTo().alert();
   await alert.sendKeys(promptResponse);
   await alert.accept();
   await waitFor.pageToFullyLoad();
