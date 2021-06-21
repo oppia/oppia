@@ -51,8 +51,8 @@ describe('Number with Units rules service', () => {
   };
 
   var REAL_RULE_INPUT = {
-    f: createNumberWithUnitsDict('real', 2, null,
-      [{unit: 'kg', exponent: 1}, {unit: 'm', exponent: -2}])
+    f: createNumberWithUnitsDict(
+      'real', 2, null, [{unit: 'kg', exponent: 1}, {unit: 'm', exponent: -2}])
   };
 
   var FRACTION_RULE_INPUT = {
@@ -61,8 +61,9 @@ describe('Number with Units rules service', () => {
   };
 
   var CURRENCY_RULE_INPUT = {
-    f: createNumberWithUnitsDict('real', 2, null,
-      [{unit: 'dollar', exponent: 1}, {unit: 'm', exponent: -2}])
+    f: createNumberWithUnitsDict(
+      'real', 2, null, [{unit: 'dollar', exponent: 1},
+        {unit: 'm', exponent: -2}])
   };
 
   it('should have a correct \'equal to\' rule', () => {

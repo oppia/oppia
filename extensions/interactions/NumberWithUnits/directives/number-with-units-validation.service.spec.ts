@@ -76,24 +76,27 @@ describe('NumberWithUnitsValidationService', () => {
     equalsTwoRule = rof.createFromBackendDict({
       rule_type: 'IsEqualTo',
       inputs: {
-        f: createNumberWithUnitsDict('real', 2, null,
-        [{unit: 'kg', exponent: 1}, {unit: 'm', exponent: -2}])
+        f: createNumberWithUnitsDict(
+          'real', 2, null, [{unit: 'kg', exponent: 1},
+            {unit: 'm', exponent: -2}])
       }
     }, 'NumberWithUnits');
 
     equivalentToTwoThousandRule = rof.createFromBackendDict({
       rule_type: 'IsEquivalentTo',
       inputs: {
-        f: createNumberWithUnitsDict('real', 2000, null,
-        [{unit: 'g', exponent: 1}, {unit: 'm', exponent: -2}])
+        f: createNumberWithUnitsDict(
+          'real', 2000, null, [{unit: 'g', exponent: 1},
+            {unit: 'm', exponent: -2}])
       }
     }, 'NumberWithUnits');
 
     equivalentToTwoRule = rof.createFromBackendDict({
       rule_type: 'IsEquivalentTo',
       inputs: {
-        f: createNumberWithUnitsDict('real', 2, null,
-        [{unit: 'kg', exponent: 1}, {unit: 'm', exponent: -2}])
+        f: createNumberWithUnitsDict(
+          'real', 2, null, [{unit: 'kg', exponent: 1},
+            {unit: 'm', exponent: -2}])
       }
     }, 'NumberWithUnits');
 

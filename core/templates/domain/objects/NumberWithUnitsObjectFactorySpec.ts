@@ -90,7 +90,8 @@ describe('NumberWithUnitsObjectFactory', () => {
         'Rs')).toString()).toBe('Rs 2.02');
       expect(new NumberWithUnits('real', 2.02, null, uof.fromRawInputString(
         '₹')).toString()).toBe('₹ 2.02');
-      expect(new NumberWithUnits('real', 2, null, uof.fromRawInputString('')).toString()).toBe('2');
+      expect(new NumberWithUnits(
+        'real', 2, null, uof.fromRawInputString('')).toString()).toBe('2');
       expect(new NumberWithUnits('fraction', null, new Fraction(
         true, 0, 4, 3), uof.fromRawInputString(
         'm / s^2')).toString()).toBe('-4/3 m s^-2');
@@ -112,7 +113,8 @@ describe('NumberWithUnitsObjectFactory', () => {
 
     it('should parse valid number with units strings', () => {
       expect(nwuof.fromRawInputString('2.02 kg / m^3')).toEqual(
-        new NumberWithUnits('real', 2.02, null, uof.fromRawInputString('kg / m^3')));
+        new NumberWithUnits(
+          'real', 2.02, null, uof.fromRawInputString('kg / m^3')));
       expect(nwuof.fromRawInputString('2 / 3 kg / m^3')).toEqual(
         new NumberWithUnits('fraction', null, new Fraction(
           false, 0, 2, 3), uof.fromRawInputString('kg / m^3')));
