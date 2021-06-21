@@ -1872,7 +1872,11 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
                 if change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
                     if (frontend_version_exploration.states[old_state_name].content.html == # pylint: disable=line-too-long
                             backend_version_exploration.states[new_state_name].content.html): # pylint: disable=line-too-long
-                        change_is_mergeable = True
+                        if ('written_translations' not in
+                                changed_properties[old_state_name] and
+                                'recorded_voiceovers' not in
+                                changed_properties[old_state_name]):
+                            change_is_mergeable = True
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_INTERACTION_ID):
                     if old_state_name in changed_properties:
@@ -1905,12 +1909,13 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
                     if old_state_name in changed_properties:
                         if (frontend_version_exploration.states[old_state_name].interaction.id == # pylint: disable=line-too-long
                                 backend_version_exploration.states[new_state_name].interaction.id): # pylint: disable=line-too-long
-                            if (change.property_name not in
-                                    changed_properties[old_state_name] and
-                                    'answer_group' not in
-                                    changed_properties[old_state_name] and
-                                    'solution' not in
-                                    changed_properties[old_state_name]):
+                            if all(property not in
+                                    changed_properties[old_state_name]
+                                    for property in ['solution',
+                                                     'recorded_voiceovers',
+                                                     'answer_group',
+                                                     'written_translations',
+                                                     'widget_customization_args']):
                                 change_is_mergeable = True
                     else:
                         change_is_mergeable = True
@@ -1919,12 +1924,13 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
                     if old_state_name in changed_properties:
                         if (frontend_version_exploration.states[old_state_name].interaction.id ==  # pylint: disable=line-too-long
                                 backend_version_exploration.states[new_state_name].interaction.id): # pylint: disable=line-too-long
-                            if ('widget_customization_args' not in
-                                    changed_properties[old_state_name] and
-                                    change.property_name not in
-                                    changed_properties[old_state_name] and
-                                    'solution' not in
-                                    changed_properties[old_state_name]):
+                            if all(property not in
+                                    changed_properties[old_state_name]
+                                    for property in ['solution',
+                                                     'recorded_voiceovers',
+                                                     'answer_group',
+                                                     'written_translations',
+                                                     'widget_customization_args']):
                                 change_is_mergeable = True
                     else:
                         change_is_mergeable = True
@@ -1957,10 +1963,12 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
                     if old_state_name in changed_properties:
                         if (frontend_version_exploration.states[old_state_name].interaction.id == # pylint: disable=line-too-long
                                 backend_version_exploration.states[new_state_name].interaction.id): # pylint: disable=line-too-long
-                            if ('widget_customization_args' not in
-                                    changed_properties[old_state_name] and
-                                    'answer_group' not in
-                                    changed_properties[old_state_name]):
+                            if (all(property not in
+                                    changed_properties[old_state_name]
+                                    for property in ['recorded_voiceovers',
+                                                     'written_translations',
+                                                     'widget_customization_args',
+                                                     'recorded_voiceovers'])):
                                 old_solution = (
                                     frontend_version_exploration.states[old_state_name].interaction.solution) # pylint: disable=line-too-long
                                 new_solution = (
@@ -1973,6 +1981,8 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
                                             old_solution.explanation.html ==
                                             new_solution.explanation.html):
                                         change_is_mergeable = True
+                                elif old_solution is None and new_solution is None:
+                                    change_is_mergeable = True
                     else:
                         change_is_mergeable = True
                 elif (change.property_name ==
@@ -1992,8 +2002,9 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
                                changed_properties[old_state_name]
                                for property in ['content', 'solution',
                                                 'hints', 'written_translations',
+                                                'answer_group',
                                                 'default_outcome',
-                                                'customization_args',
+                                                'widget_customization_args',
                                                 'recorded_voiceovers']):
                             change_is_mergeable = True
                     else:
@@ -2005,9 +2016,10 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
                                changed_properties[old_state_name]
                                for property in ['content', 'solution',
                                                 'hints',
+                                                'answer_group',
                                                 'written_translations',
                                                 'default_outcome',
-                                                'customization_args']):
+                                                'widget_customization_args']):
                             change_is_mergeable = True
                     else:
                         change_is_mergeable = True
