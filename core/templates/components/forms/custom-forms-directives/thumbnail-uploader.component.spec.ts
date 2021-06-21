@@ -29,7 +29,7 @@ import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { EditThumbnailModalComponent } from './edit-thumbnail-modal.component';
 import { ThumbnailUploaderComponent } from './thumbnail-uploader.component';
 
-describe('ThumbnailUploaderComponent', () => {
+fdescribe('ThumbnailUploaderComponent', () => {
   let fixture: ComponentFixture<ThumbnailUploaderComponent>;
   let component: ThumbnailUploaderComponent;
   let contextService: ContextService;
@@ -115,9 +115,11 @@ describe('ThumbnailUploaderComponent', () => {
         isFirstChange: () => true
       }
     };
+    expect(component.editableThumbnailDataUrl).toBe(undefined);
 
     component.ngOnChanges(changes);
 
+    expect(component.editableThumbnailDataUrl).toBe(undefined);
     expect(imageUploadHelperService.getTrustedResourceUrlForThumbnailFilename)
       .not.toHaveBeenCalled();
   });
@@ -125,6 +127,7 @@ describe('ThumbnailUploaderComponent', () => {
   it('should not show edit thumbnail modal if editing thumbnail is' +
     ' disabled', () => {
     component.disabled = true;
+    spyOn(ngbModal, 'open');
 
     expect(component.openInUploadMode).toBe(undefined);
 
@@ -133,6 +136,7 @@ describe('ThumbnailUploaderComponent', () => {
     // Here, openInUpload mode is not set as which means, showEditThumbnailModal
     // returned as soon as the first check was executed.
     expect(component.openInUploadMode).toBe(undefined);
+    expect(ngbModal.open).not.toHaveBeenCalled();
   });
 
   it('should show edit thumbnail modal when user clicks on edit button and' +
