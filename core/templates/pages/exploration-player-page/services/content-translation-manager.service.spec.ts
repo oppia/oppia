@@ -32,7 +32,7 @@ import { ContentTranslationManagerService } from
   'pages/exploration-player-page/services/content-translation-manager.service';
 import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
-import { AudioTranslationLanguageService} from
+import { AudioTranslationLanguageService } from
   'pages/exploration-player-page/services/audio-translation-language.service';
 import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
 import { ExplorationHtmlFormatterService } from
