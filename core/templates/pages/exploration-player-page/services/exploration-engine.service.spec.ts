@@ -24,7 +24,7 @@ import { ExplorationBackendDict, ExplorationObjectFactory } from 'domain/explora
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { ParamChangeBackendDict, ParamChangeObjectFactory } from 'domain/exploration/ParamChangeObjectFactory';
 import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
-import { StateCardObjectFactory } from 'domain/state_card/StateCardObjectFactory';
+import { StateCard } from 'domain/state_card/state-card.model';
 import { ExpressionInterpolationService } from 'expressions/expression-interpolation.service';
 import { TextInputRulesService } from 'interactions/TextInput/directives/text-input-rules.service';
 import { AlertsService } from 'services/alerts.service';
@@ -56,7 +56,6 @@ describe('Exploration engine service ', () => {
   let playerTranscriptService: PlayerTranscriptService;
   let readOnlyExplorationBackendApiService:
     ReadOnlyExplorationBackendApiService;
-  let stateCardObjectFactory: StateCardObjectFactory;
   let statsReportingService: StatsReportingService;
   let urlService: UrlService;
   let paramChangeObjectFactory: ParamChangeObjectFactory;
@@ -363,7 +362,6 @@ describe('Exploration engine service ', () => {
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
     readOnlyExplorationBackendApiService = TestBed.inject(
       ReadOnlyExplorationBackendApiService);
-    stateCardObjectFactory = TestBed.inject(StateCardObjectFactory);
     statsReportingService = TestBed.inject(StatsReportingService);
     urlService = TestBed.inject(UrlService);
     explorationEngineService = TestBed.inject(ExplorationEngineService);
@@ -459,9 +457,9 @@ describe('Exploration engine service ', () => {
           missing_prerequisite_skill_id: null
         }), 1, 0, 'default_outcome');
 
-      let lastCard = stateCardObjectFactory.createNewCard(
+      let lastCard = StateCard.createNewCard(
         'Card 1', 'Content html', 'Interaction text', null,
-        null, null, 'content_id');
+        null, null, 'content_id', null);
 
       spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
       spyOn(playerTranscriptService, 'getLastStateName')
@@ -499,9 +497,9 @@ describe('Exploration engine service ', () => {
           missing_prerequisite_skill_id: null
         }), 1, 0, 'default_outcome');
 
-      let lastCard = stateCardObjectFactory.createNewCard(
+      let lastCard = StateCard.createNewCard(
         'Card 1', 'Content html', 'Interaction text', null,
-        null, null, 'content_id');
+        null, null, 'content_id', null);
 
       spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
       spyOn(playerTranscriptService, 'getLastStateName')
@@ -539,9 +537,9 @@ describe('Exploration engine service ', () => {
           missing_prerequisite_skill_id: null
         }), 1, 0, 'default_outcome');
 
-      let lastCard = stateCardObjectFactory.createNewCard(
+      let lastCard = StateCard.createNewCard(
         'Card 1', 'Content html', 'Interaction text', null,
-        null, null, 'content_id');
+        null, null, 'content_id', null);
 
       spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
       spyOn(playerTranscriptService, 'getLastStateName')
@@ -580,9 +578,9 @@ describe('Exploration engine service ', () => {
           missing_prerequisite_skill_id: null
         }), 1, 0, 'default_outcome');
 
-      let lastCard = stateCardObjectFactory.createNewCard(
+      let lastCard = StateCard.createNewCard(
         'Card 1', 'Content html', 'Interaction text', null,
-        null, null, 'content_id');
+        null, null, 'content_id', null);
 
       spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
       spyOn(playerTranscriptService, 'getLastStateName')
@@ -624,9 +622,9 @@ describe('Exploration engine service ', () => {
           missing_prerequisite_skill_id: null
         }), 1, 0, 'default_outcome');
 
-      let lastCard = stateCardObjectFactory.createNewCard(
+      let lastCard = StateCard.createNewCard(
         'Card 1', 'Content html', 'Interaction text', null,
-        null, null, 'content_id');
+        null, null, 'content_id', null);
 
       spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
       spyOn(playerTranscriptService, 'getLastStateName')
@@ -758,9 +756,9 @@ describe('Exploration engine service ', () => {
         missing_prerequisite_skill_id: null
       }), 1, 0, 'default_outcome');
 
-    let lastCard = stateCardObjectFactory.createNewCard(
+    let lastCard = StateCard.createNewCard(
       'Card 1', 'Content html', 'Interaction text', null,
-      null, null, 'content_id');
+      null, null, 'content_id', null);
 
     spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
     spyOn(playerTranscriptService, 'getLastStateName')
