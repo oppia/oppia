@@ -264,7 +264,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
 
         ts_files_to_check = self.ts_filepaths
         constants_to_source_filepaths_dict = {}
-        angularjs_source_filepaths_to_constants_dict = {}
         for filepath in ts_files_to_check:
             # The following block extracts the corresponding Angularjs
             # constants file for the Angular constants file. This is
@@ -309,9 +308,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                             if angularjs_constants_value.property:
                                 angularjs_constants_value = (
                                     angularjs_constants_value.property.name)
-                            else:
-                                angularjs_constants_value = (
-                                    angularjs_constants_value.name)
                             if angularjs_constants_value != (
                                     angularjs_constants_name):
                                 failed = True
@@ -328,40 +324,12 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                                         angularjs_constants_name))
                             angularjs_constants_list.append(
                                 angularjs_constants_name)
-                    angularjs_constants_set = set(
-                        angularjs_constants_list)
-                    if len(angularjs_constants_set) != len(
-                            angularjs_constants_list):
-                        failed = True
-                        error_messages.append(
-                            '%s --> Duplicate constant declaration '
-                            'found.' % (
-                                corresponding_angularjs_filepath))
-                    angularjs_source_filepaths_to_constants_dict[
-                        corresponding_angularjs_filepath] = (
-                            angularjs_constants_set)
-
-            # Check that the constants are declared only in a
-            # *.constants.ajs.ts file.
-            if not filepath.endswith(
-                    ('.constants.ajs.ts', '.constants.ts')):
-                for line_num, line in enumerate(self.file_cache.readlines(
-                        filepath)):
-                    if 'angular.module(\'oppia\').constant(' in line:
-                        failed = True
-                        error_message = (
-                            '%s --> Constant declaration found at line '
-                            '%s. Please declare the constants in a '
-                            'separate constants file.' % (
-                                filepath, line_num))
-                        error_messages.append(error_message)
 
             # Check if the constant has multiple declarations which is
             # prohibited.
             parsed_script = self.parsed_js_and_ts_files[filepath]
             parsed_nodes = parsed_script.body
             components_to_check = ['constant']
-            angular_constants_list = []
             for parsed_node in parsed_nodes:
                 expression = _get_expression_from_node_if_one_exists(
                     parsed_node, components_to_check)
@@ -383,55 +351,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     else:
                         constants_to_source_filepaths_dict[
                             constant_name] = filepath
-
-            # Checks that the *.constants.ts and the corresponding
-            # *.constants.ajs.ts file are in sync.
-            if filepath.endswith('.constants.ts') and (
-                    is_corresponding_angularjs_filepath):
-                angular_constants_nodes = None
-                for node in parsed_nodes:
-                    try:
-                        # Here we are treating 'app.constants.ts' differently
-                        # because it has a different structure than rest of the
-                        # '*constants.ts' files because it inherits constants
-                        # from 'assets/constants.ts'.
-                        angular_constants_nodes = (
-                            node.expression.right.arguments[1].properties
-                            if filepath.endswith('app.constants.ts') else
-                            node.expression.right.properties)
-                    # We need a try-except block here beacuse we need a node
-                    # that has properties exactly as we have defined above.
-                    # And some nodes may not have those properties and may
-                    # raise the following errors. So, we need to ignore
-                    # those nodes.
-                    except (AttributeError, IndexError, TypeError):
-                        continue
-
-                if angular_constants_nodes:
-                    for angular_constant_node in angular_constants_nodes:
-                        angular_constants_list.append(
-                            angular_constant_node.key.name)
-
-                angular_constants_set = set(angular_constants_list)
-                if len(angular_constants_set) != len(
-                        angular_constants_list):
-                    failed = True
-                    error_message = (
-                        '%s --> Duplicate constant declaration found.'
-                        % filepath)
-                    error_messages.append(error_message)
-
-            # Check that the *constants.ts files have a 'as const' at the end.
-            if filepath.endswith('.constants.ts'):
-                file_content = self.file_cache.read(filepath)
-                if not file_content.endswith('} as const;\n'):
-                    failed = True
-                    error_message = (
-                        '%s --> This constants file doesn\'t have \'as const\' '
-                        'at the end. A constants file should have the '
-                        'following structure.\nexport const SomeConstants = '
-                        '{ ... } as const;' % filepath)
-                    error_messages.append(error_message)
 
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
