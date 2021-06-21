@@ -32,8 +32,9 @@ import { ContentTranslationManagerService } from
   'pages/exploration-player-page/services/content-translation-manager.service';
 import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
-import { AudioTranslationLanguageService} from 'pages/exploration-player-page/services/audio-translation-language.service';
-import INTERACTION_SPECS from 'pages/interaction-specs.constants.ajs';
+import { AudioTranslationLanguageService} from 
+  'pages/exploration-player-page/services/audio-translation-language.service';
+import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
 import { ExplorationHtmlFormatterService } from
   'services/exploration-html-formatter.service';
 
@@ -461,7 +462,7 @@ describe('Content translation manager service', () => {
       // This throws a error. We need to suppress this error because
       // "Property 'DummyInteraction' does not exist on type".
       // @ts-expect-error
-      INTERACTION_SPECS.DummyInteraction = {
+      InteractionSpecsConstants.INTERACTION_SPECS.DummyInteraction = {
         customization_arg_specs: [{
           name: 'dummyCustArg',
           schema: {
@@ -490,7 +491,7 @@ describe('Content translation manager service', () => {
       // This throws a error. We need to suppress this error because
       // "Property 'DummyInteraction' does not exist on type".
       // @ts-expect-error
-      delete INTERACTION_SPECS.DummyInteraction;
+      delete InteractionSpecsConstants.INTERACTION_SPECS.DummyInteraction;
     });
 
     it('should replace translatable customization args', () => {
