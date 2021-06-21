@@ -42,34 +42,37 @@ class BlogPost(python_utils.OBJECT):
             blog_post_id: str. The unique ID of the blog post.
             author_id: str. The user ID of the author.
             title: str. The title of the blog post.
-            content: text. The html content of the blog post.
-            published_on: datetime.datetime. Date and time when the blog post is
-                last published.
-            last_updated: datetime.datetime. Date and time when the blog post
-                was last updated.
-            thumbnail_filename: str|None. The thumbnail filename of blog post .
+            content: str. The html content of the blog post.
             url_fragment: str. The url fragment for the blog post.
             tags: list(str). The list of tags for the blog post.
+            thumbnail_filename: str|None. The thumbnail filename of blog post .
+            last_updated: datetime.datetime. Date and time when the blog post
+                was last updated.
+            published_on: datetime.datetime. Date and time when the blog post is
+                last published.
         """
         self.id = blog_post_id
         self.author_id = author_id
         self.title = title
-        self.thumbnail_filename = thumbnail_filename
         self.content = html_cleaner.clean(content)
-        self.published_on = published_on
-        self.last_updated = last_updated
         self.url_fragment = url_fragment
         self.tags = tags
+        self.thumbnail_filename = thumbnail_filename
+        self.last_updated = last_updated
+        self.published_on = published_on
 
     @classmethod
     def require_valid_thumbnail_filename(cls, thumbnail_filename, strict=False):
         """Checks whether the thumbnail filename of the blog post is a valid
-           one.
+        one.
 
         Args:
             thumbnail_filename: str. The thumbnail filename to validate.
             strict: bool. Enable strict checks on the blog post when the
                 blog post is published or is going to be published.
+
+        Raises:
+            ValidationError. Provided thumbnail filename is invalid.
         """
         if strict:
             if not isinstance(thumbnail_filename, python_utils.BASESTRING):
@@ -93,7 +96,6 @@ class BlogPost(python_utils.OBJECT):
         Raises:
             ValidationError. One or more attributes of blog post are invalid.
         """
-        self.require_valid_blog_post_id(self.id)
         self.require_valid_title(self.title, strict)
         self.require_valid_tags(self.tags, strict)
         self.require_valid_thumbnail_filename(
@@ -109,20 +111,6 @@ class BlogPost(python_utils.OBJECT):
                 raise utils.ValidationError('Content can not be empty')
 
     @classmethod
-    def require_valid_blog_post_id(cls, blog_post_id):
-        """Checks whether the blog post ID is a valid one.
-
-        Args:
-            blog_post_id: str. The blog post ID to validate.
-        """
-        if not isinstance(blog_post_id, python_utils.BASESTRING):
-            raise utils.ValidationError(
-                'Blog Post ID should be a string, received: %s' % blog_post_id)
-
-        if len(blog_post_id) != constants.BASE_MODELS_ID_LENGTH:
-            raise utils.ValidationError('Invalid Blog Post ID.')
-
-    @classmethod
     def require_valid_tags(cls, tags, strict):
         """Validates tags for the blog post object.
 
@@ -132,7 +120,7 @@ class BlogPost(python_utils.OBJECT):
                 post is published or is going to be published.
 
         Raises:
-            ValidationErrors.
+            ValidationErrors. One or more tags provided are invalid.
         """
         if not isinstance(tags, list):
             raise utils.ValidationError(
@@ -146,7 +134,7 @@ class BlogPost(python_utils.OBJECT):
 
             if not tag:
                 raise utils.ValidationError(
-                    'Tag should not be empty, received: \'\'')
+                    'Tag should not be empty.')
 
             if not re.match(constants.TAG_REGEX, tag):
                 raise utils.ValidationError(
@@ -180,15 +168,17 @@ class BlogPost(python_utils.OBJECT):
             title: str. The title to validate.
             strict: bool. Enable strict checks on the blog post when the blog
                 post is published or is going to be published.
+
+        Raises:
+            ValidationErrors. Title provided is invalid.
         """
         if not isinstance(title, python_utils.BASESTRING):
             raise utils.ValidationError('Title should be a string.')
 
-        title_limit = constants.MAX_CHARS_IN_BLOG_POST_TITLE
-        if len(title) > title_limit:
+        if len(title) > constants.MAX_CHARS_IN_BLOG_POST_TITLE:
             raise utils.ValidationError(
                 'Blog Post title should at most have %d chars, received: %s'
-                % (title_limit, title))
+                % (constants.MAX_CHARS_IN_BLOG_POST_TITLE, title))
 
         if strict:
             if not title:
@@ -196,7 +186,7 @@ class BlogPost(python_utils.OBJECT):
             if not re.match(constants.VALID_BLOG_POST_TITLE_REGEX, title):
                 raise utils.ValidationError(
                     'Title field contains invalid characters. Only words'
-                    '(a-zA-Z) separated by spaces are allowed. Received %s'
+                    '(a-zA-Z0-9) separated by spaces are allowed. Received %s'
                     % title)
 
     @classmethod
@@ -205,11 +195,29 @@ class BlogPost(python_utils.OBJECT):
 
         Args:
             url_fragment: str. The url fragment to validate.
-        """
 
-        url_limit = constants.MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT
-        utils.require_valid_url_fragment(
-            url_fragment, 'Blog Post URL Fragment', url_limit)
+        Raises:
+            ValidationErrors. URL fragment provided is invalid.
+        """
+        if not isinstance(url_fragment, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Blog Post URL Fragment field must be a string. '
+                'Received %s.' % (url_fragment))
+        
+        if url_fragment == '':
+            raise utils.ValidationError(
+                'Blog Post URL Fragment field should not be empty.')
+
+        if len(url_fragment) > constants.MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT:
+            raise utils.ValidationError(
+                'Blog Post URL Fragment field should not exceed %d characters.'
+                % (constants.MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT))
+
+        if not re.match(constants.VALID_URL_FRAGMENT_REGEX, url_fragment):
+            raise utils.ValidationError(
+                'Blog Post URL Fragment field contains invalid characters.'
+                'Only lowercase words, numbers separated by hyphens are'
+                'allowed. Received %s.' % (url_fragment))
 
     def to_dict(self):
         """Returns a dict representing this blog post domain object.
@@ -217,6 +225,12 @@ class BlogPost(python_utils.OBJECT):
         Returns:
             dict. A dict, mapping all fields of blog post instance.
         """
+        published_on = utils.convert_naive_datetime_to_string(
+            self.published_on) if self.published_on else None
+
+        last_updated = utils.convert_naive_datetime_to_string(
+            self.last_updated) if self.published_on else None
+
         return {
             'id': self.id,
             'author_name': user_services.get_user_id_from_username(
@@ -226,6 +240,8 @@ class BlogPost(python_utils.OBJECT):
             'thumbnail_filename': self.thumbnail_filename,
             'tags': self.tags,
             'url_fragment': self.url_fragment,
+            'published_on': published_on,
+            'last_updated': last_updated
         }
 
     @classmethod
@@ -238,7 +254,7 @@ class BlogPost(python_utils.OBJECT):
                 on strings that were created using serialize().
 
         Returns:
-            blog_post . The corresponding blog post domain object.
+            BlogPost . The corresponding blog post domain object.
         """
         blog_post_dict = json.loads(json_string.decode('utf-8'))
         published_on = (
@@ -264,14 +280,6 @@ class BlogPost(python_utils.OBJECT):
             composing the object.
         """
         blog_post_dict = self.to_dict()
-        if self.last_updated:
-            blog_post_dict['last_updated'] = (
-                utils.convert_naive_datetime_to_string(self.last_updated))
-
-        if self.published_on:
-            blog_post_dict['published_on'] = (
-                utils.convert_naive_datetime_to_string(self.published_on))
-
         return json.dumps(blog_post_dict).encode('utf-8')
 
     @classmethod
@@ -289,7 +297,7 @@ class BlogPost(python_utils.OBJECT):
                 blog post was last updated.
 
         Returns:
-            blog_post. The corresponding blog post domain object.
+            BlogPost. The corresponding blog post domain object.
         """
         author_id = user_services.get_user_id_from_username(
             blog_post_dict['author_name'])
@@ -361,35 +369,38 @@ class BlogPostSummary(python_utils.OBJECT):
             blog_post_id: str. The unique ID of the blog post.
             author_id: str. The user ID of the author.
             title: str. The title of the blog post.
-            summary: text. The summary content of the blog post.
-            published_on: datetime.datetime. Date and time when the blog post
-                is last published.
-            last_updated: datetime.datetime. Date and time when the blog post
-                was last updated.
-            thumbnail_filename: str|None. The thumbnail filename of the blog
-                post.
+            summary: str. The summary content of the blog post.
             url_fragment: str. The url fragment for the blog post.
             tags: list(str). The list of tags for the blog post.
+            thumbnail_filename: str|None. The thumbnail filename of the blog
+            last_updated: datetime.datetime. Date and time when the blog post
+            published_on: datetime.datetime. Date and time when the blog post
+                is last published.
+                was last updated.
+                post.
         """
         self.id = blog_post_id
         self.author_id = author_id
         self.title = title
-        self.thumbnail_filename = thumbnail_filename
         self.summary = summary
-        self.published_on = published_on
-        self.last_updated = last_updated
-        self.url_fragment = url_fragment
         self.tags = tags
+        self.url_fragment = url_fragment
+        self.thumbnail_filename = thumbnail_filename
+        self.last_updated = last_updated
+        self.published_on = published_on
 
     @classmethod
     def require_valid_thumbnail_filename(cls, thumbnail_filename, strict=False):
         """Checks whether the thumbnail filename of the blog post is a valid
-            one.
+        one.
 
         Args:
             thumbnail_filename: str. The thumbnail filename to validate.
             strict: bool. Enable strict checks on the blog post summary when the
                 blog post is published or is going to be published.
+
+        Raises:
+            ValidationErrors. Thumbnail filename provided is invalid.
         """
         if strict:
             if not isinstance(thumbnail_filename, python_utils.BASESTRING):
@@ -413,7 +424,6 @@ class BlogPostSummary(python_utils.OBJECT):
         Raises:
             ValidationError. One or more attributes of blog post are invalid.
         """
-        self.require_valid_blog_post_id(self.id)
         self.require_valid_title(self.title, strict)
         self.require_valid_tags(self.tags, strict)
         self.require_valid_thumbnail_filename(
@@ -429,29 +439,34 @@ class BlogPostSummary(python_utils.OBJECT):
                 raise utils.ValidationError('Summary can not be empty')
 
     @classmethod
-    def require_valid_blog_post_id(cls, blog_post_id):
-        """Checks whether the blog post ID is a valid one.
-
-        Args:
-            blog_post_id: str. The blog post ID to validate.
-        """
-        if not isinstance(blog_post_id, python_utils.BASESTRING):
-            raise utils.ValidationError(
-                'Blog Post ID should be a string, received: %s' % blog_post_id)
-
-        if len(blog_post_id) != constants.BASE_MODELS_ID_LENGTH:
-            raise utils.ValidationError('Invalid Blog Post ID.')
-
-    @classmethod
     def require_valid_url_fragment(cls, url_fragment):
         """Checks whether the url fragment of the blog post is a valid one.
 
         Args:
             url_fragment: str. The url fragment to validate.
+
+        Raises:
+            ValidationErrors. URL fragment provided is invalid.
         """
-        url_limit = constants.MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT
-        utils.require_valid_url_fragment(
-            url_fragment, 'Blog Post URL Fragment', url_limit)
+        if not isinstance(url_fragment, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Blog Post URL Fragment field must be a string. '
+                'Received %s.' % (url_fragment))
+        
+        if url_fragment == '':
+            raise utils.ValidationError(
+                'Blog Post URL Fragment field should not be empty.')
+
+        if len(url_fragment) > constants.MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT:
+            raise utils.ValidationError(
+                'Blog Post URL Fragment field should not exceed %d characters.'
+                % (constants.MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT))
+
+        if not re.match(constants.VALID_URL_FRAGMENT_REGEX, url_fragment):
+            raise utils.ValidationError(
+                'Blog Post URL Fragment field contains invalid characters.'
+                'Only lowercase words, numbers separated by hyphens are'
+                'allowed. Received %s.' % (url_fragment))
 
     @classmethod
     def require_valid_title(cls, title, strict):
@@ -461,15 +476,17 @@ class BlogPostSummary(python_utils.OBJECT):
             title: str. The title to validate.
             strict: bool. Enable strict checks on the blog post summary when the
                 blog post is published or is going to be published.
+
+        Raises:
+            ValidationErrors. Title provided is invalid.
         """
         if not isinstance(title, python_utils.BASESTRING):
             raise utils.ValidationError('Title should be a string.')
 
-        title_limit = constants.MAX_CHARS_IN_BLOG_POST_TITLE
-        if len(title) > title_limit:
+        if len(title) > constants.MAX_CHARS_IN_BLOG_POST_TITLE:
             raise utils.ValidationError(
                 'blog post title should at most have %d chars, received: %s'
-                % (title_limit, title))
+                % (constants.MAX_CHARS_IN_BLOG_POST_TITLE, title))
 
         if strict:
             if not title:
@@ -485,7 +502,7 @@ class BlogPostSummary(python_utils.OBJECT):
                 post is published or is going to be published.
 
         Raises:
-            ValidationErrors.
+            ValidationErrors.One or more tags provided are invalid.
         """
         if not isinstance(tags, list):
             raise utils.ValidationError(
@@ -498,7 +515,7 @@ class BlogPostSummary(python_utils.OBJECT):
 
             if not tag:
                 raise utils.ValidationError(
-                    'Tag should not be empty, received: \'\'')
+                    'Tag should not be empty.')
 
             if not re.match(constants.TAG_REGEX, tag):
                 raise utils.ValidationError(
@@ -529,6 +546,11 @@ class BlogPostSummary(python_utils.OBJECT):
         Returns:
             dict. A dict, mapping all fields of blog post instance.
         """
+        published_on = utils.convert_naive_datetime_to_string(
+            self.published_on) if self.published_on else None
+
+        last_updated = utils.convert_naive_datetime_to_string(
+            self.last_updated) if self.published_on else None
         return {
             'id': self.id,
             'author_name': user_services.get_username(
@@ -538,6 +560,8 @@ class BlogPostSummary(python_utils.OBJECT):
             'thumbnail_filename': self.thumbnail_filename,
             'tags': self.tags,
             'url_fragment': self.url_fragment,
+            'published_on': published_on,
+            'last_updated': last_updated
         }
 
     def serialize(self):

@@ -80,7 +80,7 @@ FETCH_BATCH_SIZE = 1000
 # Constants used for generating ids.
 MAX_RETRIES = 10
 RAND_RANGE = (1 << 30) - 1
-ID_LENGTH = constants.BASE_MODELS_ID_LENGTH
+ID_LENGTH = 12
 
 
 class BaseModel(datastore_services.Model):

@@ -51,13 +51,6 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
             utils.ValidationError, expected_error_substring):
             self.blog_post.validate()
 
-    def _assert_valid_blog_post_id(
-            self, expected_error_substring, blog_post_id):
-        """Checks that the blog post ID passes validation."""
-        with self.assertRaisesRegexp(
-            utils.ValidationError, expected_error_substring):
-            blog_domain.BlogPost.require_valid_blog_post_id(blog_post_id)
-
     def _assert_valid_tags_for_blog_post(self, expected_error_substring, tags):
         """Checks that the blog post tags passes validation."""
         with self.assertRaisesRegexp(
@@ -101,11 +94,6 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
             utils.ValidationError, expected_error_substring):
             blog_domain.BlogPost.require_valid_url_fragment(url)
 
-    def test_valid_blog_post_id(self):
-        self._assert_valid_blog_post_id(
-            'Blog Post ID should be a string, received: 10', 10)
-        self._assert_valid_blog_post_id('Invalid Blog Post ID.', 'abc')
-
     def test_thumbnail_filename_validation_for_blog_post(self):
         self._assert_valid_thumbnail_filename_for_blog_post(
             'Expected thumbnail filename to be a string, received 10', 10)
@@ -140,8 +128,8 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
             'Title should not be empty', '')
         self._assert_strict_valid_title_for_blog_post(
             'Title field contains invalid characters. Only words'
-            r'\(a-zA-Z\) separated by spaces are allowed. Received %s'
-            % 'ABC12 heloo', 'ABC12 heloo')
+            r'\(a-zA-Z0-9\) separated by spaces are allowed. Received %s'
+            % 'ABC12& heloo', 'ABC12& heloo')
 
     def _assert_strict_valid_tags_for_blog_post(
             self, expected_error_substring, tags):
@@ -164,9 +152,8 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
         url_fragment = 'very-very-long' * 30
         url_fragment_char_limit = constants.MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT
         self._assert_valid_url_fragment_for_blog_post(
-            'Blog Post URL Fragment field should not exceed %d characters, '
-            'received %s.' % (
-                url_fragment_char_limit, url_fragment), url_fragment)
+            'Blog Post URL Fragment field should not exceed %d characters.'
+            % (url_fragment_char_limit), url_fragment)
 
     def test_serialize_and_deserialize_returns_unchanged_blog_post(self):
         """Checks that serializing and then deserializing a blog post works as
@@ -242,7 +229,7 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
         self._assert_valid_tags_for_blog_post(
             'Some tags duplicate each other', ['abc', 'abc'])
         self._assert_valid_tags_for_blog_post(
-            'Tag should not be empty, received: \'\'', ['abc', ''])
+            'Tag should not be empty.', ['abc', ''])
 
     def test_blog_post_passes_validate(self):
         """Tests validation for blog post."""
@@ -341,18 +328,6 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
         self._assert_strict_valid_thumbnail_filename_for_blog_post(
             'Expected thumbnail filename to be a string, received: None.', None)
 
-    def _assert_valid_blog_post_id(
-            self, expected_error_substring, blog_post_id):
-        """Checks that the blog post ID passes validation."""
-        with self.assertRaisesRegexp(
-            utils.ValidationError, expected_error_substring):
-            blog_domain.BlogPostSummary.require_valid_blog_post_id(blog_post_id)
-
-    def test_valid_blog_post_id(self):
-        self._assert_valid_blog_post_id(
-            'Blog Post ID should be a string, received: 10', 10)
-        self._assert_valid_blog_post_id('Invalid Blog Post ID.', 'abc')
-
     def _assert_strict_valid_title_for_blog_post(
             self, expected_error_substring, title):
         """Checks that blog post passes strict validation for title."""
@@ -406,9 +381,8 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
         url_fragment = 'very-very-long' * 30
         url_fragment_char_limit = constants.MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT
         self._assert_valid_url_fragment_for_blog_post(
-            'Blog Post URL Fragment field should not exceed %d characters, '
-            'received %s.' % (
-                url_fragment_char_limit, url_fragment), url_fragment)
+            'Blog Post URL Fragment field should not exceed %d characters.'
+            % (url_fragment_char_limit), url_fragment)
 
     def _assert_strict_validation_error(self, expected_error_substring):
         """Checks that the blog post passes strict validation."""
@@ -478,7 +452,7 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
         self._assert_valid_tags_for_blog_post(
             'Some tags duplicate each other', ['abc', 'abc'])
         self._assert_valid_tags_for_blog_post(
-            'Tag should not be empty, received: \'\'', ['abc', ''])
+            'Tag should not be empty.', ['abc', ''])
 
     def test_tags_validation_in_strict_mode(self):
         self._assert_strict_valid_tags_for_blog_post(
