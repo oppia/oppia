@@ -70,11 +70,11 @@ var ExplorationEditorTranslationTab = function() {
       'Recording Audio',
       'Re-record/Re-upload audio'
     ];
-    for (const heading of tutorialTabHeadings) {
+    for (const HEADING of tutorialTabHeadings) {
       var tutorialTabHeadingElement = element(by.cssContainingText(
-        '.popover-title', heading));
+        '.popover-title', HEADING));
       await waitFor.visibilityOf(
-        tutorialTabHeadingElement, 'Tutorial: ' + heading + ' is not visible');
+        tutorialTabHeadingElement, 'Tutorial: ' + HEADING + ' is not visible');
       // Progress to the next instruction in the tutorial.
       var nextTutorialStageButton = element.all(by.css('.nextBtn'));
       await waitFor.elementToBeClickable(

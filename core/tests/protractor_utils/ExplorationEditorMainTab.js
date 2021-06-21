@@ -192,12 +192,12 @@ var ExplorationEditorMainTab = function() {
       'Preview',
       'Save',
     ];
-    for (const heading of tutorialTabHeadings) {
+    for (const HEADING of tutorialTabHeadings) {
     // Use: await tutorialTabHeadings.forEach(async function(heading) {
       var tutorialTabHeadingElement = element(by.cssContainingText(
-        '.popover-title', heading));
+        '.popover-title', HEADING));
       await waitFor.visibilityOf(
-        tutorialTabHeadingElement, 'Tutorial: ' + heading + 'is not visible');
+        tutorialTabHeadingElement, 'Tutorial: ' + HEADING + 'is not visible');
       // Progress to the next instruction in the tutorial.
       var nextTutorialStageButtons = element.all(by.css('.nextBtn'));
       await waitFor.elementToBeClickable(
