@@ -2177,7 +2177,7 @@ class DisallowHandlerWithoutSchema(checkers.BaseChecker):
 
         # For checking entire hierarchy.
         if parent_class_is_basehandler is False:
-            for j in node.ancestors(recurc):
+            for j in node.ancestors():
                 if 'base.BaseHandler' in j.basenames:
                     parent_class_is_basehandler = True
                     break
