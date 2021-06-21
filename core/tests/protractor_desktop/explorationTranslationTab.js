@@ -190,8 +190,7 @@ describe('Exploration translation and voiceover tab', function() {
     await users.logout();
   });
 
-  it(
-    'should maintain its active sub-tab on saving draft and publishing changes',
+  it('should maintain its active sub-tab on saving draft',
     async function() {
       await users.login('user@editorTab.com');
       await creatorDashboardPage.get();
@@ -203,7 +202,6 @@ describe('Exploration translation and voiceover tab', function() {
       await explorationEditorTranslationTab.setTranslation(
         await forms.toRichText('Sample Translation.'));
       await explorationEditorPage.saveChanges('Adds one translation.');
-      explorationEditorTranslationTab.expectFeedbackTabToBeActive();
       explorationEditorTranslationTab.expectFeedbackTabToBeActive();
       await users.logout();
     });

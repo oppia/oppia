@@ -775,15 +775,15 @@ def _assign_role(
     committer_id = committer.user_id
     activity_rights = _get_activity_rights(activity_type, activity_id)
 
-    user_can_assigning_role = False
+    user_can_assign_role = False
     if new_role == rights_domain.ROLE_VOICE_ARTIST:
-        user_can_assigning_role = check_can_manage_voice_artist_in_activity(
+        user_can_assign_role = check_can_manage_voice_artist_in_activity(
             committer, activity_rights)
     else:
-        user_can_assigning_role = check_can_modify_core_activity_roles(
+        user_can_assign_role = check_can_modify_core_activity_roles(
             committer, activity_rights)
 
-    if not user_can_assigning_role:
+    if not user_can_assign_role:
         logging.error(
             'User %s tried to allow user %s to be a(n) %s of activity %s '
             'but was refused permission.' % (
