@@ -109,9 +109,9 @@ var ExplorationEditorPage = function() {
   var commitChangesButton = element(
     by.css('.protractor-test-save-draft-button'));
   var saveDraftButtonTextContainer = element(
-    by.css('.protractor-test-save-draft'));
+    by.css('.protractor-test-save-draft-message'));
   var publishChangesButtonTextContainer = element(
-    by.css('.protractor-test-publish-changes'));
+    by.css('.protractor-test-publish-changes-message'));
   var publishExplorationButton = element(
     by.css('.protractor-test-publish-exploration'));
 
