@@ -1279,6 +1279,11 @@ EXPLORATION_RIGHTS_CHANGE_ALLOWED_COMMANDS.append({
     'allowed_values': {
         'old_status': ALLOWED_ACTIVITY_STATUS,
         'new_status': ALLOWED_ACTIVITY_STATUS
+    },
+    # TODO(#12991): Remove this once once we use the migration jobs to remove
+    # the deprecated values from the server data.
+    'deprecated_values': {
+        'new_status': ['publicized']
     }
 })
 

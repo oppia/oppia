@@ -61,6 +61,14 @@ class ValidationError(Exception):
     pass
 
 
+class DeprecatedCommandError(ValidationError):
+    """Error class for when a domain object has a command
+    or a value that is deprecated.
+    """
+
+    pass
+
+
 class ExplorationConversionError(Exception):
     """Error class for when an exploration fails to convert from a certain
     version to a certain version.
