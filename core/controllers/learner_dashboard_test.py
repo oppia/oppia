@@ -280,7 +280,7 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
         topic_services.publish_story(
             self.TOPIC_ID_1, self.STORY_ID_2, self.admin_id)
 
-        learner_progress_services.add_topic_to_learn(
+        learner_progress_services.validate_and_add_topic_to_learn_goal(
             self.viewer_id, self.TOPIC_ID_1)
         response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['topics_to_learn']), 1)
@@ -428,7 +428,7 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
             self.viewer_id, self.TOPIC_ID_1)
         learner_progress_services.record_topic_started(
             self.viewer_id, self.TOPIC_ID_2)
-        learner_progress_services.add_topic_to_learn(
+        learner_progress_services.validate_and_add_topic_to_learn_goal(
             self.viewer_id, self.TOPIC_ID_3)
 
         response = self.get_json(feconf.LEARNER_DASHBOARD_IDS_DATA_URL)

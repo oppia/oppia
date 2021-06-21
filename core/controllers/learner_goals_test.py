@@ -174,9 +174,9 @@ class LearnerGoalsHandlerTests(test_utils.GenericTestBase):
         self.login(self.VIEWER_EMAIL)
 
         # Add topic to the learner goals.
-        learner_progress_services.add_topic_to_learn(
+        learner_progress_services.validate_and_add_topic_to_learn_goal(
             self.viewer_id, self.TOPIC_ID_1)
-        learner_progress_services.add_topic_to_learn(
+        learner_progress_services.validate_and_add_topic_to_learn_goal(
             self.viewer_id, self.TOPIC_ID_2)
         self.assertEqual(
             learner_goals_services.get_all_topic_ids_to_learn(
