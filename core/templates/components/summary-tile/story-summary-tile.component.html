@@ -38,8 +38,8 @@
     <div class="story-thumbnail"
          [ngStyle]="{background: thumbnailBgColor}">
       <a [href]="storyLink">
-        <img [src]="thumbnailUrl"
-             *ngIf="thumbnailUrl !== null"
+        <img *ngIf="thumbnailUrl !== null"
+             [src]="thumbnailUrl"
              alt=""
              class="img-thumbnail"
              [ngStyle]="{background: thumbnailBgColor}">
