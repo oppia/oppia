@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,15 +13,19 @@
 // limitations under the License.
 
 /**
- * @fileoverview Converts HTML to unicode.
+ * @fileoverview Component for the license page.
  */
 
-export const convertHtmlToUnicode = (html: string): string => {
-  return angular.element('<div>' + html + '</div>').text();
-};
+import { Component } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 
-angular.module('oppia').filter('convertHtmlToUnicode', [function() {
-  return function(html: string) {
-    return convertHtmlToUnicode(html);
-  };
-}]);
+@Component({
+  selector: 'oppia-license-page',
+  templateUrl: './license-page.component.html',
+  styleUrls: []
+})
+export class LicensePageComponent {
+}
+
+angular.module('oppia').directive('oppiaLicensePage',
+  downgradeComponent({component: LicensePageComponent}));

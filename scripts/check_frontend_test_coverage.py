@@ -91,7 +91,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'entity-creation.service.ts',
     'exploration-creation.service.ts',
     'exploration-diff.service.ts',
-    'exploration-engine.service.ts',
     'exploration-footer.component.ts',
     'exploration-save.service.ts',
     'exploration-states.service.ts',
@@ -333,7 +332,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'truncate.filter.ts',
     'truncate.pipe.ts',
     'tutor-card.directive.ts',
-    'unicode-string-editor.component.ts',
     'unit-test-utils.ts', # Please don't try to cover this file.
     'url-interpolation.service.ts',
     'utils.service.ts',
