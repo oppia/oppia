@@ -175,8 +175,9 @@ def apply_change_list(story_id, change_list):
                       story_domain.STORY_PROPERTY_THUMBNAIL_FILENAME):
                     story.update_thumbnail_filename(change.new_value)
                     thumbnail_url = (
-                        'http://localhost:8181/assetsdevhandler/story/%s/assets'
-                        '/thumbnail/%s' % (story_id, change.new_value))
+                        'http://localhost:8181/assetsdevhandler/story/%s'
+                        '/assets/thumbnail/%s' 
+                        % (story_id, change.new_value))
                     thumbnail_size_in_bytes = python_utils.url_open(
                         thumbnail_url).headers['Content-Length']
                     story.update_thumbnail_size_in_bytes(
