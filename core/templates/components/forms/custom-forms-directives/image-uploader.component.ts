@@ -34,12 +34,16 @@ interface ImageTypeMapping {
 })
 export class ImageUploaderComponent {
   @Output() fileChanged: EventEmitter<File> = new EventEmitter();
-  @Input() allowedImageFormats: string[];
-  errorMessage: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() allowedImageFormats!: string[];
+  @ViewChild('dropArea') dropAreaRef!: ElementRef;
+  @ViewChild('imageInput') imageInputRef!: ElementRef;
+  fileInputClassName!: string;
+  // The errorMessage will be null if the uploaded file is valid .
+  errorMessage!: string | null;
   backgroundWhileUploading: boolean = false;
-  @ViewChild('dropArea') dropAreaRef: ElementRef;
-  @ViewChild('imageInput') imageInputRef: ElementRef;
-  fileInputClassName: string;
 
   constructor(
     private idGenerationService: IdGenerationService,
@@ -54,15 +58,19 @@ export class ImageUploaderComponent {
   }
 
   ngAfterViewInit(): void {
-    this.dropAreaRef.nativeElement.addEventListener('drop', (event: Event) => {
-      this.onDragEnd(event);
-      let file = (<DragEvent>event).dataTransfer.files[0];
-      this.errorMessage = this.validateUploadedFile(file, file.name);
-      if (!this.errorMessage) {
-        // Only fire this event if validations pass.
-        this.fileChanged.emit(file);
-      }
-    });
+    this.dropAreaRef.nativeElement.addEventListener(
+      'drop', (event: DragEvent) => {
+        this.onDragEnd(event);
+        if (event.dataTransfer === null) {
+          throw new Error('No Files Exist');
+        }
+        let file = event.dataTransfer.files[0];
+        this.errorMessage = this.validateUploadedFile(file, file.name);
+        if (!this.errorMessage) {
+          // Only fire this event if validations pass.
+          this.fileChanged.emit(file);
+        }
+      });
 
     this.dropAreaRef.nativeElement
       .addEventListener('dragover', (event: Event) => {
@@ -101,7 +109,7 @@ export class ImageUploaderComponent {
     }
   }
 
-  validateUploadedFile(file: File, filename: string): string {
+  validateUploadedFile(file: File, filename: string): string | null {
     if (!file || !file.size || !file.type.match('image.*')) {
       return 'This file is not recognized as an image';
     }

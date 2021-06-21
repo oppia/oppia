@@ -1424,6 +1424,70 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'ca_placeholder_0': 'Placeholder'
             })
 
+    def test_get_content_id_mapping_needing_translations_does_not_return_numeric_content(self): # pylint: disable=line-too-long
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+        init_state = exploration.states[exploration.init_state_name]
+        # Set the content.
+        init_state.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'content',
+                'html': '<p>This is content</p>'
+            }))
+        # Set the multiple choice interaction.
+        init_state.update_interaction_id('MultipleChoiceInput')
+        state_interaction_cust_args = {
+            'showChoicesInShuffledOrder': {
+                'value': True
+            },
+            'choices': {
+                'value': [
+                    {
+                        'content_id': 'ca_choices_0',
+                        'html': '\u003cp\u003eoption 1\u003c/p\u003e'
+                    },
+                    {
+                        'content_id': 'ca_choices_1',
+                        'html': '1,000'
+                    },
+                    {
+                        'content_id': 'ca_choices_2',
+                        'html': '100'
+                    }
+                ]
+            }
+        }
+        init_state.update_interaction_customization_args(
+            state_interaction_cust_args)
+        # Set the default outcome.
+        default_outcome = state_domain.Outcome(
+            'Introduction', state_domain.SubtitledHtml(
+                'default_outcome', '<p>The default outcome.</p>'),
+            False, [], None, None
+        )
+        init_state.update_interaction_default_outcome(default_outcome)
+        # Set the translations.
+        written_translations_dict = {
+            'translations_mapping': {
+                'content': {},
+                'default_outcome': {},
+                'ca_choices_0': {},
+                'ca_choices_1': {},
+                'ca_choices_2': {}
+            }
+        }
+        written_translations = state_domain.WrittenTranslations.from_dict(
+            written_translations_dict)
+        init_state.update_written_translations(written_translations)
+
+        # Choice 2 should not be returned as its value is numeric.
+        self.assertEqual(
+            init_state.get_content_id_mapping_needing_translations('hi'), {
+                'content': '<p>This is content</p>',
+                'default_outcome': '<p>The default outcome.</p>',
+                'ca_choices_0': '\u003cp\u003eoption 1\u003c/p\u003e',
+                'ca_choices_1': '1,000',
+            })
+
     def test_add_translation_works_correctly(self):
         exploration = exp_domain.Exploration.create_default_exploration('0')
         init_state = exploration.states[exploration.init_state_name]
