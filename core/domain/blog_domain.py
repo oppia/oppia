@@ -212,11 +212,11 @@ class BlogPost(python_utils.OBJECT):
                 'Blog Post URL Fragment field should not exceed %d characters.'
                 % (constants.MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT))
 
-        if not re.match(constants.VALID_URL_FRAGMENT_REGEX, url_fragment):
+        if not re.match(constants.VALID_URL_BLOG_FRAGMENT_REGEX, url_fragment):
             raise utils.ValidationError(
                 'Blog Post URL Fragment field contains invalid characters.'
                 'Only lowercase words, numbers separated by hyphens are'
-                'allowed. Received %s.' % (url_fragment))
+                ' allowed. Received %s.' % (url_fragment))
 
     def to_dict(self):
         """Returns a dict representing this blog post domain object.
@@ -226,10 +226,8 @@ class BlogPost(python_utils.OBJECT):
         """
         published_on = utils.convert_naive_datetime_to_string(
             self.published_on) if self.published_on else None
-
         last_updated = utils.convert_naive_datetime_to_string(
             self.last_updated) if self.published_on else None
-
         return {
             'id': self.id,
             'author_name': user_services.get_user_id_from_username(
@@ -461,11 +459,11 @@ class BlogPostSummary(python_utils.OBJECT):
                 'Blog Post URL Fragment field should not exceed %d characters.'
                 % (constants.MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT))
 
-        if not re.match(constants.VALID_URL_FRAGMENT_REGEX, url_fragment):
+        if not re.match(constants.VALID_URL_BLOG_FRAGMENT_REGEX, url_fragment):
             raise utils.ValidationError(
                 'Blog Post URL Fragment field contains invalid characters.'
                 'Only lowercase words, numbers separated by hyphens are'
-                'allowed. Received %s.' % (url_fragment))
+                ' allowed. Received %s.' % (url_fragment))
 
     @classmethod
     def require_valid_title(cls, title, strict):
@@ -547,7 +545,6 @@ class BlogPostSummary(python_utils.OBJECT):
         """
         published_on = utils.convert_naive_datetime_to_string(
             self.published_on) if self.published_on else None
-
         last_updated = utils.convert_naive_datetime_to_string(
             self.last_updated) if self.published_on else None
         return {

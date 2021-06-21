@@ -154,6 +154,12 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
         self._assert_valid_url_fragment_for_blog_post(
             'Blog Post URL Fragment field should not exceed %d characters.'
             % (url_fragment_char_limit), url_fragment)
+        self._assert_valid_url_fragment_for_blog_post(
+            'Blog Post URL Fragment field contains invalid characters.'
+            'Only lowercase words, numbers separated by hyphens are allowed. '
+            'Received %s.' % ('oppia-in-covid19-#'), 'oppia-in-covid19-#')
+
+        blog_domain.BlogPost.require_valid_url_fragment('oppia-in-covid19')
 
     def test_serialize_and_deserialize_returns_unchanged_blog_post(self):
         """Checks that serializing and then deserializing a blog post works as
@@ -383,6 +389,12 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
         self._assert_valid_url_fragment_for_blog_post(
             'Blog Post URL Fragment field should not exceed %d characters.'
             % (url_fragment_char_limit), url_fragment)
+        self._assert_valid_url_fragment_for_blog_post(
+            'Blog Post URL Fragment field contains invalid characters.'
+            'Only lowercase words, numbers separated by hyphens are allowed. '
+            'Received %s.' % ('oppia-in-covid19-#'), 'oppia-in-covid19-#')
+
+        blog_domain.BlogPostSummary.require_valid_url_fragment('oppia-covid19')
 
     def _assert_strict_validation_error(self, expected_error_substring):
         """Checks that the blog post passes strict validation."""
