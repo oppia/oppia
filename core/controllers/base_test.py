@@ -1656,24 +1656,22 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             handlers_with_non_conforming_default_schemas, [], error_msg)
 
-    def test_names_of_handlers_with_schema_should_not_be_in_the_schema_requiring_list(self): #pylint: disable=line-too-long
-        """This test checks if a handler contains schema then, handler class
-        name should not be present in SCHEMA_REQUIRING_HANDLER_CLASS_NAMES list.
+    def test_handler_with_schemas_should_not_be_present_in_schema_requiring_handler_class_names_list(self): #pylint: disable=line-too-long
+        """This test ensures that the SCHEMA_REQUIRING_HANDLER_CLASS_NAMES list
+        in payload validator only contains handler class names which require
+        schemas.
         """
-        # The list contains names of the handlers which should be removed
-        # from the SCHEMA_REQUIRING_HANDLER_CLASS_NAMES list.
-        list_of_handlers_to_remove = []
-        non_schema_requiring_handler_class_names = (
-            payload_validator.NON_SCHEMA_REQUIRING_HANDLER_CLASS_NAMES)
+        list_of_handlers_to_be_removed = []
+        handler_names_which_do_not_require_schemas = (
+            payload_validator.HANDLER_CLASS_NAMES_WHICH_DO_NOT_REQUIRE_SCHEMAS)
         list_of_routes_which_need_schemas = (
             self._get_list_of_routes_which_need_schemas())
 
         for route in list_of_routes_which_need_schemas:
             handler = route.handler
-            handler = route.handler
 
             handler_class_name = handler.__name__
-            if handler_class_name in non_schema_requiring_handler_class_names:
+            if handler_class_name in handler_names_which_do_not_require_schemas:
                 continue
 
             schema_written_for_request_methods = (
@@ -1685,13 +1683,14 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
 
             if (handler_has_schemas and handler_class_name in
                     self.handler_class_names_with_no_schema):
-                list_of_handlers_to_remove.append(handler_class_name)
+                list_of_handlers_to_be_removed.append(handler_class_name)
 
         error_msg = (
-            'Handlers to be removed from schema requiring list: [ %s ].' % (
-                ', '.join(list_of_handlers_to_remove)))
+            'Handlers to be removed from schema requiring list in '
+            'payload validator file: [ %s ].' % (
+                ', '.join(list_of_handlers_to_be_removed)))
 
-        self.assertEqual(list_of_handlers_to_remove, [], error_msg)
+        self.assertEqual(list_of_handlers_to_be_removed, [], error_msg)
 
 
 class SchemaValidationUrlArgsTests(test_utils.GenericTestBase):

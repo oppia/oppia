@@ -3344,7 +3344,7 @@ class DisallowDunderMetaclassCheckerTests(unittest.TestCase):
 
 class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
 
-    def test_non_schema_handlers_for_request_args_raise_error(self):
+    def test_schema_handlers_without_request_args_raise_error(self):
         checker_test_object = testutils.CheckerTestCase()
         checker_test_object.CHECKER_CLASS = (
             pylint_extensions.DisallowHandlerWithoutSchema)
@@ -3365,7 +3365,7 @@ class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
         ):
             checker_test_object.checker.visit_classdef(schemaless_class_node)
 
-    def test_non_schema_handlers_for_url_path_args_raise_error(self):
+    def test_schema_handlers_without_url_path_args_raise_error(self):
         checker_test_object = testutils.CheckerTestCase()
         checker_test_object.CHECKER_CLASS = (
             pylint_extensions.DisallowHandlerWithoutSchema)

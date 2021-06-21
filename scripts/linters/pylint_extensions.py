@@ -15,7 +15,7 @@
 # limitations under the License.
 
 """Implements additional custom Pylint checkers to be used as part of
-presubmit checks. Next message id would be C0035.
+presubmit checks. Next message id would be C0037.
 """
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
@@ -2151,25 +2151,37 @@ class DisallowHandlerWithoutSchema(checkers.BaseChecker):
     priority = -1
     msgs = {
         'C0035': (
-            'Please add schema in URL_ARGS_PATH_SCHEMA for %s class.',
-            'no-schema-for-url-path-elements',
-            'Please add schema for url path elements by folllowing wiki link- '
+            'Please add schema in URL_ARGS_PATH_SCHEMA for %s class. \nVisit '
             'https://github.com/oppia/oppia/wiki/Validation-of-handler-args'
+            'to learn how to write schema for handlers.',
+            'no-schema-for-url-path-elements',
+            'Enforce writing schema for url path arguments of handler class.'
         ),
         'C0036': (
-            'Please add schema in HANDLER_ARGS_SCHEMAS for %s class.',
-            'no-schema-for-handler-args',
-            'Please add schema for payload arguments and url query string '
-            'parameters by following the link- '
+            'Please add schema in HANDLER_ARGS_SCHEMA for %s class. \nVisit '
             'https://github.com/oppia/oppia/wiki/Validation-of-handler-args'
+            'to learn how to write schema for handlers.',
+            'no-schema-for-handler-args',
+            'Enforce writing schema for request arguments of handler class.'
         )
     }
-    handler_class_names_with_no_schema = (
-        payload_validator.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA)
 
     def check_parent_class_is_basehandler(self, node):
-        """Checks whether a class is child class of BaseHandler."""
-        return 'base.BaseHandler' in node.basenames
+        """Checks whether a class is child class of BaseHandler.
+
+        Returns:
+            bool. Whether a class is child class of BaseHandler.
+        """
+        # For checking one level of inheritance.
+        parent_class_is_basehandler = 'base.BaseHandler' in node.basenames
+
+        # For checking entire hierarchy.
+        if parent_class_is_basehandler is False:
+            for j in node.ancestors(recurc):
+                if 'base.BaseHandler' in j.basenames:
+                    parent_class_is_basehandler = True
+                    break
+        return parent_class_is_basehandler
 
     def visit_classdef(self, node):
         """Visit each class definition in controllers layer module and check
@@ -2179,16 +2191,10 @@ class DisallowHandlerWithoutSchema(checkers.BaseChecker):
             node: astroid.nodes.ClassDef. Node for a class definition
                 in the AST.
         """
-        basehandler_child_class = self.check_parent_class_is_basehandler(node)
-        if basehandler_child_class is False:
-            for j in node.ancestors():
-                if self.check_parent_class_is_basehandler(j):
-                    basehandler_child_class = True
-                    break
-        if basehandler_child_class is False:
+        if not self.check_parent_class_is_basehandler(node):
             return
 
-        if node.name in self.handler_class_names_with_no_schema:
+        if node.name in payload_validator.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA:
             return
 
         if 'URL_PATH_ARGS_SCHEMAS' not in node.locals:
