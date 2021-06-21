@@ -98,6 +98,24 @@ describe('ImageUploaderComponent', () => {
     expect(component.fileChanged.emit).toHaveBeenCalledWith(validFile);
   });
 
+  it('should not upload image on drop if the event is empty', () => {
+    spyOn(component, 'validateUploadedFile');
+    component.ngAfterViewInit();
+    component.allowedImageFormats = ['jpeg', 'jpg', 'gif', 'png'];
+
+    let dataTransfer = null;
+
+    spyOn(component.fileChanged, 'emit');
+
+    // We cannot check if an error was thrown as error thrown inside an event
+    // listener is silenced. So we check if validateUploadedFile() was called
+    // or not.
+    component.dropAreaRef.nativeElement.dispatchEvent(
+      new DragEvent('drop', {dataTransfer: dataTransfer}));
+
+    expect(component.validateUploadedFile).not.toHaveBeenCalled();
+  });
+
   it('should not upload image on drop if the image' +
     ' format is not allowed', () => {
     component.ngAfterViewInit();
