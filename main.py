@@ -22,6 +22,7 @@ from constants import constants
 
 from core.controllers import acl_decorators
 from core.controllers import admin
+from core.controllers import android_e2e_config
 from core.controllers import base
 from core.controllers import classifier
 from core.controllers import classroom
@@ -218,6 +219,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/forum', pages.ForumRedirectPage),
 
     get_redirect_route(r'%s' % feconf.ADMIN_URL, admin.AdminPage),
+    get_redirect_route(
+        r'/initialize_android_test_data',
+        android_e2e_config.InitializeAndroidTestData),
     get_redirect_route(r'/adminhandler', admin.AdminHandler),
     get_redirect_route(r'/adminrolehandler', admin.AdminRoleHandler),
     get_redirect_route(

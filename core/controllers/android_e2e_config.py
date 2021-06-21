@@ -1,0 +1,270 @@
+# Copyright 2014 The Oppia Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS-IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Controller for initializing android specific structures."""
+
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
+import logging
+import random
+
+from constants import constants
+from core import jobs
+from core import jobs_registry
+from core.controllers import acl_decorators
+from core.controllers import base
+from core.domain import auth_services
+from core.domain import caching_services
+from core.domain import collection_services
+from core.domain import config_domain
+from core.domain import config_services
+from core.domain import email_manager
+from core.domain import exp_domain
+from core.domain import exp_fetchers
+from core.domain import exp_services
+from core.domain import opportunity_services
+from core.domain import platform_feature_services as feature_services
+from core.domain import question_domain
+from core.domain import question_services
+from core.domain import recommendations_services
+from core.domain import rights_manager
+from core.domain import role_services
+from core.domain import search_services
+from core.domain import skill_domain
+from core.domain import skill_services
+from core.domain import state_domain
+from core.domain import stats_services
+from core.domain import story_domain
+from core.domain import story_services
+from core.domain import subtopic_page_domain
+from core.domain import subtopic_page_services
+from core.domain import topic_domain
+from core.domain import topic_fetchers
+from core.domain import topic_services
+from core.domain import user_services
+from core.domain import wipeout_service
+import feconf
+import python_utils
+import utils
+
+
+class InitializeAndroidTestData(base.BaseHandler):
+    """Handler to initialize android specific structures."""
+
+    def post(self):
+        if constants.DEV_MODE:
+            user_id = feconf.SYSTEM_COMMITTER_ID
+            topic_id = topic_fetchers.get_new_topic_id()
+            story_id = story_services.get_new_story_id()
+            skill_id = skill_services.get_new_skill_id()
+            question_id = question_services.get_new_question_id()
+            skill = self._create_dummy_skill(
+                skill_id, 'Dummy Skill 1', '<p>Dummy Explanation 1</p>')
+            question = self._create_dummy_question(
+                question_id, 'Question 1', [skill_id])
+            question_services.add_question(user_id, question)
+
+            question_services.create_new_question_skill_link(
+                user_id, question_id, skill_id, 0.3)
+
+            if topic_services.does_topic_with_name_exist('Android test'):
+                return
+
+            topic = topic_domain.Topic.create_default_topic(
+                topic_id, 'Android test', 'test-topic-one', 'description')
+            topic.update_url_fragment("topic_url")
+            topic.update_meta_tag_content("tag")
+            topic.update_page_title_fragment_for_web("page title for topic")
+            topic.update_thumbnail_filename("testing_topic.svg")
+            topic.update_thumbnail_bg_color("#C6DCDA")
+
+            topic.add_canonical_story(story_id)
+            topic.add_uncategorized_skill_id(skill_id)
+            topic.add_subtopic(1, 'Test Subtopic Title')
+            topic.update_subtopic_url_fragment(1, "suburl")
+            topic.update_subtopic_thumbnail_filename(1, "testing_topic.svg")
+            topic.update_subtopic_thumbnail_bg_color(1, "#FFFFFF")
+
+            topic.move_skill_id_to_subtopic(None, 1, skill_id)
+
+            subtopic_page = (
+                subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                    1, topic_id))
+
+            exp_services.load_demo(python_utils.convert_to_bytes(
+                '15'))
+            rights_manager.release_ownership_of_exploration(
+                user_services.get_system_user(), python_utils.convert_to_bytes(
+                    '15'))
+            exp_services.update_exploration(
+                user_id, '15', [exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'correctness_feedback_enabled',
+                    'new_value': True
+                })], 'Changed correctness_feedback_enabled.')
+            story = story_domain.Story.create_default_story(
+                story_id, 'Android End to End testing', 'Description',
+                topic_id, 'android-e2e-testing')
+
+            story_node_dicts = [{
+                'exp_id': '15',
+                'title': 'Testing with UI Automator',
+                'description': 'In order to test all android interactions'
+            }]
+
+            def generate_dummy_story_nodes(node_id, exp_id, title, description):
+                story.add_node(
+                    '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
+                    title)
+                story.update_node_description(
+                    '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
+                    description)
+                story.update_node_exploration_id(
+                    '%s%d' % (story_domain.NODE_ID_PREFIX, node_id), exp_id)
+
+                story.update_node_thumbnail_filename(
+                    '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
+                    'testing_skill.svg')
+                story.update_node_thumbnail_bg_color(
+                    '%s%d' % (story_domain.NODE_ID_PREFIX, node_id), "#F8BF74")
+                story.update_meta_tag_content("tag")
+                story.update_thumbnail_filename("testing_skill.svg")
+                story.update_thumbnail_bg_color(
+                    constants.ALLOWED_THUMBNAIL_BG_COLORS['story'][0])
+
+                if node_id != len(story_node_dicts):
+                    story.update_node_destination_node_ids(
+                        '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
+                        ['%s%d' % (story_domain.NODE_ID_PREFIX, node_id + 1)])
+
+                exp_services.update_exploration(
+                    user_id, exp_id, [exp_domain.ExplorationChange({
+                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                        'property_name': 'category',
+                        'new_value': 'Astronomy'
+                    })], 'Change category')
+
+            for i, story_node_dict in enumerate(story_node_dicts):
+                generate_dummy_story_nodes(i + 1, **story_node_dict)
+
+            skill_services.save_new_skill(user_id, skill)
+            story_services.save_new_story(user_id, story)
+            topic_services.save_new_topic(user_id, topic)
+            subtopic_page_services.save_subtopic_page(
+                user_id, subtopic_page, 'Added subtopic',
+                [topic_domain.TopicChange({
+                    'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                    'subtopic_id': 1,
+                    'title': 'Dummy Subtopic Title'
+                })]
+            )
+
+            # Generates translation opportunities for the Contributor Dashboard.
+            exp_ids_in_story = story.story_contents.get_all_linked_exp_ids()
+            opportunity_services.add_new_exploration_opportunities(
+                story_id, exp_ids_in_story)
+
+            topic_services.publish_story(topic_id, story_id, user_id)
+            topic_services.publish_topic(topic_id, user_id)
+        else:
+            raise Exception('Cannot load new structures data in production.')
+
+
+    def _create_dummy_question(
+            self, question_id, question_content, linked_skill_ids):
+        """Creates a dummy question object with the given question ID.
+
+        Args:
+            question_id: str. The ID of the question to be created.
+            question_content: str. The question content.
+            linked_skill_ids: list(str). The IDs of the skills to which the
+                question is linked to.
+
+        Returns:
+            Question. The dummy question with given values.
+        """
+        state = state_domain.State.create_default_state(
+            'ABC', is_initial_state=True)
+        state.update_interaction_id('TextInput')
+        state.update_interaction_customization_args({
+            'placeholder': {
+                'value': {
+                    'content_id': 'ca_placeholder_0',
+                    'unicode_str': ''
+                }
+            },
+            'rows': {'value': 1}
+        })
+
+        state.update_next_content_id_index(1)
+        state.update_linked_skill_id(None)
+        state.update_content(state_domain.SubtitledHtml('1', question_content))
+        recorded_voiceovers = state_domain.RecordedVoiceovers({})
+        written_translations = state_domain.WrittenTranslations({})
+        recorded_voiceovers.add_content_id_for_voiceover('ca_placeholder_0')
+        recorded_voiceovers.add_content_id_for_voiceover('1')
+        recorded_voiceovers.add_content_id_for_voiceover('default_outcome')
+        written_translations.add_content_id_for_translation('ca_placeholder_0')
+        written_translations.add_content_id_for_translation('1')
+        written_translations.add_content_id_for_translation('default_outcome')
+
+        state.update_recorded_voiceovers(recorded_voiceovers)
+        state.update_written_translations(written_translations)
+        solution = state_domain.Solution(
+            'TextInput', False, 'Solution', state_domain.SubtitledHtml(
+                'solution', '<p>This is a solution.</p>'))
+        hints_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml('hint_1', '<p>This is a hint.</p>')
+            )
+        ]
+
+        state.update_interaction_solution(solution)
+        state.update_interaction_hints(hints_list)
+        state.update_interaction_default_outcome(
+            state_domain.Outcome(
+                None, state_domain.SubtitledHtml(
+                    'feedback_id', '<p>Dummy Feedback</p>'),
+                True, [], None, None
+            )
+        )
+        question = question_domain.Question(
+            question_id, state,
+            feconf.CURRENT_STATE_SCHEMA_VERSION,
+            constants.DEFAULT_LANGUAGE_CODE, 0, linked_skill_ids, [])
+        return question
+
+    def _create_dummy_skill(self, skill_id, skill_description, explanation):
+        """Creates a dummy skill object with the given values.
+
+        Args:
+            skill_id: str. The ID of the skill to be created.
+            skill_description: str. The description of the skill.
+            explanation: str. The review material for the skill.
+
+        Returns:
+            Skill. The dummy skill with given values.
+        """
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
+        skill = skill_domain.Skill.create_default_skill(
+            skill_id, skill_description, rubrics)
+        skill.update_explanation(state_domain.SubtitledHtml('1', explanation))
+        return skill
