@@ -26,7 +26,7 @@ import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
 import { SkillSummary } from 'domain/skill/skill-summary.model';
 import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service';
-import { TopicSummary } from 'domain/topic/topic-summary.model';
+import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { Subscription } from 'rxjs';
@@ -54,7 +54,7 @@ export class SkillsListComponent {
   @Input() skillSummaries: AugmentedSkillSummary[];
   @Input() pageNumber: number;
   @Input() itemsPerPage: number;
-  @Input() editableTopicSummaries: TopicSummary[];
+  @Input() editableTopicSummaries: CreatorTopicSummary[];
   @Input() mergeableSkillSummaries: SkillSummary[];
   @Input() untriagedSkillSummaries: SkillSummary[];
   @Input() userCanDeleteSkill: boolean;
@@ -178,8 +178,9 @@ export class SkillsListComponent {
 
   assignSkillToTopic(skill: AugmentedSkillSummary): void {
     let skillId: string = skill.id;
-    let topicSummaries: TopicSummary[] = this.editableTopicSummaries.filter(
-      topicSummary => !skill.topicNames.includes(topicSummary.name));
+    let topicSummaries: CreatorTopicSummary[] = (
+      this.editableTopicSummaries.filter(
+        topicSummary => !skill.topicNames.includes(topicSummary.name)));
     let modalRef: NgbModalRef = this.ngbModal
       .open(AssignSkillToTopicModalComponent, {
         backdrop: 'static',
@@ -191,7 +192,7 @@ export class SkillsListComponent {
         cmd: 'add_uncategorized_skill_id',
         new_uncategorized_skill_id: skillId
       }];
-      let topicSummaries: TopicSummary[] = this.editableTopicSummaries;
+      let topicSummaries: CreatorTopicSummary[] = this.editableTopicSummaries;
       for (let i = 0; i < topicIds.length; i++) {
         for (let j = 0; j < topicSummaries.length; j++) {
           if (topicSummaries[j].id === topicIds[i]) {
