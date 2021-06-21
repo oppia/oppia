@@ -52,7 +52,7 @@ export class SkillSelectorComponent implements OnInit {
   initialSubTopicFilterDict: SubTopicFilterDict = {};
 
   constructor(
-    private filterForMatchingSubtringPipe: FilterForMatchingSubstringPipe
+    private filterForMatchingSubstringPipe: FilterForMatchingSubstringPipe
   ) {}
 
   ngOnInit(): void {
@@ -76,7 +76,7 @@ export class SkillSelectorComponent implements OnInit {
     this.initialSubTopicFilterDict = cloneDeep(this.subTopicFilterDict);
   }
 
-  checkIfEmpty(skills: string[]): boolean {
+  checkIfEmpty(skills: Object[]): boolean {
     return skills.length === 0;
   }
 
@@ -93,7 +93,7 @@ export class SkillSelectorComponent implements OnInit {
     this.selectedSkillIdChange.emit(this.selectedSkill);
   }
 
-  // The folowing function is called when the subtopic filter changes.
+  // The following function is called when the subtopic filter changes.
   // This updates the list of Skills displayed in the selector.
   updateSkillsListOnSubtopicFilterChange(): void {
     let updatedSkillsDict: CategorizedSkills = {};
@@ -137,7 +137,7 @@ export class SkillSelectorComponent implements OnInit {
     }
   }
 
-  // The folowing function is called when the topic filter changes.
+  // The following function is called when the topic filter changes.
   // First, the subtopic filter is updated according to the changed
   // topic filter list. Then the main Skills list is updated.
   updateSkillsListOnTopicFilterChange(): void {
@@ -174,7 +174,7 @@ export class SkillSelectorComponent implements OnInit {
     let skills: string[] = input.map(val => {
       return val.getDescription();
     });
-    let filteredSkills = this.filterForMatchingSubtringPipe
+    let filteredSkills = this.filterForMatchingSubstringPipe
       .transform(skills, searchText);
     return input.filter(val => {
       return filteredSkills.includes(val.description);
@@ -185,7 +185,7 @@ export class SkillSelectorComponent implements OnInit {
     let skills: string[] = this.untriagedSkillSummaries.map(val => {
       return val.description;
     });
-    let filteredSkills = this.filterForMatchingSubtringPipe
+    let filteredSkills = this.filterForMatchingSubstringPipe
       .transform(skills, searchText);
     return this.untriagedSkillSummaries.filter(val => {
       return filteredSkills.includes(val.description);
