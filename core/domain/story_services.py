@@ -72,7 +72,7 @@ def _create_story(committer_id, story, commit_message, commit_cmds):
         title=story.title,
         thumbnail_bg_color=story.thumbnail_bg_color,
         thumbnail_filename=story.thumbnail_filename,
-        thumbnail_size_in_bytes = story.thumbnail_size_in_bytes,
+        thumbnail_size_in_bytes=story.thumbnail_size_in_bytes,
         language_code=story.language_code,
         story_contents_schema_version=story.story_contents_schema_version,
         notes=story.notes,
