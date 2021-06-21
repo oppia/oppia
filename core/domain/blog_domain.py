@@ -202,8 +202,8 @@ class BlogPost(python_utils.OBJECT):
         if not isinstance(url_fragment, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Blog Post URL Fragment field must be a string. '
-                'Received %s.' % (url_fragment)
-        if url_fragment == '':
+                'Received %s.' % (url_fragment))
+        if not url_fragment:
             raise utils.ValidationError(
                 'Blog Post URL Fragment field should not be empty.')
 
@@ -452,7 +452,7 @@ class BlogPostSummary(python_utils.OBJECT):
                 'Blog Post URL Fragment field must be a string. '
                 'Received %s.' % (url_fragment))
 
-        if url_fragment == '':
+        if not url_fragment:
             raise utils.ValidationError(
                 'Blog Post URL Fragment field should not be empty.')
 
