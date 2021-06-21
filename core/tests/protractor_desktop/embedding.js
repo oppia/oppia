@@ -159,7 +159,7 @@ describe('Embedding', function() {
     await general.openEditor(explorationId, false);
     await explorationEditorMainTab.setContent(
       await forms.toRichText('Version 3'));
-    await explorationEditorPage.savePublishedChanges('demonstration edit');
+    await explorationEditorPage.publishChanges('demonstration edit');
 
     for (var i = 0; i < TEST_PAGES.length; i++) {
       // This is necessary as the pages are non-angular.
@@ -317,7 +317,7 @@ describe('Embedding', function() {
       await general.openEditor(explorationId, false);
       await explorationEditorPage.navigateToSettingsTab();
       await explorationEditorSettingsTab.setLanguage('ภาษาไทย');
-      await explorationEditorPage.savePublishedChanges(
+      await explorationEditorPage.publishChanges(
         'Changing the language to a not supported one.');
       // We expect the default language, English.
       await checkPlaceholder('Type a number');
@@ -326,7 +326,7 @@ describe('Embedding', function() {
       await general.openEditor(explorationId, false);
       await explorationEditorPage.navigateToSettingsTab();
       await explorationEditorSettingsTab.setLanguage('español');
-      await explorationEditorPage.savePublishedChanges(
+      await explorationEditorPage.publishChanges(
         'Changing the language to a supported one.');
       await checkPlaceholder('Ingresa un número');
 

@@ -106,9 +106,11 @@ var ExplorationEditorPage = function() {
   var saveChangesButton = element(by.css('.protractor-test-save-changes'));
   var saveDiscardToggleButton = element(
     by.css('.protractor-test-save-discard-toggle'));
-  var saveDraftButton = element(by.css('.protractor-test-save-draft-button'));
-  var saveDraftMessageButton = element(by.css('.protractor-test-save-draft'));
-  var publishChangesMessageButton = element(
+  var commitChangesButton = element(
+    by.css('.protractor-test-save-draft-button'));
+  var saveDraftButtonTextContainer = element(
+    by.css('.protractor-test-save-draft'));
+  var publishChangesButtonTextContainer = element(
     by.css('.protractor-test-publish-changes'));
   var publishExplorationButton = element(
     by.css('.protractor-test-publish-exploration'));
@@ -223,28 +225,26 @@ var ExplorationEditorPage = function() {
       await action.sendKeys(
         'Commit message input', commitMessageInput, commitMessage);
     }
-    await action.click('Save draft button', saveDraftButton);
+    await action.click('Save draft button', commitChangesButton);
     // TODO(#13096): Remove browser.sleep from e2e files.
     /* eslint-disable-next-line oppia/protractor-practices */
     await browser.sleep(2500);
     await waitFor.textToBePresentInElement(
-      saveDraftMessageButton, 'Save Draft',
+      saveDraftButtonTextContainer, 'Save Draft',
       'Changes could not be saved');
   };
 
-  this.savePublishedChanges = async function(commitMessage) {
+  this.publishChanges = async function(commitMessage) {
     await action.waitForAutosave();
     await action.click('Save changes button', saveChangesButton);
-    if (commitMessage) {
-      await action.sendKeys(
-        'Commit message input', commitMessageInput, commitMessage);
-    }
-    await action.click('Save draft button', saveDraftButton);
+    await action.sendKeys(
+      'Commit message input', commitMessageInput, commitMessage);
+    await action.click('Publish changes button', commitChangesButton);
     // TODO(#13096): Remove browser.sleep from e2e files.
     /* eslint-disable-next-line oppia/protractor-practices */
     await browser.sleep(2500);
     await waitFor.textToBePresentInElement(
-      publishChangesMessageButton, 'Publish Changes',
+      publishChangesButtonTextContainer, 'Publish Changes',
       'Changes could not be saved');
   };
 
