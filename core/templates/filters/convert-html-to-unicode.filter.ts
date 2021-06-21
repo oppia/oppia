@@ -21,7 +21,7 @@ export const convertHtmlToUnicode = (html: string): string => {
 };
 
 angular.module('oppia').filter('convertHtmlToUnicode', [function() {
-  return function(html) {
+  return function(html: string) {
     return convertHtmlToUnicode(html);
   };
 }]);

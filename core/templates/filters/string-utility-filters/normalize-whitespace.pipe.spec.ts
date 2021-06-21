@@ -21,12 +21,12 @@ import { NormalizeWhitespacePipe } from
 import { TestBed } from '@angular/core/testing';
 
 describe('Testing NormalizeWhitespacePipe', () => {
-  let nwp: NormalizeWhitespacePipe = null;
+  let nwp: NormalizeWhitespacePipe;
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [NormalizeWhitespacePipe]
     });
-    nwp = TestBed.get(NormalizeWhitespacePipe);
+    nwp = TestBed.inject(NormalizeWhitespacePipe);
   });
 
   it('should have all expected pipes', () => {
@@ -34,10 +34,6 @@ describe('Testing NormalizeWhitespacePipe', () => {
   });
 
   it('should correctly normalize whitespace', () => {
-    expect(nwp.transform('')).toEqual('');
-    expect(nwp.transform(null)).toEqual(null);
-    expect(nwp.transform(undefined)).toEqual(undefined);
-
     expect(nwp.transform('a')).toEqual('a');
     expect(nwp.transform('a  ')).toEqual('a');
     expect(nwp.transform('  a')).toEqual('a');

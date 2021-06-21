@@ -40,12 +40,12 @@ class MockWindowRef {
 }
 
 describe('User Api Service', () => {
-  let userService: UserService = null;
-  let urlInterpolationService: UrlInterpolationService = null;
-  let urlService: UrlService = null;
-  let httpTestingController: HttpTestingController = null;
-  let csrfService: CsrfTokenService = null;
-  let windowRef: MockWindowRef = null;
+  let userService: UserService;
+  let urlInterpolationService: UrlInterpolationService;
+  let urlService: UrlService;
+  let httpTestingController: HttpTestingController;
+  let csrfService: CsrfTokenService;
+  let windowRef: MockWindowRef;
 
   beforeEach(() => {
     windowRef = new MockWindowRef();
