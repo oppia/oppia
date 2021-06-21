@@ -221,7 +221,7 @@ describe('TopNavigationBarComponent', () => {
   });
 
   it('should try displaying the hidden navbar elements if resized' +
-    ' window is larger', () => {
+    ' window is larger', fakeAsync(() => {
     let donateElement = 'I18N_TOPNAV_DONATE';
     spyOn(wds, 'getWidth').and.returnValue(700);
     component.ngOnInit();
@@ -230,11 +230,12 @@ describe('TopNavigationBarComponent', () => {
     component.navElementsVisibilityStatus[donateElement] = false;
 
     windowRef.nativeWindow.dispatchEvent(new Event('resize'));
+    tick();
 
     expect(component.navElementsVisibilityStatus[donateElement]).toBe(true);
 
     component.ngOnDestroy();
-  });
+  }));
 
   it('should show user\'s profile picture on initialization', fakeAsync(() => {
     expect(component.profilePictureDataUrl).toBe(undefined);
