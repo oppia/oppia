@@ -83,19 +83,21 @@ var logout = async function() {
 
 // The user needs to log in immediately before this method is called. Note
 // that this will fail if the user already has a username.
-var _completeSignup = async function(username) {
+var _completeSignup = async function(username, useManualNavigation) {
+  if (useManualNavigation) {
+    await browser.get(
+      general.SERVER_URL_PREFIX + general.COMPLETE_SIGNUP_URL +
+      '?return_url=/');
+  }
   await waitFor.pageToFullyLoad();
-
   var signupPage = element(by.css('.protractor-test-signup-page'));
   await waitFor.presenceOf(signupPage, 'Signup page did not load');
 
   var usernameInput = element(by.css('.protractor-test-username-input'));
   await action.sendKeys('Username input', usernameInput, username);
-
   var agreeToTermsCheckbox = (
     element(by.css('.protractor-test-agree-to-terms-checkbox')));
   await action.click('Agree to terms checkbox', agreeToTermsCheckbox);
-
   var registerUser = element(by.css('.protractor-test-register-user'));
   await action.click('Register user button', registerUser);
 
@@ -106,7 +108,7 @@ var createAndLoginUser = async function(
     email, username, useManualNavigation = true) {
   await _createFirebaseAccount(email);
   await login(email, useManualNavigation);
-  await _completeSignup(username);
+  await _completeSignup(username, useManualNavigation);
 };
 
 var createAndLoginAdminUser = async function(email, username) {
