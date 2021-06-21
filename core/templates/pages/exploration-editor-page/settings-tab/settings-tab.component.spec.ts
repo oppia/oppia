@@ -46,6 +46,8 @@ import { ReadOnlyExplorationBackendApiService } from
 
 import { Subscription } from 'rxjs';
 import { importAllAngularServices } from 'tests/unit-test-utils';
+import { ChangeListService } from '../services/change-list.service';
+import { ExplorationDataService } from '../services/exploration-data.service';
 
 class MockRouterService {
   private refreshSettingsTabEventEmitter: EventEmitter<void>;
@@ -56,7 +58,6 @@ class MockRouterService {
     this.refreshSettingsTabEventEmitter = val;
   }
 }
-
 describe('Settings Tab Component', () => {
   let ctrl = null;
   let $httpBackend = null;
@@ -102,9 +103,26 @@ describe('Settings Tab Component', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
+      providers: [
+        {
+          provide: ExplorationDataService,
+          useValue: {
+            explorationId: explorationId,
+            data: {
+              param_changes: []
+            },
+            getDataAsync: () => $q.resolve(),
+            autosaveChangeListAsync() {
+              return;
+            }
+          }
+        }
+      ]
     });
+
     alertsService = TestBed.inject(AlertsService);
+    changeListService = TestBed.inject(ChangeListService);
     userExplorationPermissionsService = (
       TestBed.inject(UserExplorationPermissionsService));
     windowRef = TestBed.inject(WindowRef);
@@ -132,17 +150,12 @@ describe('Settings Tab Component', () => {
       'StateInteractionIdService', TestBed.inject(StateInteractionIdService));
     $provide.value(
       'StateSolutionService', TestBed.inject(StateSolutionService));
-    $provide.value('ExplorationDataService', {
-      explorationId: explorationId,
-      data: {
-        param_changes: []
-      },
-      getDataAsync: () => $q.resolve(),
-      autosaveChangeListAsync: () => {}
-    });
     $provide.value(
       'ReadOnlyExplorationBackendApiService',
       TestBed.inject(ReadOnlyExplorationBackendApiService));
+    $provide.value(
+      'ExplorationDataService',
+      TestBed.inject(ExplorationDataService));
   }));
 
   afterEach(() => {
@@ -155,7 +168,6 @@ describe('Settings Tab Component', () => {
       $q = $injector.get('$q');
       $rootScope = $injector.get('$rootScope');
       $uibModal = $injector.get('$uibModal');
-      changeListService = $injector.get('ChangeListService');
       explorationDataService = $injector.get('ExplorationDataService');
       contextService = $injector.get('ContextService');
       spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
@@ -793,12 +805,12 @@ describe('Settings Tab Component', () => {
       $q = $injector.get('$q');
       $rootScope = $injector.get('$rootScope');
       $uibModal = $injector.get('$uibModal');
-      changeListService = $injector.get('ChangeListService');
       contextService = $injector.get('ContextService');
       spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
       editableExplorationBackendApiService = $injector.get(
         'EditableExplorationBackendApiService');
       explorationCategoryService = $injector.get('ExplorationCategoryService');
+      explorationDataService = $injector.get('ExplorationDataService');
       explorationInitStateNameService = $injector.get(
         'ExplorationInitStateNameService');
       explorationLanguageCodeService = $injector.get(
