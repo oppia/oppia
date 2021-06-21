@@ -19,7 +19,7 @@
 import { fromEvent } from 'rxjs';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { async, ComponentFixture, fakeAsync, flushMicrotasks, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { AppConstants } from 'app.constants';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
@@ -221,7 +221,7 @@ describe('TopNavigationBarComponent', () => {
   });
 
   it('should try displaying the hidden navbar elements if resized' +
-    ' window is larger', fakeAsync(() => {
+    ' window is larger', waitForAsync(() => {
     let donateElement = 'I18N_TOPNAV_DONATE';
     spyOn(wds, 'getWidth').and.returnValue(700);
     component.ngOnInit();
@@ -230,10 +230,10 @@ describe('TopNavigationBarComponent', () => {
     component.navElementsVisibilityStatus[donateElement] = false;
 
     windowRef.nativeWindow.dispatchEvent(new Event('resize'));
-    tick();
 
-    expect(component.navElementsVisibilityStatus[donateElement]).toBe(true);
-
+    fixture.whenStable().then(() => {
+      expect(component.navElementsVisibilityStatus[donateElement]).toBe(true);
+    });
     component.ngOnDestroy();
   }));
 
