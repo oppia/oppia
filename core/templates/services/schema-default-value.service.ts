@@ -58,7 +58,7 @@ interface FloatSchema {
 
 interface ListSchema {
   type: 'list';
-  items: Schema | Schema[];
+  items: Schema | Schema[] | string;
 }
 
 export interface DictSchema {
@@ -118,7 +118,7 @@ export class SchemaDefaultValueService {
       schema.obj_type === SchemaConstants.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE
     );
 
-    if ('choices' in schema) {
+    if ('choices' in schema && schema.choices !== undefined) {
       return schema.choices[0];
     } else if (schemaIsSubtitledHtml) {
       return SubtitledHtml.createFromBackendDict({
@@ -138,11 +138,11 @@ export class SchemaDefaultValueService {
       if (!Array.isArray(schema.items)) {
         return [];
       }
-      return schema.items.map(function(item) {
+      return schema.items.map((item) => {
         return that.getDefaultValue(item);
       });
     } else if (schema.type === SchemaConstants.SCHEMA_TYPE_DICT) {
-      var result = {};
+      var result: SchemaDefaultValue = {};
       for (var i = 0; i < schema.properties.length; i++) {
         result[schema.properties[i].name] = this.getDefaultValue(
           schema.properties[i].schema);
@@ -153,6 +153,7 @@ export class SchemaDefaultValueService {
       return 0;
     } else {
       this.logger.error('Invalid schema: ' + JSON.stringify(schema));
+      throw new Error('Invalid Schema');
     }
   }
 }

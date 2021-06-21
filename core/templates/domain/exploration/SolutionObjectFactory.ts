@@ -28,7 +28,7 @@ import { ConvertToPlainTextPipe } from
 import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
 import { ExplorationHtmlFormatterService } from
   'services/exploration-html-formatter.service';
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
+import { Fraction } from 'domain/objects/fraction.model';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { NumberWithUnitsObjectFactory } from
@@ -100,12 +100,12 @@ export class Solution {
     } else if (interactionId === 'LogicProof') {
       correctAnswer = (<LogicProofAnswer> this.correctAnswer).correct;
     } else if (interactionId === 'FractionInput') {
-      correctAnswer = (new FractionObjectFactory()).fromDict(
+      correctAnswer = Fraction.fromDict(
         <FractionAnswer> this.correctAnswer).toString();
     } else if (interactionId === 'NumberWithUnits') {
       correctAnswer = (new NumberWithUnitsObjectFactory(
-        new UnitsObjectFactory(), new FractionObjectFactory())).fromDict(
-        <NumberWithUnitsAnswer> this.correctAnswer).toString();
+        new UnitsObjectFactory())).fromDict(
+          <NumberWithUnitsAnswer> this.correctAnswer).toString();
     } else if (interactionId === 'DragAndDropSortInput') {
       let formatRtePreview = new FormatRtePreviewPipe(new CapitalizePipe());
       correctAnswer = [];

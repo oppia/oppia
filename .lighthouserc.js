@@ -35,6 +35,7 @@ module.exports = {
         'http://127.0.0.1:8181/emaildashboard',
         'http://127.0.0.1:8181/get-started',
         'http://127.0.0.1:8181/learner-dashboard',
+        'http://127.0.0.1:8181/license',
         'http://127.0.0.1:8181/nonprofits',
         'http://127.0.0.1:8181/moderator',
         'http://127.0.0.1:8181/parents',
@@ -222,6 +223,16 @@ module.exports = {
             // We need to use passive event listeners on this page so that
             // the page works correctly.
             'uses-passive-event-listeners': ['error', {'minScore': 0}],
+            'deprecations': ['error', {'minScore': 1}]
+          }
+        },
+        {
+          'matchingUrlPattern': 'http://[^/]+/license$',
+          'assertions': {
+            'uses-webp-images': [
+              'error', {'maxLength': 0, 'strategy': 'pessimistic'}      
+            ],
+            'uses-passive-event-listeners': ['error', {'minScore': 1}],
             'deprecations': ['error', {'minScore': 1}]
           }
         },
