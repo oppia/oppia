@@ -32,9 +32,9 @@ interface ExplorationIdToNodeIndexMap {
 }
 
 export interface CollectionBackendDict {
-  // On creating a new Collection, properties below are always
-  // initialized with null values. Null here implies that these properties
-  // are yet to be assigned. See function createEmptyCollection for reference.
+  // When creating a new collection, properties below are always
+  // initialized with null values. These are null until populated
+  // from the backend and provided themselves by the user.
   'id': string | null;
   'title': string | null;
   'objective': string | null;
