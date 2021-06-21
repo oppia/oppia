@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,9 +13,19 @@
 // limitations under the License.
 
 /**
- * @fileoverview Valid syntax .ts file, used by scripts/linters/
- * js_ts_linter_test.py.
+ * @fileoverview Component for the license page.
  */
 
-angular.module('oppia').constant('ACTIVITY_STATUS_PRIVATE',
-  AppConstants.ACTIVITY_STATUS_PRIVATE);
+import { Component } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+
+@Component({
+  selector: 'oppia-license-page',
+  templateUrl: './license-page.component.html',
+  styleUrls: []
+})
+export class LicensePageComponent {
+}
+
+angular.module('oppia').directive('oppiaLicensePage',
+  downgradeComponent({component: LicensePageComponent}));
