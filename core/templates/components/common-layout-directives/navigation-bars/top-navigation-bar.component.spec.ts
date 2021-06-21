@@ -61,7 +61,7 @@ class MockWindowRef {
   }
 }
 
-describe('TopNavigationBarComponent', () => {
+fdescribe('TopNavigationBarComponent', () => {
   let fixture: ComponentFixture<TopNavigationBarComponent>;
   let component: TopNavigationBarComponent;
   let mockWindowRef: MockWindowRef;
@@ -231,7 +231,7 @@ describe('TopNavigationBarComponent', () => {
 
     windowRef.nativeWindow.dispatchEvent(new Event('resize'));
 
-    component.navElementsVisibilityStatus[donateElement] = true;
+    expect(component.navElementsVisibilityStatus[donateElement]).toBe(true);
 
     component.ngOnDestroy();
   });
