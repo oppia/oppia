@@ -35,6 +35,7 @@ import utils
 STORY_PROPERTY_TITLE = 'title'
 STORY_PROPERTY_THUMBNAIL_BG_COLOR = 'thumbnail_bg_color'
 STORY_PROPERTY_THUMBNAIL_FILENAME = 'thumbnail_filename'
+STORY_PROPERTY_THUMBNAIL_SIZE_IN_BYTES = 'thumbnail_size_in_bytes'
 STORY_PROPERTY_DESCRIPTION = 'description'
 STORY_PROPERTY_NOTES = 'notes'
 STORY_PROPERTY_LANGUAGE_CODE = 'language_code'
@@ -103,6 +104,7 @@ class StoryChange(change_domain.BaseChange):
     STORY_PROPERTIES = (
         STORY_PROPERTY_TITLE, STORY_PROPERTY_THUMBNAIL_BG_COLOR,
         STORY_PROPERTY_THUMBNAIL_FILENAME,
+        STORY_PROPERTY_THUMBNAIL_SIZE_IN_BYTES,
         STORY_PROPERTY_DESCRIPTION, STORY_PROPERTY_NOTES,
         STORY_PROPERTY_LANGUAGE_CODE, STORY_PROPERTY_URL_FRAGMENT,
         STORY_PROPERTY_META_TAG_CONTENT)
@@ -630,7 +632,7 @@ class Story(python_utils.OBJECT):
 
     def __init__(
             self, story_id, title, thumbnail_filename,
-            thumbnail_bg_color, description, notes,
+            thumbnail_bg_color, thumbnail_size_in_bytes, description, notes,
             story_contents, story_contents_schema_version, language_code,
             corresponding_topic_id, version, url_fragment, meta_tag_content,
             created_on=None, last_updated=None):
@@ -659,6 +661,7 @@ class Story(python_utils.OBJECT):
             thumbnail_filename: str|None. The thumbnail filename of the story.
             thumbnail_bg_color: str|None. The thumbnail background color of
                 the story.
+            thumbnail_size_in_bytes: int|None. The size of thumbnail in bytes.
             url_fragment: str. The url fragment for the story.
             meta_tag_content: str. The meta tag content in the topic viewer
                 page.
@@ -667,6 +670,7 @@ class Story(python_utils.OBJECT):
         self.title = title
         self.thumbnail_filename = thumbnail_filename
         self.thumbnail_bg_color = thumbnail_bg_color
+        self.thumbnail_size_in_bytes = thumbnail_size_in_bytes
         self.description = description
         self.notes = html_cleaner.clean(notes)
         self.story_contents = story_contents
@@ -869,6 +873,7 @@ class Story(python_utils.OBJECT):
             'story_contents': self.story_contents.to_dict(),
             'thumbnail_filename': self.thumbnail_filename,
             'thumbnail_bg_color': self.thumbnail_bg_color,
+            'thumbnail_size_in_bytes': self.thumbnail_size_in_bytes,
             'url_fragment': self.url_fragment,
             'meta_tag_content': self.meta_tag_content
         }
@@ -952,6 +957,7 @@ class Story(python_utils.OBJECT):
         story = cls(
             story_dict['id'], story_dict['title'],
             story_dict['thumbnail_filename'], story_dict['thumbnail_bg_color'],
+            story_dict['thumbnail_size_in_bytes'],
             story_dict['description'], story_dict['notes'],
             StoryContents.from_dict(story_dict['story_contents']),
             story_dict['story_contents_schema_version'],
@@ -985,7 +991,7 @@ class Story(python_utils.OBJECT):
         initial_node_id = '%s1' % NODE_ID_PREFIX
         story_contents = StoryContents([], None, initial_node_id)
         return cls(
-            story_id, title, None, None, description,
+            story_id, title, None, None, 0, description,
             feconf.DEFAULT_STORY_NOTES, story_contents,
             feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
             constants.DEFAULT_LANGUAGE_CODE, corresponding_topic_id, 0,
@@ -1044,6 +1050,22 @@ class Story(python_utils.OBJECT):
         return story_contents_dict
 
     @classmethod
+    def _convert_story_contents_v4_dict_to_v5_dict(cls, story_contents_dict):
+        """Converts old Story Contents schema to the modern v5 schema.
+        v5 schema introduces the thumbnail_size_in_bytes fields for Story.
+
+        Args:
+            story_contents_dict: dict. A dict used to initialize a Story
+                Contents domain object.
+
+        Returns:
+            dict. The converted story_contents_dict.
+        """
+        for index in python_utils.RANGE(len(story_contents_dict['nodes'])):
+            story_contents_dict['nodes'][index]['thumbnail_size_in_bytes'] = 0
+        return story_contents_dict
+
+    @classmethod
     def update_story_contents_from_model(
             cls, versioned_story_contents, current_version):
         """Converts the story_contents blob contained in the given
@@ -1083,6 +1105,15 @@ class Story(python_utils.OBJECT):
                 story.
         """
         self.thumbnail_filename = thumbnail_filename
+
+    def update_thumbnail_size_in_bytes(self, new_thumbnail_size_in_bytes):
+        """Updates the size of thumbnail of the story.
+
+        Args:
+            new_thumbnail_size_in_bytes: int|0. The new thumbnail size of the
+                story.
+        """
+        self.new_thumbnail_size_in_bytes = new_thumbnail_size_in_bytes
 
     def update_thumbnail_bg_color(self, thumbnail_bg_color):
         """Updates the thumbnail background color of the story.

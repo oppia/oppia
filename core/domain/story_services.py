@@ -174,6 +174,14 @@ def apply_change_list(story_id, change_list):
                 elif (change.property_name ==
                       story_domain.STORY_PROPERTY_THUMBNAIL_FILENAME):
                     story.update_thumbnail_filename(change.new_value)
+                    thumbnail_url = (
+                        'http://localhost:8181/assetsdevhandler/story/%s'
+                        '/assets/thumbnail/%s' 
+                        % (story_id, change.new_value))
+                    thumbnail_size_in_bytes = python_utils.url_open(
+                        thumbnail_url).headers['Content-Length']
+                    print("Thumbnail size in bytes = " + str(thumbnail_size_in_bytes))
+                    story.update_thumbnail_size_in_bytes(thumbnail_size_in_bytes)                    
                 elif (change.property_name ==
                       story_domain.STORY_PROPERTY_THUMBNAIL_BG_COLOR):
                     story.update_thumbnail_bg_color(change.new_value)
