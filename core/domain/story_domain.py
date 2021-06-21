@@ -1113,7 +1113,7 @@ class Story(python_utils.OBJECT):
             new_thumbnail_size_in_bytes: int|0. The new thumbnail size of the
                 story.
         """
-        self.new_thumbnail_size_in_bytes = new_thumbnail_size_in_bytes
+        self.thumbnail_size_in_bytes = new_thumbnail_size_in_bytes
 
     def update_thumbnail_bg_color(self, thumbnail_bg_color):
         """Updates the thumbnail background color of the story.
