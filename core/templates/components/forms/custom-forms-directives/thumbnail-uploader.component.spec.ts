@@ -29,7 +29,7 @@ import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { EditThumbnailModalComponent } from './edit-thumbnail-modal.component';
 import { ThumbnailUploaderComponent } from './thumbnail-uploader.component';
 
-fdescribe('ThumbnailUploaderComponent', () => {
+describe('ThumbnailUploaderComponent', () => {
   let fixture: ComponentFixture<ThumbnailUploaderComponent>;
   let component: ThumbnailUploaderComponent;
   let contextService: ContextService;
