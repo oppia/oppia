@@ -181,21 +181,21 @@ var AdminPage = function() {
 
   this.getFeaturesTab = async function() {
     await this.get();
-    const featuresTab = element(by.css('.protractor-test-admin-features-tab'));
+    var featuresTab = element(by.css('.protractor-test-admin-features-tab'));
     await action.click('Admin features tab', featuresTab);
-    const featureFlagElements = element.all(
+    var featureFlagElements = element.all(
       by.css('.protractor-test-feature-flag'));
     await waitFor.visibilityOf(
       featureFlagElements.first(), 'Feature flags not showing up');
   };
 
   this.getDummyFeatureElement = async function() {
-    const featureFlagElements = element.all(
+    var featureFlagElements = element.all(
       by.css('.protractor-test-feature-flag'));
 
-    const count = await featureFlagElements.count();
+    var count = await featureFlagElements.count();
     for (let i = 0; i < count; i++) {
-      const elem = await featureFlagElements.get(i);
+      var elem = await featureFlagElements.get(i);
       if ((await elem.element(by.css('h2.oppia-feature-name')).getText()) ===
           'dummy_feature') {
         return elem;
@@ -257,7 +257,7 @@ var AdminPage = function() {
     await action.click('Config Tab', configTab);
     await waitFor.elementToBeClickable(saveAllConfigs);
 
-    const results = [];
+    var results = [];
     for (let configProperty of (await configProperties)) {
       results.push(
         await saveConfigProperty(
