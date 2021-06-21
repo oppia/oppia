@@ -29,8 +29,17 @@ import { AudioTranslationLanguageService, ExplorationLanguageInfo } from '../ser
 import { AudioTranslationManagerService } from '../services/audio-translation-manager.service';
 import { PlayerPositionService } from '../services/player-position.service';
 import { ComponentFixture, fakeAsync, TestBed, waitForAsync } from '@angular/core/testing';
+import { EventEmitter, NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
-describe('Audio Bar Component', () => {
+@Pipe({name: 'translate'})
+class MockTranslatePipe {
+  transform(value: string): string {
+    return value;
+  }
+}
+
+fdescribe('Audio Bar Component', () => {
   let component: AudioBarComponent;
   let fixture: ComponentFixture<AudioBarComponent>;
 
@@ -46,8 +55,13 @@ describe('Audio Bar Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [AudioBarComponent],
-      providers: []
+      imports: [HttpClientTestingModule],
+      declarations: [
+        AudioBarComponent,
+        MockTranslatePipe
+      ],
+      providers: [],
+      schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));
 
@@ -55,12 +69,34 @@ describe('Audio Bar Component', () => {
     fixture = TestBed.createComponent(AudioBarComponent);
     component = fixture.componentInstance;
     audioPlayerService = TestBed.inject(AudioPlayerService);
+    audioBarStatusService = TestBed.inject(AudioBarStatusService);
 
-    component.ngOnInit();
     fixture.detectChanges();
+  });
+  beforeEach(() => {
+    spyOn(audioBarStatusService, 'markAudioBarExpanded').and.returnValue(null);
+  });
+
+  afterEach(() => {
+    component.ngOnDestroy();
   });
 
   it('should intialize the component and set values', () => {
-    expect(component).toBeDefined();
+    let params = {
+      audioTranslations: {},
+      componentName: "feedback",
+      html: ""
+    };
+    let mockOnAutoplayAudioEventEmitter = new EventEmitter();
+    spyOnProperty(audioPlayerService, 'onAutoplayAudio')
+      .and.returnValue(mockOnAutoplayAudioEventEmitter);
+
+    component.ngOnInit();
+    component.expandAudioBar();
+    component.isPaused = false; 
+    fixture.detectChanges();
+
+    mockOnAutoplayAudioEventEmitter.emit(params);
+    fixture.detectChanges();
   });
 });
