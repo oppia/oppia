@@ -29,7 +29,7 @@ import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-a
 import { FormsModule } from '@angular/forms';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { TranslateService } from '@ngx-translate/core';
-import { SearchService } from 'services/search.service';
+import { SearchService, SelectionDetails } from 'services/search.service';
 import { ConstructTranslationIdsService } from 'services/construct-translation-ids.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { UrlService } from 'services/contextual/url.service';
@@ -89,7 +89,7 @@ class MockNavigationService {
   ACTION_CLOSE: string = 'close';
 }
 
-describe('Search bar component', () => {
+fdescribe('Search bar component', () => {
   let classroomBackendApiService: ClassroomBackendApiService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let navigationService: NavigationService;
@@ -103,7 +103,7 @@ describe('Search bar component', () => {
   let fixture: ComponentFixture<SearchBarComponent>;
   let initTranslationEmitter = new EventEmitter();
   let preferredLanguageCodesLoadedEmitter = new EventEmitter();
-  let selectionDetails = {
+  let selectionDetails: SelectionDetails = {
     categories: {
       description: 'description',
       itemsName: 'categories',
@@ -183,7 +183,9 @@ describe('Search bar component', () => {
       TestBed.inject(ConstructTranslationIdsService));
     languageUtilService = TestBed.inject(LanguageUtilService);
     urlService = TestBed.inject(UrlService);
-    component.selectionDetails = selectionDetails;
+
+    component.ngOnInit();
+    fixture.detectChanges();
   });
 
   it ('should search', () => {
@@ -217,14 +219,12 @@ describe('Search bar component', () => {
 
   it('should update selection details', () => {
     spyOn(translateService, 'instant').and.returnValue('key');
-    component.ngOnInit();
     component.selectionDetails = selectionDetails;
     component.updateSelectionDetails('categories');
   });
 
   it('should update selection details when they are no selections', () => {
     spyOn(translateService, 'instant').and.returnValue('key');
-    component.ngOnInit();
     component.updateSelectionDetails('categories');
     expect(component.selectionDetails.categories.numSelections).toEqual(0);
   });
@@ -321,7 +321,6 @@ describe('Search bar component', () => {
         return null;
       });
     spyOn(urlService, 'getUrlParams').and.returnValue({ q: '' });
-    component.ngOnInit();
     component.searchQueryChanged.next();
   });
 
