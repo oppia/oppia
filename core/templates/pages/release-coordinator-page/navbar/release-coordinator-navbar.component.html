@@ -1,0 +1,174 @@
+<style>
+  .release-coordinator-navbar .nav > li > a:focus,
+  .release-coordinator-navbar .oppia-release-coordinator-page-dropdown-icon {
+    background-color: #00376d;
+    color: #fff;
+  }
+
+  .release-coordinator-navbar .oppia-navbar-profile-release-coordinator > li > a:hover,
+  .release-coordinator-navbar .oppia-navbar-profile-release-coordinator > li > a:focus,
+  .release-coordinator-navbar .oppia-navbar-profile-release-coordinator .open > a,
+  .release-coordinator-navbar .oppia-navbar-profile-release-coordinator .open > a:hover,
+  .release-coordinator-navbar .oppia-navbar-profile-release-coordinator .open > a:focus,
+  .release-coordinator-navbar .oppia-navbar-tabs-release-coordinator > li > a:hover,
+  .release-coordinator-navbar .oppia-navbar-tabs-release-coordinator > li > a.active,
+  .release-coordinator-navbar .oppia-release-coordinator-page-dropdown-icon {
+    background-color: #fff;
+    color: #00376d;
+  }
+  .oppia-navbar-tabs-release-coordinator .dropdown-toggle::after {
+    color: #fff;
+  }
+  .oppia-navbar-tabs-release-coordinator:hover .dropdown-toggle::after,
+  .oppia-navbar-tabs-release-coordinator:focus .dropdown-toggle::after {
+    color: #00376d;
+  }
+  .release-coordinator-navbar .oppia-navbar-release-coordinator {
+    top: 0;
+  }
+  .release-coordinator-navbar .navbar-container.oppia-navbar-container {
+    background-color: #00376d;
+  }
+  .release-coordinator-navbar .nav .dropdown:hover > .dropdown-menu > li > a.oppia-dropdown-item-text {
+    color: #00376d;
+  }
+  .release-coordinator-navbar .oppia-dropdown-toggle-icon {
+    margin-top: -1px;
+  }
+  @media screen and (max-width: 710px) {
+    .release-coordinator-navbar .oppia-release-coordinator-page-dropdown {
+      display: block;
+    }
+    .release-coordinator-navbar .oppia-hide-in-small-width-screens {
+      display: none;
+    }
+  }
+  @media screen and (min-width: 711px) {
+    .release-coordinator-navbar .oppia-release-coordinator-page-dropdown,
+    .release-coordinator-navbar .oppia-release-coordinator-page-dropdown-icon,
+    .release-coordinator-navbar .oppia-release-coordinator-page-dropdown-menu {
+      display: none;
+    }
+  }
+</style>
+<div class="release-coordinator-navbar">
+  <nav class="navbar navbar-default navbar-light oppia-navbar oppia-prevent-selection oppia-navbar-release-coordinator" role="navigation">
+    <div class="navbar-container oppia-navbar-container">
+      <div class="navbar-header protractor-test-navbar-header float-left">
+        <a class="oppia-navbar-brand-name oppia-transition-200 float-left" href="/community-library">
+          <picture>
+            <source type="image/webp" [srcset]="logoWebpImageSrc">
+            <source type="image/png" [srcset]="logoPngImageSrc">
+            <img [src]="logoPngImageSrc"
+                 class="oppia-logo oppia-logo-wide"
+                 alt="Oppia Logo">
+          </picture>
+          Return to Oppia Library Page
+        </a>
+        <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+          <li>
+            <span class="oppia-navbar-breadcrumb-separator"></span>Release coordinator
+          </li>
+        </ul>
+      </div>
+      <div class="navbar-header float-right">
+        <ul class="nav oppia-navbar-nav oppia-navbar-profile-release-coordinator">
+          <li>
+            <ul class="nav oppia-navbar-tabs-release-coordinator oppia-hide-in-small-width-screens">
+              <li class="nav-item oppia-clickable-navbar-element float-right">
+                <a class="nav-link oppia-navbar-tab"
+                   (click)="switchTab(TAB_ID_JOBS)"
+                   href="#"
+                   [ngClass]="{ 'active': activeTab == TAB_ID_JOBS }"
+                   ngbTooltip="Jobs"
+                   placement="bottom"
+                   container="body">
+                  Jobs
+                </a>
+              </li>
+              <li class="nav-item oppia-clickable-navbar-element float-right">
+                <a class="nav-link oppia-navbar-tab"
+                   (click)="switchTab(TAB_ID_MISC)"
+                   href="#"
+                   [ngClass]="{ 'active': activeTab == TAB_ID_MISC }"
+                   ngbTooltip="Miscellaneous"
+                   placement="bottom"
+                   container="body">
+                  Misc
+                </a>
+              </li>
+            </ul>
+          </li>
+          <li>
+            <ul class="nav oppia-navbar-tabs-release-coordinator">
+              <li ngbDropdown class="nav-item dropdown float-right" [ngClass]="{'open' : profileDropdownIsActive}">
+                <a ngbDropdownToggle class="nav-link oppia-navbar-dropdown-toggle"
+                   data-toggle="dropdown"
+                   (mouseenter)="activateProfileDropdown()"
+                   (mouseleave)="deactivateProfileDropdown()">
+                  <div class="oppia-navbar-profile-picture-container dropdown-toggle float-left">
+                    <span *ngIf="profilePictureDataUrl">
+                      <!--
+                        Lighthouse flags <img> elements that don't have alt attributes:
+                        If the image acts as decoration and does not provide any useful content, give it an empty alt=""
+                        https://web.dev/image-alt/?utm_source=lighthouse&utm_medium=devtools#how-to-add-alternative-text-to-images
+                      -->
+                      <img [src]="profilePictureDataUrl"
+                           class="oppia-navbar-profile-picture rounded-circle"
+                           alt="">
+                    </span>
+                    <div *ngIf="!profilePictureDataUrl" class="dropdown-toggle">
+                      <i class="material-icons md-40 oppia-dropdown-toggle-icon">&#xE853;</i>
+                    </div>
+                  </div>
+                </a>
+                <ul ngbDropdownMenu class="dropdown-menu dropdown-menu oppia-navbar-dropdown"
+                    role="menu"
+                    (mouseenter)="activateProfileDropdown()"
+                    (mouseleave)="deactivateProfileDropdown()">
+                  <li>
+                    <a (click)="onMouseoutProfilePictureOrDropdown($event)"
+                       [href]="profileUrl"
+                       class="dropdown-item oppia-dropdown-item-text">
+                      <strong>{{ username }}</strong>
+                    </a>
+                  </li>
+                  <hr class="oppia-top-right-menu-item-separator">
+                  <li>
+                    <a (click)="onMouseoutProfilePictureOrDropdown($event)"
+                       href="/creator-dashboard"
+                       class="dropdown-item oppia-dropdown-item-text">
+                      Creator Dashboard
+                    </a>
+                  </li>
+                  <li>
+                    <a (click)="onMouseoutProfilePictureOrDropdown($event)"
+                       href="/notifications"
+                       class="dropdown-item oppia-dropdown-item-text">
+                      Notifications
+                    </a>
+                  </li>
+                  <li>
+                    <a (click)="onMouseoutProfilePictureOrDropdown($event)"
+                       href="/preferences"
+                       class="dropdown-item oppia-dropdown-item-text">
+                      Preferences
+                    </a>
+                  </li>
+                  <hr class="oppia-top-right-menu-item-separator">
+                  <li>
+                    <a (click)="onMouseoutProfilePictureOrDropdown($event)"
+                       [href]="logoutUrl"
+                       class="dropdown-item oppia-dropdown-item-text">
+                      Logout
+                    </a>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</div>

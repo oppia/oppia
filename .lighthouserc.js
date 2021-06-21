@@ -35,6 +35,7 @@ module.exports = {
         'http://127.0.0.1:8181/emaildashboard',
         'http://127.0.0.1:8181/get-started',
         'http://127.0.0.1:8181/learner-dashboard',
+        'http://127.0.0.1:8181/license',
         'http://127.0.0.1:8181/nonprofits',
         'http://127.0.0.1:8181/moderator',
         'http://127.0.0.1:8181/parents',
@@ -49,10 +50,10 @@ module.exports = {
         'http://127.0.0.1:8181/terms',
         'http://127.0.0.1:8181/thanks',
         'http://127.0.0.1:8181/volunteers',
-        `http://127.0.0.1:8181/create/${process.env.exploration_editor}`,
-        `http://127.0.0.1:8181/collection_editor/create/${process.env.collection_editor}`,
-        `http://127.0.0.1:8181/topic_editor/${process.env.topic_editor}`,
-        `http://127.0.0.1:8181/skill_editor/${process.env.skill_editor}`,
+        `http://127.0.0.1:8181/create/${process.env.exploration_id}`,
+        `http://127.0.0.1:8181/collection_editor/create/${process.env.collection_id}`,
+        `http://127.0.0.1:8181/topic_editor/${process.env.topic_id}`,
+        `http://127.0.0.1:8181/skill_editor/${process.env.skill_id}`,
       ]
     },
     'assert': {
@@ -165,7 +166,7 @@ module.exports = {
           'matchingUrlPattern': 'http://[^/]+/creator-guidelines$',
           'assertions': {
             'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}      
+              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
             ],
             'uses-passive-event-listeners': ['error', {'minScore': 1}],
             'deprecations': ['error', {'minScore': 1}]
@@ -222,6 +223,16 @@ module.exports = {
             // We need to use passive event listeners on this page so that
             // the page works correctly.
             'uses-passive-event-listeners': ['error', {'minScore': 0}],
+            'deprecations': ['error', {'minScore': 1}]
+          }
+        },
+        {
+          'matchingUrlPattern': 'http://[^/]+/license$',
+          'assertions': {
+            'uses-webp-images': [
+              'error', {'maxLength': 0, 'strategy': 'pessimistic'}      
+            ],
+            'uses-passive-event-listeners': ['error', {'minScore': 1}],
             'deprecations': ['error', {'minScore': 1}]
           }
         },

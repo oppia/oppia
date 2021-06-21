@@ -68,6 +68,7 @@ describe('SvgFilenameEditor', () => {
   var csrfService = null;
   let fixture: ComponentFixture<SvgFilenameEditorComponent>;
   var component: SvgFilenameEditorComponent;
+  let svgSanitizerService: SvgSanitizerService;
   // This sample SVG is generated using different tools present
   // in the SVG editor.
   var samplesvg = (
@@ -225,6 +226,7 @@ describe('SvgFilenameEditor', () => {
         }
       ]
     }).compileComponents();
+    svgSanitizerService = TestBed.inject(SvgSanitizerService);
     contextService = TestBed.inject(ContextService);
     csrfService = TestBed.inject(CsrfTokenService);
     const alertsService = TestBed.inject(AlertsService);
@@ -240,15 +242,15 @@ describe('SvgFilenameEditor', () => {
     svgFileFetcherBackendApiService = (
       TestBed.inject(SvgFileFetcherBackendApiService));
     // This throws "Argument of type 'mockImageObject' is not assignable to
-    // parameter of type 'HTMLImageElement'.". This is because
-    // 'HTMLImageElement' has around 250 more properties. We have only defined
-    // the properties we need in 'mockImageObject'.
+    // parameter of type 'HTMLImageElement'.". We need to suppress this error
+    // because 'HTMLImageElement' has around 250 more properties.
+    // We have only defined the properties we need in 'mockImageObject'.
     // @ts-expect-error
     spyOn(window, 'Image').and.returnValue(new mockImageObject());
     // This throws "Argument of type 'mockReaderObject' is not assignable to
-    // parameter of type 'HTMLImageElement'.". This is because
-    // 'HTMLImageElement' has around 250 more properties. We have only defined
-    // the properties we need in 'mockReaderObject'.
+    // parameter of type 'HTMLImageElement'.". We need to suppress this error
+    // because 'HTMLImageElement' has around 250 more properties.
+    // We have only defined the properties we need in 'mockReaderObject'.
     // @ts-expect-error
     spyOn(window, 'FileReader').and.returnValue(new mockReaderObject());
     fixture = TestBed.createComponent(SvgFilenameEditorComponent);
@@ -268,19 +270,42 @@ describe('SvgFilenameEditor', () => {
     component.bgPicker = mockPicker;
   }));
 
-  it('should update diagram size', () => {
-    spyOnProperty(document, 'readyState').and.returnValue('loading');
-    component.ngOnInit();
-    component.continueDiagramEditing();
-    var WIDTH = 100;
-    var HEIGHT = 100;
-    component.diagramWidth = WIDTH;
-    component.diagramHeight = HEIGHT;
-    component.onWidthInputBlur();
-    expect(component.currentDiagramWidth).toBe(WIDTH);
-    component.onHeightInputBlur();
-    expect(component.currentDiagramHeight).toBe(HEIGHT);
-  });
+  it(
+    'should wait before updating diagram size when dom is loading',
+    waitForAsync(fakeAsync(() => {
+      spyOnProperty(document, 'readyState').and.returnValue('loading');
+      spyOn(document, 'addEventListener').and.callFake((eventName, handler) => {
+        setTimeout(() => handler());
+      });
+      component.ngOnInit();
+      tick(10);
+      component.bgPicker.onOpen();
+      var WIDTH = 100;
+      var HEIGHT = 100;
+      component.diagramWidth = WIDTH;
+      component.diagramHeight = HEIGHT;
+      component.onWidthInputBlur();
+      expect(component.currentDiagramWidth).toBe(WIDTH);
+      component.onHeightInputBlur();
+      expect(component.currentDiagramHeight).toBe(HEIGHT);
+    })));
+
+  it(
+    'should update diagram size when dom had loaded',
+    waitForAsync(fakeAsync(() => {
+      spyOnProperty(document, 'readyState').and.returnValue('loaded');
+      component.ngOnInit();
+      tick(100);
+      component.bgPicker.onOpen();
+      var WIDTH = 100;
+      var HEIGHT = 100;
+      component.diagramWidth = WIDTH;
+      component.diagramHeight = HEIGHT;
+      component.onWidthInputBlur();
+      expect(component.currentDiagramWidth).toBe(WIDTH);
+      component.onHeightInputBlur();
+      expect(component.currentDiagramHeight).toBe(HEIGHT);
+    })));
 
   it('should reset to maximum width correctly', () => {
     component.diagramWidth = 600;
@@ -308,6 +333,44 @@ describe('SvgFilenameEditor', () => {
     component.onHeightInputBlur();
     expect(component.currentDiagramHeight).toBe(
       SvgFilenameEditorConstants.MIN_SVG_DIAGRAM_HEIGHT);
+  });
+
+  it('should fail svg validation', () => {
+    spyOn(
+      svgSanitizerService, 'getInvalidSvgTagsAndAttrsFromDataUri'
+    ).and.callFake(() => {
+      return { tags: [], attrs: ['width'] };
+    });
+    spyOn(svgSanitizerService, 'getTrustedSvgResourceUrl').and.callFake(
+      (data) => data
+    );
+    var invalidWidthAttribute = (
+      '<svg widht="100" height="100"><rect id="rectangle-de569866-9c11-b553-' +
+      'f5b7-4194e2380d9f" x="143" y="97" width="12" height="29" stroke="hsla' +
+      '(0, 0%, 0%, 1)" fill="hsla(0, 0%, 100%, 1)" stroke-width="1"></rect>' +
+      '</svg>');
+    expect(() => {
+      component.isSvgTagValid(invalidWidthAttribute);
+    }).toThrowError('Invalid attributes in svg:width');
+  });
+
+  it('should fail svg validation', () => {
+    spyOn(
+      svgSanitizerService, 'getInvalidSvgTagsAndAttrsFromDataUri'
+    ).and.callFake(() => {
+      return { tags: ['script'], attrs: [] };
+    });
+    spyOn(svgSanitizerService, 'getTrustedSvgResourceUrl').and.callFake(
+      (data) => data
+    );
+    var invalidSvgTag = (
+      '<svg width="100" height="100"><rect id="rectangle-de569866-9c11-b553-' +
+      'f5b7-4194e2380d9f" x="143" y="97" width="12" height29" stroke="hsla(0' +
+      ', 0%, 0%, 1)" fill="hsla(0, 0%, 100%, 1)" stroke-width="1"></rect>' +
+      '<script src="evil.com"></script></svg>');
+    expect(() => {
+      component.isSvgTagValid(invalidSvgTag);
+    }).toThrowError('Invalid tags in svg:script');
   });
 
   it('should check if diagram is created', () => {
@@ -604,18 +667,43 @@ describe('SvgFilenameEditor', () => {
       expect(alertSpy).toHaveBeenCalledWith(errorMessage);
     })));
 
-  it('should allow user to continue editing the diagram', () => {
-    component.savedSvgDiagram = 'saved';
-    component.savedSvgDiagram = samplesvg;
-    component.continueDiagramEditing();
-    var mocktoSVG = (arg) => {
-      return '<path></path>';
-    };
-    var customToSVG = component.createCustomToSVG(
+  it(
+    'should allow user to continue editing the diagram when dom loaded',
+    waitForAsync(fakeAsync(() => {
+      spyOnProperty(document, 'readyState').and.returnValue('loaded');
+      component.savedSvgDiagram = 'saved';
+      component.savedSvgDiagram = samplesvg;
+      component.continueDiagramEditing();
+      tick(100);
+      var mocktoSVG = (arg) => {
+        return '<path></path>';
+      };
+      var customToSVG = component.createCustomToSVG(
       mocktoSVG as unknown as () => string, 'path', 'group1', component);
-    expect(customToSVG()).toBe('<path id="group1"/>');
-    expect(component.diagramStatus).toBe('editing');
-  });
+      expect(customToSVG()).toBe('<path id="group1"/>');
+      expect(component.diagramStatus).toBe('editing');
+    })));
+
+  it(
+    'should wait for the dom to load before allowing the user to continue ' +
+    'editing the diagram',
+    waitForAsync(fakeAsync(() => {
+      spyOnProperty(document, 'readyState').and.returnValue('loading');
+      spyOn(document, 'addEventListener').and.callFake((eventName, handler) => {
+        setTimeout(() => handler());
+      });
+      component.savedSvgDiagram = 'saved';
+      component.savedSvgDiagram = samplesvg;
+      component.continueDiagramEditing();
+      tick(10);
+      var mocktoSVG = (arg) => {
+        return '<path></path>';
+      };
+      var customToSVG = component.createCustomToSVG(
+      mocktoSVG as unknown as () => string, 'path', 'group1', component);
+      expect(customToSVG()).toBe('<path id="group1"/>');
+      expect(component.diagramStatus).toBe('editing');
+    })));
 });
 
 
@@ -692,7 +780,7 @@ describe(
     var dataUrl = 'data:image/svg+xml;utf8,' + samplesvg;
 
     var mockilss = {
-      getObjectUrlForImage: (filename) => {
+      getRawImageData: (filename) => {
         return dataUrl;
       },
       saveImage: (filename, imageData) => {
@@ -793,15 +881,15 @@ describe(
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
 
       // This throws "Argument of type 'mockImageObject' is not assignable to
-      // parameter of type 'HTMLImageElement'.". This is because
-      // 'HTMLImageElement' has around 250 more properties. We have only defined
-      // the properties we need in 'mockImageObject'.
+      // parameter of type 'HTMLImageElement'.". We need to suppress this error
+      // because 'HTMLImageElement' has around 250 more properties. We have only
+      // defined the properties we need in 'mockImageObject'.
       // @ts-expect-error
       spyOn(window, 'Image').and.returnValue(new mockImageObject());
       // This throws "Argument of type 'mockReaderObject' is not assignable
-      // to parameter of type 'FileReader'.". This is because
-      // 'FileReader' has around 15 more properties. We have only defined
-      // the properties we need in 'mockReaderObject'.
+      // to parameter of type 'FileReader'.". We need to suppress this error
+      // because 'FileReader' has around 15 more properties. We have only
+      // defined the properties we need in 'mockReaderObject'.
       // @ts-expect-error
       spyOn(window, 'FileReader').and.returnValue(new mockReaderObject());
       fixture = TestBed.createComponent(SvgFilenameEditorComponent);
@@ -832,82 +920,3 @@ describe(
       expect(component.diagramStatus).toBe('editing');
     });
   });
-
-
-describe('should fail svg tag validation', () => {
-  let fixture: ComponentFixture<SvgFilenameEditorComponent>;
-  var component: SvgFilenameEditorComponent;
-  var mockSvgSanitizerService = {
-    getInvalidSvgTagsAndAttrsFromDataUri: (dataURI) => {
-      return { tags: ['script'], attrs: [] };
-    },
-    getTrustedSvgResourceUrl: (data) => {
-      return data;
-    }
-  };
-
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      declarations: [SvgFilenameEditorComponent],
-      providers: [
-        {
-          provide: SvgSanitizerService,
-          useValue: mockSvgSanitizerService
-        }
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
-    }).compileComponents();
-    fixture = TestBed.createComponent(SvgFilenameEditorComponent);
-    component = fixture.componentInstance;
-  }));
-
-  it('should fail svg validation', () => {
-    var invalidSvgTag = (
-      '<svg width="100" height="100"><rect id="rectangle-de569866-9c11-b553-' +
-      'f5b7-4194e2380d9f" x="143" y="97" width="12" height29" stroke="hsla(0' +
-      ', 0%, 0%, 1)" fill="hsla(0, 0%, 100%, 1)" stroke-width="1"></rect>' +
-      '<script src="evil.com"></script></svg>');
-    expect(() => {
-      component.isSvgTagValid(invalidSvgTag);
-    }).toThrowError('Invalid tags in svg:script');
-  });
-});
-
-describe('should fail svg attribute validation', () => {
-  var component: SvgFilenameEditorComponent;
-  var mockSvgSanitizerService = {
-    getInvalidSvgTagsAndAttrsFromDataUri: (dataURI) => {
-      return { tags: [], attrs: ['widht'] };
-    },
-    getTrustedSvgResourceUrl: (data) => {
-      return data;
-    }
-  };
-
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      declarations: [SvgFilenameEditorComponent],
-      providers: [{
-        provide: SvgSanitizerService,
-        useValue: mockSvgSanitizerService
-      }],
-      schemas: [NO_ERRORS_SCHEMA]
-    });
-    component = TestBed.createComponent(
-      SvgFilenameEditorComponent).componentInstance;
-  }));
-
-
-  it('should fail svg validation', () => {
-    var invalidWidthAttribute = (
-      '<svg widht="100" height="100"><rect id="rectangle-de569866-9c11-b553-' +
-      'f5b7-4194e2380d9f" x="143" y="97" width="12" height="29" stroke="hsla' +
-      '(0, 0%, 0%, 1)" fill="hsla(0, 0%, 100%, 1)" stroke-width="1"></rect>' +
-      '</svg>');
-    expect(() => {
-      component.isSvgTagValid(invalidWidthAttribute);
-    }).toThrowError('Invalid attributes in svg:widht');
-  });
-});

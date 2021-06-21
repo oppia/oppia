@@ -678,6 +678,7 @@ describe('Creator dashboard controller', () => {
       threads_for_suggestions_to_review_list: [],
       suggestions_to_review_list: []
     };
+
     beforeEach(function() {
       spyOn(CreatorDashboardBackendApiService, 'fetchDashboardDataAsync')
         .and.returnValue($q.resolve({
