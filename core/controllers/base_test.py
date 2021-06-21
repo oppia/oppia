@@ -1656,15 +1656,15 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             handlers_with_non_conforming_default_schemas, [], error_msg)
 
-    def test_handler_with_schemas_should_not_be_present_in_schema_requiring_handler_class_names_list(self): #pylint: disable=line-too-long
-        """This test ensures that the SCHEMA_REQUIRING_HANDLER_CLASS_NAMES list
-        in payload validator only contains handler class names which require
-        schemas.
+    def test_handlers_with_schemas_are_not_in_handler_schema_todo_list(self):
+        """This test ensures that the
+        HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS list in payload validator
+        only contains handler class names which require schemas.
         """
 
         list_of_handlers_to_be_removed = []
         handler_names_which_require_schemas = (
-            payload_validator.SCHEMA_REQUIRING_HANDLER_CLASS_NAMES)
+            payload_validator.HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS)
         list_of_routes_which_need_schemas = (
             self._get_list_of_routes_which_need_schemas())
 

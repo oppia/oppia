@@ -90,11 +90,10 @@ def validate(handler_args, handler_args_schemas, allowed_extra_args):
 # not have schema. In order to add schema incrementally this list is
 # maintained. Please remove the name of the handlers if they already
 # contains schema.
-SCHEMA_REQUIRING_HANDLER_CLASS_NAMES = [
+HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'AboutRedirectPage',
     'AddContributionRightsHandler',
     'AdminHandler',
-    'AdminJobOutputHandler',
     'AdminPage',
     'AdminRoleHandler',
     'AdminSuperAdminPrivilegesHandler',
@@ -105,7 +104,7 @@ SCHEMA_REQUIRING_HANDLER_CLASS_NAMES = [
     'ClassroomDataHandler',
     'ClassroomPage',
     'ClassroomPromosStatusHandler',
-    'CollectioRightsHandler',
+    'CollectionRightsHandler',
     'CollectionDataHandler',
     'CollectionEditorHandler',
     'CollectionEditorPage',
@@ -355,9 +354,9 @@ HANDLER_CLASS_NAMES_WHICH_DO_NOT_REQUIRE_SCHEMAS = [
 ]
 
 # HANDLER_CLASS_NAMES_WITH_NO_SCHEMA is addressed everywhere in the
-# code since, SCHEMA_REQUIRING_HANDLER_CLASS_NAMES is temporary and
+# code since, HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS is temporary and
 # will be removed once every handlers in controller layer will become
 # ready for schema validation.
 HANDLER_CLASS_NAMES_WITH_NO_SCHEMA = (
-    SCHEMA_REQUIRING_HANDLER_CLASS_NAMES +
+    HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS +
     HANDLER_CLASS_NAMES_WHICH_DO_NOT_REQUIRE_SCHEMAS)
