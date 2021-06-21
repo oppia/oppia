@@ -37,9 +37,9 @@ var AdminPage = function() {
   var adminRolesTab = element(by.css('.protractor-test-admin-roles-tab'));
   var adminRolesTabContainer = element(
     by.css('.protractor-test-roles-tab-container'));
-  var updateFormName = element(by.css('.protractor-update-form-name'));
-  var updateFormSubmit = element(by.css('.protractor-update-form-submit'));
-  var roleSelect = element(by.css('.protractor-update-form-role-select'));
+  var updateFormName = element(by.css('.protractor-test-update-form-name'));
+  var updateFormSubmit = element(by.css('.protractor-test-update-form-submit'));
+  var roleSelect = element(by.css('.protractor-test-update-form-role-select'));
   var statusMessage = element(by.css('.protractor-test-status-message'));
 
   var addContributionRightsForm = element(

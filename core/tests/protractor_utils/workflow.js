@@ -32,7 +32,7 @@ var imageUploadInput = element(
 var imageSubmitButton = element(
   by.css('.protractor-test-photo-upload-submit'));
 var thumbnailResetButton = element(by.css(
-  '.protractor-thumbnail-reset-button'));
+  '.protractor-test-thumbnail-reset-button'));
 var stateNameText = element(
   by.css('.protractor-test-state-name-text'));
 

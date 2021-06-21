@@ -272,7 +272,8 @@ describe('Site language', function() {
       // Checking exploration player page.
       await browser.get('/explore/' + firstExplorationId);
       await waitFor.pageToFullyLoad();
-      expect(await element(by.css('.author-profile-text')).getText())
+      expect(await element(
+        by.css('.protractor-test-author-profile-text')).getText())
         .toEqual('PERFILES DE AUTORES');
       await general.ensurePageHasNoTranslationIds();
     }

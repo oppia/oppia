@@ -169,7 +169,7 @@ var ExplorationEditorTranslationTab = function() {
   var stateGraph = element(
     by.css('.protractor-test-translation-graph'));
   var feedbackList = element.all(
-    by.css('li.protractor-test-translation-feedback'));
+    by.css('.protractor-test-translation-feedback'));
   var stateBackgroundNodes = stateGraph.all(
     by.css('.protractor-test-node-background'));
   var stateNodes = stateGraph.all(

@@ -136,7 +136,7 @@ var ExplorationPlayerPage = function() {
     let submitButton = await element.all(by.tagName('button')).get(1);
     await action.click('Submit Button', submitButton);
     let afterSubmitText = await element(
-      by.css('.protractor-exploration-flagged-success-message')).getText();
+      by.css('.protractor-test-exploration-flagged-success-message')).getText();
     expect(afterSubmitText).toMatch(
       'Your report has been forwarded to the moderators for review.');
   };
