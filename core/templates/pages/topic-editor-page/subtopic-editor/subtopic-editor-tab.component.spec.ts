@@ -22,7 +22,7 @@ import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { Subtopic } from 'domain/topic/subtopic.model';
 import { SubtopicPage } from 'domain/topic/subtopic-page.model';
 
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 describe('Subtopic editor tab', function() {
   importAllAngularServices();

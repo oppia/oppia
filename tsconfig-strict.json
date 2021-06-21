@@ -34,7 +34,6 @@
     }
   },
   "files": [
-    "core/templates/pages/topic-viewer-page/topic-viewer-page.component.spec.ts",
     "assets/constants.ts",
     "assets/rich_text_components_definitions.ts",
     "core/templates/app-events/app-events.ts",
@@ -195,6 +194,7 @@
     "core/templates/pages/exploration-player-page/services/learner-view-info-backend-api.service.ts",
     "core/templates/pages/exploration-player-page/services/learner-view-info-backend-api.service.spec.ts",
     "core/templates/pages/story-editor-page/story-editor-page.constants.ts",
+    "core/templates/pages/topic-viewer-page/topic-viewer-page.component.spec.ts",
     "core/templates/services/app.service.ts",
     "core/templates/services/app.service.spec.ts",
     "core/templates/services/audio-bar-status.service.ts",

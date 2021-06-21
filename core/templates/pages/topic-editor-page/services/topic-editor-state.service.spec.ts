@@ -23,7 +23,7 @@ import { StoryReferenceObjectFactory } from
 import { SubtopicPage } from
   'domain/topic/subtopic-page.model';
 import { TopicRights } from 'domain/topic/topic-rights.model';
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
 import { TopicUpdateService } from 'domain/topic/topic-update.service';
 // ^^^ This block is to be removed.
