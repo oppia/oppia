@@ -17,35 +17,17 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import logging
-import random
-
 from constants import constants
-from core import jobs
-from core import jobs_registry
-from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import auth_services
-from core.domain import caching_services
-from core.domain import collection_services
-from core.domain import config_domain
-from core.domain import config_services
-from core.domain import email_manager
 from core.domain import exp_domain
-from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import opportunity_services
-from core.domain import platform_feature_services as feature_services
 from core.domain import question_domain
 from core.domain import question_services
-from core.domain import recommendations_services
 from core.domain import rights_manager
-from core.domain import role_services
-from core.domain import search_services
 from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import state_domain
-from core.domain import stats_services
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import subtopic_page_domain
@@ -54,10 +36,8 @@ from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
-from core.domain import wipeout_service
 import feconf
 import python_utils
-import utils
 
 
 class InitializeAndroidTestData(base.BaseHandler):
@@ -84,18 +64,18 @@ class InitializeAndroidTestData(base.BaseHandler):
 
             topic = topic_domain.Topic.create_default_topic(
                 topic_id, 'Android test', 'test-topic-one', 'description')
-            topic.update_url_fragment("topic_url")
-            topic.update_meta_tag_content("tag")
-            topic.update_page_title_fragment_for_web("page title for topic")
-            topic.update_thumbnail_filename("testing_topic.svg")
-            topic.update_thumbnail_bg_color("#C6DCDA")
+            topic.update_url_fragment('topic_url')
+            topic.update_meta_tag_content('tag')
+            topic.update_page_title_fragment_for_web('page title for topic')
+            topic.update_thumbnail_filename('testing_topic.svg')
+            topic.update_thumbnail_bg_color('#C6DCDA')
 
             topic.add_canonical_story(story_id)
             topic.add_uncategorized_skill_id(skill_id)
             topic.add_subtopic(1, 'Test Subtopic Title')
-            topic.update_subtopic_url_fragment(1, "suburl")
-            topic.update_subtopic_thumbnail_filename(1, "testing_topic.svg")
-            topic.update_subtopic_thumbnail_bg_color(1, "#FFFFFF")
+            topic.update_subtopic_url_fragment(1, 'suburl')
+            topic.update_subtopic_thumbnail_filename(1, 'testing_topic.svg')
+            topic.update_subtopic_thumbnail_bg_color(1, '#FFFFFF')
 
             topic.move_skill_id_to_subtopic(None, 1, skill_id)
 
@@ -125,6 +105,15 @@ class InitializeAndroidTestData(base.BaseHandler):
             }]
 
             def generate_dummy_story_nodes(node_id, exp_id, title, description):
+                """Generates and connects sequential story nodes.
+
+                Args:
+                    node_id: int. The node id.
+                    exp_id: str. The exploration id.
+                    title: str. The title of the story node.
+                    description: str. The description of the story node.
+                """
+
                 story.add_node(
                     '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
                     title)
@@ -138,9 +127,9 @@ class InitializeAndroidTestData(base.BaseHandler):
                     '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
                     'testing_skill.svg')
                 story.update_node_thumbnail_bg_color(
-                    '%s%d' % (story_domain.NODE_ID_PREFIX, node_id), "#F8BF74")
-                story.update_meta_tag_content("tag")
-                story.update_thumbnail_filename("testing_skill.svg")
+                    '%s%d' % (story_domain.NODE_ID_PREFIX, node_id), '#F8BF74')
+                story.update_meta_tag_content('tag')
+                story.update_thumbnail_filename('testing_skill.svg')
                 story.update_thumbnail_bg_color(
                     constants.ALLOWED_THUMBNAIL_BG_COLORS['story'][0])
 
@@ -180,7 +169,6 @@ class InitializeAndroidTestData(base.BaseHandler):
             topic_services.publish_topic(topic_id, user_id)
         else:
             raise Exception('Cannot load new structures data in production.')
-
 
     def _create_dummy_question(
             self, question_id, question_content, linked_skill_ids):
