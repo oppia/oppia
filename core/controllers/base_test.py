@@ -1661,9 +1661,10 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
         in payload validator only contains handler class names which require
         schemas.
         """
+
         list_of_handlers_to_be_removed = []
-        handler_names_which_do_not_require_schemas = (
-            payload_validator.HANDLER_CLASS_NAMES_WHICH_DO_NOT_REQUIRE_SCHEMAS)
+        handler_names_which_require_schemas = (
+            payload_validator.SCHEMA_REQUIRING_HANDLER_CLASS_NAMES)
         list_of_routes_which_need_schemas = (
             self._get_list_of_routes_which_need_schemas())
 
@@ -1671,7 +1672,7 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
             handler = route.handler
 
             handler_class_name = handler.__name__
-            if handler_class_name in handler_names_which_do_not_require_schemas:
+            if handler_class_name not in handler_names_which_require_schemas:
                 continue
 
             schema_written_for_request_methods = (
@@ -1681,8 +1682,7 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
             handler_has_schemas = (schema_written_for_request_methods and
                 schema_written_for_url_path_args)
 
-            if (handler_has_schemas and handler_class_name in
-                    self.handler_class_names_with_no_schema):
+            if handler_has_schemas:
                 list_of_handlers_to_be_removed.append(handler_class_name)
 
         error_msg = (
