@@ -98,6 +98,19 @@ describe('ImageUploaderComponent', () => {
     expect(component.fileChanged.emit).toHaveBeenCalledWith(validFile);
   });
 
+  it('should not upload image on drop if the event is empty', () => {
+    spyOn(component.fileChanged, 'emit');
+    component.ngAfterViewInit();
+
+    component.allowedImageFormats = ['jpeg', 'jpg', 'gif', 'png'];
+    let dataTransfer = null;
+
+    component.dropAreaRef.nativeElement.dispatchEvent(
+      new DragEvent('drop', {dataTransfer: dataTransfer}));
+
+    expect(component.fileChanged.emit).not.toHaveBeenCalled();
+  });
+
   it('should not upload image on drop if the image' +
     ' format is not allowed', () => {
     component.ngAfterViewInit();

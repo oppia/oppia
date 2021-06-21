@@ -61,14 +61,13 @@ export class ImageUploaderComponent {
     this.dropAreaRef.nativeElement.addEventListener(
       'drop', (event: DragEvent) => {
         this.onDragEnd(event);
-        if (event.dataTransfer === null) {
-          throw new Error('No Files Exist');
-        }
-        let file = event.dataTransfer.files[0];
-        this.errorMessage = this.validateUploadedFile(file, file.name);
-        if (!this.errorMessage) {
-          // Only fire this event if validations pass.
-          this.fileChanged.emit(file);
+        if (event.dataTransfer !== null) {
+          let file = event.dataTransfer.files[0];
+          this.errorMessage = this.validateUploadedFile(file, file.name);
+          if (!this.errorMessage) {
+            // Only fire this event if validations pass.
+            this.fileChanged.emit(file);
+          }
         }
       });
 
