@@ -202,8 +202,7 @@ class BlogPost(python_utils.OBJECT):
         if not isinstance(url_fragment, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Blog Post URL Fragment field must be a string. '
-                'Received %s.' % (url_fragment))
-        
+                'Received %s.' % (url_fragment)
         if url_fragment == '':
             raise utils.ValidationError(
                 'Blog Post URL Fragment field should not be empty.')
@@ -373,11 +372,11 @@ class BlogPostSummary(python_utils.OBJECT):
             url_fragment: str. The url fragment for the blog post.
             tags: list(str). The list of tags for the blog post.
             thumbnail_filename: str|None. The thumbnail filename of the blog
+                post.
             last_updated: datetime.datetime. Date and time when the blog post
+                was last updated.
             published_on: datetime.datetime. Date and time when the blog post
                 is last published.
-                was last updated.
-                post.
         """
         self.id = blog_post_id
         self.author_id = author_id
@@ -452,7 +451,7 @@ class BlogPostSummary(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Blog Post URL Fragment field must be a string. '
                 'Received %s.' % (url_fragment))
-        
+
         if url_fragment == '':
             raise utils.ValidationError(
                 'Blog Post URL Fragment field should not be empty.')
