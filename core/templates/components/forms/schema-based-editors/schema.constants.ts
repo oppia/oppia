@@ -12,20 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * @fileoverview Constants for schema types.
  */
-export class SchemaConstants {
-  static readonly SCHEMA_KEY_LIST = 'list';
-  static readonly SCHEMA_TYPE_BOOL = 'bool';
-  static readonly SCHEMA_TYPE_CUSTOM = 'custom';
-  static readonly SCHEMA_TYPE_DICT = 'dict';
-  static readonly SCHEMA_TYPE_FLOAT = 'float';
-  static readonly SCHEMA_TYPE_HTML = 'html';
-  static readonly SCHEMA_TYPE_INT = 'int';
-  static readonly SCHEMA_TYPE_UNICODE = 'unicode';
-
-  static readonly SCHEMA_OBJ_TYPE_SUBTITLED_HTML = 'SubtitledHtml';
-  static readonly SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE = 'SubtitledUnicode';
-}
+export const SchemaConstants = {
+  SCHEMA_KEY_LIST: 'list',
+  SCHEMA_TYPE_BOOL: 'bool',
+  SCHEMA_TYPE_CUSTOM: 'custom',
+  SCHEMA_TYPE_DICT: 'dict',
+  SCHEMA_TYPE_FLOAT: 'float',
+  SCHEMA_TYPE_HTML: 'html',
+  SCHEMA_TYPE_INT: 'int',
+  SCHEMA_TYPE_UNICODE: 'unicode',
+  SCHEMA_OBJ_TYPE_SUBTITLED_HTML: 'SubtitledHtml',
+  SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE: 'SubtitledUnicode',
+} as const;

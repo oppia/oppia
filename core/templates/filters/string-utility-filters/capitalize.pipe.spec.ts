@@ -19,7 +19,7 @@
 import { CapitalizePipe } from 'filters/string-utility-filters/capitalize.pipe';
 
 describe('Testing filters', () => {
-  let pipe: CapitalizePipe = null;
+  let pipe: CapitalizePipe;
   beforeEach(() => {
     pipe = new CapitalizePipe();
   });
