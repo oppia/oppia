@@ -991,7 +991,7 @@ class Story(python_utils.OBJECT):
         initial_node_id = '%s1' % NODE_ID_PREFIX
         story_contents = StoryContents([], None, initial_node_id)
         return cls(
-            story_id, title, None, None, 0, description,
+            story_id, title, None, None, None, description,
             feconf.DEFAULT_STORY_NOTES, story_contents,
             feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
             constants.DEFAULT_LANGUAGE_CODE, corresponding_topic_id, 0,
@@ -1110,7 +1110,7 @@ class Story(python_utils.OBJECT):
         """Updates the size of thumbnail of the story.
 
         Args:
-            new_thumbnail_size_in_bytes: int|0. The new thumbnail size of the
+            new_thumbnail_size_in_bytes: int|None. The new thumbnail size of the
                 story.
         """
         self.thumbnail_size_in_bytes = new_thumbnail_size_in_bytes

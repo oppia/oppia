@@ -93,7 +93,8 @@ def get_story_from_model(story_model):
 
     return story_domain.Story(
         story_model.id, story_model.title, story_model.thumbnail_filename,
-        story_model.thumbnail_bg_color, story_model.description,
+        story_model.thumbnail_bg_color, story_model.thumbnail_size_in_bytes,
+        story_model.description,
         story_model.notes, story_domain.StoryContents.from_dict(
             versioned_story_contents['story_contents']),
         versioned_story_contents['schema_version'],
