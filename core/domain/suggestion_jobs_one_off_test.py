@@ -170,12 +170,13 @@ class QuestionSuggestionMigrationJobManagerTests(test_utils.GenericTestBase):
                 ['TextInput'], category='Algebra'))
 
         add_translation_change_dict = {
-            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': 'State 1',
             'content_id': 'content',
             'language_code': 'hi',
             'content_html': exploration.states['State 1'].content.html,
-            'translation_html': '<p>This is translated html.</p>'
+            'translation_html': '<p>This is translated html.</p>',
+            'data_format': 'html'
         }
 
         suggestion_services.create_suggestion(

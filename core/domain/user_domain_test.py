@@ -560,18 +560,24 @@ class IncompleteActivitiesTests(test_utils.GenericTestBase):
     def test_initialization(self):
         """Testing init method."""
         incomplete_activities = (user_domain.IncompleteActivities(
-            'user_id0', ['exp_id0'], ['collect_id0']))
+            'user_id0', ['exp_id0'], ['collect_id0'], ['story_id0'],
+            ['topic_id0']))
 
         self.assertEqual(incomplete_activities.id, 'user_id0')
         self.assertListEqual(
             incomplete_activities.exploration_ids, ['exp_id0'])
         self.assertListEqual(
             incomplete_activities.collection_ids, ['collect_id0'])
+        self.assertListEqual(
+            incomplete_activities.story_ids, ['story_id0'])
+        self.assertListEqual(
+            incomplete_activities.partially_learnt_topic_ids, ['topic_id0'])
 
     def test_add_exploration_id(self):
         """Testing add_exploration_id."""
         incomplete_activities = (user_domain.IncompleteActivities(
-            'user_id0', ['exp_id0'], ['collect_id0']))
+            'user_id0', ['exp_id0'], ['collect_id0'], ['story_id0'],
+            ['topic_id0']))
 
         self.assertListEqual(
             incomplete_activities.exploration_ids, ['exp_id0'])
@@ -585,7 +591,8 @@ class IncompleteActivitiesTests(test_utils.GenericTestBase):
     def test_remove_exploration_id(self):
         """Testing remove_exploration_id."""
         incomplete_activities = (user_domain.IncompleteActivities(
-            'user_id0', ['exp_id0'], ['collect_id0']))
+            'user_id0', ['exp_id0'], ['collect_id0'], ['story_id0'],
+            ['topic_id0']))
 
         self.assertListEqual(
             incomplete_activities.exploration_ids, ['exp_id0'])
@@ -598,7 +605,8 @@ class IncompleteActivitiesTests(test_utils.GenericTestBase):
     def test_add_collection_id(self):
         """Testing add_collection_id."""
         incomplete_activities = (user_domain.IncompleteActivities(
-            'user_id0', ['exp_id0'], ['collect_id0']))
+            'user_id0', ['exp_id0'], ['collect_id0'], ['story_id0'],
+            ['topic_id0']))
 
         self.assertListEqual(
             incomplete_activities.collection_ids, ['collect_id0'])
@@ -612,7 +620,8 @@ class IncompleteActivitiesTests(test_utils.GenericTestBase):
     def test_remove_collection_id(self):
         """Testing remove_collection_id."""
         incomplete_activities = (user_domain.IncompleteActivities(
-            'user_id0', ['exp_id0'], ['collect_id0']))
+            'user_id0', ['exp_id0'], ['collect_id0'], ['story_id0'],
+            ['topic_id0']))
 
         self.assertListEqual(
             incomplete_activities.collection_ids, ['collect_id0'])
@@ -622,6 +631,64 @@ class IncompleteActivitiesTests(test_utils.GenericTestBase):
         self.assertListEqual(
             incomplete_activities.collection_ids, [])
 
+    def test_add_story_id(self):
+        """Testing add_story_id."""
+        incomplete_activities = (user_domain.IncompleteActivities(
+            'user_id0', ['exp_id0'], ['collect_id0'], ['story_id0'],
+            ['topic_id0']))
+
+        self.assertListEqual(
+            incomplete_activities.story_ids, ['story_id0'])
+
+        incomplete_activities.add_story_id('story_id1')
+
+        self.assertListEqual(
+            incomplete_activities.story_ids,
+            ['story_id0', 'story_id1'])
+
+    def test_remove_story_id(self):
+        """Testing remove_story_id."""
+        incomplete_activities = (user_domain.IncompleteActivities(
+            'user_id0', ['exp_id0'], ['collect_id0'], ['story_id0'],
+            ['topic_id0']))
+
+        self.assertListEqual(
+            incomplete_activities.story_ids, ['story_id0'])
+
+        incomplete_activities.remove_story_id('story_id0')
+
+        self.assertListEqual(
+            incomplete_activities.story_ids, [])
+
+    def test_add_partially_learnt_topic_id(self):
+        """Testing add_partially_learnt_topic_id."""
+        incomplete_activities = (user_domain.IncompleteActivities(
+            'user_id0', ['exp_id0'], ['collect_id0'], ['story_id0'],
+            ['topic_id0']))
+
+        self.assertListEqual(
+            incomplete_activities.partially_learnt_topic_ids, ['topic_id0'])
+
+        incomplete_activities.add_partially_learnt_topic_id('topic_id1')
+
+        self.assertListEqual(
+            incomplete_activities.partially_learnt_topic_ids,
+            ['topic_id0', 'topic_id1'])
+
+    def test_remove_partially_learnt_topic_id(self):
+        """Testing remove_partially_learnt_topic_id."""
+        incomplete_activities = (user_domain.IncompleteActivities(
+            'user_id0', ['exp_id0'], ['collect_id0'], ['story_id0'],
+            ['topic_id0']))
+
+        self.assertListEqual(
+            incomplete_activities.partially_learnt_topic_ids, ['topic_id0'])
+
+        incomplete_activities.remove_partially_learnt_topic_id('topic_id0')
+
+        self.assertListEqual(
+            incomplete_activities.partially_learnt_topic_ids, [])
+
 
 class CompletedActivitiesTests(test_utils.GenericTestBase):
     """Testing domain object for the activities completed."""
@@ -629,18 +696,24 @@ class CompletedActivitiesTests(test_utils.GenericTestBase):
     def test_initialization(self):
         """Testing init method."""
         completed_activities = (user_domain.CompletedActivities(
-            'user_id0', ['exp_id0'], ['collect_id0']))
+            'user_id0', ['exp_id0'], ['collect_id0'], ['story_id0'],
+            ['topic_id0']))
 
         self.assertEqual('user_id0', completed_activities.id)
         self.assertListEqual(
             completed_activities.exploration_ids, ['exp_id0'])
         self.assertListEqual(
             completed_activities.collection_ids, ['collect_id0'])
+        self.assertListEqual(
+            completed_activities.story_ids, ['story_id0'])
+        self.assertListEqual(
+            completed_activities.learnt_topic_ids, ['topic_id0'])
 
     def test_add_exploration_id(self):
         """Testing add_exploration_id."""
         completed_activities = (user_domain.CompletedActivities(
-            'user_id0', ['exp_id0'], ['collect_id0']))
+            'user_id0', ['exp_id0'], ['collect_id0'], ['story_id0'],
+            ['topic_id0']))
 
         self.assertListEqual(
             completed_activities.exploration_ids, ['exp_id0'])
@@ -654,7 +727,8 @@ class CompletedActivitiesTests(test_utils.GenericTestBase):
     def test_remove_exploration_id(self):
         """Testing remove_exploration_id."""
         completed_activities = (user_domain.CompletedActivities(
-            'user_id0', ['exp_id0'], ['collect_id0']))
+            'user_id0', ['exp_id0'], ['collect_id0'], ['story_id0'],
+            ['topic_id0']))
 
         self.assertListEqual(
             completed_activities.exploration_ids, ['exp_id0'])
@@ -667,7 +741,8 @@ class CompletedActivitiesTests(test_utils.GenericTestBase):
     def test_add_collection_id(self):
         """Testing add_collection_id."""
         completed_activities = (user_domain.CompletedActivities(
-            'user_id0', ['exp_id0'], ['collect_id0']))
+            'user_id0', ['exp_id0'], ['collect_id0'], ['story_id0'],
+            ['topic_id0']))
 
         self.assertListEqual(
             completed_activities.collection_ids, ['collect_id0'])
@@ -681,7 +756,8 @@ class CompletedActivitiesTests(test_utils.GenericTestBase):
     def test_remove_collection_id(self):
         """Testing remove_collection_id."""
         completed_activities = (user_domain.CompletedActivities(
-            'user_id0', ['exp_id0'], ['collect_id0']))
+            'user_id0', ['exp_id0'], ['collect_id0'], ['story_id0'],
+            ['topic_id0']))
 
         self.assertListEqual(
             completed_activities.collection_ids, ['collect_id0'])
@@ -690,6 +766,64 @@ class CompletedActivitiesTests(test_utils.GenericTestBase):
 
         self.assertListEqual(
             completed_activities.collection_ids, [])
+
+    def test_add_story_id(self):
+        """Testing add_story_id."""
+        completed_activities = (user_domain.CompletedActivities(
+            'user_id0', ['exp_id0'], ['collect_id0'], ['story_id0'],
+            ['topic_id0']))
+
+        self.assertListEqual(
+            completed_activities.story_ids, ['story_id0'])
+
+        completed_activities.add_story_id('story_id1')
+
+        self.assertListEqual(
+            completed_activities.story_ids,
+            ['story_id0', 'story_id1'])
+
+    def test_remove_story_id(self):
+        """Testing remove_story_id."""
+        completed_activities = (user_domain.CompletedActivities(
+            'user_id0', ['exp_id0'], ['collect_id0'], ['story_id0'],
+            ['topic_id0']))
+
+        self.assertListEqual(
+            completed_activities.story_ids, ['story_id0'])
+
+        completed_activities.remove_story_id('story_id0')
+
+        self.assertListEqual(
+            completed_activities.story_ids, [])
+
+    def test_add_learnt_topic_id(self):
+        """Testing add_learnt_topic_id."""
+        completed_activities = (user_domain.CompletedActivities(
+            'user_id0', ['exp_id0'], ['collect_id0'], ['story_id0'],
+            ['topic_id0']))
+
+        self.assertListEqual(
+            completed_activities.learnt_topic_ids, ['topic_id0'])
+
+        completed_activities.add_learnt_topic_id('topic_id1')
+
+        self.assertListEqual(
+            completed_activities.learnt_topic_ids,
+            ['topic_id0', 'topic_id1'])
+
+    def test_remove_learnt_topic_id(self):
+        """Testing remove_learnt_topic_id."""
+        completed_activities = (user_domain.CompletedActivities(
+            'user_id0', ['exp_id0'], ['collect_id0'], ['story_id0'],
+            ['topic_id0']))
+
+        self.assertListEqual(
+            completed_activities.learnt_topic_ids, ['topic_id0'])
+
+        completed_activities.remove_learnt_topic_id('topic_id0')
+
+        self.assertListEqual(
+            completed_activities.learnt_topic_ids, [])
 
 
 class LearnerPlaylistTests(test_utils.GenericTestBase):

@@ -24,6 +24,8 @@ import datetime
 from core.domain import event_services
 from core.domain import rating_services
 from core.domain import taskqueue_services
+from core.domain import topic_domain
+from core.domain import topic_services
 from core.domain import user_jobs_continuous
 from core.domain import user_jobs_one_off
 from core.domain import user_services
