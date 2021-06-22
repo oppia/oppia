@@ -13,8 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Utility functions for unit testing.
+ * @fileoverview nit Tests for utility functions used in AngularJS.
  */
+
 import { Directive, ElementRef, Injector, destroyPlatform } from
   '@angular/core';
 import { UpgradeComponent } from '@angular/upgrade/static';

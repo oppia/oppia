@@ -217,7 +217,6 @@
     "core/templates/pages/exploration-player-page/services/player-correctness-feedback-enabled.service.ts",
     "core/templates/pages/profile-page/profile-page-domain.constants.ts",
     "core/templates/pages/story-editor-page/story-editor-page.constants.ts",
-    "core/templates/pages/topic-viewer-page/topic-viewer-page.component.spec.ts",
     "core/templates/pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants.ts",
     "core/templates/services/alerts.service.ts",
     "core/templates/services/alerts.service.spec.ts",

@@ -13,14 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for MockTranslate pipe for Oppia.
+ * @fileoverview Unit Tests for utility functions used in Angular.
  */
 
 import { TestBed } from '@angular/core/testing';
 import { MockTranslatePipe } from './unit-test-utils';
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Testing MockTranslatePipe', () => {
+describe('Testing MockTranslatePipe', () => {
   let mtp: MockTranslatePipe;
   beforeEach(() => {
     TestBed.configureTestingModule({

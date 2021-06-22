@@ -28,7 +28,7 @@ import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
 import { TopicUpdateService } from 'domain/topic/topic-update.service';
 // ^^^ This block is to be removed.
 
-import { TranslatorProviderForTests } from 'tests/test.extras';
+import { TranslatorProviderForTests } from 'tests/unit-test-utils.ajs';
 import { Subscription } from 'rxjs';
 
 require('domain/topic/TopicObjectFactory.ts');

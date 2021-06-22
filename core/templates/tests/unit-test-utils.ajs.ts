@@ -159,3 +159,22 @@ export const setupAndGetUpgradedComponentAsync = async(
     platformBrowserDynamic(), Ng2Module, element, ng1Module).then(
     () => multiTrim(element.textContent));
 };
+
+/* This function overwrites the translationProvider for a dummy function
+ * (customLoader). This is necessary to prevent the js test warnings about an
+ * 'unexpected GET request' when the translationProvider tries to load the
+ * translation files.
+ * More info in the angular-translate documentation:
+ *   http://angular-translate.github.io/docs/#/guide
+ * (see the 'Unit Testing' section).
+ */
+export const TranslatorProviderForTests = function(
+    $provide: ng.auto.IProvideService,
+    $translateProvider: ng.translate.ITranslateProvider): void {
+  $provide.factory('customLoader', ['$q', function($q) {
+    return function() {
+      return $q.resolve({});
+    };
+  }]);
+  $translateProvider.useLoader('customLoader');
+};
