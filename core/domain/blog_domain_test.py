@@ -221,8 +221,8 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
             'Expected each tag in \'tags\' to be a string,' +
             ' received: ''\'%s\'' % 123, ['abc', 123])
         self._assert_valid_tags_for_blog_post(
-            'Tags should only contain lowercase letters and spaces, '
-            'received: \'%s\'' % 'ABC', ['ABC'])
+            'Tags should only contain alphanumeric characters and spaces, '
+            'received: \'%s\'' % 'Alpha@', ['Alpha@'])
         self._assert_valid_tags_for_blog_post(
             'Tags should not start or end with whitespace, '
             'received: \'%s\'' % ' a b', [' a b'])
@@ -450,8 +450,8 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
             'Expected each tag in \'tags\' to be a string,' +
             ' received: ''\'%s\'' % 123, ['abc', 123])
         self._assert_valid_tags_for_blog_post(
-            'Tags should only contain lowercase letters and spaces, '
-            'received: \'%s\'' % 'ABC', ['ABC'])
+            'Tags should only contain alphanumeric characters and spaces, '
+            'received: \'%s\'' % 'Alpha@', ['Alpha@'])
         self._assert_valid_tags_for_blog_post(
             'Tags should not start or end with whitespace, '
             'received: \'%s\'' % ' a b', [' a b'])

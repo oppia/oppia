@@ -136,9 +136,9 @@ class BlogPost(python_utils.OBJECT):
                 raise utils.ValidationError(
                     'Tag should not be empty.')
 
-            if not re.match(constants.TAG_REGEX, tag):
+            if not re.match(constants.BLOG_POST_TAG_REGEX, tag):
                 raise utils.ValidationError(
-                    'Tags should only contain lowercase letters and spaces, '
+                    'Tags should only contain alphanumeric characters and spaces, '
                     'received: \'%s\'' % tag)
 
             if not re.match(r'^[^\s]+(\s+[^\s]+)*$', tag):
@@ -514,9 +514,9 @@ class BlogPostSummary(python_utils.OBJECT):
                 raise utils.ValidationError(
                     'Tag should not be empty.')
 
-            if not re.match(constants.TAG_REGEX, tag):
+            if not re.match(constants.BLOG_POST_TAG_REGEX, tag):
                 raise utils.ValidationError(
-                    'Tags should only contain lowercase letters and spaces, '
+                    'Tags should only contain alphanumeric characters and spaces, '
                     'received: \'%s\'' % tag)
 
             if not re.match(r'^[^\s]+(\s+[^\s]+)*$', tag):
