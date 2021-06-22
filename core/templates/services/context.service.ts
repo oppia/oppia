@@ -40,16 +40,15 @@ export class ContextService {
   // NOTE TO DEV: Make sure any tests that directly access these variables clear
   // it (using the appropriate reset fn) initially. Since these are static,
   // depending on the order of tests, values may be retained across tests.
-  static customEntityContext = null;
+  static customEntityContext: EntityContext | null = null;
   static imageSaveDestination: string = (
     AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
 
-  pageContext = null;
-  explorationId = null;
-  explorationIsLinkedToStory = false;
-  questionPlayerIsManuallySet = false;
-  questionId = null;
-  editorContext = null;
+  pageContext: string | null = null;
+  explorationId: string | null = null;
+  explorationIsLinkedToStory: boolean = false;
+  questionPlayerIsManuallySet: boolean = false;
+  editorContext: string | null = null;
   // Depending on this value, new images can be either saved in the localStorage
   // or uploaded directly to the datastore.
 
@@ -60,7 +59,7 @@ export class ContextService {
   // question editor or exploration editor. The variable editorContext is
   // set from the init function that is called upon initialization in the
   // respective editors.
-  getEditorContext(): string {
+  getEditorContext(): string | null {
     return this.editorContext;
   }
   // Returns a string representing the current tab of the editor (either
@@ -189,7 +188,7 @@ export class ContextService {
   }
 
   // Add constants for entity type.
-  getEntityType(): string {
+  getEntityType(): string | undefined {
     if (ContextService.customEntityContext !== null) {
       return ContextService.customEntityContext.getType();
     }
@@ -217,6 +216,7 @@ export class ContextService {
         return AppConstants.ENTITY_TYPE.SKILL;
       }
     }
+    return;
   }
 
   // Returns a string representing the explorationId (obtained from the
@@ -245,6 +245,7 @@ export class ContextService {
         'ContextService should not be used outside the ' +
         'context of an exploration or a question.');
     }
+    throw new Error('Exploratiod Id is possibly null');
   }
 
   // Following method helps to know whether exploration editor is

@@ -51,8 +51,8 @@ class MockWindowRef {
 }
 
 describe('Context service', () => {
-  let ecs: ContextService = null;
-  let urlService: UrlService = null;
+  let ecs: ContextService;
+  let urlService: UrlService;
   let windowRef: MockWindowRef;
 
   describe('behavior in the exploration learner view', () => {
@@ -345,6 +345,14 @@ describe('Context service', () => {
       expect(ecs.getPageContext()).toBe('other');
       spyOn(urlService, 'getPathname').and.returnValue('/question_editor/123');
       expect(ecs.getPageContext()).toBe('question_editor');
+    });
+
+    it ('should throw error if Exploration ID is null', () => {
+      ecs.explorationId = null;
+      spyOn(ecs, 'isInQuestionPlayerMode').and.returnValue(true);
+      expect(() => {
+        ecs.getExplorationId();
+      }).toThrowError('Exploratiod Id is possibly null');
     });
 
     it('should correctly retrieve the page context as question player', () => {
