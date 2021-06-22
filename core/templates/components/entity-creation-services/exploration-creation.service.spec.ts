@@ -65,7 +65,7 @@ class MockWindowRef {
   }
 }
 
-fdescribe('ExplorationCreationService', () => {
+describe('ExplorationCreationService', () => {
   let ecs: ExplorationCreationService;
   let ecbas: MockExploratinoCreationBackendApiService;
   let loaderService: LoaderService;
