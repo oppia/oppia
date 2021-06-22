@@ -30,7 +30,6 @@ from core.domain import customization_args_util
 from core.domain import exp_domain
 from core.domain import interaction_registry
 from core.domain import playthrough_issue_registry
-from core.platform import models
 import feconf
 import python_utils
 import utils
