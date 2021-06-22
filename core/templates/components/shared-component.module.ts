@@ -37,6 +37,9 @@ import { ToastrModule } from 'ngx-toastr';
 import { TranslateModule, TranslateLoader, TranslateService, TranslateDefaultParser, TranslateParser, MissingTranslationHandler } from '@ngx-translate/core';
 import { TranslateCacheModule, TranslateCacheService, TranslateCacheSettings } from 'ngx-translate-cache';
 import { CommonElementsModule } from './common-layout-directives/common-elements/common-elements.module';
+import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
+import { CodeMirrorModule } from './code-mirror/codemirror.module';
+import { OppiaCkEditor4Module } from './ck-editor-helpers/ckeditor4.module';
 
 
 // Components.
@@ -76,6 +79,8 @@ import { LoadingMessageComponent } from '../base-components/loading-message.comp
 import { CreateActivityButtonComponent } from './button-directives/create-activity-button.component';
 import { CreateActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/create-activity-modal.component';
 import { UploadActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/upload-activity-modal.component';
+import { ThumbnailUploaderComponent } from './forms/custom-forms-directives/thumbnail-uploader.component';
+import { EditThumbnailModalComponent } from './forms/custom-forms-directives/edit-thumbnail-modal.component';
 import { TopNavigationBarComponent } from './common-layout-directives/navigation-bars/top-navigation-bar.component';
 import { CorrectnessFooterComponent } from 'pages/exploration-player-page/layout-directives/correctness-footer.component';
 import { ContinueButtonComponent } from 'pages/exploration-player-page/learner-experience/continue-button.component';
@@ -107,8 +112,6 @@ import { LimitToPipe } from 'filters/limit-to.pipe';
 
 // Services.
 import { AuthService } from 'services/auth.service';
-import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
-import { CodeMirrorModule } from './code-mirror/codemirror.module';
 import { HttpClient } from '@angular/common/http';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
@@ -171,6 +174,7 @@ const toastrConfig = {
     RichTextComponentsModule,
     ToastrModule.forRoot(toastrConfig),
     ObjectComponentsModule,
+    OppiaCkEditor4Module,
     SharedFormsModule,
     SharedPipesModule,
     /**
@@ -253,7 +257,6 @@ const toastrConfig = {
     OnScreenKeyboardComponent,
     OppiaFooterComponent,
     OutcomeFeedbackEditorComponent,
-    PreviewThumbnailComponent,
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
     PromoBarComponent,
@@ -269,6 +272,8 @@ const toastrConfig = {
     SubtopicSummaryTileDirective,
     SummaryListHeaderComponent,
     TakeBreakModalComponent,
+    ThumbnailUploaderComponent,
+    EditThumbnailModalComponent,
     TopNavigationBarComponent,
     WrapTextWithEllipsisPipe,
     WarningsAndAlertsComponent,
@@ -281,7 +286,8 @@ const toastrConfig = {
     UploadActivityModalComponent,
     PromoBarComponent,
     SortByPipe,
-    LearnerDashboardIconsComponent
+    LearnerDashboardIconsComponent,
+    PreviewThumbnailComponent
   ],
 
   entryComponents: [
@@ -327,12 +333,15 @@ const toastrConfig = {
     StorySummaryTileComponent,
     SummaryListHeaderComponent,
     ThumbnailDisplayComponent,
+    ThumbnailUploaderComponent,
+    EditThumbnailModalComponent,
     UploadActivityModalComponent,
     ThreadTableComponent,
     TopNavigationBarComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     WarningsAndAlertsComponent,
-    LearnerDashboardIconsComponent
+    LearnerDashboardIconsComponent,
+    PreviewThumbnailComponent
   ],
 
   exports: [
@@ -345,9 +354,10 @@ const toastrConfig = {
     MaterialModule,
     NgbTooltipModule,
     NgbNavModule,
-    RichTextComponentsModule,
     NgbModalModule,
+    RichTextComponentsModule,
     ObjectComponentsModule,
+    OppiaCkEditor4Module,
     SharedFormsModule,
     SharedPipesModule,
     TranslateModule,
@@ -395,6 +405,8 @@ const toastrConfig = {
     SummaryListHeaderComponent,
     TakeBreakModalComponent,
     ThumbnailDisplayComponent,
+    ThumbnailUploaderComponent,
+    EditThumbnailModalComponent,
     TopNavigationBarComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     WarningsAndAlertsComponent,
@@ -404,7 +416,7 @@ const toastrConfig = {
     TruncatePipe,
     SummarizeNonnegativeNumberPipe,
     SortByPipe,
-    LearnerDashboardIconsComponent
+    LearnerDashboardIconsComponent,
   ],
 })
 

@@ -28,10 +28,10 @@ import { UserBackendApiService } from 'services/user-backend-api.service';
 import { Title } from '@angular/platform-browser';
 
 describe('User Backend Api Service', () => {
-  let userBackendApiService: UserBackendApiService = null;
-  let urlInterpolationService: UrlInterpolationService = null;
-  let httpTestingController: HttpTestingController = null;
-  let csrfService: CsrfTokenService = null;
+  let userBackendApiService: UserBackendApiService;
+  let urlInterpolationService: UrlInterpolationService;
+  let httpTestingController: HttpTestingController;
+  let csrfService: CsrfTokenService;
   let titleService: Title;
 
   beforeEach(() => {

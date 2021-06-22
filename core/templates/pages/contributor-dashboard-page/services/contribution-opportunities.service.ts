@@ -46,7 +46,7 @@ export class ContributionOpportunitiesService {
       private readonly modalService: NgbModal) {}
 
   public readonly reloadOpportunitiesEventEmitter = new EventEmitter<void>();
-  public readonly removeOpportunitiesEventEmitter = new EventEmitter<void>();
+  public readonly removeOpportunitiesEventEmitter = new EventEmitter();
   private _skillOpportunitiesCursor: string = null;
   private _translationOpportunitiesCursor: string = null;
   private _voiceoverOpportunitiesCursor: string = null;

@@ -24,7 +24,6 @@ import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { ExplorationFeaturesService } from
   'services/exploration-features.service';
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { ImprovementsService } from 'services/improvements.service';
 import { OutcomeObjectFactory } from
@@ -116,7 +115,6 @@ describe('Exploration editor tab component', function() {
       'AnswerGroupObjectFactory', answerGroupObjectFactory);
     $provide.value(
       'ExplorationFeaturesService', explorationFeaturesService);
-    $provide.value('FractionObjectFactory', TestBed.get(FractionObjectFactory));
     $provide.value('HintObjectFactory', hintObjectFactory);
     $provide.value('ImprovementsService', TestBed.get(ImprovementsService));
     $provide.value(
@@ -812,10 +810,10 @@ describe('Exploration editor tab component', function() {
       spyOn(angular, 'element')
         .withArgs('#tutorialStateContent').and.returnValue({
           // This throws "Type '{ top: number; }' is not assignable to type
-          // 'JQLite | Coordinates'." This is because the actual 'offset'
-          // functions returns more properties than the function we've
-          // defined. We have only returned the properties we need
-          // in 'offset' function.
+          // 'JQLite | Coordinates'.". We need to suppress this error because
+          // the actual 'offset' functions returns more properties than the
+          // function we've defined. We have only returned the properties we
+          // need in 'offset' function.
           // @ts-expect-error
           offset: () => ({
             top: 5
@@ -838,10 +836,10 @@ describe('Exploration editor tab component', function() {
       spyOn(angular, 'element')
         .withArgs('#tutorialStateInteraction').and.returnValue({
           // This throws "Type '{ top: number; }' is not assignable to type
-          // 'JQLite | Coordinates'." This is because the actual 'offset'
-          // functions returns more properties than the function we've
-          // defined. We have only returned the properties we need
-          // in 'offset' function.
+          // 'JQLite | Coordinates'.". We need to suppress this error because
+          // the actual 'offset' functions returns more properties than the
+          // function we've defined. We have only returned the properties we
+          // need in 'offset' function.
           // @ts-expect-error
           offset: () => ({
             top: 20
@@ -864,10 +862,10 @@ describe('Exploration editor tab component', function() {
       spyOn(angular, 'element')
         .withArgs('#tutorialPreviewTab').and.returnValue({
           // This throws "Type '{ top: number; }' is not assignable to type
-          // 'JQLite | Coordinates'." This is because the actual 'offset'
-          // functions returns more properties than the function we've
-          // defined. We have only returned the properties we need
-          // in 'offset' function.
+          // 'JQLite | Coordinates'.". We need to suppress this error because
+          // the actual 'offset' functions returns more properties than the
+          // function we've defined. We have only returned the properties we
+          // need in 'offset' function.
           // @ts-expect-error
           offset: () => ({
             top: 5
@@ -890,10 +888,10 @@ describe('Exploration editor tab component', function() {
       spyOn(angular, 'element')
         .withArgs('#tutorialStateInteraction').and.returnValue({
           // This throws "Type '{ top: number; }' is not assignable to type
-          // 'JQLite | Coordinates'." This is because the actual 'offset'
-          // functions returns more properties than the function we've
-          // defined. We have only returned the properties we need
-          // in 'offset' function.
+          // 'JQLite | Coordinates'.". We need to suppress this error because
+          // the actual 'offset' functions returns more properties than the
+          // function we've defined. We have only returned the properties we
+          // need in 'offset' function.
           // @ts-expect-error
           offset: () => ({
             top: 20
@@ -916,10 +914,10 @@ describe('Exploration editor tab component', function() {
       spyOn(angular, 'element')
         .withArgs('#tutorialPreviewTab').and.returnValue({
           // This throws "Type '{ top: number; }' is not assignable to type
-          // 'JQLite | Coordinates'." This is because the actual 'offset'
-          // functions returns more properties than the function we've
-          // defined. We have only returned the properties we need
-          // in 'offset' function.
+          // 'JQLite | Coordinates'.". We need to suppress this error because
+          // the actual 'offset' functions returns more properties than the
+          // function we've defined. We have only returned the properties we
+          // need in 'offset' function.
           // @ts-expect-error
           offset: () => ({
             top: 5
@@ -942,10 +940,10 @@ describe('Exploration editor tab component', function() {
       spyOn(angular, 'element')
         .withArgs('#tutorialStateInteraction').and.returnValue({
           // This throws "Type '{ top: number; }' is not assignable to type
-          // 'JQLite | Coordinates'." This is because the actual 'offset'
-          // functions returns more properties than the function we've
-          // defined. We have only returned the properties we need
-          // in 'offset' function.
+          // 'JQLite | Coordinates'.". We need to suppress this error because
+          // the actual 'offset' functions returns more properties than the
+          // function we've defined. We have only returned the properties we
+          // need in 'offset' function.
           // @ts-expect-error
           offset: () => ({
             top: 20
