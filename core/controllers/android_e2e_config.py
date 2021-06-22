@@ -45,6 +45,8 @@ class InitializeAndroidTestData(base.BaseHandler):
 
     def post(self):
         if constants.DEV_MODE:
+            # TODO(#13170): Change this to "26" after #13029 is merged
+            exp_id = '15'
             user_id = feconf.SYSTEM_COMMITTER_ID
             topic_id = topic_fetchers.get_new_topic_id()
             story_id = story_services.get_new_story_id()
@@ -84,12 +86,12 @@ class InitializeAndroidTestData(base.BaseHandler):
                     1, topic_id))
 
             exp_services.load_demo(python_utils.convert_to_bytes(
-                '15'))
+                exp_id))
             rights_manager.release_ownership_of_exploration(
                 user_services.get_system_user(), python_utils.convert_to_bytes(
-                    '15'))
+                    exp_id))
             exp_services.update_exploration(
-                user_id, '15', [exp_domain.ExplorationChange({
+                user_id, exp_id, [exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                     'property_name': 'correctness_feedback_enabled',
                     'new_value': True
@@ -99,7 +101,7 @@ class InitializeAndroidTestData(base.BaseHandler):
                 topic_id, 'android-e2e-testing')
 
             story_node_dicts = [{
-                'exp_id': '15',
+                'exp_id': exp_id,
                 'title': 'Testing with UI Automator',
                 'description': 'In order to test all android interactions'
             }]
