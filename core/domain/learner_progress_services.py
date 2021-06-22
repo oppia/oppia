@@ -1575,6 +1575,8 @@ def get_displayable_topic_summary_dicts(user_id, topic_summaries):
             'story_titles': topic_services.get_story_titles_in_topic(topic),
             'thumbnail_filename': topic.thumbnail_filename,
             'thumbnail_bg_color': topic.thumbnail_bg_color,
+            'canonical_story_dicts': topic_fetchers.get_canonical_story_dicts(
+                user_id, topic),
             'url_fragment': topic.url_fragment,
             'classroom': (
                 classroom_services.get_classroom_url_fragment_for_topic_id(
