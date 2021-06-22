@@ -36,14 +36,19 @@ class BaseVoiceArtistControllerTests(test_utils.GenericTestBase):
         super(BaseVoiceArtistControllerTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VOICE_ARTIST_EMAIL, self.VOICE_ARTIST_USERNAME)
+        self.signup('voiceoveradmin@app.com', 'voiceoverManager')
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
+
         self.voice_artist_id = self.get_user_id_from_email(
             self.VOICE_ARTIST_EMAIL)
 
-        self.owner = user_services.get_user_actions_info(self.owner_id)
+        self.voiceover_admin_id = self.get_user_id_from_email(
+            'voiceoveradmin@app.com')
+        self.set_user_role('voiceoverManager', feconf.ROLE_ID_VOICEOVER_ADMIN)
         self.voiceover_admin = user_services.get_user_actions_info(
-            self.voice_artist_id)
+            self.voiceover_admin_id)
 
 
 class VoiceArtistTest(BaseVoiceArtistControllerTests):
@@ -70,7 +75,9 @@ class VoiceArtistTest(BaseVoiceArtistControllerTests):
         super(VoiceArtistTest, self).setUp()
         self.login(self.OWNER_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
+        self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id, end_state_name='End card')
+        self.publish_exploration(self.owner_id, self.EXP_ID)
         rights_manager.assign_role_for_exploration(
             self.voiceover_admin,
             self.EXP_ID,
@@ -194,6 +201,7 @@ class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
         self.login(self.OWNER_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
+        self.publish_exploration(self.owner_id, self.EXP_ID)
         rights_manager.assign_role_for_exploration(
             self.voiceover_admin,
             self.EXP_ID,
@@ -285,6 +293,7 @@ class TranslationFirstTimeTutorialTest(BaseVoiceArtistControllerTests):
         self.login(self.OWNER_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
+        self.publish_exploration(self.owner_id, self.EXP_ID)
         rights_manager.assign_role_for_exploration(
             self.voiceover_admin,
             self.EXP_ID,
