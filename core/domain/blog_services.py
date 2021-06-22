@@ -195,13 +195,14 @@ def filter_blog_post_ids(user_id, blog_post_is_published):
         list(str). The blog post IDs of the blog posts for which the user is an
         editor corresponding to the status(draft/published).
     """
-    blog_post_rights_models = (
-        blog_models.BlogPostRightsModel.get_by_user(user_id))
+    blog_post_rights_models = blog_models.BlogPostRightsModel.query(
+        blog_models.BlogPostRightsModel.editor_ids == user_id,
+        blog_models.BlogPostRightsModel.blog_post_is_published == (
+            blog_post_is_published)).fetch()
     model_ids = []
     if blog_post_rights_models:
         for model in blog_post_rights_models:
-            if model.blog_post_is_published == blog_post_is_published:
-                model_ids.append(model.id)
+            model_ids.append(model.id)
     return model_ids
 
 
@@ -225,19 +226,6 @@ def get_blog_post_summary_by_title(title):
     return get_blog_post_summary_from_model(blog_post_summary_model[0])
 
 
-def get_all_blog_posts():
-    """Returns all the blog posts present in the datastore.
-
-    Returns:
-        list(BlogPosts). The list of domain objects for blog posts present
-        in the datastore.
-    """
-    backend_blog_post_models = blog_models.BlogPostModel.get_all()
-    return [
-        get_blog_post_from_model(blog_post)
-        for blog_post in backend_blog_post_models]
-
-
 def get_new_blog_post_id():
     """Returns a new blog post ID.
 
@@ -259,7 +247,6 @@ def get_blog_post_rights_from_model(blog_post_rights_model):
         BlogPostRights. A blog post rights domain object corresponding to the
         given blog post rights model.
     """
-
     return blog_domain.BlogPostRights(
         blog_post_rights_model.id,
         blog_post_rights_model.editor_ids,
@@ -484,19 +471,21 @@ def deassign_user_from_all_blog_posts(user_id):
         user_id)
 
 
-def generate_url_fragment(title):
+def generate_url_fragment(title, blog_post_id):
     """Generates the url fragment for a blog post from the title of the blog
     post.
 
     Args:
         title: str. The title of the blog post.
+        blog_post_id: str. The unique blog post ID.
 
     Returns:
         str. The url fragment of the blog post.
     """
     lower_title = title.lower()
     hyphenated_title = lower_title.replace(' ', '-')
-    return hyphenated_title
+    lower_id = blog_post_id.lower()
+    return hyphenated_title + '-' + lower_id
 
 
 def generate_summary_of_blog_post(content):
@@ -553,8 +542,9 @@ def apply_change_dict(blog_post_id, change_dict):
     blog_post = get_blog_post_by_id(blog_post_id)
 
     if 'title' in change_dict:
+        url_fragment = generate_url_fragment(
+            change_dict['title'], blog_post_id)
         blog_post.update_title(change_dict['title'])
-        url_fragment = generate_url_fragment(change_dict['title'])
         blog_post.update_url_fragment(url_fragment)
     if 'thumbnail_filename' in change_dict:
         blog_post.update_thumbnail_filename(change_dict['thumbnail_filename'])
@@ -577,14 +567,14 @@ def update_blog_post(blog_post_id, change_dict):
     """
     old_blog_post = get_blog_post_by_id(blog_post_id)
     updated_blog_post = apply_change_dict(blog_post_id, change_dict)
-
-    if (
-            old_blog_post.url_fragment != updated_blog_post.url_fragment and
-            does_blog_post_with_url_fragment_exist(
-                updated_blog_post.url_fragment)):
-        raise utils.ValidationError(
-            'Blog Post with given title already exists: %s'
-            % updated_blog_post.title)
+    if 'title' in change_dict:
+        blog_post_models = blog_models.BlogPostModel.query().filter(
+            blog_models.BlogPostModel.title == updated_blog_post.title
+            ).filter(blog_models.BlogPostModel.deleted == False).fetch()  # pylint: disable=singleton-comparison
+        if blog_post_models != []:
+            raise utils.ValidationError(
+                'Blog Post with given title already exists: %s'
+                % updated_blog_post.title)
 
     _save_blog_post(updated_blog_post)
     updated_blog_post_summary = compute_summary_of_blog_post(updated_blog_post)

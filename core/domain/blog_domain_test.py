@@ -19,9 +19,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import datetime
-import json
-
 from constants import constants
 from core.domain import blog_domain
 from core.domain import blog_services
@@ -161,17 +158,6 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
 
         blog_domain.BlogPost.require_valid_url_fragment('oppia-in-covid19')
 
-    def test_serialize_and_deserialize_returns_unchanged_blog_post(self):
-        """Checks that serializing and then deserializing a blog post works as
-        intended by leaving the blog post unchanged.
-        """
-        self.blog_post.published_on = datetime.datetime.utcnow()
-        self.assertEqual(
-            self.blog_post.to_dict(),
-            blog_domain.BlogPost.deserialize(
-                self.blog_post.serialize()).to_dict()
-        )
-
     def test_update_title(self):
         self.assertEqual(self.blog_post.title, '')
         self.blog_post.update_title('Blog Post Title')
@@ -276,10 +262,10 @@ class BlogPostRightsDomainUnitTests(test_utils.GenericTestBase):
         self.assertFalse(self.blog_post_rights.is_editor(self.user_id_b))
 
     def test_to_human_readable_dict(self):
-        """Checks conversion of BlogPostRights to human readable dict."""
+        """Checks conversion of BlogPostRights to dict."""
         expected_dict = {
             'blog_post_id': self.blog_post_id,
-            'editor_names': ['A'],
+            'editor_ids': [self.user_id_a],
             'blog_post_is_published': False
         }
         self.assertEqual(self.blog_post_rights.to_dict(), expected_dict)
@@ -426,16 +412,6 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
 
         self.blog_post_summary.summary = 'Hello'
         self.blog_post_summary.validate(strict=True)
-
-    def test_blog_post_summary_serialization(self):
-        """Tests serialization of blog post summary."""
-
-        self.blog_post_summary.published_on = datetime.datetime.utcnow()
-        summary_serialized = self.blog_post_summary.serialize()
-        blog_post_summary_dict = (
-            json.loads(summary_serialized.decode('utf-8')))
-        self.assertEqual(blog_post_summary_dict['id'], self.blog_post_id)
-        self.assertEqual(blog_post_summary_dict['summary'], '...')
 
     def test_tags_validation_for_blog_post(self):
         """"Tests tags validation for blog post."""

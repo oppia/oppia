@@ -50,6 +50,8 @@ class BlogPostModelValidatorTests(test_utils.AuditJobsTestBase):
         self.blog_post_id_2 = self.blog_post_2.id
         self.blog_post_model_2 = (
             blog_models.BlogPostModel.get_by_id(self.blog_post_id_2))
+        self.blog_post_summary_model = (
+            blog_models.BlogPostSummaryModel.get_by_id(self.blog_post_id_1))
 
         self.job_class = (
             prod_validation_jobs_one_off.BlogPostModelAuditOneOffJob)
@@ -86,6 +88,14 @@ class BlogPostModelValidatorTests(test_utils.AuditJobsTestBase):
         self.blog_post_model_1.put()
         self.blog_post_model_2.update_timestamps()
         self.blog_post_model_2.put()
+        self.blog_post_summary_model.title = 'Sample Title'
+        self.blog_post_summary_model.update_timestamps()
+        self.blog_post_summary_model.put()
+        blog_post_summary_model_2 = (
+            blog_models.BlogPostSummaryModel.get_by_id(self.blog_post_id_2))
+        blog_post_summary_model_2.title = 'Sample Title'
+        blog_post_summary_model_2.update_timestamps()
+        blog_post_summary_model_2.put()
         expected_output = [
             (
                 u'[u\'failed validation check for unique title for blog post '
@@ -97,6 +107,31 @@ class BlogPostModelValidatorTests(test_utils.AuditJobsTestBase):
                     self.blog_post_id_1, self.blog_post_model_1.title,
                     self.blog_post_id_2, self.blog_post_id_2,
                     self.blog_post_model_1.title, self.blog_post_id_1)
+            )
+            ]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=True)
+
+    def test_model_with_repeated_url_fragment(self):
+        self.blog_post_model_1.url_fragment = 'sample-url'
+        self.blog_post_model_2.url_fragment = 'sample-url'
+        self.blog_post_model_1.update_timestamps()
+        self.blog_post_model_1.put()
+        self.blog_post_model_2.update_timestamps()
+        self.blog_post_model_2.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for unique url fragment for '
+                'blog post of BlogPostModel\', '
+                '[u"Entity id %s: url fragment %s matches with url fragment'
+                ' of blog post models with ids [\'%s\']",'
+                ' u"Entity id %s: url fragment %s matches with url'
+                ' fragment of blog post models with ids [\'%s\']"]]' % (
+                    self.blog_post_id_1,
+                    self.blog_post_model_1.url_fragment,
+                    self.blog_post_id_2, self.blog_post_id_2,
+                    self.blog_post_model_1.url_fragment,
+                    self.blog_post_id_1)
             )
             ]
         self.run_job_and_check_output(
@@ -167,6 +202,9 @@ class BlogPostModelValidatorTests(test_utils.AuditJobsTestBase):
         self.blog_post_model_1.url = 'sample-title'
         self.blog_post_model_1.update_timestamps()
         self.blog_post_model_1.put()
+        self.blog_post_summary_model.title = 'Sample Title'
+        self.blog_post_summary_model.update_timestamps()
+        self.blog_post_summary_model.put()
         expected_output = [
             (
                 u'[u\'failed validation check for domain object check of '
@@ -211,6 +249,9 @@ class BlogPostModelValidatorTests(test_utils.AuditJobsTestBase):
         self.blog_post_model_1.thumbnail_filename = 'thumbnail.svg'
         self.blog_post_model_1.update_timestamps()
         self.blog_post_model_1.put()
+        self.blog_post_summary_model.title = 'sample-title'
+        self.blog_post_summary_model.update_timestamps()
+        self.blog_post_summary_model.put()
         expected_output = [
             (
                 u'[u\'failed validation check for domain object check of '
@@ -233,6 +274,9 @@ class BlogPostModelValidatorTests(test_utils.AuditJobsTestBase):
         self.blog_post_model_1.thumbnail_filename = 'thumbnail.svg'
         self.blog_post_model_1.update_timestamps()
         self.blog_post_model_1.put()
+        self.blog_post_summary_model.title = 'sample-title'
+        self.blog_post_summary_model.update_timestamps()
+        self.blog_post_summary_model.put()
         expected_output = [
             (
                 u'[u\'failed validation check for domain object check of '
@@ -257,6 +301,25 @@ class BlogPostModelValidatorTests(test_utils.AuditJobsTestBase):
             u'[u\'fully-validated BlogPostModel\', 1]']
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
+
+    def test_model_with_different_title_for_blog_post_summary(self):
+        self.blog_post_model_1.title = 'sample'
+        self.blog_post_model_1.update_timestamps()
+        self.blog_post_model_1.put()
+        self.blog_post_summary_model.title = 'sample-title'
+        self.blog_post_summary_model.update_timestamps()
+        self.blog_post_summary_model.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for Same Title for blog post'
+                ' and blog post summary of BlogPostModel\', '
+                '[u"Title for blog post with Entity id %s'
+                ' does not match with title of corresponding'
+                ' blog post summary model"]]' % (self.blog_post_id_1)
+            ),
+            u'[u\'fully-validated BlogPostModel\', 1]']
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=True)
 
 
 class BlogPostSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
@@ -484,6 +547,31 @@ class BlogPostSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
                     self.blog_post_summary_model_2.title, self.blog_post_id_2
                 )
             )]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=True)
+
+    def test_model_with_repeated_url_fragment(self):
+        self.blog_post_summary_model_1.url_fragment = 'sample-url'
+        self.blog_post_summary_model_2.url_fragment = 'sample-url'
+        self.blog_post_summary_model_1.update_timestamps()
+        self.blog_post_summary_model_1.put()
+        self.blog_post_summary_model_2.update_timestamps()
+        self.blog_post_summary_model_2.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for unique url fragment for '
+                'blog post of BlogPostSummaryModel\', '
+                '[u"Entity id %s: url fragment %s matches with url fragment'
+                ' of blog post summary models with ids [\'%s\']",'
+                ' u"Entity id %s: url fragment %s matches with url'
+                ' fragment of blog post summary models with ids [\'%s\']"]]' % (
+                    self.blog_post_id_1,
+                    self.blog_post_summary_model_1.url_fragment,
+                    self.blog_post_id_2, self.blog_post_id_2,
+                    self.blog_post_summary_model_1.url_fragment,
+                    self.blog_post_id_1)
+            )
+            ]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=True)
 

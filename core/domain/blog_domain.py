@@ -19,12 +19,10 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import json
 import re
 
 from constants import constants
 from core.domain import html_cleaner
-from core.domain import user_services
 
 import python_utils
 import utils
@@ -138,8 +136,8 @@ class BlogPost(python_utils.OBJECT):
 
             if not re.match(constants.BLOG_POST_TAG_REGEX, tag):
                 raise utils.ValidationError(
-                    'Tags should only contain alphanumeric characters and spaces, '
-                    'received: \'%s\'' % tag)
+                    'Tags should only contain alphanumeric characters '
+                    'and spaces, received: \'%s\'' % tag)
 
             if not re.match(r'^[^\s]+(\s+[^\s]+)*$', tag):
                 raise utils.ValidationError(
@@ -230,8 +228,7 @@ class BlogPost(python_utils.OBJECT):
             self.last_updated) if self.published_on else None
         return {
             'id': self.id,
-            'author_name': user_services.get_user_id_from_username(
-                self.author_id),
+            'author_id': self.author_id,
             'title': self.title,
             'content': self.content,
             'thumbnail_filename': self.thumbnail_filename,
@@ -240,44 +237,6 @@ class BlogPost(python_utils.OBJECT):
             'published_on': published_on,
             'last_updated': last_updated
         }
-
-    @classmethod
-    def deserialize(cls, json_string):
-        """Returns a blog post domain object decoded from a JSON string.
-
-        Args:
-            json_string: str. A JSON-encoded utf-8 string that can be
-                decoded into a dictionary representing a blog post. Only call
-                on strings that were created using serialize().
-
-        Returns:
-            BlogPost . The corresponding blog post domain object.
-        """
-        blog_post_dict = json.loads(json_string.decode('utf-8'))
-        published_on = (
-            utils.convert_string_to_naive_datetime_object(
-                blog_post_dict['published_on'])
-            if 'published_on' in blog_post_dict else None)
-        last_updated = (
-            utils.convert_string_to_naive_datetime_object(
-                blog_post_dict['last_updated'])
-            if 'last_updated' in blog_post_dict else None)
-
-        blog_post = cls.from_dict(
-            blog_post_dict, blog_post_published_on=published_on,
-            blog_post_last_updated=last_updated)
-
-        return blog_post
-
-    def serialize(self):
-        """Returns the object serialized as a JSON string.
-
-        Returns:
-            str. JSON-encoded utf-8 string encoding all of the information
-            composing the object.
-        """
-        blog_post_dict = self.to_dict()
-        return json.dumps(blog_post_dict).encode('utf-8')
 
     @classmethod
     def from_dict(
@@ -296,10 +255,8 @@ class BlogPost(python_utils.OBJECT):
         Returns:
             BlogPost. The corresponding blog post domain object.
         """
-        author_id = user_services.get_user_id_from_username(
-            blog_post_dict['author_name'])
         blog_post = cls(
-            blog_post_dict['id'], author_id,
+            blog_post_dict['id'], blog_post_dict['author_id'],
             blog_post_dict['title'], blog_post_dict['content'],
             blog_post_dict['url_fragment'], blog_post_dict['tags'],
             blog_post_dict['thumbnail_filename'],
@@ -516,8 +473,8 @@ class BlogPostSummary(python_utils.OBJECT):
 
             if not re.match(constants.BLOG_POST_TAG_REGEX, tag):
                 raise utils.ValidationError(
-                    'Tags should only contain alphanumeric characters and spaces, '
-                    'received: \'%s\'' % tag)
+                    'Tags should only contain alphanumeric characters '
+                    'and spaces, received: \'%s\'' % tag)
 
             if not re.match(r'^[^\s]+(\s+[^\s]+)*$', tag):
                 raise utils.ValidationError(
@@ -549,8 +506,7 @@ class BlogPostSummary(python_utils.OBJECT):
             self.last_updated) if self.published_on else None
         return {
             'id': self.id,
-            'author_name': user_services.get_username(
-                self.author_id),
+            'author_id': self.author_id,
             'title': self.title,
             'summary': self.summary,
             'thumbnail_filename': self.thumbnail_filename,
@@ -559,25 +515,6 @@ class BlogPostSummary(python_utils.OBJECT):
             'published_on': published_on,
             'last_updated': last_updated
         }
-
-    def serialize(self):
-        """Returns the object serialized as a JSON string.
-
-        Returns:
-            str. JSON-encoded utf-8 string encoding all of the information
-            composing the object.
-        """
-        blog_post_summary_dict = self.to_dict()
-
-        if self.last_updated:
-            blog_post_summary_dict['last_updated'] = (
-                utils.convert_naive_datetime_to_string(self.last_updated))
-
-        if self.published_on:
-            blog_post_summary_dict['published_on'] = (
-                utils.convert_naive_datetime_to_string(self.published_on))
-
-        return json.dumps(blog_post_summary_dict).encode('utf-8')
 
 
 class BlogPostRights(python_utils.OBJECT):
@@ -605,8 +542,7 @@ class BlogPostRights(python_utils.OBJECT):
         """
         return {
             'blog_post_id': self.id,
-            'editor_names': user_services.get_human_readable_user_ids(
-                self.editor_ids),
+            'editor_ids': self.editor_ids,
             'blog_post_is_published': self.blog_post_is_published
         }
 
