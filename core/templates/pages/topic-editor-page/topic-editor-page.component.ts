@@ -57,13 +57,13 @@ angular.module('oppia').directive('topicEditorPage', [
         '/pages/topic-editor-page/topic-editor-page.component.html'),
       controllerAs: '$ctrl',
       controller: [
-        'BottomNavbarStatusService', 'ContextService', 'LoaderService',
-        'PageTitleService', 'PreventPageUnloadEventService',
+        '$rootScope', 'BottomNavbarStatusService', 'ContextService',
+        'LoaderService', 'PageTitleService', 'PreventPageUnloadEventService',
         'TopicEditorRoutingService', 'TopicEditorStateService',
         'UndoRedoService', 'UrlService',
         function(
-            BottomNavbarStatusService, ContextService, LoaderService,
-            PageTitleService, PreventPageUnloadEventService,
+            $rootScope, BottomNavbarStatusService, ContextService,
+            LoaderService, PageTitleService, PreventPageUnloadEventService,
             TopicEditorRoutingService, TopicEditorStateService,
             UndoRedoService, UrlService) {
           var ctrl = this;
@@ -191,6 +191,14 @@ angular.module('oppia').directive('topicEditorPage', [
               TopicEditorStateService.onTopicReinitialized.subscribe(
                 () => setPageTitle()
               ));
+            // This subscription can be removed once this component is migrated.
+            ctrl.directiveSubscriptions.add(
+              TopicEditorRoutingService.updateViewEventEmitter.subscribe(
+                () => {
+                  $rootScope.$applyAsync();
+                }
+              )
+            );
             TopicEditorStateService.loadTopic(UrlService.getTopicIdFromUrl());
             PageTitleService.setPageTitleForMobileView('Topic Editor');
             PreventPageUnloadEventService.addListener(

@@ -16,7 +16,7 @@
  * @fileoverview Service that handles routing for the topic editor page.
  */
 
-import { Injectable } from '@angular/core';
+import { Injectable, EventEmitter } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -34,6 +34,7 @@ export class TopicEditorRoutingService {
   private _lastTabVisited = 'main';
   private _lastSubtopicId = null;
   private _activeTabName = this._MAIN_TAB;
+  private _updateViewEventEmitter: EventEmitter<void> = new EventEmitter();
 
   constructor(
     private windowRef: WindowRef,
@@ -60,6 +61,7 @@ export class TopicEditorRoutingService {
     } else if (newHash.startsWith('/topic_preview')) {
       this._activeTabName = this._TOPIC_PREVIEW_TAB;
     }
+    this._updateViewEventEmitter.emit();
   }
 
   getActiveTabName(): string {
@@ -116,6 +118,10 @@ export class TopicEditorRoutingService {
         skill_id: skillId
       });
     this.windowRef.nativeWindow.open(skillEditorUrl);
+  }
+
+  get updateViewEventEmitter(): EventEmitter<void> {
+    return this._updateViewEventEmitter;
   }
 }
 
