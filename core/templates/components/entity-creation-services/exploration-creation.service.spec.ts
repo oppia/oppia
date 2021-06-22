@@ -19,6 +19,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { AlertsService } from 'services/alerts.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { LoaderService } from 'services/loader.service';
@@ -64,13 +65,14 @@ class MockWindowRef {
   }
 }
 
-describe('ExplorationCreationService', () => {
+fdescribe('ExplorationCreationService', () => {
   let ecs: ExplorationCreationService;
   let ecbas: MockExploratinoCreationBackendApiService;
   let loaderService: LoaderService;
   let siteAnalyticsService: SiteAnalyticsService;
   let urlInterpolationService: UrlInterpolationService;
   let csrfTokenService: CsrfTokenService;
+  let alertsService: AlertsService;
   let windowRef: MockWindowRef;
   let ngbModal: NgbModal;
 
@@ -98,6 +100,7 @@ describe('ExplorationCreationService', () => {
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     csrfTokenService = TestBed.inject(CsrfTokenService);
+    alertsService = TestBed.inject(AlertsService);
     ngbModal = TestBed.inject(NgbModal);
   });
 
@@ -193,11 +196,14 @@ describe('ExplorationCreationService', () => {
       let d = $.Deferred();
       d.resolve(
         options.dataFilter(')]}\',\n{"explorationId": "expId"}')
-      ).promise();
-      return d;
+      );
+      return d.promise();
     });
 
     ecs.showUploadExplorationModal();
+    tick();
+
+    expect(windowRef.nativeWindow.location.href).toBe('/create/expId');
   }));
 
   it('should show upload exploration modal', fakeAsync(() => {
@@ -209,6 +215,8 @@ describe('ExplorationCreationService', () => {
       }
     );
     spyOn(csrfTokenService, 'getTokenAsync').and.resolveTo('sample-csrf-token');
+    spyOn(alertsService, 'addWarning');
+    spyOn(loaderService, 'hideLoadingScreen');
 
     // @ts-ignore in order to ignore JQuery properties that should
     // be declared.
@@ -216,10 +224,15 @@ describe('ExplorationCreationService', () => {
       let d = $.Deferred();
       d.reject({
         responseText: ')]}\',\n{"error": "Failed to upload exploration"}'
-      }).promise();
-      return d;
+      });
+      return d.promise();
     });
 
     ecs.showUploadExplorationModal();
+    tick();
+
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'Failed to upload exploration');
+    expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
   }));
 });
