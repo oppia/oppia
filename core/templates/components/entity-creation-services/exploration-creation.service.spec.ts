@@ -1,0 +1,226 @@
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+/**
+ * @fileoverview Unit test for Exploration creation service.
+ */
+
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { fakeAsync, flushMicrotasks, TestBed, tick } from '@angular/core/testing';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { CsrfTokenService } from 'services/csrf-token.service';
+import { LoaderService } from 'services/loader.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { ExplorationCreationBackendApiService, ExplorationCreationResponse } from './exploration-creation-backend-api.service';
+import { ExplorationCreationService } from './exploration-creation.service';
+
+class MockExploratinoCreationBackendApiService {
+  throwError: boolean = false;
+  message: string;
+  registerNewExplorationAsync(): object {
+    return {
+      then: (
+        successCallback: (response: {explorationId: string}) => void,
+        errorCallback: (errorMessage: string) => void
+      ) => {
+        if(this.throwError) {
+          errorCallback(this.message)
+        } else {
+          successCallback({
+            explorationId: 'exp1'
+          });
+        }
+      }
+    };
+  }
+}
+
+class MockWindowRef {
+  _window = {
+    location: {
+      _href: '',
+      get href(): string {
+        return this._href;
+      },
+      set href(val) {
+        this._href = val;
+      }
+    }
+  };
+  get nativeWindow() {
+    return this._window;
+  }
+}
+
+fdescribe('ExplorationCreationService', () => {
+  let ecs: ExplorationCreationService;
+  let ecbas: MockExploratinoCreationBackendApiService;
+  let loaderService: LoaderService;
+  let siteAnalyticsService: SiteAnalyticsService;
+  let urlInterpolationService: UrlInterpolationService;
+  let csrfTokenService: CsrfTokenService;
+  let windowRef: MockWindowRef;
+  let ngbModal: NgbModal;
+
+  beforeEach(() => {
+    windowRef = new MockWindowRef();
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [
+        {
+          provide: ExplorationCreationBackendApiService,
+          useClass: MockExploratinoCreationBackendApiService
+        },
+        {
+          provide: WindowRef,
+          useValue: windowRef
+        }
+      ]
+    });
+
+    ecs = TestBed.inject(ExplorationCreationService);
+    ecbas = (TestBed.inject(ExplorationCreationBackendApiService) as
+      unknown) as MockExploratinoCreationBackendApiService;
+    loaderService = TestBed.inject(LoaderService);
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
+    csrfTokenService = TestBed.inject(CsrfTokenService);
+    ngbModal = TestBed.inject(NgbModal);
+  });
+
+  it('should not create a new exploration if another exploration' +
+    ' creation is in progress', () => {
+    spyOn(ecbas, 'registerNewExplorationAsync');
+    ecs.explorationCreationInProgress = true;
+
+    expect(ecs.createNewExploration()).toBe(undefined);
+    expect(ecbas.registerNewExplorationAsync).not.toHaveBeenCalled();
+  });
+
+  it('should show \'Creating exploration\' loading screen while' +
+    ' creating exploration', () => {
+    spyOn(ecbas, 'registerNewExplorationAsync').and.returnValue(
+      new Promise<ExplorationCreationResponse>((resolve, reject) => {}));
+    spyOn(loaderService, 'showLoadingScreen');
+    ecs.explorationCreationInProgress = false;
+
+    ecs.createNewExploration();
+
+    expect(loaderService.showLoadingScreen)
+      .toHaveBeenCalledWith('Creating exploration');
+    expect(ecbas.registerNewExplorationAsync).toHaveBeenCalled();
+  });
+
+  it('should create new exploration', fakeAsync(() => {
+    spyOn(siteAnalyticsService, 'registerCreateNewExplorationEvent');
+    spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
+      '/url/to/exp1'
+    );
+
+    expect(ecs.explorationCreationInProgress).toBe(undefined);
+    expect(windowRef.nativeWindow.location.href).toBe('');
+
+    ecs.createNewExploration();
+    tick(150);
+
+    expect(ecs.explorationCreationInProgress).toBe(true);
+    expect(windowRef.nativeWindow.location.href).toBe('/url/to/exp1');
+  }));
+
+  it('should create new exploration', fakeAsync(() => {
+    spyOn(siteAnalyticsService, 'registerCreateNewExplorationEvent');
+    spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
+      '/url/to/exp1'
+    );
+
+    expect(ecs.explorationCreationInProgress).toBe(undefined);
+    expect(windowRef.nativeWindow.location.href).toBe('');
+
+    ecs.createNewExploration();
+    tick(150);
+
+    expect(ecs.explorationCreationInProgress).toBe(true);
+    expect(windowRef.nativeWindow.location.href).toBe('/url/to/exp1');
+  }));
+
+  it('should handle error if exploration creation fails', fakeAsync(() => {
+    spyOn(siteAnalyticsService, 'registerCreateNewExplorationEvent');
+    spyOn(urlInterpolationService, 'interpolateUrl');
+    spyOn(loaderService, 'hideLoadingScreen');
+
+    ecbas.throwError = true;
+
+    expect(ecs.explorationCreationInProgress).toBe(undefined);
+    expect(windowRef.nativeWindow.location.href).toBe('');
+
+    ecs.createNewExploration();
+    tick(150);
+
+    expect(ecs.explorationCreationInProgress).toBe(false);
+    expect(windowRef.nativeWindow.location.href).toBe('');
+    expect(siteAnalyticsService.registerCreateNewExplorationEvent)
+      .not.toHaveBeenCalled();
+    expect(urlInterpolationService.interpolateUrl).not.toHaveBeenCalled();
+    expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
+  }));
+
+  it('should show upload exploration modal', fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.returnValue(
+      <NgbModalRef>{
+        result: Promise.resolve({
+          yamlFile: ''
+        })
+      }
+    );
+    spyOn(csrfTokenService, 'getTokenAsync').and.resolveTo('sample-csrf-token');
+
+    // @ts-ignore in order to ignore JQuery properties that should
+    // be declared.
+    spyOn($, 'ajax').and.callFake(function() {
+      let d = $.Deferred();
+      d.resolve({
+        explorationId: 'expId'
+      });
+      return d.promise();
+    });
+
+    ecs.showUploadExplorationModal();
+
+  }));
+
+  it('should show upload exploration modal', fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.returnValue(
+      <NgbModalRef>{
+        result: Promise.resolve({
+          yamlFile: ''
+        })
+      }
+    );
+    spyOn(csrfTokenService, 'getTokenAsync').and.resolveTo('sample-csrf-token');
+
+    // @ts-ignore in order to ignore JQuery properties that should
+    // be declared.
+    spyOn($, 'ajax').and.callFake(function() {
+      let d = $.Deferred();
+      d.reject({
+        responseText: ')]}\',\n{"error": "Failed to upload exploration"}'
+      });
+      return d.promise();
+    });
+
+    ecs.showUploadExplorationModal();
+
+  }));
+});
