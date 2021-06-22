@@ -25,12 +25,14 @@ import { BeamJobRun } from 'domain/admin/beam-job-run.model';
 import { ReleaseCoordinatorBackendApiService } from 'pages/release-coordinator-page/services/release-coordinator-backend-api.service';
 import { BeamJobRunResult } from 'domain/admin/beam-job-run-result.model';
 import { AlertDialogComponent } from 'pages/release-coordinator-page/components/alert-dialog.component';
+import { FormControl } from '@angular/forms';
 
 @Component({
   selector: 'view-beam-job-output-dialog',
   templateUrl: './view-beam-job-output-dialog.component.html',
 })
 export class ViewBeamJobOutputDialogComponent implements OnInit, OnDestroy {
+  selectedTab = new FormControl(0);
   output: BeamJobRunResult = null;
   subscription: Subscription = null;
 
@@ -39,6 +41,20 @@ export class ViewBeamJobOutputDialogComponent implements OnInit, OnDestroy {
       public dialogRef: MatDialogRef<ViewBeamJobOutputDialogComponent>,
       private matDialog: MatDialog,
       private backendApiService: ReleaseCoordinatorBackendApiService) {}
+
+  getOutput(): string {
+    if (!this.output) {
+      return '';
+    }
+    if (this.output.stdout && this.output.stderr) {
+      return this.selectedTab.value ?
+        this.output.stderr : this.output.stdout;
+    } else if (this.output.stdout) {
+      return this.output.stdout;
+    } else {
+      return this.output.stderr;
+    }
+  }
 
   ngOnInit(): void {
     this.subscription = (

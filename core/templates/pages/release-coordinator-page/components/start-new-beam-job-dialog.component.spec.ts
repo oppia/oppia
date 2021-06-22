@@ -69,6 +69,8 @@ describe('Start new beam job dialog', () => {
             }),
         },
       ],
+    }).overrideModule(BrowserDynamicTestingModule, {
+      set: { entryComponents: [AlertDialogComponent] }
     }).compileComponents();
 
     backendApiService = TestBed.inject(ReleaseCoordinatorBackendApiService);

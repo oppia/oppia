@@ -121,6 +121,52 @@ describe('View beam job output dialog', () => {
     expect(component.output).toEqual(result);
   });
 
+  it('should use the output corresponding to the selected tab', async() => {
+    const getBeamJobRunOutputSpy = (
+      spyOn(backendApiService, 'getBeamJobRunOutput')
+        .and.returnValue(of(new BeamJobRunResult('abc', '123')))
+    );
+
+    fixture.detectChanges();
+    expect(getBeamJobRunOutputSpy).toHaveBeenCalledWith(beamJobRun);
+
+    expect(component.getOutput()).toEqual('abc');
+
+    component.selectedTab.setValue(1);
+    fixture.detectChanges();
+
+    expect(component.getOutput()).toEqual('123');
+
+    component.selectedTab.setValue(0);
+    fixture.detectChanges();
+
+    expect(component.getOutput()).toEqual('abc');
+  });
+
+  it('should show stderr when stdout is empty', async() => {
+    const getBeamJobRunOutputSpy = (
+      spyOn(backendApiService, 'getBeamJobRunOutput')
+        .and.returnValue(of(new BeamJobRunResult('', '123')))
+    );
+
+    fixture.detectChanges();
+    expect(getBeamJobRunOutputSpy).toHaveBeenCalledWith(beamJobRun);
+
+    expect(component.getOutput()).toEqual('123');
+  });
+
+  it('should show stdout when stderr is empty', async() => {
+    const getBeamJobRunOutputSpy = (
+      spyOn(backendApiService, 'getBeamJobRunOutput')
+        .and.returnValue(of(new BeamJobRunResult('abc', '')))
+    );
+
+    fixture.detectChanges();
+    expect(getBeamJobRunOutputSpy).toHaveBeenCalledWith(beamJobRun);
+
+    expect(component.getOutput()).toEqual('abc');
+  });
+
   it('should show the error dialog if the operation failed', async() => {
     const error = new Error();
     const getBeamJobRunOutputSpy = (
