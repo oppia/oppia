@@ -143,7 +143,6 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   // Update the description, numSelections and summary fields of the
   // relevant entry of selectionDetails.
   updateSelectionDetails(itemsType: string): void {
-    console.log(this.selectionDetails)
     let itemsName = this.selectionDetails[itemsType].itemsName;
     let masterList = this.selectionDetails[itemsType].masterList;
 
