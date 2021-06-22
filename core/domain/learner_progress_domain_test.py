@@ -69,7 +69,7 @@ class ActivityIdsInLearnerDashboardUnitTests(test_utils.GenericTestBase):
         learnt_topic_ids = ['7']
         topic_ids_to_learn = ['8']
         all_topic_ids = ['9']
-        new_topic_ids: ['10']
+        new_topic_ids = ['10']
         exploration_playlist_ids = ['11']
         collection_playlist_ids = ['12']
 
@@ -84,7 +84,7 @@ class ActivityIdsInLearnerDashboardUnitTests(test_utils.GenericTestBase):
                 partially_learnt_topic_ids,
                 topic_ids_to_learn,
                 all_topic_ids,
-                new_topic_ids
+                new_topic_ids,
                 exploration_playlist_ids,
                 collection_playlist_ids))
         to_dict_result = observed_activity_ids_in_learner_dashboard.to_dict()

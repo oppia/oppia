@@ -1,0 +1,90 @@
+<mat-card
+  class="oppia-story-dashboard-card">
+  <a [href]="getStoryLink()" target="{{ openInNewWindow ? '_blank' : '_self' }}" class="story-link">
+    <div class="title-section" [ngStyle]="{'background-color': thumbnailBgColor}">
+      <img class="thumbnail-image" [src]="thumbnailUrl">
+      <div class="story-completion">
+        <p class="percent-story-completed">
+          {{storyProgress}}% Complete
+        </p>
+      </div>
+    </div>
+    <div class="summary-section">
+      <span class="story-title">
+        {{storyTitle}}
+      </span>
+      <span class="topic-title">
+        {{topicTitle}}
+      </span>
+    </div>
+  </a>
+</mat-card>
+<style>
+  .story-title {
+    text-align: left;
+    font-size: 16px;
+    letter-spacing: 0px;
+    height: 40px;
+    display: inline-block;
+    color: #333333;
+    opacity: 1;
+    margin: 0px 8px 0 8px;
+  }
+  .story-completion {
+    width: 80px;
+    height: 19px;
+    background: #000000CC 0% 0% no-repeat padding-box;
+    border-radius: 2px;
+    position: relative;
+    float: right;
+    bottom: 23px;
+    right: 4px;
+  }
+  .story-link {
+    text-decoration: none;
+  }
+  .summary-section {
+    position: absolute;
+  }
+  .topic-title {
+    display: block;
+    text-transform: uppercase;
+    text-align: left;
+    font-size: 14px;
+    height: 16px;
+    letter-spacing: 0.05px;
+    font-weight: 300;
+    margin: 4px 8px 12px 8px;
+    padding-bottom: 12px;
+    color: #333333;
+  }
+  .percent-story-completed {
+    font-size: 10px;
+    padding: 2px;
+    width: 100%;
+    margin: 2px;
+    letter-spacing: 0px;
+    color: #FFFFFF;
+  }
+  .oppia-story-dashboard-card {
+    box-shadow: 0px 3px 6px #00000029;
+    border-radius: 4px;
+    position: relative;
+    padding: 0;
+    z-index: 5;
+    width: 192px;
+    display: inline-block;
+    height: 224px;
+    margin: 0px 2px 30px 6px;
+  }
+  .title-section {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    width: 192px;
+    height: 144px;
+  }
+  .thumbnail-image {
+    height: 144px;
+    width: 192px;
+  }
+</style>

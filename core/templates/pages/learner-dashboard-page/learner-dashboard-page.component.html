@@ -66,6 +66,11 @@
     <div class="col-md-2 oppia-learner-dashboard-side-content"
          [ngClass]="{'oppia-learner-dashboard-mobile-mode': checkMobileView()}">
       <mat-card class="oppia-learner-dashboard-main-menu">
+        <!-- <h4 class="oppia-learner-dashboard-menu"
+          [ngClass]="{'oppia-learner-dashboard-section-active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS}"
+          (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS)">
+          <span [innerHTML]="LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS | translate"></span>
+        </h4> -->
         <h4 class="dropdown-toggle oppia-learner-dashboard-menu protractor-test-play-later-section"
             [ngClass]="{'oppia-learner-dashboard-section-active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST}"
             (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST)">
@@ -211,6 +216,13 @@
         </span>
       </div>
       <div class="oppia-learner-dashboard-main-content-container">
+        <!-- <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS">
+          <oppia-goals-tab [currentGoals]="topicsToLearn"
+                           [editGoals]="allTopics"
+                           [completedGoals]="learntTopics"
+                           [learntToPartiallyLearntTopics]="learntToPartiallyLearntTopics">
+          </oppia-goals-tab>
+        </div> -->
         <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS">
           <span class="oppia-learner-dashboard-nonexistent-exploration"
                 *ngIf="numberNonexistentIncompleteExplorations !== 0">
