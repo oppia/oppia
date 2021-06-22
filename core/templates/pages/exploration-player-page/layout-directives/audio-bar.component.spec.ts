@@ -38,7 +38,7 @@ class MockTranslatePipe {
   }
 }
 
-fdescribe('Audio Bar Component', () => {
+describe('Audio Bar Component', () => {
   let component: AudioBarComponent;
   let fixture: ComponentFixture<AudioBarComponent>;
 
