@@ -16,7 +16,7 @@
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { fakeAsync, flushMicrotasks, TestBed, tick } from '@angular/core/testing';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -32,11 +32,11 @@ class MockExploratinoCreationBackendApiService {
   registerNewExplorationAsync(): object {
     return {
       then: (
-        successCallback: (response: {explorationId: string}) => void,
-        errorCallback: (errorMessage: string) => void
+          successCallback: (response: {explorationId: string}) => void,
+          errorCallback: (errorMessage: string) => void
       ) => {
-        if(this.throwError) {
-          errorCallback(this.message)
+        if (this.throwError) {
+          errorCallback(this.message);
         } else {
           successCallback({
             explorationId: 'exp1'
@@ -64,7 +64,7 @@ class MockWindowRef {
   }
 }
 
-fdescribe('ExplorationCreationService', () => {
+describe('ExplorationCreationService', () => {
   let ecs: ExplorationCreationService;
   let ecbas: MockExploratinoCreationBackendApiService;
   let loaderService: LoaderService;
@@ -91,8 +91,9 @@ fdescribe('ExplorationCreationService', () => {
     });
 
     ecs = TestBed.inject(ExplorationCreationService);
-    ecbas = (TestBed.inject(ExplorationCreationBackendApiService) as
-      unknown) as MockExploratinoCreationBackendApiService;
+    ecbas = (TestBed.inject(
+      ExplorationCreationBackendApiService) as unknown) as
+      MockExploratinoCreationBackendApiService;
     loaderService = TestBed.inject(LoaderService);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
@@ -197,7 +198,6 @@ fdescribe('ExplorationCreationService', () => {
     });
 
     ecs.showUploadExplorationModal();
-
   }));
 
   it('should show upload exploration modal', fakeAsync(() => {
@@ -221,6 +221,5 @@ fdescribe('ExplorationCreationService', () => {
     });
 
     ecs.showUploadExplorationModal();
-
   }));
 });
