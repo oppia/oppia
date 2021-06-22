@@ -122,6 +122,7 @@ describe('Contribution Opportunities backend API service', function() {
   );
 
   it('should fail to fetch the skill opportunities data ' +
+    'given invalid cursor ' +
     'when calling \'fetchSkillOpportunitiesAsync\'', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
@@ -179,19 +180,20 @@ describe('Contribution Opportunities backend API service', function() {
   );
 
   it('should fail to fetch the translation opportunities data ' +
+    'given invalid language code ' +
     'when calling \'fetchTranslationOpportunitiesAsync\'', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
 
     contributionOpportunitiesBackendApiService
-      .fetchTranslationOpportunitiesAsync('hi', 'invalidCursor',).then(
+      .fetchTranslationOpportunitiesAsync('invlaidCode', 'invalidCursor',).then(
         successHandler, failHandler
       );
     const req = httpTestingController.expectOne(
       urlInterpolationService.interpolateUrl(
         '/opportunitiessummaryhandler/<opportunityType>',
         { opportunityType: 'translation' }
-      ) + '?language_code=hi&cursor=invalidCursor'
+      ) + '?language_code=invlaidCode&cursor=invalidCursor'
     );
 
     expect(req.request.method).toEqual('GET');
@@ -237,19 +239,20 @@ describe('Contribution Opportunities backend API service', function() {
   );
 
   it('should fail to fetch the voiceover opportunities data ' +
+    'given invali language code ' +
     'when calling \'fetchVoiceoverOpportunitiesAsync\'', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
 
     contributionOpportunitiesBackendApiService
-      .fetchVoiceoverOpportunitiesAsync('hi', 'invalidCursor',).then(
+      .fetchVoiceoverOpportunitiesAsync('invalidCode', 'invalidCursor',).then(
         successHandler, failHandler
       );
     const req = httpTestingController.expectOne(
       urlInterpolationService.interpolateUrl(
         '/opportunitiessummaryhandler/<opportunityType>',
         { opportunityType: 'voiceover' }
-      ) + '?language_code=hi&cursor=invalidCursor'
+      ) + '?language_code=invalidCode&cursor=invalidCursor'
     );
 
     expect(req.request.method).toEqual('GET');
