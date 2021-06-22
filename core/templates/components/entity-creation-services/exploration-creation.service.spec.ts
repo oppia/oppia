@@ -189,12 +189,12 @@ describe('ExplorationCreationService', () => {
 
     // @ts-ignore in order to ignore JQuery properties that should
     // be declared.
-    spyOn($, 'ajax').and.callFake(function() {
+    spyOn($, 'ajax').and.callFake((options) => {
       let d = $.Deferred();
-      d.resolve({
-        explorationId: 'expId'
-      });
-      return d.promise();
+      d.resolve(
+        options.dataFilter(')]}\',\n{"explorationId": "expId"}')
+      ).promise();
+      return d;
     });
 
     ecs.showUploadExplorationModal();
@@ -212,12 +212,12 @@ describe('ExplorationCreationService', () => {
 
     // @ts-ignore in order to ignore JQuery properties that should
     // be declared.
-    spyOn($, 'ajax').and.callFake(function() {
+    spyOn($, 'ajax').and.callFake(() => {
       let d = $.Deferred();
       d.reject({
         responseText: ')]}\',\n{"error": "Failed to upload exploration"}'
-      });
-      return d.promise();
+      }).promise();
+      return d;
     });
 
     ecs.showUploadExplorationModal();
