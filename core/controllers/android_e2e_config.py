@@ -17,10 +17,13 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import os
+
 from constants import constants
 from core.controllers import base
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import fs_services
 from core.domain import opportunity_services
 from core.domain import question_domain
 from core.domain import question_services
@@ -66,17 +69,17 @@ class InitializeAndroidTestData(base.BaseHandler):
 
             topic = topic_domain.Topic.create_default_topic(
                 topic_id, 'Android test', 'test-topic-one', 'description')
-            topic.update_url_fragment('topic_url')
+            topic.update_url_fragment('test-topic')
             topic.update_meta_tag_content('tag')
             topic.update_page_title_fragment_for_web('page title for topic')
-            topic.update_thumbnail_filename('testing_topic.svg')
+            topic.update_thumbnail_filename('test_svg.svg')
             topic.update_thumbnail_bg_color('#C6DCDA')
 
             topic.add_canonical_story(story_id)
             topic.add_uncategorized_skill_id(skill_id)
             topic.add_subtopic(1, 'Test Subtopic Title')
             topic.update_subtopic_url_fragment(1, 'suburl')
-            topic.update_subtopic_thumbnail_filename(1, 'testing_topic.svg')
+            topic.update_subtopic_thumbnail_filename(1, 'test_svg.svg')
             topic.update_subtopic_thumbnail_bg_color(1, '#FFFFFF')
 
             topic.move_skill_id_to_subtopic(None, 1, skill_id)
@@ -98,7 +101,7 @@ class InitializeAndroidTestData(base.BaseHandler):
                 })], 'Changed correctness_feedback_enabled.')
             story = story_domain.Story.create_default_story(
                 story_id, 'Android End to End testing', 'Description',
-                topic_id, 'android-e2e-testing')
+                topic_id, 'android-end-to-end-testing')
 
             story_node_dicts = [{
                 'exp_id': exp_id,
@@ -127,11 +130,11 @@ class InitializeAndroidTestData(base.BaseHandler):
 
                 story.update_node_thumbnail_filename(
                     '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
-                    'testing_skill.svg')
+                    'test_svg.svg')
                 story.update_node_thumbnail_bg_color(
                     '%s%d' % (story_domain.NODE_ID_PREFIX, node_id), '#F8BF74')
                 story.update_meta_tag_content('tag')
-                story.update_thumbnail_filename('testing_skill.svg')
+                story.update_thumbnail_filename('test_svg.svg')
                 story.update_thumbnail_bg_color(
                     constants.ALLOWED_THUMBNAIL_BG_COLORS['story'][0])
 
@@ -169,8 +172,23 @@ class InitializeAndroidTestData(base.BaseHandler):
 
             topic_services.publish_story(topic_id, story_id, user_id)
             topic_services.publish_topic(topic_id, user_id)
+            self._upload_thumbnail(topic_id, feconf.ENTITY_TYPE_TOPIC)
+            self._upload_thumbnail(story_id, feconf.ENTITY_TYPE_STORY)
         else:
             raise Exception('Cannot load new structures data in production.')
+
+    def _upload_thumbnail(self, structure_id, structure_type):
+        """Uploads images to the local datastore to be fetched using the
+        AssetDevHandler.
+        """
+
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
+            encoding=None) as f:
+            image_content = f.read()
+            fs_services.save_original_and_compressed_versions_of_image(
+                'test_svg.svg', structure_type, structure_id,
+                image_content, 'thumbnail', False)
 
     def _create_dummy_question(
             self, question_id, question_content, linked_skill_ids):
