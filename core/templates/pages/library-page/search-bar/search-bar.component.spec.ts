@@ -88,6 +88,7 @@ class MockNavigationService {
   ACTION_OPEN: string = 'open';
   ACTION_CLOSE: string = 'close';
 }
+for(let i = 0; i < 100; i++) {
 
 fdescribe('Search bar component', () => {
   let classroomBackendApiService: ClassroomBackendApiService;
@@ -103,37 +104,7 @@ fdescribe('Search bar component', () => {
   let fixture: ComponentFixture<SearchBarComponent>;
   let initTranslationEmitter = new EventEmitter();
   let preferredLanguageCodesLoadedEmitter = new EventEmitter();
-  let selectionDetails: SelectionDetails = {
-    categories: {
-      description: 'description',
-      itemsName: 'categories',
-      masterList: [
-        {
-          id: 'id',
-          text: 'category 1'
-        },
-        {
-          id: 'id_2',
-          text: 'category 2'
-        },
-        {
-          id: 'id_3',
-          text: 'category 3'
-        }
-      ],
-      selections: { id: true, id_2: true, id_3: true },
-      numSelections: 0,
-      summary: 'all categories'
-    },
-    languageCodes: {
-      description: 'English',
-      itemsName: 'languages',
-      masterList: [],
-      numSelections: 1,
-      selections: {en: true},
-      summary: 'English'
-    }
-  };
+  let selectionDetailsStub: SelectionDetails;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -164,6 +135,49 @@ fdescribe('Search bar component', () => {
   }));
 
   beforeEach(() => {
+    selectionDetailsStub = {
+      categories: {
+        description: 'description',
+        itemsName: 'categories',
+        masterList: [
+          {
+            id: 'id',
+            text: 'category 1'
+          },
+          {
+            id: 'id_2',
+            text: 'category 2'
+          },
+          {
+            id: 'id_3',
+            text: 'category 3'
+          }
+        ],
+        selections: { id: true, id_2: true, id_3: true },
+        numSelections: 0,
+        summary: 'all categories'
+      },
+      languageCodes: {
+        description: 'English',
+        itemsName: 'languages',
+        masterList: [
+          {
+          id: "en",
+          text: "English"
+          },
+          {
+            id: "es",
+            text: "Spanish"
+          }
+        ],
+        numSelections: 1,
+        selections: {en: true},
+        summary: 'English'
+      }
+    };
+  });
+
+  beforeEach(() => {
     fixture = TestBed.createComponent(SearchBarComponent);
     component = fixture.componentInstance;
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
@@ -186,6 +200,25 @@ fdescribe('Search bar component', () => {
 
     component.ngOnInit();
     fixture.detectChanges();
+  });
+
+  describe('should update selection details', () => {
+    it('if selected languages are greater than zero ', () => {
+      expect(component.selectionDetails.languageCodes.description).toEqual(
+        'I18N_LIBRARY_ALL_LANGUAGES_SELECTED');
+      component.selectionDetails = selectionDetailsStub;
+      spyOn(translateService, 'instant').and.returnValue('English');
+      component.updateSelectionDetails('languageCodes');
+      expect(component.selectionDetails.languageCodes.description).toEqual(
+        'English');
+    });
+
+    it('if there are no selections', () => {
+      spyOn(translateService, 'instant').and.returnValue('key');
+      component.updateSelectionDetails('categories');
+      expect(component.selectionDetails.categories.numSelections).toEqual(0);
+    });
+  
   });
 
   it ('should search', () => {
@@ -215,25 +248,6 @@ fdescribe('Search bar component', () => {
     navigationService.activeMenuName = activeMenuName;
     component.onMenuKeypress(null, null, null);
     expect(component.activeMenuName).toEqual(activeMenuName);
-  });
-
-  it('should update selection details', () => {
-    spyOn(translateService, 'instant').and.returnValue('key');
-    component.selectionDetails = selectionDetails;
-    component.updateSelectionDetails('categories');
-  });
-
-  it('should update selection details when they are no selections', () => {
-    spyOn(translateService, 'instant').and.returnValue('key');
-    component.updateSelectionDetails('categories');
-    expect(component.selectionDetails.categories.numSelections).toEqual(0);
-  });
-
-  it('should update selection details', () => {
-    spyOn(translateService, 'instant').and.returnValue('key');
-    component.updateSelectionDetails('languageCodes');
-    expect(component.selectionDetails.languageCodes.description).toEqual(
-      'I18N_LIBRARY_ALL_LANGUAGES_SELECTED');
   });
 
   it('should toggle selection', () => {
@@ -333,3 +347,4 @@ fdescribe('Search bar component', () => {
     component.openSubmenu(null, null);
   });
 });
+}
