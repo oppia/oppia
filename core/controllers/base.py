@@ -311,7 +311,7 @@ class BaseHandler(webapp2.RequestHandler):
             self.handle_exception(e, self.app.debug)
             schema_validation_succeeded = False
 
-        if schema_validation_succeeded is False:
+        if not schema_validation_succeeded:
             return
 
         super(BaseHandler, self).dispatch()
@@ -325,10 +325,22 @@ class BaseHandler(webapp2.RequestHandler):
         """
         handler_class_name = self.__class__.__name__
         request_method = self.request.environ['REQUEST_METHOD']
-        handler_args = self.payload
         url_path_args = self.request.route_kwargs
         handler_class_names_with_no_schema = (
             payload_validator.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA)
+
+        if request_method in ['GET', 'DELETE']:
+            handler_args = {}
+            for arg in self.request.arguments():
+                handler_args[arg] = self.request.get(arg)
+        else:
+            # When request_method in ['PUT', 'POST']
+            handler_args = self.payload
+        if handler_args is None:
+            # When a handler class expects an argument but it is missing in
+            # payloads then for raising exception for missing args,
+            # handler_args must be initialized with empty dict.
+            handler_args = {}
 
         if handler_class_name in handler_class_names_with_no_schema:
             return
@@ -341,29 +353,19 @@ class BaseHandler(webapp2.RequestHandler):
         # For html handlers, extra args are allowed (to accommodate
         # e.g. utm parameters which are not used by the backend but
         # needed for analytics).
-        extra_args_are_allowed = False
-        if (self.GET_HANDLER_ERROR_RETURN_TYPE == 'html' and
-                request_method == 'GET'):
-            extra_args_are_allowed = True
+        extra_args_are_allowed = (
+            self.GET_HANDLER_ERROR_RETURN_TYPE == 'html' and
+                request_method == 'GET')
 
-        # Validation for url path elements.
         schema_for_url_path_args = self.URL_PATH_ARGS_SCHEMAS
         errors = payload_validator.validate(
             url_path_args, schema_for_url_path_args, extra_args_are_allowed)
         if errors:
             raise self.InvalidInputException('\n'.join(errors))
 
-        # Validation for body params and url query string params.
-        if request_method in ['GET', 'DELETE']:
-            handler_args = {}
-            for arg in self.request.arguments():
-                handler_args[arg] = self.request.get(arg)
-        if handler_args is None:
-            return
-
         try:
-            schema_for_handler_args = self.HANDLER_ARGS_SCHEMAS
-            schema_for_request_method = schema_for_handler_args[request_method]
+            schema_for_request_method = self.HANDLER_ARGS_SCHEMAS[
+                request_method]
         except Exception:
             raise NotImplementedError(
                 'Missing schema for %s method in %s handler class.' % (

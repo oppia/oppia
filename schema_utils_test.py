@@ -778,7 +778,7 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
             mappings: list(tuple). A list of 2-element tuples.
                 The first element of each item is expected to be normalized to
                 the second.
-            invalid_items_with_error_messages: list(tuple(str, str)). A list of
+            invalid_items_with_error_messages: list(tuple(*, str)). A list of
                 values with their corresponding messages. Each value is expected
                 to raise an AssertionError when normalized.
         """
@@ -1044,7 +1044,15 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
             })
         ]
 
-        invalid_values_with_error_messages = []
+        invalid_values_with_error_messages = [
+            ({
+                'arg_with_some_default': 5
+            },'Expected unicode string, received %s' % 5),
+            ({
+                'arg_with_default_none': 5,
+                'arg_with_some_default': 'python3'
+            }, 'Expected unicode string, received %s' % 5)
+        ]
 
         self.check_normalization(
             schema, mappings, invalid_values_with_error_messages)
@@ -1065,7 +1073,11 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
             })
         ]
 
-        invalid_values_with_error_messages = []
+        invalid_values_with_error_messages = [
+            ({
+                'arg_a': 'arbitary_argument_a'
+            }, 'Missing arg_b in argument.')
+        ]
 
         self.check_normalization(
             schema, mappings, invalid_values_with_error_messages)

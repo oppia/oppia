@@ -61,8 +61,8 @@ def validate(handler_args, handler_args_schemas, allowed_extra_args):
 
     Args:
         handler_args: *. Object for normalization.
-        handler_args_schemas: dict. Schema for objects.
-        allowed_extra_args: bool. Allows extra args.
+        handler_args_schemas: dict. Schema for args.
+        allowed_extra_args: bool. Whether extra args are allowed in handler.
 
     Returns:
         errors: list(str). List of all errors.

@@ -655,9 +655,9 @@
 /core/domain/draft_upgrade_services*.py @DubeySandeep
 
 
-# Schema validation.
-/core/controllers/payload_validator*.py @aks681
+# Data stability.
 /core/controllers/domain_objects_validator*.py @aks681
+/core/controllers/payload_validator*.py @aks681
 
 
 # QA team.
