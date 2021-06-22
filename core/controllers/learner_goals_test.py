@@ -1,4 +1,4 @@
-# Copyright 2017 The Oppia Authors. All Rights Reserved.
+# Copyright 2021 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -143,6 +143,17 @@ class LearnerGoalsHandlerTests(test_utils.GenericTestBase):
             learner_goals_services.get_all_topic_ids_to_learn(
                 self.viewer_id), [self.TOPIC_ID_1, self.TOPIC_ID_2])
 
+        # Fail to add one topic to the learner goal.
+        response = self.post_json(
+            '%s/%s/%s' % (
+                feconf.LEARNER_GOALS_DATA_URL,
+                'InvalidActivityType',
+                self.TOPIC_ID_1), {},
+            csrf_token=csrf_token,
+            expected_status_int=400)
+        self.assertEqual(
+            response['error'], 'Invalid activityType: InvalidActivityType')
+
         # Now we begin testing of not exceeding the limit of activities in the
         # learner goals.
         # Add feconf.MAX_CURRENT_GOALS_COUNT - 2 activities to reach
@@ -172,11 +183,12 @@ class LearnerGoalsHandlerTests(test_utils.GenericTestBase):
 
     def test_remove_topic_from_learner_goals(self):
         self.login(self.VIEWER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
 
         # Add topic to the learner goals.
-        learner_progress_services.add_topic_to_learn(
+        learner_progress_services.validate_and_add_topic_to_learn_goal(
             self.viewer_id, self.TOPIC_ID_1)
-        learner_progress_services.add_topic_to_learn(
+        learner_progress_services.validate_and_add_topic_to_learn_goal(
             self.viewer_id, self.TOPIC_ID_2)
         self.assertEqual(
             learner_goals_services.get_all_topic_ids_to_learn(
@@ -209,5 +221,21 @@ class LearnerGoalsHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(
             learner_goals_services.get_all_topic_ids_to_learn(
                 self.viewer_id), [])
+
+        # Add one topic to the learner goal.
+        self.post_json(
+            '%s/%s/%s' % (
+                feconf.LEARNER_GOALS_DATA_URL,
+                constants.ACTIVITY_TYPE_LEARN_TOPIC,
+                self.TOPIC_ID_1), {},
+            csrf_token=csrf_token)
+
+        # Fail to delete one topic from learner goals.
+        response = self.delete_json('%s/%s/%s' % (
+            feconf.LEARNER_GOALS_DATA_URL,
+            'InvalidActivityType',
+            self.TOPIC_ID_1), expected_status_int=400)
+        self.assertEqual(
+            response['error'], 'Invalid activityType: InvalidActivityType')
 
         self.logout()

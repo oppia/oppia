@@ -33,10 +33,12 @@ class LearnerGoalsHandler(base.BaseHandler):
         goals_limit_exceeded = False
 
         if activity_type == constants.ACTIVITY_TYPE_LEARN_TOPIC:
-            (
-                belongs_to_learnt_list, goals_limit_exceeded) = (
-                    learner_progress_services.add_topic_to_learn(
-                        self.user_id, topic_id))
+            belongs_to_learnt_list, goals_limit_exceeded = (
+                learner_progress_services.validate_and_add_topic_to_learn_goal(
+                    self.user_id, topic_id))
+        else:
+            raise self.InvalidInputException('Invalid activityType: %s' % (
+                activity_type))
 
         self.values.update({
             'belongs_to_learnt_list': belongs_to_learnt_list,
@@ -48,7 +50,10 @@ class LearnerGoalsHandler(base.BaseHandler):
     @acl_decorators.can_access_learner_dashboard
     def delete(self, activity_type, topic_id):
         if activity_type == constants.ACTIVITY_TYPE_LEARN_TOPIC:
-            learner_goals_services.remove_topic_from_learn(
-                self.user_id, topic_id)
+            learner_goals_services.remove_topics_from_learn_goal(
+                self.user_id, [topic_id])
+        else:
+            raise self.InvalidInputException('Invalid activityType: %s' % (
+                activity_type))
 
         self.render_json(self.values)

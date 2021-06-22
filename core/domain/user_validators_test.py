@@ -1018,7 +1018,7 @@ class LearnerGoalsModelValidatorTests(test_utils.AuditJobsTestBase):
         self.signup(USER_EMAIL, USER_NAME)
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
 
-        learner_progress_services.add_topic_to_learn(
+        learner_progress_services.validate_and_add_topic_to_learn_goal(
             self.user_id, self.TOPIC_ID_0)
         learner_progress_services.mark_topic_as_learnt(
             self.user_id, self.TOPIC_ID_1)

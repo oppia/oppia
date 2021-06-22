@@ -245,8 +245,8 @@ class StoryProgressHandler(base.BaseHandler):
         else:
             learner_progress_services.mark_topic_as_learnt(
                 self.user_id, topic.id)
-            learner_goals_services.remove_topic_from_learn(
-                self.user_id, topic.id)
+            learner_goals_services.remove_topics_from_learn_goal(
+                self.user_id, [topic.id])
 
         return self.render_json({
             'summaries': exp_summaries,

@@ -508,7 +508,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
             self.viewer_id, self.STORY_ID, self.NODE_ID_2)
         story_services.record_completed_node_in_story_context(
             self.viewer_id, self.STORY_ID, self.NODE_ID_1)
-        learner_progress_services.add_topic_to_learn(
+        learner_progress_services.validate_and_add_topic_to_learn_goal(
             self.viewer_id, self.TOPIC_ID)
         self.assertEqual(len(
             learner_goals_services.get_all_topic_ids_to_learn(
@@ -617,7 +617,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
                      'id.' % self.STORY_ID])
 
     def test_remove_topic_from_learn(self):
-        learner_progress_services.add_topic_to_learn(
+        learner_progress_services.validate_and_add_topic_to_learn_goal(
             self.viewer_id, self.TOPIC_ID)
         self.assertEqual(
             len(learner_goals_services.get_all_topic_ids_to_learn(

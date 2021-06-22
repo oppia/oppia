@@ -599,7 +599,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.user_id), [self.TOPIC_ID_0, self.TOPIC_ID_1])
 
         # Marking a topic as learnt removes it from the topics to learn list.
-        learner_progress_services.add_topic_to_learn(
+        learner_progress_services.validate_and_add_topic_to_learn_goal(
             self.user_id, self.TOPIC_ID_2)
         self.assertEqual(
             learner_goals_services.get_all_topic_ids_to_learn(
@@ -1740,7 +1740,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(
             learner_goals_services.get_all_topic_ids_to_learn(
                 self.user_id), [])
-        learner_progress_services.add_topic_to_learn(
+        learner_progress_services.validate_and_add_topic_to_learn_goal(
             self.user_id, self.TOPIC_ID_0)
         self.assertEqual(
             learner_goals_services.get_all_topic_ids_to_learn(
@@ -1764,9 +1764,9 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
     def test_unpublishing_topic_filters_it_out_from_topics_to_learn(self):
         # Add topics to learn section of the learner goals.
-        learner_progress_services.add_topic_to_learn(
+        learner_progress_services.validate_and_add_topic_to_learn_goal(
             self.user_id, self.TOPIC_ID_0)
-        learner_progress_services.add_topic_to_learn(
+        learner_progress_services.validate_and_add_topic_to_learn_goal(
             self.user_id, self.TOPIC_ID_1)
         self.assertEqual(
             learner_goals_services.get_all_topic_ids_to_learn(
@@ -1967,7 +1967,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.user_id, self.COL_ID_3)
 
         # Add topics to the learn section of the learner goals.
-        learner_progress_services.add_topic_to_learn(
+        learner_progress_services.validate_and_add_topic_to_learn_goal(
             self.user_id, self.TOPIC_ID_2)
 
         # Get the ids of all the activities.
@@ -2050,7 +2050,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.user_id, self.COL_ID_3)
 
         # Add topics to the learn section of the learner goals.
-        learner_progress_services.add_topic_to_learn(
+        learner_progress_services.validate_and_add_topic_to_learn_goal(
             self.user_id, self.TOPIC_ID_2)
 
         # Get the progress of the user.

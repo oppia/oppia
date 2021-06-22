@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2017 The Oppia Authors. All Rights Reserved.
+# Copyright 2021 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,8 +24,6 @@ from core.platform import models
 import feconf
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
-
-MAX_CURRENT_GOALS_COUNT = feconf.MAX_CURRENT_GOALS_COUNT
 
 
 def get_learner_goals_from_model(learner_goals_model):
@@ -54,12 +52,10 @@ def save_learner_goals(learner_goals):
         learner_goals: LearnerGoals. The learner goals domain object to
             be saved in the datastore.
     """
-    learner_goals_dict = {
-        'topic_ids_to_learn': learner_goals.topic_ids_to_learn
-    }
+    learner_goals_dict = learner_goals.to_dict()
 
-    learner_goals_model = (user_models.LearnerGoalsModel.get_by_id(
-        learner_goals.id))
+    learner_goals_model = (user_models.LearnerGoalsModel.get(
+        learner_goals.id, strict=False))
     if learner_goals_model is not None:
         learner_goals_model.populate(**learner_goals_dict)
         learner_goals_model.update_timestamps()
@@ -79,7 +75,7 @@ def mark_topic_to_learn(user_id, topic_id):
             learner goals.
 
     Returns:
-        bool. The first boolean indicates whether the learner goals limit
+        bool. The boolean indicates whether the learner goals limit
         of the user has been exceeded.
     """
     learner_goals_model = user_models.LearnerGoalsModel.get(
@@ -94,7 +90,7 @@ def mark_topic_to_learn(user_id, topic_id):
     goals_limit_exceeded = False
     topic_ids_count = len(learner_goals.topic_ids_to_learn)
     if topic_id not in learner_goals.topic_ids_to_learn:
-        if topic_ids_count < MAX_CURRENT_GOALS_COUNT:
+        if topic_ids_count < feconf.MAX_CURRENT_GOALS_COUNT:
             learner_goals.add_topic_id_to_learn(topic_id)
         else:
             goals_limit_exceeded = True
@@ -102,13 +98,13 @@ def mark_topic_to_learn(user_id, topic_id):
     return goals_limit_exceeded
 
 
-def remove_topic_from_learn(user_id, topic_id):
-    """Removes the topic from the learner goals of the user
+def remove_topics_from_learn_goal(user_id, topic_ids_in_learn):
+    """Removes topics from the learner goals of the user
     (if present).
 
     Args:
         user_id: str. The id of the user.
-        topic_id: str. The id of the topic to be removed.
+        topic_ids_in_learn: list(str). The ids of the topics to be removed.
     """
     learner_goals_model = user_models.LearnerGoalsModel.get(
         user_id, strict=False)
@@ -116,9 +112,10 @@ def remove_topic_from_learn(user_id, topic_id):
     if learner_goals_model:
         learner_goals = get_learner_goals_from_model(
             learner_goals_model)
-        if topic_id in learner_goals.topic_ids_to_learn:
-            learner_goals.remove_topic_id_from_learn(topic_id)
-            save_learner_goals(learner_goals)
+        for topic_id in topic_ids_in_learn:
+            if topic_id in learner_goals.topic_ids_to_learn:
+                learner_goals.remove_topic_id_from_learn(topic_id)
+                save_learner_goals(learner_goals)
 
 
 def get_all_topic_ids_to_learn(user_id):

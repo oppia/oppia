@@ -255,7 +255,8 @@ def mark_topic_as_learnt(user_id, topic_id):
 
     if topic_id not in activities_completed.learnt_topic_ids:
         remove_topic_from_partially_learnt_list(user_id, topic_id)
-        learner_goals_services.remove_topic_from_learn(user_id, topic_id)
+        learner_goals_services.remove_topics_from_learn_goal(
+            user_id, [topic_id])
         activities_completed.add_learnt_topic_id(topic_id)
         _save_completed_activities(activities_completed)
 
@@ -448,7 +449,7 @@ def mark_collection_as_incomplete(user_id, collection_id):
         _save_incomplete_activities(incomplete_activities)
 
 
-def add_topic_to_learn(user_id, topic_id):
+def validate_and_add_topic_to_learn_goal(user_id, topic_id):
     """This function checks if the topic exists in the learnt.
     If it does not exist we call the function in learner
     goals services to add the topic to the learn list.
@@ -478,29 +479,6 @@ def add_topic_to_learn(user_id, topic_id):
     return (
         belongs_to_learnt_list,
         goals_limit_exceeded)
-
-
-def _remove_topic_ids_from_learner_goals(
-        user_id, topic_ids_in_learn):
-    """Removes the topics from the learner goals of the user.
-
-    Args:
-        user_id: str. The id of the user.
-        topic_ids_in_learn: list(str). The ids of the topics to be removed
-            from learn.
-    """
-    learner_goals_model = user_models.LearnerGoalsModel.get(
-        user_id, strict=False)
-
-    if learner_goals_model:
-        learner_goals = (
-            learner_goals_services.get_learner_goals_from_model(
-                learner_goals_model))
-
-        for topic_id in topic_ids_in_learn:
-            learner_goals.remove_topic_id_from_learn(topic_id)
-
-        learner_goals_services.save_learner_goals(learner_goals)
 
 
 def add_collection_to_learner_playlist(
@@ -1342,8 +1320,8 @@ def _get_filtered_topics_to_learn_summaries(
 
             if (set(story_ids_in_topic).issubset(
                     set(completed_story_ids))):
-                learner_goals_services.remove_topic_from_learn(
-                    user_id, topic_id)
+                learner_goals_services.remove_topics_from_learn_goal(
+                    user_id, [topic_id])
                 mark_topic_as_learnt(user_id, topic_id)
             elif not topic_rights.topic_is_published:
                 nonexistent_topic_ids_to_learn.append(topic_ids[index])
@@ -1941,7 +1919,7 @@ def get_activity_progress(user_id):
     _remove_activity_ids_from_playlist(
         user_id, nonexistent_playlist_exp_ids,
         nonexistent_playlist_collection_ids)
-    _remove_topic_ids_from_learner_goals(
+    learner_goals_services.remove_topics_from_learn_goal(
         user_id, nonexistent_topic_ids_to_learn)
 
     learner_progress = learner_progress_domain.LearnerProgress(

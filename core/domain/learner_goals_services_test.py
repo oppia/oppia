@@ -127,7 +127,7 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
         # Test adding a single topic_id to learn.
         self.assertEqual(
             self._get_all_topic_ids_to_learn(self.viewer_id), [])
-        learner_progress_services.add_topic_to_learn(
+        learner_progress_services.validate_and_add_topic_to_learn_goal(
             self.viewer_id, self.TOPIC_ID_1)
         self.assertEqual(
             self._get_all_topic_ids_to_learn(
@@ -139,13 +139,13 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
             self._get_all_topic_ids_to_learn(
                 self.viewer_id), [])
 
-        learner_progress_services.add_topic_to_learn(
+        learner_progress_services.validate_and_add_topic_to_learn_goal(
             self.viewer_id, self.TOPIC_ID_1)
         self.assertEqual(
             self._get_all_topic_ids_to_learn(
                 self.viewer_id), [self.TOPIC_ID_1])
 
-        learner_progress_services.add_topic_to_learn(
+        learner_progress_services.validate_and_add_topic_to_learn_goal(
             self.viewer_id, self.TOPIC_ID_2)
         self.assertEqual(
             self._get_all_topic_ids_to_learn(
@@ -154,22 +154,22 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
     def test_adding_exisiting_topic_is_not_added_again(self):
         # Test adding the topic_id if it is already in
         # learner_goals.topic_id.
-        learner_progress_services.add_topic_to_learn(
+        learner_progress_services.validate_and_add_topic_to_learn_goal(
             self.viewer_id, self.TOPIC_ID_1)
-        learner_progress_services.add_topic_to_learn(
+        learner_progress_services.validate_and_add_topic_to_learn_goal(
             self.viewer_id, self.TOPIC_ID_2)
         self.assertEqual(
             self._get_all_topic_ids_to_learn(
                 self.viewer_id), [self.TOPIC_ID_1, self.TOPIC_ID_2])
 
-        learner_progress_services.add_topic_to_learn(
+        learner_progress_services.validate_and_add_topic_to_learn_goal(
             self.viewer_id, self.TOPIC_ID_1)
         self.assertEqual(
             self._get_all_topic_ids_to_learn(
                 self.viewer_id), [self.TOPIC_ID_1, self.TOPIC_ID_2])
 
     def test_completed_topic_is_not_added_to_learner_goals(self):
-        learner_progress_services.add_topic_to_learn(
+        learner_progress_services.validate_and_add_topic_to_learn_goal(
             self.viewer_id, self.TOPIC_ID_1)
         self.assertEqual(
             self._get_all_topic_ids_to_learn(
@@ -178,7 +178,7 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
         learner_progress_services.mark_topic_as_learnt(
             self.viewer_id, self.TOPIC_ID_2)
 
-        # Test that the topic added to the in learnt list doesn't get
+        # Test that the topic added to the in the learnt list doesn't get
         # added to the learner goals.
         self.assertEqual(
             self._get_all_topic_ids_to_learn(
@@ -189,7 +189,7 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
         topic_ids = ['SAMPLE_TOPIC_ID_%s' % index for index in (
             python_utils.RANGE(0, MAX_CURRENT_GOALS_COUNT))]
         for topic_id in topic_ids:
-            learner_progress_services.add_topic_to_learn(
+            learner_progress_services.validate_and_add_topic_to_learn_goal(
                 self.viewer_id, topic_id)
         self.assertEqual(
             self._get_all_topic_ids_to_learn(self.viewer_id), topic_ids)
@@ -215,20 +215,20 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
             self.viewer_id), [self.TOPIC_ID_1, self.TOPIC_ID_2])
 
         # Removing a topic.
-        learner_goals_services.remove_topic_from_learn(
-            self.viewer_id, self.TOPIC_ID_1)
+        learner_goals_services.remove_topics_from_learn_goal(
+            self.viewer_id, [self.TOPIC_ID_1])
         self.assertEqual(self._get_all_topic_ids_to_learn(
             self.viewer_id), [self.TOPIC_ID_2])
 
         # Removing the same topic again has no effect.
-        learner_goals_services.remove_topic_from_learn(
-            self.viewer_id, self.TOPIC_ID_1)
+        learner_goals_services.remove_topics_from_learn_goal(
+            self.viewer_id, [self.TOPIC_ID_1])
         self.assertEqual(self._get_all_topic_ids_to_learn(
             self.viewer_id), [self.TOPIC_ID_2])
 
         # Removing the second topic.
-        learner_goals_services.remove_topic_from_learn(
-            self.viewer_id, self.TOPIC_ID_2)
+        learner_goals_services.remove_topics_from_learn_goal(
+            self.viewer_id, [self.TOPIC_ID_2])
         self.assertEqual(self._get_all_topic_ids_to_learn(
             self.viewer_id), [])
 

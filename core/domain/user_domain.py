@@ -822,6 +822,18 @@ class LearnerGoals(python_utils.OBJECT):
         """
         self.topic_ids_to_learn.remove(topic_id)
 
+    def to_dict(self):
+        """Return dictionary representation of LearnerGoals.
+
+        Returns:
+            dict. A dictionary containing the LearnerGoals class information
+            in a dictionary form.
+        """
+        return {
+            'topic_ids_to_learn': self.topic_ids_to_learn,
+            'topic_ids_to_master': self.topic_ids_to_master
+        }
+
 
 class LearnerPlaylist(python_utils.OBJECT):
     """Domain object for the learner playlist model."""
