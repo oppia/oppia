@@ -178,7 +178,7 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
         learner_progress_services.mark_topic_as_learnt(
             self.viewer_id, self.TOPIC_ID_2)
 
-        # Test that the topic added to the in learnt list doesn't get
+        # Test that the topic added to the in the learnt list doesn't get
         # added to the learner goals.
         self.assertEqual(
             self._get_all_topic_ids_to_learn(

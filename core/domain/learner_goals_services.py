@@ -99,12 +99,12 @@ def mark_topic_to_learn(user_id, topic_id):
 
 
 def remove_topics_from_learn_goal(user_id, topic_ids_in_learn):
-    """Removes the topic from the learner goals of the user
+    """Removes topics from the learner goals of the user
     (if present).
 
     Args:
         user_id: str. The id of the user.
-        topic_ids_in_learn: str. The ids of the topics to be removed.
+        topic_ids_in_learn: list(str). The ids of the topics to be removed.
     """
     learner_goals_model = user_models.LearnerGoalsModel.get(
         user_id, strict=False)
