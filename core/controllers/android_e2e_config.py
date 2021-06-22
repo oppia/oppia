@@ -45,7 +45,7 @@ class InitializeAndroidTestData(base.BaseHandler):
 
     def post(self):
         if constants.DEV_MODE:
-            # TODO(#13170): Change this to "26" after #13029 is merged
+            # TODO(#13170): Change this to "26" after #13029 is merged.
             exp_id = '15'
             user_id = feconf.SYSTEM_COMMITTER_ID
             topic_id = topic_fetchers.get_new_topic_id()
