@@ -2193,8 +2193,6 @@ class DisallowHandlerWithoutSchema(checkers.BaseChecker):
             node.locals['URL_PATH_ARGS_SCHEMAS'][0].assigned_stmts())
 
         for value_of_schemas in generator_object_for_value_of_schemas:
-            print(value_of_schemas.name)
-            print(value_of_schemas)
             if value_of_schemas.name != 'dict':
                 return False
         return True
