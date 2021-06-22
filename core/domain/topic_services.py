@@ -42,12 +42,12 @@ import feconf
 import python_utils
 import utils
 
-# Thumbnail resource URL for DEV mode
-BASE_URL_TOPIC_THUMBNAIL_RESOURCE_DEV_MODE = \
-    'http://localhost:8181/assetsdevhandler/topic/'
-# Thumbnail resource URL for PROD mode
-BASE_URL_TOPIC_THUMBNAIL_RESOUCE_PROD_MODE = \
-    'https://storage.googleapis.com/oppiaserver-resources/topic/'
+# Thumbnail resource URL for DEV mode.
+BASE_URL_TOPIC_THUMBNAIL_RESOURCE_DEV_MODE = (
+    'http://localhost:8181/assetsdevhandler/topic/')
+# Thumbnail resource URL for PROD mode.
+BASE_URL_TOPIC_THUMBNAIL_RESOUCE_PROD_MODE = (
+    'https://storage.googleapis.com/oppiaserver-resources/topic/')
 
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
 datastore_services = models.Registry.import_datastore_services()
@@ -281,11 +281,13 @@ def apply_change_list(topic_id, change_list):
                     if constants.DEV_MODE:
                         thumbnail_url = (
                             '%s%s/assets/thumbnail/%s' % (
-                            BASE_URL_TOPIC_THUMBNAIL_RESOURCE_DEV_MODE, topic_id, change.new_value))
+                                BASE_URL_TOPIC_THUMBNAIL_RESOURCE_DEV_MODE,
+                                topic_id, change.new_value))
                     else:
                         thumbnail_url = (
-                                '%s%s/assets/thumbnail/%s' % (
-                            BASE_URL_TOPIC_THUMBNAIL_RESOUCE_PROD_MODE, topic_id, change.new_value))
+                            '%s%s/assets/thumbnail/%s' % (
+                                BASE_URL_TOPIC_THUMBNAIL_RESOUCE_PROD_MODE,
+                                topic_id, change.new_value))
                     thumbnail_size_in_bytes = python_utils.url_open(
                         thumbnail_url).headers['Content-Length']
                     topic.update_thumbnail_size_in_bytes(

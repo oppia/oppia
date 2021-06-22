@@ -240,39 +240,3 @@ class RegenerateTopicSummaryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 sum(ast.literal_eval(v) for v in values))])
         else:
             yield (key, values)
-
-
-class UpdateThumbnailSizeInBytesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """ One-off job to update the thumbnail size in bytes."""
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [topic_models.TopicModel]
-
-    @staticmethod
-    def map(item):
-        if item.deleted:
-            return
-
-        topic = topic_fetchers.get_topic_by_id(item.id)
-
-        # Update topic thumbnail file size
-        topic.update_thumbnail_size_in_bytes(
-            UpdateThumbnailSizeInBytesOneOffJob.compute_thumbnail_size_in_bytes(
-                topic.thumbnail_filename, topic.id))
-
-        # TODO(#Srikanth): Update subtopic thumbnail file size
-
-    @staticmethod
-    def reduce(key, values):
-        yield (key, values)
-
-    @staticmethod
-    def compute_thumbnail_size_in_bytes(thumbnail_filename, topic_id):
-        thumbnail_url = (
-                'http://localhost:8181/assetsdevhandler/topic/%s/assets'
-                '/thumbnail/%s' % (topic_id, thumbnail_filename))
-        thumbnail_size_in_bytes = python_utils.url_open(
-            thumbnail_url).headers['Content-length']
-
-        return thumbnail_size_in_bytes
