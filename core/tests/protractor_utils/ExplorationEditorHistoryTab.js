@@ -113,6 +113,10 @@ var ExplorationEditorHistoryTab = function() {
           'Close State History button takes too long to disappear.');
       },
       deselectVersion: async function() {
+        var toastSuccessElement = element(by.css('.toast-success'));
+        await waitFor.invisibilityOf(
+          toastSuccessElement,
+          'Toast message is taking too long to disappear after saving changes');
         await action.click('Reset graph button', resetGraphButton);
       },
       /*

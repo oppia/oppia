@@ -106,7 +106,12 @@ var ExplorationEditorPage = function() {
   var saveChangesButton = element(by.css('.protractor-test-save-changes'));
   var saveDiscardToggleButton = element(
     by.css('.protractor-test-save-discard-toggle'));
-  var saveDraftButton = element(by.css('.protractor-test-save-draft-button'));
+  var commitChangesButton = element(
+    by.css('.protractor-test-save-draft-button'));
+  var saveDraftButtonTextContainer = element(
+    by.css('.protractor-test-save-draft-message'));
+  var publishChangesButtonTextContainer = element(
+    by.css('.protractor-test-publish-changes-message'));
   var publishExplorationButton = element(
     by.css('.protractor-test-publish-exploration'));
 
@@ -214,22 +219,33 @@ var ExplorationEditorPage = function() {
   };
 
   this.saveChanges = async function(commitMessage) {
-    var toastSuccessElement = element(by.css('.toast-success'));
     await action.waitForAutosave();
     await action.click('Save changes button', saveChangesButton);
     if (commitMessage) {
       await action.sendKeys(
         'Commit message input', commitMessageInput, commitMessage);
     }
-    await action.click('Save draft button', saveDraftButton);
-    await waitFor.visibilityOf(
-      toastSuccessElement,
-      'Toast message is taking too long to appear after saving changes');
-    // This is necessary to give the page time to record the changes,
-    // so that it does not attempt to stop the user leaving.
-    await waitFor.invisibilityOf(
-      toastSuccessElement,
-      'Toast message is taking too long to disappear after saving changes');
+    await action.click('Save draft button', commitChangesButton);
+    // TODO(#13096): Remove browser.sleep from e2e files.
+    /* eslint-disable-next-line oppia/protractor-practices */
+    await browser.sleep(2500);
+    await waitFor.textToBePresentInElement(
+      saveDraftButtonTextContainer, 'Save Draft',
+      'Changes could not be saved');
+  };
+
+  this.publishChanges = async function(commitMessage) {
+    await action.waitForAutosave();
+    await action.click('Save changes button', saveChangesButton);
+    await action.sendKeys(
+      'Commit message input', commitMessageInput, commitMessage);
+    await action.click('Publish changes button', commitChangesButton);
+    // TODO(#13096): Remove browser.sleep from e2e files.
+    /* eslint-disable-next-line oppia/protractor-practices */
+    await browser.sleep(2500);
+    await waitFor.textToBePresentInElement(
+      publishChangesButtonTextContainer, 'Publish Changes',
+      'Changes could not be saved');
   };
 
   this.discardChanges = async function() {
