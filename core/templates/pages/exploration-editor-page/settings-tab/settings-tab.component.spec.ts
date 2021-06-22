@@ -47,6 +47,7 @@ import { ReadOnlyExplorationBackendApiService } from
 import { Subscription } from 'rxjs';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 import { ChangeListService } from '../services/change-list.service';
+import { ExplorationDataService } from '../services/exploration-data.service';
 
 class MockRouterService {
   private refreshSettingsTabEventEmitter: EventEmitter<void>;
@@ -57,7 +58,6 @@ class MockRouterService {
     this.refreshSettingsTabEventEmitter = val;
   }
 }
-
 describe('Settings Tab Component', () => {
   let ctrl = null;
   let $httpBackend = null;
@@ -105,7 +105,19 @@ describe('Settings Tab Component', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [
-        ChangeListService
+        {
+          provide: ExplorationDataService,
+          useValue: {
+            explorationId: explorationId,
+            data: {
+              param_changes: []
+            },
+            getDataAsync: () => $q.resolve(),
+            autosaveChangeListAsync() {
+              return;
+            }
+          }
+        }
       ]
     });
 
@@ -138,17 +150,12 @@ describe('Settings Tab Component', () => {
       'StateInteractionIdService', TestBed.inject(StateInteractionIdService));
     $provide.value(
       'StateSolutionService', TestBed.inject(StateSolutionService));
-    $provide.value('ExplorationDataService', {
-      explorationId: explorationId,
-      data: {
-        param_changes: []
-      },
-      getDataAsync: () => $q.resolve(),
-      autosaveChangeListAsync: () => {}
-    });
     $provide.value(
       'ReadOnlyExplorationBackendApiService',
       TestBed.inject(ReadOnlyExplorationBackendApiService));
+    $provide.value(
+      'ExplorationDataService',
+      TestBed.inject(ExplorationDataService));
   }));
 
   afterEach(() => {
@@ -823,8 +830,6 @@ describe('Settings Tab Component', () => {
       spyOn(explorationStatesService, 'isInitialized').and.returnValue(true);
       spyOn(explorationStatesService, 'getStateNames').and.returnValue([
         'Introduction']);
-      spyOn(explorationDataService, 'autosaveChangeListAsync')
-        .and.returnValue(null);
 
       explorationCategoryService.init('Astrology');
       routerService.refreshSettingsTabEmitter = new EventEmitter();

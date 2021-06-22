@@ -47,7 +47,9 @@ describe('Story summary model', () => {
       story_is_published: true,
       completed_node_titles: ['Chapter 1'],
       url_fragment: 'story-url-fragment',
-      all_node_dicts: [nodeDict]
+      all_node_dicts: [nodeDict],
+      topic_url_fragment: 'topic-one',
+      classroom_url_fragment: 'math'
     };
     _sampleStorySummary = StorySummary.createFromBackendDict(
       sampleStorySummaryBackendDict
@@ -81,5 +83,7 @@ describe('Story summary model', () => {
         thumbnail_bg_color: '#a33f40'
       })
     ]);
+    expect(_sampleStorySummary.getTopicUrlFragment()).toEqual('topic-one');
+    expect(_sampleStorySummary.getClassroomUrlFragment()).toEqual('math');
   });
 });
