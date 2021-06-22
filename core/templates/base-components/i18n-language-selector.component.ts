@@ -49,8 +49,10 @@ export class I18nLanguageSelectorComponent {
       .getCurrentI18nLanguageCode();
     this.supportedSiteLanguages = AppConstants.SUPPORTED_SITE_LANGUAGES;
     this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe((code) => {
-      this.currentLanguageCode = code;
-      this.changeDetectorRef.detectChanges();
+      if (this.currentLanguageCode !== code) {
+        this.currentLanguageCode = code;
+        this.changeDetectorRef.detectChanges();
+      }
     });
   }
 

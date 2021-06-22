@@ -117,14 +117,10 @@ angular.module('oppia').directive('oppiaRoot', [
               );
             }
 
-            const i18nLanguageCodeService = (
-              OppiaAngularRootComponent.i18nLanguageCodeService);
-
-            i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(
+            OppiaAngularRootComponent.translateService.onLangChange.subscribe(
               (code) => {
-                $translate.use(code);
-              }
-            );
+                $translate.use(code.lang);
+              });
 
             // The next line allows the transcluded content to start executing.
             $scope.initialized = true;
