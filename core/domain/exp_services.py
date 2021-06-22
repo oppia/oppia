@@ -1873,14 +1873,13 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
                 else:
                     changed_translations[state_name] = [changed_property]
                 if state_name in changed_properties:
-                    if (change.property_name not in
+                    if ('written_translations' not in
                             changed_properties[state_name]):
                         changed_properties[state_name].append(
                             'written_translations')
                 else:
                     changed_properties[state_name] = ['written_translations']
-        print(changed_properties)
-        print(changed_translations)
+
         # Old_to_new_state_names: dict. Dictionary mapping state names of
         # prev_exp_version to the state names of current_exp_version.
         # It doesn't include the name changes of added/deleted states.
@@ -1968,7 +1967,8 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
                                     for property in ['solution',
                                                      'recorded_voiceovers',
                                                      'answer_groups',
-                                                     'widget_customization_args']) and
+                                                     'widget_customization_args'
+                                                    ]) and
                                     change.property_name not in
                                     changed_translations[old_state_name]):
                                 change_is_mergeable = True
@@ -1984,7 +1984,8 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
                                     for property in ['solution',
                                                      'recorded_voiceovers',
                                                      'answer_groups',
-                                                     'widget_customization_args']) and
+                                                     'widget_customization_args'
+                                                    ]) and
                                     change.property_name not in
                                     changed_translations[old_state_name]):
                                 change_is_mergeable = True
@@ -2029,9 +2030,10 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
                             if (all(property not in
                                     changed_properties[old_state_name]
                                     for property in ['solution',
-                                                     'answer_groups'
-                                                     'widget_customization_args',
-                                                     'recorded_voiceovers']) and
+                                                     'answer_groups',
+                                                     'recorded_voiceovers',
+                                                     'widget_customization_args'
+                                                    ]) and
                                     change.property_name not in
                                     changed_translations[old_state_name]):
                                 old_solution = (
@@ -2046,7 +2048,8 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
                                             old_solution.explanation.html ==
                                             new_solution.explanation.html):
                                         change_is_mergeable = True
-                                elif old_solution is None and new_solution is None:
+                                elif (old_solution is None and
+                                      new_solution is None):
                                     change_is_mergeable = True
                     else:
                         change_is_mergeable = True
@@ -2069,7 +2072,8 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
                         if all(property not in
                                changed_properties[old_state_name]
                                for property in ['content', 'solution',
-                                                'hints', 'written_translations'
+                                                'hints',
+                                                'written_translations',
                                                 'answer_group',
                                                 'default_outcome',
                                                 'widget_customization_args',
@@ -2078,8 +2082,7 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
                     else:
                         change_is_mergeable = True
             elif change.cmd == exp_domain.CMD_ADD_WRITTEN_TRANSLATION:
-                if (old_state_name in changed_properties and
-                        old_state_name in changed_translations):
+                if old_state_name in changed_properties:
                     if change.content_id == 'content':
                         if ('content' not in
                                 changed_properties[old_state_name] and
@@ -2125,7 +2128,7 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
                 else:
                     change_is_mergeable = True
             elif (change.cmd ==
-                exp_domain.CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE):
+                  exp_domain.CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE):
                 change_is_mergeable = True
             elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
                 if change.property_name == 'title':
