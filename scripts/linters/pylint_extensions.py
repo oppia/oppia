@@ -15,7 +15,7 @@
 # limitations under the License.
 
 """Implements additional custom Pylint checkers to be used as part of
-presubmit checks. Next message id would be C0037.
+presubmit checks. Next message id would be C0039.
 """
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
@@ -2163,24 +2163,78 @@ class DisallowHandlerWithoutSchema(checkers.BaseChecker):
             'to learn how to write schema for handlers.',
             'no-schema-for-handler-args',
             'Enforce writing schema for request arguments of handler class.'
+        ),
+        'C0037': (
+            'URL_PATH_ARGS_SCHEMAS for %s class must be dict.',
+            'url-path-args-schemas-must-be-dict',
+            'Enforce URL_ARGS_PATH_SCHEMAS to be of dict type.'
+        ),
+        'C0038': (
+            'HANDLER_ARGS_SCHEMAS for %s class must be dict.',
+            'handler-args-schemas-must-be-dict',
+            'Enforce HANDLER_ARGS_SCHEMAS must be of dict type.'
         )
     }
 
-    def check_parent_class_is_basehandler(self, node):
-        """Checks whether a class is child class of BaseHandler.
+    def check_url_path_args_schemas_must_be_a_dict(self, node):
+        """Checks whether URL_PATH_ARGS_SCHEMAS of a class is of dict type.
+
+        Args:
+            node: astroid.nodes.ClassDef. Node for a class definition
+                in the AST.
 
         Returns:
-            bool. Whether a class is child class of BaseHandler.
+            bool. Whether URL_PATH_ARGS_SCHEMAS of a class is of dict type.
         """
-        # For checking one level of inheritance.
-        parent_class_is_basehandler = 'base.BaseHandler' in node.basenames
+        if 'URL_PATH_ARGS_SCHEMAS' not in node.locals:
+            return True
 
-        # For checking entire hierarchy.
-        if parent_class_is_basehandler is False:
-            for j in node.ancestors():
-                if 'base.BaseHandler' in j.basenames:
-                    parent_class_is_basehandler = True
-                    break
+        generator_object_for_value_of_schemas = (
+            node.locals['URL_PATH_ARGS_SCHEMAS'][0].assigned_stmts())
+
+        for value_of_schemas in generator_object_for_value_of_schemas:
+            print(value_of_schemas.name)
+            print(value_of_schemas)
+            if value_of_schemas.name != 'dict':
+                return False
+        return True
+
+    def check_handler_args_schemas_must_be_a_dict(self, node):
+        """Checks whether HANDLER_ARGS_SCHEMAS of a class is of dict type.
+
+        Args:
+            node: astroid.nodes.ClassDef. Node for a class definition
+                in the AST.
+
+        Returns:
+            bool. Whether HANDLER_ARGS_SCHEMAS of a class is of dict type.
+        """
+        if 'HANDLER_ARGS_SCHEMAS' not in node.locals:
+            return True
+
+        generator_object_for_value_of_schemas = (
+            node.locals['HANDLER_ARGS_SCHEMAS'][0].assigned_stmts())
+
+        for value_of_schemas in generator_object_for_value_of_schemas:
+            if value_of_schemas.name != 'dict':
+                return False
+        return True
+
+    def check_parent_class_is_basehandler(self, node):
+        """Checks whether the parent class of given class is BaseHandler.
+
+        Args:
+            node: astroid.nodes.ClassDef. Node for a class definition
+                in the AST.
+
+        Returns:
+            bool. Whether the parent class of given class is BaseHandler.
+        """
+        parent_class_is_basehandler = False
+        for ancestor_node in node.ancestors():
+            if 'BaseHandler' == ancestor_node.name:
+                parent_class_is_basehandler = True
+                break
         return parent_class_is_basehandler
 
     def visit_classdef(self, node):
@@ -2203,6 +2257,14 @@ class DisallowHandlerWithoutSchema(checkers.BaseChecker):
         if 'HANDLER_ARGS_SCHEMAS' not in node.locals:
             self.add_message(
                 'no-schema-for-handler-args', node=node, args=(node.name))
+        if not self.check_url_path_args_schemas_must_be_a_dict(node):
+            self.add_message(
+                'url-path-args-schemas-must-be-dict',
+                    node=node, args=(node.name))
+        if not self.check_handler_args_schemas_must_be_a_dict(node):
+            self.add_message(
+                'handler-args-schemas-must-be-dict',
+                    node=node, args=(node.name))
 
 
 def register(linter):

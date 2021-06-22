@@ -656,8 +656,9 @@
 
 
 # Data stability.
-/core/controllers/domain_objects_validator*.py @aks681
-/core/controllers/payload_validator*.py @aks681
+# TODO(Nik-09): Assign these files to @vojtechjelinek, once he is back.
+/core/controllers/domain_objects_validator*.py @rohitkatlaa
+/core/controllers/payload_validator*.py @rohitkatlaa
 
 
 # QA team.
