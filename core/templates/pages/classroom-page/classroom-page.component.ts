@@ -34,10 +34,10 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
   templateUrl: './classroom-page.component.html'
 })
 export class ClassroomPageComponent {
-  private classroomDisplayName: string = '';
-  private classroomUrlFragment: string = '';
-  private bannerImageFileUrl: string = '';
-  private classroomData: ClassroomData;
+  classroomDisplayName: string = '';
+  classroomUrlFragment: string = '';
+  bannerImageFileUrl: string = '';
+  classroomData: ClassroomData;
 
   constructor(
     private alertsService: AlertsService,
