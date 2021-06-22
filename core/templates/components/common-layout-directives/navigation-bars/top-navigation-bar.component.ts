@@ -164,10 +164,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
             username: this.username
           });
       }
-
-      if (this.userIsLoggedIn) {
-        this.userBackendApiService.showUnseenNotifications();
-      }
     });
 
     for (var i = 0; i < this.NAV_ELEMENTS_ORDER.length; i++) {
