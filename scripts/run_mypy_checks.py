@@ -27,6 +27,9 @@ import sys
 
 import python_utils
 
+from scripts import common
+from scripts import install_third_party_libs
+
 # List of directories whose files won't be type-annotated ever.
 EXCLUDED_DIRECTORIES = [
     'proto_files/',
@@ -776,6 +779,9 @@ def install_mypy_prerequisites():
 def main(args=None):
     """Runs the MyPy type checks."""
     parsed_args = _PARSER.parse_args(args=args)
+
+    install_third_party_libs.main()
+    common.fix_third_party_imports()
 
     python_utils.PRINT('Installing Mypy and stubs for third party libraries.')
     return_code = install_mypy_prerequisites()
