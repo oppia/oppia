@@ -1,4 +1,4 @@
-# Copyright 2017 The Oppia Authors. All Rights Reserved.
+# Copyright 2021 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -170,6 +170,26 @@ class LearnerGoalsHandlerTests(test_utils.GenericTestBase):
 
         self.logout()
 
+    def raise_invalid_input_exception_in_post_request(self):
+        """Test for invalid input expression error raised when invalid
+            activityType passed in post request.
+        """
+        self.login(self.VIEWER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        # Add one topic to the learner goal.
+        response = self.post_json(
+            '%s/%s/%s' % (
+                feconf.LEARNER_GOALS_DATA_URL,
+                'InvalidActivityType',
+                self.TOPIC_ID_1), {},
+            csrf_token=csrf_token,
+            expected_status_int=400)
+        self.assertEqual(
+            response['error'], 'Invalid activityType: InvalidActivityType')
+
+        self.logout()
+
     def test_remove_topic_from_learner_goals(self):
         self.login(self.VIEWER_EMAIL)
 
@@ -209,5 +229,30 @@ class LearnerGoalsHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(
             learner_goals_services.get_all_topic_ids_to_learn(
                 self.viewer_id), [])
+
+        self.logout()
+
+    def raise_invalid_input_exception_in_delete_request(self):
+        """Test for invalid input expression error raised when invalid
+            activityType passed in delete request.
+        """
+        self.login(self.VIEWER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        # Add one topic to the learner goal.
+        self.post_json(
+            '%s/%s/%s' % (
+                feconf.LEARNER_GOALS_DATA_URL,
+                constants.ACTIVITY_TYPE_LEARN_TOPIC,
+                self.TOPIC_ID_1), {},
+            csrf_token=csrf_token)
+
+        # Delete one topic from learner goals.
+        response = self.delete_json('%s/%s/%s' % (
+            feconf.LEARNER_GOALS_DATA_URL,
+            'InvalidActivityType',
+            self.TOPIC_ID_1), expected_status_int=400)
+        self.assertEqual(
+            response['error'], 'Invalid activityType: InvalidActivityType')
 
         self.logout()
