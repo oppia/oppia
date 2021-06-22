@@ -35,9 +35,6 @@ import feconf
 import python_utils
 import utils
 
-(stats_models,) = models.Registry.import_models([models.NAMES.statistics])
-
-
 # These are special sentinel values attributed to answers migrated from the old
 # answer storage model. Those answers could not have session IDs or time spent
 # values inferred or reconstituted perfectly, so they are assigned these
@@ -1485,10 +1482,6 @@ class StateAnswersCalcOutput(python_utils.OBJECT):
     """Domain object that represents output of calculations operating on
     state answers.
     """
-
-    # NOTE TO DEVELOPERS: The method save() was removed in #13021 as part of the
-    # migration to Apache Beam. Please refer to that PR if you need to reinstate
-    # it.
 
     def __init__(
             self, exploration_id, exploration_version, state_name,
