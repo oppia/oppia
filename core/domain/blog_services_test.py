@@ -242,8 +242,8 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(updated_blog_post.thumbnail_filename, 'thummbnail.svg')
         self.assertEqual(updated_blog_post.content, '<p>Hello</p>')
         lower_id = '-' + self.blog_post_a_id.lower()
-        self.assertEqual(updated_blog_post.url_fragment,
-        'sample-title' + lower_id)
+        self.assertEqual(
+            updated_blog_post.url_fragment, 'sample-title' + lower_id)
 
         blog_services.update_blog_post(self.blog_post_a_id, self.change_dict)
         updated_blog_post = (
@@ -303,8 +303,8 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
             updated_blog_post_summary.thumbnail_filename, 'thummbnail.svg')
         self.assertEqual(updated_blog_post_summary.summary, 'Hello...')
         lower_id = '-' + self.blog_post_a_id.lower()
-        self.assertEqual(updated_blog_post_summary.url_fragment,
-        'sample-title' + lower_id)
+        self.assertEqual(
+            updated_blog_post_summary.url_fragment, 'sample-title' + lower_id)
 
     def test_check_can_edit_blog_post(self):
         blog_post_rights = (
