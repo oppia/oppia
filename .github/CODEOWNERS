@@ -656,7 +656,7 @@
 
 
 # Data stability.
-# TODO(Nik-09): Assign these files to @vojtechjelinek, once he is back.
+# TODO(Nik-09): Assign these files to @vojtechjelinek, once he returns.
 /core/controllers/domain_objects_validator*.py @rohitkatlaa
 /core/controllers/payload_validator*.py @rohitkatlaa
 

@@ -2167,7 +2167,7 @@ class DisallowHandlerWithoutSchema(checkers.BaseChecker):
         'C0037': (
             'URL_PATH_ARGS_SCHEMAS for %s class must be dict.',
             'url-path-args-schemas-must-be-dict',
-            'Enforce URL_ARGS_PATH_SCHEMAS to be of dict type.'
+            'Enforce URL_ARGS_PATH_SCHEMAS must be of dict type.'
         ),
         'C0038': (
             'HANDLER_ARGS_SCHEMAS for %s class must be dict.',
@@ -2176,7 +2176,7 @@ class DisallowHandlerWithoutSchema(checkers.BaseChecker):
         )
     }
 
-    def check_url_path_args_schemas_must_be_a_dict(self, node):
+    def check_url_path_args_schemas_to_be_a_dict(self, node):
         """Checks whether URL_PATH_ARGS_SCHEMAS of a class is of dict type.
 
         Args:
@@ -2197,7 +2197,7 @@ class DisallowHandlerWithoutSchema(checkers.BaseChecker):
                 return False
         return True
 
-    def check_handler_args_schemas_must_be_a_dict(self, node):
+    def check_handler_args_schemas_to_be_a_dict(self, node):
         """Checks whether HANDLER_ARGS_SCHEMAS of a class is of dict type.
 
         Args:
@@ -2230,7 +2230,7 @@ class DisallowHandlerWithoutSchema(checkers.BaseChecker):
         """
         parent_class_is_basehandler = False
         for ancestor_node in node.ancestors():
-            if 'BaseHandler' == ancestor_node.name:
+            if ancestor_node.name == u'BaseHandler':
                 parent_class_is_basehandler = True
                 break
         return parent_class_is_basehandler
@@ -2255,14 +2255,14 @@ class DisallowHandlerWithoutSchema(checkers.BaseChecker):
         if 'HANDLER_ARGS_SCHEMAS' not in node.locals:
             self.add_message(
                 'no-schema-for-handler-args', node=node, args=(node.name))
-        if not self.check_url_path_args_schemas_must_be_a_dict(node):
+        if not self.check_url_path_args_schemas_to_be_a_dict(node):
             self.add_message(
                 'url-path-args-schemas-must-be-dict',
-                    node=node, args=(node.name))
-        if not self.check_handler_args_schemas_must_be_a_dict(node):
+                node=node, args=(node.name))
+        if not self.check_handler_args_schemas_to_be_a_dict(node):
             self.add_message(
                 'handler-args-schemas-must-be-dict',
-                    node=node, args=(node.name))
+                node=node, args=(node.name))
 
 
 def register(linter):

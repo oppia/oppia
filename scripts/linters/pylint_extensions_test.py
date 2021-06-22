@@ -3344,11 +3344,14 @@ class DisallowDunderMetaclassCheckerTests(unittest.TestCase):
 
 class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
 
-    def test_schema_handlers_without_request_args_raise_error(self):
-        checker_test_object = testutils.CheckerTestCase()
-        checker_test_object.CHECKER_CLASS = (
+    def setUp(self):
+        super(DisallowHandlerWithoutSchemaTests, self).setUp()
+        self.checker_test_object = testutils.CheckerTestCase()
+        self.checker_test_object.CHECKER_CLASS = (
             pylint_extensions.DisallowHandlerWithoutSchema)
-        checker_test_object.setup_method()
+        self.checker_test_object.setup_method()
+
+    def test_schema_handlers_without_request_args_raise_error(self):
 
         schemaless_class_node = astroid.extract_node(
             """
@@ -3359,20 +3362,17 @@ class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
             class FakeClass(BaseHandler):
                 URL_PATH_ARGS_SCHEMAS = {}
             """)
-        with checker_test_object.assertAddsMessages(
+        with self.checker_test_object.assertAddsMessages(
             testutils.Message(
                 msg_id='no-schema-for-handler-args',
                 node=schemaless_class_node,
                 args=(schemaless_class_node.name)
             )
         ):
-            checker_test_object.checker.visit_classdef(schemaless_class_node)
+            self.checker_test_object.checker.visit_classdef(
+                schemaless_class_node)
 
     def test_schema_handlers_without_url_path_args_raise_error(self):
-        checker_test_object = testutils.CheckerTestCase()
-        checker_test_object.CHECKER_CLASS = (
-            pylint_extensions.DisallowHandlerWithoutSchema)
-        checker_test_object.setup_method()
 
         schemaless_class_node = astroid.extract_node(
             """
@@ -3384,20 +3384,17 @@ class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
                 HANDLER_ARGS_SCHEMAS = {}
             """)
 
-        with checker_test_object.assertAddsMessages(
+        with self.checker_test_object.assertAddsMessages(
             testutils.Message(
                 msg_id='no-schema-for-url-path-elements',
                 node=schemaless_class_node,
                 args=(schemaless_class_node.name)
             )
         ):
-            checker_test_object.checker.visit_classdef(schemaless_class_node)
+            self.checker_test_object.checker.visit_classdef(
+                schemaless_class_node)
 
     def test_handlers_with_schema_do_not_raise_error(self):
-        checker_test_object = testutils.CheckerTestCase()
-        checker_test_object.CHECKER_CLASS = (
-            pylint_extensions.DisallowHandlerWithoutSchema)
-        checker_test_object.setup_method()
 
         schemaless_class_node = astroid.extract_node(
             """
@@ -3410,18 +3407,15 @@ class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
                 HANDLER_ARGS_SCHEMAS = {'GET': {}}
             """)
 
-        with checker_test_object.assertNoMessages():
-            checker_test_object.checker.visit_classdef(schemaless_class_node)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_classdef(
+                schemaless_class_node)
 
     def test_list_of_non_schema_handlers_do_not_raise_errors(self):
         """Handler class name in list of
         HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS do not raise error
         for missing schemas.
         """
-        checker_test_object = testutils.CheckerTestCase()
-        checker_test_object.CHECKER_CLASS = (
-            pylint_extensions.DisallowHandlerWithoutSchema)
-        checker_test_object.setup_method()
 
         schemaless_class_node = astroid.extract_node(
             """
@@ -3434,17 +3428,14 @@ class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
                     return
             """)
 
-        with checker_test_object.assertNoMessages():
-            checker_test_object.checker.visit_classdef(schemaless_class_node)
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_classdef(
+                schemaless_class_node)
 
     def test_non_schema_handlers_with_basehandler_as_parent_raise_error(self):
         """Handlers which are child classes of BaseHandler must have schema
         defined locally into the class.
         """
-        checker_test_object = testutils.CheckerTestCase()
-        checker_test_object.CHECKER_CLASS = (
-            pylint_extensions.DisallowHandlerWithoutSchema)
-        checker_test_object.setup_method()
 
         schemaless_class_node = astroid.extract_node(
             """
@@ -3460,23 +3451,20 @@ class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
                 HANDLER_ARGS_SCHEMAS = {}
             """)
 
-        with checker_test_object.assertAddsMessages(
+        with self.checker_test_object.assertAddsMessages(
             testutils.Message(
                 msg_id='no-schema-for-url-path-elements',
                 node=schemaless_class_node,
                 args=(schemaless_class_node.name)
             )
         ):
-            checker_test_object.checker.visit_classdef(schemaless_class_node)
+            self.checker_test_object.checker.visit_classdef(
+                schemaless_class_node)
 
     def test_wrong_data_type_in_url_path_args_schema_raise_error(self):
         """Checks whether the schemas in URL_PATH_ARGS_SCHEMAS must be of
         dict type.
         """
-        checker_test_object = testutils.CheckerTestCase()
-        checker_test_object.CHECKER_CLASS = (
-            pylint_extensions.DisallowHandlerWithoutSchema)
-        checker_test_object.setup_method()
 
         schemaless_class_node = astroid.extract_node(
             """
@@ -3493,23 +3481,20 @@ class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
                 HANDLER_ARGS_SCHEMAS = {}
             """)
 
-        with checker_test_object.assertAddsMessages(
+        with self.checker_test_object.assertAddsMessages(
             testutils.Message(
                 msg_id='url-path-args-schemas-must-be-dict',
                 node=schemaless_class_node,
                 args=(schemaless_class_node.name)
             )
         ):
-            checker_test_object.checker.visit_classdef(schemaless_class_node)
+            self.checker_test_object.checker.visit_classdef(
+                schemaless_class_node)
 
     def test_wrong_data_type_in_handler_args_schema_raise_error(self):
         """Checks whether the schemas in URL_PATH_ARGS_SCHEMAS must be of
         dict type.
         """
-        checker_test_object = testutils.CheckerTestCase()
-        checker_test_object.CHECKER_CLASS = (
-            pylint_extensions.DisallowHandlerWithoutSchema)
-        checker_test_object.setup_method()
 
         schemaless_class_node = astroid.extract_node(
             """
@@ -3526,11 +3511,12 @@ class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
                 HANDLER_ARGS_SCHEMAS = 10
             """)
 
-        with checker_test_object.assertAddsMessages(
+        with self.checker_test_object.assertAddsMessages(
             testutils.Message(
                 msg_id='handler-args-schemas-must-be-dict',
                 node=schemaless_class_node,
                 args=(schemaless_class_node.name)
             )
         ):
-            checker_test_object.checker.visit_classdef(schemaless_class_node)
+            self.checker_test_object.checker.visit_classdef(
+                schemaless_class_node)
