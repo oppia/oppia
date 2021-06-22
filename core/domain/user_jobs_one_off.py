@@ -21,6 +21,7 @@ from core import jobs
 from core.domain import user_services
 from core.platform import models
 
+(user_models,) = models.Registry.import_models([models.NAMES.user])
 
 
 class DashboardStatsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
