@@ -27,8 +27,8 @@ import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/t
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { of, throwError } from 'rxjs';
 
-import { BeamJobRun } from 'domain/admin/beam-job-run.model';
-import { BeamJob } from 'domain/admin/beam-job.model';
+import { BeamJobRun } from 'domain/jobs/beam-job-run.model';
+import { BeamJob } from 'domain/jobs/beam-job.model';
 import { StartNewBeamJobDialogComponent } from 'pages/release-coordinator-page/components/start-new-beam-job-dialog.component';
 import { ReleaseCoordinatorBackendApiService } from 'pages/release-coordinator-page/services/release-coordinator-backend-api.service';
 import { AlertDialogComponent } from 'pages/release-coordinator-page/components/alert-dialog.component';

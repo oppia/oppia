@@ -30,8 +30,8 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { of, throwError } from 'rxjs';
 import { marbles } from 'rxjs-marbles';
 
-import { BeamJobRunResult } from 'domain/admin/beam-job-run-result.model';
-import { BeamJobRun } from 'domain/admin/beam-job-run.model';
+import { BeamJobRunResult } from 'domain/jobs/beam-job-run-result.model';
+import { BeamJobRun } from 'domain/jobs/beam-job-run.model';
 import { ViewBeamJobOutputDialogComponent } from 'pages/release-coordinator-page/components/view-beam-job-output-dialog.component';
 import { ReleaseCoordinatorBackendApiService } from 'pages/release-coordinator-page/services/release-coordinator-backend-api.service';
 import { AlertDialogComponent } from 'pages/release-coordinator-page/components/alert-dialog.component';

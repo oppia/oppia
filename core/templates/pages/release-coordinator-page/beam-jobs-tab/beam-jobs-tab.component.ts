@@ -24,8 +24,8 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { BehaviorSubject, combineLatest, Observable, of, zip } from 'rxjs';
 import { catchError, distinctUntilChanged, first, map, startWith } from 'rxjs/operators';
 
-import { BeamJobRun } from 'domain/admin/beam-job-run.model';
-import { BeamJob } from 'domain/admin/beam-job.model';
+import { BeamJobRun } from 'domain/jobs/beam-job-run.model';
+import { BeamJob } from 'domain/jobs/beam-job.model';
 import { CancelBeamJobDialogComponent } from 'pages/release-coordinator-page/components/cancel-beam-job-dialog.component';
 import { StartNewBeamJobDialogComponent } from 'pages/release-coordinator-page/components/start-new-beam-job-dialog.component';
 import { ViewBeamJobOutputDialogComponent } from 'pages/release-coordinator-page/components/view-beam-job-output-dialog.component';

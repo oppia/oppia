@@ -26,7 +26,7 @@ import { of, throwError } from 'rxjs';
 
 import { ReleaseCoordinatorBackendApiService } from 'pages/release-coordinator-page/services/release-coordinator-backend-api.service';
 import { CancelBeamJobDialogComponent } from 'pages/release-coordinator-page/components/cancel-beam-job-dialog.component';
-import { BeamJobRun } from 'domain/admin/beam-job-run.model';
+import { BeamJobRun } from 'domain/jobs/beam-job-run.model';
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';

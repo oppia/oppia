@@ -20,8 +20,8 @@ import { Component, Inject } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { catchError, take } from 'rxjs/operators';
 
-import { BeamJob } from 'domain/admin/beam-job.model';
-import { BeamJobRun } from 'domain/admin/beam-job-run.model';
+import { BeamJob } from 'domain/jobs/beam-job.model';
+import { BeamJobRun } from 'domain/jobs/beam-job-run.model';
 import { ReleaseCoordinatorBackendApiService } from 'pages/release-coordinator-page/services/release-coordinator-backend-api.service';
 import { AlertDialogComponent } from 'pages/release-coordinator-page/components/alert-dialog.component';
 

@@ -21,9 +21,9 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dial
 import { Subscription } from 'rxjs';
 import { catchError, first } from 'rxjs/operators';
 
-import { BeamJobRun } from 'domain/admin/beam-job-run.model';
+import { BeamJobRun } from 'domain/jobs/beam-job-run.model';
 import { ReleaseCoordinatorBackendApiService } from 'pages/release-coordinator-page/services/release-coordinator-backend-api.service';
-import { BeamJobRunResult } from 'domain/admin/beam-job-run-result.model';
+import { BeamJobRunResult } from 'domain/jobs/beam-job-run-result.model';
 import { AlertDialogComponent } from 'pages/release-coordinator-page/components/alert-dialog.component';
 import { FormControl } from '@angular/forms';
 

@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for BeamJobRun.
  */
 
-import { BeamJobRun } from 'domain/admin/beam-job-run.model';
+import { BeamJobRun } from 'domain/jobs/beam-job-run.model';
 
 describe('Beam Job Run', () => {
   it('should copy values from arguments', () => {

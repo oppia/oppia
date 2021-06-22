@@ -42,13 +42,13 @@ import { of } from 'rxjs';
 import { marbles } from 'rxjs-marbles';
 import { BeamJobsTabComponent } from './beam-jobs-tab.component';
 
-import { BeamJobRun } from 'domain/admin/beam-job-run.model';
-import { BeamJob } from 'domain/admin/beam-job.model';
+import { BeamJobRun } from 'domain/jobs/beam-job-run.model';
+import { BeamJob } from 'domain/jobs/beam-job.model';
 import { CancelBeamJobDialogComponent } from 'pages/release-coordinator-page/components/cancel-beam-job-dialog.component';
 import { StartNewBeamJobDialogComponent } from 'pages/release-coordinator-page/components/start-new-beam-job-dialog.component';
 import { ViewBeamJobOutputDialogComponent } from 'pages/release-coordinator-page/components/view-beam-job-output-dialog.component';
 import { ReleaseCoordinatorBackendApiService } from 'pages/release-coordinator-page/services/release-coordinator-backend-api.service';
-import { BeamJobRunResult } from 'domain/admin/beam-job-run-result.model';
+import { BeamJobRunResult } from 'domain/jobs/beam-job-run-result.model';
 import { AlertDialogComponent } from 'pages/release-coordinator-page/components/alert-dialog.component';
 
 describe('Beam Jobs Tab Component', () => {

@@ -22,9 +22,9 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-import { BeamJobRunResult, BeamJobRunResultBackendDict } from 'domain/admin/beam-job-run-result.model';
-import { BeamJobRun, BeamJobRunBackendDict } from 'domain/admin/beam-job-run.model';
-import { BeamJob, BeamJobBackendDict } from 'domain/admin/beam-job.model';
+import { BeamJobRunResult, BeamJobRunResultBackendDict } from 'domain/jobs/beam-job-run-result.model';
+import { BeamJobRun, BeamJobRunBackendDict } from 'domain/jobs/beam-job-run.model';
+import { BeamJob, BeamJobBackendDict } from 'domain/jobs/beam-job.model';
 import { ComputationData, ComputationDataBackendDict } from 'domain/admin/computation-data.model';
 import { JobStatusSummary, JobStatusSummaryBackendDict } from 'domain/admin/job-status-summary.model';
 import { Job, JobDataBackendDict } from 'domain/admin/job.model';

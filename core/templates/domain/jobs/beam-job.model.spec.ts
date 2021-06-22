@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for BeamJob.
  */
 
-import { BeamJob } from 'domain/admin/beam-job.model';
+import { BeamJob } from 'domain/jobs/beam-job.model';
 
 describe('BeamJob model', () => {
   it('should copy arguments', () => {

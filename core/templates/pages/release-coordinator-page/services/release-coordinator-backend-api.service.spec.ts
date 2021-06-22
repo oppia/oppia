@@ -25,9 +25,9 @@ import { ComputationData } from 'domain/admin/computation-data.model';
 import { Job } from 'domain/admin/job.model';
 import { JobStatusSummary } from 'domain/admin/job-status-summary.model';
 import { CsrfTokenService } from 'services/csrf-token.service';
-import { BeamJobRun } from 'domain/admin/beam-job-run.model';
-import { BeamJob } from 'domain/admin/beam-job.model';
-import { BeamJobRunResult } from 'domain/admin/beam-job-run-result.model';
+import { BeamJobRun } from 'domain/jobs/beam-job-run.model';
+import { BeamJob } from 'domain/jobs/beam-job.model';
+import { BeamJobRunResult } from 'domain/jobs/beam-job-run-result.model';
 
 describe('Release coordinator backend api service', () => {
   let rcbas: ReleaseCoordinatorBackendApiService;
