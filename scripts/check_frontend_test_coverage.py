@@ -89,7 +89,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'editable-story-backend-api.service.ts',
     'email-dashboard-data.service.ts',
     'entity-creation.service.ts',
-    'exploration-creation.service.ts',
     'exploration-diff.service.ts',
     'exploration-footer.component.ts',
     'exploration-save.service.ts',
