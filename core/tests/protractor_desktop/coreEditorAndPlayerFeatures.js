@@ -375,10 +375,10 @@ describe('Core exploration functionality', function() {
       await explorationEditorMainTab.addResponse(
         'NumericInput', async function(richTextEditor) {
           await richTextEditor.appendBoldText('correct');
-        }, 'final card', true, 'IsInclusivelyBetween', 1, 3);
+        }, 'final card', true, 'IsInclusivelyBetween', -1, 3);
       var responseEditor = await explorationEditorMainTab.getResponseEditor(0);
       await responseEditor.expectRuleToBe(
-        'NumericInput', 'IsInclusivelyBetween', [1, 3]);
+        'NumericInput', 'IsInclusivelyBetween', [-1, 3]);
       responseEditor = await explorationEditorMainTab.getResponseEditor(0);
       await responseEditor.expectFeedbackInstructionToBe('correct');
       responseEditor = await explorationEditorMainTab.getResponseEditor(
