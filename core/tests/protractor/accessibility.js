@@ -53,7 +53,6 @@ describe('screenreader and keyboard user accessibility features', function() {
   var LEARNER_DASHBOARD_URL = 'http://localhost:9001/learner-dashboard';
   var CREATOR_DASHBOARD_URL = 'http://localhost:9001/creator-dashboard';
   var ABOUT_URL = 'http://localhost:9001/about';
-  var NOTIFICATIONS_URL = 'http://localhost:9001/notifications';
   var PREFERENCES_URL = 'http://localhost:9001/preferences';
   var PRIVACY_POLICY_URL = 'http://localhost:9001/privacy-policy';
   var DONATE_URL = 'http://localhost:9001/donate';

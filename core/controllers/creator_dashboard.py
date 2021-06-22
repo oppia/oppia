@@ -45,15 +45,6 @@ EXPLORATION_ID_KEY = 'exploration_id'
 COLLECTION_ID_KEY = 'collection_id'
 
 
-class OldNotificationsDashboardRedirectPage(base.BaseHandler):
-    """Redirects the old notifications dashboard URL to the new one."""
-
-    @acl_decorators.open_access
-    def get(self):
-        """Handles GET requests."""
-        self.redirect(feconf.NOTIFICATIONS_DASHBOARD_URL, permanent=True)
-
-
 class OldContributorDashboardRedirectPage(base.BaseHandler):
     """Redirects the old contributor dashboard URL to the new one."""
 
@@ -61,61 +52,6 @@ class OldContributorDashboardRedirectPage(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         self.redirect('/contributor-dashboard', permanent=True)
-
-
-class NotificationsDashboardPage(base.BaseHandler):
-    """Page with notifications for the user."""
-
-    @acl_decorators.can_access_creator_dashboard
-    def get(self):
-        self.render_template(
-            'notifications-dashboard-page.mainpage.html')
-
-
-class NotificationsDashboardHandler(base.BaseHandler):
-    """Provides data for the user notifications dashboard."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    @acl_decorators.can_access_creator_dashboard
-    def get(self):
-        """Handles GET requests."""
-        job_queued_msec, recent_notifications = (
-            user_jobs_continuous.DashboardRecentUpdatesAggregator
-            .get_recent_user_changes(self.user_id))
-
-        last_seen_msec = (
-            subscription_services.get_last_seen_notifications_msec(
-                self.user_id))
-
-        # Replace author_ids with their usernames.
-        author_ids = [
-            notification['author_id'] for notification in recent_notifications
-            if notification['author_id']]
-        author_usernames = user_services.get_usernames(author_ids)
-
-        author_id_to_username = {
-            None: '',
-        }
-        for ind, author_id in enumerate(author_ids):
-            author_id_to_username[author_id] = author_usernames[ind]
-        for notification in recent_notifications:
-            notification['author_username'] = (
-                author_id_to_username[notification['author_id']])
-            del notification['author_id']
-
-        subscription_services.record_user_has_seen_notifications(
-            self.user_id, job_queued_msec if job_queued_msec else 0.0)
-
-        self.values.update({
-            # This may be None if no job has ever run for this user.
-            'job_queued_msec': job_queued_msec,
-            # This may be None if this is the first time the user has seen
-            # the dashboard.
-            'last_seen_msec': last_seen_msec,
-            'recent_notifications': recent_notifications,
-        })
-        self.render_json(self.values)
 
 
 class OldCreatorDashboardRedirectPage(base.BaseHandler):
@@ -326,31 +262,6 @@ class CreatorDashboardHandler(base.BaseHandler):
         user_services.update_user_creator_dashboard_display(
             self.user_id, creator_dashboard_display_pref)
         self.render_json({})
-
-
-class NotificationsHandler(base.BaseHandler):
-    """Provides data about unseen notifications."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    @acl_decorators.can_access_creator_dashboard
-    def get(self):
-        """Handles GET requests."""
-        num_unseen_notifications = 0
-        last_seen_msec = (
-            subscription_services.get_last_seen_notifications_msec(
-                self.user_id))
-        _, recent_notifications = (
-            user_jobs_continuous.DashboardRecentUpdatesAggregator
-            .get_recent_user_changes(self.user_id))
-        for notification in recent_notifications:
-            if (notification['last_updated_ms'] > last_seen_msec and
-                    notification['author_id'] != self.user_id):
-                num_unseen_notifications += 1
-
-        self.render_json({
-            'num_unseen_notifications': num_unseen_notifications,
-        })
 
 
 class NewExplorationHandler(base.BaseHandler):

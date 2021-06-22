@@ -312,7 +312,6 @@ AUDIT_JOB_MANAGERS = [
 ALL_CONTINUOUS_COMPUTATION_MANAGERS = [
     feedback_jobs_continuous.FeedbackAnalyticsAggregator,
     stats_jobs_continuous.InteractionAnswerSummariesAggregator,
-    user_jobs_continuous.DashboardRecentUpdatesAggregator,
     user_jobs_continuous.UserStatsAggregator,
 ]
 

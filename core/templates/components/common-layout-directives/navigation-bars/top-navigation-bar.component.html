@@ -295,16 +295,6 @@
         </li>
         <li class="nav-item">
           <a (click)="closeSubmenuIfNotMobile($event)"
-             href="/notifications"
-             class="dropdown-item nav-link protractor-test-notifications-link">
-            <span [innerHTML]="'I18N_TOPNAV_NOTIFICATIONS' | translate"></span>
-            <span *ngIf="numUnseenNotifications > 0">
-              ({{ numUnseenNotifications }})
-            </span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a (click)="closeSubmenuIfNotMobile($event)"
              href="/preferences"
              class="dropdown-item nav-link protractor-test-preferences-link">
             <span [innerHTML]="'I18N_TOPNAV_PREFERENCES' | translate"></span>
