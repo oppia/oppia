@@ -76,11 +76,12 @@ describe('Contributor dashboard page', function() {
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createTopic(
       TOPIC_NAMES[0], 'community-topic-one', 'Topic description 1', false);
-    const url = await browser.getCurrentUrl();
+    const URL = await browser.getCurrentUrl();
     // Example URL: http://localhost:8181/topic_editor/jT9z3iLnFjsQ#/
-    const topicIdUrlPart = url.split('/')[4];
+    const TOPIC_ID_URL_PART = URL.split('/')[4];
     // We have to remove the ending "#".
-    const topicId = topicIdUrlPart.substring(0, topicIdUrlPart.length - 1);
+    const TOPIC_ID = TOPIC_ID_URL_PART.substring(
+      0, TOPIC_ID_URL_PART.length - 1);
     await workflow.createSkillAndAssignTopic(
       SKILL_DESCRIPTIONS[0], REVIEW_MATERIALS[0], TOPIC_NAMES[0]);
     await topicsAndSkillsDashboardPage.get();
@@ -99,7 +100,7 @@ describe('Contributor dashboard page', function() {
         elem = await elem.editItem(0, 'Dictionary');
         elem = await elem.editEntry(4, 'List');
         elem = await elem.addItem('Unicode');
-        await elem.setValue(topicId);
+        await elem.setValue(TOPIC_ID);
       });
     await users.logout();
   });
