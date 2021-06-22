@@ -29,7 +29,7 @@ import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-a
 import { FormsModule } from '@angular/forms';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { TranslateService } from '@ngx-translate/core';
-import { SearchService } from 'services/search.service';
+import { SearchService, SelectionDetails } from 'services/search.service';
 import { ConstructTranslationIdsService } from 'services/construct-translation-ids.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { UrlService } from 'services/contextual/url.service';
@@ -103,37 +103,7 @@ describe('Search bar component', () => {
   let fixture: ComponentFixture<SearchBarComponent>;
   let initTranslationEmitter = new EventEmitter();
   let preferredLanguageCodesLoadedEmitter = new EventEmitter();
-  let selectionDetails = {
-    categories: {
-      description: 'description',
-      itemsName: 'categories',
-      masterList: [
-        {
-          id: 'id',
-          text: 'category 1'
-        },
-        {
-          id: 'id_2',
-          text: 'category 2'
-        },
-        {
-          id: 'id_3',
-          text: 'category 3'
-        }
-      ],
-      selections: { id: true, id_2: true, id_3: true },
-      numSelections: 0,
-      summary: 'all categories'
-    },
-    languageCodes: {
-      description: 'English',
-      itemsName: 'languages',
-      masterList: [],
-      numSelections: 1,
-      selections: {en: true},
-      summary: 'English'
-    }
-  };
+  let selectionDetailsStub: SelectionDetails;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -164,6 +134,47 @@ describe('Search bar component', () => {
   }));
 
   beforeEach(() => {
+    selectionDetailsStub = {
+      categories: {
+        description: 'description',
+        itemsName: 'categories',
+        masterList: [
+          {
+            id: 'id',
+            text: 'category 1'
+          },
+          {
+            id: 'id_2',
+            text: 'category 2'
+          },
+          {
+            id: 'id_3',
+            text: 'category 3'
+          }
+        ],
+        selections: { id: true, id_2: true, id_3: true },
+        numSelections: 0,
+        summary: 'all categories'
+      },
+      languageCodes: {
+        description: 'English',
+        itemsName: 'languages',
+        masterList: [
+          {
+            id: 'en',
+            text: 'English'
+          },
+          {
+            id: 'es',
+            text: 'Spanish'
+          }
+        ],
+        numSelections: 1,
+        selections: {en: true},
+        summary: 'English'
+      }
+    };
+
     fixture = TestBed.createComponent(SearchBarComponent);
     component = fixture.componentInstance;
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
@@ -183,7 +194,26 @@ describe('Search bar component', () => {
       TestBed.inject(ConstructTranslationIdsService));
     languageUtilService = TestBed.inject(LanguageUtilService);
     urlService = TestBed.inject(UrlService);
-    component.selectionDetails = selectionDetails;
+
+    component.ngOnInit();
+    fixture.detectChanges();
+  });
+
+  it('should update selection details if selected languages' +
+  ' are greater than zero', () => {
+    expect(component.selectionDetails.languageCodes.description).toEqual(
+      'I18N_LIBRARY_ALL_LANGUAGES_SELECTED');
+    component.selectionDetails = selectionDetailsStub;
+    spyOn(translateService, 'instant').and.returnValue('English');
+    component.updateSelectionDetails('languageCodes');
+    expect(component.selectionDetails.languageCodes.description).toEqual(
+      'English');
+  });
+
+  it('should update selection details if there are no selections', () => {
+    spyOn(translateService, 'instant').and.returnValue('key');
+    component.updateSelectionDetails('categories');
+    expect(component.selectionDetails.categories.numSelections).toEqual(0);
   });
 
   it ('should search', () => {
@@ -213,30 +243,6 @@ describe('Search bar component', () => {
     navigationService.activeMenuName = activeMenuName;
     component.onMenuKeypress(null, null, null);
     expect(component.activeMenuName).toEqual(activeMenuName);
-  });
-
-  it('should update selection details', () => {
-    spyOn(translateService, 'instant').and.returnValue('key');
-    component.ngOnInit();
-    fixture.detectChanges();
-    component.selectionDetails = selectionDetails;
-    component.updateSelectionDetails('categories');
-    fixture.detectChanges();
-    expect(component.selectionDetails.categories.numSelections).toEqual(3);
-  });
-
-  it('should update selection details when they are no selections', () => {
-    spyOn(translateService, 'instant').and.returnValue('key');
-    component.ngOnInit();
-    component.updateSelectionDetails('categories');
-    expect(component.selectionDetails.categories.numSelections).toEqual(0);
-  });
-
-  it('should update selection details', () => {
-    spyOn(translateService, 'instant').and.returnValue('key');
-    component.updateSelectionDetails('languageCodes');
-    expect(component.selectionDetails.languageCodes.description).toEqual(
-      'I18N_LIBRARY_ALL_LANGUAGES_SELECTED');
   });
 
   it('should toggle selection', () => {
@@ -324,7 +330,6 @@ describe('Search bar component', () => {
         return null;
       });
     spyOn(urlService, 'getUrlParams').and.returnValue({ q: '' });
-    component.ngOnInit();
     component.searchQueryChanged.next();
   });
 
