@@ -99,7 +99,7 @@ angular.module('oppia').component('translationTab', {
           stateName, ExplorationStatesService.getWrittenTranslationsMemento(
             stateName));
         $scope.showTranslationTabSubDirectives = true;
-        TranslationTabActiveModeService.activateVoiceoverMode();
+        TranslationTabActiveModeService.activateTranslationMode();
         LoaderService.hideLoadingScreen();
 
         if (EditabilityService.inTutorialMode()) {
