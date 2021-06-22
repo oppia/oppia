@@ -22,7 +22,7 @@ import { Collection } from
   'domain/collection/collection.model';
 
 describe('Collection model', () => {
-  let _sampleCollection: Collection = null;
+  let _sampleCollection: Collection;
 
   beforeEach(() => {
     var sampleCollectionBackendObject = {
@@ -44,7 +44,7 @@ describe('Collection model', () => {
       sampleCollectionBackendObject);
   });
 
-  var _addCollectionNode = function(explorationId) {
+  var _addCollectionNode = (explorationId: string) => {
     var collectionNodeBackendObject = {
       exploration_id: explorationId,
       exploration_summary: {
@@ -76,7 +76,7 @@ describe('Collection model', () => {
       CollectionNode.create(collectionNodeBackendObject));
   };
 
-  var _getCollectionNode = function(explorationId) {
+  var _getCollectionNode = (explorationId: string) => {
     return _sampleCollection.getCollectionNodeByExplorationId(explorationId);
   };
 
