@@ -565,7 +565,6 @@ def update_blog_post(blog_post_id, change_dict):
             corresponding field name (title, content, thumbnail_filename,
             tags).
     """
-    old_blog_post = get_blog_post_by_id(blog_post_id)
     updated_blog_post = apply_change_dict(blog_post_id, change_dict)
     if 'title' in change_dict:
         blog_post_models = blog_models.BlogPostModel.query().filter(
