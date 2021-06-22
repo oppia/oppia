@@ -722,7 +722,8 @@ class EditorAutosaveHandler(ExplorationHandler):
             self.user, exploration_rights)
         can_voiceover = rights_manager.check_can_voiceover_activity(
             self.user, exploration_rights)
-
+        print("Are_changes_mergeable")
+        print(exp_services.are_changes_mergeable(exploration_id, version, change_list))
         try:
             if can_edit:
                 exp_services.create_or_update_draft(
