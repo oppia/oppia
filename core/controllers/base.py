@@ -355,7 +355,7 @@ class BaseHandler(webapp2.RequestHandler):
         # needed for analytics).
         extra_args_are_allowed = (
             self.GET_HANDLER_ERROR_RETURN_TYPE == 'html' and
-                request_method == 'GET')
+            request_method == 'GET')
 
         schema_for_url_path_args = self.URL_PATH_ARGS_SCHEMAS
         errors = payload_validator.validate(

@@ -1047,7 +1047,7 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
         invalid_values_with_error_messages = [
             ({
                 'arg_with_some_default': 5
-            },'Expected unicode string, received %s' % 5),
+            }, 'Expected unicode string, received %s' % 5),
             ({
                 'arg_with_default_none': 5,
                 'arg_with_some_default': 'python3'
