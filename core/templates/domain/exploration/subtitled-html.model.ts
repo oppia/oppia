@@ -18,17 +18,17 @@
  */
 
 export interface SubtitledHtmlBackendDict {
-  'content_id': string;
+  'content_id': string | null;
   'html': string;
 }
 
 export class SubtitledHtml {
   _html: string;
-  // A null content_id indicates that the SubtitledHtml has been created
-  // but not saved. Before the SubtitledHtml object is saved into a State,
-  // the content_id should be set to a string.
-  _contentId: string;
-  constructor(html: string, contentId: string) {
+  // A null 'content_id' indicates that the 'SubtitledHtml' has been created
+  // but not saved. Before the 'SubtitledHtml' object is saved into a State,
+  // the 'content_id' should be set to a string.
+  _contentId: string | null;
+  constructor(html: string, contentId: string | null) {
     this._html = html;
     this._contentId = contentId;
   }
@@ -44,11 +44,11 @@ export class SubtitledHtml {
     return !this._html;
   }
 
-  get contentId(): string {
+  get contentId(): string | null {
     return this._contentId;
   }
 
-  set contentId(contentId: string) {
+  set contentId(contentId: string | null) {
     this._contentId = contentId;
   }
 
