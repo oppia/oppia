@@ -1841,7 +1841,7 @@ class Exploration(python_utils.OBJECT):
                     'customization_args']
                 customization_args.update({
                     'inputGreaterThanZero': {
-                        'value': True
+                        'value': False
                     }
                 })
 

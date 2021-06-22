@@ -39,11 +39,11 @@ angular.module('oppia').directive('oppiaInteractiveNumericInput', [
       template: require('./numeric-input-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$attrs', 'CurrentInteractionService',
+        '$attrs', '$rootScope', 'CurrentInteractionService',
         'InteractionAttributesExtractorService',
         'NumericInputRulesService', 'NumericInputValidationService',
         function(
-            $attrs, CurrentInteractionService,
+            $attrs, $rootScope, CurrentInteractionService,
             InteractionAttributesExtractorService,
             NumericInputRulesService, NumericInputValidationService,) {
           var ctrl = this;
@@ -73,6 +73,7 @@ angular.module('oppia').directive('oppiaInteractiveNumericInput', [
             InteractionAttributesExtractorService.getValuesFromAttributes(
               'NumericInput', $attrs);
             ctrl.inputGreaterThanZero = inputGreaterThanZero;
+            $rootScope.isInputGreaterThanZero = inputGreaterThanZero;
             ctrl.answer = (
               ctrl.savedSolution !== undefined ?
               ctrl.savedSolution : ''

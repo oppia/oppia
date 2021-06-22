@@ -403,7 +403,7 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
                 'state_name': new_exp.init_state_name,
                 'new_value': {
                     'inputGreaterThanZero': {
-                        'value': True
+                        'value': False
                     }
                 }
             })]

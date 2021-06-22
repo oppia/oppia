@@ -146,21 +146,6 @@ describe('NumericInputValidationService', () => {
     }]);
   });
 
-  it('should set customization_arg as true', () => {
-    validatorService.isInputGreaterThanZeroTrue(customizationArgs);
-    expect(customizationArgs.inputGreaterThanZero.value).toBe(true);
-  });
-
-  it('should set customization_arg as true', () => {
-    customizationArgs = {
-      inputGreaterThanZero: {
-        value: false
-      }
-    };
-    validatorService.isInputGreaterThanZeroTrue(customizationArgs);
-    expect(customizationArgs.inputGreaterThanZero.value).toBe(false);
-  });
-
   it('should show warning if input less than zero for IsWithinTolerance',
     () => {
       zeroWithinToleranceOfOneRule = rof.createFromBackendDict({

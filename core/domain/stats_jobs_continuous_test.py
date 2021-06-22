@@ -531,7 +531,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                         exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
                     'new_value': {
                         'inputGreaterThanZero': {
-                            'value': True
+                            'value': False
                         }
                     },
                 })], 'Change to NumericInput')
@@ -719,7 +719,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                         exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
                     'new_value': {
                         'inputGreaterThanZero': {
-                            'value': True
+                            'value': False
                         }
                     },
                 })], 'Change to NumericInput')

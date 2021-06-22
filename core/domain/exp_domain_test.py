@@ -3607,7 +3607,7 @@ states:
       confirmed_unclassified_answers: []
       customization_args:
         inputGreaterThanZero:
-          value: True
+          value: False
         rows:
           value: 1
       default_outcome:
@@ -3676,7 +3676,7 @@ states:
       confirmed_unclassified_answers: []
       customization_args:
         inputGreaterThanZero:
-          value: True
+          value: False
         rows:
           value: 1
       default_outcome:

@@ -38,14 +38,6 @@ export class NumericInputValidationService {
       private baseInteractionValidationServiceInstance:
         baseInteractionValidationService) {}
 
-  isInputGreaterThanZeroTrue(
-      customizationArgs: NumericInputCustomizationArgs): boolean {
-    if (customizationArgs.inputGreaterThanZero.value) {
-      return true;
-    }
-    return false;
-  }
-
   getCustomizationArgsWarnings(
       customizationArgs: NumericInputCustomizationArgs): Warning[] {
     return [];

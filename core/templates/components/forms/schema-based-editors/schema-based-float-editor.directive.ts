@@ -44,11 +44,11 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
       template: require('./schema-based-float-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$timeout', 'FocusManagerService',
+        '$rootScope', '$scope', '$timeout', 'FocusManagerService',
         'NumericInputValidationService',
         'SchemaFormSubmittedService',
         function(
-            $scope, $timeout, FocusManagerService,
+            $rootScope, $scope, $timeout, FocusManagerService,
             NumericInputValidationService,
             SchemaFormSubmittedService) {
           var ctrl = this;
@@ -112,11 +112,12 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
             }
           };
 
-          ctrl.numericInputCustArgEnabled = function() {
-            if (NumericInputValidationService.isInputGreaterThanZeroTrue()) {
-              return true;
+          ctrl.onDownKeyPress = function(event) {
+            if ($rootScope.isInputGreaterThanZero && ctrl.localValue < 0) {
+              event.preventDefault();
+              // Var Btn = document.getElementById("input-greater-than-zero");
+              // Btn.setAttribute("min", "0");
             }
-            return false;
           };
 
           ctrl.$onInit = function() {
@@ -129,6 +130,7 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
             if (ctrl.localValue === undefined) {
               ctrl.localValue = 0.0;
             }
+            ctrl.localValue = 0.0;
             // So that focus is applied after all the functions in
             // main thread have executed.
             $timeout(function() {
