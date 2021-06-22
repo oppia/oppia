@@ -1537,7 +1537,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 self.user_id))
         all_topics, new_topics = (
             learner_progress_services.get_all_and_new_topic_ids_for_user(
-                self.user_id, partially_learnt_topic_ids, learnt_topic_ids, topic_ids_to_learn))
+                partially_learnt_topic_ids, learnt_topic_ids,
+                topic_ids_to_learn))
         self.assertEqual(len(all_topics), 2)
         self.assertEqual(len(new_topics), 2)
 
@@ -1555,7 +1556,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 self.user_id))
         all_topics, new_topics = (
             learner_progress_services.get_all_and_new_topic_ids_for_user(
-                self.user_id, partially_learnt_topic_ids, learnt_topic_ids, topic_ids_to_learn))
+                partially_learnt_topic_ids, learnt_topic_ids,
+                topic_ids_to_learn))
         self.assertEqual(len(all_topics), 2)
         self.assertEqual(len(new_topics), 1)
 
@@ -1573,7 +1575,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 self.user_id))
         all_topics, new_topics = (
             learner_progress_services.get_all_and_new_topic_ids_for_user(
-                self.user_id, partially_learnt_topic_ids, learnt_topic_ids, topic_ids_to_learn))
+                partially_learnt_topic_ids, learnt_topic_ids,
+                topic_ids_to_learn))
         self.assertEqual(len(all_topics), 2)
         self.assertEqual(len(new_topics), 0)
 

@@ -1310,12 +1310,14 @@ def _get_filtered_topics_to_learn_summaries(
         user_id, topic_summaries, topic_ids):
     """Returns a list of summaries of the topics selected by the user ids
     of topics that are no longer present.
+
     Args:
         user_id: str. The id of the learner.
         topic_summaries: list(TopicSummary). The list of topic
             summary domain objects to be filtered.
         topic_ids: list(str). The ids of the topics corresponding to
             the topic summary domain objects.
+
     Returns:
         tuple. A 2-tuple whose elements are as follows:
         - list(TopicSummary). Filtered list of TopicSummary domain
@@ -1413,13 +1415,12 @@ def _get_filtered_collection_playlist_summaries(
         nonexistent_playlist_collection_ids)
 
 
-def get_all_and_new_topic_ids_for_user(user_id, partially_learnt_topic_ids,
-    learnt_topic_ids, topic_ids_to_learn):
+def get_all_and_new_topic_ids_for_user(
+        partially_learnt_topic_ids, learnt_topic_ids, topic_ids_to_learn):
     """Returns a list of all the topic ids on the server and ids of topics
     not tracked for the user.
 
     Args:
-        user_id: str. The id of the learner.
         partially_learnt_topic_ids: list(str). The ids of the topics partially
             learnt by the user.
         learnt_topic_ids: list(str). The ids of the topics learnt by the user.
@@ -1464,7 +1465,6 @@ def _get_filtered_all_topic_summaries(topic_summaries, topic_ids):
     topic_rights = topic_fetchers.get_multi_topic_rights(topic_ids)
     for index, topic_summary in enumerate(topic_summaries):
         if topic_summary is not None:
-            topic_id = topic_summary.id
             if topic_rights[index].topic_is_published:
                 filtered_all_topic_summaries.append(topic_summary)
 
@@ -1491,7 +1491,6 @@ def _get_filtered_new_topic_summaries(topic_summaries, topic_ids):
     topic_rights = topic_fetchers.get_multi_topic_rights(topic_ids)
     for index, topic_summary in enumerate(topic_summaries):
         if topic_summary is not None:
-            topic_id = topic_summary.id
             if topic_rights[index].topic_is_published:
                 filtered_new_topic_summaries.append(topic_summary)
 
@@ -1696,8 +1695,8 @@ def get_learner_dashboard_activities(user_id):
         topic_ids_to_learn = []
 
     all_topic_ids, new_topic_ids = get_all_and_new_topic_ids_for_user(
-            user_id, partially_learnt_topic_ids, learnt_topic_ids,
-            topic_ids_to_learn)
+        partially_learnt_topic_ids, learnt_topic_ids,
+        topic_ids_to_learn)
 
     activity_ids = learner_progress_domain.ActivityIdsInLearnerDashboard(
         completed_exploration_ids, completed_collection_ids,
@@ -1914,7 +1913,7 @@ def get_activity_progress(user_id):
 
     filtered_new_topic_summaries = (
         _get_filtered_new_topic_summaries(
-            new_topic_summaries, new_topic_ids))    
+            new_topic_summaries, new_topic_ids))
 
     number_of_nonexistent_activities = {
         'incomplete_explorations': len(nonexistent_incomplete_exp_ids),

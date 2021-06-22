@@ -370,7 +370,7 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
         self.post_json('/adminhandler', payload, csrf_token=csrf_token)
         self.logout()
 
-        self.login(self.VIEWER_EMAIL)        
+        self.login(self.VIEWER_EMAIL)
         response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['new_topics_list']), 1)
         self.assertEqual(

@@ -482,6 +482,7 @@ def get_canonical_story_dicts(user_id, topic):
     Args:
         user_id: str. The ID of the user.
         topic: Topic. The topic domain object.
+
     Returns:
         list(dict). A list of canonical story dicts in the given topic.
     """
@@ -512,4 +513,3 @@ def get_canonical_story_dicts(user_id, topic):
         canonical_story_dicts.append(story_summary_dict)
 
     return canonical_story_dicts
-    

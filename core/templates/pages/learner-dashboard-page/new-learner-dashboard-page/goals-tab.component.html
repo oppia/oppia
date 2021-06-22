@@ -55,25 +55,27 @@
   </div>
 </div>
 <div class="goals-box">
-    <p class="goals-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_COMPLETED_GOALS_SECTION' | translate">
-    </p>
-    <div *ngIf="completedGoals.length > 0">
-      <div *ngFor="let topic of completedGoals">
-        <div class="completed-goals-content">
-          <a [href]="getTopicPageUrl(topic.urlFragment, topic.classroom)" class="completed-goals-topic-name">
-            Learnt {{topic.name}}
-          </a>
-          <div *ngFor="let story of topic.storyTitles">
-            <p class="goals-story-name">
-              Completed {{story}}
-            </p>
-          </div>
+  <p class="goals-title"
+     [innerHTML]="'I18N_LEARNER_DASHBOARD_COMPLETED_GOALS_SECTION' | translate">
+  </p>
+  <div *ngIf="completedGoals.length > 0">
+    <div *ngFor="let topic of completedGoals">
+      <div class="completed-goals-content">
+        <a [href]="getTopicPageUrl(topic.urlFragment, topic.classroom)"
+           class="completed-goals-topic-name">
+          Learnt {{topic.name}}
+        </a>
+        <div *ngFor="let story of topic.storyTitles">
+          <p class="goals-story-name">
+            Completed {{story}}
+          </p>
         </div>
       </div>
     </div>
-    <div *ngIf="completedGoals.length == 0" class="empty-goals-content">
-      <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_COMPLETED_GOALS_SECTION' | translate"></p>
-    </div>
+  </div>
+  <div *ngIf="completedGoals.length == 0" class="empty-goals-content">
+    <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_COMPLETED_GOALS_SECTION' | translate"></p>
+  </div>
 </div>
 
 <style>
@@ -87,59 +89,59 @@
     width: 6px;
   }
   .current-goals-content {
-    border-bottom: 1px solid #CCCCCC;
+    border-bottom: 1px solid #CCC;
+    margin-bottom: 16px;
+    margin-left: 80px;
     min-height: 57px;
     width: 600px;
-    margin-left: 80px;
-    margin-bottom: 16px;
   }
   .completed-goals {
-    border-bottom: 1px solid #CCCCCC;
+    border-bottom: 1px solid #CCC;
     height: 125px;
-    width: 656px;
     margin-bottom: 14px;
+    width: 656px;
   }
   .goals-title {
-    color: #333333;
+    color: #333;
     font-size: 28px;
     font-weight: 500;
-    letter-spacing: 0px;
+    letter-spacing: 0;
     margin-bottom: 30px;
     opacity: 1;
-    padding: 32px 0px 0px 33px;
+    padding: 32px 0 0 33px;
     position: relative;
     text-align: left;
   }
   .completed-goals-content {
-    border-bottom: 1px solid #CCCCCC;
-    min-height: 57px;
-    width: 656px;
+    border-bottom: 1px solid #CCC;
     margin: auto;
     margin-bottom: 14px;
+    min-height: 57px;
     padding-left: 7px;
+    width: 656px;
   }
   .goals-story-name {
-    text-align: left;
+    color: #333333B3;
     font-size: 16px;
     font-style: italic;
-    letter-spacing: 0px;
-    color: #333333B3;
+    letter-spacing: 0;
     opacity: 1;
+    text-align: left;
   }
   .edit-goals-content {
-    border-bottom: 1px solid #CCCCCC;
-    min-height: 36px;
-    width: 656px;
+    border-bottom: 1px solid #CCC;
     margin: auto;
     margin-bottom: 14px;
+    min-height: 36px;
+    width: 656px;
   }
   .edit-goals-learn-title {
-    color: #333333;
+    color: #333;
     float: right;
     font-size: 22px;
     font-weight: 500;
-    letter-spacing: 0px;
-    margin-bottom: 0px;
+    letter-spacing: 0;
+    margin-bottom: 0;
     opacity: 1;
     position: relative;
     right: 50px;
@@ -148,75 +150,75 @@
     width: 150px;
   }
   .edit-goals-subheading {
-    border-bottom: 1px solid #CCCCCC;
+    border-bottom: 1px solid #CCC;
     height: 68px;
     margin: auto;
     margin-bottom: 14px;
     width: 656px;
   }
   .current-goals-topic-name {
-    color: #333333;
+    color: #333;
     display: inline-block;
     font-size: 19px;
-    letter-spacing: 0px;
-    margin-bottom: 0px;
+    letter-spacing: 0;
+    margin-bottom: 0;
     opacity: 1;
     position: relative;
     text-align: left;
     width: 500px;
   }
   .completed-goals-topic-name {
-    color: #333333;
+    color: #333;
     display: inline-block;
     font-size: 19px;
-    letter-spacing: 0px;
-    margin-bottom: 0px;
+    letter-spacing: 0;
+    margin-bottom: 0;
     opacity: 1;
     position: relative;
     text-align: left;
     width: 450px;
   }
   .goals-topic-name {
-    color: #333333;
+    color: #333;
     display: inline-block;
     font-size: 19px;
-    letter-spacing: 0px;
-    margin-bottom: 0px;
+    letter-spacing: 0;
+    margin-bottom: 0;
     opacity: 1;
     position: relative;
     text-align: left;
     width: 150px;
   }
   .new-story-content {
-    text-align: left;
-    font-size: 16px;
-    width: 300px;
-    letter-spacing: 0px;
     color: #00645C;
-    text-transform: uppercase;
+    font-size: 16px;
+    letter-spacing: 0;
     opacity: 1;
+    text-align: left;
+    text-transform: uppercase;
+    width: 300px;
   }
   .goals-topic-name:hover {
-    text-decoration: none;
     font-weight: 450;
+    text-decoration: none;
   }
   .edit-goals-topic-title {
-    color: #333333;
+    color: #333;
     font-size: 22px;
     font-weight: 450;
-    letter-spacing: 0px;
-    margin-bottom: 0px;
+    letter-spacing: 0;
+    margin-bottom: 0;
     opacity: 1;
-    padding: 32px 0px 20px 0px;
+    padding: 32px 0 20px 0;
     position: relative;
     text-align: left;
     width: 150px;
   }
   .empty-goals-content {
-    color: #333333;
+    color: #333;
     font-size: 18px;
     height: 44px;
-    letter-spacing: 0px;
+    letter-spacing: 0;
     margin: auto;
     opacity: 1;
     text-align: left;
@@ -225,13 +227,13 @@
   .checkbox {
     left: 675px;
     position: absolute;
-    transform: translateY(0%);
     text-align: center;
+    transform: translateY(0%);
   }
   .goals-box {
     background-color: #fff;
     border-radius: 4px;
-    box-shadow: 0px 0px 4px #0000001a;
+    box-shadow: 0 0 4px #0000001a;
     margin: auto;
     margin-bottom: 25px;
     opacity: 1;
@@ -239,30 +241,30 @@
     width: 726px;
   }
   .edit-goals-title {
-    color: #333333;
+    color: #333;
     font-size: 28px;
     font-weight: 500;
-    letter-spacing: 0px;
-    margin-bottom: 0px;
+    letter-spacing: 0;
+    margin-bottom: 0;
     opacity: 1;
-    padding: 32px 0px 0px 33px;
+    padding: 32px 0 0 33px;
     position: relative;
     text-align: left;
   }
   .oppia-input-box-subtitle {
-    padding: 0px 33px;
+    padding: 0 33px;
   }
   .story-summary-card {
     display: inline-block;
   }
   .trash-button {
-    color: #555555;
+    color: #555;
+    cursor: pointer;
     float: right;
     font-size: 13px;
-    width: 24px;
     height: 24px;
     margin-right: 40px;
-    cursor: pointer;
+    width: 24px;
   }
   @media screen and (max-width: 768px) {
     .goals-box {
@@ -278,8 +280,8 @@
     margin-right: 3px;
   }
   .current-goals-content {
-    width: 293px;
     margin-left: 50px;
+    width: 293px;
   }
   .edit-goals-subheading {
     width: 300px;
