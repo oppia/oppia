@@ -86,6 +86,11 @@
 /buf.gen.yaml @oppia/ml
 
 
+# App Feedback Reporting project
+# TODO(#12736): Restore code ownership for @BenHenning after 2021-05-24.
+/core/domain/app_feedback_report_*.py @vinitamurthi
+
+
 # Audio and Translation team.
 /core/controllers/voice_artist*.py @DubeySandeep
 /core/templates/pages/exploration-editor-page/translation-tab/ @DubeySandeep
