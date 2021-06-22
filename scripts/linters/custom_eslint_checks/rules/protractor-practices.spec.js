@@ -44,6 +44,8 @@ ruleTester.run('protractor-practices', rule, {
           '.protractor-test-profile-link'));`
   }, {
     code: 'const SKILL_DESCRIPTIONS = 1;'
+  }, {
+    code: 'var modal = element.all(by.css(".modal-dialog")).last();'
   }],
 
   invalid: [

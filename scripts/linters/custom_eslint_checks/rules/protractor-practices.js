@@ -44,6 +44,8 @@ module.exports = {
   create: function(context) {
     var byCssSelector = (
       'CallExpression[callee.object.name=by][callee.property.name=css]');
+    var thirdPartySelectorPrefixes = (
+      ['.modal', '.select2', '.CodeMirror', '.toast', '.ng-joyride', '.mat']);
     var checkSleepCall = function(node) {
       var callee = node.callee;
       if (callee.property && callee.property.name !== 'sleep') {
@@ -88,6 +90,13 @@ module.exports = {
         });
       },
       [byCssSelector]: function(node) {
+        for (var i = 0; i < thirdPartySelectorPrefixes.length; i++) {
+          if ((node.arguments[0].type === 'Literal') &&
+           (node.arguments[0].value.startsWith(
+             thirdPartySelectorPrefixes[i]))) {
+            return;
+          }
+        }
         if ((node.arguments[0].type === 'Literal') &&
           (!node.arguments[0].value.startsWith('.protractor-test-'))) {
           context.report({

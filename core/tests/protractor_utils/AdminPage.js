@@ -195,7 +195,7 @@ var AdminPage = function() {
 
     var count = await featureFlagElements.count();
     for (let i = 0; i < count; i++) {
-      const elem = await featureFlagElements.get(i);
+      var elem = await featureFlagElements.get(i);
       if ((await elem.element(
         by.css('.protractor-test-feature-name')).getText()) ===
           'dummy_feature') {

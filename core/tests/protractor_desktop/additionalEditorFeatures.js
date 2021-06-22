@@ -67,7 +67,7 @@ describe('Full exploration editor', function() {
 
       await workflow.createExploration(true);
 
-      var postTutorialPopover = element(by.css('.popover-content'));
+      var postTutorialPopover = element(by.css('.ng-joyride .popover-content'));
       var stateEditButton = element(
         by.css('.protractor-test-edit-content-pencil-button'));
       await waitFor.invisibilityOf(
