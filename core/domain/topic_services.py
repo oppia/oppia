@@ -22,6 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import collections
 import logging
 
+from constants import constants
 from core.domain import caching_services
 from core.domain import feedback_services
 from core.domain import opportunity_services
@@ -40,6 +41,13 @@ from core.platform import models
 import feconf
 import python_utils
 import utils
+
+# Thumbnail resource URL for DEV mode
+BASE_URL_TOPIC_THUMBNAIL_RESOURCE_DEV_MODE = \
+    'http://localhost:8181/assetsdevhandler/topic/'
+# Thumbnail resource URL for PROD mode
+BASE_URL_TOPIC_THUMBNAIL_RESOUCE_PROD_MODE = \
+    'https://storage.googleapis.com/oppiaserver-resources/topic/'
 
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
 datastore_services = models.Registry.import_datastore_services()
@@ -270,9 +278,14 @@ def apply_change_list(topic_id, change_list):
                 elif (change.property_name ==
                       topic_domain.TOPIC_PROPERTY_THUMBNAIL_FILENAME):
                     topic.update_thumbnail_filename(change.new_value)
-                    thumbnail_url = (
-                        'http://localhost:8181/assetsdevhandler/topic/%s/assets'
-                        '/thumbnail/%s' % (topic_id, change.new_value))
+                    if constants.DEV_MODE:
+                        thumbnail_url = (
+                            '%s%s/assets/thumbnail/%s' % (
+                            BASE_URL_TOPIC_THUMBNAIL_RESOURCE_DEV_MODE, topic_id, change.new_value))
+                    else:
+                        thumbnail_url = (
+                                '%s%s/assets/thumbnail/%s' % (
+                            BASE_URL_TOPIC_THUMBNAIL_RESOUCE_PROD_MODE, topic_id, change.new_value))
                     thumbnail_size_in_bytes = python_utils.url_open(
                         thumbnail_url).headers['Content-Length']
                     topic.update_thumbnail_size_in_bytes(
