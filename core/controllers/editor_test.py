@@ -57,6 +57,7 @@ class BaseEditorControllerTests(test_utils.GenericTestBase):
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup(self.VOICE_ARTIST_EMAIL, self.VOICE_ARTIST_USERNAME)
+        self.signup('voiceoveradmin@app.com', 'voiceoverManager')
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
@@ -65,13 +66,18 @@ class BaseEditorControllerTests(test_utils.GenericTestBase):
         self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
         self.voice_artist_id = self.get_user_id_from_email(
             self.VOICE_ARTIST_EMAIL)
+        self.voiceover_admin_id = self.get_user_id_from_email(
+            'voiceoveradmin@app.com')
 
         self.set_admins([self.ADMIN_USERNAME])
         self.set_moderators([self.MODERATOR_USERNAME])
+        self.set_user_role('voiceoverManager', feconf.ROLE_ID_VOICEOVER_ADMIN)
 
         self.owner = user_services.get_user_actions_info(self.owner_id)
         self.system_user = user_services.get_system_user()
         self.editor = user_services.get_user_actions_info(self.editor_id)
+        self.voiceover_admin = user_services.get_user_actions_info(
+            self.voiceover_admin_id)
 
     def assert_can_edit(self, exp_id):
         """Returns True if the current user can edit the exploration
@@ -1045,10 +1051,6 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
             self.owner, unpublished_exp_id, self.editor_id,
             rights_domain.ROLE_EDITOR)
 
-        rights_manager.assign_role_for_exploration(
-            self.owner, unpublished_exp_id, self.voice_artist_id,
-            rights_domain.ROLE_VOICE_ARTIST)
-
         self.login(self.EDITOR_EMAIL)
         self.delete_json(
             '/createhandler/data/%s' % unpublished_exp_id,
@@ -1056,12 +1058,6 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
         self.logout()
 
         self.login(self.VIEWER_EMAIL)
-        self.delete_json(
-            '/createhandler/data/%s' % unpublished_exp_id,
-            expected_status_int=401)
-        self.logout()
-
-        self.login(self.VOICE_ARTIST_EMAIL)
         self.delete_json(
             '/createhandler/data/%s' % unpublished_exp_id,
             expected_status_int=401)
@@ -1079,14 +1075,14 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
         exploration = exp_domain.Exploration.create_default_exploration(
             published_exp_id, title='A title', category='A category')
         exp_services.save_new_exploration(self.owner_id, exploration)
+        rights_manager.publish_exploration(self.owner, published_exp_id)
 
         rights_manager.assign_role_for_exploration(
             self.owner, published_exp_id, self.editor_id,
             rights_domain.ROLE_EDITOR)
         rights_manager.assign_role_for_exploration(
-            self.owner, published_exp_id, self.voice_artist_id,
+            self.voiceover_admin, published_exp_id, self.voice_artist_id,
             rights_domain.ROLE_VOICE_ARTIST)
-        rights_manager.publish_exploration(self.owner, published_exp_id)
 
         self.login(self.EDITOR_EMAIL)
         self.delete_json(
@@ -1413,12 +1409,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
                 'new_member_username': self.VIEWER_USERNAME,
                 'new_member_role': rights_domain.ROLE_VIEWER
             }, csrf_token=csrf_token)
-        self.put_json(
-            rights_url, {
-                'version': exploration.version,
-                'new_member_username': self.VOICE_ARTIST_USERNAME,
-                'new_member_role': rights_domain.ROLE_VOICE_ARTIST
-            }, csrf_token=csrf_token)
+
         self.put_json(
             rights_url, {
                 'version': exploration.version,
@@ -1497,25 +1488,6 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         self.assertIn('State 5', response_dict['states'])
 
         # Check that collaborator2 cannot add new members.
-        exploration = exp_fetchers.get_exploration_by_id(exp_id)
-        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
-        self.put_json(
-            rights_url, {
-                'version': exploration.version,
-                'new_member_username': self.COLLABORATOR3_USERNAME,
-                'new_member_role': rights_domain.ROLE_EDITOR,
-                }, csrf_token=csrf_token, expected_status_int=401)
-
-        self.logout()
-
-        # Check that voice artist can access editor page and can only voiceover.
-        self.login(self.VOICE_ARTIST_EMAIL)
-        self.get_html_response('/create/%s' % exp_id)
-        self.assert_cannot_edit(exp_id)
-        self.assert_can_voiceover(exp_id)
-        csrf_token = self.get_new_csrf_token()
-
-        # Check that voice artist cannot add new members.
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
         rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
         self.put_json(
