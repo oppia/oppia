@@ -251,16 +251,13 @@ var addExplorationCollaborator = async function(username) {
 };
 
 var addExplorationVoiceArtist = async function(username) {
-  var editButtonElement = element(
-    by.css('.protractor-test-edit-voice-artist-roles'));
-  await action.click('Edit voice artist role button', editButtonElement);
-
+  await action.click('Edit voice artist role button', element(
+    by.css('.protractor-test-edit-voice-artist-roles')));
   await action.sendKeys(
     'New voice artist username input',
     element(by.css('.protractor-test-new-voice-artist-username')), username);
-  var addRoleButtonElement = element(
-    by.css('.protractor-test-add-voice-artist-role-button'));
-  await action.click('Add voice artis button', addRoleButtonElement);
+  await action.click('Add voice artist button', element(
+    by.css('.protractor-test-add-voice-artist-role-button')));
   await waitFor.visibilityOf(element(by.css(
     '.protractor-test-voice-artist-' + username)));
 };

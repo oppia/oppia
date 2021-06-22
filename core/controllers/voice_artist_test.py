@@ -42,6 +42,8 @@ class BaseVoiceArtistControllerTests(test_utils.GenericTestBase):
             self.VOICE_ARTIST_EMAIL)
 
         self.owner = user_services.get_user_actions_info(self.owner_id)
+        self.voiceover_admin = user_services.get_user_actions_info(
+            self.voice_artist_id)
 
 
 class VoiceArtistTest(BaseVoiceArtistControllerTests):
@@ -70,7 +72,7 @@ class VoiceArtistTest(BaseVoiceArtistControllerTests):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
         rights_manager.assign_role_for_exploration(
-            self.owner,
+            self.voiceover_admin,
             self.EXP_ID,
             self.voice_artist_id,
             rights_domain.ROLE_VOICE_ARTIST
@@ -193,7 +195,7 @@ class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
         rights_manager.assign_role_for_exploration(
-            self.owner,
+            self.voiceover_admin,
             self.EXP_ID,
             self.voice_artist_id,
             rights_domain.ROLE_VOICE_ARTIST
@@ -284,7 +286,7 @@ class TranslationFirstTimeTutorialTest(BaseVoiceArtistControllerTests):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
         rights_manager.assign_role_for_exploration(
-            self.owner,
+            self.voiceover_admin,
             self.EXP_ID,
             self.voice_artist_id,
             rights_domain.ROLE_VOICE_ARTIST
