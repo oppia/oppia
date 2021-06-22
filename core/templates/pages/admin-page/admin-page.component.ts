@@ -16,7 +16,7 @@
  * @fileoverview Data and component for the Oppia admin page.
  */
 
-import { Component, EventEmitter } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -34,6 +34,7 @@ export class AdminPageComponent {
 
   constructor(
     private adminRouterService: AdminRouterService,
+    private changeDetectorRef: ChangeDetectorRef,
     private platformFeatureService: PlatformFeatureService,
     private windowRef: WindowRef
   ) {}
@@ -69,6 +70,7 @@ export class AdminPageComponent {
 
   setStatusMessage(statusMessage: string): void {
     this.statusMessage = statusMessage;
+    this.changeDetectorRef.detectChanges();
   }
 
   isDummyFeatureEnabled(): boolean {

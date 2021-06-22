@@ -16,7 +16,7 @@
   </oppia-admin-prod-mode-activities-tab>
 
   <oppia-admin-config-tab *ngIf="isConfigTabOpen()"
-                    (setStatusMessage)="setStatusMessage($event)">
+                          (setStatusMessage)="setStatusMessage($event)">
   </oppia-admin-config-tab>
 
   <admin-features-tab *ngIf="isFeaturesTabOpen()"
@@ -28,7 +28,7 @@
   </oppia-admin-roles-tab>
 
   <oppia-admin-misc-tab *ngIf="isMiscTabOpen()"
-                        (set-status-message)="setStatusMessage($event)">
+                        (setStatusMessage)="setStatusMessage($event)">
   </oppia-admin-misc-tab>
 </div>
 
