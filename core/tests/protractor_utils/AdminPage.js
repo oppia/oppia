@@ -340,6 +340,8 @@ var AdminPage = function() {
     await action.click('Admin Roles Tab', adminRolesTab);
 
     // Change values for "update role" form, and submit it.
+    await waitFor.visibilityOf(
+      updateFormName, 'Update Form name taking too long to appear.');
     await action.sendKeys('Update Form Name', updateFormName, name);
     await action.select('Role Drop Down', roleSelect, newRole);
     await action.click('Update Form Submit', updateFormSubmit);
