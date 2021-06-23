@@ -72,7 +72,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'collection.model.ts',
     'concept-card.directive.ts',
     'ConceptCardObjectFactory.ts',
-    'contribution-and-review.service.ts',,
+    'contribution-and-review.service.ts',
     'contributions-and-review.component.ts',
     'conversation-skin.directive.ts',
     'conversion.ts',
