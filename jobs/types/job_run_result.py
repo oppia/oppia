@@ -64,7 +64,7 @@ class JobRunResult(python_utils.OBJECT):
         Returns:
             JobRunResult. A JobRunResult with the given value as its stdout.
         """
-        str_value = ('%r' if use_repr else '%s') % value
+        str_value = ('%r' if use_repr else '%s') % (value,)
         return JobRunResult(stdout=str_value)
 
     @classmethod
@@ -79,7 +79,7 @@ class JobRunResult(python_utils.OBJECT):
         Returns:
             JobRunResult. A JobRunResult with the given value as its stderr.
         """
-        str_value = ('%r' if use_repr else '%s') % value
+        str_value = ('%r' if use_repr else '%s') % (value,)
         return JobRunResult(stderr=str_value)
 
     @classmethod
