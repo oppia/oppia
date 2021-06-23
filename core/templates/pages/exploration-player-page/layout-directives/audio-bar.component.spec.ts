@@ -29,13 +29,7 @@ import { PlayerPositionService } from '../services/player-position.service';
 import { ComponentFixture, discardPeriodicTasks, fakeAsync, flush, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { EventEmitter, NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-
-@Pipe({name: 'translate'})
-class MockTranslatePipe {
-  transform(value: string): string {
-    return value;
-  }
-}
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 describe('Audio Bar Component', () => {
   let component: AudioBarComponent;
@@ -112,14 +106,13 @@ describe('Audio Bar Component', () => {
     discardPeriodicTasks();
     fixture.detectChanges();
 
-
     expect(secondaryTranslaionsSpy).toHaveBeenCalledWith(
       params.audioTranslations, params.html, params.componentName);
   }));
 
   it('should set current time when calling \'setProgress\'', () => {
     // This time period is used to set progress
-    // when user pull the drag button in audio bar.
+    // when user pulls the drag button in audio bar.
     let param = {
       value: 100
     };
@@ -143,8 +136,8 @@ describe('Audio Bar Component', () => {
   });
 
   it('should check if the audio bar is available', () => {
-    // Audio bar is only accessible if the available
-    // languages are greater than one.
+    // Audio bar is only accessible if the number of
+    // available languages are greater than one.
     component.languagesInExploration = [
       {
         value: 'en',
@@ -468,7 +461,7 @@ describe('Audio Bar Component', () => {
     });
 
     it('should load audio track and play audio ' +
-      'play which are stored in cache', fakeAsync(() => {
+      'which are stored in cache', fakeAsync(() => {
       let audioTranslation = {
         en: Voiceover.createFromBackendDict({
           filename: 'audio-en.mp3',
