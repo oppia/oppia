@@ -33,7 +33,7 @@ export class StateWrittenTranslationsService extends
   StatePropertyService<WrittenTranslations> {
   constructor(alertsService: AlertsService, utilsService: UtilsService) {
     super(alertsService, utilsService);
-    this.setterMethodKey = 'saveWrittenTranslations';
+    this.setterMethodKey = 'saveWrittenTranslation';
   }
 }
 

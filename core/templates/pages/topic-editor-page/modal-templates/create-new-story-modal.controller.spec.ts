@@ -120,4 +120,8 @@ describe('Create New Story Modal Controller', function() {
     $scope.story.title = '';
     expect($scope.isValid()).toBe(false);
   });
+
+  it ('should update View when thumbnail has been uploaded', function() {
+    $scope.updateView();
+  });
 });

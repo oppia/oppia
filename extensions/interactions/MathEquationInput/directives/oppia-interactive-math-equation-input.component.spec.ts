@@ -22,6 +22,7 @@ import { GuppyConfigurationService } from 'services/guppy-configuration.service'
 import { GuppyInitializationService } from 'services/guppy-initialization.service';
 import { MathInteractionsService } from 'services/math-interactions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 require(
   'interactions/MathEquationInput/directives/' +
@@ -69,6 +70,7 @@ describe('MathEquationInputInteractive', function() {
   }
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.module('oppia', function($provide) {
     guppyConfigurationService = new GuppyConfigurationService();
     mathInteractionsService = new MathInteractionsService();
