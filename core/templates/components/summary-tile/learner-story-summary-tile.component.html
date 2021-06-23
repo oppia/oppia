@@ -1,27 +1,27 @@
 <mat-card class="oppia-story-dashboard-card">
   <a [href]="getStoryLink()"
      target="{{ openInNewWindow ? '_blank' : '_self' }}"
-     class="story-link">
-    <div class="title-section" [ngStyle]="{'background-color': thumbnailBgColor}">
-      <img class="thumbnail-image" [src]="thumbnailUrl">
-      <div class="story-completion">
-        <p class="percent-story-completed">
+     class="oppia-story-link">
+    <div class="oppia-title-section" [ngStyle]="{'background-color': thumbnailBgColor}">
+      <img class="oppia-thumbnail-image" [src]="thumbnailUrl">
+      <div class="oppia-story-completion">
+        <p class="oppia-percent-story-completed">
           {{storyProgress}}% Complete
         </p>
       </div>
     </div>
-    <div class="summary-section">
-      <span class="story-title">
+    <div class="oppia-summary-section">
+      <span class="oppia-story-title">
         {{storyTitle}}
       </span>
-      <span class="topic-title">
+      <span class="oppia-topic-title">
         {{topicTitle}}
       </span>
     </div>
   </a>
 </mat-card>
 <style>
-  .story-title {
+  .oppia-story-title {
     color: #333;
     display: inline-block;
     font-size: 16px;
@@ -31,7 +31,7 @@
     opacity: 1;
     text-align: left;
   }
-  .story-completion {
+  .oppia-story-completion {
     background: #000C 0% 0% no-repeat padding-box;
     border-radius: 2px;
     bottom: 23px;
@@ -41,13 +41,13 @@
     right: 4px;
     width: 80px;
   }
-  .story-link {
+  .oppia-story-link {
     text-decoration: none;
   }
-  .summary-section {
+  .oppia-summary-section {
     position: absolute;
   }
-  .topic-title {
+  .oppia-topic-title {
     color: #333;
     display: block;
     font-size: 14px;
@@ -59,7 +59,7 @@
     text-align: left;
     text-transform: uppercase;
   }
-  .percent-story-completed {
+  .oppia-percent-story-completed {
     color: #FFF;
     font-size: 10px;
     letter-spacing: 0;
@@ -78,13 +78,13 @@
     width: 192px;
     z-index: 5;
   }
-  .title-section {
+  .oppia-title-section {
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
     height: 144px;
     width: 192px;
   }
-  .thumbnail-image {
+  .oppia-thumbnail-image {
     height: 144px;
     width: 192px;
   }
