@@ -240,3 +240,53 @@ class RegenerateTopicSummaryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 sum(ast.literal_eval(v) for v in values))])
         else:
             yield (key, values)
+
+
+class UpdateTopicThumbnailSizeInBytesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job to update the thumbnail_size_in_bytes in topic models. """
+
+    _DELETED_KEY = 'topic_deleted'
+    _ERROR_KEY = 'computation_error'
+    _SUCCESS_KEY = 'thumbnail_size_updated'
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [topic_models.TopicModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+        print()
+        print(item._properties)
+        print()
+        if 'thumbnail_size_in_bytes' not in item._properties: # pylint: disable=protected-access
+            item._properties['thumbnail_size_in_bytes'] = None
+
+        topic = topic_fetchers.get_topic_by_id(item.id)
+        try:
+            topic.validate()
+        except Exception as e:
+            logging.exception(
+                'Topic %s failed validation: %s' % (item.id, e))
+            yield (
+                TopicMigrationOneOffJob._ERROR_KEY,
+                'Topic %s failed validation: %s' % (item.id, e))
+            return
+
+        commit_cmds = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+            'property_name': topic_domain.TOPIC_PROPERTY_THUMBNAIL_FILENAME,
+            'new_value': topic.thumbnail_filename,
+            'old_value': topic.thumbnail_filename
+        })]
+
+        topic_services.update_topic_and_subtopic_pages(
+            feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
+            'Update topic thumbnail size'
+        )
+        yield (UpdateTopicThumbnailSizeInBytesOneOffJob._SUCCESS_KEY, 1)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)
