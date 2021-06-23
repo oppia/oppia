@@ -871,7 +871,8 @@ class TranslationContributionStatsModel(base_models.BaseModel):
             submitted_translations_count=submitted_translations_count,
             submitted_translation_word_count=submitted_translation_word_count,
             accepted_translations_count=accepted_translations_count,
-            accepted_translations_without_reviewer_edits_count=accepted_translations_without_reviewer_edits_count,
+            accepted_translations_without_reviewer_edits_count=(
+                accepted_translations_without_reviewer_edits_count),
             accepted_translation_word_count=accepted_translation_word_count,
             rejected_translations_count=rejected_translations_count,
             rejected_translation_word_count=rejected_translation_word_count,

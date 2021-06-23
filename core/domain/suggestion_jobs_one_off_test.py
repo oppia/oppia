@@ -1397,7 +1397,6 @@ class PopulateContributionStatsOneOffJobTests(
         self._create_question_suggestion_with_skill_id('skill_1')
         self._create_question_suggestion_with_skill_id('skill_2')
         expected_output = ['[u\'suggestion.add_question.en\', 2]']
-
         self._run_job_and_verify_output(expected_output)
 
         community_contribution_stats = (
@@ -1649,7 +1648,7 @@ class PopulateTranslationContributionStatsOneOffJobTests(
         self.assertEqual(
             translation_contribution_stats
             .accepted_translations_without_reviewer_edits_count, 1)
-        # NOTE: len("This is html to translate") = 5
+        # NOTE: len("This is html to translate") = 5.
         self.assertEqual(
             translation_contribution_stats.accepted_translation_word_count, 5)
         self.assertEqual(
@@ -1675,7 +1674,7 @@ class PopulateTranslationContributionStatsOneOffJobTests(
         )
         self.assertEqual(
             translation_contribution_stats.submitted_translations_count, 2)
-        # NOTE: len("This is html to translate") * 2 = 10
+        # NOTE: len("This is html to translate") * 2 = 10.
         self.assertEqual(
             translation_contribution_stats.submitted_translation_word_count, 10)
         self.assertEqual(
@@ -1683,7 +1682,7 @@ class PopulateTranslationContributionStatsOneOffJobTests(
         self.assertEqual(
             translation_contribution_stats
             .accepted_translations_without_reviewer_edits_count, 1)
-        # NOTE: len("This is html to translate") = 5
+        # NOTE: len("This is html to translate") = 5.
         self.assertEqual(
             translation_contribution_stats.accepted_translation_word_count, 5)
         self.assertEqual(

@@ -369,26 +369,26 @@ class PopulateTranslationContributionStatsOneOffJob(
     @staticmethod
     def reduce(key, stringified_values):
         """Updates the TranslationContributionStatsModel for the given key
-            and stringified_values.
+        and stringified_values.
 
-            Args:
-                key: str. Entity ID for a TranslationContributionStatsModel.
-                stringified_values: list(dict(str, str)). A list of stringified
-                    dicts with the following keys:
-                    suggestion_status: str. The translation suggestion status.
-                    edited_by_reviewer: bool. Whether the translation suggestion
-                        was edited by a reviewer.
-                    content_word_count: int. The word count of the translation
-                        suggestion content HTML.
-                    last_updated_date: date. The last updated date of the
-                        translation suggestion.
+        Args:
+            key: str. Entity ID for a TranslationContributionStatsModel.
+            stringified_values: list(dict(str, str)). A list of stringified
+                dicts with the following keys:
+                suggestion_status: str. The translation suggestion status.
+                edited_by_reviewer: bool. Whether the translation suggestion
+                    was edited by a reviewer.
+                content_word_count: int. The word count of the translation
+                    suggestion content HTML.
+                last_updated_date: date. The last updated date of the
+                    translation suggestion.
 
-            Yields:
-                tuple(key, count), where:
-                    key: str. TranslationContributionStatsModel entity ID.
-                    count: int. Number of translation suggestions processed for
-                        populating the TranslationContributionStatsModel with ID
-                        key.
+        Yields:
+            tuple(key, count), where:
+                key: str. TranslationContributionStatsModel entity ID.
+                count: int. Number of translation suggestions processed for
+                    populating the TranslationContributionStatsModel with ID
+                    key.
         """
         values = [ast.literal_eval(v) for v in stringified_values]
         submitted_translations_count = 0
@@ -428,7 +428,8 @@ class PopulateTranslationContributionStatsOneOffJob(
             submitted_translations_count=submitted_translations_count,
             submitted_translation_word_count=submitted_translation_word_count,
             accepted_translations_count=accepted_translations_count,
-            accepted_translations_without_reviewer_edits_count=accepted_translations_without_reviewer_edits_count,
+            accepted_translations_without_reviewer_edits_count=(
+                accepted_translations_without_reviewer_edits_count),
             accepted_translation_word_count=accepted_translation_word_count,
             rejected_translations_count=rejected_translations_count,
             rejected_translation_word_count=rejected_translation_word_count,
