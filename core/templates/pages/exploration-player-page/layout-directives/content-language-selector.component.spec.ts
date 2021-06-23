@@ -91,6 +91,8 @@ describe('Content language selector component', () => {
     writtenTranslationsObjectFactory = TestBed.get(
       WrittenTranslationsObjectFactory);
     imagePreloaderService = TestBed.get(ImagePreloaderService);
+    audioTranslationLanguageService = TestBed.get(
+      AudioTranslationLanguageService);
     fixture = TestBed.createComponent(ContentLanguageSelectorComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

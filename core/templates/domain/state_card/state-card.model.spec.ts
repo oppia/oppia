@@ -18,7 +18,7 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { AudioTranslationLanguageService} from
+import { AudioTranslationLanguageService } from
   'pages/exploration-player-page/services/audio-translation-language.service';
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
@@ -48,6 +48,8 @@ describe('State card object factory', () => {
     interactionObjectFactory = TestBed.get(InteractionObjectFactory);
     writtenTranslationsObjectFactory = TestBed.get(
       WrittenTranslationsObjectFactory);
+    audioTranslationLanguageService = TestBed.get(
+      AudioTranslationLanguageService);
 
     let interactionDict = {
       answer_groups: [],
