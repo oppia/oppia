@@ -280,7 +280,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'state-hints-editor.directive.ts',
     'state-interaction-editor.directive.ts',
     'state-property.service.ts',
-    'state-responses.directive.ts',
+    'state-responses.component.ts',
     'state-solution-editor.directive.ts',
     'state-top-answers-stats.service.ts',
     'StateCardObjectFactory.ts',
