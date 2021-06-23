@@ -27,8 +27,7 @@ import { ExplorationPlayerConstants } from 'pages/exploration-player-page/explor
 import { TextInputRulesService } from 'interactions/TextInput/directives/text-input-rules.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Learner answer info service', () =>{
+describe('Learner answer info service', () =>{
   let sof: StateObjectFactory;
   let oof: OutcomeObjectFactory;
   let stateDict: StateBackendDict;
