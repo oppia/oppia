@@ -26,7 +26,7 @@ class ModelCanonicalNameMismatchError(base_validation_errors.BaseAuditError):
     """Error class for models that have mismatching names."""
 
     def __init__(self, model):
-        super(ModelCanonicalNameMismatchError, self).__init__(model)
-        self.message = (
+        message = (
             'Entity name %s in lowercase does not match '
             'canonical name %s' % (model.name, model.canonical_name))
+        super(ModelCanonicalNameMismatchError, self).__init__(message, model)
