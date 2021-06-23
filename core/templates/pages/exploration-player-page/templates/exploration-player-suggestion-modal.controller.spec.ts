@@ -23,8 +23,7 @@ import { PlayerPositionService } from '../services/player-position.service';
 import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { RecordedVoiceovers } from
   'domain/exploration/recorded-voiceovers.model';
-import { StateCard } from
-    'domain/state_card/state-card.model';
+import { StateCard } from 'domain/state_card/state-card.model';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';

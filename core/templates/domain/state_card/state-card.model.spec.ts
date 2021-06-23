@@ -25,7 +25,7 @@ import { CamelCaseToHyphensPipe } from
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
 import { StateCard } from
-    'domain/state_card/state-card.model';
+  'domain/state_card/state-card.model';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { WrittenTranslationsObjectFactory } from
