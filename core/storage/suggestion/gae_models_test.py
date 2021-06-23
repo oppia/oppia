@@ -1502,7 +1502,7 @@ class TranslationContributionStatsModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(user_data, {})
 
     def test_export_data_nontrivial(self):
-        topic_id_2 = "topic ID 2"
+        topic_id_2 = 'topic ID 2'
         # Seed translation stats data for two different topics.
         model_1_id = suggestion_models.TranslationContributionStatsModel.create(
             language_code=self.LANGUAGE_CODE,

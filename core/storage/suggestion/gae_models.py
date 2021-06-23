@@ -812,6 +812,7 @@ class TranslationContributionStatsModel(base_models.BaseModel):
     topic_id) tuple. See related design doc for more details:
     https://docs.google.com/document/d/1JEDiy-f1vnBLwibu8hsfuo3JObBWiaFvDTTU9L18zpY/edit#
     """
+
     # The ISO 639-1 language code for which the translation contributions were
     # made.
     language_code = datastore_services.StringProperty(
@@ -870,8 +871,7 @@ class TranslationContributionStatsModel(base_models.BaseModel):
             submitted_translations_count=submitted_translations_count,
             submitted_translation_word_count=submitted_translation_word_count,
             accepted_translations_count=accepted_translations_count,
-            accepted_translations_without_reviewer_edits_count=
-            accepted_translations_without_reviewer_edits_count,
+            accepted_translations_without_reviewer_edits_count=accepted_translations_without_reviewer_edits_count,
             accepted_translation_word_count=accepted_translation_word_count,
             rejected_translations_count=rejected_translations_count,
             rejected_translation_word_count=rejected_translation_word_count,
@@ -976,10 +976,10 @@ class TranslationContributionStatsModel(base_models.BaseModel):
             dict. Dictionary of the data from TranslationContributionStatsModel.
         """
         user_data = dict()
-        models = (
+        stats_models = (
             cls.get_all()
             .filter(cls.contributor_user_id == user_id).fetch())
-        for model in models:
+        for model in stats_models:
             user_data[model.id] = {
                 'language_code': model.language_code,
                 'topic_id': model.topic_id,

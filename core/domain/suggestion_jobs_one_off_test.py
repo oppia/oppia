@@ -1528,7 +1528,7 @@ class PopulateTranslationContributionStatsOneOffJobTests(
 
     def mock_update_exploration(
             self, unused_user_id, unused_exploration_id, unused_change_list,
-            commit_message, is_suggestion):
+            unused_commit_message, is_suggestion):
         self.assertTrue(is_suggestion)
 
     def mock_get_opportunities(self, unused_exploration_ids):
@@ -1640,8 +1640,8 @@ class PopulateTranslationContributionStatsOneOffJobTests(
         )
         self.assertEqual(
             translation_contribution_stats.submitted_translations_count, 2)
-        # len("This is html to translate") * 2 = 10. Note HTML tags/attributes
-        # were not considered part of the word count.
+        # NOTE: len("This is html to translate") * 2 = 10. HTML tags/attributes
+        # are not considered part of the word count.
         self.assertEqual(
             translation_contribution_stats.submitted_translation_word_count, 10)
         self.assertEqual(
@@ -1649,14 +1649,14 @@ class PopulateTranslationContributionStatsOneOffJobTests(
         self.assertEqual(
             translation_contribution_stats
             .accepted_translations_without_reviewer_edits_count, 1)
-        # len("This is html to translate") = 5
+        # NOTE: len("This is html to translate") = 5
         self.assertEqual(
             translation_contribution_stats.accepted_translation_word_count, 5)
         self.assertEqual(
             translation_contribution_stats.rejected_translations_count, 0)
         self.assertEqual(
             translation_contribution_stats.rejected_translation_word_count, 0)
-        # Note we only persist unique dates.
+        # NOTE: We only persist unique dates.
         self.assertEqual(
             translation_contribution_stats.contribution_dates,
             [datetime.datetime.now().date()])
@@ -1675,7 +1675,7 @@ class PopulateTranslationContributionStatsOneOffJobTests(
         )
         self.assertEqual(
             translation_contribution_stats.submitted_translations_count, 2)
-        # len("This is html to translate") * 2 = 10
+        # NOTE: len("This is html to translate") * 2 = 10
         self.assertEqual(
             translation_contribution_stats.submitted_translation_word_count, 10)
         self.assertEqual(
@@ -1683,7 +1683,7 @@ class PopulateTranslationContributionStatsOneOffJobTests(
         self.assertEqual(
             translation_contribution_stats
             .accepted_translations_without_reviewer_edits_count, 1)
-        # len("This is html to translate") = 5
+        # NOTE: len("This is html to translate") = 5
         self.assertEqual(
             translation_contribution_stats.accepted_translation_word_count, 5)
         self.assertEqual(
