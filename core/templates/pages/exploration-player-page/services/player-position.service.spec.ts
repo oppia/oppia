@@ -25,8 +25,6 @@ import { PlayerPositionService } from
   'pages/exploration-player-page/services/player-position.service';
 import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
-import { StateCardObjectFactory } from
-  'domain/state_card/StateCardObjectFactory';
 
 describe('Player position service', () => {
   let pts = null;
@@ -38,7 +36,6 @@ describe('Player position service', () => {
   beforeEach(() => {
     pts = TestBed.get(PlayerTranscriptService);
     pps = TestBed.get(PlayerPositionService);
-    scof = TestBed.get(StateCardObjectFactory);
     onQuestionChangeSpy = jasmine.createSpy('onQuestionChangeSpy');
     subscriptions = new Subscription();
     subscriptions.add(pps.onCurrentQuestionChange.subscribe(

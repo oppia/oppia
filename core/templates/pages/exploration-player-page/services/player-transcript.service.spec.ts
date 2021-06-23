@@ -20,55 +20,67 @@ import { TestBed } from '@angular/core/testing';
 
 import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
-import { StateCardObjectFactory } from
+import { StateCard } from
   'domain/state_card/StateCardObjectFactory';
 
 describe('Player transcript service', () => {
   let pts;
-  let scof;
   beforeEach(() => {
     pts = TestBed.get(PlayerTranscriptService);
-    scof = TestBed.get(StateCardObjectFactory);
   });
 
   it('should reset the transcript correctly', () => {
-    pts.addNewCard(scof.createNewCard(
+    pts.addNewCard(StateCard.createNewCard(
       'First state', 'Content HTML',
-      '<oppia-text-input-html></oppia-text-input-html>'));
-    pts.addNewCard(scof.createNewCard(
+      '<oppia-text-input-html></oppia-text-input-html>',
+      null, null, null, null,
+      null));
+    pts.addNewCard(StateCard.createNewCard(
       'Second state', 'Content HTML',
-      '<oppia-text-input-html></oppia-text-input-html>'));
+      '<oppia-text-input-html></oppia-text-input-html>',
+      null, null, null, null,
+      null));
 
     expect(pts.getNumCards()).toBe(2);
 
     pts.init();
     expect(pts.getNumCards()).toBe(0);
-    pts.addNewCard(scof.createNewCard(
+    pts.addNewCard(StateCard.createNewCard(
       'Third state', 'Content HTML',
-      '<oppia-text-input-html></oppia-text-input-html>'));
+      '<oppia-text-input-html></oppia-text-input-html>',
+      null, null, null, null,
+      null));
     expect(pts.getCard(0).getStateName()).toBe('Third state');
   });
 
   it(
     'should correctly check whether a state have been encountered before',
     () => {
-      pts.addNewCard(scof.createNewCard(
+      pts.addNewCard(StateCard.createNewCard(
         'First state', 'Content HTML',
-        '<oppia-text-input-html></oppia-text-input-html>'));
-      pts.addNewCard(scof.createNewCard(
+        '<oppia-text-input-html></oppia-text-input-html>',
+        null, null, null, null,
+        null));
+      pts.addNewCard(StateCard.createNewCard(
         'Second state', 'Content HTML',
-        '<oppia-text-input-html></oppia-text-input-html>'));
-      pts.addNewCard(scof.createNewCard(
+        '<oppia-text-input-html></oppia-text-input-html>',
+        null, null, null, null,
+        null));
+      pts.addNewCard(StateCard.createNewCard(
         'First state', 'Content HTML',
-        '<oppia-text-input-html></oppia-text-input-html>'));
+        '<oppia-text-input-html></oppia-text-input-html>',
+        null, null, null, null,
+        null));
       expect(pts.hasEncounteredStateBefore('First state')).toEqual(true);
       expect(pts.hasEncounteredStateBefore('Third state')).toEqual(false);
     });
 
   it('should add a new card correctly', () => {
-    pts.addNewCard(scof.createNewCard(
+    pts.addNewCard(StateCard.createNewCard(
       'First state', 'Content HTML',
-      '<oppia-text-input-html></oppia-text-input-html>'));
+      '<oppia-text-input-html></oppia-text-input-html>',
+      null, null, null, null,
+      null));
 
     let firstCard = pts.getCard(0);
     expect(firstCard.getStateName()).toEqual('First state');
@@ -78,12 +90,16 @@ describe('Player transcript service', () => {
   });
 
   it('should add a previous card correctly', () => {
-    pts.addNewCard(scof.createNewCard(
+    pts.addNewCard(StateCard.createNewCard(
       'First state', 'Content HTML',
-      '<oppia-text-input-html></oppia-text-input-html>'));
-    pts.addNewCard(scof.createNewCard(
+      '<oppia-text-input-html></oppia-text-input-html>',
+      null, null, null, null,
+      null));
+    pts.addNewCard(StateCard.createNewCard(
       'Second state', 'Content HTML',
-      '<oppia-text-input-html></oppia-text-input-html>'));
+      '<oppia-text-input-html></oppia-text-input-html>',
+      null, null, null, null,
+      null));
     pts.addPreviousCard();
 
     expect(pts.getNumCards()).toEqual(3);
@@ -93,22 +109,28 @@ describe('Player transcript service', () => {
   });
 
   it('should set lastAnswer correctly', () => {
-    pts.addNewCard(scof.createNewCard(
+    pts.addNewCard(StateCard.createNewCard(
       'First state', 'Content HTML',
-      '<oppia-text-input-html></oppia-text-input-html>'));
+      '<oppia-text-input-html></oppia-text-input-html>',
+      null, null, null, null,
+      null));
     let lastAnswer = pts.getLastAnswerOnDisplayedCard(0);
     expect(lastAnswer).toEqual(null);
 
     pts.addNewInput('first answer', false);
-    pts.addNewCard(scof.createNewCard(
+    pts.addNewCard(StateCard.createNewCard(
       'Second state', 'Content HTML',
-      '<oppia-text-input-html></oppia-text-input-html>'));
+      '<oppia-text-input-html></oppia-text-input-html>',
+      null, null, null, null,
+      null));
     lastAnswer = pts.getLastAnswerOnDisplayedCard(0);
     expect(lastAnswer).toEqual('first answer');
 
-    pts.addNewCard(scof.createNewCard(
+    pts.addNewCard(StateCard.createNewCard(
       'Third state', 'Content HTML',
-      '<oppia-text-input-html></oppia-text-input-html>'));
+      '<oppia-text-input-html></oppia-text-input-html>',
+      null, null, null, null,
+      null));
     // Variable lastAnswer should be null as no answers were provided in the
     // second state.
     lastAnswer = pts.getLastAnswerOnDisplayedCard(1);
@@ -116,9 +138,11 @@ describe('Player transcript service', () => {
   });
 
   it('should record answer/feedback pairs in the correct order', () => {
-    pts.addNewCard(scof.createNewCard(
+    pts.addNewCard(StateCard.createNewCard(
       'First state', 'Content HTML',
-      '<oppia-text-input-html></oppia-text-input-html>'));
+      '<oppia-text-input-html></oppia-text-input-html>',
+      null, null, null, null,
+      null));
     pts.addNewInput('first answer', false);
     expect(() => {
       pts.addNewInput('invalid answer');
@@ -143,12 +167,16 @@ describe('Player transcript service', () => {
   });
 
   it('should retrieve the last card of the transcript correctly', () => {
-    pts.addNewCard(scof.createNewCard(
+    pts.addNewCard(StateCard.createNewCard(
       'First state', 'Content HTML',
-      '<oppia-text-input-html></oppia-text-input-html>'));
-    pts.addNewCard(scof.createNewCard(
+      '<oppia-text-input-html></oppia-text-input-html>',
+      null, null, null, null,
+      null));
+    pts.addNewCard(StateCard.createNewCard(
       'Second state', 'Content HTML',
-      '<oppia-text-input-html></oppia-text-input-html>'));
+      '<oppia-text-input-html></oppia-text-input-html>',
+      null, null, null, null,
+      null));
     expect(pts.getNumCards()).toBe(2);
     expect(pts.getLastCard().getStateName()).toBe('Second state');
     expect(pts.isLastCard(0)).toBe(false);

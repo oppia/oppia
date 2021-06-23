@@ -27,7 +27,7 @@ import { SubtitledUnicodeObjectFactory } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { WrittenTranslations, WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
-import { StateCardObjectFactory } from
+import { StateCard } from
   'domain/state_card/StateCardObjectFactory';
 import { ContentTranslationManagerService } from
   'pages/exploration-player-page/services/content-translation-manager.service';
@@ -36,15 +36,17 @@ import { PlayerTranscriptService } from
 import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
 import { ExplorationHtmlFormatterService } from
   'services/exploration-html-formatter.service';
+import { AudioTranslationLanguageService} from
+    'pages/exploration-player-page/services/audio-translation-language.service';
 
 describe('Content translation manager service', () => {
   let ctms: ContentTranslationManagerService;
   let ehfs: ExplorationHtmlFormatterService;
   let iof: InteractionObjectFactory;
   let pts: PlayerTranscriptService;
-  let scof: StateCardObjectFactory;
   let suof: SubtitledUnicodeObjectFactory;
   let wtof: WrittenTranslationsObjectFactory;
+  let atls: AudioTranslationLanguageService;
 
   let writtenTranslations: WrittenTranslations;
 
@@ -53,7 +55,6 @@ describe('Content translation manager service', () => {
     ehfs = TestBed.get(ExplorationHtmlFormatterService);
     iof = TestBed.get(InteractionObjectFactory);
     pts = TestBed.get(PlayerTranscriptService);
-    scof = TestBed.get(StateCardObjectFactory);
     suof = TestBed.get(SubtitledUnicodeObjectFactory);
     wtof = TestBed.get(WrittenTranslationsObjectFactory);
 
@@ -185,7 +186,7 @@ describe('Content translation manager service', () => {
     const interaction = iof.createFromBackendDict(interactionDict);
 
     pts.addNewCard(
-      scof.createNewCard(
+      StateCard.createNewCard(
         'State 1',
         '<p>en content</p>',
         ehfs.getInteractionHtml(
@@ -193,7 +194,8 @@ describe('Content translation manager service', () => {
         interaction,
         RecordedVoiceovers.createEmpty(),
         writtenTranslations,
-        'content'
+        'content',
+        atls
       )
     );
   });
@@ -434,7 +436,7 @@ describe('Content translation manager service', () => {
     pts.init();
     const newInteraction = iof.createFromBackendDict(newInteractionDict);
     pts.addNewCard(
-      scof.createNewCard(
+      StateCard.createNewCard(
         'State 1',
         '<p>en content</p>',
         ehfs.getInteractionHtml(
@@ -443,7 +445,8 @@ describe('Content translation manager service', () => {
         newInteraction,
         RecordedVoiceovers.createEmpty(),
         newWrittenTranslations,
-        'content'
+        'content',
+        atls
       )
     );
 

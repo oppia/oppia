@@ -21,7 +21,7 @@ import { TestBed} from '@angular/core/testing';
 import { AnswerClassificationResult } from 'domain/classifier/answer-classification-result.model';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { QuestionBackendDict, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
-import { StateCardObjectFactory } from 'domain/state_card/StateCardObjectFactory';
+import { StateCard } from 'domain/state_card/StateCardObjectFactory';
 import { ExpressionInterpolationService } from 'expressions/expression-interpolation.service';
 import { TextInputRulesService } from 'interactions/TextInput/directives/text-input-rules.service';
 import { AlertsService } from 'services/alerts.service';
@@ -41,7 +41,6 @@ describe('Question player engine service ', () => {
   let questionObjectFactory: QuestionObjectFactory;
   let questionPlayerEngineService: QuestionPlayerEngineService;
   let singleQuestionBackendDict: QuestionBackendDict;
-  let stateCardObjectFactory: StateCardObjectFactory;
   let textInputService: InteractionRulesService;
 
   beforeEach(() => {
@@ -423,7 +422,6 @@ describe('Question player engine service ', () => {
     questionPlayerEngineService = TestBed.inject(QuestionPlayerEngineService);
     outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
     focusManagerService = TestBed.inject(FocusManagerService);
-    stateCardObjectFactory = TestBed.inject(StateCardObjectFactory);
     textInputService = TestBed.get(TextInputRulesService);
   });
 
@@ -774,9 +772,9 @@ describe('Question player engine service ', () => {
         outcomeObjectFactory
           .createNew('default', '', '', []), 1, 0, 'default_outcome'
       );
-      let sampleCard = stateCardObjectFactory.createNewCard(
+      let sampleCard = StateCard.createNewCard(
         'Card 1', 'Content html', 'Interaction text', null,
-        null, null, 'content_id');
+        null, null, 'content_id', null);
 
       answerClassificationResult.outcome.labelledAsCorrect = true;
 
@@ -792,7 +790,7 @@ describe('Question player engine service ', () => {
         multipleQuestionsBackendDict, initSuccessCb, initErrorCb);
 
       let createNewCardSpy = spyOn(
-        stateCardObjectFactory, 'createNewCard').and.returnValue(sampleCard);
+        StateCard, 'createNewCard').and.returnValue(sampleCard);
 
       expect(createNewCardSpy).toHaveBeenCalledTimes(0);
 

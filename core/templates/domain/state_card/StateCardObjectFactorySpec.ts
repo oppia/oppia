@@ -13,16 +13,18 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for StateCardObjectFactory.
+ * @fileoverview Tests for state-card.model.ts.
  */
 
 import { TestBed } from '@angular/core/testing';
 
+import { AudioTranslationLanguageService} from
+    'pages/exploration-player-page/services/audio-translation-language.service';
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
-import { StateCardObjectFactory } from
+import { StateCard } from
   'domain/state_card/StateCardObjectFactory';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
@@ -33,9 +35,9 @@ import { Voiceover } from 'domain/exploration/voiceover.model';
 
 
 describe('State card object factory', () => {
-  let stateCardObjectFactory = null;
   let interactionObjectFactory = null;
   let writtenTranslationsObjectFactory = null;
+  let audioTranslationLanguageService: AudioTranslationLanguageService;
   let _sampleCard = null;
 
   beforeEach(() => {
@@ -43,7 +45,6 @@ describe('State card object factory', () => {
       providers: [CamelCaseToHyphensPipe]
     });
 
-    stateCardObjectFactory = TestBed.get(StateCardObjectFactory);
     interactionObjectFactory = TestBed.get(InteractionObjectFactory);
     writtenTranslationsObjectFactory = TestBed.get(
       WrittenTranslationsObjectFactory);
@@ -73,7 +74,7 @@ describe('State card object factory', () => {
       hints: [],
       id: 'TextInput'
     };
-    _sampleCard = stateCardObjectFactory.createNewCard(
+    _sampleCard = StateCard.createNewCard(
       'State 1', '<p>Content</p>', '<interaction></interaction>',
       interactionObjectFactory.createFromBackendDict(interactionDict),
       RecordedVoiceovers.createFromBackendDict({
@@ -95,7 +96,7 @@ describe('State card object factory', () => {
         }
       }),
       writtenTranslationsObjectFactory.createEmpty(),
-      'content');
+      'content', audioTranslationLanguageService);
   });
 
   it('should be able to get the various fields', () => {
