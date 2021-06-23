@@ -733,26 +733,6 @@ def apply_change_list(exploration_id, change_list, frontend_version):
                             state_domain.RecordedVoiceovers.from_dict(
                                 change.new_value))
                         state.update_recorded_voiceovers(recorded_voiceovers)
-                    elif (change.property_name ==
-                        exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
-                        if not isinstance(change.new_value, dict):
-                            raise Exception(
-                                'Expected written_translations to be a dict, '
-                                'received %s' % change.new_value)
-                        cleaned_written_translations_dict = (
-                            state_domain.WrittenTranslations
-                            .convert_html_in_written_translations(
-                                change.new_value, html_cleaner.clean))
-                        written_translations = (
-                            state_domain.WrittenTranslations.from_dict(
-                                cleaned_written_translations_dict))
-                        state.update_written_translations(written_translations)
-                elif change.cmd == exp_domain.DEPRECATED_CMD_ADD_TRANSLATION:
-                    # DEPRECATED: This command is deprecated. Please do not use.
-                    # The command remains here to support old suggestions.
-                    exploration.states[change.state_name].add_translation(
-                        change.content_id, change.language_code,
-                        change.translation_html)
                 elif change.cmd == exp_domain.CMD_ADD_WRITTEN_TRANSLATION:
                     exploration.states[change.state_name].add_written_translation(
                         change.content_id, change.language_code,
@@ -777,11 +757,6 @@ def apply_change_list(exploration_id, change_list, frontend_version):
                         exploration.update_blurb(change.new_value)
                     elif change.property_name == 'author_notes':
                         exploration.update_author_notes(change.new_value)
-                    elif change.property_name == 'param_specs':
-                        exploration.update_param_specs(change.new_value)
-                    elif change.property_name == 'param_changes':
-                        exploration.update_param_changes(list(
-                            python_utils.MAP(to_param_domain, change.new_value)))
                     elif change.property_name == 'init_state_name':
                         exploration.update_init_state_name(change.new_value)
                     elif change.property_name == 'auto_tts_enabled':
@@ -2507,7 +2482,6 @@ def get_user_exploration_data(
     exploration_email_preferences = (
         user_services.get_email_preferences_for_exploration(
             user_id, exploration_id))
-
     editor_dict = {
         'auto_tts_enabled': exploration.auto_tts_enabled,
         'category': exploration.category,
@@ -2621,7 +2595,7 @@ def get_exp_with_draft_applied(exp_id, user_id):
     updated_exploration = None
 
     if (exp_user_data and exp_user_data.draft_change_list and
-            is_version_of_draft_valid(exp_id, draft_change_list_exp_version)):
+            are_changes_mergeable(exp_id, draft_change_list_exp_version, draft_change_list)):
         updated_exploration = apply_change_list(exp_id, draft_change_list,
             draft_change_list_exp_version)
         updated_exploration_has_no_invalid_math_tags = True

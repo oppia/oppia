@@ -746,6 +746,7 @@ class EditorAutosaveHandler(ExplorationHandler):
         # If the draft_change_list_id is False, have the user discard the draft
         # changes. We save the draft to the datastore even if the version is
         # invalid, so that it is available for recovery later.
+        print(are_changes_mergeable)
         self.render_json({
             'draft_change_list_id': exp_user_data['draft_change_list_id'],
             'is_version_of_draft_valid': are_changes_mergeable})
