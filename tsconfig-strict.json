@@ -117,8 +117,6 @@
     "core/templates/domain/improvements/high-bounce-rate-task.model.spec.ts",
     "core/templates/domain/improvements/needs-guiding-response-task.model.ts",
     "core/templates/domain/improvements/needs-guiding-responses-task.model.spec.ts",
-    "core/templates/domain/learner_dashboard/learner-dashboard-backend-api.service.ts",
-    "core/templates/domain/learner_dashboard/learner-dashboard-backend-api.service.spec.ts",
     "core/templates/domain/learner_dashboard/learner-dashboard-ids-backend-api.service.ts",
     "core/templates/domain/learner_dashboard/learner-dashboard-ids-backend-api.service.spec.ts",
     "core/templates/domain/objects/UnitsObjectFactory.ts",
