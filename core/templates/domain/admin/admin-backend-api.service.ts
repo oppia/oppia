@@ -23,9 +23,9 @@ import { Injectable } from '@angular/core';
 import { AdminPageConstants } from
   'pages/admin-page/admin-page.constants';
 import {
-  TopicSummary,
-  TopicSummaryBackendDict
-} from 'domain/topic/topic-summary.model';
+  CreatorTopicSummary,
+  CreatorTopicSummaryBackendDict
+} from 'domain/topic/creator-topic-summary.model';
 import {
   PlatformParameter,
   PlatformParameterBackendDict
@@ -129,7 +129,7 @@ export interface AdminPageDataBackendDict {
   'role_to_actions': RoleToActionsBackendResponse;
   'config_properties': ConfigPropertiesBackendResponse;
   'viewable_roles': UserRolesBackendResponse;
-  'topic_summaries': TopicSummaryBackendDict[];
+  'topic_summaries': CreatorTopicSummaryBackendDict[];
   'feature_flags': PlatformParameterBackendDict[];
 }
 
@@ -141,7 +141,7 @@ export interface AdminPageData {
   roleToActions: RoleToActionsBackendResponse;
   configProperties: ConfigPropertiesBackendResponse;
   viewableRoles: UserRolesBackendResponse;
-  topicSummaries: TopicSummary[];
+  topicSummaries: CreatorTopicSummary[];
   featureFlags: PlatformParameter[];
 }
 
@@ -173,7 +173,7 @@ export class AdminBackendApiService {
           configProperties: response.config_properties,
           viewableRoles: response.viewable_roles,
           topicSummaries: response.topic_summaries.map(
-            TopicSummary.createFromBackendDict),
+            CreatorTopicSummary.createFromBackendDict),
           featureFlags: response.feature_flags.map(
             dict => PlatformParameter.createFromBackendDict(
               dict)
