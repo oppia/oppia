@@ -95,7 +95,7 @@ describe('NumberWithUnitsObjectFactory', () => {
         '₹')).toString()).toBe('₹ 2.02');
       expect(new NumberWithUnits(
         'real', 2, new Fraction(
-        false, 0, 0, 1), uof.fromRawInputString('')).toString()).toBe('2');
+          false, 0, 0, 1), uof.fromRawInputString('')).toString()).toBe('2');
       expect(new NumberWithUnits('fraction', 0, new Fraction(
         true, 0, 4, 3), uof.fromRawInputString(
         'm / s^2')).toString()).toBe('-4/3 m s^-2');
@@ -119,21 +119,20 @@ describe('NumberWithUnitsObjectFactory', () => {
 
     it('should parse valid number with units strings', () => {
       expect(nwuof.fromRawInputString('2.02 kg / m^3')).toEqual(
-        new NumberWithUnits(
-          'real', 2.02, new Fraction(
-        false, 0, 0, 1), uof.fromRawInputString('kg / m^3')));
+        new NumberWithUnits('real', 2.02, new Fraction(
+          false, 0, 0, 1), uof.fromRawInputString('kg / m^3')));
       expect(nwuof.fromRawInputString('2 / 3 kg / m^3')).toEqual(
         new NumberWithUnits('fraction', 0, new Fraction(
           false, 0, 2, 3), uof.fromRawInputString('kg / m^3')));
       expect(nwuof.fromRawInputString('2')).toEqual(
         new NumberWithUnits('real', 2, new Fraction(
-        false, 0, 0, 1), uof.fromRawInputString('')));
+          false, 0, 0, 1), uof.fromRawInputString('')));
       expect(nwuof.fromRawInputString('2 / 3')).toEqual(
         new NumberWithUnits('fraction', 0, new Fraction(
           false, 0, 2, 3), uof.fromRawInputString('')));
       expect(nwuof.fromRawInputString('$ 2.02')).toEqual(
         new NumberWithUnits('real', 2.02, new Fraction(
-        false, 0, 0, 1), uof.fromRawInputString('$')));
+          false, 0, 0, 1), uof.fromRawInputString('$')));
       expect(nwuof.fromRawInputString('Rs 2 / 3 per hour')).toEqual(
         new NumberWithUnits('fraction', 0, new Fraction(
           false, 0, 2, 3), uof.fromRawInputString('Rs / hour')));
