@@ -1835,10 +1835,10 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
 
             # A condition to store the name of the properties changed
             # in changed_properties dict.
+            state_name = change.state_name
+            if state_name in new_to_old_state_names:
+                state_name = new_to_old_state_names[change.state_name]
             elif change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
-                state_name = change.state_name
-                if state_name in new_to_old_state_names:
-                    state_name = new_to_old_state_names[change.state_name]
                 if state_name in changed_properties:
                     if (change.property_name not in
                             changed_properties[state_name]):
@@ -1862,9 +1862,6 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
                     changed_property = 'answer_groups'
                 elif change.content_id[:10] == 'rule_input':
                     changed_property = 'answer_groups'
-                state_name = change.state_name
-                if state_name in new_to_old_state_names:
-                    state_name = new_to_old_state_names[change.state_name]
                 if state_name in changed_translations:
                     if (changed_property not in
                             changed_translations[state_name]):
@@ -1922,6 +1919,8 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
             if change.state_name in old_to_new_state_names:
                 new_state_name = old_to_new_state_names[old_state_name]
             elif change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
+                if old_state_name not in changed_translations:
+                    changed_translations[old_state_name] = []
                 if change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
                     if old_state_name in changed_properties:
                         if (frontend_version_exploration.states[old_state_name].content.html == # pylint: disable=line-too-long
