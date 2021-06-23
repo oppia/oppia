@@ -102,6 +102,11 @@
 /core/templates/services/assets-backend-api.service*.ts @DubeySandeep
 
 
+# Blog project
+/core/domain/blog*.py @iamprayush
+/core/domain/blog_validators*.py @brianrodri @iamprayush
+
+
 # Collection project.
 /core/controllers/collection*.py @aks681
 /core/domain/collection*.py @aks681
@@ -482,7 +487,6 @@
 # TODO(#13119): Set @vojtechjelinek as owner after 2021-07-06 (up to /core/domain/base_model_validators*.py)
 /core/domain/audit_validators*.py @brianrodri
 /core/domain/base_model_validators*.py @brianrodri
-/core/domain/blog_validators*.py @brianrodri
 /core/domain/beam_job*.py @brianrodri
 /core/domain/email*.py @aks681
 /core/domain/image_service*.py @DubeySandeep
