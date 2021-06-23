@@ -44,8 +44,32 @@ module.exports = {
   create: function(context) {
     var byCssSelector = (
       'CallExpression[callee.object.name=by][callee.property.name=css]');
-    var thirdPartySelectorPrefixes = (
-      ['.modal', '.select2', '.CodeMirror', '.toast', '.ng-joyride', '.mat']);
+
+    var checkElementSelector = function(node) {
+      var thirdPartySelectorPrefixes = (
+        ['.modal', '.select2', '.CodeMirror', '.toast', '.ng-joyride', '.mat']);
+      for (var i = 0; i < thirdPartySelectorPrefixes.length; i++) {
+        if ((node.arguments[0].type === 'Literal') &&
+          (node.arguments[0].value.startsWith(thirdPartySelectorPrefixes[i]))) {
+          return;
+        }
+        if ((node.arguments[0].type === 'Literal') &&
+         (node.arguments[0].value.startsWith('option'))) {
+          return;
+        }
+      }
+      if ((node.arguments[0].type === 'Literal') &&
+        (!node.arguments[0].value.startsWith('.protractor-test-'))) {
+        context.report({
+          node: node.arguments[0],
+          messageId: 'useProtractorTest',
+          data: {
+            incorrectClassname: node.arguments[0].value
+          }
+        });
+      }
+    };
+
     var checkSleepCall = function(node) {
       var callee = node.callee;
       if (callee.property && callee.property.name !== 'sleep') {
@@ -90,23 +114,7 @@ module.exports = {
         });
       },
       [byCssSelector]: function(node) {
-        for (var i = 0; i < thirdPartySelectorPrefixes.length; i++) {
-          if ((node.arguments[0].type === 'Literal') &&
-           (node.arguments[0].value.startsWith(
-             thirdPartySelectorPrefixes[i]))) {
-            return;
-          }
-        }
-        if ((node.arguments[0].type === 'Literal') &&
-          (!node.arguments[0].value.startsWith('.protractor-test-'))) {
-          context.report({
-            node: node.arguments[0],
-            messageId: 'useProtractorTest',
-            data: {
-              incorrectClassname: node.arguments[0].value
-            }
-          });
-        }
+        checkElementSelector(node);
       }
     };
   }

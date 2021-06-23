@@ -46,6 +46,8 @@ ruleTester.run('protractor-practices', rule, {
     code: 'const SKILL_DESCRIPTIONS = 1;'
   }, {
     code: 'var modal = element.all(by.css(".modal-dialog")).last();'
+  }, {
+    code: 'var modal = element(by.css("option:checked"));'
   }],
 
   invalid: [
