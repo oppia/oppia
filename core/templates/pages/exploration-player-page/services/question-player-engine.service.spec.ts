@@ -21,7 +21,7 @@ import { TestBed} from '@angular/core/testing';
 import { AnswerClassificationResult } from 'domain/classifier/answer-classification-result.model';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { QuestionBackendDict, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
-import { StateCard } from 'domain/state_card/StateCardObjectFactory';
+import { StateCard } from 'domain/state_card/state-card.model';
 import { ExpressionInterpolationService } from 'expressions/expression-interpolation.service';
 import { TextInputRulesService } from 'interactions/TextInput/directives/text-input-rules.service';
 import { AlertsService } from 'services/alerts.service';

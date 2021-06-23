@@ -283,7 +283,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'state-responses.directive.ts',
     'state-solution-editor.directive.ts',
     'state-top-answers-stats.service.ts',
-    'StateCardObjectFactory.ts',
+    'state-card.model.ts',
     'stats-reporting.service.ts',
     'story-creation.service.ts',
     'story-editor-navbar-breadcrumb.component.ts',

@@ -24,7 +24,7 @@ import { ExplorationBackendDict, ExplorationObjectFactory } from 'domain/explora
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { ParamChangeBackendDict, ParamChangeObjectFactory } from 'domain/exploration/ParamChangeObjectFactory';
 import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
-import { StateCardObjectFactory } from 'domain/state_card/StateCardObjectFactory';
+import { StateCardObjectFactory } from 'domain/state_card/state-card.model';
 import { ExpressionInterpolationService } from 'expressions/expression-interpolation.service';
 import { TextInputRulesService } from 'interactions/TextInput/directives/text-input-rules.service';
 import { AlertsService } from 'services/alerts.service';

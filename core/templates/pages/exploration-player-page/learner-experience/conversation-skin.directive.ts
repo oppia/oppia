@@ -17,7 +17,7 @@
  */
 
 import { Subscription } from 'rxjs';
-import { StateCard } from 'domain/state_card/StateCardObjectFactory';
+import { StateCard } from 'domain/state_card/state-card.model';
 
 require(
   'components/question-directives/question-player/services/' +
@@ -47,7 +47,7 @@ require('domain/exploration/editable-exploration-backend-api.service.ts');
 require('domain/exploration/read-only-exploration-backend-api.service.ts');
 require('domain/question/pretest-question-backend-api.service.ts');
 require('domain/skill/ConceptCardObjectFactory.ts');
-require('domain/state_card/StateCardObjectFactory.ts');
+require('domain/state_card/state-card.model.ts');
 require('domain/story_viewer/story-viewer-backend-api.service.ts');
 require('domain/story_viewer/story-viewer-domain.constants.ajs.ts');
 require('domain/topic_viewer/topic-viewer-domain.constants.ajs.ts');
