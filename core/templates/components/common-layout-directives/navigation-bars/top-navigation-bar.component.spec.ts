@@ -31,6 +31,7 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UserService } from 'services/user.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { TopNavigationBarComponent } from './top-navigation-bar.component';
+import { DebouncerService } from 'services/debouncer.service';
 
 class MockWindowRef {
   _window = {
@@ -73,6 +74,7 @@ describe('TopNavigationBarComponent', () => {
   let siteAnalyticsService: SiteAnalyticsService;
   let navigationService: NavigationService;
   let deviceInfoService: DeviceInfoService;
+  let debouncerService: DebouncerService;
 
   let mockOnSearchBarLoadedEventEmitter = new EventEmitter();
   let userInfo = {
@@ -137,6 +139,7 @@ describe('TopNavigationBarComponent', () => {
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     navigationService = TestBed.inject(NavigationService);
     deviceInfoService = TestBed.inject(DeviceInfoService);
+    debouncerService = TestBed.inject(DebouncerService);
 
     spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo);
     spyOnProperty(searchService, 'onSearchBarLoaded').and.returnValue(
@@ -223,6 +226,9 @@ describe('TopNavigationBarComponent', () => {
   it('should try displaying the hidden navbar elements if resized' +
     ' window is larger', waitForAsync(() => {
     let donateElement = 'I18N_TOPNAV_DONATE';
+    spyOn(debouncerService, 'debounce').and.callFake((callback, ms) => {
+      return () => {};
+    });
     spyOn(wds, 'getWidth').and.returnValue(700);
     component.ngOnInit();
 
