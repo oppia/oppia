@@ -117,7 +117,9 @@ class ExplorationHandler(EditorHandler):
         """Updates properties of the given exploration."""
         exploration = exp_fetchers.get_exploration_by_id(exploration_id)
         version = self.payload.get('version')
-        # _require_valid_version(version, exploration.version)
+        if version is None:
+            raise base.BaseHandler.InvalidInputException(
+                'Invalid POST request: a version must be specified.')
 
         commit_message = self.payload.get('commit_message')
 
@@ -746,10 +748,11 @@ class EditorAutosaveHandler(ExplorationHandler):
         # If the draft_change_list_id is False, have the user discard the draft
         # changes. We save the draft to the datastore even if the version is
         # invalid, so that it is available for recovery later.
-        print(are_changes_mergeable)
         self.render_json({
             'draft_change_list_id': exp_user_data['draft_change_list_id'],
-            'is_version_of_draft_valid': are_changes_mergeable})
+            'is_version_of_draft_valid': exp_services.is_version_of_draft_valid(
+                exploration_id, version),
+            'are_changes_mergeable': are_changes_mergeable})
 
     @acl_decorators.can_save_exploration
     def post(self, exploration_id):
