@@ -2261,6 +2261,9 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
                     elif (change.property_name ==
                           exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX):
                         change_is_mergeable = True
+                    elif (change.property_name ==
+                          exp_domain.STATE_PROPERTY_LINKED_SKILL_ID):
+                        change_is_mergeable = True
                     # We’ll not be able to handle the merge if changelists
                     # affect the different indices of the hint in the same
                     # state because whenever there is even a small change
