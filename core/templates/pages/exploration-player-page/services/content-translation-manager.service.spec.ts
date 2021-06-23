@@ -32,11 +32,11 @@ import { ContentTranslationManagerService } from
   'pages/exploration-player-page/services/content-translation-manager.service';
 import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
-import { AudioTranslationLanguageService } from
-  'pages/exploration-player-page/services/audio-translation-language.service';
 import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
 import { ExplorationHtmlFormatterService } from
   'services/exploration-html-formatter.service';
+import { AudioTranslationLanguageService} from
+  'pages/exploration-player-page/services/audio-translation-language.service';
 
 describe('Content translation manager service', () => {
   let ctms: ContentTranslationManagerService;
@@ -56,6 +56,7 @@ describe('Content translation manager service', () => {
     pts = TestBed.get(PlayerTranscriptService);
     suof = TestBed.get(SubtitledUnicodeObjectFactory);
     wtof = TestBed.get(WrittenTranslationsObjectFactory);
+    atls = TestBed.get(AudioTranslationLanguageService);
 
     let defaultOutcomeDict = {
       dest: 'dest_default',

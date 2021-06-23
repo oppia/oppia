@@ -32,7 +32,8 @@ import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { AudioTranslationLanguageService } from 'pages/exploration-player-page/services/audio-translation-language.service';
+import { AudioTranslationLanguageService } from
+  'pages/exploration-player-page/services/audio-translation-language.service';
 
 @Injectable({
   providedIn: 'root'
@@ -52,7 +53,6 @@ export class QuestionPlayerEngineService {
       private expressionInterpolationService: ExpressionInterpolationService,
       private focusManagerService: FocusManagerService,
       private questionObjectFactory: QuestionObjectFactory) {
-
   }
 
   // Evaluate feedback.
@@ -112,7 +112,6 @@ export class QuestionPlayerEngineService {
         interactionId, interaction.customizationArgs, true, nextFocusLabel,
         null);
     }
-
     const initialCard =
       StateCard.createNewCard(
         null, questionHtml, interactionHtml, interaction,

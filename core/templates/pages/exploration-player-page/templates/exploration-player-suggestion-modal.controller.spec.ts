@@ -27,8 +27,9 @@ import { StateCard } from 'domain/state_card/state-card.model';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
-import { AudioTranslationLanguageService} from
+import {AudioTranslationLanguageService} from
   'pages/exploration-player-page/services/audio-translation-language.service';
+
 
 // TODO(#7222): Remove usage of importAllAngularServices once upgraded to
 // Angular 8.

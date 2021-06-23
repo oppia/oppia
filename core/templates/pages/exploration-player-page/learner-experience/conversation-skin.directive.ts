@@ -47,12 +47,11 @@ require('domain/exploration/editable-exploration-backend-api.service.ts');
 require('domain/exploration/read-only-exploration-backend-api.service.ts');
 require('domain/question/pretest-question-backend-api.service.ts');
 require('domain/skill/ConceptCardObjectFactory.ts');
+require('domain/state_card/state-card.model.ts');
 require('domain/story_viewer/story-viewer-backend-api.service.ts');
 require('domain/story_viewer/story-viewer-domain.constants.ajs.ts');
 require('domain/topic_viewer/topic-viewer-domain.constants.ajs.ts');
 require('domain/utilities/url-interpolation.service.ts');
-require(
-  'pages/exploration-player-page/services/audio-translation-language.service');
 require(
   'pages/exploration-player-page/services/' +
   'audio-translation-manager.service.ts');
@@ -102,6 +101,8 @@ require('services/stateful/focus-manager.service.ts');
 require(
   'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
 require('pages/interaction-specs.constants.ajs.ts');
+require(
+  'pages/exploration-player-page/services/audio-translation-language.service');
 require(
   'pages/exploration-player-page/services/' +
   'content-translation-manager.service.ts');
