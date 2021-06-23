@@ -226,8 +226,8 @@ class BlogPostSummaryModelValidator(base_model_validators.BaseModelValidator):
                 blog_models.BlogPostSummaryModel.query().filter(
                     blog_models.BlogPostSummaryModel.url_fragment == (
                         item.url_fragment)).filter(
-                            blog_models.BlogPostSummaryModel.deleted == False
-                            ).fetch()) # pylint: disable=singleton-comparison
+                            blog_models.BlogPostSummaryModel.deleted == False # pylint: disable=singleton-comparison
+                            ).fetch())
             blog_model_ids = [
                 model.id for model in summary_models if model.id != item.id]
             if blog_model_ids:
