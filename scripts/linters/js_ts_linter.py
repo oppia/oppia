@@ -144,3 +144,23 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
                     ['There are no JavaScript or Typescript files to lint.'])]
 
         return [self._lint_js_and_ts_files()]
+
+
+def get_linters(js_filepaths, ts_filepaths, unused_file_cache):
+    """Creates JsTsLintChecksManager and ThirdPartyJsTsLintChecksManager
+        objects and return them.
+
+    Args:
+        js_filepaths: list(str). A list of js filepaths to lint.
+        ts_filepaths: list(str). A list of ts filepaths to lint.
+        unused_file_cache: object(FileCache). Provides thread-safe access to
+            cached file content.
+
+    Returns:
+        tuple(None, ThirdPartyJsTsLintChecksManager. A 2-tuple
+        of custom and third_party linter objects.
+    """
+    third_party_linter = ThirdPartyJsTsLintChecksManager(
+        js_filepaths + ts_filepaths)
+
+    return None, third_party_linter
