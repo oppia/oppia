@@ -39,7 +39,7 @@ export const ExplorationEditorPageConstants = {
 
   IMPROVE_TYPE_INCOMPLETE: 'incomplete',
 
-  DEFAULT_AUDIO_LANGUAGE: 'en',
+  DEFAULT_TRANSLATION_LANGUAGE: 'ar',
 
   INFO_MESSAGE_SOLUTION_IS_VALID:
     'The solution is now valid!',

@@ -42,13 +42,13 @@ angular.module('oppia').component('translatorOverview', {
     'FocusManagerService', 'LanguageUtilService',
     'RouterService', 'StateEditorService', 'TranslationLanguageService',
     'TranslationStatusService', 'TranslationTabActiveModeService',
-    'DEFAULT_AUDIO_LANGUAGE',
+    'DEFAULT_TRANSLATION_LANGUAGE',
     function(
         $scope, $window, ExplorationLanguageCodeService,
         FocusManagerService, LanguageUtilService,
         RouterService, StateEditorService, TranslationLanguageService,
         TranslationStatusService, TranslationTabActiveModeService,
-        DEFAULT_AUDIO_LANGUAGE) {
+        DEFAULT_TRANSLATION_LANGUAGE) {
       var ctrl = this;
       var LAST_SELECTED_TRANSLATION_LANGUAGE = (
         'last_selected_translation_lang');
@@ -116,8 +116,7 @@ angular.module('oppia').component('translatorOverview', {
           StateEditorService.onShowTranslationTabBusyModal.emit();
           return;
         }
-        TranslationLanguageService.setActiveLanguageCode(
-          $scope.languageCode);
+        TranslationLanguageService.setActiveLanguageCode($scope.languageCode);
         TranslationStatusService.refresh();
 
         $window.localStorage.setItem(
@@ -149,9 +148,8 @@ angular.module('oppia').component('translatorOverview', {
 
         $scope.languageCode =
           allAudioLanguageCodes.indexOf(prevLanguageCode) !== -1 ?
-            prevLanguageCode : DEFAULT_AUDIO_LANGUAGE;
-        TranslationLanguageService.setActiveLanguageCode(
-          $scope.languageCode);
+            prevLanguageCode : DEFAULT_TRANSLATION_LANGUAGE;
+        TranslationLanguageService.setActiveLanguageCode($scope.languageCode);
         // We need to refresh the status service once the active language is
         // set.
         TranslationStatusService.refresh();

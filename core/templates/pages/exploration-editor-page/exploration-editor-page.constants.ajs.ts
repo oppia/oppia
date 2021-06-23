@@ -53,8 +53,8 @@ angular.module('oppia').constant(
   ExplorationEditorPageConstants.IMPROVE_TYPE_INCOMPLETE);
 
 angular.module('oppia').constant(
-  'DEFAULT_AUDIO_LANGUAGE',
-  ExplorationEditorPageConstants.DEFAULT_AUDIO_LANGUAGE);
+  'DEFAULT_TRANSLATION_LANGUAGE',
+  ExplorationEditorPageConstants.DEFAULT_TRANSLATION_LANGUAGE);
 
 angular.module('oppia').constant(
   'INFO_MESSAGE_SOLUTION_IS_VALID',
