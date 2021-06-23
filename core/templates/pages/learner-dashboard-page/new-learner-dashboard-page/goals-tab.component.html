@@ -39,6 +39,7 @@
     </em>
   </span>
   <div class="edit-goals-subheading">
+    <img [src]="getStaticImageUrl('/learner_dashboard/paw.svg')" alt="paw image" class="svg-paw-image">
     <p class="edit-goals-topic-title">Topic</p>
     <p class="edit-goals-learn-title">Learn</p>
   </div>
@@ -61,6 +62,7 @@
   <div *ngIf="completedGoals.length > 0">
     <div *ngFor="let topic of completedGoals">
       <div class="completed-goals-content">
+        <img [src]="getStaticImageUrl('/learner_dashboard/star.svg')" alt="star image" class="svg-star-image">
         <a [href]="getTopicPageUrl(topic.urlFragment, topic.classroom)"
            class="completed-goals-topic-name">
           Learnt {{topic.name}}
@@ -178,6 +180,10 @@
     text-align: left;
     width: 450px;
   }
+  .completed-goals-topic-name:hover {
+    font-weight: 450;
+    text-decoration: none;
+  }
   .goals-topic-name {
     color: #333;
     display: inline-block;
@@ -229,6 +235,20 @@
     position: absolute;
     text-align: center;
     transform: translateY(0%);
+  }
+  .svg-paw-image {
+    bottom: 10px;
+    filter: invert(31%) sepia(3%) saturate(11%) hue-rotate(341deg) brightness(101%) contrast(90%);
+    float: right;
+    margin-right: 110px;
+    position: relative;
+    width: 32px;
+  }
+  .svg-star-image {
+    filter: invert(95%) sepia(49%) saturate(2374%) hue-rotate(320deg) brightness(91%) contrast(89%);
+    float: right;
+    margin-right: 24px;
+    width: 30px;
   }
   .goals-box {
     background-color: #fff;
@@ -313,6 +333,13 @@
   }
   .goals-topic-name {
     width: 134px;
+  }
+  .svg-paw-image {
+    left: 47px;
+  }
+  .svg-star-image {
+    position: relative;
+    top: 25px;
   }
   }
 </style>

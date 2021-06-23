@@ -23,6 +23,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { LearnerDashboardActivityBackendApiService } from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
 import { LearnerDashboardIdsBackendApiService } from 'domain/learner_dashboard/learner-dashboard-ids-backend-api.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import { LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
@@ -46,6 +47,7 @@ describe('Goals tab Component', () => {
     LearnerDashboardActivityBackendApiService;
   let learnerDashboardIdsBackendApiService:
     LearnerDashboardIdsBackendApiService;
+  let urlInterpolationService: UrlInterpolationService;
   let ngbModal: NgbModal;
 
   beforeEach(async(() => {
@@ -61,7 +63,8 @@ describe('Goals tab Component', () => {
       ],
       providers: [
         LearnerDashboardActivityBackendApiService,
-        LearnerDashboardIdsBackendApiService
+        LearnerDashboardIdsBackendApiService,
+        UrlInterpolationService
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -75,6 +78,7 @@ describe('Goals tab Component', () => {
     ngbModal = TestBed.inject(NgbModal);
     learnerDashboardIdsBackendApiService =
       TestBed.inject(LearnerDashboardIdsBackendApiService);
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
     let subtopic = {
       skill_ids: ['skill_id_2'],
       id: 1,
@@ -335,4 +339,15 @@ describe('Goals tab Component', () => {
 
     expect(modalSpy).toHaveBeenCalled();
   }));
+
+  it('should get static image url', () => {
+    const urlSpy = spyOn(
+      urlInterpolationService, 'getStaticImageUrl')
+      .and.returnValue('/assets/images/learner_dashboard/star.svg');
+
+    component.getStaticImageUrl('/learner_dashboard/star.svg');
+    fixture.detectChanges();
+
+    expect(urlSpy).toHaveBeenCalled();
+  });
 });

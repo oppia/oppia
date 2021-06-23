@@ -90,6 +90,10 @@ export class GoalsTabComponent {
     }
   }
 
+  getStaticImageUrl(imagePath: string): string {
+    return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  }
+
   topicBelongToLearntToPartiallyLearntTopics(topicName: string): boolean {
     if (this.learntToPartiallyLearntTopics.includes(topicName)) {
       return true;
