@@ -15,26 +15,20 @@
 /**
  * @fileoverview Unit tests for the learner answer info service.
  */
+
 import { TestBed } from '@angular/core/testing';
+import { AnswerClassificationResult } from 'domain/classifier/answer-classification-result.model';
+import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
+import { State, StateBackendDict, StateObjectFactory } from 'domain/state/StateObjectFactory';
+import { LearnerAnswerDetailsBackendApiService } from 'domain/statistics/learner-answer-details-backend-api.service';
+import { AnswerClassificationService, InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
+import { LearnerAnswerInfoService } from 'pages/exploration-player-page/services/learner-answer-info.service';
+import { ExplorationPlayerConstants } from 'pages/exploration-player-page/exploration-player-page.constants';
+import { TextInputRulesService } from 'interactions/TextInput/directives/text-input-rules.service';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
-import { AnswerClassificationResult } from
-  'domain/classifier/answer-classification-result.model';
-import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
-import { State, StateBackendDict, StateObjectFactory } from
-  'domain/state/StateObjectFactory';
-import { LearnerAnswerDetailsBackendApiService } from
-  'domain/statistics/learner-answer-details-backend-api.service';
-import { AnswerClassificationService, InteractionRulesService } from
-  'pages/exploration-player-page/services/answer-classification.service';
-import { LearnerAnswerInfoService } from
-  'pages/exploration-player-page/services/learner-answer-info.service';
-import { ExplorationPlayerConstants } from
-  'pages/exploration-player-page/exploration-player-page.constants';
-import { TextInputRulesService } from
-  'interactions/TextInput/directives/text-input-rules.service';
-
-describe('Learner answer info service', () =>{
+// eslint-disable-next-line oppia/no-test-blockers
+fdescribe('Learner answer info service', () =>{
   let sof: StateObjectFactory;
   let oof: OutcomeObjectFactory;
   let stateDict: StateBackendDict;
@@ -49,6 +43,10 @@ describe('Learner answer info service', () =>{
   let DEFAULT_OUTCOME_CLASSIFICATION: string;
 
   beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [LearnerAnswerInfoService]
+    });
     stateDict = {
       content: {
         content_id: 'content',
