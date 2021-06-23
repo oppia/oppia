@@ -27,7 +27,7 @@ import { EventEmitter } from '@angular/core';
 import { Subtopic } from 'domain/topic/subtopic.model';
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 
-fdescribe('Topic editor page', function() {
+describe('Topic editor page', function() {
   var ctrl = null;
   var $scope = null;
   var ContextService = null;
