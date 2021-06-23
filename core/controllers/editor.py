@@ -117,7 +117,7 @@ class ExplorationHandler(EditorHandler):
         """Updates properties of the given exploration."""
         exploration = exp_fetchers.get_exploration_by_id(exploration_id)
         version = self.payload.get('version')
-        _require_valid_version(version, exploration.version)
+        # _require_valid_version(version, exploration.version)
 
         commit_message = self.payload.get('commit_message')
 
@@ -137,6 +137,8 @@ class ExplorationHandler(EditorHandler):
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
+        are_changes_mergeable = exp_services.are_changes_mergeable(
+            exploration_id, version, change_list)
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id)
         can_edit = rights_manager.check_can_edit_activity(
@@ -145,11 +147,11 @@ class ExplorationHandler(EditorHandler):
             self.user, exploration_rights)
 
         try:
-            if can_edit:
+            if can_edit and are_changes_mergeable:
                 exp_services.update_exploration(
                     self.user_id, exploration_id, change_list, commit_message,
                     version=version)
-            elif can_voiceover:
+            elif can_voiceover and are_changes_mergeable:
                 exp_services.update_exploration(
                     self.user_id, exploration_id, change_list, commit_message,
                     is_by_voice_artist=True, version=version)
@@ -724,12 +726,14 @@ class EditorAutosaveHandler(ExplorationHandler):
         can_voiceover = rights_manager.check_can_voiceover_activity(
             self.user, exploration_rights)
 
+        are_changes_mergeable = exp_services.are_changes_mergeable(
+            exploration_id, version, change_list)
         try:
-            if can_edit:
+            if can_edit and are_changes_mergeable:
                 exp_services.create_or_update_draft(
                     exploration_id, self.user_id, change_list, version,
                     datetime.datetime.utcnow())
-            elif can_voiceover:
+            elif can_voiceover and are_changes_mergeable:
                 exp_services.create_or_update_draft(
                     exploration_id, self.user_id, change_list, version,
                     datetime.datetime.utcnow(), is_by_voice_artist=True)
@@ -744,8 +748,7 @@ class EditorAutosaveHandler(ExplorationHandler):
         # invalid, so that it is available for recovery later.
         self.render_json({
             'draft_change_list_id': exp_user_data['draft_change_list_id'],
-            'is_version_of_draft_valid': exp_services.is_version_of_draft_valid(
-                exploration_id, version)})
+            'is_version_of_draft_valid': are_changes_mergeable})
 
     @acl_decorators.can_save_exploration
     def post(self, exploration_id):
