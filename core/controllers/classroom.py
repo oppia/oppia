@@ -28,6 +28,12 @@ import feconf
 
 class ClassroomPage(base.BaseHandler):
     """Renders the classroom page."""
+    URL_PATH_ARGS_SCHEMAS = {
+        'classroom_url_fragment': {
+            'type': 'unicode'
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.does_classroom_exist
     def get(self, _):
@@ -42,6 +48,12 @@ class ClassroomDataHandler(base.BaseHandler):
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'classroom_url_fragment': {
+            'type': 'unicode'
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.does_classroom_exist
     def get(self, classroom_url_fragment):
@@ -70,6 +82,17 @@ class ClassroomDataHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
+class DefaultClassroomRedirectPage(base.BaseHandler):
+    """Redirects to the default classroom page."""
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+    @acl_decorators.open_access
+    def get(self):
+        """Handles GET requests."""
+        self.redirect('/learn/%s' % constants.DEFAULT_CLASSROOM_URL_FRAGMENT)
+
+
 class ClassroomPromosStatusHandler(base.BaseHandler):
     """The handler for checking whether the classroom promos are enabled."""
 
@@ -77,6 +100,8 @@ class ClassroomPromosStatusHandler(base.BaseHandler):
     # This prevents partially logged in user from being logged out
     # during user registration.
     REDIRECT_UNFINISHED_SIGNUPS = False
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.open_access
     def get(self):
@@ -84,12 +109,3 @@ class ClassroomPromosStatusHandler(base.BaseHandler):
             'classroom_promos_are_enabled': (
                 config_domain.CLASSROOM_PROMOS_ARE_ENABLED.value)
         })
-
-
-class DefaultClassroomRedirectPage(base.BaseHandler):
-    """Redirects to the default classroom page."""
-
-    @acl_decorators.open_access
-    def get(self):
-        """Handles GET requests."""
-        self.redirect('/learn/%s' % constants.DEFAULT_CLASSROOM_URL_FRAGMENT)

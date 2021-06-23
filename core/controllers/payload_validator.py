@@ -71,7 +71,6 @@ def validate(handler_args, handler_args_schema, allowed_extra_args):
     errors = []
     for arg_key, arg_schema in handler_args_schema.items():
         value, schema = construct_args_schema(arg_key, arg_schema, handler_args)
-
         try:
             schema_utils.normalize_against_schema(value, schema)
         except Exception as e:
@@ -93,16 +92,9 @@ def validate(handler_args, handler_args_schema, allowed_extra_args):
 SCHEMA_REQUIRING_HANDLERS = [
     'AboutRedirectPage',
     'AdminJobOutputHandler',
-    'AdminPage',
-    'AdminRoleHandler',
-    'AdminSuperAdminPrivilegesHandler',
-    'AdminTopicsCsvFileDownloader',
     'AnswerSubmittedEventHandler',
     'AssetDevHandler',
     'AudioUploadHandler',
-    'ClassroomDataHandler',
-    'ClassroomPage',
-    'ClassroomPromosStatusHandler',
     'CollectioRightsHandler',
     'CollectionDataHandler',
     'CollectionEditorHandler',
@@ -130,11 +122,9 @@ SCHEMA_REQUIRING_HANDLERS = [
     'CronMapreduceCleanupHandler',
     'CronModelsCleanupHandler',
     'CronUserDeletionHandler',
-    'DefaultClassroomRedirectPage',
     'DeferredTasksHandler',
     'DeleteAccountHandler',
     'DeleteAccountPage',
-    'DeleteUserHandler',
     'EditableCollectionDataHandler',
     'EditableQuestionDataHandler',
     'EditableSkillDataHandler',
@@ -213,12 +203,10 @@ SCHEMA_REQUIRING_HANDLERS = [
     'NewExplorationHandler',
     'NewSkillHandler',
     'NewTopicHandler',
-    'NextJobHandler',
     'NotificationHandler',
     'NotificationsDashboardHandler',
     'NotificationsDashboardPage',
     'NotificationsHandler',
-    'NumberOfDeletionRequestsHandler',
     'OldContributorDashboardRedirectPage',
     'OldCreatorDashboardRedirectPage',
     'OldLearnerDashboardRedirectPage',
@@ -313,7 +301,6 @@ SCHEMA_REQUIRING_HANDLERS = [
     'TopicViewerPage',
     'TopicsAndSkillsDashboardPage',
     'TopicsAndSkillsDashboardPageDataHandler',
-    'TrainedClassifierHandler',
     'TranslatableTextHandler',
     'UnsentFeedbackEmailHandler',
     'UnsubscribeHandler',

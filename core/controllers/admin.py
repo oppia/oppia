@@ -34,6 +34,7 @@ from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import opportunity_services
 from core.domain import platform_feature_services as feature_services
+from core.domain import platform_parameter_domain
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import recommendations_services
@@ -72,6 +73,29 @@ class AdminPage(base.BaseHandler):
 
 class AdminHandler(base.BaseHandler):
     """Handler for the admin page."""
+    NEW_RULES_TYPE_SCHEMA = {
+        'type': 'list',
+        'items': {
+            'type': 'dict',
+            'properties': [{
+                'name': 'value_when_matched',
+                'schema': {
+                    'type': 'bool'
+                }
+            }, {
+                'name': 'filters',
+                'schema': {
+                    'type': 'list',
+                    'items': {
+                        'type': 'object_dict',
+                        'object_class': (
+                            platform_parameter_domain.PlatformParameterFilter)
+                    }
+                }
+            }]
+        },
+        'default_value': None
+    }
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {}
@@ -108,8 +132,12 @@ class AdminHandler(base.BaseHandler):
                 'type': 'int',
                 'default_value': None
             },
-            'new_config_property_values': (
-                config_domain.NEW_CONFIG_PROPERTY_VALUE_SCHEMA),
+            'new_config_property_values': {
+                'type': 'dict',
+                'properties': (
+                    config_domain.NEW_CONFIG_PROPERTY_VALUE_SCHEMA_LIST),
+                'default_value': None
+            },
             'config_property_id': {
                 'type': 'unicode',
                 'default_value': None
@@ -142,14 +170,7 @@ class AdminHandler(base.BaseHandler):
                 'type': 'unicode',
                 'default_value': None
             },
-            'new_rules': {
-                'type': 'list',
-                'items': {
-                    'type': 'object_dict',
-                    'validate_method': (
-                        domain_objects_validator.validate_new_rules_dict)
-                }
-            }
+            'new_rules': NEW_RULES_TYPE_SCHEMA,
             'exp_id': {
                 'type': 'unicode',
                 'default_value': None
@@ -851,7 +872,7 @@ class DataExtractionQueryHandler(base.BaseHandler):
             'exp_version': {
                 'type': 'unicode'
             },
-            'state_num': {
+            'state_name': {
                 'type': 'unicode'
             },
             'num_answers': {
@@ -920,7 +941,8 @@ class AddContributionRightsHandler(base.BaseHandler):
                 'type': 'unicode',
                 'validators': [{
                     'id': 'is_supported_audio_language_code'
-                }]
+                }],
+                'default_value': None
             }
         }
     }
@@ -1003,7 +1025,8 @@ class RemoveContributionRightsHandler(base.BaseHandler):
                 'choices': [
                     'translation', 'voiceover',
                     'question', 'submit_question'
-                ]
+                ],
+                'default_value': None
             },
             'language_code': {
                 'type': 'unicode',

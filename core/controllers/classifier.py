@@ -50,6 +50,21 @@ class TrainedClassifierHandler(base.OppiaMLVMHandler):
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'exploration_id': {
+                'type': 'unicode'
+            },
+            'exploration_version': {
+                'type': 'int'
+            },
+            'state_name': {
+                'type': 'unicode'
+            }
+        },
+        'POST': {}
+    }
 
     def extract_request_message_vm_id_and_signature(self):
         """Returns message, vm_id and signature retrieved from incoming request.
@@ -183,6 +198,20 @@ class NextJobHandler(base.OppiaMLVMHandler):
     """
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'vm_id': {
+                'type': 'unicode'
+            },
+            'message': {
+                'type': 'unicode'
+            },
+            'signature': {
+                'type': 'unicode'
+            }
+        }
+    }
 
     def extract_request_message_vm_id_and_signature(self):
         """Returns message, vm_id and signature retrieved from incoming request.

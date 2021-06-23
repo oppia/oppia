@@ -50,7 +50,8 @@ LIST_OF_FEATURED_TRANSLATION_LANGUAGES_DICTS_SCHEMA = {
                 'type': schema_utils.SCHEMA_TYPE_UNICODE
             }
         }]
-    }
+    },
+    'default_value': None
 }
 
 SET_OF_STRINGS_SCHEMA = {
@@ -61,6 +62,7 @@ SET_OF_STRINGS_SCHEMA = {
     'validators': [{
         'id': 'is_uniquified',
     }],
+    'default_value': None
 }
 
 SET_OF_CLASSROOM_DICTS_SCHEMA = {
@@ -111,7 +113,8 @@ SET_OF_CLASSROOM_DICTS_SCHEMA = {
                 }]
             }
         }]
-    }
+    },
+    'default_value': None
 }
 
 VMID_SHARED_SECRET_KEY_SCHEMA = {
@@ -129,23 +132,28 @@ VMID_SHARED_SECRET_KEY_SCHEMA = {
                 'type': schema_utils.SCHEMA_TYPE_UNICODE
             }
         }]
-    }
+    },
+    'default_value': None
 }
 
 BOOL_SCHEMA = {
-    'type': schema_utils.SCHEMA_TYPE_BOOL
+    'type': schema_utils.SCHEMA_TYPE_BOOL,
+    'default_value': None
 }
 
 UNICODE_SCHEMA = {
-    'type': schema_utils.SCHEMA_TYPE_UNICODE
+    'type': schema_utils.SCHEMA_TYPE_UNICODE,
+    'default_value': None
 }
 
 FLOAT_SCHEMA = {
-    'type': schema_utils.SCHEMA_TYPE_FLOAT
+    'type': schema_utils.SCHEMA_TYPE_FLOAT,
+    'default_value': None
 }
 
 INT_SCHEMA = {
-    'type': schema_utils.SCHEMA_TYPE_INT
+    'type': schema_utils.SCHEMA_TYPE_INT,
+    'default_value': None
 }
 
 
@@ -494,9 +502,8 @@ MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER = ConfigProperty(
     5)
 
 # Schema for new config property value.
-NEW_CONFIG_PROPERTY_VALUE_SCHEMA = {
-    'type': 'dict',
-    'properties': [{
+NEW_CONFIG_PROPERTY_VALUE_SCHEMA_LIST = [
+    {
         'name': 'always_ask_learners_for_answer_details',
         'schema': BOOL_SCHEMA
     }, {
@@ -551,19 +558,14 @@ NEW_CONFIG_PROPERTY_VALUE_SCHEMA = {
         'name': 'notification_user_ids_for_failed_tasks',
         'schema': {
             'type': 'list',
-            'items': UNICODE_SCHEMA
+            'items': UNICODE_SCHEMA,
+            'default_value': None
         }
     }, {
         'name': 'notify_admins_suggestions_waiting_too_long_is_enabled',
         'schema': BOOL_SCHEMA
     }, {
         'name': 'oppia_csrf_secret',
-        'schema': UNICODE_SCHEMA
-    }, {
-        'name': 'promo_bar_enabled',
-        'schema': BOOL_SCHEMA
-    }, {
-        'name': 'promo_bar_message',
         'schema': UNICODE_SCHEMA
     }, {
         'name': 'record_playthrough_probability',
@@ -573,10 +575,13 @@ NEW_CONFIG_PROPERTY_VALUE_SCHEMA = {
         'schema': {
             'type': 'dict',
             'properties': [{
-                'html_body': UNICODE_SCHEMA
+                'name': 'html_body',
+                'schema': UNICODE_SCHEMA
             }, {
-                'subject': UNICODE_SCHEMA
-            }]
+                'name': 'subject',
+                'schema': UNICODE_SCHEMA
+            }],
+            'default_value': None
         }
     }, {
         'name': 'unpublish_exploration_email_html_body',
@@ -587,5 +592,5 @@ NEW_CONFIG_PROPERTY_VALUE_SCHEMA = {
     }, {
         'name': 'whitelisted_exploration_ids_for_playthroughs',
         'schema': SET_OF_STRINGS_SCHEMA
-    }, ]
-}
+    }
+]
