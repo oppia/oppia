@@ -55,21 +55,21 @@ def construct_args_schema(arg_key, arg_schema, handler_args):
     return value, schema
 
 
-def validate(handler_args, handler_args_schema, allowed_extra_args):
+def validate(handler_args, handler_args_schemas, allowed_extra_args):
     """Calls schema utils for normalization of object against its schema
     and collects all the errors.
 
     Args:
         handler_args: *. Object for normalization.
-        handler_args_schema: dict. Schema for objects.
-        allowed_extra_args: bool. Allows extra args.
+        handler_args_schemas: dict. Schema for args.
+        allowed_extra_args: bool. Whether extra args are allowed in handler.
 
     Returns:
         errors: list(str). List of all errors.
     """
     # Collect all errors and present them at once.
     errors = []
-    for arg_key, arg_schema in handler_args_schema.items():
+    for arg_key, arg_schema in handler_args_schemas.items():
         value, schema = construct_args_schema(arg_key, arg_schema, handler_args)
         try:
             schema_utils.normalize_against_schema(value, schema)
@@ -77,7 +77,7 @@ def validate(handler_args, handler_args_schema, allowed_extra_args):
             errors.append(
                 'Schema validation for \'%s\' failed: %s' % (arg_key, e))
 
-    extra_args = set(handler_args.keys()) - set(handler_args_schema.keys())
+    extra_args = set(handler_args.keys()) - set(handler_args_schemas.keys())
 
     if not allowed_extra_args and extra_args:
         errors.append('Found extra args: %s.' % (list(extra_args)))
@@ -89,13 +89,20 @@ def validate(handler_args, handler_args_schema, allowed_extra_args):
 # not have schema. In order to add schema incrementally this list is
 # maintained. Please remove the name of the handlers if they already
 # contains schema.
-SCHEMA_REQUIRING_HANDLERS = [
+HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'AboutRedirectPage',
-    'AdminJobOutputHandler',
+    'AddContributionRightsHandler',
+    'AdminHandler',
+    'AdminPage',
+    'AdminRoleHandler',
+    'AdminSuperAdminPrivilegesHandler',
+    'AdminTopicsCsvFileDownloader',
     'AnswerSubmittedEventHandler',
     'AssetDevHandler',
     'AudioUploadHandler',
-    'CollectioRightsHandler',
+    'ClassroomDataHandler',
+    'ClassroomPage',
+    'ClassroomPromosStatusHandler',
     'CollectionDataHandler',
     'CollectionEditorHandler',
     'CollectionEditorPage',
@@ -133,12 +140,11 @@ SCHEMA_REQUIRING_HANDLERS = [
     'EditableTopicDataHandler',
     'EditorAutosaveHandler',
     'EditorHandler',
-    'EmailDashboardCancelEmailHandler',
     'EmailDashboardDataHandler',
     'EmailDashboardPage',
     'EmailDashboardResultPage',
     'EmailDashboardTestBulkEmailHandler',
-    'EmailDashboardcancelEmailHandler',
+    'EmailDashboardCancelEmailHandler',
     'EmailDraftHandler',
     'ExplorationActualStartEventHandler',
     'ExplorationCompleteEventHandler',
@@ -260,9 +266,8 @@ SCHEMA_REQUIRING_HANDLERS = [
     'StateAnswerStatisticsHandler',
     'StateCompleteEventHandler',
     'StateHitEventHandler',
-    'StateInteractionStatsHandler',
     'StateYamlHandler',
-    'StateinteractionStatsHandler',
+    'StateInteractionStatsHandler',
     'StatsEventsHandler',
     'StewardsLandingPage',
     'StorePlaythroughHandler',
@@ -284,7 +289,6 @@ SCHEMA_REQUIRING_HANDLERS = [
     'TeachRedirectPage',
     'ThreadHandler',
     'ThreadListHandler',
-    'ThreadListHandlerForTopicHandler',
     'ThreadListHandlerForTopicsHandler',
     'TopUnresolvedAnswersHandler',
     'TopicAssignmentsHandler',
@@ -319,7 +323,7 @@ SCHEMA_REQUIRING_HANDLERS = [
     ]
 
 # These handlers do not require any schema validation.
-NON_SCHEMA_REQUIRING_HANDLERS = [
+HANDLER_CLASS_NAMES_WHICH_DO_NOT_REQUIRE_SCHEMAS = [
     'SessionBeginHandler',
     'SessionEndHandler',
     'OppiaMLVMHandler',
@@ -332,7 +336,10 @@ NON_SCHEMA_REQUIRING_HANDLERS = [
     'SeedFirebaseHandler'
 ]
 
-# NON_SCHEMA_HANDLERS is addressed everywhere in the code since
-# SCHEMA_REQUIRING_HANDLERS is temporary and will be removed once every
-# handlers in controller layer will become ready for schema validation.
-NON_SCHEMA_HANDLERS = SCHEMA_REQUIRING_HANDLERS + NON_SCHEMA_REQUIRING_HANDLERS
+# HANDLER_CLASS_NAMES_WITH_NO_SCHEMA is addressed everywhere in the
+# code since, HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS is temporary and
+# will be removed once every handlers in controller layer will become
+# ready for schema validation.
+HANDLER_CLASS_NAMES_WITH_NO_SCHEMA = (
+    HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS +
+    HANDLER_CLASS_NAMES_WHICH_DO_NOT_REQUIRE_SCHEMAS)

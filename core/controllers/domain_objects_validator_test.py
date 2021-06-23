@@ -34,3 +34,12 @@ class ValidateExplorationChangeTests(test_utils.GenericTestBase):
             Exception, 'Missing cmd key in change dict'):
             domain_objects_validator.validate_exploration_change(
                 exploration_change)
+
+    def test_correct_object_do_not_raises_exception(self):
+        exploration_change = {
+            'cmd': 'edit_exploration_property',
+            'new_value': 'nik',
+            'old_value': '',
+            'property_name': 'title'
+        }
+        domain_objects_validator.validate_exploration_change(exploration_change)

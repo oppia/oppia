@@ -1,4 +1,3 @@
-# Tests.
 # Copyright 2021 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +21,7 @@ from core.controllers import payload_validator
 from core.tests import test_utils
 
 
-class ErrorValidationUnitTests(test_utils.GenericTestBase):
+class PayloadValidationUnitTests(test_utils.GenericTestBase):
 
     def test_invalid_args_raises_exceptions(self):
 

@@ -14,8 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Contains methods validate domain objects, these methods are required
-for schema validation of handler arguments.
+"""Methods for validating domain objects for schema validation of
+handler arguments.
 """
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules

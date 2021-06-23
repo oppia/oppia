@@ -303,9 +303,11 @@ def validate_schema(schema):
       property which specifies the len of the list.
     - 'dict' requires an additional 'properties' property, which specifies the
       names of the keys in the dict, and schema definitions for their values.
-    - 'object_dict' requires an additional 'validation_method' property,
-      which specifies the name of the validate method written in
-      domain_object_validator.
+    - 'object_dict' requires any of the one additional schema keys either
+      'validation_method' or 'object_class'.
+      validation_method, takes the method which is written in
+      domain_obejcts_vaildator.
+      object_class, takes a domain class as its value.
     There may also be an optional 'post_normalizers' key whose value is a list
     of normalizers.
 
@@ -776,7 +778,7 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
             mappings: list(tuple). A list of 2-element tuples.
                 The first element of each item is expected to be normalized to
                 the second.
-            invalid_items_with_error_messages: list(tuple(str, str)). A list of
+            invalid_items_with_error_messages: list(tuple(*, str)). A list of
                 values with their corresponding messages. Each value is expected
                 to raise an AssertionError when normalized.
         """
@@ -1042,7 +1044,15 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
             })
         ]
 
-        invalid_values_with_error_messages = []
+        invalid_values_with_error_messages = [
+            ({
+                'arg_with_some_default': 5
+            }, 'Expected unicode string, received %s' % 5),
+            ({
+                'arg_with_default_none': 5,
+                'arg_with_some_default': 'python3'
+            }, 'Expected unicode string, received %s' % 5)
+        ]
 
         self.check_normalization(
             schema, mappings, invalid_values_with_error_messages)
@@ -1063,7 +1073,11 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
             })
         ]
 
-        invalid_values_with_error_messages = []
+        invalid_values_with_error_messages = [
+            ({
+                'arg_a': 'arbitary_argument_a'
+            }, 'Missing arg_b in argument.')
+        ]
 
         self.check_normalization(
             schema, mappings, invalid_values_with_error_messages)
