@@ -583,7 +583,7 @@ def apply_change_list(exploration_id, change_list, frontend_version):
         # A complete list of changes from one version to another
         # is composite_change_list.
         composite_change_list = get_composite_change_list(
-            exp_id, frontend_version, backend_version)
+            exploration_id, frontend_version, backend_version)
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(composite_change_list)
         # Added_state_names: list(str). Names of the states added to the
         # exploration from prev_exp_version to current_exp_version. It stores
