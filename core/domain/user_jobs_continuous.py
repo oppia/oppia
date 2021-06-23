@@ -26,25 +26,12 @@ from core.platform import models
 import feconf
 import python_utils
 
-(exp_models, collection_models, feedback_models, user_models) = (
+(exp_models, collection_models, user_models) = (
     models.Registry.import_models([
-        models.NAMES.exploration, models.NAMES.collection,
-        models.NAMES.feedback, models.NAMES.user]))
+        models.NAMES.exploration, models.NAMES.collection, models.NAMES.user]))
 
 datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
-
-
-# TODO(bhenning): Implement a working real-time layer for the recent dashboard
-# updates aggregator job.
-class RecentUpdatesRealtimeModel(
-        jobs.BaseRealtimeDatastoreClassForContinuousComputations):
-    """Storage class for entities in the realtime layer. See
-    jobs.BaseRealtimeDatastoreClassForContinuousComputations class for more
-    details.
-    """
-
-    pass
 
 
 class UserStatsRealtimeModel(

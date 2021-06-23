@@ -95,7 +95,6 @@ describe('Profile menu flow', function() {
       expect(await links.count()).toEqual(0);
     });
 
-
     it('should visit the preferences page from the profile dropdown menu',
       async function() {
         var preferencesLink = element(by.css(

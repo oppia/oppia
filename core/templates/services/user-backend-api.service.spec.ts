@@ -181,8 +181,6 @@ describe('User Backend Api Service', () => {
     flushMicrotasks();
   }));
 
-
-
   it('should update preferred site langauge', fakeAsync(() => {
     let siteLanguageUrl = '/save_site_language';
     let successHandler = jasmine.createSpy('success');

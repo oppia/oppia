@@ -20,8 +20,6 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { UserInfo, UserInfoBackendDict } from 'domain/user/user-info.model';
-import { WindowRef } from './contextual/window-ref.service';
-import { Title } from '@angular/platform-browser';
 
 interface SubscriptionSummary {
   'creator_picture_data_url': string;
@@ -54,22 +52,18 @@ export interface UserContributionRightsDataBackendDict {
   'can_review_questions': boolean;
 }
 
-
 @Injectable({
   providedIn: 'root'
 })
 export class UserBackendApiService {
   constructor(
-    private http: HttpClient,
-    private windowRef: WindowRef,
-    private titleService: Title) {}
+    private http: HttpClient) {}
 
   private USER_INFO_URL = '/userinfohandler';
   private PROFILE_PICTURE_URL = '/preferenceshandler/profile_picture';
   private PREFERENCES_DATA_URL = '/preferenceshandler/data';
   private USER_CONTRIBUTION_RIGHTS_DATA_URL = (
     '/usercontributionrightsdatahandler');
-  numUnseenNotifications: string | number = 0;
   private SITE_LANGUAGE_URL = '/save_site_language';
 
   async getUserInfoAsync(): Promise<UserInfo> {

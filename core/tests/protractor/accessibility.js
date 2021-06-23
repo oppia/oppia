@@ -201,7 +201,6 @@ describe('screenreader and keyboard user accessibility features', function() {
       await holdCtrlAndPressKey('1');
       await waitFor.urlRedirection(COMMUNITY_LIBRARY_URL);
 
-
       await holdCtrlAndPressKey('1');
       await waitFor.urlRedirection(COMMUNITY_LIBRARY_URL);
 
