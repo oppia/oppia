@@ -622,16 +622,16 @@ def apply_change_list(exploration_id, change_list, frontend_version):
                             change_old_state_name)
                     exploration.rename_state(
                         change.old_state_name, change.new_state_name)
-                old_state_name = change.state_name
-                new_state_name = change.state_name
-                if change.state_name in state_names_of_renamed_states:
-                    old_state_name = (
-                        state_names_of_renamed_states[change.state_name])
-                    new_state_name = (
-                        state_names_of_renamed_states[change.state_name])
-                if change.state_name in old_to_new_state_names:
-                    new_state_name = old_to_new_state_names[old_state_name]
                 elif change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
+                    old_state_name = change.state_name
+                    new_state_name = change.state_name
+                    if change.state_name in state_names_of_renamed_states:
+                        old_state_name = (
+                            state_names_of_renamed_states[change.state_name])
+                        new_state_name = (
+                            state_names_of_renamed_states[change.state_name])
+                    if change.state_name in old_to_new_state_names:
+                        new_state_name = old_to_new_state_names[old_state_name]
                     state = exploration.states[new_state_name]
                     if change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
                         content = (
@@ -734,13 +734,31 @@ def apply_change_list(exploration_id, change_list, frontend_version):
                                 change.new_value))
                         state.update_recorded_voiceovers(recorded_voiceovers)
                 elif change.cmd == exp_domain.CMD_ADD_WRITTEN_TRANSLATION:
-                    exploration.states[change.state_name].add_written_translation(
+                    old_state_name = change.state_name
+                    new_state_name = change.state_name
+                    if change.state_name in state_names_of_renamed_states:
+                        old_state_name = (
+                            state_names_of_renamed_states[change.state_name])
+                        new_state_name = (
+                            state_names_of_renamed_states[change.state_name])
+                    if change.state_name in old_to_new_state_names:
+                        new_state_name = old_to_new_state_names[old_state_name]
+                    exploration.states[new_state_name].add_written_translation(
                         change.content_id, change.language_code,
                         change.translation_html, change.data_format)
                 elif (change.cmd ==
                     exp_domain.CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE):
+                    old_state_name = change.state_name
+                    new_state_name = change.state_name
+                    if change.state_name in state_names_of_renamed_states:
+                        old_state_name = (
+                            state_names_of_renamed_states[change.state_name])
+                        new_state_name = (
+                            state_names_of_renamed_states[change.state_name])
+                    if change.state_name in old_to_new_state_names:
+                        new_state_name = old_to_new_state_names[old_state_name]
                     exploration.states[
-                        change.state_name
+                        new_state_name
                     ].mark_written_translations_as_needing_update(change.content_id)
                 elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
                     if change.property_name == 'title':
