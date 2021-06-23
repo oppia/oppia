@@ -148,11 +148,10 @@ describe('Contributor dashboard page', function() {
     });
 
     it('should call scrollFunction on scroll', function() {
-      var e = document.createEvent('Event');
+      var dummyScrollEvent = new Event('scroll');
       var scrollSpy = spyOn(ctrl, 'scrollFunction');
-      e.initEvent('scroll', true, true);
 
-      window.dispatchEvent(e);
+      windowRef.nativeWindow.dispatchEvent(dummyScrollEvent);
 
       expect(scrollSpy).toHaveBeenCalled();
     });

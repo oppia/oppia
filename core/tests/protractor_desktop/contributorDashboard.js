@@ -330,12 +330,12 @@ describe('Translation contribution featured languages', () => {
       contributorDashboardPage.getTranslateTextTab());
     await users.createAndLoginAdminUser(
       'config@contributorDashboard.com', 'contributorDashboard');
-    const adminPage = new AdminPage.AdminPage();
+    var adminPage = new AdminPage.AdminPage();
     await adminPage.editConfigProperty(
       'Featured Translation Languages',
       'List',
       async function(elem) {
-        const featured = await elem.addItem('Dictionary');
+        var featured = await elem.addItem('Dictionary');
         await (await featured.editEntry(0, 'Unicode')).setValue('fr');
         await (await featured.editEntry(1, 'Unicode'))
           .setValue('Partnership with ABC');

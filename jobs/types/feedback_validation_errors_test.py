@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for base model validator errors."""
+"""Unit tests for feedback model validator errors."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -43,6 +43,6 @@ class InvalidEntityTypeErrorTests(
         error = feedback_validation_errors.InvalidEntityTypeError(model)
 
         self.assertEqual(
-            error.message,
-            'InvalidEntityTypeError in GeneralFeedbackThreadModel(id=\'123\'):'
+            error.stderr,
+            'InvalidEntityTypeError in GeneralFeedbackThreadModel(id="123"):'
             ' entity type %s is invalid.' % model.entity_type)

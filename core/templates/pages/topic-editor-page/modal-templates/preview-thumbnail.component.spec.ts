@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for the preview thumbnail component.
  */
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { ThumbnailDisplayComponent } from 'components/forms/custom-forms-directives/thumbnail-display.component';
 import { ContextService } from 'services/context.service';
@@ -30,6 +31,7 @@ describe('Preview Thumbnail Component', function() {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
       declarations: [
         PreviewThumbnailComponent,
         ThumbnailDisplayComponent
@@ -45,8 +47,8 @@ describe('Preview Thumbnail Component', function() {
     fixture = TestBed.createComponent(PreviewThumbnailComponent);
     componentInstance = fixture.componentInstance;
     imageUploadHelperService = (
-      TestBed.inject(ImageUploadHelperService) as unknown) as
-        jasmine.SpyObj<ImageUploadHelperService>;
+       TestBed.inject(ImageUploadHelperService) as unknown) as
+         jasmine.SpyObj<ImageUploadHelperService>;
     spyOn(
       imageUploadHelperService, 'getTrustedResourceUrlForThumbnailFilename')
       .and.returnValue(testUrl);
