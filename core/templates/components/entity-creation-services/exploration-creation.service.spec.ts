@@ -65,7 +65,7 @@ class MockWindowRef {
   }
 }
 
-describe('ExplorationCreationService', () => {
+fdescribe('ExplorationCreationService', () => {
   let ecs: ExplorationCreationService;
   let ecbas: MockExploratinoCreationBackendApiService;
   let loaderService: LoaderService;
@@ -143,22 +143,6 @@ describe('ExplorationCreationService', () => {
     expect(windowRef.nativeWindow.location.href).toBe('/url/to/exp1');
   }));
 
-  it('should create new exploration', fakeAsync(() => {
-    spyOn(siteAnalyticsService, 'registerCreateNewExplorationEvent');
-    spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
-      '/url/to/exp1'
-    );
-
-    expect(ecs.explorationCreationInProgress).toBe(undefined);
-    expect(windowRef.nativeWindow.location.href).toBe('');
-
-    ecs.createNewExploration();
-    tick(150);
-
-    expect(ecs.explorationCreationInProgress).toBe(true);
-    expect(windowRef.nativeWindow.location.href).toBe('/url/to/exp1');
-  }));
-
   it('should handle error if exploration creation fails', fakeAsync(() => {
     spyOn(siteAnalyticsService, 'registerCreateNewExplorationEvent');
     spyOn(urlInterpolationService, 'interpolateUrl');
@@ -180,7 +164,8 @@ describe('ExplorationCreationService', () => {
     expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
   }));
 
-  it('should show upload exploration modal', fakeAsync(() => {
+  it('should show upload exploration modal when user clicks' +
+    ' on upload', fakeAsync(() => {
     spyOn(ngbModal, 'open').and.returnValue(
       <NgbModalRef>{
         result: Promise.resolve({
@@ -206,7 +191,8 @@ describe('ExplorationCreationService', () => {
     expect(windowRef.nativeWindow.location.href).toBe('/create/expId');
   }));
 
-  it('should show upload exploration modal', fakeAsync(() => {
+  it('should show upload exploration modal and display alert if post' +
+    ' request fails', fakeAsync(() => {
     spyOn(ngbModal, 'open').and.returnValue(
       <NgbModalRef>{
         result: Promise.resolve({
