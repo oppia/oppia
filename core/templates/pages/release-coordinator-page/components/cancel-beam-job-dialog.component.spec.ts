@@ -19,7 +19,6 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { MatDialogHarness } from '@angular/material/dialog/testing';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
 import { of, throwError } from 'rxjs';
@@ -27,10 +26,8 @@ import { of, throwError } from 'rxjs';
 import { ReleaseCoordinatorBackendApiService } from 'pages/release-coordinator-page/services/release-coordinator-backend-api.service';
 import { CancelBeamJobDialogComponent } from 'pages/release-coordinator-page/components/cancel-beam-job-dialog.component';
 import { BeamJobRun } from 'domain/jobs/beam-job-run.model';
-import { HarnessLoader } from '@angular/cdk/testing';
-import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { AlertDialogComponent } from 'pages/release-coordinator-page/components/alert-dialog.component';
+import { AlertsService } from 'services/alerts.service';
 
 describe('Cancel beam job dialog', () => {
   const beamJobRun = (
@@ -38,17 +35,16 @@ describe('Cancel beam job dialog', () => {
 
   let fixture: ComponentFixture<CancelBeamJobDialogComponent>;
   let component: CancelBeamJobDialogComponent;
-  let loader: HarnessLoader;
 
   let backendApiService: ReleaseCoordinatorBackendApiService;
+  let alertsService: AlertsService;
   let matDialogRef: MatDialogRef<CancelBeamJobDialogComponent, BeamJobRun>;
 
   beforeEach(waitForAsync(async() => {
     const mockDialogRef = { disableClose: false, close: () => {} };
 
-    await TestBed.configureTestingModule({
+    TestBed.configureTestingModule({
       declarations: [
-        AlertDialogComponent,
         CancelBeamJobDialogComponent,
       ],
       imports: [
@@ -69,17 +65,24 @@ describe('Cancel beam job dialog', () => {
             }),
         },
       ],
-    }).compileComponents();
+    });
+    // NOTE: This allows tests to compile the DOM of each dialog component.
+    TestBed.overrideModule(BrowserDynamicTestingModule, {
+      set: {
+        entryComponents: [
+          CancelBeamJobDialogComponent,
+        ],
+      }
+    });
+    await TestBed.compileComponents();
 
     backendApiService = TestBed.inject(ReleaseCoordinatorBackendApiService);
+    alertsService = TestBed.inject(AlertsService);
     matDialogRef = TestBed.inject(MatDialogRef);
 
     fixture = TestBed.createComponent(CancelBeamJobDialogComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
-    // NOTE: This must use .documentRootLoader(), otherwise the DOM elements
-    // within the dialog components won't be found.
-    loader = TestbedHarnessEnvironment.documentRootLoader(fixture);
   }));
 
   it('should lock the dialog and cancel the job before finally closing', () => {
@@ -107,19 +110,12 @@ describe('Cancel beam job dialog', () => {
     const error = new Error();
     const cancelBeamJobRunSpy = spyOn(backendApiService, 'cancelBeamJobRun')
       .and.returnValue(throwError(error));
+    const addWarningSpy = spyOn(alertsService, 'addWarning');
 
     component.onActionClick();
 
     fixture.detectChanges();
     expect(cancelBeamJobRunSpy).toHaveBeenCalledWith(beamJobRun);
-
-    let alertDialogs = await loader.getAllHarnesses(MatDialogHarness);
-    expect(alertDialogs.length).toEqual(1);
-
-    alertDialogs[0].close();
-
-    fixture.detectChanges();
-    alertDialogs = await loader.getAllHarnesses(MatDialogHarness);
-    expect(alertDialogs.length).toEqual(0);
+    expect(addWarningSpy).toHaveBeenCalled();
   });
 });

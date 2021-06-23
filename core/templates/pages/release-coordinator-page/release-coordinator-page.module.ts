@@ -47,7 +47,6 @@ import { ReleaseCoordinatorNavbarComponent } from 'pages/release-coordinator-pag
 import { ReleaseCoordinatorPageComponent } from 'pages/release-coordinator-page/release-coordinator-page.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
 import { RequestInterceptor } from 'services/request-interceptor.service';
-import { AlertDialogComponent } from 'pages/release-coordinator-page/components/alert-dialog.component';
 
 
 declare var angular: ng.IAngularStatic;
@@ -74,7 +73,6 @@ declare var angular: ng.IAngularStatic;
     SharedComponentsModule,
   ],
   declarations: [
-    AlertDialogComponent,
     BeamJobsTabComponent,
     CancelBeamJobDialogComponent,
     JobsTabComponent,
@@ -85,7 +83,6 @@ declare var angular: ng.IAngularStatic;
     ViewBeamJobOutputDialogComponent,
   ],
   entryComponents: [
-    AlertDialogComponent,
     CancelBeamJobDialogComponent,
     JobsTabComponent,
     OppiaAngularRootComponent,

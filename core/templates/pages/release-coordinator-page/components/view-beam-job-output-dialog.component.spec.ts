@@ -17,12 +17,9 @@
  */
 
 import { ClipboardModule } from '@angular/cdk/clipboard';
-import { HarnessLoader } from '@angular/cdk/testing';
-import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { MatDialogHarness } from '@angular/material/dialog/testing';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTabsModule } from '@angular/material/tabs';
 import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
@@ -34,21 +31,22 @@ import { BeamJobRunResult } from 'domain/jobs/beam-job-run-result.model';
 import { BeamJobRun } from 'domain/jobs/beam-job-run.model';
 import { ViewBeamJobOutputDialogComponent } from 'pages/release-coordinator-page/components/view-beam-job-output-dialog.component';
 import { ReleaseCoordinatorBackendApiService } from 'pages/release-coordinator-page/services/release-coordinator-backend-api.service';
-import { AlertDialogComponent } from 'pages/release-coordinator-page/components/alert-dialog.component';
+import { AlertsService } from 'services/alerts.service';
 
 describe('View beam job output dialog', () => {
   const beamJobRun = new BeamJobRun('123', 'FooJob', 'DONE', [], 0, 0, false);
 
   let fixture: ComponentFixture<ViewBeamJobOutputDialogComponent>;
   let component: ViewBeamJobOutputDialogComponent;
-  let loader: HarnessLoader;
 
   let backendApiService: ReleaseCoordinatorBackendApiService;
+  let alertsService: AlertsService;
 
   beforeEach(waitForAsync(async() => {
-    await TestBed.configureTestingModule({
+    const mockDialogRef = { disableClose: false, close: () => {} };
+
+    TestBed.configureTestingModule({
       declarations: [
-        AlertDialogComponent,
         ViewBeamJobOutputDialogComponent,
       ],
       imports: [
@@ -62,7 +60,7 @@ describe('View beam job output dialog', () => {
       ],
       providers: [
         { provide: MAT_DIALOG_DATA, useValue: beamJobRun },
-        { provide: MatDialogRef, useValue: {} },
+        { provide: MatDialogRef, useValue: mockDialogRef },
         {
           provide: ReleaseCoordinatorBackendApiService,
           useValue: jasmine.createSpyObj<ReleaseCoordinatorBackendApiService>(
@@ -71,15 +69,22 @@ describe('View beam job output dialog', () => {
             }),
         },
       ],
-    }).compileComponents();
+    });
+    // NOTE: This allows tests to compile the DOM of each dialog component.
+    TestBed.overrideModule(BrowserDynamicTestingModule, {
+      set: {
+        entryComponents: [
+          ViewBeamJobOutputDialogComponent,
+        ],
+      }
+    });
+    await TestBed.compileComponents();
 
     backendApiService = TestBed.inject(ReleaseCoordinatorBackendApiService);
+    alertsService = TestBed.inject(AlertsService);
 
     fixture = TestBed.createComponent(ViewBeamJobOutputDialogComponent);
     component = fixture.componentInstance;
-    // NOTE: This must use .documentRootLoader(), otherwise the DOM elements
-    // within the dialog components won't be found.
-    loader = TestbedHarnessEnvironment.documentRootLoader(fixture);
   }));
 
   it('should unsubscribe when ngOnDestroy() is called', marbles(m => {
@@ -110,10 +115,7 @@ describe('View beam job output dialog', () => {
     const result = new BeamJobRunResult('abc', '123');
     const getBeamJobRunOutputSpy = (
       spyOn(backendApiService, 'getBeamJobRunOutput')
-        .and.returnValue(of(result))
-    );
-
-    expect(component.output).toBeNull();
+        .and.returnValue(of(result)));
 
     fixture.detectChanges();
 
@@ -121,15 +123,14 @@ describe('View beam job output dialog', () => {
     expect(component.output).toEqual(result);
   });
 
-  it('should use the output corresponding to the selected tab', async() => {
+  it('should use the output corresponding to the selected tab', () => {
     const getBeamJobRunOutputSpy = (
       spyOn(backendApiService, 'getBeamJobRunOutput')
-        .and.returnValue(of(new BeamJobRunResult('abc', '123')))
-    );
+        .and.returnValue(of(new BeamJobRunResult('abc', '123'))));
 
     fixture.detectChanges();
-    expect(getBeamJobRunOutputSpy).toHaveBeenCalledWith(beamJobRun);
 
+    expect(getBeamJobRunOutputSpy).toHaveBeenCalledWith(beamJobRun);
     expect(component.getOutput()).toEqual('abc');
 
     component.selectedTab.setValue(1);
@@ -143,27 +144,25 @@ describe('View beam job output dialog', () => {
     expect(component.getOutput()).toEqual('abc');
   });
 
-  it('should show stderr when stdout is empty', async() => {
+  it('should show stderr when stdout is empty', () => {
     const getBeamJobRunOutputSpy = (
       spyOn(backendApiService, 'getBeamJobRunOutput')
-        .and.returnValue(of(new BeamJobRunResult('', '123')))
-    );
+        .and.returnValue(of(new BeamJobRunResult('', '123'))));
 
     fixture.detectChanges();
-    expect(getBeamJobRunOutputSpy).toHaveBeenCalledWith(beamJobRun);
 
+    expect(getBeamJobRunOutputSpy).toHaveBeenCalledWith(beamJobRun);
     expect(component.getOutput()).toEqual('123');
   });
 
-  it('should show stdout when stderr is empty', async() => {
+  it('should show stdout when stderr is empty', () => {
     const getBeamJobRunOutputSpy = (
       spyOn(backendApiService, 'getBeamJobRunOutput')
-        .and.returnValue(of(new BeamJobRunResult('abc', '')))
-    );
+        .and.returnValue(of(new BeamJobRunResult('abc', ''))));
 
     fixture.detectChanges();
-    expect(getBeamJobRunOutputSpy).toHaveBeenCalledWith(beamJobRun);
 
+    expect(getBeamJobRunOutputSpy).toHaveBeenCalledWith(beamJobRun);
     expect(component.getOutput()).toEqual('abc');
   });
 
@@ -172,17 +171,11 @@ describe('View beam job output dialog', () => {
     const getBeamJobRunOutputSpy = (
       spyOn(backendApiService, 'getBeamJobRunOutput')
         .and.returnValue(throwError(error)));
+    const addWarningSpy = spyOn(alertsService, 'addWarning').and.stub();
 
     fixture.detectChanges();
+
     expect(getBeamJobRunOutputSpy).toHaveBeenCalledWith(beamJobRun);
-
-    let alertDialogs = await loader.getAllHarnesses(MatDialogHarness);
-    expect(alertDialogs.length).toEqual(1);
-
-    alertDialogs[0].close();
-
-    fixture.detectChanges();
-    alertDialogs = await loader.getAllHarnesses(MatDialogHarness);
-    expect(alertDialogs.length).toEqual(0);
+    expect(addWarningSpy).toHaveBeenCalled();
   });
 });

@@ -29,8 +29,8 @@ import { BeamJob } from 'domain/jobs/beam-job.model';
 import { CancelBeamJobDialogComponent } from 'pages/release-coordinator-page/components/cancel-beam-job-dialog.component';
 import { StartNewBeamJobDialogComponent } from 'pages/release-coordinator-page/components/start-new-beam-job-dialog.component';
 import { ViewBeamJobOutputDialogComponent } from 'pages/release-coordinator-page/components/view-beam-job-output-dialog.component';
-import { AlertDialogComponent } from 'pages/release-coordinator-page/components/alert-dialog.component';
 import { ReleaseCoordinatorBackendApiService } from 'pages/release-coordinator-page/services/release-coordinator-backend-api.service';
+import { AlertsService } from 'services/alerts.service';
 
 @Component({
   selector: 'oppia-beam-jobs-tab',
@@ -54,13 +54,14 @@ export class BeamJobsTabComponent implements OnInit, OnDestroy {
 
   constructor(
       private backendApiService: ReleaseCoordinatorBackendApiService,
+      private alertsService: AlertsService,
       private matDialog: MatDialog) {}
 
   ngOnInit(): void {
     const initialBeamJobs = this.backendApiService.getBeamJobs()
-      .pipe(catchError(error => this.onError(error, [])));
+      .pipe(catchError(error => this.onError<BeamJob>(error)));
     const initialBeamJobRuns = this.backendApiService.getBeamJobRuns()
-      .pipe(catchError(error => this.onError(error, [])));
+      .pipe(catchError(error => this.onError<BeamJobRun>(error)));
 
     zip(initialBeamJobs, initialBeamJobRuns)
       .pipe(first())
@@ -97,10 +98,10 @@ export class BeamJobsTabComponent implements OnInit, OnDestroy {
     this.beamJobRuns.complete();
   }
 
-  onError<T>(error: Error, replacement: T): Observable<T> {
+  onError<T>(error: Error): Observable<T[]> {
     this.dataFailedToLoad = true;
-    this.matDialog.open(AlertDialogComponent, { data: error });
-    return of(replacement);
+    this.alertsService.addWarning(error.message);
+    return of([]);
   }
 
   onJobNameSelect(jobName: string): void {

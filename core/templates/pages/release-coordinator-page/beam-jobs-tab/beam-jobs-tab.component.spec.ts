@@ -49,7 +49,6 @@ import { StartNewBeamJobDialogComponent } from 'pages/release-coordinator-page/c
 import { ViewBeamJobOutputDialogComponent } from 'pages/release-coordinator-page/components/view-beam-job-output-dialog.component';
 import { ReleaseCoordinatorBackendApiService } from 'pages/release-coordinator-page/services/release-coordinator-backend-api.service';
 import { BeamJobRunResult } from 'domain/jobs/beam-job-run-result.model';
-import { AlertDialogComponent } from 'pages/release-coordinator-page/components/alert-dialog.component';
 
 describe('Beam Jobs Tab Component', () => {
   let fixture: ComponentFixture<BeamJobsTabComponent>;
@@ -88,7 +87,6 @@ describe('Beam Jobs Tab Component', () => {
         ReactiveFormsModule,
       ],
       declarations: [
-        AlertDialogComponent,
         BeamJobsTabComponent,
         CancelBeamJobDialogComponent,
         StartNewBeamJobDialogComponent,
@@ -112,7 +110,6 @@ describe('Beam Jobs Tab Component', () => {
     TestBed.overrideModule(BrowserDynamicTestingModule, {
       set: {
         entryComponents: [
-          AlertDialogComponent,
           BeamJobsTabComponent,
           CancelBeamJobDialogComponent,
           StartNewBeamJobDialogComponent,
@@ -150,38 +147,22 @@ describe('Beam Jobs Tab Component', () => {
       .toBeObservable(expectedRuns, {e: [], r: beamJobRuns});
   }));
 
-  it('should open the error dialog if runs fail to load', marbles(async(m) => {
-    const beamJobRuns = m.hot('^-#', null, new Error('err'));
-    const expectedRuns = '     e-e';
-    spyOn(backendApiService, 'getBeamJobRuns').and.returnValue(beamJobRuns);
-
-    fixture.detectChanges();
-    m.expect(component.beamJobRuns).toBeObservable(expectedRuns, { e: [] });
-
-    let alertDialogs = await loader.getAllHarnesses(MatDialogHarness);
-    expect(alertDialogs.length).toEqual(1);
-
-    alertDialogs[0].close();
-
-    alertDialogs = await loader.getAllHarnesses(MatDialogHarness);
-    expect(alertDialogs.length).toEqual(0);
-  }));
-
-  it('should open the error dialog if jobs fail to load', marbles(async(m) => {
+  it('should return empty array when jobs fail to load', marbles(async(m) => {
     const beamJobs = m.hot('^-#', null, new Error('err'));
     const expectedNames = ' e-e';
     spyOn(backendApiService, 'getBeamJobs').and.returnValue(beamJobs);
 
     fixture.detectChanges();
     m.expect(component.jobNames).toBeObservable(expectedNames, { e: [] });
+  }));
 
-    let alertDialogs = await loader.getAllHarnesses(MatDialogHarness);
-    expect(alertDialogs.length).toEqual(1);
+  it('should return empty array when runs fail to load', marbles(async(m) => {
+    const beamJobRuns = m.hot('^-#', null, new Error('err'));
+    const expectedRuns = '     e-e';
+    spyOn(backendApiService, 'getBeamJobRuns').and.returnValue(beamJobRuns);
 
-    alertDialogs[0].close();
-
-    alertDialogs = await loader.getAllHarnesses(MatDialogHarness);
-    expect(alertDialogs.length).toEqual(0);
+    fixture.detectChanges();
+    m.expect(component.beamJobRuns).toBeObservable(expectedRuns, { e: [] });
   }));
 
   it('should update the table when the job name input changes', async() => {

@@ -17,13 +17,14 @@
  */
 
 import { Component, Inject } from '@angular/core';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { catchError, take } from 'rxjs/operators';
 
 import { BeamJob } from 'domain/jobs/beam-job.model';
 import { BeamJobRun } from 'domain/jobs/beam-job-run.model';
 import { ReleaseCoordinatorBackendApiService } from 'pages/release-coordinator-page/services/release-coordinator-backend-api.service';
-import { AlertDialogComponent } from 'pages/release-coordinator-page/components/alert-dialog.component';
+import { AlertsService } from 'services/alerts.service';
+import { of } from 'rxjs';
 
 @Component({
   selector: 'start-new-beam-job-dialog',
@@ -36,7 +37,7 @@ export class StartNewBeamJobDialogComponent {
       @Inject(MAT_DIALOG_DATA) public beamJob: BeamJob,
       private matDialogRef:
         MatDialogRef<StartNewBeamJobDialogComponent, BeamJobRun>,
-      private matDialog: MatDialog,
+      private alertsService: AlertsService,
       private backendApiService: ReleaseCoordinatorBackendApiService) {}
 
   onActionClick(): void {
@@ -45,9 +46,10 @@ export class StartNewBeamJobDialogComponent {
 
     this.backendApiService.startNewBeamJob(this.beamJob, []).pipe(
       take(1),
-      catchError(
-        data =>
-          this.matDialog.open(AlertDialogComponent, { data }).afterClosed())
+      catchError(error => {
+        this.alertsService.addWarning(error.message);
+        return of(null);
+      })
     ).subscribe(newJobRun => this.matDialogRef.close(newJobRun));
   }
 }
