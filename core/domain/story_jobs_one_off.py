@@ -67,6 +67,16 @@ class StoryMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         return [story_models.StoryModel]
 
     @staticmethod
+    def compute_thumbnail_size_in_bytes(thumbnail_filename, item_id):
+        """thumbnail_url = (
+           'https://storage.googleapis.com/oppiaserver-resources/story/%s/assets/'
+           'thumbnail/%s' %(item_id, thumbnail_filename))
+        thumbnail_size_in_bytes = python_utils.url_open(
+            thumbnail_url).headers['Content-Length']
+        return thumbnail_size_in_bytes
+        """
+
+    @staticmethod
     def map(item):
         if item.deleted:
             yield (StoryMigrationOneOffJob._DELETED_KEY, 1)
