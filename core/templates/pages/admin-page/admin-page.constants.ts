@@ -38,11 +38,11 @@ export const AdminPageConstants = {
   ADMIN_SUPER_ADMIN_PRIVILEGES_HANDLER_URL: '/adminsuperadminhandler',
 
   ADMIN_TAB_URLS: {
-    ACTIVITIES: '#activities',
-    CONFIG: '#config',
-    FEATURES: '#features',
-    ROLES: '#roles',
-    MISC: '#misc'
+    ACTIVITIES: '#/activities',
+    CONFIG: '#/config',
+    FEATURES: '#/features',
+    ROLES: '#/roles',
+    MISC: '#/misc'
   },
 
   PROFILE_URL_TEMPLATE: '/profile/<username>'

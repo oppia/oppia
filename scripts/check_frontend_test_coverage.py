@@ -38,10 +38,10 @@ EXCLUDED_DIRECTORIES = [
 # NOTE TO DEVELOPERS: do not add any new files to this list without asking
 # @nithusha21 first.
 NOT_FULLY_COVERED_FILENAMES = [
-    'admin-config-tab.directive.ts',
-    'admin-misc-tab.directive.ts',
-    'admin-page.directive.ts',
-    'admin-roles-tab.directive.ts',
+    'admin-config-tab.component.ts',
+    'admin-misc-tab.component.ts',
+    'admin-page.component.ts',
+    'admin-roles-tab.component.ts',
     'angular-html-bind.directive.ts',
     'answer-classification.service.ts',
     'answer-group-editor.directive.ts',

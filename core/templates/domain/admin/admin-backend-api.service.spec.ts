@@ -25,6 +25,7 @@ import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 import { PlatformParameterFilterType } from 'domain/platform_feature/platform-parameter-filter.model';
 import { FeatureStage, PlatformParameter } from 'domain/platform_feature/platform-parameter.model';
 import { CsrfTokenService } from 'services/csrf-token.service';
+import { Schema } from 'services/schema-default-value.service';
 
 describe('Admin backend api service', () => {
   let abas: AdminBackendApiService;
@@ -62,7 +63,7 @@ describe('Admin backend api service', () => {
       oppia_csrf_secret: {
         schema: {
           type: 'unicode'
-        },
+        } as Schema,
         value: '3WHOWnD3sy0r1wukJ2lX4vBS_YA=',
         description: 'Text used to encrypt CSRF tokens.'
       }
@@ -681,58 +682,6 @@ describe('Admin backend api service', () => {
       expect(failHandler).toHaveBeenCalledWith('Failed to clear search index.');
     }
     ));
-
-  it('should populate exploration stats when calling' +
-    'populateExplorationStatsRegenerationCsvResultAsync', fakeAsync(() => {
-    let action = 'regenerate_missing_exploration_stats';
-    let expIdToRegenerate = '11';
-    let payload = {
-      action: action,
-      exp_id: expIdToRegenerate
-    };
-
-    abas.populateExplorationStatsRegenerationCsvResultAsync(
-      expIdToRegenerate
-    ).then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne('/adminhandler');
-    expect(req.request.method).toEqual('POST');
-    expect(req.request.body).toEqual(payload);
-    req.flush(200);
-    flushMicrotasks();
-
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
-  }
-  ));
-
-  it('should fail to populate exploration stats when calling' +
-    'populateExplorationStatsRegenerationCsvResultAsync', fakeAsync(() => {
-    let action = 'regenerate_missing_exploration_stats';
-    let expIdToRegenerate = 'InvalidId';
-    let payload = {
-      action: action,
-      exp_id: expIdToRegenerate
-    };
-
-    abas.populateExplorationStatsRegenerationCsvResultAsync(
-      expIdToRegenerate
-    ).then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne('/adminhandler');
-    expect(req.request.method).toEqual('POST');
-    expect(req.request.body).toEqual(payload);
-    req.flush({
-      error: 'Failed to get data.'
-    }, {
-      status: 500, statusText: 'Internal Server Error'
-    });
-    flushMicrotasks();
-
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith('Failed to get data.');
-  }
-  ));
 
   it('should regenerate topic related oppurtunities when' +
     'calling regenerateOpportunitiesRelatedToTopicAsync', fakeAsync(() => {
