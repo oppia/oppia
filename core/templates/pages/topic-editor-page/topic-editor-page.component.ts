@@ -185,11 +185,15 @@ angular.module('oppia').directive('topicEditorPage', [
                 () => {
                   LoaderService.hideLoadingScreen();
                   setPageTitle();
+                  $rootScope.$applyAsync();
                 }
               ));
             ctrl.directiveSubscriptions.add(
               TopicEditorStateService.onTopicReinitialized.subscribe(
-                () => setPageTitle()
+                () => {
+                  setPageTitle();
+                  $rootScope.$applyAsync();
+                }
               ));
             // This subscription can be removed once this component is migrated.
             ctrl.directiveSubscriptions.add(
