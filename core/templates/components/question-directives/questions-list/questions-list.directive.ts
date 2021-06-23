@@ -24,7 +24,7 @@ require(
   'confirm-or-cancel-modal.controller.ts');
 require(
   'components/question-difficulty-selector/' +
-  'question-difficulty-selector.directive.ts');
+  'question-difficulty-selector.component.ts');
 require(
   'components/question-directives/question-editor/' +
   'question-editor.directive.ts');
@@ -303,6 +303,11 @@ angular.module('oppia').directive('questionsList', [
             ctrl.showDifficultyChoices = true;
             ctrl.editorIsOpen = true;
             ctrl.initiateQuestionCreation();
+          };
+
+          ctrl.updateSkillWithDifficulty = function($event, $index) {
+            this.linkedSkillsWithDifficulty[$index] = $event;
+            ctrl.changeLinkedSkillDifficulty();
           };
 
           ctrl.changeLinkedSkillDifficulty = function() {

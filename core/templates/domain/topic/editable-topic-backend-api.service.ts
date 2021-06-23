@@ -47,7 +47,7 @@ interface FetchTopicBackendResponse {
   'skill_creation_is_allowed': boolean;
 }
 
-interface FetchTopicResponse {
+export interface FetchTopicResponse {
   topicDict: TopicBackendDict;
   groupedSkillSummaries: {
     [topicName: string]: SkillSummaryBackendDict[];
@@ -83,7 +83,7 @@ interface UpdateTopicBackendResponse {
   };
 }
 
-interface UpdateTopicResponse {
+export interface UpdateTopicResponse {
   topicDict: TopicBackendDict;
   skillIdToDescriptionDict: SkillIdToDescriptionMap;
   skillIdToRubricsDict: {

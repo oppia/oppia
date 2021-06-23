@@ -578,12 +578,12 @@ export interface TopicRemoveSkillFromSubtopicChange {
   'skill_id': string;
 }
 
-interface TopicDeleteAdditionalStoryChange {
+export interface TopicDeleteAdditionalStoryChange {
   'cmd': 'delete_additional_story';
   'story_id': string;
 }
 
-interface TopicDeleteCanonicalStoryChange {
+export interface TopicDeleteCanonicalStoryChange {
   'cmd': 'delete_canonical_story';
   'story_id': string;
 }

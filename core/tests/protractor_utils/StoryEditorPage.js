@@ -371,8 +371,16 @@ var StoryEditorPage = function() {
     await expect(desc).toMatch(nodeDescription);
   };
 
-  this.expectChapterExplorationIdToBe = function(id) {
-    expect(explorationIdInput.getAttribute('value')).toEqual(id);
+  this.expectChapterExplorationIdToBe = async function(id) {
+    await waitFor.visibilityOf(
+      explorationIdInput,
+      'explorationIdInput takes too long to be visible'
+    );
+    let explorationId = await browser.executeScript(() => {
+      return document.getElementsByClassName(
+        'protractor-test-exploration-id-input')[0].value;
+    });
+    await expect(explorationId).toEqual(id);
   };
 
   this.changeNodeOutline = async function(richTextInstructions) {
