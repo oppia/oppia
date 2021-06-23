@@ -22,7 +22,7 @@
 
 import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { isUndefined } from 'lodash';
+import isUndefined from 'lodash/isUndefined';
 import { InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { NumericInputRulesService } from './numeric-input-rules.service';
