@@ -224,6 +224,7 @@ class ExplorationStatsTests(test_utils.GenericTestBase):
             exploration_stats.to_dict(), expected_clone_object.to_dict()
         )
 
+
 class StateStatsTests(test_utils.GenericTestBase):
     """Tests the StateStats domain object."""
 
