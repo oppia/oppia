@@ -221,8 +221,8 @@ class FixQuestionImagesStorageOneOffJobTests(test_utils.GenericTestBase):
                     'alt-with-value="&quot;Image&quot;">'
                     '</oppia-noninteractive-image>'
                     '<oppia-noninteractive-image filepath-with-value='
-                    '"&quot;test_svg.svg&quot;" caption-with-value="&quot;&quot;" '
-                    'alt-with-value="&quot;Image&quot;">'
+                    '"&quot;test_svg.svg&quot;" caption-with-value="&quot;'
+                    '&quot;" alt-with-value="&quot;Image&quot;">'
                     '</oppia-noninteractive-image>')
             })
         )
