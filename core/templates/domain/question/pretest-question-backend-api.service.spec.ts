@@ -132,4 +132,19 @@ describe('Pretest question backend API service', function() {
       expect(failHandler).toHaveBeenCalled();
     })
   );
+
+  it('should return empty list if we fetch pretest ' +
+    'question with invalid url fragment', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+    let invalidUrl = '-invalid-url-';
+    let emptyList = [];
+
+    pretestQuestionBackendApiService.fetchPretestQuestionsAsync(
+      'expId', invalidUrl).then(successHandler, failHandler);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(emptyList);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
 });
