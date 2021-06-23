@@ -19,9 +19,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import datetime
-import json
-
 from constants import constants
 from core.domain import blog_domain
 from core.domain import blog_services
@@ -50,13 +47,6 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             utils.ValidationError, expected_error_substring):
             self.blog_post.validate()
-
-    def _assert_valid_blog_post_id(
-            self, expected_error_substring, blog_post_id):
-        """Checks that the blog post ID passes validation."""
-        with self.assertRaisesRegexp(
-            utils.ValidationError, expected_error_substring):
-            blog_domain.BlogPost.require_valid_blog_post_id(blog_post_id)
 
     def _assert_valid_tags_for_blog_post(self, expected_error_substring, tags):
         """Checks that the blog post tags passes validation."""
@@ -101,11 +91,6 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
             utils.ValidationError, expected_error_substring):
             blog_domain.BlogPost.require_valid_url_fragment(url)
 
-    def test_valid_blog_post_id(self):
-        self._assert_valid_blog_post_id(
-            'Blog Post ID should be a string, received: 10', 10)
-        self._assert_valid_blog_post_id('Invalid Blog Post ID.', 'abc')
-
     def test_thumbnail_filename_validation_for_blog_post(self):
         self._assert_valid_thumbnail_filename_for_blog_post(
             'Expected thumbnail filename to be a string, received 10', 10)
@@ -140,8 +125,8 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
             'Title should not be empty', '')
         self._assert_strict_valid_title_for_blog_post(
             'Title field contains invalid characters. Only words'
-            r'\(a-zA-Z\) separated by spaces are allowed. Received %s'
-            % 'ABC12 heloo', 'ABC12 heloo')
+            r'\(a-zA-Z0-9\) separated by spaces are allowed. Received %s'
+            % 'ABC12& heloo', 'ABC12& heloo')
 
     def _assert_strict_valid_tags_for_blog_post(
             self, expected_error_substring, tags):
@@ -164,20 +149,14 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
         url_fragment = 'very-very-long' * 30
         url_fragment_char_limit = constants.MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT
         self._assert_valid_url_fragment_for_blog_post(
-            'Blog Post URL Fragment field should not exceed %d characters, '
-            'received %s.' % (
-                url_fragment_char_limit, url_fragment), url_fragment)
+            'Blog Post URL Fragment field should not exceed %d characters.'
+            % (url_fragment_char_limit), url_fragment)
+        self._assert_valid_url_fragment_for_blog_post(
+            'Blog Post URL Fragment field contains invalid characters.'
+            'Only lowercase words, numbers separated by hyphens are allowed. '
+            'Received %s.' % ('oppia-in-covid19-#'), 'oppia-in-covid19-#')
 
-    def test_serialize_and_deserialize_returns_unchanged_blog_post(self):
-        """Checks that serializing and then deserializing a blog post works as
-        intended by leaving the blog post unchanged.
-        """
-        self.blog_post.published_on = datetime.datetime.utcnow()
-        self.assertEqual(
-            self.blog_post.to_dict(),
-            blog_domain.BlogPost.deserialize(
-                self.blog_post.serialize()).to_dict()
-        )
+        blog_domain.BlogPost.require_valid_url_fragment('oppia-in-covid19')
 
     def test_update_title(self):
         self.assertEqual(self.blog_post.title, '')
@@ -228,8 +207,8 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
             'Expected each tag in \'tags\' to be a string,' +
             ' received: ''\'%s\'' % 123, ['abc', 123])
         self._assert_valid_tags_for_blog_post(
-            'Tags should only contain lowercase letters and spaces, '
-            'received: \'%s\'' % 'ABC', ['ABC'])
+            'Tags should only contain alphanumeric characters and spaces, '
+            'received: \'%s\'' % 'Alpha@', ['Alpha@'])
         self._assert_valid_tags_for_blog_post(
             'Tags should not start or end with whitespace, '
             'received: \'%s\'' % ' a b', [' a b'])
@@ -242,7 +221,7 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
         self._assert_valid_tags_for_blog_post(
             'Some tags duplicate each other', ['abc', 'abc'])
         self._assert_valid_tags_for_blog_post(
-            'Tag should not be empty, received: \'\'', ['abc', ''])
+            'Tag should not be empty.', ['abc', ''])
 
     def test_blog_post_passes_validate(self):
         """Tests validation for blog post."""
@@ -283,10 +262,10 @@ class BlogPostRightsDomainUnitTests(test_utils.GenericTestBase):
         self.assertFalse(self.blog_post_rights.is_editor(self.user_id_b))
 
     def test_to_human_readable_dict(self):
-        """Checks conversion of BlogPostRights to human readable dict."""
+        """Checks conversion of BlogPostRights to dict."""
         expected_dict = {
             'blog_post_id': self.blog_post_id,
-            'editor_names': ['A'],
+            'editor_ids': [self.user_id_a],
             'blog_post_is_published': False
         }
         self.assertEqual(self.blog_post_rights.to_dict(), expected_dict)
@@ -341,18 +320,6 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
         self._assert_strict_valid_thumbnail_filename_for_blog_post(
             'Expected thumbnail filename to be a string, received: None.', None)
 
-    def _assert_valid_blog_post_id(
-            self, expected_error_substring, blog_post_id):
-        """Checks that the blog post ID passes validation."""
-        with self.assertRaisesRegexp(
-            utils.ValidationError, expected_error_substring):
-            blog_domain.BlogPostSummary.require_valid_blog_post_id(blog_post_id)
-
-    def test_valid_blog_post_id(self):
-        self._assert_valid_blog_post_id(
-            'Blog Post ID should be a string, received: 10', 10)
-        self._assert_valid_blog_post_id('Invalid Blog Post ID.', 'abc')
-
     def _assert_strict_valid_title_for_blog_post(
             self, expected_error_substring, title):
         """Checks that blog post passes strict validation for title."""
@@ -406,9 +373,14 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
         url_fragment = 'very-very-long' * 30
         url_fragment_char_limit = constants.MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT
         self._assert_valid_url_fragment_for_blog_post(
-            'Blog Post URL Fragment field should not exceed %d characters, '
-            'received %s.' % (
-                url_fragment_char_limit, url_fragment), url_fragment)
+            'Blog Post URL Fragment field should not exceed %d characters.'
+            % (url_fragment_char_limit), url_fragment)
+        self._assert_valid_url_fragment_for_blog_post(
+            'Blog Post URL Fragment field contains invalid characters.'
+            'Only lowercase words, numbers separated by hyphens are allowed. '
+            'Received %s.' % ('oppia-in-covid19-#'), 'oppia-in-covid19-#')
+
+        blog_domain.BlogPostSummary.require_valid_url_fragment('oppia-covid19')
 
     def _assert_strict_validation_error(self, expected_error_substring):
         """Checks that the blog post passes strict validation."""
@@ -441,16 +413,6 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
         self.blog_post_summary.summary = 'Hello'
         self.blog_post_summary.validate(strict=True)
 
-    def test_blog_post_summary_serialization(self):
-        """Tests serialization of blog post summary."""
-
-        self.blog_post_summary.published_on = datetime.datetime.utcnow()
-        summary_serialized = self.blog_post_summary.serialize()
-        blog_post_summary_dict = (
-            json.loads(summary_serialized.decode('utf-8')))
-        self.assertEqual(blog_post_summary_dict['id'], self.blog_post_id)
-        self.assertEqual(blog_post_summary_dict['summary'], '...')
-
     def test_tags_validation_for_blog_post(self):
         """"Tests tags validation for blog post."""
 
@@ -464,8 +426,8 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
             'Expected each tag in \'tags\' to be a string,' +
             ' received: ''\'%s\'' % 123, ['abc', 123])
         self._assert_valid_tags_for_blog_post(
-            'Tags should only contain lowercase letters and spaces, '
-            'received: \'%s\'' % 'ABC', ['ABC'])
+            'Tags should only contain alphanumeric characters and spaces, '
+            'received: \'%s\'' % 'Alpha@', ['Alpha@'])
         self._assert_valid_tags_for_blog_post(
             'Tags should not start or end with whitespace, '
             'received: \'%s\'' % ' a b', [' a b'])
@@ -478,7 +440,7 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
         self._assert_valid_tags_for_blog_post(
             'Some tags duplicate each other', ['abc', 'abc'])
         self._assert_valid_tags_for_blog_post(
-            'Tag should not be empty, received: \'\'', ['abc', ''])
+            'Tag should not be empty.', ['abc', ''])
 
     def test_tags_validation_in_strict_mode(self):
         self._assert_strict_valid_tags_for_blog_post(

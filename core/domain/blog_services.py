@@ -46,7 +46,6 @@ def get_blog_post_from_model(blog_post_model):
         BlogPost. A blog post domain object corresponding to the given
         blog post model.
     """
-
     return blog_domain.BlogPost(
         blog_post_model.id,
         blog_post_model.author_id,
@@ -72,8 +71,7 @@ def get_blog_post_by_id(blog_post_id, strict=True):
     """
     blog_post_model = blog_models.BlogPostModel.get(blog_post_id, strict=strict)
     if blog_post_model:
-        blog_post = get_blog_post_from_model(blog_post_model)
-        return blog_post
+        return get_blog_post_from_model(blog_post_model)
     else:
         return None
 
@@ -112,8 +110,7 @@ def get_blog_post_by_url_fragment(url_fragment):
     if blog_post_model is None:
         return None
 
-    blog_post = get_blog_post_from_model(blog_post_model)
-    return blog_post
+    return get_blog_post_from_model(blog_post_model)
 
 
 def get_blog_post_summary_from_model(blog_post_summary_model):
@@ -128,7 +125,6 @@ def get_blog_post_summary_from_model(blog_post_summary_model):
         BlogPostSummary. A blog post summary domain object corresponding to the
         given blog post summary model.
     """
-
     return blog_domain.BlogPostSummary(
         blog_post_summary_model.id,
         blog_post_summary_model.author_id,
@@ -199,13 +195,14 @@ def filter_blog_post_ids(user_id, blog_post_is_published):
         list(str). The blog post IDs of the blog posts for which the user is an
         editor corresponding to the status(draft/published).
     """
-    blog_post_rights_models = (
-        blog_models.BlogPostRightsModel.get_by_user(user_id))
+    blog_post_rights_models = blog_models.BlogPostRightsModel.query(
+        blog_models.BlogPostRightsModel.editor_ids == user_id,
+        blog_models.BlogPostRightsModel.blog_post_is_published == (
+            blog_post_is_published)).fetch()
     model_ids = []
     if blog_post_rights_models:
         for model in blog_post_rights_models:
-            if model.blog_post_is_published == blog_post_is_published:
-                model_ids.append(model.id)
+            model_ids.append(model.id)
     return model_ids
 
 
@@ -219,7 +216,6 @@ def get_blog_post_summary_by_title(title):
         BlogPostSummary or None. The domain object representing a blog post
         summary with the given title, or None if it does not exist.
     """
-
     blog_post_summary_model = blog_models.BlogPostSummaryModel.query(
         blog_models.BlogPostSummaryModel.title == title
     ).fetch() # pylint: disable=singleton-comparison
@@ -227,23 +223,7 @@ def get_blog_post_summary_by_title(title):
     if len(blog_post_summary_model) == 0:
         return None
 
-    blog_post_summary = (
-        get_blog_post_summary_from_model(blog_post_summary_model[0]))
-    return blog_post_summary
-
-
-def get_all_blog_posts():
-    """Returns all the blog posts present in the datastore.
-
-    Returns:
-        list(BlogPosts). The list of domain objects for blog posts present
-        in the datastore.
-    """
-    backend_blog_post_models = blog_models.BlogPostModel.get_all()
-    blog_posts = [
-        get_blog_post_from_model(blog_post)
-        for blog_post in backend_blog_post_models]
-    return blog_posts
+    return get_blog_post_summary_from_model(blog_post_summary_model[0])
 
 
 def get_new_blog_post_id():
@@ -267,7 +247,6 @@ def get_blog_post_rights_from_model(blog_post_rights_model):
         BlogPostRights. A blog post rights domain object corresponding to the
         given blog post rights model.
     """
-
     return blog_domain.BlogPostRights(
         blog_post_rights_model.id,
         blog_post_rights_model.editor_ids,
@@ -366,7 +345,6 @@ def publish_blog_post(blog_post_id):
     Raises:
         Exception. The given blog post does not exist.
     """
-
     blog_post_rights = get_blog_post_rights(blog_post_id, strict=False)
     if blog_post_rights is None:
         raise Exception('The given blog post does not exist')
@@ -394,7 +372,6 @@ def unpublish_blog_post(blog_post_id):
     Raises:
         Exception. The given blog post does not exist.
     """
-
     blog_post_rights = get_blog_post_rights(blog_post_id, strict=False)
     if blog_post_rights is None:
         raise Exception('The given blog post does not exist')
@@ -409,7 +386,6 @@ def delete_blog_post(blog_post_id):
         blog_post_id: str. ID of the blog post which is to be
             deleted.
     """
-
     blog_models.BlogPostModel.get(blog_post_id).delete()
     blog_models.BlogPostSummaryModel.get(blog_post_id).delete()
     blog_models.BlogPostRightsModel.get(blog_post_id).delete()
@@ -422,7 +398,6 @@ def _save_blog_post_summary(blog_post_summary):
         blog_post_summary: BlogPostSummary. The summary object for the given
             blog post summary.
     """
-
     model = blog_models.BlogPostSummaryModel.get(
         blog_post_summary.id, strict=False)
     if model:
@@ -496,19 +471,21 @@ def deassign_user_from_all_blog_posts(user_id):
         user_id)
 
 
-def generate_url_fragment(title):
+def generate_url_fragment(title, blog_post_id):
     """Generates the url fragment for a blog post from the title of the blog
     post.
 
     Args:
         title: str. The title of the blog post.
+        blog_post_id: str. The unique blog post ID.
 
     Returns:
         str. The url fragment of the blog post.
     """
     lower_title = title.lower()
     hyphenated_title = lower_title.replace(' ', '-')
-    return hyphenated_title
+    lower_id = blog_post_id.lower()
+    return hyphenated_title + '-' + lower_id
 
 
 def generate_summary_of_blog_post(content):
@@ -521,7 +498,6 @@ def generate_summary_of_blog_post(content):
     Returns:
         str. The summary of the blog post.
     """
-
     raw_text = html_cleaner.strip_html_tags(content)
     max_chars_in_summary = constants.MAX_CHARS_IN_BLOG_POST_SUMMARY - 3
     summary = raw_text[:max_chars_in_summary] + '...'
@@ -537,7 +513,6 @@ def compute_summary_of_blog_post(blog_post):
     Returns:
         BlogPostSummary. The blog post summary domain object.
     """
-
     summary = generate_summary_of_blog_post(blog_post.content)
 
     return blog_domain.BlogPostSummary(
@@ -564,12 +539,12 @@ def apply_change_dict(blog_post_id, change_dict):
     Returns:
         UpdatedBlogPost. The modified blog post object.
     """
-
     blog_post = get_blog_post_by_id(blog_post_id)
 
     if 'title' in change_dict:
+        url_fragment = generate_url_fragment(
+            change_dict['title'], blog_post_id)
         blog_post.update_title(change_dict['title'])
-        url_fragment = generate_url_fragment(change_dict['title'])
         blog_post.update_url_fragment(url_fragment)
     if 'thumbnail_filename' in change_dict:
         blog_post.update_thumbnail_filename(change_dict['thumbnail_filename'])
@@ -590,17 +565,15 @@ def update_blog_post(blog_post_id, change_dict):
             corresponding field name (title, content, thumbnail_filename,
             tags).
     """
-
-    old_blog_post = get_blog_post_by_id(blog_post_id)
     updated_blog_post = apply_change_dict(blog_post_id, change_dict)
-
-    if (
-            old_blog_post.url_fragment != updated_blog_post.url_fragment and
-            does_blog_post_with_url_fragment_exist(
-                updated_blog_post.url_fragment)):
-        raise utils.ValidationError(
-            'Blog Post with given title already exists: %s'
-            % updated_blog_post.title)
+    if 'title' in change_dict:
+        blog_post_models = blog_models.BlogPostModel.query().filter(
+            blog_models.BlogPostModel.title == updated_blog_post.title
+            ).filter(blog_models.BlogPostModel.deleted == False).fetch()  # pylint: disable=singleton-comparison
+        if blog_post_models != []:
+            raise utils.ValidationError(
+                'Blog Post with given title already exists: %s'
+                % updated_blog_post.title)
 
     _save_blog_post(updated_blog_post)
     updated_blog_post_summary = compute_summary_of_blog_post(updated_blog_post)
@@ -617,7 +590,6 @@ def create_new_blog_post(author_id):
     Returns:
         BlogPost. A newly created blog post domain object .
     """
-
     blog_post_id = get_new_blog_post_id()
     new_blog_post_model = blog_models.BlogPostModel.create(
         blog_post_id, author_id

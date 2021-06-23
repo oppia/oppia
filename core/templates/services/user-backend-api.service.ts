@@ -72,7 +72,7 @@ export class UserBackendApiService {
   private PREFERENCES_DATA_URL = '/preferenceshandler/data';
   private USER_CONTRIBUTION_RIGHTS_DATA_URL = (
     '/usercontributionrightsdatahandler');
-  numUnseenNotifications: string | number;
+  numUnseenNotifications: string | number = 0;
   private SITE_LANGUAGE_URL = '/save_site_language';
 
   async getUserInfoAsync(): Promise<UserInfo> {

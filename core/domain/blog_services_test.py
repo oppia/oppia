@@ -52,7 +52,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
             'content': '<p>Hello</p>'
         }
         self.change_dict_two = {
-            'title': 'Sample Title',
+            'title': 'Sample title two',
             'thumbnail_filename': 'thummbnail.svg',
             'content': '<p>Hello</p>',
             'tags': ['one', 'two']
@@ -187,7 +187,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
             blog_services.publish_blog_post(self.blog_post_a_id)
 
         change_dict_three = {
-            'title': 'Sample Title',
+            'title': 'Sample',
             'thumbnail_filename': 'thummbnail.svg',
             'content': '',
             'tags': ['one', 'two']
@@ -233,12 +233,6 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
             blog_services.filter_blog_post_ids(self.user_id_b, False))
         self.assertEqual(filtered_model_ids, [self.blog_post_b_id])
 
-    def test_get_all_blog_posts(self):
-        blog_posts = blog_services.get_all_blog_posts()
-        self.assertEqual(len(blog_posts), 2)
-        blog_post_ids = [blog_posts[0].id, blog_posts[1].id]
-        self.assertTrue(self.blog_post_a_id in blog_post_ids)
-
     def test_update_blog_post(self):
         self.assertEqual(self.blog_post_a.title, '')
         blog_services.update_blog_post(
@@ -247,7 +241,9 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
             blog_services.get_blog_post_by_id(self.blog_post_a_id))
         self.assertEqual(updated_blog_post.thumbnail_filename, 'thummbnail.svg')
         self.assertEqual(updated_blog_post.content, '<p>Hello</p>')
-        self.assertEqual(updated_blog_post.url_fragment, 'sample-title')
+        lower_id = '-' + self.blog_post_a_id.lower()
+        self.assertEqual(
+            updated_blog_post.url_fragment, 'sample-title' + lower_id)
 
         blog_services.update_blog_post(self.blog_post_a_id, self.change_dict)
         updated_blog_post = (
@@ -266,7 +262,9 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
             self.blog_post_a_id, self.change_dict_one)
         expected_blog_post = (
             blog_services.get_blog_post_by_id(self.blog_post_a_id))
-        blog_post = blog_services.get_blog_post_by_url_fragment('sample-title')
+        lower_id = '-' + self.blog_post_a_id.lower()
+        blog_post = blog_services.get_blog_post_by_url_fragment(
+            'sample-title' + lower_id)
         self.assertEqual(blog_post.to_dict(), expected_blog_post.to_dict())
 
     def test_get_blog_posy_by_invalid_url(self):
@@ -284,9 +282,10 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
     def test_does_blog_post_with_url_fragment_exist(self):
         blog_services.update_blog_post(
             self.blog_post_a_id, self.change_dict_one)
+        lower_id = '-' + self.blog_post_a_id.lower()
         self.assertTrue(
             blog_services.does_blog_post_with_url_fragment_exist(
-                'sample-title'))
+                'sample-title' + lower_id))
         self.assertFalse(
             blog_services.does_blog_post_with_url_fragment_exist('title'))
 
@@ -303,7 +302,9 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             updated_blog_post_summary.thumbnail_filename, 'thummbnail.svg')
         self.assertEqual(updated_blog_post_summary.summary, 'Hello...')
-        self.assertEqual(updated_blog_post_summary.url_fragment, 'sample-title')
+        lower_id = '-' + self.blog_post_a_id.lower()
+        self.assertEqual(
+            updated_blog_post_summary.url_fragment, 'sample-title' + lower_id)
 
     def test_check_can_edit_blog_post(self):
         blog_post_rights = (
@@ -335,12 +336,14 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
 
     def test_generate_url_fragment(self):
         url_fragment = (
-            blog_services.generate_url_fragment('Sample Url Fragment'))
-        self.assertEqual(url_fragment, 'sample-url-fragment')
+            blog_services.generate_url_fragment(
+                'Sample Url Fragment', 'ABC123EFG'))
+        self.assertEqual(url_fragment, 'sample-url-fragment-abc123efg')
 
         url_fragment = (
-            blog_services.generate_url_fragment('SaMple Url FrAgMent'))
-        self.assertEqual(url_fragment, 'sample-url-fragment')
+            blog_services.generate_url_fragment(
+                'SaMple Url FrAgMent', 'ABC123Efgh'))
+        self.assertEqual(url_fragment, 'sample-url-fragment-abc123efgh')
 
     def test_save_blog_post_rights(self):
         blog_post_rights = blog_domain.BlogPostRights(

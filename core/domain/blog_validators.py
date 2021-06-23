@@ -96,8 +96,51 @@ class BlogPostModelValidator(base_model_validators.BaseModelValidator):
                         item.id, item.title, blog_model_ids))
 
     @classmethod
+    def _validate_url_fragment_is_unique(cls, item):
+        """Validates that the url fragment of the model is unique.
+
+        Args:
+            item: datastore_services.Model. BlogPostModel to validate.
+        """
+        if item.url_fragment != '':
+            blog_post_models = blog_models.BlogPostModel.query().filter(
+                blog_models.BlogPostModel.url_fragment == (
+                    item.url_fragment)).filter(
+                        blog_models.BlogPostModel.deleted == False).fetch() # pylint: disable=singleton-comparison
+            blog_model_ids = [
+                model.id for model in blog_post_models if model.id != item.id]
+            if blog_model_ids:
+                cls._add_error(
+                    'unique url fragment for blog post',
+                    'Entity id %s: url fragment %s matches with url fragment '
+                    'of blog post models with ids %s' % (
+                        item.id, item.url_fragment, blog_model_ids))
+
+    @classmethod
+    def _validate_title_matches_summary_model_title(cls, item):
+        """Validates that the title of blog post model matches corresponding
+        summary model title.
+
+        Args:
+            item: datastore_services.Model. BlogPostModel to validate.
+        """
+        if item.title != '':
+            blog_post_summary_title = (
+                blog_models.BlogPostSummaryModel.get_by_id(item.id).title)
+            if blog_post_summary_title != item.title:
+                cls._add_error(
+                    'Same Title for blog post and blog post summary',
+                    'Title for blog post with Entity id'
+                    ' %s does not match with title of corresponding'
+                    ' blog post summary model' % (item.id))
+
+    @classmethod
     def _get_custom_validation_functions(cls):
-        return [cls._validate_title_is_unique]
+        return [
+            cls._validate_title_is_unique,
+            cls._validate_url_fragment_is_unique,
+            cls._validate_title_matches_summary_model_title
+        ]
 
 
 class BlogPostSummaryModelValidator(base_model_validators.BaseModelValidator):
@@ -172,8 +215,34 @@ class BlogPostSummaryModelValidator(base_model_validators.BaseModelValidator):
                         item.id, item.title, blog_model_ids))
 
     @classmethod
+    def _validate_url_fragment_is_unique(cls, item):
+        """Validates that the url fragment of the model is unique.
+
+        Args:
+            item: datastore_services.Model. BlogPostModel to validate.
+        """
+        if item.url_fragment != '':
+            summary_models = (
+                blog_models.BlogPostSummaryModel.query().filter(
+                    blog_models.BlogPostSummaryModel.url_fragment == (
+                        item.url_fragment)).filter(
+                            blog_models.BlogPostSummaryModel.deleted == False # pylint: disable=singleton-comparison
+                            ).fetch())
+            blog_model_ids = [
+                model.id for model in summary_models if model.id != item.id]
+            if blog_model_ids:
+                cls._add_error(
+                    'unique url fragment for blog post',
+                    'Entity id %s: url fragment %s matches with url fragment '
+                    'of blog post summary models with ids %s' % (
+                        item.id, item.url_fragment, blog_model_ids))
+
+    @classmethod
     def _get_custom_validation_functions(cls):
-        return [cls._validate_title_is_unique]
+        return [
+            cls._validate_title_is_unique,
+            cls._validate_url_fragment_is_unique,
+        ]
 
 
 class BlogPostRightsModelValidator(base_model_validators.BaseModelValidator):
