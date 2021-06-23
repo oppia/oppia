@@ -757,6 +757,12 @@ class BaseSnapshotMetadataModelValidator(BaseSnapshotContentModelValidator):
                 continue
             try:
                 change_domain_object(commit_cmd_dict)
+            except utils.DeprecatedCommandError:
+                # The commit_cmds that raise DeprecatedCommandError
+                # need not be flagged during the validation jobs as these
+                # commands are currently deprecated and will be removed using
+                # migration jobs.
+                pass
             except Exception as e:
                 cmd_name = commit_cmd_dict.get('cmd')
                 cls._add_error(

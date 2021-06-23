@@ -1008,12 +1008,14 @@ ROLE_ID_EXPLORATION_EDITOR = 'EXPLORATION_EDITOR'
 ROLE_ID_COLLECTION_EDITOR = 'COLLECTION_EDITOR'
 ROLE_ID_TOPIC_MANAGER = 'TOPIC_MANAGER'
 ROLE_ID_MODERATOR = 'MODERATOR'
+ROLE_ID_RELEASE_COORDINATOR = 'RELEASE_COORDINATOR'
 ROLE_ID_ADMIN = 'ADMIN'
 
 ALLOWED_USER_ROLES = [
     ROLE_ID_GUEST, ROLE_ID_BANNED_USER, ROLE_ID_LEARNER,
     ROLE_ID_EXPLORATION_EDITOR, ROLE_ID_COLLECTION_EDITOR,
-    ROLE_ID_TOPIC_MANAGER, ROLE_ID_MODERATOR, ROLE_ID_ADMIN]
+    ROLE_ID_TOPIC_MANAGER, ROLE_ID_MODERATOR, ROLE_ID_RELEASE_COORDINATOR,
+    ROLE_ID_ADMIN]
 
 # Intent of the User making query to role structure via admin interface. Used
 # to store audit data regarding queries to role IDs.
@@ -1277,6 +1279,11 @@ EXPLORATION_RIGHTS_CHANGE_ALLOWED_COMMANDS.append({
     'allowed_values': {
         'old_status': ALLOWED_ACTIVITY_STATUS,
         'new_status': ALLOWED_ACTIVITY_STATUS
+    },
+    # TODO(#12991): Remove this once once we use the migration jobs to remove
+    # the deprecated values from the server data.
+    'deprecated_values': {
+        'new_status': ['publicized']
     }
 })
 

@@ -16,7 +16,7 @@
  * @fileoverview Controller for the questions player directive.
  */
 
-require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
+require('components/ck-editor-helpers/ck-editor-4-rte.component.ts');
 require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
 require(
   'components/common-layout-directives/common-elements/' +
@@ -107,7 +107,7 @@ require(
   'conversation-skin.directive.ts');
 require(
   'pages/exploration-player-page/layout-directives/' +
-  'exploration-footer.directive.ts');
+  'exploration-footer.component.ts');
 require(
   'pages/exploration-player-page/layout-directives/' +
   'learner-local-nav.component.ts');

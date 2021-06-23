@@ -24,8 +24,11 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { InteractiveNumericExpressionInput } from './oppia-interactive-numeric-expression-input.component';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('NumericExpressionInputInteractive', () => {
+  importAllAngularServices();
+  
   let component: InteractiveNumericExpressionInput;
   let fixture: ComponentFixture<InteractiveNumericExpressionInput>;
   let windowRef: WindowRef;
@@ -55,6 +58,7 @@ describe('NumericExpressionInputInteractive', () => {
     static 'add_global_symbol'(name: string, symbol: Object): void {}
   }
 
+<<<<<<< HEAD
   class MockCurrentInteractionService {
     onSubmit(answer, rulesService) {}
     registerCurrentInteraction(submitAnswerFn, validateExpressionFn) {
@@ -62,6 +66,15 @@ describe('NumericExpressionInputInteractive', () => {
       validateExpressionFn();
     }
   }
+=======
+  beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    guppyConfigurationService = new GuppyConfigurationService();
+    mathInteractionsService = new MathInteractionsService();
+    guppyInitializationService = new GuppyInitializationService();
+    deviceInfoService = new DeviceInfoService(new WindowRef());
+>>>>>>> upstream/develop
 
   class MockInteractionAttributesExtractorService {
     getValuesFromAttributes(inputType: string, attributes: Object) {
