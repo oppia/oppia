@@ -124,7 +124,7 @@ describe('Versions tree service', () => {
     });
 
     it('should get correct list of parents', () => {
-     // Prechecks: If we try to get version tree without initializing it.
+      // Prechecks: If we try to get version tree without initializing it.
       expect(() => {
         vts.getVersionTree();
       }).toThrowError('version tree not initialized.');
