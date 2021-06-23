@@ -72,6 +72,7 @@ describe('Voiceover upload features', function() {
     await creatorDashboardPage.get();
     await creatorDashboardPage.editExploration(EXPLORATION_TITLE);
     await explorationEditorPage.navigateToTranslationTab();
+    await explorationEditorTranslationTab.switchToVoiceoverMode();
   });
 
   it('should upload an audio file', async function() {
@@ -144,6 +145,7 @@ describe('Voiceover upload features', function() {
       await creatorDashboardPage.editExploration(EXPLORATION_TITLE);
 
       await explorationEditorPage.navigateToTranslationTab();
+      await explorationEditorTranslationTab.switchToVoiceoverMode();
       await explorationEditorTranslationTab.playAudioRecord();
       await explorationEditorTranslationTab.deleteAudioRecord();
       await explorationEditorPage.saveChanges(
