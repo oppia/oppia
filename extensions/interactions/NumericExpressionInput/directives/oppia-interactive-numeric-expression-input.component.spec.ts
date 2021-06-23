@@ -28,7 +28,7 @@ import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('NumericExpressionInputInteractive', () => {
   importAllAngularServices();
-  
+
   let component: InteractiveNumericExpressionInput;
   let fixture: ComponentFixture<InteractiveNumericExpressionInput>;
   let windowRef: WindowRef;

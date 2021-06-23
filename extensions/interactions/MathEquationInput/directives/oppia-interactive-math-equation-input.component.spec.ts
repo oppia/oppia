@@ -27,7 +27,7 @@ import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('MathEquationInputInteractive', () => {
   importAllAngularServices();
-  
+
   let component: InteractiveMathEquationInput;
   let fixture: ComponentFixture<InteractiveMathEquationInput>;
   let windowRef: WindowRef;

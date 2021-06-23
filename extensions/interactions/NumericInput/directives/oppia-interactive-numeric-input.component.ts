@@ -22,7 +22,7 @@
 
 import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import _ from 'lodash';
+import { isUndefined } from 'lodash';
 import { InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { NumericInputRulesService } from './numeric-input-rules.service';
@@ -50,7 +50,7 @@ export class InteractiveNumericInput implements OnInit {
       this.answer !== undefined &&
       this.answer !== null &&
       this.answer !== '' &&
-      _.isUndefined(
+      isUndefined(
         this.numericInputValidationService.getErrorString(
           this.answer)));
   }
