@@ -132,6 +132,16 @@ export class CkEditor4RteComponent implements AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
+    let value = this.value;
+    value = value.replace(
+      /<oppia-noninteractive-/g,
+      '<oppia-noninteractive-ckeditor-'
+    );
+    value = value.replace(
+      /<\/oppia-noninteractive-/g,
+      '</oppia-noninteractive-ckeditor-'
+    );
+    this.value = value;
     var _RICH_TEXT_COMPONENTS = this.rteHelperService.getRichTextComponents();
     var names = [];
     var icons = [];
@@ -175,7 +185,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnDestroy {
        */
     // Whitelist the component tags with any attributes and classes.
     var componentRule = names.map((name) => {
-      return 'oppia-noninteractive-' + name;
+      return 'oppia-noninteractive-ckeditor-' + name;
     }).join(' ') + '(*)[*];';
       // Whitelist the inline component wrapper, which is a
       // span with a "type" attribute.
@@ -241,7 +251,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnDestroy {
 
     // A RegExp for matching rich text components.
     var componentRe = (
-      /(<(oppia-noninteractive-(.+?))\b[^>]*>)[\s\S]*?<\/\2>/g
+      /(<(oppia-noninteractive-ckeditor-(.+?))\b[^>]*>)[\s\S]*?<\/\2>/g
     );
 
     /**
@@ -297,7 +307,8 @@ export class CkEditor4RteComponent implements AfterViewInit, OnDestroy {
       $('.cke_button_icon')
         .css('height', '24px')
         .css('width', '24px');
-      ck.setData(wrapComponents(this.value));
+      const wrapper = wrapComponents(this.value);
+      ck.setData(wrapper);
     });
 
     // Angular rendering of components confuses CKEditor's undo system, so
@@ -341,8 +352,17 @@ export class CkEditor4RteComponent implements AfterViewInit, OnDestroy {
           break;
         }
       }
-      this.valueChange.emit(elt.html());
-      this.value = elt.html();
+      let html = elt.html();
+      this.value = html;
+      html = html.replace(
+        /<oppia-noninteractive-ckeditor-/g,
+        '<oppia-noninteractive-'
+      );
+      html = html.replace(
+        /<\/oppia-noninteractive-ckeditor-/g,
+        '</oppia-noninteractive-'
+      );
+      this.valueChange.emit(html);
     });
     ck.setData(this.value);
     this.ck = ck;

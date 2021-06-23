@@ -40,7 +40,7 @@ import { ContextService } from 'services/context.service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 
 @Component({
-  selector: 'oppia-non-interactive-link',
+  selector: 'oppia-noninteractive-link',
   templateUrl: './link.component.html',
   styleUrls: []
 })

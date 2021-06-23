@@ -43,7 +43,7 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
 import { OppiaNoninteractiveSkillreviewConceptCardModalComponent } from './oppia-noninteractive-skillreview-concept-card-modal.component';
 
 @Component({
-  selector: 'oppia-non-interactive-skillreview',
+  selector: 'oppia-noninteractive-skillreview',
   templateUrl: './skillreview.component.html'
 })
 export class NoninteractiveSkillreview implements OnInit, OnChanges {

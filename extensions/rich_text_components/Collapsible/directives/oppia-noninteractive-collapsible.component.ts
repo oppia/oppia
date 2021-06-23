@@ -39,7 +39,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 
 @Component({
-  selector: 'oppia-non-interactive-collapsible',
+  selector: 'oppia-noninteractive-collapsible',
   templateUrl: './collapsible.component.html',
   styleUrls: []
 })

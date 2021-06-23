@@ -33,15 +33,16 @@ interface CkEditorCopyEvent {
 })
 export class CkEditorCopyContentService {
   private readonly OUTPUT_VIEW_TAG_NAME = 'ANGULAR-HTML-BIND';
-  private readonly NON_INTERACTIVE_TAG = '-non-interactive-';
+  private readonly OUTPUT_NG_TAG_NAME = 'OPPIA-RTE-OUTPUT-DISPLAY';
+  private readonly NON_INTERACTIVE_TAG = '-noninteractive-';
   private readonly ALLOWLISTED_WIDGETS = new Set([
-    'oppia-non-interactive-collapsible',
-    'oppia-non-interactive-image',
-    'oppia-non-interactive-link',
-    'oppia-non-interactive-math',
-    'oppia-non-interactive-tabs',
-    'oppia-non-interactive-video',
-    'oppia-non-interactive-skillreview'
+    'oppia-noninteractive-collapsible',
+    'oppia-noninteractive-image',
+    'oppia-noninteractive-link',
+    'oppia-noninteractive-math',
+    'oppia-noninteractive-tabs',
+    'oppia-noninteractive-video',
+    'oppia-noninteractive-skillreview'
   ]);
 
   private copyEventEmitter = new EventEmitter<CkEditorCopyEvent>();
@@ -74,7 +75,8 @@ export class CkEditorCopyContentService {
 
       if (
         currentElement.parentElement.tagName === this.OUTPUT_VIEW_TAG_NAME ||
-        currentElement.parentElement.tagName === 'OPPIA-RTE-OUTPUT-DISPLAY') {
+        currentElement.parentElement.tagName === this.OUTPUT_NG_TAG_NAME
+      ) {
         break;
       }
 
@@ -121,13 +123,11 @@ export class CkEditorCopyContentService {
     let elementTagName = (
       containedWidgetTagName || element.tagName.toLowerCase());
     let html = element.outerHTML;
-    html = html.replace(/<oppia-non-interactive/g, '<oppia-noninteractive');
-    html = html.replace(/<\/oppia-non-interactive/g, '</oppia-noninteractive');
     html = html.replace(/<!--[^>]*-->/g, '');
     if (!containedWidgetTagName) {
       editor.insertHtml(html);
     } else {
-      const widgetName = elementTagName.replace('-non-interactive-', '');
+      const widgetName = elementTagName.replace('-noninteractive-', '');
 
       // Look for x-with-value="y" to extract x and y.
       //  Group 1 (\w+): Any word containing [a-zA-Z0-9_] characters. This is
