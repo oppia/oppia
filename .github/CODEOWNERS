@@ -656,7 +656,7 @@
 
 
 # Data stability.
-# TODO(Nik-09): Assign these files to @vojtechjelinek, once he returns.
+# TODO(#13119): Add @vojtechjelinek as owner after 2021-07-06
 /core/controllers/domain_objects_validator*.py @rohitkatlaa
 /core/controllers/payload_validator*.py @rohitkatlaa
 

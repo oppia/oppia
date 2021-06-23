@@ -3394,7 +3394,7 @@ class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
             self.checker_test_object.checker.visit_classdef(
                 schemaless_class_node)
 
-    def test_handlers_with_schema_do_not_raise_error(self):
+    def test_handlers_with_valid_schema_do_not_raise_error(self):
 
         schemaless_class_node = astroid.extract_node(
             """
@@ -3432,9 +3432,9 @@ class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
             self.checker_test_object.checker.visit_classdef(
                 schemaless_class_node)
 
-    def test_non_schema_handlers_with_basehandler_as_parent_raise_error(self):
+    def test_schema_handler_with_basehandler_as_an_ancestor_raise_error(self):
         """Handlers which are child classes of BaseHandler must have schema
-        defined locally into the class.
+        defined locally in the class.
         """
 
         schemaless_class_node = astroid.extract_node(

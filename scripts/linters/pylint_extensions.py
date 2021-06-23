@@ -2167,51 +2167,28 @@ class DisallowHandlerWithoutSchema(checkers.BaseChecker):
         'C0037': (
             'URL_PATH_ARGS_SCHEMAS for %s class must be dict.',
             'url-path-args-schemas-must-be-dict',
-            'Enforce URL_ARGS_PATH_SCHEMAS must be of dict type.'
+            'Enforce URL_ARGS_PATH_SCHEMAS to be of dict type.'
         ),
         'C0038': (
             'HANDLER_ARGS_SCHEMAS for %s class must be dict.',
             'handler-args-schemas-must-be-dict',
-            'Enforce HANDLER_ARGS_SCHEMAS must be of dict type.'
+            'Enforce HANDLER_ARGS_SCHEMAS to be of dict type.'
         )
     }
 
-    def check_url_path_args_schemas_to_be_a_dict(self, node):
-        """Checks whether URL_PATH_ARGS_SCHEMAS of a class is of dict type.
+    def check_given_variable_is_a_dict(self, node, variable_name):
+        """Checks whether schema variable of a handlers class is of dict type.
 
         Args:
             node: astroid.nodes.ClassDef. Node for a class definition
                 in the AST.
+            variable_name: str. Name of the variable which contains schemas.
 
         Returns:
-            bool. Whether URL_PATH_ARGS_SCHEMAS of a class is of dict type.
+            bool. Whether schema variable of a class is of dict type.
         """
-        if 'URL_PATH_ARGS_SCHEMAS' not in node.locals:
-            return True
-
         generator_object_for_value_of_schemas = (
-            node.locals['URL_PATH_ARGS_SCHEMAS'][0].assigned_stmts())
-
-        for value_of_schemas in generator_object_for_value_of_schemas:
-            if value_of_schemas.name != 'dict':
-                return False
-        return True
-
-    def check_handler_args_schemas_to_be_a_dict(self, node):
-        """Checks whether HANDLER_ARGS_SCHEMAS of a class is of dict type.
-
-        Args:
-            node: astroid.nodes.ClassDef. Node for a class definition
-                in the AST.
-
-        Returns:
-            bool. Whether HANDLER_ARGS_SCHEMAS of a class is of dict type.
-        """
-        if 'HANDLER_ARGS_SCHEMAS' not in node.locals:
-            return True
-
-        generator_object_for_value_of_schemas = (
-            node.locals['HANDLER_ARGS_SCHEMAS'][0].assigned_stmts())
+            node.locals[variable_name][0].assigned_stmts())
 
         for value_of_schemas in generator_object_for_value_of_schemas:
             if value_of_schemas.name != 'dict':
@@ -2228,12 +2205,10 @@ class DisallowHandlerWithoutSchema(checkers.BaseChecker):
         Returns:
             bool. Whether the parent class of given class is BaseHandler.
         """
-        parent_class_is_basehandler = False
         for ancestor_node in node.ancestors():
             if ancestor_node.name == u'BaseHandler':
-                parent_class_is_basehandler = True
-                break
-        return parent_class_is_basehandler
+                return True
+        return False
 
     def visit_classdef(self, node):
         """Visit each class definition in controllers layer module and check
@@ -2252,14 +2227,17 @@ class DisallowHandlerWithoutSchema(checkers.BaseChecker):
         if 'URL_PATH_ARGS_SCHEMAS' not in node.locals:
             self.add_message(
                 'no-schema-for-url-path-elements', node=node, args=(node.name))
-        if 'HANDLER_ARGS_SCHEMAS' not in node.locals:
-            self.add_message(
-                'no-schema-for-handler-args', node=node, args=(node.name))
-        if not self.check_url_path_args_schemas_to_be_a_dict(node):
+        elif not self.check_given_variable_is_a_dict(
+                node, 'URL_PATH_ARGS_SCHEMAS'):
             self.add_message(
                 'url-path-args-schemas-must-be-dict',
                 node=node, args=(node.name))
-        if not self.check_handler_args_schemas_to_be_a_dict(node):
+
+        if 'HANDLER_ARGS_SCHEMAS' not in node.locals:
+            self.add_message(
+                'no-schema-for-handler-args', node=node, args=(node.name))
+        elif not self.check_given_variable_is_a_dict(
+                node, 'HANDLER_ARGS_SCHEMAS'):
             self.add_message(
                 'handler-args-schemas-must-be-dict',
                 node=node, args=(node.name))
