@@ -29,7 +29,7 @@ export class FatigueDetectionService {
   private submissionTimesMsec: number[] = [];
   private SPAM_COUNT_THRESHOLD: number = 4;
   private SPAM_WINDOW_MSEC: number = 10000;
-  // Function shift is of type T | undefined
+  // Function shift return result type T | undefined
   // so WidnowStartTime can be undefined.
   private windowStartTime!: number | undefined;
   private windowEndTime!: number;

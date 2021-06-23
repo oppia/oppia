@@ -175,16 +175,15 @@ export class PythonProgramTokenizer {
       let pos = 0;
       const max = line.length;
 
-      let endmatch: { length: number; }[] | RegExpExecArray | null;
       if (contstr) {
         if (!line) {
           // Exception.
           this.loggerService.error('EOF in multi-line string');
         }
-        if (endprog === null) {
-          throw new Error('End Progress is null');
+        let endmatch;
+        if (endprog !== null) {
+          endmatch = endprog.exec(line);
         }
-        let endmatch = endprog.exec(line);
         if (endmatch && endmatch.index === 0) {
           this.token = endmatch[0];
           pos = pos + this.token.length;
@@ -299,11 +298,11 @@ export class PythonProgramTokenizer {
                 [this.PythonProgramTokenType.COMMENT, token]);
             }
           } else if (this.tripleQuoted.indexOf(token) !== -1) {
-            endprog = this.endprogs[token];
-            if (endprog === null) {
-              throw new Error('End Progress is null');
+            let endprog = this.endprogs[token];
+            let endmatch;
+            if (endprog !== null) {
+              endmatch = endprog.exec(line.slice(pos));
             }
-            endmatch = endprog.exec(line.slice(pos));
             // All on one line.
             if (endmatch) {
               pos = pos + endmatch[0].length;
