@@ -19,7 +19,7 @@
 import { TestBed } from '@angular/core/testing';
 
 import { AudioTranslationLanguageService} from
-    'pages/exploration-player-page/services/audio-translation-language.service';
+  'pages/exploration-player-page/services/audio-translation-language.service';
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { InteractionObjectFactory } from

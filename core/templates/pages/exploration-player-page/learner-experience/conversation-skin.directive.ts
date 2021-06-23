@@ -1202,7 +1202,7 @@ angular.module('oppia').directive('conversationSkin', [
               _addNewCard(
                 StateCard.createNewCard(
                   null, $scope.conceptCard.getExplanation(), null, null, null,
-                  null, null, null));
+                  null, null, AudioTranslationLanguageService));
               $rootScope.$applyAsync();
               return;
             }

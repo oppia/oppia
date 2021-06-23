@@ -253,10 +253,10 @@ export class StateCard {
    * @param {string} contentId
    */
   static createNewCard(
-    stateName: string, contentHtml: string, interactionHtml: string,
-    interaction: Interaction, recordedVoiceovers: RecordedVoiceovers,
-    writtenTranslations: WrittenTranslations, contentId: string,
-    audioTranslationLanguageService: AudioTranslationLanguageService
+      stateName: string, contentHtml: string, interactionHtml: string,
+      interaction: Interaction, recordedVoiceovers: RecordedVoiceovers,
+      writtenTranslations: WrittenTranslations, contentId: string,
+      audioTranslationLanguageService: AudioTranslationLanguageService
   ): StateCard {
     return new StateCard(
       stateName, contentHtml, interactionHtml,

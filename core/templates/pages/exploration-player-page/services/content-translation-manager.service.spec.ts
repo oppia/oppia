@@ -37,7 +37,7 @@ import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
 import { ExplorationHtmlFormatterService } from
   'services/exploration-html-formatter.service';
 import { AudioTranslationLanguageService} from
-    'pages/exploration-player-page/services/audio-translation-language.service';
+  'pages/exploration-player-page/services/audio-translation-language.service';
 
 describe('Content translation manager service', () => {
   let ctms: ContentTranslationManagerService;

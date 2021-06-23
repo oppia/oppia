@@ -62,7 +62,8 @@ describe('Exploration Player Suggestion Modal Controller', function() {
     suggestionModalService = TestBed.get(SuggestionModalService);
     writtenTranslationsObjectFactory = TestBed.get(
       WrittenTranslationsObjectFactory);
-    audioTranslationLanguageService = TestBed.get(AudioTranslationLanguageService)
+    audioTranslationLanguageService = TestBed.get(
+      AudioTranslationLanguageService);
   });
 
   beforeEach(angular.mock.inject(function($injector, $controller) {
