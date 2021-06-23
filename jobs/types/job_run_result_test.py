@@ -32,6 +32,26 @@ class JobRunResultTests(test_utils.TestBase):
         self.assertEqual(run_result.stdout, 'abc')
         self.assertEqual(run_result.stderr, '123')
 
+    def test_as_stdout(self):
+        run_result = job_run_result.JobRunResult.as_stdout(123)
+        self.assertEqual(run_result.stdout, '123')
+        self.assertEqual(run_result.stderr, '')
+
+    def test_as_stderr(self):
+        run_result = job_run_result.JobRunResult.as_stderr(123)
+        self.assertEqual(run_result.stderr, '123')
+        self.assertEqual(run_result.stdout, '')
+
+    def test_as_stdout_using_repr(self):
+        run_result = job_run_result.JobRunResult.as_stdout('abc', use_repr=True)
+        self.assertEqual(run_result.stdout, 'u\'abc\'')
+        self.assertEqual(run_result.stderr, '')
+
+    def test_as_stderr_using_repr(self):
+        run_result = job_run_result.JobRunResult.as_stderr('abc', use_repr=True)
+        self.assertEqual(run_result.stderr, 'u\'abc\'')
+        self.assertEqual(run_result.stdout, '')
+
     def test_empty_result_raises_value_error(self):
         with self.assertRaisesRegexp(ValueError, 'must not be empty'):
             job_run_result.JobRunResult()
