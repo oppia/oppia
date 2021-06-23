@@ -31,13 +31,13 @@ module.exports = {
     fixable: null,
     schema: [],
     messages: {
+      constInAllCaps: (
+        'Please make constant name “{{constName}}” are in all-caps'),
       disallowSleep: 'Please do not use browser.sleep() in protractor files',
       disallowThen: 'Please do not use .then(), consider async/await instead',
       useProtractorTest: (
         'Please use “.protractor-test-” prefix classname selector instead of ' +
-        '“{{incorrectClassname}}”'),
-      constInAllCaps: (
-        'Please make constant name “{{constName}}” are in all-caps')
+        '“{{incorrectClassname}}”')
     },
   },
 
