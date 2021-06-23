@@ -145,7 +145,7 @@ class FixQuestionImagesStorageOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         html_list = question.question_state_data.get_all_html_content_strings()
         image_filenames = html_cleaner.get_image_filenames_from_html_strings(
             html_list)
-        file_system_class =fs_services. get_entity_file_system_class()
+        file_system_class = fs_services.get_entity_file_system_class()
         question_fs = fs_domain.AbstractFileSystem(file_system_class(
             feconf.ENTITY_TYPE_QUESTION, question.id))
         success_count = 0
@@ -172,7 +172,7 @@ class FixQuestionImagesStorageOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def reduce(key, values):
-        if key == QuestionMigrationOneOffJob._DELETED_KEY:
+        if key == FixQuestionImagesStorageOneOffJob._DELETED_KEY:
             yield (key, ['Encountered %d deleted questions.' % (
                 sum(ast.literal_eval(v) for v in values))])
         else:

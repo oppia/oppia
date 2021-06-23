@@ -283,7 +283,7 @@ export class ExtractImageFilenamesFromModelService {
      * @param {object} skill - The skill from which the filenames of the image
      *                         should be extracted.
      */
-     _getImageFilenamesInSkill(skill: Skill): string[] {
+    _getImageFilenamesInSkill(skill: Skill): string[] {
       let htmlList = [];
       for (let misconception of skill.getMisconceptions()) {
         htmlList.push(misconception.getFeedback(), misconception.getNotes());

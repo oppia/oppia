@@ -25,9 +25,9 @@ import os
 from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import question_domain
-from core.domain import state_domain
 from core.domain import question_jobs_one_off
 from core.domain import question_services
+from core.domain import state_domain
 from core.domain import taskqueue_services
 from core.platform import models
 from core.tests import test_utils
@@ -214,16 +214,16 @@ class FixQuestionImagesStorageOneOffJobTests(test_utils.GenericTestBase):
         dummy_question_state_data = self._create_valid_question_data('ABC')
         dummy_question_state_data.update_content(
             state_domain.SubtitledHtml.from_dict({
-            'content_id': 'content',
-            'html': (
-                '<oppia-noninteractive-image filepath-with-value='
-                '"&quot;img.png&quot;" caption-with-value="&quot;&quot;" '
-                'alt-with-value="&quot;Image&quot;">'
-                '</oppia-noninteractive-image>'
-                '<oppia-noninteractive-image filepath-with-value='
-                '"&quot;test_svg.svg&quot;" caption-with-value="&quot;&quot;" '
-                'alt-with-value="&quot;Image&quot;">'
-                '</oppia-noninteractive-image>')
+                'content_id': 'content',
+                'html': (
+                    '<oppia-noninteractive-image filepath-with-value='
+                    '"&quot;img.png&quot;" caption-with-value="&quot;&quot;" '
+                    'alt-with-value="&quot;Image&quot;">'
+                    '</oppia-noninteractive-image>'
+                    '<oppia-noninteractive-image filepath-with-value='
+                    '"&quot;test_svg.svg&quot;" caption-with-value="&quot;&quot;" '
+                    'alt-with-value="&quot;Image&quot;">'
+                    '</oppia-noninteractive-image>')
             })
         )
         with python_utils.open_file(
@@ -254,7 +254,7 @@ class FixQuestionImagesStorageOneOffJobTests(test_utils.GenericTestBase):
         """Tests that the question images are copied to the correct storage
         path.
         """
-        file_system_class =fs_services. get_entity_file_system_class()
+        file_system_class = fs_services.get_entity_file_system_class()
         question_fs = fs_domain.AbstractFileSystem(file_system_class(
             feconf.ENTITY_TYPE_QUESTION, self.QUESTION_ID))
 
@@ -310,6 +310,7 @@ class FixQuestionImagesStorageOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(
             [[u'question_deleted', [u'Encountered 1 deleted questions.']]],
             [ast.literal_eval(x) for x in output])
+
 
 class MissingQuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
 
