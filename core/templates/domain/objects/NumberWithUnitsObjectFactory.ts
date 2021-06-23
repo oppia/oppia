@@ -51,11 +51,11 @@ export class NumberWithUnits {
     this.type = type;
 
     if (this.type === 'real') {
-      if (fractionObj) {
+      if (fractionObj.numerator !== 0 || fractionObj.wholeNumber !== 0) {
         throw new Error('Number with type real cannot have a fraction part.');
       }
     } else if (this.type === 'fraction') {
-      if (real) {
+      if (real !== 0) {
         throw new Error('Number with type fraction cannot have a real part.');
       }
     }
@@ -138,9 +138,9 @@ export class NumberWithUnitsObjectFactory {
   fromRawInputString(rawInput: string): NumberWithUnits {
     rawInput = rawInput.trim();
     var type = '';
-    var real = null;
+    var real = 0.0;
     // Default fraction value.
-    var fractionObj = null;
+    var fractionObj = Fraction.fromRawInputString('0/1');
     var units = '';
     var value = '';
 
@@ -258,25 +258,10 @@ export class NumberWithUnitsObjectFactory {
   }
 
   fromDict(numberWithUnitsDict: NumberWithUnitsAnswer): NumberWithUnits {
-    let fractionObj: Fraction = null;
-
-    if (numberWithUnitsDict.type === 'real') {
-      if (numberWithUnitsDict.fraction) {
-        throw new Error('Number with type real cannot have a fraction part.');
-      }
-    } else if (numberWithUnitsDict.type === 'fraction') {
-      if (numberWithUnitsDict.real) {
-        throw new Error('Number with type fraction cannot have a real part.');
-      }
-      fractionObj = Fraction.fromDict(numberWithUnitsDict.fraction);
-    } else {
-      fractionObj = Fraction.fromDict(numberWithUnitsDict.fraction);
-    }
-
     return new NumberWithUnits(
       numberWithUnitsDict.type,
       numberWithUnitsDict.real,
-      fractionObj,
+      Fraction.fromDict(numberWithUnitsDict.fraction),
       this.unitsFactory.fromList(numberWithUnitsDict.units));
   }
 }

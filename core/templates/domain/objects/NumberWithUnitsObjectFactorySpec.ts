@@ -84,23 +84,29 @@ describe('NumberWithUnitsObjectFactory', () => {
     });
 
     it('should convert number with units object to a string', () => {
-      expect(new NumberWithUnits('real', 2.02, null, uof.fromRawInputString(
+      expect(new NumberWithUnits('real', 2.02, new Fraction(
+        false, 0, 0, 1), uof.fromRawInputString(
         'm / s^2')).toString()).toBe('2.02 m s^-2');
-      expect(new NumberWithUnits('real', 2.02, null, uof.fromRawInputString(
+      expect(new NumberWithUnits('real', 2.02, new Fraction(
+        false, 0, 0, 1), uof.fromRawInputString(
         'Rs')).toString()).toBe('Rs 2.02');
-      expect(new NumberWithUnits('real', 2.02, null, uof.fromRawInputString(
+      expect(new NumberWithUnits('real', 2.02, new Fraction(
+        false, 0, 0, 1), uof.fromRawInputString(
         '₹')).toString()).toBe('₹ 2.02');
       expect(new NumberWithUnits(
-        'real', 2, null, uof.fromRawInputString('')).toString()).toBe('2');
-      expect(new NumberWithUnits('fraction', null, new Fraction(
+        'real', 2, new Fraction(
+        false, 0, 0, 1), uof.fromRawInputString('')).toString()).toBe('2');
+      expect(new NumberWithUnits('fraction', 0, new Fraction(
         true, 0, 4, 3), uof.fromRawInputString(
         'm / s^2')).toString()).toBe('-4/3 m s^-2');
-      expect(new NumberWithUnits('fraction', null, new Fraction(
+      expect(new NumberWithUnits('fraction', 0, new Fraction(
         false, 0, 4, 3), uof.fromRawInputString(
         '$ per hour')).toString()).toBe('$ 4/3 hour^-1');
-      expect(new NumberWithUnits('real', 40, null, uof.fromRawInputString(
+      expect(new NumberWithUnits('real', 40, new Fraction(
+        false, 0, 0, 1), uof.fromRawInputString(
         'Rs per hour')).toString()).toBe('Rs 40 hour^-1');
-      expect(new NumberWithUnits('real', 40, null, uof.fromRawInputString(
+      expect(new NumberWithUnits('real', 40, new Fraction(
+        false, 0, 0, 1), uof.fromRawInputString(
         '₹ per hour')).toString()).toBe('₹ 40 hour^-1');
     });
 
@@ -114,22 +120,25 @@ describe('NumberWithUnitsObjectFactory', () => {
     it('should parse valid number with units strings', () => {
       expect(nwuof.fromRawInputString('2.02 kg / m^3')).toEqual(
         new NumberWithUnits(
-          'real', 2.02, null, uof.fromRawInputString('kg / m^3')));
+          'real', 2.02, new Fraction(
+        false, 0, 0, 1), uof.fromRawInputString('kg / m^3')));
       expect(nwuof.fromRawInputString('2 / 3 kg / m^3')).toEqual(
-        new NumberWithUnits('fraction', null, new Fraction(
+        new NumberWithUnits('fraction', 0, new Fraction(
           false, 0, 2, 3), uof.fromRawInputString('kg / m^3')));
       expect(nwuof.fromRawInputString('2')).toEqual(
-        new NumberWithUnits('real', 2, null, uof.fromRawInputString('')));
+        new NumberWithUnits('real', 2, new Fraction(
+        false, 0, 0, 1), uof.fromRawInputString('')));
       expect(nwuof.fromRawInputString('2 / 3')).toEqual(
-        new NumberWithUnits('fraction', null, new Fraction(
+        new NumberWithUnits('fraction', 0, new Fraction(
           false, 0, 2, 3), uof.fromRawInputString('')));
       expect(nwuof.fromRawInputString('$ 2.02')).toEqual(
-        new NumberWithUnits('real', 2.02, null, uof.fromRawInputString('$')));
+        new NumberWithUnits('real', 2.02, new Fraction(
+        false, 0, 0, 1), uof.fromRawInputString('$')));
       expect(nwuof.fromRawInputString('Rs 2 / 3 per hour')).toEqual(
-        new NumberWithUnits('fraction', null, new Fraction(
+        new NumberWithUnits('fraction', 0, new Fraction(
           false, 0, 2, 3), uof.fromRawInputString('Rs / hour')));
       expect(nwuof.fromRawInputString('₹ 2 / 3 per hour')).toEqual(
-        new NumberWithUnits('fraction', null, new Fraction(
+        new NumberWithUnits('fraction', 0, new Fraction(
           false, 0, 2, 3), uof.fromRawInputString('₹ / hour')));
     });
 
@@ -258,14 +267,15 @@ describe('NumberWithUnitsObjectFactory', () => {
       expect((new NumberWithUnits(
         'real',
         1,
-        null,
+        new Fraction(
+          false, 0, 0, 1),
         new Units(
           [{unit: 'kg', exponent: 2}])
       )).toMathjsCompatibleString()).toBe('1 kg^2');
 
       expect((new NumberWithUnits(
         'fraction',
-        null,
+        0,
         new Fraction(
           false, 2, 1, 3),
         new Units(
