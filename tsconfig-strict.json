@@ -167,6 +167,8 @@
     "core/templates/domain/subtopic_viewer/subtopic-viewer-domain.constants.ts",
     "core/templates/domain/summary/creator-exploration-summary.model.ts",
     "core/templates/domain/summary/creator-exploration-summary.model.spec.ts",
+    "core/templates/domain/summary/learner-exploration-summary.model.ts",
+    "core/templates/domain/summary/learner-exploration-summary.model.spec.ts",
     "core/templates/domain/topic/StoryReferenceObjectFactory.ts",
     "core/templates/domain/topic/StoryReferenceObjectFactorySpec.ts",
     "core/templates/domain/topic/topic-domain.constants.ts",
