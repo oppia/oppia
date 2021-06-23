@@ -5526,6 +5526,8 @@ export default {
   "MAX_CHARS_IN_CHAPTER_TITLE": 36,
   "MAX_CHARS_IN_CHAPTER_DESCRIPTION": 152,
   "MAX_CHARS_IN_MISCONCEPTION_NAME": 100,
+  "MAX_CHARS_IN_BLOG_POST_TITLE": 40,
+  "MAX_CHARS_IN_BLOG_POST_SUMMARY": 240,
   // This represents the maximum number of characters in the URL fragment for
   // story in the story page URL. E.g.
   // in /learn/math/fractions/story/bakery/..., 'bakery' is the
@@ -5536,6 +5538,9 @@ export default {
   // in /learn/math/fractions/revision/place-values, 'place-values' is the
   // 'subtopic URL fragment'.
   "MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT": 25,
+  // This represents the maximum number of characters in the URL fragment for
+  // the blog post.
+  "MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT": 65,
   // The recommended length for meta tag contents. Search engines will truncate
   // results greater than this limit.
   "MAX_CHARS_IN_META_TAG_CONTENT": 160,
@@ -5606,8 +5611,17 @@ export default {
   // A regular expression for tags.
   "TAG_REGEX": "^[a-z ]+$",
 
+  // A regular expression for allowed character in tags for blog post.
+  "BLOG_POST_TAG_REGEX": "^[a-zA-Z0-9 ]+$",
+
   // A regular expression for allowed characters in URL fragment fields.
   "VALID_URL_FRAGMENT_REGEX": "^[a-z]+(-[a-z]+)*$",
+
+  // A regular expression for allowed characters in Title field for Blog Post.
+  "VALID_BLOG_POST_TITLE_REGEX": "^[a-zA-Z0-9][a-zA-Z0-9 ]+(-[a-zA-Z0-9]+)*$",
+
+  // A regular expression for allowed characters in URL fragment for Blog Post.
+  "VALID_URL_BLOG_FRAGMENT_REGEX": "^[a-z0-9]+(-[a-z0-9]+)*$",
 
   // A regular expression for valid skill misconception id.
   "VALID_SKILL_MISCONCEPTION_ID_REGEX": "[A-Za-z0-9]{12}-[0-9]+",
