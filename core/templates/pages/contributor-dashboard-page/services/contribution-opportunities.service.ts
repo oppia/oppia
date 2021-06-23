@@ -26,7 +26,7 @@ import { ExplorationOpportunitySummary } from 'domain/opportunity/exploration-op
 import { LoginRequiredModalContent } from 'pages/contributor-dashboard-page/modal-templates/login-required-modal.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
-class SkillOpportunitiesDict {
+export class SkillOpportunitiesDict {
   opportunities: SkillOpportunity[];
   more: boolean;
 }
