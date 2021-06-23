@@ -56,6 +56,7 @@ describe('Content translation manager service', () => {
     pts = TestBed.get(PlayerTranscriptService);
     suof = TestBed.get(SubtitledUnicodeObjectFactory);
     wtof = TestBed.get(WrittenTranslationsObjectFactory);
+    atls = TestBed.get(AudioTranslationLanguageService);
 
     let defaultOutcomeDict = {
       dest: 'dest_default',

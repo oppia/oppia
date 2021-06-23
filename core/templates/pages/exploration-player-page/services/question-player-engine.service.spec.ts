@@ -29,8 +29,11 @@ import { ContextService } from 'services/context.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { AnswerClassificationService, InteractionRulesService } from './answer-classification.service';
 import { QuestionPlayerEngineService } from './question-player-engine.service';
+import { AudioTranslationLanguageService } from
+  'pages/exploration-player-page/services/audio-translation-language.service';
 
 describe('Question player engine service ', () => {
+  let audioTranslationLanguageService: AudioTranslationLanguageService;
   let alertsService: AlertsService;
   let answerClassificationService: AnswerClassificationService;
   let contextService: ContextService;
@@ -413,6 +416,8 @@ describe('Question player engine service ', () => {
       imports: [HttpClientTestingModule]
     });
 
+    audioTranslationLanguageService = TestBed.inject(
+      AudioTranslationLanguageService);
     alertsService = TestBed.inject(AlertsService);
     answerClassificationService = TestBed.inject(AnswerClassificationService);
     contextService = TestBed.inject(ContextService);
@@ -774,7 +779,7 @@ describe('Question player engine service ', () => {
       );
       let sampleCard = StateCard.createNewCard(
         'Card 1', 'Content html', 'Interaction text', null,
-        null, null, 'content_id', null);
+        null, null, 'content_id', audioTranslationLanguageService);
 
       answerClassificationResult.outcome.labelledAsCorrect = true;
 

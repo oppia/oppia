@@ -21,11 +21,16 @@ import { TestBed } from '@angular/core/testing';
 import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
 import { StateCard } from 'domain/state_card/state-card.model';
+import { AudioTranslationLanguageService } from
+  'pages/exploration-player-page/services/audio-translation-language.service';
 
 describe('Player transcript service', () => {
   let pts;
+  let atls;
+
   beforeEach(() => {
     pts = TestBed.get(PlayerTranscriptService);
+    atls = TestBed.get(AudioTranslationLanguageService);
   });
 
   it('should reset the transcript correctly', () => {
@@ -33,12 +38,12 @@ describe('Player transcript service', () => {
       'First state', 'Content HTML',
       '<oppia-text-input-html></oppia-text-input-html>',
       null, null, null, null,
-      null));
+      atls));
     pts.addNewCard(StateCard.createNewCard(
       'Second state', 'Content HTML',
       '<oppia-text-input-html></oppia-text-input-html>',
       null, null, null, null,
-      null));
+      atls));
 
     expect(pts.getNumCards()).toBe(2);
 
@@ -48,7 +53,7 @@ describe('Player transcript service', () => {
       'Third state', 'Content HTML',
       '<oppia-text-input-html></oppia-text-input-html>',
       null, null, null, null,
-      null));
+      atls));
     expect(pts.getCard(0).getStateName()).toBe('Third state');
   });
 
@@ -59,17 +64,17 @@ describe('Player transcript service', () => {
         'First state', 'Content HTML',
         '<oppia-text-input-html></oppia-text-input-html>',
         null, null, null, null,
-        null));
+        atls));
       pts.addNewCard(StateCard.createNewCard(
         'Second state', 'Content HTML',
         '<oppia-text-input-html></oppia-text-input-html>',
         null, null, null, null,
-        null));
+        atls));
       pts.addNewCard(StateCard.createNewCard(
         'First state', 'Content HTML',
         '<oppia-text-input-html></oppia-text-input-html>',
         null, null, null, null,
-        null));
+        atls));
       expect(pts.hasEncounteredStateBefore('First state')).toEqual(true);
       expect(pts.hasEncounteredStateBefore('Third state')).toEqual(false);
     });
@@ -79,7 +84,7 @@ describe('Player transcript service', () => {
       'First state', 'Content HTML',
       '<oppia-text-input-html></oppia-text-input-html>',
       null, null, null, null,
-      null));
+      atls));
 
     let firstCard = pts.getCard(0);
     expect(firstCard.getStateName()).toEqual('First state');
@@ -93,12 +98,12 @@ describe('Player transcript service', () => {
       'First state', 'Content HTML',
       '<oppia-text-input-html></oppia-text-input-html>',
       null, null, null, null,
-      null));
+      atls));
     pts.addNewCard(StateCard.createNewCard(
       'Second state', 'Content HTML',
       '<oppia-text-input-html></oppia-text-input-html>',
       null, null, null, null,
-      null));
+      atls));
     pts.addPreviousCard();
 
     expect(pts.getNumCards()).toEqual(3);
@@ -112,7 +117,7 @@ describe('Player transcript service', () => {
       'First state', 'Content HTML',
       '<oppia-text-input-html></oppia-text-input-html>',
       null, null, null, null,
-      null));
+      atls));
     let lastAnswer = pts.getLastAnswerOnDisplayedCard(0);
     expect(lastAnswer).toEqual(null);
 
@@ -121,7 +126,7 @@ describe('Player transcript service', () => {
       'Second state', 'Content HTML',
       '<oppia-text-input-html></oppia-text-input-html>',
       null, null, null, null,
-      null));
+      atls));
     lastAnswer = pts.getLastAnswerOnDisplayedCard(0);
     expect(lastAnswer).toEqual('first answer');
 
@@ -129,7 +134,7 @@ describe('Player transcript service', () => {
       'Third state', 'Content HTML',
       '<oppia-text-input-html></oppia-text-input-html>',
       null, null, null, null,
-      null));
+      atls));
     // Variable lastAnswer should be null as no answers were provided in the
     // second state.
     lastAnswer = pts.getLastAnswerOnDisplayedCard(1);
@@ -141,7 +146,7 @@ describe('Player transcript service', () => {
       'First state', 'Content HTML',
       '<oppia-text-input-html></oppia-text-input-html>',
       null, null, null, null,
-      null));
+      atls));
     pts.addNewInput('first answer', false);
     expect(() => {
       pts.addNewInput('invalid answer');
@@ -170,12 +175,12 @@ describe('Player transcript service', () => {
       'First state', 'Content HTML',
       '<oppia-text-input-html></oppia-text-input-html>',
       null, null, null, null,
-      null));
+      atls));
     pts.addNewCard(StateCard.createNewCard(
       'Second state', 'Content HTML',
       '<oppia-text-input-html></oppia-text-input-html>',
       null, null, null, null,
-      null));
+      atls));
     expect(pts.getNumCards()).toBe(2);
     expect(pts.getLastCard().getStateName()).toBe('Second state');
     expect(pts.isLastCard(0)).toBe(false);
