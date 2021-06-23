@@ -39,6 +39,11 @@ datastore_services = models.Registry.import_datastore_services()
 class PipelinedTestBase(test_utils.AppEngineTestBase):
     """Base class that runs tests within the context of a TestPipeline."""
 
+    # TODO(#11464): Find a newer version of Apache Beam that fixes
+    # GroupIntoBatches() to provide correct type info, so we don't have to
+    # provide this hook for tests to override.
+    RUNTIME_TYPE_CHECK = True
+
     # Helpful constants used by tests to create models.
     NOW = datetime.datetime.utcnow()
     YEAR_AGO = NOW - datetime.timedelta(weeks=52)
@@ -48,7 +53,8 @@ class PipelinedTestBase(test_utils.AppEngineTestBase):
         super(PipelinedTestBase, self).__init__(*args, **kwargs)
         self.pipeline = test_pipeline.TestPipeline(
             runner=runners.DirectRunner(),
-            options=test_pipeline.PipelineOptions(runtime_type_check=True))
+            options=test_pipeline.PipelineOptions(
+                runtime_type_check=self.RUNTIME_TYPE_CHECK))
         self._pipeline_context_stack = None
 
     def setUp(self):

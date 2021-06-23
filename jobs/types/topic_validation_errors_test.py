@@ -45,7 +45,7 @@ class ModelCanonicalNameMismatchErrorTests(
         error = topic_validation_errors.ModelCanonicalNameMismatchError(model)
 
         self.assertEqual(
-            error.message,
-            'ModelCanonicalNameMismatchError in TopicModel(id=\'test\'): '
+            error.stderr,
+            'ModelCanonicalNameMismatchError in TopicModel(id="test"): '
             'Entity name %s in lowercase does not match canonical name %s' %
             (model.name, model.canonical_name))

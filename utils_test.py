@@ -651,3 +651,6 @@ class UtilsTests(test_utils.GenericTestBase):
 
         self.assertEqual(list(errors), [(0, 'ERROR: foo'), (3, 'ERROR: fie')])
         self.assertEqual(list(others), [(1, 'INFO: bar'), (2, 'INFO: fee')])
+
+    def test_quoted_string(self):
+        self.assertEqual(utils.quoted('a"b\'c'), '"a\\"b\'c"')

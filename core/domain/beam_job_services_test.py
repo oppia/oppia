@@ -340,6 +340,15 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
                 [m.id for m in initial_beam_job_run_models]))
         self.assertIn('Failed to update the state of job', logs[-1])
 
+    def test_create_beam_job_run_result_model(self):
+        model = beam_job_services.create_beam_job_run_result_model(
+            '123', 'abc', '123')
+        model.put()
+
+        result = beam_job_services.get_beam_job_run_result('123')
+        self.assertEqual(result.stdout, 'abc')
+        self.assertEqual(result.stderr, '123')
+
 
 class GetBeamJobRunResultTests(test_utils.GenericTestBase):
 

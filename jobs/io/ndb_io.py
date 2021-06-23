@@ -19,12 +19,17 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.platform import models
 import feconf
 from jobs import job_utils
 
 import apache_beam as beam
 
+datastore_services = models.Registry.import_datastore_services()
 
+
+@beam.typehints.with_input_types(beam.pvalue.PBegin)
+@beam.typehints.with_output_types(datastore_services.Model)
 class GetModels(beam.PTransform):
     """Reads NDB models from the datastore using a query.
 
@@ -64,6 +69,8 @@ class GetModels(beam.PTransform):
         )
 
 
+@beam.typehints.with_input_types(datastore_services.Model)
+@beam.typehints.with_output_types(beam.pvalue.PDone)
 class PutModels(beam.PTransform):
     """Writes NDB models to the datastore."""
 
@@ -96,6 +103,8 @@ class PutModels(beam.PTransform):
         )
 
 
+@beam.typehints.with_input_types(datastore_services.Key)
+@beam.typehints.with_output_types(beam.pvalue.PDone)
 class DeleteModels(beam.PTransform):
     """Deletes NDB models from the datastore."""
 

@@ -43,6 +43,6 @@ class InvalidEntityTypeErrorTests(
         error = feedback_validation_errors.InvalidEntityTypeError(model)
 
         self.assertEqual(
-            error.message,
-            'InvalidEntityTypeError in GeneralFeedbackThreadModel(id=\'123\'):'
+            error.stderr,
+            'InvalidEntityTypeError in GeneralFeedbackThreadModel(id="123"):'
             ' entity type %s is invalid.' % model.entity_type)

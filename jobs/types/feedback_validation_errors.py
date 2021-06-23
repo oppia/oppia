@@ -26,6 +26,5 @@ class InvalidEntityTypeError(base_validation_errors.BaseAuditError):
     """Error class for models that have invalid entity type."""
 
     def __init__(self, model):
-        super(InvalidEntityTypeError, self).__init__(model)
-        self.message = (
-            'entity type %s is invalid.' % model.entity_type)
+        message = 'entity type %s is invalid.' % model.entity_type
+        super(InvalidEntityTypeError, self).__init__(message, model)

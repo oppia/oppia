@@ -23,203 +23,126 @@ import feconf
 from jobs import job_utils
 from jobs.types import job_run_result
 import python_utils
+import utils
 
 
 class BaseAuditError(job_run_result.JobRunResult):
-    """Base class for model audit errors.
+    """Base class for model audit errors."""
 
-    NOTE: Apache Beam will use pickle to serialize/deserialize class instances.
-    """
-
-    # BaseAuditError and its subclasses will hold exactly one attribute to
-    # minimize their memory footprint.
-    __slots__ = ('_message',)
-
-    def __init__(self, model_or_kind, model_id=None):
+    def __init__(self, message, model_or_kind, model_id=None):
         """Initializes a new audit error.
 
         Args:
+            message: str. The message describing the error.
             model_or_kind: Model|bytes. If model_id is not provided, then this
                 is a model (type: BaseModel).
                 Otherwise, this is a model's kind (type: bytes).
             model_id: bytes|None. The model's ID, or None when model_or_kind is
                 a model.
-        """
-        if model_id is not None:
-            model_kind = model_or_kind
-        else:
-            model_id = job_utils.get_model_id(model_or_kind)
-            model_kind = job_utils.get_model_kind(model_or_kind)
-        super(BaseAuditError, self).__init__(stdout=None, stderr=None)
-        # At first, self._message is a tuple of model identifiers that will be
-        # used to annotate the _actual_ message provided by subclasses.
-        self._message = (model_kind, model_id)
-
-    @property
-    def stdout(self):
-        """Returns an empty string.
-
-        Returns:
-            str. An empty string.
-        """
-        return ''
-
-    @property
-    def stderr(self):
-        """Returns the error message, which includes the erroneous model's id.
-
-        Returns:
-            str. The error message.
 
         Raises:
-            NotImplementedError. When self.message was never assigned a value.
-        """
-        return self.message
-
-    @property
-    def message(self):
-        """Returns the error message, which includes the erroneous model's id.
-
-        Returns:
-            str. The error message.
-
-        Raises:
-            NotImplementedError. When self.message was never assigned a value.
-        """
-        if not python_utils.is_string(self._message):
-            raise NotImplementedError(
-                'self.message must be assigned a value in __init__')
-        return self._message
-
-    @message.setter
-    def message(self, message):
-        """Sets the error message.
-
-        Args:
-            message: str. The error message.
-
-        Raises:
-            TypeError. When self.message has already been assigned a value.
             TypeError. When the input message is not a string.
             ValueError. When the input message is empty.
         """
-        if python_utils.is_string(self._message):
-            raise TypeError('self.message must be assigned to exactly once')
         if not python_utils.is_string(message):
-            raise TypeError('self.message must be a string')
+            raise TypeError('message must be a string')
+
         if not message:
-            raise ValueError('self.message must be a non-empty string')
-        model_kind, model_id = self._message
-        self._message = '%s in %s(id=%r): %s' % (
-            self.__class__.__name__, model_kind, model_id, message)
+            raise ValueError('message must be a non-empty string')
 
-    def __repr__(self):
-        return repr(self.message)
+        if model_id is None:
+            model_id = job_utils.get_model_id(model_or_kind)
+            model_kind = job_utils.get_model_kind(model_or_kind)
+        else:
+            model_kind = model_or_kind
 
-    def __hash__(self):
-        return hash((self.__class__, self.message))
+        error_message = '%s in %s(id=%s): %s' % (
+            self.__class__.__name__,
+            model_kind, utils.quoted(model_id), message)
 
-    def __eq__(self, other):
-        return (
-            self.message == other.message
-            if self.__class__ is other.__class__ else NotImplemented)
-
-    def __ne__(self, other):
-        return (
-            not (self == other)
-            if self.__class__ is other.__class__ else NotImplemented)
-
-    def __getstate__(self):
-        """Called by pickle to get the value that uniquely defines self."""
-        return self.message
-
-    def __setstate__(self, message):
-        """Called by pickle to build an instance from __getstate__'s value."""
-        self._message = message
+        super(BaseAuditError, self).__init__(stderr=error_message)
 
 
 class InconsistentTimestampsError(BaseAuditError):
     """Error class for models with inconsistent timestamps."""
 
     def __init__(self, model):
-        super(InconsistentTimestampsError, self).__init__(model)
-        self.message = 'created_on=%r is later than last_updated=%r' % (
+        message = 'created_on=%r is later than last_updated=%r' % (
             model.created_on, model.last_updated)
+        super(InconsistentTimestampsError, self).__init__(message, model)
 
 
 class InvalidCommitStatusError(BaseAuditError):
     """Error class for commit models with inconsistent status values."""
 
     def __init__(self, model):
-        super(InvalidCommitStatusError, self).__init__(model)
-        self.message = (
-            'post_commit_status is %s' % model.post_commit_status)
+        message = 'post_commit_status is %s' % model.post_commit_status
+        super(InvalidCommitStatusError, self).__init__(message, model)
 
 
 class InvalidPublicCommitStatusError(BaseAuditError):
     """Error class for commit models with inconsistent public status values."""
 
     def __init__(self, model):
-        super(InvalidPublicCommitStatusError, self).__init__(model)
-        self.message = (
-            'post_commit_status="%s" but post_commit_community_owned=%s' % (
+        message = (
+            'post_commit_status=%s but post_commit_community_owned=%s' % (
                 model.post_commit_status, model.post_commit_community_owned))
+        super(InvalidPublicCommitStatusError, self).__init__(message, model)
 
 
 class InvalidPrivateCommitStatusError(BaseAuditError):
     """Error class for commit models with inconsistent private status values."""
 
     def __init__(self, model):
-        super(InvalidPrivateCommitStatusError, self).__init__(model)
-        self.message = (
-            'post_commit_status="%s" but post_commit_is_private=%r' % (
+        message = (
+            'post_commit_status=%s but post_commit_is_private=%r' % (
                 model.post_commit_status, model.post_commit_is_private))
+        super(InvalidPrivateCommitStatusError, self).__init__(message, model)
 
 
 class ModelMutatedDuringJobError(BaseAuditError):
     """Error class for models mutated during a job."""
 
     def __init__(self, model):
-        super(ModelMutatedDuringJobError, self).__init__(model)
-        self.message = (
+        message = (
             'last_updated=%r is later than the audit job\'s start time' % (
                 model.last_updated))
+        super(ModelMutatedDuringJobError, self).__init__(message, model)
 
 
 class ModelIdRegexError(BaseAuditError):
     """Error class for models with ids that fail to match a regex pattern."""
 
     def __init__(self, model, regex_string):
-        super(ModelIdRegexError, self).__init__(model)
-        self.message = 'id does not match the expected regex=%r' % regex_string
+        message = 'id does not match the expected regex=%s' % (
+            utils.quoted(regex_string))
+        super(ModelIdRegexError, self).__init__(message, model)
 
 
 class ModelDomainObjectValidateError(BaseAuditError):
     """Error class for domain object validation errors."""
 
     def __init__(self, model, error_message):
-        super(ModelDomainObjectValidateError, self).__init__(model)
-        self.message = (
-            'Entity fails domain validation with the '
-            'error: %s' % error_message)
+        message = 'Entity fails domain validation with the error: %s' % (
+            error_message)
+        super(ModelDomainObjectValidateError, self).__init__(message, model)
 
 
 class ModelExpiredError(BaseAuditError):
     """Error class for expired models."""
 
     def __init__(self, model):
-        super(ModelExpiredError, self).__init__(model)
-        self.message = 'deleted=True when older than %s days' % (
+        message = 'deleted=True when older than %s days' % (
             feconf.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED.days)
+        super(ModelExpiredError, self).__init__(message, model)
 
 
 class InvalidCommitTypeError(BaseAuditError):
     """Error class for commit_type validation errors."""
 
     def __init__(self, model):
-        super(InvalidCommitTypeError, self).__init__(model)
-        self.message = (
-            'Commit type %s is not allowed' % model.commit_type)
+        message = 'Commit type %s is not allowed' % model.commit_type
+        super(InvalidCommitTypeError, self).__init__(message, model)
 
 
 class ModelRelationshipError(BaseAuditError):
@@ -238,33 +161,29 @@ class ModelRelationshipError(BaseAuditError):
         """
         # NOTE: IDs are converted to bytes because that's how they're read from
         # and written to the datastore.
+        message = (
+            '%s=%s should correspond to the ID of an existing %s, but no such '
+            'model exists' % (
+                id_property, utils.quoted(target_id), target_kind))
         super(ModelRelationshipError, self).__init__(
-            id_property.model_kind,
-            model_id=python_utils.convert_to_bytes(model_id))
-        self.message = (
-            '%s=%r should correspond to the ID of an existing %s, '
-            'but no such model exists' % (
-                id_property, python_utils.convert_to_bytes(target_id),
-                target_kind))
+            message, id_property.model_kind, model_id=model_id)
 
 
 class CommitCmdsNoneError(BaseAuditError):
     """Error class for None Commit Cmds."""
 
     def __init__(self, model):
-        super(CommitCmdsNoneError, self).__init__(model)
-        self.message = (
-            'No commit command domain object '
-            'defined for entity with commands: %s' % (
-                model.commit_cmds))
+        message = (
+            'No commit command domain object defined for entity with commands: '
+            '%s' % model.commit_cmds)
+        super(CommitCmdsNoneError, self).__init__(message, model)
 
 
 class CommitCmdsValidateError(BaseAuditError):
     """Error class for wrong commit cmmds."""
 
     def __init__(self, model, commit_cmd_dict, e):
-        super(CommitCmdsValidateError, self).__init__(model)
-        self.message = (
-            'Commit command domain validation for '
-            'command: %s failed with error: %s' % (
-                commit_cmd_dict, e))
+        message = (
+            'Commit command domain validation for command: %s failed with '
+            'error: %s' % (commit_cmd_dict, e))
+        super(CommitCmdsValidateError, self).__init__(message, model)
