@@ -15,19 +15,19 @@
  * @fileoverview Unit tests for Contribution Opportunities Service.
  */
 
-import { NgbModal, NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { ContributionOpportunitiesService, ExplorationOpportunitiesDict, SkillOpportunitiesDict } from '../services/contribution-opportunities.service';
 import { ContributionOpportunitiesBackendApiService } from 'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { fakeAsync, flushMicrotasks, TestBed, tick } from "@angular/core/testing";
-import { LoginRequiredModalContent } from "../modal-templates/login-required-modal.component";
-import { SkillOpportunity } from "domain/opportunity/skill-opportunity.model";
-import { ExplorationOpportunitySummary } from "domain/opportunity/exploration-opportunity-summary.model";
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { LoginRequiredModalContent } from '../modal-templates/login-required-modal.component';
+import { SkillOpportunity } from 'domain/opportunity/skill-opportunity.model';
+import { ExplorationOpportunitySummary } from 'domain/opportunity/exploration-opportunity-summary.model';
 class MockNgbModalRef {
   componentInstance: {};
 }
 
-fdescribe('Contribution Opportunities Service', function() {
+describe('Contribution Opportunities Service', function() {
   let ngbModal: NgbModal;
   let contributionOpportunitiesBackendApiService:
     ContributionOpportunitiesBackendApiService;
@@ -62,12 +62,12 @@ fdescribe('Contribution Opportunities Service', function() {
   const sampleSkillOpportunitiesResponse = [
     SkillOpportunity.createFromBackendDict(
       skillOpportunityResponse.opportunities[0])
-    ];
+  ];
 
   const sampleTranslationOpportunitiesResponse = [
     ExplorationOpportunitySummary.createFromBackendDict(
       skillOpportunity.opportunities[0])
-    ];
+  ];
 
   const sampleVoiceoverOpportunitiesResponse = [
     ExplorationOpportunitySummary.createFromBackendDict(
@@ -79,7 +79,7 @@ fdescribe('Contribution Opportunities Service', function() {
       imports: [
         HttpClientTestingModule
       ]
-    })
+    });
   });
 
   beforeEach(() => {
@@ -114,14 +114,15 @@ fdescribe('Contribution Opportunities Service', function() {
     };
 
     let getSkillOpportunitiesSpy = spyOn(
-      contributionOpportunitiesBackendApiService, 'fetchSkillOpportunitiesAsync')
+      contributionOpportunitiesBackendApiService,
+      'fetchSkillOpportunitiesAsync')
       .and.returnValue(Promise.resolve(
         {
           opportunities: sampleSkillOpportunitiesResponse,
           nextCursor: skillOpportunityResponse.next_cursor,
           more: skillOpportunityResponse.more
         }
-      ))
+      ));
 
     contributionOpportunitiesService.getSkillOpportunitiesAsync().then(
       successHandler, failHandler);
@@ -142,14 +143,15 @@ fdescribe('Contribution Opportunities Service', function() {
     };
 
     let getSkillOpportunitiesSpy = spyOn(
-      contributionOpportunitiesBackendApiService, 'fetchSkillOpportunitiesAsync')
+      contributionOpportunitiesBackendApiService,
+      'fetchSkillOpportunitiesAsync')
       .and.returnValue(Promise.resolve(
         {
           opportunities: sampleSkillOpportunitiesResponse,
           nextCursor: skillOpportunityResponse.next_cursor,
           more: skillOpportunityResponse.more
         }
-      ))
+      ));
 
     contributionOpportunitiesService.getMoreSkillOpportunitiesAsync().then(
       successHandler, failHandler);
@@ -178,7 +180,7 @@ fdescribe('Contribution Opportunities Service', function() {
           nextCursor: '6',
           more: true
         }
-      ))
+      ));
 
     contributionOpportunitiesService.getTranslationOpportunitiesAsync('en')
       .then(successHandler, failHandler);
@@ -188,7 +190,7 @@ fdescribe('Contribution Opportunities Service', function() {
     expect(successHandler).toHaveBeenCalledWith(translationOpportunitiesDict);
   }));
 
-  it('should return more translation opportunities if they are available  ' +
+  it('should return more translation opportunities if they are available ' +
     'when calling \'getMoreTranslationOpportunitiesAsync\'', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
@@ -207,7 +209,7 @@ fdescribe('Contribution Opportunities Service', function() {
           nextCursor: '6',
           more: true
         }
-      ))
+      ));
 
     contributionOpportunitiesService.getMoreTranslationOpportunitiesAsync('en')
       .then(successHandler, failHandler);
@@ -228,14 +230,15 @@ fdescribe('Contribution Opportunities Service', function() {
     };
 
     let getVoiceoverOpportunitiesSpy = spyOn(
-      contributionOpportunitiesBackendApiService, 'fetchVoiceoverOpportunitiesAsync')
+      contributionOpportunitiesBackendApiService,
+      'fetchVoiceoverOpportunitiesAsync')
       .and.returnValue(Promise.resolve(
         {
           opportunities: sampleVoiceoverOpportunitiesResponse,
           nextCursor: '6',
           more: true
         }
-      ))
+      ));
 
     contributionOpportunitiesService.getVoiceoverOpportunitiesAsync('en').then(
       successHandler, failHandler);
@@ -256,17 +259,18 @@ fdescribe('Contribution Opportunities Service', function() {
     };
 
     let getVoiceoverOpportunitiesSpy = spyOn(
-      contributionOpportunitiesBackendApiService, 'fetchVoiceoverOpportunitiesAsync')
+      contributionOpportunitiesBackendApiService,
+      'fetchVoiceoverOpportunitiesAsync')
       .and.returnValue(Promise.resolve(
         {
           opportunities: sampleVoiceoverOpportunitiesResponse,
           nextCursor: '6',
           more: true
         }
-      ))
+      ));
 
-    contributionOpportunitiesService.getMoreVoiceoverOpportunitiesAsync('en').then(
-      successHandler, failHandler);
+    contributionOpportunitiesService.getMoreVoiceoverOpportunitiesAsync('en')
+      .then(successHandler, failHandler);
     tick();
 
     expect(getVoiceoverOpportunitiesSpy).toHaveBeenCalled();
