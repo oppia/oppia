@@ -750,6 +750,11 @@ TASK_URL_DEFERRED = (
 # TODO(sll): Add all other URLs here.
 ADMIN_URL = '/admin'
 ADMIN_ROLE_HANDLER_URL = '/adminrolehandler'
+BLOG_ADMIN_PAGE_URL = '/blog-admin'
+BLOG_ADMIN_ROLE_HANDLER_URL = '/blogadminrolehandler'
+BLOG_DASHBOARD_DATA_URL: '/blogdashboardhandler/data'
+BLOG_DASHBOARD_URL:  '/blog-dashboard'
+BLOG_EDITOR_DATA_URL_PREFIX = '/blogeditorhandler/data'
 CLASSROOM_DATA_HANDLER = '/classroom_data_handler'
 COLLECTION_DATA_URL_PREFIX = '/collection_handler/data'
 COLLECTION_EDITOR_DATA_URL_PREFIX = '/collection_editor_handler/data'
@@ -1010,12 +1015,14 @@ ROLE_ID_TOPIC_MANAGER = 'TOPIC_MANAGER'
 ROLE_ID_MODERATOR = 'MODERATOR'
 ROLE_ID_RELEASE_COORDINATOR = 'RELEASE_COORDINATOR'
 ROLE_ID_ADMIN = 'ADMIN'
+ROLE_ID_BLOG_ADMIN = 'BLOG_ADMIN'
+ROLE_ID_BLOG_EDITOR = 'BLOG_EDITOR'
 
 ALLOWED_USER_ROLES = [
     ROLE_ID_GUEST, ROLE_ID_BANNED_USER, ROLE_ID_LEARNER,
     ROLE_ID_EXPLORATION_EDITOR, ROLE_ID_COLLECTION_EDITOR,
     ROLE_ID_TOPIC_MANAGER, ROLE_ID_MODERATOR, ROLE_ID_RELEASE_COORDINATOR,
-    ROLE_ID_ADMIN]
+    ROLE_ID_ADMIN, ROLE_ID_BLOG_ADMIN, ROLE_ID_BLOG_EDITOR]
 
 # Intent of the User making query to role structure via admin interface. Used
 # to store audit data regarding queries to role IDs.
