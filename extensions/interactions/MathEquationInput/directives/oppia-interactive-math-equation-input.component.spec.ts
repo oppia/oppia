@@ -57,7 +57,6 @@ describe('MathEquationInputInteractive', () => {
     static 'add_global_symbol'(name: string, symbol: Object): void {}
   }
 
-<<<<<<< HEAD
   class MockCurrentInteractionService {
     onSubmit(answer, rulesService) {}
     registerCurrentInteraction(submitAnswerFn, validateExpressionFn) {
@@ -77,31 +76,6 @@ describe('MathEquationInputInteractive', () => {
           }
         ]
       }).compileComponents();
-=======
-  beforeEach(angular.mock.module('oppia'));
-  importAllAngularServices();
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    guppyConfigurationService = new GuppyConfigurationService();
-    mathInteractionsService = new MathInteractionsService();
-    guppyInitializationService = new GuppyInitializationService();
-    deviceInfoService = new DeviceInfoService(new WindowRef());
-
-    $provide.value(
-      'CurrentInteractionService', mockCurrentInteractionService);
-    $provide.value(
-      'MathEquationInputRulesService', mockMathEquationInputRulesService);
-    $provide.value('GuppyConfigurationService', guppyConfigurationService);
-    $provide.value('MathInteractionsService', mathInteractionsService);
-    $provide.value('GuppyInitializationService', guppyInitializationService);
-    $provide.value('$attrs', {
-      customOskLettersWithValue: '[&quot;a&quot;, &quot;b&quot;]'
-    });
-  }));
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $window = $injector.get('$window');
-    ctrl = $componentController('oppiaInteractiveMathEquationInput');
-    $window.Guppy = MockGuppy;
->>>>>>> upstream/develop
   }));
 
   beforeEach(() => {

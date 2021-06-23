@@ -58,7 +58,6 @@ describe('NumericExpressionInputInteractive', () => {
     static 'add_global_symbol'(name: string, symbol: Object): void {}
   }
 
-<<<<<<< HEAD
   class MockCurrentInteractionService {
     onSubmit(answer, rulesService) {}
     registerCurrentInteraction(submitAnswerFn, validateExpressionFn) {
@@ -66,15 +65,6 @@ describe('NumericExpressionInputInteractive', () => {
       validateExpressionFn();
     }
   }
-=======
-  beforeEach(angular.mock.module('oppia'));
-  importAllAngularServices();
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    guppyConfigurationService = new GuppyConfigurationService();
-    mathInteractionsService = new MathInteractionsService();
-    guppyInitializationService = new GuppyInitializationService();
-    deviceInfoService = new DeviceInfoService(new WindowRef());
->>>>>>> upstream/develop
 
   class MockInteractionAttributesExtractorService {
     getValuesFromAttributes(inputType: string, attributes: Object) {
