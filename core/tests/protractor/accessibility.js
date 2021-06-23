@@ -423,59 +423,59 @@ describe('screenreader and keyboard user accessibility features', function() {
       await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
     });
 
-  it('should navigate to the preferences page when ctrl+6 is pressed',
+  it('should navigate to the preferences page when ctrl+5 is pressed',
     async function() {
       await browser.get('get-started');
       await waitFor.urlRedirection(GET_STARTED_URL);
       await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
-      await holdCtrlAndPressKey('6');
+      await holdCtrlAndPressKey('5');
       await waitFor.urlRedirection(PREFERENCES_URL);
 
       await browser.get('about');
       await waitFor.urlRedirection(ABOUT_URL);
       await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
-      await holdCtrlAndPressKey('6');
+      await holdCtrlAndPressKey('5');
       await waitFor.urlRedirection(PREFERENCES_URL);
 
       await browser.get('privacy-policy');
       await waitFor.urlRedirection(PRIVACY_POLICY_URL);
       await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
-      await holdCtrlAndPressKey('6');
+      await holdCtrlAndPressKey('5');
       await waitFor.urlRedirection(PREFERENCES_URL);
 
       await browser.get('learner-dashboard');
       await waitFor.urlRedirection(LEARNER_DASHBOARD_URL);
       await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
-      await holdCtrlAndPressKey('6');
+      await holdCtrlAndPressKey('5');
       await waitFor.urlRedirection(PREFERENCES_URL);
 
       await browser.get('donate');
       await waitFor.urlRedirection(DONATE_URL);
       await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
-      await holdCtrlAndPressKey('6');
+      await holdCtrlAndPressKey('5');
       await waitFor.urlRedirection(PREFERENCES_URL);
 
 
-      await holdCtrlAndPressKey('6');
+      await holdCtrlAndPressKey('5');
       await waitFor.urlRedirection(PREFERENCES_URL);
 
       await browser.get('creator-dashboard');
       await waitFor.urlRedirection(CREATOR_DASHBOARD_URL);
       await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
-      await holdCtrlAndPressKey('6');
+      await holdCtrlAndPressKey('5');
       await waitFor.urlRedirection(PREFERENCES_URL);
 
       await browser.get('community-library');
       await waitFor.urlRedirection(COMMUNITY_LIBRARY_URL);
       await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
-      await holdCtrlAndPressKey('6');
+      await holdCtrlAndPressKey('5');
       await waitFor.urlRedirection(PREFERENCES_URL);
     });
 

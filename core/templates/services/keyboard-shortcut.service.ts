@@ -124,7 +124,7 @@ export class KeyboardShortcutService {
       this.windowRef.nativeWindow.location.href = '/about';
     });
 
-    Mousetrap.bind('ctrl+6', () => {
+    Mousetrap.bind('ctrl+5', () => {
       this.windowRef.nativeWindow.location.href = '/preferences';
     });
   }
