@@ -20,6 +20,8 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { UserInfo, UserInfoBackendDict } from 'domain/user/user-info.model';
+import { WindowRef } from './contextual/window-ref.service';
+import { Title } from '@angular/platform-browser';
 
 interface SubscriptionSummary {
   'creator_picture_data_url': string;
@@ -57,7 +59,9 @@ export interface UserContributionRightsDataBackendDict {
 })
 export class UserBackendApiService {
   constructor(
-    private http: HttpClient) {}
+    private http: HttpClient,
+    private windowRef: WindowRef,
+    private titleService: Title) {}
 
   private USER_INFO_URL = '/userinfohandler';
   private PROFILE_PICTURE_URL = '/preferenceshandler/profile_picture';
