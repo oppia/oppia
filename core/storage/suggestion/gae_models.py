@@ -838,25 +838,80 @@ class TranslationContributionStatsModel(base_models.BaseModel):
     # attributes.
     accepted_translation_word_count = datastore_services.IntegerProperty(
         required=True, indexed=True)
+    # The number of rejected translations.
+    rejected_translations_count = datastore_services.IntegerProperty(
+        required=True, indexed=True)
+    # The total word count of rejected translations. Excludes HTML tags and
+    # attributes.
+    rejected_translation_word_count = datastore_services.IntegerProperty(
+        required=True, indexed=True)
     # The unique last_updated dates of the translation suggestions.
     contribution_dates = datastore_services.DateProperty(
-        required=True, indexed=True, repeated=True)
+        repeated=True, indexed=True)
+
+    @classmethod
+    def create(
+            cls, language_code, contributor_user_id, topic_id,
+            submitted_translations_count, submitted_translation_word_count,
+            accepted_translations_count,
+            accepted_translations_without_reviewer_edits_count,
+            accepted_translation_word_count, rejected_translations_count,
+            rejected_translation_word_count, contribution_dates):
+        """Creates a new TranslationContributionStatsModel instance and returns
+        its ID.
+        """
+        entity_id = cls.generate_id(
+            language_code, contributor_user_id, topic_id)
+        entity = cls(
+            id=entity_id,
+            language_code=language_code,
+            contributor_user_id=contributor_user_id,
+            topic_id=topic_id,
+            submitted_translations_count=submitted_translations_count,
+            submitted_translation_word_count=submitted_translation_word_count,
+            accepted_translations_count=accepted_translations_count,
+            accepted_translations_without_reviewer_edits_count=
+            accepted_translations_without_reviewer_edits_count,
+            accepted_translation_word_count=accepted_translation_word_count,
+            rejected_translations_count=rejected_translations_count,
+            rejected_translation_word_count=rejected_translation_word_count,
+            contribution_dates=contribution_dates)
+        entity.update_timestamps()
+        entity.put()
+        return entity_id
+
+    @staticmethod
+    def generate_id(
+            language_code, contributor_user_id, topic_id):
+        """Generates a unique ID for a TranslationContributionStatsModel
+        instance.
+
+        Args:
+            language_code: str. ISO 639-1 language code.
+            contributor_user_id: str. User ID.
+            topic_id: str. Topic ID.
+
+        Returns:
+            str. An ID of the form:
+
+            [language_code].[contributor_user_id].[topic_id]
+        """
+        return (
+            '%s.%s.%s' % (language_code, contributor_user_id, topic_id)
+        )
 
     @classmethod
     def get(cls, language_code, contributor_user_id, topic_id):
-        """Gets all TranslationContributionStatsModels matching the supplied
+        """Gets the TranslationContributionStatsModel matching the supplied
         language_code, contributor_user_id, topic_id.
 
         Returns:
-            list(TranslationContributionStatsModel). List of
-            TranslationContributionStatsModel(s).
+            TranslationContributionStatsModel. The matching
+            TranslationContributionStatsModel.
         """
-        return (
-            cls.get_all()
-            .filter(cls.language_code == language_code)
-            .filter(cls.contributor_user_id == contributor_user_id)
-            .filter(cls.topic_id == topic_id)
-            .fetch(feconf.DEFAULT_QUERY_LIMIT))
+        entity_id = cls.generate_id(
+            language_code, contributor_user_id, topic_id)
+        return cls.get_by_id(entity_id)
 
     @classmethod
     def get_deletion_policy(cls):
@@ -891,6 +946,10 @@ class TranslationContributionStatsModel(base_models.BaseModel):
                 base_models.EXPORT_POLICY.EXPORTED,
             'accepted_translation_word_count':
                 base_models.EXPORT_POLICY.EXPORTED,
+            'rejected_translations_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'rejected_translation_word_count':
+                base_models.EXPORT_POLICY.EXPORTED,
             'contribution_dates':
                 base_models.EXPORT_POLICY.EXPORTED
         })
@@ -924,7 +983,6 @@ class TranslationContributionStatsModel(base_models.BaseModel):
             user_data[model.id] = {
                 'language_code': model.language_code,
                 'topic_id': model.topic_id,
-                'target_id': model.target_id,
                 'submitted_translations_count': (
                     model.submitted_translations_count),
                 'submitted_translation_word_count': (
@@ -935,6 +993,10 @@ class TranslationContributionStatsModel(base_models.BaseModel):
                     model.accepted_translations_without_reviewer_edits_count),
                 'accepted_translation_word_count': (
                     model.accepted_translation_word_count),
+                'rejected_translations_count': (
+                    model.rejected_translations_count),
+                'rejected_translation_word_count': (
+                    model.rejected_translation_word_count),
                 'contribution_dates': model.contribution_dates
             }
         return user_data
