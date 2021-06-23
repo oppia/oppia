@@ -414,18 +414,13 @@ describe('screenreader and keyboard user accessibility features', function() {
       await waitFor.urlRedirection(DONATE_URL);
       await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
-
-
-
       await browser.get('creator-dashboard');
       await waitFor.urlRedirection(CREATOR_DASHBOARD_URL);
       await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
-
       await browser.get('community-library');
       await waitFor.urlRedirection(COMMUNITY_LIBRARY_URL);
       await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
-
     });
 
   it('should navigate to the preferences page when ctrl+6 is pressed',
