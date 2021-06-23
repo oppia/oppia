@@ -152,6 +152,13 @@ describe('Skill object factory', () => {
       misconceptionObjectFactory.createFromBackendDict(misconceptionDict2));
   });
 
+  it('should throw error when there is no misconception' +
+    ' by the given id', () => {
+    let skill = skillObjectFactory.createFromBackendDict(skillDict);
+    expect(() => skill.findMisconceptionById('55')).toThrowError(
+      'Could not find misconception with ID: 55');
+  });
+
   it('should delete a misconception given its id', () => {
     let skill = skillObjectFactory.createFromBackendDict(skillDict);
     skill.deleteMisconception('2');
@@ -216,6 +223,12 @@ describe('Skill object factory', () => {
     expect(skill.toBackendDict()).toEqual(skillDict);
   });
 
+  it('should return null when there are no rubrics' +
+    ' for the given difficulty', () => {
+    let skill = skillObjectFactory.createFromBackendDict(skillDict);
+    expect(skill.getRubricExplanations('difficult')).toBe(null);
+  });
+
   it('should be able to create an interstitial skill', () => {
     let skill = skillObjectFactory.createInterstitialSkill();
     expect(skill.getId()).toEqual(null);
@@ -229,5 +242,11 @@ describe('Skill object factory', () => {
     expect(skill.getSupersedingSkillId()).toEqual(null);
     expect(skill.getAllQuestionsMerged()).toEqual(false);
     expect(skill.getPrerequisiteSkillIds()).toEqual([]);
+  });
+
+  it('should get misconception id', () => {
+    let skill = skillObjectFactory.createFromBackendDict(skillDict);
+    expect(skill.getMisconceptionId(0)).toBe('2');
+    expect(skill.getMisconceptionId(1)).toBe('4');
   });
 });
