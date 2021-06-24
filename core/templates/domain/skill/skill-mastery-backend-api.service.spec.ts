@@ -38,7 +38,7 @@ describe('Skill mastery backend API service', () => {
     });
 
     skillMasteryBackendApiService =
-     TestBed.inject(SkillMasteryBackendApiService);
+      TestBed.inject(SkillMasteryBackendApiService);
     csrfService = TestBed.inject(CsrfTokenService);
     httpTestingController = TestBed.inject(HttpTestingController);
 
