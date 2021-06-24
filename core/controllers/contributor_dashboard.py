@@ -54,13 +54,24 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
         'opportunity_type': {
-            'type': 'unicode',
-            'choices': [
-                'skill', 'translation', 'voiceover'
-            ]
+            'type': 'unicode'
         }
     }
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'cursor': {
+                'type': 'unicode',
+                'default_value': None
+            },
+           'language_code': {
+                'type': 'unicode',
+                'validators': [{
+                    'id': 'is_supported_audio_language_code'
+                }],
+                'default_value': None
+            }
+        }
+    }
 
     @acl_decorators.open_access
     def get(self, opportunity_type):
