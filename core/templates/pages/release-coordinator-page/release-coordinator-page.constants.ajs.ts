@@ -21,6 +21,8 @@
 import { ReleaseCoordinatorPageConstants } from './release-coordinator-page.constants';
 
 angular.module('oppia').constant(
+  'TAB_ID_BEAM_JOBS', ReleaseCoordinatorPageConstants.TAB_ID_BEAM_JOBS);
+angular.module('oppia').constant(
   'TAB_ID_JOBS', ReleaseCoordinatorPageConstants.TAB_ID_JOBS);
 angular.module('oppia').constant(
   'TAB_ID_MISC', ReleaseCoordinatorPageConstants.TAB_ID_MISC);

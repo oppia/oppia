@@ -20,19 +20,22 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { UserService } from 'services/user.service';
-import { ReleaseCoordinatorPageConstants } from 'pages/release-coordinator-page/release-coordinator-page.constants';
 import { AppConstants } from 'app.constants';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { ReleaseCoordinatorPageConstants } from 'pages/release-coordinator-page/release-coordinator-page.constants';
+import { UserService } from 'services/user.service';
+
 
 @Component({
   selector: 'oppia-release-coordinator-navbar',
   templateUrl: './release-coordinator-navbar.component.html',
 })
 export class ReleaseCoordinatorNavbarComponent implements OnInit {
-  @Input() activeTab;
+  @Input() activeTab: string;
   @Output() activeTabChange = new EventEmitter();
 
+  BEAM_JOBS_TAB_IS_ENABLED = AppConstants.BEAM_JOBS_ARE_ENABLED;
+  TAB_ID_BEAM_JOBS: string = ReleaseCoordinatorPageConstants.TAB_ID_BEAM_JOBS;
   TAB_ID_JOBS: string = ReleaseCoordinatorPageConstants.TAB_ID_JOBS;
   TAB_ID_MISC: string = ReleaseCoordinatorPageConstants.TAB_ID_MISC;
   profilePictureDataUrl: string;

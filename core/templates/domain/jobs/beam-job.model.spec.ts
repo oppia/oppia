@@ -13,11 +13,23 @@
 // limitations under the License.
 
 /**
- * @fileoverview Constants for the Oppia release coordinator page.
+ * @fileoverview Unit tests for BeamJob.
  */
 
-export const ReleaseCoordinatorPageConstants = {
-  TAB_ID_BEAM_JOBS: 'beam_jobs',
-  TAB_ID_JOBS: 'jobs',
-  TAB_ID_MISC: ' misc',
-} as const;
+import { BeamJob } from 'domain/jobs/beam-job.model';
+
+describe('BeamJob model', () => {
+  it('should copy arguments', () => {
+    const job = new BeamJob('FooJob', ['foo', 'bar']);
+    expect(job.name).toEqual('FooJob');
+    expect(job.parameterNames).toEqual(['foo', 'bar']);
+  });
+
+  it('should copy values from backend dict', () => {
+    const job = BeamJob.createFromBackendDict({
+      name: 'FooJob', parameter_names: ['foo', 'bar']
+    });
+    expect(job.name).toEqual('FooJob');
+    expect(job.parameterNames).toEqual(['foo', 'bar']);
+  });
+});

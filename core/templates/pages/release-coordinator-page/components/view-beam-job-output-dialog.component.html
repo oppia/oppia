@@ -1,0 +1,53 @@
+<div class="beam-job-run-dialog">
+  <mat-dialog-content>
+    <h2 mat-dialog-title>{{ beamJobRun.jobName }}(id="{{ beamJobRun.jobId }}") output</h2>
+
+    <mat-tab-group *ngIf="output !== null">
+      <mat-tab *ngIf="output.stdout" label="Output" aria-label="Output">
+        <ng-template matTabContent>
+          <pre class="beam-job-run-output">{{ output.stdout }}</pre>
+        </ng-template>
+      </mat-tab>
+      <mat-tab *ngIf="output.stderr" label="Errors" aria-label="Errors">
+        <ng-template matTabContent>
+          <pre class="beam-job-run-output">{{ output.stderr }}</pre>
+        </ng-template>
+      </mat-tab>
+    </mat-tab-group>
+
+    <mat-progress-bar *ngIf="output === null" mode="indeterminate"
+                      class="oppia-align-center oppia-vcenter" color="accent">
+    </mat-progress-bar>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="beam-job-run-output-actions">
+    <button mat-button mat-dialog-close>Close</button>
+    <button mat-raised-button color="accent"
+            [disabled]="output === null"
+            [cdkCopyToClipboard]="getOutput()">
+      Copy To Clipboard
+    </button>
+  </mat-dialog-actions>
+</div>
+
+<style>
+  .beam-job-run-dialog {
+    font-size: 12px;
+    width: 600px;
+  }
+  .beam-job-run-output {
+    max-height: 300px;
+    overflow: scroll;
+    overflow-x: auto;
+    white-space: -moz-pre-wrap;
+    white-space: -o-pre-wrap;
+    white-space: -pre-wrap;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+  .beam-job-run-output-actions {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
+</style>

@@ -44,6 +44,7 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
   promoBarConfigForm: FormGroup;
   submitButtonDisabled: boolean;
 
+  TAB_ID_BEAM_JOBS: string = ReleaseCoordinatorPageConstants.TAB_ID_BEAM_JOBS;
   TAB_ID_JOBS: string = ReleaseCoordinatorPageConstants.TAB_ID_JOBS;
   TAB_ID_MISC: string = ReleaseCoordinatorPageConstants.TAB_ID_MISC;
 
