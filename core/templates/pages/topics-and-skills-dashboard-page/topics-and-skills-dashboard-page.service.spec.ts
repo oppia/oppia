@@ -25,8 +25,8 @@ import { TopicsAndSkillsDashboardFilter } from
 import { TopicsAndSkillsDashboardPageService } from
   // eslint-disable-next-line max-len
   'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service';
-import { TopicSummary } from
-  'domain/topic/topic-summary.model';
+import { CreatorTopicSummary } from
+  'domain/topic/creator-topic-summary.model';
 
 describe('Topic and Skill dashboard page service', () => {
   let tsds: TopicsAndSkillsDashboardPageService = null;
@@ -36,7 +36,7 @@ describe('Topic and Skill dashboard page service', () => {
   });
 
   it('should filter the topics', () => {
-    const topic1 = TopicSummary.createFromBackendDict({
+    const topic1 = CreatorTopicSummary.createFromBackendDict({
       topic_model_created_on: 1581839432987.596,
       uncategorized_skill_count: 0,
       canonical_story_count: 0,
@@ -57,7 +57,7 @@ describe('Topic and Skill dashboard page service', () => {
       thumbnail_filename: 'image.svg',
       thumbnail_bg_color: '#C6DCDA'
     });
-    const topic2 = TopicSummary.createFromBackendDict({
+    const topic2 = CreatorTopicSummary.createFromBackendDict({
       topic_model_created_on: 1681839432987.596,
       uncategorized_skill_count: 0,
       canonical_story_count: 0,
@@ -78,7 +78,7 @@ describe('Topic and Skill dashboard page service', () => {
       thumbnail_filename: 'image.svg',
       thumbnail_bg_color: '#C6DCDA'
     });
-    const topic3 = TopicSummary.createFromBackendDict({
+    const topic3 = CreatorTopicSummary.createFromBackendDict({
       topic_model_created_on: 1781839432987.596,
       uncategorized_skill_count: 0,
       canonical_story_count: 0,
@@ -148,9 +148,9 @@ describe('Topic and Skill dashboard page service', () => {
     expect(filteredArray).toEqual([topic3]);
 
     // This throws "Type '"Invalid sort value"' is not assignable to
-    // type 'ETopicSortOptions'.". This is because 'Invalid sort value'
-    // is not a valid sort option. We set the sort filter option to
-    // 'Invalid sort value' to test validations.
+    // type 'ETopicSortOptions'.". We need to suppress this error because
+    // 'Invalid sort value' is not a valid sort option. We set the sort filter
+    // option to 'Invalid sort value' to test validations.
     // @ts-expect-error
     filterOptions.sort = 'Invalid sort value';
     expect(() => {

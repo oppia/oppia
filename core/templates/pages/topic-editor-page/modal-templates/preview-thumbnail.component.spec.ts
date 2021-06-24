@@ -47,8 +47,8 @@ describe('Preview Thumbnail Component', function() {
     fixture = TestBed.createComponent(PreviewThumbnailComponent);
     componentInstance = fixture.componentInstance;
     imageUploadHelperService = (
-      TestBed.inject(ImageUploadHelperService) as unknown) as
-        jasmine.SpyObj<ImageUploadHelperService>;
+       TestBed.inject(ImageUploadHelperService) as unknown) as
+         jasmine.SpyObj<ImageUploadHelperService>;
     spyOn(
       imageUploadHelperService, 'getTrustedResourceUrlForThumbnailFilename')
       .and.returnValue(testUrl);

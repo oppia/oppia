@@ -175,7 +175,7 @@ describe('State Translation Editor Component', function() {
       spyOn(editabilityService, 'isEditable').and.returnValue(true);
       stateObj = stateObjectFactory.createFromBackendDict(stateName, state);
       spyOn(explorationStatesService, 'getState').and.returnValue(stateObj);
-      spyOn(explorationStatesService, 'saveWrittenTranslations').and.callFake(
+      spyOn(explorationStatesService, 'saveWrittenTranslation').and.callFake(
         () => {});
 
       spyOn(
@@ -391,7 +391,7 @@ describe('State Translation Editor Component', function() {
       spyOn(editabilityService, 'isEditable').and.returnValue(true);
       stateObj = stateObjectFactory.createFromBackendDict(stateName, state);
       spyOn(explorationStatesService, 'getState').and.returnValue(stateObj);
-      spyOn(explorationStatesService, 'saveWrittenTranslations').and.callFake(
+      spyOn(explorationStatesService, 'saveWrittenTranslation').and.callFake(
         () => {});
       spyOn(
         translationTabActiveContentIdService, 'getActiveDataFormat'
