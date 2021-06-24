@@ -49,6 +49,6 @@ class InvalidCompositeEntityErrorTests(
             model)
 
         self.assertEqual(
-            error.message,
-            'InvalidCompositeEntityError in TaskEntryModel(id=\'23\'): model '
+            error.stderr,
+            'InvalidCompositeEntityError in TaskEntryModel(id="23"): model '
             'has invalid composite entity %s' % model.composite_entity_id)
