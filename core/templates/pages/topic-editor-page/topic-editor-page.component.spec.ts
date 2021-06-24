@@ -84,10 +84,12 @@ describe('Topic editor page', function() {
     let topicInitializedEventEmitter = new EventEmitter();
     let topicReinitializedEventEmitter = new EventEmitter();
     let undoRedoChangeEventEmitter = new EventEmitter();
+    let topicUpdateViewEmitter = new EventEmitter();
     spyOn(TopicEditorStateService, 'loadTopic').and.callFake(function() {
       topicInitializedEventEmitter.emit();
       topicReinitializedEventEmitter.emit();
       undoRedoChangeEventEmitter.emit();
+      topicUpdateViewEmitter.emit();
     });
     spyOnProperty(
       TopicEditorStateService, 'onTopicInitialized').and.returnValue(
@@ -95,6 +97,8 @@ describe('Topic editor page', function() {
     spyOnProperty(
       TopicEditorStateService, 'onTopicReinitialized').and.returnValue(
       topicReinitializedEventEmitter);
+    spyOnProperty(TopicEditorRoutingService, 'updateViewEventEmitter')
+      .and.returnValue(topicUpdateViewEmitter);
     spyOn(UrlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
     spyOn(PageTitleService, 'setPageTitle').and.callThrough();
 
