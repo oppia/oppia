@@ -22,7 +22,7 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { Subscription } from 'rxjs';
 
-import { ReadOnlyCollectionBackendApiService } from
+import { ReadOnlyCollectionBackendApiService, ReadOnlyCollectionBackendResponse } from
   'domain/collection/read-only-collection-backend-api.service';
 import { Collection } from
   'domain/collection/collection.model';
@@ -31,7 +31,10 @@ describe('Read only collection backend API service', () => {
   let readOnlyCollectionBackendApiService:
     ReadOnlyCollectionBackendApiService = null;
   let httpTestingController: HttpTestingController;
-  let sampleDataResults = {
+  let sampleDataResults: ReadOnlyCollectionBackendResponse = {
+    meta_name: 'meta_name',
+    can_edit: false,
+    meta_description: 'meta_description',
     collection: {
       id: '0',
       title: 'Collection Under Test',
@@ -236,4 +239,39 @@ describe('Read only collection backend API service', () => {
     expect(successHandler).toHaveBeenCalledWith(collection);
     expect(failHandler).not.toHaveBeenCalled();
   }));
+
+  it('should return collection details from cache when calling ' +
+    '\'getCollectionDetails\'', fakeAsync(() => {
+    let collectionId = '0';
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+    let collectionDetails = {
+      canEdit: false,
+      title: 'Collection Under Test'
+    };
+
+    // Loading collection and storing it in cache.
+    readOnlyCollectionBackendApiService.loadCollectionAsync('0').then(
+      successHandler, failHandler);
+    let req = httpTestingController.expectOne('/collection_handler/data/0');
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleDataResults);
+
+    flushMicrotasks();
+
+    // Getting collection details.
+    let expectedCollection = (
+      readOnlyCollectionBackendApiService.getCollectionDetails(collectionId));
+
+    expect(expectedCollection).toEqual(collectionDetails);
+  }));
+
+  it('should throw error if we try to fetch collection ' +
+    'details which are not cached', () => {
+    // Trying to get collection details of a collection with an invalid Id.
+    let collectionId = 'invalid';
+    expect(() => {
+      readOnlyCollectionBackendApiService.getCollectionDetails(collectionId);
+    }).toThrowError('collection has not been fetched');
+  });
 });

@@ -102,6 +102,11 @@
 /core/templates/services/assets-backend-api.service*.ts @DubeySandeep
 
 
+# Blog project
+/core/domain/blog*.py @iamprayush
+/core/domain/blog_validators*.py @brianrodri @iamprayush
+
+
 # Collection project.
 /core/controllers/collection*.py @aks681
 /core/domain/collection*.py @aks681
@@ -258,7 +263,7 @@
 /core/templates/components/common-layout-directives/common-elements/alert-message.component*.ts @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/attribution-guide.component.html @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/attribution-guide.component*.ts @srijanreddy98
-/core/templates/components/common-layout-directives/common-elements/background-banner.component.ts @srijanreddy98
+/core/templates/components/common-layout-directives/common-elements/background-banner.component*.ts @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/background-banner.component.html @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/confirm-or-cancel-modal.controller*.ts @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/confirm-or-cancel-modal.component*.ts @srijanreddy98
@@ -427,7 +432,7 @@
 /core/controllers/concept_card_viewer*.py @aks681
 /core/controllers/skill*.py @aks681
 /core/domain/skill*.py @aks681
-/core/templates/components/entity-creation-services/skill-creation.service.ts @kevintab95
+/core/templates/components/entity-creation-services/skill-creation.service*.ts @kevintab95
 /core/templates/components/question-difficulty-selector/ @aks681
 /core/templates/components/review-material-editor/ @kevintab95
 /core/templates/components/rubrics-editor/ @kevintab95
@@ -481,7 +486,6 @@
 # TODO(#13119): Set @vojtechjelinek as owner after 2021-07-06 (up to /core/domain/base_model_validators*.py)
 /core/domain/audit_validators*.py @brianrodri
 /core/domain/base_model_validators*.py @brianrodri
-/core/domain/blog_validators*.py @brianrodri
 /core/domain/beam_job*.py @brianrodri
 /core/domain/email*.py @aks681
 /core/domain/image_service*.py @DubeySandeep
