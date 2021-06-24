@@ -133,7 +133,7 @@ ONE_OFF_JOB_MANAGERS = [
     topic_jobs_one_off.RegenerateTopicSummaryOneOffJob,
     topic_jobs_one_off.RemoveDeletedSkillsFromTopicOneOffJob,
     topic_jobs_one_off.TopicMigrationOneOffJob,
-    topic_jobs_one_off.UpdateTopicThumbnailSizeInBytesOneOffJob,
+    topic_jobs_one_off.UpdateTopicThumbnailSizeOneOffJob,
     user_jobs_one_off.CleanupExplorationIdsFromUserSubscriptionsModelOneOffJob,
     user_jobs_one_off.DashboardSubscriptionsOneOffJob,
     user_jobs_one_off.LongUserBiosOneOffJob,

@@ -242,7 +242,7 @@ class RegenerateTopicSummaryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, values)
 
 
-class UpdateTopicThumbnailSizeInBytesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+class UpdateTopicThumbnailSizeOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job to update the thumbnail_size_in_bytes in topic models. """
 
     _DELETED_KEY = 'topic_deleted'
@@ -257,22 +257,8 @@ class UpdateTopicThumbnailSizeInBytesOneOffJob(jobs.BaseMapReduceOneOffJobManage
     def map(item):
         if item.deleted:
             return
-        print()
-        print(item._properties)
-        print()
-        if 'thumbnail_size_in_bytes' not in item._properties: # pylint: disable=protected-access
-            item._properties['thumbnail_size_in_bytes'] = None
 
         topic = topic_fetchers.get_topic_by_id(item.id)
-        try:
-            topic.validate()
-        except Exception as e:
-            logging.exception(
-                'Topic %s failed validation: %s' % (item.id, e))
-            yield (
-                TopicMigrationOneOffJob._ERROR_KEY,
-                'Topic %s failed validation: %s' % (item.id, e))
-            return
 
         commit_cmds = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
@@ -285,7 +271,7 @@ class UpdateTopicThumbnailSizeInBytesOneOffJob(jobs.BaseMapReduceOneOffJobManage
             feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
             'Update topic thumbnail size'
         )
-        yield (UpdateTopicThumbnailSizeInBytesOneOffJob._SUCCESS_KEY, 1)
+        yield (UpdateTopicThumbnailSizeOneOffJob._SUCCESS_KEY, 1)
 
     @staticmethod
     def reduce(key, values):
