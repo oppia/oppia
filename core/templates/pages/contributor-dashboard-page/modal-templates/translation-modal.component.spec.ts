@@ -496,6 +496,64 @@ describe('Translation Modal Component', () => {
       });
     });
 
+    describe('when original text has paragraphs with spaces', () => {
+      it('should exclude paragraphs with spaces', () => {
+        component.textToTranslate = '<p>First para</p><p>&nbsp;</p>';
+
+        const filteredText = component.modifyContentToValidate(component.textToTranslate);
+
+        expect(filteredText).toBe('<p>First para</p>');
+      });
+    });
+
+    describe('when translated content have elements with missing child' +
+        ' elements', () => {
+      it('should not submit the translation', () => {
+        component.textToTranslate = '<p><strong>First</strong> para</p>';
+        component.activeWrittenTranslation.html = '<p>New First para</p>';
+        spyOn(translateTextService, 'suggestTranslatedText').and.callThrough();
+
+        component.suggestTranslatedText();
+
+        expect(translateTextService.suggestTranslatedText)
+          .toHaveBeenCalledTimes(0);
+      });
+    });
+
+    describe('when translated content have elements with incorrect child' +
+        ' elements', () => {
+      it('should not submit the translation', () => {
+        component.textToTranslate = '<p><strong>First</strong> para</p>';
+        component.activeWrittenTranslation.html = '<p><i>New</i> Para</p>';
+        spyOn(translateTextService, 'suggestTranslatedText').and.callThrough();
+
+        component.suggestTranslatedText();
+
+        expect(translateTextService.suggestTranslatedText)
+          .toHaveBeenCalledTimes(0);
+      });
+    });
+
+    describe('when alt text/caption is not included in original text', () => {
+      it('should submit the translation', () => {
+        component.textToTranslate = '<oppia-noninteractive-image filepath-' +
+          'with-value="&amp;quot;img_20210624_184112_z05ty41osl_height_69_w' +
+          'idth_363.png&amp;quot;" ng-version="11.2.14"></oppia-noninteract' +
+          'ive-image>';
+        component.activeWrittenTranslation.html = (
+          '<oppia-noninteractive-image filepath-' +
+          'with-value="&amp;quot;img_20210624_184112_z05ty41osl_height_69_w' +
+          'idth_363.png&amp;quot;" ng-version="11.2.14"></oppia-noninteract' +
+          'ive-image>');
+        spyOn(translateTextService, 'suggestTranslatedText');
+
+        component.suggestTranslatedText();
+
+        expect(translateTextService.suggestTranslatedText)
+          .toHaveBeenCalledTimes(1);
+      });
+    });
+
     describe('when suggesting the last available text', () => {
       beforeEach(() => {
         expectedPayload = {

@@ -99,6 +99,7 @@ export class TranslationModalComponent {
   hadCopyParagraphError = false;
   hasImgTextError = false;
   hasIncompleteTranslationError = false;
+  elementViolation: string;
 
   constructor(
     private readonly activeModal: NgbActiveModal,
@@ -231,7 +232,9 @@ export class TranslationModalComponent {
       // img_2021029_210552_zbmdt94_height_54_width_490.png&amp;quot;">
       // </oppia-noninteractive-image>
       if (element.localName === 'oppia-noninteractive-image') {
-        const attribute = element.attributes[type].value;
+        const attribute = (
+          element.attributes[type] ? 
+          element.attributes[type].value : '&quot;&quot;');
         return attribute.substring(
           textWrapperLength, attribute.length - textWrapperLength);
       }
@@ -284,7 +287,26 @@ export class TranslationModalComponent {
     for (const [i, originalElement] of filteredOriginalElements.entries()) {
       if (originalElement.nodeName !== filteredTranslatedElements[
         i].nodeName) {
+        this.elementViolation = (
+          '"' + filteredTranslatedElements[i].outerHTML + '"' + ' does ' + 
+          'not match ' + '"' + originalElement.outerHTML + '"' + '.');
         return false;
+      }
+      if (originalElement.children.length !== filteredTranslatedElements[
+        i].children.length) {
+        this.elementViolation = (
+          '"' + filteredTranslatedElements[i].outerHTML + '"' + ' does ' + 
+          'not match ' + '"' + originalElement.outerHTML + '"' + '.');
+        return false;
+      }
+      for (let index = 0; index < originalElement.children.length; index++) {
+        if(originalElement.children[index].nodeName !== (
+          filteredTranslatedElements[i].children[index].nodeName)) {
+          this.elementViolation = (
+            '"' + filteredTranslatedElements[i].outerHTML + '"' + ' does ' + 
+            'not match ' + '"' + originalElement.outerHTML + '"' + '.');
+          return false;
+        }
       }
     }
     return true;
@@ -315,11 +337,29 @@ export class TranslationModalComponent {
       hasDuplicateDescriptions, hasUntranslatedElements);
   }
 
+  modifyContentToValidate(text: string): string {
+    const lineBreakLessText = text.replace(/(\r\n|\n|\r)/gm, "");
+
+    // These fake wrappers are added in order to wrap all the unwrapped texts
+    // to validate. See issue https://github.com/oppia/oppia/issues/13173
+    const fakeDiv = $('<div />', {html: lineBreakLessText});
+    fakeDiv.contents().filter(function() {
+      if(this.innerHTML === '&nbsp;') {
+        this.parentElement.removeChild(this);
+      }
+      return (this.nodeType === 3);
+    }).wrap('<p />');
+
+    return fakeDiv.html();
+  }
+
   suggestTranslatedText(): void {
+    this.elementViolation = null;
+
     const originalElements = Array.from(angular.element(
-      this.textToTranslate));
+      this.modifyContentToValidate(this.textToTranslate)));
     const translatedElements = Array.from(angular.element(
-      this.activeWrittenTranslation.html));
+      this.modifyContentToValidate(this.activeWrittenTranslation.html)));
 
     const translationError = this.validateTranslation(
       originalElements, translatedElements);
@@ -359,8 +399,7 @@ export class TranslationModalComponent {
             this.textToTranslate = textAndAvailability.text;
             this.moreAvailable = textAndAvailability.more;
             this.activeStatus = textAndAvailability.status;
-            this.activeWrittenTranslation.html = (
-              textAndAvailability.translationHtml);
+            this.activeWrittenTranslation.html = '';
           } else {
             this.activeWrittenTranslation.html = '';
           }
