@@ -54,8 +54,8 @@ def save_learner_goals(learner_goals):
     """
     learner_goals_dict = learner_goals.to_dict()
 
-    learner_goals_model = (user_models.LearnerGoalsModel.get(
-        learner_goals.id, strict=False))
+    learner_goals_model = user_models.LearnerGoalsModel.get(
+        learner_goals.id, strict=False)
     if learner_goals_model is not None:
         learner_goals_model.populate(**learner_goals_dict)
         learner_goals_model.update_timestamps()
@@ -81,11 +81,9 @@ def mark_topic_to_learn(user_id, topic_id):
     learner_goals_model = user_models.LearnerGoalsModel.get(
         user_id, strict=False)
     if not learner_goals_model:
-        learner_goals_model = (
-            user_models.LearnerGoalsModel(id=user_id))
+        learner_goals_model = user_models.LearnerGoalsModel(id=user_id)
 
-    learner_goals = get_learner_goals_from_model(
-        learner_goals_model)
+    learner_goals = get_learner_goals_from_model(learner_goals_model)
 
     goals_limit_exceeded = False
     topic_ids_count = len(learner_goals.topic_ids_to_learn)
@@ -94,17 +92,20 @@ def mark_topic_to_learn(user_id, topic_id):
             learner_goals.add_topic_id_to_learn(topic_id)
         else:
             goals_limit_exceeded = True
-    save_learner_goals(learner_goals)
-    return goals_limit_exceeded
+        save_learner_goals(learner_goals)
+        return goals_limit_exceeded
+    else:
+        raise Exception(
+            'The topic id %s is already present in the learner goals' % (
+                topic_id))
 
 
-def remove_topics_from_learn_goal(user_id, topic_ids_in_learn):
-    """Removes topics from the learner goals of the user
-    (if present).
+def remove_topics_from_learn_goal(user_id, topic_ids_to_remove):
+    """Removes topics from the learner goals of the user (if present).
 
     Args:
         user_id: str. The id of the user.
-        topic_ids_in_learn: list(str). The ids of the topics to be removed.
+        topic_ids_to_remove: list(str). The ids of the topics to be removed.
     """
     learner_goals_model = user_models.LearnerGoalsModel.get(
         user_id, strict=False)
@@ -112,10 +113,14 @@ def remove_topics_from_learn_goal(user_id, topic_ids_in_learn):
     if learner_goals_model:
         learner_goals = get_learner_goals_from_model(
             learner_goals_model)
-        for topic_id in topic_ids_in_learn:
+        for topic_id in topic_ids_to_remove:
             if topic_id in learner_goals.topic_ids_to_learn:
                 learner_goals.remove_topic_id_from_learn(topic_id)
-                save_learner_goals(learner_goals)
+            else:
+                raise Exception(
+                    'The topic id %s is not present in LearnerGoalsModel' % (
+                        topic_id))
+        save_learner_goals(learner_goals)
 
 
 def get_all_topic_ids_to_learn(user_id):

@@ -162,11 +162,11 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
             self._get_all_topic_ids_to_learn(
                 self.viewer_id), [self.TOPIC_ID_1, self.TOPIC_ID_2])
 
-        learner_progress_services.validate_and_add_topic_to_learn_goal(
-            self.viewer_id, self.TOPIC_ID_1)
-        self.assertEqual(
-            self._get_all_topic_ids_to_learn(
-                self.viewer_id), [self.TOPIC_ID_1, self.TOPIC_ID_2])
+        with self.assertRaisesRegexp(
+            Exception,
+            'The topic id Topic_id_1 is already present in the learner goals'):
+            learner_progress_services.validate_and_add_topic_to_learn_goal(
+                self.viewer_id, self.TOPIC_ID_1)
 
     def test_completed_topic_is_not_added_to_learner_goals(self):
         learner_progress_services.validate_and_add_topic_to_learn_goal(
@@ -184,7 +184,7 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
             self._get_all_topic_ids_to_learn(
                 self.viewer_id), [self.TOPIC_ID_1])
 
-    def test_nunmber_of_topics_cannot_exceed_max(self):
+    def test_number_of_topics_cannot_exceed_max(self):
         # Add MAX_CURRENT_GOALS_COUNT topics.
         topic_ids = ['SAMPLE_TOPIC_ID_%s' % index for index in (
             python_utils.RANGE(0, MAX_CURRENT_GOALS_COUNT))]
@@ -220,11 +220,12 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
         self.assertEqual(self._get_all_topic_ids_to_learn(
             self.viewer_id), [self.TOPIC_ID_2])
 
-        # Removing the same topic again has no effect.
-        learner_goals_services.remove_topics_from_learn_goal(
-            self.viewer_id, [self.TOPIC_ID_1])
-        self.assertEqual(self._get_all_topic_ids_to_learn(
-            self.viewer_id), [self.TOPIC_ID_2])
+        # Removing the same topic raises error.
+        with self.assertRaisesRegexp(
+            Exception,
+            'The topic id Topic_id_1 is not present in LearnerGoalsModel'):
+            learner_goals_services.remove_topics_from_learn_goal(
+                self.viewer_id, [self.TOPIC_ID_1])
 
         # Removing the second topic.
         learner_goals_services.remove_topics_from_learn_goal(
