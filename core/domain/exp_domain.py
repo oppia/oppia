@@ -81,9 +81,21 @@ CMD_ADD_STATE = 'add_state'
 CMD_RENAME_STATE = 'rename_state'
 # This takes an additional 'state_name' parameter.
 CMD_DELETE_STATE = 'delete_state'
-# This takes additional 'state_name', 'content_id', 'language_code' and
-# 'content_html' and 'translation_html' parameters.
-CMD_ADD_TRANSLATION = 'add_translation'
+# TODO(#12981): Write a one-off job to modify all existing translation
+# suggestions that use DEPRECATED_CMD_ADD_TRANSLATION to use
+# CMD_ADD_WRITTEN_TRANSLATION instead. Suggestions in the future will only use
+# CMD_ADD_WRITTEN_TRANSLATION.
+# DEPRECATED: This command is deprecated. Please do not use. The command remains
+# here to support old suggestions. This takes additional 'state_name',
+# 'content_id', 'language_code' and 'content_html' and 'translation_html'
+# parameters.
+DEPRECATED_CMD_ADD_TRANSLATION = 'add_translation'
+# This takes additional 'state_name', 'content_id', 'language_code',
+# 'data_format', 'content_html' and 'translation_html' parameters.
+CMD_ADD_WRITTEN_TRANSLATION = 'add_written_translation'
+# This takes additional 'content_id' and 'state_name' parameters.
+CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE = (
+    'mark_written_translations_as_needing_update')
 # This takes additional 'property_name' and 'new_value' parameters.
 CMD_EDIT_STATE_PROPERTY = 'edit_state_property'
 # This takes additional 'property_name' and 'new_value' parameters.
@@ -274,10 +286,22 @@ class ExplorationChange(change_domain.BaseChange):
         'optional_attribute_names': [],
         'user_id_attribute_names': []
     }, {
-        'name': CMD_ADD_TRANSLATION,
+        'name': DEPRECATED_CMD_ADD_TRANSLATION,
         'required_attribute_names': [
             'state_name', 'content_id', 'language_code', 'content_html',
             'translation_html'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
+    }, {
+        'name': CMD_ADD_WRITTEN_TRANSLATION,
+        'required_attribute_names': [
+            'state_name', 'content_id', 'language_code', 'content_html',
+            'translation_html', 'data_format'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
+    }, {
+        'name': CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE,
+        'required_attribute_names': ['content_id', 'state_name'],
         'optional_attribute_names': [],
         'user_id_attribute_names': []
     }, {
@@ -286,7 +310,10 @@ class ExplorationChange(change_domain.BaseChange):
             'property_name', 'state_name', 'new_value'],
         'optional_attribute_names': ['old_value'],
         'user_id_attribute_names': [],
-        'allowed_values': {'property_name': STATE_PROPERTIES}
+        'allowed_values': {'property_name': STATE_PROPERTIES},
+        # TODO(#12991): Remove this once once we use the migration jobs to
+        # remove the deprecated values from the server data.
+        'deprecated_values': {'property_name': ['fallbacks']}
     }, {
         'name': CMD_EDIT_EXPLORATION_PROPERTY,
         'required_attribute_names': ['property_name', 'new_value'],
@@ -304,6 +331,12 @@ class ExplorationChange(change_domain.BaseChange):
         'optional_attribute_names': [],
         'user_id_attribute_names': []
     }]
+
+    # TODO(#12991): Remove this once once we use the migration jobs to remove
+    # the deprecated commands from the server data.
+    DEPRECATED_COMMANDS = [
+        'clone', 'add_gadget', 'edit_gadget_property',
+        'delete_gadget', 'rename_gadget']
 
 
 class ExplorationCommitLogEntry(python_utils.OBJECT):
@@ -967,87 +1000,89 @@ class Exploration(python_utils.OBJECT):
                             'but it does not exist in this exploration'
                             % param_change.name)
 
-        # Check if first state is a checkpoint or not.
-        if not self.states[self.init_state_name].card_is_checkpoint:
-            raise utils.ValidationError(
-                'Expected card_is_checkpoint of first state to be True'
-                ' but found it to be %s'
-                % (self.states[self.init_state_name].card_is_checkpoint)
-            )
-
-        # Check if terminal states are checkpoints.
-        for state_name, state in self.states.items():
-            interaction = state.interaction
-            if interaction.is_terminal:
-                if state_name != self.init_state_name:
-                    if self.states[state_name].card_is_checkpoint:
-                        raise utils.ValidationError(
-                            'Expected card_is_checkpoint of terminal state to '
-                            'be False but found it to be %s'
-                            % self.states[state_name].card_is_checkpoint
-                        )
-
-        # Check if checkpoint count is between 1 and 8, inclusive.
-        checkpoint_count = 0
-        for state_name, state in self.states.items():
-            if state.card_is_checkpoint:
-                checkpoint_count = checkpoint_count + 1
-        if not 1 <= checkpoint_count <= 8:
-            raise utils.ValidationError(
-                'Expected checkpoint count to be between 1 and 8 inclusive '
-                'but found it to be %s'
-                % checkpoint_count
-            )
-
-        # Check if a state marked as a checkpoint is bypassable.
-        non_initial_checkpoint_state_names = []
-        for state_name, state in self.states.items():
-            if state_name != self.init_state_name and state.card_is_checkpoint:
-                non_initial_checkpoint_state_names.append(state_name)
-
-        # For every non-initial checkpoint state we remove it from the states
-        # dict. Then we check if we can reach a terminal state after removing
-        # the state with checkpoint. As soon as we find a terminal state, we
-        # break out of the loop and raise a validation error. Since, we reached
-        # a terminal state, this implies that the user was not required to go
-        # through the checkpoint. Hence, the checkpoint is bypassable.
-        for state_name_to_exclude in non_initial_checkpoint_state_names:
-            new_states = copy.deepcopy(self.states)
-            new_states.pop(state_name_to_exclude)
-            processed_state_names = set()
-            curr_queue = [self.init_state_name]
-            excluded_state_is_bypassable = False
-            while curr_queue:
-                if curr_queue[0] == state_name_to_exclude:
-                    curr_queue.pop(0)
-                    continue
-                curr_state_name = curr_queue[0]
-                curr_queue = curr_queue[1:]
-                if not curr_state_name in processed_state_names:
-                    processed_state_names.add(curr_state_name)
-                    curr_state = new_states[curr_state_name]
-
-                    # We do not need to check if the current state is terminal
-                    # or not before getting all outcomes, as when we find a
-                    # terminal state in an outcome, we break out of the for loop
-                    # and raise a validation error.
-                    all_outcomes = (
-                        curr_state.interaction.get_all_outcomes())
-                    for outcome in all_outcomes:
-                        dest_state = outcome.dest
-                        if self.states[dest_state].interaction.is_terminal:
-                            excluded_state_is_bypassable = True
-                            break
-                        if (dest_state not in curr_queue and
-                                dest_state not in processed_state_names):
-                            curr_queue.append(dest_state)
-                if excluded_state_is_bypassable:
-                    raise utils.ValidationError(
-                        'Cannot make %s a checkpoint as it is bypassable'
-                        % state_name_to_exclude)
-
         if strict:
             warnings_list = []
+
+            # Check if first state is a checkpoint or not.
+            if not self.states[self.init_state_name].card_is_checkpoint:
+                raise utils.ValidationError(
+                    'Expected card_is_checkpoint of first state to be True'
+                    ' but found it to be %s'
+                    % (self.states[self.init_state_name].card_is_checkpoint)
+                )
+
+            # Check if terminal states are checkpoints.
+            for state_name, state in self.states.items():
+                interaction = state.interaction
+                if interaction.is_terminal:
+                    if state_name != self.init_state_name:
+                        if self.states[state_name].card_is_checkpoint:
+                            raise utils.ValidationError(
+                                'Expected card_is_checkpoint of terminal state '
+                                'to be False but found it to be %s'
+                                % self.states[state_name].card_is_checkpoint
+                            )
+
+            # Check if checkpoint count is between 1 and 8, inclusive.
+            checkpoint_count = 0
+            for state_name, state in self.states.items():
+                if state.card_is_checkpoint:
+                    checkpoint_count = checkpoint_count + 1
+            if not 1 <= checkpoint_count <= 8:
+                raise utils.ValidationError(
+                    'Expected checkpoint count to be between 1 and 8 inclusive '
+                    'but found it to be %s'
+                    % checkpoint_count
+                )
+
+            # Check if a state marked as a checkpoint is bypassable.
+            non_initial_checkpoint_state_names = []
+            for state_name, state in self.states.items():
+                if (state_name != self.init_state_name
+                        and state.card_is_checkpoint):
+                    non_initial_checkpoint_state_names.append(state_name)
+
+            # For every non-initial checkpoint state we remove it from the
+            # states dict. Then we check if we can reach a terminal state after
+            # removing the state with checkpoint. As soon as we find a terminal
+            # state, we break out of the loop and raise a validation error.
+            # Since, we reached a terminal state, this implies that the user was
+            # not required to go through the checkpoint. Hence, the checkpoint
+            # is bypassable.
+            for state_name_to_exclude in non_initial_checkpoint_state_names:
+                new_states = copy.deepcopy(self.states)
+                new_states.pop(state_name_to_exclude)
+                processed_state_names = set()
+                curr_queue = [self.init_state_name]
+                excluded_state_is_bypassable = False
+                while curr_queue:
+                    if curr_queue[0] == state_name_to_exclude:
+                        curr_queue.pop(0)
+                        continue
+                    curr_state_name = curr_queue[0]
+                    curr_queue = curr_queue[1:]
+                    if not curr_state_name in processed_state_names:
+                        processed_state_names.add(curr_state_name)
+                        curr_state = new_states[curr_state_name]
+
+                        # We do not need to check if the current state is
+                        # terminal or not before getting all outcomes, as when
+                        # we find a terminal state in an outcome, we break out
+                        # of the for loop and raise a validation error.
+                        all_outcomes = (
+                            curr_state.interaction.get_all_outcomes())
+                        for outcome in all_outcomes:
+                            dest_state = outcome.dest
+                            if self.states[dest_state].interaction.is_terminal:
+                                excluded_state_is_bypassable = True
+                                break
+                            if (dest_state not in curr_queue and
+                                    dest_state not in processed_state_names):
+                                curr_queue.append(dest_state)
+                    if excluded_state_is_bypassable:
+                        raise utils.ValidationError(
+                            'Cannot make %s a checkpoint as it is bypassable'
+                            % state_name_to_exclude)
 
             try:
                 self._verify_all_states_reachable()

@@ -181,21 +181,21 @@ var AdminPage = function() {
 
   this.getFeaturesTab = async function() {
     await this.get();
-    const featuresTab = element(by.css('.protractor-test-admin-features-tab'));
+    var featuresTab = element(by.css('.protractor-test-admin-features-tab'));
     await action.click('Admin features tab', featuresTab);
-    const featureFlagElements = element.all(
+    var featureFlagElements = element.all(
       by.css('.protractor-test-feature-flag'));
     await waitFor.visibilityOf(
       featureFlagElements.first(), 'Feature flags not showing up');
   };
 
   this.getDummyFeatureElement = async function() {
-    const featureFlagElements = element.all(
+    var featureFlagElements = element.all(
       by.css('.protractor-test-feature-flag'));
 
-    const count = await featureFlagElements.count();
+    var count = await featureFlagElements.count();
     for (let i = 0; i < count; i++) {
-      const elem = await featureFlagElements.get(i);
+      var elem = await featureFlagElements.get(i);
       if ((await elem.element(by.css('h2.oppia-feature-name')).getText()) ===
           'dummy_feature') {
         return elem;
@@ -257,7 +257,7 @@ var AdminPage = function() {
     await action.click('Config Tab', configTab);
     await waitFor.elementToBeClickable(saveAllConfigs);
 
-    const results = [];
+    var results = [];
     for (let configProperty of (await configProperties)) {
       results.push(
         await saveConfigProperty(
@@ -340,6 +340,8 @@ var AdminPage = function() {
     await action.click('Admin Roles Tab', adminRolesTab);
 
     // Change values for "update role" form, and submit it.
+    await waitFor.visibilityOf(
+      updateFormName, 'Update Form name taking too long to appear.');
     await action.sendKeys('Update Form Name', updateFormName, name);
     await action.select('Role Drop Down', roleSelect, newRole);
     await action.click('Update Form Submit', updateFormSubmit);
@@ -373,6 +375,10 @@ var AdminPage = function() {
 
   this.expectUsernamesToMatch = async function(expectedUsernamesArray) {
     var foundUsersArray = [];
+    if (expectedUsernamesArray.length !== 0) {
+      await waitFor.visibilityOf(element(
+        by.css('.protractor-test-roles-result-rows')));
+    }
     var usernames = await element.all(
       by.css('.protractor-test-roles-result-rows'))
       .map(async function(elm) {

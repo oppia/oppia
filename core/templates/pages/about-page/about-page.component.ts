@@ -16,103 +16,65 @@
  * @fileoverview Component for the about page.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
-import { AboutPageConstants } from './about-page.constants';
+import constants from 'assets/constants';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { WindowRef } from
   'services/contextual/window-ref.service';
 
-interface CreditNames {
-  letter: string;
-  names: string[];
-}
-
 @Component({
   selector: 'about-page',
   templateUrl: './about-page.component.html'
 })
-export class AboutPageComponent implements OnInit {
-  aboutPageMascotImgUrl: string;
-  activeTabName: string;
-  allCredits: CreditNames[] = [];
-  listOfNames: string;
-  listOfNamesToThank = [
-    'Alex Kauffmann', 'Allison Barros',
-    'Amy Latten', 'Brett Barros',
-    'Crystal Kwok', 'Daniel Hernandez',
-    'Divya Siddarth', 'Ilwon Yoon',
-    'Jennifer Chen', 'John Cox',
-    'John Orr', 'Katie Berlent',
-    'Michael Wawszczak', 'Mike Gainer',
-    'Neil Fraser', 'Noah Falstein',
-    'Nupur Jain', 'Peter Norvig',
-    'Philip Guo', 'Piotr Mitros',
-    'Rachel Chen', 'Rahim Nathwani',
-    'Robyn Choo', 'Tricia Ngoon',
-    'Vikrant Nanda', 'Vinamrata Singal',
-    'Yarin Feigenbaum'];
-  // Define constant for each tab on the page.
-  TAB_ID_ABOUT = 'about';
-  TAB_ID_FOUNDATION = 'foundation';
-  TAB_ID_CREDITS = 'credits';
-  ALLOWED_TABS = [
-    this.TAB_ID_ABOUT, this.TAB_ID_FOUNDATION, this.TAB_ID_CREDITS];
+export class AboutPageComponent {
+  features = [{
+    i18nDescription: 'I18N_ABOUT_PAGE_AUDIO_SUBTITLES_FEATURE',
+    imageFilename: '/about/cc.svg',
+  }, {
+    i18nDescription: 'I18N_ABOUT_PAGE_LESSON_FEATURE',
+    imageFilename: '/about/lesson_icon.svg'
+  }, {
+    i18nDescription: 'I18N_ABOUT_PAGE_MOBILE_FEATURE',
+    imageFilename: '/about/mobile_alt_solid.svg'
+  }, {
+    i18nDescription: 'I18N_ABOUT_PAGE_WIFI_FEATURE',
+    imageFilename: '/about/wifi_solid.svg'
+  }, {
+    i18nDescription: 'I18N_ABOUT_PAGE_LANGUAGE_FEATURE',
+    imageFilename: '/about/language_icon.svg'
+  }];
   constructor(
     private urlInterpolationService: UrlInterpolationService,
-    private windowRef: WindowRef) {
-  }
-
-  getCredits(startLetter: string): string[] {
-    const results = AboutPageConstants.CREDITS_CONSTANTS.filter(
-      (credit) => credit.startsWith(startLetter)).sort();
-    return results;
-  }
-
-  onTabClick(tabName: string): Window {
-    this.windowRef.nativeWindow.location.hash = '#' + tabName;
-    this.activeTabName = tabName;
-    return this.windowRef.nativeWindow;
+    private windowRef: WindowRef,
+    private siteAnalyticsService: SiteAnalyticsService) {
   }
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  ngOnInit(): void {
-    this.activeTabName = this.TAB_ID_ABOUT;
-    this.allCredits = [];
-    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
-    for (const letter of letters) {
-      const names = this.getCredits(letter);
-      if (names.length > 0) {
-        this.allCredits.push({letter, names});
-      }
-    }
-    const hash = this.windowRef.nativeWindow.location.hash.slice(1);
-    if (hash === 'license') {
-      this.activeTabName = this.TAB_ID_FOUNDATION;
-    } else if (this.ALLOWED_TABS.includes(hash)) {
-      this.activeTabName = hash;
-    }
+  onClickVisitClassroomButton(): void {
+    let classroomUrl = this.urlInterpolationService.interpolateUrl(
+      '/learn/<classroomUrlFragment>', {
+        classroomUrlFragment: constants.DEFAULT_CLASSROOM_URL_FRAGMENT
+      });
+    this.siteAnalyticsService.registerClickVisitClassroomButtonEvent();
+    this.windowRef.nativeWindow.location.href = classroomUrl;
+  }
 
-    this.listOfNames = this.listOfNamesToThank
-      .slice(0, this.listOfNamesToThank.length - 1).join(', ') +
-      ' & ' + this.listOfNamesToThank[this.listOfNamesToThank.length - 1];
-    this.aboutPageMascotImgUrl = this.urlInterpolationService
-      .getStaticImageUrl('/general/about_page_mascot.webp');
+  onClickBrowseLibraryButton(): void {
+    this.siteAnalyticsService.registerClickBrowseLibraryButtonEvent();
+    this.windowRef.nativeWindow.location.href = '/community-library';
+  }
 
-    this.windowRef.nativeWindow.onhashchange = () => {
-      const hashChange = this.windowRef.nativeWindow.location.hash.slice(1);
-      if (hashChange === 'license') {
-        this.activeTabName = this.TAB_ID_FOUNDATION;
-        this.windowRef.nativeWindow.location.reload(true);
-      } else if (this.ALLOWED_TABS.includes(hashChange)) {
-        this.activeTabName = hashChange;
-      }
-    };
+  onClickCreateLessonButton(): void {
+    this.siteAnalyticsService.registerCreateLessonButtonEvent();
+    this.windowRef.nativeWindow.location.href = (
+      '/creator-dashboard?mode=create');
   }
 }
 angular.module('oppia').directive(

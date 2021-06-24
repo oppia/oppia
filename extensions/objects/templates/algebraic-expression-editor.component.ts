@@ -74,14 +74,14 @@ export class AlgebraicExpressionEditorComponent implements OnInit {
       // for touch-based devices) to capture input from user and the 'change'
       // event while using the normal keyboard.
       Guppy.event('focus', (focusObj) => {
-        if (!focusObj.focused) {
-          this.isCurrentAnswerValid();
-        }
         const activeGuppyObject = (
           this.guppyInitializationService.findActiveGuppyObject());
         if (activeGuppyObject !== undefined) {
           this.hasBeenTouched = true;
           this.currentValue = activeGuppyObject.guppyInstance.asciimath();
+        }
+        if (!focusObj.focused) {
+          this.isCurrentAnswerValid();
         }
       });
     } else {
@@ -89,14 +89,14 @@ export class AlgebraicExpressionEditorComponent implements OnInit {
       // for touch-based devices) to capture input from user and the 'change'
       // event while using the normal keyboard.
       Guppy.event('change', (focusObj) => {
-        if (!focusObj.focused) {
-          this.isCurrentAnswerValid();
-        }
         const activeGuppyObject = (
           this.guppyInitializationService.findActiveGuppyObject());
         if (activeGuppyObject !== undefined) {
           this.hasBeenTouched = true;
           this.currentValue = activeGuppyObject.guppyInstance.asciimath();
+          this.isCurrentAnswerValid();
+        }
+        if (!focusObj.focused) {
           this.isCurrentAnswerValid();
         }
       });

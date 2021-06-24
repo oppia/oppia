@@ -182,12 +182,13 @@ class QuestionSuggestionMigrationJobManagerTests(test_utils.GenericTestBase):
                 ['TextInput'], category='Algebra'))
 
         add_translation_change_dict = {
-            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': 'State 1',
             'content_id': 'content',
             'language_code': 'hi',
             'content_html': exploration.states['State 1'].content.html,
-            'translation_html': '<p>This is translated html.</p>'
+            'translation_html': '<p>This is translated html.</p>',
+            'data_format': 'html'
         }
 
         suggestion_services.create_suggestion(
@@ -982,12 +983,14 @@ class SuggestionSvgFilenameValidationOneOffJobTests(test_utils.GenericTestBase):
                 self.author_id_1, change1, 'test description')
 
         change2 = {
-            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': 'state_1',
             'content_id': 'content',
             'language_code': 'hi',
-            'content_html': '<p>State name: state_1, Content id: content</p>',
-            'translation_html': '<p>This is translated html.</p>'
+            'content_html': (
+                '<p>State name: state_1, Content id: content</p>'),
+            'translation_html': '<p>This is translated html.</p>',
+            'data_format': 'html'
         }
         with self.swap(
             exp_fetchers, 'get_exploration_by_id',
@@ -1109,12 +1112,13 @@ class PopulateContributionStatsOneOffJobTests(
     def _create_translation_suggestion_with_language_code(self, language_code):
         """Creates a translation suggestion in the given language_code."""
         add_translation_change_dict = {
-            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': 'state_1',
             'content_id': 'content',
             'language_code': language_code,
             'content_html': '<p>This is html to translate.</p>',
-            'translation_html': '<p>This is translated html.</p>'
+            'translation_html': '<p>This is translated html.</p>',
+            'data_format': 'html'
         }
 
         with self.swap(

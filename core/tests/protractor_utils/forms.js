@@ -171,8 +171,9 @@ var ListEditor = function(elem) {
 var RealEditor = function(elem) {
   return {
     setValue: async function(value) {
-      await elem.element(by.tagName('input')).clear();
-      await elem.element(by.tagName('input')).sendKeys(value);
+      await action.clear('Text Input', elem.element(by.tagName('input')));
+      await action.sendKeys(
+        'Text Input', elem.element(by.tagName('input')), value);
     }
   };
 };
@@ -444,6 +445,7 @@ var MultiSelectEditor = function(elem) {
 //   handler.readRteComponent('Math', ...);
 var expectRichText = function(elem) {
   var toMatch = async function(richTextInstructions) {
+    await waitFor.visibilityOf(elem, 'RTE taking too long to become visible');
     // TODO(#9821): Find a better way to parse through the tags rather than
     // using xpath.
     // We select all top-level non-paragraph elements, as well as all children

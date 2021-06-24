@@ -24,7 +24,6 @@ import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { ExplorationFeaturesService } from
   'services/exploration-features.service';
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { ImprovementsService } from 'services/improvements.service';
 import { OutcomeObjectFactory } from
@@ -40,6 +39,9 @@ import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
+import { StateCardIsCheckpointService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-card-is-checkpoint.service';
 import { StateEditorService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -55,6 +57,7 @@ import { SubtitledUnicode } from
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import { ExplorationDataService } from '../services/exploration-data.service';
 
 describe('Exploration editor tab component', function() {
   var ctrl;
@@ -75,6 +78,7 @@ describe('Exploration editor tab component', function() {
   var siteAnalyticsService = null;
   var stateEditorRefreshService = null;
   var solutionObjectFactory = null;
+  var stateCardIsCheckpointService = null;
   var stateEditorService = null;
   var userExplorationPermissionsService = null;
   var focusManagerService = null;
@@ -82,7 +86,21 @@ describe('Exploration editor tab component', function() {
 
   importAllAngularServices();
 
-  beforeEach(function() {
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [
+        {
+          provide: ExplorationDataService,
+          useValue: {
+            explorationId: 0,
+            autosaveChangeListAsync() {
+              return;
+            }
+          }
+        }
+      ]
+    });
+
     answerGroupObjectFactory = TestBed.get(AnswerGroupObjectFactory);
     explorationFeaturesService = TestBed.get(ExplorationFeaturesService);
     hintObjectFactory = TestBed.get(HintObjectFactory);
@@ -97,7 +115,6 @@ describe('Exploration editor tab component', function() {
       'AnswerGroupObjectFactory', answerGroupObjectFactory);
     $provide.value(
       'ExplorationFeaturesService', explorationFeaturesService);
-    $provide.value('FractionObjectFactory', TestBed.get(FractionObjectFactory));
     $provide.value('HintObjectFactory', hintObjectFactory);
     $provide.value('ImprovementsService', TestBed.get(ImprovementsService));
     $provide.value(
@@ -114,6 +131,9 @@ describe('Exploration editor tab component', function() {
       'StateClassifierMappingService',
       TestBed.get(StateClassifierMappingService));
     $provide.value(
+      'StateCardIsCheckpointService',
+      TestBed.get(StateCardIsCheckpointService));
+    $provide.value(
       'StateEditorService', TestBed.get(StateEditorService));
     $provide.value('UnitsObjectFactory', TestBed.get(UnitsObjectFactory));
     $provide.value(
@@ -122,9 +142,6 @@ describe('Exploration editor tab component', function() {
     $provide.value(
       'WrittenTranslationsObjectFactory',
       TestBed.get(WrittenTranslationsObjectFactory));
-    $provide.value('ExplorationDataService', {
-      autosaveChangeListAsync: function() {}
-    });
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
@@ -133,6 +150,8 @@ describe('Exploration editor tab component', function() {
     $uibModal = $injector.get('$uibModal');
     $timeout = $injector.get('$timeout');
     stateEditorService = $injector.get('StateEditorService');
+    stateCardIsCheckpointService = $injector.get(
+      'StateCardIsCheckpointService');
     editabilityService = $injector.get('EditabilityService');
     focusManagerService = $injector.get('FocusManagerService');
     explorationInitStateNameService = $injector.get(
@@ -152,6 +171,7 @@ describe('Exploration editor tab component', function() {
 
     explorationStatesService.init({
       'First State': {
+        card_is_checkpoint: true,
         content: {
           content_id: 'content',
           html: 'First State Content'
@@ -230,6 +250,7 @@ describe('Exploration editor tab component', function() {
         }
       },
       'Second State': {
+        card_is_checkpoint: false,
         content: {
           content_id: 'content',
           html: 'Second State Content'
@@ -586,6 +607,19 @@ describe('Exploration editor tab component', function() {
     expect(stateEditorService.solicitAnswerDetails).toBe(true);
   });
 
+  it('should save card is checkpoint on change', function() {
+    stateEditorService.setActiveStateName('Second State');
+    stateEditorService.setCardIsCheckpoint(
+      explorationStatesService.getState('Second State').cardIsCheckpoint);
+
+    expect(stateEditorService.cardIsCheckpoint).toBe(false);
+
+    stateCardIsCheckpointService.displayed = true;
+    ctrl.onChangeCardIsCheckpoint();
+
+    expect(stateEditorService.cardIsCheckpoint).toBe(true);
+  });
+
   it('should mark all audio as needing update when closing modal', function() {
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.resolve()
@@ -776,10 +810,10 @@ describe('Exploration editor tab component', function() {
       spyOn(angular, 'element')
         .withArgs('#tutorialStateContent').and.returnValue({
           // This throws "Type '{ top: number; }' is not assignable to type
-          // 'JQLite | Coordinates'." This is because the actual 'offset'
-          // functions returns more properties than the function we've
-          // defined. We have only returned the properties we need
-          // in 'offset' function.
+          // 'JQLite | Coordinates'.". We need to suppress this error because
+          // the actual 'offset' functions returns more properties than the
+          // function we've defined. We have only returned the properties we
+          // need in 'offset' function.
           // @ts-expect-error
           offset: () => ({
             top: 5
@@ -802,10 +836,10 @@ describe('Exploration editor tab component', function() {
       spyOn(angular, 'element')
         .withArgs('#tutorialStateInteraction').and.returnValue({
           // This throws "Type '{ top: number; }' is not assignable to type
-          // 'JQLite | Coordinates'." This is because the actual 'offset'
-          // functions returns more properties than the function we've
-          // defined. We have only returned the properties we need
-          // in 'offset' function.
+          // 'JQLite | Coordinates'.". We need to suppress this error because
+          // the actual 'offset' functions returns more properties than the
+          // function we've defined. We have only returned the properties we
+          // need in 'offset' function.
           // @ts-expect-error
           offset: () => ({
             top: 20
@@ -828,10 +862,10 @@ describe('Exploration editor tab component', function() {
       spyOn(angular, 'element')
         .withArgs('#tutorialPreviewTab').and.returnValue({
           // This throws "Type '{ top: number; }' is not assignable to type
-          // 'JQLite | Coordinates'." This is because the actual 'offset'
-          // functions returns more properties than the function we've
-          // defined. We have only returned the properties we need
-          // in 'offset' function.
+          // 'JQLite | Coordinates'.". We need to suppress this error because
+          // the actual 'offset' functions returns more properties than the
+          // function we've defined. We have only returned the properties we
+          // need in 'offset' function.
           // @ts-expect-error
           offset: () => ({
             top: 5
@@ -854,10 +888,10 @@ describe('Exploration editor tab component', function() {
       spyOn(angular, 'element')
         .withArgs('#tutorialStateInteraction').and.returnValue({
           // This throws "Type '{ top: number; }' is not assignable to type
-          // 'JQLite | Coordinates'." This is because the actual 'offset'
-          // functions returns more properties than the function we've
-          // defined. We have only returned the properties we need
-          // in 'offset' function.
+          // 'JQLite | Coordinates'.". We need to suppress this error because
+          // the actual 'offset' functions returns more properties than the
+          // function we've defined. We have only returned the properties we
+          // need in 'offset' function.
           // @ts-expect-error
           offset: () => ({
             top: 20
@@ -880,10 +914,10 @@ describe('Exploration editor tab component', function() {
       spyOn(angular, 'element')
         .withArgs('#tutorialPreviewTab').and.returnValue({
           // This throws "Type '{ top: number; }' is not assignable to type
-          // 'JQLite | Coordinates'." This is because the actual 'offset'
-          // functions returns more properties than the function we've
-          // defined. We have only returned the properties we need
-          // in 'offset' function.
+          // 'JQLite | Coordinates'.". We need to suppress this error because
+          // the actual 'offset' functions returns more properties than the
+          // function we've defined. We have only returned the properties we
+          // need in 'offset' function.
           // @ts-expect-error
           offset: () => ({
             top: 5
@@ -906,10 +940,10 @@ describe('Exploration editor tab component', function() {
       spyOn(angular, 'element')
         .withArgs('#tutorialStateInteraction').and.returnValue({
           // This throws "Type '{ top: number; }' is not assignable to type
-          // 'JQLite | Coordinates'." This is because the actual 'offset'
-          // functions returns more properties than the function we've
-          // defined. We have only returned the properties we need
-          // in 'offset' function.
+          // 'JQLite | Coordinates'.". We need to suppress this error because
+          // the actual 'offset' functions returns more properties than the
+          // function we've defined. We have only returned the properties we
+          // need in 'offset' function.
           // @ts-expect-error
           offset: () => ({
             top: 20
