@@ -384,7 +384,7 @@ class PopulateTranslationContributionStatsOneOffJob(
                         translation suggestion.
 
         Yields:
-            tuple(key, count), where:
+            tuple(key, count). Where:
                 key: str. TranslationContributionStatsModel entity ID.
                 count: int. Number of translation suggestions processed for
                     populating the TranslationContributionStatsModel with ID
