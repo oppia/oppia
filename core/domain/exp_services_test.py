@@ -3818,6 +3818,14 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             'state_name': 'New state'
         }]
 
+        with self.assertRaisesRegexp(
+            Exception,
+            'Unexpected error: Trying to find change list from version %s '
+            'of exploration to version %s. Please reload and try again.'
+            % (4, 1)):
+            exp_services.get_composite_change_list(
+                self.EXP_0_ID, 4, 1)
+
         composite_change_list = exp_services.get_composite_change_list(
             self.EXP_0_ID, 1, 4)
         composite_change_list_dict = [change.to_dict()
@@ -5432,12 +5440,29 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
                 'content_id': 'content'
             }
         })]
+
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 2, change_list_3)
+        self.assertEqual(changes_are_mergeable, True)
+
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list_3,
             'Changed content of End state.')
 
         # Changing content of first state.
         change_list_4 = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_RENAME_STATE,
+            'old_state_name': 'Introduction',
+            'new_state_name': 'Renamed state'
+        }), exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_RENAME_STATE,
+            'old_state_name': 'Renamed state',
+            'new_state_name': 'Renamed state again'
+        }), exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_RENAME_STATE,
+            'old_state_name': 'Renamed state again',
+            'new_state_name': 'Introduction'
+        }), exp_domain.ExplorationChange({
             'property_name': 'content',
             'state_name': 'Introduction',
             'cmd': 'edit_state_property',
@@ -5454,6 +5479,11 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
         # Checking for the mergability of the fourth change list.
         changes_are_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 2, change_list_4)
+        self.assertEqual(changes_are_mergeable, True)
+
+        # Checking for the mergability when working on latest version.
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 3, change_list_4)
         self.assertEqual(changes_are_mergeable, True)
 
     def test_changes_are_not_mergeable_when_content_changes_conflict(self):
@@ -6696,6 +6726,11 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
                     'html': '<p>Explanation.</p>'
                 }
             }
+        }), exp_domain.ExplorationChange({
+            'cmd': 'edit_state_property',
+            'state_name': 'Introduction',
+            'property_name': 'solicit_answer_details',
+            'new_value': True
         })]
 
         changes_are_mergeable = exp_services.are_changes_mergeable(
@@ -7231,6 +7266,11 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
                 },
                 'answer_is_exclusive': False
             }
+        }), exp_domain.ExplorationChange({
+            'cmd': 'edit_state_property',
+            'state_name': 'Introduction',
+            'property_name': 'solicit_answer_details',
+            'new_value': True
         })]
 
         exp_services.update_exploration(
@@ -7289,6 +7329,11 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             },
             'cmd': 'edit_state_property',
             'property_name': 'content'
+        }), exp_domain.ExplorationChange({
+            'cmd': 'edit_state_property',
+            'state_name': 'Introduction',
+            'property_name': 'solicit_answer_details',
+            'new_value': True
         })]
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list_2,
@@ -7469,6 +7514,11 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
                     'html': '<p>Explanation.</p>'
                 }
             }
+        }), exp_domain.ExplorationChange({
+            'cmd': 'edit_state_property',
+            'state_name': 'Introduction',
+            'property_name': 'solicit_answer_details',
+            'new_value': False
         })]
 
         changes_are_mergeable = exp_services.are_changes_mergeable(
@@ -8385,16 +8435,7 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
         # Also included rename states changes to check that
         # renaming states doesn't affect anything.
         change_list = [exp_domain.ExplorationChange({
-            'new_state_name': 'Intro-rename',
-            'cmd': 'rename_state',
-            'old_state_name': 'Introduction'
-        }), exp_domain.ExplorationChange({
-            'new_value': 'Intro-rename',
-            'cmd': 'edit_exploration_property',
-            'property_name': 'init_state_name',
-            'old_value': 'Introduction'
-        }), exp_domain.ExplorationChange({
-            'state_name': 'Intro-rename',
+            'state_name': 'Introduction',
             'new_value': {
                 'html': '<p>Content</p>',
                 'content_id': 'content'
@@ -8406,7 +8447,7 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
                 'content_id': 'content'
             }
         }), exp_domain.ExplorationChange({
-            'state_name': 'Intro-rename',
+            'state_name': 'Introduction',
             'new_value': [
                 {
                     'hint_content': {
@@ -8421,19 +8462,19 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
 
             ]
         }), exp_domain.ExplorationChange({
-            'state_name': 'Intro-rename',
+            'state_name': 'Introduction',
             'new_value': 2,
             'cmd': 'edit_state_property',
             'property_name': 'next_content_id_index',
             'old_value': 1
         }), exp_domain.ExplorationChange({
-            'state_name': 'Intro-rename',
+            'state_name': 'Introduction',
             'new_value': None,
             'cmd': 'edit_state_property',
             'property_name': 'widget_id',
             'old_value': 'TextInput'
         }), exp_domain.ExplorationChange({
-            'state_name': 'Intro-rename',
+            'state_name': 'Introduction',
             'new_value': {},
             'cmd': 'edit_state_property',
             'property_name': 'widget_customization_args',
@@ -8449,19 +8490,19 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
                 }
             }
         }), exp_domain.ExplorationChange({
-            'state_name': 'Intro-rename',
+            'state_name': 'Introduction',
             'new_value': 'NumericInput',
             'cmd': 'edit_state_property',
             'property_name': 'widget_id',
             'old_value': None
         }), exp_domain.ExplorationChange({
-            'state_name': 'Intro-rename',
+            'state_name': 'Introduction',
             'new_value': 3,
             'cmd': 'edit_state_property',
             'property_name': 'next_content_id_index',
             'old_value': 2
         }), exp_domain.ExplorationChange({
-            'state_name': 'Intro-rename',
+            'state_name': 'Introduction',
             'new_value': [
                 {
                     'outcome': {
@@ -8493,7 +8534,7 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
 
             ]
         }), exp_domain.ExplorationChange({
-            'state_name': 'Intro-rename',
+            'state_name': 'Introduction',
             'new_value': {
                 'refresher_exploration_id': None,
                 'feedback': {
@@ -8521,7 +8562,7 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
                 ]
             }
         }), exp_domain.ExplorationChange({
-            'state_name': 'Intro-rename',
+            'state_name': 'Introduction',
             'new_value': {
                 'refresher_exploration_id': None,
                 'feedback': {
@@ -8530,7 +8571,7 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
                 },
                 'missing_prerequisite_skill_id': None,
                 'labelled_as_correct': False,
-                'dest': 'Intro-rename',
+                'dest': 'Introduction',
                 'param_changes': [
 
                 ]
@@ -8557,7 +8598,7 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
 
         # Changes to properties of second state.
         change_list_2 = [exp_domain.ExplorationChange({
-            'state_name': 'Intro-rename',
+            'state_name': 'Introduction',
             'new_value': {
                 'answer_is_exclusive': False,
                 'correct_answer': 25,
@@ -8570,7 +8611,7 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             'property_name': 'solution',
             'old_value': None
         }), exp_domain.ExplorationChange({
-            'state_name': 'Intro-rename',
+            'state_name': 'Introduction',
             'new_value': [
                 {
                     'hint_content': {
@@ -8594,7 +8635,7 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
                 }
             }]
         }), exp_domain.ExplorationChange({
-            'state_name': 'Intro-rename',
+            'state_name': 'Introduction',
             'new_value': 4,
             'cmd': 'edit_state_property',
             'property_name': 'next_content_id_index',
@@ -8662,8 +8703,51 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
                 'new',
                 'skill'
             ]
+        }), exp_domain.ExplorationChange({
+            'cmd': 'edit_exploration_property',
+            'property_name': 'language_code',
+            'new_value': 'bn',
+            'old_value': 'en'
+        }), exp_domain.ExplorationChange({
+            'cmd': 'edit_exploration_property',
+            'property_name': 'author_notes',
+            'new_value': 'author_notes'
+        }), exp_domain.ExplorationChange({
+            'cmd': 'edit_exploration_property',
+            'property_name': 'blurb',
+            'new_value': 'blurb'
+        }), exp_domain.ExplorationChange({
+            'cmd': 'edit_exploration_property',
+            'property_name': 'init_state_name',
+            'new_value': 'End',
+        }), exp_domain.ExplorationChange({
+            'cmd': 'edit_exploration_property',
+            'property_name': 'init_state_name',
+            'new_value': 'Introduction',
+        }), exp_domain.ExplorationChange({
+            'cmd': 'edit_exploration_property',
+            'property_name': 'auto_tts_enabled',
+            'new_value': False
+        }), exp_domain.ExplorationChange({
+            'cmd': 'edit_exploration_property',
+            'property_name': 'correctness_feedback_enabled',
+            'new_value': True
+        }), exp_domain.ExplorationChange({
+            'cmd': 'edit_state_property',
+            'property_name': 'confirmed_unclassified_answers',
+            'state_name': 'Introduction',
+            'new_value': ['test']
+        }), exp_domain.ExplorationChange({
+            'cmd': 'edit_state_property',
+            'state_name': 'Introduction',
+            'property_name': 'linked_skill_id',
+            'new_value': 'string_1'
+        }), exp_domain.ExplorationChange({
+            'cmd': 'edit_state_property',
+            'state_name': 'Introduction',
+            'property_name': 'card_is_checkpoint',
+            'new_value': True
         })]
-
         changes_are_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 1, change_list_3)
         self.assertEqual(changes_are_mergeable, True)
@@ -8888,13 +8972,54 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
                 'content_id': 'content',
                 'html': '<p>Second State Content.</p>'
             }
+        }), exp_domain.ExplorationChange({
+            'new_state_name': 'End-Rename',
+            'cmd': 'rename_state',
+            'old_state_name': 'End'
         })]
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list,
             'Added various contents.')
 
-        # Adding some translations to the first state.
         change_list_2 = [exp_domain.ExplorationChange({
+            'cmd': 'edit_state_property',
+            'property_name': 'answer_groups',
+            'old_value': [],
+            'state_name': 'Introduction',
+            'new_value': [{
+                'rule_specs': [{
+                    'rule_type': 'StartsWith',
+                    'inputs': {
+                        'x': {
+                            'contentId': 'rule_input_2',
+                            'normalizedStrSet': [
+                                'Hello',
+                                'Hola'
+                            ]
+                        }
+                    }
+                }],
+                'tagged_skill_misconception_id': None,
+                'outcome': {
+                    'labelled_as_correct': False,
+                    'feedback': {
+                        'content_id': 'feedback_1',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'missing_prerequisite_skill_id': None,
+                    'dest': 'End-Rename',
+                    'param_changes': [],
+                    'refresher_exploration_id': None
+                },
+                'training_data': []
+            }]
+        })]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, change_list_2,
+            'Added answer group.')
+
+        # Adding some translations to the first state.
+        change_list_3 = [exp_domain.ExplorationChange({
             'language_code': 'de',
             'data_format': 'html',
             'cmd': 'add_written_translation',
@@ -8910,18 +9035,29 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             'translation_html': '<p>Translation Feedback 1.</p>',
             'state_name': 'Introduction',
             'content_html': 'N/A'
+        }), exp_domain.ExplorationChange({
+            'cmd': 'mark_written_translations_as_needing_update',
+            'state_name': 'Introduction',
+            'content_id': 'default_outcome'
         })]
 
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 2, change_list_3)
+        self.assertEqual(changes_are_mergeable, True)
         exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, change_list_2,
+            self.owner_id, self.EXP_0_ID, change_list_3,
             'Added some translations.')
 
         # Adding translations again to the different contents
         # of same state to check that they can be merged.
-        change_list_3 = [exp_domain.ExplorationChange({
+        change_list_4 = [ exp_domain.ExplorationChange({
+            'new_state_name': 'Intro-Rename',
+            'cmd': 'rename_state',
+            'old_state_name': 'Introduction'
+        }), exp_domain.ExplorationChange({
             'content_html': 'N/A',
             'translation_html': 'Placeholder Translation.',
-            'state_name': 'Introduction',
+            'state_name': 'Intro-Rename',
             'language_code': 'de',
             'content_id': 'ca_placeholder_0',
             'cmd': 'add_written_translation',
@@ -8929,23 +9065,43 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
         }), exp_domain.ExplorationChange({
             'content_html': 'N/A',
             'translation_html': '<p>Hints Translation.</p>',
-            'state_name': 'Introduction',
+            'state_name': 'Intro-Rename',
             'language_code': 'de',
             'content_id': 'hint_1',
             'cmd': 'add_written_translation',
             'data_format': 'html'
-        })]
+        }),  exp_domain.ExplorationChange({
+            'language_code': 'de',
+            'data_format': 'html',
+            'cmd': 'add_written_translation',
+            'content_id': 'rule_input_2',
+            'translation_html': '<p>Translation Rule Input.</p>',
+            'state_name': 'Intro-Rename',
+            'content_html': 'N/A'
+        }), exp_domain.ExplorationChange({
+            'language_code': 'de',
+            'data_format': 'html',
+            'cmd': 'add_written_translation',
+            'content_id': 'feedback_1',
+            'translation_html': '<p>Translation Feedback.</p>',
+            'state_name': 'Intro-Rename',
+            'content_html': 'N/A'
+        }), exp_domain.ExplorationChange({
+            'new_state_name': 'Introduction',
+            'cmd': 'rename_state',
+            'old_state_name': 'Intro-Rename'
+        }),]
 
         changes_are_mergeable = exp_services.are_changes_mergeable(
-            self.EXP_0_ID, 2, change_list_3)
+            self.EXP_0_ID, 3, change_list_4)
         self.assertEqual(changes_are_mergeable, True)
 
         # Adding translations to the second state to check
         # that they can be merged even in the same property.
-        change_list_4 = [exp_domain.ExplorationChange({
+        change_list_5 = [exp_domain.ExplorationChange({
             'content_html': 'N/A',
             'translation_html': '<p>State 2 Content Translation.</p>',
-            'state_name': 'End',
+            'state_name': 'End-Rename',
             'language_code': 'de',
             'content_id': 'content',
             'cmd': 'add_written_translation',
@@ -8953,13 +9109,13 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
         })]
 
         changes_are_mergeable_1 = exp_services.are_changes_mergeable(
-            self.EXP_0_ID, 2, change_list_4)
+            self.EXP_0_ID, 3, change_list_5)
         self.assertEqual(changes_are_mergeable_1, True)
 
         # Add changes to the different content of first state to
         # check that translation changes to some properties doesn't
         # affects the changes of content of other properties.
-        change_list_5 = [exp_domain.ExplorationChange({
+        change_list_6 = [exp_domain.ExplorationChange({
             'old_value': {
                 'rows': {
                     'value': 1
@@ -8985,13 +9141,47 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
                     }
                 }
             }
+        }), exp_domain.ExplorationChange({
+            'new_state_name': 'End',
+            'cmd': 'rename_state',
+            'old_state_name': 'End-Rename'
+        }), exp_domain.ExplorationChange({
+            'property_name': 'default_outcome',
+            'old_value': {
+                'labelled_as_correct': False,
+                'missing_prerequisite_skill_id': None,
+                'refresher_exploration_id': None,
+                'feedback': {
+                    'content_id': 'default_outcome',
+                    'html': 'Feedback 1.'
+                },
+                'param_changes': [
+
+                ],
+                'dest': 'End'
+            },
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'new_value': {
+                'labelled_as_correct': False,
+                'missing_prerequisite_skill_id': None,
+                'refresher_exploration_id': None,
+                'feedback': {
+                    'content_id': 'default_outcome',
+                    'html': '<p>Feedback 2.</p>'
+                },
+                'param_changes': [
+
+                ],
+                'dest': 'End'
+            }
         })]
 
         exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, change_list_5,
+            self.owner_id, self.EXP_0_ID, change_list_6,
             'Changing Customization Args Placeholder in First State.')
         changes_are_mergeable_3 = exp_services.are_changes_mergeable(
-            self.EXP_0_ID, 3, change_list_4)
+            self.EXP_0_ID, 4, change_list_5)
         self.assertEqual(changes_are_mergeable_3, True)
 
     def test_changes_are_not_mergeable_when_translations_changes_conflict(self): # pylint: disable=line-too-long
@@ -9003,6 +9193,38 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
         # Adding content, feedbacks, solutions so that
         # translations can be added later on.
         change_list = [exp_domain.ExplorationChange({
+            'cmd': 'edit_state_property',
+            'property_name': 'answer_groups',
+            'old_value': [],
+            'state_name': 'Introduction',
+            'new_value': [{
+                'rule_specs': [{
+                    'rule_type': 'StartsWith',
+                    'inputs': {
+                        'x': {
+                            'contentId': 'rule_input_2',
+                            'normalizedStrSet': [
+                                'Hello',
+                                'Hola'
+                            ]
+                        }
+                    }
+                }],
+                'tagged_skill_misconception_id': None,
+                'outcome': {
+                    'labelled_as_correct': False,
+                    'feedback': {
+                        'content_id': 'feedback_1',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'missing_prerequisite_skill_id': None,
+                    'dest': 'End',
+                    'param_changes': [],
+                    'refresher_exploration_id': None
+                },
+                'training_data': []
+            }]
+        }), exp_domain.ExplorationChange({
             'property_name': 'content',
             'old_value': {
                 'content_id': 'content',
@@ -9123,6 +9345,18 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
 
         # Adding some translations to the first state.
         change_list_2 = [exp_domain.ExplorationChange({
+            'state_name': 'Introduction',
+            'old_value': {
+                'content_id': 'content',
+                'html': '<p>First State Content.</p>'
+            },
+            'new_value': {
+                'content_id': 'content',
+                'html': '<p>Changed First State Content.</p>'
+            },
+            'property_name': 'content',
+            'cmd': 'edit_state_property'
+        }), exp_domain.ExplorationChange({
             'language_code': 'de',
             'data_format': 'html',
             'cmd': 'add_written_translation',
@@ -9138,6 +9372,54 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             'translation_html': '<p>Translation Feedback 1.</p>',
             'state_name': 'Introduction',
             'content_html': 'N/A'
+        }), exp_domain.ExplorationChange({
+            'language_code': 'de',
+            'data_format': 'html',
+            'cmd': 'add_written_translation',
+            'content_id': 'ca_placeholder_0',
+            'translation_html': '<p>Translation Placeholder.</p>',
+            'state_name': 'Introduction',
+            'content_html': 'N/A'
+        }), exp_domain.ExplorationChange({
+            'language_code': 'de',
+            'data_format': 'html',
+            'cmd': 'add_written_translation',
+            'content_id': 'hint_1',
+            'translation_html': '<p>Translation Hint.</p>',
+            'state_name': 'Introduction',
+            'content_html': 'N/A'
+        }), exp_domain.ExplorationChange({
+            'language_code': 'de',
+            'data_format': 'html',
+            'cmd': 'add_written_translation',
+            'content_id': 'solution',
+            'translation_html': '<p>Translation Solution.</p>',
+            'state_name': 'Introduction',
+            'content_html': 'N/A'
+        }), exp_domain.ExplorationChange({
+            'language_code': 'de',
+            'data_format': 'html',
+            'cmd': 'add_written_translation',
+            'content_id': 'rule_input_2',
+            'translation_html': '<p>Translation Rule Input.</p>',
+            'state_name': 'Introduction',
+            'content_html': 'N/A'
+        }), exp_domain.ExplorationChange({
+            'new_state_name': 'Intro-Rename',
+            'cmd': 'rename_state',
+            'old_state_name': 'Introduction'
+        }), exp_domain.ExplorationChange({
+            'language_code': 'de',
+            'data_format': 'html',
+            'cmd': 'add_written_translation',
+            'content_id': 'feedback_1',
+            'translation_html': '<p>Translation Feedback.</p>',
+            'state_name': 'Intro-Rename',
+            'content_html': 'N/A'
+        }), exp_domain.ExplorationChange({
+            'new_state_name': 'Introduction',
+            'cmd': 'rename_state',
+            'old_state_name': 'Intro-Rename'
         })]
 
         exp_services.update_exploration(
@@ -9330,8 +9612,20 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_0_ID, change_list,
             'Added various contents.')
 
-        # Adding some voiceovers to the first state.
+        # Adding change to the field which is neither
+        # affected by nor affects voiceovers.
         change_list_2 = [exp_domain.ExplorationChange({
+            'cmd': 'edit_state_property',
+            'state_name': 'Introduction',
+            'property_name': 'card_is_checkpoint',
+            'new_value': True
+        })]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, change_list_2,
+            'Added single unrelated change.')
+
+        # Adding some voiceovers to the first state.
+        change_list_3 = [exp_domain.ExplorationChange({
             'property_name': 'recorded_voiceovers',
             'old_value': {
                 'voiceovers_mapping': {
@@ -9404,16 +9698,19 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             },
             'cmd': 'edit_state_property'
         })]
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 2, change_list_3)
+        self.assertEqual(changes_are_mergeable, True)
 
         exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, change_list_2,
+            self.owner_id, self.EXP_0_ID, change_list_3,
             'Added some voiceovers.')
 
         # Adding voiceovers again to the same first state
         # to check if they can be applied. They will not
         # be mergeable as the changes are in the same property
         # i.e. recorded_voiceovers.
-        change_list_3 = [exp_domain.ExplorationChange({
+        change_list_4 = [exp_domain.ExplorationChange({
             'property_name': 'recorded_voiceovers',
             'cmd': 'edit_state_property',
             'old_value': {
@@ -9445,13 +9742,13 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
         })]
 
         changes_are_mergeable = exp_services.are_changes_mergeable(
-            self.EXP_0_ID, 2, change_list_3)
+            self.EXP_0_ID, 3, change_list_4)
         self.assertEqual(changes_are_mergeable, False)
 
         # Adding voiceovers to the second state to check
         # if they can be applied. They can be mergead as
         # the changes are in the differents states.
-        change_list_4 = [exp_domain.ExplorationChange({
+        change_list_5 = [exp_domain.ExplorationChange({
             'old_value': {
                 'voiceovers_mapping': {
                     'content': {}
@@ -9475,14 +9772,14 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
         })]
 
         changes_are_mergeable_1 = exp_services.are_changes_mergeable(
-            self.EXP_0_ID, 2, change_list_4)
+            self.EXP_0_ID, 3, change_list_5)
         self.assertEqual(changes_are_mergeable_1, True)
 
         # Changes to the content of first state to check
         # that the changes in the contents of first state
         # doesn't affects the changes to the voiceovers in
         # second state.
-        change_list_5 = [exp_domain.ExplorationChange({
+        change_list_6 = [exp_domain.ExplorationChange({
             'state_name': 'Introduction',
             'old_value': {
                 'content_id': 'content',
@@ -9497,10 +9794,10 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
         })]
 
         exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, change_list_5,
+            self.owner_id, self.EXP_0_ID, change_list_6,
             'Changing Content in First State.')
         changes_are_mergeable_3 = exp_services.are_changes_mergeable(
-            self.EXP_0_ID, 3, change_list_4)
+            self.EXP_0_ID, 4, change_list_5)
         self.assertEqual(changes_are_mergeable_3, True)
 
         # Changes to the content of second state to check that
@@ -9905,11 +10202,29 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
         # state is deleted or added, then the changes can not be
         # merged.
         change_list_3 = [exp_domain.ExplorationChange({
+            'new_state_name': 'End-State',
+            'cmd': 'rename_state',
+            'old_state_name': 'End'
+        }), exp_domain.ExplorationChange({
+            'cmd': 'delete_state',
+            'state_name': 'End-State'
+        }), exp_domain.ExplorationChange({
+            'cmd': 'add_state',
+            'state_name': 'End'
+        }), exp_domain.ExplorationChange({
             'cmd': 'delete_state',
             'state_name': 'End'
         }), exp_domain.ExplorationChange({
             'cmd': 'add_state',
             'state_name': 'End'
+        }), exp_domain.ExplorationChange({
+            'new_state_name': 'End-State',
+            'cmd': 'rename_state',
+            'old_state_name': 'End'
+        }), exp_domain.ExplorationChange({
+            'new_state_name': 'End',
+            'cmd': 'rename_state',
+            'old_state_name': 'End-State'
         }), exp_domain.ExplorationChange({
             'old_value': [{
                 'tagged_skill_misconception_id': None,

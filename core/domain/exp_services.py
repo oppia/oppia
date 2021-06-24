@@ -2051,20 +2051,6 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
                                                         ]) and
                                         change.property_name not in
                                         changed_translations[old_state_name]):
-                                    old_solution = (
-                                        frontend_version_exploration.states[old_state_name].interaction.solution) # pylint: disable=line-too-long
-                                    new_solution = (
-                                        backend_version_exploration.states[new_state_name].interaction.solution) # pylint: disable=line-too-long
-                                    if old_solution and new_solution:
-                                        if (old_solution.answer_is_exclusive ==
-                                                new_solution.answer_is_exclusive and # pylint: disable=line-too-long
-                                                old_solution.correct_answer ==
-                                                new_solution.correct_answer and
-                                                old_solution.explanation.html ==
-                                                new_solution.explanation.html):
-                                            change_is_mergeable = True
-                                    elif (old_solution is None and
-                                          new_solution is None):
                                         change_is_mergeable = True
                         else:
                             change_is_mergeable = True
@@ -2106,6 +2092,8 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
                             state_names_of_renamed_states[change.state_name])
                     if change.state_name in old_to_new_state_names:
                         new_state_name = old_to_new_state_names[old_state_name]
+                    if old_state_name not in changed_translations:
+                        changed_translations[old_state_name] = []
                     if old_state_name in changed_properties:
                         if change.content_id == 'content':
                             if ('content' not in
