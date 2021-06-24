@@ -23,9 +23,12 @@ from core.domain import exp_domain
 from core.platform import models
 from jobs.decorators import validation_decorators
 from jobs.transforms import base_validation
-import python_utils
 
-(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
+(
+    exp_models, story_models
+) = models.Registry.import_models([
+    models.NAMES.exploration, models.NAMES.story
+])
 
 
 @validation_decorators.AuditsExisting(
@@ -48,11 +51,17 @@ class ValidateExplorationCommitCmdsSchema(
         return exp_domain.ExplorationChange
 
 
-@validation_decorators.RelationshipsOf(exp_models.ExplorationModel)
-def exploration_model_relationships(model):
+@validation_decorators.RelationshipsOf(exp_models.ExplorationContextModel)
+def exploration_context_model_relationships(model):
     """Yields how the properties of the model relates to the ID of others."""
 
-    exploration_model_ids = [
-        'exploration-%s-%s' % (model.id, version)
-        for version in python_utils.RANGE(1, model.version + 1)]
-    yield exploration_model_ids, [exp_models.ExplorationCommitLogEntryModel]
+    yield model.story_id, [story_models.StoryModel]
+    yield model.id, [exp_models.ExplorationModel]
+
+
+@validation_decorators.RelationshipsOf(exp_models.ExpSummaryModel)
+def exp_summary_model_relationships(model):
+    """Yields how the properties of the model relates to the ID of others."""
+
+    yield model.id, [exp_models.ExplorationModel]
+    yield model.id, [exp_models.ExplorationRightsModel]

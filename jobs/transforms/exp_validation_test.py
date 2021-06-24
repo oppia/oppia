@@ -255,8 +255,16 @@ class ValidateExplorationCommitCmdsSchemaTests(
 
 class RelationshipsOfTests(test_utils.TestBase):
 
-    def test_exploration_model_relationships(self):
+    def test_exploration_context_model_relationships(self):
         self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
-                'ExplorationModel', 'exploration_model_ids'), # to change
-            ['ExplorationCommitLogEntryModel'])
+                'ExplorationContextModel', 'story_id'), ['StoryModel'])
+        self.assertItemsEqual(
+            validation_decorators.RelationshipsOf.get_model_kind_references(
+                'ExplorationContextModel', 'id'), ['ExplorationModel'])
+
+    def test_exp_summary_model_relationships(self):
+        self.assertItemsEqual(
+            validation_decorators.RelationshipsOf.get_model_kind_references(
+                'ExpSummaryModel', 'id'),
+            ['ExplorationRightsModel', 'ExplorationModel'])
