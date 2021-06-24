@@ -249,6 +249,7 @@ describe('Search bar component', () => {
     spyOn(component, 'updateSelectionDetails');
     spyOn(component, 'onSearchQueryChangeExec');
     component.toggleSelection('categories', 'id_1');
+    component.toggleSelection('categories', 'id_1');
     expect(component.updateSelectionDetails).toHaveBeenCalled();
     expect(component.onSearchQueryChangeExec).toHaveBeenCalled();
   });
@@ -318,6 +319,7 @@ describe('Search bar component', () => {
     spyOn(i18nLanguageCodeService.onPreferredLanguageCodesLoaded, 'subscribe')
       .and.callFake((callb) => {
         callb(['en', 'es']);
+        callb(['en', 'es']);
         return null;
       });
     spyOn(translateService.onLangChange, 'subscribe').and.callFake((callb) => {
@@ -331,6 +333,20 @@ describe('Search bar component', () => {
       });
     spyOn(urlService, 'getUrlParams').and.returnValue({ q: '' });
     component.searchQueryChanged.next();
+    component.ngOnInit();
+    expect(component.searchDropdownCategories).toHaveBeenCalled();
+    expect(languageUtilService.getLanguageIdsAndTexts).toHaveBeenCalled();
+    expect(component.updateSelectionDetails).toHaveBeenCalled();
+    expect(component.refreshSearchBarLabels).toHaveBeenCalled();
+    expect(component.onSearchQueryChangeExec).toHaveBeenCalled();
+    expect(component.updateSearchFieldsBasedOnUrlQuery).toHaveBeenCalled();
+    expect(searchService.onSearchBarLoaded.emit).toHaveBeenCalled();
+    expect(i18nLanguageCodeService.onPreferredLanguageCodesLoaded.subscribe)
+      .toHaveBeenCalledWith();
+    expect(translateService.onLangChange.subscribe).toHaveBeenCalled();
+    expect(classroomBackendApiService.onInitializeTranslation.subscribe)
+      .toHaveBeenCalled();
+    expect(urlService.getUrlParams).toHaveBeenCalled();
   });
 
   it('should tell searching status', () => {
