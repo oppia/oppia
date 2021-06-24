@@ -36,7 +36,9 @@ export class ThumbnailDisplayComponent implements OnInit, OnChanges {
   height = '180px';
   width = '320px';
   ngOnInit(): void {
-    this.updateSvgInViewIfSafe();
+    if (this.imgSrc !== undefined) {
+      this.updateSvgInViewIfSafe();
+    }
   }
 
   /**
@@ -54,13 +56,15 @@ export class ThumbnailDisplayComponent implements OnInit, OnChanges {
       this.imageSourceInView = this.imgSrc;
     }
     this.width = this.aspectRatio === '4:3' ? '248px' : '320px';
-    this.height = this.aspectRatio === '4:3' ? '186px' : '180px';
+    this.height = this.aspectRatio === '4:3' ? '100px' : '180px';
   }
 
   ngOnChanges(): void {
-    this.updateSvgInViewIfSafe();
-    this.width = this.aspectRatio === '4:3' ? '248px' : '320px';
-    this.height = this.aspectRatio === '4:3' ? '186px' : '180px';
+    if (this.imgSrc !== undefined) {
+      this.updateSvgInViewIfSafe();
+      this.width = this.aspectRatio === '4:3' ? '248px' : '320px';
+      this.height = this.aspectRatio === '4:3' ? '100px' : '180px';
+    }
   }
 }
 

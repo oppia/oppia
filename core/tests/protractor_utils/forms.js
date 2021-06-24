@@ -171,8 +171,9 @@ var ListEditor = function(elem) {
 var RealEditor = function(elem) {
   return {
     setValue: async function(value) {
-      await elem.element(by.tagName('input')).clear();
-      await elem.element(by.tagName('input')).sendKeys(value);
+      await action.clear('Text Input', elem.element(by.tagName('input')));
+      await action.sendKeys(
+        'Text Input', elem.element(by.tagName('input')), value);
     }
   };
 };
