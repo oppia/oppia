@@ -113,10 +113,10 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
           };
 
           ctrl.onDownKeyPress = function(event) {
-            if ($rootScope.isInputGreaterThanZero && ctrl.localValue < 0) {
-              event.preventDefault();
-              // Var Btn = document.getElementById("input-greater-than-zero");
-              // Btn.setAttribute("min", "0");
+            if ($rootScope.isInputGreaterThanZero && ctrl.localValue < 1) {
+              if (event.keyCode === 40) {
+                event.preventDefault();
+              }
             }
           };
 

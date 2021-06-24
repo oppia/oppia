@@ -39,7 +39,7 @@ var submitAnswer = async function(elem, answer) {
 var answerObjectType = 'Real';
 
 var testSuite = [{
-  interactionArguments: [],
+  interactionArguments: [false],
   ruleArguments: ['IsWithinTolerance', 2, 143],
   expectedInteractionDetails: [],
   wrongAnswers: [146, 130],
