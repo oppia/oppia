@@ -34,8 +34,8 @@ export interface StorySummaryBackendDict {
   'all_node_dicts': StoryNodeBackendDict[],
   // This property is optional because it is only present in the
   // story summary dict of learner dashboard page.
-  'topic_url_fragment'?: string,
-  'classroom_url_fragment'?: string
+  'topic_url_fragment'?: string | undefined,
+  'classroom_url_fragment'?: string | undefined
 }
 
 export class StorySummary {
@@ -50,8 +50,8 @@ export class StorySummary {
     private _completedNodeTitles: string[],
     private _urlFragment: string,
     private _allNodes: StoryNode[],
-    private _topicUrlFragment: string,
-    private _classroomUrlFragment: string
+    private _topicUrlFragment: string | undefined,
+    private _classroomUrlFragment: string | undefined
   ) {}
 
   getId(): string {
@@ -95,11 +95,17 @@ export class StorySummary {
   }
 
   getTopicUrlFragment(): string {
-    return this._topicUrlFragment;
+    if (this._topicUrlFragment !== undefined) {
+      return this._topicUrlFragment;
+    }
+    throw new Error('Topic Url Fragment is undefined');
   }
 
   getClassroomUrlFragment(): string {
-    return this._classroomUrlFragment;
+    if (this._classroomUrlFragment !== undefined) {
+      return this._classroomUrlFragment;
+    }
+    throw new Error('Classroom Url Fragment is undefined');
   }
 
   static createFromBackendDict(

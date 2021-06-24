@@ -27,7 +27,8 @@ import { AppConstants } from 'app.constants';
 import { AuthBackendApiService } from 'services/auth-backend-api.service';
 
 abstract class AuthServiceImpl {
-  abstract getRedirectResultAsync(): Promise<firebase.auth.UserCredential>;
+  abstract getRedirectResultAsync():
+   Promise<firebase.auth.UserCredential | null>;
   abstract signInWithRedirectAsync(): Promise<void>;
   abstract signOutAsync(): Promise<void>;
 }
@@ -56,7 +57,7 @@ class DevAuthServiceImpl extends AuthServiceImpl {
   async signInWithRedirectAsync(): Promise<void> {
   }
 
-  async getRedirectResultAsync(): Promise<firebase.auth.UserCredential> {
+  async getRedirectResultAsync(): Promise<firebase.auth.UserCredential | null> {
     return null;
   }
 
@@ -124,7 +125,7 @@ export class AuthService {
     } as const;
   }
 
-  static get firebaseEmulatorConfig(): readonly [string, number] {
+  static get firebaseEmulatorConfig(): readonly [string, number] | undefined {
     return AuthService.firebaseEmulatorIsEnabled ?
       ['localhost', 9099] : undefined;
   }
@@ -166,6 +167,9 @@ export class AuthService {
       } else {
         throw err;
       }
+    }
+    if (creds.user === null) {
+      throw new Error('No User Found');
     }
     const idToken = await creds.user.getIdToken();
     await this.authBackendApiService.beginSessionAsync(idToken);
