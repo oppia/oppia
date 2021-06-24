@@ -476,6 +476,7 @@
 
 # Infrastructure.
 /jobs/ @brianrodri @rohitkatlaa
+/core/templates/domain/jobs/ @brianrodri @rohitkatlaa
 /core/controllers/cron*.py @nithusha21
 /core/domain/cron_services*.py @nithusha21
 /main_cron.py @nithusha21
