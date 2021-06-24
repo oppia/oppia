@@ -236,6 +236,8 @@ class StoryProgressHandler(base.BaseHandler):
 
         is_topic_completed = set(story_ids_in_topic).intersection(
             set(completed_story_ids))
+        topic_ids_to_learn = learner_goals_services.get_all_topic_ids_to_learn(
+            self.user_id)
 
         # If at least one story in the topic is completed,
         # mark the topic as learnt else mark it as partially learnt.
@@ -245,8 +247,9 @@ class StoryProgressHandler(base.BaseHandler):
         else:
             learner_progress_services.mark_topic_as_learnt(
                 self.user_id, topic.id)
-            learner_goals_services.remove_topics_from_learn_goal(
-                self.user_id, [topic.id])
+            if topic.id in topic_ids_to_learn:
+                learner_goals_services.remove_topics_from_learn_goal(
+                    self.user_id, [topic.id])
 
         return self.render_json({
             'summaries': exp_summaries,
