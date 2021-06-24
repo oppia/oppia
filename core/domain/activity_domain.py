@@ -75,6 +75,18 @@ class ActivityReference(python_utils.OBJECT):
             'id': self.id,
         }
 
+    @classmethod
+    def from_dict(cls, obj):
+        """Return the ActivityReference object from a dict.
+
+        Args:
+            obj: dict. Dictionary representation of the object.
+
+        Returns:
+            ActivityReference. The correcponding ActivityReference object.
+        """
+        return cls(obj['type'], obj['id'])
+
 
 class ActivityReferences(python_utils.OBJECT):
     """Domain object for a list of activity references.
