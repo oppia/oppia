@@ -31,28 +31,22 @@ module.exports = {
     fixable: null,
     schema: [],
     messages: {
-      disallowSleep: 'Please do not use browser.sleep() in protractor files',
-      disallowThen: 'Please do not use .then(), consider async/await instead',
       constInAllCaps: (
-        'Please make constant name “{{constName}}” are in all-caps')
+        'Please make constant name “{{constName}}” are in all-caps'),
+      disallowedBrowserMethods: (
+        'Please do not use browser.{{methodName}}() in protractor files'),
+      disallowThen: 'Please do not use .then(), consider async/await instead'
     },
   },
 
   create: function(context) {
-    var checkSleepCall = function(node) {
-      var callee = node.callee;
-      if (callee.property && callee.property.name !== 'sleep') {
-        return;
-      }
-
-      if (callee.object && callee.object.name === 'browser') {
-        context.report({
-          node: node,
-          loc: callee.loc,
-          messageId: 'disallowSleep'
-        });
-      }
-    };
+    var disallowedBrowserMethods = [
+      'sleep', 'explore', 'pause', 'waitForAngular'];
+    var disallowedBrowserMethodsRegex = (
+      `/^(${disallowedBrowserMethods.join('|')})$/`);
+    var disallowedBrowserMethodsSelector = (
+      'CallExpression[callee.object.name=browser][callee.property.name=' +
+      disallowedBrowserMethodsRegex + ']');
 
     var checkConstName = function(node) {
       var constantName = node.declarations[0].id.name;
@@ -72,8 +66,15 @@ module.exports = {
       'VariableDeclaration[kind=const]': function(node) {
         checkConstName(node);
       },
-      CallExpression: function(node) {
-        checkSleepCall(node);
+      [disallowedBrowserMethodsSelector]: function(node) {
+        context.report({
+          node: node,
+          loc: node.callee.loc,
+          messageId: 'disallowedBrowserMethods',
+          data: {
+            methodName: node.callee.property.name
+          }
+        });
       },
       'CallExpression[callee.property.name=\'then\']': function(node) {
         context.report({
