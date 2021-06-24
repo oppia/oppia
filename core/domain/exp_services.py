@@ -624,7 +624,7 @@ def apply_change_list(exploration_id, change_list, frontend_version):
                         state_names_of_renamed_states[change_new_state_name] = (
                             change_old_state_name)
                     exploration.rename_state(
-                        change.old_state_name, change.new_state_name)
+                        change_old_state_name, change_new_state_name)
                 elif change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
                     old_state_name = change.state_name
                     new_state_name = change.state_name
