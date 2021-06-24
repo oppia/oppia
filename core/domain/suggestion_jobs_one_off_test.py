@@ -1555,7 +1555,7 @@ class PopulateTranslationContributionStatsOneOffJobTests(
     def _create_translation_suggestion(self, language_code):
         """Creates a translation suggestion."""
         add_translation_change_dict = {
-            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': 'state_1',
             'content_id': 'content',
             'language_code': language_code,
