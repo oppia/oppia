@@ -191,12 +191,6 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(topics[1])
         self.assertEqual(len(topics), 2)
 
-    def test_get_all_topics_with_skills(self):
-        expected_topic = self.topic.to_dict()
-        topics = topic_fetchers.get_all_topics_with_skills()
-        self.assertEqual(topics[0].to_dict(), expected_topic)
-        self.assertEqual(len(topics), 1)
-
     def test_get_all_topic_rights_of_user(self):
         topic_services.assign_role(
             self.user_admin, self.user_a,
