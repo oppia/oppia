@@ -323,7 +323,7 @@ export class SiteAnalyticsService {
       explorationId);
   }
 
-  registerClassoomHeaderClickEvent(): void {
+  registerClassroomHeaderClickEvent(): void {
     this._sendEventToGoogleAnalytics(
       'ClassroomEngagement', 'click', 'ClickOnClassroom');
   }

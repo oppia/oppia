@@ -578,7 +578,7 @@ describe('Site Analytics Service', () => {
   });
 
   it('should register classroom header click event', () => {
-    sas.registerClassoomHeaderClickEvent();
+    sas.registerClassroomHeaderClickEvent();
 
     expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
       event_category: 'ClassroomEngagement',
