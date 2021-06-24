@@ -36,6 +36,9 @@ import utils
 class ContributorDashboardPage(base.BaseHandler):
     """Page showing the contributor dashboard."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
     @acl_decorators.open_access
     def get(self):
         # TODO(#7402): Serve this page statically through app.yaml once
@@ -49,6 +52,15 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
     """Provides data for opportunities available in different categories."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'opportunity_type': {
+            'type': 'unicode',
+            'choices': [
+                'skill', 'translation', 'voiceover'
+            ]
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.open_access
     def get(self, opportunity_type):
@@ -185,6 +197,20 @@ class TranslatableTextHandler(base.BaseHandler):
     """Provides lessons content which can be translated in a given language."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'language_code': {
+                'type': 'unicode',
+                'valiadtors': [{
+                    'id': 'is_supported_audio_language_code'
+                }]
+            },
+            'exp_id': {
+                'type': 'unicode'
+            }
+        }
+    }
 
     @acl_decorators.open_access
     def get(self):
@@ -268,6 +294,26 @@ class MachineTranslationStateTextsHandler(base.BaseHandler):
     """Provides a machine translation of exploration content."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'exp_id': {
+                'type': 'unicode'
+            },
+            'state_name': {
+                'type': 'unicode'
+            },
+            'content_ids': {
+                'type': 'unicode'
+            },
+            'target_language_code': {
+                'type': 'unicode',
+                'validators': [{
+                    'id': 'is_supported_audio_language_code'
+                }]
+            }
+        }
+    }
 
     @acl_decorators.open_access
     def get(self):
@@ -364,6 +410,8 @@ class UserContributionRightsDataHandler(base.BaseHandler):
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.open_access
     def get(self):
@@ -393,6 +441,8 @@ class FeaturedTranslationLanguagesHandler(base.BaseHandler):
     """Provides featured translation languages set in admin config."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.open_access
     def get(self):
