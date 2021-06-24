@@ -1560,7 +1560,8 @@ class PopulateTranslationContributionStatsOneOffJobTests(
             'content_id': 'content',
             'language_code': language_code,
             'content_html': '<p>This is html to translate.</p>',
-            'translation_html': '<p>This is translated html.</p>'
+            'translation_html': '<p>This is translated html.</p>',
+            'data_format': 'html'
         }
 
         with self.swap(
