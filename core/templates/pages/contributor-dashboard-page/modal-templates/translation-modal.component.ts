@@ -233,7 +233,7 @@ export class TranslationModalComponent {
       // </oppia-noninteractive-image>
       if (element.localName === 'oppia-noninteractive-image') {
         const attribute = (
-          element.attributes[type] ? 
+          element.attributes[type] ?
           element.attributes[type].value : '&quot;&quot;');
         return attribute.substring(
           textWrapperLength, attribute.length - textWrapperLength);
@@ -288,22 +288,22 @@ export class TranslationModalComponent {
       if (originalElement.nodeName !== filteredTranslatedElements[
         i].nodeName) {
         this.elementViolation = (
-          '"' + filteredTranslatedElements[i].outerHTML + '"' + ' does ' + 
+          '"' + filteredTranslatedElements[i].outerHTML + '"' + ' does ' +
           'not match ' + '"' + originalElement.outerHTML + '"' + '.');
         return false;
       }
       if (originalElement.children.length !== filteredTranslatedElements[
         i].children.length) {
         this.elementViolation = (
-          '"' + filteredTranslatedElements[i].outerHTML + '"' + ' does ' + 
+          '"' + filteredTranslatedElements[i].outerHTML + '"' + ' does ' +
           'not match ' + '"' + originalElement.outerHTML + '"' + '.');
         return false;
       }
       for (let index = 0; index < originalElement.children.length; index++) {
-        if(originalElement.children[index].nodeName !== (
+        if (originalElement.children[index].nodeName !== (
           filteredTranslatedElements[i].children[index].nodeName)) {
           this.elementViolation = (
-            '"' + filteredTranslatedElements[i].outerHTML + '"' + ' does ' + 
+            '"' + filteredTranslatedElements[i].outerHTML + '"' + ' does ' +
             'not match ' + '"' + originalElement.outerHTML + '"' + '.');
           return false;
         }
@@ -338,13 +338,13 @@ export class TranslationModalComponent {
   }
 
   modifyContentToValidate(text: string): string {
-    const lineBreakLessText = text.replace(/(\r\n|\n|\r)/gm, "");
+    const lineBreakLessText = text.replace(/(\r\n|\n|\r)/gm, '');
 
     // These fake wrappers are added in order to wrap all the unwrapped texts
     // to validate. See issue https://github.com/oppia/oppia/issues/13173
     const fakeDiv = $('<div />', {html: lineBreakLessText});
     fakeDiv.contents().filter(function() {
-      if(this.innerHTML === '&nbsp;') {
+      if (this.outerHTML === '<p>&nbsp;</p>') {
         this.parentElement.removeChild(this);
       }
       return (this.nodeType === 3);

@@ -500,7 +500,8 @@ describe('Translation Modal Component', () => {
       it('should exclude paragraphs with spaces', () => {
         component.textToTranslate = '<p>First para</p><p>&nbsp;</p>';
 
-        const filteredText = component.modifyContentToValidate(component.textToTranslate);
+        const filteredText = component.modifyContentToValidate(
+          component.textToTranslate);
 
         expect(filteredText).toBe('<p>First para</p>');
       });
