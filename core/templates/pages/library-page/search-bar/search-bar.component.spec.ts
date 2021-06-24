@@ -342,7 +342,7 @@ describe('Search bar component', () => {
     expect(component.updateSearchFieldsBasedOnUrlQuery).toHaveBeenCalled();
     expect(searchService.onSearchBarLoaded.emit).toHaveBeenCalled();
     expect(i18nLanguageCodeService.onPreferredLanguageCodesLoaded.subscribe)
-      .toHaveBeenCalledWith();
+      .toHaveBeenCalled();
     expect(translateService.onLangChange.subscribe).toHaveBeenCalled();
     expect(classroomBackendApiService.onInitializeTranslation.subscribe)
       .toHaveBeenCalled();
