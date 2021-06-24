@@ -331,7 +331,7 @@ class Subtopic(python_utils.OBJECT):
 
     def __init__(
             self, subtopic_id, title, skill_ids, thumbnail_filename,
-            thumbnail_bg_color, url_fragment):
+            thumbnail_bg_color, thumbnail_size_in_bytes, url_fragment):
         """Constructs a Subtopic domain object.
 
         Args:
@@ -343,6 +343,8 @@ class Subtopic(python_utils.OBJECT):
                 subtopic.
             thumbnail_bg_color: str|None. The thumbnail background color for
                 the subtopic.
+            thumbnail_size_in_bytes: int|None. The thumbnail size of the topic
+                in bytes.
             url_fragment: str. The url fragment for the subtopic.
         """
         self.id = subtopic_id
@@ -350,6 +352,7 @@ class Subtopic(python_utils.OBJECT):
         self.skill_ids = skill_ids
         self.thumbnail_filename = thumbnail_filename
         self.thumbnail_bg_color = thumbnail_bg_color
+        self.thumbnail_size_in_bytes = thumbnail_size_in_bytes
         self.url_fragment = url_fragment
 
     def to_dict(self):
@@ -364,6 +367,7 @@ class Subtopic(python_utils.OBJECT):
             'skill_ids': self.skill_ids,
             'thumbnail_filename': self.thumbnail_filename,
             'thumbnail_bg_color': self.thumbnail_bg_color,
+            'thumbnail_size_in_bytes': self.thumbnail_size_in_bytes,
             'url_fragment': self.url_fragment
         }
 
@@ -380,7 +384,9 @@ class Subtopic(python_utils.OBJECT):
         subtopic = cls(
             subtopic_dict['id'], subtopic_dict['title'],
             subtopic_dict['skill_ids'], subtopic_dict['thumbnail_filename'],
-            subtopic_dict['thumbnail_bg_color'], subtopic_dict['url_fragment'])
+            subtopic_dict['thumbnail_bg_color'],
+            subtopic_dict['thumbnail_size_in_bytes'],
+            subtopic_dict['url_fragment'])
         return subtopic
 
     @classmethod
@@ -395,7 +401,7 @@ class Subtopic(python_utils.OBJECT):
             Subtopic. A subtopic object with given id, title and empty skill ids
             list.
         """
-        return cls(subtopic_id, title, [], None, None, '')
+        return cls(subtopic_id, title, [], None, None, None, '')
 
     @classmethod
     def require_valid_thumbnail_filename(cls, thumbnail_filename):
@@ -1464,6 +1470,25 @@ class Topic(python_utils.OBJECT):
                 'The subtopic with id %s does not exist.' % subtopic_id)
         self.subtopics[subtopic_index].thumbnail_filename = (
             new_thumbnail_filename)
+
+    def update_subtopic_thumbnail_size_in_bytes(
+            self, subtopic_id, new_thumbnail_size_in_bytes):
+        """Updates the thumbnail size in bytes property of the new subtopic.
+
+        Args:
+            subtopic_id: str. The id of the subtopic to edit.
+            new_thumbnail_size_in_bytes: str. The new thumbnail size in bytes
+                for the subtopic.
+
+        Raises:
+            Exception. The subtopic with the given id doesn't exist.
+        """
+        subtopic_index = self.get_subtopic_index(subtopic_id)
+        if subtopic_index is None:
+            raise Exception(
+                'The subtopic with id %s does not exist.' % subtopic_id)
+        self.subtopics[subtopic_index].thumbnail_size_in_bytes = (
+            new_thumbnail_size_in_bytes)
 
     def update_subtopic_url_fragment(self, subtopic_id, new_url_fragment):
         """Updates the url fragment of the subtopic.
