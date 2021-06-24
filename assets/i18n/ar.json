@@ -380,6 +380,7 @@
 	"I18N_LICENSE_PAGE_LICENSE_HEADING": "الترخيص",
 	"I18N_LICENSE_PAGE_PARAGRAPH_1": "جميع المحتويات في استكشافات أوبيا مرخصة بموجب <a href=\"https://creativecommons.org/licenses/by-sa/4.0/legalcode\" class=\"inline-links\"> المشاع الإبداعي النسبة-المشاركة بالمثل 4.0</a> مع التنازل عن شرط الإسناد (على وجه التحديد، القسمين 3 (أ) (1) و3 (أ) (2))، إذا أعدت استخدام محتوى من هذا الموقع، فنحن نشجعك على تضمين رابط إلى صفحة الاستكشاف ذات الصلة، ولكن لا تحتاج إلى ذلك.",
 	"I18N_LICENSE_PAGE_PARAGRAPH_2": "برنامج تشغيل أوبيا مفتوح المصدر و<a href=\"https://github.com/oppia/oppia/\" class=\"inline-links\">كوده</a>، ومفرج عنه بموجب <a href=\"https://www.apache.org/licenses/\" class=\"inline-links\">رخصة أباتشي 2.0</a>.",
+	"I18N_LICENSE_TERMS_HEADING": "شروط الترخيص",
 	"I18N_LOGOUT_LOADING": "تسجيل الخروج",
 	"I18N_LOGOUT_PAGE_TITLE": "تسجيل الخروج",
 	"I18N_MODAL_CANCEL_BUTTON": "إلغاء",
