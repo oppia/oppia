@@ -31,7 +31,6 @@ describe('Entity creation service', function() {
   var $rootScope = null;
   var $uibModal = null;
   var $q = null;
-  var $location = null;
   var TopicObjectFactory = null;
   var TopicEditorStateService = null;
   var TopicEditorRoutingService = null;
@@ -39,7 +38,6 @@ describe('Entity creation service', function() {
 
   beforeEach(angular.mock.inject(function($injector) {
     $rootScope = $injector.get('$rootScope');
-    $location = $injector.get('$location');
     $q = $injector.get('$q');
     $uibModal = $injector.get('$uibModal');
     TopicEditorRoutingService = $injector.get('TopicEditorRoutingService');
@@ -76,10 +74,5 @@ describe('Entity creation service', function() {
     EntityCreationService.createSubtopic();
 
     expect(spy).toHaveBeenCalled();
-  });
-
-  it('should return subtopic Id from URL', function() {
-    $location.path('/subtopic_editor/2');
-    expect(TopicEditorRoutingService.getSubtopicIdFromUrl()).toEqual(2);
   });
 });
