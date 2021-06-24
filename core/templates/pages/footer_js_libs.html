@@ -3,11 +3,7 @@
 <!-- This code is used for inserting webpack bundles
     https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
 <% for (var chunk in htmlWebpackPlugin.files.js) { %>
-  <% if (webpackConfig.mode == 'production') { %>
     <script src="<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
-  <% } else { %>
-    <script src="<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
-  <% } %>
 <% } %>
 
 <% if (htmlWebpackPlugin.options.hybrid && webpackConfig.mode == 'production') { %>
