@@ -473,7 +473,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['login'],
       filename: 'login-page.mainpage.html',
-      hybrid: true,
       meta: defaultMeta,
       template: commonPrefix + '/pages/login-page/login-page.mainpage.html',
       minify: htmlMinifyConfig,
@@ -528,7 +527,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['pending_account_deletion'],
       filename: 'pending-account-deletion-page.mainpage.html',
-      hybrid: true,
       meta: defaultMeta,
       template:
           commonPrefix + '/pages/pending-account-deletion-page/' +
@@ -578,7 +576,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['privacy'],
       filename: 'privacy-page.mainpage.html',
-      hybrid: true,
       meta: defaultMeta,
       template: commonPrefix + '/pages/privacy-page/privacy-page.mainpage.html',
       minify: htmlMinifyConfig,
@@ -648,7 +645,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['splash'],
       filename: 'splash-page.mainpage.html',
-      hybrid: true,
       meta: {
         name: defaultMeta.name,
         description: 'With Oppia, you can access free lessons on math, ' +
@@ -721,7 +717,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['terms'],
       filename: 'terms-page.mainpage.html',
-      hybrid: true,
       meta: {
         name: defaultMeta.name,
         description: 'Oppia is a 501(c)(3) registered non-profit open-source' +
@@ -735,7 +730,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['thanks'],
       filename: 'thanks-page.mainpage.html',
-      hybrid: true,
       meta: {
         name: defaultMeta.name,
         description: 'Thank you for donating to The Oppia Foundation!'

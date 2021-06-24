@@ -29,6 +29,7 @@ import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { RequestInterceptor } from 'services/request-interceptor.service';
+import { ThanksPageRootComponent } from './thanks-page-root.component';
 
 @NgModule({
   imports: [
@@ -38,11 +39,13 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
   ],
   declarations: [
     OppiaAngularRootComponent,
-    ThanksPageComponent
+    ThanksPageComponent,
+    ThanksPageRootComponent
   ],
   entryComponents: [
     OppiaAngularRootComponent,
-    ThanksPageComponent
+    ThanksPageComponent,
+    ThanksPageRootComponent
   ],
   providers: [
     {
@@ -56,30 +59,7 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
       deps: [PlatformFeatureService],
       multi: true
     }
-  ]
+  ],
+  bootstrap: [ThanksPageRootComponent]
 })
-class ThanksPageModule {
-  // Empty placeholder method to satisfy the `Compiler`.
-  ngDoBootstrap() {}
-}
-
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { downgradeModule } from '@angular/upgrade/static';
-
-const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
-  const platformRef = platformBrowserDynamic(extraProviders);
-  return platformRef.bootstrapModule(ThanksPageModule);
-};
-const downgradedModule = downgradeModule(bootstrapFnAsync);
-
-declare var angular: ng.IAngularStatic;
-
-angular.module('oppia').requires.push(downgradedModule);
-
-angular.module('oppia').directive(
-  // This directive is the downgraded version of the Angular component to
-  // bootstrap the Angular 8.
-  'oppiaAngularRoot',
-  downgradeComponent({
-    component: OppiaAngularRootComponent
-  }) as angular.IDirectiveFactory);
+export class ThanksPageModule {}
