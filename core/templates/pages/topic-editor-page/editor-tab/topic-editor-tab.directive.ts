@@ -20,10 +20,10 @@ require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 require(
-  'components/forms/custom-forms-directives/thumbnail-uploader.directive.ts');
+  'components/forms/custom-forms-directives/thumbnail-uploader.component.ts');
 require(
   'components/forms/custom-forms-directives/' +
-    'edit-thumbnail-modal.controller.ts');
+    'edit-thumbnail-modal.component.ts');
 require('components/entity-creation-services/story-creation.service.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/topic/topic-update.service.ts');
@@ -296,6 +296,7 @@ angular.module('oppia').directive('topicEditorTab', [
             }
             TopicUpdateService.setTopicThumbnailBgColor(
               $scope.topic, newThumbnailBgColor);
+            $scope.$applyAsync();
           };
 
           $scope.updateTopicDescription = function(newDescription) {
