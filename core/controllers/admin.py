@@ -23,7 +23,7 @@ import random
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.controllers import domain_objects_validator
+from core.controllers import domain_objects_validator as validation_method
 from core.domain import auth_services
 from core.domain import collection_services
 from core.domain import config_domain
@@ -61,6 +61,7 @@ import utils
 
 class AdminPage(base.BaseHandler):
     """Admin page shown in the App Engine admin console."""
+
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
@@ -73,6 +74,7 @@ class AdminPage(base.BaseHandler):
 
 class AdminHandler(base.BaseHandler):
     """Handler for the admin page."""
+
     NEW_RULES_TYPE_SCHEMA = {
         'type': 'list',
         'items': {
@@ -133,9 +135,9 @@ class AdminHandler(base.BaseHandler):
                 'default_value': None
             },
             'new_config_property_values': {
-                'type': 'dict',
-                'properties': (
-                    config_domain.NEW_CONFIG_PROPERTY_VALUE_SCHEMA_LIST),
+                'type': 'object_dict',
+                'validation_method': (
+                    validation_method.validate_new_config_property_values),
                 'default_value': None
             },
             'config_property_id': {
@@ -1185,6 +1187,7 @@ class ContributionRightsDataHandler(base.BaseHandler):
 
 class SendDummyMailToAdminHandler(base.BaseHandler):
     """This function handles sending test emails."""
+
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {'POST': {}}
 
@@ -1200,6 +1203,7 @@ class SendDummyMailToAdminHandler(base.BaseHandler):
 
 class UpdateUsernameHandler(base.BaseHandler):
     """Handler for renaming usernames."""
+
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
@@ -1287,6 +1291,7 @@ class VerifyUserModelsDeletedHandler(base.BaseHandler):
 
 class DeleteUserHandler(base.BaseHandler):
     """Handler for deleting a user with specific ID."""
+
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {
         'DELETE': {

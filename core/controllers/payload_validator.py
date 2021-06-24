@@ -91,18 +91,9 @@ def validate(handler_args, handler_args_schemas, allowed_extra_args):
 # contains schema.
 HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'AboutRedirectPage',
-    'AddContributionRightsHandler',
-    'AdminHandler',
-    'AdminPage',
-    'AdminRoleHandler',
-    'AdminSuperAdminPrivilegesHandler',
-    'AdminTopicsCsvFileDownloader',
     'AnswerSubmittedEventHandler',
     'AssetDevHandler',
     'AudioUploadHandler',
-    'ClassroomDataHandler',
-    'ClassroomPage',
-    'ClassroomPromosStatusHandler',
     'CollectionDataHandler',
     'CollectionEditorHandler',
     'CollectionEditorPage',
