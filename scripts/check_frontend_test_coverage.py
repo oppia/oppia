@@ -224,7 +224,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'question-update.service.ts',
     'questions-list.directive.ts',
     'random-selector.directive.ts',
-    'rating-display.directive.ts',
     'read-only-collection-backend-api.service.ts',
     'real-editor.component.ts',
     'refresher-exploration-confirmation-modal.service.ts',

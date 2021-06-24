@@ -26,15 +26,16 @@ require('components/ratings/rating-display/rating-display.directive.ts');
 
 describe('Rating display directive', function() {
   var outerScope, ctrlScope;
+
   beforeEach(angular.mock.module('directiveTemplates'));
-  beforeEach(
-    angular.mock.module('oppia', TranslatorProviderForTests));
+  beforeEach(angular.mock.module('oppia', TranslatorProviderForTests));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
+
   beforeEach(
     angular.mock.inject(function($compile, $rootScope, $templateCache) {
       var templateHtml = $templateCache.get(
@@ -49,6 +50,7 @@ describe('Rating display directive', function() {
       outerScope.$digest();
       ctrlScope = compiledElem[0].getControllerScope();
     }));
+
   it('should display the correct number of stars', function() {
     ctrlScope.ratingValue = 4.2;
     outerScope.$digest();
@@ -75,20 +77,52 @@ describe('Rating display directive', function() {
     expect(ctrlScope.stars[3].cssClass).toBe('far fa-star');
     expect(ctrlScope.stars[4].cssClass).toBe('far fa-star');
 
-    ctrlScope.ratingValue = 2.25;
+    ctrlScope.ratingValue = undefined;
     outerScope.$digest();
-    expect(ctrlScope.stars[0].cssClass).toBe('fas fa-star');
-    expect(ctrlScope.stars[1].cssClass).toBe('fas fa-star');
-    expect(ctrlScope.stars[2].cssClass).toBe('far fa-star-half');
+    expect(ctrlScope.stars[0].cssClass).toBe('far fa-star');
+    expect(ctrlScope.stars[1].cssClass).toBe('far fa-star');
+    expect(ctrlScope.stars[2].cssClass).toBe('far fa-star');
     expect(ctrlScope.stars[3].cssClass).toBe('far fa-star');
     expect(ctrlScope.stars[4].cssClass).toBe('far fa-star');
 
+    ctrlScope.status = 'active';
     ctrlScope.ratingValue = 4.3;
     outerScope.$digest();
-    expect(ctrlScope.stars[0].cssClass).toBe('fas fa-star');
-    expect(ctrlScope.stars[1].cssClass).toBe('fas fa-star');
-    expect(ctrlScope.stars[2].cssClass).toBe('fas fa-star');
-    expect(ctrlScope.stars[3].cssClass).toBe('fas fa-star');
+    expect(ctrlScope.stars[0].cssClass).toBe('fas fa-star oppia-rating-star-active');
+    expect(ctrlScope.stars[1].cssClass).toBe('fas fa-star oppia-rating-star-active');
+    expect(ctrlScope.stars[2].cssClass).toBe('fas fa-star oppia-rating-star-active');
+    expect(ctrlScope.stars[3].cssClass).toBe('fas fa-star oppia-rating-star-active');
     expect(ctrlScope.stars[4].cssClass).toBe('far fa-star-half');
+  });
+
+  it('should select star on click', () => {
+    ctrlScope.onEdit = jasmine.createSpy('edit', () => {});
+
+    ctrlScope.isEditable = true;
+    ctrlScope.status = 'active';
+
+    ctrlScope.clickStar(4);
+
+    expect(ctrlScope.status).toBe('rating_set');
+    expect(ctrlScope.onEdit).toHaveBeenCalled();
+  });
+
+  it('should display star value on entering star if star' +
+    ' has not been clicked ', () => {
+    ctrlScope.status = 'inactive';
+    ctrlScope.isEditable = true;
+
+    ctrlScope.enterStar(4);
+
+    expect(ctrlScope.status).toBe('active');
+  });
+
+  it('should mark status as inactive if user leaves area', () => {
+    ctrlScope.ratingValue = 4;
+    ctrlScope.status = 'active';
+
+    ctrlScope.leaveArea();
+
+    expect(ctrlScope.status).toBe('inactive');
   });
 });
