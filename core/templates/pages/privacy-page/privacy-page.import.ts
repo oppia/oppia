@@ -36,4 +36,4 @@ platformBrowserDynamic().bootstrapModule(PrivacyPageModule).catch(
   (err) => console.error(err)
 );
 
-window.name = ''
+window.name = '';
