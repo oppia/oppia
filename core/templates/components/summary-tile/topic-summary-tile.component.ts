@@ -20,7 +20,7 @@ import { Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { ClassroomDomainConstants } from 'domain/classroom/classroom-domain.constants';
-import { TopicSummary } from 'domain/topic/topic-summary.model';
+import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 
@@ -29,7 +29,7 @@ import { AssetsBackendApiService } from 'services/assets-backend-api.service';
   templateUrl: './topic-summary-tile.component.html'
 })
 export class TopicSummaryTileComponent {
-  @Input() topicSummary: TopicSummary;
+  @Input() topicSummary: CreatorTopicSummary;
   @Input() classroomUrlFragment: string;
   @Input() isPublished: boolean;
   thumbnailUrl: string = '';
