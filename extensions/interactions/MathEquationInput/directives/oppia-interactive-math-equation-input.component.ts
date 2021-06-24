@@ -43,6 +43,7 @@ export class InteractiveMathEquationInput implements OnInit {
   @Input() savedSolution: InteractionAnswer;
   @Input() useFractionForDivisionWithValue;
   @Input() customOskLettersWithValue;
+
   constructor(
     private currentInteractionService: CurrentInteractionService,
     private guppyConfigurationService: GuppyConfigurationService,
