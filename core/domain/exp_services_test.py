@@ -9050,7 +9050,7 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
 
         # Adding translations again to the different contents
         # of same state to check that they can be merged.
-        change_list_4 = [ exp_domain.ExplorationChange({
+        change_list_4 = [exp_domain.ExplorationChange({
             'new_state_name': 'Intro-Rename',
             'cmd': 'rename_state',
             'old_state_name': 'Introduction'
@@ -9070,7 +9070,7 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             'content_id': 'hint_1',
             'cmd': 'add_written_translation',
             'data_format': 'html'
-        }),  exp_domain.ExplorationChange({
+        }), exp_domain.ExplorationChange({
             'language_code': 'de',
             'data_format': 'html',
             'cmd': 'add_written_translation',
@@ -9090,7 +9090,7 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             'new_state_name': 'Introduction',
             'cmd': 'rename_state',
             'old_state_name': 'Intro-Rename'
-        }),]
+        })]
 
         changes_are_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 3, change_list_4)

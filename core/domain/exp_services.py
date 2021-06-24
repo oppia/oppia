@@ -2051,7 +2051,7 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
                                                         ]) and
                                         change.property_name not in
                                         changed_translations[old_state_name]):
-                                        change_is_mergeable = True
+                                    change_is_mergeable = True
                         else:
                             change_is_mergeable = True
                     elif (change.property_name ==
