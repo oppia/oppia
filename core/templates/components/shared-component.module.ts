@@ -84,6 +84,7 @@ import { EditThumbnailModalComponent } from './forms/custom-forms-directives/edi
 import { TopNavigationBarComponent } from './common-layout-directives/navigation-bars/top-navigation-bar.component';
 import { CorrectnessFooterComponent } from 'pages/exploration-player-page/layout-directives/correctness-footer.component';
 import { ContinueButtonComponent } from 'pages/exploration-player-page/learner-experience/continue-button.component';
+import { QuestionDifficultySelectorComponent } from './question-difficulty-selector/question-difficulty-selector.component';
 import { BaseContentComponent } from '../base-components/base-content.component';
 import { PreviewThumbnailComponent } from 'pages/topic-editor-page/modal-templates/preview-thumbnail.component';
 import { InputResponsePairComponent } from 'pages/exploration-player-page/learner-experience/input-response-pair.component';
@@ -261,6 +262,7 @@ const toastrConfig = {
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
     PromoBarComponent,
+    QuestionDifficultySelectorComponent,
     SelectSkillModalComponent,
     RubricsEditorComponent,
     SearchBarComponent,
@@ -330,6 +332,7 @@ const toastrConfig = {
     OppiaFooterComponent,
     PreviewThumbnailComponent,
     PromoBarComponent,
+    QuestionDifficultySelectorComponent,
     RubricsEditorComponent,
     SearchBarComponent,
     SideNavigationBarComponent,
@@ -398,6 +401,7 @@ const toastrConfig = {
     OppiaFooterComponent,
     OutcomeFeedbackEditorComponent,
     SearchBarComponent,
+    QuestionDifficultySelectorComponent,
     StateSkillEditorComponent,
     SelectSkillModalComponent,
     SideNavigationBarComponent,
