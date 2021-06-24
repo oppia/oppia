@@ -40,6 +40,7 @@ describe('Topic editor page', function() {
   var TopicObjectFactory = null;
   var StoryReferenceObjectFactory = null;
   var topic = null;
+  var applyAsyncSpy = null;
 
   importAllAngularServices();
 
@@ -74,7 +75,9 @@ describe('Topic editor page', function() {
     TopicEditorStateService.setTopic(topic);
     spyOn(TopicEditorStateService, 'getTopic').and.returnValue(topic);
     $scope = $rootScope.$new();
+    applyAsyncSpy = spyOn($rootScope, '$applyAsync').and.stub();
     ctrl = $componentController('topicEditorPage', {
+      $rootScope: $rootScope,
       $scope: $scope
     });
   }));
@@ -84,10 +87,12 @@ describe('Topic editor page', function() {
     let topicInitializedEventEmitter = new EventEmitter();
     let topicReinitializedEventEmitter = new EventEmitter();
     let undoRedoChangeEventEmitter = new EventEmitter();
+    let updateViewEventEmitter = new EventEmitter();
     spyOn(TopicEditorStateService, 'loadTopic').and.callFake(function() {
       topicInitializedEventEmitter.emit();
       topicReinitializedEventEmitter.emit();
       undoRedoChangeEventEmitter.emit();
+      updateViewEventEmitter.emit();
     });
     spyOnProperty(
       TopicEditorStateService, 'onTopicInitialized').and.returnValue(
@@ -95,6 +100,9 @@ describe('Topic editor page', function() {
     spyOnProperty(
       TopicEditorStateService, 'onTopicReinitialized').and.returnValue(
       topicReinitializedEventEmitter);
+    spyOnProperty(
+      TopicEditorRoutingService, 'updateViewEventEmitter').and.returnValue(
+      updateViewEventEmitter);
     spyOn(UrlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
     spyOn(PageTitleService, 'setPageTitle').and.callThrough();
 
@@ -102,6 +110,7 @@ describe('Topic editor page', function() {
 
     expect(TopicEditorStateService.loadTopic).toHaveBeenCalledWith('topic_1');
     expect(PageTitleService.setPageTitle).toHaveBeenCalledTimes(2);
+    expect(applyAsyncSpy).toHaveBeenCalledTimes(3);
 
     ctrl.$onDestroy();
   });
