@@ -375,13 +375,13 @@ class PopulateTranslationContributionStatsOneOffJob(
             key: str. Entity ID for a TranslationContributionStatsModel.
             stringified_values: list(dict(str, str)). A list of stringified
                 dicts with the following keys:
-                suggestion_status: str. The translation suggestion status.
-                edited_by_reviewer: bool. Whether the translation suggestion
-                    was edited by a reviewer.
-                content_word_count: int. The word count of the translation
-                    suggestion content HTML.
-                last_updated_date: date. The last updated date of the
-                    translation suggestion.
+                    suggestion_status: str. The translation suggestion status.
+                    edited_by_reviewer: bool. Whether the translation suggestion
+                        was edited by a reviewer.
+                    content_word_count: int. The word count of the translation
+                        suggestion content HTML.
+                    last_updated_date: date. The last updated date of the
+                        translation suggestion.
 
         Yields:
             tuple(key, count), where:
