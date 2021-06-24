@@ -32,7 +32,7 @@ ES = elasticsearch.Elasticsearch(
     cloud_id=feconf.ES_CLOUD_ID,
     http_auth=(
         (feconf.ES_USERNAME, feconf.ES_PASSWORD)
-        if feconf.ES_CLOUD_ID else None))
+        if feconf.ES_CLOUD_ID else None), timeout=60)
 
 
 def _create_index(index_name):

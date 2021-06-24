@@ -48,6 +48,16 @@ class InitializeAndroidTestData(base.BaseHandler):
 
     def post(self):
         if constants.DEV_MODE:
+            if topic_services.does_topic_with_name_exist(
+                    'Android test'):
+                topic = topic_fetchers.get_topic_by_name('Android test')
+                topic_rights = topic_fetchers.get_topic_rights(
+                    topic.id, strict=False)
+                if topic_rights.topic_is_published:
+                    raise Exception('The topic is already published.')
+                else:
+                    raise Exception('The topic exists but not published.')
+
             # TODO(#13170): Change this to "26" after #13029 is merged.
             exp_id = '15'
             user_id = feconf.SYSTEM_COMMITTER_ID

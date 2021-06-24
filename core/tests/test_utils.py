@@ -2242,6 +2242,15 @@ title: Title
 
         return self._parse_json_response(json_response, expect_errors)
 
+    def post_req(self, url, expected_status_int=200):
+        """Post request with no response."""
+        data = {}
+        expect_errors = expected_status_int >= 400
+        json_response = self._send_post_request(
+            self.testapp, url, data, expect_errors,
+            expected_status_int=expected_status_int)
+        self.assertEqual(json_response.status_int, expected_status_int)
+
     def post_json(
             self, url, payload, csrf_token=None, expected_status_int=200,
             upload_files=None):
