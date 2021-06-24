@@ -1511,7 +1511,6 @@ class PopulateTranslationContributionStatsOneOffJobTests(
             self.id = exploration_id
             self.topic_id = topic_id
 
-    # A mock exploration created for testing.
     explorations = [
         MockExploration(target_id, {'state_1': {}, 'state_2': {}})
     ]
