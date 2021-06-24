@@ -122,7 +122,12 @@ describe('Solution object factory', () => {
       solution.setCorrectAnswer({
         type: 'real',
         real: 1,
-        fraction: '',
+        fraction: {
+          isNegative: false,
+          wholeNumber: 0,
+          numerator: 0,
+          denominator: 1
+        },
         units: []
       });
       expect(solution.getSummary('NumberWithUnits')).toEqual(
