@@ -68,7 +68,8 @@
         "core.domain.topic_domain_test",
         "core.controllers.acl_decorators_test",
         "core.domain.user_query_jobs_one_off_test",
-        "core.domain.question_domain_test"
+        "core.domain.question_domain_test",
+        "jobs.io.job_io_test"
     ],
     "3": [
         "core.domain.rights_manager_test",
@@ -102,6 +103,8 @@
     "4": [
         "core.domain.beam_job_domain_test",
         "core.domain.beam_job_services_test",
+        "core.domain.blog_domain_test",
+        "core.domain.blog_services_test",
         "core.domain.skill_jobs_one_off_test",
         "scripts.check_if_pr_is_low_risk_test",
         "scripts.scripts_test_utils_test",

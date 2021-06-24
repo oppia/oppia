@@ -666,3 +666,6 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertRaisesRegexp(
             Exception, 'The given string does not represent a PNG data URL.',
             lambda: utils.convert_png_data_url_to_binary(image_data_url))
+
+    def test_quoted_string(self):
+        self.assertEqual(utils.quoted('a"b\'c'), '"a\\"b\'c"')
