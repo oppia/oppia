@@ -1417,9 +1417,9 @@ def update_email_preferences(
         can_receive_subscription_email: bool. Whether the given user can receive
             emails related to his/her creator subscriptions.
         bulk_email_db_already_updated: bool. Whether the bulk email provider's
-            db is already updated. This is set to true only when calling from
-            the webhook controller since in that case, the external update to
-            bulk email db initiated the update here.
+            database is already updated. This is set to true only when calling
+            from the webhook controller since in that case, the external update
+            to the bulk email provider's database initiated the update here.
 
     Returns:
         bool. Whether to send a mail to the user to complete bulk email service
