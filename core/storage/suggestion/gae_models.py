@@ -915,6 +915,21 @@ class TranslationContributionStatsModel(base_models.BaseModel):
         return cls.get_by_id(entity_id)
 
     @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether TranslationContributionStatsModel references the
+        supplied user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.query(
+            cls.contributor_user_id == user_id
+        ).get(keys_only=True) is not None
+
+    @classmethod
     def get_deletion_policy(cls):
         """Model contains corresponding to a user: contributor_user_id."""
         return base_models.DELETION_POLICY.DELETE
