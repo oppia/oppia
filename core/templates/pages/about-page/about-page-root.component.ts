@@ -19,7 +19,7 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'about-page-root',
+  selector: 'oppia-about-page-root',
   templateUrl: './about-page-root.component.html'
 })
 export class AboutPageRootComponent {}

@@ -45,8 +45,8 @@ class ModelExpiringErrorTests(base_validation_errors_test.AuditErrorsTestBase):
         error = user_validation_errors.ModelExpiringError(model)
 
         self.assertEqual(
-            error.message,
-            'ModelExpiringError in UserQueryModel(id=\'test\'): mark model '
+            error.stderr,
+            'ModelExpiringError in UserQueryModel(id="test"): mark model '
             'as deleted when older than %s days' % (
                 feconf.PERIOD_TO_MARK_MODELS_AS_DELETED.days))
 
@@ -63,9 +63,9 @@ class ModelIncorrectKeyErrorTests(
             model, incorrect_keys)
 
         self.assertEqual(
-            error.message,
+            error.stderr,
             'ModelIncorrectKeyError in PendingDeletionRequestModel'
-            '(id=\'test\'): contains keys %s are not allowed' %
+            '(id="test"): contains keys %s are not allowed' %
             incorrect_keys)
 
 
@@ -79,9 +79,9 @@ class ModelIdRegexErrorTests(base_validation_errors_test.AuditErrorsTestBase):
         error = base_validation_errors.ModelIdRegexError(model, '[abc]{3}')
 
         self.assertEqual(
-            error.message,
-            'ModelIdRegexError in BaseModel(id=\'?!"\'): id does not '
-            'match the expected regex=u\'[abc]{3}\'')
+            error.stderr,
+            'ModelIdRegexError in BaseModel(id="?!\\""): id does not '
+            'match the expected regex="[abc]{3}"')
 
 
 class DraftChangeListLastUpdatedNoneErrorTests(
@@ -107,9 +107,9 @@ class DraftChangeListLastUpdatedNoneErrorTests(
             DraftChangeListLastUpdatedNoneError(model))
 
         self.assertEqual(
-            error.message,
+            error.stderr,
             'DraftChangeListLastUpdatedNoneError in ExplorationUserDataModel'
-            '(id=\'123\'): draft change list %s exists but draft change list '
+            '(id="123"): draft change list %s exists but draft change list '
             'last updated is None' % draft_change_list)
 
 
@@ -137,9 +137,9 @@ class DraftChangeListLastUpdatedInvalidErrorTests(
             DraftChangeListLastUpdatedInvalidError(model))
 
         self.assertEqual(
-            error.message,
+            error.stderr,
             'DraftChangeListLastUpdatedInvalidError in '
-            'ExplorationUserDataModel(id=\'123\'): draft change list last '
+            'ExplorationUserDataModel(id="123"): draft change list last '
             'updated %s is greater than the time when job was run' %
             last_updated)
 
@@ -158,7 +158,7 @@ class ArchivedModelNotMarkedDeletedErrorTests(
         error = user_validation_errors.ArchivedModelNotMarkedDeletedError(model)
 
         self.assertEqual(
-            error.message,
+            error.stderr,
             'ArchivedModelNotMarkedDeletedError in '
-            'UserQueryModel(id=\'test\'): model is archived '
+            'UserQueryModel(id="test"): model is archived '
             'but not marked as deleted')

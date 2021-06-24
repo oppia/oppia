@@ -27,17 +27,17 @@ class ModelIncorrectKeyError(base_validation_errors.BaseAuditError):
     """Error class for incorrect key in PendingDeletionRequestModel."""
 
     def __init__(self, model, incorrect_keys):
-        super(ModelIncorrectKeyError, self).__init__(model)
-        self.message = 'contains keys %s are not allowed' % (incorrect_keys)
+        message = 'contains keys %s are not allowed' % (incorrect_keys)
+        super(ModelIncorrectKeyError, self).__init__(message, model)
 
 
 class ModelExpiringError(base_validation_errors.BaseAuditError):
     """Error class for models that are expiring."""
 
     def __init__(self, model):
-        super(ModelExpiringError, self).__init__(model)
-        self.message = 'mark model as deleted when older than %s days' % (
+        message = 'mark model as deleted when older than %s days' % (
             feconf.PERIOD_TO_MARK_MODELS_AS_DELETED.days)
+        super(ModelExpiringError, self).__init__(message, model)
 
 
 class DraftChangeListLastUpdatedNoneError(
@@ -47,10 +47,11 @@ class DraftChangeListLastUpdatedNoneError(
     """
 
     def __init__(self, model):
-        super(DraftChangeListLastUpdatedNoneError, self).__init__(model)
-        self.message = (
+        message = (
             'draft change list %s exists but draft change list '
             'last updated is None' % model.draft_change_list)
+        super(DraftChangeListLastUpdatedNoneError, self).__init__(
+            message, model)
 
 
 class DraftChangeListLastUpdatedInvalidError(
@@ -58,10 +59,11 @@ class DraftChangeListLastUpdatedInvalidError(
     """Error class for models with invalid draft change list last_updated."""
 
     def __init__(self, model):
-        super(DraftChangeListLastUpdatedInvalidError, self).__init__(model)
-        self.message = (
+        message = (
             'draft change list last updated %s is greater than the time '
             'when job was run' % model.draft_change_list_last_updated)
+        super(DraftChangeListLastUpdatedInvalidError, self).__init__(
+            message, model)
 
 
 class ArchivedModelNotMarkedDeletedError(
@@ -69,5 +71,5 @@ class ArchivedModelNotMarkedDeletedError(
     """Error class for models which are archived but not deleted."""
 
     def __init__(self, model):
-        super(ArchivedModelNotMarkedDeletedError, self).__init__(model)
-        self.message = 'model is archived but not marked as deleted'
+        message = 'model is archived but not marked as deleted'
+        super(ArchivedModelNotMarkedDeletedError, self).__init__(message, model)
