@@ -2174,8 +2174,8 @@ class StringConcatenationChecker(checkers.BaseChecker):
             bool. True if Operand is a string constant, otherwise false.
         """
         return (
-          isinstance(node, astroid.nodes.Const) and
-                ('str' in node.pytype() or 'unicode' in node.pytype()))
+            isinstance(node, astroid.nodes.Const) and
+            ('str' in node.pytype() or 'unicode' in node.pytype()))
 
     def visit_binop(self, node):
         """Called for every '+' operator to prohibit usage of string

@@ -299,7 +299,8 @@ describe('Full exploration editor', function() {
     responseEditor = await explorationEditorMainTab.getResponseEditor(
       'default');
     await responseEditor.setDestination(null, false, refresherExplorationId);
-    await explorationEditorPage.saveChanges('Add Refresher Exploration Id');
+    await explorationEditorPage.publishChanges(
+      'Add Refresher Exploration Id');
 
     await creatorDashboardPage.get();
     await creatorDashboardPage.editExploration(
@@ -307,7 +308,8 @@ describe('Full exploration editor', function() {
     responseEditor = await explorationEditorMainTab.getResponseEditor(
       'default');
     await responseEditor.setDestination(null, false, refresherExplorationId);
-    await explorationEditorPage.saveChanges('Add Refresher Exploration Id');
+    await explorationEditorPage.publishChanges(
+      'Add Refresher Exploration Id');
 
     // Create collection and add created exploration.
     await creatorDashboardPage.get();

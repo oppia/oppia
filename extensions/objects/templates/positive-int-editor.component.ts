@@ -19,28 +19,59 @@
 // Every editor directive should implement an alwaysEditable option. There
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
-angular.module('oppia').component('positiveIntEditor', {
-  bindings: {
-    value: '='
-  },
-  template: require('./positive-int-editor.component.html'),
-  controller: [function() {
-    const ctrl = this;
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 
-    ctrl.$onInit = function() {
-      ctrl.SCHEMA = {
-        type: 'int',
-        validators: [{
-          id: 'is_at_least',
-          min_value: 1
-        }, {
-          id: 'is_integer'
-        }]
-      };
+interface PositiveIntSchema {
+  type: string;
+  validators: {
+    id: string;
+    'min_value'?: number;
+  }[];
+}
 
-      if (!ctrl.value) {
-        ctrl.value = 1;
-      }
-    };
-  }]
-});
+@Component({
+  selector: 'positive-int-editor',
+  templateUrl: './positive-int-editor.component.html',
+  styleUrls: []
+})
+export class PositiveIntEditorComponent implements OnInit {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() modalId!: symbol;
+  @Input() value!: number;
+  @Output() valueChanged = new EventEmitter();
+  SCHEMA: PositiveIntSchema = {
+    type: 'int',
+    validators: [{
+      id: 'is_at_least',
+      min_value: 1
+    }, {
+      id: 'is_integer'
+    }]
+  };
+  constructor(private changeDetectorRef: ChangeDetectorRef) {}
+
+  ngOnInit(): void {
+    if (!this.value) {
+      this.value = 1;
+    }
+  }
+
+  getSchema(): PositiveIntSchema {
+    return this.SCHEMA;
+  }
+
+  updateValue(newValue: number): void {
+    if (this.value === newValue) {
+      return;
+    }
+    this.value = newValue;
+    this.valueChanged.emit(this.value);
+    this.changeDetectorRef.detectChanges();
+  }
+}
+angular.module('oppia').directive('positiveIntEditor', downgradeComponent({
+  component: PositiveIntEditorComponent
+}) as angular.IDirectiveFactory);

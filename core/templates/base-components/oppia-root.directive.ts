@@ -23,7 +23,7 @@ import { OppiaAngularRootComponent } from
 import { angularServices } from 'services/angular-services.index';
 
 angular.module('oppia').directive('oppiaRoot', [
-  '$translate', function($translate) {
+  '$translate', 'RteHelperService', function($translate, RteHelperService) {
     return {
       template: require('./oppia-root.directive.html'),
       scope: {},
@@ -32,7 +32,7 @@ angular.module('oppia').directive('oppiaRoot', [
       controller: ['$scope',
         function($scope) {
           $scope.initialized = false;
-
+          OppiaAngularRootComponent.rteHelperService = RteHelperService;
           $scope.onInit = function() {
             const map: Record<string, unknown[]> = {};
             for (let [serviceName, serviceType] of angularServices) {
@@ -122,15 +122,23 @@ angular.module('oppia').directive('oppiaRoot', [
             OppiaAngularRootComponent.ajsTranslate = $translate;
             const translateService = (
               OppiaAngularRootComponent.translateService);
+            const translateCacheService = (
+              OppiaAngularRootComponent.translateCacheService);
             const i18nLanguageCodeService = (
               OppiaAngularRootComponent.i18nLanguageCodeService);
-            translateService.use(
-              i18nLanguageCodeService.getCurrentI18nLanguageCode());
+
             i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(
-              (code) => translateService.use(code)
+              (code) => {
+                translateService.use(code);
+                $translate.use(code);
+              }
             );
-            i18nLanguageCodeService.setI18nLanguageCode(
-              $translate.proposedLanguage() || $translate.use());
+            translateCacheService.init();
+
+            const cachedLanguage = translateCacheService.getCachedLanguage();
+            if (cachedLanguage) {
+              i18nLanguageCodeService.setI18nLanguageCode(cachedLanguage);
+            }
 
             // The next line allows the transcluded content to start executing.
             $scope.initialized = true;

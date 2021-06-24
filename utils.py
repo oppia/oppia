@@ -43,6 +43,7 @@ sys.path.insert(0, _YAML_PATH)
 import yaml  # isort:skip  #pylint: disable=wrong-import-position
 
 DATETIME_FORMAT = '%m/%d/%Y, %H:%M:%S:%f'
+ISO_8601_DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%fz'
 PNG_DATA_URL_PREFIX = 'data:image/png;base64,'
 SECONDS_IN_HOUR = 60 * 60
 SECONDS_IN_MINUTE = 60
@@ -56,6 +57,14 @@ class InvalidInputException(Exception):
 
 class ValidationError(Exception):
     """Error class for when a domain object fails validation."""
+
+    pass
+
+
+class DeprecatedCommandError(ValidationError):
+    """Error class for when a domain object has a command
+    or a value that is deprecated.
+    """
 
     pass
 
@@ -1062,3 +1071,15 @@ def partition(iterable, predicate=bool, enumerated=False):
     return (
         (i for i, predicate_is_true in true_part if predicate_is_true),
         (i for i, predicate_is_true in false_part if not predicate_is_true))
+
+
+def quoted(s):
+    """Returns a string enclosed in quotes, escaping any quotes within it.
+
+    Args:
+        s: str. The string to quote.
+
+    Returns:
+        str. The quoted string.
+    """
+    return json.dumps(s)

@@ -2086,12 +2086,13 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         given translation html and submission datetime.
         """
         add_translation_change_dict = {
-            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'content_id': feconf.DEFAULT_NEW_STATE_CONTENT_ID,
             'language_code': language_code,
             'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
-            'translation_html': translation_html
+            'translation_html': translation_html,
+            'data_format': 'html'
         }
 
         translation_suggestion = suggestion_services.create_suggestion(
@@ -3668,12 +3669,13 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         given translation html and submission datetime.
         """
         add_translation_change_dict = {
-            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'content_id': feconf.DEFAULT_NEW_STATE_CONTENT_ID,
             'language_code': language_code,
             'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
-            'translation_html': translation_html
+            'translation_html': translation_html,
+            'data_format': 'html'
         }
 
         with self.mock_datetime_utcnow(submission_datetime):
@@ -4427,12 +4429,13 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
     def _create_translation_suggestion_with_language_code(self, language_code):
         """Creates a translation suggestion in the given language_code."""
         add_translation_change_dict = {
-            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'content_id': feconf.DEFAULT_NEW_STATE_CONTENT_ID,
             'language_code': language_code,
             'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
-            'translation_html': '<p>This is the translated content.</p>'
+            'translation_html': '<p>This is the translated content.</p>',
+            'data_format': 'html'
         }
 
         return suggestion_services.create_suggestion(

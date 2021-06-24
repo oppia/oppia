@@ -16,37 +16,50 @@
  * @fileoverview Unit tests for the position of terms component.
  */
 
-describe('PositionOfTerms', function() {
-  var PositionOfTermsCtrl = null;
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { PositionOfTerm, PositionOfTermsEditorComponent } from './position-of-terms-editor.component';
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($componentController) {
-    PositionOfTermsCtrl = $componentController('positionOfTermsEditor');
-    PositionOfTermsCtrl.$onInit();
+describe('PositionOfTerms', () => {
+  let fixture: ComponentFixture<PositionOfTermsEditorComponent>;
+  let component: PositionOfTermsEditorComponent;
+
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      declarations: [PositionOfTermsEditorComponent],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
 
-  it('should have the correct default value of position', function() {
-    expect(PositionOfTermsCtrl.localValue.name).toBe('both');
+  beforeEach(waitForAsync(()=> {
+    fixture = TestBed.createComponent(PositionOfTermsEditorComponent);
+    component = fixture.componentInstance;
+    component.ngOnInit();
+  }));
+
+  it('should have the correct default value of position', () => {
+    expect(component.localValue.name).toBe('both');
   });
 
-  it('should change ctrl.value when ctrl.localValue changes', function() {
+  it('should change ctrl.value when ctrl.localValue changes', () => {
     // Initially, the default value of localValue is assigned.
-    PositionOfTermsCtrl.onChangePosition();
-    expect(PositionOfTermsCtrl.value).toBe('both');
+    component.onChangePosition('both');
+    expect(component.value).toBe('both');
 
     // Changing localValue should change ctrl.value.
-    PositionOfTermsCtrl.localValue = PositionOfTermsCtrl.positionOfTerms[0];
-    PositionOfTermsCtrl.onChangePosition();
-    expect(PositionOfTermsCtrl.value).toBe('lhs');
+    component.localValue = (
+      component.positionOfTerms[0] as unknown as PositionOfTerm);
+    component.onChangePosition('lhs');
+    expect(component.value).toBe('lhs');
   });
 
-  it('should initialize ctrl.localValue with ctrl.value', function() {
-    PositionOfTermsCtrl.value = 'rhs';
-    PositionOfTermsCtrl.$onInit();
-    expect(PositionOfTermsCtrl.localValue.name).toBe('rhs');
+  it('should initialize ctrl.localValue with ctrl.value', () => {
+    component.value = 'rhs';
+    component.ngOnInit();
+    expect(component.localValue.name).toBe('rhs');
 
-    PositionOfTermsCtrl.value = 'irrelevant';
-    PositionOfTermsCtrl.$onInit();
-    expect(PositionOfTermsCtrl.localValue.name).toBe('irrelevant');
+    component.value = 'irrelevant';
+    component.ngOnInit();
+    expect(component.localValue.name).toBe('irrelevant');
   });
 });
