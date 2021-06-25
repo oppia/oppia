@@ -196,6 +196,7 @@ describe('Context service', () => {
     it('should correctly set and retrieve the entity type', () => {
       expect(ecs.getEntityType()).toBeUndefined();
       spyOn(urlService, 'getPathname').and.returnValue('/topic_editor/123');
+      spyOn(urlService, 'getHash').and.returnValue('');
       expect(ecs.getEntityType()).toBe('topic');
     });
 
@@ -317,6 +318,7 @@ describe('Context service', () => {
     it('should correctly retrieve the entity type', () => {
       expect(ecs.getEntityType()).toBeUndefined();
       spyOn(urlService, 'getPathname').and.returnValue('/skill_editor/123');
+      spyOn(urlService, 'getHash').and.returnValue('');
       expect(ecs.getEntityType()).toBe('skill');
     });
 
