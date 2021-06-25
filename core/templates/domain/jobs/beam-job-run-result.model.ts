@@ -13,11 +13,19 @@
 // limitations under the License.
 
 /**
- * @fileoverview Constants for the Oppia release coordinator page.
+ * @fileoverview Domain object for the result of an Apache Beam job instance.
  */
 
-export const ReleaseCoordinatorPageConstants = {
-  TAB_ID_BEAM_JOBS: 'beam_jobs',
-  TAB_ID_JOBS: 'jobs',
-  TAB_ID_MISC: ' misc',
-} as const;
+export interface BeamJobRunResultBackendDict {
+  'stdout': string;
+  'stderr': string;
+}
+
+export class BeamJobRunResult {
+  constructor(public readonly stdout: string, public readonly stderr: string) {}
+
+  static createFromBackendDict(
+      backendDict: BeamJobRunResultBackendDict): BeamJobRunResult {
+    return new BeamJobRunResult(backendDict.stdout, backendDict.stderr);
+  }
+}
