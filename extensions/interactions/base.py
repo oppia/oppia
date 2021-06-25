@@ -68,6 +68,10 @@ class BaseInteraction(python_utils.OBJECT):
     178 x 146 pixels. This image will be shown in the interaction selector.
     """
 
+    # NOTE TO DEVELOPERS: The property answer_calculation_ids() was removed in
+    # #13021 as part of the migration to Apache Beam. Please refer to that PR if
+    # you need to reinstate it.
+
     # The human-readable name of the interaction. Overridden in subclasses.
     name = ''
     # A description of the interaction. Overridden in subclasses.
@@ -154,13 +158,6 @@ class BaseInteraction(python_utils.OBJECT):
                     spec['calculation_id'], spec['options'],
                     spec['addressed_info_is_supported']))
         return result
-
-    @property
-    def answer_calculation_ids(self):
-        """A set of answer calculation ids."""
-        visualizations = self.answer_visualizations
-        return set(
-            [visualization.calculation_id for visualization in visualizations])
 
     @property
     def dependency_ids(self):

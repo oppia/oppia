@@ -19,7 +19,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import logging
 import types
 
 from core.domain import exp_domain
@@ -633,49 +632,3 @@ class StateAnswersCalcOutputModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             stats_models.StateAnswersCalcOutputModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
-
-    def test_get_model_returns_created_properties(self):
-
-        stats_models.StateAnswersCalcOutputModel.create_or_update(
-            'exp_id', '1', 'state_name', '', 'calculation_id', '', {})
-
-        model1 = stats_models.StateAnswersCalcOutputModel.get_model(
-            'exp_id', '1', 'state_name', 'calculation_id')
-
-        self.assertEqual(model1.exploration_id, 'exp_id')
-        self.assertEqual(model1.exploration_version, '1')
-        self.assertEqual(model1.state_name, 'state_name')
-        self.assertEqual(model1.calculation_id, 'calculation_id')
-
-        # Model with 'invalid_exp_id' does not exist.
-        model1 = stats_models.StateAnswersCalcOutputModel.get_model(
-            'invalid_exp_id', '1', 'state_name', 'calculation_id')
-
-        self.assertIsNone(model1)
-
-    def test_raise_exception_with_large_calculation_output(self):
-
-        observed_log_messages = []
-
-        def _mock_logging_function(msg, *args):
-            """Mocks logging.exception."""
-            observed_log_messages.append(msg % args)
-
-        logging_swap = self.swap(logging, 'exception', _mock_logging_function)
-
-        large_calculation_output = {'key': 'a' * 1200000}
-
-        with logging_swap:
-            stats_models.StateAnswersCalcOutputModel.create_or_update(
-                'exp_id', '1', 'state_name', '', 'calculation_id', '',
-                large_calculation_output)
-
-            self.assertEqual(len(observed_log_messages), 1)
-            self.assertEqual(
-                observed_log_messages[0],
-                (
-                    'Failed to add calculation output for exploration ID '
-                    'exp_id, version 1, state name state_name, and '
-                    'calculation ID calculation_id'
-                )
-            )

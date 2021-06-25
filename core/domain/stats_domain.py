@@ -30,13 +30,9 @@ from core.domain import customization_args_util
 from core.domain import exp_domain
 from core.domain import interaction_registry
 from core.domain import playthrough_issue_registry
-from core.platform import models
 import feconf
 import python_utils
 import utils
-
-(stats_models,) = models.Registry.import_models([models.NAMES.statistics])
-
 
 # These are special sentinel values attributed to answers migrated from the old
 # answer storage model. Those answers could not have session IDs or time spent
@@ -1510,15 +1506,6 @@ class StateAnswersCalcOutput(python_utils.OBJECT):
         self.calculation_id = calculation_id
         self.interaction_id = interaction_id
         self.calculation_output = calculation_output
-
-    def save(self):
-        """Validate the domain object and commit it to storage."""
-        self.validate()
-        stats_models.StateAnswersCalcOutputModel.create_or_update(
-            self.exploration_id, self.exploration_version, self.state_name,
-            self.interaction_id, self.calculation_id,
-            self.calculation_output.calculation_output_type,
-            self.calculation_output.to_raw_type())
 
     def validate(self):
         """Validates StateAnswersCalcOutputModel domain object entity before
