@@ -53,6 +53,36 @@ class JobRunResult(python_utils.OBJECT):
                 'JobRunResult must not exceed %d bytes' % MAX_OUTPUT_BYTES)
 
     @classmethod
+    def as_stdout(cls, value, use_repr=False):
+        """Returns a new JobRunResult with a stdout value.
+
+        Args:
+            value: *. The input value to convert into a stdout result. Types are
+                always casted to string using '%s' formatting.
+            use_repr: bool. Whether to use the `repr` of the value.
+
+        Returns:
+            JobRunResult. A JobRunResult with the given value as its stdout.
+        """
+        str_value = ('%r' if use_repr else '%s') % (value,)
+        return JobRunResult(stdout=str_value)
+
+    @classmethod
+    def as_stderr(cls, value, use_repr=False):
+        """Returns a new JobRunResult with a stderr value.
+
+        Args:
+            value: *. The input value to convert into a stderr result. Types are
+                always casted to string using '%s' formatting.
+            use_repr: bool. Whether to use the `repr` of the value.
+
+        Returns:
+            JobRunResult. A JobRunResult with the given value as its stderr.
+        """
+        str_value = ('%r' if use_repr else '%s') % (value,)
+        return JobRunResult(stderr=str_value)
+
+    @classmethod
     def accumulate(cls, results):
         """Accumulates results into bigger ones that maintain the size limit.
 
