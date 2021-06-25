@@ -241,7 +241,6 @@
 /core/templates/services/exploration-html-formatter.service*.ts @kevintab95
 /core/templates/services/image-upload-helper.service*.ts @kevintab95
 /core/templates/services/validators.service*.ts @kevintab95
-/core/domain/blog*.py @iamprayush
 
 
 # Forms pages.
