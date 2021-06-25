@@ -114,7 +114,7 @@ class FixQuestionImagesStorageOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (FixQuestionImagesStorageOneOffJob._DELETED_KEY, 1)
             return
 
-        question = question_services.get_question_by_id(item.id, strict=False)
+        question = question_fetchers.get_question_from_model(item)
         html_list = question.question_state_data.get_all_html_content_strings()
         image_filenames = html_cleaner.get_image_filenames_from_html_strings(
             html_list)
