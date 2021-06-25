@@ -472,6 +472,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/profilehandler/data/<username>', profile.ProfileHandler),
     get_redirect_route(feconf.PREFERENCES_URL, profile.PreferencesPage),
     get_redirect_route(
+        r'%s/<secret>' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT,
+        profile.BulkEmailWebhookEndpoint),
+    get_redirect_route(
         feconf.PREFERENCES_DATA_URL, profile.PreferencesHandler),
     get_redirect_route(
         r'/preferenceshandler/profile_picture', profile.ProfilePictureHandler),

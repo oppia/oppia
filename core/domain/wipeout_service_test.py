@@ -255,10 +255,23 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
             email_preferences.can_receive_subscription_email,
             feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
 
-        wipeout_service.pre_delete_user(self.user_1_id)
+        observed_log_messages = []
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.info()."""
+            observed_log_messages.append(msg % args)
+
+        with self.swap(logging, 'info', _mock_logging_function):
+            wipeout_service.pre_delete_user(self.user_1_id)
         self.process_and_flush_pending_tasks()
 
         email_preferences = user_services.get_email_preferences(self.user_1_id)
+        self.assertItemsEqual(
+            observed_log_messages,
+            ['Email ID %s permanently deleted from bulk email provider\'s db. '
+             'Cannot access API, since this is a dev environment'
+             % self.USER_1_EMAIL, 'Updated status of email ID %s\'s bulk email '
+             'preference in the service provider\'s db to False. Cannot access '
+             'API, since this is a dev environment.' % self.USER_1_EMAIL])
         self.assertFalse(email_preferences.can_receive_email_updates)
         self.assertFalse(email_preferences.can_receive_editor_role_email)
         self.assertFalse(email_preferences.can_receive_feedback_message_email)

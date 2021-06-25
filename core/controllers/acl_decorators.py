@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import functools
+import logging
 
 from constants import constants
 from core.controllers import base
@@ -87,6 +88,41 @@ def open_access(handler):
     test_can_access.__wrapped__ = True
 
     return test_can_access
+
+
+def is_source_mailchimp(handler):
+    """Decorator to check whether the request was generated from Mailchimp.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function.
+    """
+
+    def test_is_source_mailchimp(self, secret, **kwargs):
+        """Checks whether the request was generated from Mailchimp.
+
+        Args:
+            secret: str. The key that is used to authenticate that the request
+                has originated from Mailchimp.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+        """
+        if feconf.MAILCHIMP_WEBHOOK_SECRET is None:
+            raise self.PageNotFoundException
+        elif secret != feconf.MAILCHIMP_WEBHOOK_SECRET:
+            logging.error(
+                'Invalid Mailchimp webhook request received with secret: %s'
+                % secret)
+            raise self.PageNotFoundException
+        else:
+            return handler(self, secret, **kwargs)
+    test_is_source_mailchimp.__wrapped__ = True
+
+    return test_is_source_mailchimp
 
 
 def does_classroom_exist(handler):

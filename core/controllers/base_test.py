@@ -192,7 +192,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         """Tests request without csrf_token results in 401 error."""
 
         self.post_json(
-            '/community-library/any', payload={}, expected_status_int=401)
+            '/community-library/any', data={}, expected_status_int=401)
 
         self.put_json(
             '/community-library/any', payload={}, expected_status_int=401)
@@ -209,7 +209,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             '/community-library/data/extra', expected_status_int=404)
 
         self.post_json(
-            '/community-library/extra', payload={}, csrf_token=csrf_token,
+            '/community-library/extra', data={}, csrf_token=csrf_token,
             expected_status_int=404)
 
         self.put_json(
@@ -1224,6 +1224,14 @@ class ControllerClassNameTests(test_utils.GenericTestBase):
                             class_return_type,
                             handler_type_to_name_endings_dict)
                     class_name = clazz.__name__
+                    # BulkEmailWebhookEndpoint is a unique class, compared to
+                    # others, since it is never called from the frontend, and so
+                    # the error raised here on it - 'Please ensure that the name
+                    # of this class ends with 'Page'' - doesn't apply.
+                    # It is only called from the bulk email provider via a
+                    # webhook to update Oppia's database.
+                    if class_name == "BulkEmailWebhookEndpoint":
+                        continue
                     file_name = inspect.getfile(clazz)
                     line_num = inspect.getsourcelines(clazz)[1]
                     allowed_class_ending = handler_type_to_name_endings_dict[

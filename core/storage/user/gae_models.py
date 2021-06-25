@@ -346,6 +346,20 @@ class UserSettingsModel(base_models.BaseModel):
             cls.normalized_username == normalized_username).get()
 
     @classmethod
+    def get_by_email(cls, email):
+        """Returns a user model given an email.
+
+        Args:
+            email: str. The user's email.
+
+        Returns:
+            UserSettingsModel | None. The UserSettingsModel instance which
+            contains the same email.
+        """
+        filtered_users = cls.query(cls.email == email).fetch()
+        return None if not filtered_users else filtered_users[0]
+
+    @classmethod
     def get_by_role(cls, role):
         """Returns user models with given role.
 
