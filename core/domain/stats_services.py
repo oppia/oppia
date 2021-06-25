@@ -549,11 +549,9 @@ def get_multiple_exploration_stats_by_version(exp_id, version_numbers):
         stats_models.ExplorationStatsModel.get_multi_versions(
             exp_id, version_numbers))
     for exploration_stats_model in exploration_stats_models:
-        if exploration_stats_model is None:
-            exploration_stats.append(None)
-        else:
-            exploration_stats.append(get_exploration_stats_from_model(
-                exploration_stats_model))
+        exploration_stats.append(
+            None if exploration_stats_model is None else
+            get_exploration_stats_from_model(exploration_stats_model))
     return exploration_stats
 
 
