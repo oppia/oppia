@@ -501,7 +501,15 @@ var TopicEditorPage = function() {
   };
 
   this.expectTopicNameToBe = async function(name) {
-    expect(await topicNameField.getAttribute('value')).toEqual(name);
+    await waitFor.visibilityOf(
+      topicNameField,
+      'topicNameField takes too long to be visible'
+    );
+    let desc = await browser.executeScript(() => {
+      return document.getElementsByClassName(
+        'protractor-test-topic-name-field')[0].value;
+    });
+    await expect(desc).toMatch(name);
   };
 
   this.changeTopicDescription = async function(newDescription) {
@@ -512,8 +520,15 @@ var TopicEditorPage = function() {
   };
 
   this.expectTopicDescriptionToBe = async function(description) {
-    expect(await topicDescriptionField.getAttribute('value')).toEqual(
-      description);
+    await waitFor.visibilityOf(
+      topicDescriptionField,
+      'topicDescriptionField takes too long to be visible'
+    );
+    let desc = await browser.executeScript(() => {
+      return document.getElementsByClassName(
+        'protractor-test-topic-description-field')[0].value;
+    });
+    await expect(desc).toMatch(description);
   };
 
   this.saveTopic = async function(commitMessage) {
@@ -523,7 +538,8 @@ var TopicEditorPage = function() {
     await saveTopicButton.click();
     await waitFor.visibilityOf(
       commitMessageField, 'Commit Message field taking too long to appear.');
-    await commitMessageField.sendKeys(commitMessage);
+    await action.sendKeys(
+      'commit message field', commitMessageField, commitMessage);
 
     await action.click('Close save modal button', closeSaveModalButton);
     await waitFor.visibilityOfSuccessToast(
