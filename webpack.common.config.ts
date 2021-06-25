@@ -341,7 +341,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['error'],
       filename: 'error-page-400.mainpage.html',
-      hybrid: true,
       meta: defaultMeta,
       template: commonPrefix + '/pages/error-pages/error-page.mainpage.html',
       minify: htmlMinifyConfig,
@@ -351,7 +350,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['error'],
       filename: 'error-page-401.mainpage.html',
-      hybrid: true,
       meta: defaultMeta,
       template: commonPrefix + '/pages/error-pages/error-page.mainpage.html',
       minify: htmlMinifyConfig,
@@ -361,7 +359,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['error'],
       filename: 'error-page-404.mainpage.html',
-      hybrid: true,
       meta: defaultMeta,
       template: commonPrefix + '/pages/error-pages/error-page.mainpage.html',
       minify: htmlMinifyConfig,
@@ -371,7 +368,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['error'],
       filename: 'error-page-500.mainpage.html',
-      hybrid: true,
       meta: defaultMeta,
       template: commonPrefix + '/pages/error-pages/error-page.mainpage.html',
       minify: htmlMinifyConfig,
