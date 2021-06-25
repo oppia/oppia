@@ -204,15 +204,6 @@ class LearnerGoalsHandlerTests(test_utils.GenericTestBase):
             learner_goals_services.get_all_topic_ids_to_learn(
                 self.viewer_id), [self.TOPIC_ID_2])
 
-        # Removing the same topic again has no effect.
-        self.delete_json('%s/%s/%s' % (
-            feconf.LEARNER_GOALS_DATA_URL,
-            constants.ACTIVITY_TYPE_LEARN_TOPIC,
-            self.TOPIC_ID_1))
-        self.assertEqual(
-            learner_goals_services.get_all_topic_ids_to_learn(
-                self.viewer_id), [self.TOPIC_ID_2])
-
         # Remove the second topic.
         self.delete_json('%s/%s/%s' % (
             feconf.LEARNER_GOALS_DATA_URL,

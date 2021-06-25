@@ -310,7 +310,10 @@ class ExplorationChange(change_domain.BaseChange):
             'property_name', 'state_name', 'new_value'],
         'optional_attribute_names': ['old_value'],
         'user_id_attribute_names': [],
-        'allowed_values': {'property_name': STATE_PROPERTIES}
+        'allowed_values': {'property_name': STATE_PROPERTIES},
+        # TODO(#12991): Remove this once once we use the migration jobs to
+        # remove the deprecated values from the server data.
+        'deprecated_values': {'property_name': ['fallbacks']}
     }, {
         'name': CMD_EDIT_EXPLORATION_PROPERTY,
         'required_attribute_names': ['property_name', 'new_value'],
@@ -328,6 +331,12 @@ class ExplorationChange(change_domain.BaseChange):
         'optional_attribute_names': [],
         'user_id_attribute_names': []
     }]
+
+    # TODO(#12991): Remove this once once we use the migration jobs to remove
+    # the deprecated commands from the server data.
+    DEPRECATED_COMMANDS = [
+        'clone', 'add_gadget', 'edit_gadget_property',
+        'delete_gadget', 'rename_gadget']
 
 
 class ExplorationCommitLogEntry(python_utils.OBJECT):

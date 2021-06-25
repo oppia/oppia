@@ -249,14 +249,17 @@ def mark_topic_as_learnt(user_id, topic_id):
     if not completed_activities_model:
         completed_activities_model = (
             user_models.CompletedActivitiesModel(id=user_id))
+    topic_ids_to_learn = learner_goals_services.get_all_topic_ids_to_learn(
+        user_id)
 
     activities_completed = _get_completed_activities_from_model(
         completed_activities_model)
 
     if topic_id not in activities_completed.learnt_topic_ids:
         remove_topic_from_partially_learnt_list(user_id, topic_id)
-        learner_goals_services.remove_topics_from_learn_goal(
-            user_id, [topic_id])
+        if topic_id in topic_ids_to_learn:
+            learner_goals_services.remove_topics_from_learn_goal(
+                user_id, [topic_id])
         activities_completed.add_learnt_topic_id(topic_id)
         _save_completed_activities(activities_completed)
 
