@@ -88,19 +88,19 @@ describe('Editable collection backend API service', () => {
 
   it('should successfully fetch an existing collection from the backend',
     fakeAsync(() => {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
 
       editableCollectionBackendApiService.fetchCollectionAsync('0').then(
         successHandler, failHandler);
-      var req = httpTestingController.expectOne(
+      let req = httpTestingController.expectOne(
         '/collection_editor_handler/data/0');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleDataResults);
 
       flushMicrotasks();
 
-      var collectionObject = Collection.create(
+      let collectionObject = Collection.create(
         sampleDataResults.collection);
 
       expect(successHandler).toHaveBeenCalledWith(collectionObject);
@@ -110,12 +110,12 @@ describe('Editable collection backend API service', () => {
 
   it('should use the rejection handler if the backend request failed',
     fakeAsync(() => {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
 
       editableCollectionBackendApiService.fetchCollectionAsync('1').then(
         successHandler, failHandler);
-      var req = httpTestingController.expectOne(
+      let req = httpTestingController.expectOne(
         '/collection_editor_handler/data/1');
       expect(req.request.method).toEqual('GET');
       req.flush({
@@ -133,21 +133,22 @@ describe('Editable collection backend API service', () => {
 
   it('should update a collection after fetching it from the backend',
     fakeAsync(() => {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
-      var collection: Collection = null;
-      var collectionDict = sampleDataResults;
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+      let collection: Collection = null;
+      let collectionDict = sampleDataResults;
       // Loading a collection the first time should fetch it from the backend.
       editableCollectionBackendApiService.fetchCollectionAsync('0').then(
         (data) => {
           collection = data;
         });
-      var req = httpTestingController.expectOne(
+      let req = httpTestingController.expectOne(
         '/collection_editor_handler/data/0');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleDataResults);
 
       flushMicrotasks();
+      expect(collection.id).toBe('0');
 
       collectionDict.collection.title = 'New Title';
       collectionDict.collection.version = 2;
@@ -168,6 +169,48 @@ describe('Editable collection backend API service', () => {
 
       expect(successHandler).toHaveBeenCalledWith(collection);
       expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
+
+  it('should fail to update a collection after fetching it from the backend',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+      let collection: Collection = null;
+      let collectionDict = sampleDataResults;
+      // Loading a collection the first time should fetch it from the backend.
+      editableCollectionBackendApiService.fetchCollectionAsync('1').then(
+        (data) => {
+          collection = data;
+        });
+      let req = httpTestingController.expectOne(
+        '/collection_editor_handler/data/1');
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleDataResults);
+
+      flushMicrotasks();
+      expect(collection.id).toBe('0');
+
+      // Sending a request to update collection with invalid Id.
+      editableCollectionBackendApiService.updateCollectionAsync(
+        'invalidId',
+        collectionDict.collection.version,
+        collectionDict.collection.title, []
+      ).then(successHandler, failHandler);
+      req = httpTestingController.expectOne(
+        '/collection_editor_handler/data/invalidId');
+      expect(req.request.method).toEqual('PUT');
+      req.flush({
+        error: 'Error updating collection.'
+      }, {
+        status: 500, statusText: 'Invalid Request'
+      });
+
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(
+        'Error updating collection.');
     })
   );
 });
