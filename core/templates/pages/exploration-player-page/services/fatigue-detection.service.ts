@@ -49,6 +49,8 @@ export class FatigueDetectionService {
         this.windowStartTime.valueOf() < this.SPAM_WINDOW_MSEC)
       ) {
         return true;
+      } else {
+        return false;
       }
     }
     return false;

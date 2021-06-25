@@ -357,11 +357,11 @@ describe('Learner Dashboard Backend API Service', () => {
     let updatedSubject = 'Updated Subject';
     let text = 'Sending message';
     let url = '/threadhandler/exploration.4.Wfafsafd';
-    let payload = {
+    let payload: AddMessagePayload = {
       updated_status: updatedStatus,
       updated_subject: updatedSubject,
       text: text
-    } as AddMessagePayload;
+    };
 
     learnerDashboardBackendApiService.addNewMessageAsync(
       url, payload
@@ -390,11 +390,11 @@ describe('Learner Dashboard Backend API Service', () => {
     let updatedSubject = 'Updated Subject';
     let text = 'Sending message';
     let invalidUrl = '/invalidUrl';
-    let payload = {
+    let payload: AddMessagePayload = {
       updated_status: updatedStatus,
       updated_subject: updatedSubject,
       text: text
-    } as AddMessagePayload;
+    };
     learnerDashboardBackendApiService.addNewMessageAsync(
       invalidUrl, payload
     ).then(successHandler, failHandler);
