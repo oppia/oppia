@@ -35,11 +35,11 @@ import { UrlInterpolationService } from
 import { Schema } from 'services/schema-default-value.service';
 
 
-interface UserRolesBackendResponse {
+export interface UserRolesBackendResponse {
   [role: string]: string;
 }
 
-interface RoleToActionsBackendResponse {
+export interface RoleToActionsBackendResponse {
   [role: string]: string[];
 }
 
@@ -47,31 +47,31 @@ export interface ConfigPropertiesBackendResponse {
   [key: string]: ConfigProperty;
 }
 
-interface ViewContributionBackendResponse {
+export interface ViewContributionBackendResponse {
   usernames: string[];
 }
 
-interface ContributionRightsBackendResponse {
+export interface ContributionRightsBackendResponse {
   'can_review_questions': boolean,
   'can_review_translation_for_language_codes': string[],
   'can_review_voiceover_for_language_codes': string[],
   'can_submit_questions': boolean
 }
 
-interface PendingDeletionRequestBackendResponse {
+export interface PendingDeletionRequestBackendResponse {
   'number_of_pending_deletion_models': string
 }
 
-interface ModelsRelatedToUserBackendResponse {
+export interface ModelsRelatedToUserBackendResponse {
   'related_models_exist': boolean
 }
 
-interface SignupEmailContent {
+export interface SignupEmailContent {
   'html_body': string,
   'subject': string
 }
 
-interface ClassroomPageData {
+export interface ClassroomPageData {
   'name': string,
   'topic_ids': string[],
   'course_details': string,
@@ -79,7 +79,7 @@ interface ClassroomPageData {
   'topic_list_intro': string
 }
 
-interface VmidSharedSecretKeyMapping {
+export interface VmidSharedSecretKeyMapping {
   'shared_secret_key': string,
   'vm_id': string
 }
