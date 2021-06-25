@@ -63,7 +63,7 @@ class MockWindowRef {
   }
 }
 
-fdescribe('TopNavigationBarComponent', () => {
+describe('TopNavigationBarComponent', () => {
   let fixture: ComponentFixture<TopNavigationBarComponent>;
   let component: TopNavigationBarComponent;
   let mockWindowRef: MockWindowRef;
