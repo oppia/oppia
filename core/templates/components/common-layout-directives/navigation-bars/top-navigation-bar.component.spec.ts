@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for TopNavigationBarComponent.
  */
 
-import { fromEvent } from 'rxjs';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed, tick, waitForAsync } from '@angular/core/testing';
@@ -63,11 +62,10 @@ class MockWindowRef {
   }
 }
 
-describe('TopNavigationBarComponent', () => {
+fdescribe('TopNavigationBarComponent', () => {
   let fixture: ComponentFixture<TopNavigationBarComponent>;
   let component: TopNavigationBarComponent;
   let mockWindowRef: MockWindowRef;
-  let windowRef: WindowRef;
   let cbas: ClassroomBackendApiService;
   let searchService: SearchService;
   let wds: WindowDimensionsService;
@@ -79,6 +77,8 @@ describe('TopNavigationBarComponent', () => {
   let sidebarStatusService: SidebarStatusService;
 
   let mockOnSearchBarLoadedEventEmitter = new EventEmitter();
+  let mockResizeEmitter = new EventEmitter();
+
   let userInfo = {
     _isModerator: true,
     _isAdmin: true,
@@ -102,7 +102,6 @@ describe('TopNavigationBarComponent', () => {
 
   beforeEach(waitForAsync(() => {
     mockWindowRef = new MockWindowRef();
-    windowRef = new WindowRef();
     TestBed.configureTestingModule({
       imports: [
         HttpClientTestingModule
@@ -122,7 +121,7 @@ describe('TopNavigationBarComponent', () => {
           provide: WindowDimensionsService,
           useValue: {
             getWidth: () => 700,
-            getResizeEvent: () => fromEvent(windowRef.nativeWindow, 'resize'),
+            getResizeEvent: () => mockResizeEmitter,
             isWindowNarrow: () => false
           }
         }
@@ -232,7 +231,7 @@ describe('TopNavigationBarComponent', () => {
     component.currentWindowWidth = 600;
     component.navElementsVisibilityStatus[donateElement] = false;
 
-    windowRef.nativeWindow.dispatchEvent(new Event('resize'));
+    mockResizeEmitter.emit();
 
     fixture.whenStable().then(() => {
       fixture.detectChanges();
