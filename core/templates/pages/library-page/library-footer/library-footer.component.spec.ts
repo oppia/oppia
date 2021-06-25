@@ -16,40 +16,78 @@
  * @fileoverview Unit tests for libraryFooter.
  */
 
-describe('Library Footer Component', function() {
-  var ctrl = null;
-  var $window = null;
+import { TestBed, ComponentFixture } from '@angular/core/testing';
+import { LibraryFooterComponent } from './library-footer.component';
+import { SharedComponentsModule } from './../../../../templates/components/shared-component.module';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { HttpClientModule } from '@angular/common/http';
 
-  var mockWindow = {
+
+class MockWindowRef {
+  _window = {
     location: {
-      pathname: ''
+      _pathname: '/math/ratios',
+      _href: '',
+      get pathname(): string {
+        return this._pathname;
+      },
+      set pathname(val: string) {
+        this._pathname = val;
+      },
+      get href(): string {
+        return this._href;
+      },
+      set href(val) {
+        this._href = val;
+      }
     }
   };
+  get nativeWindow() {
+    return this._window;
+  }
+}
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('$window', mockWindow);
-  }));
+describe('Library Footer Component', () => {
+  let windowRef: MockWindowRef;
+  let fixture: ComponentFixture<LibraryFooterComponent>;
+  let component: LibraryFooterComponent;
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $window = $injector.get('$window');
+  beforeEach(() => {
+    windowRef = new MockWindowRef();
+    TestBed.configureTestingModule({
+      declarations: [
+        LibraryFooterComponent
+      ],
+      providers: [
+        {
+          provide: WindowRef,
+          useValue: windowRef
+        },
+      ],
+      imports: [
+        SharedComponentsModule,
+        HttpClientModule
+      ]
+    }).compileComponents();
+  });
 
-    ctrl = $componentController('libraryFooter', {
-      $window: $window
-    });
-  }));
+  beforeEach(() => {
+    fixture = TestBed.createComponent(LibraryFooterComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
 
-  it('should show library footer when not searching for explorations',
-    function() {
-      mockWindow.location.pathname = '/community-library';
-      ctrl.$onInit();
+  it('should show library footer when not searching for explorations', () => {
+    windowRef.nativeWindow.location.pathname = '/community-library';
+    fixture.detectChanges();
+    component.ngOnInit();
+    expect(component.footerIsDisplayed).toBe(true);
+  });
 
-      expect(ctrl.footerIsDisplayed).toBe(true);
-    });
-
-  it('should hide library footer when searching for explorations', function() {
-    mockWindow.location.pathname = '/search/find';
-    ctrl.$onInit();
-
-    expect(ctrl.footerIsDisplayed).toBe(false);
+  it('should hide library footer when searching for explorations', () => {
+    windowRef.nativeWindow.location.pathname = '/search/find';
+    fixture.detectChanges();
+    component.ngOnInit();
+    expect(component.footerIsDisplayed).toBe(false);
   });
 });
