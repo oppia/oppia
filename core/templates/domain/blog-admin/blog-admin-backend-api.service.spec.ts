@@ -16,14 +16,13 @@
  * @fileoverview Unit tests for BlogAdminBackendApiService.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
- '@angular/common/http/testing';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { BlogAdminPageData, BlogAdminBackendApiService } from './blog-admin-backend-api.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 
 describe('Blog Admin backend api service', () => {
-  let babas: BlogAdminBackendApiService
+  let babas: BlogAdminBackendApiService;
   let httpTestingController: HttpTestingController;
   let csrfService: CsrfTokenService = null;
   let successHandler = null;
@@ -137,7 +136,6 @@ describe('Blog Admin backend api service', () => {
 
   it('should fail to update the role of user when user does' +
     'not exists when calling updateUserRoleAsync', fakeAsync(() => {
-    let topicId = null;
     let newRole = 'BLOG_EDITOR';
     let username = 'InvalidUser';
     let payload = {
@@ -317,4 +315,4 @@ describe('Blog Admin backend api service', () => {
       'Config property does not exist.');
   }
   ));
-})
+});

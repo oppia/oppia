@@ -1240,7 +1240,7 @@ class CanDeleteBlogPostTests(test_utils.GenericTestBase):
 
     username = 'userone'
     user_email = 'user@example.com'
-    
+
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
@@ -1314,6 +1314,7 @@ class CanEditBlogPostTests(test_utils.GenericTestBase):
 
     username = 'userone'
     user_email = 'user@example.com'
+
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
@@ -1380,6 +1381,7 @@ class CanEditBlogPostTests(test_utils.GenericTestBase):
                 'User %s does not have permissions to edit blog post %s'
                 % (self.user_id, self.blog_post_id))
         self.logout()
+
 
 class CanRunAnyJobDecoratorTests(test_utils.GenericTestBase):
 

@@ -46,14 +46,6 @@ class BlogAdminPageTest(test_utils.GenericTestBase):
         self.get_html_response(
             '/blog-admin', expected_status_int=302)
 
-    def test_blog_admin_can_acces_the_page(self):
-        self.login(self.BLOG_ADMIN_EMAIL)
-
-        response = self.get_html_response('/blog-admin')
-        # response.mustcontain(
-        #     '<oppia-blog-admin-page></oppia-blog-admin-page>')
-        self.logout()
-
 
 class BlogAdminRolesHandlerTest(test_utils.GenericTestBase):
     """Checks the user role handling on the blog admin page."""
@@ -92,6 +84,7 @@ class BlogAdminRolesHandlerTest(test_utils.GenericTestBase):
             csrf_token=csrf_token,
             expected_status_int=200)
         self.assertEqual(response_dict, {})
+
 
 class BlogAdminHandlerTest(test_utils.GenericTestBase):
     """Checks the user role handling on the blog admin page."""
@@ -161,14 +154,15 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
             self.post_json(
                 '/blogadminhandler', {
                     'action': 'revert_config_property',
-                    'config_property_id': 'max_number_of_tags_assigned_to_blog_post'
+                    'config_property_id':
+                        'max_number_of_tags_assigned_to_blog_post',
                 }, csrf_token=csrf_token)
 
         self.assertFalse(config_domain.PROMO_BAR_ENABLED.value)
         self.assertEqual(
             observed_log_messages,
             ['[BLOG ADMIN] %s reverted config property:'
-            ' max_number_of_tags_assigned_to_blog_post'
+             ' max_number_of_tags_assigned_to_blog_post'
              % self.blog_admin_id])
 
         self.logout()

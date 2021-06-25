@@ -105,6 +105,9 @@
 # Blog project
 /core/domain/blog*.py @iamprayush
 /core/domain/blog_validators*.py @brianrodri @iamprayush
+/core/controllers/blog_dashboard*.py @iamprayush
+/core/controllers/blog_admin*.py @iamprayush
+/core/templates/domain/blog-admin/blog-admin-backend-api.service*.ts @iamprayush
 
 
 # Collection project.

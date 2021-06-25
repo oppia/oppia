@@ -19,10 +19,8 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
 
-from core.tests import test_utils
 from core.domain import blog_services
-from core.domain import config_domain
-from core.domain import user_services
+from core.tests import test_utils
 import feconf
 import python_utils
 import utils
@@ -49,10 +47,10 @@ class BlogDashboardDataHandlerTests(test_utils.GenericTestBase):
         self.blog_admin_id = (
             self.get_user_id_from_email(self.BLOG_ADMIN_EMAIL))
         self.blog_editor_id = (
-            self.get_user_id_from_email(self.BLOG_EDITOR_EMAIL))  
+            self.get_user_id_from_email(self.BLOG_EDITOR_EMAIL))
 
     def test_get_dashboard_page_data(self):
-        #Checks blog editor can access blog dashboard.
+        # Checks blog editor can access blog dashboard.
         self.login(self.BLOG_EDITOR_EMAIL)
         json_response = self.get_json(
             '%s' % (feconf.BLOG_DASHBOARD_DATA_URL),
@@ -62,7 +60,7 @@ class BlogDashboardDataHandlerTests(test_utils.GenericTestBase):
         self.assertIsNone(json_response['draft_blog_post_summary_dicts'])
         self.logout()
 
-        #Checks blog admin can access blog dashboard.
+        # Checks blog admin can access blog dashboard.
         self.login(self.BLOG_ADMIN_EMAIL)
         json_response = self.get_json(
             '%s' % (feconf.BLOG_DASHBOARD_DATA_URL),
@@ -72,13 +70,13 @@ class BlogDashboardDataHandlerTests(test_utils.GenericTestBase):
         self.assertIsNone(json_response['draft_blog_post_summary_dicts'])
         self.logout()
 
-        #Checks non blog-admins and non-editors can not access blog dashboard.
+        # Checks non blog-admins and non-editors can not access blog dashboard.
         self.login(self.user_email)
         json_response = self.get_json(
             '%s' % (feconf.BLOG_DASHBOARD_DATA_URL), expected_status_int=401)
         self.logout()
 
-        #Checks for correct published and draft blog post summary data.
+        # Checks for correct published and draft blog post summary data.
         blog_post = blog_services.create_new_blog_post(self.blog_editor_id)
         change_dict = {
             'title': 'Sample Title',
@@ -90,7 +88,8 @@ class BlogDashboardDataHandlerTests(test_utils.GenericTestBase):
         json_response = self.get_json(
             '%s' % (feconf.BLOG_DASHBOARD_DATA_URL))
         self.assertEqual(self.BLOG_EDITOR_USERNAME, json_response['username'])
-        self.assertEqual(blog_post.id,
+        self.assertEqual(
+            blog_post.id,
             json_response['draft_blog_post_summary_dicts'][0]['id'])
 
         blog_services.update_blog_post(blog_post.id, change_dict)
@@ -98,14 +97,16 @@ class BlogDashboardDataHandlerTests(test_utils.GenericTestBase):
         json_response = self.get_json(
             '%s' % (feconf.BLOG_DASHBOARD_DATA_URL))
         self.assertEqual(self.BLOG_EDITOR_USERNAME, json_response['username'])
-        self.assertEqual(blog_post.id,
+        self.assertEqual(
+            blog_post.id,
             json_response['published_blog_post_summary_dicts'][0]['id'])
-        self.assertEqual(change_dict['title'],
+        self.assertEqual(
+            change_dict['title'],
             json_response['published_blog_post_summary_dicts'][0]['title'])
         self.assertIsNone(json_response['draft_blog_post_summary_dicts'])
 
     def test_create_new_blog_post(self):
-        #Checks blog editor can create a new blog post.
+        # Checks blog editor can create a new blog post.
         self.login(self.BLOG_EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
         json_response = self.post_json(
@@ -115,12 +116,13 @@ class BlogDashboardDataHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(blog_post_rights.editor_ids, [self.blog_editor_id])
         self.logout()
 
-        #Checks non blog-admins and non editors cannot create a new blog post.
+        # Checks non blog-admins and non editors cannot create a new blog post.
         self.login(self.user_email)
         json_response = self.post_json(
             '%s' % (feconf.BLOG_DASHBOARD_DATA_URL), {},
             csrf_token=csrf_token, expected_status_int=401)
         self.logout()
+
 
 class BlogPostHandlerTests(test_utils.GenericTestBase):
 
@@ -148,28 +150,29 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
             blog_services.create_new_blog_post(self.blog_editor_id))
 
     def test_get_blog_post_editor_page_data(self):
-        #Checks blog editor can access blog post editor.
+        # Checks blog editor can access blog post editor.
         self.login(self.BLOG_EDITOR_EMAIL)
         json_response = self.get_json(
             '%s/%s' % (feconf.BLOG_EDITOR_DATA_URL_PREFIX, self.blog_post.id),
             )
         self.assertEqual(self.BLOG_EDITOR_USERNAME, json_response['username'])
         expected_blog_post_dict = {
-            'id': u'%s' %  self.blog_post.id,
+            'id': u'%s' % self.blog_post.id,
             'title': '',
             'content': '',
             'tags': [],
             'thumbnail_filename': None,
             'url_fragment': '',
-            'published_on':None,
+            'published_on': None,
             'last_updated': u'%s' % utils.convert_naive_datetime_to_string(
                 self.blog_post.last_updated)
         }
-        self.assertEqual(expected_blog_post_dict, json_response['blog_post_dict'])
+        self.assertEqual(
+            expected_blog_post_dict, json_response['blog_post_dict'])
         self.assertEqual(10, json_response['max_no_of_tags'])
         self.logout()
 
-        #Checks non blog-admins and non-editors can not access blog post editor.
+        # Checks non blog-admins and non-editors can not access blog editor.
         self.login(self.user_email)
         json_response = self.get_json(
             '%s/%s' % (feconf.BLOG_EDITOR_DATA_URL_PREFIX, self.blog_post.id),
@@ -184,9 +187,7 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_put_blog_post_data(self):
-        #Checks blog editor can edit owned blog post.
-        blog_post_rights = blog_services.get_blog_post_rights(self.blog_post.id)
-        print(blog_post_rights.editor_ids)
+        # Checks blog editor can edit owned blog post.
         self.login(self.BLOG_EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
         payload = {
@@ -220,13 +221,14 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
             encoding=None) as f:
             raw_image = f.read()
-        json_response = self.post_json(
-            '%s/%s' % (feconf.BLOG_EDITOR_DATA_URL_PREFIX, self.blog_post.id), payload,
+        self.post_json(
+            '%s/%s' % (feconf.BLOG_EDITOR_DATA_URL_PREFIX, self.blog_post.id),
+            payload,
             csrf_token=csrf_token,
             upload_files=(('image', 'unused_filename', raw_image),),
             expected_status_int=200)
 
-        self.logout()      
+        self.logout()
 
     def test_updating_blog_post_fails_with_invalid_image(self):
         self.login(self.BLOG_EDITOR_EMAIL)
@@ -241,7 +243,8 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
             raw_image = f.read()
 
         json_response = self.post_json(
-            '%s/%s' % (feconf.BLOG_EDITOR_DATA_URL_PREFIX, self.blog_post.id), payload,
+            '%s/%s' % (feconf.BLOG_EDITOR_DATA_URL_PREFIX, self.blog_post.id),
+            payload,
             csrf_token=csrf_token,
             upload_files=(('image', 'unused_filename', raw_image),),
             expected_status_int=400)
@@ -260,13 +263,13 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
     def test_cannot_delete_invalid_blog_post(self):
         # Check that an invalid blog post can not be deleted.
         self.login(self.BLOG_ADMIN_EMAIL)
-        response = self.delete_json(
+        self.delete_json(
             '%s/%s' % (feconf.BLOG_EDITOR_DATA_URL_PREFIX, 123456),
             expected_status_int=404)
         self.logout()
 
         self.login(self.BLOG_ADMIN_EMAIL)
-        response = self.delete_json(
+        self.delete_json(
             '%s/%s' % (feconf.BLOG_EDITOR_DATA_URL_PREFIX, 'abc123efgH34'),
             expected_status_int=404)
         self.logout()
@@ -290,7 +293,8 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_cannot_delete_post_by_blog_editor(self):
-        # Check that blog editor who does not own the blog post can not delete it.
+        # Check that blog editor who does not own the blog post can not
+        # delete it.
         self.set_user_role(
             self.username, feconf.ROLE_ID_BLOG_POST_EDITOR)
         self.login(self.user_email)
@@ -298,6 +302,6 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
         self.delete_json(
             '%s/%s' % (
                 feconf.BLOG_EDITOR_DATA_URL_PREFIX, self.blog_post.id),
-                expected_status_int=401)
+            expected_status_int=401)
 
         self.logout()

@@ -32,6 +32,7 @@ import python_utils
 BLOG_POST_EDITOR = feconf.ROLE_ID_BLOG_POST_EDITOR
 BLOG_ADMIN = feconf.ROLE_ID_BLOG_ADMIN
 
+
 class BlogAdminPage(base.BaseHandler):
     """Handler for rendering the blog admin page."""
 
@@ -62,7 +63,8 @@ class BlogAdminHandler(base.BaseHandler):
                 BLOG_ADMIN: role_to_action[BLOG_ADMIN]
             },
             'updatable_roles': {
-                BLOG_POST_EDITOR: role_services.HUMAN_READABLE_ROLES[BLOG_POST_EDITOR],
+                BLOG_POST_EDITOR: (
+                    role_services.HUMAN_READABLE_ROLES[BLOG_POST_EDITOR]),
                 BLOG_ADMIN: role_services.HUMAN_READABLE_ROLES[BLOG_ADMIN]
             }
         })
@@ -92,6 +94,7 @@ class BlogAdminHandler(base.BaseHandler):
             logging.exception('[BLOG ADMIN] %s', e)
             self.render_json({'error': python_utils.UNICODE(e)})
             python_utils.reraise_exception()
+
 
 class BlogAdminRolesHandler(base.BaseHandler):
     """Handler for the blog admin page."""

@@ -74,7 +74,7 @@ export class BlogAdminBackendApiService {
   }
 
   private async _postRequestAsync(
-    handlerUrl: string, payload?: Object, action?: string): Promise<void> {
+      handlerUrl: string, payload?: Object, action?: string): Promise<void> {
     return new Promise((resolve, reject) => {
       this.http.post<void>(
         handlerUrl, { action, ...payload }).toPromise()
@@ -87,7 +87,7 @@ export class BlogAdminBackendApiService {
   }
 
   async saveConfigPropertiesAsync(
-    newConfigPropertyValues: ConfigPropertyValues): Promise<void> {
+      newConfigPropertyValues: ConfigPropertyValues): Promise<void> {
     let action = 'save_config_properties';
     let payload = {
       new_config_property_values: newConfigPropertyValues
@@ -139,4 +139,3 @@ export class BlogAdminBackendApiService {
 angular.module('oppia').factory(
   'BlogAdminBackendApiService',
   downgradeInjectable(BlogAdminBackendApiService));
-  
