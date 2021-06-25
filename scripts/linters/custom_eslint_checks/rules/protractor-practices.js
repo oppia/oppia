@@ -32,7 +32,7 @@ module.exports = {
     schema: [],
     messages: {
       constInAllCaps: (
-        'Please make constant name “{{constName}}” are in all-caps'),
+        'Please make sure that constant name “{{constName}}” are in all-caps'),
       disallowedBrowserMethods: (
         'Please do not use browser.{{methodName}}() in protractor files'),
       disallowThen: 'Please do not use .then(), consider async/await instead'
@@ -47,6 +47,17 @@ module.exports = {
     var disallowedBrowserMethodsSelector = (
       'CallExpression[callee.object.name=browser][callee.property.name=' +
       disallowedBrowserMethodsRegex + ']');
+
+    var checkBrowserMethod = function(node) {
+      context.report({
+        node: node,
+        loc: node.callee.loc,
+        messageId: 'disallowedBrowserMethods',
+        data: {
+          methodName: node.callee.property.name
+        }
+      });
+    };
 
     var checkConstName = function(node) {
       var constantName = node.declarations[0].id.name;
@@ -67,14 +78,7 @@ module.exports = {
         checkConstName(node);
       },
       [disallowedBrowserMethodsSelector]: function(node) {
-        context.report({
-          node: node,
-          loc: node.callee.loc,
-          messageId: 'disallowedBrowserMethods',
-          data: {
-            methodName: node.callee.property.name
-          }
-        });
+        checkBrowserMethod(node);
       },
       'CallExpression[callee.property.name=\'then\']': function(node) {
         context.report({

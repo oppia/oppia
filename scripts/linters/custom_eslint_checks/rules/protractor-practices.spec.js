@@ -106,7 +106,7 @@ ruleTester.run('protractor-practices', rule, {
       code:
       'const Value = 5;',
       errors: [{
-        message: 'Please make constant name “Value” are in all-caps',
+        message: 'Please make sure that constant name “Value” are in all-caps',
       }],
     },
   ]
