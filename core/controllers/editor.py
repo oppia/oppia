@@ -115,7 +115,6 @@ class ExplorationHandler(EditorHandler):
     @acl_decorators.can_save_exploration
     def put(self, exploration_id):
         """Updates properties of the given exploration."""
-        exploration = exp_fetchers.get_exploration_by_id(exploration_id)
         version = self.payload.get('version')
         if version is None:
             raise base.BaseHandler.InvalidInputException(

@@ -2801,7 +2801,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             _get_change_list(
                 self.init_state_name,
                 exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
-                 {
+                {
                     'buttonText': {
                         'value': {
                             'content_id': 'ca_buttonText_1',
@@ -2856,7 +2856,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             _get_change_list(
                 self.init_state_name,
                 exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
-                 {
+                {
                     'buttonText': {
                         'value': {
                             'content_id': 'ca_buttonText_1',
@@ -2867,7 +2867,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             '', version=1)
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-        customization_args = exploration.init_state.interaction.customization_args
+        customization_args = (
+            exploration.init_state.interaction.customization_args)
         self.assertEqual(
             customization_args['buttonText'].value.unicode_str,
             'Continue')
@@ -3062,7 +3063,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         self.assertEqual(rule_specs[0].inputs, {'x': 0})
         self.assertEqual(outcome.feedback.html, '<p>Try again</p>')
         self.assertEqual(outcome.dest, 'State 2')
-        self.assertEqual(second_state_interaction.default_outcome.dest, 'State 2')
+        self.assertEqual(
+            second_state_interaction.default_outcome.dest, 'State 2')
 
     def test_update_state_invalid_state(self):
         """Test that rule destination states cannot be non-existent."""
@@ -3212,7 +3214,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             'hi': 1
         })
 
-        # Adding a change to upgrade the version
+        # Add a change to upgrade the version.
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, _get_change_list(
                 self.init_state_name,
@@ -3228,7 +3230,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 }),
             'Add Customization Args')
 
-        # Applying changed translation to the old_version
+        # Applying changed translation to the old_version.
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID,
             [exp_domain.ExplorationChange({
@@ -3240,12 +3242,13 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 'translation_html': '<p>Translated text 2</p>',
                 'data_format': 'html'
             })],
-        '', version=2)
+            '', version=2)
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         init_interaction = exploration.init_state.interaction
         customization_args = init_interaction.customization_args
-        self.assertEqual(customization_args['placeholder'].value.unicode_str,
+        self.assertEqual(
+            customization_args['placeholder'].value.unicode_str,
             'placeholder')
         self.assertEqual(exploration.get_translation_counts(), {
             'hi': 1,
@@ -3368,7 +3371,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         self.assertFalse(hindi_written_translation.needs_update)
         self.assertFalse(bangla_written_translation.needs_update)
 
-        # Adding a change to upgrade the version
+        # Add a change to upgrade the version.
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, _get_change_list(
                 self.init_state_name,
@@ -3413,7 +3416,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         # Assert that final version has all the changes made above.
         init_interaction = exploration.init_state.interaction
         customization_args = init_interaction.customization_args
-        self.assertEqual(customization_args['placeholder'].value.unicode_str,
+        self.assertEqual(
+            customization_args['placeholder'].value.unicode_str,
             'placeholder')
 
     def test_update_solicit_answer_details(self):
@@ -3450,7 +3454,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         # Assert that exploration's final version consist of all the
         # changes.
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-        self.assertEqual(exploration.init_state.content.html,
+        self.assertEqual(
+            exploration.init_state.content.html,
             '<p><strong>Test content</strong></p>')
         self.assertEqual(
             exploration.init_state.solicit_answer_details, False)
@@ -3494,7 +3499,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         # Assert that exploration's final version consist of all the
         # changes.
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-        self.assertEqual(exploration.init_state.content.html,
+        self.assertEqual(
+            exploration.init_state.content.html,
             '<p><strong>Test content</strong></p>')
         self.assertEqual(
             exploration.init_state.solicit_answer_details, False)
@@ -3540,7 +3546,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         # Assert that exploration's final version consist of all the
         # changes.
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-        self.assertEqual(exploration.init_state.content.html,
+        self.assertEqual(
+            exploration.init_state.content.html,
             '<p><strong>Test content</strong></p>')
         self.assertEqual(
             exploration.states['State1'].linked_skill_id, 'string_2')
@@ -3587,7 +3594,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         # Assert that exploration's final version consist of all the
         # changes.
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-        self.assertEqual(exploration.init_state.content.html,
+        self.assertEqual(
+            exploration.init_state.content.html,
             '<p><strong>Test content</strong></p>')
         self.assertEqual(
             exploration.states['State1'].card_is_checkpoint, False)
@@ -3631,7 +3639,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         # Assert that exploration's final version consist of all the
         # changes.
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-        self.assertEqual(exploration.init_state.content.html,
+        self.assertEqual(
+            exploration.init_state.content.html,
             '<p><strong>Test content</strong></p>')
         self.assertEqual(
             exploration.init_state.card_is_checkpoint, True)
@@ -5167,7 +5176,6 @@ title: Old Title
         self.assertEqual(exploration.title, 'new title')
         self.assertEqual(exploration.language_code, 'en')
 
-
     def test_update_exploration_tags(self):
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(exploration.tags, [])
@@ -5372,7 +5380,8 @@ title: Old Title
         # Assert that final version consists all the changes.
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(exploration.title, 'new title')
-        self.assertEqual(exploration.init_state_name, feconf.DEFAULT_INIT_STATE_NAME)
+        self.assertEqual(
+            exploration.init_state_name, feconf.DEFAULT_INIT_STATE_NAME)
 
     def test_update_exploration_auto_tts_enabled(self):
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)

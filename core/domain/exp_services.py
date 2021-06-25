@@ -365,6 +365,8 @@ def apply_change_list(exploration_id, change_list, frontend_version):
         exploration_id: str. The id of the exploration to which the change list
             is to be applied.
         change_list: list(ExplorationChange). The list of changes to apply.
+        frontend_version: int. Version of the exploration on which the user
+            was working.
 
     Returns:
         Exploration. The exploration domain object that results from applying
@@ -404,30 +406,33 @@ def apply_change_list(exploration_id, change_list, frontend_version):
                         state.update_content(content)
                     elif (change.property_name ==
                           exp_domain.STATE_PROPERTY_INTERACTION_ID):
-                          state.update_interaction_id(change.new_value)
+                        state.update_interaction_id(change.new_value)
                     elif (change.property_name ==
                           exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX):
-                          state.update_next_content_id_index(change.new_value)
+                        state.update_next_content_id_index(change.new_value)
                     elif (change.property_name ==
                           exp_domain.STATE_PROPERTY_LINKED_SKILL_ID):
-                          state.update_linked_skill_id(change.new_value)
+                        state.update_linked_skill_id(change.new_value)
                     elif (change.property_name ==
                           exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
-                          state.update_interaction_customization_args(
+                        state.update_interaction_customization_args(
                             change.new_value)
                     elif (change.property_name ==
                           exp_domain.STATE_PROPERTY_INTERACTION_HANDLERS):
                         raise utils.InvalidInputException(
-                            'Editing interaction handlers is no longer supported')
+                            'Editing interaction handlers is no'
+                            'longer supported')
                     elif (change.property_name ==
                           exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
                         new_answer_groups = [
                             state_domain.AnswerGroup.from_dict(answer_groups)
                             for answer_groups in change.new_value
-                          ]
-                        state.update_interaction_answer_groups(new_answer_groups)
+                        ]
+                        state.update_interaction_answer_groups(
+                            new_answer_groups)
                     elif (change.property_name ==
-                          exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
+                          exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME
+                         ):
                         new_outcome = None
                         if change.new_value:
                             new_outcome = state_domain.Outcome.from_dict(
@@ -436,7 +441,7 @@ def apply_change_list(exploration_id, change_list, frontend_version):
                         state.update_interaction_default_outcome(new_outcome)
                     elif (change.property_name ==
                           exp_domain.STATE_PROPERTY_UNCLASSIFIED_ANSWERS):
-                          state.update_interaction_confirmed_unclassified_answers(
+                        state.update_interaction_confirmed_unclassified_answers(
                             change.new_value)
                     elif (change.property_name ==
                           exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
@@ -519,13 +524,15 @@ def apply_change_list(exploration_id, change_list, frontend_version):
                 elif change.cmd == exp_domain.CMD_ADD_WRITTEN_TRANSLATION:
                     exploration.states[
                         change.state_name].add_written_translation(
-                        change.content_id, change.language_code,
-                        change.translation_html, change.data_format)
+                            change.content_id, change.language_code,
+                            change.translation_html, change.data_format)
                 elif (change.cmd ==
-                                                                                                                                                                                                                                                                                                                                                                                                                                                             exp_domain.CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE):
+                      exp_domain.CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE
+                     ):
                     exploration.states[
                         change.state_name
-                    ].mark_written_translations_as_needing_update(change.content_id)
+                    ].mark_written_translations_as_needing_update(
+                        change.content_id)
                 elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
                     if change.property_name == 'title':
                         exploration.update_title(change.new_value)
@@ -545,7 +552,9 @@ def apply_change_list(exploration_id, change_list, frontend_version):
                         exploration.update_param_specs(change.new_value)
                     elif change.property_name == 'param_changes':
                         exploration.update_param_changes(list(
-                            python_utils.MAP(to_param_domain, change.new_value)))
+                            python_utils.MAP(
+                                to_param_domain,
+                                change.new_value)))
                     elif change.property_name == 'init_state_name':
                         exploration.update_init_state_name(change.new_value)
                     elif change.property_name == 'auto_tts_enabled':
@@ -554,7 +563,7 @@ def apply_change_list(exploration_id, change_list, frontend_version):
                         exploration.update_correctness_feedback_enabled(
                             change.new_value)
                 elif (change.cmd ==
-                    exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION):
+                      exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION):
                     # Loading the exploration model from the datastore into an
                     # Exploration domain object automatically converts it to use
                     # the latest states schema version. As a result, simply
@@ -564,7 +573,8 @@ def apply_change_list(exploration_id, change_list, frontend_version):
                     # migrate to is the latest version.
                     target_version_is_current_state_schema_version = (
                         change.to_version ==
-                        python_utils.UNICODE(feconf.CURRENT_STATE_SCHEMA_VERSION))
+                        python_utils.UNICODE(
+                            feconf.CURRENT_STATE_SCHEMA_VERSION))
                     if not target_version_is_current_state_schema_version:
                         raise Exception(
                             'Expected to migrate to the latest state schema '
@@ -586,21 +596,8 @@ def apply_change_list(exploration_id, change_list, frontend_version):
         # is composite_change_list.
         composite_change_list = get_composite_change_list(
             exploration_id, frontend_version, backend_version)
-        exp_versions_diff = exp_domain.ExplorationVersionsDiff(composite_change_list)
-        # Added_state_names: list(str). Names of the states added to the
-        # exploration from prev_exp_version to current_exp_version. It stores
-        # the latest name of the added state.
-        added_state_names = exp_versions_diff.added_state_names
-
-        # Deleted_state_names: list(str). Names of the states deleted from the
-        # exploration from prev_exp_version to current_exp_version. It stores
-        # the initial name of the deleted state from pre_exp_version.
-        deleted_state_names = exp_versions_diff.deleted_state_names
-
-        # New_to_old_state_names: dict. Dictionary mapping state names of
-        # current_exp_version to the state names of prev_exp_version.
-        # It doesn't include the name changes of added/deleted states.
-        new_to_old_state_names = exp_versions_diff.new_to_old_state_names
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(
+            composite_change_list)
 
         # Old_to_new_state_names: dict. Dictionary mapping state names of
         # prev_exp_version to the state names of current_exp_version.
@@ -618,7 +615,8 @@ def apply_change_list(exploration_id, change_list, frontend_version):
                     change_new_state_name = change.new_state_name
                     if change_old_state_name in state_names_of_renamed_states:
                         state_names_of_renamed_states[change_new_state_name] = (
-                            state_names_of_renamed_states.pop(change_old_state_name))
+                            state_names_of_renamed_states.pop(
+                                change_old_state_name))
                     else:
                         state_names_of_renamed_states[change_new_state_name] = (
                             change_old_state_name)
@@ -635,38 +633,45 @@ def apply_change_list(exploration_id, change_list, frontend_version):
                     if change.state_name in old_to_new_state_names:
                         new_state_name = old_to_new_state_names[old_state_name]
                     state = exploration.states[new_state_name]
-                    if change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
+                    if (change.property_name ==
+                            exp_domain.STATE_PROPERTY_CONTENT):
                         content = (
-                            state_domain.SubtitledHtml.from_dict(change.new_value))
+                            state_domain.SubtitledHtml.from_dict(
+                                change.new_value))
                         content.validate()
                         state.update_content(content)
                     elif (change.property_name ==
-                        exp_domain.STATE_PROPERTY_INTERACTION_ID):
+                          exp_domain.STATE_PROPERTY_INTERACTION_ID):
                         state.update_interaction_id(change.new_value)
                     elif (change.property_name ==
-                        exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX):
-                        next_content_id_index = max(change.new_value, state.next_content_id_index)
-                        state.update_next_content_id_index(next_content_id_index)
+                          exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX):
+                        next_content_id_index = max(
+                            change.new_value, state.next_content_id_index)
+                        state.update_next_content_id_index(
+                            next_content_id_index)
                     elif (change.property_name ==
-                        exp_domain.STATE_PROPERTY_LINKED_SKILL_ID):
+                          exp_domain.STATE_PROPERTY_LINKED_SKILL_ID):
                         state.update_linked_skill_id(change.new_value)
                     elif (change.property_name ==
-                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
+                          exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
                         state.update_interaction_customization_args(
                             change.new_value)
                     elif (change.property_name ==
-                        exp_domain.STATE_PROPERTY_INTERACTION_HANDLERS):
+                          exp_domain.STATE_PROPERTY_INTERACTION_HANDLERS):
                         raise utils.InvalidInputException(
-                            'Editing interaction handlers is no longer supported')
+                            'Editing interaction handlers'
+                            'is no longer supported')
                     elif (change.property_name ==
-                        exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
+                          exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
                         new_answer_groups = [
                             state_domain.AnswerGroup.from_dict(answer_groups)
                             for answer_groups in change.new_value
                         ]
-                        state.update_interaction_answer_groups(new_answer_groups)
+                        state.update_interaction_answer_groups(
+                            new_answer_groups)
                     elif (change.property_name ==
-                        exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
+                          exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME
+                         ):
                         new_outcome = None
                         if change.new_value:
                             new_outcome = state_domain.Outcome.from_dict(
@@ -674,11 +679,11 @@ def apply_change_list(exploration_id, change_list, frontend_version):
                             )
                         state.update_interaction_default_outcome(new_outcome)
                     elif (change.property_name ==
-                        exp_domain.STATE_PROPERTY_UNCLASSIFIED_ANSWERS):
+                          exp_domain.STATE_PROPERTY_UNCLASSIFIED_ANSWERS):
                         state.update_interaction_confirmed_unclassified_answers(
                             change.new_value)
                     elif (change.property_name ==
-                        exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
+                          exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
                         if not isinstance(change.new_value, list):
                             raise Exception(
                                 'Expected hints_list to be a list,'
@@ -689,28 +694,28 @@ def apply_change_list(exploration_id, change_list, frontend_version):
                         ]
                         state.update_interaction_hints(new_hints_list)
                     elif (change.property_name ==
-                        exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
+                          exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
                         new_solution = None
                         if change.new_value is not None:
                             new_solution = state_domain.Solution.from_dict(
                                 state.interaction.id, change.new_value)
                         state.update_interaction_solution(new_solution)
                     elif (change.property_name ==
-                        exp_domain.STATE_PROPERTY_SOLICIT_ANSWER_DETAILS):
+                          exp_domain.STATE_PROPERTY_SOLICIT_ANSWER_DETAILS):
                         if not isinstance(change.new_value, bool):
                             raise Exception(
                                 'Expected solicit_answer_details to be a ' +
                                 'bool, received %s' % change.new_value)
                         state.update_solicit_answer_details(change.new_value)
                     elif (change.property_name ==
-                        exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT):
+                          exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT):
                         if not isinstance(change.new_value, bool):
                             raise Exception(
                                 'Expected card_is_checkpoint to be a ' +
                                 'bool, received %s' % change.new_value)
                         state.update_card_is_checkpoint(change.new_value)
                     elif (change.property_name ==
-                        exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
+                          exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
                         if not isinstance(change.new_value, dict):
                             raise Exception(
                                 'Expected recorded_voiceovers to be a dict, '
@@ -744,12 +749,14 @@ def apply_change_list(exploration_id, change_list, frontend_version):
                         new_state_name = (
                             state_names_of_renamed_states[change.state_name])
                     if change.state_name in old_to_new_state_names:
-                        new_state_name = old_to_new_state_names[old_state_name]
+                        new_state_name = (
+                            old_to_new_state_names[old_state_name])
                     exploration.states[new_state_name].add_written_translation(
                         change.content_id, change.language_code,
                         change.translation_html, change.data_format)
                 elif (change.cmd ==
-                    exp_domain.CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE):
+                      exp_domain.CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE
+                     ):
                     old_state_name = change.state_name
                     new_state_name = change.state_name
                     if change.state_name in state_names_of_renamed_states:
@@ -761,7 +768,8 @@ def apply_change_list(exploration_id, change_list, frontend_version):
                         new_state_name = old_to_new_state_names[old_state_name]
                     exploration.states[
                         new_state_name
-                    ].mark_written_translations_as_needing_update(change.content_id)
+                    ].mark_written_translations_as_needing_update(
+                        change.content_id)
                 elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
                     if change.property_name == 'title':
                         exploration.update_title(change.new_value)
@@ -1326,6 +1334,7 @@ def update_exploration(
             accepted.
         is_by_voice_artist: bool. Whether the changes are made by a
             voice artist.
+        version: int. Version of an exploration on which the changes are made.
 
     Raises:
         ValueError. No commit message is supplied and the exploration is public.
@@ -1360,7 +1369,8 @@ def update_exploration(
             'Commit messages for non-suggestions may not start with \'%s\'' %
             feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX)
 
-    updated_exploration = apply_change_list(exploration_id, change_list, version)
+    updated_exploration = apply_change_list(
+        exploration_id, change_list, version)
     if get_story_id_linked_to_exploration(exploration_id) is not None:
         validate_exploration_for_story(updated_exploration, True)
     _save_exploration(
@@ -2576,7 +2586,8 @@ def get_exp_with_draft_applied(exp_id, user_id):
     updated_exploration = None
 
     if (exp_user_data and exp_user_data.draft_change_list and
-            are_changes_mergeable(exp_id, draft_change_list_exp_version, draft_change_list)):
+            are_changes_mergeable(
+                exp_id, draft_change_list_exp_version, draft_change_list)):
         updated_exploration = apply_change_list(
             exp_id, draft_change_list,
             draft_change_list_exp_version)

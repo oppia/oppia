@@ -13,7 +13,7 @@
       <div *ngIf="lostChange.cmd === 'edit_state_property'">
         <strong>Edits to state:</strong> {{ lostChange.stateName }}
         <div>
-        <strong>Edits to property:</strong> {{ lostChange.propertyName }}</div>
+          <strong>Edits to property:</strong> {{ lostChange.propertyName }}</div>
         <ng-container [ngSwitch]="lostChange.propertyName">
           <div *ngSwitchCase="'content'">
             <div *ngIf="!lostChange.isNewValueEmpty()" class="state-edit-desc">
