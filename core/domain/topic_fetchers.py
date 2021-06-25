@@ -48,6 +48,8 @@ def _migrate_subtopics_to_latest_schema(versioned_subtopics):
         Exception. The schema version of subtopics is outside of what
             is supported at present.
     """
+    print()
+    print("migrate subtopic to latest schema version method called..")
     subtopic_schema_version = versioned_subtopics['schema_version']
     if not (1 <= subtopic_schema_version
             <= feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
@@ -119,6 +121,9 @@ def get_topic_from_model(topic_model):
         'schema_version': topic_model.story_reference_schema_version,
         'story_references': topic_model.additional_story_references
     }
+    print(get_topic_from_model.__name__)
+    print("subtopic schema version from topic = ")
+    print()
     if (topic_model.subtopic_schema_version !=
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
         _migrate_subtopics_to_latest_schema(versioned_subtopics)

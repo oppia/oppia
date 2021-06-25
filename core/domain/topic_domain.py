@@ -1155,6 +1155,8 @@ class Topic(python_utils.OBJECT):
         Returns:
             dict. The converted subtopic_dict.
         """
+        print()
+        print("Subtopic migration conversion function called..")
         subtopic_dict['thumbnail_size_in_bytes'] = None
         return subtopic_dict
 
@@ -1206,6 +1208,8 @@ class Topic(python_utils.OBJECT):
                     subtopics of the topic.
             current_version: int. The current schema version of subtopics.
         """
+        print()
+        print("Update subtopics from model called...")
         versioned_subtopics['schema_version'] = current_version + 1
 
         conversion_fn = getattr(
