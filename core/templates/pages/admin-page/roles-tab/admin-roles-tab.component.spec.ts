@@ -128,9 +128,9 @@ describe('Admin roles tab component ', function() {
     spyOn(adminDataService, 'getDataAsync').and.resolveTo(adminPageData);
 
     // Prechecks.
-    expect(component.UPDATABLE_ROLES).toBe({});
+    expect(component.UPDATABLE_ROLES).toEqual({});
     expect(component.roleToActions).toBe(null);
-    expect(component.VIEWABLE_ROLES).toBe({});
+    expect(component.VIEWABLE_ROLES).toEqual({});
     expect(component.topicSummaries).toBe(null);
 
     component.ngOnInit();
