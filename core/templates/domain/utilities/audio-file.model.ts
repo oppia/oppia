@@ -18,12 +18,9 @@
 
 export class AudioFile {
   filename: string;
-  // 'get' method from a 'Map' interface can return an undefined value
-  // for a data.
-  // get(key: K): V | undefined; used in assets-backend-api.service.ts .
-  data: Blob | undefined;
+  data: Blob;
 
-  constructor(filename: string, data: Blob | undefined) {
+  constructor(filename: string, data: Blob) {
     this.filename = filename;
     this.data = data;
   }
