@@ -83,8 +83,11 @@
     <div class="form-group row">
       <label for="label-target-interests-dropdown" class="col-lg-4 col-md-4 col-sm-4">{{ 'I18N_PREFERENCES_SUBJECT_INTERESTS' | translate }}</label>
       <div class="col-lg-8 col-md-8 col-sm-8">
-        <div *ngIf="hasPageLoaded && select2DropdownIsShown">
-          <mat-form-field>
+        <div *ngIf="hasPageLoaded">
+          <oppia-subject-interests [subjectInterests]="subjectInterests"
+                                   (subjectInterestsChange)="onSubjectInterestsSelectionChange($event)">
+          </oppia-subject-interests>
+          <!-- <mat-form-field>
             <mat-label>Subject Interests</mat-label>
             <mat-chip-list #chipList aria-label="Subject Interests">
               <mat-chip
@@ -92,19 +95,19 @@
                 <!-- [selectable]="selectable"
                 [removable]="removable"
                 (removed)="remove(fruit)"> -->
-                {{fruit}}
+                <!-- {{ subjectInterest }} -->
                 <!-- <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon> -->
-              </mat-chip>
-              <input
+              <!-- </mat-chip> -->
+              <!-- <input
                 placeholder="{{ 'I18N_PREFERENCES_SUBJECT_INTERESTS_PLACEHOLDER' | translate }}"
-                #fruitInput>
+                #fruitInput> -->
                 <!-- [formControl]="fruitCtrl"> -->
                 <!-- [matAutocomplete]="auto"
                 [matChipInputFor]="chipList"
                 [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
                 (matChipInputTokenEnd)="add($event)"> -->
-            </mat-chip-list>
-          </mat-form-field>
+            <!-- </mat-chip-list> -->
+          <!-- </mat-form-field> -->
           <!-- <select2-dropdown id="label-target-interests-dropdown"
                             item="subjectInterests"
                             class="protractor-test-interests-dropdown"

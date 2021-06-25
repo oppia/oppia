@@ -1,16 +1,15 @@
-<mat-form-field class="example-chip-list" appearance="fill">
-  <mat-label>Favorite Fruits</mat-label>
-  <mat-chip-list #chipList aria-label="Fruit selection">
+<mat-form-field class="subject-interests-chip-list" appearance="fill">
+  <mat-chip-list #chipList aria-label="Subject Interests">
     <mat-chip
-      *ngFor="let fruit of fruits"
+      *ngFor="let subjectInterest of subjectInterests"
       [selectable]="selectable"
       [removable]="removable"
-      (removed)="remove(fruit)">
-      {{fruit}}
+      (removed)="remove(subjectInterest)">
+      {{ subjectInterest }}
       <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
     </mat-chip>
     <input
-      placeholder="New fruit..."
+      placeholder="New Subject Interest"
       #fruitInput
       [formControl]="fruitCtrl"
       [matAutocomplete]="auto"
@@ -19,8 +18,15 @@
       (matChipInputTokenEnd)="add($event)">
   </mat-chip-list>
   <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
-    <mat-option *ngFor="let fruit of filteredFruits | async" [value]="fruit">
-      {{fruit}}
+    <mat-option *ngFor="let subjectInterest of filteredSubjectInterests | async" [value]="subjectInterest">
+      {{ subjectInterest }}
     </mat-option>
   </mat-autocomplete>
+  <mat-error>Subject interests must be unique and in lowercase.</mat-error>
 </mat-form-field>
+
+<style>
+	.subject-interests-chip-list {
+    width: 100%;
+  }
+</style>

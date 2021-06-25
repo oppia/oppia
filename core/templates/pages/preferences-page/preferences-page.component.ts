@@ -16,19 +16,18 @@
  * @fileoverview Component for the Oppia 'edit preferences' page.
  */
 
-import { HttpClient } from '@angular/common/http';
 import { Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { TranslateService } from '@ngx-translate/core';
 import { AppConstants } from 'app.constants';
-import { LanguageUtilService } from 'domain/utilities/language-util.service';
+import { LanguageIdAndText, LanguageUtilService } from 'domain/utilities/language-util.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { AlertsService } from 'services/alerts.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { LoaderService } from 'services/loader.service';
 import { PreventPageUnloadEventService } from 'services/prevent-page-unload-event.service';
+import { SubscriptionSummary, UserBackendApiService } from 'services/user-backend-api.service';
 import { UserService } from 'services/user.service';
 import { EditProfilePictureModalComponent } from './modal-templates/edit-profile-picture-modal.component';
 require('cropperjs/dist/cropper.min.css');
@@ -42,7 +41,6 @@ export class PreferencesPageComponent {
   @Input() preferredLanguageCodes;
   @Input() preferredSiteLanguageCode;
   @Input() preferredAudioLanguageCode;
-  private _PREFERENCES_DATA_URL = '/preferenceshandler/data';
   subjectInterestsChangeAtLeastOnce: boolean;
   exportingData = false;
   profilePictureDataUrl;
@@ -52,22 +50,19 @@ export class PreferencesPageComponent {
   email: string;
   AUDIO_LANGUAGE_CHOICES;
   hasPageLoaded: boolean;
-  userBio: any;
-  defaultDashboard: any;
-  canReceiveEmailUpdates: any;
-  canReceiveEditorRoleEmail: any;
-  can_receive_editor_role_email: any;
-  canReceiveSubscriptionEmail: any;
-  canReceiveFeedbackMessageEmail: any;
-  subscriptionList: any;
+  userBio: string;
+  defaultDashboard: string;
+  canReceiveEmailUpdates: boolean;
+  canReceiveEditorRoleEmail: boolean;
+  canReceiveSubscriptionEmail: boolean;
+  canReceiveFeedbackMessageEmail: boolean;
+  subscriptionList: SubscriptionSummary[];
   userCanDeleteAccount: boolean;
   TAG_REGEX_STRING: string;
   LANGUAGE_CHOICES: LanguageIdAndText[];
   SITE_LANGUAGE_CHOICES;
 
   constructor(
-    private translateService: TranslateService,
-    private httpClient: HttpClient,
     private ngbModal: NgbModal,
     private windowRef: WindowRef,
     private alertsService: AlertsService,
@@ -76,6 +71,7 @@ export class PreferencesPageComponent {
     private loaderService: LoaderService,
     private preventPageUnloadEventService: PreventPageUnloadEventService,
     private urlInterpolationService: UrlInterpolationService,
+    private userBackendApiService: UserBackendApiService,
     private userService: UserService
   ) {}
 
@@ -85,16 +81,14 @@ export class PreferencesPageComponent {
 
   private _saveDataItem(updateType, data): void {
     this.preventPageUnloadEventService.addListener();
-    this.httpClient.put(this._PREFERENCES_DATA_URL, {
-      update_type: updateType,
-      data: data
-    }).toPromise().then(() => {
+    this.userBackendApiService.updatePreferencesDataAsync(
+      updateType, data).then(() => {
       this.preventPageUnloadEventService.removeListener();
       this.alertsService.addInfoMessage('Saved!', 1000);
     });
   }
 
-  saveUserBio(userBio): void {
+  saveUserBio(userBio: string): void {
     this._saveDataItem('user_bio', userBio);
   }
 
@@ -102,26 +96,27 @@ export class PreferencesPageComponent {
     this.preventPageUnloadEventService.addListener();
   }
 
-  onSubjectInterestsSelectionChange(subjectInterests): void {
+  onSubjectInterestsSelectionChange(subjectInterests: string[]): void {
     this.alertsService.clearWarnings();
     this.subjectInterestsChangeAtLeastOnce = true;
     this._saveDataItem('subject_interests', subjectInterests);
   }
 
-  savePreferredSiteLanguageCodes(preferredSiteLanguageCode): void {
+  savePreferredSiteLanguageCodes(preferredSiteLanguageCode: string): void {
     this.i18nLanguageCodeService.setI18nLanguageCode(preferredSiteLanguageCode);
     this._saveDataItem(
       'preferred_site_language_code', preferredSiteLanguageCode);
   }
 
-  savePreferredAudioLanguageCode(preferredAudioLanguageCode): void {
+  savePreferredAudioLanguageCode(preferredAudioLanguageCode: string): void {
     this._saveDataItem(
       'preferred_audio_language_code', preferredAudioLanguageCode);
   }
 
   saveEmailPreferences(
-      canReceiveEmailUpdates, canReceiveEditorRoleEmail,
-      canReceiveFeedbackMessageEmail, canReceiveSubscriptionEmail): void {
+      canReceiveEmailUpdates: boolean, canReceiveEditorRoleEmail: boolean,
+      canReceiveFeedbackMessageEmail: boolean,
+      canReceiveSubscriptionEmail: boolean): void {
     let data = {
       can_receive_email_updates: canReceiveEmailUpdates,
       can_receive_editor_role_email: canReceiveEditorRoleEmail,
@@ -132,17 +127,15 @@ export class PreferencesPageComponent {
     this._saveDataItem('email_preferences', data);
   }
 
-
-  savePreferredLanguageCodes(preferredLanguageCodes): void {
+  savePreferredLanguageCodes(preferredLanguageCodes: string[]): void {
     this._saveDataItem('preferred_language_codes', preferredLanguageCodes);
   }
 
-  saveDefaultDashboard(defaultDashboard): void {
+  saveDefaultDashboard(defaultDashboard: string): void {
     this._saveDataItem('default_dashboard', defaultDashboard);
   }
 
-
-  handleExportDataClick (): void {
+  handleExportDataClick(): void {
     if (!this.exportingData) {
       this.exportingData = true;
     }
@@ -206,8 +199,8 @@ export class PreferencesPageComponent {
 
     this.hasPageLoaded = false;
 
-    let preferencesPromise = this.httpClient.get(
-      this._PREFERENCES_DATA_URL).toPromise();
+    let preferencesPromise = this.userBackendApiService.getPreferencesAsync();
+
     preferencesPromise.then((data) => {
       this.userBio = data.user_bio;
       this.subjectInterests = data.subject_interests;
@@ -217,13 +210,13 @@ export class PreferencesPageComponent {
       this.defaultDashboard = data.default_dashboard;
       this.canReceiveEmailUpdates = data.can_receive_email_updates;
       this.canReceiveEditorRoleEmail =
-      this.can_receive_editor_role_email;
+      data.can_receive_editor_role_email;
       this.canReceiveSubscriptionEmail =
         data.can_receive_subscription_email;
       this.canReceiveFeedbackMessageEmail = (
         data.can_receive_feedback_message_email);
       this.preferredSiteLanguageCode =
-      this.preferred_site_language_code;
+      data.preferred_site_language_code;
       this.preferredAudioLanguageCode =
         data.preferred_audio_language_code;
       this.subscriptionList = data.subscription_list;

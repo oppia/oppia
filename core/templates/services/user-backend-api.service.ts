@@ -23,7 +23,7 @@ import { UserInfo, UserInfoBackendDict } from 'domain/user/user-info.model';
 import { WindowRef } from './contextual/window-ref.service';
 import { Title } from '@angular/platform-browser';
 
-interface SubscriptionSummary {
+export interface SubscriptionSummary {
   'creator_picture_data_url': string;
   'creator_username': string;
   'creator_impact': number;
@@ -93,13 +93,9 @@ export class UserBackendApiService {
   }
 
   async setProfileImageDataUrlAsync(
-      newProfileImageDataUrl: string): Promise<PreferencesBackendDict> {
-    const profileImageUpdateUrlData = {
-      update_type: 'profile_picture_data_url',
-      data: newProfileImageDataUrl
-    };
-    return this.http.put<PreferencesBackendDict>(
-      this.PREFERENCES_DATA_URL, profileImageUpdateUrlData).toPromise();
+      newProfileImageDataUrl: string): Promise<Object> {
+    return this.updatePreferencesDataAsync(
+      'profile_picture_data_url', newProfileImageDataUrl);
   }
 
   async getLoginUrlAsync(currentUrl: string): Promise<string> {
@@ -139,6 +135,21 @@ export class UserBackendApiService {
   ): Promise<Object> {
     return this.http.put(this.SITE_LANGUAGE_URL, {
       site_language_code: currentLanguageCode
+    }).toPromise();
+  }
+
+  async getPreferencesAsync(): Promise<PreferencesBackendDict> {
+    return this.http.get<PreferencesBackendDict>(this.PREFERENCES_DATA_URL)
+      .toPromise();
+  }
+
+  async updatePreferencesDataAsync(
+      updateType: string,
+      data: boolean | string | string[] | SubscriptionSummary[]):
+      Promise<Object> {
+    return this.http.put(this.PREFERENCES_DATA_URL, {
+      update_type: updateType,
+      data: data
     }).toPromise();
   }
 }

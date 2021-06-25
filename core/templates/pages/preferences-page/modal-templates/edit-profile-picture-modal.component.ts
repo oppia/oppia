@@ -16,7 +16,8 @@
  * @fileoverview Component for edit profile picture modal.
  */
 
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, ViewChild } from '@angular/core';
+import { SafeResourceUrl } from '@angular/platform-browser';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
@@ -29,23 +30,24 @@ require('cropperjs/dist/cropper.min.css');
   templateUrl: './edit-profile-picture-modal.component.html'
 })
 export class EditProfilePictureModalComponent extends ConfirmOrCancelModal {
-  uploadedImage;
+  uploadedImage: SafeResourceUrl;
   cropppedImageDataUrl: string = '';
   invalidImageWarningIsShown: boolean = false;
   allowedImageFormats: readonly string[] = AppConstants.ALLOWED_IMAGE_FORMATS;
-  cropper = null;
+  cropper;
   @ViewChild('croppableImage') croppableImageRef: ElementRef;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
-    private svgSanitizerService: SvgSanitizerService
+    private svgSanitizerService: SvgSanitizerService,
+    private changeDetectorRef: ChangeDetectorRef
   ) {
     super(ngbActiveModal);
   }
 
   initialiseCropper(): void {
+    this.changeDetectorRef.detectChanges();
     let profilePicture = this.croppableImageRef.nativeElement;
-    console.log(profilePicture);
     this.cropper = new Cropper(profilePicture, {
       minContainerWidth: 500,
       minContainerHeight: 350,
@@ -53,9 +55,8 @@ export class EditProfilePictureModalComponent extends ConfirmOrCancelModal {
     });
   }
 
-  onFileChanged(file): void {
+  onFileChanged(file: Blob): void {
     this.invalidImageWarningIsShown = false;
-
     let reader = new FileReader();
     reader.onload = (e) => {
       this.uploadedImage = this.svgSanitizerService.getTrustedSvgResourceUrl(
@@ -85,70 +86,3 @@ export class EditProfilePictureModalComponent extends ConfirmOrCancelModal {
     super.confirm(this.cropppedImageDataUrl);
   }
 }
-
-// angular.module('oppia').controller('EditProfilePictureModalController', [
-//   '$controller', '$scope', '$timeout', '$uibModalInstance',
-//   'ALLOWED_IMAGE_FORMATS', function(
-//       $controller, $scope, $timeout, $uibModalInstance,
-//       ALLOWED_IMAGE_FORMATS) {
-//     $controller('ConfirmOrCancelModalController', {
-//       $scope: $scope,
-//       $uibModalInstance: $uibModalInstance
-//     });
-
-//     $scope.uploadedImage = null;
-//     $scope.croppedImageDataUrl = '';
-//     $scope.invalidImageWarningIsShown = false;
-//     $scope.allowedImageFormats = ALLOWED_IMAGE_FORMATS;
-//     let cropper = null;
-
-//     $scope.initialiseCropper = function() {
-//       let profilePicture = (
-//         <HTMLImageElement>document.getElementById(
-//           'croppable-image'));
-//       cropper = new Cropper(profilePicture, {
-//         minContainerWidth: 500,
-//         minContainerHeight: 350,
-//         aspectRatio: 1
-//       });
-//     };
-
-//     $scope.onFileChanged = function(file) {
-//       $('.oppia-profile-image-uploader').fadeOut(function() {
-//         $scope.invalidImageWarningIsShown = false;
-
-//         var reader = new FileReader();
-//         reader.onload = function(e) {
-//           $scope.$apply(function() {
-//             $scope.uploadedImage = (<FileReader>e.target).result;
-//           });
-//           $scope.initialiseCropper();
-//         };
-//         reader.readAsDataURL(file);
-
-//         $timeout(function() {
-//           $('.oppia-profile-image-uploader').fadeIn();
-//         }, 100);
-//       });
-//     };
-
-//     $scope.reset = function() {
-//       $scope.uploadedImage = null;
-//       $scope.croppedImageDataUrl = '';
-//     };
-
-//     $scope.onInvalidImageLoaded = function() {
-//       $scope.reset();
-//       $scope.invalidImageWarningIsShown = true;
-//     };
-
-//     $scope.confirm = function() {
-//       $scope.croppedImageDataUrl = (
-//         cropper.getCroppedCanvas({
-//           height: 150,
-//           width: 150
-//         }).toDataURL());
-//       $uibModalInstance.close($scope.croppedImageDataUrl);
-//     };
-//   }
-// ]);

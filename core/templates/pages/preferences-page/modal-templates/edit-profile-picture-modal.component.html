@@ -18,11 +18,11 @@
 
       <div *ngIf="uploadedImage">
         <span>{{ 'I18N_PREFERENCES_PROFILE_PICTURE_DRAG' | translate }}</span>
-        <div class="oppia-profile-picture-crop-area protractor-test-photo-crop" *ngIf="uploadedImage">
+        <div class="oppia-profile-picture-crop-area protractor-test-photo-crop">
           <button class="btn btn-secondary oppia-profile-picture-reset-button" (click)="reset()">
             <i class="material-icons oppia-vcenter">&#xE14C;</i>
           </button>
-          <img *ngIf="uploadedImage" id="croppable-image" [src]="uploadedImage" #croppableImage>
+          <img id="croppable-image" [src]="uploadedImage" #croppableImage>
         </div>
       </div>
     </div>

@@ -33,17 +33,20 @@ import { PreferencesPageComponent } from './preferences-page.component';
   imports: [
     BrowserModule,
     HttpClientModule,
+    ReactiveFormsModule,
     SharedComponentsModule
   ],
   declarations: [
     EditProfilePictureModalComponent,
     OppiaAngularRootComponent,
-    PreferencesPageComponent
+    PreferencesPageComponent,
+    SubjectInterestsComponent
   ],
   entryComponents: [
     EditProfilePictureModalComponent,
     OppiaAngularRootComponent,
-    PreferencesPageComponent
+    PreferencesPageComponent,
+    SubjectInterestsComponent
   ],
   providers: [
     {
@@ -67,6 +70,8 @@ class PreferencesPageModule {
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 import { EditProfilePictureModalComponent } from './modal-templates/edit-profile-picture-modal.component';
+import { SubjectInterestsComponent } from './form-fields/subject-interests.component';
+import { ReactiveFormsModule } from '@angular/forms';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
