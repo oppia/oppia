@@ -83,7 +83,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'current-interaction.service.ts',
     'drag-and-drop-positive-int-editor.component.ts',
     'email-dashboard-data.service.ts',
-    'entity-creation.service.ts',
     'exploration-creation.service.ts',
     'exploration-diff.service.ts',
     'exploration-footer.component.ts',
