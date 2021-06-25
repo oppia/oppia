@@ -116,6 +116,8 @@
         "core.domain.blog_domain_test",
         "core.domain.blog_services_test",
         "core.domain.blog_validators_test",
+        "core.controllers.blog_admin_test",
+        "core.controllers.blog_dashboard_test",
         "core.domain.skill_jobs_one_off_test",
         "core.domain.email_validators_test",
         "core.domain.exploration_validators_test",
