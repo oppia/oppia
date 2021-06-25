@@ -43,9 +43,10 @@ import feconf
 import python_utils
 
 (
-    feedback_models, opportunity_models, suggestion_models
+    feedback_models, opportunity_models, story_models, suggestion_models
 ) = models.Registry.import_models([
-    models.NAMES.feedback, models.NAMES.opportunity, models.NAMES.suggestion
+    models.NAMES.feedback, models.NAMES.opportunity, models.NAMES.story,
+    models.NAMES.suggestion
 ])
 
 
@@ -915,3 +916,12 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
                 'exp_2', strict=False
             )
         )
+
+    def test_regenerate_opportunities_related_to_topic_when_story_deleted(self):
+        story_models.StoryModel.delete_by_id(self.STORY_ID)
+
+        self.assertRaisesRegexp(
+            Exception, 'Failed to regenerate opportunities',
+            lambda: (
+                opportunity_services.regenerate_opportunities_related_to_topic(
+                    self.TOPIC_ID)))
