@@ -93,7 +93,7 @@ describe('Auth service', function() {
 
   it('should throw if signOutAsync is called without angular fire', async() => {
     await expectAsync(
-      new AuthService(angularFireAuth, authBackendApiService).signOutAsync()
+      new AuthService(null, authBackendApiService).signOutAsync()
     ).toBeRejectedWithError('AngularFireAuth is not available');
   });
 
@@ -101,7 +101,7 @@ describe('Auth service', function() {
     async() => {
       await expectAsync(
         new AuthService(
-          angularFireAuth, authBackendApiService).signInWithRedirectAsync()
+          null, authBackendApiService).signInWithRedirectAsync()
       ).toBeRejectedWithError('AngularFireAuth is not available');
     });
 
@@ -109,7 +109,7 @@ describe('Auth service', function() {
     async() => {
       await expectAsync(
         new AuthService(
-          angularFireAuth, authBackendApiService).handleRedirectResultAsync()
+          null, authBackendApiService).handleRedirectResultAsync()
       ).toBeRejectedWithError('AngularFireAuth is not available');
     });
 

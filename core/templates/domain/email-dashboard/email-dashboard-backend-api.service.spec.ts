@@ -30,7 +30,14 @@ import { EmailDashboardQueryResults } from
 describe('Email dashboard backend api service', () => {
   let httpTestingController: HttpTestingController;
   let edbas: EmailDashboardBackendApiService;
-  let defaultData: QueryData;
+  let defaultData: QueryData = {
+    inactive_in_last_n_days: 0,
+    has_not_logged_in_for_n_days: 0,
+    created_at_least_n_exps: 0,
+    created_fewer_than_n_exps: 0,
+    edited_at_least_n_exps: 0,
+    edited_fewer_than_n_exps: 0
+  };
 
   beforeEach(() => {
     TestBed.configureTestingModule({

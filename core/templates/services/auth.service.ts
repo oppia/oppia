@@ -97,9 +97,10 @@ class ProdAuthServiceImpl extends AuthServiceImpl {
 })
 export class AuthService {
   private authServiceImpl: AuthServiceImpl;
+  creds!: firebase.auth.UserCredential;
 
   constructor(
-      @Optional() private angularFireAuth: AngularFireAuth,
+      @Optional() private angularFireAuth: AngularFireAuth | null,
       private authBackendApiService: AuthBackendApiService) {
     if (!this.angularFireAuth) {
       this.authServiceImpl = new NullAuthServiceImpl();
@@ -156,23 +157,26 @@ export class AuthService {
     // emulator DOES NOT run. Instead, production takes the user to the Google
     // sign-in page, which eventually redirects them back to Oppia.
     const password = await md5(email);
-    let creds: firebase.auth.UserCredential;
     try {
-      creds = await this.angularFireAuth.signInWithEmailAndPassword(
-        email, password);
+      if (this.angularFireAuth !== null) {
+        this.creds = await this.angularFireAuth.signInWithEmailAndPassword(
+          email, password);
+      }
     } catch (err) {
       if (err.code === 'auth/user-not-found') {
-        creds = await this.angularFireAuth.createUserWithEmailAndPassword(
-          email, password);
+        if (this.angularFireAuth !== null) {
+          this.creds =
+           await this.angularFireAuth.createUserWithEmailAndPassword(
+             email, password);
+        }
       } else {
         throw err;
       }
     }
-    if (creds.user === null) {
-      throw new Error('No User Found');
+    if (this.creds?.user !== null) {
+      const idToken = await this.creds.user.getIdToken();
+      await this.authBackendApiService.beginSessionAsync(idToken);
     }
-    const idToken = await creds.user.getIdToken();
-    await this.authBackendApiService.beginSessionAsync(idToken);
   }
 
   async signInWithRedirectAsync(): Promise<void> {
