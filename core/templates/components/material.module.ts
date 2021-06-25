@@ -51,6 +51,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     MatProgressBarModule,
     MatProgressSpinnerModule,
     MatRadioModule,
+    MatSelectModule,
     MatSliderModule,
     MatSlideToggleModule,
   ],
@@ -69,6 +70,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     MatProgressBarModule,
     MatProgressSpinnerModule,
     MatRadioModule,
+    MatSelectModule,
     MatSliderModule,
     MatSlideToggleModule,
   ]

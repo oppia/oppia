@@ -25,8 +25,8 @@ import { TopicManagerRoleEditorModalComponent } from './topic-manager-role-edito
 import { AlertsService } from 'services/alerts.service';
 
 @Component({
-  selector: 'oppia-roles-editor',
-  templateUrl: './admin-roles-tab.directive.html'
+  selector: 'oppia-admin-roles-tab',
+  templateUrl: './admin-roles-tab.component.html'
 })
 export class AdminRolesTabComponent implements OnInit {
   UPDATABLE_ROLES = null;
@@ -34,6 +34,7 @@ export class AdminRolesTabComponent implements OnInit {
   topicSummaries = null;
   roleToActions = null;
   rolesFetched = false;
+
   selectingNewRole = false;
   username = '';
   userRoles = [];
@@ -178,7 +179,7 @@ export class AdminRolesTabComponent implements OnInit {
   }
 }
 
-angular.module('oppia').directive('oppiaRolesTab',
+angular.module('oppia').directive('oppiaAdminRolesTab',
   downgradeComponent({
     component: AdminRolesTabComponent
   }) as angular.IDirectiveFactory);
