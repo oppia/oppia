@@ -29,3 +29,6 @@ jobs:
         run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
       - name: Run frontend tests
         run: PYTHONIOENCODING=utf-8 python -m scripts.run_frontend_tests --run_minified_tests --skip_install --check_coverage
+        with:
+          name: karma-coverage-report
+          path: /home/runner/work/karma_coverage_reports
