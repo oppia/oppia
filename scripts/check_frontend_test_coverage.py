@@ -155,7 +155,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'oppia-noninteractive-math.component.ts',
     'oppia-noninteractive-skillreview.component.ts',
     'oppia-noninteractive-tabs.component.ts',
-    'oppia-noninteractive-video.component.ts',
     'oppia-response-code-repl.component.ts',
     'oppia-response-drag-and-drop-sort-input.directive.ts',
     'oppia-response-graph-input.component.ts',
