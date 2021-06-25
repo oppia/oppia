@@ -188,7 +188,6 @@
 /scripts/*.py @DubeySandeep
 /scripts/check_e2e_tests_are_captured_in_ci*.py @kevintab95 @DubeySandeep
 /scripts/check_frontend_test_coverage*.py @DubeySandeep @nithusha21
-/scripts/create_topological_sort_of_all_services*.py @DubeySandeep
 /scripts/install_prerequisites.sh @DubeySandeep
 # TODO(#13119): Add @vojtechjelinek as owner after 2021-07-06
 /scripts/typescript_checks*.py @DubeySandeep

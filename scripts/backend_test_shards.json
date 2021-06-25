@@ -313,7 +313,6 @@
         "core.domain.html_cleaner_test",
         "core.platform.taskqueue.dev_mode_taskqueue_services_test",
         "scripts.linters.pre_commit_linter_test",
-        "scripts.create_topological_sort_of_all_services_test",
         "core.storage.suggestion.gae_models_test",
         "core.storage.auth.gae_models_test",
         "scripts.linters.html_linter_test",
