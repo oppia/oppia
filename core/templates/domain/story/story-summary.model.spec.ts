@@ -86,4 +86,43 @@ describe('Story summary model', () => {
     expect(_sampleStorySummary.getTopicUrlFragment()).toEqual('topic-one');
     expect(_sampleStorySummary.getClassroomUrlFragment()).toEqual('math');
   });
+
+  it (
+    'should throw errors if topicUrlFragment & classroomUrlFragment is' +
+      ' undefined', () => {
+      let nodeDict1 = {
+        id: 'node_1',
+        thumbnail_filename: 'image.png',
+        title: 'Title 1',
+        description: 'Description 1',
+        prerequisite_skill_ids: ['skill_1'],
+        acquired_skill_ids: ['skill_2'],
+        destination_node_ids: ['node_2'],
+        outline: 'Outline',
+        exploration_id: null,
+        outline_is_finalized: false,
+        thumbnail_bg_color: '#a33f40'
+      };
+
+      const sampleStorySummaryBackendDict1 = {
+        id: 'sample_story_id',
+        title: 'Story title',
+        node_titles: ['Chapter 1', 'Chapter 2'],
+        thumbnail_filename: 'image.svg',
+        thumbnail_bg_color: '#F8BF74',
+        description: 'Description',
+        story_is_published: true,
+        completed_node_titles: ['Chapter 1'],
+        url_fragment: 'story-url-fragment',
+        all_node_dicts: [nodeDict1],
+        topic_url_fragment: undefined,
+        classroom_url_fragment: undefined
+      };
+      _sampleStorySummary = StorySummary.createFromBackendDict(
+        sampleStorySummaryBackendDict1);
+      expect(() => _sampleStorySummary.getTopicUrlFragment())
+        .toThrowError('Topic Url Fragment is undefined');
+      expect(() => _sampleStorySummary.getClassroomUrlFragment())
+        .toThrowError('Classroom Url Fragment is undefined');
+    });
 });
