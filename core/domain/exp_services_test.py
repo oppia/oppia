@@ -5441,6 +5441,12 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             }
         })]
 
+        # Checking that the changes can be applied when
+        # changing to same version.
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 3, change_list_3)
+        self.assertEqual(changes_are_mergeable, True)
+
         changes_are_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 2, change_list_3)
         self.assertEqual(changes_are_mergeable, True)
@@ -5766,6 +5772,11 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             }],
             'old_value': [],
             'property_name': 'answer_groups'
+        }), exp_domain.ExplorationChange({
+            'cmd': 'edit_state_property',
+            'state_name': 'End',
+            'property_name': 'solicit_answer_details',
+            'new_value': True
         })]
         changes_are_mergeable_1 = exp_services.are_changes_mergeable(
             self.EXP_1_ID, 1, change_list_4)
@@ -6548,9 +6559,44 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_0_ID, change_list_2,
             'Changed Contents and Hint')
 
+        change_list_3 = [exp_domain.ExplorationChange({
+            'property_name': 'default_outcome',
+            'old_value': {
+                'labelled_as_correct': False,
+                'missing_prerequisite_skill_id': None,
+                'refresher_exploration_id': None,
+                'feedback': {
+                    'content_id': 'default_outcome',
+                    'html': ''
+                },
+                'param_changes': [
+
+                ],
+                'dest': 'End'
+            },
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'new_value': {
+                'labelled_as_correct': False,
+                'missing_prerequisite_skill_id': None,
+                'refresher_exploration_id': None,
+                'feedback': {
+                    'content_id': 'default_outcome',
+                    'html': '<p>Feedback 1.</p>'
+                },
+                'param_changes': [
+
+                ],
+                'dest': 'End'
+            }
+        })]
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 2, change_list_3)
+        self.assertEqual(changes_are_mergeable, True)
+
         # Changes to the answer_groups and the properties that
         # affects or are affected by answer_groups.
-        change_list_3 = [exp_domain.ExplorationChange({
+        change_list_4 = [exp_domain.ExplorationChange({
             'state_name': 'Introduction',
             'new_value': [{
                 'outcome': {
@@ -6734,7 +6780,7 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
         })]
 
         changes_are_mergeable = exp_services.are_changes_mergeable(
-            self.EXP_0_ID, 2, change_list_3)
+            self.EXP_0_ID, 2, change_list_4)
         self.assertEqual(changes_are_mergeable, True)
 
         # Creating second exploration to test the scenario
@@ -6758,7 +6804,7 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
 
         # Changes to the properties related to the answer_groups
         # in the second state to check for mergeability.
-        change_list_4 = [exp_domain.ExplorationChange({
+        change_list_5 = [exp_domain.ExplorationChange({
             'old_value': 'EndExploration',
             'state_name': 'End',
             'property_name': 'widget_id',
@@ -6865,7 +6911,7 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
         })]
 
         changes_are_mergeable_1 = exp_services.are_changes_mergeable(
-            self.EXP_1_ID, 2, change_list_4)
+            self.EXP_1_ID, 2, change_list_5)
         self.assertEqual(changes_are_mergeable_1, True)
 
     def test_changes_are_not_mergeable_when_answer_groups_changes_conflict(self): # pylint: disable=line-too-long
@@ -9084,6 +9130,14 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             'cmd': 'add_written_translation',
             'content_id': 'feedback_1',
             'translation_html': '<p>Translation Feedback.</p>',
+            'state_name': 'Intro-Rename',
+            'content_html': 'N/A'
+        }), exp_domain.ExplorationChange({
+            'language_code': 'de',
+            'data_format': 'html',
+            'cmd': 'add_written_translation',
+            'content_id': 'solution',
+            'translation_html': '<p>Translation Solution.</p>',
             'state_name': 'Intro-Rename',
             'content_html': 'N/A'
         }), exp_domain.ExplorationChange({
