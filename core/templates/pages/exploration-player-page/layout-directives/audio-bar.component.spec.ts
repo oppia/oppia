@@ -13,8 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for for AudioBarComponent.
+ * @fileoverview Unit tests for the AudioBarComponent.
  */
+
+import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ComponentFixture, discardPeriodicTasks, fakeAsync, flush, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 import { AudioBarComponent } from 'pages/exploration-player-page/layout-directives/audio-bar.component';
 import { Voiceover } from 'domain/exploration/voiceover.model';
@@ -26,10 +31,6 @@ import { AudioPreloaderService } from '../services/audio-preloader.service';
 import { AudioTranslationLanguageService } from '../services/audio-translation-language.service';
 import { AudioTranslationManagerService } from '../services/audio-translation-manager.service';
 import { PlayerPositionService } from '../services/player-position.service';
-import { ComponentFixture, discardPeriodicTasks, fakeAsync, flush, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 describe('Audio Bar Component', () => {
   let component: AudioBarComponent;
