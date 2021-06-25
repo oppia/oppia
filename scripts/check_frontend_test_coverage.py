@@ -99,7 +99,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'generatedParser.ts',
     'google-analytics.initializer.ts',
     'graph-editor.component.ts',
-    'graph-input-rules.service.ts',
     'graph-input-validation.service.ts',
     'graph-property-editor.component.ts',
     'graph-viz.component.ts',
