@@ -1538,6 +1538,8 @@ class TranslationContributionStatsModelUnitTests(test_utils.GenericTestBase):
                 self.REJECTED_TRANSLATION_WORD_COUNT),
             contribution_dates=self.CONTRIBUTION_DATES
         )
+        dates_in_iso_format = [
+            date.isoformat() for date in self.CONTRIBUTION_DATES]
         expected_data = {
             model_1_id: {
                 'language_code': self.LANGUAGE_CODE,
@@ -1556,7 +1558,7 @@ class TranslationContributionStatsModelUnitTests(test_utils.GenericTestBase):
                     self.REJECTED_TRANSLATIONS_COUNT),
                 'rejected_translation_word_count': (
                     self.REJECTED_TRANSLATION_WORD_COUNT),
-                'contribution_dates': self.CONTRIBUTION_DATES
+                'contribution_dates': dates_in_iso_format
             },
             model_2_id: {
                 'language_code': self.LANGUAGE_CODE,
@@ -1575,7 +1577,7 @@ class TranslationContributionStatsModelUnitTests(test_utils.GenericTestBase):
                     self.REJECTED_TRANSLATIONS_COUNT),
                 'rejected_translation_word_count': (
                     self.REJECTED_TRANSLATION_WORD_COUNT),
-                'contribution_dates': self.CONTRIBUTION_DATES
+                'contribution_dates': dates_in_iso_format
             }
         }
 

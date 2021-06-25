@@ -813,6 +813,9 @@ class TranslationContributionStatsModel(base_models.BaseModel):
     https://docs.google.com/document/d/1JEDiy-f1vnBLwibu8hsfuo3JObBWiaFvDTTU9L18zpY/edit#
     """
 
+    # We use the model id as a key in the Takeout dict.
+    ID_IS_USED_AS_TAKEOUT_KEY = True
+
     # The ISO 639-1 language code for which the translation contributions were
     # made.
     language_code = datastore_services.StringProperty(
@@ -1013,6 +1016,7 @@ class TranslationContributionStatsModel(base_models.BaseModel):
                     model.rejected_translations_count),
                 'rejected_translation_word_count': (
                     model.rejected_translation_word_count),
-                'contribution_dates': model.contribution_dates
+                'contribution_dates': [
+                    date.isoformat() for date in model.contribution_dates]
             }
         return user_data
