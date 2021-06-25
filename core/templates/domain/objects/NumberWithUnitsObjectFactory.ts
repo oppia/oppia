@@ -49,6 +49,17 @@ export class NumberWithUnits {
       type: string, real: number, fractionObj: Fraction,
       unitsObj: Units) {
     this.type = type;
+
+    if (this.type === 'real') {
+      if (fractionObj.numerator !== 0 || fractionObj.wholeNumber !== 0) {
+        throw new Error('Number with type real cannot have a fraction part.');
+      }
+    } else if (this.type === 'fraction') {
+      if (real !== 0) {
+        throw new Error('Number with type fraction cannot have a real part.');
+      }
+    }
+
     this.real = real;
     this.fraction = fractionObj;
     this.units = unitsObj.units;
@@ -107,7 +118,7 @@ export class NumberWithUnits {
     return {
       type: this.type,
       real: this.real,
-      fraction: this.fraction.toDict(),
+      fraction: this.fraction?.toDict(),
       units: this.units
     };
   }

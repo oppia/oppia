@@ -23,7 +23,7 @@ require(
     'confirm-or-cancel-modal.controller.ts');
 require(
   'components/question-difficulty-selector/' +
-    'question-difficulty-selector.directive.ts');
+    'question-difficulty-selector.component.ts');
 require(
   'components/question-directives/question-editor/' +
     'question-editor.directive.ts');
