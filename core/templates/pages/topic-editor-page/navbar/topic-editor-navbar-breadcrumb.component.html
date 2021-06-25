@@ -1,0 +1,22 @@
+<div class="nav navbar-nav oppia-navbar-breadcrumb">
+  <span>
+    <a href="/topics-and-skills-dashboard"
+       ngbTooltip="Back to Topics and Skills Dashboard"
+       *ngIf="!canNavigateToTopicEditorPage()"
+       class="back-to-dashboard">
+      <i class="fa fa-arrow-left"></i>
+    </a>
+    <i class="fa fa-arrow-left protractor-test-edit-topic-tab"
+       ngbTooltip="Back to Topic"
+       *ngIf="canNavigateToTopicEditorPage()"
+       (click)="navigateToMainTab()">
+    </i>
+    {{ topic.getName() }} (v{{ topic.getVersion() }})
+  </span>
+</div>
+<style>
+  .back-to-dashboard {
+    color: #FFF;
+    text-decoration: none;
+  }
+</style>
