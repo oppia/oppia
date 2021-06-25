@@ -48,7 +48,7 @@ module.exports = {
       'CallExpression[callee.object.name=browser][callee.property.name=' +
       disallowedBrowserMethodsRegex + ']');
 
-    var checkBrowserMethod = function(node) {
+    var reportDisallowedBrowserMethod = function(node) {
       context.report({
         node: node,
         loc: node.callee.loc,
@@ -78,7 +78,7 @@ module.exports = {
         checkConstName(node);
       },
       [disallowedBrowserMethodsSelector]: function(node) {
-        checkBrowserMethod(node);
+        reportDisallowedBrowserMethod(node);
       },
       'CallExpression[callee.property.name=\'then\']': function(node) {
         context.report({
