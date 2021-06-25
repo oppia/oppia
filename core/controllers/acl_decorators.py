@@ -694,19 +694,19 @@ def can_access_admin_page(handler):
 
 
 def can_access_contributor_dashboard_admin_page(handler):
-    """Decorator that checks if the current user is a contributor dashboard
-    admin.
+    """Decorator that checks if the user can access the contributor dashboard
+    admin page.
 
     Args:
         handler: function. The function to be decorated.
 
     Returns:
-        function. The newly decorated function that now also checks if the user
-        is a super admin.
+        function. The newly decorated function that now also checks user can
+        access the contributor dashboard admin page.
     """
 
-    def test_contributor_dashboard_admin(self, **kwargs):
-        """Checks if the user is logged in and is a contributor dashboard admin.
+    def test_can_access_contributor_dashboard_admin_page(self, **kwargs):
+        """Checks if the user can access the contributor dashboard admin page.
 
         Args:
             **kwargs: *. Keyword arguments.
@@ -716,21 +716,77 @@ def can_access_contributor_dashboard_admin_page(handler):
 
         Raises:
             NotLoggedInException. The user is not logged in.
-            UnauthorizedUserException. The user is not a contributor dashboard
-                admin of the application.
+            UnauthorizedUserException. The user cannot access the contributor
+            dashboard admin page.
         """
         if not self.user_id:
             raise self.NotLoggedInException
 
-        if role_services.ACTION_MANAGE_CONTRIBUTORS in self.user.actions:
+        if role_services.ACTION_ACCESS_CONTRIBUTOR_DASHBOARD_ADMIN_PAGE in (
+                self.user.actions):
             return handler(self, **kwargs)
 
         raise self.UnauthorizedUserException(
-            'User is not a contributor dashboard admin of this application')
+            'You do not have credentials to access contributor dashbaord '
+            'admin page.')
 
-    test_contributor_dashboard_admin.__wrapped__ = True
+    test_can_access_contributor_dashboard_admin_page.__wrapped__ = True
 
-    return test_contributor_dashboard_admin
+    return test_can_access_contributor_dashboard_admin_page
+
+
+def can_manage_contributors_role(handler):
+    """Decorator that checks if the current user can modity contributors role
+    for contributor dashbaord page.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks if the user
+        can modity contributors role for contributor dashbaord page.
+    """
+
+    def test_can_manage_contributors_role(self, category, **kwargs):
+        """Checks if the user can modity contributors role for contributor
+        dashbaord page.
+
+        Args:
+            category: str. The category of contribution.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            UnauthorizedUserException. The user cannnot modity contributors role
+            for contributor dashbaord page.
+        """
+        if not self.user_id:
+            raise self.NotLoggedInException
+
+        if category in [
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
+                constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION]:
+            if role_services.ACTION_MANAGE_QUESTION_CONTRIBUTOR_ROLES in (
+                    self.user.actions):
+                return handler(self, **kwargs)
+        elif category == (
+            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION):
+            if role_services.ACTION_MANAGE_TRANSLATION_CONTRIBUTOR_ROLES in (
+                    self.user.actions):
+                return handler(self, **kwargs)
+        else:
+            raise self.InvalidInputException(
+                'Invalid category: %s' % category)
+
+        raise self.UnauthorizedUserException(
+            'You do not have credentials to modity contributors role.')
+
+    test_can_manage_contributors_role.__wrapped__ = True
+
+    return test_can_manage_contributors_role
 
 
 def can_delete_any_user(handler):

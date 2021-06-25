@@ -48,8 +48,8 @@ export class ContributorDashboardAdminBackendApiService {
   ): Promise<void> {
     return new Promise((resolve, reject) => {
       this.http.post<void>(
-        PageConstants.ADD_CONTRIBUTION_RIGHTS_HANDLER_URL, {
-          category: category,
+        this.urlInterpolationService.interpolateUrl(
+          PageConstants.ADD_CONTRIBUTION_RIGHTS_HANDLER_URL, { category }), {
           username: username,
           language_code: languageCode
         }

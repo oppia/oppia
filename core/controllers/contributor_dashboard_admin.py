@@ -39,15 +39,14 @@ class AddContributionRightsHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.can_access_contributor_dashboard_admin_page
-    def post(self):
+    @acl_decorators.can_manage_contributors_role
+    def post(self, category):
         username = self.payload.get('username')
         user_id = user_services.get_user_id_from_username(username)
 
         if user_id is None:
             raise self.InvalidInputException('Invalid username: %s' % username)
 
-        category = self.payload.get('category')
         language_code = self.payload.get('language_code', None)
 
         if category == constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION:
@@ -84,9 +83,6 @@ class AddContributionRightsHandler(base.BaseHandler):
                     'User %s already has rights to submit question.' % (
                         username))
             user_services.allow_user_to_submit_question(user_id)
-        else:
-            raise self.InvalidInputException(
-                'Invalid category: %s' % category)
 
         if category in [
                 constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
@@ -103,8 +99,8 @@ class RemoveContributionRightsHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.can_access_contributor_dashboard_admin_page
-    def put(self):
+    @acl_decorators.can_manage_contributors_role
+    def put(self, category):
         username = self.payload.get('username', None)
         if username is None:
             raise self.InvalidInputException('Missing username param')
@@ -119,12 +115,7 @@ class RemoveContributionRightsHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Invalid language_code: %s' % language_code)
 
-        removal_type = self.payload.get('removal_type')
-        if removal_type == constants.ACTION_REMOVE_ALL_REVIEW_RIGHTS:
-            user_services.remove_contribution_reviewer(user_id)
-        elif (removal_type ==
-              constants.ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS):
-            category = self.payload.get('category')
+        if removal_type == constants.ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS:
             if (category ==
                     constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION):
                 if not user_services.can_review_translation_suggestions(
@@ -180,20 +171,14 @@ class ContributorUsersListHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.can_access_contributor_dashboard_admin_page
-    def get(self):
-        category = self.request.get('category')
+    @acl_decorators.can_manage_contributors_role
+    def get(self, category):
         language_code = self.request.get('language_code', None)
         if language_code is not None and not (
                 utils.is_supported_audio_language_code(language_code)):
             raise self.InvalidInputException(
                 'Invalid language_code: %s' % language_code)
-        if category not in [
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION]:
-            raise self.InvalidInputException('Invalid category: %s' % category)
+
         usernames = user_services.get_contributor_usernames(
             category, language_code=language_code)
         self.render_json({'usernames': usernames})

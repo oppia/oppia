@@ -21,7 +21,7 @@
 import { ContributorDashboardAdminPageConstants as PageConstants } from './contributor-dashboard-admin-page.constants';
 
 angular.module('oppia').constant(
-  'ADD_CONTRIBUTION_RIGHTS_HANDLER_URL',
+  'ADD_CONTRIBUTION_RIGHTS_HANDLER_URL/<category>',
   PageConstants.ADD_CONTRIBUTION_RIGHTS_HANDLER_URL);
 angular.module('oppia').constant(
   'CONTRIBUTION_RIGHTS_HANDLER_URL',
