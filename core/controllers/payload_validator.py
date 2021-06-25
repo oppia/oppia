@@ -49,6 +49,7 @@ def validate(handler_args, handler_args_schemas, allowed_extra_args):
                 handler_args[arg_key] = arg_schema['default_value']
         elif arg_key not in handler_args and 'default_value' not in arg_schema:
             errors.append('Missing key in handler args: %s.' % arg_key)
+            continue
 
         try:
             normalized_value[arg_key] = schema_utils.normalize_against_schema(
