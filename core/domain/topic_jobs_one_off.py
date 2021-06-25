@@ -75,8 +75,6 @@ class TopicMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         # the old version.
         if (item.subtopic_schema_version <=
                 feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
-            print()
-            print("Subtopic schema migration command added...")
             commit_cmds = [topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_MIGRATE_SUBTOPIC_SCHEMA_TO_LATEST_VERSION, # pylint: disable=line-too-long
                 'from_version': item.subtopic_schema_version,
@@ -250,7 +248,6 @@ class UpdateSubtopicThumbnailSizeOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     _SUCCESS_KEY = 'thumbnail_size_updated'
     _ERROR_KEY = 'updating_error'
 
-
     @classmethod
     def entity_classes_to_map_over(cls):
         return [topic_models.TopicModel]
@@ -265,15 +262,16 @@ class UpdateSubtopicThumbnailSizeOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         try:
             subtopics_dict = topic.get_all_subtopics()
             for subtopic_dict in subtopics_dict:
-                # We are not updating subtopic thumbnail_filename here, but using it
-                # call the update for subtopic thumbnail_size_in_bytes.
+                # We are not updating subtopic thumbnail_filename here, but
+                # using it call the update for subtopic thumbnail_size_in_bytes
                 # old_value and new_value are same here, because the update for
-                # thumbnail_size_in_bytes is called from within the code for updating
-                # thumbnail_filename in topic_services.py file.
+                # thumbnail_size_in_bytes is called from within the code for
+                # updating thumbnail_filename in topic_services.py file.
                 commit_cmds = [topic_domain.TopicChange({
                     'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,
                     'subtopic_id': subtopic_dict['id'],
-                    'property_name': topic_domain.SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME,
+                    'property_name':
+                        topic_domain.SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME,
                     'new_value': subtopic_dict['thumbnail_filename'],
                     'old_value': subtopic_dict['thumbnail_filename']
                 })]

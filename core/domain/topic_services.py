@@ -47,6 +47,7 @@ datastore_services = models.Registry.import_datastore_services()
 
 ASSET_TYPE_THUMBNAIL = 'thumbnail'
 
+
 def _create_topic(committer_id, topic, commit_message, commit_cmds):
     """Creates a new topic, and ensures that rights for a new topic
     are saved first.
@@ -344,8 +345,6 @@ def apply_change_list(topic_id, change_list):
                 # Topic domain object automatically converts it to use the
                 # latest schema version. As a result, simply resaving the
                 # topic is sufficient to apply the schema migration.
-                print()
-                print("migrate subtopic schema to latest version called")
                 continue
         return (
             topic, modified_subtopic_pages, deleted_subtopic_ids,
