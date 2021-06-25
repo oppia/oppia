@@ -1,0 +1,575 @@
+<div class="community-lessons-section">
+  <p class="lessons-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_COMMUNITY_LESSONS_SECTION' | translate">
+  </p>
+  <div class="dropdown" *ngIf="checkMobileView() && (totalCompletedLessonsList.length !== 0 || totalIncompleteLessonsList.length !== 0)">
+    <p class="view-text">
+      View
+    </p>
+    <button (click)="enableDropdown()" class="dropbtn">
+      {{selectedSection}}
+      <i class="fa fa-caret-down dropdown-icon"></i>
+    </button>
+    <div class="dropdown-content" *ngIf="dropdownEnabled">
+      <p (click)="changeSection('All')">All</p>
+      <p (click)="changeSection('Completed')">Completed</p>
+      <p (click)="changeSection('Incomplete')">Incomplete</p>
+    </div>
+    <div class="pagination" *ngIf="displayInCommunityLessons.length !== 0">
+      <i class="fa fa-angle-left pagination-arrow" aria-label="Previous Page" (click)="changePageByOne('MOVE_TO_PREV_PAGE')"></i>
+      <span class="dot">
+        <span class="pagination-number">
+          {{pageNumber}}
+        </span>
+      </span>
+      <i class="fa fa-angle-right pagination-arrow" aria-label="Next Page" (click)="changePageByOne('MOVE_TO_NEXT_PAGE')"></i>
+    </div>
+  </div>
+  <div *ngIf="noCommunityLessonActivity">
+    <p [innerHTML]="'I18N_LEARNER_DASHBOARD_NO_ACTIVITY_IN_EXPLORATION' | translate" class="empty-section"></p>
+    <a class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-learner-dashboard-intro-button-link"
+      [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate" href="/community-library" [oppiaFocusOn]="'ourLessonsBtn'">
+    </a>
+  </div>
+  <div class="incomplete-section" *ngIf="!checkMobileView()">
+    <div *ngIf="totalIncompleteLessonsList.length !== 0">
+      <p class="sub-section-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION' | translate">
+      </p>
+      <div class="summary-container">
+        <div *ngFor="let tile of displayIncompleteLessonsList"
+           class="oppia-summary-tile-container"
+           (mouseenter)="tile.toggle = !tile.toggle"
+           (mouseleave)="tile.toggle = !tile.toggle">
+          <div *ngIf="getTileType(tile) === 'exploration'">
+            <i class="remove-icon fa fa-times"
+               *ngIf="tile.toggle || checkMobileView()"
+               aria-hidden="true"
+               (click)="openRemoveActivityModal('I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION', 'I18N_DASHBOARD_EXPLORATIONS', tile)"
+               ngbTooltip="Remove"
+               container="body"
+               placement="top">
+            </i>
+            <oppia-exploration-summary-tile [getExplorationId]="tile.id"
+                                            [getExplorationTitle]="tile.title"
+                                            [getLastUpdatedMsec]="tile.lastUpdatedMsec"
+                                            [getObjective]="tile.objective"
+                                            [getCategory]="tile.category"
+                                            [getRatings]="tile.ratings"
+                                            [getNumViews]="tile.numViews"
+                                            [getThumbnailIconUrl]="tile.thumbnailIconUrl"
+                                            [getThumbnailBgColor]="tile.thumbnailBgColor">
+            </oppia-exploration-summary-tile>
+          </div>
+          <div *ngIf="getTileType(tile) === 'collection'">
+            <i class="remove-icon fa fa-times"
+               *ngIf="tile.toggle || checkMobileView()"
+               aria-hidden="true"
+               (click)="openRemoveActivityModal('I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION', 'I18N_DASHBOARD_COLLECTIONS', tile)"
+               ngbTooltip="Remove"
+               container="body"
+               placement="top">
+            </i>
+            <oppia-collection-summary-tile [getCollectionId]="tile.id"
+                                           [getCollectionTitle]="tile.title"
+                                           [getLastUpdatedMsec]="tile.lastUpdatedMsec"
+                                           [getObjective]="tile.objective"
+                                           [getNodeCount]="tile.nodeCount"
+                                           [getCategory]="tile.category"
+                                           [getThumbnailIconUrl]="tile.thumbnailIconUrl"
+                                           [getThumbnailBgColor]="tile.thumbnailBgColor">
+            </oppia-collection-summary-tile>
+          </div>
+        </div>
+        <div class="oppia-toggle-button-section" *ngIf="totalIncompleteLessonsList.length > 3">
+          <button class="btn oppia-toggle-btn"
+                  (click)="handleShowMore('incomplete')"
+                  *ngIf="!showMore['incomplete']">
+                  Show More
+          </button>
+          <button class="btn oppia-toggle-btn"
+                  (click)="handleShowMore('incomplete')"
+                  *ngIf="showMore['incomplete']">
+                  Show Less
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="completed-section" *ngIf="!checkMobileView()">
+    <div *ngIf="totalCompletedLessonsList.length !== 0">
+      <p class="sub-section-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_COMPLETED_SECTION' | translate">
+      </p>
+      <div class="summary-container">
+        <span class="oppia-learner-dashboard-nonexistent-exploration" *ngIf="completedToIncompleteCollections.length !== 0">
+          <span
+            [innerHTML]="'I18N_LEARNER_DASHBOARD_COMPLETED_TO_INCOMPLETE_COLLECTIONS' | translate: {numberMoved: completedToIncompleteCollections.length}">
+          </span>
+          <span>
+            <ul>
+              <li *ngFor="let title of completedToIncompleteCollections">{{ title }}</li>
+            </ul>
+          </span>
+        </span>
+        <div *ngFor="let tile of displayCompletedLessonsList"
+           class="oppia-summary-tile-container"
+           (mouseenter)="tile.toggle = !tile.toggle"
+           (mouseleave)="tile.toggle = !tile.toggle">
+          <div *ngIf="getTileType(tile) === 'exploration'">
+            <i class="oppia-learner-dashboard-icon far fa-check-circle"
+               aria-hidden="true"
+               ngbTooltip="{{ 'I18N_LIBRARY_ACTIVITY_COMPLETED_ICON' | translate }}"
+               container="body"
+               placement="left">
+            </i>
+            <oppia-exploration-summary-tile [getExplorationId]="tile.id"
+                                            [getExplorationTitle]="tile.title"
+                                            [getLastUpdatedMsec]="tile.lastUpdatedMsec"
+                                            [getObjective]="tile.objective"
+                                            [getCategory]="tile.category"
+                                            [getRatings]="tile.ratings"
+                                            [getNumViews]="tile.numViews"
+                                            [getThumbnailIconUrl]="tile.thumbnailIconUrl"
+                                            [getThumbnailBgColor]="tile.thumbnailBgColor">
+            </oppia-exploration-summary-tile>
+          </div>
+          <div *ngIf="getTileType(tile) === 'collection'">
+            <i class="oppia-learner-dashboard-icon far fa-check-circle"
+               aria-hidden="true"
+               ngbTooltip="{{ 'I18N_LIBRARY_ACTIVITY_COMPLETED_ICON' | translate }}"
+               container="body"
+               placement="left">
+            </i>
+            <oppia-collection-summary-tile [getCollectionId]="tile.id"
+                                           [getCollectionTitle]="tile.title"
+                                           [getLastUpdatedMsec]="tile.lastUpdatedMsec"
+                                           [getObjective]="tile.objective"
+                                           [getNodeCount]="tile.nodeCount"
+                                           [getCategory]="tile.category"
+                                           [getThumbnailIconUrl]="tile.thumbnailIconUrl"
+                                           [getThumbnailBgColor]="tile.thumbnailBgColor">
+            </oppia-collection-summary-tile>
+          </div>
+        </div>
+        <div class="oppia-toggle-button-section" *ngIf="totalCompletedLessonsList.length > 3">
+          <button class="btn oppia-toggle-btn"
+                  (click)="handleShowMore('completed')"
+                  *ngIf="!showMore['completed']">
+                  Show More
+          </button>
+          <button class="btn oppia-toggle-btn"
+                  (click)="handleShowMore('completed')"
+                  *ngIf="showMore['completed']">
+                  Show Less
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="communtiy-lessons-mobile-view" *ngIf="checkMobileView()">
+    <span class="oppia-learner-dashboard-nonexistent-exploration"
+          *ngIf="completedToIncompleteCollections.length !== 0">
+      <span [innerHTML]="'I18N_LEARNER_DASHBOARD_COMPLETED_TO_INCOMPLETE_COLLECTIONS' | translate: {numberMoved: completedToIncompleteCollections.length}">
+      </span>
+      <span>
+        <ul>
+          <li *ngFor="let title of completedToIncompleteCollections">{{ title }}</li>
+        </ul>
+      </span>
+    </span>
+    <div *ngFor="let tile of displayInCommunityLessons.slice(startIndex, endIndex)"
+         class="oppia-mobile-summary-tile-container">
+      <div *ngIf="getTileType(tile) === 'exploration'">
+        <i class="oppia-mobile-view-icon oppia-learner-dashboard-icon far fa-check-circle"
+           *ngIf="getLessonType(tile) === 'Completed'"
+           aria-hidden="true"
+           ngbTooltip="{{ 'I18N_LIBRARY_ACTIVITY_COMPLETED_ICON' | translate }}"
+           container="body"
+           placement="left">
+        </i>
+        <i class="oppia-mobile-view-icon remove-icon fa fa-times"
+           *ngIf="getLessonType(tile) === 'Incomplete'"
+           aria-hidden="true"
+           (click)="openRemoveActivityModal('I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION', 'I18N_DASHBOARD_EXPLORATIONS', tile)"
+           ngbTooltip="Remove"
+           container="body"
+           placement="top">
+        </i>
+        <oppia-exploration-summary-tile [getExplorationId]="tile.id"
+                                        [getExplorationTitle]="tile.title"
+                                        [getLastUpdatedMsec]="tile.lastUpdatedMsec"
+                                        [getObjective]="tile.objective"
+                                        [getCategory]="tile.category"
+                                        [getRatings]="tile.ratings"
+                                        [getNumViews]="tile.numViews"
+                                        [getThumbnailIconUrl]="tile.thumbnailIconUrl"
+                                        [getThumbnailBgColor]="tile.thumbnailBgColor">
+        </oppia-exploration-summary-tile>
+      </div>
+      <div *ngIf="getTileType(tile) === 'collection'">
+        <i class="oppia-learner-dashboard-icon far fa-check-circle"
+           *ngIf="getLessonType(tile) === 'Completed'"
+           aria-hidden="true"
+           ngbTooltip="{{ 'I18N_LIBRARY_ACTIVITY_COMPLETED_ICON' | translate }}"
+           container="body"
+           placement="left">
+        </i>
+        <i class="remove-icon fa fa-times"
+           *ngIf="getLessonType(tile) === 'Incomplete'"
+           aria-hidden="true"
+           (click)="openRemoveActivityModal('I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION', 'I18N_DASHBOARD_EXPLORATIONS', tile)"
+           ngbTooltip="Remove"
+           container="body"
+           placement="top">
+        </i>
+        <oppia-collection-summary-tile [getCollectionId]="tile.id"
+                                       [getCollectionTitle]="tile.title"
+                                       [getLastUpdatedMsec]="tile.lastUpdatedMsec"
+                                       [getObjective]="tile.objective"
+                                       [getNodeCount]="tile.nodeCount"
+                                       [getCategory]="tile.category"
+                                       [getThumbnailIconUrl]="tile.thumbnailIconUrl"
+                                       [getThumbnailBgColor]="tile.thumbnailBgColor">
+        </oppia-collection-summary-tile>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="playlist-section">
+  <p class="lessons-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION' | translate">
+  </p>
+  <div *ngIf="totalLessonsInPlaylist.length === 0">
+    <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_EXPLORATION_PLAYLIST' | translate" class="empty-section"></p>
+    <a class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-learner-dashboard-nonexistent-exploration"
+      [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate" href="/community-library">
+    </a>
+  </div>
+  <div *ngIf="totalLessonsInPlaylist.length !== 0 && !checkMobileView()">
+    <div class="summary-container">
+      <div *ngFor="let tile of displayLessonsInPlaylist"
+           class="oppia-summary-tile-container"
+           (mouseenter)="tile.toggle = !tile.toggle"
+           (mouseleave)="tile.toggle = !tile.toggle">
+        <div *ngIf="getTileType(tile) === 'exploration'">
+          <i class="remove-icon fa fa-times"
+             *ngIf="tile.toggle || checkMobileView()"
+             aria-hidden="true"
+             (click)="openRemoveActivityModal('I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION', 'I18N_DASHBOARD_EXPLORATIONS', tile)"
+             ngbTooltip="Remove"
+             container="body"
+             placement="top">
+          </i>
+          <oppia-exploration-summary-tile [getExplorationId]="tile.id"
+                                          [getExplorationTitle]="tile.title"
+                                          [getLastUpdatedMsec]="tile.lastUpdatedMsec"
+                                          [getObjective]="tile.objective"
+                                          [getCategory]="tile.category"
+                                          [getRatings]="tile.ratings"
+                                          [getNumViews]="tile.numViews"
+                                          [getThumbnailIconUrl]="tile.thumbnailIconUrl"
+                                          [getThumbnailBgColor]="tile.thumbnailBgColor">
+          </oppia-exploration-summary-tile>
+        </div>
+        <div *ngIf="getTileType(tile) === 'collection'">
+          <i class="remove-icon fa fa-times"
+             *ngIf="tile.toggle || checkMobileView()"
+             aria-hidden="true"
+             (click)="openRemoveActivityModal('I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION', 'I18N_DASHBOARD_COLLECTIONS', tile)"
+             ngbTooltip="Remove"
+             container="body"
+             placement="top">
+          </i>
+          <oppia-collection-summary-tile [getCollectionId]="tile.id"
+                                         [getCollectionTitle]="tile.title"
+                                         [getLastUpdatedMsec]="tile.lastUpdatedMsec"
+                                         [getObjective]="tile.objective"
+                                         [getNodeCount]="tile.nodeCount"
+                                         [getCategory]="tile.category"
+                                         [getThumbnailIconUrl]="tile.thumbnailIconUrl"
+                                         [getThumbnailBgColor]="tile.thumbnailBgColor">
+          </oppia-collection-summary-tile>
+        </div>
+      </div>
+      <div class="oppia-toggle-button-section" *ngIf="totalLessonsInPlaylist.length > 3">
+        <button class="btn oppia-toggle-btn"
+                (click)="handleShowMore('playlist')"
+                *ngIf="!showMore['playlist']">
+                Show More
+        </button>
+        <button class="btn oppia-toggle-btn"
+                (click)="handleShowMore('playlist')"
+                *ngIf="showMore['playlist']">
+                Show Less
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="subscriptions-section">
+  <p class="lessons-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_SUBSCRIPTIONS_SECTION' | translate"></p>
+  <div *ngIf="subscriptionsList.length === 0">
+    <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_SUBSCRIPTIONS' | translate" class="empty-section"></p>
+    <a class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-learner-dashboard-intro-button-link"
+      [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate" href="/community-library">
+    </a>
+  </div>
+  <div *ngIf="subscriptionsList.length !== 0" class="oppia-subscriptions-container">
+    <mat-card class="oppia-subscription-card oppia-subscription-container-list"
+      *ngFor="let subscription of subscriptionsList">
+      <a class="oppia-subscription-profile-link" href="/profile/{{ subscription.username }}" target="_blank" rel="noopener">
+        <img [src]="decodePngURIData(subscription.pictureDataUrl)"
+          class="oppia-subscription-card-profile-picture rounded-circle">
+        <span class="oppia-subscription-card-summary text-dark">
+          <div class="oppia-subscription-name">
+            <strong container="body"
+              triggers="showUsernamePopover(subscription.username)" ngbPopover="subscription.username">
+              {{ subscription.username| truncate:10 }}
+            </strong>
+          </div>
+          <div class="oppia-impact-text">
+            <span>Impact: </span>
+            <span>{{ subscription.impact || 0 }}</span>
+          </div>
+        </span>
+      </a>
+    </mat-card>
+    <div class="oppia-toggle-button-section" *ngIf="subscriptionsList.length > 3">
+      <button class="btn oppia-toggle-btn"
+              (click)="handleShowMore('subscription')"
+              *ngIf="!showMore['subscription'] && !checkMobileView()">
+              Show More
+      </button>
+      <button class="btn oppia-toggle-btn"
+              (click)="handleShowMore('subscription')"
+              *ngIf="showMore['subscription'] && !checkMobileView()">
+              Show Less
+      </button>
+    </div>
+  </div>
+</div>
+<style>
+  .community-lessons-section,
+  .playlist-section,
+  .subscriptions-section{
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: 0 0 4px #0000001a;
+    margin: auto;
+    margin-bottom: 25px;
+    opacity: 1;
+    min-height: 215px;
+    padding: 0 0 30px 0;
+    width: 726px;
+  }
+  .summary-container {
+    margin: auto;
+    width: 656px;
+  }
+  .oppia-dashboard-intro-button {
+    position: relative;
+    left: 40px;
+  }
+  .pagination {
+    display: block;
+    padding-left: 0;
+    position: relative;
+    list-style: none;
+    width: 205px;
+    text-align: end;
+    bottom: 17px;
+  }
+  .dot {
+    height: 25px;
+    width: 25px;
+    background-color: rgba(65, 152, 137, 0.15);
+    border-radius: 50%;
+    margin: 0px 10px;
+    position: relative;
+    display: inline-block;
+    bottom: 4px;
+  }
+  .pagination-number {
+    font-size: 15px;
+    position: relative;
+    right: 1px;
+    opacity: 1;
+    color: black;
+    margin: 0 7px;
+  }
+  .pagination-arrow {
+    font-size: 25px;
+    color: #CCC;
+  }
+  .dropbtn {
+    background-color: #fff;
+    right: -163px;
+    position: relative;
+    margin-bottom: 20px;
+    font-size: 14px;
+    height: 24px;
+    width: 104px;
+    border: 1px solid;
+    bottom: 23px;
+  }
+  .dropdown-icon {
+    float: right;
+    position: relative;
+    right: 5px;
+    top: 2px;
+  }
+  .dropdown {
+    position: relative;
+    display: inline-block;
+    height: 0px;
+  }
+  .view-text {
+    float: right;
+    font-size: 16px;
+    margin-right: 55px;
+    font-weight: 500;
+    bottom: 20px;
+    position: relative;
+  }
+  .dropdown-content {
+    display: none;
+    background-color: #fff;
+    max-width: 104px;
+    box-shadow: 0px 8px 16px 0px rgb(0 0 0 / 20%);
+    z-index: 1;
+  }
+
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-content a:hover {background-color: #ddd;}
+
+  .dropdown:hover .dropdown-content {
+    display: block;
+    padding: 10px;
+    position: relative;
+    left: 164px;
+    bottom: 43px;
+    margin-right: 0;
+  }
+  .lessons-title {
+    text-align: left;
+    font-size: 24px;
+    letter-spacing: 0px;
+    font-family: 'Capriola';
+    color: #00645C;
+    font-style: capriola;
+    opacity: 1;
+    margin-bottom: 0;
+    padding: 34px 40px;
+  }
+  .oppia-summary-tile-container {
+    display: inline-block;
+    padding: 0 10px 30px 0;
+  }
+  .empty-section {
+    padding: 0 113px 0 40px;
+  }
+  .remove-icon {
+    color: white;
+    float: right;
+    font-size: 20px;
+    left: -7px;
+    margin-left: -26px;
+    margin-top: 10px;
+    position: relative;
+    width: 18px;
+    z-index: 20;
+  }
+  .oppia-impact-text {
+    font-size: 14.5px;
+  }
+  .oppia-subscription-card {
+    background-color: #fff;
+    display: inline-block;
+    height: 90px;
+    margin: 8px 4px;
+    padding: 0;
+    width: 191px;
+  }
+  .oppia-learner-dashboard-nonexistent-exploration {
+    display: block;
+    padding: 5px 7.5px;
+  }
+  .oppia-mobile-view-icon {
+    margin-right: 22px;
+  }
+  .oppia-subscription-container-list {
+    margin: 0 8px 0 4px;
+    width: 197px;
+    padding: 0 10px 30px 0;
+  }
+  .oppia-subscriptions-container {
+    width: 656px;
+    margin: auto;
+  }
+  .oppia-subscription-name {
+    font-size: 17.5px;
+    margin-bottom: 5px;
+  }
+  .oppia-toggle-button-section {
+    margin: auto;
+    width: 50%;
+    padding: 0 98px;
+  }
+  .oppia-toggle-btn {
+    text-align: center;
+    letter-spacing: 0px;
+    color: #00645C;
+    text-transform: uppercase;
+    opacity: 1;
+    font-weight: 500;
+    font-size: 18px;
+  }
+  .sub-section-title {
+    text-align: left;
+    font-size: 20px;
+    letter-spacing: 0px;
+    color: #333333;
+    opacity: 1;
+    font-weight: 500;
+    margin-bottom: 0;
+    padding: 0 0 12px 40px;
+  }
+  @media screen and (max-width: 768px) {
+    .community-lessons-section,
+    .playlist-section,
+    .subscriptions-section {
+      width: 296px;
+    }
+    .summary-container {
+      width: 256px;
+    }
+    .oppia-summary-tile-container {
+      width: 272px;
+    }
+    .oppia-mobile-summary-tile-container {
+      width: 310px;
+      padding: 10px;
+    }
+    .empty-section {
+      padding: 0 40px;
+    }
+    .lessons-title {
+      font-size: 17px;
+      padding: 34px 24px;
+    }
+    .oppia-subscriptions-container {
+      width: 205px;
+    }
+    .remove-icon {
+      top: 2px;
+      left: -40px;
+    }
+    .oppia-learner-dashboard-icon {
+      right: 44px;
+      top: 12px;
+    }
+  }
+</style>
