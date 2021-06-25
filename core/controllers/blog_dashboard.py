@@ -52,7 +52,6 @@ def get_blog_card_summary_dicts_for_dashboard(summaries):
     for summary in summaries:
         summary_dict = summary.to_dict()
         del summary_dict['author_id']
-        del summary_dict['thumbnail_filename']
         summary_dicts.append(summary_dict)
     return summary_dicts
 

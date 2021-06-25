@@ -45,6 +45,8 @@ class BlogAdminPage(base.BaseHandler):
 class BlogAdminHandler(base.BaseHandler):
     """Handler for the blog admin page."""
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
     @acl_decorators.can_access_blog_admin_page
     def get(self):
         """Handles GET requests."""
@@ -98,6 +100,8 @@ class BlogAdminHandler(base.BaseHandler):
 
 class BlogAdminRolesHandler(base.BaseHandler):
     """Handler for the blog admin page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_manage_blog_post_editors
     def post(self):
