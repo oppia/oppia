@@ -50,8 +50,9 @@ class ValidateExplorationCommitCmdsSchema(
         """
         return exp_domain.ExplorationChange
 
-# TODO(#12688): Implement the skipped model.ID relationship checks after
-# new decorators are implemented.
+# TODO(#12688): Implement the skipped model.ID relationship checks (listed in
+# 12688). These are skipped at the moment as, Realationshipsof is only capable
+# of handling straigtforward model.ID relations.
 
 
 @validation_decorators.RelationshipsOf(exp_models.ExplorationContextModel)
