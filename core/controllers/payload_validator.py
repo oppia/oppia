@@ -24,37 +24,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import schema_utils
 
 
-def construct_args_schema(arg_key, arg_schema, handler_args):
-    """This constructs the schema for missing or None valued argument.
-
-    Args:
-        arg_key: str. Name of the argument.
-        arg_schema: dict. Schema of the argument.
-        handler_args: dict. Key value pair of name and values of arguments
-            coming from payloads or requests or url path elements.
-
-    Returns:
-        *. A 2-tuple, the first element of which is the value of the argument,
-        it may be empty dict if initially it was None valued or missing in the
-        handler args. The second element is the schema of the argument
-        represented in dict.
-    """
-    value = {}
-    schema = {}
-    if arg_key not in handler_args or handler_args[arg_key] is None:
-        schema['type'] = 'dict'
-        properties = [{
-            'name': arg_key,
-            'schema': arg_schema
-        }]
-        schema['properties'] = properties
-    else:
-        value = handler_args[arg_key]
-        schema = arg_schema
-
-    return value, schema
-
-
 def validate(handler_args, handler_args_schemas, allowed_extra_args):
     """Calls schema utils for normalization of object against its schema
     and collects all the errors.
@@ -69,10 +38,22 @@ def validate(handler_args, handler_args_schemas, allowed_extra_args):
     """
     # Collect all errors and present them at once.
     errors = []
+    normalized_value = {}
     for arg_key, arg_schema in handler_args_schemas.items():
-        value, schema = construct_args_schema(arg_key, arg_schema, handler_args)
+
+        if arg_key not in handler_args and 'default_value' in arg_schema:
+            if arg_schema['default_value'] is None:
+                # Skip validation for optional cases.
+                continue
+            else:
+                handler_args[arg_key] = arg_schema['default_value']
+        elif arg_key not in handler_args and 'default_value' not in arg_schema:
+            errors.append('Missing key in handler args: %s.' % arg_key)
+            continue
+
         try:
-            schema_utils.normalize_against_schema(value, schema)
+            normalized_value[arg_key] = schema_utils.normalize_against_schema(
+                handler_args[arg_key], arg_schema)
         except Exception as e:
             errors.append(
                 'Schema validation for \'%s\' failed: %s' % (arg_key, e))
@@ -82,7 +63,7 @@ def validate(handler_args, handler_args_schemas, allowed_extra_args):
     if not allowed_extra_args and extra_args:
         errors.append('Found extra args: %s.' % (list(extra_args)))
 
-    return errors
+    return normalized_value, errors
 
 
 # Handlers which require schema validation, but currently they do

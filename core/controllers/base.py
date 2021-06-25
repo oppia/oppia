@@ -170,6 +170,8 @@ class BaseHandler(webapp2.RequestHandler):
         self.partially_logged_in = False
         self.user_is_scheduled_for_deletion = False
         self.current_user_is_super_admin = False
+        self.normalized_value_for_request_args = None
+        self.normalized_value_for_url_path_args = None
 
         try:
             auth_claims = auth_services.get_auth_claims_from_request(request)
@@ -358,8 +360,10 @@ class BaseHandler(webapp2.RequestHandler):
             request_method == 'GET')
 
         schema_for_url_path_args = self.URL_PATH_ARGS_SCHEMAS
-        errors = payload_validator.validate(
-            url_path_args, schema_for_url_path_args, extra_args_are_allowed)
+        self.normalized_value_for_url_path_args, errors = (
+            payload_validator.validate(
+                url_path_args, schema_for_url_path_args, extra_args_are_allowed)
+        )
         if errors:
             raise self.InvalidInputException('\n'.join(errors))
 
@@ -371,8 +375,10 @@ class BaseHandler(webapp2.RequestHandler):
                 'Missing schema for %s method in %s handler class.' % (
                     request_method, handler_class_name))
 
-        errors = payload_validator.validate(
-            handler_args, schema_for_request_method, extra_args_are_allowed)
+        self.normalized_value_for_request_args, errors = (
+            payload_validator.validate(
+                handler_args, schema_for_request_method, extra_args_are_allowed)
+        )
         if errors:
             raise self.InvalidInputException('\n'.join(errors))
 
