@@ -271,7 +271,7 @@
 	"I18N_LEARNER_DASHBOARD_COMPLETED_SECTION": "Text for the completed section in the learner dashboard.",
 	"I18N_LEARNER_DASHBOARD_COMPLETED_TO_INCOMPLETE_COLLECTIONS": "Text displayed in the learner dashboard. - The text is shown when new exporations are added to the collections the user has already completed.",
 	"I18N_LEARNER_DASHBOARD_CURRENT_GOALS_SECTION": "Text for the current goals section in the learner dashboard.",
-	"I18N_LEARNER_DASHBOARD_EDIT_GOALS_SECTION": "Text for the edit goals section in the learner dashboard.",
+	"I18N_LEARNER_DASHBOARD_ALL_GOALS_SECTION": "Text for the edit goals section in the learner dashboard.",
 	"I18N_LEARNER_DASHBOARD_EMPTY_COLLECTION_PLAYLIST": "Text displayed in the learner dashboard. - This text is shown when there are no collections in the playlist of the user.",
 	"I18N_LEARNER_DASHBOARD_EMPTY_COMPLETED_COLLECTIONS": "Text displayed in the learner dashboard. - This text is shown when there are no collections in the completed section of the user.",
 	"I18N_LEARNER_DASHBOARD_EMPTY_COMPLETED_EXPLORATIONS": "Text displayed in the learner dashboard. - This text is shown when there are no explorations in the completed section of the user.",

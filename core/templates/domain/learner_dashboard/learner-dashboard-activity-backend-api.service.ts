@@ -149,9 +149,8 @@ export class LearnerDashboardActivityBackendApiService {
         if (response.goals_limit_exceeded) {
           this.successfullyAdded = false;
           this.alertsService.addInfoMessage(
-            'Your \'Current Goals\' list is full!  Either you can ' +
-            'complete some or you can remove some from the Current Goals ' +
-            'list.');
+            'Your \'Current Goals\' list is full! Please finish existing ' +
+            'goals or remove some to add new goals to your list.');
         }
         if (this.successfullyAdded) {
           this.alertsService.addSuccessMessage(

@@ -218,13 +218,7 @@ describe('Goals tab Component', () => {
     component.currentGoalsStoryIsShown = [];
     component.topicBelongToCurrentGoals = [];
     component.topicIdsInCompletedGoals = [];
-    component.topicIdsInEditGoals = [];
     component.topicIdsInCurrentGoals = [];
-    component.topicMapping = {
-      'belongs to current goals': 0,
-      'belongs to completed goals': 1,
-      'belongs to neither': 2
-    };
     component.activityType = 'learntopic';
     fixture.detectChanges();
   });
@@ -259,15 +253,13 @@ describe('Goals tab Component', () => {
       .toEqual(learnerDashboardActivityIds.learntTopicIds);
     expect(component.topicIdsInCurrentGoals)
       .toEqual(learnerDashboardActivityIds.topicIdsToLearn);
-    expect(component.topicIdsInEditGoals)
-      .toEqual(learnerDashboardActivityIds.allTopicIds);
     expect(learnerDashboardSpy).toHaveBeenCalled();
   }
   ));
   it('should check where the topicId belongs to current goal', fakeAsync(() => {
     component.topicIdsInCurrentGoals = ['1', '2', '3'];
 
-    let topicBelongsTo = component.topicBelongsTo('1');
+    let topicBelongsTo = component.getTopicClassification('1');
     fixture.detectChanges();
 
     expect(topicBelongsTo).toEqual(0);
@@ -278,7 +270,7 @@ describe('Goals tab Component', () => {
     fakeAsync(() => {
       component.topicIdsInCompletedGoals = ['1', '2', '3'];
 
-      let topicBelongsTo = component.topicBelongsTo('1');
+      let topicBelongsTo = component.getTopicClassification('1');
       fixture.detectChanges();
 
       expect(topicBelongsTo).toEqual(1);

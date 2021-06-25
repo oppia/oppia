@@ -73,15 +73,13 @@ export class LearnerTopicSummary {
       topicSummaryBackendDict.language_code,
       topicSummaryBackendDict.description,
       topicSummaryBackendDict.version,
-      topicSummaryBackendDict.story_titles,
-      stories,
+      topicSummaryBackendDict.story_titles, stories,
       topicSummaryBackendDict.thumbnail_filename,
       topicSummaryBackendDict.thumbnail_bg_color,
       topicSummaryBackendDict.classroom,
       topicSummaryBackendDict.practice_tab_is_displayed,
       topicSummaryBackendDict.degrees_of_mastery,
-      topicSummaryBackendDict.skill_descriptions,
-      subtopics,
+      topicSummaryBackendDict.skill_descriptions, subtopics,
       topicSummaryBackendDict.url_fragment);
   }
 

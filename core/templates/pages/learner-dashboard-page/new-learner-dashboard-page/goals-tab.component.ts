@@ -47,12 +47,11 @@ export class GoalsTabComponent {
   currentGoalsStoryIsShown: boolean[];
   topicBelongToCurrentGoals: boolean[] = [];
   topicIdsInCompletedGoals: string[] = [];
-  topicIdsInEditGoals: string[] = [];
   topicIdsInCurrentGoals: string[] = [];
-  topicMapping = {
-    'belongs to current goals': 0,
-    'belongs to completed goals': 1,
-    'belongs to neither': 2
+  topicToIndexMapping = {
+    CURRENT: 0,
+    COMPLETED: 1,
+    NEITHER: 2
   };
   activityType: string = constants.ACTIVITY_TYPE_LEARN_TOPIC;
 
@@ -62,7 +61,6 @@ export class GoalsTabComponent {
         (learnerDashboardActivityIds) => {
           this.topicIdsInCompletedGoals = (
             learnerDashboardActivityIds.learntTopicIds);
-          this.topicIdsInEditGoals = learnerDashboardActivityIds.allTopicIds;
           this.topicIdsInCurrentGoals = (
             learnerDashboardActivityIds.topicIdsToLearn);
         }
@@ -80,13 +78,13 @@ export class GoalsTabComponent {
       });
   }
 
-  topicBelongsTo(topicId: string): number {
+  getTopicClassification(topicId: string): number {
     if (this.topicIdsInCurrentGoals.includes(topicId)) {
-      return this.topicMapping['belongs to current goals'];
+      return this.topicToIndexMapping.CURRENT;
     } else if (this.topicIdsInCompletedGoals.includes(topicId)) {
-      return this.topicMapping['belongs to completed goals'];
+      return this.topicToIndexMapping.COMPLETED;
     } else {
-      return this.topicMapping['belongs to neither'];
+      return this.topicToIndexMapping.NEITHER;
     }
   }
 

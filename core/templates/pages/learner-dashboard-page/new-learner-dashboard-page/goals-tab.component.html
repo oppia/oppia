@@ -32,7 +32,7 @@
   </div>
 </div>
 <div class="oppia-goals-box">
-  <p class="oppia-edit-goals-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_EDIT_GOALS_SECTION' | translate"> </p>
+  <p class="oppia-edit-goals-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_ALL_GOALS_SECTION' | translate"> </p>
   <span class="oppia-input-box-subtitle">
     <em>
       Limit of {{MAX_CURRENT_GOALS_LENGTH}} goals
@@ -50,8 +50,8 @@
         <p *ngIf="topicBelongToLearntToPartiallyLearntTopics(topic.name)" class="oppia-new-story-content" [innerHTML]="'I18N_LEARNER_DASHBOARD_NEW_STORY_CONTENT' | translate">
         </p>
       </a>
-      <mat-checkbox color="primary" *ngIf="topicBelongsTo(topic.id) == 2" class="oppia-checkbox" (click)="addToLearnerGoals(topic, topic.id, i)" [disabled]="this.currentGoals.length == this.MAX_CURRENT_GOALS_LENGTH"></mat-checkbox>
-      <mat-checkbox color="primary" *ngIf="topicBelongsTo(topic.id) == 0" checked disabled class="oppia-checkbox"></mat-checkbox>
+      <mat-checkbox color="primary" *ngIf="getTopicClassification(topic.id) == 2" class="oppia-checkbox" (click)="addToLearnerGoals(topic, topic.id, i)" [disabled]="this.currentGoals.length == this.MAX_CURRENT_GOALS_LENGTH"></mat-checkbox>
+      <mat-checkbox color="primary" *ngIf="getTopicClassification(topic.id) == 0" checked disabled class="oppia-checkbox"></mat-checkbox>
     </div>
   </div>
 </div>
@@ -286,60 +286,67 @@
     margin-right: 40px;
     width: 24px;
   }
+  @media screen and (max-width: 1200px) {
+    .oppia-checkbox {
+      left: 570px;
+    }
+  }
   @media screen and (max-width: 768px) {
     .oppia-goals-box {
-    width: 369px;
-  }
-  .oppia-current-goals-topic-name {
-    width: 260px;
-  }
-  .oppia-goals-story-name {
-    width: 250px;
-  }
-  .oppia-trash-button {
-    margin-right: 3px;
-  }
-  .oppia-current-goals-content {
-    margin-left: 50px;
-    width: 293px;
-  }
-  .oppia-edit-goals-subheading {
-    width: 300px;
-  }
-  .oppia-edit-goals-learn-title {
-    text-align: end;
-  }
-  .oppia-edit-goals-content {
-    width: 300px;
-  }
-  .oppia-checkbox {
-    left: 270px;
-  }
-  .oppia-new-story-content {
-    font-size: 13px;
-  }
-  .oppia-completed-goals-content {
-    width: 300px;
-  }
-  .oppia-completed-goals-topic-name {
-    width: 250px;
-  }
-  .oppia-goals-title {
-    margin-bottom: 20px;
-  }
-  .oppia-empty-goals-content {
-    margin-bottom: 20px;
-    width: 300px;
-  }
-  .oppia-goals-topic-name {
-    width: 134px;
-  }
-  .oppia-svg-paw-image {
-    left: 47px;
-  }
-  .oppia-svg-star-image {
-    position: relative;
-    top: 25px;
-  }
+      width: 369px;
+    }
+    .oppia-current-goals-topic-name {
+      width: 260px;
+    }
+    .oppia-goals-story-name {
+      width: 250px;
+    }
+    .oppia-trash-button {
+      margin-right: 3px;
+    }
+    .oppia-current-goals-content {
+      margin-left: 50px;
+      width: 293px;
+    }
+    .oppia-edit-goals-subheading {
+      width: 300px;
+    }
+    .oppia-edit-goals-learn-title {
+      text-align: end;
+    }
+    .oppia-edit-goals-content {
+      width: 300px;
+    }
+    .oppia-checkbox {
+      left: 267px;
+      width: 100px;
+      text-align: start;
+    }
+    .oppia-new-story-content {
+      font-size: 13px;
+    }
+    .oppia-completed-goals-content {
+      width: 300px;
+    }
+    .oppia-completed-goals-topic-name {
+      width: 250px;
+    }
+    .oppia-goals-title {
+      margin-bottom: 20px;
+    }
+    .oppia-empty-goals-content {
+      margin-bottom: 20px;
+      width: 300px;
+    }
+    .oppia-goals-topic-name {
+      width: 134px;
+    }
+    .oppia-svg-paw-image {
+      left: 47px;
+    }
+    .oppia-svg-star-image {
+      position: relative;
+      top: 25px;
+    }
   }
 </style>
