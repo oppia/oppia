@@ -44,10 +44,7 @@ export class SubtitledHtml {
     return !this._html;
   }
 
-  get contentId(): string {
-    if (this._contentId === null) {
-      throw new Error('Content Id is null');
-    }
+  get contentId(): string | null {
     return this._contentId;
   }
 

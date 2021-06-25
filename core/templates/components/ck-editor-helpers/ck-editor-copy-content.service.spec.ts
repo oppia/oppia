@@ -45,9 +45,7 @@ describe('Ck editor copy content service', () => {
   let insertHtmlSpy: jasmine.Spy<(
     html: string, mode?: string,
     range?: CKEDITOR.dom.range) => void>;
-  // Argument data here has a default type of 'any'.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let execCommandSpy: jasmine.Spy<(commandName: string, data?: any) => boolean>;
+  let execCommandSpy;
 
   beforeEach(() => {
     ckEditorStub = {
