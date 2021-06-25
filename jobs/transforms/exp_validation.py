@@ -50,7 +50,7 @@ class ValidateExplorationCommitCmdsSchema(
         """
         return exp_domain.ExplorationChange
 
-# TODO(#13203): Implement the skipped model.ID relationship checks after
+# TODO(#12688): Implement the skipped model.ID relationship checks after
 # new decorators are implemented.
 
 
