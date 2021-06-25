@@ -1144,6 +1144,21 @@ class Topic(python_utils.OBJECT):
             feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION, '', False, '')
 
     @classmethod
+    def _convert_subtopic_v3_dict_to_v4_dict(cls, subtopic_dict):
+        """Converts old Subtopic schema to the modern v4 schema. v4 schema
+        introduces the thumbnail_size_in_bytes field
+
+        Args:
+            subtopic_dict: dict. A dict used to initialize a Subtopic domain
+                object.
+
+        Returns:
+            dict. The converted subtopic_dict.
+        """
+        subtopic_dict['thumbnail_size_in_bytes'] = None
+        return subtopic_dict
+
+    @classmethod
     def _convert_subtopic_v2_dict_to_v3_dict(cls, subtopic_dict):
         """Converts old Subtopic schema to the modern v3 schema. v3 schema
         introduces the url_fragment field.

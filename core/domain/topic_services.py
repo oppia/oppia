@@ -24,6 +24,7 @@ import logging
 
 from core.domain import caching_services
 from core.domain import feedback_services
+from core.domain import fs_domain
 from core.domain import opportunity_services
 from core.domain import rights_domain
 from core.domain import role_services
@@ -44,6 +45,7 @@ import utils
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
 datastore_services = models.Registry.import_datastore_services()
 
+ASSET_TYPE_THUMBNAIL = 'thumbnail'
 
 def _create_topic(committer_id, topic, commit_message, commit_cmds):
     """Creates a new topic, and ensures that rights for a new topic
@@ -318,6 +320,14 @@ def apply_change_list(topic_id, change_list):
                         topic_domain.SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME):
                     topic.update_subtopic_thumbnail_filename(
                         change.subtopic_id, change.new_value)
+                    fs = fs_domain.AbstractFileSystem(
+                        fs_domain.GcsFileSystem(
+                            feconf.ENTITY_TYPE_TOPIC, topic_id))
+                    thumbnail_size_in_bytes = len(fs.get(
+                        '%s/%s' % (
+                            ASSET_TYPE_THUMBNAIL, change.new_value)))
+                    topic.update_subtopic_thumbnail_size_in_bytes(
+                        change.subtopic_id, thumbnail_size_in_bytes)
                 if (change.property_name ==
                         topic_domain.SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR):
                     topic.update_subtopic_thumbnail_bg_color(
