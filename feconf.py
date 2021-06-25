@@ -428,6 +428,11 @@ def get_empty_ratings():
     return copy.deepcopy(_EMPTY_RATINGS)
 
 
+# To use mailchimp email service.
+BULK_EMAIL_SERVICE_PROVIDER_MAILCHIMP = 'mailchimp_email_service'
+# Use GAE email service by default.
+BULK_EMAIL_SERVICE_PROVIDER = BULK_EMAIL_SERVICE_PROVIDER_MAILCHIMP
+
 # Empty scaled average rating as a float.
 EMPTY_SCALED_AVERAGE_RATING = 0.0
 
@@ -441,6 +446,15 @@ MAILGUN_API_KEY = None
 # If the Mailgun email API is used, the "None" below should be replaced
 # with the Mailgun domain name (ending with mailgun.org).
 MAILGUN_DOMAIN_NAME = None
+
+# Audience ID of the mailing list for Oppia in Mailchimp.
+MAILCHIMP_AUDIENCE_ID = None
+# Mailchimp API Key.
+MAILCHIMP_API_KEY = None
+# Mailchimp username.
+MAILCHIMP_USERNAME = None
+# Mailchimp secret, used to authenticate webhook requests.
+MAILCHIMP_WEBHOOK_SECRET = None
 
 ES_LOCALHOST_PORT = 9200
 # NOTE TO RELEASE COORDINATORS: Replace this with the correct ElasticSearch
@@ -756,6 +770,7 @@ BLOG_ADMIN_ROLE_HANDLER_URL = '/blogadminrolehandler'
 BLOG_DASHBOARD_DATA_URL = '/blogdashboardhandler/data'
 BLOG_DASHBOARD_URL = '/blog-dashboard'
 BLOG_EDITOR_DATA_URL_PREFIX = '/blogeditorhandler/data'
+BULK_EMAIL_WEBHOOK_ENDPOINT = '/bulk_email_webhook_endpoint'
 CLASSROOM_DATA_HANDLER = '/classroom_data_handler'
 COLLECTION_DATA_URL_PREFIX = '/collection_handler/data'
 COLLECTION_EDITOR_DATA_URL_PREFIX = '/collection_editor_handler/data'
