@@ -1005,58 +1005,6 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
         self.check_normalization(
             schema, mappings, invalid_values_with_error_messages)
 
-    def test_dict_schema_with_default_value(self):
-        schema = {
-            'type': SCHEMA_TYPE_DICT,
-            'properties': [{
-                'name': 'arg_with_some_default',
-                'schema': {
-                    'type': 'unicode',
-                    'default_value': 'arbitary_text'
-                }
-            }, {
-                'name': 'arg_with_default_none',
-                'schema': {
-                    'type': 'unicode',
-                    'default_value': None
-                }
-            }]
-        }
-
-        # Missing args should not raise errors if SCHEMA_KEY_DEFAULT_VALUE
-        # is present in schema.
-        mappings = [
-            ({}, {
-                'arg_with_some_default': 'arbitary_text'
-            }),
-            ({
-                'arg_with_default_none': 'python2',
-                'arg_with_some_default': 'python3'
-            }, {
-                'arg_with_default_none': 'python2',
-                'arg_with_some_default': 'python3'
-            }),
-            ({
-                'arg_with_default_none': 'python2'
-            }, {
-                'arg_with_default_none': 'python2',
-                'arg_with_some_default': 'arbitary_text'
-            })
-        ]
-
-        invalid_values_with_error_messages = [
-            ({
-                'arg_with_some_default': 5
-            }, 'Expected unicode string, received %s' % 5),
-            ({
-                'arg_with_default_none': 5,
-                'arg_with_some_default': 'python3'
-            }, 'Expected unicode string, received %s' % 5)
-        ]
-
-        self.check_normalization(
-            schema, mappings, invalid_values_with_error_messages)
-
     def test_object_dict_schema_with_validation_method_key(self):
         schema = {
             'type': SCHEMA_TYPE_OBJECT_DICT,
