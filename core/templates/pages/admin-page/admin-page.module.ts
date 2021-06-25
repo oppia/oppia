@@ -34,11 +34,13 @@ import { OppiaAdminProdModeActivitiesTabComponent } from
   './activities-tab/admin-prod-mode-activities-tab.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
-import { AdminJobsTabComponent } from './jobs-tab/admin-jobs-tab.component';
 import { RolesAndActionsVisualizerComponent } from './roles-tab/roles-and-actions-visualizer.component';
-import { RolesEditorComponent } from './roles-tab/admin-roles-tab.component';
+import { AdminMiscTabComponent } from './misc-tab/admin-misc-tab.component';
+import { AdminRolesTabComponent } from './roles-tab/admin-roles-tab.component';
+import { AdminConfigTabComponent } from './config-tab/admin-config-tab.component';
+import { AdminPageComponent } from './admin-page.component';
 import { TopicManagerRoleEditorModalComponent } from './roles-tab/topic-manager-role-editor-modal.component';
-
+import { SharedFormsModule } from 'components/forms/shared-forms.module';
 
 @NgModule({
   imports: [
@@ -46,27 +48,32 @@ import { TopicManagerRoleEditorModalComponent } from './roles-tab/topic-manager-
     FormsModule,
     HttpClientModule,
     SharedComponentsModule,
+    SharedFormsModule
   ],
   declarations: [
     OppiaAdminProdModeActivitiesTabComponent,
     OppiaAngularRootComponent,
+    AdminConfigTabComponent,
     AdminFeaturesTabComponent,
-    AdminJobsTabComponent,
+    AdminMiscTabComponent,
     AdminNavbarComponent,
+    AdminPageComponent,
+    AdminRolesTabComponent,
     AdminDevModeActivitiesTabComponent,
     RolesAndActionsVisualizerComponent,
-    RolesEditorComponent,
     TopicManagerRoleEditorModalComponent
   ],
   entryComponents: [
     OppiaAdminProdModeActivitiesTabComponent,
     OppiaAngularRootComponent,
+    AdminConfigTabComponent,
     AdminFeaturesTabComponent,
-    AdminJobsTabComponent,
+    AdminMiscTabComponent,
     AdminNavbarComponent,
+    AdminPageComponent,
+    AdminRolesTabComponent,
     AdminDevModeActivitiesTabComponent,
     RolesAndActionsVisualizerComponent,
-    RolesEditorComponent,
     TopicManagerRoleEditorModalComponent
   ],
   providers: [

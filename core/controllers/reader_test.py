@@ -34,8 +34,10 @@ from core.domain import skill_services
 from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import story_domain
+from core.domain import story_fetchers
 from core.domain import story_services
 from core.domain import taskqueue_services
+from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
@@ -1087,6 +1089,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
     # belongs. The second number corresponds to the exploration id.
     EXP_ID_1_0 = 'exp_2'
     EXP_ID_1_1 = 'exp_3'
+    EXP_ID_2_0 = 'exp_4'
     COL_ID_0 = 'col_0'
     COL_ID_1 = 'col_1'
     USER_EMAIL = 'user@example.com'
@@ -1097,9 +1100,14 @@ class LearnerProgressTest(test_utils.GenericTestBase):
 
         self.signup(self.USER_EMAIL, self.USER_USERNAME)
         self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.set_admins([self.ADMIN_USERNAME])
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.owner = user_services.get_user_actions_info(self.owner_id)
+        self.STORY_ID = story_services.get_new_story_id()
+        self.TOPIC_ID = topic_fetchers.get_new_topic_id()
 
         # Save and publish explorations.
         self.save_new_valid_exploration(
@@ -1119,10 +1127,16 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             title='Introduce Interactions in Oppia',
             category='Welcome', language_code='en')
 
+        self.save_new_valid_exploration(
+            self.EXP_ID_2_0, self.owner_id, title='Sillat Suomi',
+            category='Architecture', language_code='en',
+            correctness_feedback_enabled=True)
+
         rights_manager.publish_exploration(self.owner, self.EXP_ID_0)
         rights_manager.publish_exploration(self.owner, self.EXP_ID_1)
         rights_manager.publish_exploration(self.owner, self.EXP_ID_1_0)
         rights_manager.publish_exploration(self.owner, self.EXP_ID_1_1)
+        rights_manager.publish_exploration(self.owner, self.EXP_ID_2_0)
 
         # Save a new collection.
         self.save_new_default_collection(
@@ -1132,6 +1146,45 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         self.save_new_default_collection(
             self.COL_ID_1, self.owner_id, title='Bridges in England',
             category='Architecture')
+
+        # Save a new topic and story.
+        self.subtopic = topic_domain.Subtopic(
+            0, 'Title', ['skill_id_1'], 'image.svg',
+            constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+            'dummy-subtopic-one')
+        self.save_new_topic(
+            self.TOPIC_ID, self.owner_id, name='Topic',
+            description='A new topic', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[self.subtopic], next_subtopic_id=1)
+        self.save_new_story(self.STORY_ID, self.owner_id, self.TOPIC_ID)
+        topic_services.add_canonical_story(
+            self.owner_id, self.TOPIC_ID, self.STORY_ID)
+
+        changelist = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_ADD_STORY_NODE,
+                'node_id': 'node_1',
+                'title': 'Title 1'
+            })
+        ]
+        story_services.update_story(
+            self.owner_id, self.STORY_ID, changelist, 'Added node.')
+
+        change_list = [story_domain.StoryChange({
+            'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+            'property_name': (
+                story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+            'old_value': None,
+            'new_value': self.EXP_ID_2_0,
+            'node_id': 'node_1'
+        })]
+        story_services.update_story(
+            self.owner_id, self.STORY_ID, change_list, 'Updated Node 1.')
+
+        topic_services.publish_story(
+            self.TOPIC_ID, self.STORY_ID, self.admin_id)
+        topic_services.publish_topic(self.TOPIC_ID, self.admin_id)
 
         # Add two explorations to the previously saved collection and publish
         # it.
@@ -1299,6 +1352,40 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             learner_progress_services.get_all_incomplete_collection_ids(
                 self.user_id), [self.COL_ID_1])
 
+        # If the exploration is played in the context of a story, the
+        # story is also added to the incomplete list.
+        self.post_json(
+            '/explorehandler/exploration_maybe_leave_event/%s' % self.EXP_ID_2_0, # pylint: disable=line-too-long
+            payload, csrf_token=csrf_token)
+        self.assertEqual(learner_progress_services.get_all_incomplete_exp_ids(
+            self.user_id), [self.EXP_ID_0, self.EXP_ID_1_0, self.EXP_ID_2_0])
+        self.assertEqual(
+            learner_progress_services.get_all_incomplete_story_ids(
+                self.user_id), [self.STORY_ID])
+        self.assertEqual(
+            learner_progress_services.get_all_partially_learnt_topic_ids(
+                self.user_id), [self.TOPIC_ID])
+
+        # If the exploration is played in context of an invalid story, raise
+        # an error.
+        def _mock_none_function(_):
+            """Mocks None."""
+            return None
+
+        story_fetchers_swap = self.swap(
+            story_fetchers, 'get_story_by_id', _mock_none_function)
+
+        with story_fetchers_swap:
+            with self.capture_logging(min_level=logging.ERROR) as captured_logs:
+                self.post_json(
+                    '/explorehandler/exploration_maybe_leave_event'
+                    '/%s' % self.EXP_ID_2_0,
+                    payload, csrf_token=csrf_token)
+                self.assertEqual(
+                    captured_logs,
+                    ['Could not find a story corresponding to '
+                     '%s id.' % self.STORY_ID])
+
     def test_exp_incomplete_event_handler_with_no_version_raises_error(self):
         self.login(self.USER_EMAIL)
         csrf_token = self.get_new_csrf_token()
@@ -1389,6 +1476,28 @@ class LearnerProgressTest(test_utils.GenericTestBase):
                 self.COL_ID_1))
         self.assertEqual(
             learner_progress_services.get_all_incomplete_collection_ids(
+                self.user_id), [])
+
+        # Remove one story.
+        self.delete_json(
+            '%s/%s/%s' %
+            (
+                feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
+                constants.ACTIVITY_TYPE_STORY,
+                self.STORY_ID))
+        self.assertEqual(
+            learner_progress_services.get_all_incomplete_story_ids(
+                self.user_id), [])
+
+        # Remove one topic.
+        self.delete_json(
+            '%s/%s/%s' %
+            (
+                feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
+                constants.ACTIVITY_TYPE_LEARN_TOPIC,
+                self.TOPIC_ID))
+        self.assertEqual(
+            learner_progress_services.get_all_partially_learnt_topic_ids(
                 self.user_id), [])
 
 

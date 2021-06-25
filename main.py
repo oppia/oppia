@@ -48,6 +48,7 @@ from core.controllers import question_editor
 from core.controllers import questions_list
 from core.controllers import reader
 from core.controllers import recent_commits
+from core.controllers import release_coordinator
 from core.controllers import resources
 from core.controllers import review_tests
 from core.controllers import skill_editor
@@ -222,9 +223,6 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/bannedusershandler', admin.BannedUsersHandler),
     get_redirect_route(
         r'/adminsuperadminhandler', admin.AdminSuperAdminPrivilegesHandler),
-    get_redirect_route(
-        r'/memorycacheadminhandler', admin.MemoryCacheAdminHandler),
-    get_redirect_route(r'/adminjoboutput', admin.AdminJobOutputHandler),
     get_redirect_route(
         r'/admintopicscsvdownloadhandler',
         admin.AdminTopicsCsvFileDownloader),
@@ -475,6 +473,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/profilehandler/data/<username>', profile.ProfileHandler),
     get_redirect_route(feconf.PREFERENCES_URL, profile.PreferencesPage),
     get_redirect_route(
+        r'%s/<secret>' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT,
+        profile.BulkEmailWebhookEndpoint),
+    get_redirect_route(
         feconf.PREFERENCES_DATA_URL, profile.PreferencesHandler),
     get_redirect_route(
         r'/preferenceshandler/profile_picture', profile.ProfilePictureHandler),
@@ -502,6 +503,14 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/moderatorhandler/featured', moderator.FeaturedActivitiesHandler),
     get_redirect_route(
         r'/moderatorhandler/email_draft', moderator.EmailDraftHandler),
+
+    get_redirect_route(
+        r'/release-coordinator', release_coordinator.ReleaseCoordinatorPage),
+    get_redirect_route(
+        r'/joboutputhandler', release_coordinator.JobOutputHandler),
+    get_redirect_route(r'/jobshandler', release_coordinator.JobsHandler),
+    get_redirect_route(
+        r'/memorycachehandler', release_coordinator.MemoryCacheHandler),
 
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_URL_PREFIX,

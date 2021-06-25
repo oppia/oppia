@@ -28,7 +28,7 @@ import { AlertsService } from 'services/alerts.service';
   selector: 'oppia-roles-editor',
   templateUrl: './admin-roles-tab.directive.html'
 })
-export class RolesEditorComponent implements OnInit {
+export class AdminRolesTabComponent implements OnInit {
   UPDATABLE_ROLES = null;
   VIEWABLE_ROLES = null;
   topicSummaries = null;
@@ -178,7 +178,7 @@ export class RolesEditorComponent implements OnInit {
   }
 }
 
-angular.module('oppia').directive('oppiaRolesEditor',
+angular.module('oppia').directive('oppiaRolesTab',
   downgradeComponent({
-    component: RolesEditorComponent
+    component: AdminRolesTabComponent
   }) as angular.IDirectiveFactory);

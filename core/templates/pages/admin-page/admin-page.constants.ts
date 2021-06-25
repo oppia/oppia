@@ -39,12 +39,11 @@ export const AdminPageConstants = {
   ADMIN_BANNED_USERS_HANDLER: '/bannedusershandler',
 
   ADMIN_TAB_URLS: {
-    ACTIVITIES: '#activities',
-    JOBS: '#jobs',
-    CONFIG: '#config',
-    FEATURES: '#features',
-    ROLES: '#roles',
-    MISC: '#misc'
+    ACTIVITIES: '#/activities',
+    CONFIG: '#/config',
+    FEATURES: '#/features',
+    ROLES: '#/roles',
+    MISC: '#/misc'
   },
 
   PROFILE_URL_TEMPLATE: '/profile/<username>'

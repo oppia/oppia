@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import functools
+import logging
 
 from constants import constants
 from core.controllers import base
@@ -87,6 +88,41 @@ def open_access(handler):
     test_can_access.__wrapped__ = True
 
     return test_can_access
+
+
+def is_source_mailchimp(handler):
+    """Decorator to check whether the request was generated from Mailchimp.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function.
+    """
+
+    def test_is_source_mailchimp(self, secret, **kwargs):
+        """Checks whether the request was generated from Mailchimp.
+
+        Args:
+            secret: str. The key that is used to authenticate that the request
+                has originated from Mailchimp.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+        """
+        if feconf.MAILCHIMP_WEBHOOK_SECRET is None:
+            raise self.PageNotFoundException
+        elif secret != feconf.MAILCHIMP_WEBHOOK_SECRET:
+            logging.error(
+                'Invalid Mailchimp webhook request received with secret: %s'
+                % secret)
+            raise self.PageNotFoundException
+        else:
+            return handler(self, secret, **kwargs)
+    test_is_source_mailchimp.__wrapped__ = True
+
+    return test_is_source_mailchimp
 
 
 def does_classroom_exist(handler):
@@ -462,6 +498,122 @@ def can_access_moderator_page(handler):
     test_can_access_moderator_page.__wrapped__ = True
 
     return test_can_access_moderator_page
+
+
+def can_access_release_coordinator_page(handler):
+    """Decorator to check whether user can access release coordinator page.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now checks if the user has
+        permission to access the release coordinator page.
+    """
+
+    def test_can_access_release_coordinator_page(self, **kwargs):
+        """Checks if the user is logged in and can access release coordinator
+        page.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            UnauthorizedUserException. The user does not have credentials to
+                access the release coordinator page.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        if role_services.ACTION_ACCESS_RELEASE_COORDINATOR_PAGE in (
+                self.user.actions):
+            return handler(self, **kwargs)
+
+        raise self.UnauthorizedUserException(
+            'You do not have credentials to access release coordinator page.')
+    test_can_access_release_coordinator_page.__wrapped__ = True
+
+    return test_can_access_release_coordinator_page
+
+
+def can_manage_memcache(handler):
+    """Decorator to check whether user can can manage memcache.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now checks if the user has
+        permission to manage memcache.
+    """
+
+    def test_can_manage_memcache(self, **kwargs):
+        """Checks if the user is logged in and can manage memcache.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            UnauthorizedUserException. The user does not have credentials manage
+                memcache.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        if role_services.ACTION_MANAGE_MEMCACHE in self.user.actions:
+            return handler(self, **kwargs)
+
+        raise self.UnauthorizedUserException(
+            'You do not have credentials to manage memcache.')
+    test_can_manage_memcache.__wrapped__ = True
+
+    return test_can_manage_memcache
+
+
+def can_run_any_job(handler):
+    """Decorator to check whether user can can run any job.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now checks if the user has
+        permission to run any job.
+    """
+
+    def test_can_run_any_job(self, **kwargs):
+        """Checks if the user is logged in and can run any job.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            UnauthorizedUserException. The user does not have credentials run
+                any job.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        if role_services.ACTION_RUN_ANY_JOB in self.user.actions:
+            return handler(self, **kwargs)
+
+        raise self.UnauthorizedUserException(
+            'You do not have credentials to run jobs.')
+    test_can_run_any_job.__wrapped__ = True
+
+    return test_can_run_any_job
 
 
 def can_send_moderator_emails(handler):
@@ -2993,7 +3145,8 @@ def can_update_suggestion(handler):
 
         if suggestion.author_id == self.user_id:
             raise base.UserFacingExceptions.UnauthorizedUserException(
-                'You are not allowed to update suggestions that you created.')
+                'The user, %s is not allowed to update self-created'
+                'suggestions.' % (user_services.get_username(self.user_id)))
 
         if suggestion.suggestion_type not in (
                 feconf.CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES):

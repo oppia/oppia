@@ -74,7 +74,7 @@ require(
   'conversation-skin.directive.ts');
 require(
   'pages/exploration-player-page/layout-directives/' +
-  'exploration-footer.directive.ts');
+  'exploration-footer.component.ts');
 require('value_generators/valueGeneratorsRequires.ts');
 
 require('interactions/interactionsRequires.ts');
@@ -237,6 +237,7 @@ angular.module('oppia').component('explorationEditorPage', {
             if (!AutosaveInfoModalsService.isModalOpen()) {
               AutosaveInfoModalsService.showLostChangesModal(
                 lostChanges, explorationId);
+              $rootScope.$applyAsync();
             }
           }),
           ExplorationFeaturesBackendApiService.fetchExplorationFeaturesAsync(
@@ -337,6 +338,7 @@ angular.module('oppia').component('explorationEditorPage', {
           if (explorationData.draft_changes !== null) {
             ChangeListService.loadAutosavedChangeList(
               explorationData.draft_changes);
+            $rootScope.$applyAsync();
           }
 
           if (explorationData.is_version_of_draft_valid === false &&
@@ -346,6 +348,7 @@ angular.module('oppia').component('explorationEditorPage', {
             // changes is invalid, and draft_changes is not `null`.
             AutosaveInfoModalsService.showVersionMismatchModal(
               ChangeListService.getChangeList());
+            $rootScope.$applyAsync();
             return;
           }
           RouterService.onRefreshStatisticsTab.emit();
@@ -465,7 +468,10 @@ angular.module('oppia').component('explorationEditorPage', {
       ctrl.getWarnings = () => ExplorationWarningsService.getWarnings();
       ctrl.hasCriticalWarnings = () => (
         ExplorationWarningsService.hasCriticalWarnings);
-      ctrl.selectMainTab = () => RouterService.navigateToMainTab();
+      ctrl.selectMainTab = () => {
+        RouterService.navigateToMainTab();
+        $rootScope.$applyAsync();
+      };
       ctrl.selectTranslationTab = (
         () => RouterService.navigateToTranslationTab());
       ctrl.selectPreviewTab = () => RouterService.navigateToPreviewTab();
@@ -513,6 +519,7 @@ angular.module('oppia').component('explorationEditorPage', {
           ExplorationPropertyService.onExplorationPropertyChanged.subscribe(
             () => {
               setPageTitle();
+              $rootScope.$applyAsync();
             }
           )
         );
