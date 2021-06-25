@@ -113,7 +113,6 @@ describe('TopNavigationBarComponent', () => {
       ],
       providers: [
         NavigationService,
-        SidebarStatusService,
         UserService,
         {
           provide: WindowRef,
