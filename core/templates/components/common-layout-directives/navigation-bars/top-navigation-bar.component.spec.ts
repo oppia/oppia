@@ -359,18 +359,15 @@ describe('TopNavigationBarComponent', () => {
     expect(component.activeMenuName).toBe('aboutMenu');
   });
 
-  // Commenting this part of the code to guarantee < 100% coverage, to avoid
-  // flake in develop until it is fixed.
+  it('should toggle side bar', () => {
+    spyOn(sidebarStatusService, 'isSidebarShown').and.returnValues(false, true);
+    spyOn(wds, 'isWindowNarrow').and.returnValue(true);
+    expect(component.isSidebarShown()).toBe(false);
 
-  // it('should toggle side bar', () => {
-  //   spyOn(sidebarStatusService, 'isSidebarShown').and.returnValues(false, true);
-  //   spyOn(wds, 'isWindowNarrow').and.returnValue(true);
-  //   expect(component.isSidebarShown()).toBe(false);
+    component.toggleSidebar();
 
-  //   component.toggleSidebar();
-
-  //   expect(component.isSidebarShown()).toBe(true);
-  // });
+    expect(component.isSidebarShown()).toBe(true);
+  });
 
   it('should navigate to classroom page when user clicks' +
     ' on \'Basic Mathematics\'', fakeAsync(() => {
