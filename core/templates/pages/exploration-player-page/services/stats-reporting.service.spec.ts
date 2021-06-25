@@ -48,6 +48,7 @@ describe('Stats reporting service ', () => {
   let recordAnswerSubmittedSpy;
   let recordMaybeLeaveEventSpy;
   let recordAnswerSubmitActionSpy;
+  let postStatsSpy;
 
   let explorationId = 'expId';
   let explorationTitle = 'expTitle';
@@ -74,7 +75,7 @@ describe('Stats reporting service ', () => {
     recordExplorationStartedSpy = spyOn(
       statsReportingBackendApiService, 'recordExpStartedAsync')
       .and.returnValue(Promise.resolve({}));
-    spyOn(statsReportingBackendApiService, 'postsStatsAsync')
+    postStatsSpy = spyOn(statsReportingBackendApiService, 'postsStatsAsync')
       .and.returnValue(Promise.resolve({}));
     recordExplorationActuallyStartedSpy = spyOn(
       statsReportingBackendApiService, 'recordExplorationActuallyStartedAsync')
@@ -121,7 +122,7 @@ describe('Stats reporting service ', () => {
     spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
     spyOn(urlService, 'getUrlParams')
       .and.returnValue({classroom_url_fragment: 'classroom'});
-    StatsReportingService.stateStopwatch = Stopwatch.create();
+    statsReportingService.stateStopwatch = Stopwatch.create();
   });
 
   it('should create default aggregated stats when initialized', () => {
@@ -132,53 +133,35 @@ describe('Stats reporting service ', () => {
       state_stats_mapping: {}
     };
 
-    expect(StatsReportingService.aggregatedStats).toEqual(defaultValues);
+    expect(statsReportingService.aggregatedStats).toEqual(defaultValues);
   });
 
   it('should set session properties when calling ' +
     '\'initSession\'', fakeAsync(() => {
+    // Prechecks.
+    expect(statsReportingService.explorationId).toEqual(null);
+    expect(statsReportingService.explorationTitle).toEqual(null);
+    expect(statsReportingService.explorationVersion)
+      .toEqual(null);
+    expect(statsReportingService.sessionId).toEqual(null);
+    expect(statsReportingService.optionalCollectionId).toEqual(null);
+
     statsReportingService.initSession(
       explorationId, explorationTitle, explorationVersion,
       sessionId, collectionId);
     tick(300001);
     discardPeriodicTasks();
 
-    expect(StatsReportingService.explorationId).toEqual(explorationId);
-    expect(StatsReportingService.explorationTitle).toEqual(explorationTitle);
-    expect(StatsReportingService.explorationVersion)
+    expect(statsReportingService.explorationId).toEqual(explorationId);
+    expect(statsReportingService.explorationTitle).toEqual(explorationTitle);
+    expect(statsReportingService.explorationVersion)
       .toEqual(explorationVersion);
-    expect(StatsReportingService.sessionId).toEqual(sessionId);
-    expect(StatsReportingService.optionalCollectionId).toEqual(collectionId);
+    expect(statsReportingService.sessionId).toEqual(sessionId);
+    expect(statsReportingService.optionalCollectionId).toEqual(collectionId);
   }));
 
   it('should record exploration\'s stats when it is about to start', () => {
-    StatsReportingService.explorationStarted = false;
-    statsReportingService.recordExplorationStarted('firstState', {});
-
-    expect(StatsReportingService.explorationStarted).toBe(true);
-    expect(recordExplorationStartedSpy).toHaveBeenCalled();
-  });
-
-  it('should not again record exploration\'s stats when ' +
-    'it is about to start and already recorded', () => {
-    StatsReportingService.explorationStarted = true;
-    statsReportingService.recordExplorationStarted('firstState', {});
-
-    expect(recordExplorationStartedSpy).not.toHaveBeenCalled();
-  });
-
-  it('should not create default stats for a state if ' +
-    'it\'s already exist', () => {
-    let defaultStats = {
-      total_answers_count: 0,
-      useful_feedback_count: 0,
-      total_hit_count: 0,
-      first_hit_count: 0,
-      num_times_solution_viewed: 0,
-      num_completions: 0
-    };
-
-    let originalStats = {
+    let sampleStats = {
       total_answers_count: 1,
       useful_feedback_count: 1,
       total_hit_count: 1,
@@ -186,32 +169,46 @@ describe('Stats reporting service ', () => {
       num_times_solution_viewed: 1,
       num_completions: 1
     };
+    statsReportingService.aggregatedStats.state_stats_mapping.firstState = (
+      sampleStats);
 
-    StatsReportingService.aggregatedStats.state_stats_mapping = {
-      firstState: originalStats
-    };
-
-    // Trying to start a state which has already been recorded.
+    expect(statsReportingService.explorationStarted).toBe(false);
     statsReportingService.recordExplorationStarted('firstState', {});
 
-    expect(StatsReportingService.aggregatedStats.state_stats_mapping.firstState)
-      .toBe(originalStats);
-    expect(StatsReportingService.aggregatedStats.state_stats_mapping.firstState)
-      .not.toBe(defaultStats);
+    expect(statsReportingService.explorationStarted).toBe(true);
+    expect(recordExplorationStartedSpy).toHaveBeenCalled();
+  });
+
+  it('should not again record exploration\'s stats when ' +
+    'it is about to start and already recorded', () => {
+    statsReportingService.explorationStarted = true;
+    statsReportingService.recordExplorationStarted('firstState', {});
+
+    expect(recordExplorationStartedSpy).not.toHaveBeenCalled();
+  });
+
+  it('should not send request to backend when an exploration ' +
+    'it is about to start and already recorded', () => {
+    statsReportingService.explorationIsComplete = true;
+    statsReportingService.recordExplorationStarted('firstState', {});
+
+    expect(postStatsSpy).not.toHaveBeenCalled();
   });
 
   it('should record exploration\'s stats when it is actually started', () => {
-    StatsReportingService.explorationActuallyStarted = false;
+    expect(statsReportingService.currentStateName).toBe(null);
+    expect(statsReportingService.explorationActuallyStarted).toBe(false);
+
     statsReportingService.recordExplorationActuallyStarted('firstState');
 
-    expect(StatsReportingService.currentStateName).toBe('firstState');
-    expect(StatsReportingService.explorationActuallyStarted).toBe(true);
+    expect(statsReportingService.currentStateName).toBe('firstState');
+    expect(statsReportingService.explorationActuallyStarted).toBe(true);
     expect(recordExplorationActuallyStartedSpy).toHaveBeenCalled();
   });
 
   it('should not again record exploration\'s stats when ' +
     'it is actually started and already recorded', () => {
-    StatsReportingService.explorationActuallyStarted = true;
+    statsReportingService.explorationActuallyStarted = true;
     statsReportingService.recordExplorationActuallyStarted('firstState');
 
     expect(recordExplorationActuallyStartedSpy).not.toHaveBeenCalled();
@@ -224,15 +221,16 @@ describe('Stats reporting service ', () => {
   });
 
   it('should record stats when refresher exploration is opened', () => {
-    StatsReportingService.nextExpId = null;
+    expect(statsReportingService.nextExpId).toBe(null);
     statsReportingService.recordLeaveForRefresherExp(
       'firstState', 'refresherExp');
 
-    expect(StatsReportingService.nextExpId).toBe('refresherExp');
+    expect(statsReportingService.nextExpId).toBe('refresherExp');
     expect(recordLeaveForRefresherExpSpy).toHaveBeenCalled();
   });
 
   it('should record stats when state is changed', () => {
+    expect(statsReportingService.statesVisited.size).toBe(0);
     // First transition.
     statsReportingService.recordStateTransition(
       'firstState', 'secondState', 'answer', {}, true);
@@ -246,23 +244,23 @@ describe('Stats reporting service ', () => {
       'thirdState', 'fourthState', 'answer', {}, true);
 
     expect(recordStateHitSpy).toHaveBeenCalled();
-    expect(StatsReportingService.statesVisited.size).toBe(4);
+    expect(statsReportingService.statesVisited.size).toBe(3);
   });
 
   it('should record stats when a card in exploration is finished', () => {
-    StatsReportingService.currentStateName = null;
+    expect(statsReportingService.currentStateName).toBe(null);
     statsReportingService.recordStateCompleted('firstState');
 
     expect(recordStateCompletedSpy).toHaveBeenCalled();
-    expect(StatsReportingService.currentStateName).toBe('firstState');
+    expect(statsReportingService.currentStateName).toBe('firstState');
   });
 
   it('should record stats when an exploration is finished', () => {
-    StatsReportingService.explorationIsComplete = false;
+    expect(statsReportingService.explorationIsComplete).toBe(false);
     statsReportingService.recordExplorationCompleted('firstState', {});
 
     expect(recordExplorationCompletedSpy).toHaveBeenCalled();
-    expect(StatsReportingService.explorationIsComplete).toBe(true);
+    expect(statsReportingService.explorationIsComplete).toBe(true);
   });
 
   it('should record stats when a leave event is triggered', () => {
@@ -286,9 +284,9 @@ describe('Stats reporting service ', () => {
   });
 
   it('should set topic name', () => {
-    StatsReportingService.topicName = null;
+    expect(statsReportingService.topicName).toBe(null);
     statsReportingService.setTopicName('newTopic');
 
-    expect(StatsReportingService.topicName).toBe('newTopic');
+    expect(statsReportingService.topicName).toBe('newTopic');
   });
 });
