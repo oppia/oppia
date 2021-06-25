@@ -201,4 +201,3 @@ describe('SubtopicPreviewTab', () => {
     expect(component.thumbnailIsShown).toBe(false);
   });
 });
-
