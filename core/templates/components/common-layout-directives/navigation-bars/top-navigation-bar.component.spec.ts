@@ -31,6 +31,8 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UserService } from 'services/user.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { TopNavigationBarComponent } from './top-navigation-bar.component';
+import { DebouncerService } from 'services/debouncer.service';
+import { SidebarStatusService } from 'services/sidebar-status.service';
 
 class MockWindowRef {
   _window = {
@@ -61,7 +63,7 @@ class MockWindowRef {
   }
 }
 
-describe('TopNavigationBarComponent', () => {
+fdescribe('TopNavigationBarComponent', () => {
   let fixture: ComponentFixture<TopNavigationBarComponent>;
   let component: TopNavigationBarComponent;
   let mockWindowRef: MockWindowRef;
@@ -73,6 +75,8 @@ describe('TopNavigationBarComponent', () => {
   let siteAnalyticsService: SiteAnalyticsService;
   let navigationService: NavigationService;
   let deviceInfoService: DeviceInfoService;
+  let debouncerService: DebouncerService;
+  let sidebarStatusService: SidebarStatusService;
 
   let mockOnSearchBarLoadedEventEmitter = new EventEmitter();
   let userInfo = {
@@ -109,6 +113,7 @@ describe('TopNavigationBarComponent', () => {
       ],
       providers: [
         NavigationService,
+        SidebarStatusService,
         UserService,
         {
           provide: WindowRef,
@@ -119,7 +124,7 @@ describe('TopNavigationBarComponent', () => {
           useValue: {
             getWidth: () => 700,
             getResizeEvent: () => fromEvent(windowRef.nativeWindow, 'resize'),
-            isWindowNarrow: () => true
+            isWindowNarrow: () => false
           }
         }
       ],
@@ -137,6 +142,8 @@ describe('TopNavigationBarComponent', () => {
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     navigationService = TestBed.inject(NavigationService);
     deviceInfoService = TestBed.inject(DeviceInfoService);
+    debouncerService = TestBed.inject(DebouncerService);
+    sidebarStatusService = TestBed.inject(SidebarStatusService);
 
     spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo);
     spyOnProperty(searchService, 'onSearchBarLoaded').and.returnValue(
@@ -147,7 +154,6 @@ describe('TopNavigationBarComponent', () => {
     spyOn(cbas, 'fetchClassroomPromosAreEnabledStatusAsync')
       .and.resolveTo(true);
     spyOn(wds, 'isWindowNarrow').and.returnValue(true);
-    spyOn(wds, 'getWidth').and.returnValue(700);
 
     expect(component.currentUrl).toBe(undefined);
     expect(component.labelForClearingFocus).toBe(undefined);
@@ -181,8 +187,6 @@ describe('TopNavigationBarComponent', () => {
   it('should get user info on initialization', fakeAsync(() => {
     spyOn(cbas, 'fetchClassroomPromosAreEnabledStatusAsync')
       .and.resolveTo(true);
-    spyOn(wds, 'isWindowNarrow').and.returnValue(true);
-    spyOn(wds, 'getWidth').and.returnValue(700);
 
     expect(component.isModerator).toBe(undefined);
     expect(component.isAdmin).toBe(undefined);
@@ -223,8 +227,8 @@ describe('TopNavigationBarComponent', () => {
   it('should try displaying the hidden navbar elements if resized' +
     ' window is larger', waitForAsync(() => {
     let donateElement = 'I18N_TOPNAV_DONATE';
-    spyOn(wds, 'getWidth').and.returnValue(700);
     component.ngOnInit();
+    spyOn(debouncerService, 'debounce').and.stub();
 
     component.currentWindowWidth = 600;
     component.navElementsVisibilityStatus[donateElement] = false;
@@ -247,6 +251,7 @@ describe('TopNavigationBarComponent', () => {
     tick();
 
     expect(component.profilePictureDataUrl).toBe('/profile-picture/user1.jpg');
+    component.ngOnDestroy();
   }));
 
   it('should show Oppia\'s logos', () => {
@@ -356,6 +361,8 @@ describe('TopNavigationBarComponent', () => {
   });
 
   it('should toggle side bar', () => {
+    spyOn(sidebarStatusService, 'isSidebarShown').and.returnValues(false, true);
+    spyOn(wds, 'isWindowNarrow').and.returnValue(true);
     expect(component.isSidebarShown()).toBe(false);
 
     component.toggleSidebar();
@@ -409,10 +416,9 @@ describe('TopNavigationBarComponent', () => {
   });
 
   it('should not truncate navbar if the window is narrow', () => {
-    // The function isWindowNarrow() returns true as defined in the mock. So,
-    // the truncateNavbar() function return, as soon as the check for
+    // The truncateNavbar() function returns, as soon as the check for
     // narrow window passes.
-
+    spyOn(wds, 'isWindowNarrow').and.returnValue(true);
     spyOn(component, 'checkIfI18NCompleted');
     spyOn(document, 'querySelector');
 
@@ -426,7 +432,6 @@ describe('TopNavigationBarComponent', () => {
 
   it('should hide navbar if it\'s height more than 60px', () => {
     let donateElement = 'I18N_TOPNAV_DONATE';
-    spyOn(wds, 'isWindowNarrow').and.returnValue(false);
     spyOn(document, 'querySelector')
     // This throws "Type '{ clientWidth: number; }' is missing the following
     // properties from type 'Element': assignedSlot, attributes, classList,
@@ -450,5 +455,6 @@ describe('TopNavigationBarComponent', () => {
 
     expect(component.navElementsVisibilityStatus[donateElement])
       .toBe(false);
+    component.ngOnDestroy();
   });
 });
