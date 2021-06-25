@@ -246,7 +246,7 @@ class UpdateTopicThumbnailSizeOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job to update the thumbnail_size_in_bytes in topic models. """
 
     _DELETED_KEY = 'topic_deleted'
-    _ERROR_KEY = 'computation_error'
+    _ERROR_KEY = 'update_error'
     _SUCCESS_KEY = 'thumbnail_size_updated'
 
     @classmethod
@@ -260,23 +260,33 @@ class UpdateTopicThumbnailSizeOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
         topic = topic_fetchers.get_topic_by_id(item.id)
 
-        # We are not updating thumbnail_filename here, but using it call the
-        # update for topic thumbnail_size_in_bytes.
-        # old_value and new_value are same here, because the update for
-        # thumbnail_size_in_bytes is called from within the code for updating
-        # thumbnail_filename in topic_services.py file.
-        commit_cmds = [topic_domain.TopicChange({
-            'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
-            'property_name': topic_domain.TOPIC_PROPERTY_THUMBNAIL_FILENAME,
-            'new_value': topic.thumbnail_filename,
-            'old_value': topic.thumbnail_filename
-        })]
+        try:
+            # We are not updating thumbnail_filename here, but using it call the
+            # update for topic thumbnail_size_in_bytes.
+            # old_value and new_value are same here, because the update for
+            # thumbnail_size_in_bytes is called from within the code for updating
+            # thumbnail_filename in topic_services.py file.
+            commit_cmds = [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+                'property_name': topic_domain.TOPIC_PROPERTY_THUMBNAIL_FILENAME,
+                'new_value': topic.thumbnail_filename,
+                'old_value': topic.thumbnail_filename
+            })]
 
-        topic_services.update_topic_and_subtopic_pages(
-            feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
-            'Update topic thumbnail size'
-        )
-        yield (UpdateTopicThumbnailSizeOneOffJob._SUCCESS_KEY, 1)
+            topic_services.update_topic_and_subtopic_pages(
+                feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
+                'Update topic thumbnail size'
+            )
+            yield (UpdateTopicThumbnailSizeOneOffJob._SUCCESS_KEY, 1)
+        except Exception as e:
+            logging.exception(
+                'Updating topic thumbnail_size_in_bytes %s failed validation'
+                ': %s' % (item.id, e))
+            yield (
+                UpdateTopicThumbnailSizeOneOffJob._ERROR_KEY,
+                'Updating topic thumbnail_size_in_bytes %s failed validation'
+                ': %s' % (item.id, e))
+            return
 
     @staticmethod
     def reduce(key, values):
