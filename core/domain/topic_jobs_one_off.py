@@ -264,8 +264,8 @@ class UpdateTopicThumbnailSizeOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             # We are not updating thumbnail_filename here, but using it call the
             # update for topic thumbnail_size_in_bytes.
             # old_value and new_value are same here, because the update for
-            # thumbnail_size_in_bytes is called from within the code for updating
-            # thumbnail_filename in topic_services.py file.
+            # thumbnail_size_in_bytes is called from within the code for
+            # updating thumbnail_filename in topic_services.py file.
             commit_cmds = [topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
                 'property_name': topic_domain.TOPIC_PROPERTY_THUMBNAIL_FILENAME,
