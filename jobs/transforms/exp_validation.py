@@ -50,6 +50,9 @@ class ValidateExplorationCommitCmdsSchema(
         """
         return exp_domain.ExplorationChange
 
+# TODO(#12688): Implement the skipped relations checks after new decorators are
+# implemented.
+
 
 @validation_decorators.RelationshipsOf(exp_models.ExplorationContextModel)
 def exploration_context_model_relationships(model):
