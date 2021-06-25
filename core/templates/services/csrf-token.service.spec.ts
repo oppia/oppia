@@ -30,13 +30,15 @@ describe('Csrf Token Service', function() {
     // TODO(#8035): Remove the use of $.ajax in csrf-token.service
     // and hence this ts-ignore once all the services are migrated.
 
-    // This throws "Argument of type 'Promise<{ token: string; }>' is not
-    // assignable to parameter of type 'jqXHR<any>'.". We need to suppress
-    // this error because we need to mock $.ajax to this function for
-    // testing purposes.
-    // @ts-expect-error
-    spyOn($, 'ajax').and.returnValue(Promise.resolve(
-      {token: 'sample-csrf-token'}));
+    // @ts-ignore in order to ignore JQuery properties that should
+    // be declared.
+    spyOn($, 'ajax').and.callFake((options) => {
+      let d = $.Deferred();
+      d.resolve(
+        options.dataFilter('12345{"token": "sample-csrf-token"}')
+      );
+      return d.promise();
+    });
   });
 
   it('should correctly set the csrf token', (done) => {
