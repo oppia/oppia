@@ -1587,7 +1587,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                     'accepted_translations_count': (
                         self.ACCEPTED_TRANSLATIONS_COUNT),
                     'accepted_translations_without_reviewer_edits_count': (
-                        self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+                        self
+                        .ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
                     'accepted_translation_word_count': (
                         self.ACCEPTED_TRANSLATION_WORD_COUNT),
                     'rejected_translations_count': (
