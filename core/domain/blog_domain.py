@@ -225,7 +225,7 @@ class BlogPost(python_utils.OBJECT):
         published_on = utils.convert_naive_datetime_to_string(
             self.published_on) if self.published_on else None
         last_updated = utils.convert_naive_datetime_to_string(
-            self.last_updated) if self.published_on else None
+            self.last_updated) if self.last_updated else None
         return {
             'id': self.id,
             'author_id': self.author_id,
@@ -503,7 +503,7 @@ class BlogPostSummary(python_utils.OBJECT):
         published_on = utils.convert_naive_datetime_to_string(
             self.published_on) if self.published_on else None
         last_updated = utils.convert_naive_datetime_to_string(
-            self.last_updated) if self.published_on else None
+            self.last_updated) if self.last_updated else None
         return {
             'id': self.id,
             'author_id': self.author_id,
