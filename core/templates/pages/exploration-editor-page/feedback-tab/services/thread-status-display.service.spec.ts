@@ -21,29 +21,29 @@
 import { ThreadStatusDisplayService } from 'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
 
 describe('Thread Status Display Service', () => {
-  var threadStatusDisplayService;
+  let threadStatusDisplayService: ThreadStatusDisplayService;
   beforeEach(() => {
     threadStatusDisplayService = new ThreadStatusDisplayService();
   });
 
   it('should give human readable status for status choice', () => {
-    var mockStatusChoices = threadStatusDisplayService.STATUS_CHOICES;
+    let mockStatusChoices = threadStatusDisplayService.STATUS_CHOICES;
 
-    for (var i = 0; i < mockStatusChoices.length; i++) {
-      mockStatusID = mockStatusChoices[i].id;
+    for (let i = 0; i < mockStatusChoices.length; i++) {
+      let mockStatusID = mockStatusChoices[i].id;
       expect(
         threadStatusDisplayService.getHumanReadableStatus(
           mockStatusID)).toBe(mockStatusChoices[i].text);
     }
 
-    var mockStatusID = 'INVALID_STATUS';
+    let mockStatusID = 'INVALID_STATUS';
     expect(
       threadStatusDisplayService.getHumanReadableStatus(
         mockStatusID)).toBe('');
   });
 
   it('should give appropriate label class for status id', () => {
-    var mockStatusID = 'open';
+    let mockStatusID = 'open';
     expect(threadStatusDisplayService.getLabelClass(mockStatusID)).toBe(
       'badge badge-info');
 

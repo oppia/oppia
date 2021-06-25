@@ -15,6 +15,7 @@
 /**
  * @fileoverview Constants for schema types.
  */
+
 export const SchemaConstants = {
   SCHEMA_KEY_LIST: 'list',
   SCHEMA_TYPE_BOOL: 'bool',
