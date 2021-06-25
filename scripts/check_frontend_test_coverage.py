@@ -276,7 +276,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'subtitled-html-editor.component.ts',
     'subtitled-unicode-editor.component.ts',
     'subtopic-page.model.ts',
-    'subtopic-preview-tab.component.ts',
     'subtopic-summary-tile.directive.ts',
     'subtopic.model.ts',
     'suggestion-modal-for-exploration-editor.service.ts',
