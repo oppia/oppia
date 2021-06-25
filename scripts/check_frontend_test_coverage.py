@@ -138,7 +138,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'oppia-interactive-code-repl.component.ts',
     'oppia-interactive-drag-and-drop-sort-input.directive.ts',
     'oppia-interactive-graph-input.component.ts',
-    'oppia-interactive-image-click-input.component.ts',
     'oppia-interactive-interactive-map.component.ts',
     'oppia-interactive-item-selection-input.directive.ts',
     'oppia-interactive-logic-proof.component.ts',
