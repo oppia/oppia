@@ -40,12 +40,16 @@ import { PreferencesPageComponent } from './preferences-page.component';
     EditProfilePictureModalComponent,
     OppiaAngularRootComponent,
     PreferencesPageComponent,
+    PreferredLanguagesComponent,
+    PreferredSiteLanguage,
     SubjectInterestsComponent
   ],
   entryComponents: [
     EditProfilePictureModalComponent,
     OppiaAngularRootComponent,
     PreferencesPageComponent,
+    PreferredLanguagesComponent,
+    PreferredSiteLanguage,
     SubjectInterestsComponent
   ],
   providers: [
@@ -72,6 +76,8 @@ import { downgradeModule } from '@angular/upgrade/static';
 import { EditProfilePictureModalComponent } from './modal-templates/edit-profile-picture-modal.component';
 import { SubjectInterestsComponent } from './form-fields/subject-interests.component';
 import { ReactiveFormsModule } from '@angular/forms';
+import { PreferredLanguagesComponent } from './form-fields/preferred-languages.component';
+import { PreferredSiteLanguage } from './form-fields/preferred-site-language.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

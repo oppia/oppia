@@ -80,6 +80,7 @@ export class PreferencesPageComponent {
   }
 
   private _saveDataItem(updateType, data): void {
+    console.log(updateType, data);
     this.preventPageUnloadEventService.addListener();
     this.userBackendApiService.updatePreferencesDataAsync(
       updateType, data).then(() => {
@@ -128,6 +129,7 @@ export class PreferencesPageComponent {
   }
 
   savePreferredLanguageCodes(preferredLanguageCodes: string[]): void {
+    console.log(preferredLanguageCodes);
     this._saveDataItem('preferred_language_codes', preferredLanguageCodes);
   }
 

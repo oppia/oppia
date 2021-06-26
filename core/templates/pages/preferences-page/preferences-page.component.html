@@ -162,15 +162,11 @@
           If the *ngIf is omitted, the select2-dropdown directive won't be
           updated after the initial page load.
          -->
-        <!-- <div *ngIf="hasPageLoaded">
-          <select2-dropdown choices="LANGUAGE_CHOICES"
-                            item="preferredLanguageCodes"
-                            allow-multiple-choices="true"
-                            width="100%"
-                            placeholder="{{ 'I18N_PREFERENCES_SELECT_EXPLORATION_LANGUAGE' | translate }}"
-                            on-selection-change="savePreferredLanguageCodes(preferredLanguageCodes)">
-          </select2-dropdown>
-        </div> -->
+        <div *ngIf="hasPageLoaded">
+          <oppia-preferred-languages [preferredLanguages]="preferredLanguageCodes"
+                                     [choices]="LANGUAGE_CHOICES"
+                                     (preferredLanguagesChange)="savePreferredLanguageCodes($event)"></oppia-preferred-languages>
+        </div>
         <span class="form-text oppia-form-text">
           {{ 'I18N_PREFERENCES_PREFERRED_EXPLORATION_LANGUAGE_EXPLAIN' | translate }}
         </span>
@@ -186,7 +182,11 @@
            If the *ngIf is omitted, the select2-dropdown directive won't be
            updated after the initial page load.
         -->
-        <div *ngIf="hasPageLoaded && select2DropdownIsShown">
+        <div *ngIf="hasPageLoaded">
+          <oppia-preferred-site-language [choices]="SITE_LANGUAGE_CHOICES"
+                                         [preferredSiteLanguageCode]="preferredSiteLanguageCode"
+                                         (preferredSiteLanguageCodeChange)="savePreferredSiteLanguageCodes($event)">
+          </oppia-preferred-site-language>
           <!-- <select2-dropdown class="protractor-test-system-language-selector"
                             choices="SITE_LANGUAGE_CHOICES"
                             item="preferredSiteLanguageCode"
@@ -211,7 +211,7 @@
            If the *ngIf is omitted, the select2-dropdown directive won't be
            updated after the initial page load.
         -->
-        <div *ngIf="hasPageLoaded && select2DropdownIsShown">
+        <div *ngIf="hasPageLoaded">
           <!-- <select2-dropdown class="protractor-test-preferred-audio-language-selector"
                             choices="AUDIO_LANGUAGE_CHOICES"
                             item="preferredAudioLanguageCode"
