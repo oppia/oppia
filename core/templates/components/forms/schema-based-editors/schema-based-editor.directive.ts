@@ -79,6 +79,11 @@ angular.module('oppia').directive('schemaBasedEditor', [
              */
             $rootScope.$applyAsync();
           };
+
+          ctrl.updateValue = function(value) {
+            ctrl.localValue = value;
+            $rootScope.$applyAsync();
+          };
         }]
     };
   }]);

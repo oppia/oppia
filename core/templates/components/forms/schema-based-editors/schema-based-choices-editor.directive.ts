@@ -15,35 +15,30 @@
 /**
  * @fileoverview Directive for a schema-based editor for multiple choice.
  */
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 
-require('services/nested-directives-recursion-timeout-prevention.service.ts');
+@Component({
+  selector: 'schema-based-choices-editor',
+  templateUrl: './schema-based-choices-editor.directive.html'
+})
+export class SchemaBasedChoicesEditorComponent implements OnInit {
+  @Input() localValue;
+  @Output() localValueChange = new EventEmitter();
+  @Input() disabled;
+  // The choices for the object's value.
+  @Input() choices;
+  // The schema for this object.
+  // TODO(sll): Validate each choice against the schema.
+  @Input() schema;
+  constructor() { }
 
-angular.module('oppia').directive('schemaBasedChoicesEditor', [
-  'NestedDirectivesRecursionTimeoutPreventionService',
-  function(NestedDirectivesRecursionTimeoutPreventionService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {
-        localValue: '=',
-        // The choices for the object's value.
-        choices: '&',
-        // The schema for this object.
-        // TODO(sll): Validate each choice against the schema.
-        schema: '&',
-        isDisabled: '&'
-      },
-      template: require('./schema-based-choices-editor.directive.html'),
-      controllerAs: '$ctrl',
-      compile: NestedDirectivesRecursionTimeoutPreventionService.compile,
-      controller: [function() {
-        var ctrl = this;
-        ctrl.getReadonlySchema = function() {
-          var readonlySchema = angular.copy(ctrl.schema());
-          delete readonlySchema.choices;
-          return readonlySchema;
-        };
-      }]
-    };
-  }
-]);
+  ngOnInit(): void { }
+}
+
+angular.module('oppia').directive(
+  'schemaBasedChoicesEditor',
+  downgradeComponent({
+    component: SchemaBasedChoicesEditorComponent
+  })
+);

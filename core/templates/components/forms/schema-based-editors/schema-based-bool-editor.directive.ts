@@ -16,18 +16,23 @@
  * @fileoverview Directive for a schema-based editor for booleans.
  */
 
-angular.module('oppia').directive('schemaBasedBoolEditor', [
-  function() {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {
-        localValue: '=',
-        isDisabled: '&',
-        labelForFocusTarget: '&'
-      },
-      template: require('./schema-based-bool-editor.directive.html'),
-      controllerAs: '$ctrl',
-      controller: [function() {}]
-    };
-  }]);
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+
+@Component({
+  selector: 'schema-based-bool-editor',
+  templateUrl: './schema-based-bool-editor.directive.html'
+})
+export class SchemaBasedBoolEditorComponent implements OnInit {
+  @Input() localValue;
+  @Output() localValueChange = new EventEmitter();
+  @Input() disabled: boolean;
+  @Input() labelForFocusTarget: string;
+  constructor() { }
+
+  ngOnInit(): void { }
+}
+
+angular.module('oppia').directive('schemaBasedBoolEditor', downgradeComponent({
+  component: SchemaBasedBoolEditorComponent
+}) as angular.IDirectiveFactory);

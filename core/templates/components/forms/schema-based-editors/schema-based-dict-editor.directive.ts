@@ -16,45 +16,65 @@
  * @fileoverview Directive for a schema-based editor for dicts.
  */
 
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { IdGenerationService } from 'services/id-generation.service';
+
+@Component({
+  selector: 'schema-based-dict-editor',
+  templateUrl: './schema-based-dict-editor.directive.html'
+})
+
+export class SchemaBasedDictEditorComponent implements OnInit {
+  @Input() localValue;
+  @Output() localValueChange = new EventEmitter();
+  @Input() disabled;
+  @Input() propertySchemas;
+  @Input() labelForFocusTarget;
+  fieldIds: Record<string, string> = {};
+  JSON = JSON;
+  constructor(private idGenerationService: IdGenerationService) { }
+
+  ngOnInit(): void {
+    this.fieldIds = {};
+    for (let i = 0; i < this.propertySchemas.length; i++) {
+      // Generate random IDs for each field.
+      this.fieldIds[this.propertySchemas[i].name] = (
+        this.idGenerationService.generateNewId());
+    }
+  }
+
+  updateValue(value: unknown, name: string): void {
+    this.localValue[name] = value;
+    this.localValueChange.emit(this.localValue);
+  }
+
+  getSchema(index: number): unknown {
+    const schema = this.propertySchemas[index].schema;
+    return () => schema;
+  }
+
+  getLabelForFocusTarget(): string {
+    return this.labelForFocusTarget;
+  }
+
+  getEmptyString(): '' {
+    return '';
+  }
+
+  getHumanReadablePropertyDescription(
+      property: {description: string, name: string}
+  ): string {
+    return property.description || '[' + property.name + ']';
+  }
+}
+
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 
 require('services/id-generation.service.ts');
 require('services/nested-directives-recursion-timeout-prevention.service.ts');
 
-angular.module('oppia').directive('schemaBasedDictEditor', [
-  'NestedDirectivesRecursionTimeoutPreventionService',
-  function(NestedDirectivesRecursionTimeoutPreventionService) {
-    return {
-      scope: {
-        localValue: '=',
-        isDisabled: '&',
-        // Read-only property. An object whose keys and values are the dict
-        // properties and the corresponding schemas.
-        propertySchemas: '&',
-        labelForFocusTarget: '&'
-      },
-      template: require('./schema-based-dict-editor.directive.html'),
-      restrict: 'E',
-      compile: NestedDirectivesRecursionTimeoutPreventionService.compile,
-      controller: [
-        '$scope', 'IdGenerationService',
-        function($scope, IdGenerationService) {
-          var ctrl = this;
-          $scope.getHumanReadablePropertyDescription = function(property) {
-            return property.description || '[' + property.name + ']';
-          };
-
-          ctrl.$onInit = function() {
-            $scope.fieldIds = {};
-            for (var i = 0; i < $scope.propertySchemas().length; i++) {
-              // Generate random IDs for each field.
-              $scope.fieldIds[$scope.propertySchemas()[i].name] = (
-                IdGenerationService.generateNewId());
-            }
-          };
-        }
-      ]
-    };
-  }
-]);
+angular.module('oppia').directive('schemaBasedDictEditor', downgradeComponent({
+  component: SchemaBasedDictEditorComponent
+}));

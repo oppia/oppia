@@ -15,32 +15,32 @@
 /**
  * @fileoverview Directive for a schema-based editor for HTML.
  */
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 
-require('components/ck-editor-helpers/ck-editor-4-rte.component.ts');
-require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
+@Component({
+  selector: 'schema-based-html-editor',
+  templateUrl: './schema-based-html-editor.directive.html'
+})
 
-angular.module('oppia').directive('schemaBasedHtmlEditor', [
-  function() {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {
-        localValue: '=',
-        isDisabled: '&',
-        labelForFocusTarget: '&',
-        uiConfig: '&'
-      },
-      template: require('./schema-based-html-editor.directive.html'),
-      controllerAs: '$ctrl',
-      controller: ['$scope', function($scope) {
-        var ctrl = this;
-        ctrl.updateValue = function(value: string) {
-          ctrl.localValue = value;
-          $scope.$applyAsync();
-          setTimeout(() => {
-            $scope.$applyAsync();
-          });
-        };
-      }]
-    };
-  }]);
+export class SchemaBasedHtmlEditorComponent implements OnInit {
+  @Input() localValue;
+  @Output() localValueChange = new EventEmitter();
+  @Input() disabled;
+  @Input() labelForFocusTarget;
+  @Input() uiConfig;
+  constructor() { }
+
+  ngOnInit(): void { }
+
+  updateValue(value: string): void {
+    this.localValueChange.emit(value);
+    setTimeout(() => {
+      this.localValueChange.emit(value);
+    });
+  }
+}
+
+angular.module('oppia').directive('schemaBasedHtmlEditor', downgradeComponent({
+  component: SchemaBasedHtmlEditorComponent
+}));

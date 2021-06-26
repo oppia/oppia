@@ -15,7 +15,28 @@
 /**
  * @fileoverview Directive for a schema-based editor for lists.
  */
+import { Component, OnInit } from '@angular/core';
+import { Subscription } from 'rxjs';
+import { IdGenerationService } from 'services/id-generation.service';
+import { SchemaDefaultValueService } from 'services/schema-default-value.service';
+import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
+import { SchemaUndefinedLastElementService } from 'services/schema-undefined-last-element.service';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
+@Component({
+  selector: 'schema-based-list-editor',
+  templateUrl: './schema-based-list-editor.directive.html'
+})
+export class SchemaBasedListEditorComponent implements OnInit {
+  constructor(
+    private focusManagerService: FocusManagerService,
+    private idGenerationService: IdGenerationService,
+    private schemaDefaultValueService: SchemaDefaultValueService,
+    private schemaFormSubmittedService: SchemaFormSubmittedService,
+    private schemaUndefinedLastElementService: SchemaUndefinedLastElementService
+  ) {}
 
+  ngOnInit(): void { }
+}
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 
@@ -25,8 +46,6 @@ require('services/schema-default-value.service.ts');
 require('services/schema-undefined-last-element.service.ts');
 require('services/schema-form-submitted.service.ts');
 require('services/stateful/focus-manager.service.ts');
-
-import { Subscription } from 'rxjs';
 
 
 angular.module('oppia').directive('schemaBasedListEditor', [

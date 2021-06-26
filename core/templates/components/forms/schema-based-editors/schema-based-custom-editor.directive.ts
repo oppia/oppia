@@ -16,34 +16,31 @@
  * @fileoverview Directive for a schema-based editor for custom values.
  */
 
-require('components/forms/custom-forms-directives/object-editor.directive.ts');
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 
-require('services/nested-directives-recursion-timeout-prevention.service.ts');
+@Component({
+  selector: 'schema-based-custom-editor',
+  templateUrl: './schema-based-custom-editor.directive.html'
+})
 
-angular.module('oppia').directive('schemaBasedCustomEditor', [
-  'NestedDirectivesRecursionTimeoutPreventionService',
-  function(NestedDirectivesRecursionTimeoutPreventionService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {
-        localValue: '=',
-        schema: '='
-      },
-      template: require('./schema-based-custom-editor.directive.html'),
-      controllerAs: '$ctrl',
-      compile: NestedDirectivesRecursionTimeoutPreventionService.compile,
-      controller: ['$element', '$scope', function($element, $scope) {
-        var ctrl = this;
-        ctrl.updateValue = function(value) {
-          ctrl.localValue = value;
-          $scope.$applyAsync();
-        };
-        ctrl.$postLink = function() {
-          ctrl.form = angular.element(
-            $element[0].lastElementChild).controller('ngModel');
-        };
-      }]
-    };
+export class SchemaBasedCustomEditorComponent implements OnInit {
+  @Input() localValue;
+  @Output() localValueChange = new EventEmitter();
+  @Input() schema;
+  @Input() form;
+  constructor() { }
+
+  updateValue(e: unknown): void {
+    this.localValueChange.emit(e);
   }
-]);
+
+  ngOnInit(): void { }
+}
+
+angular.module('oppia').directive(
+  'schemaBasedCustomEditor',
+  downgradeComponent({
+    component: SchemaBasedCustomEditorComponent
+  })
+);

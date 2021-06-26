@@ -31,14 +31,28 @@ import { CustomFormsComponentsModule } from './custom-forms-directives/custom-fo
 import { SchemaBasedEditorDirective } from './schema-based-editors/schema-based-editor.directive';
 import { AudioSliderComponent } from './slider/audio-slider.component';
 import { ObjectEditorComponent } from './custom-forms-directives/object-editor.directive';
+import { DirectivesModule } from 'directives/directives.module';
+import { SchemaBasedIntEditorComponent } from './schema-based-editors/schema-based-int-editor.directive';
+import { ApplyValidationDirective } from './custom-forms-directives/apply-validation.directive';
+import { MatInputModule } from '@angular/material/input';
+import { SchemaBasedFloatEditorComponent } from './schema-based-editors/schema-based-float-editor.directive';
+import { SchemaBasedBoolEditorComponent } from './schema-based-editors/schema-based-bool-editor.directive';
+import { SchemaBasedChoicesEditorComponent } from './schema-based-editors/schema-based-choices-editor.directive';
+import { SchemaBasedCustomEditorComponent } from './schema-based-editors/schema-based-custom-editor.directive';
+import { SchemaBasedDictEditorComponent } from './schema-based-editors/schema-based-dict-editor.directive';
+import { SchemaBasedHtmlEditorComponent } from './schema-based-editors/schema-based-html-editor.directive';
+import { OppiaCkEditor4Module } from 'components/ck-editor-helpers/ckeditor4.module';
 
 @NgModule({
   imports: [
     BrowserModule,
     CommonModule,
     CustomFormsComponentsModule,
+    OppiaCkEditor4Module,
+    DirectivesModule,
     DynamicContentModule,
     FormsModule,
+    MatInputModule,
     MaterialModule,
     NgbTooltipModule,
     NgbModalModule,
@@ -48,17 +62,40 @@ import { ObjectEditorComponent } from './custom-forms-directives/object-editor.d
   ],
   declarations: [
     AudioSliderComponent,
+    ApplyValidationDirective,
+    SchemaBasedBoolEditorComponent,
+    SchemaBasedChoicesEditorComponent,
+    SchemaBasedCustomEditorComponent,
+    SchemaBasedDictEditorComponent,
     SchemaBasedEditorDirective,
+    SchemaBasedFloatEditorComponent,
+    SchemaBasedHtmlEditorComponent,
+    SchemaBasedIntEditorComponent,
     ObjectEditorComponent
   ],
   entryComponents: [
     AudioSliderComponent,
+    SchemaBasedBoolEditorComponent,
+    SchemaBasedChoicesEditorComponent,
+    SchemaBasedCustomEditorComponent,
+    SchemaBasedDictEditorComponent,
+    SchemaBasedFloatEditorComponent,
+    SchemaBasedHtmlEditorComponent,
+    SchemaBasedIntEditorComponent,
     ObjectEditorComponent
   ],
   exports: [
     AudioSliderComponent,
+    ApplyValidationDirective,
     CustomFormsComponentsModule,
+    SchemaBasedBoolEditorComponent,
+    SchemaBasedChoicesEditorComponent,
+    SchemaBasedCustomEditorComponent,
+    SchemaBasedDictEditorComponent,
     SchemaBasedEditorDirective,
+    SchemaBasedFloatEditorComponent,
+    SchemaBasedHtmlEditorComponent,
+    SchemaBasedIntEditorComponent,
     ObjectEditorComponent
   ],
 })

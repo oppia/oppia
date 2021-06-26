@@ -1,9 +1,9 @@
-<object-editor [obj-type]="$ctrl.schema.obj_type"
-               [schema]="$ctrl.schema"
-               [value]="$ctrl.localValue"
-               (value-change)="$ctrl.updateValue($event)"
-               [always-editable]="true"
-               [form]="$ctrl.form">
+<object-editor [objType]="schema.obj_type"
+               [schema]="schema"
+               [value]="localValue"
+               (valueChange)="localValueChange.emit($event)"
+               [alwaysEditable]="true"
+               [form]="form">
 </object-editor>
 <style>
   .validity-form-input-element {
@@ -11,5 +11,3 @@
       width: 0;
   }
 </style>
-<!-- This in put is here to mark the parent form as invalid/ valid from object editor. -->
-<input ng-show="false" class="validity-form-input-element" ng-model="value">

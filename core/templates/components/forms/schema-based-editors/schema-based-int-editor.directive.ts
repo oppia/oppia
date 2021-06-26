@@ -15,55 +15,53 @@
 /**
  * @fileoverview Directive for a schema-based editor for integers.
  */
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
+
+@Component({
+  selector: 'schema-based-int-editor',
+  templateUrl: './schema-based-int-editor.directive.html',
+  styleUrls: []
+})
+export class SchemaBasedIntEditorComponent implements OnInit {
+  @Input() localValue;
+  @Output() localValueChange = new EventEmitter();
+  @Input() disabled;
+  @Input() notRequired;
+  @Input() validators;
+  @Input() labelForFocusTarget;
+  @Output() inputBlur = new EventEmitter<void>();
+  @Output() inputFocus = new EventEmitter<void>();
+  constructor(
+    private focusManagerService: FocusManagerService,
+    private schemaFormSubmittedService: SchemaFormSubmittedService
+  ) { }
+
+  onKeypress(evt: KeyboardEvent): void {
+    if (evt.keyCode === 13) {
+      this.schemaFormSubmittedService.onSubmittedSchemaBasedForm.emit();
+    }
+  }
+
+  ngOnInit(): void {
+    if (this.localValue === undefined) {
+      this.localValue = 0;
+    }
+    // So that focus is applied after all the functions in
+    // main thread have executed.
+    setTimeout(() => {
+      this.focusManagerService.setFocusWithoutScroll(this.labelForFocusTarget);
+    }, 50);
+  }
+}
 
 require(
   'components/forms/custom-forms-directives/apply-validation.directive.ts');
 require('services/schema-form-submitted.service.ts');
 require('services/stateful/focus-manager.service.ts');
 
-angular.module('oppia').directive('schemaBasedIntEditor', [
-  function() {
-    return {
-      restrict: 'E',
-      scope: {
-        labelForFocusTarget: '&'
-      },
-      bindToController: {
-        localValue: '=',
-        isDisabled: '&',
-        notRequired: '&',
-        validators: '&',
-        labelForFocusTarget: '&',
-        onInputBlur: '=',
-        onInputFocus: '='
-      },
-      template: require('./schema-based-int-editor.directive.html'),
-      controllerAs: '$ctrl',
-      controller: [
-        '$scope', '$timeout', 'FocusManagerService',
-        'SchemaFormSubmittedService',
-        function(
-            $scope, $timeout, FocusManagerService,
-            SchemaFormSubmittedService) {
-          var ctrl = this;
-          var labelForFocus = $scope.labelForFocusTarget();
-          ctrl.onKeypress = function(evt) {
-            if (evt.keyCode === 13) {
-              SchemaFormSubmittedService.onSubmittedSchemaBasedForm.emit();
-            }
-          };
-
-          ctrl.$onInit = function() {
-            if (ctrl.localValue === undefined) {
-              ctrl.localValue = 0;
-            }
-            // So that focus is applied after all the functions in
-            // main thread have executed.
-            $timeout(function() {
-              FocusManagerService.setFocusWithoutScroll(labelForFocus);
-            }, 50);
-          };
-        }
-      ]
-    };
-  }]);
+angular.module('oppia').directive('schemaBasedIntEditor', downgradeComponent({
+  component: SchemaBasedIntEditorComponent
+}) as angular.IDirectiveFactory);
