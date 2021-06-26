@@ -22,7 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import json
 import os
 import re
-from typing import Any
+from typing import Any # pylint: disable=unused-import, import-only-modules
 
 import python_utils
 
