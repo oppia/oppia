@@ -44,6 +44,7 @@ import requests_mock
 
 auth_models, user_models = (
     models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
+bulk_email_services = models.Registry.import_bulk_email_services()
 
 
 class MockUserStatsAggregator(
@@ -434,13 +435,44 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             email_preferences.can_receive_feedback_message_email,
             feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE)
 
-        # The user retrieves their email preferences. This initializes
-        # a UserEmailPreferencesModel instance with the default values.
-        user_services.update_email_preferences(
-            user_id, feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE,
-            feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
-            feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
-            feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
+        observed_log_messages = []
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.info()."""
+            observed_log_messages.append(msg % args)
+
+        with self.swap(logging, 'info', _mock_logging_function):
+            user_services.update_email_preferences(
+                user_id, feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE,
+                feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+                feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
+                feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
+
+        self.assertItemsEqual(
+            observed_log_messages,
+            ['Updated status of email ID %s\'s bulk email '
+             'preference in the service provider\'s db to False. Cannot access '
+             'API, since this is a dev environment.' % user_email])
+
+        def _mock_add_or_update_user_status(_email, _can_receive_updates):
+            """Mocks bulk_email_services.add_or_update_user_status()."""
+            return False
+
+        with self.swap(
+            bulk_email_services, 'add_or_update_user_status',
+            _mock_add_or_update_user_status):
+            bulk_email_signup_message_should_be_shown = (
+                user_services.update_email_preferences(
+                    user_id, True, feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+                    feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
+                    feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE))
+            self.assertTrue(bulk_email_signup_message_should_be_shown)
+
+        bulk_email_signup_message_should_be_shown = (
+            user_services.update_email_preferences(
+                user_id, True, feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+                feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
+                feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE))
+        self.assertFalse(bulk_email_signup_message_should_be_shown)
 
         email_preferences = user_services.get_email_preferences(user_id)
         self.assertEqual(
@@ -450,7 +482,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             email_preferences.can_receive_feedback_message_email,
             feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE)
 
-        # The user sets their membership email preference to False.
         user_services.update_email_preferences(
             user_id, feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE, False, False,
             False)
@@ -460,6 +491,52 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertFalse(email_preferences.can_receive_editor_role_email)
         self.assertFalse(email_preferences.can_receive_feedback_message_email)
         self.assertFalse(email_preferences.can_receive_subscription_email)
+
+    def test_get_and_set_user_email_preferences_with_error(self):
+        auth_id = 'someUser'
+        username = 'username'
+        user_email = 'user@example.com'
+
+        user_id = user_services.create_new_user(auth_id, user_email).user_id
+        user_services.set_username(user_id, username)
+        user_services.update_email_preferences(
+            user_id, feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE,
+            feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+            feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
+            feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
+        email_preferences = user_services.get_email_preferences(user_id)
+        self.assertFalse(email_preferences.can_receive_email_updates)
+
+        def _mock_add_or_update_user_status(_email, _can_receive_updates):
+            """Mocks bulk_email_services.add_or_update_user_status().
+
+            Raises:
+                Exception. Mock exception - server error.
+            """
+            raise Exception('Server error')
+
+        with self.swap(
+            bulk_email_services, 'add_or_update_user_status',
+            _mock_add_or_update_user_status):
+            try:
+                user_services.update_email_preferences(
+                    user_id, True,
+                    feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+                    feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
+                    feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
+            except Exception:
+                email_preferences = user_services.get_email_preferences(user_id)
+                # 'can_receive_email_updates' should not be updated in this
+                # case.
+                self.assertFalse(email_preferences.can_receive_email_updates)
+
+        user_services.update_email_preferences(
+            user_id, True,
+            feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+            feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
+            feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
+        email_preferences = user_services.get_email_preferences(user_id)
+        self.assertTrue(email_preferences.can_receive_email_updates)
 
     def test_set_and_get_user_email_preferences_for_exploration(self):
         auth_id = 'someUser'
@@ -2411,7 +2488,7 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
         user_services.allow_user_to_review_question(self.question_reviewer_id)
         user_services.allow_user_to_review_translation_in_language(
             self.translator_id, 'hi')
-        # Ensure that these reviewers want email updates.
+
         user_services.update_email_preferences(
             self.question_reviewer_id, True,
             feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
@@ -2439,7 +2516,7 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
         user_services.allow_user_to_review_question(self.question_reviewer_id)
         user_services.allow_user_to_review_translation_in_language(
             self.translator_id, 'hi')
-        # Ensure that these reviewers do not want email updates.
+
         user_services.update_email_preferences(
             self.question_reviewer_id, False,
             feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,

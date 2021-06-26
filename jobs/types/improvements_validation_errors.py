@@ -26,6 +26,6 @@ class InvalidCompositeEntityError(base_validation_errors.BaseAuditError):
     """Error class for models that have invalid composite entity id."""
 
     def __init__(self, model):
-        super(InvalidCompositeEntityError, self).__init__(model)
-        self.message = 'model has invalid composite entity %s' % (
+        message = 'model has invalid composite entity %s' % (
             model.composite_entity_id)
+        super(InvalidCompositeEntityError, self).__init__(message, model)
