@@ -66,12 +66,13 @@ SCHEMA_TYPE_FLOAT = schema_utils.SCHEMA_TYPE_FLOAT
 SCHEMA_TYPE_HTML = schema_utils.SCHEMA_TYPE_HTML
 SCHEMA_TYPE_INT = schema_utils.SCHEMA_TYPE_INT
 SCHEMA_TYPE_LIST = schema_utils.SCHEMA_TYPE_LIST
+SCHEMA_TYPE_STRING = schema_utils.SCHEMA_TYPE_STRING
 SCHEMA_TYPE_UNICODE = schema_utils.SCHEMA_TYPE_UNICODE
 SCHEMA_TYPE_UNICODE_OR_NONE = schema_utils.SCHEMA_TYPE_UNICODE_OR_NONE
 SCHEMA_TYPE_OBJECT_DICT = schema_utils.SCHEMA_TYPE_OBJECT_DICT
 ALLOWED_SCHEMA_TYPES = [
     SCHEMA_TYPE_BOOL, SCHEMA_TYPE_CUSTOM, SCHEMA_TYPE_DICT, SCHEMA_TYPE_FLOAT,
-    SCHEMA_TYPE_HTML, SCHEMA_TYPE_INT, SCHEMA_TYPE_LIST,
+    SCHEMA_TYPE_HTML, SCHEMA_TYPE_INT, SCHEMA_TYPE_LIST, SCHEMA_TYPE_STRING,
     SCHEMA_TYPE_UNICODE, SCHEMA_TYPE_UNICODE_OR_NONE, SCHEMA_TYPE_OBJECT_DICT]
 ALLOWED_CUSTOM_OBJ_TYPES = [
     'Filepath', 'LogicQuestion', 'MathExpressionContent', 'MusicPhrase',
@@ -1005,54 +1006,14 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
         self.check_normalization(
             schema, mappings, invalid_values_with_error_messages)
 
-    def test_dict_schema_with_default_value(self):
+    def test_string_schema(self):
         schema = {
-            'type': SCHEMA_TYPE_DICT,
-            'properties': [{
-                'name': 'arg_with_some_default',
-                'schema': {
-                    'type': 'unicode',
-                    'default_value': 'arbitary_text'
-                }
-            }, {
-                'name': 'arg_with_default_none',
-                'schema': {
-                    'type': 'unicode',
-                    'default_value': None
-                }
-            }]
+            'type': schema_utils.SCHEMA_TYPE_STRING,
         }
-
-        # Missing args should not raise errors if SCHEMA_KEY_DEFAULT_VALUE
-        # is present in schema.
-        mappings = [
-            ({}, {
-                'arg_with_some_default': 'arbitary_text'
-            }),
-            ({
-                'arg_with_default_none': 'python2',
-                'arg_with_some_default': 'python3'
-            }, {
-                'arg_with_default_none': 'python2',
-                'arg_with_some_default': 'python3'
-            }),
-            ({
-                'arg_with_default_none': 'python2'
-            }, {
-                'arg_with_default_none': 'python2',
-                'arg_with_some_default': 'arbitary_text'
-            })
-        ]
-
+        mappings = [('test1', 'test1'), ('test2', 'test2')]
         invalid_values_with_error_messages = [
-            ({
-                'arg_with_some_default': 5
-            }, 'Expected unicode string, received %s' % 5),
-            ({
-                'arg_with_default_none': 5,
-                'arg_with_some_default': 'python3'
-            }, 'Expected unicode string, received %s' % 5)
-        ]
+            (12, 'Expected unicode string, received 12'),
+            (None, 'Expected unicode string, received None')]
 
         self.check_normalization(
             schema, mappings, invalid_values_with_error_messages)
