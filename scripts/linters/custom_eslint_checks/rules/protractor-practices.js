@@ -32,8 +32,9 @@ module.exports = {
     schema: [],
     messages: {
       constInAllCaps: (
-        'Please make constant name “{{constName}}” are in all-caps'),
-      disallowSleep: 'Please do not use browser.sleep() in protractor files',
+        'Please make sure that constant name “{{constName}}” are in all-caps'),
+      disallowedBrowserMethods: (
+        'Please do not use browser.{{methodName}}() in protractor files'),
       disallowThen: 'Please do not use .then(), consider async/await instead',
       useProtractorTest: (
         'Please use “.protractor-test-” prefix classname selector instead of ' +
@@ -42,8 +43,40 @@ module.exports = {
   },
 
   create: function(context) {
+    var disallowedBrowserMethods = [
+      'sleep', 'explore', 'pause', 'waitForAngular'];
+    var disallowedBrowserMethodsRegex = (
+      `/^(${disallowedBrowserMethods.join('|')})$/`);
+    var disallowedBrowserMethodsSelector = (
+      'CallExpression[callee.object.name=browser][callee.property.name=' +
+      disallowedBrowserMethodsRegex + ']');
     var byCssSelector = (
       'CallExpression[callee.object.name=by][callee.property.name=css]');
+
+    var reportDisallowedBrowserMethod = function(node) {
+      context.report({
+        node: node,
+        loc: node.callee.loc,
+        messageId: 'disallowedBrowserMethods',
+        data: {
+          methodName: node.callee.property.name
+        }
+      });
+    };
+
+    var checkConstName = function(node) {
+      var constantName = node.declarations[0].id.name;
+      if ((node.declarations[0].id.type === 'Identifier') &&
+        (constantName !== constantName.toUpperCase())) {
+        context.report({
+          node: node,
+          messageId: 'constInAllCaps',
+          data: {
+            constName: constantName
+          }
+        });
+      }
+    };
 
     var checkElementSelector = function(node) {
       var thirdPartySelectorPrefixes = (
@@ -70,41 +103,12 @@ module.exports = {
       }
     };
 
-    var checkSleepCall = function(node) {
-      var callee = node.callee;
-      if (callee.property && callee.property.name !== 'sleep') {
-        return;
-      }
-
-      if (callee.object && callee.object.name === 'browser') {
-        context.report({
-          node: node,
-          loc: callee.loc,
-          messageId: 'disallowSleep'
-        });
-      }
-    };
-
-    var checkConstName = function(node) {
-      var constantName = node.declarations[0].id.name;
-      if ((node.declarations[0].id.type === 'Identifier') &&
-        (constantName !== constantName.toUpperCase())) {
-        context.report({
-          node: node,
-          messageId: 'constInAllCaps',
-          data: {
-            constName: constantName
-          }
-        });
-      }
-    };
-
     return {
       'VariableDeclaration[kind=const]': function(node) {
         checkConstName(node);
       },
-      CallExpression: function(node) {
-        checkSleepCall(node);
+      [disallowedBrowserMethodsSelector]: function(node) {
+        reportDisallowedBrowserMethod(node);
       },
       'CallExpression[callee.property.name=\'then\']': function(node) {
         context.report({
