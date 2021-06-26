@@ -40,7 +40,7 @@ class MockRemoveActivityNgbModalRef {
   };
 }
 
-describe('Goals tab Component', () => {
+fdescribe('Goals tab Component', () => {
   let component: GoalsTabComponent;
   let fixture: ComponentFixture<GoalsTabComponent>;
   let learnerDashboardActivityBackendApiService:
@@ -256,7 +256,7 @@ describe('Goals tab Component', () => {
     expect(learnerDashboardSpy).toHaveBeenCalled();
   }
   ));
-  it('should check where the topicId belongs to current goal', fakeAsync(() => {
+  it('should check where the topicId belongs to current goal', () => {
     component.topicIdsInCurrentGoals = ['1', '2', '3'];
 
     let topicBelongsTo = component.getTopicClassification('1');
@@ -264,21 +264,20 @@ describe('Goals tab Component', () => {
 
     expect(topicBelongsTo).toEqual(0);
   }
-  ));
+  );
 
-  it('should check where the topicId belongs to completed goal',
-    fakeAsync(() => {
-      component.topicIdsInCompletedGoals = ['1', '2', '3'];
+  it('should check where the topicId belongs to completed goal', () => {
+    component.topicIdsInCompletedGoals = ['1', '2', '3'];
 
-      let topicBelongsTo = component.getTopicClassification('1');
-      fixture.detectChanges();
+    let topicBelongsTo = component.getTopicClassification('1');
+    fixture.detectChanges();
 
-      expect(topicBelongsTo).toEqual(1);
-    }
-    ));
+    expect(topicBelongsTo).toEqual(1);
+  }
+  );
 
   it('should check if the topicName belongs to learntToPartiallyLearntTopics',
-    fakeAsync(() => {
+    () => {
       component.learntToPartiallyLearntTopics = ['topic', 'topic2', 'topic3'];
 
       let topicBelongsTo = component.topicBelongToLearntToPartiallyLearntTopics(
@@ -286,34 +285,30 @@ describe('Goals tab Component', () => {
       fixture.detectChanges();
 
       expect(topicBelongsTo).toEqual(true);
-    }
-    ));
+    });
 
-  it('should toggle story', fakeAsync(() => {
+  it('should toggle story', () => {
     component.currentGoalsStoryIsShown = [true];
 
     component.toggleStory('0');
     fixture.detectChanges();
 
     expect(component.currentGoalsStoryIsShown[0]).toEqual(false);
-  }
-  ));
+  });
 
-  it('should add topic to learner goals if not already present',
-    fakeAsync(() => {
-      component.topicIdsInCurrentGoals.length = 0;
-      component.topicIdsInCompletedGoals = ['1', '2'];
-      const learnerGoalsSpy = spyOn(
-        learnerDashboardActivityBackendApiService, 'addToLearnerGoals')
-        .and.returnValue(true);
+  it('should add topic to learner goals if not already present', () => {
+    component.topicIdsInCurrentGoals.length = 0;
+    component.topicIdsInCompletedGoals = ['1', '2'];
+    const learnerGoalsSpy = spyOn(
+      learnerDashboardActivityBackendApiService, 'addToLearnerGoals')
+      .and.returnValue(true);
+    component.addToLearnerGoals(component.editGoals[0], '3', 1);
+    fixture.detectChanges();
 
-      component.addToLearnerGoals(component.editGoals[0], '3', 1);
-      fixture.detectChanges();
+    expect(learnerGoalsSpy).toHaveBeenCalled();
+  });
 
-      expect(learnerGoalsSpy).toHaveBeenCalled();
-    }));
-
-  it('should remove topic from the learner goals', fakeAsync(() => {
+  it('should remove topic from the learner goals', () => {
     expect(learnerDashboardActivityBackendApiService.removeActivityModalStatus)
       .toBeUndefined;
     component.topicIdsInCurrentGoals = ['1', '2', '3'];
@@ -330,7 +325,7 @@ describe('Goals tab Component', () => {
     fixture.detectChanges();
 
     expect(modalSpy).toHaveBeenCalled();
-  }));
+  });
 
   it('should get static image url', () => {
     const urlSpy = spyOn(
