@@ -36,9 +36,9 @@
       </p>
       <div class="summary-container">
         <div *ngFor="let tile of displayIncompleteLessonsList"
-           class="oppia-summary-tile-container"
-           (mouseenter)="tile.toggle = !tile.toggle"
-           (mouseleave)="tile.toggle = !tile.toggle">
+             class="oppia-summary-tile-container"
+             (mouseenter)="tile.toggle = !tile.toggle"
+             (mouseleave)="tile.toggle = !tile.toggle">
           <div *ngIf="getTileType(tile) === 'exploration'">
             <i class="remove-icon fa fa-times"
                *ngIf="tile.toggle || checkMobileView()"
@@ -110,9 +110,9 @@
           </span>
         </span>
         <div *ngFor="let tile of displayCompletedLessonsList"
-           class="oppia-summary-tile-container"
-           (mouseenter)="tile.toggle = !tile.toggle"
-           (mouseleave)="tile.toggle = !tile.toggle">
+             class="oppia-summary-tile-container"
+             (mouseenter)="tile.toggle = !tile.toggle"
+             (mouseleave)="tile.toggle = !tile.toggle">
           <div *ngIf="getTileType(tile) === 'exploration'">
             <i class="oppia-learner-dashboard-icon far fa-check-circle"
                aria-hidden="true"
@@ -233,14 +233,16 @@
     </div>
     <div class="pagination-bottom" *ngIf="displayInCommunityLessons.length !== 0 && checkMobileView()">
       <i class="fa fa-angle-left pagination-arrow" aria-label="Previous Page"
-        (click)="changePageByOne('MOVE_TO_PREV_PAGE', 'communityLessons')"></i>
+         (click)="changePageByOne('MOVE_TO_PREV_PAGE', 'communityLessons')">
+      </i>
       <span class="dot">
         <span class="pagination-number">
           {{pageNumberInCommunityLessons}}
         </span>
       </span>
       <i class="fa fa-angle-right pagination-arrow" aria-label="Next Page"
-        (click)="changePageByOne('MOVE_TO_NEXT_PAGE', 'communityLessons')"></i>
+         (click)="changePageByOne('MOVE_TO_NEXT_PAGE', 'communityLessons')">
+      </i>
     </div>
   </div>
 </div>
@@ -256,14 +258,16 @@
   <div *ngIf="checkMobileView() && displayLessonsInPlaylist !== 0">
     <div class="pagination">
       <i class="fa fa-angle-left pagination-arrow" aria-label="Previous Page"
-        (click)="changePageByOne('MOVE_TO_PREV_PAGE', 'playlist')"></i>
+         (click)="changePageByOne('MOVE_TO_PREV_PAGE', 'playlist')">
+      </i>
       <span class="dot">
         <span class="pagination-number">
           {{pageNumberInPlaylist}}
         </span>
       </span>
       <i class="fa fa-angle-right pagination-arrow" aria-label="Next Page"
-        (click)="changePageByOne('MOVE_TO_NEXT_PAGE', 'playlist')"></i>
+         (click)="changePageByOne('MOVE_TO_NEXT_PAGE', 'playlist')">
+      </i>
     </div>
   </div>
   <div *ngIf="totalLessonsInPlaylist.length !== 0">
@@ -315,14 +319,16 @@
       <div *ngIf="checkMobileView() && displayLessonsInPlaylist !== 0">
         <div class="pagination-bottom">
           <i class="fa fa-angle-left pagination-arrow" aria-label="Previous Page"
-            (click)="changePageByOne('MOVE_TO_PREV_PAGE', 'playlist')"></i>
+             (click)="changePageByOne('MOVE_TO_PREV_PAGE', 'playlist')">
+          </i>
           <span class="dot">
             <span class="pagination-number">
               {{pageNumberInPlaylist}}
             </span>
           </span>
           <i class="fa fa-angle-right pagination-arrow" aria-label="Next Page"
-            (click)="changePageByOne('MOVE_TO_NEXT_PAGE', 'playlist')"></i>
+             (click)="changePageByOne('MOVE_TO_NEXT_PAGE', 'playlist')">
+          </i>
         </div>
       </div>
       <div class="oppia-toggle-button-section" *ngIf="totalLessonsInPlaylist.length > 3 && !checkMobileView()">
@@ -353,11 +359,11 @@
       *ngFor="let subscription of subscriptionsList">
       <a class="oppia-subscription-profile-link" href="/profile/{{ subscription.username }}" target="_blank" rel="noopener">
         <img [src]="decodePngURIData(subscription.pictureDataUrl)"
-          class="oppia-subscription-card-profile-picture rounded-circle">
+             class="oppia-subscription-card-profile-picture rounded-circle">
         <span class="oppia-subscription-card-summary text-dark">
           <div class="oppia-subscription-name">
             <strong container="body"
-              triggers="showUsernamePopover(subscription.username)" ngbPopover="subscription.username">
+                    triggers="showUsernamePopover(subscription.username)" ngbPopover="subscription.username">
               {{ subscription.username| truncate:10 }}
             </strong>
           </div>
@@ -385,14 +391,14 @@
 <style>
   .community-lessons-section,
   .playlist-section,
-  .subscriptions-section{
+  .subscriptions-section {
     background-color: #fff;
     border-radius: 4px;
     box-shadow: 0 0 4px #0000001a;
     margin: auto;
     margin-bottom: 25px;
-    opacity: 1;
     min-height: 215px;
+    opacity: 1;
     padding: 0 0 30px 0;
     width: 726px;
   }
@@ -401,59 +407,59 @@
     width: 656px;
   }
   .oppia-dashboard-intro-button {
-    position: relative;
     left: 40px;
+    position: relative;
   }
   .pagination {
+    bottom: 10px;
     display: block;
+    list-style: none;
     padding-left: 0;
     position: relative;
-    list-style: none;
-    width: 250px;
     text-align: end;
-    bottom: 10px;
+    width: 250px;
   }
   .pagination-bottom {
+    bottom: 10px;
     display: block;
+    list-style: none;
     padding-top: 25px;
     position: relative;
-    list-style: none;
     right: 41px;
     text-align: end;
-    bottom: 10px;
   }
   .dot {
-    height: 25px;
-    width: 25px;
     background-color: rgba(65, 152, 137, 0.15);
     border-radius: 50%;
-    margin: 0px 10px;
-    position: relative;
-    display: inline-block;
     bottom: 4px;
+    display: inline-block;
+    height: 25px;
+    margin: 0 10px;
+    position: relative;
+    width: 25px;
   }
   .pagination-number {
+    color: black;
     font-size: 15px;
+    margin: 0 7px;
+    opacity: 1;
     position: relative;
     right: 1px;
-    opacity: 1;
-    color: black;
-    margin: 0 7px;
   }
   .pagination-arrow {
-    font-size: 25px;
     color: #CCC;
+    font-size: 25px;
   }
   .dropbtn {
     background-color: #fff;
-    right: -163px;
-    position: relative;
-    margin-bottom: 20px;
-    font-size: 14px;
-    height: 24px;
-    width: 104px;
     border: 1px solid;
     bottom: 23px;
+    font-size: 14px;
+    height: 24px;
+    margin-bottom: 20px;
+    position: relative;
+    right: -163px;
+    width: 104px;
   }
   .dropdown-icon {
     float: right;
@@ -462,50 +468,51 @@
     top: 2px;
   }
   .dropdown {
-    position: relative;
     display: inline-block;
-    height: 0px;
+    height: 0;
+    position: relative;
   }
   .view-text {
-    float: right;
-    position: relative;
     bottom: 22px;
-    right: 100px;
-    font-weight: 500;
+    float: right;
     font-size: 16px;
+    font-weight: 500;
+    position: relative;
+    right: 100px;
   }
   .dropdown-content {
-    display: none;
     background-color: #fff;
+    box-shadow: 0 8px 16px 0 rgb(0 0 0 / 20%);
+    display: none;
     max-width: 104px;
-    box-shadow: 0px 8px 16px 0px rgb(0 0 0 / 20%);
     z-index: 1;
   }
   .dropdown-content a {
     color: black;
+    display: block;
     padding: 12px 16px;
     text-decoration: none;
-    display: block;
   }
-  .dropdown-content a:hover {background-color: #ddd;}
+  .dropdown-content a:hover {
+    background-color: #ddd;
+  }
   .dropdown:hover .dropdown-content {
+    bottom: 43px;
     display: block;
+    left: 164px;
+    margin-right: 0;
     padding: 10px;
     position: relative;
-    left: 164px;
-    bottom: 43px;
-    margin-right: 0;
   }
   .lessons-title {
-    text-align: left;
-    font-size: 24px;
-    letter-spacing: 0px;
-    font-family: 'Capriola';
     color: #00645C;
-    font-style: capriola;
-    opacity: 1;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-size: 24px;
+    letter-spacing: 0;
     margin-bottom: 0;
+    opacity: 1;
     padding: 34px 40px;
+    text-align: left;
   }
   .oppia-summary-tile-container {
     display: inline-block;
@@ -545,12 +552,12 @@
   }
   .oppia-subscription-container-list {
     margin: 0 8px 0 4px;
-    width: 197px;
     padding: 0 10px 30px 0;
+    width: 197px;
   }
   .oppia-subscriptions-container {
-    width: 656px;
     margin: auto;
+    width: 656px;
   }
   .oppia-subscription-name {
     font-size: 17.5px;
@@ -558,27 +565,27 @@
   }
   .oppia-toggle-button-section {
     margin: auto;
-    width: 50%;
     padding: 0 98px;
+    width: 50%;
   }
   .oppia-toggle-btn {
-    text-align: center;
-    letter-spacing: 0px;
     color: #00645C;
-    text-transform: uppercase;
-    opacity: 1;
-    font-weight: 500;
     font-size: 18px;
+    font-weight: 500;
+    letter-spacing: 0;
+    opacity: 1;
+    text-align: center;
+    text-transform: uppercase;
   }
   .sub-section-title {
-    text-align: left;
+    color: #333;
     font-size: 20px;
-    letter-spacing: 0px;
-    color: #333333;
-    opacity: 1;
     font-weight: 500;
+    letter-spacing: 0;
     margin-bottom: 0;
+    opacity: 1;
     padding: 0 0 12px 40px;
+    text-align: left;
   }
   @media screen and (max-width: 767px) {
     .community-lessons-section,
@@ -593,8 +600,8 @@
       width: 272px;
     }
     .oppia-mobile-summary-tile-container {
-      width: 310px;
       padding: 13px;
+      width: 310px;
     }
     .empty-section {
       padding: 0 40px;
@@ -607,8 +614,8 @@
       width: 205px;
     }
     .remove-icon {
-      top: 2px;
       left: -40px;
+      top: 2px;
     }
     .oppia-learner-dashboard-icon {
       right: 44px;
@@ -619,14 +626,14 @@
     .community-lessons-section,
     .playlist-section,
     .subscriptions-section {
-      width: 726px;
       position: relative;
       right: 117px;
+      width: 726px;
     }
     .communtiy-lessons-mobile-view {
-      width: 650px;
-      margin: auto;
       display: flex;
+      margin: auto;
+      width: 650px;
     }
     .pagination-bottom {
       display: none;
