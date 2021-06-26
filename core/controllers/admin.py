@@ -275,20 +275,7 @@ class AdminHandler(base.BaseHandler):
                 result = {
                     'opportunities_count': opportunities_count
                 }
-            elif action == 'regenerate_missing_exploration_stats':
-                exp_id = self.payload.get('exp_id')
-                (
-                    exp_stats, state_stats,
-                    num_valid_exp_stats, num_valid_state_stats
-                ) = exp_services.regenerate_missing_stats_for_exploration(
-                    exp_id)
-                result = {
-                    'missing_exp_stats': exp_stats,
-                    'missing_state_stats': state_stats,
-                    'num_valid_exp_stats': num_valid_exp_stats,
-                    'num_valid_state_stats': num_valid_state_stats
-                }
-            elif action == 'update_feature_flag_rules':
+            elif self.payload.get('action') == 'update_feature_flag_rules':
                 feature_name = self.payload.get('feature_name')
                 new_rule_dicts = self.payload.get('new_rules')
                 commit_message = self.payload.get('commit_message')
