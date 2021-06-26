@@ -25,13 +25,15 @@ import os
 import subprocess
 import sys
 
+
+from scripts import common
 from scripts import install_third_party_libs
 # This installs third party libraries before importing other files or importing
 # libraries that use the builtins python module (e.g. build, python_utils).
 install_third_party_libs.main()
 
 import python_utils # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-from scripts import common # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+
 
 # List of directories whose files won't be type-annotated ever.
 EXCLUDED_DIRECTORIES = [
