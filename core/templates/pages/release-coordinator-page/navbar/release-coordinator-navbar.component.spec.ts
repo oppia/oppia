@@ -17,12 +17,11 @@
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
 
 import { UserService } from 'services/user.service';
-
-import { ReleaseCoordinatorNavbarComponent } from './release-coordinator-navbar.component';
 import { ReleaseCoordinatorPageConstants } from '../release-coordinator-page.constants';
+import { ReleaseCoordinatorNavbarComponent } from './release-coordinator-navbar.component';
 
 
 describe('Release coordinator navbar component', () => {
@@ -36,8 +35,7 @@ describe('Release coordinator navbar component', () => {
   };
   let profileUrl = '/profile/username1';
   let fixture: ComponentFixture<ReleaseCoordinatorNavbarComponent>;
-
-  beforeEach(async(() => {
+  beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [ReleaseCoordinatorNavbarComponent]
@@ -45,7 +43,7 @@ describe('Release coordinator navbar component', () => {
 
     fixture = TestBed.createComponent(ReleaseCoordinatorNavbarComponent);
     component = fixture.componentInstance;
-    userService = TestBed.get(UserService);
+    userService = TestBed.inject(UserService);
     fixture.detectChanges();
 
     spyOn(userService, 'getProfileImageDataUrlAsync')
@@ -97,5 +95,9 @@ describe('Release coordinator navbar component', () => {
     component.deactivateProfileDropdown();
 
     expect(component.profileDropdownIsActive).toBe(false);
+  });
+
+  it('should disable the Beam Jobs tab by default', () => {
+    expect(component.BEAM_JOBS_TAB_IS_ENABLED).toBe(false);
   });
 });
