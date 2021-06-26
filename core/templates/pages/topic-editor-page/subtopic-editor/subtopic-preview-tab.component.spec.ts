@@ -187,17 +187,4 @@ describe('SubtopicPreviewTab', () => {
     expect(topicEditorRoutingService.navigateToSubtopicEditorWithId)
       .toHaveBeenCalledWith(1);
   });
-
-  it('should set thumbnailIsShown to true if thumbnail is displayed', () => {
-    component.changeContent('thumbnail');
-
-    expect(component.thumbnailIsShown).toBe(true);
-  });
-
-  it('should set thumbnailIsShown to false if thumbnail is not' +
-  ' displayed', () => {
-    component.changeContent('not_thumbnail');
-
-    expect(component.thumbnailIsShown).toBe(false);
-  });
 });

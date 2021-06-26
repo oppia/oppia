@@ -77,6 +77,9 @@ describe('GraphDetailService', () => {
 
   it('should return arrow points when directed option is selected in' +
   'the graph interaction', () => {
+    // Pre-checks cannot be used here since all the variables used within
+    // the function are private. Here we attempt to test if the
+    // function returns the expected output for a specified input.
     expect(graphDetailService.getDirectedEdgeArrowPoints(graph, index))
       .toBe('196,50 186,45 186,55');
   });
@@ -84,12 +87,18 @@ describe('GraphDetailService', () => {
   it('should return empty string when edge arrow points are in the same ' +
   'location', () => {
     graph.vertices[0] = graph.vertices[1];
+    // Pre-checks cannot be used here since all the variables used within
+    // the function are private. Here we attempt to test if the
+    // function returns the expected output for a specified input.
     expect(graphDetailService.getDirectedEdgeArrowPoints(graph, index))
       .toBe('');
   });
 
   it('should return edge center points when weighted option is selected in' +
   'the graph interaction', () => {
+    // Pre-checks cannot be used here since all the variables used within
+    // the function are private. Here we attempt to test if the
+    // function returns the expected output for a specified input.
     expect(graphDetailService.getEdgeCentre(graph, index)).toEqual({
       x: 175,
       y: 50
