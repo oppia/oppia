@@ -28,15 +28,6 @@ import feconf
 import utils
 
 
-class BlogDashboardPage(base.BaseHandler):
-    """The editor page for a single skill."""
-
-    @acl_decorators.can_access_blog_dashboard
-    def get(self):
-        """Handles GET requests."""
-        self.render_template('blog-dashboard-page.mainpage.html')
-
-
 def get_blog_card_summary_dicts_for_dashboard(summaries):
     """Creates summary dicts for use in blog dashboard.
 
