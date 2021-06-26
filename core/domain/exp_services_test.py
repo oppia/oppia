@@ -5119,7 +5119,7 @@ title: Old Title
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(exploration.title, 'new title')
 
-        # Check that the property can we changed when working
+        # Check that the property can be changed when working
         # on old version.
         # Add change to upgrade the version.
         exp_services.update_exploration(
@@ -5154,7 +5154,7 @@ title: Old Title
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(exploration.language_code, 'bn')
 
-        # Check that the property can we changed when working
+        # Check that the property can be changed when working
         # on old version.
         # Add change to upgrade the version.
         exp_services.update_exploration(
@@ -5189,7 +5189,7 @@ title: Old Title
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(exploration.tags, ['test'])
 
-        # Check that the property can we changed when working
+        # Check that the property can be changed when working
         # on old version.
         # Add change to upgrade the version.
         exp_services.update_exploration(
@@ -5224,7 +5224,7 @@ title: Old Title
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(exploration.author_notes, 'author_notes')
 
-        # Check that the property can we changed when working
+        # Check that the property can be changed when working
         # on old version.
         # Add change to upgrade the version.
         exp_services.update_exploration(
@@ -5259,7 +5259,7 @@ title: Old Title
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(exploration.blurb, 'blurb')
 
-        # Check that the property can we changed when working
+        # Check that the property can be changed when working
         # on old version.
         # Add change to upgrade the version.
         exp_services.update_exploration(
@@ -5346,7 +5346,7 @@ title: Old Title
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(exploration.init_state_name, 'State')
 
-        # Check that the property can we changed when working
+        # Check that the property can be changed when working
         # on old version.
         # Add change to upgrade the version.
         exp_services.update_exploration(
@@ -5396,7 +5396,7 @@ title: Old Title
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(exploration.auto_tts_enabled, False)
 
-        # Check that the property can we changed when working
+        # Check that the property can be changed when working
         # on old version.
         # Add change to upgrade the version.
         exp_services.update_exploration(
@@ -5431,7 +5431,7 @@ title: Old Title
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(exploration.correctness_feedback_enabled, True)
 
-        # Check that the property can we changed when working
+        # Check that the property can be changed when working
         # on old version.
         # Add change to upgrade the version.
         exp_services.update_exploration(
@@ -5472,7 +5472,7 @@ title: Old Title
             exploration.init_state.interaction.confirmed_unclassified_answers,
             ['test'])
 
-        # Check that the property can we changed when working
+        # Check that the property can be changed when working
         # on old version.
         # Add change to upgrade the version.
         exp_services.update_exploration(
@@ -5530,7 +5530,7 @@ title: Old Title
             exploration.init_state.interaction.hints[0].hint_content.content_id,
             'hint_1')
 
-        # Check that the property can we changed when working
+        # Check that the property can be changed when working
         # on old version.
         # Add change to upgrade the version.
         exp_services.update_exploration(
@@ -5621,7 +5621,7 @@ title: Old Title
                 'Changed hints.'
             )
 
-        # Check that the property can we changed when working
+        # Check that the property can be changed when working
         # on old version.
         # Add change to upgrade the version.
         exp_services.update_exploration(
@@ -5720,7 +5720,7 @@ title: Old Title
             exploration.init_state.interaction.solution,
             None)
 
-        # Check that the property can we changed when working
+        # Check that the property can be changed when working
         # on old version.
         # Add change to upgrade the version.
         exp_services.update_exploration(
@@ -5768,7 +5768,7 @@ title: Old Title
                     'new_value': 'invalid_recorded_voiceovers'
                 })], 'Changed recorded_voiceovers.')
 
-        # Check that the property can we changed when working
+        # Check that the property can be changed when working
         # on old version.
         # Add change to upgrade the version.
         exp_services.update_exploration(

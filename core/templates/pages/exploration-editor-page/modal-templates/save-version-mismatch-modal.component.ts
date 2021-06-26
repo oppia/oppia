@@ -16,8 +16,7 @@
  * @fileoverview Component for version mismatch modal.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-
+import { Component, ElementRef, Input, OnInit } from '@angular/core';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
@@ -37,6 +36,7 @@ export class SaveVersionMismatchModalComponent
 
   constructor(
     private windowRef: WindowRef,
+    private elRef: ElementRef,
     private loggerService: LoggerService,
     private explorationDataService: ExplorationDataService,
     private lostChangeObjectFactory: LostChangeObjectFactory,
@@ -54,6 +54,22 @@ export class SaveVersionMismatchModalComponent
         this.lostChangeObjectFactory.createNew);
       this.loggerService.error(
         'Lost changes: ' + JSON.stringify(this.lostChanges));
+    }
+  }
+  ngAfterViewInit(): void {
+    // eslint-disable-next-line max-len
+    let div = this.elRef.nativeElement.getElementsByClassName('oppia-lost-changes');
+    // eslint-disable-next-line no-console
+    var blob = new Blob([div[0].innerText], {type: 'text/csv'});
+    if (window.navigator.msSaveOrOpenBlob) {
+      window.navigator.msSaveBlob(blob, 'static.txt');
+    } else {
+      var elem = window.document.createElement('a');
+      elem.href = window.URL.createObjectURL(blob);
+      elem.download = 'static.txt';
+      document.body.appendChild(elem);
+      elem.click();
+      document.body.removeChild(elem);
     }
   }
 
