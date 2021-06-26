@@ -26,11 +26,8 @@ from core.domain import exp_services
 from core.domain import recommendations_services
 from core.domain import rights_domain
 from core.platform import models
-import python_utils
 
-(exp_models, recommendations_models,) = models.Registry.import_models([
-    models.NAMES.exploration, models.NAMES.recommendations])
-datastore_services = models.Registry.import_datastore_services()
+(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
 MAX_RECOMMENDATIONS = 10
 # Note: There is a threshold so that bad recommendations will be
@@ -101,77 +98,3 @@ class ExplorationRecommendationsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
         recommendations_services.set_exploration_recommendations(
             key, recommended_exploration_ids)
-
-
-class DeleteAllExplorationRecommendationsOneOffJob(
-        jobs.BaseMapReduceOneOffJobManager):
-    """A one-off job that deletes all instances of
-    ExplorationRecommendationsModel.
-    """
-
-    @classmethod
-    def enqueue(cls, job_id, additional_job_params=None):
-        super(DeleteAllExplorationRecommendationsOneOffJob, cls).enqueue(
-            job_id, shard_count=64)
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [recommendations_models.ExplorationRecommendationsModel]
-
-    @staticmethod
-    def map(model):
-        model.delete()
-        yield ('DELETED', 1)
-
-    @staticmethod
-    def reduce(key, values):
-        yield (key, len(values))
-
-
-class CleanUpExplorationRecommendationsOneOffJob(
-        jobs.BaseMapReduceOneOffJobManager):
-    """Cleans up ExplorationRecommendationsModel.
-
-    This is done by:
-        1. Removing exploration ids from recommendation list of model if
-        exploration model is deleted.
-        2. Deleting the recommendations model if the exploration for which it
-        was created is deleted.
-
-    NOTE TO DEVELOPERS: Do not delete this job until issue #10809 is fixed.
-    """
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [recommendations_models.ExplorationRecommendationsModel]
-
-    @staticmethod
-    def map(item):
-        if item.deleted:
-            return
-
-        exp_model = exp_models.ExplorationModel.get_by_id(item.id)
-        if exp_model is None or exp_model.deleted:
-            yield ('Removed recommendation model', item.id)
-            item.delete()
-            return
-
-        fetched_exploration_model_instances = (
-            datastore_services.fetch_multiple_entities_by_ids_and_models(
-                [('ExplorationModel', item.recommended_exploration_ids)]))[0]
-
-        exp_ids_removed = []
-        for exp_id, exp_instance in list(python_utils.ZIP(
-                item.recommended_exploration_ids,
-                fetched_exploration_model_instances)):
-            if exp_instance is None or exp_instance.deleted:
-                exp_ids_removed.append(exp_id)
-                item.recommended_exploration_ids.remove(exp_id)
-        if exp_ids_removed:
-            item.update_timestamps()
-            item.put()
-            yield ('Removed deleted exp ids from recommendations', item.id)
-
-    @staticmethod
-    def reduce(key, values):
-        yield (key, values)
