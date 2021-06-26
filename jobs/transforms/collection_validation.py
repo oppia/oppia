@@ -45,3 +45,11 @@ class ValidateCollectionCommitCmdsSchema(
             changes made by commit commands of the model.
         """
         return collection_domain.CollectionChange
+
+
+@validation_decorators.RelationshipsOf(collection_models.CollectionSummaryModel)
+def collection_summary_model_relationships(model):
+    """Yields how the properties of the model relates to the ID of others."""
+
+    yield model.id, [collection_models.CollectionModel]
+    yield model.id, [collection_models.CollectionRightsModel]

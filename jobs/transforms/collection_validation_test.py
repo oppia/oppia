@@ -20,7 +20,9 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform import models
+from core.tests import test_utils
 from jobs import job_test_utils
+from jobs.decorators import validation_decorators
 from jobs.transforms import collection_validation
 from jobs.types import base_validation_errors
 
@@ -227,3 +229,12 @@ class ValidateCollectionCommitCmdsSchemaTests(
                 'Value for property_name in cmd edit_collection_property: '
                 'invalid is not allowed')
         ])
+
+
+class RelationshipsOfTests(test_utils.TestBase):
+
+    def test_collection_summary_model_relationships(self):
+        self.assertItemsEqual(
+            validation_decorators.RelationshipsOf.get_model_kind_references(
+                'CollectionSummaryModel', 'id'),
+            ['CollectionModel', 'CollectionRightsModel'])
