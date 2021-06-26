@@ -22,6 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import json
 import os
 import re
+from typing import Any
 
 import python_utils
 
@@ -58,8 +59,13 @@ def remove_comments(text):
 class Constants(dict):
     """Transforms dict to object, attributes can be accessed by dot notation."""
 
-    __getattr__ = dict.__getitem__
+    def __setattr__(self, name, value):
+        # type: (str, Any) -> None
+        self[name] = value
 
+    def __getattr__(self, name):
+        # type: (str) -> Any
+        return self[name]
 
 with python_utils.open_file(os.path.join('assets', 'constants.ts'), 'r') as f:
     constants = Constants(parse_json_from_js(f))  # pylint:disable=invalid-name
