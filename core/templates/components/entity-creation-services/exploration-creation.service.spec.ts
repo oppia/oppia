@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 /**
  * @fileoverview Unit test for Exploration creation service.
  */
@@ -104,121 +105,120 @@ describe('ExplorationCreationService', () => {
     ngbModal = TestBed.inject(NgbModal);
   });
 
-  it('should not create a new exploration if another exploration' +
-    ' creation is in progress', () => {
-    spyOn(ecbas, 'registerNewExplorationAsync');
-    ecs.explorationCreationInProgress = true;
+  describe('on calling createNewExploration', () => {
+    it('should not create a new exploration if another exploration' +
+      ' creation is in progress', () => {
+      spyOn(ecbas, 'registerNewExplorationAsync');
+      ecs.explorationCreationInProgress = true;
 
-    expect(ecs.createNewExploration()).toBe(undefined);
-    expect(ecbas.registerNewExplorationAsync).not.toHaveBeenCalled();
-  });
+      expect(ecs.createNewExploration()).toBe(undefined);
+      expect(ecbas.registerNewExplorationAsync).not.toHaveBeenCalled();
+    });
 
-  it('should show \'Creating exploration\' loading screen while' +
-    ' creating exploration', () => {
-    spyOn(ecbas, 'registerNewExplorationAsync').and.returnValue(
-      new Promise<ExplorationCreationResponse>((resolve, reject) => {}));
-    spyOn(loaderService, 'showLoadingScreen');
-    ecs.explorationCreationInProgress = false;
+    it('should change loadingMessage to Creating exploration', () => {
+      spyOn(loaderService, 'showLoadingScreen');
+      ecs.explorationCreationInProgress = false;
 
-    ecs.createNewExploration();
+      ecs.createNewExploration();
 
-    expect(loaderService.showLoadingScreen)
-      .toHaveBeenCalledWith('Creating exploration');
-    expect(ecbas.registerNewExplorationAsync).toHaveBeenCalled();
-  });
+      expect(loaderService.showLoadingScreen)
+        .toHaveBeenCalledWith('Creating exploration');
+    });
 
-  it('should create new exploration', fakeAsync(() => {
-    spyOn(siteAnalyticsService, 'registerCreateNewExplorationEvent');
-    spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
-      '/url/to/exp1'
-    );
-
-    expect(ecs.explorationCreationInProgress).toBe(undefined);
-    expect(windowRef.nativeWindow.location.href).toBe('');
-
-    ecs.createNewExploration();
-    tick(150);
-
-    expect(ecs.explorationCreationInProgress).toBe(true);
-    expect(windowRef.nativeWindow.location.href).toBe('/url/to/exp1');
-  }));
-
-  it('should handle error if exploration creation fails', fakeAsync(() => {
-    spyOn(siteAnalyticsService, 'registerCreateNewExplorationEvent');
-    spyOn(urlInterpolationService, 'interpolateUrl');
-    spyOn(loaderService, 'hideLoadingScreen');
-
-    ecbas.throwError = true;
-
-    expect(ecs.explorationCreationInProgress).toBe(undefined);
-    expect(windowRef.nativeWindow.location.href).toBe('');
-
-    ecs.createNewExploration();
-    tick(150);
-
-    expect(ecs.explorationCreationInProgress).toBe(false);
-    expect(windowRef.nativeWindow.location.href).toBe('');
-    expect(siteAnalyticsService.registerCreateNewExplorationEvent)
-      .not.toHaveBeenCalled();
-    expect(urlInterpolationService.interpolateUrl).not.toHaveBeenCalled();
-    expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
-  }));
-
-  it('should show upload exploration modal when user clicks' +
-    ' on upload', fakeAsync(() => {
-    spyOn(ngbModal, 'open').and.returnValue(
-      <NgbModalRef>{
-        result: Promise.resolve({
-          yamlFile: ''
-        })
-      }
-    );
-    spyOn(csrfTokenService, 'getTokenAsync').and.resolveTo('sample-csrf-token');
-
-    // @ts-ignore in order to ignore JQuery properties that should
-    // be declared.
-    spyOn($, 'ajax').and.callFake((options) => {
-      let d = $.Deferred();
-      d.resolve(
-        options.dataFilter(')]}\',\n{"explorationId": "expId"}')
+    it('should create new exploration', fakeAsync(() => {
+      spyOn(siteAnalyticsService, 'registerCreateNewExplorationEvent');
+      spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
+        '/url/to/exp1'
       );
-      return d.promise();
-    });
 
-    ecs.showUploadExplorationModal();
-    tick();
+      expect(ecs.explorationCreationInProgress).toBe(undefined);
+      expect(windowRef.nativeWindow.location.href).toBe('');
 
-    expect(windowRef.nativeWindow.location.href).toBe('/create/expId');
-  }));
+      ecs.createNewExploration();
+      tick(150);
 
-  it('should show upload exploration modal and display alert if post' +
-    ' request fails', fakeAsync(() => {
-    spyOn(ngbModal, 'open').and.returnValue(
-      <NgbModalRef>{
-        result: Promise.resolve({
-          yamlFile: ''
-        })
-      }
-    );
-    spyOn(csrfTokenService, 'getTokenAsync').and.resolveTo('sample-csrf-token');
-    spyOn(alertsService, 'addWarning');
-    spyOn(loaderService, 'hideLoadingScreen');
+      expect(ecs.explorationCreationInProgress).toBe(true);
+      expect(windowRef.nativeWindow.location.href).toBe('/url/to/exp1');
+    }));
 
-    // @ts-ignore in order to ignore JQuery properties that should
-    // be declared.
-    spyOn($, 'ajax').and.callFake(() => {
-      let d = $.Deferred();
-      d.reject({
-        responseText: ')]}\',\n{"error": "Failed to upload exploration"}'
+    it('should handle error if exploration creation fails', fakeAsync(() => {
+      spyOn(siteAnalyticsService, 'registerCreateNewExplorationEvent');
+      spyOn(urlInterpolationService, 'interpolateUrl');
+      spyOn(loaderService, 'hideLoadingScreen');
+
+      ecbas.throwError = true;
+
+      expect(ecs.explorationCreationInProgress).toBe(undefined);
+      expect(windowRef.nativeWindow.location.href).toBe('');
+
+      ecs.createNewExploration();
+      tick(150);
+
+      expect(ecs.explorationCreationInProgress).toBe(false);
+      expect(windowRef.nativeWindow.location.href).toBe('');
+      expect(siteAnalyticsService.registerCreateNewExplorationEvent)
+        .not.toHaveBeenCalled();
+      expect(urlInterpolationService.interpolateUrl).not.toHaveBeenCalled();
+      expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
+    }));
+  });
+
+  describe('on calling showUploadExplorationModal',() => {
+    it('should show upload exploration modal', fakeAsync(() => {
+      spyOn(ngbModal, 'open').and.returnValue(
+        <NgbModalRef>{
+          result: Promise.resolve({
+            yamlFile: ''
+          })
+        }
+      );
+      spyOn(csrfTokenService, 'getTokenAsync').and.resolveTo('sample-csrf-token');
+
+      // @ts-ignore in order to ignore JQuery properties that should
+      // be declared.
+      spyOn($, 'ajax').and.callFake((options) => {
+        let d = $.Deferred();
+        d.resolve(
+          options.dataFilter(')]}\',\n{"explorationId": "expId"}')
+        );
+        return d.promise();
       });
-      return d.promise();
-    });
 
-    ecs.showUploadExplorationModal();
-    tick();
+      ecs.showUploadExplorationModal();
+      tick();
 
-    expect(alertsService.addWarning).toHaveBeenCalledWith(
-      'Failed to upload exploration');
-    expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
-  }));
+      expect(windowRef.nativeWindow.location.href).toBe('/create/expId');
+    }));
+
+    it('should show upload exploration modal and display alert if post' +
+      ' request fails', fakeAsync(() => {
+      spyOn(ngbModal, 'open').and.returnValue(
+        <NgbModalRef>{
+          result: Promise.resolve({
+            yamlFile: ''
+          })
+        }
+      );
+      spyOn(csrfTokenService, 'getTokenAsync').and.resolveTo('sample-csrf-token');
+      spyOn(alertsService, 'addWarning');
+      spyOn(loaderService, 'hideLoadingScreen');
+
+      // @ts-ignore in order to ignore JQuery properties that should
+      // be declared.
+      spyOn($, 'ajax').and.callFake(() => {
+        let d = $.Deferred();
+        d.reject({
+          responseText: ')]}\',\n{"error": "Failed to upload exploration"}'
+        });
+        return d.promise();
+      });
+
+      ecs.showUploadExplorationModal();
+      tick();
+
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
+        'Failed to upload exploration');
+      expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
+    }));
+  });
 });
