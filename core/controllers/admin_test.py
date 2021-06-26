@@ -860,9 +860,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             '/adminsuperadminhandler', {}, csrf_token=self.get_new_csrf_token(),
             expected_status_int=400)
 
-        error_msg = (
-            'Schema validation for \'username\' failed: Missing keys: '
-            '[u\'username\'], Extra keys: []')
+        error_msg = ('Missing key in handler args: username.')
         self.assertEqual(response['error'], error_msg)
 
     def test_grant_super_admin_privileges_fails_with_invalid_username(self):
@@ -912,10 +910,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         response = self.delete_json(
             '/adminsuperadminhandler', params={}, expected_status_int=400)
 
-        error_msg = (
-            'Schema validation for \'username\' failed: Missing keys: '
-            '[u\'username\'], Extra keys: []')
-
+        error_msg = ('Missing key in handler args: username.')
         self.assertEqual(response['error'], error_msg)
 
     def test_revoke_super_admin_privileges_fails_with_invalid_username(self):
@@ -1418,9 +1413,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
                 'new_username': None},
             csrf_token=csrf_token,
             expected_status_int=400)
-        error_msg = (
-            'Schema validation for \'new_username\' failed: Missing keys'
-            ': [u\'new_username\'], Extra keys: []')
+        error_msg = ('Missing key in handler args: new_username.')
         self.assertEqual(
             response['error'], error_msg)
 
@@ -1434,9 +1427,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
                 'new_username': self.NEW_USERNAME},
             csrf_token=csrf_token,
             expected_status_int=400)
-        error_msg = (
-            'Schema validation for \'old_username\' failed: Missing keys'
-            ': [u\'old_username\'], Extra keys: []')
+        error_msg = ('Missing key in handler args: old_username.')
         self.assertEqual(
             response['error'], error_msg)
 
@@ -1481,11 +1472,12 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
                 'new_username': long_username},
             csrf_token=csrf_token,
             expected_status_int=400)
+        error_msg = (
+            'Schema validation for \'new_username\' failed: Validation failed'
+            ': is_length_atmost ({u\'max_value\': 29}) for object '
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
         self.assertEqual(
-            response['error'], 'Expected new username to be less than %s '
-            'characters, received %s' % (
-                constants.MAX_USERNAME_LENGTH,
-                long_username))
+            response['error'], error_msg)
 
     def test_update_username_with_nonexistent_old_username(self):
         non_existent_username = 'invalid'
@@ -1859,9 +1851,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
                 'removal_type': 'all'
             }, csrf_token=csrf_token, expected_status_int=400)
 
-        error_msg = (
-            'Schema validation for \'username\' failed: Missing keys: '
-            '[u\'username\'], Extra keys: []')
+        error_msg = ('Missing key in handler args: username.')
         self.assertEqual(response['error'], error_msg)
 
     def test_add_reviewer_with_invalid_username_raise_error(self):
@@ -2305,9 +2295,7 @@ class ContributionRightsDataHandlerTest(test_utils.GenericTestBase):
             '/contributionrightsdatahandler', params={},
             expected_status_int=400)
 
-        error_msg = (
-            'Schema validation for \'username\' failed: Missing keys: '
-            '[u\'username\'], Extra keys: []')
+        error_msg = ('Missing key in handler args: username.')
         self.assertEqual(response['error'], error_msg)
         self.logout()
 

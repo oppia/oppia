@@ -58,6 +58,7 @@ SCHEMA_TYPE_FLOAT = 'float'
 SCHEMA_TYPE_HTML = 'html'
 SCHEMA_TYPE_INT = 'int'
 SCHEMA_TYPE_LIST = 'list'
+SCHEMA_TYPE_STRING = 'string'
 SCHEMA_TYPE_UNICODE = 'unicode'
 SCHEMA_TYPE_UNICODE_OR_NONE = 'unicode_or_none'
 SCHEMA_TYPE_OBJECT_DICT = 'object_dict'
@@ -173,6 +174,10 @@ def normalize_against_schema(
             obj = python_utils.UNICODE(obj)
         assert isinstance(obj, python_utils.UNICODE), (
             'Expected unicode, received %s' % obj)
+        normalized_obj = obj
+    elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_STRING:
+        assert isinstance(obj, python_utils.BASESTRING), (
+            'Expected unicode string, received %s' % obj)
         normalized_obj = obj
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_UNICODE_OR_NONE:
         assert obj is None or isinstance(obj, python_utils.BASESTRING), (
@@ -460,6 +465,18 @@ class _Validators(python_utils.OBJECT):
         """
         return obj <= max_value
 
+    @staticmethod
+    def is_length_atmost(obj, max_value):
+        """Ensures that `obj` (an str) has length at most `max_value`.
+
+        Args:
+            obj: str. An object.
+            max_value: int. The maximum allowed length for `obj`.
+
+        Returns:
+            bool. Whether the given object has length at most `max_value`.
+        """
+        return len(obj) <= max_value
     @staticmethod
     def does_not_contain_email(obj):
         """Ensures that obj doesn't contain a valid email.

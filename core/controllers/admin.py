@@ -34,7 +34,7 @@ from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import opportunity_services
 from core.domain import platform_feature_services as feature_services
-from core.domain import platform_parameter_domain
+from core.domain import platform_parameter_domain as parameter_domain
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import recommendations_services
@@ -75,37 +75,13 @@ class AdminPage(base.BaseHandler):
 class AdminHandler(base.BaseHandler):
     """Handler for the admin page."""
 
-    NEW_RULES_TYPE_SCHEMA = {
-        'type': 'list',
-        'items': {
-            'type': 'dict',
-            'properties': [{
-                'name': 'value_when_matched',
-                'schema': {
-                    'type': 'bool'
-                }
-            }, {
-                'name': 'filters',
-                'schema': {
-                    'type': 'list',
-                    'items': {
-                        'type': 'object_dict',
-                        'object_class': (
-                            platform_parameter_domain.PlatformParameterFilter)
-                    }
-                }
-            }]
-        },
-        'default_value': None
-    }
-
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {},
         'POST': {
             'action': {
-                'type': 'unicode',
+                'type': 'string',
                 'choices': [
                     'reload_exploration', 'reload_collection',
                     'generate_dummy_explorations', 'clear_search_index',
@@ -116,14 +92,15 @@ class AdminHandler(base.BaseHandler):
                     'cancel_job', 'regenerate_topic_related_opportunities',
                     'start_new_job', 'regenerate_missing_exploration_stats',
                     'update_feature_flag_rules'
-                ]
+                ],
+                'default_value': None
             },
             'exploration_id': {
-                'type': 'unicode',
+                'type': 'string',
                 'default_value': None
             },
             'collection_id': {
-                'type': 'unicode',
+                'type': 'string',
                 'default_value': None
             },
             'num_dummy_exps_to_generate': {
@@ -141,40 +118,62 @@ class AdminHandler(base.BaseHandler):
                 'default_value': None
             },
             'config_property_id': {
-                'type': 'unicode',
+                'type': 'string',
                 'default_value': None
             },
             'job_type': {
-                'type': 'unicode',
+                'type': 'string',
                 'default_value': None
             },
             'job_id': {
-                'type': 'unicode',
+                'type': 'string',
                 'default_value': None
             },
             'computation_type': {
-                'type': 'unicode',
+                'type': 'string',
                 'default_value': None
             },
             'data': {
-                'type': 'unicode',
+                'type': 'string',
                 'default_value': None
             },
             'topic_id': {
-                'type': 'unicode',
+                'type': 'string',
                 'default_value': None
             },
             'feature_name': {
-                'type': 'unicode',
+                'type': 'string',
                 'default_value': None
             },
             'commit_message': {
-                'type': 'unicode',
+                'type': 'string',
                 'default_value': None
             },
-            'new_rules': NEW_RULES_TYPE_SCHEMA,
+            'new_rules': {
+                'type': 'list',
+                'items': {
+                    'type': 'dict',
+                    'properties': [{
+                        'name': 'value_when_matched',
+                        'schema': {
+                            'type': 'bool'
+                        }
+                    }, {
+                        'name': 'filters',
+                        'schema': {
+                            'type': 'list',
+                            'items': {
+                                'type': 'object_dict',
+                                'object_class': (
+                                    parameter_domain.PlatformParameterFilter)
+                            }
+                        }
+                    }]
+                },
+                'default_value': None
+            },
             'exp_id': {
-                'type': 'unicode',
+                'type': 'string',
                 'default_value': None
             }
         }
@@ -219,15 +218,16 @@ class AdminHandler(base.BaseHandler):
     @acl_decorators.can_access_admin_page
     def post(self):
         """Handles POST requests."""
+        action = self.payload.get('action')
         try:
             result = {}
-            if self.payload.get('action') == 'reload_exploration':
+            if action == 'reload_exploration':
                 exploration_id = self.payload.get('exploration_id')
                 self._reload_exploration(exploration_id)
-            elif self.payload.get('action') == 'reload_collection':
+            elif action == 'reload_collection':
                 collection_id = self.payload.get('collection_id')
                 self._reload_collection(collection_id)
-            elif self.payload.get('action') == 'generate_dummy_explorations':
+            elif action == 'generate_dummy_explorations':
                 num_dummy_exps_to_generate = self.payload.get(
                     'num_dummy_exps_to_generate')
                 num_dummy_exps_to_publish = self.payload.get(
@@ -239,18 +239,14 @@ class AdminHandler(base.BaseHandler):
                 else:
                     self._generate_dummy_explorations(
                         num_dummy_exps_to_generate, num_dummy_exps_to_publish)
-            elif self.payload.get('action') == 'clear_search_index':
+            elif action == 'clear_search_index':
                 search_services.clear_collection_search_index()
                 search_services.clear_exploration_search_index()
-            elif (
-                    self.payload.get('action') ==
-                    'generate_dummy_new_structures_data'):
+            elif action == 'generate_dummy_new_structures_data':
                 self._load_dummy_new_structures_data()
-            elif (
-                    self.payload.get('action') ==
-                    'generate_dummy_new_skill_data'):
+            elif action == 'generate_dummy_new_skill_data':
                 self._generate_dummy_skill_and_questions()
-            elif self.payload.get('action') == 'save_config_properties':
+            elif action == 'save_config_properties':
                 new_config_property_values = self.payload.get(
                     'new_config_property_values')
                 logging.info(
@@ -258,18 +254,19 @@ class AdminHandler(base.BaseHandler):
                     (self.user_id, new_config_property_values))
                 for (name, value) in new_config_property_values.items():
                     config_services.set_property(self.user_id, name, value)
-            elif self.payload.get('action') == 'revert_config_property':
-                config_property_id = self.payload.get('config_property_id')
+            elif action == 'revert_config_property':
+                config_property_id = (
+                    self.payload.get(
+                        'config_property_id'))
                 logging.info(
                     '[ADMIN] %s reverted config property: %s' %
                     (self.user_id, config_property_id))
                 config_services.revert_property(
                     self.user_id, config_property_id)
-            elif self.payload.get('action') == 'upload_topic_similarities':
+            elif action == 'upload_topic_similarities':
                 data = self.payload.get('data')
                 recommendations_services.update_topic_similarities(data)
-            elif self.payload.get('action') == (
-                    'regenerate_topic_related_opportunities'):
+            elif action == 'regenerate_topic_related_opportunities':
                 topic_id = self.payload.get('topic_id')
                 opportunities_count = (
                     opportunity_services
@@ -278,8 +275,7 @@ class AdminHandler(base.BaseHandler):
                 result = {
                     'opportunities_count': opportunities_count
                 }
-            elif self.payload.get('action') == (
-                    'regenerate_missing_exploration_stats'):
+            elif action == 'regenerate_missing_exploration_stats':
                 exp_id = self.payload.get('exp_id')
                 (
                     exp_stats, state_stats,
@@ -292,7 +288,7 @@ class AdminHandler(base.BaseHandler):
                     'num_valid_exp_stats': num_valid_exp_stats,
                     'num_valid_state_stats': num_valid_state_stats
                 }
-            elif self.payload.get('action') == 'update_feature_flag_rules':
+            elif action == 'update_feature_flag_rules':
                 feature_name = self.payload.get('feature_name')
                 new_rule_dicts = self.payload.get('new_rules')
                 commit_message = self.payload.get('commit_message')
@@ -706,27 +702,27 @@ class AdminRoleHandler(base.BaseHandler):
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'filter_criterion': {
-                'type': 'unicode',
+                'type': 'string',
                 'choices': ['role', 'username']
             },
             'role': {
-                'type': 'unicode',
+                'type': 'string',
                 'default_value': None
             },
             'username': {
-                'type': 'unicode',
+                'type': 'string',
                 'default_value': None
             }
         },
         'POST': {
             'role': {
-                'type': 'unicode'
+                'type': 'string'
             },
             'username': {
-                'type': 'unicode'
+                'type': 'string'
             },
             'topic_id': {
-                'type': 'unicode',
+                'type': 'string',
                 'default_value': None
             }
         }
@@ -734,10 +730,11 @@ class AdminRoleHandler(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def get(self):
-        filter_criterion = self.request.get('filter_criterion')
-
+        filter_criterion = self.normalized_request.get(
+            'filter_criterion')
         if filter_criterion == feconf.USER_FILTER_CRITERION_ROLE:
-            role = self.request.get(feconf.USER_FILTER_CRITERION_ROLE)
+            role = self.normalized_request.get(
+                feconf.USER_FILTER_CRITERION_ROLE)
             users_by_role = {
                 username: role
                 for username in user_services.get_usernames_by_role(role)
@@ -747,7 +744,8 @@ class AdminRoleHandler(base.BaseHandler):
                 role=role)
             self.render_json(users_by_role)
         elif filter_criterion == feconf.USER_FILTER_CRITERION_USERNAME:
-            username = self.request.get(feconf.USER_FILTER_CRITERION_USERNAME)
+            username = self.normalized_request.get(
+                feconf.USER_FILTER_CRITERION_USERNAME)
             user_id = user_services.get_user_id_from_username(username)
             role_services.log_role_query(
                 self.user_id, feconf.ROLE_ACTION_VIEW_BY_USERNAME,
@@ -802,12 +800,12 @@ class AdminSuperAdminPrivilegesHandler(base.BaseHandler):
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
             'username': {
-                'type': 'unicode'
+                'type': 'string'
             }
         },
         'DELETE': {
             'username': {
-                'type': 'unicode'
+                'type': 'string'
             }
         }
     }
@@ -818,7 +816,7 @@ class AdminSuperAdminPrivilegesHandler(base.BaseHandler):
             raise self.UnauthorizedUserException(
                 'Only the default system admin can manage super admins')
 
-        username = self.payload.get('username', None)
+        username = self.payload.get('username')
 
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
@@ -833,7 +831,7 @@ class AdminSuperAdminPrivilegesHandler(base.BaseHandler):
             raise self.UnauthorizedUserException(
                 'Only the default system admin can manage super admins')
 
-        username = self.request.get('username', None)
+        username = self.normalized_request.get('username')
 
         user_settings = user_services.get_user_settings_from_username(username)
         if user_settings is None:
@@ -869,29 +867,30 @@ class DataExtractionQueryHandler(base.BaseHandler):
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'exp_id': {
-                'type': 'unicode'
+                'type': 'string'
             },
             'exp_version': {
-                'type': 'unicode'
+                'type': 'string'
             },
             'state_name': {
-                'type': 'unicode'
+                'type': 'string'
             },
             'num_answers': {
-                'type': 'unicode'
+                'type': 'string'
             }
         }
     }
 
     @acl_decorators.can_access_admin_page
     def get(self):
-        exp_id = self.request.get('exp_id')
+        exp_id = self.normalized_request.get('exp_id')
         try:
-            exp_version = int(self.request.get('exp_version'))
+            exp_version = int(
+                self.normalized_request.get('exp_version'))
         except ValueError:
             raise self.InvalidInputException(
                 'Version %s cannot be converted to int.'
-                % self.request.get('exp_version')
+                % self.normalized_request.get('exp_version')
             )
 
         exploration = exp_fetchers.get_exploration_by_id(
@@ -899,10 +898,10 @@ class DataExtractionQueryHandler(base.BaseHandler):
         if exploration is None:
             raise self.InvalidInputException(
                 'Entity for exploration with id %s and version %s not found.'
-                % (exp_id, self.request.get('exp_version')))
+                % (exp_id, self.normalized_request.get('exp_version')))
 
-        state_name = self.request.get('state_name')
-        num_answers = int(self.request.get('num_answers'))
+        state_name = self.normalized_request.get('state_name')
+        num_answers = int(self.normalized_request.get('num_answers'))
 
         if state_name not in exploration.states:
             raise self.InvalidInputException(
@@ -930,17 +929,17 @@ class AddContributionRightsHandler(base.BaseHandler):
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
             'username': {
-                'type': 'unicode'
+                'type': 'string'
             },
             'category': {
-                'type': 'unicode',
+                'type': 'string',
                 'choices': [
                     'translation', 'voiceover',
                     'question', 'submit_question'
                 ]
             },
             'language_code': {
-                'type': 'unicode',
+                'type': 'string',
                 'validators': [{
                     'id': 'is_supported_audio_language_code'
                 }],
@@ -958,12 +957,9 @@ class AddContributionRightsHandler(base.BaseHandler):
             raise self.InvalidInputException('Invalid username: %s' % username)
 
         category = self.payload.get('category')
-        language_code = self.payload.get('language_code', None)
+        language_code = self.payload.get('language_code')
 
         if category == constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION:
-            if not utils.is_supported_audio_language_code(language_code):
-                raise self.InvalidInputException(
-                    'Invalid language_code: %s' % language_code)
             if user_services.can_review_translation_suggestions(
                     user_id, language_code=language_code):
                 raise self.InvalidInputException(
@@ -972,9 +968,6 @@ class AddContributionRightsHandler(base.BaseHandler):
             user_services.allow_user_to_review_translation_in_language(
                 user_id, language_code)
         elif category == constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER:
-            if not utils.is_supported_audio_language_code(language_code):
-                raise self.InvalidInputException(
-                    'Invalid language_code: %s' % language_code)
             if user_services.can_review_voiceover_applications(
                     user_id, language_code=language_code):
                 raise self.InvalidInputException(
@@ -994,9 +987,6 @@ class AddContributionRightsHandler(base.BaseHandler):
                     'User %s already has rights to submit question.' % (
                         username))
             user_services.allow_user_to_submit_question(user_id)
-        else:
-            raise self.InvalidInputException(
-                'Invalid category: %s' % category)
 
         if category in [
                 constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
@@ -1016,14 +1006,14 @@ class RemoveContributionRightsHandler(base.BaseHandler):
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
             'username': {
-                'type': 'unicode'
+                'type': 'string'
             },
             'removal_type': {
-                'type': 'unicode',
+                'type': 'string',
                 'choices': ['all', 'specific']
             },
             'category': {
-                'type': 'unicode',
+                'type': 'string',
                 'choices': [
                     'translation', 'voiceover',
                     'question', 'submit_question'
@@ -1031,7 +1021,7 @@ class RemoveContributionRightsHandler(base.BaseHandler):
                 'default_value': None
             },
             'language_code': {
-                'type': 'unicode',
+                'type': 'string',
                 'validators': [{
                     'id': 'is_supported_audio_language_code'
                 }],
@@ -1042,17 +1032,13 @@ class RemoveContributionRightsHandler(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def put(self):
-        username = self.payload.get('username', None)
+        username = self.payload.get('username')
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
             raise self.InvalidInputException(
                 'Invalid username: %s' % username)
 
-        language_code = self.payload.get('language_code', None)
-        if language_code is not None and not (
-                utils.is_supported_audio_language_code(language_code)):
-            raise self.InvalidInputException(
-                'Invalid language_code: %s' % language_code)
+        language_code = self.payload.get('language_code')
 
         removal_type = self.payload.get('removal_type')
         if removal_type == constants.ACTION_REMOVE_ALL_REVIEW_RIGHTS:
@@ -1092,9 +1078,6 @@ class RemoveContributionRightsHandler(base.BaseHandler):
                         '%s does not have rights to submit question.' % (
                             username))
                 user_services.remove_question_submit_rights(user_id)
-            else:
-                raise self.InvalidInputException(
-                    'Invalid category: %s' % category)
 
             if category in [
                     constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
@@ -1103,9 +1086,6 @@ class RemoveContributionRightsHandler(base.BaseHandler):
             ]:
                 email_manager.send_email_to_removed_contribution_reviewer(
                     user_id, category, language_code=language_code)
-        else:
-            raise self.InvalidInputException(
-                'Invalid removal_type: %s' % removal_type)
 
         self.render_json({})
 
@@ -1118,14 +1098,14 @@ class ContributorUsersListHandler(base.BaseHandler):
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'category': {
-                'type': 'unicode',
+                'type': 'string',
                 'choices': [
                     'translation', 'voiceover',
                     'question', 'submit_question'
                 ]
             },
             'language_code': {
-                'type': 'unicode',
+                'type': 'string',
                 'validators': [{
                     'id': 'is_supported_audio_language_code'
                 }],
@@ -1136,18 +1116,9 @@ class ContributorUsersListHandler(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def get(self):
-        category = self.request.get('category')
-        language_code = self.request.get('language_code', None)
-        if language_code is not None and not (
-                utils.is_supported_audio_language_code(language_code)):
-            raise self.InvalidInputException(
-                'Invalid language_code: %s' % language_code)
-        if category not in [
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION]:
-            raise self.InvalidInputException('Invalid category: %s' % category)
+        category = self.normalized_request.get('category')
+        language_code = self.normalized_request.get('language_code')
+
         usernames = user_services.get_contributor_usernames(
             category, language_code=language_code)
         self.render_json({'usernames': usernames})
@@ -1161,14 +1132,14 @@ class ContributionRightsDataHandler(base.BaseHandler):
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'username': {
-                'type': 'unicode'
+                'type': 'string'
             }
         }
     }
 
     @acl_decorators.can_access_admin_page
     def get(self):
-        username = self.request.get('username', None)
+        username = self.normalized_request.get('username')
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
             raise self.InvalidInputException(
@@ -1208,38 +1179,27 @@ class UpdateUsernameHandler(base.BaseHandler):
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
             'old_username': {
-                'type': 'unicode'
+                'type': 'string'
             },
             'new_username': {
-                'type': 'unicode'
+                'type': 'string',
+                'validators': [{
+                    'id': 'is_length_atmost',
+                    'max_value': (constants.MAX_USERNAME_LENGTH - 1)
+                }]
             }
         }
     }
 
     @acl_decorators.can_access_admin_page
     def put(self):
-        old_username = self.payload.get('old_username', None)
-        new_username = self.payload.get('new_username', None)
-
-        if not isinstance(old_username, python_utils.UNICODE):
-            raise self.InvalidInputException(
-                'Expected old username to be a unicode string, received %s'
-                % old_username)
-
-        if not isinstance(new_username, python_utils.UNICODE):
-            raise self.InvalidInputException(
-                'Expected new username to be a unicode string, received %s'
-                % new_username)
+        old_username = self.payload.get('old_username')
+        new_username = self.payload.get('new_username')
 
         user_id = user_services.get_user_id_from_username(old_username)
         if user_id is None:
             raise self.InvalidInputException(
                 'Invalid username: %s' % old_username)
-
-        if len(new_username) > constants.MAX_USERNAME_LENGTH:
-            raise self.InvalidInputException(
-                'Expected new username to be less than %s characters, '
-                'received %s' % (constants.MAX_USERNAME_LENGTH, new_username))
 
         if user_services.is_username_taken(new_username):
             raise self.InvalidInputException('Username already taken.')
@@ -1275,14 +1235,14 @@ class VerifyUserModelsDeletedHandler(base.BaseHandler):
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'user_id': {
-                'type': 'unicode'
+                'type': 'string'
             }
         }
     }
 
     @acl_decorators.can_access_admin_page
     def get(self):
-        user_id = self.request.get('user_id', None)
+        user_id = self.normalized_request.get('user_id')
 
         user_is_deleted = wipeout_service.verify_user_deleted(
             user_id, include_delete_at_end_models=True)
@@ -1296,18 +1256,18 @@ class DeleteUserHandler(base.BaseHandler):
     HANDLER_ARGS_SCHEMAS = {
         'DELETE': {
             'user_id': {
-                'type': 'unicode'
+                'type': 'string'
             },
             'username': {
-                'type': 'unicode'
+                'type': 'string'
             }
         }
     }
 
     @acl_decorators.can_delete_any_user
     def delete(self):
-        user_id = self.request.get('user_id', None)
-        username = self.request.get('username', None)
+        user_id = self.normalized_request.get('user_id')
+        username = self.normalized_request.get('username')
 
         user_id_from_username = (
             user_services.get_user_id_from_username(username))

@@ -54,13 +54,14 @@ class TrainedClassifierHandler(base.OppiaMLVMHandler):
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'exploration_id': {
-                'type': 'unicode'
+                'type': 'string'
             },
             'exploration_version': {
-                'type': 'int'
+                'type': 'int',
+                'default_value': None
             },
             'state_name': {
-                'type': 'unicode'
+                'type': 'string'
             }
         },
         'POST': {}
@@ -121,11 +122,12 @@ class TrainedClassifierHandler(base.OppiaMLVMHandler):
         Retrieves the name of the file on GCS storing the trained model
         parameters and transfers it to the frontend.
         """
-        exploration_id = self.request.get('exploration_id')
-        state_name = self.request.get('state_name')
+        exploration_id = self.normalized_request.get('exploration_id')
+        state_name = self.normalized_request.get('state_name')
 
         try:
-            exp_version = int(self.request.get('exploration_version'))
+            exp_version = int(self.normalized_request.get(
+                'exploration_version'))
             exploration = exp_fetchers.get_exploration_by_id(
                 exploration_id, version=exp_version)
             interaction_id = exploration.states[state_name].interaction.id
@@ -133,8 +135,8 @@ class TrainedClassifierHandler(base.OppiaMLVMHandler):
             raise self.InvalidInputException(
                 'Entity for exploration with id %s, version %s and state %s '
                 'not found.' % (
-                    exploration_id, self.request.get('exploration_version'),
-                    state_name))
+                    exploration_id, self.normalized_request.get(
+                        'exploration_version'), state_name))
 
         if interaction_id not in feconf.INTERACTION_CLASSIFIER_MAPPING:
             raise self.PageNotFoundException(
@@ -202,13 +204,13 @@ class NextJobHandler(base.OppiaMLVMHandler):
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
             'vm_id': {
-                'type': 'unicode'
+                'type': 'string'
             },
             'message': {
-                'type': 'unicode'
+                'type': 'string'
             },
             'signature': {
-                'type': 'unicode'
+                'type': 'string'
             }
         }
     }

@@ -30,7 +30,7 @@ class ClassroomPage(base.BaseHandler):
     """Renders the classroom page."""
     URL_PATH_ARGS_SCHEMAS = {
         'classroom_url_fragment': {
-            'type': 'unicode'
+            'type': 'string'
         }
     }
     HANDLER_ARGS_SCHEMAS = {'GET': {}}
@@ -50,7 +50,7 @@ class ClassroomDataHandler(base.BaseHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
         'classroom_url_fragment': {
-            'type': 'unicode'
+            'type': 'string'
         }
     }
     HANDLER_ARGS_SCHEMAS = {'GET': {}}
@@ -58,7 +58,6 @@ class ClassroomDataHandler(base.BaseHandler):
     @acl_decorators.does_classroom_exist
     def get(self, classroom_url_fragment):
         """Handles GET requests."""
-
         classroom = classroom_services.get_classroom_by_url_fragment(
             classroom_url_fragment)
 
@@ -82,17 +81,6 @@ class ClassroomDataHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class DefaultClassroomRedirectPage(base.BaseHandler):
-    """Redirects to the default classroom page."""
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
-
-    @acl_decorators.open_access
-    def get(self):
-        """Handles GET requests."""
-        self.redirect('/learn/%s' % constants.DEFAULT_CLASSROOM_URL_FRAGMENT)
-
-
 class ClassroomPromosStatusHandler(base.BaseHandler):
     """The handler for checking whether the classroom promos are enabled."""
 
@@ -109,3 +97,14 @@ class ClassroomPromosStatusHandler(base.BaseHandler):
             'classroom_promos_are_enabled': (
                 config_domain.CLASSROOM_PROMOS_ARE_ENABLED.value)
         })
+
+
+class DefaultClassroomRedirectPage(base.BaseHandler):
+    """Redirects to the default classroom page."""
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+    @acl_decorators.open_access
+    def get(self):
+        """Handles GET requests."""
+        self.redirect('/learn/%s' % constants.DEFAULT_CLASSROOM_URL_FRAGMENT)

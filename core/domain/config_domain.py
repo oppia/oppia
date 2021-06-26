@@ -50,8 +50,7 @@ LIST_OF_FEATURED_TRANSLATION_LANGUAGES_DICTS_SCHEMA = {
                 'type': schema_utils.SCHEMA_TYPE_UNICODE
             }
         }]
-    },
-    'default_value': None
+    }
 }
 
 SET_OF_STRINGS_SCHEMA = {
@@ -61,8 +60,7 @@ SET_OF_STRINGS_SCHEMA = {
     },
     'validators': [{
         'id': 'is_uniquified',
-    }],
-    'default_value': None
+    }]
 }
 
 SET_OF_CLASSROOM_DICTS_SCHEMA = {
@@ -113,8 +111,7 @@ SET_OF_CLASSROOM_DICTS_SCHEMA = {
                 }]
             }
         }]
-    },
-    'default_value': None
+    }
 }
 
 VMID_SHARED_SECRET_KEY_SCHEMA = {
@@ -132,28 +129,23 @@ VMID_SHARED_SECRET_KEY_SCHEMA = {
                 'type': schema_utils.SCHEMA_TYPE_UNICODE
             }
         }]
-    },
-    'default_value': None
+    }
 }
 
 BOOL_SCHEMA = {
-    'type': schema_utils.SCHEMA_TYPE_BOOL,
-    'default_value': None
+    'type': schema_utils.SCHEMA_TYPE_BOOL
 }
 
 UNICODE_SCHEMA = {
-    'type': schema_utils.SCHEMA_TYPE_UNICODE,
-    'default_value': None
+    'type': schema_utils.SCHEMA_TYPE_UNICODE
 }
 
 FLOAT_SCHEMA = {
-    'type': schema_utils.SCHEMA_TYPE_FLOAT,
-    'default_value': None
+    'type': schema_utils.SCHEMA_TYPE_FLOAT
 }
 
 INT_SCHEMA = {
-    'type': schema_utils.SCHEMA_TYPE_INT,
-    'default_value': None
+    'type': schema_utils.SCHEMA_TYPE_INT
 }
 
 
@@ -500,97 +492,3 @@ MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER = ConfigProperty(
     'the number of suggestions per reviewer surpasses this maximum, for any '
     'given suggestion type on the dashboard, the admins are notified by email.',
     5)
-
-# Schema for new config property value.
-NEW_CONFIG_PROPERTY_VALUE_SCHEMA_LIST = [
-    {
-        'name': 'always_ask_learners_for_answer_details',
-        'schema': BOOL_SCHEMA
-    }, {
-        'name': 'classroom_pages_data',
-        'schema': SET_OF_CLASSROOM_DICTS_SCHEMA
-    }, {
-        'name': 'classroom_promos_are_enabled',
-        'schema': BOOL_SCHEMA
-    }, {
-        'name': 'contributor_can_suggest_questions',
-        'schema': BOOL_SCHEMA
-    }, {
-        'name': 'contributor_dashboard_is_enabled',
-        'schema': BOOL_SCHEMA
-    }, {
-        'name': 'contributor_dashboard_reviewer_emails_is_enabled',
-        'schema': BOOL_SCHEMA
-    }, {
-        'name': 'email_footer',
-        'schema': UNICODE_SCHEMA
-    }, {
-        'name': 'email_sender_name',
-        'schema': UNICODE_SCHEMA
-    }, {
-        'name': 'enable_admin_notifications_for_reviewer_shortage',
-        'schema': BOOL_SCHEMA
-    }, {
-        'name': 'featured_translation_languages',
-        'schema': LIST_OF_FEATURED_TRANSLATION_LANGUAGES_DICTS_SCHEMA
-    }, {
-        'name': 'high_bounce_rate_task_minimum_exploration_starts',
-        'schema': INT_SCHEMA
-    }, {
-        'name': 'high_bounce_rate_task_state_bounce_rate_creation_threshold',
-        'schema': FLOAT_SCHEMA
-    }, {
-        'name': 'high_bounce_rate_task_state_bounce_rate_obsoletion_threshold',
-        'schema': FLOAT_SCHEMA
-    }, {
-        'name': 'is_improvements_tab_enabled',
-        'schema': BOOL_SCHEMA
-    }, {
-        'name': 'max_number_of_explorations_in_math_svgs_batch',
-        'schema': INT_SCHEMA
-    }, {
-        'name': 'max_number_of_suggestions_per_reviewer',
-        'schema': INT_SCHEMA
-    }, {
-        'name': 'max_number_of_svgs_in_math_svgs_batch',
-        'schema': INT_SCHEMA
-    }, {
-        'name': 'notification_user_ids_for_failed_tasks',
-        'schema': {
-            'type': 'list',
-            'items': UNICODE_SCHEMA,
-            'default_value': None
-        }
-    }, {
-        'name': 'notify_admins_suggestions_waiting_too_long_is_enabled',
-        'schema': BOOL_SCHEMA
-    }, {
-        'name': 'oppia_csrf_secret',
-        'schema': UNICODE_SCHEMA
-    }, {
-        'name': 'record_playthrough_probability',
-        'schema': FLOAT_SCHEMA
-    }, {
-        'name': 'signup_email_content',
-        'schema': {
-            'type': 'dict',
-            'properties': [{
-                'name': 'html_body',
-                'schema': UNICODE_SCHEMA
-            }, {
-                'name': 'subject',
-                'schema': UNICODE_SCHEMA
-            }],
-            'default_value': None
-        }
-    }, {
-        'name': 'unpublish_exploration_email_html_body',
-        'schema': UNICODE_SCHEMA
-    }, {
-        'name': 'vmid_shared_secret_key_mapping',
-        'schema': VMID_SHARED_SECRET_KEY_SCHEMA
-    }, {
-        'name': 'whitelisted_exploration_ids_for_playthroughs',
-        'schema': SET_OF_STRINGS_SCHEMA
-    }
-]
