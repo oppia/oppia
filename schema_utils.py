@@ -60,6 +60,7 @@ SCHEMA_TYPE_INT = 'int'
 SCHEMA_TYPE_LIST = 'list'
 SCHEMA_TYPE_STRING = 'string'
 SCHEMA_TYPE_UNICODE = 'unicode'
+SCHEMA_TYPE_STRING = 'string'
 SCHEMA_TYPE_UNICODE_OR_NONE = 'unicode_or_none'
 SCHEMA_TYPE_OBJECT_DICT = 'object_dict'
 
@@ -165,6 +166,10 @@ def normalize_against_schema(
                 item, item_schema, global_validators=global_validators
             ) for item in obj
         ]
+    elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_STRING:
+        assert isinstance(obj, python_utils.BASESTRING), (
+            'Expected unicode string, received %s' % obj)
+        normalized_obj = obj
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_UNICODE:
         assert isinstance(obj, python_utils.BASESTRING), (
             'Expected unicode string, received %s' % obj)

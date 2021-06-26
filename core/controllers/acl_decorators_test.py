@@ -3974,13 +3974,13 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS = {
             'POST': {
                 'vm_id': {
-                    'type': 'unicode'
+                    'type': 'string'
                 },
                 'message': {
-                    'type': 'unicode'
+                    'type': 'string'
                 },
                 'signature': {
-                    'type': 'unicode'
+                    'type': 'string'
                 }
             }
         }
