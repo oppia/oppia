@@ -30,7 +30,7 @@ class CollectionPage(base.BaseHandler):
 
     URL_PATH_ARGS_SCHEMAS = {
         'collection_id': {
-            'type': 'unicode'
+            'type': 'string'
         }
     }
     HANDLER_ARGS_SCHEMAS = {'GET': {}}
@@ -48,7 +48,7 @@ class CollectionDataHandler(base.BaseHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
         'collection_id': {
-            'type': 'unicode'
+            'type': 'string'
         }
     }
     HANDLER_ARGS_SCHEMAS = {'GET': {}}
