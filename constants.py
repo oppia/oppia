@@ -67,6 +67,7 @@ class Constants(dict):
         # type: (str) -> Any
         return self[name]
 
+
 with python_utils.open_file(os.path.join('assets', 'constants.ts'), 'r') as f:
     constants = Constants(parse_json_from_js(f))  # pylint:disable=invalid-name
 
