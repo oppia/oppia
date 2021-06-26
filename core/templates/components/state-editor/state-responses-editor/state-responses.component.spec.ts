@@ -17,6 +17,7 @@ import { TestBed } from '@angular/core/testing';
 import { AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
 import { Interaction, InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
+import { Rule } from 'domain/exploration/RuleObjectFactory';
 import { MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
@@ -28,6 +29,8 @@ fdescribe('StateResponsesComponent', () => {
   let ctrl = null;
   let $rootScope = null;
   let $scope = null;
+  let $uibModal = null;
+  let $q = null;
   let WindowDimensionsService = null;
   let StateEditorService = null;
   let ResponsesService = null;
@@ -42,6 +45,7 @@ fdescribe('StateResponsesComponent', () => {
   let misconceptionObjectFactory: MisconceptionObjectFactory;
   let ExternalSaveService = null;
   let StateSolicitAnswerDetailsService = null;
+  let AlertsService = null;
 
   let defaultsOutcomesToSuppressWarnings = [
     {
@@ -78,35 +82,83 @@ fdescribe('StateResponsesComponent', () => {
     misconceptionObjectFactory = TestBed.get(MisconceptionObjectFactory);
   });
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
+  beforeEach(angular.mock.inject(
+    function($injector, $componentController) {
+      $rootScope = $injector.get('$rootScope');
+      $scope = $rootScope.$new();
+      $uibModal = $injector.get('$uibModal');
+      $q = $injector.get('$q');
 
-    WindowDimensionsService = $injector.get('WindowDimensionsService');
-    StateEditorService = $injector.get('StateEditorService');
-    ResponsesService = $injector.get('ResponsesService');
-    StateInteractionIdService = $injector.get('StateInteractionIdService');
-    StateCustomizationArgsService = $injector
-      .get('StateCustomizationArgsService');
-    ExternalSaveService = $injector.get('ExternalSaveService');
-    StateSolicitAnswerDetailsService = $injector
-      .get('StateSolicitAnswerDetailsService');
+      WindowDimensionsService = $injector.get('WindowDimensionsService');
+      StateEditorService = $injector.get('StateEditorService');
+      ResponsesService = $injector.get('ResponsesService');
+      StateInteractionIdService = $injector.get('StateInteractionIdService');
+      StateCustomizationArgsService = $injector
+        .get('StateCustomizationArgsService');
+      ExternalSaveService = $injector.get('ExternalSaveService');
+      StateSolicitAnswerDetailsService = $injector
+        .get('StateSolicitAnswerDetailsService');
+      AlertsService = $injector.get('AlertsService');
 
-    interactionData = interactionObjectFactory.createFromBackendDict({
-      id: 'TextInput',
-      answer_groups: [
-        {
-          outcome: {
-            dest: 'State',
-            feedback: {
-              html: '',
-              content_id: 'This is a new feedback text',
+      interactionData = interactionObjectFactory.createFromBackendDict({
+        id: 'TextInput',
+        answer_groups: [
+          {
+            outcome: {
+              dest: 'State',
+              feedback: {
+                html: '',
+                content_id: 'This is a new feedback text',
+              },
+              refresher_exploration_id: 'test',
+              missing_prerequisite_skill_id: 'test_skill_id',
+              labelled_as_correct: false,
+              param_changes: [],
             },
-            refresher_exploration_id: 'test',
-            missing_prerequisite_skill_id: 'test_skill_id',
-            labelled_as_correct: false,
-            param_changes: [],
+            rule_specs: [{
+              rule_type: 'Contains',
+              inputs: {x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['abc']
+              }}
+            }],
+            training_data: [],
+            tagged_skill_misconception_id: 'misconception1',
           },
+        ],
+        default_outcome: {
+          dest: 'Hola',
+          feedback: {
+            content_id: '',
+            html: '',
+          },
+          labelled_as_correct: true,
+          param_changes: [],
+          refresher_exploration_id: 'test',
+          missing_prerequisite_skill_id: 'test_skill_id',
+        },
+        confirmed_unclassified_answers: [],
+        customization_args: {
+          rows: {
+            value: true,
+          },
+          placeholder: {
+            value: 1,
+          },
+        },
+        hints: [],
+        solution: {
+          answer_is_exclusive: true,
+          correct_answer: 'test_answer',
+          explanation: {
+            content_id: '2',
+            html: 'test_explanation1',
+          },
+        },
+      });
+
+      answerGroups = [answerGroupObjectFactory
+        .createFromBackendDict({
           rule_specs: [{
             rule_type: 'Contains',
             inputs: {x: {
@@ -114,96 +166,53 @@ fdescribe('StateResponsesComponent', () => {
               normalizedStrSet: ['abc']
             }}
           }],
+          outcome: {
+            dest: 'State',
+            feedback: {
+              html: '',
+              content_id: 'This is a new feedback text'
+            },
+            labelled_as_correct: false,
+            param_changes: [],
+            refresher_exploration_id: 'test',
+            missing_prerequisite_skill_id: 'test_skill_id'
+          },
           training_data: [],
-          tagged_skill_misconception_id: 'misconception1',
-        },
-      ],
-      default_outcome: {
+          tagged_skill_misconception_id: 'misconception1'
+        }, 'TextInput')
+      ];
+      defaultOutcome =  outcomeObjectFactory.createFromBackendDict({
         dest: 'Hola',
         feedback: {
           content_id: '',
-          html: '',
+          html: ''
         },
         labelled_as_correct: true,
         param_changes: [],
         refresher_exploration_id: 'test',
-        missing_prerequisite_skill_id: 'test_skill_id',
-      },
-      confirmed_unclassified_answers: [],
-      customization_args: {
-        rows: {
-          value: true,
-        },
-        placeholder: {
-          value: 1,
-        },
-      },
-      hints: [],
-      solution: {
-        answer_is_exclusive: true,
-        correct_answer: 'test_answer',
-        explanation: {
-          content_id: '2',
-          html: 'test_explanation1',
-        },
-      },
-    });
-
-    answerGroups = [answerGroupObjectFactory
-      .createFromBackendDict({
-        rule_specs: [{
-          rule_type: 'Contains',
-          inputs: {x: {
-            contentId: 'rule_input',
-            normalizedStrSet: ['abc']
-          }}
-        }],
-        outcome: {
-          dest: 'State',
-          feedback: {
-            html: '',
-            content_id: 'This is a new feedback text'
-          },
-          labelled_as_correct: false,
-          param_changes: [],
-          refresher_exploration_id: 'test',
-          missing_prerequisite_skill_id: 'test_skill_id'
-        },
-        training_data: [],
-        tagged_skill_misconception_id: 'misconception1'
-      }, 'TextInput')
-    ];
-    defaultOutcome =  outcomeObjectFactory.createFromBackendDict({
-      dest: 'Hola',
-      feedback: {
-        content_id: '',
-        html: ''
-      },
-      labelled_as_correct: true,
-      param_changes: [],
-      refresher_exploration_id: 'test',
-      missing_prerequisite_skill_id: 'test_skill_id'
-    });
+        missing_prerequisite_skill_id: 'test_skill_id'
+      });
 
 
-    ctrl = $componentController('stateResponses', {
-      $scope: $scope
-    });
+      ctrl = $componentController('stateResponses', {
+        $scope: $scope
+      });
 
-    ctrl.onSaveInteractionDefaultOutcome = jasmine.createSpy(
-      'saveInteraction', () => {});
-    ctrl.onSaveInteractionAnswerGroups = jasmine.createSpy(
-      'saveAnswerGroup', () => {});
-    ctrl.onResponsesInitialized = jasmine.createSpy(
-      'responseInitialized', () => {});
-    ctrl.refreshWarnings = () => jasmine.createSpy(
-      'refreshWarnings', () => {});
-    ctrl.onSaveInapplicableSkillMisconceptionIds = jasmine.createSpy(
-      'saveInapplicableSkillMisconceptionIds', () => {});
-    ctrl.onSaveSolicitAnswerDetails = jasmine.createSpy(
-      'saveInapplicableSkillMisconceptionIds', () => {});
-
-  }));
+      ctrl.onSaveInteractionDefaultOutcome = jasmine.createSpy(
+        'saveInteraction', () => {});
+      ctrl.onSaveInteractionAnswerGroups = jasmine.createSpy(
+        'saveAnswerGroup', () => {});
+      ctrl.onResponsesInitialized = jasmine.createSpy(
+        'responseInitialized', () => {});
+      ctrl.refreshWarnings = () => jasmine.createSpy(
+        'refreshWarnings', () => {});
+      ctrl.onSaveInapplicableSkillMisconceptionIds = jasmine.createSpy(
+        'saveInapplicableSkillMisconceptionIds', () => {});
+      ctrl.onSaveSolicitAnswerDetails = jasmine.createSpy(
+        'saveSolicitAnswerDetails', () => {});
+      ctrl.onSaveNextContentIdIndex = jasmine.createSpy(
+        'saveNextContentIdIndex', () => {});
+    }));
 
   it('should set component properties on initialization', () => {
     spyOn(WindowDimensionsService, 'isWindowNarrow').and.returnValue(true);
@@ -697,5 +706,93 @@ fdescribe('StateResponsesComponent', () => {
       ' or direct the learner to a different card.');
   });
 
+  it('should open add response modal when user clicks on' +
+    ' \'+ ADD RESPONSE\' button', () => {
+    spyOn($uibModal, 'open').and.callThrough();
 
+    $scope.openAddAnswerGroupModal();
+
+    expect($uibModal.open).toHaveBeenCalled();
+  });
+
+  it('should open add response modal and save new answer groups' +
+    ' added by the user', () => {
+    spyOn(ResponsesService, 'save').and.callFake(
+      (answerGroups, defaultOutcome, callback) => {
+        callback(answerGroups, defaultOutcome);
+      }
+    );
+    // Returning rejecting callback as the modal opens again, as reopen is true
+    // so we close it when it is opened for the second time.
+    spyOn($uibModal, 'open').and.returnValues({
+      result: $q.resolve({
+        reopen: true,
+        tmpRule: new Rule('', null, null),
+        tmpOutcome: outcomeObjectFactory.createNew('Hola', '1', 'Feedback text', []),
+        tmpTaggedSkillMisconceptionId: ''
+      })
+    }, {
+      result: $q.reject()
+    });
+    $scope.answerGroups = [];
+
+    $scope.openAddAnswerGroupModal();
+    $scope.$apply();
+
+    expect($scope.answerGroups).toEqual([answerGroupObjectFactory.createNew(
+      [new Rule('', null, null)], outcomeObjectFactory.createNew('Hola', '1', 'Feedback text', []),
+      [], ''
+    )]);
+    expect(ResponsesService.save).toHaveBeenCalled();
+  });
+
+  it('should clear warnings when modal is closed', () => {
+    spyOn(AlertsService, 'clearWarnings');
+    spyOn($uibModal, 'open').and.returnValue({
+      result: $q.reject()
+    });
+
+    $scope.openAddAnswerGroupModal();
+    $scope.$apply();
+
+    expect(AlertsService.clearWarnings).toHaveBeenCalledTimes(2);
+  });
+
+  it('should open delete answer group modal when user clicks' +
+    ' on delete button', () => {
+    spyOn($uibModal, 'open').and.callThrough();
+
+    $scope.deleteAnswerGroup(0, new Event(''));
+
+    expect($uibModal.open).toHaveBeenCalled();
+  });
+
+  it('should delete answer group after modal is opened', () => {
+    spyOn(ResponsesService, 'deleteAnswerGroup').and.callFake(
+      (index, callback) => {
+        callback();
+      }
+    );
+    spyOn($uibModal, 'open').and.returnValue({
+      result: $q.resolve()
+    });
+
+    $scope.deleteAnswerGroup(0, new Event(''));
+    $scope.$apply();
+
+    expect($uibModal.open).toHaveBeenCalled();
+    expect(ResponsesService.deleteAnswerGroup).toHaveBeenCalled();
+  });
+
+  it('should clear warnings when delete answer group modal is closed', () => {
+    spyOn(AlertsService, 'clearWarnings');
+    spyOn($uibModal, 'open').and.returnValue({
+      result: $q.reject()
+    });
+
+    $scope.deleteAnswerGroup(0, new Event(''));
+    $scope.$apply();
+
+    expect(AlertsService.clearWarnings).toHaveBeenCalledTimes(2);
+  });
 });
