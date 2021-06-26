@@ -63,9 +63,18 @@ fdescribe('Admin misc tab component ', () => {
 
     statusMessageSpy = spyOn(component.setStatusMessage, 'emit')
       .and.returnValue(null);
+    spyOn(adminTaskManagerService, 'startTask').and.returnValue(null);
   });
 
-  it('should initialize', () => {
-    expect(component).toBeDefined();
-  });
+  it('should clear search index when clicking on ' +
+    '\'clear search index\' button', fakeAsync(() => {
+    let clearSearchIndexSpy = spyOn(
+      adminBackendApiService, 'clearSearchIndexAsync')
+      .and.returnValue(Promise.resolve(null));
+
+    component.clearSearchIndex();
+
+    expect(clearSearchIndexSpy).toHaveBeenCalled();
+    
+  }));
 });
