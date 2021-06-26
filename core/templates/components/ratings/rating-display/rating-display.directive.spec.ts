@@ -88,10 +88,14 @@ describe('Rating display directive', function() {
     ctrlScope.status = 'active';
     ctrlScope.ratingValue = 4.3;
     outerScope.$digest();
-    expect(ctrlScope.stars[0].cssClass).toBe('fas fa-star oppia-rating-star-active');
-    expect(ctrlScope.stars[1].cssClass).toBe('fas fa-star oppia-rating-star-active');
-    expect(ctrlScope.stars[2].cssClass).toBe('fas fa-star oppia-rating-star-active');
-    expect(ctrlScope.stars[3].cssClass).toBe('fas fa-star oppia-rating-star-active');
+    expect(ctrlScope.stars[0].cssClass)
+      .toBe('fas fa-star oppia-rating-star-active');
+    expect(ctrlScope.stars[1].cssClass)
+      .toBe('fas fa-star oppia-rating-star-active');
+    expect(ctrlScope.stars[2].cssClass)
+      .toBe('fas fa-star oppia-rating-star-active');
+    expect(ctrlScope.stars[3].cssClass)
+      .toBe('fas fa-star oppia-rating-star-active');
     expect(ctrlScope.stars[4].cssClass).toBe('far fa-star-half');
   });
 
@@ -108,7 +112,7 @@ describe('Rating display directive', function() {
   });
 
   it('should display star value on entering star if star' +
-    ' has not been clicked ', () => {
+    ' has not been clicked', () => {
     ctrlScope.status = 'inactive';
     ctrlScope.isEditable = true;
 

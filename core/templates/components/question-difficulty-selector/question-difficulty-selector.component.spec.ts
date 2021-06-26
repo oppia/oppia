@@ -51,8 +51,7 @@ describe('QuestionDifficultySelectorComponent', () => {
     spyOn(component.skillWithDifficulty, 'setDifficulty');
     spyOn(component.skillWithDifficultyChange, 'emit');
     let mockMatRadioChange: MatRadioChange = {
-      //@ts-expect-error
-      source: '',
+      source: null,
       value: 0.9
     };
 
