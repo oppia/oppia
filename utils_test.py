@@ -72,7 +72,10 @@ class UtilsTests(test_utils.GenericTestBase):
         test_dicts = [{}, {'a': 'b'}, {'a': 2}, {'a': ['b', 2, {'c': 3.5}]}]
 
         for adict in test_dicts:
-            yaml_str = python_utils.yaml_from_dict(adict) # type: ignore[no-untyped-call]
+            yaml_str = (
+                python_utils.yaml_from_dict( # type: ignore[no-untyped-call]
+                    adict)
+            )
             yaml_dict = utils.dict_from_yaml(yaml_str)
             self.assertEqual(adict, yaml_dict)
 
@@ -170,7 +173,8 @@ class UtilsTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'URL query parameter name must be a string'
             ):
-            utils.set_url_query_parameter('http://test.com?a=b', None, 'value') # type: ignore[arg-type]
+            utils.set_url_query_parameter(
+                'http://test.com?a=b', None, 'value') # type: ignore[arg-type]
 
     def test_convert_to_hash(self):
         # type: () -> None
@@ -216,7 +220,6 @@ class UtilsTests(test_utils.GenericTestBase):
     def test_capitalize_string(self):
         # type: () -> None
         test_data = [
-            [None, None],
             ['', ''],
             ['a', 'A'],
             ['A', 'A'],
@@ -226,7 +229,7 @@ class UtilsTests(test_utils.GenericTestBase):
             ['Partially', 'Partially'],
             ['miDdle', 'MiDdle'],
             ['2be', '2be'],
-        ] # type: List[List[Union[None, Text]]]
+        ] # type: List[List[Text]]
 
         for datum in test_data:
             self.assertEqual(utils.capitalize_string(datum[0]), datum[1])
@@ -442,7 +445,8 @@ class UtilsTests(test_utils.GenericTestBase):
         utils.require_valid_name(name, 'name_type')
 
         name = 0
-        with self.assertRaisesRegexp(Exception, '0 must be a string.'): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+            Exception, '0 must be a string.'):
             utils.require_valid_name(name, 'name_type')
 
     def test_require_valid_meta_tag_content(self):
@@ -453,13 +457,16 @@ class UtilsTests(test_utils.GenericTestBase):
         non_string_meta_tag_content = 0
         invalid_type_error = (
             'Expected meta tag content to be a string, received 0')
-        with self.assertRaisesRegexp(Exception, invalid_type_error): # type: ignore[no-untyped-call]
-            utils.require_valid_meta_tag_content(non_string_meta_tag_content) # type: ignore[arg-type]
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+            Exception, invalid_type_error):
+            utils.require_valid_meta_tag_content(
+                non_string_meta_tag_content) # type: ignore[arg-type]
         lengthy_meta_tag_content = 'a' * 200
         max_length_error = (
             'Meta tag content should not be longer than %s characters.'
-            % constants.MAX_CHARS_IN_META_TAG_CONTENT) # type: ignore[attr-defined]
-        with self.assertRaisesRegexp(Exception, max_length_error): # type: ignore[no-untyped-call]
+            % constants.MAX_CHARS_IN_META_TAG_CONTENT) # type: ignore[attr-defined] # pylint: disable=line-too-long
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+            Exception, max_length_error):
             utils.require_valid_meta_tag_content(lengthy_meta_tag_content)
 
     def test_require_valid_page_title_fragment_for_web(self):
@@ -471,14 +478,16 @@ class UtilsTests(test_utils.GenericTestBase):
         non_string_page_title_fragment_for_web = 0
         invalid_type_error = (
             'Expected page title fragment to be a string, received 0')
-        with self.assertRaisesRegexp(Exception, invalid_type_error): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+            Exception, invalid_type_error):
             utils.require_valid_page_title_fragment_for_web(
                 non_string_page_title_fragment_for_web) # type: ignore[arg-type]
         lengthy_page_title_fragment_for_web = 'a' * 60
         max_length_error = (
             'Page title fragment should not be longer than %s characters.'
-            % constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB) # type: ignore[attr-defined]
-        with self.assertRaisesRegexp(Exception, max_length_error): # type: ignore[no-untyped-call]
+            % constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB) # type: ignore[attr-defined] # pylint: disable=line-too-long
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+            Exception, max_length_error):
             utils.require_valid_page_title_fragment_for_web(
                 lengthy_page_title_fragment_for_web)
 
@@ -501,7 +510,8 @@ class UtilsTests(test_utils.GenericTestBase):
         name_in_caps_expected_error = (
             'name-type field contains invalid characters. Only '
             'lowercase words separated by hyphens are allowed. Received NAME.')
-        with self.assertRaisesRegexp(Exception, name_in_caps_expected_error): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+            Exception, name_in_caps_expected_error):
             utils.require_valid_url_fragment(
                 name_in_caps, 'name-type', 20)
 
@@ -518,13 +528,15 @@ class UtilsTests(test_utils.GenericTestBase):
         long_name_expected_error = (
             'name-type field should not exceed 10 characters, '
             'received %s' % long_name)
-        with self.assertRaisesRegexp(Exception, long_name_expected_error): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+            Exception, long_name_expected_error):
             utils.require_valid_url_fragment(
                 long_name, 'name-type', 10)
 
         empty_name = ''
         empty_name_expected_error = 'name-type field should not be empty.'
-        with self.assertRaisesRegexp(Exception, empty_name_expected_error): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+            Exception, empty_name_expected_error):
             utils.require_valid_url_fragment(empty_name, 'name-type', 20)
 
         non_string_name = 0
@@ -532,7 +544,8 @@ class UtilsTests(test_utils.GenericTestBase):
             'name-type field must be a string. Received 0.')
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, non_string_name_expected_error):
-            utils.require_valid_url_fragment(non_string_name, 'name-type', 20) # type: ignore[arg-type]
+            utils.require_valid_url_fragment(
+                non_string_name, 'name-type', 20) # type: ignore[arg-type]
 
     def test_validate_convert_to_hash(self):
         # type: () -> None
@@ -543,7 +556,8 @@ class UtilsTests(test_utils.GenericTestBase):
     def test_convert_png_to_data_url_with_non_png_image_raises_error(self):
         # type: () -> None
         favicon_filepath = os.path.join(
-            self.get_static_asset_filepath(), 'assets', 'favicon.ico') # type: ignore[no-untyped-call]
+            self.get_static_asset_filepath(), # type: ignore[no-untyped-call]
+            'assets', 'favicon.ico')
 
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'The given string does not represent a PNG image.'):
@@ -658,7 +672,8 @@ class UtilsTests(test_utils.GenericTestBase):
         # type: () -> None
         """Test thumbnail filename validation."""
         self._assert_valid_thumbnail_filename(
-            'Expected thumbnail filename to be a string, received 10', 10) # type: ignore[arg-type]
+            'Expected thumbnail filename to be a string, received 10',
+            10) # type: ignore[arg-type]
         self._assert_valid_thumbnail_filename(
             'Thumbnail filename should not start with a dot.', '.name')
         self._assert_valid_thumbnail_filename(
@@ -680,7 +695,9 @@ class UtilsTests(test_utils.GenericTestBase):
         msecs = utils.get_time_in_millisecs(dt)
         self.assertEqual(
             dt,
-            datetime.datetime.fromtimestamp(python_utils.divide(msecs, 1000.0))) # type: ignore[no-untyped-call]
+            datetime.datetime.fromtimestamp(
+                python_utils.divide( # type: ignore[no-untyped-call]
+                    msecs, 1000.0)))
 
     def test_get_time_in_millisecs_with_complicated_time(self):
         # type: () -> None
@@ -688,7 +705,9 @@ class UtilsTests(test_utils.GenericTestBase):
         msecs = utils.get_time_in_millisecs(dt)
         self.assertEqual(
             dt,
-            datetime.datetime.fromtimestamp(python_utils.divide(msecs, 1000.0))) # type: ignore[no-untyped-call]
+            datetime.datetime.fromtimestamp(
+                python_utils.divide( # type: ignore[no-untyped-call]
+                    msecs, 1000.0)))
 
     def test_grouper(self):
         # type: () -> None
@@ -721,3 +740,26 @@ class UtilsTests(test_utils.GenericTestBase):
 
         self.assertEqual(list(errors), [(0, 'ERROR: foo'), (3, 'ERROR: fie')])
         self.assertEqual(list(others), [(1, 'INFO: bar'), (2, 'INFO: fee')])
+
+    def test_convert_png_data_url_to_binary(self):
+        # type: () -> None
+        image_data_url = '%s%s' % (
+            utils.PNG_DATA_URL_PREFIX,
+            python_utils.url_quote( # type: ignore[no-untyped-call]
+                base64.b64encode('test123')))
+
+        self.assertEqual(
+            utils.convert_png_data_url_to_binary(image_data_url), 'test123')
+
+    def test_convert_png_data_url_to_binary_raises_if_prefix_is_missing(self):
+        # type: () -> None
+        image_data_url = python_utils.url_quote( # type: ignore[no-untyped-call]
+            base64.b64encode('test123'))
+
+        self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+            Exception, 'The given string does not represent a PNG data URL.',
+            lambda: utils.convert_png_data_url_to_binary(image_data_url))
+
+    def test_quoted_string(self):
+        # type: () -> None
+        self.assertEqual(utils.quoted('a"b\'c'), '"a\\"b\'c"')

@@ -66,6 +66,14 @@ class RegistryUnitTest(test_utils.TestBase):
             expected_base_models,
             self.registry_instance.import_models([models.NAMES.base_model]))
 
+    def test_import_models_blog_model(self):
+        """Tests import_models function with blog post model option."""
+        from core.storage.blog import gae_models as blog_models
+        expected_blog_models = (blog_models,)
+        self.assertEqual(
+            expected_blog_models,
+            self.registry_instance.import_models([models.NAMES.blog]))
+
     def test_import_models_beam_job_model(self):
         """Tests import_models function with base model option."""
         from core.storage.beam_job import gae_models as beam_job_models
@@ -284,6 +292,33 @@ class RegistryUnitTest(test_utils.TestBase):
                 Exception,
                 'Invalid email service provider: invalid service provider'):
                 self.registry_instance.import_email_services()
+
+    def test_import_bulk_email_services_mailchimp(self):
+        """Tests import email services method for when email service provider is
+        mailchimp.
+        """
+        with self.swap(
+            feconf, 'BULK_EMAIL_SERVICE_PROVIDER',
+            feconf.BULK_EMAIL_SERVICE_PROVIDER_MAILCHIMP), (
+                self.swap(constants, 'EMULATOR_MODE', False)):
+            from core.platform.bulk_email import mailchimp_bulk_email_services
+            self.assertEqual(
+                mailchimp_bulk_email_services,
+                self.registry_instance.import_bulk_email_services())
+
+    def test_import_bulk_email_services_invalid(self):
+        """Tests import email services method for when email service provider is
+        an invalid option.
+        """
+        with self.swap(
+            feconf, 'BULK_EMAIL_SERVICE_PROVIDER',
+            'invalid service provider'), (
+                self.swap(constants, 'EMULATOR_MODE', False)):
+            with self.assertRaisesRegexp(
+                Exception,
+                'Invalid bulk email service provider: invalid service '
+                'provider'):
+                self.registry_instance.import_bulk_email_services()
 
     def test_import_cache_services(self):
         """Tests import cache services function."""

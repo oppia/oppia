@@ -67,9 +67,11 @@ export class StoryEditorNavbarBreadcrumbComponent {
    ngOnInit(): void {
      this.directiveSubscriptions.add(
        this.storyEditorStateService.onStoryInitialized.subscribe(
-         () => this.topicName = this.storyEditorStateService.getTopicName()
+         () => {
+           this.topicName = this.storyEditorStateService.getTopicName();
+           this.story = this.storyEditorStateService.getStory();
+         }
        ));
-     this.story = this.storyEditorStateService.getStory();
    }
 
    ngOnDestroy(): void {

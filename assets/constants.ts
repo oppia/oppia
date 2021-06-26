@@ -39,6 +39,8 @@ export default {
     "Statistics", "Trigonometry", "Welcome"],
   "ACTIVITY_TYPE_EXPLORATION": "exploration",
   "ACTIVITY_TYPE_COLLECTION": "collection",
+  "ACTIVITY_TYPE_STORY": "story",
+  "ACTIVITY_TYPE_LEARN_TOPIC": "learn topic",
   "DISABLED_EXPLORATION_IDS": ["5"],
   "TESTING_CONSTANT": "test",
   "LIBRARY_TILE_WIDTH_PX": 208,
@@ -5499,6 +5501,8 @@ export default {
 
   "NUM_QUESTIONS_PER_PAGE": 10,
 
+  "BULK_EMAIL_SERVICE_SIGNUP_URL": "",
+
   // The default number of opportunities to show on the contributor dashboard
   // page.
   "OPPORTUNITIES_PAGE_SIZE": 10,
@@ -5524,6 +5528,8 @@ export default {
   "MAX_CHARS_IN_CHAPTER_TITLE": 36,
   "MAX_CHARS_IN_CHAPTER_DESCRIPTION": 152,
   "MAX_CHARS_IN_MISCONCEPTION_NAME": 100,
+  "MAX_CHARS_IN_BLOG_POST_TITLE": 40,
+  "MAX_CHARS_IN_BLOG_POST_SUMMARY": 240,
   // This represents the maximum number of characters in the URL fragment for
   // story in the story page URL. E.g.
   // in /learn/math/fractions/story/bakery/..., 'bakery' is the
@@ -5534,6 +5540,9 @@ export default {
   // in /learn/math/fractions/revision/place-values, 'place-values' is the
   // 'subtopic URL fragment'.
   "MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT": 25,
+  // This represents the maximum number of characters in the URL fragment for
+  // the blog post.
+  "MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT": 65,
   // The recommended length for meta tag contents. Search engines will truncate
   // results greater than this limit.
   "MAX_CHARS_IN_META_TAG_CONTENT": 160,
@@ -5599,13 +5608,24 @@ export default {
   "FIREBASE_CONFIG_APP_ID": "",
   "FIREBASE_CONFIG_GOOGLE_CLIENT_ID": "",
 
+  "BEAM_JOBS_ARE_ENABLED": false,
+
   "ALLOW_YAML_FILE_UPLOAD": false,
 
   // A regular expression for tags.
   "TAG_REGEX": "^[a-z ]+$",
 
+  // A regular expression for allowed character in tags for blog post.
+  "BLOG_POST_TAG_REGEX": "^[a-zA-Z0-9 ]+$",
+
   // A regular expression for allowed characters in URL fragment fields.
   "VALID_URL_FRAGMENT_REGEX": "^[a-z]+(-[a-z]+)*$",
+
+  // A regular expression for allowed characters in Title field for Blog Post.
+  "VALID_BLOG_POST_TITLE_REGEX": "^[a-zA-Z0-9][a-zA-Z0-9 ]+(-[a-zA-Z0-9]+)*$",
+
+  // A regular expression for allowed characters in URL fragment for Blog Post.
+  "VALID_URL_BLOG_FRAGMENT_REGEX": "^[a-z0-9]+(-[a-z0-9]+)*$",
 
   // A regular expression for valid skill misconception id.
   "VALID_SKILL_MISCONCEPTION_ID_REGEX": "[A-Za-z0-9]{12}-[0-9]+",
@@ -5763,6 +5783,7 @@ export default {
   // fields must be at most 1500 bytes, and UTF-8 encoded characters can be
   // up to 4 bytes long.
   "MAX_COMMIT_MESSAGE_LENGTH": 375,
+  "MAX_REVIEW_MESSAGE_LENGTH": 10000,
 
   "EMAIL_DASHBOARD_PREDICATE_DEFINITION": [
     {

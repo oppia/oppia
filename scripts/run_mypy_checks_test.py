@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2020 The Oppia Authors. All Rights Reserved.
+# Copyright 2021 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for MyPy tyoe check runner script."""
+"""Tests for MyPy type check runner script."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -22,10 +22,16 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import subprocess
 
 from core.tests import test_utils
+from scripts import install_third_party_libs
 from scripts import run_mypy_checks
 
 PYTHON_CMD = 'python3'
 MYPY_SCRIPT_MODULE = 'scripts.run_mypy_checks'
+
+
+def mock_install_third_party_libs_main():
+    """Mock for install_third_party_libs."""
+    return
 
 
 class MypyScriptChecks(test_utils.GenericTestBase):
@@ -33,6 +39,11 @@ class MypyScriptChecks(test_utils.GenericTestBase):
 
     def setUp(self):
         super(MypyScriptChecks, self).setUp()
+
+        self.install_swap = self.swap_with_checks(
+            install_third_party_libs, 'main',
+            mock_install_third_party_libs_main)
+
         process_success = subprocess.Popen(
             ['echo', 'test'], stdout=subprocess.PIPE)
         def mock_popen_success(
@@ -49,6 +60,14 @@ class MypyScriptChecks(test_utils.GenericTestBase):
         self.popen_swap_failure = self.swap(
             subprocess, 'Popen', mock_popen_failure)
 
+        self.files_swap = self.swap(
+            run_mypy_checks, 'NOT_FULLY_COVERED_FILES',
+            ['file1.py', 'file2.py'])
+
+        self.directories_swap = self.swap(
+            run_mypy_checks, 'EXCLUDED_DIRECTORIES',
+            ['dir1/', 'dir2/'])
+
         def mock_install_mypy_prerequisites_success():
             return 0
         self.swap_install_success = self.swap(
@@ -56,16 +75,23 @@ class MypyScriptChecks(test_utils.GenericTestBase):
             mock_install_mypy_prerequisites_success)
 
     def test_get_mypy_cmd_without_files(self):
-        cmd = run_mypy_checks.get_mypy_cmd(None)
-        self.assertIn('--exclude', cmd)
-        self.assertIn('--config-file', cmd)
+        expected_cmd = [
+            'mypy', '--exclude', 'file1.py|file2.py|dir1/|dir2/',
+            '--config-file', './mypy.ini', '.'
+        ]
+        with self.files_swap:
+            with self.directories_swap:
+                cmd = run_mypy_checks.get_mypy_cmd(None)
+                self.assertEqual(cmd, expected_cmd)
 
     def test_get_mypy_cmd_with_files(self):
-        cmd = run_mypy_checks.get_mypy_cmd([['file1.py', 'file2.py']])
-        self.assertIn('file1.py', cmd)
-        self.assertIn('file2.py', cmd)
-        self.assertNotIn('--exclude', cmd)
-        self.assertIn('--config-file', cmd)
+        expected_cmd = [
+            'mypy', '--config-file', './mypy.ini', 'file1.py', 'file2.py'
+        ]
+        with self.files_swap:
+            with self.directories_swap:
+                cmd = run_mypy_checks.get_mypy_cmd(['file1.py', 'file2.py'])
+                self.assertEqual(cmd, expected_cmd)
 
     def test_install_mypy_prerequisites_success(self):
         with self.popen_swap_success:
@@ -93,36 +119,36 @@ class MypyScriptChecks(test_utils.GenericTestBase):
             output = process.communicate()
             self.assertEqual(output[0], '')
 
-    def test_main_files_success(self):
+    def test_main_with_files_success(self):
         with self.popen_swap_success:
-            with self.swap_install_success:
+            with self.swap_install_success, self.install_swap:
                 process = run_mypy_checks.main(args=['--files', 'file1.py'])
                 self.assertEqual(process, 0)
 
     def test_main_success(self):
         with self.popen_swap_success:
-            with self.swap_install_success:
+            with self.swap_install_success, self.install_swap:
                 process = run_mypy_checks.main(args=[])
                 self.assertEqual(process, 0)
 
-    def test_main_files_failure(self):
+    def test_main_with_files_failure(self):
         with self.popen_swap_failure:
-            with self.swap_install_success:
+            with self.swap_install_success, self.install_swap:
                 with self.assertRaisesRegexp(SystemExit, '1'):
                     run_mypy_checks.main(args=['--files', 'file1.py'])
 
     def test_main_failure(self):
         with self.popen_swap_failure:
-            with self.swap_install_success:
+            with self.swap_install_success, self.install_swap:
                 with self.assertRaisesRegexp(SystemExit, '1'):
                     run_mypy_checks.main(args=[])
 
     def test_main_install_prerequisites_success(self):
-        with self.popen_swap_success:
+        with self.popen_swap_success, self.install_swap:
             process = run_mypy_checks.main(args=[])
             self.assertEqual(process, 0)
 
-    def test_main_install_prerequisites_fail(self):
-        with self.popen_swap_failure:
+    def test_main_install_prerequisites_failure(self):
+        with self.popen_swap_failure, self.install_swap:
             with self.assertRaisesRegexp(SystemExit, '1'):
                 run_mypy_checks.main(args=[])

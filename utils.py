@@ -78,6 +78,14 @@ class ValidationError(Exception):
     pass
 
 
+class DeprecatedCommandError(ValidationError):
+    """Error class for when a domain object has a command
+    or a value that is deprecated.
+    """
+
+    pass
+
+
 class ExplorationConversionError(Exception):
     """Error class for when an exploration fails to convert from a certain
     version to a certain version.
@@ -737,7 +745,7 @@ def require_valid_url_fragment(name, name_type, allowed_length):
             'received %s.' % (name_type, allowed_length, name))
 
     if not re.match(
-            constants.VALID_URL_FRAGMENT_REGEX, name): # type: ignore[attr-defined]
+            constants.VALID_URL_FRAGMENT_REGEX, name): # type: ignore[attr-defined] # pylint: disable=line-too-long
         raise ValidationError(
             '%s field contains invalid characters. Only lowercase words'
             ' separated by hyphens are allowed. Received %s.' % (
@@ -799,10 +807,10 @@ def require_valid_meta_tag_content(meta_tag_content):
             'Expected meta tag content to be a string, received %s'
             % meta_tag_content)
     if len(meta_tag_content) > (
-            constants.MAX_CHARS_IN_META_TAG_CONTENT): # type: ignore[attr-defined]
+            constants.MAX_CHARS_IN_META_TAG_CONTENT): # type: ignore[attr-defined] # pylint: disable=line-too-long
         raise ValidationError(
             'Meta tag content should not be longer than %s characters.'
-            % constants.MAX_CHARS_IN_META_TAG_CONTENT) # type: ignore[attr-defined]
+            % constants.MAX_CHARS_IN_META_TAG_CONTENT) # type: ignore[attr-defined] # pylint: disable=line-too-long
 
 
 def require_valid_page_title_fragment_for_web(page_title_fragment_for_web):
@@ -817,7 +825,7 @@ def require_valid_page_title_fragment_for_web(page_title_fragment_for_web):
         ValidationError. Page title fragment is too lengthy.
     """
     max_chars_in_page_title_frag_for_web = (
-        constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB) # type: ignore[attr-defined]
+        constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB) # type: ignore[attr-defined] # pylint: disable=line-too-long
     if not isinstance(page_title_fragment_for_web, python_utils.BASESTRING):
         raise ValidationError(
             'Expected page title fragment to be a string, received %s'
@@ -825,11 +833,11 @@ def require_valid_page_title_fragment_for_web(page_title_fragment_for_web):
     if len(page_title_fragment_for_web) > max_chars_in_page_title_frag_for_web:
         raise ValidationError(
             'Page title fragment should not be longer than %s characters.'
-            % constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB) # type: ignore[attr-defined]
+            % constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB) # type: ignore[attr-defined] # pylint: disable=line-too-long
 
 
 def capitalize_string(input_string):
-    # type: (Optional[Text]) -> Optional[Text]
+    # type: (Text) -> Text
     """Converts the first character of a string to its uppercase equivalent (if
     it's a letter), and returns the result.
 
@@ -1058,7 +1066,8 @@ def compress_to_zlib(data):
         str. Compressed data string.
     """
     # Ignoring arg-type because we are preventing direct usage of 'str' for
-    # Python3 compatibilty.
+    # Python3 compatibilty. For details, refer to:
+    # https://github.com/oppia/oppia/wiki/Backend-Type-Annotations#1-use-typingtext-instead-of-str-and-unicode
     return zlib.compress(data) # type: ignore[arg-type]
 
 
@@ -1127,7 +1136,7 @@ def grouper(iterable, chunk_len, fillvalue=None):
 
 
 def partition(iterable, predicate=bool, enumerated=False):
-    # type: (Iterable[T], Callable[..., Any], bool) -> Tuple[Iterable[Union[T, Tuple[int,T]]], Iterable[Union[T, Tuple[int,T]]]]
+    # type: (Iterable[T], Callable[..., Any], bool) -> Tuple[Iterable[Union[T, Tuple[int,T]]], Iterable[Union[T, Tuple[int,T]]]] # pylint: disable=line-too-long
     """Returns two generators which split the iterable based on the predicate.
 
     NOTE: The predicate is called AT MOST ONCE per item.
@@ -1163,7 +1172,8 @@ def partition(iterable, predicate=bool, enumerated=False):
         themselves.
     """
     if enumerated:
-        new_iterable = enumerate(iterable) # type: Iterable[Union[T, Tuple[int, T]]]
+        new_iterable = enumerate(
+            iterable) # type: Iterable[Union[T, Tuple[int, T]]]
         old_predicate = predicate
         predicate = lambda pair: old_predicate(pair[1])
     else:
@@ -1175,3 +1185,16 @@ def partition(iterable, predicate=bool, enumerated=False):
     return (
         (i for i, predicate_is_true in true_part if predicate_is_true),
         (i for i, predicate_is_true in false_part if not predicate_is_true))
+
+
+def quoted(s):
+    # type: (Text) -> Text
+    """Returns a string enclosed in quotes, escaping any quotes within it.
+
+    Args:
+        s: str. The string to quote.
+
+    Returns:
+        str. The quoted string.
+    """
+    return json.dumps(s)

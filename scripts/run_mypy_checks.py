@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2020 The Oppia Authors. All Rights Reserved.
+# Copyright 2021 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,6 +26,9 @@ import subprocess
 import sys
 
 import python_utils
+
+from scripts import common
+from scripts import install_third_party_libs
 
 # List of directories whose files won't be type-annotated ever.
 EXCLUDED_DIRECTORIES = [
@@ -159,6 +162,11 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/beam_job_services_test.py',
     'core/domain/beam_job_validators.py',
     'core/domain/beam_job_validators_test.py',
+    'core/domain/blog_domain_test.py',
+    'core/domain/blog_services.py',
+    'core/domain/blog_services_test.py',
+    'core/domain/blog_validators.py',
+    'core/domain/blog_validators_test.py',
     'core/domain/caching_domain.py',
     'core/domain/caching_services.py',
     'core/domain/caching_services_test.py',
@@ -423,6 +431,10 @@ NOT_FULLY_COVERED_FILES = [
     'core/platform/app_identity/gae_app_identity_services_test.py',
     'core/platform/auth/firebase_auth_services.py',
     'core/platform/auth/firebase_auth_services_test.py',
+    'core/platform/bulk_email/dev_mode_bulk_email_services.py',
+    'core/platform/bulk_email/dev_mode_bulk_email_services_test.py',
+    'core/platform/bulk_email/mailchimp_bulk_email_services.py',
+    'core/platform/bulk_email/mailchimp_bulk_email_services_test.py',
     'core/platform/cache/redis_cache_services.py',
     'core/platform/cache/redis_cache_services_test.py',
     'core/platform/cloud_translate/cloud_translate_emulator.py',
@@ -464,6 +476,8 @@ NOT_FULLY_COVERED_FILES = [
     'core/storage/base_model/gae_models_test.py',
     'core/storage/beam_job/gae_models.py',
     'core/storage/beam_job/gae_models_test.py',
+    'core/storage/blog/gae_models.py',
+    'core/storage/blog/gae_models_test.py',
     'core/storage/classifier/gae_models.py',
     'core/storage/classifier/gae_models_test.py',
     'core/storage/collection/gae_models.py',
@@ -571,6 +585,8 @@ NOT_FULLY_COVERED_FILES = [
     'jobs/base_validation_jobs_test.py',
     'jobs/decorators/validation_decorators.py',
     'jobs/decorators/validation_decorators_test.py',
+    'jobs/io/job_io.py',
+    'jobs/io/job_io_test.py',
     'jobs/io/ndb_io.py',
     'jobs/io/ndb_io_test.py',
     'jobs/io/stub_io.py',
@@ -725,21 +741,28 @@ PYTHON3_CMD = 'python3'
 
 
 _PARSER = argparse.ArgumentParser(
-    description='Type checking script for Oppia codebase.'
+    description='Python type checking using mypy script.'
 )
 
 _PARSER.add_argument(
     '--files',
     help='Files to type-check',
-    action='append',
+    action='store',
     nargs='+'
 )
 
 
 def get_mypy_cmd(files):
-    """Return the appropriate command to be run."""
+    """Return the appropriate command to be run.
+
+    Args:
+        files: list(list(str)). List having first element as list of string.
+
+    Returns:
+        list(str). List of command line arguments.
+    """
     if files:
-        cmd = [MYPY_CMD, '--config-file', CONFIG_FILE_PATH] + files[0]
+        cmd = [MYPY_CMD, '--config-file', CONFIG_FILE_PATH] + files
     else:
         excluded_files_regex = (
             '|'.join(NOT_FULLY_COVERED_FILES + EXCLUDED_DIRECTORIES))
@@ -751,7 +774,11 @@ def get_mypy_cmd(files):
 
 
 def install_mypy_prerequisites():
-    """Install mypy and type stubs from mypy_requirements.txt."""
+    """Install mypy and type stubs from mypy_requirements.txt.
+
+    Returns:
+        int. The return code from installing prerequisites.
+    """
     cmd = [PYTHON3_CMD, '-m', 'pip', 'install', '-r', MYPY_REQUIREMENTS_PATH]
     process = subprocess.call(
         cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
@@ -760,7 +787,10 @@ def install_mypy_prerequisites():
 
 def main(args=None):
     """Runs the MyPy type checks."""
-    unused_parsed_args = _PARSER.parse_args(args=args)
+    parsed_args = _PARSER.parse_args(args=args)
+
+    install_third_party_libs.main()
+    common.fix_third_party_imports()
 
     python_utils.PRINT('Installing Mypy and stubs for third party libraries.')
     return_code = install_mypy_prerequisites()
@@ -768,12 +798,12 @@ def main(args=None):
         python_utils.PRINT(
             'Cannot install Mypy and stubs for third party libraries.')
         sys.exit(1)
-    else:
-        python_utils.PRINT(
-            'Installed Mypy and stubs for third party libraries.')
+
+    python_utils.PRINT(
+        'Installed Mypy and stubs for third party libraries.')
 
     python_utils.PRINT('Starting Mypy type checks.')
-    cmd = get_mypy_cmd(getattr(unused_parsed_args, 'files'))
+    cmd = get_mypy_cmd(getattr(parsed_args, 'files'))
     process = subprocess.call(cmd, stdin=subprocess.PIPE)
 
     if process == 0:
