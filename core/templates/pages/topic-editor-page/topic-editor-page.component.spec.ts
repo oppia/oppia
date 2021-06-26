@@ -86,10 +86,12 @@ describe('Topic editor page', function() {
     let topicInitializedEventEmitter = new EventEmitter();
     let topicReinitializedEventEmitter = new EventEmitter();
     let undoRedoChangeEventEmitter = new EventEmitter();
+    let topicUpdateViewEmitter = new EventEmitter();
     spyOn(TopicEditorStateService, 'loadTopic').and.callFake(function() {
       topicInitializedEventEmitter.emit();
       topicReinitializedEventEmitter.emit();
       undoRedoChangeEventEmitter.emit();
+      topicUpdateViewEmitter.emit();
     });
     spyOnProperty(
       TopicEditorStateService, 'onTopicInitialized').and.returnValue(
@@ -97,6 +99,8 @@ describe('Topic editor page', function() {
     spyOnProperty(
       TopicEditorStateService, 'onTopicReinitialized').and.returnValue(
       topicReinitializedEventEmitter);
+    spyOnProperty(TopicEditorRoutingService, 'updateViewEventEmitter')
+      .and.returnValue(topicUpdateViewEmitter);
     spyOn(UrlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
     spyOn(PageTitleService, 'setPageTitle').and.callThrough();
 
@@ -222,5 +226,22 @@ describe('Topic editor page', function() {
     expect(ctrl.getNavbarText()).toEqual('Topic Preview');
     routingSpy.and.returnValue('main');
     expect(ctrl.getNavbarText()).toEqual('Topic Editor');
+  });
+
+  it('should load topic based on its id on url when undo or redo action' +
+  ' is performed', function() {
+    let mockUndoRedoChangeEventEmitter = new EventEmitter();
+    spyOn(UndoRedoService, 'onUndoRedoChangeApplied$').and.returnValue(
+      mockUndoRedoChangeEventEmitter);
+    spyOn(PageTitleService, 'setPageTitle').and.callThrough();
+    spyOn(UrlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
+    ctrl.$onInit();
+    mockUndoRedoChangeEventEmitter.emit();
+
+    expect(PageTitleService.setPageTitle)
+      .toHaveBeenCalledWith('New Name - Oppia');
+    expect(ctrl.topic).toEqual(topic);
+
+    ctrl.$onDestroy();
   });
 });
