@@ -57,6 +57,9 @@ export interface LostChangeBackendDict {
   'new_value'?: LostChangeValue;
   'old_value'?: LostChangeValue;
   'property_name'?: string;
+  'translation_html'?: string;
+  'content_id'?: string;
+  'language_code'?: string;
 }
 
 export class LostChange {
@@ -67,12 +70,16 @@ export class LostChange {
   newValue: LostChangeValue;
   oldValue: LostChangeValue;
   propertyName: string;
+  contentId: string;
+  languageCode: string;
+  translationHTML: string;
   utilsService: UtilsService;
 
   constructor(
       utilsService: UtilsService, cmd: string, newStateName: string,
       oldStateName: string, stateName: string, newValue: LostChangeValue,
-      oldValue: LostChangeValue, propertyName: string) {
+      oldValue: LostChangeValue, propertyName: string, contentId: string,
+      languageCode: string, translationHTML: string) {
     this.utilsService = utilsService;
     this.cmd = cmd;
     this.newStateName = newStateName;
@@ -81,6 +88,9 @@ export class LostChange {
     this.newValue = newValue;
     this.oldValue = oldValue;
     this.propertyName = propertyName;
+    this.contentId = contentId;
+    this.languageCode = languageCode;
+    this.translationHTML = translationHTML;
   }
 
   // An edit is represented either as an object or an array. If it's an
@@ -206,7 +216,10 @@ export class LostChangeObjectFactory {
       lostChangeDict.state_name,
       lostChangeDict.new_value,
       lostChangeDict.old_value,
-      lostChangeDict.property_name
+      lostChangeDict.property_name,
+      lostChangeDict.content_id,
+      lostChangeDict.language_code,
+      lostChangeDict.translation_html,
     );
   }
 }

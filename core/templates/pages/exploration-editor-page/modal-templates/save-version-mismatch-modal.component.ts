@@ -56,22 +56,6 @@ export class SaveVersionMismatchModalComponent
         'Lost changes: ' + JSON.stringify(this.lostChanges));
     }
   }
-  ngAfterViewInit(): void {
-    // eslint-disable-next-line max-len
-    let div = this.elRef.nativeElement.getElementsByClassName('oppia-lost-changes');
-    // eslint-disable-next-line no-console
-    var blob = new Blob([div[0].innerText], {type: 'text/csv'});
-    if (window.navigator.msSaveOrOpenBlob) {
-      window.navigator.msSaveBlob(blob, 'static.txt');
-    } else {
-      var elem = window.document.createElement('a');
-      elem.href = window.URL.createObjectURL(blob);
-      elem.download = 'static.txt';
-      document.body.appendChild(elem);
-      elem.click();
-      document.body.removeChild(elem);
-    }
-  }
 
   private _refreshPage(delay: number): void {
     setTimeout(() => {
@@ -80,6 +64,25 @@ export class SaveVersionMismatchModalComponent
   }
 
   discardChanges(): void {
+    this.explorationDataService.discardDraftAsync().then(() => {
+      this._refreshPage(this.MSECS_TO_REFRESH);
+    });
+  }
+
+  exportAndDiscardChanges(): void {
+    let lostChangesData = this.elRef.nativeElement.getElementsByClassName(
+      'oppia-lost-changes');
+    let blob = new Blob([lostChangesData[0].innerText], {type: 'text/plain'});
+    if (this.windowRef.nativeWindow.navigator.msSaveOrOpenBlob) {
+      this.windowRef.nativeWindow.navigator.msSaveBlob(blob, 'lostChanges.txt');
+    } else {
+      var elem = this.windowRef.nativeWindow.document.createElement('a');
+      elem.href = URL.createObjectURL(blob);
+      elem.download = 'lostChanges.txt';
+      document.body.appendChild(elem);
+      elem.click();
+      document.body.removeChild(elem);
+    }
     this.explorationDataService.discardDraftAsync().then(() => {
       this._refreshPage(this.MSECS_TO_REFRESH);
     });
