@@ -25,7 +25,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { LoaderService } from 'services/loader.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { ExplorationCreationBackendApiService, ExplorationCreationResponse } from './exploration-creation-backend-api.service';
+import { ExplorationCreationBackendApiService } from './exploration-creation-backend-api.service';
 import { ExplorationCreationService } from './exploration-creation.service';
 
 class MockExploratinoCreationBackendApiService {
@@ -163,7 +163,7 @@ describe('ExplorationCreationService', () => {
     }));
   });
 
-  describe('on calling showUploadExplorationModal',() => {
+  describe('on calling showUploadExplorationModal', () => {
     it('should show upload exploration modal', fakeAsync(() => {
       spyOn(ngbModal, 'open').and.returnValue(
         <NgbModalRef>{
@@ -172,7 +172,8 @@ describe('ExplorationCreationService', () => {
           })
         }
       );
-      spyOn(csrfTokenService, 'getTokenAsync').and.resolveTo('sample-csrf-token');
+      spyOn(csrfTokenService, 'getTokenAsync')
+        .and.resolveTo('sample-csrf-token');
 
       // @ts-ignore in order to ignore JQuery properties that should
       // be declared.
@@ -199,7 +200,8 @@ describe('ExplorationCreationService', () => {
           })
         }
       );
-      spyOn(csrfTokenService, 'getTokenAsync').and.resolveTo('sample-csrf-token');
+      spyOn(csrfTokenService, 'getTokenAsync')
+        .and.resolveTo('sample-csrf-token');
       spyOn(alertsService, 'addWarning');
       spyOn(loaderService, 'hideLoadingScreen');
 
