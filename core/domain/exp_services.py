@@ -1814,7 +1814,7 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
         # related (affected by or affecting) solution. This list
         # can be changed when any new property is added or deleted which
         # affects or is affected by solution.
-        properties_related_to_solution= ['solution', 'answer_groups',
+        properties_related_to_solution = ['solution', 'answer_groups',
                                           'recorded_voiceovers',
                                           'widget_customization_args']
 
@@ -2001,7 +2001,7 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
                             if (all(property not in
                                     changed_properties[old_state_name]
                                     for property in
-                                    PROPERTIES_RELATED_TO_CUST_ARGS) and
+                                    properties_related_to_cust_args) and
                                     change.property_name not in
                                     changed_translations[old_state_name]):
                                 change_is_mergeable = True
