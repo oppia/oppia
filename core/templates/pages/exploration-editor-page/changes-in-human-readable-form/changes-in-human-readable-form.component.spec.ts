@@ -786,7 +786,7 @@ describe('Changes in Human Readable Form Directive', () => {
       'Edits to property:' +
       '</strong> ' + component.lostChanges[0].propertyName +
       ' </div>' +
-      '<div>'+
+      '<div>' +
       '<div class="state-edit-desc">' +
       ' Deleted default outcome ' +
       '</div>' +
