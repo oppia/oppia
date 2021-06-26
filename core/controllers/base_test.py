@@ -1416,9 +1416,9 @@ class OppiaMLVMHandlerTests(test_utils.GenericTestBase):
         URL_PATH_ARGS_SCHEMAS = {}
         HANDLER_ARGS_SCHEMAS = {
             'POST': {
-                'vm_id': {'type': 'unicode'},
-                'signature': {'type': 'unicode'},
-                'message': {'type': 'unicode'},
+                'vm_id': {'type': 'string'},
+                'signature': {'type': 'string'},
+                'message': {'type': 'string'},
             }
         }
 
