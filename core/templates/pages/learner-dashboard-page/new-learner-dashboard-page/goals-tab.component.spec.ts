@@ -40,7 +40,7 @@ class MockRemoveActivityNgbModalRef {
   };
 }
 
-fdescribe('Goals tab Component', () => {
+describe('Goals tab Component', () => {
   let component: GoalsTabComponent;
   let fixture: ComponentFixture<GoalsTabComponent>;
   let learnerDashboardActivityBackendApiService:
