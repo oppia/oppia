@@ -19,12 +19,18 @@
 import { TestBed } from '@angular/core/testing';
 
 import { HtmlEscaperService } from 'services/html-escaper.service';
+import { LoggerService } from './contextual/logger.service';
 
 describe('HTML escaper service', () => {
   let ohe: HtmlEscaperService;
+  let loggerService: LoggerService;
 
   beforeEach(() => {
-    ohe = TestBed.get(HtmlEscaperService);
+    TestBed.configureTestingModule({
+      providers: [HtmlEscaperService]
+    });
+    ohe = TestBed.inject(HtmlEscaperService);
+    loggerService = TestBed.inject(LoggerService);
   });
 
   it('should correctly translate between escaped and unescaped strings',
@@ -45,5 +51,16 @@ describe('HTML escaper service', () => {
       expect(ohe.escapedJsonToObj(
         ohe.objToEscapedJson(objs[i]))).toEqual(objs[i]);
     }
+  });
+
+  it('should log an error if an empty string was passed to' +
+   ' JSON decoder', () => {
+    spyOn(loggerService, 'error');
+
+    let escapedJsonToObjResponse = ohe.escapedJsonToObj('');
+
+    expect(escapedJsonToObjResponse).toBe('');
+    expect(loggerService.error).toHaveBeenCalledWith(
+      'Empty string was passed to JSON decoder.');
   });
 });

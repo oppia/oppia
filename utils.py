@@ -61,6 +61,14 @@ class ValidationError(Exception):
     pass
 
 
+class DeprecatedCommandError(ValidationError):
+    """Error class for when a domain object has a command
+    or a value that is deprecated.
+    """
+
+    pass
+
+
 class ExplorationConversionError(Exception):
     """Error class for when an exploration fails to convert from a certain
     version to a certain version.
@@ -1063,3 +1071,15 @@ def partition(iterable, predicate=bool, enumerated=False):
     return (
         (i for i, predicate_is_true in true_part if predicate_is_true),
         (i for i, predicate_is_true in false_part if not predicate_is_true))
+
+
+def quoted(s):
+    """Returns a string enclosed in quotes, escaping any quotes within it.
+
+    Args:
+        s: str. The string to quote.
+
+    Returns:
+        str. The quoted string.
+    """
+    return json.dumps(s)
