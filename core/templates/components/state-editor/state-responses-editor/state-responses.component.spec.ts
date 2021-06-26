@@ -41,6 +41,7 @@ fdescribe('StateResponsesComponent', () => {
   let defaultOutcome;
   let misconceptionObjectFactory: MisconceptionObjectFactory;
   let ExternalSaveService = null;
+  let StateSolicitAnswerDetailsService = null;
 
   let defaultsOutcomesToSuppressWarnings = [
     {
@@ -88,6 +89,8 @@ fdescribe('StateResponsesComponent', () => {
     StateCustomizationArgsService = $injector
       .get('StateCustomizationArgsService');
     ExternalSaveService = $injector.get('ExternalSaveService');
+    StateSolicitAnswerDetailsService = $injector
+      .get('StateSolicitAnswerDetailsService');
 
     interactionData = interactionObjectFactory.createFromBackendDict({
       id: 'TextInput',
@@ -197,6 +200,9 @@ fdescribe('StateResponsesComponent', () => {
       'refreshWarnings', () => {});
     ctrl.onSaveInapplicableSkillMisconceptionIds = jasmine.createSpy(
       'saveInapplicableSkillMisconceptionIds', () => {});
+    ctrl.onSaveSolicitAnswerDetails = jasmine.createSpy(
+      'saveInapplicableSkillMisconceptionIds', () => {});
+
   }));
 
   it('should set component properties on initialization', () => {
@@ -548,8 +554,148 @@ fdescribe('StateResponsesComponent', () => {
 
   it('should save displayed value when solicit answer details' +
     ' are changed', () => {
+    spyOn(StateSolicitAnswerDetailsService, 'saveDisplayedValue');
+
     ctrl.$onInit();
 
     $scope.onChangeSolicitAnswerDetails();
+
+    expect(ctrl.onSaveSolicitAnswerDetails).toHaveBeenCalled();
+    expect(StateSolicitAnswerDetailsService.saveDisplayedValue)
+      .toHaveBeenCalled();
   });
+
+  it('should check if outcome has no feedback with self loop', () => {
+    $scope.stateName = 'State Name';
+    let outcome1 = outcomeObjectFactory.createNew(
+      'State Name', '1', '', []);
+    let outcome2 = outcomeObjectFactory.createNew(
+      'State Name', '1', 'Feedback Text', []);
+
+    expect($scope.isSelfLoopWithNoFeedback(outcome1)).toBe(true);
+    expect($scope.isSelfLoopWithNoFeedback(outcome2)).toBe(false);
+    expect($scope.isSelfLoopWithNoFeedback(null)).toBe(false);
+  });
+
+  it('should check if outcome marked as correct has self loop', () => {
+    spyOn(StateEditorService, 'getCorrectnessFeedbackEnabled').and.returnValue(
+      true);
+    let outcome = outcomeObjectFactory.createFromBackendDict({
+      dest: 'State Name',
+      feedback: {
+        content_id: '',
+        html: ''
+      },
+      labelled_as_correct: true,
+      param_changes: [],
+      refresher_exploration_id: 'test',
+      missing_prerequisite_skill_id: 'test_skill_id'
+    });
+    $scope.stateName = 'State Name';
+
+    expect($scope.isSelfLoopThatIsMarkedCorrect(outcome)).toBe(true);
+
+    $scope.stateName = 'Hola';
+
+    expect($scope.isSelfLoopThatIsMarkedCorrect(outcome)).toBe(false);
+  });
+
+  it('should check if outcome marked as correct has self loop and return' +
+    ' false if correctness feedback is not enabled', () => {
+    spyOn(StateEditorService, 'getCorrectnessFeedbackEnabled').and.returnValue(
+      false);
+    let outcome = outcomeObjectFactory.createFromBackendDict({
+      dest: 'State Name',
+      feedback: {
+        content_id: '',
+        html: ''
+      },
+      labelled_as_correct: true,
+      param_changes: [],
+      refresher_exploration_id: 'test',
+      missing_prerequisite_skill_id: 'test_skill_id'
+    });
+    $scope.stateName = 'State Name';
+
+    expect($scope.isSelfLoopThatIsMarkedCorrect(outcome)).toBe(false);
+  });
+
+  it('should show state name input if user is creating new state', () => {
+    let outcome1 = outcomeObjectFactory.createNew('/', '', '', []);
+    let outcome2 = outcomeObjectFactory.createNew('Hola', '', '', []);
+
+    expect($scope.isCreatingNewState(outcome1)).toBe(true);
+    expect($scope.isCreatingNewState(outcome2)).toBe(false);
+  });
+
+  it('should check if current interaction is non trivial', () => {
+    StateInteractionIdService.savedMemento = 'Continue';
+
+    expect($scope.isCurrentInteractionTrivial()).toBe(true);
+
+    StateInteractionIdService.savedMemento = 'TextInput';
+
+    expect($scope.isCurrentInteractionTrivial()).toBe(false);
+  });
+
+  it('should check if the interaction is linear and has feedback', () => {
+    StateInteractionIdService.savedMemento = 'Continue';
+    let outcome1 = outcomeObjectFactory.createNew('Hola', '', '', []);
+
+    expect($scope.isLinearWithNoFeedback(outcome1)).toBe(true);
+
+    StateInteractionIdService.savedMemento = 'Continue';
+    let outcome2 = outcomeObjectFactory.createNew('Hola', '', 'Right!', []);
+
+    expect($scope.isLinearWithNoFeedback(outcome2)).toBe(false);
+
+    StateInteractionIdService.savedMemento = 'TextInput';
+    let outcome3 = outcomeObjectFactory.createNew('Hola', '', '', []);
+
+    expect($scope.isLinearWithNoFeedback(outcome3)).toBe(false);
+
+    StateInteractionIdService.savedMemento = 'TextInput';
+    let outcome4 = outcomeObjectFactory.createNew('Hola', '', 'Wrong!', []);
+
+    expect($scope.isLinearWithNoFeedback(outcome4)).toBe(false);
+
+    expect($scope.isLinearWithNoFeedback(null)).toBe(false);
+  });
+
+  it('should get outcome tooltip text', () => {
+    // When outcome has self loop and is labelled correct.
+    spyOn(StateEditorService, 'getCorrectnessFeedbackEnabled').and.returnValue(
+      true);
+    let outcome = outcomeObjectFactory.createFromBackendDict({
+      dest: 'State Name',
+      feedback: {
+        content_id: '',
+        html: ''
+      },
+      labelled_as_correct: true,
+      param_changes: [],
+      refresher_exploration_id: 'test',
+      missing_prerequisite_skill_id: 'test_skill_id'
+    });
+    $scope.stateName = 'State Name';
+
+    expect($scope.getOutcomeTooltip(outcome)).toBe(
+      'Self-loops should not be labelled as correct.');
+
+    // When interaction is linear with no feedback.
+    StateInteractionIdService.savedMemento = 'Continue';
+    let outcome1 = outcomeObjectFactory.createNew('Hola', '', '', []);
+
+    expect($scope.getOutcomeTooltip(outcome1)).toBe(
+      'Please direct the learner to a different card.');
+
+    // When interaction is not linear.
+    StateInteractionIdService.savedMemento = 'TextInput';
+
+    expect($scope.getOutcomeTooltip(outcome1)).toBe(
+      'Please give Oppia something useful to say,' +
+      ' or direct the learner to a different card.');
+  });
+
+
 });
