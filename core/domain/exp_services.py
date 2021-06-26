@@ -1793,36 +1793,36 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
         # according to the state and content_id name.
         changed_translations = {}
 
-        # PROPERTIES_RELATED_TO_CUST_ARGS: List of the properties
+        # properties_related_to_cust_args: List of the properties
         # related (affected by or affecting) customization args. This list
         # can be changed when any new property is added or deleted which
         # affects or is affected by customization args.
-        PROPERTIES_RELATED_TO_CUST_ARGS = ['solution', 'recorded_voiceovers',
+        properties_related_to_cust_args = ['solution', 'recorded_voiceovers',
                                            'answer_groups',
                                            'widget_customization_args']
 
-        # PROPERTIES_RELATED_TO_ANSWER_GROUPS: List of the properties
+        # properties_related_to_answer_groups: List of the properties
         # related (affected by or affecting) answer groups. This list
         # can be changed when any new property is added or deleted which
         # affects or is affected by answer groups.
-        PROPERTIES_RELATED_TO_ANSWER_GROUPS = ['solution',
+        properties_related_to_answer_groups = ['solution',
                                                'recorded_voiceovers',
                                                'answer_groups',
                                                'widget_customization_args']
 
-        # PROPERTIES_RELATED_TO_SOLUTION: List of the properties
+        # properties_related_to_solution: List of the properties
         # related (affected by or affecting) solution. This list
         # can be changed when any new property is added or deleted which
         # affects or is affected by solution.
-        PROPERTIES_RELATED_TO_SOLUTION = ['solution', 'answer_groups',
+        properties_related_to_solution= ['solution', 'answer_groups',
                                           'recorded_voiceovers',
                                           'widget_customization_args']
 
-        # PROPERTIES_RELATED_TO_VOICEOVERS: List of the properties
+        # properties_related_to_voiceovers: List of the properties
         # related (affected by or affecting) voiceovers. This list
         # can be changed when any new property is added or deleted which
         # affects or is affected by voiceovers.
-        PROPERTIES_RELATED_TO_VOICEOVERS = ['content', 'solution',
+        properties_related_to_voiceovers = ['content', 'solution',
                                             'hints',
                                             'written_translations',
                                             'answer_group',
@@ -2015,7 +2015,7 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
                             if (all(property not in
                                     changed_properties[old_state_name]
                                     for property in
-                                    PROPERTIES_RELATED_TO_ANSWER_GROUPS) and
+                                    properties_related_to_answer_groups) and
                                     change.property_name not in
                                     changed_translations[old_state_name]):
                                 change_is_mergeable = True
@@ -2065,7 +2065,7 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
                             if (all(property not in
                                     changed_properties[old_state_name]
                                     for property in
-                                    PROPERTIES_RELATED_TO_SOLUTION) and
+                                    properties_related_to_solution) and
                                     change.property_name not in
                                     changed_translations[old_state_name]):
                                 change_is_mergeable = True
@@ -2090,7 +2090,7 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
                         if all(property not in
                                changed_properties[old_state_name]
                                for property in
-                               PROPERTIES_RELATED_TO_VOICEOVERS):
+                               properties_related_to_voiceovers):
                             change_is_mergeable = True
                     else:
                         change_is_mergeable = True
