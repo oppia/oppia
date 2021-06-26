@@ -155,11 +155,11 @@ var LearnerDashboardPage = function() {
   };
 
   this.checkCompleteExplorationSection = async function(explorationTitle) {
-    var isDisplayed;
-    await completedExplorationsSection.isDisplayed.then((isVisible) => {
-      isDisplayed = isVisible;
+    var isVisible;
+    await completedExplorationsSection.isDisplayed().then((result) => {
+      isVisible = result;
     });
-    if (!isDisplayed) {
+    if (!isVisible) {
       await this.navigateToCompletedSection(); 
     }
     await this.navigateToCompletedExplorationsSection();
