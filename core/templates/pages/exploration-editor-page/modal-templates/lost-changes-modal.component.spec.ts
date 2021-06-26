@@ -135,7 +135,7 @@ describe('Lost Changes Modal Component', () => {
     fixture.detectChanges();
 
     expect(modalBody).toBe(
-      'The lost changes are displayed below. You may want to copy and ' +
-      'paste these changes before discarding them.');
+      'The lost changes are displayed below. You may want to export or ' +
+      'copy and paste these changes before discarding them.');
   });
 });
