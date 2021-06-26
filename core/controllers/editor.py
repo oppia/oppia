@@ -550,11 +550,8 @@ class StateInteractionStatsHandler(EditorHandler):
                 list(current_exploration.states.keys())))
             raise self.PageNotFoundException
 
-        self.render_json({
-            'visualizations_info': stats_services.get_visualizations_info(
-                current_exploration.id, state_name,
-                current_exploration.states[state_name].interaction.id),
-        })
+        # TODO(#11475): Return visualizations info based on Apache Beam job.
+        self.render_json({'visualizations_info': []})
 
 
 class FetchIssuesHandler(EditorHandler):
@@ -759,20 +756,10 @@ class StateAnswerStatisticsHandler(EditorHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_view_exploration_stats
-    def get(self, exploration_id):
+    def get(self, unused_exploration_id):
         """Handles GET requests."""
-        current_exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-
-        top_state_answers = stats_services.get_top_state_answer_stats_multi(
-            exploration_id, current_exploration.states)
-        top_state_interaction_ids = {
-            state_name: current_exploration.states[state_name].interaction.id
-            for state_name in top_state_answers
-        }
-        self.render_json({
-            'answers': top_state_answers,
-            'interaction_ids': top_state_interaction_ids,
-        })
+        # TODO(#11475): Return visualizations info based on Apache Beam job.
+        self.render_json({'answers': {}, 'interaction_ids': {}})
 
 
 class TopUnresolvedAnswersHandler(EditorHandler):
@@ -781,19 +768,10 @@ class TopUnresolvedAnswersHandler(EditorHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_edit_exploration
-    def get(self, exploration_id):
+    def get(self, unused_exploration_id):
         """Handles GET requests for unresolved answers."""
-        state_name = self.request.get('state_name')
-        if not state_name:
-            raise self.PageNotFoundException
-
-        unresolved_answers_with_frequency = (
-            stats_services.get_top_state_unresolved_answers(
-                exploration_id, state_name))
-
-        self.render_json({
-            'unresolved_answers': unresolved_answers_with_frequency
-        })
+        # TODO(#11475): Return visualizations info based on Apache Beam job.
+        self.render_json({'unresolved_answers': []})
 
 
 class LearnerAnswerInfoHandler(EditorHandler):

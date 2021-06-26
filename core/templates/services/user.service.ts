@@ -36,7 +36,6 @@ export class UserService {
     private userBackendApiService: UserBackendApiService
   ) {}
 
-
     // This property will be null when the user does not have
     // enough rights to review translations, voiceover and questions.
     private userContributionRightsInfo:
