@@ -63,7 +63,7 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
                 'type': 'string',
                 'default_value': None
             },
-           'language_code': {
+            'language_code': {
                 'type': 'string',
                 'validators': [{
                     'id': 'is_supported_audio_language_code'
