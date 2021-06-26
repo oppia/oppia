@@ -25,10 +25,13 @@ import os
 import subprocess
 import sys
 
-import python_utils
-
-from scripts import common
 from scripts import install_third_party_libs
+# This installs third party libraries before importing other files or importing
+# libraries that use the builtins python module (e.g. build, python_utils).
+install_third_party_libs.main()
+
+import python_utils # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from scripts import common # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 # List of directories whose files won't be type-annotated ever.
 EXCLUDED_DIRECTORIES = [
@@ -789,7 +792,6 @@ def main(args=None):
     """Runs the MyPy type checks."""
     parsed_args = _PARSER.parse_args(args=args)
 
-    install_third_party_libs.main()
     common.fix_third_party_imports()
 
     python_utils.PRINT('Installing Mypy and stubs for third party libraries.')
