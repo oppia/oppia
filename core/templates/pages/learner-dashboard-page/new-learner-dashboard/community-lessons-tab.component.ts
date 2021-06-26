@@ -188,11 +188,11 @@ export class CommunityLessonsTabComponent {
 
   changePageByOne(direction: string, section: string): void {
     if (section === 'communityLessons') {
+      let totalPages = this.displayInCommunityLessons.length / this.pageSize;
       if (direction === 'MOVE_TO_PREV_PAGE' &&
         this.pageNumberInCommunityLessons > 1) {
         this.pageNumberInCommunityLessons -= 1;
       }
-      let totalPages = this.displayInCommunityLessons.length / this.pageSize;
       if (totalPages > Math.floor(totalPages)) {
         totalPages = Math.floor(totalPages) + 1;
       }
@@ -206,11 +206,11 @@ export class CommunityLessonsTabComponent {
         this.startIndexInCommunityLessons + this.pageSize,
         this.displayInCommunityLessons.length);
     } else if (section === 'playlist') {
+      let totalPages = this.displayLessonsInPlaylist.length / this.pageSize;
       if (direction === 'MOVE_TO_PREV_PAGE' &&
         this.pageNumberInPlaylist > 1) {
         this.pageNumberInPlaylist -= 1;
       }
-      let totalPages = this.displayLessonsInPlaylist.length / this.pageSize;
       if (totalPages > Math.floor(totalPages)) {
         totalPages = Math.floor(totalPages) + 1;
       }

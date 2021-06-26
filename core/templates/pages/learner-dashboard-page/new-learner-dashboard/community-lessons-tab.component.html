@@ -580,29 +580,7 @@
     margin-bottom: 0;
     padding: 0 0 12px 40px;
   }
-  @media screen and (max-width: 1200px) {
-    .communtiy-lessons-mobile-view {
-      width: 650px;
-      margin: auto;
-      display: flex;
-    }
-    .pagination-bottom {
-      display: none;
-    }
-    .oppia-mobile-summary-tile-container {
-      padding: 0 5px;
-    }
-    .pagination {
-      width: 670px;
-    }
-    .dropbtn {
-      left: 595px;
-    }
-    .dropdown:hover .dropdown-content {
-      left: 595px;
-    }
-  }
-  @media screen and (max-width: 768px) {
+  @media screen and (max-width: 767px) {
     .community-lessons-section,
     .playlist-section,
     .subscriptions-section {
@@ -635,6 +613,35 @@
     .oppia-learner-dashboard-icon {
       right: 44px;
       top: 12px;
+    }
+  }
+  @media screen and (min-width: 768px) and (max-width: 1200px) {
+    .community-lessons-section,
+    .playlist-section,
+    .subscriptions-section {
+      width: 726px;
+      position: relative;
+      right: 117px;
+    }
+    .communtiy-lessons-mobile-view {
+      width: 650px;
+      margin: auto;
+      display: flex;
+    }
+    .pagination-bottom {
+      display: none;
+    }
+    .oppia-mobile-summary-tile-container {
+      padding: 0 5px;
+    }
+    .pagination {
+      width: 670px;
+    }
+    .dropbtn {
+      left: 595px;
+    }
+    .dropdown:hover .dropdown-content {
+      left: 595px;
     }
   }
 </style>
