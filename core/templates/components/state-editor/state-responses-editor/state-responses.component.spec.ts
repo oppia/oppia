@@ -25,7 +25,7 @@ import { importAllAngularServices } from 'tests/unit-test-utils';
  * @fileoverview Unit tests for paramChangesEditor.
  */
 
-fdescribe('StateResponsesComponent', () => {
+describe('StateResponsesComponent', () => {
   let ctrl = null;
   let $rootScope = null;
   let $scope = null;
@@ -181,7 +181,7 @@ fdescribe('StateResponsesComponent', () => {
           tagged_skill_misconception_id: 'misconception1'
         }, 'TextInput')
       ];
-      defaultOutcome =  outcomeObjectFactory.createFromBackendDict({
+      defaultOutcome = outcomeObjectFactory.createFromBackendDict({
         dest: 'Hola',
         feedback: {
           content_id: '',
@@ -249,12 +249,17 @@ fdescribe('StateResponsesComponent', () => {
 
     ctrl.$onInit();
 
-    expect(ResponsesService.onInitializeAnswerGroups.subscribe).toHaveBeenCalled();
-    expect(StateInteractionIdService.onInteractionIdChanged.subscribe).toHaveBeenCalled();
+    expect(ResponsesService.onInitializeAnswerGroups.subscribe)
+      .toHaveBeenCalled();
+    expect(StateInteractionIdService.onInteractionIdChanged.subscribe)
+      .toHaveBeenCalled();
     expect(ResponsesService.onAnswerGroupsChanged.subscribe).toHaveBeenCalled();
-    expect(StateEditorService.onUpdateAnswerChoices.subscribe).toHaveBeenCalled();
-    expect(StateEditorService.onHandleCustomArgsUpdate.subscribe).toHaveBeenCalled();
-    expect(StateEditorService.onStateEditorInitialized.subscribe).toHaveBeenCalled();
+    expect(StateEditorService.onUpdateAnswerChoices.subscribe)
+      .toHaveBeenCalled();
+    expect(StateEditorService.onHandleCustomArgsUpdate.subscribe)
+      .toHaveBeenCalled();
+    expect(StateEditorService.onStateEditorInitialized.subscribe)
+      .toHaveBeenCalled();
 
     ctrl.$onDestroy();
   });
@@ -278,7 +283,7 @@ fdescribe('StateResponsesComponent', () => {
     ctrl.$onDestroy();
   });
 
-  it('should re-initialize properties and open add answer group modal  when' +
+  it('should re-initialize properties and open add answer group modal when' +
     ' interaction is changed to a non-linear and non-terminal one', () => {
     let onInteractionIdChangedEmitter = new EventEmitter();
     spyOn(ResponsesService, 'getAnswerGroups').and.returnValue(answerGroups);
@@ -286,7 +291,9 @@ fdescribe('StateResponsesComponent', () => {
     spyOnProperty(StateInteractionIdService, 'onInteractionIdChanged')
       .and.returnValue(onInteractionIdChangedEmitter);
     spyOn(ResponsesService, 'onInteractionIdChanged').and.callFake(
-      (options, callback) => { callback(); });
+      (options, callback) => {
+        callback();
+      });
     spyOn(StateEditorService, 'isInQuestionMode').and.returnValue(true);
     spyOn(ResponsesService, 'getDefaultOutcome').and.returnValue(
       defaultOutcome);
@@ -294,20 +301,20 @@ fdescribe('StateResponsesComponent', () => {
 
     expect($scope.answerGroups).toEqual(undefined);
     expect($scope.defaultOutcome).toEqual(undefined);
-    expect($scope.activeAnswerGroupIndex ).toBe(undefined);
+    expect($scope.activeAnswerGroupIndex).toBe(undefined);
 
     ctrl.$onInit();
     onInteractionIdChangedEmitter.emit('ImageClickInput');
 
     expect($scope.answerGroups).toEqual(answerGroups);
     expect($scope.defaultOutcome).toEqual(defaultOutcome);
-    expect($scope.activeAnswerGroupIndex ).toBe(0);
+    expect($scope.activeAnswerGroupIndex).toBe(0);
     expect($scope.openAddAnswerGroupModal).toHaveBeenCalled();
 
     ctrl.$onDestroy();
   });
 
-  it('should not open add answer group modal  when interaction is' +
+  it('should not open add answer group modal when interaction is' +
     ' changed to a linear and terminal one', () => {
     let onInteractionIdChangedEmitter = new EventEmitter();
     spyOnProperty(StateInteractionIdService, 'onInteractionIdChanged')
@@ -394,7 +401,7 @@ fdescribe('StateResponsesComponent', () => {
       .and.returnValue({
         skill1: [misconceptionObjectFactory.create(
           'm1', 'Misconception 1', 'note', '', false)]
-    });
+      });
 
     expect($scope.misconceptionsBySkill).toBe(undefined);
     expect($scope.containsOptionalMisconceptions).toBe(undefined);
@@ -728,7 +735,8 @@ fdescribe('StateResponsesComponent', () => {
       result: $q.resolve({
         reopen: true,
         tmpRule: new Rule('', null, null),
-        tmpOutcome: outcomeObjectFactory.createNew('Hola', '1', 'Feedback text', []),
+        tmpOutcome: outcomeObjectFactory
+          .createNew('Hola', '1', 'Feedback text', []),
         tmpTaggedSkillMisconceptionId: ''
       })
     }, {
@@ -740,8 +748,8 @@ fdescribe('StateResponsesComponent', () => {
     $scope.$apply();
 
     expect($scope.answerGroups).toEqual([answerGroupObjectFactory.createNew(
-      [new Rule('', null, null)], outcomeObjectFactory.createNew('Hola', '1', 'Feedback text', []),
-      [], ''
+      [new Rule('', null, null)], outcomeObjectFactory.createNew(
+        'Hola', '1', 'Feedback text', []), [], ''
     )]);
     expect(ResponsesService.save).toHaveBeenCalled();
   });
@@ -798,7 +806,7 @@ fdescribe('StateResponsesComponent', () => {
 
   it('should update active answer group for newly tagged misconception', () => {
     spyOn(ResponsesService, 'updateActiveAnswerGroup').and.callFake(
-      ({}, callback) => {
+      ({taggedSkillMisconceptionId}, callback) => {
         callback();
       }
     );
@@ -808,7 +816,7 @@ fdescribe('StateResponsesComponent', () => {
 
   it('should update active answer group when feedback is changed', () => {
     spyOn(ResponsesService, 'updateActiveAnswerGroup').and.callFake(
-      ({}, callback) => {
+      ({feedback}, callback) => {
         callback();
       }
     );
@@ -817,11 +825,10 @@ fdescribe('StateResponsesComponent', () => {
   });
 
   it('should update active answer group when destination is changed', () => {
-    spyOn(ResponsesService, 'updateActiveAnswerGroup').and.callFake(
-      ({}, callback) => {
+    spyOn(ResponsesService, 'updateActiveAnswerGroup')
+      .and.callFake(({dest, expId, skillId}, callback) => {
         callback();
-      }
-    );
+      });
     $scope.saveActiveAnswerGroupDest(defaultOutcome);
     expect(ctrl.onSaveInteractionAnswerGroups).toHaveBeenCalled();
   });
@@ -830,7 +837,7 @@ fdescribe('StateResponsesComponent', () => {
   it('should update active answer group when correctness' +
     ' label is changed', () => {
     spyOn(ResponsesService, 'updateActiveAnswerGroup').and.callFake(
-      ({}, callback) => {
+      ({labelledAsCorrect}, callback) => {
         callback();
       }
     );
@@ -841,7 +848,7 @@ fdescribe('StateResponsesComponent', () => {
 
   it('should update active answer group when answer rules are changed', () => {
     spyOn(ResponsesService, 'updateActiveAnswerGroup').and.callFake(
-      ({}, callback) => {
+      ({rules}, callback) => {
         callback();
       }
     );
@@ -853,7 +860,7 @@ fdescribe('StateResponsesComponent', () => {
   it('should update default outcome when default' +
     ' outcome feedback is changed', () => {
     spyOn(ResponsesService, 'updateDefaultOutcome').and.callFake(
-      ({}, callback) => {
+      ({feedback, dest}, callback) => {
         callback();
       }
     );
@@ -863,11 +870,10 @@ fdescribe('StateResponsesComponent', () => {
 
   it('should update default outcome when default' +
     ' outcome destination is changed', () => {
-    spyOn(ResponsesService, 'updateDefaultOutcome').and.callFake(
-      ({}, callback) => {
+    spyOn(ResponsesService, 'updateDefaultOutcome')
+      .and.callFake(({dest, expId, skillId}, callback) => {
         callback();
-      }
-    );
+      });
     $scope.saveDefaultOutcomeDest(defaultOutcome);
     expect(ctrl.onSaveInteractionDefaultOutcome).toHaveBeenCalled();
   });
@@ -875,7 +881,7 @@ fdescribe('StateResponsesComponent', () => {
   it('should update default outcome when default' +
     ' outcome correctness label is changed', () => {
     spyOn(ResponsesService, 'updateDefaultOutcome').and.callFake(
-      ({}, callback) => {
+      ({labelledAsCorrect}, callback) => {
         callback();
       }
     );
@@ -919,5 +925,70 @@ fdescribe('StateResponsesComponent', () => {
     ' is a falsy value', () => {
     expect($scope.summarizeDefaultOutcome(null, 'Continue', 0, true))
       .toBe('');
+  });
+
+  it('should check if outcome is looping', () => {
+    $scope.stateName = 'Hola';
+    expect($scope.isOutcomeLooping(outcomeObjectFactory.createNew(
+      'Hola', '', '', []))).toBe(true);
+    expect($scope.isOutcomeLooping(outcomeObjectFactory.createNew(
+      'Second Last', '', '', []))).toBe(false);
+  });
+
+  it('should toggle response card', () => {
+    $scope.responseCardIsShown = true;
+
+    $scope.toggleResponseCard();
+    expect($scope.responseCardIsShown).toBe(false);
+
+    $scope.toggleResponseCard();
+    expect($scope.responseCardIsShown).toBe(true);
+  });
+
+  it('should check if no action is expected for misconception', () => {
+    spyOn(ResponsesService, 'getAnswerGroups').and.returnValue(answerGroups);
+    $scope.inapplicableSkillMisconceptionIds = ['misconception2'];
+    // Here, misconception1 is assigned to answerGroup, so no action is
+    // expected.
+    expect($scope.isNoActionExpected('misconception1')).toBe(true);
+    // Here, misconception2 is not assigned to answerGroup but it is an
+    // inapplicable skill misconception, so no action is expected.
+    expect($scope.isNoActionExpected('misconception2')).toBe(true);
+    // Here, misconception3 is neither inapplicable nor assigned to answerGroup
+    // so action is expected.
+    expect($scope.isNoActionExpected('misconceptions')).toBe(false);
+  });
+
+  it('should update optional misconception id status when user' +
+    ' marks it as applicable', () => {
+    $scope.inapplicableSkillMisconceptionIds = ['misconception1'];
+
+    $scope.updateOptionalMisconceptionIdStatus('misconception1', true);
+
+    expect($scope.inapplicableSkillMisconceptionIds).toEqual([]);
+  });
+
+  it('should update optional misconception id status when user' +
+    ' marks it as applicable', () => {
+    $scope.inapplicableSkillMisconceptionIds = ['misconception1'];
+
+    $scope.updateOptionalMisconceptionIdStatus('misconception2', false);
+
+    expect($scope.inapplicableSkillMisconceptionIds)
+      .toEqual(['misconception1', 'misconception2']);
+  });
+
+  it('should get unaddressed misconception names', () => {
+    spyOn(ResponsesService, 'getAnswerGroups').and.returnValue(answerGroups);
+    $scope.misconceptionsBySkill = {
+      skill1: [
+        misconceptionObjectFactory.create(
+          'm1', 'Misconception 1', 'note', '', false),
+        misconceptionObjectFactory.create(
+          'm2', 'Misconception 2', 'note', '', true)
+      ]
+    };
+    expect($scope.getUnaddressedMisconceptionNames())
+      .toEqual(['Misconception 2']);
   });
 });
