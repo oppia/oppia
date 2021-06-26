@@ -990,13 +990,13 @@ class CanAccessReleaseCoordinatorPageDecoratorTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(CanAccessReleaseCoordinatorPageDecoratorTests, self).setUp()
-        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.ADMIN_USERNAME)
+        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
 
         self.signup(
             self.RELEASE_COORDINATOR_EMAIL, self.RELEASE_COORDINATOR_USERNAME)
 
-        self.set_user_role(
+        self.add_user_role(
             self.RELEASE_COORDINATOR_USERNAME,
             feconf.ROLE_ID_RELEASE_COORDINATOR)
 
@@ -1062,13 +1062,13 @@ class CanRunAnyJobDecoratorTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(CanRunAnyJobDecoratorTests, self).setUp()
-        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.ADMIN_USERNAME)
+        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
 
         self.signup(
             self.RELEASE_COORDINATOR_EMAIL, self.RELEASE_COORDINATOR_USERNAME)
 
-        self.set_user_role(
+        self.add_user_role(
             self.RELEASE_COORDINATOR_USERNAME,
             feconf.ROLE_ID_RELEASE_COORDINATOR)
 
@@ -1131,13 +1131,13 @@ class CanManageMemcacheDecoratorTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(CanManageMemcacheDecoratorTests, self).setUp()
-        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.ADMIN_USERNAME)
+        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
 
         self.signup(
             self.RELEASE_COORDINATOR_EMAIL, self.RELEASE_COORDINATOR_USERNAME)
 
-        self.set_user_role(
+        self.add_user_role(
             self.RELEASE_COORDINATOR_USERNAME,
             feconf.ROLE_ID_RELEASE_COORDINATOR)
 

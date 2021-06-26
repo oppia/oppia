@@ -95,12 +95,12 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
         super(LearnerDashboardHandlerTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.set_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
 
     def test_can_see_completed_explorations(self):
         self.login(self.VIEWER_EMAIL)

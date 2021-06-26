@@ -608,7 +608,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
         super(MaintenanceModeTests, self).setUp()
         self.signup(
             self.RELEASE_COORDINATOR_EMAIL, self.RELEASE_COORDINATOR_USERNAME)
-        self.set_user_role(
+        self.add_user_role(
             self.RELEASE_COORDINATOR_USERNAME,
             feconf.ROLE_ID_RELEASE_COORDINATOR)
         with python_utils.ExitStack() as context_stack:
