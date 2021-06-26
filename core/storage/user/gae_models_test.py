@@ -84,6 +84,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             id=self.USER_3_ID,
             email=self.USER_3_EMAIL,
             roles=[self.USER_3_ROLE],
+            banned=False,
             username=self.GENERIC_USERNAME,
             normalized_username=self.GENERIC_USERNAME,
             last_agreed_to_terms=self.GENERIC_DATE,
@@ -184,6 +185,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
         expected_user_data = {
             'email': 'user@example.com',
             'roles': [feconf.ROLE_ID_CURRICULUM_ADMIN],
+            'banned': False,
             'username': None,
             'normalized_username': None,
             'last_agreed_to_terms_msec': None,
@@ -211,6 +213,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
         expected_user_data = {
             'email': self.USER_3_EMAIL,
             'roles': [feconf.ROLE_ID_CURRICULUM_ADMIN],
+            'banned': False,
             'username': self.GENERIC_USERNAME,
             'normalized_username': self.GENERIC_USERNAME,
             'last_agreed_to_terms_msec': self.GENERIC_EPOCH,
