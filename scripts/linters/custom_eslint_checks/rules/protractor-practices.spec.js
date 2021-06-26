@@ -30,7 +30,15 @@ ruleTester.run('protractor-practices', rule, {
   }, {
     code:
     `action.click(elem);
-    browser.action.sleep();`,
+    browser.action.waitForAngular();`,
+  }, {
+    code:
+    `action.click(elem);
+    browser.action.explore();`,
+  }, {
+    code:
+    `action.click(elem);
+    browser.action.pause();`,
   }, {
     code: 'card.then = 3;',
   }, {
@@ -56,6 +64,37 @@ ruleTester.run('protractor-practices', rule, {
     },
     {
       code:
+      `it('should test a feature', function() {
+        browser.explore();
+      });`,
+      errors: [{
+        message: 'Please do not use browser.explore() in protractor files',
+        type: 'CallExpression',
+      }],
+    },
+    {
+      code:
+      `it('should test a feature', function() {
+        browser.pause();
+      });`,
+      errors: [{
+        message: 'Please do not use browser.pause() in protractor files',
+        type: 'CallExpression',
+      }],
+    },
+    {
+      code:
+      `it('should test a feature', function() {
+        browser.waitForAngular();
+      });`,
+      errors: [{
+        message: (
+          'Please do not use browser.waitForAngular() in protractor files'),
+        type: 'CallExpression',
+      }],
+    },
+    {
+      code:
       `toPromise.then(function() {
         numLessons = 3;
       });`,
@@ -67,7 +106,7 @@ ruleTester.run('protractor-practices', rule, {
       code:
       'const Value = 5;',
       errors: [{
-        message: 'Please make constant name “Value” are in all-caps',
+        message: 'Please make sure that constant name “Value” are in all-caps',
       }],
     },
   ]
