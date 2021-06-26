@@ -35,11 +35,14 @@ module.exports = {
         'Please make sure that constant name “{{constName}}” are in all-caps'),
       disallowedBrowserMethods: (
         'Please do not use browser.{{methodName}}() in protractor files'),
-      disallowThen: 'Please do not use .then(), consider async/await instead'
+      disallowThen: 'Please do not use .then(), consider async/await instead',
+      disallowAwait: 'Please do not use await for "{{propertyName}}()"'
     },
   },
 
   create: function(context) {
+    var invalidAwaitSelector = (
+      'AwaitExpression[argument.callee.property.name=/^(first|last|get)$/]');
     var disallowedBrowserMethods = [
       'sleep', 'explore', 'pause', 'waitForAngular'];
     var disallowedBrowserMethodsRegex = (
@@ -47,6 +50,16 @@ module.exports = {
     var disallowedBrowserMethodsSelector = (
       'CallExpression[callee.object.name=browser][callee.property.name=' +
       disallowedBrowserMethodsRegex + ']');
+
+    var reportDisallowInvalidAwait = function(node) {
+      context.report({
+        node: node,
+        messageId: 'disallowAwait',
+        data: {
+          propertyName: node.argument.callee.property.name
+        }
+      });
+    };
 
     var reportDisallowedBrowserMethod = function(node) {
       context.report({
@@ -74,6 +87,9 @@ module.exports = {
     };
 
     return {
+      [invalidAwaitSelector]: function(node) {
+        reportDisallowInvalidAwait(node);
+      },
       'VariableDeclaration[kind=const]': function(node) {
         checkConstName(node);
       },
