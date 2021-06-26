@@ -22,16 +22,10 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import subprocess
 
 from core.tests import test_utils
-from scripts import install_third_party_libs
 from scripts import run_mypy_checks
 
 PYTHON_CMD = 'python3'
 MYPY_SCRIPT_MODULE = 'scripts.run_mypy_checks'
-
-
-def mock_install_third_party_libs_main():
-    """Mock for install_third_party_libs."""
-    return
 
 
 class MypyScriptChecks(test_utils.GenericTestBase):
@@ -39,10 +33,6 @@ class MypyScriptChecks(test_utils.GenericTestBase):
 
     def setUp(self):
         super(MypyScriptChecks, self).setUp()
-
-        self.install_swap = self.swap_with_checks(
-            install_third_party_libs, 'main',
-            mock_install_third_party_libs_main)
 
         process_success = subprocess.Popen(
             ['echo', 'test'], stdout=subprocess.PIPE)
@@ -121,34 +111,34 @@ class MypyScriptChecks(test_utils.GenericTestBase):
 
     def test_main_with_files_success(self):
         with self.popen_swap_success:
-            with self.swap_install_success, self.install_swap:
+            with self.swap_install_success:
                 process = run_mypy_checks.main(args=['--files', 'file1.py'])
                 self.assertEqual(process, 0)
 
     def test_main_success(self):
         with self.popen_swap_success:
-            with self.swap_install_success, self.install_swap:
+            with self.swap_install_success:
                 process = run_mypy_checks.main(args=[])
                 self.assertEqual(process, 0)
 
     def test_main_with_files_failure(self):
         with self.popen_swap_failure:
-            with self.swap_install_success, self.install_swap:
+            with self.swap_install_success:
                 with self.assertRaisesRegexp(SystemExit, '1'):
                     run_mypy_checks.main(args=['--files', 'file1.py'])
 
     def test_main_failure(self):
         with self.popen_swap_failure:
-            with self.swap_install_success, self.install_swap:
+            with self.swap_install_success:
                 with self.assertRaisesRegexp(SystemExit, '1'):
                     run_mypy_checks.main(args=[])
 
     def test_main_install_prerequisites_success(self):
-        with self.popen_swap_success, self.install_swap:
+        with self.popen_swap_success:
             process = run_mypy_checks.main(args=[])
             self.assertEqual(process, 0)
 
     def test_main_install_prerequisites_failure(self):
-        with self.popen_swap_failure, self.install_swap:
+        with self.popen_swap_failure:
             with self.assertRaisesRegexp(SystemExit, '1'):
                 run_mypy_checks.main(args=[])
