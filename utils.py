@@ -1188,6 +1188,7 @@ def partition(iterable, predicate=bool, enumerated=False):
 
 
 def quoted(s):
+    # type: (Text) -> Text
     """Returns a string enclosed in quotes, escaping any quotes within it.
 
     Args:
