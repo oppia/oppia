@@ -9801,7 +9801,7 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
 
         # Adding voiceovers to the second state to check
         # if they can be applied. They can be mergead as
-        # the changes are in the differents states.
+        # the changes are in the different states.
         change_list_5 = [exp_domain.ExplorationChange({
             'old_value': {
                 'voiceovers_mapping': {
