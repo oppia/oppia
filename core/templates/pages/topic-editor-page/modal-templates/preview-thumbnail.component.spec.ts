@@ -28,6 +28,7 @@ describe('Preview Thumbnail Component', function() {
   let fixture: ComponentFixture<PreviewThumbnailComponent>;
   let imageUploadHelperService: ImageUploadHelperService;
   let testUrl = 'test_url';
+  let contextService: ContextService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -45,6 +46,7 @@ describe('Preview Thumbnail Component', function() {
 
   beforeEach(() => {
     fixture = TestBed.createComponent(PreviewThumbnailComponent);
+    contextService = TestBed.inject(ContextService);
     componentInstance = fixture.componentInstance;
     imageUploadHelperService = (
        TestBed.inject(ImageUploadHelperService) as unknown) as
@@ -59,6 +61,7 @@ describe('Preview Thumbnail Component', function() {
   });
 
   it('should initialize', () => {
+    spyOn(contextService, 'getEntityType').and.returnValue('topic');
     componentInstance.ngOnInit();
     expect(componentInstance.editableThumbnailDataUrl).toEqual(testUrl);
   });

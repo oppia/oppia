@@ -188,7 +188,7 @@ export class ContextService {
   }
 
   // Add constants for entity type.
-  getEntityType(): string | undefined {
+  getEntityType(): string {
     if (ContextService.customEntityContext !== null) {
       return ContextService.customEntityContext.getType();
     }
@@ -216,7 +216,7 @@ export class ContextService {
         return AppConstants.ENTITY_TYPE.SKILL;
       }
     }
-    return;
+    throw new Error('No Entity Type found!');
   }
 
   // Returns a string representing the explorationId (obtained from the

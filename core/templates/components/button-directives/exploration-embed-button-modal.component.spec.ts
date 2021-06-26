@@ -127,7 +127,6 @@ describe('ExplorationEmbedButtonModalComponent', () => {
   it('should throw Error if selection is null', fakeAsync(() => {
     const removeAllRanges = jasmine.createSpy('removeAllRanges');
     const addRange = jasmine.createSpy('addRange');
-
     spyOn(window, 'getSelection').and.returnValue(null);
 
     let embedUrlDiv = fixture.debugElement.query(
@@ -136,6 +135,5 @@ describe('ExplorationEmbedButtonModalComponent', () => {
     fixture.detectChanges();
     expect(addRange).not.toHaveBeenCalled();
     expect(removeAllRanges).not.toHaveBeenCalled();
-    expect(component.selectText).toThrowError('Unable to Select!');
   }));
 });
