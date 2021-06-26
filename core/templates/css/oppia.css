@@ -930,6 +930,7 @@ textarea {
 
 .dropup .dropdown-menu,
 .navbar-fixed-bottom .dropdown .dropdown-menu {
+  bottom: 100%;
   margin-bottom: 2px;
   top: auto;
 }
