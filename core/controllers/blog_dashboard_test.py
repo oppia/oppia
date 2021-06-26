@@ -172,6 +172,28 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(10, json_response['max_no_of_tags'])
         self.logout()
 
+        # Checks blog admin can access blog post editor for a given blog post.
+        self.login(self.BLOG_ADMIN_EMAIL)
+        json_response = self.get_json(
+            '%s/%s' % (feconf.BLOG_EDITOR_DATA_URL_PREFIX, self.blog_post.id),
+            )
+        self.assertEqual(self.BLOG_EDITOR_USERNAME, json_response['username'])
+        expected_blog_post_dict = {
+            'id': u'%s' % self.blog_post.id,
+            'title': '',
+            'content': '',
+            'tags': [],
+            'thumbnail_filename': None,
+            'url_fragment': '',
+            'published_on': None,
+            'last_updated': u'%s' % utils.convert_naive_datetime_to_string(
+                self.blog_post.last_updated)
+        }
+        self.assertEqual(
+            expected_blog_post_dict, json_response['blog_post_dict'])
+        self.assertEqual(10, json_response['max_no_of_tags'])
+        self.logout()
+
         # Checks non blog-admins and non-editors can not access blog editor.
         self.login(self.user_email)
         json_response = self.get_json(
@@ -184,6 +206,19 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
         json_response = self.get_json(
             '%s/%s' % (feconf.BLOG_EDITOR_DATA_URL_PREFIX, self.blog_post.id),
             expected_status_int=401)
+        self.logout()
+
+    def test_get_blog_post_data_by_invalid_blog_post_id(self):
+        self.login(self.BLOG_EDITOR_EMAIL)
+        self.get_json(
+            '%s/%s' % (feconf.BLOG_EDITOR_DATA_URL_PREFIX, '123'),
+            expected_status_int=404)
+
+        blog_services.delete_blog_post(self.blog_post.id)
+        self.get_json(
+            '%s/%s' % (feconf.BLOG_EDITOR_DATA_URL_PREFIX, self.blog_post.id),
+            expected_status_int=404)
+
         self.logout()
 
     def test_put_blog_post_data(self):
@@ -210,6 +245,60 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
             blog_services.get_blog_post_by_id(self.blog_post.id))
         self.assertEqual(
             blog_post.thumbnail_filename, 'file.svg')
+
+        self.logout()
+
+    def test_put_blog_post_data_by_invalid_blog_post_id(self):
+        self.login(self.BLOG_EDITOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        payload = {
+            'change_dict': {
+                'title': 'Sample Title',
+            },
+            'is_blog_post_published': False
+        }
+
+        self.put_json(
+            '%s/%s' % (feconf.BLOG_EDITOR_DATA_URL_PREFIX, 123),
+            payload, csrf_token=csrf_token,
+            expected_status_int=404)
+
+        blog_services.delete_blog_post(self.blog_post.id)
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            '%s/%s' % (feconf.BLOG_EDITOR_DATA_URL_PREFIX, self.blog_post.id),
+            payload, csrf_token=csrf_token, expected_status_int=404)
+
+    def test_publishing_unpublishing_blog_post(self):
+        self.login(self.BLOG_EDITOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        payload = {
+            'change_dict': {
+                'title': 'Sample Title',
+                'content': '<p>Hello<p>',
+                'tags': ['Newsletter', 'Learners'],
+                'thumbnail_filename': 'file.svg'
+            },
+            'is_blog_post_published': True
+        }
+
+        self.put_json(
+            '%s/%s' % (feconf.BLOG_EDITOR_DATA_URL_PREFIX, self.blog_post.id),
+            payload, csrf_token=csrf_token)
+        blog_post_rights = blog_services.get_blog_post_rights(self.blog_post.id)
+        self.assertTrue(blog_post_rights.blog_post_is_published)
+
+        # Unpublishing blog post.
+        csrf_token = self.get_new_csrf_token()
+        payload = {
+            'change_dict': {},
+            'is_blog_post_published': False
+        }
+        self.put_json(
+            '%s/%s' % (feconf.BLOG_EDITOR_DATA_URL_PREFIX, self.blog_post.id),
+            payload, csrf_token=csrf_token)
+        blog_post_rights = blog_services.get_blog_post_rights(self.blog_post.id)
+        self.assertFalse(blog_post_rights.blog_post_is_published)
 
     def test_uploading_thumbnail_with_valid_image(self):
         self.login(self.BLOG_EDITOR_EMAIL)

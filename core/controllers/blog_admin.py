@@ -33,15 +33,6 @@ BLOG_POST_EDITOR = feconf.ROLE_ID_BLOG_POST_EDITOR
 BLOG_ADMIN = feconf.ROLE_ID_BLOG_ADMIN
 
 
-class BlogAdminPage(base.BaseHandler):
-    """Handler for rendering the blog admin page."""
-
-    @acl_decorators.can_access_blog_admin_page
-    def get(self):
-        """Handles GET requests."""
-        self.render_template('blog-admin-page.mainpage.html')
-
-
 class BlogAdminHandler(base.BaseHandler):
     """Handler for the blog admin page."""
 

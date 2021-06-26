@@ -25,7 +25,6 @@ from core.domain import fs_services
 from core.domain import image_validation_services
 from core.domain import user_services
 import feconf
-import python_utils
 import utils
 
 
@@ -66,8 +65,6 @@ class BlogDashboardDataHandler(base.BaseHandler):
         """Handles GET requests."""
 
         user_settings = user_services.get_user_settings(self.user_id)
-        if not user_settings:
-            raise self.PageNotFoundException
 
         no_of_published_blog_posts = 0
         published_post_summary_dicts = None
@@ -120,13 +117,9 @@ class BlogPostHandler(base.BaseHandler):
     @acl_decorators.can_access_blog_dashboard
     def get(self, blog_post_id):
         """Populates the data on the blog dashboard editor page."""
-        if not isinstance(blog_post_id, python_utils.BASESTRING):
+        if len(blog_post_id) != 12:
             raise self.PageNotFoundException(
                 Exception('The given blog post id is invalid.'))
-
-        user_settings = user_services.get_user_settings(self.user_id)
-        if not user_settings:
-            raise self.PageNotFoundException
 
         blog_post = (
             blog_services.get_blog_post_by_id(blog_post_id, strict=False))
@@ -134,6 +127,9 @@ class BlogPostHandler(base.BaseHandler):
             raise self.PageNotFoundException(
                 Exception(
                     'The blog post with the given id or url doesn\'t exist.'))
+        user_settings = user_services.get_users_settings(
+            [blog_post.author_id], strict=False, include_marked_deleted=True)
+        username = user_settings[0].username
 
         max_no_of_tags = config_domain.Registry.get_config_property(
             'max_number_of_tags_assigned_to_blog_post').value
@@ -145,8 +141,9 @@ class BlogPostHandler(base.BaseHandler):
 
         self.values.update({
             'blog_post_dict': blog_post_dict,
-            'username': user_settings.username,
-            'profile_picture_data_url': user_settings.profile_picture_data_url,
+            'username': username,
+            'profile_picture_data_url': (
+                user_settings[0].profile_picture_data_url),
             'max_no_of_tags': max_no_of_tags,
             'list_of_default_tags': list_of_default_tags
         })
@@ -156,10 +153,6 @@ class BlogPostHandler(base.BaseHandler):
     @acl_decorators.can_edit_blog_post
     def put(self, blog_post_id):
         """Updates properties of the given blog post."""
-        if not isinstance(blog_post_id, python_utils.BASESTRING):
-            raise self.PageNotFoundException(
-                Exception('The given blog post id is invalid.'))
-
         blog_post_rights = (
             blog_services.get_blog_post_rights(blog_post_id, strict=False))
         if blog_post_rights is None:
@@ -213,10 +206,6 @@ class BlogPostHandler(base.BaseHandler):
     @acl_decorators.can_delete_blog_post
     def delete(self, blog_post_id):
         """Handles Delete requests."""
-        if not isinstance(blog_post_id, python_utils.BASESTRING):
-            raise self.PageNotFoundException(
-                Exception('The given blog post id is invalid.'))
-
         blog_post = (
             blog_services.get_blog_post_by_id(blog_post_id, strict=False))
         if blog_post is None:

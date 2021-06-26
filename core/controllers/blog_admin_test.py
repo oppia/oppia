@@ -25,28 +25,6 @@ from core.tests import test_utils
 import feconf
 
 
-class BlogAdminPageTest(test_utils.GenericTestBase):
-    """Test for release coordinator pages."""
-
-    def setUp(self):
-        """Complete the signup process for self.BLOG_ADMIN_EMAIL."""
-        super(BlogAdminPageTest, self).setUp()
-        self.signup(
-            self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
-
-        self.set_user_role(
-            self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_BLOG_ADMIN)
-
-    def test_guest_user_cannot_access_the_page(self):
-        self.get_html_response(
-            '/blog-admin', expected_status_int=302)
-
-    def test_exploration_editor_cannot_access_the_page(self):
-        self.login(self.EDITOR_EMAIL)
-        self.get_html_response(
-            '/blog-admin', expected_status_int=302)
-
-
 class BlogAdminRolesHandlerTest(test_utils.GenericTestBase):
     """Checks the user role handling on the blog admin page."""
 
@@ -84,6 +62,37 @@ class BlogAdminRolesHandlerTest(test_utils.GenericTestBase):
             csrf_token=csrf_token,
             expected_status_int=200)
         self.assertEqual(response_dict, {})
+
+    def test_updating_blog_editor_role_for_invalid_user(self):
+        username = 'invaliduser'
+
+        self.login(self.BLOG_ADMIN_EMAIL)
+
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            feconf.BLOG_ADMIN_ROLE_HANDLER_URL,
+            {'role': feconf.ROLE_ID_BLOG_ADMIN, 'username': username},
+            csrf_token=csrf_token,
+            expected_status_int=400)
+
+    def test_removing_blog_editor_role_for_invalid_user(self):
+        username = 'invaliduser'
+
+        self.login(self.BLOG_ADMIN_EMAIL)
+
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            feconf.BLOG_ADMIN_ROLE_HANDLER_URL,
+            {'username': username},
+            csrf_token=csrf_token,
+            expected_status_int=400)
+
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            feconf.BLOG_ADMIN_ROLE_HANDLER_URL,
+            {},
+            csrf_token=csrf_token,
+            expected_status_int=400)
 
 
 class BlogAdminHandlerTest(test_utils.GenericTestBase):

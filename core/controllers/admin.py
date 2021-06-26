@@ -90,8 +90,8 @@ class AdminHandler(base.BaseHandler):
         del config_properties['promo_bar_enabled']
         del config_properties['promo_bar_message']
 
-        # Remove blog related configs as they will be handled by 'blog admin'
-        # page by blog admins.
+        # Remove blog related configs as they will be handled by 'blog admins'
+        # on blog admin page.
         del config_properties['max_number_of_tags_assigned_to_blog_post']
         del config_properties['list_of_default_tags_for_blog_post']
 

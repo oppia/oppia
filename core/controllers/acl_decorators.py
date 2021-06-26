@@ -535,7 +535,7 @@ def can_manage_blog_post_editors(handler):
             return handler(self, **kwargs)
 
         raise self.UnauthorizedUserException(
-            'You do not have credentials to access blog admin page.')
+            'You do not have credentials to add or remove blog post editors.')
     test_can_manage_blog_post_editors.__wrapped__ = True
 
     return test_can_manage_blog_post_editors
@@ -611,6 +611,10 @@ def can_delete_blog_post(handler):
         blog_post_rights = blog_services.get_blog_post_rights(
             blog_post_id, strict=False)
 
+        if not blog_post_rights:
+            raise self.PageNotFoundException(
+                Exception('The given blog post id is invalid.'))
+
         if role_services.ACTION_DELETE_ANY_BLOG_POST in self.user.actions:
             return handler(self, blog_post_id, **kwargs)
         if self.user_id in blog_post_rights.editor_ids:
@@ -655,6 +659,10 @@ def can_edit_blog_post(handler):
 
         blog_post_rights = blog_services.get_blog_post_rights(
             blog_post_id, strict=False)
+
+        if not blog_post_rights:
+            raise self.PageNotFoundException(
+                Exception('The given blog post id is invalid.'))
 
         if role_services.ACTION_EDIT_ANY_BLOG_POST in self.user.actions:
             return handler(self, blog_post_id, **kwargs)
