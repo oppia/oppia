@@ -35,6 +35,9 @@ angular.module('oppia').directive('angularHtmlBindWrapper', [
         '$rootScope',
         function($rootScope) {
           var ctrl = this;
+          // Manually implementing the OnChanges lifecycle hook to trigger the
+          // digest loop. Without this, there seems to be change detection
+          // issues.
           ctrl.$onChanges = () => {
             $rootScope.$applyAsync();
           };
@@ -44,7 +47,7 @@ angular.module('oppia').directive('angularHtmlBindWrapper', [
   }
 ]);
 
-import { Directive, ElementRef, Injector, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Directive, ElementRef, Injector, Input } from '@angular/core';
 import { UpgradeComponent } from '@angular/upgrade/static';
 // Allow $scope to be provided to parent Component.
 export const ScopeProvider = {
@@ -56,16 +59,10 @@ export const ScopeProvider = {
   selector: 'angular-html-bind-wrapper',
   providers: [ScopeProvider],
 })
-export class AngularHtmlBindWrapperDirective extends UpgradeComponent
-  implements OnChanges {
+export class AngularHtmlBindWrapperDirective extends UpgradeComponent {
   @Input() htmlData: string;
   @Input() classStr = '';
   constructor(elementRef: ElementRef, injector: Injector) {
     super('angularHtmlBindWrapper', elementRef, injector);
-  }
-  // Manually implementing the OnChanges lifecycle hook to call through to the
-  // super class. Without this, there seems to be change detection issues.
-  ngOnChanges(changes: SimpleChanges): void {
-    super.ngOnChanges(changes);
   }
 }
