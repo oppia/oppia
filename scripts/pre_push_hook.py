@@ -60,7 +60,6 @@ FILE_DIR = os.path.abspath(os.path.dirname(__file__))
 OPPIA_DIR = os.path.join(FILE_DIR, os.pardir, os.pardir)
 LINTER_FILE_FLAG = '--files'
 PYTHON_CMD = 'python'
-PYTHON3_CMD = 'python3'
 OPPIA_PARENT_DIR = os.path.join(FILE_DIR, os.pardir, os.pardir, os.pardir)
 FRONTEND_TEST_CMDS = [
     PYTHON_CMD, '-m', 'scripts.run_frontend_tests', '--check_coverage']
@@ -333,7 +332,7 @@ def start_linter(files):
 def start_mypy_checks():
     """Starts the mypy type checks."""
     task = subprocess.Popen(
-        [PYTHON3_CMD, '-m', MYPY_TYPE_CHECK_MODULE])
+        [PYTHON_CMD, '-m', MYPY_TYPE_CHECK_MODULE])
     task.communicate()
     return task.returncode
 
