@@ -19,16 +19,15 @@
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
-var waitFor = require('../protractor_utils/waitFor.js');
-var workflow = require('../protractor_utils/workflow.js');
 
-var AdminPage = require('../protractor_utils/AdminPage.js');
+var Constants = require('../protractor_utils/ProtractorConstants.js');
 var ExplorationEditorPage = require(
   '../protractor_utils/ExplorationEditorPage.js');
 var TopicsAndSkillsDashboardPage = require(
   '../protractor_utils/TopicsAndSkillsDashboardPage.js');
 var SkillEditorPage = require('../protractor_utils/SkillEditorPage.js');
 var TopicEditorPage = require('../protractor_utils/TopicEditorPage.js');
+
 
 describe('Topics and skills dashboard functionality', function() {
   var topicsAndSkillsDashboardPage = null;
@@ -37,99 +36,203 @@ describe('Topics and skills dashboard functionality', function() {
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
 
-  beforeAll(function() {
-    topicsAndSkillsDashboardPage =
-      new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage();
-    skillEditorPage =
-      new SkillEditorPage.SkillEditorPage();
-    topicEditorPage =
-      new TopicEditorPage.TopicEditorPage();
+  beforeAll(async function() {
+    topicsAndSkillsDashboardPage = (
+      new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage());
+    skillEditorPage = new SkillEditorPage.SkillEditorPage();
+    topicEditorPage = new TopicEditorPage.TopicEditorPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
-    users.createAdmin('creator@topicsAndSkillsDashboard.com',
-      'creatorTopicsAndSkillsDashboard');
+    await users.createAndLoginAdminUser(
+      'creator@topicsAndSkillsDashboard.com',
+      'creatorTopicsAndSkillsDB');
   });
 
-  beforeEach(function() {
-    users.login('creator@topicsAndSkillsDashboard.com');
-    topicsAndSkillsDashboardPage.get();
+  beforeEach(async function() {
+    await topicsAndSkillsDashboardPage.get();
   });
 
-  it('should add a new topic to list', function() {
-    topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
-    topicsAndSkillsDashboardPage.createTopic('Topic 1', 'abbrev');
+  it('should assign, unassign, create and delete a skill', async function() {
+    let TOPIC_NAME = 'Topic1 TASD';
+    let SKILL_NAME = 'skill1 TASD';
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
+    await topicsAndSkillsDashboardPage.createTopic(
+      TOPIC_NAME, 'topic-tasd-one', 'Topic 1 description', true);
 
-    topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.filterTopicsByKeyword(TOPIC_NAME);
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
+
+    await topicsAndSkillsDashboardPage
+      .createSkillWithDescriptionAndExplanation(
+        SKILL_NAME, 'Concept card explanation', true);
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.navigateToSkillsTab();
+    await topicsAndSkillsDashboardPage.filterSkillsByStatus(
+      Constants.SKILL_STATUS_UNASSIGNED);
+    await topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(1);
+    await topicsAndSkillsDashboardPage.assignSkillToTopic(
+      SKILL_NAME, TOPIC_NAME);
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.navigateToSkillsTab();
+
+    await topicsAndSkillsDashboardPage.unassignSkillFromTopic(
+      SKILL_NAME, TOPIC_NAME);
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.navigateToSkillsTab();
+    await topicsAndSkillsDashboardPage.filterSkillsByStatus(
+      Constants.SKILL_STATUS_ASSIGNED);
+    await topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(0);
+    await topicsAndSkillsDashboardPage.resetTopicFilters();
+    await topicsAndSkillsDashboardPage.filterSkillsByStatus(
+      Constants.SKILL_STATUS_UNASSIGNED);
+    await topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(1);
+    await topicsAndSkillsDashboardPage.resetTopicFilters();
+    await topicsAndSkillsDashboardPage.deleteSkillWithName(SKILL_NAME);
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.navigateToSkillsTab();
+    await topicsAndSkillsDashboardPage.searchSkillByName(SKILL_NAME);
+    await topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(0);
+
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.filterTopicsByKeyword(TOPIC_NAME);
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
+    await topicsAndSkillsDashboardPage.deleteTopicWithName(TOPIC_NAME);
+    let topicsTableIsPresent = (
+      await topicsAndSkillsDashboardPage.isTopicTablePresent());
+    if (topicsTableIsPresent) {
+      await topicsAndSkillsDashboardPage.filterTopicsByKeyword(TOPIC_NAME);
+      await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
+    }
   });
 
-  it('should move published skill to unused skills section', function() {
-    topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-      'Skill 2', 'Concept card explanation');
-    topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
-    topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(1);
+  it('should filter the topics', async function() {
+    let TOPIC_ALPHA = 'Alpha TASD';
+    let TOPIC_BETA = 'Beta TASD';
+    let topicsTableIsPresent = (
+      await topicsAndSkillsDashboardPage.isTopicTablePresent());
+    if (topicsTableIsPresent) {
+      await topicsAndSkillsDashboardPage.filterTopicsByKeyword(TOPIC_ALPHA);
+      await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
+      await topicsAndSkillsDashboardPage.resetTopicFilters();
+      await topicsAndSkillsDashboardPage.filterTopicsByKeyword(TOPIC_BETA);
+      await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
+    }
+    await topicsAndSkillsDashboardPage.createTopic(
+      TOPIC_ALPHA, 'alpha-tasd', 'Alpha description', true);
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.createTopic(
+      TOPIC_BETA, 'beta-tasd', 'Beta description', true);
+
+    await topicsAndSkillsDashboardPage.get();
+    let topicsCount = await topicsAndSkillsDashboardPage.getTopicsCount();
+    await topicsAndSkillsDashboardPage.filterTopicsByKeyword(TOPIC_ALPHA);
+    await topicsAndSkillsDashboardPage.filterTopicsByKeyword(TOPIC_BETA);
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(2);
+    await topicsAndSkillsDashboardPage.resetTopicFilters();
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(topicsCount);
+
+    await topicsAndSkillsDashboardPage.filterTopicsByKeyword('alp');
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
+    await topicsAndSkillsDashboardPage.resetTopicFilters();
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(topicsCount);
+
+    await topicsAndSkillsDashboardPage.filterTopicsByKeyword('be');
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
+    await topicsAndSkillsDashboardPage.resetTopicFilters();
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(topicsCount);
+
+    await topicsAndSkillsDashboardPage.filterTopicsByClassroom('Math');
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
+    await topicsAndSkillsDashboardPage.resetTopicFilters();
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(topicsCount);
+
+    await topicsAndSkillsDashboardPage.filterTopicsByKeyword('gamma');
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
+    await topicsAndSkillsDashboardPage.resetTopicFilters();
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(topicsCount);
   });
 
-  it('should move skill to a topic', function() {
-    topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
-    topicsAndSkillsDashboardPage.assignSkillWithIndexToTopic(0, 0);
-    topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
-    topicEditorPage.moveToSubtopicsTab();
-    topicEditorPage.expectNumberOfUncategorizedSkillsToBe(1);
+  it('should move skill to a topic', async function() {
+    let SKILL_NAME = 'skill2 TASD';
+    let TOPIC_NAME = 'Topic2 TASD';
+    await topicsAndSkillsDashboardPage.createTopic(
+      TOPIC_NAME, 'topic-tasd-two', 'Topic 2 description', true);
+    await topicsAndSkillsDashboardPage
+      .createSkillWithDescriptionAndExplanation(
+        SKILL_NAME, 'Concept card explanation', true);
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.navigateToSkillsTab();
+    await topicsAndSkillsDashboardPage.assignSkillToTopic(
+      SKILL_NAME, TOPIC_NAME);
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.editTopic(TOPIC_NAME);
+    await topicEditorPage.expectNumberOfUncategorizedSkillsToBe(1);
   });
 
-  it('should merge an outside skill with one in a topic', function() {
-    topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-      'Skill to be merged', 'Concept card explanation');
-    skillEditorPage.moveToQuestionsTab();
-    skillEditorPage.clickCreateQuestionButton();
-    skillEditorPage.confirmSkillDifficulty();
-    explorationEditorMainTab.setContent(forms.toRichText('Question 1'));
-    explorationEditorMainTab.setInteraction('TextInput', 'Placeholder', 5);
-    explorationEditorMainTab.addResponse(
-      'TextInput', forms.toRichText('Correct Answer'), null, false,
-      'FuzzyEquals', 'correct');
-    explorationEditorMainTab.getResponseEditor(0).markAsCorrect();
-    explorationEditorMainTab.addHint('Hint 1');
-    explorationEditorMainTab.addSolution('TextInput', {
+  it('should merge an outside skill with one in a topic', async function() {
+    let SKILL_NAME = 'skill3 TASD';
+    let TOPIC_NAME = 'Topic3 TASD';
+    await topicsAndSkillsDashboardPage.createTopic(
+      TOPIC_NAME, 'topic-tasd-three', 'Topic 3 description', true);
+    await topicsAndSkillsDashboardPage
+      .createSkillWithDescriptionAndExplanation(
+        SKILL_NAME, 'Concept card explanation', true);
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.navigateToSkillsTab();
+    await topicsAndSkillsDashboardPage.assignSkillToTopic(
+      SKILL_NAME, TOPIC_NAME);
+    await topicsAndSkillsDashboardPage.get();
+    var handle = await browser.getWindowHandle();
+    await topicsAndSkillsDashboardPage
+      .createSkillWithDescriptionAndExplanation(
+        'Skill to be merged', 'Concept card explanation', false);
+    await skillEditorPage.addRubricExplanationForDifficulty(
+      'Easy', 'Second explanation for easy difficulty.');
+    await skillEditorPage.saveOrPublishSkill('Edited rubrics');
+    var url = await browser.getCurrentUrl();
+    skillId = url.split('/')[4];
+    await skillEditorPage.get(skillId);
+
+    await skillEditorPage.moveToQuestionsTab();
+    await skillEditorPage.clickCreateQuestionButton();
+    await explorationEditorMainTab.setContent(
+      await forms.toRichText('Question 1'));
+    await explorationEditorMainTab.setInteraction(
+      'TextInput', 'Placeholder', 5);
+    await explorationEditorMainTab.addResponse(
+      'TextInput', await forms.toRichText('Correct Answer'), null, false,
+      'FuzzyEquals', ['correct']);
+    var responseEditor = await explorationEditorMainTab.getResponseEditor(0);
+    await responseEditor.markAsCorrect();
+    await (
+      await explorationEditorMainTab.getResponseEditor('default')
+    ).setFeedback(await forms.toRichText('Try again'));
+    await explorationEditorMainTab.addHint('Hint 1');
+    await explorationEditorMainTab.addSolution('TextInput', {
       correctAnswer: 'correct',
       explanation: 'It is correct'
     });
-    skillEditorPage.saveQuestion();
-    topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
-    topicsAndSkillsDashboardPage.mergeSkillWithIndexToSkillWithIndex(0, 0);
-    topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
-    topicEditorPage.moveToQuestionsTab();
-    topicEditorPage.expectNumberOfQuestionsForSkillWithDescriptionToBe(
-      1, 'Skill 2');
+    await skillEditorPage.saveQuestion();
+    await general.closeCurrentTabAndSwitchTo(handle);
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.navigateToSkillsTab();
+    await topicsAndSkillsDashboardPage.filterSkillsByStatus(
+      Constants.SKILL_STATUS_UNASSIGNED);
+    await topicsAndSkillsDashboardPage.mergeSkills(
+      'Skill to be merged', SKILL_NAME);
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.editTopic(TOPIC_NAME);
+    await topicEditorPage.moveToQuestionsTab();
+    await topicEditorPage.expectNumberOfQuestionsForSkillWithDescriptionToBe(
+      1, SKILL_NAME);
   });
 
-  it('should remove a skill from list once deleted', function() {
-    topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-      'Skill to be deleted', 'Concept card explanation');
-    topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
-    topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(1);
-    topicsAndSkillsDashboardPage.deleteSkillWithIndex(0);
-
-    topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
-    topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(0);
+  afterEach(async function() {
+    await general.checkForConsoleErrors([]);
   });
 
-  it('should remove a topic from list once deleted', function() {
-    topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
-    topicsAndSkillsDashboardPage.deleteTopicWithIndex(0);
-
-    topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
-  });
-
-  afterEach(function() {
-    general.checkForConsoleErrors([]);
-    users.logout();
+  afterAll(async function() {
+    await users.logout();
   });
 });

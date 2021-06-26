@@ -23,8 +23,8 @@ from core import jobs_registry
 from core.domain import event_services
 from core.domain import feedback_jobs_continuous
 from core.domain import feedback_services
+from core.domain import taskqueue_services
 from core.platform import models
-from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
 
@@ -36,6 +36,7 @@ class MockFeedbackAnalyticsAggregator(
     """A modified FeedbackAnalyticsAggregator that does not start a new batch
     job when the previous one has finished.
     """
+
     @classmethod
     def _get_batch_job_manager_class(cls):
         return MockFeedbackAnalyticsMRJobManager
@@ -59,6 +60,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
     test environment the realtime datastore is not automatically cleared after
     a batch job completes.
     """
+
     ALL_CC_MANAGERS_FOR_TESTS = [MockFeedbackAnalyticsAggregator]
 
     def _get_swap_context(self):
@@ -71,12 +73,12 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
 
     def _run_job(self):
         """Runs the job, then processes and flushes all the pending tasks."""
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         MockFeedbackAnalyticsAggregator.start_computation()
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def _run_job_and_check_results(
             self, exp_id, expected_thread_analytics_dict):
@@ -176,6 +178,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             thread.entity_type = feconf.ENTITY_TYPE_EXPLORATION
             thread.entity_id = exp_id
             thread.subject = 'subject'
+            thread.update_timestamps()
             thread.put()
             self._run_job_and_check_results(
                 exp_id, {
@@ -195,6 +198,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             thread_1.entity_type = feconf.ENTITY_TYPE_EXPLORATION
             thread_1.entity_id = exp_id
             thread_1.subject = 'subject'
+            thread_1.update_timestamps()
             thread_1.put()
             thread_2 = feedback_models.GeneralFeedbackThreadModel.create(
                 thread_id_2)
@@ -202,6 +206,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             thread_2.entity_type = feconf.ENTITY_TYPE_EXPLORATION
             thread_2.entity_id = exp_id
             thread_2.subject = 'subject'
+            thread_2.update_timestamps()
             thread_2.put()
 
             self._run_job_and_check_results(
@@ -228,6 +233,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             thread_1.entity_type = feconf.ENTITY_TYPE_EXPLORATION
             thread_1.entity_id = exp_id_1
             thread_1.subject = 'subject'
+            thread_1.update_timestamps()
             thread_1.put()
             thread_2 = feedback_models.GeneralFeedbackThreadModel.create(
                 thread_id_2)
@@ -235,6 +241,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             thread_2.entity_type = feconf.ENTITY_TYPE_EXPLORATION
             thread_2.entity_id = exp_id_1
             thread_2.subject = 'subject'
+            thread_2.update_timestamps()
             thread_2.put()
             thread_3 = feedback_models.GeneralFeedbackThreadModel.create(
                 thread_id_3)
@@ -242,13 +249,14 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             thread_3.entity_type = feconf.ENTITY_TYPE_EXPLORATION
             thread_3.entity_id = exp_id_3
             thread_3.subject = 'subject'
+            thread_3.update_timestamps()
             thread_3.put()
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
             MockFeedbackAnalyticsAggregator.start_computation()
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
             # Do a multi call for all explorations and check for stats.
             feedback_analytics_multi = (
                 MockFeedbackAnalyticsAggregator
@@ -307,6 +315,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             thread_1.entity_type = feconf.ENTITY_TYPE_EXPLORATION
             thread_1.entity_id = exp_id
             thread_1.subject = 'subject'
+            thread_1.update_timestamps()
             thread_1.put()
 
             # Start job.
@@ -319,13 +328,14 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             # Stop job.
             MockFeedbackAnalyticsAggregator.stop_computation(user_id)
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
             # Close thread.
             thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(
                 thread_id_1)
             thread.status = feedback_models.STATUS_CHOICES_FIXED
+            thread.update_timestamps()
             thread.put()
 
             self._run_job_and_check_results(
@@ -347,6 +357,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             thread_1.entity_type = feconf.ENTITY_TYPE_EXPLORATION
             thread_1.entity_id = exp_id
             thread_1.subject = 'subject'
+            thread_1.update_timestamps()
             thread_1.put()
 
             # Start job.
@@ -359,13 +370,14 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             # Stop job.
             MockFeedbackAnalyticsAggregator.stop_computation(user_id)
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
             # Close thread.
             thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(
                 thread_id_1)
             thread.status = feedback_models.STATUS_CHOICES_FIXED
+            thread.update_timestamps()
             thread.put()
 
             # Restart job.
@@ -378,13 +390,14 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             # Stop job.
             MockFeedbackAnalyticsAggregator.stop_computation(user_id)
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
             # Reopen thread.
             thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(
                 thread_id_1)
             thread.status = feedback_models.STATUS_CHOICES_OPEN
+            thread.update_timestamps()
             thread.put()
 
             # Restart job.
@@ -407,6 +420,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             thread_1.entity_type = feconf.ENTITY_TYPE_EXPLORATION
             thread_1.entity_id = exp_id
             thread_1.subject = 'subject'
+            thread_1.update_timestamps()
             thread_1.put()
 
             self._run_job_and_check_results(
@@ -417,13 +431,14 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             # Stop job.
             MockFeedbackAnalyticsAggregator.stop_computation(user_id)
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
             # Close thread.
             thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(
                 thread_id_1)
             thread.status = feedback_models.STATUS_CHOICES_FIXED
+            thread.update_timestamps()
             thread.put()
 
             # Restart job.
@@ -436,13 +451,14 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             # Stop job.
             MockFeedbackAnalyticsAggregator.stop_computation(user_id)
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
             # Change thread status.
             thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(
                 thread_id_1)
             thread.status = feedback_models.STATUS_CHOICES_IGNORED
+            thread.update_timestamps()
             thread.put()
 
             # Restart job.
@@ -499,7 +515,7 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
             self.save_new_valid_exploration(exp_id, self.owner_id)
 
             # Trigger thread creation event.
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
             feedback_services.create_thread(
                 'exploration', exp_id, None, 'a subject', 'some text')
 
@@ -516,7 +532,7 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
             self.save_new_valid_exploration(exp_id, self.owner_id)
 
             # Trigger thread creation events.
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
             feedback_services.create_thread(
                 'exploration', exp_id, None, 'a subject', 'some text')
             feedback_services.create_thread(
@@ -537,7 +553,7 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
             self.save_new_valid_exploration(exp_id_2, self.owner_id)
 
             # Trigger thread creation events.
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
             feedback_services.create_thread(
                 'exploration', exp_id_1, None, 'a subject', 'some text')
             feedback_services.create_thread(
@@ -565,7 +581,7 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
             self.save_new_valid_exploration(exp_id, self.owner_id)
 
             # Trigger thread creation events.
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
             feedback_services.create_thread(
                 'exploration', exp_id, None, 'a subject', 'some text')
             self._flush_tasks_and_check_analytics(
@@ -637,7 +653,7 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
             self.save_new_valid_exploration(exp_id, self.owner_id)
 
             # Trigger thread creation events.
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
             feedback_services.create_thread(
                 'exploration', exp_id, None, 'a subject', 'some text')
 
@@ -679,21 +695,34 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
             user_id = 'uid'
             exp_id = 'eid'
             self.save_new_valid_exploration(exp_id, self.owner_id)
+
+            self._flush_tasks_and_check_analytics(
+                exp_id, {
+                    'num_open_threads': 0,
+                    'num_total_threads': 0,
+                })
+
             feedback_services.create_thread(
                 'exploration', exp_id, None, 'a subject', 'some text')
 
+            self._flush_tasks_and_check_analytics(
+                exp_id, {
+                    'num_open_threads': 1,
+                    'num_total_threads': 1,
+                })
+
             # Start job.
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
             MockFeedbackAnalyticsAggregator.start_computation()
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
             # Stop job.
             MockFeedbackAnalyticsAggregator.stop_computation(user_id)
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
             self._flush_tasks_and_check_analytics(

@@ -21,13 +21,6 @@
 import { InteractionsExtensionsConstants } from
   'interactions/interactions-extension.constants';
 
-// Minimum confidence required for a predicted answer group to be shown to user.
-// Generally a threshold of 0.7-0.8 is assumed to be a good one in practice,
-// however value need not be in those bounds.
-angular.module('oppia').constant(
-  'CODE_REPL_PREDICTION_SERVICE_THRESHOLD',
-  InteractionsExtensionsConstants.CODE_REPL_PREDICTION_SERVICE_THRESHOLD);
-
 angular.module('oppia').constant(
   'GRAPH_INPUT_LEFT_MARGIN',
   InteractionsExtensionsConstants.GRAPH_INPUT_LEFT_MARGIN);

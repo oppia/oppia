@@ -1,0 +1,125 @@
+<div class="subtopic-card protractor-test-subtopic-tile" ng-click="$ctrl.openSubtopicPage()" ng-class="{'disabled-link': !$ctrl.classroomUrlFragment}">
+  <div class="subtopic-thumbnail"
+       ng-style="{background: $ctrl.subtopic.getThumbnailBgColor()}">
+    <img ng-src="<[$ctrl.thumbnailUrl]>"
+         class="img-thumbnail"
+         alt=""
+         ng-style="{background: $ctrl.subtopic.getThumbnailBgColor()}">
+  </div>
+  <div class="subtopic-title">
+    <[$ctrl.subtopic.getTitle()]>
+  </div>
+</div>
+<style>
+  subtopic-summary-tile .subtopic-card {
+    box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    width: 170px;
+  }
+
+  subtopic-summary-tile .subtopic-card:focus {
+    outline: 0;
+  }
+
+  subtopic-summary-tile .subtopic-thumbnail {
+    border: 1px solid #fff;
+    border-radius: 0.4em 0.4em 0 0;
+    height: 120px;
+    text-align: center;
+    vertical-align: middle;
+    width: 100%;
+  }
+
+  subtopic-summary-tile .img-thumbnail {
+    border: none;
+    border-radius: 0.4em 0.4em 0 0;
+    max-height: 100%;
+    max-width: 100%;
+  }
+
+  subtopic-summary-tile .subtopic-title {
+    background-color: #BE563C;
+    border-radius: 0 0 0.4em 0.4em;
+    color: #fff;
+    font-family: Roboto, Arial, sans-serif;
+    font-weight: 600;
+    height: 100px;
+    letter-spacing: normal;
+    padding: 8px 12px 16px 12px;
+  }
+
+  subtopic-summary-tile .disabled-link,
+  subtopic-summary-tile .disabled-link:hover,
+  subtopic-summary-tile .disabled-link:active {
+    color: #000;
+    cursor: default;
+  }
+
+  @media(max-width: 1024px) {
+    subtopics-list .subtopic-card {
+      width: 150px;
+    }
+
+    subtopic-summary-tile .subtopic-title {
+      font-size: 0.8em;
+      height: 85px;
+      padding-left: 10px;
+    }
+  }
+
+  @media(max-width: 680px) {
+    subtopics-list .subtopic-card {
+      width: 130px;
+    }
+
+    subtopic-summary-tile .subtopic-title {
+      font-size: 0.8em;
+      height: 85px;
+    }
+  }
+
+  @media(max-width: 500px) {
+    subtopics-list .subtopic-card {
+      width: 130px;
+    }
+
+    subtopic-summary-tile .subtopic-title {
+      height: 75px;
+    }
+
+    subtopic-summary-tile .subtopic-thumbnail {
+      height: 100px;
+    }
+  }
+
+  @media(max-width: 350px) {
+    subtopics-list .subtopic-card {
+      width: 120px;
+    }
+  }
+
+  .oppia-topic-viewer-container .background-banner-position {
+    position: inherit;
+  }
+
+  .oppia-page-card {
+    border-radius: 0.25em;
+    margin-top: 5vh;
+    padding-bottom: 7.5vh;
+    width: 704px;
+  }
+
+  @media(max-width: 1024px) {
+    .oppia-page-card {
+      margin-top: 5vh;
+      width: 80vw;
+    }
+  }
+
+  @media(max-width: 500px) {
+    .oppia-page-card {
+      padding: 15px 24px 64px 24px;
+      width: 90vw;
+    }
+  }
+</style>

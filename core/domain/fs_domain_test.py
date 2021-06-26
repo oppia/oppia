@@ -19,6 +19,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import re
+
 from core.domain import fs_domain
 from core.platform import models
 from core.tests import test_utils
@@ -65,7 +67,8 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
         self.fs.delete('abc.png')
         self.assertFalse(self.fs.isfile('abc.png'))
         with self.assertRaisesRegexp(
-            IOError, r'File abc\.png not found'):
+            IOError, re.escape('File abc.png not found')
+        ):
             self.fs.get('abc.png')
 
         with self.assertRaisesRegexp(
@@ -103,6 +106,16 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
             fs_domain.GcsFileSystem(
                 feconf.ENTITY_TYPE_EXPLORATION, 'eid2'))
         self.assertEqual(new_fs.listdir('assets'), [])
+
+    def test_copy(self):
+        self.fs.commit('abc2.png', 'file_contents')
+        self.assertEqual(self.fs.listdir(''), ['abc2.png'])
+        destination_fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_QUESTION, 'question_id1'))
+        self.assertEqual(destination_fs.listdir(''), [])
+        destination_fs.copy(self.fs.impl.assets_path, 'abc2.png')
+        self.assertTrue(destination_fs.isfile('abc2.png'))
 
 
 class DirectoryTraversalTests(test_utils.GenericTestBase):

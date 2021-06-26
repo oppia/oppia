@@ -61,6 +61,10 @@ ISSUES_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'issues'))
 INTERACTIONS_DIR = (
     os.path.join('extensions', 'interactions'))
+INTERACTIONS_LEGACY_SPECS_FILE_DIR = (
+    os.path.join(INTERACTIONS_DIR, 'legacy_interaction_specs_by_state_version'))
+INTERACTIONS_SPECS_FILE_PATH = (
+    os.path.join(INTERACTIONS_DIR, 'interaction_specs.json'))
 RTE_EXTENSIONS_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'rich_text_components'))
 RTE_EXTENSIONS_DEFINITIONS_PATH = (
@@ -88,18 +92,26 @@ OBJECT_DEFAULT_VALUES_FILE_PATH = os.path.join(
     'extensions', 'objects', 'object_defaults.json')
 RULES_DESCRIPTIONS_FILE_PATH = os.path.join(
     os.getcwd(), 'extensions', 'interactions', 'rule_templates.json')
+HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH = os.path.join(
+    os.getcwd(), 'extensions', 'interactions',
+    'html_field_types_to_rule_specs.json')
+LEGACY_HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH_FILE_DIR = os.path.join(
+    os.getcwd(), 'extensions', 'interactions',
+    'legacy_html_field_types_to_rule_specs_by_state_version')
 
 # A mapping of interaction ids to classifier properties.
+# TODO(#10217): As of now we support only one algorithm per interaction.
+# However, we do have the necessary storage infrastructure to support multiple
+# algorithms per interaction. Hence, whenever we find a secondary algorithm
+# candidate for any of the supported interactions, the logical functions to
+# support multiple algorithms need to be implemented.
 INTERACTION_CLASSIFIER_MAPPING = {
     'TextInput': {
         'algorithm_id': 'TextClassifier',
-        'current_data_schema_version': 1
+        'algorithm_version': 1
     },
-    'CodeRepl': {
-        'algorithm_id': 'CodeClassifier',
-        'current_data_schema_version': 1
-    }
 }
+
 # Classifier job time to live (in mins).
 CLASSIFIER_JOB_TTL_MINS = 5
 TRAINING_JOB_STATUS_COMPLETE = 'COMPLETE'
@@ -114,6 +126,20 @@ ALLOWED_TRAINING_JOB_STATUSES = [
     TRAINING_JOB_STATUS_PENDING
 ]
 
+# Allowed formats of how HTML is present in rule specs.
+HTML_RULE_VARIABLE_FORMAT_SET = 'set'
+HTML_RULE_VARIABLE_FORMAT_STRING = 'string'
+HTML_RULE_VARIABLE_FORMAT_LIST_OF_SETS = 'listOfSets'
+
+ALLOWED_HTML_RULE_VARIABLE_FORMATS = [
+    HTML_RULE_VARIABLE_FORMAT_SET,
+    HTML_RULE_VARIABLE_FORMAT_STRING,
+    HTML_RULE_VARIABLE_FORMAT_LIST_OF_SETS
+]
+
+ANSWER_TYPE_LIST_OF_SETS_OF_HTML = 'ListOfSetsOfHtmlStrings'
+ANSWER_TYPE_SET_OF_HTML = 'SetOfHtmlString'
+
 # The maximum number of characters allowed for userbio length.
 MAX_BIO_LENGTH_IN_CHARS = 2000
 
@@ -125,13 +151,35 @@ ALLOWED_TRAINING_JOB_STATUS_CHANGES = {
     TRAINING_JOB_STATUS_FAILED: [TRAINING_JOB_STATUS_NEW]
 }
 
+# Allowed formats of how HTML is present in rule specs.
+HTML_RULE_VARIABLE_FORMAT_SET = 'set'
+HTML_RULE_VARIABLE_FORMAT_STRING = 'string'
+HTML_RULE_VARIABLE_FORMAT_LIST_OF_SETS = 'listOfSets'
+
+ALLOWED_HTML_RULE_VARIABLE_FORMATS = [
+    HTML_RULE_VARIABLE_FORMAT_SET,
+    HTML_RULE_VARIABLE_FORMAT_STRING,
+    HTML_RULE_VARIABLE_FORMAT_LIST_OF_SETS
+]
+
+ANSWER_TYPE_LIST_OF_SETS_OF_HTML = 'ListOfSetsOfHtmlStrings'
+ANSWER_TYPE_SET_OF_HTML = 'SetOfHtmlString'
+
 ENTITY_TYPE_EXPLORATION = 'exploration'
 ENTITY_TYPE_TOPIC = 'topic'
 ENTITY_TYPE_SKILL = 'skill'
 ENTITY_TYPE_STORY = 'story'
-ENTITY_TYPE_SUBTOPIC = 'subtopic'
 ENTITY_TYPE_QUESTION = 'question'
 ENTITY_TYPE_VOICEOVER_APPLICATION = 'voiceover_application'
+
+IMAGE_CONTEXT_QUESTION_SUGGESTIONS = 'question_suggestions'
+IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS = 'exploration_suggestions'
+
+MAX_TASK_MODELS_PER_FETCH = 25
+MAX_TASK_MODELS_PER_HISTORY_PAGE = 10
+
+PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED = datetime.timedelta(weeks=8)
+PERIOD_TO_MARK_MODELS_AS_DELETED = datetime.timedelta(weeks=4)
 
 # The maximum number of activities allowed in the playlist of the learner. This
 # limit applies to both the explorations playlist and the collections playlist.
@@ -165,16 +213,41 @@ NUMBER_OF_TOP_RATED_EXPLORATIONS_FULL_PAGE = 20
 # for recently published explorations in /library/recently_published page.
 RECENTLY_PUBLISHED_QUERY_LIMIT_FULL_PAGE = 20
 
+# The maximum number of days a feedback report can be saved in storage before it
+# must be scrubbed.
+APP_FEEDBACK_REPORT_MAXIMUM_DAYS = datetime.timedelta(days=90)
+
+# The minimum version of the Android feedback report info blob schema.
+MINIMUM_ANDROID_REPORT_SCHEMA_VERSION = 1
+
+# The current version of the Android feedback report info blob schema.
+CURRENT_ANDROID_REPORT_SCHEMA_VERSION = 1
+
+# The current version of the web feedback report info blob schema.
+MINIMUM_WEB_REPORT_SCHEMA_VERSION = 1
+
+# The current version of the web feedback report info blob schema.
+CURRENT_WEB_REPORT_SCHEMA_VERSION = 1
+
+# The current version of the app feedback report daily stats blob schema.
+CURRENT_FEEDBACK_REPORT_STATS_SCHEMA_VERSION = 1
+
+# The minimum version of the app feedback report daily stats blob schema.
+MINIMUM_FEEDBACK_REPORT_STATS_SCHEMA_VERSION = 1
+
 # The current version of the dashboard stats blob schema. If any backward-
 # incompatible changes are made to the stats blob schema in the data store,
 # this version number must be changed.
 CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 
+# The earliest supported version of the exploration states blob schema.
+EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION = 41
+
 # The current version of the exploration states blob schema. If any backward-
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATE_SCHEMA_VERSION = 30
+CURRENT_STATE_SCHEMA_VERSION = 45
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -183,25 +256,25 @@ CURRENT_STATE_SCHEMA_VERSION = 30
 CURRENT_COLLECTION_SCHEMA_VERSION = 6
 
 # The current version of story contents dict in the story schema.
-CURRENT_STORY_CONTENTS_SCHEMA_VERSION = 1
+CURRENT_STORY_CONTENTS_SCHEMA_VERSION = 4
 
 # The current version of skill contents dict in the skill schema.
-CURRENT_SKILL_CONTENTS_SCHEMA_VERSION = 1
+CURRENT_SKILL_CONTENTS_SCHEMA_VERSION = 2
 
 # The current version of misconceptions dict in the skill schema.
-CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 2
+CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 3
 
 # The current version of rubric dict in the skill schema.
-CURRENT_RUBRIC_SCHEMA_VERSION = 1
+CURRENT_RUBRIC_SCHEMA_VERSION = 3
 
 # The current version of subtopics dict in the topic schema.
-CURRENT_SUBTOPIC_SCHEMA_VERSION = 1
+CURRENT_SUBTOPIC_SCHEMA_VERSION = 3
 
 # The current version of story reference dict in the topic schema.
 CURRENT_STORY_REFERENCE_SCHEMA_VERSION = 1
 
 # The current version of page_contents dict in the subtopic page schema.
-CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION = 1
+CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION = 2
 
 # This value should be updated in the event of any
 # StateAnswersModel.submitted_answer_list schema change.
@@ -210,6 +283,10 @@ CURRENT_STATE_ANSWERS_SCHEMA_VERSION = 1
 # This value should be updated if the schema of LearnerAnswerInfo
 # dict schema changes.
 CURRENT_LEARNER_ANSWER_INFO_SCHEMA_VERSION = 1
+
+# This value should be updated if the schema of PlatformParameterRule dict
+# schema changes.
+CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION = 1
 
 # The default number of exploration tiles to load at a time in the search
 # results page.
@@ -222,9 +299,6 @@ COMMIT_LIST_PAGE_SIZE = 50
 # The default number of items to show on a page in the exploration feedback
 # tab.
 FEEDBACK_TAB_PAGE_SIZE = 20
-
-# The default number of opportunities to show on community dashboard page.
-OPPORTUNITIES_PAGE_SIZE = 20
 
 # The maximum number of top unresolved answers which should be aggregated
 # from all of the submitted answers.
@@ -249,6 +323,9 @@ DEFAULT_NEW_STATE_CONTENT_ID = 'content'
 DEFAULT_OUTCOME_CONTENT_ID = 'default_outcome'
 # Default content id for the explanation in the concept card of a skill.
 DEFAULT_EXPLANATION_CONTENT_ID = 'explanation'
+# Content id assigned to rule inputs that do not match any interaction
+# customization argument choices.
+INVALID_CONTENT_ID = 'invalid_content_id'
 # Default recorded_voiceovers dict for a default state template.
 DEFAULT_RECORDED_VOICEOVERS = {
     'voiceovers_mapping': {
@@ -305,14 +382,23 @@ DEFAULT_VM_ID = 'vm_default'
 # Shared secret key for default VM.
 DEFAULT_VM_SHARED_SECRET = '1a2b3c4e'
 
+IMAGE_FORMAT_JPEG = 'jpeg'
+IMAGE_FORMAT_PNG = 'png'
+IMAGE_FORMAT_GIF = 'gif'
+IMAGE_FORMAT_SVG = 'svg'
+
 # An array containing the accepted image formats (as determined by the imghdr
 # module) and the corresponding allowed extensions in the filenames of uploaded
 # images.
 ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS = {
-    'jpeg': ['jpg', 'jpeg'],
-    'png': ['png'],
-    'gif': ['gif'],
+    IMAGE_FORMAT_JPEG: ['jpg', 'jpeg'],
+    IMAGE_FORMAT_PNG: ['png'],
+    IMAGE_FORMAT_GIF: ['gif'],
+    IMAGE_FORMAT_SVG: ['svg']
 }
+
+# An array containing the image formats that can be compressed.
+COMPRESSIBLE_IMAGE_FORMATS = [IMAGE_FORMAT_JPEG, IMAGE_FORMAT_PNG]
 
 # An array containing the accepted audio extensions for uploaded files and
 # the corresponding MIME types.
@@ -336,26 +422,57 @@ def get_empty_ratings():
 
     Returns:
         dict. Copy of the '_EMPTY_RATINGS' dict object which contains the empty
-            ratings.
+        ratings.
     """
     return copy.deepcopy(_EMPTY_RATINGS)
 
 
+# To use mailchimp email service.
+BULK_EMAIL_SERVICE_PROVIDER_MAILCHIMP = 'mailchimp_email_service'
+# Use GAE email service by default.
+BULK_EMAIL_SERVICE_PROVIDER = BULK_EMAIL_SERVICE_PROVIDER_MAILCHIMP
+
 # Empty scaled average rating as a float.
 EMPTY_SCALED_AVERAGE_RATING = 0.0
 
-# To use GAE email service.
-EMAIL_SERVICE_PROVIDER_GAE = 'gae_email_service'
 # To use mailgun email service.
 EMAIL_SERVICE_PROVIDER_MAILGUN = 'mailgun_email_service'
 # Use GAE email service by default.
-EMAIL_SERVICE_PROVIDER = EMAIL_SERVICE_PROVIDER_GAE
+EMAIL_SERVICE_PROVIDER = EMAIL_SERVICE_PROVIDER_MAILGUN
 # If the Mailgun email API is used, the "None" below should be replaced
 # with the Mailgun API key.
 MAILGUN_API_KEY = None
 # If the Mailgun email API is used, the "None" below should be replaced
 # with the Mailgun domain name (ending with mailgun.org).
 MAILGUN_DOMAIN_NAME = None
+
+# Audience ID of the mailing list for Oppia in Mailchimp.
+MAILCHIMP_AUDIENCE_ID = None
+# Mailchimp API Key.
+MAILCHIMP_API_KEY = None
+# Mailchimp username.
+MAILCHIMP_USERNAME = None
+# Mailchimp secret, used to authenticate webhook requests.
+MAILCHIMP_WEBHOOK_SECRET = None
+
+ES_LOCALHOST_PORT = 9200
+# NOTE TO RELEASE COORDINATORS: Replace this with the correct ElasticSearch
+# auth information during deployment.
+ES_CLOUD_ID = None
+ES_USERNAME = None
+ES_PASSWORD = None
+
+# NOTE TO RELEASE COORDINATORS: Replace this with the correct Redis Host and
+# Port when switching to prod server. Keep this in sync with redis.conf in the
+# root folder. Specifically, REDISPORT should always be the same as the port in
+# redis.conf.
+REDISHOST = 'localhost'
+REDISPORT = 6379
+
+# NOTE TO RELEASE COORDINATORS: Replace this project id with the correct oppia
+# project id when switching to the prod server.
+OPPIA_PROJECT_ID = 'dev-project-id'
+GOOGLE_APP_ENGINE_REGION = 'us-central1'
 
 # Committer id for system actions. The username for the system committer
 # (i.e. admin) is also 'admin'.
@@ -412,9 +529,6 @@ AVERAGE_RATINGS_DASHBOARD_PRECISION = 2
 # database by non-admins.
 ENABLE_MAINTENANCE_MODE = False
 
-# Whether community dashboard is ready to use for contributors.
-COMMUNITY_DASHBOARD_ENABLED = False
-
 # The interactions permissible for a question.
 ALLOWED_QUESTION_INTERACTION_IDS = [
     'TextInput', 'MultipleChoiceInput', 'NumericInput']
@@ -428,10 +542,7 @@ SEND_SUGGESTION_REVIEW_RELATED_EMAILS = False
 ENABLE_RECORDING_OF_SCORES = False
 
 # No. of pretest questions to display.
-NUM_PRETEST_QUESTIONS = 3
-
-# Whether to automatically accept suggestions after a threshold time.
-ENABLE_AUTO_ACCEPT_OF_SUGGESTIONS = False
+NUM_PRETEST_QUESTIONS = 0
 
 EMAIL_INTENT_SIGNUP = 'signup'
 EMAIL_INTENT_DAILY_BATCH = 'daily_batch'
@@ -445,7 +556,18 @@ EMAIL_INTENT_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
 EMAIL_INTENT_DELETE_EXPLORATION = 'delete_exploration'
 EMAIL_INTENT_QUERY_STATUS_NOTIFICATION = 'query_status_notification'
 EMAIL_INTENT_ONBOARD_REVIEWER = 'onboard_reviewer'
-EMAIL_INTENT_REVIEW_SUGGESTIONS = 'review_suggestions'
+EMAIL_INTENT_REMOVE_REVIEWER = 'remove_reviewer'
+EMAIL_INTENT_ADDRESS_CONTRIBUTOR_DASHBOARD_SUGGESTIONS = (
+    'address_contributor_dashboard_suggestions'
+)
+EMAIL_INTENT_REVIEW_CREATOR_DASHBOARD_SUGGESTIONS = (
+    'review_creator_dashboard_suggestions')
+EMAIL_INTENT_REVIEW_CONTRIBUTOR_DASHBOARD_SUGGESTIONS = (
+    'review_contributor_dashboard_suggestions'
+)
+EMAIL_INTENT_ADD_CONTRIBUTOR_DASHBOARD_REVIEWERS = (
+    'add_contributor_dashboard_reviewers'
+)
 EMAIL_INTENT_VOICEOVER_APPLICATION_UPDATES = 'voiceover_application_updates'
 EMAIL_INTENT_ACCOUNT_DELETED = 'account_deleted'
 # Possible intents for email sent in bulk.
@@ -454,6 +576,7 @@ BULK_EMAIL_INTENT_IMPROVE_EXPLORATION = 'bulk_email_improve_exploration'
 BULK_EMAIL_INTENT_CREATE_EXPLORATION = 'bulk_email_create_exploration'
 BULK_EMAIL_INTENT_CREATOR_REENGAGEMENT = 'bulk_email_creator_reengagement'
 BULK_EMAIL_INTENT_LEARNER_REENGAGEMENT = 'bulk_email_learner_reengagement'
+BULK_EMAIL_INTENT_ML_JOB_FAILURE = 'bulk_email_ml_job_failure'
 BULK_EMAIL_INTENT_TEST = 'bulk_email_test'
 
 MESSAGE_TYPE_FEEDBACK = 'feedback'
@@ -487,6 +610,10 @@ REGISTRATION_PAGE_LAST_UPDATED_UTC = datetime.datetime(2015, 10, 14, 2, 40, 0)
 # the existing storage models for UserStatsModel.
 DASHBOARD_STATS_DATETIME_STRING_FORMAT = '%Y-%m-%d'
 
+# We generate images for existing math rich text components in batches. This
+# gives the maximum size for a batch of Math SVGs in bytes.
+MAX_SIZE_OF_MATH_SVGS_BATCH_BYTES = 31 * 1024 * 1024
+
 # The maximum size of an uploaded file, in bytes.
 MAX_FILE_SIZE_BYTES = 1048576
 
@@ -499,9 +626,6 @@ MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME = 20
 # The minimum score required for a user to review suggestions of a particular
 # category.
 MINIMUM_SCORE_REQUIRED_TO_REVIEW = 10
-
-# The number of medium question skill difficulty.
-MEDIUM_SKILL_DIFFICULTY = 0.6
 
 # The maximum number of skills to be requested at one time when fetching
 # questions.
@@ -545,6 +669,9 @@ ALLOWED_RTE_EXTENSIONS = {
     'Math': {
         'dir': os.path.join(RTE_EXTENSIONS_DIR, 'Math')
     },
+    'Svgdiagram': {
+        'dir': os.path.join(RTE_EXTENSIONS_DIR, 'svgdiagram')
+    },
     'Tabs': {
         'dir': os.path.join(RTE_EXTENSIONS_DIR, 'Tabs')
     },
@@ -567,10 +694,10 @@ LINEAR_INTERACTION_IDS = ['Continue']
 # either a YAML file or a directory (depending on whether it ends in .yaml).
 # These explorations can be found under data/explorations.
 DEMO_EXPLORATIONS = {
-    u'0': 'welcome.yaml',
+    u'0': 'welcome',
     u'1': 'multiples.yaml',
     u'2': 'binary_search',
-    u'3': 'root_linear_coefficient_theorem.yaml',
+    u'3': 'root_linear_coefficient_theorem',
     u'4': 'three_balls',
     # TODO(bhenning): Replace demo exploration '5' with a new exploration
     # described in #1376.
@@ -586,7 +713,8 @@ DEMO_EXPLORATIONS = {
     u'15': 'classifier_demo_exploration.yaml',
     u'16': 'all_interactions',
     u'17': 'audio_test',
-    u'18': 'code_classifier_test.yaml',
+    # Exploration with ID 18 was used for testing CodeClassifier functionality
+    # which has been removed (#10060).
     u'19': 'example_exploration_in_collection1.yaml',
     u'20': 'example_exploration_in_collection2.yaml',
     u'21': 'example_exploration_in_collection3.yaml',
@@ -612,6 +740,12 @@ GOOGLE_GROUP_URL = (
 # External URL for the Foundation site.
 FOUNDATION_SITE_URL = 'http://oppiafoundation.org'
 
+# NOTE TO RELEASE COORDINATORS: External URL for the oppia production site.
+# Change to the correct url for internal testing in the testing production
+# environment.
+# Change to the production URL when deploying to production site.
+OPPIA_SITE_URL = 'http://localhost:8181'
+
 # Prefix for all taskqueue-related URLs.
 TASKQUEUE_URL_PREFIX = '/task'
 TASK_URL_FEEDBACK_MESSAGE_EMAILS = (
@@ -624,11 +758,13 @@ TASK_URL_INSTANT_FEEDBACK_EMAILS = (
     '%s/email/instantfeedbackmessageemailhandler' % TASKQUEUE_URL_PREFIX)
 TASK_URL_SUGGESTION_EMAILS = (
     '%s/email/suggestionemailhandler' % TASKQUEUE_URL_PREFIX)
+TASK_URL_DEFERRED = (
+    '%s/deferredtaskshandler' % TASKQUEUE_URL_PREFIX)
 
 # TODO(sll): Add all other URLs here.
 ADMIN_URL = '/admin'
 ADMIN_ROLE_HANDLER_URL = '/adminrolehandler'
-CLASSROOM_URL_PREFIX = '/classroom'
+BULK_EMAIL_WEBHOOK_ENDPOINT = '/bulk_email_webhook_endpoint'
 CLASSROOM_DATA_HANDLER = '/classroom_data_handler'
 COLLECTION_DATA_URL_PREFIX = '/collection_handler/data'
 COLLECTION_EDITOR_DATA_URL_PREFIX = '/collection_editor_handler/data'
@@ -638,11 +774,11 @@ COLLECTION_PUBLISH_PREFIX = '/collection_editor_handler/publish'
 COLLECTION_UNPUBLISH_PREFIX = '/collection_editor_handler/unpublish'
 COLLECTION_EDITOR_URL_PREFIX = '/collection_editor/create'
 COLLECTION_URL_PREFIX = '/collection'
-COMMUNITY_DASHBOARD_URL = '/community_dashboard'
-COMMUNITY_OPPORTUNITIES_DATA_URL = '/opportunitiessummaryhandler'
 CONCEPT_CARD_DATA_URL_PREFIX = '/concept_card_handler'
+CONTRIBUTOR_DASHBOARD_URL = '/contributor-dashboard'
+CONTRIBUTOR_OPPORTUNITIES_DATA_URL = '/opportunitiessummaryhandler'
 CREATOR_DASHBOARD_DATA_URL = '/creatordashboardhandler/data'
-CREATOR_DASHBOARD_URL = '/creator_dashboard'
+CREATOR_DASHBOARD_URL = '/creator-dashboard'
 CSRF_HANDLER_URL = '/csrfhandler'
 CUSTOM_NONPROFITS_LANDING_PAGE_URL = '/nonprofits'
 CUSTOM_PARENTS_LANDING_PAGE_URL = '/parents'
@@ -672,23 +808,26 @@ FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event'
 FETCH_SKILLS_URL_PREFIX = '/fetch_skills'
 FLAG_EXPLORATION_URL_PREFIX = '/flagexplorationhandler'
 FRACTIONS_LANDING_PAGE_URL = '/fractions'
-TOPIC_LANDING_PAGE_URL = '/learn/<subject>/<topic>'
+IMPROVEMENTS_URL_PREFIX = '/improvements'
+IMPROVEMENTS_HISTORY_URL_PREFIX = '/improvements/history'
+IMPROVEMENTS_CONFIG_URL_PREFIX = '/improvements/config'
 LEARNER_ANSWER_INFO_HANDLER_URL = (
     '/learneranswerinfohandler/learner_answer_details')
 LEARNER_ANSWER_DETAILS_SUBMIT_URL = '/learneranswerdetailshandler'
-LEARNER_DASHBOARD_URL = '/learner_dashboard'
+LEARNER_DASHBOARD_URL = '/learner-dashboard'
 LEARNER_DASHBOARD_DATA_URL = '/learnerdashboardhandler/data'
 LEARNER_DASHBOARD_IDS_DATA_URL = '/learnerdashboardidshandler/data'
 LEARNER_DASHBOARD_FEEDBACK_THREAD_DATA_URL = '/learnerdashboardthreadhandler'
 LEARNER_PLAYLIST_DATA_URL = '/learnerplaylistactivityhandler'
 LEARNER_INCOMPLETE_ACTIVITY_DATA_URL = '/learnerincompleteactivityhandler'
 LIBRARY_GROUP_DATA_URL = '/librarygrouphandler'
-LIBRARY_INDEX_URL = '/library'
+LIBRARY_INDEX_URL = '/community-library'
 LIBRARY_INDEX_DATA_URL = '/libraryindexhandler'
-LIBRARY_RECENTLY_PUBLISHED_URL = '/library/recently_published'
+LIBRARY_RECENTLY_PUBLISHED_URL = '/community-library/recently-published'
 LIBRARY_SEARCH_URL = '/search/find'
 LIBRARY_SEARCH_DATA_URL = '/searchhandler/data'
-LIBRARY_TOP_RATED_URL = '/library/top_rated'
+LIBRARY_TOP_RATED_URL = '/community-library/top-rated'
+MACHINE_TRANSLATION_DATA_URL = '/machine_translated_state_texts_handler'
 MERGE_SKILLS_URL = '/merge_skills_handler'
 NEW_COLLECTION_URL = '/collection_editor_handler/create_new'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
@@ -697,7 +836,7 @@ NEW_SKILL_URL = '/skill_editor_handler/create_new'
 TOPIC_EDITOR_STORY_URL = '/topic_editor_story_handler'
 TOPIC_EDITOR_QUESTION_URL = '/topic_editor_question_handler'
 NEW_TOPIC_URL = '/topic_editor_handler/create_new'
-NOTIFICATIONS_DASHBOARD_URL = '/notifications_dashboard'
+NOTIFICATIONS_DASHBOARD_URL = '/notifications'
 PREFERENCES_URL = '/preferences'
 PRACTICE_SESSION_URL_PREFIX = '/practice_session'
 PRACTICE_SESSION_DATA_URL_PREFIX = '/practice_session/data'
@@ -705,11 +844,13 @@ PREFERENCES_DATA_URL = '/preferenceshandler/data'
 QUESTION_EDITOR_DATA_URL_PREFIX = '/question_editor_handler/data'
 QUESTION_SKILL_LINK_URL_PREFIX = '/manage_question_skill_link'
 QUESTIONS_LIST_URL_PREFIX = '/questions_list_handler'
+QUESTION_COUNT_URL_PREFIX = '/question_count_handler'
 QUESTIONS_URL_PREFIX = '/question_player_handler'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
 DELETE_ACCOUNT_URL = '/delete-account'
 DELETE_ACCOUNT_HANDLER_URL = '/delete-account-handler'
+EXPORT_ACCOUNT_HANDLER_URL = '/export-account-handler'
 PENDING_ACCOUNT_DELETION_URL = '/pending-account-deletion'
 REVIEW_TEST_DATA_URL_PREFIX = '/review_test_handler/data'
 REVIEW_TEST_URL_PREFIX = '/review_test'
@@ -717,40 +858,51 @@ ROBOTS_TXT_URL = '/robots.txt'
 SITE_LANGUAGE_DATA_URL = '/save_site_language'
 SIGNUP_DATA_URL = '/signuphandler/data'
 SIGNUP_URL = '/signup'
+SKILL_DASHBOARD_DATA_URL = '/skills_dashboard/data'
 SKILL_DATA_URL_PREFIX = '/skill_data_handler'
 SKILL_EDITOR_DATA_URL_PREFIX = '/skill_editor_handler/data'
 SKILL_EDITOR_URL_PREFIX = '/skill_editor'
 SKILL_EDITOR_QUESTION_URL = '/skill_editor_question_handler'
 SKILL_MASTERY_DATA_URL = '/skill_mastery_handler/data'
 SKILL_RIGHTS_URL_PREFIX = '/skill_editor_handler/rights'
-SPLASH_URL = '/splash'
+SKILL_DESCRIPTION_HANDLER = '/skill_description_handler'
 STORY_DATA_HANDLER = '/story_data_handler'
 STORY_EDITOR_URL_PREFIX = '/story_editor'
 STORY_EDITOR_DATA_URL_PREFIX = '/story_editor_handler/data'
 STORY_PROGRESS_URL_PREFIX = '/story_progress_handler'
 STORY_PUBLISH_HANDLER = '/story_publish_handler'
+STORY_URL_FRAGMENT_HANDLER = '/story_url_fragment_handler'
 STORY_VIEWER_URL_PREFIX = '/story'
 SUBTOPIC_DATA_HANDLER = '/subtopic_data_handler'
 SUBTOPIC_VIEWER_URL_PREFIX = '/subtopic'
 SUGGESTION_ACTION_URL_PREFIX = '/suggestionactionhandler'
 SUGGESTION_LIST_URL_PREFIX = '/suggestionlisthandler'
 SUGGESTION_URL_PREFIX = '/suggestionhandler'
+UPDATE_TRANSLATION_SUGGESTION_URL_PREFIX = (
+    '/updatetranslationsuggestionhandler')
+UPDATE_QUESTION_SUGGESTION_URL_PREFIX = (
+    '/updatequestionsuggestionhandler')
 SUBSCRIBE_URL_PREFIX = '/subscribehandler'
 SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX = '/subtopic_page_editor_handler/data'
-TOPIC_VIEWER_URL_PREFIX = '/topic'
+TOPIC_VIEWER_URL_PREFIX = (
+    '/learn/<classroom_url_fragment>/<topic_url_fragment>')
 TOPIC_DATA_HANDLER = '/topic_data_handler'
 TOPIC_EDITOR_DATA_URL_PREFIX = '/topic_editor_handler/data'
 TOPIC_EDITOR_URL_PREFIX = '/topic_editor'
+TOPIC_NAME_HANDLER = '/topic_name_handler'
 TOPIC_RIGHTS_URL_PREFIX = '/rightshandler/get_topic_rights'
 TOPIC_SEND_MAIL_URL_PREFIX = '/rightshandler/send_topic_publish_mail'
 TOPIC_STATUS_URL_PREFIX = '/rightshandler/change_topic_status'
+TOPIC_URL_FRAGMENT_HANDLER = '/topic_url_fragment_handler'
 TOPICS_AND_SKILLS_DASHBOARD_DATA_URL = '/topics_and_skills_dashboard/data'
-TOPICS_AND_SKILLS_DASHBOARD_URL = '/topics_and_skills_dashboard'
+UNASSIGN_SKILL_DATA_HANDLER_URL = '/topics_and_skills_dashboard/unassign_skill'
+TOPICS_AND_SKILLS_DASHBOARD_URL = '/topics-and-skills-dashboard'
 UNSUBSCRIBE_URL_PREFIX = '/unsubscribehandler'
 UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
 USER_EXPLORATION_EMAILS_PREFIX = '/createhandler/notificationpreferences'
 USER_PERMISSIONS_URL_PREFIX = '/createhandler/permissions'
 USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
+VALIDATE_STORY_EXPLORATIONS_URL_PREFIX = '/validate_story_explorations'
 
 # Event types.
 EVENT_TYPE_ALL_STATS = 'all_stats'
@@ -791,10 +943,8 @@ MAX_PLAYTHROUGHS_FOR_ISSUE = 5
 TOP_UNRESOLVED_ANSWERS_COUNT_DASHBOARD = 3
 # Number of open feedback to be displayed in the dashboard for each exploration.
 OPEN_FEEDBACK_COUNT_DASHBOARD = 3
-# NOTE TO DEVELOPERS: This should be synchronized with App.js.
+# NOTE TO DEVELOPERS: This should be synchronized with app.constants.ts.
 ENABLE_ML_CLASSIFIERS = False
-SHOW_COLLECTION_NAVIGATION_TAB_HISTORY = False
-SHOW_COLLECTION_NAVIGATION_TAB_STATS = False
 
 # The regular expression used to identify whether a string contains float value.
 # The regex must match with regex that is stored in vmconf.py file of Oppia-ml.
@@ -828,6 +978,13 @@ USER_QUERY_STATUS_COMPLETED = 'completed'
 USER_QUERY_STATUS_ARCHIVED = 'archived'
 USER_QUERY_STATUS_FAILED = 'failed'
 
+ALLOWED_USER_QUERY_STATUSES = (
+    USER_QUERY_STATUS_PROCESSING,
+    USER_QUERY_STATUS_COMPLETED,
+    USER_QUERY_STATUS_ARCHIVED,
+    USER_QUERY_STATUS_FAILED
+)
+
 # The time difference between which to consider two login events "close". This
 # is taken to be 12 hours.
 PROXIMAL_TIMEDELTA_SECS = 12 * 60 * 60
@@ -845,25 +1002,13 @@ LIBRARY_CATEGORY_RECENTLY_PUBLISHED = 'I18N_LIBRARY_GROUPS_RECENTLY_PUBLISHED'
 
 # The group name that appears at the end of the url for the recently published
 # page.
-LIBRARY_GROUP_RECENTLY_PUBLISHED = 'recently_published'
+LIBRARY_GROUP_RECENTLY_PUBLISHED = 'recently-published'
 # The group name that appears at the end of the url for the top rated page.
-LIBRARY_GROUP_TOP_RATED = 'top_rated'
+LIBRARY_GROUP_TOP_RATED = 'top-rated'
 
 # Defaults for topic similarities.
 DEFAULT_TOPIC_SIMILARITY = 0.5
 SAME_TOPIC_SIMILARITY = 1.0
-
-# The following are all page descriptions for the meta tag.
-CREATE_PAGE_DESCRIPTION = (
-    'Help others learn new things. Create lessons through explorations and '
-    'share your knowledge with the community.')
-CREATOR_DASHBOARD_PAGE_DESCRIPTION = (
-    'Keep track of the lessons you have created, as well as feedback from '
-    'learners.')
-LIBRARY_GROUP_PAGE_DESCRIPTION = (
-    'Discover top-rated or recently-published explorations on Oppia. Learn '
-    'from these explorations or help improve an existing one for the '
-    'community.')
 
 # The type of the response returned by a handler when an exception is raised.
 HANDLER_TYPE_HTML = 'html'
@@ -873,11 +1018,19 @@ HANDLER_TYPE_DOWNLOADABLE = 'downloadable'
 # Following are the constants for the role IDs.
 ROLE_ID_GUEST = 'GUEST'
 ROLE_ID_BANNED_USER = 'BANNED_USER'
+ROLE_ID_LEARNER = 'LEARNER'
 ROLE_ID_EXPLORATION_EDITOR = 'EXPLORATION_EDITOR'
 ROLE_ID_COLLECTION_EDITOR = 'COLLECTION_EDITOR'
 ROLE_ID_TOPIC_MANAGER = 'TOPIC_MANAGER'
 ROLE_ID_MODERATOR = 'MODERATOR'
+ROLE_ID_RELEASE_COORDINATOR = 'RELEASE_COORDINATOR'
 ROLE_ID_ADMIN = 'ADMIN'
+
+ALLOWED_USER_ROLES = [
+    ROLE_ID_GUEST, ROLE_ID_BANNED_USER, ROLE_ID_LEARNER,
+    ROLE_ID_EXPLORATION_EDITOR, ROLE_ID_COLLECTION_EDITOR,
+    ROLE_ID_TOPIC_MANAGER, ROLE_ID_MODERATOR, ROLE_ID_RELEASE_COORDINATOR,
+    ROLE_ID_ADMIN]
 
 # Intent of the User making query to role structure via admin interface. Used
 # to store audit data regarding queries to role IDs.
@@ -885,8 +1038,8 @@ ROLE_ACTION_UPDATE = 'update'
 ROLE_ACTION_VIEW_BY_USERNAME = 'view_by_username'
 ROLE_ACTION_VIEW_BY_ROLE = 'view_by_role'
 
-VIEW_METHOD_ROLE = 'role'
-VIEW_METHOD_USERNAME = 'username'
+USER_FILTER_CRITERION_ROLE = 'role'
+USER_FILTER_CRITERION_USERNAME = 'username'
 
 QUESTION_BATCH_SIZE = 10
 
@@ -915,7 +1068,8 @@ RTE_CONTENT_SPEC = {
             'oppia-noninteractive-image': ['b', 'i', 'li', 'p', 'pre'],
             'oppia-noninteractive-collapsible': ['b', 'i', 'li', 'p', 'pre'],
             'oppia-noninteractive-video': ['b', 'i', 'li', 'p', 'pre'],
-            'oppia-noninteractive-tabs': ['b', 'i', 'li', 'p', 'pre']
+            'oppia-noninteractive-tabs': ['b', 'i', 'li', 'p', 'pre'],
+            'oppia-noninteractive-svgdiagram': ['b', 'i', 'li', 'p', 'pre']
         },
         # Valid html tags in TextAngular.
         'ALLOWED_TAG_LIST': [
@@ -933,7 +1087,8 @@ RTE_CONTENT_SPEC = {
             'oppia-noninteractive-image',
             'oppia-noninteractive-collapsible',
             'oppia-noninteractive-video',
-            'oppia-noninteractive-tabs'
+            'oppia-noninteractive-tabs',
+            'oppia-noninteractive-svgdiagram'
         ]
     },
     'RTE_TYPE_CKEDITOR': {
@@ -951,6 +1106,9 @@ RTE_CONTENT_SPEC = {
             'oppia-noninteractive-link': ['strong', 'em', 'li', 'p', 'pre'],
             'oppia-noninteractive-math': ['strong', 'em', 'li', 'p', 'pre'],
             'oppia-noninteractive-image': ['blockquote', 'li', '[document]'],
+            'oppia-noninteractive-svgdiagram': [
+                'blockquote', 'li', '[document]'
+            ],
             'oppia-noninteractive-collapsible': [
                 'blockquote', 'li', '[document]'
             ],
@@ -973,7 +1131,8 @@ RTE_CONTENT_SPEC = {
             'oppia-noninteractive-image',
             'oppia-noninteractive-collapsible',
             'oppia-noninteractive-video',
-            'oppia-noninteractive-tabs'
+            'oppia-noninteractive-tabs',
+            'oppia-noninteractive-svgdiagram'
         ]
 
     }
@@ -983,7 +1142,268 @@ RTE_CONTENT_SPEC = {
 # of topics as the value.
 # Note: This dict needs to be keep in sync with frontend TOPIC_LANDING_PAGE_DATA
 # oppia constant defined in
-# core/templates/dev/head/pages/landing-pages/TopicLandingPage.js file.
+# core/templates/pages/landing-pages/TopicLandingPage.js file.
 AVAILABLE_LANDING_PAGES = {
-    'maths': ['fractions', 'negative-numbers', 'ratios']
+    'math': ['fractions', 'negative-numbers', 'ratios']
 }
+
+# Classroom page names for generating URLs. These need to be kept in sync with
+# CLASSROOM_PAGES_DATA property in config_domain.
+CLASSROOM_PAGES = ['math']
+
+# Authentication method using GAE ID (google sign in).
+GAE_AUTH_PROVIDER_ID = 'gae'
+# Authentication method using Firebase authentication. Firebase signs its ID
+# Tokens with iss='Firebase' (iss: issuer, public API refers to this as
+# "provider id"), so using this naming convention helps us stay consistent with
+# the status quo.
+FIREBASE_AUTH_PROVIDER_ID = 'Firebase'
+# Firebase-specific role specified for users with super admin privileges.
+FIREBASE_ROLE_SUPER_ADMIN = 'super_admin'
+
+# Firebase *explicitly* requires IDs to have at most 128 characters, and may
+# contain any valid ASCII character:
+# https://firebase.google.com/docs/auth/admin/manage-users#create_a_user
+#
+# After manually inspecting ~200 of them, however, we've found that they only
+# use alpha-numeric characters, hence the tighter restriction.
+FIREBASE_AUTH_ID_REGEX = '^[A-Za-z0-9]{1,128}$'
+
+CLOUD_DATASTORE_EMULATOR_HOST = 'localhost'
+CLOUD_DATASTORE_EMULATOR_PORT = 8089
+
+FIREBASE_EMULATOR_CONFIG_PATH = '.firebase.json'
+FIREBASE_EMULATOR_PORT = 9099
+
+# The name of the cookie Oppia will place the session cookie into. The name is
+# arbitrary. If it is changed later on, then the cookie will live on in the
+# users' browsers as garbage (although it would expire eventually, see MAX_AGE).
+FIREBASE_SESSION_COOKIE_NAME = 'session'
+# The duration a session cookie from Firebase should remain valid for. After the
+# duration expires, a new cookie will need to be generated. Generating a new
+# cookie requires the user to sign-in _explicitly_.
+FIREBASE_SESSION_COOKIE_MAX_AGE = datetime.timedelta(days=14)
+
+# TODO(#10501): Once domain objects can be imported by the storage layer, move
+# these back to appropriate places (rights_domain, topic_domain).
+# The reserved prefix for keys that are automatically inserted into a
+# commit_cmd dict by this model.
+AUTOGENERATED_PREFIX = 'AUTO'
+
+# The command string for a revert commit.
+CMD_REVERT_COMMIT = '%s_revert_version_number' % AUTOGENERATED_PREFIX
+
+# The command string for a delete commit.
+CMD_DELETE_COMMIT = '%s_mark_deleted' % AUTOGENERATED_PREFIX
+
+# IMPORTANT: Ensure that all changes to how these cmds are interpreted preserve
+# backward-compatibility with previous exploration snapshots in the datastore.
+# Do not modify the definitions of CMD keys that already exist.
+CMD_CREATE_NEW = 'create_new'
+CMD_CHANGE_ROLE = 'change_role'
+CMD_REMOVE_ROLE = 'remove_role'
+CMD_CHANGE_EXPLORATION_STATUS = 'change_exploration_status'
+CMD_CHANGE_COLLECTION_STATUS = 'change_collection_status'
+CMD_CHANGE_PRIVATE_VIEWABILITY = 'change_private_viewability'
+CMD_RELEASE_OWNERSHIP = 'release_ownership'
+CMD_UPDATE_FIRST_PUBLISHED_MSEC = 'update_first_published_msec'
+
+# Roles used in collections and explorations.
+ROLE_OWNER = 'owner'
+ROLE_EDITOR = 'editor'
+ROLE_VOICE_ARTIST = 'voice artist'
+ROLE_VIEWER = 'viewer'
+ROLE_NONE = 'none'
+
+# The list of entity types that do not require entity specific access control
+# when viewing respective suggestions.
+ENTITY_TYPES_WITH_UNRESTRICTED_VIEW_SUGGESTION_ACCESS = [ENTITY_TYPE_SKILL]
+
+# The allowed list of roles which can be used in change_role command.
+ALLOWED_ACTIVITY_ROLES = [
+    ROLE_OWNER, ROLE_EDITOR, ROLE_VOICE_ARTIST, ROLE_VIEWER]
+
+# The allowed list of status which can be used in change_exploration_status
+# and change_collection_status commands.
+ALLOWED_ACTIVITY_STATUS = [
+    constants.ACTIVITY_STATUS_PRIVATE, constants.ACTIVITY_STATUS_PUBLIC]
+
+# Commands allowed in CollectionRightsChange and ExplorationRightsChange.
+COMMON_RIGHTS_ALLOWED_COMMANDS = [{
+    'name': CMD_CREATE_NEW,
+    'required_attribute_names': [],
+    'optional_attribute_names': [],
+    'user_id_attribute_names': []
+}, {
+    'name': CMD_CHANGE_ROLE,
+    'required_attribute_names': ['assignee_id', 'old_role', 'new_role'],
+    'optional_attribute_names': [],
+    'user_id_attribute_names': ['assignee_id'],
+    'allowed_values': {
+        'new_role': ALLOWED_ACTIVITY_ROLES, 'old_role': ALLOWED_ACTIVITY_ROLES}
+}, {
+    'name': CMD_REMOVE_ROLE,
+    'required_attribute_names': ['removed_user_id', 'old_role'],
+    'optional_attribute_names': [],
+    'user_id_attribute_names': ['removed_user_id'],
+    'allowed_values': {'old_role': ALLOWED_ACTIVITY_ROLES}
+}, {
+    'name': CMD_CHANGE_PRIVATE_VIEWABILITY,
+    'required_attribute_names': [
+        'old_viewable_if_private', 'new_viewable_if_private'],
+    'optional_attribute_names': [],
+    'user_id_attribute_names': []
+}, {
+    'name': CMD_RELEASE_OWNERSHIP,
+    'required_attribute_names': [],
+    'optional_attribute_names': [],
+    'user_id_attribute_names': []
+}, {
+    'name': CMD_UPDATE_FIRST_PUBLISHED_MSEC,
+    'required_attribute_names': [
+        'old_first_published_msec', 'new_first_published_msec'],
+    'optional_attribute_names': [],
+    'user_id_attribute_names': []
+}, {
+    'name': CMD_DELETE_COMMIT,
+    'required_attribute_names': [],
+    'optional_attribute_names': [],
+    'user_id_attribute_names': []
+}]
+
+COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS = copy.deepcopy(
+    COMMON_RIGHTS_ALLOWED_COMMANDS)
+COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS.append({
+    'name': CMD_CHANGE_COLLECTION_STATUS,
+    'required_attribute_names': ['old_status', 'new_status'],
+    'optional_attribute_names': [],
+    'user_id_attribute_names': [],
+    'allowed_values': {
+        'old_status': ALLOWED_ACTIVITY_STATUS,
+        'new_status': ALLOWED_ACTIVITY_STATUS
+    }
+})
+
+EXPLORATION_RIGHTS_CHANGE_ALLOWED_COMMANDS = copy.deepcopy(
+    COMMON_RIGHTS_ALLOWED_COMMANDS)
+EXPLORATION_RIGHTS_CHANGE_ALLOWED_COMMANDS.append({
+    'name': CMD_CHANGE_EXPLORATION_STATUS,
+    'required_attribute_names': ['old_status', 'new_status'],
+    'optional_attribute_names': [],
+    'user_id_attribute_names': [],
+    'allowed_values': {
+        'old_status': ALLOWED_ACTIVITY_STATUS,
+        'new_status': ALLOWED_ACTIVITY_STATUS
+    },
+    # TODO(#12991): Remove this once once we use the migration jobs to remove
+    # the deprecated values from the server data.
+    'deprecated_values': {
+        'new_status': ['publicized']
+    }
+})
+
+CMD_REMOVE_MANAGER_ROLE = 'remove_manager_role'
+CMD_PUBLISH_TOPIC = 'publish_topic'
+CMD_UNPUBLISH_TOPIC = 'unpublish_topic'
+
+ROLE_MANAGER = 'manager'
+
+# The allowed list of roles which can be used in TopicRightsChange change_role
+# command.
+ALLOWED_TOPIC_ROLES = [ROLE_NONE, ROLE_MANAGER]
+
+# Commands allowed in TopicRightsChange.
+TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS = [{
+    'name': CMD_CREATE_NEW,
+    'required_attribute_names': [],
+    'optional_attribute_names': [],
+    'user_id_attribute_names': []
+}, {
+    'name': CMD_CHANGE_ROLE,
+    'required_attribute_names': ['assignee_id', 'new_role', 'old_role'],
+    'optional_attribute_names': [],
+    'user_id_attribute_names': ['assignee_id'],
+    'allowed_values': {
+        'new_role': ALLOWED_TOPIC_ROLES, 'old_role': ALLOWED_TOPIC_ROLES
+    }
+}, {
+    'name': CMD_REMOVE_MANAGER_ROLE,
+    'required_attribute_names': ['removed_user_id'],
+    'optional_attribute_names': [],
+    'user_id_attribute_names': ['removed_user_id']
+}, {
+    'name': CMD_PUBLISH_TOPIC,
+    'required_attribute_names': [],
+    'optional_attribute_names': [],
+    'user_id_attribute_names': []
+}, {
+    'name': CMD_UNPUBLISH_TOPIC,
+    'required_attribute_names': [],
+    'optional_attribute_names': [],
+    'user_id_attribute_names': []
+}, {
+    'name': CMD_DELETE_COMMIT,
+    'required_attribute_names': [],
+    'optional_attribute_names': [],
+    'user_id_attribute_names': []
+}]
+
+USER_ID_RANDOM_PART_LENGTH = 32
+USER_ID_LENGTH = 36
+USER_ID_REGEX = r'uid_[a-z]{%s}' % USER_ID_RANDOM_PART_LENGTH
+PSEUDONYMOUS_ID_REGEX = r'pid_[a-z]{%s}' % USER_ID_RANDOM_PART_LENGTH
+
+# Length of user PIN for different roles used on Android.
+FULL_USER_PIN_LENGTH = 5
+PROFILE_USER_PIN_LENGTH = 3
+
+MAX_NUMBER_OF_OPS_IN_TRANSACTION = 25
+
+# This is the maximum wait time for the task queue HTTP request. If the request
+# takes longer than this value, an exception is raised. The default value
+# of 5 seconds is too short and must be avoided because it can cause events
+# to go unrecorded.
+# https://cloud.google.com/appengine/docs/standard/python/outbound-requests#request_timeouts
+DEFAULT_TASKQUEUE_TIMEOUT_SECONDS = 30
+
+# Mapping from issue type to issue keyname in the issue customization dict. This
+# mapping is useful to uniquely identify issues by the combination of their
+# issue type and other type-specific information (such as the list of states
+# involved).
+CUSTOMIZATION_ARG_WHICH_IDENTIFIES_ISSUE = {
+    'EarlyQuit': 'state_name',
+    'MultipleIncorrectSubmissions': 'state_name',
+    'CyclicStateTransitions': 'state_names'
+}
+
+# Constants defining various suggestion types.
+SUGGESTION_TYPE_EDIT_STATE_CONTENT = 'edit_exploration_state_content'
+SUGGESTION_TYPE_TRANSLATE_CONTENT = 'translate_content'
+SUGGESTION_TYPE_ADD_QUESTION = 'add_question'
+
+# Suggestion fields that can be queried.
+ALLOWED_SUGGESTION_QUERY_FIELDS = [
+    'suggestion_type', 'target_type', 'target_id', 'status', 'author_id',
+    'final_reviewer_id', 'score_category', 'language_code'
+]
+
+# Possible targets that the suggestions can modify.
+SUGGESTION_TARGET_TYPE_CHOICES = [
+    ENTITY_TYPE_EXPLORATION,
+    ENTITY_TYPE_QUESTION,
+    ENTITY_TYPE_SKILL,
+    ENTITY_TYPE_TOPIC
+]
+
+# Possible suggestion types.
+SUGGESTION_TYPE_CHOICES = [
+    SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+    SUGGESTION_TYPE_TRANSLATE_CONTENT,
+    SUGGESTION_TYPE_ADD_QUESTION
+]
+
+# The types of suggestions that are offered on the Contributor Dashboard.
+CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES = [
+    SUGGESTION_TYPE_TRANSLATE_CONTENT,
+    SUGGESTION_TYPE_ADD_QUESTION
+]

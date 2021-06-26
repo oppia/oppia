@@ -26,10 +26,10 @@ from core.domain import feedback_services
 from core.domain import rights_manager
 from core.domain import state_domain
 from core.domain import suggestion_services
-from core.domain import topic_services
+from core.domain import taskqueue_services
+from core.domain import topic_fetchers
 from core.domain import user_services
 from core.platform import models
-from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
 import python_utils
@@ -40,11 +40,11 @@ import python_utils
 
 EXPECTED_THREAD_KEYS = [
     'status', 'original_author_username', 'state_name', 'summary',
-    'thread_id', 'subject', 'last_updated', 'message_count',
+    'thread_id', 'subject', 'last_updated_msecs', 'message_count',
     'last_nonempty_message_text', 'last_nonempty_message_author']
 EXPECTED_MESSAGE_KEYS = [
-    'author_username', 'created_on', 'entity_type', 'message_id', 'entity_id',
-    'text', 'updated_status', 'updated_subject', 'received_via_email']
+    'author_username', 'created_on_msecs', 'entity_type', 'message_id',
+    'entity_id', 'text', 'updated_status', 'updated_subject']
 
 
 class MockFeedbackAnalyticsAggregator(
@@ -52,6 +52,7 @@ class MockFeedbackAnalyticsAggregator(
     """A modified FeedbackAnalyticsAggregator that does not start a new batch
     job when the previous one has finished.
     """
+
     @classmethod
     def _kickoff_batch_job_after_previous_one_ends(cls):
         pass
@@ -140,7 +141,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
         super(FeedbackThreadIntegrationTests, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.editor = user_services.UserActionsInfo(self.editor_id)
+        self.editor = user_services.get_user_actions_info(self.editor_id)
 
         # Load exploration 0.
         exp_services.delete_demo(self.EXP_ID)
@@ -226,15 +227,13 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
 
         # Then, create a new message in that thread.
         thread_url = '%s/%s' % (feconf.FEEDBACK_THREAD_URL_PREFIX, thread_id)
-        self.post_json(
+        response_dict = self.post_json(
             thread_url, {
                 'updated_status': None,
                 'updated_subject': None,
                 'text': 'Message 1'
             }, csrf_token=csrf_token)
 
-        # The resulting thread should contain two messages.
-        response_dict = self.get_json(thread_url)
         self.assertEqual(len(response_dict['messages']), 2)
         self.assertEqual(
             set(response_dict['messages'][0].keys()),
@@ -388,7 +387,7 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
         self.owner_id_1 = self.get_user_id_from_email(self.OWNER_EMAIL_1)
         self.owner_id_2 = self.get_user_id_from_email(self.OWNER_EMAIL_2)
         self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
-        self.owner_2 = user_services.UserActionsInfo(self.owner_id_2)
+        self.owner_2 = user_services.get_user_actions_info(self.owner_id_2)
 
         # Create an exploration.
         self.save_new_valid_exploration(
@@ -528,9 +527,9 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
             'new_value': new_content
         }
         suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION, self.EXP_ID, 1,
-            self.user_id, change_cmd, 'sample description', None)
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID, 1,
+            self.user_id, change_cmd, 'sample description')
 
         response = self.get_json(
             '%s/%s' % (
@@ -552,8 +551,8 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
             '%s/%s' % (feconf.FEEDBACK_THREAD_URL_PREFIX, thread_id))
         expected_suggestion_dict = {
             'suggestion_type': (
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
-            'target_type': suggestion_models.TARGET_TYPE_EXPLORATION,
+                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
+            'target_type': feconf.ENTITY_TYPE_EXPLORATION,
             'target_id': self.EXP_ID,
             'status': suggestion_models.STATUS_IN_REVIEW,
             'author_name': self.USER_USERNAME
@@ -597,9 +596,9 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
             'new_value': new_content
         }
         suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION, self.EXP_ID, 1,
-            self.owner_id_1, change, 'sample description', None)
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID, 1,
+            self.owner_id_1, change, 'sample description')
 
         thread_id = suggestion_services.query_suggestions(
             [('author_id', self.owner_id_1),
@@ -628,10 +627,9 @@ class ThreadListHandlerForTopicsHandlerTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.set_admins([self.OWNER_USERNAME])
 
-        self.topic_id = topic_services.get_new_topic_id()
+        self.topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             self.topic_id, self.owner_id, name='Name',
-            abbreviated_name='abbrev', thumbnail_filename=None,
             description='Description', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=1)
@@ -756,8 +754,9 @@ class FeedbackStatsHandlerTests(test_utils.GenericTestBase):
                 .start_computation()
             )
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
+            self.process_and_flush_pending_mapreduce_tasks()
             self.process_and_flush_pending_tasks()
 
             response = self.get_json(

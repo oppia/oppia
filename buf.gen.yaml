@@ -1,0 +1,11 @@
+version: v1beta1
+plugins:
+  - name: python
+    out: proto_files
+
+  - name: js
+    out: extensions/classifiers/proto
+    opt: import_style=commonjs,binary
+
+  - name: ts
+    out: extensions/classifiers/proto

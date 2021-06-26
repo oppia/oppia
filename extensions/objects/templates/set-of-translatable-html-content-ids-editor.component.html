@@ -1,0 +1,22 @@
+<style>
+  .set-of-translatable-html-content-ids-editor .mat-checkbox /deep/  .mat-checkbox-label {
+    vertical-align: top;
+  }
+  .set-of-translatable-html-content-ids-editor /deep/  .oppia-check-box {
+    max-width: 300px;
+  }
+</style>
+<div class="set-of-translatable-html-content-ids-editor">
+  <div class="container-fluid">
+    <div *ngFor="let choice of choices; let idx = index">
+      <mat-checkbox (click)="toggleSelection(idx)"
+                    [(ngModel)]="selections[idx]"
+                    class="oppia-check-box fx-row" aria-label="choice">
+        <span>
+          <angular-html-bind-wrapper classStr="protractor-test-html-item-select-option" [htmlData]="choice.id">
+          </angular-html-bind-wrapper>
+        </span>
+      </mat-checkbox>
+    </div>
+  </div>
+</div>

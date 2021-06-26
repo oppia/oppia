@@ -1,0 +1,362 @@
+<mat-card layout="row" class="list-view-item">
+  <table class="dashboard-table protractor-test-topics-table">
+    <colgroup>
+      <col class="dashboard-table-index-column">
+      <col class="dashboard-table-name-column">
+      <col class="dashboard-table-story-column">
+      <col class="dashboard-table-subtopic-column">
+      <col class="dashboard-table-skill-column">
+      <col class="dashboard-table-status-column">
+    </colgroup>
+    <tr>
+      <th *ngFor="let key of TOPIC_HEADINGS"
+          class="dashboard-table-headings">
+        <p *ngIf="key === 'index'"></p>
+        <p *ngIf="key === 'name'" id="dashboard-table-headings-details">Details</p>
+        <p *ngIf="key === 'canonical_story_count'">Published Stories</p>
+        <p *ngIf="key === 'subtopic_count'">Subtopics</p>
+        <p *ngIf="key === 'skill_count'" class="text-center">Skills</p>
+        <p *ngIf="key === 'topic_status'" class="text-center">Topic Status</p>
+      </th>
+    </tr>
+    <tr *ngFor="let topic of topicSummaries; index as idx" class="list-item">
+      <td>
+        {{getSerialNumberForTopic(idx)}}.
+      </td>
+      <td>
+        <div class="topic-primary-information-container">
+          <div class="list-summary list-summary-name protractor-test-topics-list-item">
+            <div>
+              <a class="topic-name protractor-test-topic-name"
+                 [href]="getTopicEditorUrl(topic.id)">
+                {{topic.name}}
+              </a>
+            </div>
+            <div>
+              <span class="topic-classroom protractor-test-topic-classroom">
+                <span *ngIf="topic.classroom">{{topic.classroom}}</span>
+                <span ngbTooltip="Assign this topic to a classroom from the admin page" placement="bottom" *ngIf="!topic.classroom">No classroom assigned.</span>
+              </span>
+            </div>
+            <div><span class="topic-description protractor-test-topic-description">{{topic.description}}</span></div>
+          </div>
+        </div>
+      </td>
+      <td>
+        <p class="text-center list-summary">
+          <span> {{topic.canonicalStoryCount}} </span>
+        </p>
+      </td>
+      <td>
+        <p class="text-center list-summary">
+          <span> {{topic.subtopicCount}} </span>
+        </p>
+      </td>
+      <td>
+        <p class="list-summary text-center">
+          <span> {{topic.totalSkillCount}} </span>
+          <span [hidden]="!topic.uncategorized_skill_count"
+                class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color tooltip"
+                ngbTooltip="This topic has {{ topic.uncategorizedSkillCount }} uncategorized skill{{topic.uncategorizedSkillCount > 1 ? 's' : ''}}."
+                placement="bottom">
+            <span class="oppia-editor-warnings-count">
+              &nbsp;!
+            </span>
+          </span>
+        </p>
+      </td>
+      <td class="text-center topic-list-status">
+        <span class="topic-list-status-text" *ngIf="topic.isPublished"> Published </span>
+        <span class="topic-list-status-text" *ngIf="!topic.isPublished"> Not Published </span>
+        <p class="fas fa-ellipsis-v topic-edit-box-icon protractor-test-topic-edit-box" (click)="changeEditOptions(topic.id)" attr.aria-label="Topic edit"></p>
+        <div *ngIf="showEditOptions(topic.id)" class="topic-edit-options">
+          <a class="topic-edit-options-edit protractor-test-edit-topic-button" [href]="getTopicEditorUrl(topic.id)">
+            <i class="fa fa-pen"></i>
+            <span>Edit</span>
+          </a>
+          <span *ngIf="userCanDeleteTopic" (click)="deleteTopic(topic.id, topic.name)">
+            <a>
+              <i class="fas fa-trash-alt protractor-test-delete-topic-button"></i>
+              <span>Delete</span>
+            </a>
+          </span>
+        </div>
+      </td>
+    </tr>
+  </table>
+  <div class="topics-list-mobile">
+    <div *ngFor="let topic of topicSummaries; index as idx">
+      <div class="topic-item">
+        <div class="topic-item-header">
+          <div class="topic-item-name-box">
+            <div class="topic-item-name">
+              <span>
+                {{getSerialNumberForTopic(idx)}}
+              </span>
+              <a [href]="getTopicEditorUrl(topic.id)">
+                {{topic.name}}
+              </a>
+            </div>
+            <div class="topic-item-classroom">
+              <span *ngIf="topic.classroom">{{topic.classroom}}</span>
+              <span *ngIf="!topic.classroom">Unassigned</span>
+            </div>
+          </div>
+          <div class="topic-item-options">
+            <p class="fas fa-ellipsis-v topic-edit-box-icon" aria-label="Edit Options" (click)="changeEditOptions(topic.id)"></p>
+            <div *ngIf="showEditOptions(topic.id)" class="topic-edit-options">
+              <a class="topic-edit-options-edit" [href]="getTopicEditorUrl(topic.id)">
+                <i class="fa fa-pen"></i>
+                <span>Edit</span>
+              </a>
+              <a *ngIf="userCanDeleteTopic" (click)="deleteTopic(topic.id, topic.name)">
+                <i class="fas fa-trash-alt"></i>
+                <span>Delete</span>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="topic-item-description">
+          <span>{{topic.description}}</span>
+        </div>
+        <div class="topic-item-entities">
+          <div class="topic-item-entity">
+            <div class="topic-item-value">
+              <span>{{topic.canonicalStoryCount}}</span>
+            </div>
+            <div class="topic-item-type">
+              Published Stories
+            </div>
+          </div>
+          <div class="topic-item-entity">
+            <div class="topic-item-value">
+              <span>{{topic.subtopicCount}}</span>
+            </div>
+            <div class="topic-item-type">
+              Subtopics
+            </div>
+          </div>
+          <div class="topic-item-entity">
+            <div class="topic-item-value">
+              <span>{{topic.totalSkillCount}}</span>
+            </div>
+            <div class="topic-item-type">
+              Skills
+            </div>
+          </div>
+          <div class="topic-item-entity topic-item-status">
+            <div class="topic-item-value" *ngIf="topic.isPublished">Published</div>
+            <div class="topic-item-value" *ngIf="!topic.isPublished">Not Published</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</mat-card>
+
+<style>
+  .list-view-item {
+    background: #fff;
+    box-shadow: none;
+    margin-top: 50px;
+  }
+  .topics-list-mobile {
+    display: none;
+  }
+  .dashboard-table-index-column {
+    width: 5%;
+  }
+  .dashboard-table-name-column {
+    width: 35%;
+  }
+  .dashboard-table-story-column {
+    width: 10%;
+  }
+  .dashboard-table-subtopic-column {
+    width: 10%;
+  }
+  .dashboard-table-skill-column {
+    width: 10%;
+  }
+  .dashboard-table-status-column {
+    width: 8%;
+  }
+  .dashboard-table {
+    font-size: 15px;
+    width: 100%;
+  }
+  .topic-list-status {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+  }
+  .topic-edit-box-icon {
+    cursor: pointer;
+    margin: 0;
+  }
+  .topic-edit-options {
+    background-color: #fff;
+    border: 1px solid #000;
+    display: flex;
+    flex-wrap: wrap;
+    left: -35px;
+    position: absolute;
+    top: 10px;
+    width: 120px;
+  }
+  .topic-edit-options a {
+    display: block;
+    padding: 5px;
+    text-align: left;
+    text-decoration: none;
+    width: 100%;
+  }
+  .topic-primary-information-container {
+    height: 100%;
+    overflow: auto;
+  }
+  .topic-edit-options-edit {
+    border-bottom: 1px solid #000;
+    color: inherit;
+    text-decoration: none;
+  }
+  .topic-edit-options a:hover,
+  .topic-edit-options a:active,
+  .topic-edit-options a:visited {
+    background-color: #e6e6e6;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .dashboard-table .dashboard-table-headings {
+    border-bottom: 2px solid #bbb;
+    padding-bottom: 0.7em;
+    text-align: center;
+  }
+
+  .dashboard-table .dashboard-table-headings p {
+    display: inline;
+  }
+  .dashboard-table #dashboard-table-headings-details {
+    display: inline-block;
+    text-align: left;
+    width: 100%;
+  }
+  .topic-name {
+    color: inherit;
+    font-size: 17px;
+    font-weight: bold;
+    text-decoration: none;
+  }
+  .topic-classroom {
+    font-size: 13px;
+    font-style: italic;
+    margin: 4px 0;
+    text-transform: capitalize;
+  }
+  .topic-description {
+    font-size: 15px;
+  }
+  .list-summary,
+  .list-summary:active,
+  .list-summary:visited {
+    color: inherit;
+    display: block;
+    text-decoration: none;
+  }
+
+  .list-item {
+    height: 150px;
+    text-align: left;
+    vertical-align: baseline;
+  }
+
+  .list-item td {
+    padding-top: 15px;
+  }
+
+  .list-item:not(:last-child) {
+    border-bottom: 1px solid #bbb;
+  }
+
+  .oppia-editor-warnings-indicator {
+    bottom: 13px;
+    left: 15px;
+  }
+
+  .oppia-editor-warnings-error-color {
+    border-color: transparent transparent #ffbe63 transparent;
+  }
+
+  .list-summary span {
+    display: inline-block;
+    line-height: normal;
+    vertical-align: middle;
+    word-break: break-word;
+  }
+
+  .tooltip {
+    display: block;
+  }
+
+  @media (max-width: 768px) {
+    .topics-list-mobile {
+      display: block;
+      margin: 0 auto;
+      width: 95%;
+    }
+    .dashboard-table {
+      display: none;
+    }
+    .topic-item {
+      border-bottom: 1px solid #c0bebe;
+      margin: 20px 0;
+      padding: 10px 0;
+    }
+    .list-view-item {
+      margin: 0;
+    }
+    .topic-item-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+    .topic-item-classroom span {
+      color: #707070;
+    }
+    .topic-item-description {
+      margin: 10px 0;
+    }
+    .topic-item-entities {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      text-align: center;
+    }
+    .topic-item-options {
+      position: relative;
+    }
+    .topic-item-name a {
+      color: inherit;
+      font-weight: bold;
+      text-decoration: none;
+    }
+    .topic-item-entity {
+      border-right: 2px solid #0844aa;
+      display: inline-block;
+      width: 25%;
+    }
+    .topic-item-status {
+      align-items: center;
+      border-right: none;
+      display: flex;
+      justify-content: center;
+    }
+    .topic-edit-options {
+      left: auto;
+      right: 10px;
+      top: 10px;
+    }
+  }
+</style>

@@ -24,6 +24,7 @@ import logging
 
 from core import jobs
 from core.domain import skill_domain
+from core.domain import skill_fetchers
 from core.domain import skill_services
 from core.platform import models
 import feconf
@@ -55,11 +56,11 @@ class SkillMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             return
 
         # Note: the read will bring the skill up to the newest version.
-        skill = skill_services.get_skill_by_id(item.id)
+        skill = skill_fetchers.get_skill_by_id(item.id)
         try:
             skill.validate()
         except Exception as e:
-            logging.error(
+            logging.exception(
                 'Skill %s failed validation: %s' % (item.id, e))
             yield (
                 SkillMigrationOneOffJob._ERROR_KEY,
@@ -115,3 +116,48 @@ class SkillMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 sum(ast.literal_eval(v) for v in values))])
         else:
             yield (key, values)
+
+
+class SkillCommitCmdMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """This job is used to migrate the old commit cmds in skill commit log
+    and the snapshot metadata model to the latest cmd format.
+
+    NOTE TO DEVELOPERS: Do not delete this job until issue #10807 is fixed.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [
+            skill_models.SkillCommitLogEntryModel,
+            skill_models.SkillSnapshotMetadataModel
+        ]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        updated_commit_cmds = []
+        update_required = False
+        for commit_cmd_dict in item.commit_cmds:
+            updated_commit_cmd_dict = {}
+            for cmd_key, cmd_val in commit_cmd_dict.items():
+                if cmd_key == 'explanation':
+                    update_required = True
+                    updated_commit_cmd_dict['explanations'] = cmd_val
+                else:
+                    updated_commit_cmd_dict[cmd_key] = cmd_val
+            updated_commit_cmds.append(updated_commit_cmd_dict)
+
+        if update_required:
+            item.commit_cmds = updated_commit_cmds
+            item.update_timestamps(update_last_updated_time=False)
+            item.put()
+            yield (
+                'Commit Commands Updated-%s' % item.__class__.__name__,
+                item.id
+            )
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)

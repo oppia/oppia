@@ -21,35 +21,42 @@ import { Injectable } from '@angular/core';
 
 import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { baseInteractionValidationService } from
+import { baseInteractionValidationService, Warning } from
   'interactions/base-interaction-validation.service';
+import { PencilCodeEditorCustomizationArgs } from
+  'extensions/interactions/customization-args-defs';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
+
+import { AppConstants } from 'app.constants';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PencilCodeEditorValidationService {
   constructor(
-      private baseInteractionValidationServiceInstance:
-        baseInteractionValidationService) {}
+    private baseInteractionValidationServiceInstance:
+      baseInteractionValidationService) {}
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'customizationArgs' is a dict with possible underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  getCustomizationArgsWarnings(customizationArgs: any): any[] {
-    // TODO(juansaba): Implement customization args validations.
-    return [];
+  getCustomizationArgsWarnings(
+      customizationArgs: PencilCodeEditorCustomizationArgs): Warning[] {
+    var warningsList = [];
+    this.baseInteractionValidationServiceInstance
+      .requireCustomizationArguments(customizationArgs, ['initialCode']);
+
+    var initialCode = customizationArgs.initialCode.value;
+    if (!(typeof initialCode === 'string')) {
+      warningsList.push({
+        type: AppConstants.WARNING_TYPES.ERROR,
+        message: 'The initialCode must be a string.'
+      });
+    }
+    return warningsList;
   }
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'customizationArgs' is a dict with possible underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
   getAllWarnings(
-      stateName: string, customizationArgs: any, answerGroups: AnswerGroup[],
-      defaultOutcome: Outcome): any[] {
+      stateName: string, customizationArgs: PencilCodeEditorCustomizationArgs,
+      answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
     return this.getCustomizationArgsWarnings(customizationArgs).concat(
       this.baseInteractionValidationServiceInstance.getAllOutcomeWarnings(
         answerGroups, defaultOutcome, stateName));

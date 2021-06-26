@@ -30,12 +30,18 @@ import sys
 import types
 
 from constants import constants
+from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import auth_domain
+from core.domain import classifier_domain
+from core.domain import classifier_services
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import user_services
 from core.platform import models
+from core.platform.auth import firebase_auth_services
 from core.tests import test_utils
 import feconf
 import main
@@ -46,16 +52,31 @@ from mapreduce import main as mapreduce_main
 import webapp2
 import webtest
 
-current_user_services = models.Registry.import_current_user_services()
+auth_services = models.Registry.import_auth_services()
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
 FORTY_EIGHT_HOURS_IN_SECS = 48 * 60 * 60
 PADDING = 1
 
 
+class HelperFunctionTests(test_utils.GenericTestBase):
+
+    def test_load_template(self):
+        about_path = os.path.join('core', 'templates', 'pages', 'about-page')
+        with self.swap(feconf, 'FRONTEND_TEMPLATES_DIR', about_path):
+            self.assertIn(
+                '"About | Oppia"',
+                base.load_template('about-page.mainpage.html'))
+        donate_path = os.path.join('core', 'templates', 'pages', 'donate-page')
+        with self.swap(feconf, 'FRONTEND_TEMPLATES_DIR', donate_path):
+            self.assertIn(
+                '"Donate - Oppia"',
+                base.load_template('donate-page.mainpage.html'))
+
+
 class UniqueTemplateNamesTests(test_utils.GenericTestBase):
     """Tests to ensure that all template filenames in
-    core/templates/dev/head/pages have unique filenames. This is required
+    core/templates/pages have unique filenames. This is required
     for the backend tests to work correctly since they fetch templates
     from this directory based on name of the template. For details, refer
     get_filepath_from_filename function in test_utils.py.
@@ -63,7 +84,7 @@ class UniqueTemplateNamesTests(test_utils.GenericTestBase):
 
     def test_template_filenames_are_unique(self):
         templates_dir = os.path.join(
-            'core', 'templates', 'dev', 'head', 'pages')
+            'core', 'templates', 'pages')
         all_template_names = []
         for root, _, filenames in os.walk(templates_dir):
             template_filenames = [
@@ -98,7 +119,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
     class MockHandlerForTestingErrorPageWithIframed(base.BaseHandler):
         def get(self):
-            self.values['iframed'] = True
+            self.iframed = True
             self.render_template('invalid_page.html')
 
     class MockHandlerForTestingUiAccessWrapper(base.BaseHandler):
@@ -133,6 +154,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         deleted_user_model = (
             user_models.UserSettingsModel.get_by_id(deleted_user_id))
         deleted_user_model.deleted = True
+        deleted_user_model.update_timestamps()
         deleted_user_model.put()
 
     def test_that_no_get_results_in_500_error(self):
@@ -149,17 +171,17 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
             # This url is ignored since it is only needed for a protractor test.
             # The backend tests fetch templates from
-            # core/templates/dev/head/pages instead of webpack_bundles since we
+            # core/templates/pages instead of webpack_bundles since we
             # skip webpack compilation for backend tests.
             # The console_errors.html template is present in
-            # core/templates/dev/head/tests and we want one canonical
+            # core/templates/tests and we want one canonical
             # directory for retrieving templates so we ignore this url.
             if url == '/console_errors':
                 continue
 
             # Some of these will 404 or 302. This is expected.
             self.get_response_without_checking_for_errors(
-                url, [200, 302, 400, 401, 404])
+                url, [200, 301, 302, 400, 401, 404])
 
         # TODO(sll): Add similar tests for POST, PUT, DELETE.
         # TODO(sll): Set a self.payload attr in the BaseHandler for
@@ -170,10 +192,10 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         """Tests request without csrf_token results in 401 error."""
 
         self.post_json(
-            '/library/any', payload={}, expected_status_int=401)
+            '/community-library/any', data={}, expected_status_int=401)
 
         self.put_json(
-            '/library/any', payload={}, expected_status_int=401)
+            '/community-library/any', payload={}, expected_status_int=401)
 
     def test_requests_for_invalid_paths(self):
         """Test that requests for invalid paths result in a 404 error."""
@@ -181,26 +203,29 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         csrf_token = base.CsrfTokenManager.create_csrf_token(user_id)
 
         self.get_html_response(
-            '/library/extra', expected_status_int=404)
+            '/community-library/extra', expected_status_int=404)
 
         self.get_html_response(
-            '/library/data/extra', expected_status_int=404)
+            '/community-library/data/extra', expected_status_int=404)
 
         self.post_json(
-            '/library/extra', payload={}, csrf_token=csrf_token,
+            '/community-library/extra', data={}, csrf_token=csrf_token,
             expected_status_int=404)
 
         self.put_json(
-            '/library/extra', payload={}, csrf_token=csrf_token,
+            '/community-library/extra', payload={}, csrf_token=csrf_token,
             expected_status_int=404)
 
-        self.delete_json('/library/data', expected_status_int=404)
+        self.delete_json('/community-library/data', expected_status_int=404)
 
-    def test_redirect_in_logged_out_states(self):
-        """Test for a redirect in logged out state on '/'."""
-
-        response = self.get_html_response('/', expected_status_int=302)
-        self.assertIn('splash', response.headers['location'])
+    def test_html_requests_have_no_store_cache_policy(self):
+        response = self.get_html_response('/community-library')
+        # We set 'no-store' and 'must-revalidate', but webapp
+        # adds 'no-cache' since it is basically a subset of 'no-store'.
+        self.assertEqual(
+            response.headers['Cache-Control'],
+            'must-revalidate, no-cache, no-store'
+        )
 
     def test_root_redirect_rules_for_logged_in_learners(self):
         self.login(self.TEST_LEARNER_EMAIL)
@@ -209,7 +234,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         # learner dashboard, going to '/' should redirect to the learner
         # dashboard page.
         response = self.get_html_response('/', expected_status_int=302)
-        self.assertIn('learner_dashboard', response.headers['location'])
+        self.assertIn('learner-dashboard', response.headers['location'])
         self.logout()
 
     def test_root_redirect_rules_for_deleted_user_prod_mode(self):
@@ -238,7 +263,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         # learner dashboard, going to '/' should redirect to the learner
         # dashboard page.
         response = self.get_html_response('/', expected_status_int=302)
-        self.assertIn('learner_dashboard', response.headers['location'])
+        self.assertIn('learner-dashboard', response.headers['location'])
         self.logout()
 
     def test_root_redirect_rules_for_logged_in_creators(self):
@@ -251,12 +276,12 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         # Since the default dashboard has been set as creator dashboard, going
         # to '/' should redirect to the creator dashboard.
         response = self.get_html_response('/', expected_status_int=302)
-        self.assertIn('creator_dashboard', response.headers['location'])
+        self.assertIn('creator-dashboard', response.headers['location'])
 
     def test_root_redirect_rules_for_logged_in_editors(self):
         self.login(self.TEST_CREATOR_EMAIL)
         creator_user_id = self.get_user_id_from_email(self.TEST_CREATOR_EMAIL)
-        creator = user_services.UserActionsInfo(creator_user_id)
+        creator = user_services.get_user_actions_info(creator_user_id)
         editor_user_id = self.get_user_id_from_email(self.TEST_EDITOR_EMAIL)
         exploration_id = '1_en_test_exploration'
         self.save_new_valid_exploration(
@@ -264,7 +289,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             category='Test', language_code='en')
         rights_manager.assign_role_for_exploration(
             creator, exploration_id, editor_user_id,
-            rights_manager.ROLE_EDITOR)
+            rights_domain.ROLE_EDITOR)
         self.logout()
         self.login(self.TEST_EDITOR_EMAIL)
         exp_services.update_exploration(
@@ -373,7 +398,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             to a non-existent directory.
             """
             path = ''
-            if args[1] == 'Pillow-6.0.0':
+            if args[1] == 'Pillow-6.2.2':
                 return 'invalid_path'
             else:
                 path = '/'.join(args)
@@ -395,8 +420,14 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         # We need to re-import appengine_config here to make it look like a
         # local variable so that we can again re-import appengine_config later.
         import appengine_config
+        # This exception is generated by Google App Engine (GAE). Since GAE
+        # operates its own special virtual environment, when we attempt to
+        # modify its system path with an invalid path, it throws the error
+        # below.
         assert_raises_regexp_context_manager = self.assertRaisesRegexp(
-            Exception, 'Invalid path for third_party library: invalid_path')
+            Exception,
+            'virtualenv: cannot access invalid_path/python_libs: No such '
+            'virtualenv or site directory')
 
         def mock_os_path_join_for_third_party_lib(*args):
             """Mocks path for third_party libs with an invalid path. This is
@@ -526,6 +557,198 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(
             response.headers['Location'], 'https://oppiatestserver.appspot.com')
 
+    def test_splash_redirect(self):
+        # Tests that the old '/splash' URL is redirected to '/'.
+        response = self.get_html_response('/splash', expected_status_int=302)
+        self.assertEqual('http://localhost/', response.headers['location'])
+
+    def test_unauthorized_user_exception_raised_when_session_is_stale(self):
+        with python_utils.ExitStack() as exit_stack:
+            call_counter = exit_stack.enter_context(self.swap_with_call_counter(
+                auth_services, 'destroy_auth_session'))
+            logs = exit_stack.enter_context(
+                self.capture_logging(min_level=logging.ERROR))
+            exit_stack.enter_context(self.swap_to_always_raise(
+                auth_services, 'get_auth_claims_from_request',
+                error=auth_domain.StaleAuthSessionError('uh-oh')))
+
+            response = self.get_html_response('/', expected_status_int=302)
+
+        self.assertEqual(call_counter.times_called, 1)
+        self.assertEqual(
+            response.location,
+            'http://localhost/login?return_url=http%3A%2F%2Flocalhost%2F')
+
+    def test_unauthorized_user_exception_raised_when_session_is_invalid(self):
+        with python_utils.ExitStack() as exit_stack:
+            call_counter = exit_stack.enter_context(self.swap_with_call_counter(
+                auth_services, 'destroy_auth_session'))
+            logs = exit_stack.enter_context(
+                self.capture_logging(min_level=logging.ERROR))
+            exit_stack.enter_context(self.swap_to_always_raise(
+                auth_services, 'get_auth_claims_from_request',
+                error=auth_domain.InvalidAuthSessionError('uh-oh')))
+
+            response = self.get_html_response('/', expected_status_int=302)
+
+        self.assert_matches_regexps(logs, ['User session is invalid!'])
+        self.assertEqual(call_counter.times_called, 1)
+        self.assertEqual(
+            response.location,
+            'http://localhost/login?return_url=http%3A%2F%2Flocalhost%2F')
+
+
+class MaintenanceModeTests(test_utils.GenericTestBase):
+    """Tests BaseHandler behavior when maintenance mode is enabled.
+
+    Each test case runs within a context where ENABLE_MAINTENANCE_MODE is True.
+    """
+
+    def setUp(self):
+        super(MaintenanceModeTests, self).setUp()
+        self.signup(
+            self.RELEASE_COORDINATOR_EMAIL, self.RELEASE_COORDINATOR_USERNAME)
+        self.set_user_role(
+            self.RELEASE_COORDINATOR_USERNAME,
+            feconf.ROLE_ID_RELEASE_COORDINATOR)
+        with python_utils.ExitStack() as context_stack:
+            context_stack.enter_context(
+                self.swap(feconf, 'ENABLE_MAINTENANCE_MODE', True))
+            self.context_stack = context_stack.pop_all()
+
+    def tearDown(self):
+        self.context_stack.close()
+        super(MaintenanceModeTests, self).tearDown()
+
+    def test_html_response_is_rejected(self):
+        destroy_auth_session_call_counter = self.context_stack.enter_context(
+            self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
+
+        response = self.get_html_response(
+            '/community-library', expected_status_int=503)
+
+        self.assertIn('<maintenance-page>', response.body)
+        self.assertNotIn('<library-page>', response.body)
+        self.assertEqual(destroy_auth_session_call_counter.times_called, 1)
+
+    def test_html_response_is_not_rejected_when_user_is_super_admin(self):
+        self.context_stack.enter_context(self.super_admin_context())
+        destroy_auth_session_call_counter = self.context_stack.enter_context(
+            self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
+
+        response = self.get_html_response('/community-library')
+
+        self.assertIn('<library-page>', response.body)
+        self.assertNotIn('<maintenance-page>', response.body)
+        self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
+
+    def test_html_response_is_not_rejected_when_user_is_release_coordinator(
+            self):
+        self.context_stack.enter_context(
+            self.login_context(self.RELEASE_COORDINATOR_EMAIL))
+        destroy_auth_session_call_counter = self.context_stack.enter_context(
+            self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
+
+        response = self.get_html_response('/community-library')
+
+        self.assertIn('<library-page>', response.body)
+        self.assertNotIn('<maintenance-page>', response.body)
+        self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
+
+    def test_json_response_is_rejected(self):
+        destroy_auth_session_call_counter = self.context_stack.enter_context(
+            self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
+
+        response = self.get_json('/url_handler', expected_status_int=503)
+
+        self.assertIn('error', response)
+        self.assertEqual(
+            response['error'],
+            'Oppia is currently being upgraded, and the site should be up '
+            'and running again in a few hours. Thanks for your patience!')
+        self.assertNotIn('login_url', response)
+        self.assertEqual(destroy_auth_session_call_counter.times_called, 1)
+
+    def test_json_response_is_not_rejected_when_user_is_super_admin(self):
+        self.context_stack.enter_context(self.super_admin_context())
+        destroy_auth_session_call_counter = self.context_stack.enter_context(
+            self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
+
+        response = self.get_json('/url_handler')
+
+        self.assertIn('login_url', response)
+        self.assertIsNone(response['login_url'])
+        self.assertNotIn('error', response)
+        self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
+
+    def test_csrfhandler_handler_is_not_rejected(self):
+        response = self.get_json('/csrfhandler')
+
+        self.assertTrue(
+            base.CsrfTokenManager.is_csrf_token_valid(None, response['token']))
+
+    def test_session_begin_handler_is_not_rejected(self):
+        call_counter = self.context_stack.enter_context(
+            self.swap_with_call_counter(
+                auth_services, 'establish_auth_session'))
+
+        self.get_html_response('/session_begin', expected_status_int=200)
+
+        self.assertEqual(call_counter.times_called, 1)
+
+    def test_session_end_handler_is_not_rejected(self):
+        call_counter = self.context_stack.enter_context(
+            self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
+
+        self.get_html_response('/session_end', expected_status_int=200)
+
+        self.assertEqual(call_counter.times_called, 1)
+
+    def test_signup_fails(self):
+        with self.assertRaisesRegexp(Exception, 'Bad response: 503'):
+            self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+
+    def test_signup_succeeds_when_maintenance_mode_is_disabled(self):
+        with self.swap(feconf, 'ENABLE_MAINTENANCE_MODE', False):
+            self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+
+    def test_signup_succeeds_when_user_is_super_admin(self):
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME, is_super_admin=True)
+
+    def test_admin_auth_session_is_preserved_when_in_maintenance_mode(self):
+        # TODO(#12692): Use stateful login sessions to assert the behavior of
+        # logging out, rather than asserting that destroy_auth_session() gets
+        # called.
+        destroy_auth_session_call_counter = self.context_stack.enter_context(
+            self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
+        self.context_stack.enter_context(self.super_admin_context())
+
+        with self.swap(feconf, 'ENABLE_MAINTENANCE_MODE', False):
+            self.get_json('/url_handler?current_url=/')
+
+        self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
+
+        self.get_json('/url_handler?current_url=/')
+
+        self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
+
+    def test_non_admin_auth_session_is_destroyed_when_in_maintenance_mode(self):
+        # TODO(#12692): Use stateful login sessions to assert the behavior of
+        # logging out, rather than asserting that destroy_auth_session() gets
+        # called.
+        destroy_auth_session_call_counter = self.context_stack.enter_context(
+            self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
+
+        with self.swap(feconf, 'ENABLE_MAINTENANCE_MODE', False):
+            self.get_json('/url_handler?current_url=/')
+
+        self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
+
+        with self.assertRaisesRegexp(Exception, 'Bad response: 503'):
+            self.get_json('/url_handler?current_url=/')
+
+        self.assertEqual(destroy_auth_session_call_counter.times_called, 1)
+
 
 class CsrfTokenManagerTests(test_utils.GenericTestBase):
 
@@ -638,38 +861,30 @@ class RenderDownloadableTests(test_utils.GenericTestBase):
         self.assertEqual(response.content_type, 'text/plain')
 
 
-class LogoutPageTests(test_utils.GenericTestBase):
+class SessionBeginHandlerTests(test_utils.GenericTestBase):
+    """Tests for /session_begin handler."""
 
-    def test_logout_page(self):
-        """Tests for logout handler."""
-        exp_services.load_demo('0')
-        # Logout with valid query arg. This test only validates that the login
-        # cookies have expired after hitting the logout url.
-        current_page = '/explore/0'
-        self.get_html_response(current_page)
-        response = self.get_html_response('/logout', expected_status_int=302)
-        expiry_date = response.headers['Set-Cookie'].rsplit('=', 1)
-        self.assertTrue(
-            datetime.datetime.utcnow() > datetime.datetime.strptime(
-                expiry_date[1], '%a, %d %b %Y %H:%M:%S GMT'))
+    def test_get(self):
+        swap = self.swap_with_call_counter(
+            auth_services, 'establish_auth_session')
 
-    def test_logout_page_with_redirect_url(self):
-        exp_services.load_demo('0')
-        current_page = '/explore/0'
-        self.get_html_response(current_page)
-        response = self.get_html_response(
-            '/logout?redirect_url=library', expected_status_int=302)
-        expiry_date = response.headers['Set-Cookie'].rsplit('=', 1)
+        with swap as call_counter:
+            self.get_html_response('/session_begin', expected_status_int=200)
 
-        self.assertTrue(
-            datetime.datetime.utcnow() > datetime.datetime.strptime(
-                expiry_date[1], '%a, %d %b %Y %H:%M:%S GMT'))
-        self.assertIn('library', response.headers['Location'])
+        self.assertEqual(call_counter.times_called, 1)
 
-    def test_logout_page_with_dev_mode_disabled(self):
-        with self.swap(constants, 'DEV_MODE', False):
-            self.get_html_response(
-                '/logout', expected_status_int=302)
+
+class SessionEndHandlerTests(test_utils.GenericTestBase):
+    """Tests for /session_end handler."""
+
+    def test_get(self):
+        swap = (
+            self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
+
+        with swap as call_counter:
+            self.get_html_response('/session_end', expected_status_int=200)
+
+        self.assertEqual(call_counter.times_called, 1)
 
 
 class I18nDictsTests(test_utils.GenericTestBase):
@@ -784,6 +999,8 @@ class I18nDictsTests(test_utils.GenericTestBase):
                 key_list = [line[:line.find(':')].strip() for line in lines]
                 for key in key_list:
                     self.assertTrue(key.startswith('"I18N_'))
+                    if not key.startswith('"I18N_'):
+                        self.log_line('Bad line in file: %s' % filename)
                 self.assertEqual(sorted(key_list), key_list)
 
     def test_keys_match_en_qqq(self):
@@ -796,7 +1013,7 @@ class I18nDictsTests(test_utils.GenericTestBase):
         """Tests that keys in HTML files are present in en.json."""
         en_key_list = self._extract_keys_from_json_file('en.json')
         dirs_to_search = [
-            os.path.join('core', 'templates', 'dev', 'head'),
+            os.path.join('core', 'templates', ''),
             'extensions']
         files_checked = 0
         missing_keys_count = 0
@@ -885,6 +1102,16 @@ class CheckAllHandlersHaveDecoratorTests(test_utils.GenericTestBase):
     applied on them.
     """
 
+    # Following handlers are present in base.py where acl_decorators cannot be
+    # imported.
+    UNDECORATED_HANDLERS = frozenset([
+        'CsrfTokenHandler',
+        'Error404Handler',
+        'SessionBeginHandler',
+        'SessionEndHandler',
+        'SeedFirebaseHandler',
+    ])
+
     def test_every_method_has_decorator(self):
         handlers_checked = []
 
@@ -896,10 +1123,7 @@ class CheckAllHandlersHaveDecoratorTests(test_utils.GenericTestBase):
             else:
                 handler = route.handler
 
-            # Following handler are present in base.py where acl_decorators
-            # cannot be imported.
-            if (handler.__name__ in (
-                    ('CsrfTokenHandler', 'Error404Handler', 'LogoutPage'))):
+            if handler.__name__ in self.UNDECORATED_HANDLERS:
                 continue
 
             if handler.get != base.BaseHandler.get:
@@ -1000,6 +1224,14 @@ class ControllerClassNameTests(test_utils.GenericTestBase):
                             class_return_type,
                             handler_type_to_name_endings_dict)
                     class_name = clazz.__name__
+                    # BulkEmailWebhookEndpoint is a unique class, compared to
+                    # others, since it is never called from the frontend, and so
+                    # the error raised here on it - 'Please ensure that the name
+                    # of this class ends with 'Page'' - doesn't apply.
+                    # It is only called from the bulk email provider via a
+                    # webhook to update Oppia's database.
+                    if class_name == "BulkEmailWebhookEndpoint":
+                        continue
                     file_name = inspect.getfile(clazz)
                     line_num = inspect.getsourcelines(clazz)[1]
                     allowed_class_ending = handler_type_to_name_endings_dict[
@@ -1084,6 +1316,7 @@ class SignUpTests(test_utils.GenericTestBase):
         during signup.
         """
         self.login('abc@example.com')
+        self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
         csrf_token = self.get_new_csrf_token()
 
         response = self.get_html_response('/about', expected_status_int=302)
@@ -1104,6 +1337,7 @@ class SignUpTests(test_utils.GenericTestBase):
         after signup.
         """
         self.login('abc@example.com')
+        self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
         csrf_token = self.get_new_csrf_token()
         self.post_json(
             feconf.SIGNUP_DATA_URL, {
@@ -1112,7 +1346,7 @@ class SignUpTests(test_utils.GenericTestBase):
             }, csrf_token=csrf_token,
         )
 
-        self.get_html_response('/library')
+        self.get_html_response('/community-library')
 
 
 class CsrfTokenHandlerTests(test_utils.GenericTestBase):
@@ -1127,3 +1361,73 @@ class CsrfTokenHandlerTests(test_utils.GenericTestBase):
 
         self.assertTrue(base.CsrfTokenManager.is_csrf_token_valid(
             None, csrf_token))
+
+
+class OppiaMLVMHandlerTests(test_utils.GenericTestBase):
+    """Unit tests for OppiaMLVMHandler class."""
+
+    class IncorrectMockVMHandler(base.OppiaMLVMHandler):
+        """Derived VM Handler class with missing function implementation for
+        extract_request_message_vm_id_and_signature function.
+        """
+
+        REQUIRE_PAYLOAD_CSRF_CHECK = False
+
+        @acl_decorators.is_from_oppia_ml
+        def post(self):
+            return self.render_json({})
+
+    class CorrectMockVMHandler(base.OppiaMLVMHandler):
+        """Derived VM Handler class with
+        extract_request_message_vm_id_and_signature function implementation.
+        """
+
+        REQUIRE_PAYLOAD_CSRF_CHECK = False
+
+        def extract_request_message_vm_id_and_signature(self):
+            """Returns the message, vm_id and signature retrieved from the
+            incoming requests.
+            """
+            signature = self.payload.get('signature')
+            vm_id = self.payload.get('vm_id')
+            message = self.payload.get('message')
+            return classifier_domain.OppiaMLAuthInfo(message, vm_id, signature)
+
+        @acl_decorators.is_from_oppia_ml
+        def post(self):
+            self.render_json({'job_id': 'new_job'})
+
+    def setUp(self):
+        super(OppiaMLVMHandlerTests, self).setUp()
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication([
+            webapp2.Route('/incorrectmock', self.IncorrectMockVMHandler),
+            webapp2.Route('/correctmock', self.CorrectMockVMHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_that_incorrect_derived_class_raises_exception(self):
+        payload = {}
+        payload['vm_id'] = feconf.DEFAULT_VM_ID
+        secret = feconf.DEFAULT_VM_SHARED_SECRET
+        payload['message'] = json.dumps('message')
+        payload['signature'] = classifier_services.generate_signature(
+            python_utils.convert_to_bytes(secret),
+            python_utils.convert_to_bytes(payload['message']),
+            payload['vm_id'])
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.post_json(
+                '/incorrectmock', payload, expected_status_int=500)
+
+    def test_that_correct_derived_class_does_not_raise_exception(self):
+        payload = {}
+        payload['vm_id'] = feconf.DEFAULT_VM_ID
+        secret = feconf.DEFAULT_VM_SHARED_SECRET
+        payload['message'] = json.dumps('message')
+        payload['signature'] = classifier_services.generate_signature(
+            python_utils.convert_to_bytes(secret),
+            python_utils.convert_to_bytes(payload['message']),
+            payload['vm_id'])
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.post_json(
+                '/correctmock', payload, expected_status_int=200)

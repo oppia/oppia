@@ -17,6 +17,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -25,12 +26,30 @@ from core.domain import learner_progress_services
 from core.domain import state_domain
 from core.domain import subscription_services
 from core.domain import suggestion_services
+from core.domain import topic_domain
+from core.domain import topic_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import utils
 
 (suggestion_models, feedback_models) = models.Registry.import_models([
     models.NAMES.suggestion, models.NAMES.feedback])
+
+
+class OldLearnerDashboardRedirectPageTest(test_utils.GenericTestBase):
+    """Test for redirecting the old learner dashboard page URL
+    to the new one.
+    """
+
+    def test_old_learner_dashboard_page_url(self):
+        """Test to validate that the old learner dashboard page url redirects
+        to the new one.
+        """
+        response = self.get_html_response(
+            '/learner_dashboard', expected_status_int=301)
+        self.assertEqual(
+            'http://localhost/learner-dashboard', response.headers['location'])
 
 
 class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
@@ -52,13 +71,36 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
     COL_ID_3 = 'COL_ID_3'
     COL_TITLE_3 = 'Collection title 3'
 
+    STORY_ID_1 = 'STORY_1'
+    STORY_TITLE_1 = 'Story title 1'
+    STORY_ID_2 = 'STORY_2'
+    STORY_TITLE_2 = 'Story title 2'
+
+    TOPIC_ID_1 = 'TOPIC_1'
+    TOPIC_NAME_1 = 'Topic title 1'
+    TOPIC_ID_2 = 'TOPIC_2'
+    TOPIC_NAME_2 = 'Topic title 2'
+
+    subtopic_0 = topic_domain.Subtopic(
+        0, 'Title 1', ['skill_id_1'], 'image.svg',
+        constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+        'dummy-subtopic-zero')
+
+    subtopic_1 = topic_domain.Subtopic(
+        0, 'Title 1', ['skill_id_1'], 'image.svg',
+        constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+        'dummy-subtopic-zero')
+
     def setUp(self):
         super(LearnerDashboardHandlerTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.set_admins([self.ADMIN_USERNAME])
 
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
     def test_can_see_completed_explorations(self):
         self.login(self.VIEWER_EMAIL)
@@ -94,6 +136,64 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(len(response['completed_collections_list']), 1)
         self.assertEqual(
             response['completed_collections_list'][0]['id'], self.COL_ID_1)
+        self.logout()
+
+    def test_can_see_completed_stories(self):
+        self.login(self.VIEWER_EMAIL)
+
+        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['completed_stories_list']), 0)
+
+        self.save_new_topic(
+            self.TOPIC_ID_1, self.owner_id, name=self.TOPIC_NAME_1,
+            url_fragment='topic-one',
+            description='A new topic', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[self.subtopic_0], next_subtopic_id=1)
+        self.save_new_story(self.STORY_ID_1, self.owner_id, self.TOPIC_ID_1)
+        topic_services.add_canonical_story(
+            self.owner_id, self.TOPIC_ID_1, self.STORY_ID_1)
+
+        topic_services.publish_story(
+            self.TOPIC_ID_1, self.STORY_ID_1, self.admin_id)
+        topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id)
+
+        learner_progress_services.mark_story_as_completed(
+            self.viewer_id, self.STORY_ID_1)
+        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['completed_stories_list']), 1)
+        self.assertEqual(
+            response['completed_stories_list'][0]['id'], self.STORY_ID_1)
+        self.logout()
+
+    def test_can_see_learnt_topics(self):
+        self.login(self.VIEWER_EMAIL)
+
+        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['learnt_topics_list']), 0)
+
+        self.save_new_topic(
+            self.TOPIC_ID_1, self.owner_id, name=self.TOPIC_NAME_1,
+            url_fragment='topic-one',
+            description='A new topic', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[self.subtopic_0], next_subtopic_id=1)
+        self.save_new_story(self.STORY_ID_1, self.owner_id, self.TOPIC_ID_1)
+        topic_services.add_canonical_story(
+            self.owner_id, self.TOPIC_ID_1, self.STORY_ID_1)
+
+        topic_services.publish_story(
+            self.TOPIC_ID_1, self.STORY_ID_1, self.admin_id)
+        topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id)
+
+        learner_progress_services.mark_story_as_completed(
+            self.viewer_id, self.STORY_ID_1)
+        learner_progress_services.mark_topic_as_learnt(
+            self.viewer_id, self.TOPIC_ID_1)
+        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['learnt_topics_list']), 1)
+        self.assertEqual(
+            response['learnt_topics_list'][0]['id'], self.TOPIC_ID_1)
         self.logout()
 
     def test_can_see_incomplete_explorations(self):
@@ -133,6 +233,28 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(len(response['incomplete_collections_list']), 1)
         self.assertEqual(
             response['incomplete_collections_list'][0]['id'], self.COL_ID_1)
+        self.logout()
+
+    def test_can_see_partially_learnt_topics(self):
+        self.login(self.VIEWER_EMAIL)
+
+        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['partially_learnt_topics_list']), 0)
+
+        self.save_new_topic(
+            self.TOPIC_ID_1, self.owner_id, name=self.TOPIC_NAME_1,
+            url_fragment='topic-one',
+            description='A new topic', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[self.subtopic_0], next_subtopic_id=1)
+        topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id)
+
+        learner_progress_services.record_topic_started(
+            self.viewer_id, self.TOPIC_ID_1)
+        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['partially_learnt_topics_list']), 1)
+        self.assertEqual(
+            response['partially_learnt_topics_list'][0]['id'], self.TOPIC_ID_1)
         self.logout()
 
     def test_can_see_exploration_playlist(self):
@@ -209,6 +331,34 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
             self.COL_ID_3, self.owner_id, title=self.COL_TITLE_3)
         self.publish_collection(self.owner_id, self.COL_ID_3)
 
+        self.save_new_topic(
+            self.TOPIC_ID_1, self.owner_id, name=self.TOPIC_NAME_1,
+            url_fragment='topic-one',
+            description='A new topic', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[self.subtopic_0], next_subtopic_id=1)
+        self.save_new_story(self.STORY_ID_1, self.owner_id, self.TOPIC_ID_1)
+        topic_services.add_canonical_story(
+            self.owner_id, self.TOPIC_ID_1, self.STORY_ID_1)
+
+        topic_services.publish_story(
+            self.TOPIC_ID_1, self.STORY_ID_1, self.admin_id)
+        topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id)
+
+        self.save_new_topic(
+            self.TOPIC_ID_2, self.owner_id, name=self.TOPIC_NAME_2,
+            url_fragment='topic-two',
+            description='A new topic', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[self.subtopic_1], next_subtopic_id=1)
+        self.save_new_story(self.STORY_ID_2, self.owner_id, self.TOPIC_ID_2)
+        topic_services.add_canonical_story(
+            self.owner_id, self.TOPIC_ID_2, self.STORY_ID_2)
+
+        topic_services.publish_story(
+            self.TOPIC_ID_2, self.STORY_ID_2, self.admin_id)
+        topic_services.publish_topic(self.TOPIC_ID_2, self.admin_id)
+
         state_name = 'state_name'
         version = 1
 
@@ -225,6 +375,14 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
             self.viewer_id, self.COL_ID_2)
         learner_progress_services.add_collection_to_learner_playlist(
             self.viewer_id, self.COL_ID_3)
+
+        learner_progress_services.mark_story_as_completed(
+            self.viewer_id, self.STORY_ID_1)
+
+        learner_progress_services.mark_topic_as_learnt(
+            self.viewer_id, self.TOPIC_ID_1)
+        learner_progress_services.record_topic_started(
+            self.viewer_id, self.TOPIC_ID_2)
 
         response = self.get_json(feconf.LEARNER_DASHBOARD_IDS_DATA_URL)
         learner_dashboard_activity_ids = (
@@ -249,6 +407,17 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(
             learner_dashboard_activity_ids['collection_playlist_ids'],
             [self.COL_ID_3])
+
+        self.assertEqual(
+            learner_dashboard_activity_ids['completed_story_ids'],
+            [self.STORY_ID_1])
+
+        self.assertEqual(
+            learner_dashboard_activity_ids['learnt_topic_ids'],
+            [self.TOPIC_ID_1])
+        self.assertEqual(
+            learner_dashboard_activity_ids['partially_learnt_topic_ids'],
+            [self.TOPIC_ID_2])
 
     def test_get_threads_after_updating_thread_summaries(self):
         self.login(self.OWNER_EMAIL)
@@ -284,7 +453,7 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
 
         response = self.get_html_response(feconf.LEARNER_DASHBOARD_URL)
-        self.assertIn('{"title": "Learner Dashboard - Oppia"})', response.body)
+        self.assertIn('{"title": "Learner Dashboard | Oppia"})', response.body)
 
         self.logout()
 
@@ -398,9 +567,8 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             messages_summary['author_username'], self.EDITOR_USERNAME)
-        self.assertTrue(
-            messages_summary['author_picture_data_url'].startswith(
-                'data:image/png;'))
+        self.assertTrue(test_utils.check_image_png_or_webp(
+            messages_summary['author_picture_data_url']))
         self.assertFalse(messages_summary.get('suggestion_html'))
         self.assertFalse(messages_summary.get('current_content_html'))
         self.assertFalse(messages_summary.get('description'))
@@ -415,10 +583,10 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
         }
 
         suggestion_models.GeneralSuggestionModel.create(
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION, self.EXP_ID_1, 1,
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID_1, 1,
             suggestion_models.STATUS_IN_REVIEW, self.editor_id, None,
-            change_cmd, 'score category', thread_id)
+            change_cmd, 'score category', thread_id, None)
 
         suggestion_thread = feedback_services.get_thread(thread_id)
         suggestion = suggestion_services.get_suggestion_by_id(thread_id)
@@ -428,12 +596,15 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
                 suggestion.change.state_name].content.html)
         response_dict = self.get_json(thread_url)
         messages_summary = response_dict['message_summary_list'][0]
+        first_suggestion = feedback_services.get_messages(thread_id)[0]
 
         self.assertEqual(
             messages_summary['author_username'], self.EDITOR_USERNAME)
-        self.assertTrue(
-            messages_summary['author_picture_data_url'].startswith(
-                'data:image/png;'))
+        self.assertTrue(test_utils.check_image_png_or_webp(
+            messages_summary['author_picture_data_url']))
+        self.assertEqual(
+            utils.get_time_in_millisecs(first_suggestion.created_on),
+            messages_summary['created_on_msecs'])
         self.assertEqual(
             messages_summary['suggestion_html'], '<p>new content html</p>')
         self.assertEqual(

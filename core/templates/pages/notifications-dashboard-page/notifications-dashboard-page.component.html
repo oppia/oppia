@@ -1,0 +1,94 @@
+<div class="oppia-dashboard-container">
+  <h2 class="oppia-page-heading">Notifications</h2>
+  <div class="oppia-page-heading-subtext" *ngIf="jobQueuedMsec">
+    Last updated: {{ getLocaleAbbreviatedDatetimeString(jobQueuedMsec) }}
+  </div>
+
+  <div>
+    <mat-card *ngIf="recentNotifications.length === 0" class="oppia-page-card oppia-notifications-dashboard-card">
+      <em>No recent notifications.</em>
+    </mat-card>
+
+    <div *ngIf="recentNotifications.length > 0">
+      <a [href]="getItemUrl(notification.activity_id, notification.type)"
+         *ngFor="let notification of recentNotifications">
+        <mat-card class="oppia-dashboard-row"
+                 [ngClass]="{'oppia-dashboard-row-recent': lastSeenMsec && lastSeenMsec < notification.last_updated_ms && notification.author_username !== currentUsername}">
+          <div class="oppia-notification-content">
+            <span>
+              <span *ngIf="notification.type === 'feedback_thread'"
+                    title="Feedback thread">
+                <i class="material-icons">&#xE0B9;</i>
+              </span>
+              <span *ngIf="notification.type === 'exploration_commit'"
+                    title="Exploration commit">
+                <i class="material-icons">&#xE150;</i>
+              </span>
+            </span>
+            <span class="oppia-notification-author-username">
+              <strong>
+                <span>
+                  {{ notification.author_username }}
+                </span>
+                <span *ngIf="!notification.author_username">
+                  Anonymous
+                </span>
+              </strong>
+              <span *ngIf="notification.type === 'exploration_commit'">
+                made a new commit to
+              </span>
+              <span *ngIf="notification.type === 'feedback_thread'">
+                left a comment on
+              </span>
+              <span class="oppia-notification-activity-title">
+                {{ notification.activity_title }}
+              </span>
+            </span>
+          </div>
+          <div class="oppia-notification-last-updated">
+            {{ getLocaleAbbreviatedDatetimeString(notification.last_updated_ms) }}
+          </div>
+        </mat-card>
+      </a>
+    </div>
+  </div>
+</div>
+<style>
+  .oppia-page-heading-subtext {
+    font-size: smaller;
+    opacity: 0.7;
+  }
+  .oppia-notifications-dashboard-card {
+    padding: 15px 40px;
+  }
+  .oppia-dashboard-row {
+    background-color: #fff;
+    cursor: pointer;
+    margin-bottom: -5px;
+    overflow: auto;
+    position: relative;
+  }
+  .oppia-dashboard-row:hover {
+    background: #eee;
+  }
+  .oppia-dashboard-row-recent {
+    background: #fff4ca;
+  }
+  .oppia-dashboard-row-recent:hover {
+    background: #ffe279;
+  }
+  .oppia-notification-content {
+    color: black;
+    display: inline-block;
+    float: left;
+  }
+  .oppia-notification-last-updated {
+    float: right;
+  }
+  @media (max-width: 500px) {
+    .oppia-notification-content,
+    .oppia-notification-last-updated {
+      display: inline;
+    }
+  }
+</style>

@@ -1,0 +1,139 @@
+<div class="oppia-opportunities-list-item protractor-test-opportunity-list-item">
+  <div class="oppia-opportunities-details">
+    <div class="oppia-opportunities-subheading oppia-animate-fadein">
+      <span title="{{ opportunity?.subheading }}"
+            class="protractor-test-opportunity-list-item-subheading"
+            [hidden]="opportunityDataIsLoading">  {{ opportunity?.subheading | wrapTextWithEllipsis : 55 }}
+      </span>
+      <lazy-loading [hidden]="!opportunityDataIsLoading"></lazy-loading>
+    </div>
+    <div class="oppia-opportunities-heading oppia-animate-fadein">
+      <span class="protractor-test-opportunity-list-item-heading" title="{{ opportunity?.heading }}" [hidden]="opportunityDataIsLoading">
+        {{ opportunity?.heading | wrapTextWithEllipsis : opportunityHeadingTruncationLength }}
+      </span>
+      <lazy-loading [hidden]="!opportunityDataIsLoading"></lazy-loading>
+    </div>
+  </div>
+  <div class="oppia-opportunities-progress oppia-animate-fadein" *ngIf="progressBarRequired">
+    <div class="oppia-opportunities-progress-bar">
+      <div [hidden]="opportunityDataIsLoading" class="progress">
+        <div class="progress-bar bg-success" role="progressbar" [ngStyle]="progressBarStyle"></div>
+      </div>
+      <lazy-loading [hidden]="!opportunityDataIsLoading"></lazy-loading>
+    </div>
+    <div class="oppia-opportunities-progress-label">
+      <span class="protractor-test-opportunity-list-item-progress-percentage"
+            [hidden]="opportunityDataIsLoading">
+        ({{ progressPercentage }})
+      </span>
+      <lazy-loading [hidden]="!opportunityDataIsLoading"></lazy-loading>
+    </div>
+  </div>
+  <div class="oppia-opportunities-label-container oppia-animate-fadein" *ngIf="labelRequired">
+    <div class="oppia-opportunities-label" [ngStyle]="labelStyle">
+      <span class="protractor-test-opportunity-list-item-label" [hidden]="opportunityDataIsLoading">{{ labelText }}</span>
+      <lazy-loading [hidden]="!opportunityDataIsLoading"></lazy-loading>
+    </div>
+  </div>
+  <div class="oppia-opportunities-button-container oppia-animate-fadein">
+    <button class="oppia-opportunities-button protractor-test-opportunity-list-item-button"
+            [hidden]="opportunityDataIsLoading"
+            (click)="clickActionButton.emit(opportunity.id)">
+      {{ opportunity?.actionButtonTitle }}
+    </button>
+  </div>
+</div>
+<style>
+  .oppia-opportunities-button {
+    background-color: #fff;
+    border: 2px solid #009688;
+    border-radius: 5px;
+    color: #009688;
+    font-size: 18px;
+    font-weight: bold;
+    min-width: 64%;
+    text-align: center;
+  }
+  .oppia-opportunities-button:hover {
+    background-color: #6f817f;
+    color: #fff;
+    -webkit-transition: background-color 200ms ease-out;
+    -ms-transition: background-color 200ms ease-out;
+    transition: background-color 200ms ease-out;
+  }
+  .oppia-opportunities-progress-bar {
+    border-radius: 10px;
+    height: 20px;
+    width: 60%;
+  }
+  .oppia-opportunities-progress-bar .progress {
+    height: 12px;
+  }
+  .oppia-opportunities-progress-label {
+    font-size: 12px;
+    margin-left: 5px;
+    margin-top: -6px;
+  }
+  .oppia-opportunities-subheading {
+    color: #009688;
+    font-size: 14px;
+    height: 40%;
+  }
+  .oppia-opportunities-heading {
+    color: #4a4a4a;
+    font-size: 20px;
+    font-weight: bold;
+    height: 50%;
+  }
+  .oppia-opportunities-button-container {
+    align-items: center;
+    display: flex;
+    justify-content: flex-end;
+    margin: 1% 0;
+    width: 20%;
+  }
+  .oppia-opportunities-label-container {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    margin: 1% 0;
+    width: 25%;
+  }
+  .oppia-opportunities-label {
+    background-color: #fff;
+    border-radius: 8px;
+    min-width: 150px;
+    opacity: 0.8;
+    text-align: center;
+  }
+  .oppia-opportunities-progress {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    margin: 1% 0;
+    min-width: 200px;
+    width: 25%;
+  }
+  .oppia-opportunities-details {
+    display: flex;
+    flex-direction: column;
+    margin: 1.8% 0;
+    width: 60%;
+  }
+  .oppia-opportunities-list-item {
+    background-color: #fff;
+    border: 1px solid #e8e7e2;
+    display: flex;
+    height: 90px;
+    justify-content: space-between;
+    margin-top: 24px;
+    padding: 0% 3%;
+  }
+  .oppia-animate-fadein {
+    -webkit-animation: fadein 0.5s linear 1 normal forwards; /* Safari, Chrome and Opera > 12.1 */
+    -moz-animation: fadein 0.5s linear 1 normal forwards; /* Firefox < 16 */
+    -ms-animation: fadein 0.5s linear 1 normal forwards; /* Internet Explorer */
+    -o-animation: fadein 0.5s linear 1 normal forwards; /* Opera < 12.1 */
+    animation: fadein 0.5s linear 1 normal forwards;
+  }
+</style>

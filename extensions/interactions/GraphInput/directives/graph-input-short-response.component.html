@@ -1,0 +1,16 @@
+<!-- TODO(#12104): Replace this logic for the correct pluralize tool when there are more cases that justify the use of the library -->
+<div *ngIf="graph.edges">
+  <span [innerHTML]="'I18N_INTERACTIONS_GRAPH_RESPONSE_EDGES' | translate: { edges: graph.edges.length }"
+        *ngIf="graph.edges.length != 1">
+  </span>
+  <span [innerHTML]="'I18N_INTERACTIONS_GRAPH_RESPONSE_EDGE' | translate: { edges: graph.edges.length }"
+        *ngIf="graph.edges.length == 1">
+  </span>
+  <span>&nbsp;</span>
+  <span [innerHTML]="'I18N_INTERACTIONS_GRAPH_RESPONSE_VERTICES' | translate: { vertices: graph.vertices.length }"
+        *ngIf="graph.vertices.length != 1">
+  </span>
+  <span [innerHTML]="'I18N_INTERACTIONS_GRAPH_RESPONSE_VERTEX' | translate: { vertices: graph.vertices.length }"
+        *ngIf="graph.vertices.length == 1">
+  </span>
+</div>

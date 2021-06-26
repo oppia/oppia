@@ -21,16 +21,14 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import base64
 
+from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import collection_services
 from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import summary_services
-from core.platform import models
 import feconf
-
-current_user_services = models.Registry.import_current_user_services()
 
 
 def _require_valid_version(version_from_payload, collection_version):
@@ -48,6 +46,7 @@ def _require_valid_version(version_from_payload, collection_version):
 
 class CollectionEditorHandler(base.BaseHandler):
     """Base class for all handlers for the collection editor page."""
+
     pass
 
 
@@ -57,14 +56,6 @@ class CollectionEditorPage(CollectionEditorHandler):
     @acl_decorators.can_edit_collection
     def get(self, _):
         """Handles GET requests."""
-
-        self.values.update({
-            'SHOW_COLLECTION_NAVIGATION_TAB_HISTORY': (
-                feconf.SHOW_COLLECTION_NAVIGATION_TAB_HISTORY),
-            'SHOW_COLLECTION_NAVIGATION_TAB_STATS': (
-                feconf.SHOW_COLLECTION_NAVIGATION_TAB_STATS),
-        })
-
         self.render_template('collection-editor-page.mainpage.html')
 
 
@@ -97,6 +88,13 @@ class EditableCollectionDataHandler(CollectionEditorHandler):
         _require_valid_version(version, collection.version)
 
         commit_message = self.payload.get('commit_message')
+
+        if (commit_message is not None and
+                len(commit_message) > constants.MAX_COMMIT_MESSAGE_LENGTH):
+            raise self.InvalidInputException(
+                'Commit messages must be at most %s characters long.'
+                % constants.MAX_COMMIT_MESSAGE_LENGTH)
+
         change_list = self.payload.get('change_list')
 
         collection_services.update_collection(
@@ -217,15 +215,15 @@ class ExplorationMetadataSearchHandler(base.BaseHandler):
         """Handles GET requests."""
         query_string = base64.b64decode(self.request.get('q'))
 
-        search_cursor = self.request.get('cursor', None)
+        search_offset = self.request.get('cursor', None)
 
-        collection_node_metadata_list, new_search_cursor = (
+        collection_node_metadata_list, new_search_offset = (
             summary_services.get_exp_metadata_dicts_matching_query(
-                query_string, search_cursor, self.user))
+                query_string, search_offset, self.user))
 
         self.values.update({
             'collection_node_metadata_list': collection_node_metadata_list,
-            'search_cursor': new_search_cursor,
+            'search_cursor': new_search_offset,
         })
 
         self.render_json(self.values)

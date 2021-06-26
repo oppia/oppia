@@ -19,6 +19,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import user_services
 from core.platform import models
@@ -40,7 +41,7 @@ class BaseVoiceArtistControllerTests(test_utils.GenericTestBase):
         self.voice_artist_id = self.get_user_id_from_email(
             self.VOICE_ARTIST_EMAIL)
 
-        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
 
 
 class VoiceArtistTest(BaseVoiceArtistControllerTests):
@@ -50,11 +51,13 @@ class VoiceArtistTest(BaseVoiceArtistControllerTests):
 
     RECORDED_VOICEOVERS = {
         'voiceovers_mapping': {
+            'ca_placeholder_0': {},
             'content': {
                 'en': {
                     'filename': 'testFile.mp3',
                     'file_size_bytes': 12200,
-                    'needs_update': False
+                    'needs_update': False,
+                    'duration_secs': 4.5
                 }
             },
             'default_outcome': {}
@@ -67,8 +70,11 @@ class VoiceArtistTest(BaseVoiceArtistControllerTests):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
         rights_manager.assign_role_for_exploration(
-            self.owner, self.EXP_ID, self.voice_artist_id,
-            rights_manager.ROLE_VOICE_ARTIST)
+            self.owner,
+            self.EXP_ID,
+            self.voice_artist_id,
+            rights_domain.ROLE_VOICE_ARTIST
+        )
         self.logout()
 
         self.login(self.VOICE_ARTIST_EMAIL)
@@ -157,11 +163,13 @@ class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
     OLDER_DATETIME = datetime.datetime.strptime('2015-03-16', '%Y-%m-%d')
     RECORDED_VOICEOVERS = {
         'voiceovers_mapping': {
+            'ca_placeholder_0': {},
             'content': {
                 'en': {
                     'filename': 'testFile.mp3',
                     'file_size_bytes': 12200,
-                    'needs_update': False
+                    'needs_update': False,
+                    'duration_secs': 4.5
                 }
             },
             'default_outcome': {}
@@ -185,8 +193,11 @@ class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
         rights_manager.assign_role_for_exploration(
-            self.owner, self.EXP_ID, self.voice_artist_id,
-            rights_manager.ROLE_VOICE_ARTIST)
+            self.owner,
+            self.EXP_ID,
+            self.voice_artist_id,
+            rights_domain.ROLE_VOICE_ARTIST
+        )
         self.logout()
 
         self.login(self.VOICE_ARTIST_EMAIL)
@@ -264,6 +275,7 @@ class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
 
 class TranslationFirstTimeTutorialTest(BaseVoiceArtistControllerTests):
     """This controller tests the first time tutorial for translations."""
+
     EXP_ID = 'exp1'
 
     def setUp(self):
@@ -272,8 +284,11 @@ class TranslationFirstTimeTutorialTest(BaseVoiceArtistControllerTests):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
         rights_manager.assign_role_for_exploration(
-            self.owner, self.EXP_ID, self.voice_artist_id,
-            rights_manager.ROLE_VOICE_ARTIST)
+            self.owner,
+            self.EXP_ID,
+            self.voice_artist_id,
+            rights_domain.ROLE_VOICE_ARTIST
+        )
         self.logout()
 
         self.login(self.VOICE_ARTIST_EMAIL)

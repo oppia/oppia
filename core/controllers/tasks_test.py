@@ -18,9 +18,14 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import exp_domain
+from core.domain import exp_fetchers
+from core.domain import exp_services
 from core.domain import feedback_services
-from core.domain import rights_manager
+from core.domain import rights_domain
+from core.domain import stats_domain
+from core.domain import stats_services
 from core.domain import suggestion_services
+from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -31,11 +36,10 @@ import python_utils
     [models.NAMES.job, models.NAMES.email])
 (feedback_models, suggestion_models) = models.Registry.import_models(
     [models.NAMES.feedback, models.NAMES.suggestion])
-taskqueue_services = models.Registry.import_taskqueue_services()
 transaction_services = models.Registry.import_transaction_services()
 
 
-class TasksTests(test_utils.GenericTestBase):
+class TasksTests(test_utils.EmailTestBase):
 
     USER_A_EMAIL = 'a@example.com'
     USER_B_EMAIL = 'b@example.com'
@@ -81,12 +85,14 @@ class TasksTests(test_utils.GenericTestBase):
             self.assertEqual(len(messages), 2)
 
             # Check that there are no feedback emails sent to Editor.
-            messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 0)
 
             # Send task and subsequent email to Editor.
             self.process_and_flush_pending_tasks()
-            messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.EDITOR_EMAIL)
             expected_message = (
                 'Hi editor,\n\nYou\'ve received 2 new messages on your'
                 ' Oppia explorations:\n- Title:\n- some text\n- user b message'
@@ -110,7 +116,8 @@ class TasksTests(test_utils.GenericTestBase):
 
             # Send task and subsequent email to Editor.
             self.process_and_flush_pending_tasks()
-            messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.EDITOR_EMAIL)
 
             # What is expected in the email body.
             expected_message = (
@@ -129,6 +136,7 @@ class TasksTests(test_utils.GenericTestBase):
     def test_email_is_sent_when_suggestion_created(self):
         """Tests SuggestionEmailHandler functionality."""
 
+        user_id_b = self.user_id_b
         class MockActivityRights(python_utils.OBJECT):
             def __init__(
                     self, exploration_id, owner_ids, editor_ids,
@@ -147,10 +155,10 @@ class TasksTests(test_utils.GenericTestBase):
                 self.status = status
                 self.viewable_if_private = viewable_if_private
                 self.first_published_msec = first_published_msec
-                self.owner_ids = ['121121523518511814218']
+                self.owner_ids = [user_id_b]
 
         email_user_b = self.swap(
-            rights_manager, 'ActivityRights', MockActivityRights)
+            rights_domain, 'ActivityRights', MockActivityRights)
         with email_user_b, self.can_send_feedback_email_ctx:
             with self.can_send_emails_ctx:
                 change = {
@@ -161,13 +169,12 @@ class TasksTests(test_utils.GenericTestBase):
 
                 # Create suggestion from user A to user B.
                 suggestion_services.create_suggestion(
-                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                    feconf.ENTITY_TYPE_EXPLORATION,
                     self.exploration.id, 1,
-                    self.user_id_a, change, 'test description',
-                    None)
+                    self.user_id_a, change, 'test description')
                 threadlist = feedback_services.get_all_threads(
-                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    feconf.ENTITY_TYPE_EXPLORATION,
                     self.exploration.id, True)
                 thread_id = threadlist[0].id
 
@@ -175,15 +182,15 @@ class TasksTests(test_utils.GenericTestBase):
                 payload = {
                     'exploration_id': self.exploration.id,
                     'thread_id': thread_id}
-                messages = self.mail_stub.get_sent_messages()
+                messages = self._get_all_sent_email_messages()
                 self.assertEqual(len(messages), 0)
-                taskqueue_services.enqueue_email_task(
+                taskqueue_services.enqueue_task(
                     feconf.TASK_URL_SUGGESTION_EMAILS, payload, 0)
                 self.process_and_flush_pending_tasks()
 
                 # Check that user B received message.
-                messages = self.mail_stub.get_sent_messages(
-                    to=self.USER_B_EMAIL)
+                messages = self._get_sent_email_messages(
+                    self.USER_B_EMAIL)
                 self.assertEqual(len(messages), 1)
 
                 # Check that user B received correct message.
@@ -214,8 +221,8 @@ class TasksTests(test_utils.GenericTestBase):
             self.assertEqual(len(messages), 2)
 
             # Ensure that user A has no emails sent yet.
-            messages = self.mail_stub.get_sent_messages(
-                to=self.USER_A_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.USER_A_EMAIL)
             self.assertEqual(len(messages), 0)
 
             # Invoke InstantFeedbackMessageEmail which sends
@@ -223,8 +230,8 @@ class TasksTests(test_utils.GenericTestBase):
             self.process_and_flush_pending_tasks()
 
             # Ensure that user A has an email sent now.
-            messages = self.mail_stub.get_sent_messages(
-                to=self.USER_A_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.USER_A_EMAIL)
             self.assertEqual(len(messages), 1)
 
             # Ensure that user A has right email sent to them.
@@ -240,7 +247,6 @@ class TasksTests(test_utils.GenericTestBase):
     def test_email_sent_when_status_changed(self):
         """Tests Feedback Thread Status Change Email Handler."""
         with self.can_send_feedback_email_ctx, self.can_send_emails_ctx:
-
             # Create thread.
             feedback_services.create_thread(
                 feconf.ENTITY_TYPE_EXPLORATION, self.exploration.id,
@@ -256,8 +262,8 @@ class TasksTests(test_utils.GenericTestBase):
                 None, 'user b message')
 
             # Ensure user A has no messages sent to him yet.
-            messages = self.mail_stub.get_sent_messages(
-                to=self.USER_A_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.USER_A_EMAIL)
             self.assertEqual(len(messages), 0)
 
             # Invoke feedback status change email handler.
@@ -265,8 +271,8 @@ class TasksTests(test_utils.GenericTestBase):
 
             # Check that user A has 2 emails sent to him.
             # 1 instant feedback message email and 1 status change.
-            messages = self.mail_stub.get_sent_messages(
-                to=self.USER_A_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.USER_A_EMAIL)
             self.assertEqual(len(messages), 2)
 
             # Check that user A has right email sent to him.
@@ -303,20 +309,20 @@ class TasksTests(test_utils.GenericTestBase):
                     'exploration_id': self.exploration.id,
                     'report_text': 'He said a bad word :-( ',
                     'reporter_id': self.user_id_b}
-                taskqueue_services.enqueue_email_task(
+                taskqueue_services.enqueue_task(
                     feconf.TASK_URL_FLAG_EXPLORATION_EMAILS,
                     payload, 0)
                 # Ensure moderator has no messages sent to him yet.
-                messages = self.mail_stub.get_sent_messages(
-                    to=self.MODERATOR_EMAIL)
+                messages = self._get_sent_email_messages(
+                    self.MODERATOR_EMAIL)
                 self.assertEqual(len(messages), 0)
 
                 # Invoke Flag Exploration Email Handler.
                 self.process_and_flush_pending_tasks()
 
                 # Ensure moderator has 1 email now.
-                messages = self.mail_stub.get_sent_messages(
-                    to=self.MODERATOR_EMAIL)
+                messages = self._get_sent_email_messages(
+                    self.MODERATOR_EMAIL)
                 self.assertEqual(len(messages), 1)
 
                 # Ensure moderator has received correct email.
@@ -327,3 +333,78 @@ class TasksTests(test_utils.GenericTestBase):
                     '.\n\nThanks!\n- The Oppia Team\n\nYou can change your'
                     ' email preferences via the Preferences page.')
                 self.assertEqual(messages[0].body.decode(), expected_message)
+
+    def test_deferred_tasks_handler_raises_correct_exceptions(self):
+        incorrect_function_identifier = 'incorrect_function_id'
+        taskqueue_services.defer(
+            incorrect_function_identifier,
+            taskqueue_services.QUEUE_NAME_DEFAULT)
+
+        raises_incorrect_function_id_exception = self.assertRaisesRegexp(
+            Exception,
+            'The function id, %s, is not valid.' %
+            incorrect_function_identifier)
+
+        with raises_incorrect_function_id_exception:
+            self.process_and_flush_pending_tasks()
+
+        headers = {
+            # Need to convert to bytes since test app doesn't allow unicode.
+            'X-Appengine-QueueName': python_utils.convert_to_bytes('queue'),
+            'X-Appengine-TaskName': python_utils.convert_to_bytes('None'),
+            'X-AppEngine-Fake-Is-Admin': python_utils.convert_to_bytes('1')
+        }
+        csrf_token = self.get_new_csrf_token()
+
+        self.post_task(
+            feconf.TASK_URL_DEFERRED, {}, headers,
+            csrf_token=csrf_token, expect_errors=True, expected_status_int=500)
+
+    def test_deferred_tasks_handler_handles_tasks_correctly(self):
+        exp_id = '15'
+        self.login(self.VIEWER_EMAIL)
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        exp_services.load_demo(exp_id)
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+
+        exp_version = exploration.version
+        state_name = 'Home'
+        state_stats_mapping = {
+            state_name: stats_domain.StateStats.create_default()
+        }
+        exploration_stats = stats_domain.ExplorationStats(
+            exp_id, exp_version, 0, 0, 0, 0, 0, 0,
+            state_stats_mapping)
+        stats_services.create_stats_model(exploration_stats)
+
+        aggregated_stats = {
+            'num_starts': 1,
+            'num_actual_starts': 1,
+            'num_completions': 1,
+            'state_stats_mapping': {
+                'Home': {
+                    'total_hit_count': 1,
+                    'first_hit_count': 1,
+                    'total_answers_count': 1,
+                    'useful_feedback_count': 1,
+                    'num_times_solution_viewed': 1,
+                    'num_completions': 1
+                }
+            }
+        }
+        self.post_json('/explorehandler/stats_events/%s' % (exp_id), {
+            'aggregated_stats': aggregated_stats,
+            'exp_version': exp_version})
+        self.assertEqual(self.count_jobs_in_taskqueue(
+            taskqueue_services.QUEUE_NAME_STATS), 1)
+        self.process_and_flush_pending_tasks()
+
+        # Check that the models are updated.
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            exp_id, exp_version)
+        self.assertEqual(exploration_stats.num_starts_v2, 1)
+        self.assertEqual(exploration_stats.num_actual_starts_v2, 1)
+        self.assertEqual(exploration_stats.num_completions_v2, 1)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping[
+                state_name].total_hit_count_v2, 1)

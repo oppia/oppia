@@ -1,0 +1,112 @@
+<div class="oppia-translated-content-header">Translated content</div>
+<div class="oppia-state-translation-editor-section oppia-editor-card-section">
+  <div ng-if="!translationEditorIsOpen">
+    <button class="btn oppia-translation-needs-update-button" ng-if="activeWrittenTranslation.needsUpdate">
+      <i class="material-icons md-18"
+         uib-tooltip="Translation needs update"
+         tooltip-placement="top">warning
+      </i>
+    </button>
+    <div class="protractor-test-edit-translation"
+         ng-class="{'oppia-editable-section': isEditable()}"
+         ng-click="openTranslationEditor()">
+      <i ng-if="isEditable()" class="material-icons oppia-editor-edit-icon"
+         title="Edit translation">&#xE254;
+      </i>
+      <div class="oppia-translated-content-display oppia-transition-200"
+           ng-class="{'oppia-prevent-selection': isEditable()}"
+           title="Translated Content">
+        <span class="oppia-placeholder" ng-if="!activeWrittenTranslation || activeWrittenTranslation.translation === ''">
+          This section has not been translated yet. <span ng-if="isEditable()">Click to add a translation!</span>
+        </span>
+        <span ng-if="activeWrittenTranslation">
+          <angular-html-bind ng-if="activeWrittenTranslation.isHtml()"
+                             html-data="activeWrittenTranslation.getTranslation()"
+                             class="oppia-rte-editor protractor-test-translation-display">
+          </angular-html-bind>
+          <p ng-if="activeWrittenTranslation.isUnicode()">
+            {{activeWrittenTranslation.getTranslation()}}
+          </p>
+          <ul ng-if="activeWrittenTranslation.isSetOfStrings()">
+            <li ng-repeat="item in activeWrittenTranslation.translation track by $index">
+              {{item}}
+            </li>
+          </ul>
+          <p ng-if="!activeWrittenTranslation.isUnicode() && !activeWrittenTranslation.isHtml() && !activeWrittenTranslation.isSetOfStrings()">
+            <strong>ERROR:</strong> Unsupported translation data format.
+          </p>
+        </span>
+      </div>
+      <!-- This is a dummy div created to mask the contents when the user hovers over the content. -->
+      <div class="oppia-translation-editable-mask oppia-editable-section-mask">
+      </div>
+    </div>
+  </div>
+
+  <div ng-if="translationEditorIsOpen" class="protractor-test-state-translation-editor">
+    <div ng-if="activeWrittenTranslation.isHtml()">
+      <ck-editor-copy-toolbar></ck-editor-copy-toolbar>
+      <schema-based-editor schema="HTML_SCHEMA"
+                           local-value="activeWrittenTranslation.translation">
+      </schema-based-editor>
+    </div>
+    <div ng-if="activeWrittenTranslation.isUnicode()">
+      <schema-based-editor schema="UNICODE_SCHEMA"
+                           local-value="activeWrittenTranslation.translation">
+      </schema-based-editor>
+    </div>
+    <div ng-if="activeWrittenTranslation.isSetOfStrings()">
+      <schema-based-editor schema="SET_OF_STRINGS_SCHEMA"
+                           local-value="activeWrittenTranslation.translation">
+      </schema-based-editor>
+    </div>
+    <div ng-if="!activeWrittenTranslation.isUnicode() && !activeWrittenTranslation.isHtml() && !activeWrittenTranslation.isSetOfStrings()">
+      <strong>ERROR:</strong> Unsupported translation data format.
+    </div>
+
+    <div class="oppia-save-item-button-container">
+      <button type="button"
+              class="btn btn-success oppia-save-state-item-button float-right protractor-test-save-translation"
+              ng-click="onSaveTranslationButtonClicked()">
+        Save
+      </button>
+      <button type="button" class="btn btn-secondary float-right" ng-click="cancelEdit()">Cancel</button>
+      <div class="oppia-clear"></div>
+    </div>
+  </div>
+</div>
+<style>
+  .oppia-translated-content-header {
+    background: #ccc;
+    font-size: 12px;
+    font-style: italic;
+    height: 16px;
+    text-align: center;
+  }
+  .oppia-editor-edit-icon {
+    position: absolute;
+    top: 10px;
+  }
+  .oppia-translation-needs-update-button {
+    border-radius: 14px;
+    color: yellow;
+    height: 28px;
+    left: 3px;
+    padding: 0 0 3px 0;
+    position: absolute;
+    width: 28px;
+  }
+  .oppia-translation-editable-mask {
+    background-color: #eee;
+  }
+  .oppia-translated-content-display {
+    max-width: 100%;
+    text-align: left;
+  }
+  .oppia-translation-editor {
+    min-height: 160px;
+  }
+  state-translation-editor .oppia-save-item-button-container {
+    margin-top: 2px;
+  }
+</style>

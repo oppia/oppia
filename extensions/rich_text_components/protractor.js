@@ -17,11 +17,16 @@
  * protractor tests.
  */
 
+// NOTE to devs: If this constant is renamed, make sure to edit
+// components_test.ComponentE2eTests.test_component_e2e_tests to search for the
+// correct constant name.
 var RICH_TEXT_COMPONENTS = {
   Collapsible: require('./Collapsible/protractor.js'),
   Image: require('./Image/protractor.js'),
   Link: require('./Link/protractor.js'),
   Math: require('./Math/protractor.js'),
+  Skillreview: require('./Skillreview/protractor.js'),
+  Svgdiagram: require('./Svgdiagram/protractor.js'),
   Tabs: require('./Tabs/protractor.js'),
   Video: require('./Video/protractor.js')
 };
@@ -30,7 +35,7 @@ var getComponent = function(componentName) {
   if (RICH_TEXT_COMPONENTS.hasOwnProperty(componentName)) {
     return RICH_TEXT_COMPONENTS[componentName];
   } else {
-    throw Error('Unknown rich-text component: ' + componentName);
+    throw new Error('Unknown rich-text component: ' + componentName);
   }
 };
 

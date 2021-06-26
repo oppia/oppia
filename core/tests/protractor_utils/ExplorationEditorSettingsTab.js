@@ -18,14 +18,14 @@
  */
 
 var forms = require('./forms.js');
+var general = require('./general.js');
 var waitFor = require('./waitFor.js');
+var action = require('./action.js');
 
 var ExplorationEditorSettingsTab = function() {
   /*
    * Interactive elements
    */
-  var editParamChanges = element(
-    by.css('.protractor-test-exploration-edit-param-changes'));
   var explorationCategoryInput = element(
     by.css('.protractor-test-exploration-category-input'));
   var explorationLanguageInput = element(
@@ -44,19 +44,15 @@ var ExplorationEditorSettingsTab = function() {
     return initialStateSelect.element(
       by.cssContainingText('option', stateName));
   };
+  var neutralElement = element(by.css('.protractor-test-settings-container'));
 
   /*
    * Buttons
    */
-  var addParamButton = element(by.css('.protractor-test-add-param-button'));
   var closePreviewSummaryButton = element(
     by.css('.protractor-test-close-preview-summary-modal'));
-  var enableParametersSwitch = element(
-    by.css('.protractor-test-enable-parameters'));
   var openPreviewSummaryButton = element(
     by.css('.protractor-test-open-preview-summary-modal'));
-  var saveParamChangesButton = element(
-    by.css('.protractor-test-save-param-changes-button'));
   var deleteExplorationButton = element(
     by.css('.protractor-test-delete-exploration-button'));
   var confirmDeleteExplorationButton = element(
@@ -67,123 +63,147 @@ var ExplorationEditorSettingsTab = function() {
   /*
    * Workflows
    */
-  // PARAMETERS
-
-  // This function adds a exploration level parameter change, creating
-  // the parameter if necessary.
-  this.addExplorationLevelParameterChange = function(paramName, paramValue) {
-    editParamChanges.click();
-    addParamButton.click();
-
-    var editorRowElem = element.all(by.css(
-      '.protractor-test-param-changes-list')).last();
-
-    forms.AutocompleteDropdownEditor(editorRowElem).setValue(paramName);
-
-    /* Setting parameter value is difficult via css since input fields
-      are dynamically generated. We isolate it as the last input in the
-      current parameter changes UI. */
-    var item = editorRowElem.all(by.tagName('input')).last();
-    item.clear();
-    item.sendKeys(paramValue);
-
-    saveParamChangesButton.click();
-  };
-
-  this.deleteExploration = function() {
-    waitFor.elementToBeClickable(deleteExplorationButton,
-      'Delete Exploration button is not clickable');
-    deleteExplorationButton.click();
-    waitFor.elementToBeClickable(confirmDeleteExplorationButton,
-      'Confirm Delete Exploration button is not clickable');
-    confirmDeleteExplorationButton.click();
-    waitFor.invisibilityOf(confirmDeleteExplorationButton,
+  this.deleteExploration = async function() {
+    await action.click('Neutral element', neutralElement);
+    await action.waitForAutosave();
+    await action.click('Delete Exploration Button', deleteExplorationButton);
+    await action.click(
+      'Confirm Delete Exploration Button',
+      confirmDeleteExplorationButton);
+    await waitFor.invisibilityOf(
+      confirmDeleteExplorationButton,
       'Delete Exploration modal takes too long to disappear');
-    // Returning to /creator_dashboard.
-    waitFor.pageToFullyLoad();
+    // Returning to /creator-dashboard.
+    await waitFor.pageToFullyLoad();
   };
 
-  this.enableParameters = function() {
-    enableParametersSwitch.click();
+  this.enableCorrectnessFeedback = async function() {
+    await action.click('Neutral element', neutralElement);
+    await action.waitForAutosave();
+    await action.click(
+      'Enable Correctness Feedback Button', enableCorrectnessFeedbackButton);
+    await action.click('Neutral element', neutralElement);
   };
 
-  this.enableCorrectnessFeedback = function() {
-    expect(enableCorrectnessFeedbackButton.isDisplayed()).toBe(true);
-    waitFor.elementToBeClickable(enableCorrectnessFeedbackButton,
-      'Enable correctness feedback button is not clickable.');
-    enableCorrectnessFeedbackButton.click();
+  this.expectAvailableFirstStatesToBe = async function(names) {
+    await waitFor.presenceOf(
+      initialStateSelect, 'Initial state select takes too long to be visible.');
+    var options = await initialStateSelect.all(by.tagName('option'))
+      .map(async function(elem) {
+        await waitFor.visibilityOf(
+          elem,
+          'option element taking too long to appear');
+        return await elem.getText();
+      });
+    expect(options.sort()).toEqual(names.sort());
   };
 
-  this.expectAvailableFirstStatesToBe = function(names) {
-    initialStateSelect.all(by.tagName('option')).map(function(elem) {
-      return elem.getText();
-    }).then(function(options) {
-      expect(options.sort()).toEqual(names.sort());
-    });
+  this.openAndClosePreviewSummaryTile = async function() {
+    await action.waitForAutosave();
+    await action.click('Open preview summary', openPreviewSummaryButton);
+    await waitFor.visibilityOf(
+      explorationSummaryTile, 'Summary Tile takes too long to appear');
+    expect(await explorationSummaryTile.isPresent()).toBeTruthy();
+    await action.click(
+      'Close Preview Summary Button',
+      closePreviewSummaryButton);
+    await waitFor.invisibilityOf(
+      explorationSummaryTile, 'Summary Tile takes too long to disappear');
+    expect(await explorationSummaryTile.isPresent()).toBeFalsy();
+    await action.click('Neutral element', neutralElement);
   };
 
-  this.openAndClosePreviewSummaryTile = function() {
-    openPreviewSummaryButton.click();
-    waitFor.visibilityOf(explorationSummaryTile,
-      'Summary Tile takes too long to appear');
-    expect(explorationSummaryTile.isPresent()).toBeTruthy();
-    closePreviewSummaryButton.click();
-    waitFor.invisibilityOf(explorationSummaryTile,
-      'Summary Tile takes too long to disappear');
-    expect((explorationSummaryTile.isPresent())).toBeFalsy();
+  this.setCategory = async function(category) {
+    await waitFor.presenceOf(
+      explorationCategoryInput, 'Category input takes too long to be visible.');
+    await (
+      await forms.AutocompleteDropdownEditor(explorationCategoryInput)
+    ).setValue(category);
   };
 
-  this.setCategory = function(category) {
-    forms.AutocompleteDropdownEditor(explorationCategoryInput).setValue(
-      category);
+  this.setFirstState = async function(stateName) {
+    await action.click('Neutral element', neutralElement);
+    await action.waitForAutosave();
+    await waitFor.presenceOf(
+      initialStateSelect, 'Initial state select takes too long to be visible.');
+    await action.click(
+      'State name option', initialStateSelectOption(stateName));
+    await action.click('Neutral element', neutralElement);
   };
 
-  this.setFirstState = function(stateName) {
-    initialStateSelectOption(stateName).click();
+  this.setLanguage = async function(language) {
+    await action.click('Neutral element', neutralElement);
+    await action.waitForAutosave();
+    await waitFor.presenceOf(
+      explorationLanguageInput, 'Language input takes too long to be visible.');
+    var languageButton = explorationLanguageInput.element(
+      by.cssContainingText('option', language));
+    await action.click('Language button', languageButton);
+    await action.click('Neutral element', neutralElement);
   };
 
-  this.setLanguage = function(language) {
-    element(by.css('.protractor-test-exploration-language-select')).
-      element(by.cssContainingText('option', language)).click();
+  this.setObjective = async function(objective) {
+    await action.click('Neutral element', neutralElement);
+    await action.waitForAutosave();
+    await action.clear(
+      'Exploration Objective input', explorationObjectiveInput);
+    await action.sendKeys(
+      'Exploration Objective input', explorationObjectiveInput, objective);
+    await action.click('Neutral element', neutralElement);
   };
 
-  this.setObjective = function(objective) {
-    explorationObjectiveInput.clear();
-    explorationObjectiveInput.sendKeys(objective);
+  this.setTitle = async function(title) {
+    await action.click('Neutral element', neutralElement);
+    await action.waitForAutosave();
+    await general.scrollToTop();
+    await action.clear('Exploration Title Input', explorationTitleInput);
+    await action.sendKeys(
+      'Exploration Title Input', explorationTitleInput, title);
+    await action.click('Neutral element', neutralElement);
   };
 
-  this.setTitle = function(title) {
-    explorationTitleInput.clear();
-    explorationTitleInput.sendKeys(title);
-  };
-
-  this.expectCategoryToBe = function(category) {
-    expect(explorationCategoryInput.$('option:checked').getText()).
+  this.expectCategoryToBe = async function(category) {
+    await waitFor.presenceOf(
+      explorationCategoryInput,
+      'Exploration category input takes too long to be visible.');
+    expect(await explorationCategoryInput.$('option:checked').getText()).
       toEqual(category);
   };
 
-  this.expectFirstStateToBe = function(firstState) {
-    expect(initialStateSelect.$('option:checked').getText()).
+  this.expectFirstStateToBe = async function(firstState) {
+    await waitFor.presenceOf(
+      initialStateSelect, 'Initial state select takes too long to be visible.');
+    expect(await initialStateSelect.$('option:checked').getText()).
       toEqual(firstState);
   };
 
-  this.expectLanguageToBe = function(language) {
-    expect(explorationLanguageInput.$('option:checked').getText()).
+  this.expectLanguageToBe = async function(language) {
+    await waitFor.presenceOf(
+      explorationLanguageInput, 'Language input takes too long to be visible.');
+    expect(await explorationLanguageInput.$('option:checked').getText()).
       toEqual(language);
   };
 
-  this.expectObjectiveToBe = function(objective) {
-    expect(explorationObjectiveInput.getAttribute('value')).
+  this.expectObjectiveToBe = async function(objective) {
+    await waitFor.presenceOf(
+      explorationObjectiveInput,
+      'Objective input takes too long to be visible.');
+    expect(await explorationObjectiveInput.getAttribute('value')).
       toEqual(objective);
   };
 
-  this.expectTitleToBe = function(title) {
-    expect(explorationTitleInput.getAttribute('value')).
+  this.expectTitleToBe = async function(title) {
+    await waitFor.presenceOf(
+      explorationTitleInput, 'Title input takes too long to be visible.');
+    expect(await explorationTitleInput.getAttribute('value')).
       toEqual(title);
   };
 
-  this.expectWarningsColorToBe = function(color) {
-    expect(explorationObjectiveWarning.getCssValue('color')).
+  this.expectWarningsColorToBe = async function(color) {
+    await waitFor.presenceOf(
+      explorationObjectiveWarning,
+      'Objective warning takes too long to be visible.');
+    expect(await explorationObjectiveWarning.getCssValue('color')).
       toEqual(color);
   };
 };

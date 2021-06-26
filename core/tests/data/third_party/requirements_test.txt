@@ -1,0 +1,16 @@
+#
+# This file is a test requirements.txt file that is used to test the
+# functionality of install_backend_python_libs._get_requirements_file_contents()
+
+dependency1==1.6.1      # via -r requirements.in, dependency3
+dependency2==4.9.1      # via -r requirements.in
+dependency3==3.1.5      # via -r requirements.in
+dependency4==0.3.0.1    # via -r requirements.in, dependency3
+git+git://github.com/oppia/dependency5@aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa#egg=dependency5
+git+git://github.com/oppia/dependency7@bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb#egg=dependency7
+
+# Developers: Please do not add to this auto-generated file. If
+# you want to add, remove, upgrade, or downgrade libraries,
+# please change the `requirements.in` file and run the script
+# `scripts/install_third_party` again to see your changes
+# reflected in this file.

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html ng-app="oppia" itemscope itemtype="http://schema.org/Organization">
+  <head>
+    @load('base-components/header.template.html', {"title": "Thanks - Oppia"})
+  </head>
+  <body>
+    <oppia-root>
+      <div ng-controller="Base" dir="<[direction]>">
+        <oppia-base-content>
+          <navbar-breadcrumb>
+            <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+              <li>
+                <span class="oppia-navbar-breadcrumb-separator"></span>
+                <span translate="I18N_THANKS_PAGE_BREADCRUMB"></span>
+              </li>
+            </ul>
+          </navbar-breadcrumb>
+
+          <content>
+            <thanks-page></thanks-page>
+          </content>
+        </oppia-base-content>
+      </div>
+
+    </oppia-root>
+    @load('pages/footer_js_libs.html')
+  </body>
+</html>

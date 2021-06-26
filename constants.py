@@ -14,8 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# pylint: disable=invalid-name
-
 """Loads constants for backend use."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
@@ -29,26 +27,42 @@ import python_utils
 
 
 def parse_json_from_js(js_file):
-    """Extracts JSON object from JS file."""
+    """Extracts JSON object from JS file.
+
+    Args:
+        js_file: file. The js file containing JSON that needs to be parsed.
+
+    Returns:
+        dict. The dict representation of JSON object in the js file.
+    """
     text = js_file.read()
     text_without_comments = remove_comments(text)
-    first_bracket_index = text_without_comments.find('= {')
-    last_bracket_index = text_without_comments.rfind('}')
-    json_text = (
-        text_without_comments[first_bracket_index + 2:last_bracket_index + 1]
-    )
-    return json.loads(json_text)
+    json_start = text_without_comments.find('{\n')
+    # Add 1 to index returned because the '}' is part of the JSON object.
+    json_end = text_without_comments.rfind('}') + 1
+    return json.loads(text_without_comments[json_start:json_end])
 
 
 def remove_comments(text):
-    """Removes comments from given text."""
+    """Removes comments from given text.
+
+    Args:
+        text: str. The text from which comments should be removed.
+
+    Returns:
+        str. Text with all its comments removed.
+    """
     return re.sub(r'  //.*\n', r'', text)
 
 
 class Constants(dict):
     """Transforms dict to object, attributes can be accessed by dot notation."""
+
     __getattr__ = dict.__getitem__
 
 
 with python_utils.open_file(os.path.join('assets', 'constants.ts'), 'r') as f:
-    constants = Constants(parse_json_from_js(f))
+    constants = Constants(parse_json_from_js(f))  # pylint:disable=invalid-name
+
+with python_utils.open_file('release_constants.json', 'r') as f:
+    release_constants = Constants(json.loads(f.read()))  # pylint:disable=invalid-name

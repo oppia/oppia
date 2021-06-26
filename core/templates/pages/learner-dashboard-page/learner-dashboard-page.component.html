@@ -1,0 +1,1284 @@
+<background-banner></background-banner>
+<div class="oppia-learner-dashboard-container position-relative">
+  <div>
+    <h2 class="oppia-learner-dashboard-title"
+        [innerHTML]="'I18N_TOPNAV_LEARNER_DASHBOARD' | translate"
+        [ngClass]="{'oppia-learner-dashboard-title-mobile': checkMobileView()}">
+    </h2>
+  </div>
+  <div class="oppia-dashboard-aggregated-stats oppia-learner-dashboard-main-content oppia-learner-dashboard-container"
+       [ngClass]="{'oppia-learner-dashboard-mobile-mode': checkMobileView()}"
+       *ngIf="!noActivity">
+    <mat-card class="oppia-flex-row"
+            [ngStyle]="checkMobileView() ? {'margin-bottom': '10px'} : {'margin-bottom': '40px'}">
+      <div class="stats-card">
+        <p class="stat-description">Completed Explorations</p>
+        <h1 class="stat-value">{{ completedExplorationsList && completedExplorationsList.length }}</h1>
+      </div>
+      <div class="stats-card">
+        <p class="stat-description">Completed Collections</p>
+        <h1 class="stat-value">{{ completedCollectionsList && completedCollectionsList.length }}</h1>
+      </div>
+      <div class="stats-card">
+        <p class="stat-description">Subscriptions</p>
+        <h1 class="stat-value">{{ subscriptionsList && subscriptionsList.length }}</h1>
+      </div>
+    </mat-card>
+  </div>
+
+  <div class="row no-gutters oppia-row"
+       [ngStyle]="checkMobileView() ? {'display': 'block'} : {'display': 'flex'}"
+       *ngIf="noActivity">
+    <div class="col-sm-2"
+         [ngStyle]="checkMobileView() ? {'text-align': 'center'} : {'text-align': 'left'}">
+      <div class="h-100" *ngIf="!checkMobileView()"></div>
+      <img [src]="getStaticImageUrl('/general/collection_mascot.svg')"
+           [ngClass]="{'oppia-learner-dashboard-mascot-mobile': checkMobileView()}"
+           class="oppia-learner-dashboard-mascot"
+           alt="">
+    </div>
+
+    <div class="col-sm-8">
+      <blockquote class="oppia-learner-dashboard-intro-card">
+        <p class="oppia-learner-dashboard-intro-card-message oppia-learner-dashboard-intro-card-message-part-1"
+           [innerHTML]="'I18N_LEARNER_DASHBOARD_INTRO_MESSAGE_PART_ONE' | translate">
+        </p>
+        <p class="oppia-learner-dashboard-intro-card-message oppia-learner-dashboard-intro-card-message-part-2"
+           [innerHTML]="'I18N_LEARNER_DASHBOARD_INTRO_MESSAGE_PART_TWO' | translate">
+        </p>
+        <a class="btn oppia-learner-dashboard-intro-button oppia-transition-200 protractor-mobile-test-learner-dashboard-intro-button"
+           [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate"
+           href="/community-library"
+           [oppiaFocusOn]="'ourLessonsBtn'">
+        </a>
+      </blockquote>
+    </div>
+
+    <div class="col-sm-2">
+
+    </div>
+  </div>
+
+  <div class="row oppia-row"
+       [ngStyle]="checkMobileView() ? {'display': 'block'} : {'display': 'flex'}"
+       [ngClass]="{'oppia-learner-dashboard-mobile-mode': checkMobileView()}"
+       *ngIf="!noActivity">
+    <div class="col-md-2 oppia-learner-dashboard-side-content"
+         [ngClass]="{'oppia-learner-dashboard-mobile-mode': checkMobileView()}">
+      <mat-card class="oppia-learner-dashboard-main-menu">
+        <h4 class="dropdown-toggle oppia-learner-dashboard-menu protractor-test-play-later-section"
+            [ngClass]="{'oppia-learner-dashboard-section-active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST}"
+            (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST)">
+          <span [innerHTML]="LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST | translate"></span>
+        </h4>
+        <div class="menu-sub-section"
+             [@slideInOut]="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST">
+          <div class="oppia-learner-dashboard-submenu"
+               [ngClass]="{'oppia-learner-dashboard-sub-section-active': activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS}"
+               (click)="setActiveSubsection(LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)"
+               [innerHTML]="'I18N_DASHBOARD_EXPLORATIONS' | translate">
+          </div>
+          <div class="oppia-learner-dashboard-submenu protractor-test-playlist-collection-section"
+               [ngClass]="{'oppia-learner-dashboard-sub-section-active': activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS}"
+               (click)="setActiveSubsection(LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)"
+               [innerHTML]="'I18N_DASHBOARD_COLLECTIONS' | translate">
+          </div>
+        </div>
+        <h4 class="oppia-learner-dashboard-menu protractor-test-incomplete-section dropdown-toggle"
+            [ngClass]="{'oppia-learner-dashboard-section-active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE}"
+            (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE)">
+          <span [innerHTML]="LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE | translate"></span>
+        </h4>
+        <div class="menu-sub-section"
+             [@slideInOut]="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE">
+          <div class="oppia-learner-dashboard-submenu protractor-test-incomplete-exp-section"
+               [ngClass]="{'oppia-learner-dashboard-sub-section-active': activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS}"
+               (click)="setActiveSubsection(LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)"
+               [innerHTML]="'I18N_DASHBOARD_EXPLORATIONS' | translate">
+          </div>
+          <div class="oppia-learner-dashboard-submenu protractor-test-incomplete-collection-section"
+               [ngClass]="{'oppia-learner-dashboard-sub-section-active': activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS}"
+               (click)="setActiveSubsection(LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)"
+               [innerHTML]="'I18N_DASHBOARD_COLLECTIONS' | translate">
+          </div>
+        </div>
+        <h4 class="oppia-learner-dashboard-menu protractor-test-completed-section dropdown-toggle"
+            [ngClass]="{'oppia-learner-dashboard-section-active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED}"
+            (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED)">
+          <span [innerHTML]="LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED | translate"></span>
+        </h4>
+        <div class="menu-sub-section"
+             [@slideInOut]="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED">
+          <div class="oppia-learner-dashboard-submenu protractor-test-completed-exp-section"
+               [ngClass]="{'oppia-learner-dashboard-sub-section-active': activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS}"
+               (click)="setActiveSubsection(LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)"
+               [innerHTML]="'I18N_DASHBOARD_EXPLORATIONS' | translate">
+          </div>
+          <div class="oppia-learner-dashboard-submenu protractor-test-completed-collection-section"
+               [ngClass]="{'oppia-learner-dashboard-sub-section-active': activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS}"
+               (click)="setActiveSubsection(LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)"
+               [innerHTML]="'I18N_DASHBOARD_COLLECTIONS' | translate">
+          </div>
+        </div>
+        <h4 class="oppia-learner-dashboard-menu protractor-test-subscriptions-section"
+            [ngClass]="{'oppia-learner-dashboard-section-active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.SUBSCRIPTIONS}"
+            (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.SUBSCRIPTIONS)">
+          <span [innerHTML]="LEARNER_DASHBOARD_SECTION_I18N_IDS.SUBSCRIPTIONS | translate"></span>
+        </h4>
+        <h4 class="oppia-learner-dashboard-menu protractor-test-feedback-section"
+            [ngClass]="{'oppia-learner-dashboard-section-active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.FEEDBACK}"
+            (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.FEEDBACK)">
+          <span [innerHTML]="LEARNER_DASHBOARD_SECTION_I18N_IDS.FEEDBACK | translate"></span>
+          <span *ngIf="numberOfUnreadThreads !== 0">({{ numberOfUnreadThreads }})</span>
+        </h4>
+      </mat-card>
+    </div>
+
+    <div class="col-md-8 oppia-learner-dashboard-main-content"
+         [ngClass]="{'oppia-learner-dashboard-mobile-mode': checkMobileView()}">
+      <div>
+        <span class="oppia-learner-dashboard-main-content-title">
+          <span [innerHTML]="activeSection | translate">
+          </span>
+          <span *ngIf="activeSection !== LEARNER_DASHBOARD_SECTION_I18N_IDS.SUBSCRIPTIONS && activeSection !== LEARNER_DASHBOARD_SECTION_I18N_IDS.FEEDBACK">
+            <span class="oppia-navbar-breadcrumb-separator oppia-navbar-breadcrumb-separator-icon">
+            </span>
+            <span [innerHTML]="activeSubsection | translate">
+            </span>
+            <i *ngIf="activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS" class="oppia-dashboard-tooltip material-icons">info</i>
+            <span class="oppia-dashboard-tooltip-text"
+                  [innerHTML]="'I18N_LEARNER_DASHBOARD_TOOLTIP' | translate">
+            </span>
+          </span>
+        </span>
+
+        <span class="sort-explorations-select oppia-learner-dashboard-sort"
+              [ngClass]="{'oppia-learner-dashboard-sort-mobile': checkMobileView()}"
+              *ngIf="activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS && ((activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED && completedExplorationsList.length !== 0) || (activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE && incompleteExplorationsList.length !== 0))">
+          <p class="sort-by-text mt-0">
+            Sort By
+          </p>
+          <select  [(ngModel)]="currentExpSortType"
+                  class="sort-options mt-0"
+                  (change)="setExplorationsSortingOptions(currentExpSortType)">
+            <option *ngFor="let exploration of EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS | keyvalue"
+                    [value]="exploration.value['key']">
+              {{ exploration.value['i18nId'] | translate }}
+            </option>
+          </select>
+          <span class="sort-order fas"
+                (click)="setExplorationsSortingOptions(currentExpSortType)"
+                [ngClass]="isCurrentExpSortDescending ? 'fa-long-arrow-alt-down':'fa-long-arrow-alt-up'">
+          </span>
+        </span>
+
+        <span class="sort-explorations-select oppia-learner-dashboard-sort oppia-explorations-select"
+              *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.SUBSCRIPTIONS && subscriptionsList.length !== 0"
+              [ngClass]="{'oppia-learner-dashboard-sort-mobile': checkMobileView()}">
+          <p class="sort-by-text mt-0">
+            Sort By
+          </p>
+          <select [(ngModel)]="currentSubscribersSortType"
+                  class="sort-options oppia-sort-options"
+                  (change)="setSubscriptionSortingOptions(currentSubscribersSortType)">
+            <option *ngFor="let user of SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS | keyvalue"
+                    [value]="user.value['key'] ">
+              {{ user.value['i18nId'] | translate }}
+            </option>
+          </select>
+          <span class="sort-order fas"
+                (click)="setSubscriptionSortingOptions(currentSubscribersSortType)"
+                [ngClass]="isCurrentSubscriptionSortDescending ? 'fa-long-arrow-alt-down':'fa-long-arrow-alt-up'">
+          </span>
+        </span>
+
+        <span class="sort-explorations-select oppia-learner-dashboard-sort oppia-sort-options"
+              *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.FEEDBACK && threadSummaries.length !== 0 && !feedbackThreadActive"
+              [ngClass]="{'oppia-learner-dashboard-sort-mobile': checkMobileView()}">
+          <p class="sort-by-text mt-0">Sort By</p>
+          <select [(ngModel)]="currentFeedbackThreadsSortType"
+                  class="sort-options oppia-sort-options"
+                  (change)="setFeedbackSortingOptions(currentFeedbackThreadsSortType)">
+            <option *ngFor="let thread of FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS | keyvalue"
+                    [value]="thread.value['key']">
+              {{ thread.value['i18nId'] | translate }}
+            </option>
+          </select>
+          <span class="sort-order fas"
+                (click)="setFeedbackSortingOptions(currentFeedbackThreadsSortType)"
+                [ngClass]="isCurrentFeedbackSortDescending ? 'fa-long-arrow-alt-down':'fa-long-arrow-alt-up'">
+          </span>
+        </span>
+      </div>
+      <div class="oppia-learner-dashboard-main-content-container">
+        <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS">
+          <span class="oppia-learner-dashboard-nonexistent-exploration"
+                *ngIf="numberNonexistentIncompleteExplorations !== 0">
+            <span [innerHTML]="'I18N_LEARNER_DASHBOARD_NONEXISTENT_INCOMPLETE_EXPLORATIONS' | translate: {numberNonexistent: numberNonexistentIncompleteExplorations, messageFormat: true}">
+            </span>
+            &#9785;
+          </span>
+
+          <mat-card class="oppia-learner-dashboard-no-activity-card layout-row"
+                    *ngIf="incompleteExplorationsList.length === 0">
+            <div>
+              <p *ngIf="noExplorationActivity"
+                 [innerHTML]="'I18N_LEARNER_DASHBOARD_NO_ACTIVITY_IN_EXPLORATION' | translate">
+              </p>
+              <p *ngIf="!noExplorationActivity"
+                 [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_INCOMPLETE_EXPLORATIONS' | translate">
+              </p>
+
+              <a class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-learner-dashboard-intro-button-link"
+                 [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate"
+                 href="/community-library"
+                 [oppiaFocusOn]="'ourLessonsBtn'">
+              </a>
+            </div>
+          </mat-card>
+
+          <ng-container *ngIf="incompleteExplorationsList.length !== 0">
+            <div *ngFor="let tile of incompleteExplorationsList | sortBy: isCurrentExpSortDescending: getValueOfExplorationSortKey(tile) | slice: startIncompleteExpIndex: PAGE_SIZE ; trackBy: tile?.id"
+                 class="oppia-exploration-summary-tile-container"
+                 (mouseenter)="tile.toggle = !tile.toggle"
+                 (mouseleave)="tile.toggle = !tile.toggle">
+              <i class="remove-icon fa fa-times"
+                 *ngIf="tile.toggle || checkMobileView()"
+                 aria-hidden="true"
+                 (click)="openRemoveActivityModal(activeSection, activeSubsection, tile)"
+                 ngbTooltip="Remove"
+                 container="body"
+                 placement="top">
+              </i>
+              <oppia-exploration-summary-tile [getExplorationId]="tile.id"
+                                              [getExplorationTitle]="tile.title"
+                                              [getLastUpdatedMsec]="tile.lastUpdatedMsec"
+                                              [getObjective]="tile.objective"
+                                              [getCategory]="tile.category"
+                                              [getRatings]="tile.ratings"
+                                              [getNumViews]="tile.numViews"
+                                              [getThumbnailIconUrl]="tile.thumbnailIconUrl"
+                                              [getThumbnailBgColor]="tile.thumbnailBgColor"
+                                              class="protractor-test-exp-summary-tile">
+              </oppia-exploration-summary-tile>
+            </div>
+          </ng-container>
+
+          <div class="oppia-learner-dashboard-page-portfolio"
+               *ngIf="incompleteExplorationsList.length > 8">
+            <i class="material-icons md-18"
+               (click)="goToPreviousPage(LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE, LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)">
+               &#xE5C4;
+            </i>
+            Showing {{ startIncompleteExpIndex + 1 }} - {{ Math.min(startIncompleteExpIndex + PAGE_SIZE, incompleteExplorationsList.length) }} of {{ incompleteExplorationsList.length }}
+            <i class="material-icons md-18"
+               (click)="goToNextPage(LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE, LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)">
+               &#xE5C8;
+            </i>
+          </div>
+        </div>
+
+        <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS">
+          <span class="oppia-learner-dashboard-nonexistent-exploration"
+                *ngIf="numberNonexistentCompletedExplorations !== 0">
+            <span [innerHTML]="'I18N_LEARNER_DASHBOARD_NONEXISTENT_COMPLETED_EXPLORATIONS' | translate: {numberNonexistent: numberNonexistentCompletedExplorations, messageFormat: true}">
+            </span>
+            &#9785;
+          </span>
+
+          <mat-card class="oppia-learner-dashboard-no-activity-card"
+                   *ngIf="completedExplorationsList.length === 0">
+            <div>
+              <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_COMPLETED_EXPLORATIONS' | translate"></p>
+
+              <a class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-exploration-summary-tile-container"
+                 [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate"
+                 href="/community-library">
+              </a>
+            </div>
+          </mat-card>
+          <ng-container *ngIf="getVisibleExplorationList(startCompletedExpIndex).length !== 0">
+            <div *ngFor="let tile of getVisibleExplorationList(startCompletedExpIndex) | sortBy: isCurrentExpSortDescending: getValueOfExplorationSortKey(); trackBy: tile?.id"
+                 class="oppia-exploration-summary-tile-container">
+              <oppia-exploration-summary-tile [getExplorationId]="tile.id"
+                                              [getExplorationTitle]="tile.title"
+                                              [getLastUpdatedMsec]="tile.lastUpdatedMsec"
+                                              [getObjective]="tile.objective"
+                                              [getCategory]="tile.category"
+                                              [getRatings]="tile.ratings"
+                                              [getNumViews]="tile.numViews"
+                                              [getThumbnailIconUrl]="tile.thumbnailIconUrl"
+                                              [getThumbnailBgColor]="tile.thumbnailBgColor"
+                                              class="protractor-test-exp-summary-tile">
+              </oppia-exploration-summary-tile>
+            </div>
+          </ng-container>
+
+          <div class="oppia-learner-dashboard-page-portfolio"
+               *ngIf="completedExplorationsList.length > 8">
+            <i class="material-icons md-18"
+               (click)="goToPreviousPage(LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED, LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)">
+               &#xE5C4;
+            </i>
+            Showing {{ startCompletedExpIndex + 1 }} - {{ Math.min(startCompletedExpIndex + PAGE_SIZE, completedExplorationsList.length) }} of {{ completedExplorationsList.length }}
+            <i class="material-icons md-18"
+               (click)="goToNextPage(LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED, LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)">
+               &#xE5C8;
+            </i>
+          </div>
+        </div>
+
+        <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS">
+          <span class="oppia-learner-dashboard-nonexistent-exploration"
+                *ngIf="numberNonexistentExplorationsFromPlaylist !== 0">
+            <span [innerHTML]="'I18N_LEARNER_DASHBOARD_NONEXISTENT_EXPLORATIONS_FROM_PLAYLIST' | translate: {numberNonexistent: numberNonexistentExplorationsFromPlaylist}">
+            </span>
+            &#9785;
+          </span>
+
+          <mat-card class="oppia-learner-dashboard-no-activity-card layout-row"
+                   *ngIf="explorationPlaylist.length === 0">
+            <div>
+              <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_EXPLORATION_PLAYLIST' | translate"></p>
+
+              <a class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-learner-dashboard-nonexistent-exploration"
+                 [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate"
+                 href="/community-library">
+              </a>
+            </div>
+          </mat-card>
+
+          <ng-container *ngIf="explorationPlaylist.length !== 0">
+            <div *ngFor="let tile of explorationPlaylist; let i = index; trackBy: i"
+                 class="oppia-exploration-summary-tile-container"
+                 (mouseenter)="tile.toggle = !tile.toggle "
+                 (mouseleave)="tile.toggle = !tile.toggle">
+              <i class="remove-icon fa fa-times"
+                 *ngIf="tile.toggle || checkMobileView()"
+                 aria-hidden="true"
+                 (click)="openRemoveActivityModal(activeSection, activeSubsection, tile)"
+                 ngbTooltip="Remove"
+                 container="body"
+                 placement="top">
+              </i>
+              <oppia-exploration-summary-tile [getExplorationId]="tile.id"
+                                              [getExplorationTitle]="tile.title"
+                                              [getLastUpdatedMsec]="tile.lastUpdatedMsec"
+                                              [getObjective]="tile.objective"
+                                              [getCategory]="tile.category"
+                                              [getRatings]="tile.ratings"
+                                              [getNumViews]="tile.numViews"
+                                              [getThumbnailIconUrl]="tile.thumbnailIconUrl"
+                                              [getThumbnailBgColor]="tile.thumbnailBgColor"
+                                              class="oppia-exploration-summary-tile protractor-test-exp-summary-tile">
+              </oppia-exploration-summary-tile>
+            </div>
+          </ng-container>
+        </div>
+
+        <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS">
+          <span class="oppia-learner-dashboard-nonexistent-exploration"
+                *ngIf="numberNonexistentIncompleteCollections !== 0">
+            <span [innerHTML]="'I18N_LEARNER_DASHBOARD_NONEXISTENT_INCOMPLETE_COLLECTIONS' | translate: {numberNonexistent: numberNonexistentIncompleteCollections, messageFormat: true}">
+            </span>
+            &#9785;
+          </span>
+
+          <mat-card class="oppia-learner-dashboard-no-activity-card layout-row"
+                   *ngIf="incompleteCollectionsList.length === 0">
+            <div>
+              <p *ngIf="noCollectionActivity"
+                 [innerHTML]="'I18N_LEARNER_DASHBOARD_NO_ACTIVITY_IN_COLLECTION' | translate">
+              </p>
+              <p *ngIf="!noCollectionActivity"
+                 [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_INCOMPLETE_COLLECTIONS' | translate">
+              </p>
+
+              <a class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-learner-dashboard-intro-button-link"
+                 [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate"
+                 href="/community-library">
+              </a>
+            </div>
+          </mat-card>
+
+          <div *ngFor="let tile of incompleteCollectionsList"
+               class="oppia-exploration-summary-tile-container"
+               (mouseenter)="tile.toggle = !tile.toggle "
+               (mouseleave)="tile.toggle = !tile.toggle">
+            <i class="remove-icon fa fa-times"
+               *ngIf="tile.toggle || checkMobileView()"
+               aria-hidden="true"
+               (click)="openRemoveActivityModal(activeSection, activeSubsection, tile)"
+               ngbTooltip="Remove"
+               container="body"
+               placement="top">
+            </i>
+            <oppia-collection-summary-tile [getCollectionId]="tile.id"
+                                           [getCollectionTitle]="tile.title"
+                                           [getLastUpdatedMsec]="tile.lastUpdatedMsec"
+                                           [getObjective]="tile.objective"
+                                           [getNodeCount]="tile.nodeCount"
+                                           [getCategory]="tile.category"
+                                           [getThumbnailIconUrl]="tile.thumbnailIconUrl"
+                                           [getThumbnailBgColor]="tile.thumbnailBgColor">
+            </oppia-collection-summary-tile>
+          </div>
+
+          <div class="oppia-learner-dashboard-page-portfolio"
+               *ngIf="incompleteCollectionsList.length > 8">
+            <i class="material-icons md-18"
+               (click)="goToPreviousPage(LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE, LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)">&#xE5C4;
+            </i>
+            Showing {{ startIncompleteCollectionIndex + 1 }} - {{ Math.min(startIncompleteCollectionIndex + PAGE_SIZE, incompleteCollectionsList.length )}} of {{ incompleteCollectionsList.length }}
+            <i class="material-icons md-18" (click)="goToNextPage(LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE, LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)">&#xE5C8;</i>
+          </div>
+        </div>
+
+        <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS">
+          <span class="oppia-learner-dashboard-nonexistent-exploration"
+                *ngIf="collectionPlaylist.length > 0">
+            <span [innerHTML]="'I18N_LEARNER_DASHBOARD_REARRANGE_LEARNER_PLAYLIST_MESSAGE' | translate"></span>
+          </span>
+          <span class="oppia-learner-dashboard-nonexistent-exploration"
+                *ngIf="numberNonexistentCollectionsFromPlaylist !== 0">
+            <span [innerHTML]="'I18N_LEARNER_DASHBOARD_NONEXISTENT_COLLECTIONS_FROM_PLAYLIST' | translate: {numberNonexistent: numberNonexistentCollectionsFromPlaylist, messageFormat: true}">
+            </span>
+            &#9785;
+          </span>
+
+          <mat-card class="oppia-learner-dashboard-no-activity-card layout-row"
+                   *ngIf="collectionPlaylist.length === 0">
+            <div>
+              <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_COLLECTION_PLAYLIST' | translate"></p>
+
+              <a class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-learner-dashboard-intro-button-link"
+                 [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate"
+                 href="/community-library">
+              </a>
+            </div>
+          </mat-card>
+
+          <div *ngFor="let tile of collectionPlaylist"
+               class="oppia-exploration-summary-tile-container"
+               (mouseenter)="tile.toggle = !tile.toggle "
+               (mouseleave)="tile.toggle = !tile.toggle">
+            <i class="remove-icon fa fa-times"
+               *ngIf="tile.toggle || checkMobileView()"
+               aria-hidden="true"
+               (click)="openRemoveActivityModal(activeSection, activeSubsection, tile)"
+               ngbTooltip="Remove"
+               container="body"
+               placement="top">
+            </i>
+            <oppia-collection-summary-tile [getCollectionId]="tile.id"
+                                           [getCollectionTitle]="tile.title"
+                                           [getLastUpdatedMsec]="tile.lastUpdatedMsec"
+                                           [getObjective]="tile.objective"
+                                           [getNodeCount]="tile.nodeCount"
+                                           [getCategory]="tile.category"
+                                           [getThumbnailIconUrl]="tile.thumbnailIconUrl"
+                                           [getThumbnailBgColor]="tile.thumbnailBgColor">
+            </oppia-collection-summary-tile>
+          </div>
+        </div>
+
+        <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS">
+          <span class="oppia-learner-dashboard-nonexistent-exploration"
+                *ngIf="completedToIncompleteCollections.length !== 0">
+            <span [innerHTML]="'I18N_LEARNER_DASHBOARD_COMPLETED_TO_INCOMPLETE_COLLECTIONS' | translate: {numberMoved: completedToIncompleteCollections.length}">
+            </span>
+            <span>
+              <ul>
+                <li *ngFor="let title of completedToIncompleteCollections">{{ title }}</li>
+              </ul>
+            </span>
+          </span>
+
+          <span class="oppia-learner-dashboard-nonexistent-exploration"
+                *ngIf="numberNonexistentCompletedCollections !== 0">
+            <span [innerHTML]="'I18N_LEARNER_DASHBOARD_NONEXISTENT_COMPLETED_COLLECTIONS' | translate: {numberNonexistent: numberNonexistentCompletedCollections, messageFormat: true}">
+            </span>
+            &#9785;
+          </span>
+
+          <mat-card class="oppia-learner-dashboard-no-activity-card layout-row"
+                   *ngIf="completedCollectionsList.length === 0">
+            <div>
+              <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_COMPLETED_COLLECTIONS' | translate"></p>
+
+              <a class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-learner-dashboard-intro-button-link"
+                 [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate"
+                 href="/community-library">
+              </a>
+            </div>
+          </mat-card>
+
+          <div *ngFor="let tile of completedCollectionsList"
+               class="oppia-exploration-summary-tile-container">
+            <oppia-collection-summary-tile [getCollectionId]="tile.id"
+                                           [getCollectionTitle]="tile.title"
+                                           [getLastUpdatedMsec]="tile.lastUpdatedMsec"
+                                           [getObjective]="tile.objective"
+                                           [getNodeCount]="tile.nodeCount"
+                                           [getCategory]="tile.category"
+                                           [getThumbnailIconUrl]="tile.thumbnailIconUrl"
+                                           [getThumbnailBgColor]="tile.thumbnailBgColor">
+            </oppia-collection-summary-tile>
+          </div>
+
+          <div class="oppia-learner-dashboard-page-portfolio"
+               *ngIf="completedCollectionsList.length > 8">
+            <i class="material-icons md-18"
+               (click)="goToPreviousPage(LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED, LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)">
+               &#xE5C4;
+            </i>
+            Showing {{ startCompletedCollectionIndex + 1 }} - {{ Math.min(startCompletedCollectionIndex + PAGE_SIZE, completedCollectionsList.length) }} of {{ completedCollectionsList.length }}
+            <i class="material-icons md-18"
+               (click)="goToNextPage(LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETE, LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)">
+               &#xE5C8;
+            </i>
+          </div>
+        </div>
+
+        <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.SUBSCRIPTIONS"
+             class="oppia-subscription-container">
+          <mat-card class="oppia-learner-dashboard-no-activity-card layout-row"
+                    *ngIf="subscriptionsList.length === 0">
+            <div>
+              <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_SUBSCRIPTIONS' | translate"></p>
+
+              <a class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-learner-dashboard-intro-button-link"
+                 [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate"
+                 href="/community-library">
+              </a>
+            </div>
+          </mat-card>
+
+          <mat-card class="oppia-subscription-card oppia-subscription-container-list"
+                   *ngFor="let subscription of subscriptionsList | sortBy: isCurrentSubscriptionSortDescending: getValueOfSubscriptionSortKey()">
+            <a class="oppia-subscription-profile-link"
+               href="/profile/{{ subscription.username }}"
+               target="_blank"
+               rel="noopener">
+              <img [src]="decodePngURIData(subscription.pictureDataUrl)"
+                   class="oppia-subscription-card-profile-picture rounded-circle">
+              <span class="oppia-subscription-card-summary text-dark">
+                <div class="oppia-subscription-name">
+                  <strong class="protractor-test-subscription-name"
+                          container="body"
+                          triggers="showUsernamePopover(subscription.username)"
+                          ngbPopover="subscription.username">
+                    {{ subscription.username| truncate:10 }}
+                  </strong>
+                </div>
+                <div class="oppia-impact-text">
+                  <span>Impact: </span>
+                  <span class="protractor-test-impact-number">{{ subscription.impact || 0 }}</span>
+                </div>
+              </span>
+            </a>
+          </mat-card>
+        </div>
+
+        <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.FEEDBACK"
+             class="oppia-learner-dashboard-feedback-section">
+          <mat-card class="oppia-learner-dashboard-no-activity-card layout-row"
+                   *ngIf="threadSummaries.length === 0">
+            <div>
+              <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_FEEDBACK_THREADS' | translate"></p>
+
+              <a class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-learner-dashboard-intro-button-link"
+                 [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate"
+                 href="/community-library">
+              </a>
+            </div>
+          </mat-card>
+
+          <table class="table" *ngIf="!feedbackThreadActive">
+            <tr *ngFor="let thread of threadSummaries | sortBy: isCurrentFeedbackSortDescending: getValueOfFeedbackThreadSortKey()"
+                (click)="onClickThread(thread.status, thread.explorationId, thread.threadId, thread.explorationTitle)"
+                class="oppia-feedback-tab-row protractor-test-feedback-thread">
+              <td width="10%">
+                <span [ngClass]="getLabelClass(thread.status)">{{ getHumanReadableStatus(thread.status) }}</span>
+              </td>
+              <td width="20%">
+                <span *ngIf="thread.totalMessageCount > 1">
+                  <span *ngIf="thread.authorSecondLastMessage">
+                    <span *ngIf="thread.secondLastMessageIsRead">{{ thread.authorSecondLastMessage | truncate:7 }}, </span>
+                    <span *ngIf="!thread.secondLastMessageIsRead">
+                      <strong>{{ thread.authorSecondLastMessage | truncate:7 }}, </strong>
+                    </span>
+                  </span>
+                  <span *ngIf="!thread.authorSecondLastMessage">
+                    <span *ngIf="thread.totalMessageCount > 1">
+                      <span [innerHTML]="'I18N_FEEDBACK_MESSAGE_ANONYMOUS_AUTHOR' | translate"></span>,
+                    </span>
+                  </span>
+                </span>
+                <span *ngIf="thread.authorLastMessage">
+                  <span *ngIf="thread.lastMessageIsRead">{{ thread.authorLastMessage | truncate:7 }}</span>
+                  <span *ngIf="!thread.lastMessageIsRead">
+                    <strong>{{ thread.authorLastMessage | truncate:7 }}</strong>
+                  </span>
+                </span>
+                <span *ngIf="!thread.authorLastMessage">
+                  <span [innerHTML]="'I18N_FEEDBACK_MESSAGE_ANONYMOUS_AUTHOR' | translate"></span>
+                </span>
+                <span class="feedback-thread-message-count">({{ thread.totalMessageCount }})</span>
+              </td>
+              <td width="50%">
+                <span *ngIf="thread.totalMessageCount > 1 && thread.secondLastMessageIsRead && thread.lastMessageIsRead">{{ thread.explorationTitle }} -</span>
+                <span class="protractor-test-feedback-exploration" *ngIf="thread.totalMessageCount === 1 && thread.lastMessageIsRead">{{ thread.explorationTitle }} -</span>
+                <span *ngIf="thread.totalMessageCount === 1 && !thread.lastMessageIsRead">
+                  <strong>{{ thread.explorationTitle }} -</strong>
+                </span>
+                <span *ngIf="thread.totalMessageCount > 1 && (!thread.lastMessageIsRead || !thread.secondLastMessageIsRead)">
+                  <strong>{{ thread.explorationTitle }} -</strong>
+                </span>
+                <span *ngIf="thread.lastMessageText">{{ thread.lastMessageText | truncate:50 }}</span>
+                <span *ngIf="!thread.lastMessageText && thread.totalMessageCount !== 1">
+                  <i [innerHTML]="'I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_STATUS_CHANGE_MESSAGE' | translate: {threadStatus: getHumanReadableStatus(thread.status)}">
+                  </i>
+                </span>
+                <span *ngIf="!thread.lastMessageText && thread.totalMessageCount === 1">
+                  <i [innerHTML]="'I18N_LEARNER_DASHBOARD_SUGGESTION_TEXT' | translate"></i>
+                </span>
+              </td>
+              <td width="20%">
+                <span>{{ getLocaleAbbreviatedDatetimeString(thread.lastUpdatedMsecs) }}</span>
+              </td>
+            </tr>
+          </table>
+
+          <table class="table" *ngIf="feedbackThreadActive">
+            <tr>
+              <td>
+                <button (click)="showAllThreads()"
+                        class="btn btn-secondary oppia-btn-secondary">
+                  <i class="material-icons oppia-vcenter"
+                     title="{{ 'I18N_LEARNER_DASHBOARD_RETURN_TO_FEEDBACK_THREADS_MESSAGE' | translate }}">
+                     &#xE5CB;
+                  </i>
+                </button>
+                <span class="oppia-exploration-title">{{ explorationTitle }}</span>
+              </td>
+            </tr>
+            <tr *ngIf="loadingFeedbacks">
+              <td class="text-center">
+                <span>
+                  Loading
+                  <loading-dots></loading-dots>
+                </span>
+              </td>
+            </tr>
+            <ng-container *ngIf="!loadingFeedbacks">
+              <tr *ngFor="let message of messageSummaries"
+                  class="oppia-message-summaries">
+                <td>
+                  <div class="row">
+                    <div class="col-sm-9">
+                      <span class="feedback-message-header">
+                        <span *ngIf="message.authorPictureDataUrl"
+                              class="d-inline-block">
+                          <img [src]="decodePngURIData(message.authorPictureDataUrl)"
+                               class="oppia-navbar-profile-picture rounded-circle oppia-profile-picture"
+                               alt="User Avatar">
+                        </span>
+
+                        <span *ngIf="!message.authorPictureDataUrl"
+                              class="d-inline-block">
+                          <i class="material-icons md-40 oppia-profile-picture">&#xE853;</i>
+                        </span>
+                      </span>
+
+                      <span *ngIf="message.authorUsername"
+                            class="feedback-message-author-name">
+                        <strong>{{ message.authorUsername }}</strong>
+                      </span>
+                      <span *ngIf="!message.authorUsername"
+                            class="feedback-message-author-name">
+                        <strong [innerHTML]="'I18N_FEEDBACK_MESSAGE_ANONYMOUS_AUTHOR' | translate"></strong>
+                      </span>
+                      <span class="oppia-updated-status"
+                            *ngIf="message.messageId !== 0 && message.updatedStatus">
+                        <em [innerHTML]="'I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_STATUS_CHANGE_MESSAGE' | translate: {threadStatus: getHumanReadableStatus(message.updatedStatus)}">
+                        </em>
+                      </span>
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-3">
+                      <span>{{ getLocaleAbbreviatedDatetimeString(message.createdOnMsecs) }}</span>
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-sm-2 feedback-message-spacing oppia-feedback-message-spacing"></div>
+                    <div class="col-sm-10 feedback-thread-message-body">
+                      <div>
+                        <span class="protractor-test-feedback-message" *ngIf="message.text">{{ message.text }}</span>
+                        <button *ngIf="message.currentContentHtml"
+                                class="btn btn-primary oppia-dashboard-view-suggestion-button"
+                                (click)="showSuggestionModal(message.suggestionHtml, message.currentContentHtml, message.description)"
+                                [innerHTML]="'I18N_LEARNER_DASHBOARD_VIEW_SUGGESTION' | translate">
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </ng-container>
+            <tr>
+              <td>
+                <div class="row">
+                  <div class="col-sm-1 feedback-message-author-picture oppia-feedback-message-spacing p-0">
+                    <span class="feedback-message-header">
+                      <span class="d-inline-block">
+                        <img [src]="profilePictureDataUrl"
+                             class="oppia-navbar-profile-picture rounded-circle feedback-thread-learner-profile-pic"
+                             alt="User Avatar">
+                      </span>
+                    </span>
+                  </div>
+
+                  <div class="col-sm-11">
+                    <div class="feedback-thread-new-message">
+                      <textarea class="form-control feedback-thread-reply-box"
+                                placeholder="{{ 'I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_DEFAULT_MESSAGE' | translate }}" [(ngModel)]="newMessage.text">
+                      </textarea>
+                    </div>
+                    <div>
+                      <button class="btn btn-success feedback-thread-new-message-send"
+                              (click)="addNewMessage(threadId, newMessage.text)"
+                              ng-disabled="messageSendingInProgress || !newMessage.text">
+                        <span *ngIf="messageSendingInProgress"
+                              [innerHTML]="'I18N_LEARNER_DASHBOARD_SEND_FEEDBACK_THREAD_MESSAGE_IN_PROGRESS' | translate">
+                        </span>
+                        <span class="protractor-test-feedback-send-message"
+                              *ngIf="!messageSendingInProgress"
+                              [innerHTML]="'I18N_LEARNER_DASHBOARD_SEND_FEEDBACK_THREAD_MESSAGE' | translate">
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </table>
+          <div class="feedback-thread-warning"
+               *ngIf="feedbackThreadActive">
+            <i class="material-icons">&#xE88F;</i>
+            <span [innerHTML]="'I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_WARNING' | translate"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-2 oppia-learner-dashboard-side-content"
+         [ngClass]="{'oppia-learner-dashboard-mobile-mode': checkMobileView()}">
+
+    </div>
+  </div>
+</div>
+<style>
+  body {
+    overflow-x: visible;
+  }
+
+  .oppia-flex-row {
+    box-sizing: border-box;
+    display: flex !important;
+    flex-direction: row;
+    margin: 10px 0;
+  }
+
+  .oppia-flex-row>:first-child {
+    margin-top: 10px;
+  }
+
+  .oppia-flex-row>:last-child {
+    margin-bottom: 10px;
+  }
+
+  .oppia-learner-dashboard-container {
+    margin: 0 auto 30px auto;
+    max-width: 1400px;
+    padding-top: 10px;
+  }
+
+  .oppia-learner-dashboard-title {
+    color: #01645c;
+    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+    font-size: 3em;
+    margin-bottom: 33px;
+    margin-top: 0;
+    padding-top: 65.5px;
+    text-align: center;
+  }
+
+  .oppia-learner-dashboard-title-mobile {
+    font-size: 2.5em;
+    margin-bottom: 25px;
+  }
+
+  .oppia-learner-dashboard-mascot {
+    float: right;
+    margin-top: -40px;
+    padding-left: 10px;
+    width: 140px;
+  }
+
+  .oppia-learner-dashboard-menu {
+    border: 1px solid #d0d0d0;
+    color: black;
+    cursor: pointer;
+    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+    font-size: 1em;
+    font-weight: normal;
+    margin: 0;
+    padding: 15px 20px 15px 20px;
+  }
+
+  .oppia-learner-dashboard-main-menu .oppia-learner-dashboard-sub-section-active {
+    background-color: #aed2e9;
+    border: 1px solid lightgreen;
+    color: black;
+  }
+
+  .oppia-learner-dashboard-submenu {
+    background-color: #fff;
+    border: 1px solid #d0d0d0;
+    color: #757575;
+    cursor: pointer;
+    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+    font-size: 16px;
+    padding: 12px 20px 12px 40px;
+  }
+
+  .oppia-learner-dashboard-section-active {
+    background-color: #018477;
+    color: white;
+  }
+
+  .oppia-learner-dashboard-side-content {
+    min-width: 200px;
+    padding-left: 20px;
+    width: 20%;
+  }
+
+  .oppia-learner-dashboard-main-content {
+    padding: 0;
+    width: 60%;
+  }
+
+  .oppia-learner-dashboard-main-content .stats-card {
+    min-height: 63px;
+    position: relative;
+  }
+
+  .oppia-learner-dashboard-main-content .stats-card .stat-description {
+    line-height: 1.646;
+    margin-bottom: 35px;
+    padding-right: 10px;
+  }
+
+  .oppia-learner-dashboard-main-content .stats-card .stat-value {
+    bottom: 0;
+    position: absolute;
+  }
+
+  .oppia-learner-dashboard-main-content .remove-icon {
+    color: white;
+    float: right;
+    font-size: 20px;
+    left: -7px;
+    margin-left: -26px;
+    margin-top: 10px;
+    position: relative;
+    width: 18px;
+    z-index: 20;
+  }
+
+  .oppia-learner-dashboard-main-menu {
+    background-color: white;
+    padding: 0;
+  }
+
+  .oppia-learner-dashboard-mobile-mode {
+    margin: auto;
+    width: 100%;
+  }
+
+  .oppia-learner-dashboard-mascot-mobile {
+    margin-left: -76px;
+    margin-top: 307px;
+    position: absolute;
+  }
+
+  .oppia-learner-dashboard-intro-card {
+    background: #fff;
+    border-left: none;
+    border-radius: 5px;
+    margin: 1em 0 0;
+    padding: 37px 30px;
+    text-align: center;
+  }
+
+  .oppia-learner-dashboard-intro-card:before {
+    background: #fff;
+    border-bottom-right-radius: 80px 50px;
+    bottom: -1.88em;
+    content: "";
+    display: block;
+    height: 30px;
+    position: absolute;
+    width: 50px;
+    z-index: 10;
+  }
+
+  .oppia-learner-dashboard-intro-card:after {
+    background: #e8e7e3;
+    border-bottom-right-radius: 40px 50px;
+    bottom: -1.88em;
+    content: "";
+    display: block;
+    height: 30px;
+    position: absolute;
+    width: 20px;
+    z-index: 10;
+  }
+
+  .oppia-learner-dashboard-intro-button {
+    background-color: #00645c;
+    border-radius: 4px;
+    color: #fff;
+    font-family: "Roboto", Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: 0.7px;
+    margin-top: 25px;
+    padding: 8px;
+    text-transform: uppercase;
+    width: 250px;
+  }
+
+  .oppia-learner-dashboard-intro-button:hover,
+  .oppia-learner-dashboard-intro-button:active {
+    background-color: #3d9991;
+    color: #fff;
+  }
+
+  .oppia-learner-dashboard-intro-card-message {
+    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+    font-size: 18px;
+    text-align: center;
+  }
+
+  .oppia-learner-dashboard-main-content-title {
+    color: #076962;
+    display: inline-block;
+    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+    font-size: 1.3em;
+    padding: 16px;
+    padding-bottom: 8px;
+  }
+
+  .oppia-learner-dashboard-sort {
+    float: right;
+    padding-right: 7.5px;
+    padding-top: 8px;
+  }
+
+  .oppia-learner-dashboard-main-content-container .oppia-learner-dashboard-no-activity-card {
+    background: rgb(255,255,255);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    margin: 0 17px 0 4px;
+    padding: 30px 55px 30px 30px;
+  }
+
+  .oppia-learner-dashboard-sort-mobile {
+    float: none;
+    padding: 0 7.5px;
+  }
+
+  .oppia-learner-dashboard-main-content-container {
+    padding-left: 11px;
+  }
+
+  .oppia-learner-dashboard-feedback-section {
+    margin-right: 23px;
+  }
+
+  .oppia-learner-dashboard-feedback-section .table {
+    background-color: white;
+    margin-bottom: 10px;
+    margin-left: 6px;
+  }
+
+  .oppia-learner-dashboard-feedback-section .feedback-thread-message-count {
+    color: #757575;
+    font-size: 100.25%;
+  }
+
+  .oppia-learner-dashboard-feedback-section .feedback-message-spacing {
+    left: 3px;
+    padding: 0;
+    text-align: center;
+  }
+
+  .oppia-learner-dashboard-feedback-section .feedback-message-header {
+    display: inline-block;
+    text-align: center;
+    width: 8%;
+  }
+
+  .oppia-learner-dashboard-feedback-section .feedback-thread-new-message {
+    margin-right: 10px;
+  }
+
+  .oppia-learner-dashboard-feedback-section .feedback-thread-new-message-send {
+    margin: 6px 0 0 14px;
+  }
+
+  .oppia-row {
+    display: flex;
+  }
+  .oppia-learner-dashboard-intro-card-message-part-1 {
+    padding-top: 6px;
+  }
+  .oppia-learner-dashboard-intro-card-message-part-2 {
+    padding-top: 15px;
+  }
+  .oppia-navbar-breadcrumb-separator-icon {
+    margin: 0 1px;
+  }
+  .oppia-explorations-select {
+    margin-bottom: 7px;
+  }
+  .oppia-sort-options {
+    width: auto;
+  }
+  .oppia-learner-dashboard-nonexistent-exploration {
+    display: block;
+    padding: 5px 7.5px;
+  }
+  .oppia-learner-dashboard-intro-button-link {
+    margin-top: 13px;
+    width: 230px;
+  }
+  .oppia-exploration-summary-tile-container {
+    display: inline-block;
+    margin-left: 1px;
+  }
+  .oppia-learner-playlist-tiles-sortable {
+    display: block;
+    height: 145px;
+  }
+  .oppia-exploration-summary-tile {
+    height: 100%;
+  }
+  .oppia-subscription-container
+  .oppia-dashboard-view-suggestion-button {
+    margin-top: 5px;
+  }
+  .oppia-subscription-container-list {
+    margin: 0 8px 0 4px;
+    width: 197px;
+  }
+  .oppia-subscription-name {
+    font-size: 17.5px;
+    margin-bottom: 5px;
+  }
+  .oppia-impact-text {
+    font-size: 14.5px;
+  }
+  .oppia-message-count-container {
+    width: 21%;
+  }
+  .oppia-btn-secondary {
+    padding: 0 3px;
+  }
+  .oppia-exploration-title {
+    font-size: 105%;
+    margin-left: 7px;
+  }
+  .oppia-message-summaries {
+    padding: 13px 8px 7px 8px;
+  }
+  .oppia-profile-picture {
+    margin-top: 4px;
+    min-width: 32px;
+  }
+  .oppia-updated-status {
+    float: right;
+    margin-right: 15px;
+  }
+  .oppia-feedback-message-spacing {
+    width: 8%;
+  }
+
+  @media (max-width: 768px) {
+    .oppia-learner-dashboard-feedback-section .feedback-thread-new-message {
+      margin-left: 14px;
+    }
+
+    .oppia-learner-dashboard-feedback-section .feedback-message-author-name {
+      margin-left: 10px;
+    }
+
+    .oppia-learner-dashboard-feedback-section .feedback-thread-new-message-send {
+      margin: 6px 0 0 28px;
+    }
+
+    .oppia-learner-dashboard-feedback-section .feedback-thread-reply-box {
+      margin-top: 9px;
+    }
+
+    .oppia-learner-dashboard-feedback-section .feedback-thread-message-body {
+      margin-left: 43px;
+    }
+  }
+
+  .oppia-learner-dashboard-feedback-section .col-sm-11 {
+    padding: 0 20px 0 0;
+  }
+
+  .oppia-learner-dashboard-feedback-section .feedback-thread-reply-box {
+    font-size: 1em;
+    height: 70px;
+    margin-left: 14px;
+    resize: vertical;
+  }
+
+  .oppia-learner-dashboard-feedback-section .feedback-thread-warning {
+    color: #0277BD;
+    margin-left: 4px;
+  }
+
+  .oppia-learner-dashboard-feedback-section .feedback-thread-learner-profile-pic {
+    margin-left: 26px;
+    margin-top: 4px;
+    min-width: 32px;
+  }
+
+  @media (max-width: 810px) {
+    .oppia-learner-dashboard-title {
+      font-size: 2.8em;
+    }
+
+    .sort-explorations-select.oppia-learner-dashboard-sort {
+      padding: 0 0 6px 7.5px;
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 500px) {
+    .oppia-learner-dashboard-title {
+      font-size: 2.5em;
+    }
+
+    .oppia-learner-dashboard-intro-card:before {
+      left: 17em;
+    }
+
+    .oppia-learner-dashboard-intro-card:after {
+      left: 17em;
+    }
+
+    .oppia-learner-dashboard-main-content-container {
+      padding: 7px;
+    }
+
+    .oppia-learner-dashboard-main-content-container .oppia-learner-dashboard-no-activity-card {
+      margin: 0 2px 0 4px;
+    }
+
+    .oppia-learner-dashboard-feedback-section .feedback-thread-reply-box {
+      font-size: 1em;
+      height: 70px;
+      margin-left: 14px;
+      resize: vertical;
+    }
+
+    .oppia-learner-dashboard-feedback-section .feedback-thread-learner-profile-pic {
+      margin-left: 15px;
+    }
+  }
+
+  @media (max-width: 380px) {
+    .oppia-learner-dashboard-title-mobile {
+      padding-top: 54.5px;
+    }
+
+    .oppia-learner-dashboard-mascot {
+      margin-top: 335px;
+    }
+
+    .oppia-learner-dashboard-intro-card:before {
+      left: 15em;
+    }
+
+    .oppia-learner-dashboard-intro-card:after {
+      left: 15em;
+    }
+  }
+
+  .oppia-dashboard-tooltip {
+    display: inline-block;
+    position: relative;
+  }
+
+  .oppia-dashboard-tooltip-text {
+    background-color: #018477;
+    border-radius: 6px;
+    bottom: 97%;
+    color: #fff;
+    font-size: 0.6em;
+    padding: 5px;
+    position: absolute;
+    text-align: center;
+    visibility: hidden;
+    width: auto;
+    z-index: 1;
+  }
+
+  @media screen and (max-width: 500px) {
+    .oppia-dashboard-tooltip-text {
+      margin-left: -80%;
+      width: 90%;
+    }
+  }
+
+  @media screen and (max-width: 470px) {
+    .oppia-learner-dashboard-main-content,
+    .oppia-learner-dashboard-side-content {
+      width: 100%;
+    }
+  }
+
+  .oppia-dashboard-tooltip:hover + .oppia-dashboard-tooltip-text {
+    visibility: visible;
+  }
+
+  .oppia-learner-dashboard-page-portfolio {
+    font-weight: bold;
+    margin-right: 14px;
+    margin-top: 8px;
+    text-align: right;
+  }
+
+  .oppia-learner-playlist-tiles {
+    display: inline-block;
+    margin-left: 1px;
+    padding-right: 21px;
+    width: 100%;
+  }
+
+  .oppia-subscription-card {
+    background-color: #fff;
+    display: inline-block;
+    height: 90px;
+    margin: 8px 4px;
+    padding: 0;
+    width: 191px;
+  }
+</style>

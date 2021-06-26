@@ -17,14 +17,17 @@
 """Tests interface for storage model switching."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import unicode_literals # pylint: disable=import-only-modules
 
+import re
+
+from constants import constants
 from core.platform import models
 from core.tests import test_utils
 import feconf
 
 
-class RegistryUnitTest(test_utils.GenericTestBase):
+class RegistryUnitTest(test_utils.TestBase):
     """Tests the Registry class interface."""
 
     def setUp(self):
@@ -47,6 +50,14 @@ class RegistryUnitTest(test_utils.GenericTestBase):
             expected_audit_models,
             self.registry_instance.import_models([models.NAMES.audit]))
 
+    def test_import_models_auth_model(self):
+        """Tests import_models function with auth option."""
+        from core.storage.auth import gae_models as auth_models
+        expected_auth_models = (auth_models,)
+        self.assertEqual(
+            expected_auth_models,
+            self.registry_instance.import_models([models.NAMES.auth]))
+
     def test_import_models_base_model(self):
         """Tests import_models function with base model option."""
         from core.storage.base_model import gae_models as base_models
@@ -54,6 +65,22 @@ class RegistryUnitTest(test_utils.GenericTestBase):
         self.assertEqual(
             expected_base_models,
             self.registry_instance.import_models([models.NAMES.base_model]))
+
+    def test_import_models_blog_model(self):
+        """Tests import_models function with blog post model option."""
+        from core.storage.blog import gae_models as blog_models
+        expected_blog_models = (blog_models,)
+        self.assertEqual(
+            expected_blog_models,
+            self.registry_instance.import_models([models.NAMES.blog]))
+
+    def test_import_models_beam_job_model(self):
+        """Tests import_models function with base model option."""
+        from core.storage.beam_job import gae_models as beam_job_models
+        expected_beam_job_models = (beam_job_models,)
+        self.assertEqual(
+            expected_beam_job_models,
+            self.registry_instance.import_models([models.NAMES.beam_job]))
 
     def test_import_models_classifier(self):
         """Tests import_models function with classifier option."""
@@ -178,7 +205,7 @@ class RegistryUnitTest(test_utils.GenericTestBase):
 
     def test_import_models_invalid(self):
         """Tests import_models function with an invalid option."""
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(Exception, 'Invalid model name: '):
             self.registry_instance.import_models([''])
 
     def test_get_storage_model_classes(self):
@@ -212,13 +239,6 @@ class RegistryUnitTest(test_utils.GenericTestBase):
         self.assertNotIn(base_models.BaseSnapshotMetadataModel, classes)
         self.assertNotIn(base_models.BaseSnapshotContentModel, classes)
 
-    def test_import_current_user_services(self):
-        """Tests import current user services function."""
-        from core.platform.users import gae_current_user_services
-        self.assertEqual(
-            self.registry_instance.import_current_user_services(),
-            gae_current_user_services)
-
     def test_import_datastore_services(self):
         """Tests import datastore services function."""
         from core.platform.datastore import gae_datastore_services
@@ -233,6 +253,13 @@ class RegistryUnitTest(test_utils.GenericTestBase):
             self.registry_instance.import_transaction_services(),
             gae_transaction_services)
 
+    def test_import_auth_services(self):
+        """Tests import auth services function."""
+        from core.platform.auth import firebase_auth_services
+        self.assertIs(
+            self.registry_instance.import_auth_services(),
+            firebase_auth_services)
+
     def test_import_app_identity_services(self):
         """Tests import app identity services function."""
         from core.platform.app_identity import gae_app_identity_services
@@ -240,28 +267,14 @@ class RegistryUnitTest(test_utils.GenericTestBase):
             self.registry_instance.import_app_identity_services(),
             gae_app_identity_services)
 
-    def test_import_gae_image_services(self):
-        """Tests import gae image services function."""
-        from core.platform.image import gae_image_services
-        self.assertEqual(
-            self.registry_instance.import_gae_image_services(),
-            gae_image_services)
-
-    def test_import_email_services_gae(self):
-        """Tests import email services method for when email service provider is
-        the default - GAE.
-        """
-        from core.platform.email import gae_email_services
-        self.assertEqual(
-            gae_email_services, self.registry_instance.import_email_services())
-
     def test_import_email_services_mailgun(self):
         """Tests import email services method for when email service provider is
         mailgun.
         """
         with self.swap(
             feconf, 'EMAIL_SERVICE_PROVIDER',
-            feconf.EMAIL_SERVICE_PROVIDER_MAILGUN):
+            feconf.EMAIL_SERVICE_PROVIDER_MAILGUN), (
+                self.swap(constants, 'DEV_MODE', False)):
             from core.platform.email import mailgun_email_services
             self.assertEqual(
                 mailgun_email_services,
@@ -273,34 +286,85 @@ class RegistryUnitTest(test_utils.GenericTestBase):
         """
         with self.swap(
             feconf, 'EMAIL_SERVICE_PROVIDER',
-            'invalid service provider'):
+            'invalid service provider'), (
+                self.swap(constants, 'DEV_MODE', False)):
             with self.assertRaisesRegexp(
                 Exception,
                 'Invalid email service provider: invalid service provider'):
                 self.registry_instance.import_email_services()
 
-    def test_import_memcache_services(self):
-        """Tests import memcache services function."""
-        from core.platform.memcache import gae_memcache_services
+    def test_import_bulk_email_services_mailchimp(self):
+        """Tests import email services method for when email service provider is
+        mailchimp.
+        """
+        with self.swap(
+            feconf, 'BULK_EMAIL_SERVICE_PROVIDER',
+            feconf.BULK_EMAIL_SERVICE_PROVIDER_MAILCHIMP), (
+                self.swap(constants, 'EMULATOR_MODE', False)):
+            from core.platform.bulk_email import mailchimp_bulk_email_services
+            self.assertEqual(
+                mailchimp_bulk_email_services,
+                self.registry_instance.import_bulk_email_services())
+
+    def test_import_bulk_email_services_invalid(self):
+        """Tests import email services method for when email service provider is
+        an invalid option.
+        """
+        with self.swap(
+            feconf, 'BULK_EMAIL_SERVICE_PROVIDER',
+            'invalid service provider'), (
+                self.swap(constants, 'EMULATOR_MODE', False)):
+            with self.assertRaisesRegexp(
+                Exception,
+                'Invalid bulk email service provider: invalid service '
+                'provider'):
+                self.registry_instance.import_bulk_email_services()
+
+    def test_import_cache_services(self):
+        """Tests import cache services function."""
+        from core.platform.cache import redis_cache_services
         self.assertEqual(
-            self.registry_instance.import_memcache_services(),
-            gae_memcache_services)
+            self.registry_instance.import_cache_services(),
+            redis_cache_services)
 
     def test_import_taskqueue_services(self):
         """Tests import taskqueue services function."""
-        from core.platform.taskqueue import gae_taskqueue_services
+        with self.swap(constants, 'EMULATOR_MODE', False):
+            from core.platform.taskqueue import cloud_taskqueue_services
+            self.assertEqual(
+                self.registry_instance.import_taskqueue_services(),
+                cloud_taskqueue_services)
+
+        from core.platform.taskqueue import dev_mode_taskqueue_services
         self.assertEqual(
             self.registry_instance.import_taskqueue_services(),
-            gae_taskqueue_services)
+            dev_mode_taskqueue_services)
+
+    def test_import_cloud_translate_services(self):
+        """Tests import cloud translate services function."""
+        with self.swap(constants, 'EMULATOR_MODE', False):
+            from core.platform.cloud_translate import cloud_translate_services
+            self.assertEqual(
+                self.registry_instance.import_cloud_translate_services(),
+                cloud_translate_services)
+        from core.platform.cloud_translate import (
+            dev_mode_cloud_translate_services)
+        self.assertEqual(
+            self.registry_instance.import_cloud_translate_services(),
+            dev_mode_cloud_translate_services)
 
     def test_import_search_services(self):
         """Tests import search services function."""
-        from core.platform.search import gae_search_services
+        from core.platform.search import elastic_search_services
         self.assertEqual(
             self.registry_instance.import_search_services(),
-            gae_search_services)
+            elastic_search_services)
 
     def test_import_models_not_implemented_has_not_implemented_error(self):
         """Tests NotImplementedError of Platform."""
-        with self.assertRaises(NotImplementedError):
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            re.escape(
+                'import_models() method is not overwritten in '
+                'derived classes')):
             models.Platform().import_models()

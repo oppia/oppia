@@ -1,0 +1,70 @@
+<div class="position-relative">
+  <form class="form-justify form-inline protractor-test-rule-details" role="form" name="$ctrl.ruleEditForm.form">
+    <div ng-if="$ctrl.rule.type != 'FuzzyMatches'" class="rule-parent">
+      <rule-type-selector class="protractor-test-answer-description" local-value="<[$ctrl.rule.type]>" on-selection-change="$ctrl.onSelectNewRuleType">
+      </rule-type-selector>
+
+      <span ng-repeat="item in $ctrl.ruleDescriptionFragments track by $index" class="form-group oppia-rule-editor-span protractor-test-answer-description-fragment">
+        <span ng-if="item.type == 'select'" class="text-dark">
+          <span ng-if="$ctrl.ruleDescriptionChoices.length === 1">
+            "<[$ctrl.ruleDescriptionChoices[0].val|convertToPlainText|truncate]>"
+          </span>
+          <span ng-if="$ctrl.ruleDescriptionChoices.length !== 1">
+            <html-select class="oppia-rule-description-choice" options="$ctrl.ruleDescriptionChoices" selection="$ctrl.rule.inputs[item.varName]">
+            </html-select>
+          </span>
+        </span>
+
+        <div class="oppia-custom-editor-container">
+          <span ng-if="item.type == 'checkboxes'" class="text-dark">
+            <object-editor modal-id="$ctrl.modalId" obj-type="SetOfTranslatableHtmlContentIds" init-args="{choices: $ctrl.ruleDescriptionChoices}" value="$ctrl.rule.inputs[item.varName]"></object-editor>
+          </span>
+          <span ng-if="item.type == 'dropdown'" class="text-dark">
+            <object-editor modal-id="$ctrl.modalId" obj-type="ListOfSetsOfTranslatableHtmlContentIds" init-args="{choices: $ctrl.ruleDescriptionChoices}" value="$ctrl.rule.inputs[item.varName]"></object-editor>
+          </span>
+          <span ng-if="item.type == 'dragAndDropHtmlStringSelect'" class="text-dark">
+            <object-editor modal-id="$ctrl.modalId" obj-type="TranslatableHtmlContentId" init-args="{choices: $ctrl.ruleDescriptionChoices}" value="$ctrl.rule.inputs[item.varName]"></object-editor>
+          </span>
+          <span ng-if="item.type == 'dragAndDropPositiveIntSelect'" class="text-dark">
+            <object-editor modal-id="$ctrl.modalId" obj-type="DragAndDropPositiveInt" init-args="{choices: $ctrl.ruleDescriptionChoices}" value="$ctrl.rule.inputs[item.varName]"></object-editor>
+          </span>
+          <span ng-if="item.type != 'select' && item.type != 'noneditable'">
+            <object-editor modal-id="$ctrl.modalId" obj-type="<[item.type]>" is-editable="$ctrl.isEditable" always-editable="true" value="$ctrl.rule.inputs[item.varName]" class="text-dark"></object-editor>
+          </span>
+          <span ng-if="item.type == 'noneditable'">
+            <[item.text]>
+          </span>
+        </div>
+      </span>
+    </div>
+  </form>
+
+  <div class="oppia-rule-save-cancel-buttons" ng-if="$ctrl.isEditingRuleInline()">
+    <div class="float-right">
+      <button type="button" class="btn btn-default" ng-click="$ctrl.cancelThisEdit()">Cancel</button>
+      <button type="button" class="btn btn-success protractor-test-save-answer" ng-disabled="$ctrl.ruleEditForm.form.$invalid || $ctrl.isInvalid" ng-click="$ctrl.saveThisRule()">Save Answer</button>
+    </div>
+
+    <div class="oppia-clear"></div>
+  </div>
+</div>
+<style>
+  rule-editor .form-justify {
+    justify-content: center;
+  }
+
+  rule-editor .form-group.oppia-rule-editor-span {
+    display: inline-block;
+    margin-right: 5px;
+    width: 100%;
+  }
+  rule-editor .oppia-rule-description-choice {
+    width: 200px;
+  }
+  rule-editor .oppia-custom-editor-container {
+    max-height: 320px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    text-overflow: ellipsis;
+  }
+</style>

@@ -18,251 +18,357 @@
  */
 
 var forms = require('./forms.js');
+var path = require('path');
 var users = require('./users.js');
 var waitFor = require('./waitFor.js');
+var action = require('./action.js');
 var CreatorDashboardPage = require('./CreatorDashboardPage.js');
 var ExplorationEditorPage = require('./ExplorationEditorPage.js');
-var LibraryPage = require('./LibraryPage.js');
 var TopicsAndSkillsDashboardPage = require('./TopicsAndSkillsDashboardPage.js');
+var SkillEditorPage = require('./SkillEditorPage');
 
-// check if the save roles button is clickable
-var canAddRolesToUsers = function() {
-  return element(by.css('.protractor-test-save-role')).isEnabled();
+var imageUploadInput = element(
+  by.css('.protractor-test-photo-upload-input'));
+var imageSubmitButton = element(
+  by.css('.protractor-test-photo-upload-submit'));
+var thumbnailResetButton = element(by.css(
+  '.protractor-thumbnail-reset-button'));
+var stateNameText = element(
+  by.css('.oppia-state-name-text'));
+
+// Check if the save roles button is clickable.
+var canAddRolesToUsers = async function() {
+  return await element(by.css('.protractor-test-save-role')).isEnabled();
 };
 
-// check if the warning message is visible when the title is ''
-var checkForAddTitleWarning = function() {
-  return element(by.className('protractor-test-title-warning')).isDisplayed();
+// Check if exploration is community owned.
+var isExplorationCommunityOwned = async function() {
+  return await element(
+    by.css('.protractor-test-is-community-owned')
+  ).isPresent();
 };
 
-// trigger onblur event for title
-var triggerTitleOnBlurEvent = function() {
-  element(by.css('.protractor-test-exploration-title-input')).click();
-  element(by.css('.protractor-test-exploration-objective-input')).click();
+
+// Check if the warning message is visible when the title is ''.
+var checkForAddTitleWarning = async function() {
+  return await element(
+    by.className('protractor-test-title-warning')).isDisplayed();
 };
 
-// open edit roles
-var openEditRolesForm = function() {
-  element(by.css('.protractor-test-edit-roles')).click();
-  element(by.css('.protractor-test-role-username')).sendKeys('Chuck Norris');
+// Trigger onblur event for title.
+var triggerTitleOnBlurEvent = async function() {
+  await element(by.css('.protractor-test-exploration-title-input')).click();
+  await element(by.css('.protractor-test-exploration-objective-input')).click();
+};
+
+// Open edit roles.
+var openEditRolesForm = async function() {
+  await element(by.css('.protractor-test-edit-roles')).click();
+  await element(by.css('.protractor-test-role-username')).sendKeys(
+    'Chuck Norris');
 };
 
 // Creates an exploration, opens its editor and skips the tutorial.
-var createExploration = function() {
-  createExplorationAndStartTutorial();
+var createExploration = async function(welcomeModalIsShown) {
+  await createExplorationAndStartTutorial();
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
-  explorationEditorMainTab.exitTutorial();
+  if (welcomeModalIsShown) {
+    await explorationEditorMainTab.exitTutorial();
+  }
 };
 
 // Creates a new exploration and wait for the exploration tutorial to start.
-var createExplorationAndStartTutorial = function() {
+var createExplorationAndStartTutorial = async function() {
   var creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage;
-  creatorDashboardPage.get();
+  await creatorDashboardPage.get();
   // Wait for the dashboard to transition the creator into the editor page.
-  users.isAdmin().then(function(isAdmin) {
-    creatorDashboardPage.clickCreateActivityButton();
-    if (isAdmin) {
-      var activityCreationModal = element(
-        by.css('.protractor-test-creation-modal'));
-      waitFor.visibilityOf(
-        activityCreationModal,
-        'ActivityCreationModal takes too long to be visible.');
-      var createExplorationButton = element(
-        by.css('.protractor-test-create-exploration'));
-      waitFor.elementToBeClickable(
-        createExplorationButton,
-        'createExplorationButton takes too long to be clickable.');
-      createExplorationButton.click();
-    }
-  });
+  var isAdmin = await users.isAdmin();
+
+  await creatorDashboardPage.clickCreateActivityButton();
+  if (isAdmin) {
+    var activityCreationModal = element(
+      by.css('.protractor-test-creation-modal'));
+    await waitFor.visibilityOf(
+      activityCreationModal,
+      'ActivityCreationModal takes too long to be visible.');
+    var createExplorationButton = element(
+      by.css('.protractor-test-create-exploration'));
+    await action.click('Create Exploration Button', createExplorationButton);
+  }
+
+  await waitFor.pageToFullyLoad();
+  await waitFor.visibilityOf(
+    stateNameText, 'State name text takes too long to appear.');
 };
 
 /**
  * Only Admin users can create collections.
  */
-var createCollectionAsAdmin = function() {
+var createCollectionAsAdmin = async function() {
   var creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage;
-  creatorDashboardPage.get();
-  creatorDashboardPage.clickCreateActivityButton();
+  await creatorDashboardPage.get();
+  await creatorDashboardPage.clickCreateActivityButton();
   var activityCreationModal = element(
     by.css('.protractor-test-creation-modal'));
-  waitFor.visibilityOf(
+  await waitFor.visibilityOf(
     activityCreationModal, 'Activity Creation modal takes too long to appear');
-  creatorDashboardPage.clickCreateCollectionButton();
+  await creatorDashboardPage.clickCreateCollectionButton();
 };
 
 /**
  * Creating exploration for Admin users.
  */
-var createExplorationAsAdmin = function() {
+var createExplorationAsAdmin = async function() {
   var creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage;
-  creatorDashboardPage.get();
-  creatorDashboardPage.clickCreateActivityButton();
+  await creatorDashboardPage.get();
+  await creatorDashboardPage.clickCreateActivityButton();
   var activityCreationModal = element(
     by.css('.protractor-test-creation-modal'));
-  waitFor.visibilityOf(
+  await waitFor.visibilityOf(
     activityCreationModal, 'Activity Creation modal takes too long to appear');
-  creatorDashboardPage.clickCreateExplorationButton();
+  await creatorDashboardPage.clickCreateExplorationButton();
 };
 
 // This will only work if all changes have been saved and there are no
 // outstanding warnings; run from the editor.
-var publishExploration = function() {
-  element(by.css('.protractor-test-publish-exploration')).isDisplayed().then(
-    function() {
-      element(by.css('.protractor-test-publish-exploration')).click();
-    });
+var publishExploration = async function() {
+  await waitFor.elementToBeClickable(element(by.css(
+    '.protractor-test-publish-exploration')));
+  await element(by.css('.protractor-test-publish-exploration')).isDisplayed();
+  await element(by.css('.protractor-test-publish-exploration')).click();
+  await waitFor.elementToBeClickable(element(by.css(
+    '.protractor-test-confirm-pre-publication')));
   var prePublicationButtonElem = element(by.css(
     '.protractor-test-confirm-pre-publication'));
-  prePublicationButtonElem.isPresent().then(function() {
-    prePublicationButtonElem.click();
-  });
+  await prePublicationButtonElem.isPresent();
+  await prePublicationButtonElem.click();
 
-  waitFor.invisibilityOf(
+  await waitFor.invisibilityOf(
     prePublicationButtonElem,
     'prePublicationButtonElem taking too long to disappear while publishing');
-  element(by.css('.protractor-test-confirm-publish')).click();
+  await element(by.css('.protractor-test-confirm-publish')).click();
 
   var sharePublishModal = element(
     by.css('.protractor-test-share-publish-modal'));
   var closePublishModalButton = element(
     by.css('.protractor-test-share-publish-close'));
-  waitFor.visibilityOf(
+  await waitFor.visibilityOf(
     sharePublishModal, 'Share Publish Modal takes too long to appear');
-  waitFor.elementToBeClickable(
+  await waitFor.elementToBeClickable(
     closePublishModalButton, 'Close Publish Modal button is not clickable');
-  closePublishModalButton.click();
+  await closePublishModalButton.click();
 };
 
-// Creates and publishes a minimal exploration
-var createAndPublishExploration = function(
-    title, category, objective, language) {
-  createExploration();
+// Creates and publishes a minimal exploration.
+var createAndPublishExploration = async function(
+    title, category, objective, language, welcomeModalIsShown) {
+  await createExploration(welcomeModalIsShown);
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
-  explorationEditorMainTab.setContent(forms.toRichText('new exploration'));
-  explorationEditorMainTab.setInteraction('EndExploration');
+  await explorationEditorMainTab.setContent(
+    await forms.toRichText('new exploration'));
+  await explorationEditorMainTab.setInteraction('EndExploration');
 
   var explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
-  explorationEditorPage.navigateToSettingsTab();
-  explorationEditorSettingsTab.setTitle(title);
-  explorationEditorSettingsTab.setCategory(category);
-  explorationEditorSettingsTab.setObjective(objective);
+  await explorationEditorPage.navigateToSettingsTab();
+  await explorationEditorSettingsTab.setTitle(title);
+  await explorationEditorSettingsTab.setCategory(category);
+  await explorationEditorSettingsTab.setObjective(objective);
   if (language) {
-    explorationEditorSettingsTab.setLanguage(language);
+    await explorationEditorSettingsTab.setLanguage(language);
   }
-  explorationEditorPage.saveChanges();
-  publishExploration();
+  await explorationEditorPage.saveChanges();
+  await publishExploration();
 };
 
-var createAddExpDetailsAndPublishExp = function(
-    title, category, objective, language, tags) {
-  createExploration();
+var createAddExpDetailsAndPublishExp = async function(
+    title, category, objective, language, tags, welcomeModalIsShown) {
+  await createExploration(welcomeModalIsShown);
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
-  explorationEditorMainTab.setContent(forms.toRichText('new exploration'));
-  explorationEditorMainTab.setInteraction('EndExploration');
-  explorationEditorPage.saveChanges('Save the changes');
-  explorationEditorPage.publishCardExploration(
+  await explorationEditorMainTab.setContent(
+    await forms.toRichText('new exploration'));
+  await explorationEditorMainTab.setInteraction('EndExploration');
+  await explorationEditorPage.saveChanges('Save the changes');
+  await explorationEditorPage.publishCardExploration(
     title, objective, category, language, tags);
 };
 
-// Creates and publishes a exploration with two cards
-var createAndPublishTwoCardExploration = function(
-    title, category, objective, language) {
-  createExploration();
+// Creates and publishes a exploration with two cards.
+var createAndPublishTwoCardExploration = async function(
+    title, category, objective, language, welcomeModalIsShown,
+    correctnessFeedbackIsEnabled) {
+  await createExploration(welcomeModalIsShown);
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
-  explorationEditorMainTab.setContent(forms.toRichText('card 1'));
-  explorationEditorMainTab.setInteraction('Continue');
-  explorationEditorMainTab.getResponseEditor('default').setDestination(
-    'second card', true, null
-  );
-  explorationEditorMainTab.moveToState('second card');
-  explorationEditorMainTab.setContent(forms.toRichText('card 2'));
-  explorationEditorMainTab.setInteraction('EndExploration');
+  await explorationEditorMainTab.setContent(await forms.toRichText('card 1'));
+  await explorationEditorMainTab.setInteraction('Continue');
+  var responseEditor = await explorationEditorMainTab.getResponseEditor(
+    'default');
+  await responseEditor.setDestination('second card', true, null);
+  await explorationEditorMainTab.moveToState('second card');
+  await explorationEditorMainTab.setContent(await forms.toRichText('card 2'));
+  await explorationEditorMainTab.setInteraction('EndExploration');
 
   var explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
-  explorationEditorPage.navigateToSettingsTab();
-  explorationEditorSettingsTab.setTitle(title);
-  explorationEditorSettingsTab.setCategory(category);
-  explorationEditorSettingsTab.setObjective(objective);
+  await explorationEditorPage.navigateToSettingsTab();
+  await explorationEditorSettingsTab.setTitle(title);
+  await explorationEditorSettingsTab.setCategory(category);
+  await explorationEditorSettingsTab.setObjective(objective);
   if (language) {
-    explorationEditorSettingsTab.setLanguage(language);
+    await explorationEditorSettingsTab.setLanguage(language);
   }
-  explorationEditorPage.saveChanges();
-  publishExploration();
+  if (correctnessFeedbackIsEnabled) {
+    await explorationEditorSettingsTab.enableCorrectnessFeedback();
+  }
+  await explorationEditorPage.saveChanges();
+  await publishExploration();
 };
 
-// Role management (state editor settings tab)
+// ---- Role management (state editor settings tab) ----
 
 // Here, 'roleName' is the user-visible form of the role name (e.g. 'Manager').
-var _addExplorationRole = function(roleName, username) {
-  element(by.css('.protractor-test-edit-roles')).click();
-  element(by.css('.protractor-test-role-username')).sendKeys(username);
-  element(by.css('.protractor-test-role-select')).
-    element(by.cssContainingText('option', roleName)).click();
-  element(by.css('.protractor-test-save-role')).click();
+var _addExplorationRole = async function(roleName, username) {
+  await action.click(
+    'Edit roles', element(by.css('.protractor-test-edit-roles')));
+  await action.sendKeys(
+    'Username input',
+    element(by.css('.protractor-test-role-username')),
+    username);
+  await action.select(
+    'Role select', element(by.css('.protractor-test-role-select')), roleName);
+  await action.click(
+    'Save role', element(by.css('.protractor-test-save-role')));
 };
 
-var addExplorationManager = function(username) {
-  _addExplorationRole('Manager', username);
+var addExplorationManager = async function(username) {
+  await _addExplorationRole('Manager', username);
 };
 
-var addExplorationCollaborator = function(username) {
-  _addExplorationRole('Collaborator', username);
+var addExplorationCollaborator = async function(username) {
+  await _addExplorationRole('Collaborator', username);
 };
 
-var addExplorationVoiceArtist = function(username) {
-  _addExplorationRole('Voice Artist', username);
+var addExplorationVoiceArtist = async function(username) {
+  await _addExplorationRole('Voice Artist', username);
 };
 
-var addExplorationPlaytester = function(username) {
-  _addExplorationRole('Playtester', username);
+var addExplorationPlaytester = async function(username) {
+  await _addExplorationRole('Playtester', username);
 };
 
 // Here, roleName is the server-side form of the name (e.g. 'owner').
-var _getExplorationRoles = function(roleName) {
+var _getExplorationRoles = async function(roleName) {
   var itemName = roleName + 'Name';
   var listName = roleName + 'Names';
-  return element.all(by.repeater(
+  return await element.all(by.repeater(
     itemName + ' in $ctrl.ExplorationRightsService.' + listName +
     ' track by $index'
-  )).map(function(elem) {
-    return elem.getText();
+  )).map(async function(elem) {
+    return await elem.getText();
   });
 };
 
-var getExplorationManagers = function() {
-  return _getExplorationRoles('owner');
+var getExplorationManagers = async function() {
+  return await _getExplorationRoles('owner');
 };
 
-var getExplorationCollaborators = function() {
-  return _getExplorationRoles('editor');
+var getExplorationCollaborators = async function() {
+  return await _getExplorationRoles('editor');
 };
 
-var getExplorationVoiceArtists = function() {
-  return _getExplorationRoles('voiceArtist');
+var getExplorationVoiceArtists = async function() {
+  return await _getExplorationRoles('voiceArtist');
 };
 
-var getExplorationPlaytesters = function() {
-  return _getExplorationRoles('viewer');
+var getExplorationPlaytesters = async function() {
+  return await _getExplorationRoles('viewer');
 };
 
-var createSkillAndAssignTopic = function(
+var createSkillAndAssignTopic = async function(
     skillDescription, material, topicName) {
-  var topicsAndSkillsDashboardPage =
-      new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage();
-  topicsAndSkillsDashboardPage.get();
-  topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-    skillDescription, material);
-  topicsAndSkillsDashboardPage.get();
-  topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
-  topicsAndSkillsDashboardPage.searchSkillByName(skillDescription);
-  topicsAndSkillsDashboardPage.assignSkillWithIndexToTopicByTopicName(
-    0, topicName);
+  var topicsAndSkillsDashboardPage = (
+    new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage());
+  await topicsAndSkillsDashboardPage.get();
+  await topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
+    skillDescription, material, true);
+  await topicsAndSkillsDashboardPage.get();
+  await topicsAndSkillsDashboardPage.navigateToSkillsTab();
+  await topicsAndSkillsDashboardPage.filterSkillsByStatus('Unassigned');
+  await topicsAndSkillsDashboardPage.searchSkillByName(skillDescription);
+  await topicsAndSkillsDashboardPage.assignSkillToTopic(
+    skillDescription, topicName);
 };
+
+var getImageSource = async function(customImageElement) {
+  await waitFor.visibilityOf(
+    customImageElement,
+    'Image element is taking too long to appear.');
+  return await customImageElement.getAttribute('src');
+};
+
+var uploadImage = async function(
+    imageClickableElement, imgPath, resetExistingImage) {
+  await action.click('Image clickable element', imageClickableElement);
+  if (resetExistingImage) {
+    expect(await thumbnailResetButton.isPresent()).toBe(true);
+    await action.click('Topic thumbnail reset button', thumbnailResetButton);
+  } else {
+    expect(await thumbnailResetButton.isPresent()).toBe(false);
+  }
+
+  absPath = path.resolve(__dirname, imgPath);
+  return await imageUploadInput.sendKeys(absPath);
+};
+
+var submitImage = async function(
+    imageClickableElement, imageContainer, imgPath, resetExistingImage) {
+  await waitFor.visibilityOf(
+    imageClickableElement,
+    'Image element is taking too long to appear.');
+  await uploadImage(imageClickableElement, imgPath, resetExistingImage);
+  await waitFor.visibilityOf(
+    imageContainer, 'Image container is taking too long to appear');
+  await action.click('Image submit button', imageSubmitButton);
+  await waitFor.invisibilityOf(
+    imageUploadInput,
+    'Image uploader is taking too long to disappear');
+  await waitFor.invisibilityOf(
+    imageContainer,
+    'Image container is taking too long to disappear');
+  return await waitFor.pageToFullyLoad();
+};
+
+var createQuestion = async function() {
+  var skillEditorPage = new SkillEditorPage.SkillEditorPage();
+  var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+  var explorationEditorMainTab = explorationEditorPage.getMainTab();
+  await skillEditorPage.moveToQuestionsTab();
+  await skillEditorPage.clickCreateQuestionButton();
+  await explorationEditorMainTab.setContent(
+    await forms.toRichText('Question 1'));
+  await explorationEditorMainTab.setInteraction(
+    'TextInput', 'Placeholder', 5);
+  await explorationEditorMainTab.addResponse(
+    'TextInput', await forms.toRichText('Correct Answer'), null, false,
+    'FuzzyEquals', ['correct']);
+  var responseEditor = await explorationEditorMainTab.getResponseEditor(0);
+  await responseEditor.markAsCorrect();
+  await (
+    await explorationEditorMainTab.getResponseEditor('default')
+  ).setFeedback(await forms.toRichText('Try again'));
+  await explorationEditorMainTab.addHint('Hint 1');
+  await explorationEditorMainTab.addSolution('TextInput', {
+    correctAnswer: 'correct',
+    explanation: 'It is correct'
+  });
+  await skillEditorPage.saveQuestion();
+};
+
+exports.getImageSource = getImageSource;
+exports.submitImage = submitImage;
+exports.uploadImage = uploadImage;
 
 exports.createExploration = createExploration;
 exports.createExplorationAndStartTutorial = createExplorationAndStartTutorial;
@@ -273,6 +379,7 @@ exports.createExplorationAsAdmin = createExplorationAsAdmin;
 exports.createAndPublishTwoCardExploration = createAndPublishTwoCardExploration;
 
 exports.canAddRolesToUsers = canAddRolesToUsers;
+exports.isExplorationCommunityOwned = isExplorationCommunityOwned;
 exports.checkForAddTitleWarning = checkForAddTitleWarning;
 exports.triggerTitleOnBlurEvent = triggerTitleOnBlurEvent;
 exports.openEditRolesForm = openEditRolesForm;
@@ -286,3 +393,4 @@ exports.getExplorationVoiceArtists = getExplorationVoiceArtists;
 exports.getExplorationPlaytesters = getExplorationPlaytesters;
 exports.createAddExpDetailsAndPublishExp = createAddExpDetailsAndPublishExp;
 exports.createSkillAndAssignTopic = createSkillAndAssignTopic;
+exports.createQuestion = createQuestion;

@@ -24,11 +24,10 @@ import ast
 from core import jobs
 from core.domain import exp_services
 from core.domain import recommendations_services
-from core.domain import rights_manager
+from core.domain import rights_domain
 from core.platform import models
 
-(exp_models, recommendations_models,) = models.Registry.import_models([
-    models.NAMES.exploration, models.NAMES.recommendations])
+(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
 MAX_RECOMMENDATIONS = 10
 # Note: There is a threshold so that bad recommendations will be
@@ -40,6 +39,12 @@ class ExplorationRecommendationsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """A one-off job that computes a list of recommended explorations to play
     after completing an exploration.
     """
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        super(ExplorationRecommendationsOneOffJob, cls).enqueue(
+            job_id, shard_count=64)
+
     @classmethod
     def entity_classes_to_map_over(cls):
         return [exp_models.ExpSummaryModel]
@@ -47,7 +52,7 @@ class ExplorationRecommendationsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(item):
         # Only process the exploration if it is not private.
-        if item.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
+        if item.status == rights_domain.ACTIVITY_STATUS_PRIVATE:
             return
 
         exp_summary_id = item.id
@@ -91,5 +96,5 @@ class ExplorationRecommendationsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             item['exp_id']
             for item in other_exploration_similarities[:MAX_RECOMMENDATIONS]]
 
-        recommendations_services.set_recommendations(
+        recommendations_services.set_exploration_recommendations(
             key, recommended_exploration_ids)

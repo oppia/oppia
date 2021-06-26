@@ -61,6 +61,47 @@
       "IsEquivalentTo": "is equivalent to {{f|NumberWithUnits}}"
     }
   },
+  "NumericExpressionInput": {
+    "can_have_solution": true,
+    "show_generic_submit_button": true,
+    "instructions": null,
+    "is_trainable": false,
+    "narrow_instructions": null,
+    "description": "Allows learners to enter numeric expressions.",
+    "needs_summary": false,
+    "name": "Numeric Expression Input",
+    "answer_type": "NumericExpression",
+    "is_linear": false,
+    "display_mode": "inline",
+    "id": "NumericExpressionInput",
+    "customization_arg_specs": [{
+      "description": "Placeholder text",
+      "name": "placeholder",
+      "schema": {
+        "type": "custom",
+        "obj_type": "SubtitledUnicode"
+      },
+      "default_value": {
+        "content_id": null,
+        "unicode_str": "Type an expression here, using only numbers."
+      }
+    }, {
+      "description": "Represent division using fractions (rather than ÷).",
+      "name": "useFractionForDivision",
+      "schema": {
+        "type": "bool"
+      },
+      "default_value": false
+    }],
+    "is_terminal": false,
+    "default_outcome_heading": null,
+    "rule_descriptions": {
+      "MatchesExactlyWith": "matches exactly with {{x|NumericExpression}}",
+      "IsEquivalentTo": "is equivalent to {{x|NumericExpression}}",
+      "ContainsSomeOf": "contains at least one of the terms present in {{x|NumericExpression}}",
+      "OmitsSomeOf": "omits at least one of the terms present in {{x|NumericExpression}}"
+    }
+  },
   "NumericInput": {
     "can_have_solution": true,
     "show_generic_submit_button": true,
@@ -96,7 +137,7 @@
     "description": "Allows learners to drag and drop items for sorting.",
     "needs_summary": true,
     "name": "Drag And Drop Sort",
-    "answer_type": "ListOfSetsOfHtmlStrings",
+    "answer_type": "ListOfSetsOfTranslatableHtmlContentIds",
     "is_linear": false,
     "display_mode": "supplemental",
     "id": "DragAndDropSortInput",
@@ -106,10 +147,13 @@
         "name": "choices",
         "schema": {
           "items": {
-            "type": "html",
-            "ui_config": {
-              "hide_complex_extensions": true,
-              "placeholder": "Enter an option for the learner to drag and drop."
+            "type": "custom",
+            "obj_type": "SubtitledHtml",
+            "replacement_ui_config": {
+              "html": {
+                "hide_complex_extensions": true,
+                "placeholder": "Enter an option for the learner to drag and drop."
+              }
             }
           },
           "type": "list",
@@ -124,7 +168,10 @@
           }
         },
         "default_value": [
-          ""
+          {
+            "content_id": null,
+            "html": ""
+          }
         ]
       },
       {
@@ -139,10 +186,10 @@
     "is_terminal": false,
     "default_outcome_heading": null,
     "rule_descriptions": {
-      "HasElementXAtPositionY": "has element {{x|DragAndDropHtmlString}} at position {{y|DragAndDropPositiveInt}}",
-      "IsEqualToOrdering": "is equal to ordering {{x|ListOfSetsOfHtmlStrings}}",
-      "HasElementXBeforeElementY": "has element {{x|DragAndDropHtmlString}} before element {{y|DragAndDropHtmlString}}",
-      "IsEqualToOrderingWithOneItemAtIncorrectPosition": "is equal to ordering with one item at incorrect position {{x|ListOfSetsOfHtmlStrings}}"
+      "HasElementXAtPositionY": "has element {{x|TranslatableHtmlContentId}} at position {{y|DragAndDropPositiveInt}}",
+      "IsEqualToOrdering": "is equal to ordering {{x|ListOfSetsOfTranslatableHtmlContentIds}}",
+      "HasElementXBeforeElementY": "has element {{x|TranslatableHtmlContentId}} before element {{y|TranslatableHtmlContentId}}",
+      "IsEqualToOrderingWithOneItemAtIncorrectPosition": "is equal to ordering with one item at incorrect position {{x|ListOfSetsOfTranslatableHtmlContentIds}}"
     }
   },
   "ItemSelectionInput": {
@@ -154,7 +201,7 @@
     "description": "Allows learners to select various options.",
     "needs_summary": false,
     "name": "Item Selection",
-    "answer_type": "SetOfHtmlString",
+    "answer_type": "SetOfTranslatableHtmlContentIds",
     "is_linear": false,
     "display_mode": "inline",
     "id": "ItemSelectionInput",
@@ -192,10 +239,13 @@
         "name": "choices",
         "schema": {
           "items": {
-            "type": "html",
-            "ui_config": {
-              "hide_complex_extensions": true,
-              "placeholder": "Sample item answer"
+            "type": "custom",
+            "obj_type": "SubtitledHtml",
+            "replacement_ui_config": {
+              "html": {
+                "hide_complex_extensions": true,
+                "placeholder": "Sample item answer"
+              }
             }
           },
           "type": "list",
@@ -203,18 +253,16 @@
             "add_element_text": "Add item for selection"
           }
         },
-        "default_value": [
-          ""
-        ]
+        "default_value": [{"content_id": null, "html": ""}]
       }
     ],
     "is_terminal": false,
     "default_outcome_heading": null,
     "rule_descriptions": {
-      "DoesNotContainAtLeastOneOf": "omits at least one of {{x|SetOfHtmlString}}",
-      "IsProperSubsetOf": "is a proper subset of {{x|SetOfHtmlString}}",
-      "ContainsAtLeastOneOf": "contains at least one of {{x|SetOfHtmlString}}",
-      "Equals": "is equal to {{x|SetOfHtmlString}}"
+      "DoesNotContainAtLeastOneOf": "omits at least one of {{x|SetOfTranslatableHtmlContentIds}}",
+      "IsProperSubsetOf": "is a proper subset of {{x|SetOfTranslatableHtmlContentIds}}",
+      "ContainsAtLeastOneOf": "contains at least one of {{x|SetOfTranslatableHtmlContentIds}}",
+      "Equals": "is equal to {{x|SetOfTranslatableHtmlContentIds}}"
     }
   },
   "Continue": {
@@ -235,9 +283,13 @@
         "description": "Button label",
         "name": "buttonText",
         "schema": {
-          "type": "unicode"
+          "type": "custom",
+          "obj_type": "SubtitledUnicode"
         },
-        "default_value": "Continue"
+        "default_value": {
+          "content_id": null,
+          "unicode_str": "Continue"
+        }
       }
     ],
     "is_terminal": false,
@@ -409,17 +461,30 @@
     "is_linear": false,
     "display_mode": "inline",
     "id": "SetInput",
-    "customization_arg_specs": [],
+    "customization_arg_specs": [
+      {
+        "description": "Label for the 'Add Item' button",
+        "name": "buttonText",
+        "schema": {
+          "type": "custom",
+          "obj_type": "SubtitledUnicode"
+        },
+        "default_value": {
+          "content_id": null,
+          "unicode_str": "Add Item"
+        }
+      }
+    ],
     "is_terminal": false,
     "default_outcome_heading": null,
     "rule_descriptions": {
-      "HasElementsNotIn": "has elements not in {{x|SetOfUnicodeString}}",
-      "Equals": "is equal to {{x|SetOfUnicodeString}}",
-      "IsSupersetOf": "is a proper superset of {{x|SetOfUnicodeString}}",
-      "OmitsElementsIn": "omits some elements of {{x|SetOfUnicodeString}}",
-      "HasElementsIn": "has elements in common with {{x|SetOfUnicodeString}}",
-      "IsSubsetOf": "is a proper subset of {{x|SetOfUnicodeString}}",
-      "IsDisjointFrom": "has no elements in common with {{x|SetOfUnicodeString}}"
+      "HasElementsNotIn": "has elements not in {{x|TranslatableSetOfUnicodeString}}",
+      "Equals": "is equal to {{x|TranslatableSetOfUnicodeString}}",
+      "IsSupersetOf": "is a proper superset of {{x|TranslatableSetOfUnicodeString}}",
+      "OmitsElementsIn": "omits some elements of {{x|TranslatableSetOfUnicodeString}}",
+      "HasElementsIn": "has elements in common with {{x|TranslatableSetOfUnicodeString}}",
+      "IsSubsetOf": "is a proper subset of {{x|TranslatableSetOfUnicodeString}}",
+      "IsDisjointFrom": "has no elements in common with {{x|TranslatableSetOfUnicodeString}}"
     }
   },
   "CodeRepl": {
@@ -543,6 +608,48 @@
       "NotCorrectByCategory": "is not correct due to {{c|LogicErrorCategory}}"
     }
   },
+  "MathEquationInput": {
+    "can_have_solution": true,
+    "show_generic_submit_button": true,
+    "instructions": null,
+    "is_trainable": false,
+    "narrow_instructions": null,
+    "description": "Allows learners to enter math equations.",
+    "needs_summary": false,
+    "name": "Math Equation Input",
+    "answer_type": "MathEquation",
+    "is_linear": false,
+    "display_mode": "inline",
+    "id": "MathEquationInput",
+    "customization_arg_specs": [
+      {
+        "description": "Shortcut variables that the learner can access in the on-screen keyboard. (The order of these variables will be reflected in the learner's keyboard)",
+        "name": "customOskLetters",
+        "schema": {
+          "obj_type": "CustomOskLetters",
+          "type": "custom"
+        },
+        "default_value": []
+      },
+      {
+        "description": "Represent division using fractions (rather than ÷).",
+        "name": "useFractionForDivision",
+        "schema": {
+          "type": "bool"
+        },
+        "default_value": false
+      }
+    ],
+    "is_terminal": false,
+    "default_outcome_heading": null,
+    "rule_descriptions": {
+      "MatchesExactlyWith": "matches exactly with {{x|MathEquation}} {{y|PositionOfTerms}}",
+      "IsEquivalentTo": "is equivalent to {{x|MathEquation}}",
+      "ContainsSomeOf": "contains at least one of the terms present in {{x|MathEquation}} {{y|PositionOfTerms}}",
+      "OmitsSomeOf": "omits at least one of the terms present in {{x|MathEquation}} {{y|PositionOfTerms}}",
+      "MatchesWithGeneralForm": "matches the form of {{x|MathEquation}} with placeholders {{y|SetOfAlgebraicIdentifier}}"
+    }
+  },
   "MultipleChoiceInput": {
     "can_have_solution": false,
     "show_generic_submit_button": false,
@@ -562,10 +669,13 @@
         "name": "choices",
         "schema": {
           "items": {
-            "type": "html",
-            "ui_config": {
-              "hide_complex_extensions": true,
-              "placeholder": "Enter an option for the learner to select"
+            "type": "custom",
+            "obj_type": "SubtitledHtml",
+            "replacement_ui_config": {
+              "html": {
+                "hide_complex_extensions": true,
+                "placeholder": "Enter an option for the learner to select"
+              }
             }
           },
           "type": "list",
@@ -579,10 +689,18 @@
             "add_element_text": "Add multiple choice option"
           }
         },
-        "default_value": [
-          ""
-        ]
-      }
+        "default_value": [{
+          "content_id": null,
+          "html": ""
+        }]
+      }, {
+        "name": "showChoicesInShuffledOrder",
+        "description": "Shuffle answer choices",
+        "schema": {
+            "type": "bool"
+        },
+        "default_value": true
+    }
     ],
     "is_terminal": false,
     "default_outcome_heading": null,
@@ -606,7 +724,7 @@
     "customization_arg_specs": [
       {
         "description": "The initial code",
-        "name": "initial_code",
+        "name": "initialCode",
         "schema": {
           "type": "unicode",
           "ui_config": {
@@ -646,9 +764,13 @@
         "description": "Placeholder text (optional)",
         "name": "placeholder",
         "schema": {
-          "type": "unicode"
+          "type": "custom",
+          "obj_type": "SubtitledUnicode"
         },
-        "default_value": ""
+        "default_value": {
+          "content_id": null,
+          "unicode_str": ""
+        }
       },
       {
         "description": "Height (in rows)",
@@ -672,11 +794,10 @@
     "is_terminal": false,
     "default_outcome_heading": null,
     "rule_descriptions": {
-      "StartsWith": "starts with {{x|NormalizedString}}",
-      "Contains": "contains {{x|NormalizedString}}",
-      "Equals": "is equal to {{x|NormalizedString}}",
-      "CaseSensitiveEquals": "is equal to {{x|NormalizedString}}, taking case into account",
-      "FuzzyEquals": "is equal to {{x|NormalizedString}}, misspelled by at most one character"
+      "StartsWith": "starts with at least one of {{x|TranslatableSetOfNormalizedString}}",
+      "Contains": "contains at least one of {{x|TranslatableSetOfNormalizedString}}",
+      "Equals": "is equal to at least one of {{x|TranslatableSetOfNormalizedString}}, without taking case into account",
+      "FuzzyEquals": "is equal to at least one of {{x|TranslatableSetOfNormalizedString}}, misspelled by at most one character"
     }
   },
   "InteractiveMap": {
@@ -789,24 +910,46 @@
       "HasLengthInclusivelyBetween": "has between {{a|NonnegativeInt}} and {{b|NonnegativeInt}} notes, inclusive"
     }
   },
-  "MathExpressionInput": {
+  "AlgebraicExpressionInput": {
     "can_have_solution": true,
     "show_generic_submit_button": true,
     "instructions": null,
     "is_trainable": false,
     "narrow_instructions": null,
-    "description": "Allows learners to enter mathematical expressions.",
+    "description": "Allows learners to enter algebraic expressions.",
     "needs_summary": false,
-    "name": "Math Expression Input",
-    "answer_type": "MathExpression",
+    "name": "Algebraic Expression Input",
+    "answer_type": "AlgebraicExpression",
     "is_linear": false,
     "display_mode": "inline",
-    "id": "MathExpressionInput",
-    "customization_arg_specs": [],
+    "id": "AlgebraicExpressionInput",
+    "customization_arg_specs": [
+      {
+        "description": "Shortcut variables that the learner can access in the on-screen keyboard. (The order of these variables will be reflected in the learner's keyboard)",
+        "name": "customOskLetters",
+        "schema": {
+          "obj_type": "CustomOskLetters",
+          "type": "custom"
+        },
+        "default_value": []
+      },
+      {
+        "description": "Represent division using fractions (rather than ÷).",
+        "name": "useFractionForDivision",
+        "schema": {
+          "type": "bool"
+        },
+        "default_value": false
+      }
+    ],
     "is_terminal": false,
     "default_outcome_heading": null,
     "rule_descriptions": {
-      "IsMathematicallyEquivalentTo": "is mathematically equivalent to (LaTeX) {{x|UnicodeString}}"
+      "MatchesExactlyWith": "matches exactly with {{x|AlgebraicExpression}}",
+      "IsEquivalentTo": "is equivalent to {{x|AlgebraicExpression}}",
+      "ContainsSomeOf": "contains at least one of the terms present in {{x|AlgebraicExpression}}",
+      "OmitsSomeOf": "omits at least one of the terms present in {{x|AlgebraicExpression}}",
+      "MatchesWithGeneralForm": "matches the form of {{x|AlgebraicExpression}} with placeholders {{y|SetOfAlgebraicIdentifier}}"
     }
   },
   "FractionInput": {
@@ -851,9 +994,13 @@
         "description": "Custom placeholder text (optional)",
         "name": "customPlaceholder",
         "schema": {
-          "type": "unicode"
+          "type": "custom",
+          "obj_type": "SubtitledUnicode"
         },
-        "default_value": ""
+        "default_value": {
+          "content_id": null,
+          "unicode_str": ""
+        }
       }
     ],
     "is_terminal": false,
@@ -868,7 +1015,61 @@
       "IsGreaterThan": "is greater than {{f|Fraction}}",
       "HasIntegerPartEqualTo": "has integer part equal to {{x|Int}}",
       "IsEquivalentTo": "is equivalent to {{f|Fraction}}",
-      "HasDenominatorEqualTo": "has denominator equal to {{x|NonnegativeInt}}"
+      "HasDenominatorEqualTo": "has denominator equal to {{x|PositiveInt}}"
+    }
+  },
+  "RatioExpressionInput": {
+    "can_have_solution": true,
+    "show_generic_submit_button": true,
+    "instructions": null,
+    "is_trainable": false,
+    "narrow_instructions": null,
+    "description": "Allow learners to enter ratios.",
+    "needs_summary": false,
+    "name": "Ratio Expression Input",
+    "answer_type": "RatioExpression",
+    "is_linear": false,
+    "display_mode": "inline",
+    "id": "RatioExpressionInput",
+    "customization_arg_specs": [
+      {
+        "description": "Custom placeholder text (optional)",
+        "name": "placeholder",
+        "schema": {
+          "type": "custom",
+          "obj_type": "SubtitledUnicode"
+        },
+        "default_value": {
+          "content_id": null,
+          "unicode_str": ""
+        }
+      },
+      {
+        "description": "The number of elements that the answer must have. If set to 0, a ratio of any length will be accepted. The number of elements should not be greater than 10.",
+        "name": "numberOfTerms",
+        "schema": {
+          "type": "int",
+          "validators": [
+            {
+              "min_value": 0,
+              "id": "is_at_least"
+            },
+            {
+              "max_value": 10,
+              "id": "is_at_most"
+            }
+          ]
+        },
+        "default_value": 0
+      }
+    ],
+    "is_terminal": false,
+    "default_outcome_heading": null,
+    "rule_descriptions": {
+      "Equals": "is equal to {{x|RatioExpression}}",
+      "IsEquivalent": "is equivalent to {{x|RatioExpression}}",
+      "HasNumberOfTermsEqualTo": "has number of terms equal to {{y|PositiveInt}}",
+      "HasSpecificTermEqualTo": "has term {{x|PositiveInt}} equal to {{y|PositiveInt}}"
     }
   }
 }

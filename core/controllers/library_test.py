@@ -27,18 +27,29 @@ from core.domain import activity_services
 from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
-from core.domain import exp_jobs_one_off
 from core.domain import exp_services
 from core.domain import rating_services
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import summary_services
 from core.domain import user_services
-from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
 import utils
 
 CAN_EDIT_STR = 'can_edit'
+
+
+class OldLibraryRedirectPageTest(test_utils.GenericTestBase):
+    """Test for redirecting the old library page URL to the new one."""
+
+    def test_old_library_page_url(self):
+        """Test to validate that the old library page url redirects
+        to the new one.
+        """
+        response = self.get_html_response('/library', expected_status_int=301)
+        self.assertEqual(
+            'http://localhost/community-library', response.headers['location'])
 
 
 class LibraryPageTests(test_utils.GenericTestBase):
@@ -50,7 +61,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
 
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.admin = user_services.UserActionsInfo(self.admin_id)
+        self.admin = user_services.get_user_actions_info(self.admin_id)
 
     def test_library_page(self):
         """Test access to the library page."""
@@ -61,7 +72,6 @@ class LibraryPageTests(test_utils.GenericTestBase):
         """Test the library data handler on demo explorations."""
         response_dict = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL)
         self.assertEqual({
-            'iframed': False,
             'is_admin': False,
             'is_topic_manager': False,
             'is_moderator': False,
@@ -72,6 +82,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
 
         # Load a public demo exploration.
         exp_services.load_demo('0')
+        self.process_and_flush_pending_tasks()
 
         # Load the search results with an empty query.
         response_dict = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL)
@@ -82,24 +93,10 @@ class LibraryPageTests(test_utils.GenericTestBase):
             'title': 'Welcome to Oppia!',
             'language_code': 'en',
             'objective': 'become familiar with Oppia\'s capabilities',
-            'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
+            'status': rights_domain.ACTIVITY_STATUS_PUBLIC,
         }, response_dict['activity_list'][0])
 
         self.set_admins([self.ADMIN_USERNAME])
-
-        # Run migration job to create exploration summaries.
-        # This is not necessary, but serves as additional check that
-        # the migration job works well and gives correct results.
-        self.process_and_flush_pending_tasks()
-        job_id = (exp_jobs_one_off.ExpSummariesCreationOneOffJob.create_new())
-        exp_jobs_one_off.ExpSummariesCreationOneOffJob.enqueue(job_id)
-        self.assertGreaterEqual(
-            self.count_jobs_in_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
-        self.assertEqual(
-            self.count_jobs_in_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
 
         # Change title and category.
         exp_services.update_exploration(
@@ -113,6 +110,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
                 'new_value': 'A new category'
             })],
             'Change title and category')
+        self.process_and_flush_pending_tasks()
 
         # Load the search results with an empty query.
         response_dict = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL)
@@ -123,7 +121,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
             'title': 'A new title!',
             'language_code': 'en',
             'objective': 'become familiar with Oppia\'s capabilities',
-            'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
+            'status': rights_domain.ACTIVITY_STATUS_PUBLIC,
         }, response_dict['activity_list'][0])
 
     def test_library_handler_for_created_explorations(self):
@@ -175,7 +173,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
             'title': 'Title B',
             'language_code': 'en',
             'objective': 'Objective B',
-            'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
+            'status': rights_domain.ACTIVITY_STATUS_PUBLIC,
         }, response_dict['activity_list'][1])
         self.assertDictContainsSubset({
             'id': 'A',
@@ -183,7 +181,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
             'title': 'Title A',
             'language_code': 'en',
             'objective': 'Objective A',
-            'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
+            'status': rights_domain.ACTIVITY_STATUS_PUBLIC,
         }, response_dict['activity_list'][0])
 
         # Delete exploration A.
@@ -198,13 +196,12 @@ class LibraryPageTests(test_utils.GenericTestBase):
             'title': 'Title B',
             'language_code': 'en',
             'objective': 'Objective B',
-            'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
+            'status': rights_domain.ACTIVITY_STATUS_PUBLIC,
         }, response_dict['activity_list'][0])
 
     def test_library_handler_with_exceeding_query_limit_logs_error(self):
         response_dict = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL)
         self.assertEqual({
-            'iframed': False,
             'is_admin': False,
             'is_topic_manager': False,
             'is_moderator': False,
@@ -222,7 +219,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
             """Mocks logging.error()."""
             observed_log_messages.append(msg)
 
-        logging_swap = self.swap(logging, 'error', _mock_logging_function)
+        logging_swap = self.swap(logging, 'exception', _mock_logging_function)
         default_query_limit_swap = self.swap(feconf, 'DEFAULT_QUERY_LIMIT', 1)
         # Load the search results with an empty query.
         with default_query_limit_swap, logging_swap:
@@ -243,8 +240,8 @@ class LibraryPageTests(test_utils.GenericTestBase):
         exp_services.index_explorations_given_ids([exp_id])
         response_dict = self.get_json(
             feconf.LIBRARY_SEARCH_DATA_URL, params={
-                'category': 'A category',
-                'language_code': 'en'
+                'category': '("A category")',
+                'language_code': '("en")'
             })
         activity_list = (
             summary_services.get_displayable_exp_summary_dicts_matching_ids(
@@ -253,6 +250,30 @@ class LibraryPageTests(test_utils.GenericTestBase):
         self.assertEqual(response_dict['activity_list'], activity_list)
 
         self.logout()
+
+    def test_library_handler_with_invalid_category(self):
+        response_1 = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL, params={
+            'category': 'missing-outer-parens',
+            'language_code': '("en")'
+        }, expected_status_int=400)
+        self.assertEqual(response_1['error'], 'Invalid search query.')
+        response_2 = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL, params={
+            'category': '(missing-inner-quotes)',
+            'language_code': '("en")'
+        }, expected_status_int=400)
+        self.assertEqual(response_2['error'], 'Invalid search query.')
+
+    def test_library_handler_with_invalid_language_code(self):
+        response_1 = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL, params={
+            'category': '("A category")',
+            'language_code': 'missing-outer-parens'
+        }, expected_status_int=400)
+        self.assertEqual(response_1['error'], 'Invalid search query.')
+        response_2 = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL, params={
+            'category': '("A category")',
+            'language_code': '(missing-inner-quotes)'
+        }, expected_status_int=400)
+        self.assertEqual(response_2['error'], 'Invalid search query.')
 
 
 class LibraryIndexHandlerTests(test_utils.GenericTestBase):
@@ -327,7 +348,7 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
             'title': 'Welcome to Oppia!',
             'language_code': 'en',
             'objective': 'become familiar with Oppia\'s capabilities',
-            'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
+            'status': rights_domain.ACTIVITY_STATUS_PUBLIC,
         }, activity_summary_dicts[0])
 
     def test_library_index_handler_updates_featured_activity_summary_dict(self):
@@ -373,7 +394,7 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
             'title': 'Welcome to Oppia!',
             'language_code': 'en',
             'objective': 'become familiar with Oppia\'s capabilities',
-            'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
+            'status': rights_domain.ACTIVITY_STATUS_PUBLIC,
         }, activity_summary_dicts[0])
 
 
@@ -447,7 +468,7 @@ class LibraryGroupPageTests(test_utils.GenericTestBase):
             'title': 'Welcome to Oppia!',
             'language_code': 'en',
             'objective': 'become familiar with Oppia\'s capabilities',
-            'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
+            'status': rights_domain.ACTIVITY_STATUS_PUBLIC,
         }, response_dict['activity_list'][0])
 
     def test_handler_for_top_rated_library_group_page(self):
@@ -486,7 +507,7 @@ class LibraryGroupPageTests(test_utils.GenericTestBase):
             'title': 'Welcome to Oppia!',
             'language_code': 'en',
             'objective': 'become familiar with Oppia\'s capabilities',
-            'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
+            'status': rights_domain.ACTIVITY_STATUS_PUBLIC,
         }, response_dict['activity_list'][0])
 
         # Load another public demo exploration.
@@ -508,7 +529,7 @@ class LibraryGroupPageTests(test_utils.GenericTestBase):
             'title': 'Project Euler Problem 1',
             'language_code': 'en',
             'objective': 'solve Problem 1 on the Project Euler site',
-            'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
+            'status': rights_domain.ACTIVITY_STATUS_PUBLIC,
         }, response_dict['activity_list'][0])
         self.assertDictContainsSubset({
             'id': '0',
@@ -516,7 +537,7 @@ class LibraryGroupPageTests(test_utils.GenericTestBase):
             'title': 'Welcome to Oppia!',
             'language_code': 'en',
             'objective': 'become familiar with Oppia\'s capabilities',
-            'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
+            'status': rights_domain.ACTIVITY_STATUS_PUBLIC,
         }, response_dict['activity_list'][1])
 
 
@@ -551,7 +572,7 @@ class ExplorationSummariesHandlerTests(test_utils.GenericTestBase):
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
-        self.editor = user_services.UserActionsInfo(self.editor_id)
+        self.editor = user_services.get_user_actions_info(self.editor_id)
 
         self.save_new_valid_exploration(
             self.PRIVATE_EXP_ID_EDITOR, self.editor_id)
@@ -608,7 +629,7 @@ class ExplorationSummariesHandlerTests(test_utils.GenericTestBase):
         # private exploration, then it will show up for the next request.
         rights_manager.assign_role_for_exploration(
             self.editor, self.PRIVATE_EXP_ID_EDITOR, self.viewer_id,
-            rights_manager.ROLE_EDITOR)
+            rights_domain.ROLE_EDITOR)
 
         response_dict = self.get_json(
             feconf.EXPLORATION_SUMMARIES_DATA_URL,
@@ -670,6 +691,7 @@ class ExplorationSummariesHandlerTests(test_utils.GenericTestBase):
 
 class CollectionSummariesHandlerTests(test_utils.GenericTestBase):
     """Test Collection Summaries Handler."""
+
     def test_access_collection(self):
         response_dict = self.get_json(
             feconf.COLLECTION_SUMMARIES_DATA_URL,

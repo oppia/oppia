@@ -25,29 +25,29 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
-import { InteractionsExtensionsConstants } from
-  'interactions/interactions-extension.constants';
+import { InteractionsExtensionsConstants } from 'interactions/interactions-extension.constants';
 import { SVMPredictionService } from 'classifiers/svm-prediction.service';
+import { TextClassifierFrozenModel } from 'classifiers/proto/text_classifier';
 import { TextInputTokenizer } from 'classifiers/text-input.tokenizer';
 
-export interface IClassifierData {
-  /* eslint-disable camelcase */
-  cv_vocabulary: object;
-  SVM: object;
-}
 @Injectable({
   providedIn: 'root'
 })
 export class TextInputPredictionService {
   private TEXT_INPUT_PREDICTION_SERVICE_THRESHOLD = (
     InteractionsExtensionsConstants.TEXT_INPUT_PREDICTION_SERVICE_THRESHOLD);
-  constructor(private countVectorizerService: CountVectorizerService,
-      private svmPredictionService: SVMPredictionService,
-      private textInputTokenizer: TextInputTokenizer) {
+  constructor(
+    private countVectorizerService: CountVectorizerService,
+    private svmPredictionService: SVMPredictionService,
+    private textInputTokenizer: TextInputTokenizer) {
   }
 
-  predict(classifierData: IClassifierData, textInput: string): number {
-    /* eslint-disable camelcase */
+  predict(classifierBuffer: ArrayBuffer, textInput: string): number {
+    // The model_json attribute in TextClassifierFrozenModel class can't be
+    // changed to camelcase since the class definition is automatically compiled
+    // with the help of protoc.
+    const classifierData = JSON.parse(TextClassifierFrozenModel.deserialize(
+      new Uint8Array(classifierBuffer)).model_json) as TextInputClassifierData;
     const cvVocabulary = classifierData.cv_vocabulary;
     const svmData = classifierData.SVM;
 

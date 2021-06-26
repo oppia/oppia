@@ -16,62 +16,50 @@
  * @fileoverview End-to-end tests for the classroom page.
  */
 
-var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
-var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 
-var AdminPage = require('../protractor_utils/AdminPage.js');
 var ClassroomPage = require('../protractor_utils/ClassroomPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
-var TopicsAndSkillsDashboardPage = require(
-  '../protractor_utils/TopicsAndSkillsDashboardPage.js');
-var TopicEditorPage = require('../protractor_utils/TopicEditorPage.js');
 
 describe('Classroom page functionality', function() {
-  var adminPage = null;
   var classroomPage = null;
   var libraryPage = null;
-  var topicsAndSkillsDashboardPage = null;
-  var topicEditorPage = null;
 
-  beforeAll(function() {
-    adminPage = new AdminPage.AdminPage();
+  beforeAll(async function() {
     classroomPage = new ClassroomPage.ClassroomPage();
     libraryPage = new LibraryPage.LibraryPage();
-    topicsAndSkillsDashboardPage =
-      new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage();
-    topicEditorPage =
-      new TopicEditorPage.TopicEditorPage();
 
-    users.createAndLoginAdminUser(
+    await users.createAndLoginUser(
       'creator@classroomPage.com', 'creatorClassroomPage');
+    await users.logout();
   });
 
-  beforeEach(function() {
-    users.login('creator@classroomPage.com');
+  beforeEach(async function() {
+    await users.login('creator@classroomPage.com');
   });
 
-  it('should search for explorations from classroom page', function() {
-    workflow.createAndPublishExploration(
+  it('should search for explorations from classroom page', async function() {
+    await workflow.createAndPublishExploration(
       'Exploration Title',
       'Algorithms',
       'This is the objective.',
-      'English');
-    classroomPage.get('Math');
-    libraryPage.findExploration('Title');
-    libraryPage.expectExplorationToBeVisible('Exploration Title');
+      'English',
+      true);
+    await classroomPage.get('math');
+    await libraryPage.findExploration('Title');
+    await libraryPage.expectExplorationToBeVisible('Exploration Title');
 
-    libraryPage.selectLanguages(['English']);
-    libraryPage.expectCurrentLanguageSelectionToBe(['English']);
+    await libraryPage.selectLanguages(['English']);
+    await libraryPage.expectCurrentLanguageSelectionToBe(['English']);
 
-    libraryPage.selectCategories(['Algorithms']);
-    libraryPage.expectCurrentCategorySelectionToBe(['Algorithms']);
-    users.logout();
+    await libraryPage.selectCategories(['Algorithms']);
+    await libraryPage.expectCurrentCategorySelectionToBe(['Algorithms']);
   });
 
-  afterEach(function() {
-    general.checkForConsoleErrors([]);
+  afterEach(async function() {
+    await general.checkForConsoleErrors([]);
+    await users.logout();
   });
 });

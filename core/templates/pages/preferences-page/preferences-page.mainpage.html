@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html ng-app="oppia" itemscope itemtype="http://schema.org/Organization">
+
+  <head>
+    @load('base-components/header.template.html', {"title": "Preferences | Oppia"})
+  </head>
+
+  <body>
+    <oppia-root>
+      <div ng-controller="Base" dir="<[direction]>">
+        <oppia-base-content>
+          <navbar-breadcrumb>
+            <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+              <li>
+                <span class="oppia-navbar-breadcrumb-separator"></span>
+                <span translate="I18N_PREFERENCES_BREADCRUMB"></span>
+              </li>
+            </ul>
+          </navbar-breadcrumb>
+
+          <content>
+            <preferences-page subject-interests="subjectInterests"
+                              preferred-language-codes="preferredLanguageCodes"
+                              preferred-site-language-code="preferredSiteLanguageCode"
+                              preferred-audio-language-code="preferredAudioLanguageCode">
+            </preferences-page>
+          </content>
+        </oppia-base-content>
+      </div>
+
+    </oppia-root>
+    @load('pages/footer_js_libs.html')
+  </body>
+</html>

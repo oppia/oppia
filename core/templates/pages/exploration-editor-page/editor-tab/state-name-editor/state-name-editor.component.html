@@ -1,0 +1,33 @@
+<div>
+  <span class="protractor-test-state-name-container">
+    <span ng-if="$ctrl.EditabilityService.isEditable()">
+      <span ng-if="!$ctrl.StateNameService.isStateNameEditorShown()" ng-click="$ctrl.openStateNameEditor()" class="oppia-editable-section">
+        <strong class="oppia-state-name-text"><[$ctrl.StateEditorService.getActiveStateName()]></strong>
+        <button ng-if="$ctrl.EditabilityService.isEditable()" class="material-icons oppia-editor-edit-icon oppia-autofocus"
+                title="Edit State Name">&#xE254;
+        </button>
+      </span>
+
+      <span ng-if="$ctrl.StateNameService.isStateNameEditorShown()">
+        <form class="form-horizontal" role="form" ng-submit="$ctrl.saveStateNameAndRefresh($ctrl.tmpStateName)">
+          <input type="text" ng-model="$ctrl.tmpStateName" maxlength="{{$ctrl.maxLen}}" focus-on="stateNameEditorOpened" class="protractor-test-state-name-input">
+          <button type="submit" class="btn btn-success btn-sm protractor-test-state-name-submit">Save</button>
+        </form>
+      </span>
+    </span>
+
+    <span ng-if="!$ctrl.EditabilityService.isEditable()">
+      <strong><[$ctrl.StateEditorService.getActiveStateName()]></strong>
+    </span>
+  </span>
+</div>
+<style>
+  state-name-editor .oppia-state-name-text {
+    font-size: 1.2em;
+  }
+
+  button.oppia-editor-edit-icon {
+    border: 0;
+    padding: 0;
+  }
+</style>

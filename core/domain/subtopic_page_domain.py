@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.domain import change_domain
+from core.domain import html_validation_service
 from core.domain import state_domain
 from core.platform import models
 import feconf
@@ -58,12 +59,14 @@ class SubtopicPageChange(change_domain.BaseChange):
     ALLOWED_COMMANDS = [{
         'name': CMD_CREATE_NEW,
         'required_attribute_names': ['topic_id', 'subtopic_id'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
         'required_attribute_names': [
             'property_name', 'new_value', 'old_value', 'subtopic_id'],
         'optional_attribute_names': [],
+        'user_id_attribute_names': [],
         'allowed_values': {'property_name': SUBTOPIC_PAGE_PROPERTIES}
     }]
 
@@ -117,7 +120,7 @@ class SubtopicPageContents(python_utils.OBJECT):
         """Returns a dict representing this SubtopicPageContents domain object.
 
         Returns:
-            A dict, mapping all fields of SubtopicPageContents instance.
+            dict. A dict, mapping all fields of SubtopicPageContents instance.
         """
         return {
             'subtitled_html': self.subtitled_html.to_dict(),
@@ -136,9 +139,11 @@ class SubtopicPageContents(python_utils.OBJECT):
         Returns:
             SubtopicPageContents. The corresponding object.
         """
+        page_contents = state_domain.SubtitledHtml.from_dict(
+            page_contents_dict['subtitled_html'])
+        page_contents.validate()
         return cls(
-            state_domain.SubtitledHtml.from_dict(
-                page_contents_dict['subtitled_html']),
+            page_contents,
             state_domain.RecordedVoiceovers.from_dict(page_contents_dict[
                 'recorded_voiceovers']),
             state_domain.WrittenTranslations.from_dict(page_contents_dict[
@@ -175,7 +180,7 @@ class SubtopicPage(python_utils.OBJECT):
         """Returns a dict representing this SubtopicPage domain object.
 
         Returns:
-            A dict, mapping all fields of SubtopicPage instance.
+            dict. A dict, mapping all fields of SubtopicPage instance.
         """
         return {
             'id': self.id,
@@ -210,7 +215,7 @@ class SubtopicPage(python_utils.OBJECT):
 
         Returns:
             SubtopicPage. A subtopic object with given id, topic_id and default
-                page contents field.
+            page contents field.
         """
         subtopic_page_id = cls.get_subtopic_page_id(topic_id, subtopic_id)
         return cls(
@@ -220,11 +225,35 @@ class SubtopicPage(python_utils.OBJECT):
             constants.DEFAULT_LANGUAGE_CODE, 0)
 
     @classmethod
+    def _convert_page_contents_v1_dict_to_v2_dict(cls, page_contents_dict):
+        """Converts v1 SubtopicPage Contents schema to the v2 schema.
+        v2 schema introduces the new schema for Math components.
+
+        Args:
+            page_contents_dict: dict. A dict used to initialize a SubtopicPage
+                domain object.
+
+        Returns:
+            dict. The converted page_contents_dict.
+        """
+        page_contents_dict['written_translations'] = (
+            state_domain.WrittenTranslations.
+            convert_html_in_written_translations(
+                page_contents_dict['written_translations'],
+                html_validation_service.
+                add_math_content_to_math_rte_components))
+        page_contents_dict['subtitled_html']['html'] = (
+            html_validation_service.
+            add_math_content_to_math_rte_components(
+                page_contents_dict['subtitled_html']['html']))
+        return page_contents_dict
+
+    @classmethod
     def update_page_contents_from_model(
             cls, versioned_page_contents, current_version):
         """Converts the page_contents blob contained in the given
-        versioned_skill_contents dict from current_version to
-        current_version + 1. Note that the versioned_skill_contents being
+        versioned_page_contents dict from current_version to
+        current_version + 1. Note that the versioned_page_contents being
         passed in is modified in-place.
 
         Args:
@@ -265,7 +294,7 @@ class SubtopicPage(python_utils.OBJECT):
 
         Args:
             new_page_contents_audio: RecordedVoiceovers. The new audio for
-            the subtopic page.
+                the subtopic page.
         """
         self.page_contents.recorded_voiceovers = new_page_contents_audio
 
@@ -285,7 +314,7 @@ class SubtopicPage(python_utils.OBJECT):
         """Validates various properties of the SubtopicPage object.
 
         Raises:
-            ValidationError: One or more attributes of the subtopic page are
+            ValidationError. One or more attributes of the subtopic page are
                 invalid.
         """
         if not isinstance(self.topic_id, python_utils.BASESTRING):

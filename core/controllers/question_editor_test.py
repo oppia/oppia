@@ -17,6 +17,9 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import os
+
+from constants import constants
 from core.domain import question_fetchers
 from core.domain import question_services
 from core.domain import skill_services
@@ -24,6 +27,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 
 (question_models,) = models.Registry.import_models([models.NAMES.question])
 
@@ -49,11 +53,11 @@ class BaseQuestionEditorControllerTests(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
         self.set_topic_managers([self.TOPIC_MANAGER_USERNAME])
 
-        self.topic_manager = user_services.UserActionsInfo(
+        self.topic_manager = user_services.get_user_actions_info(
             self.topic_manager_id)
-        self.admin = user_services.UserActionsInfo(self.admin_id)
-        self.new_user = user_services.UserActionsInfo(self.new_user_id)
-        self.editor = user_services.UserActionsInfo(self.editor_id)
+        self.admin = user_services.get_user_actions_info(self.admin_id)
+        self.new_user = user_services.get_user_actions_info(self.new_user_id)
+        self.editor = user_services.get_user_actions_info(self.editor_id)
 
         self.skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
@@ -134,6 +138,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
         question_dict['id'] = 'abc123456789'
+        question_dict['version'] = 0
         self.post_json(
             feconf.NEW_QUESTION_URL, {
                 'question_dict': question_dict,
@@ -146,6 +151,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
         del question_dict['question_state_data']['content']
+        question_dict['version'] = 0
         self.post_json(
             feconf.NEW_QUESTION_URL, {
                 'question_dict': question_dict,
@@ -158,6 +164,19 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
         question_dict['id'] = None
+        question_dict['version'] = 0
+        self.post_json(
+            feconf.NEW_QUESTION_URL, {
+                'question_dict': question_dict,
+                'skill_ids': [self.skill_id]
+            }, csrf_token=csrf_token, expected_status_int=400)
+        self.logout()
+
+    def test_post_with_incorrect_version_returns_400(self):
+        self.login(self.ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        question_dict = self.question.to_dict()
+        question_dict['version'] = 1
         self.post_json(
             feconf.NEW_QUESTION_URL, {
                 'question_dict': question_dict,
@@ -170,6 +189,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
         question_dict['id'] = None
+        question_dict['version'] = 0
         self.post_json(
             feconf.NEW_QUESTION_URL, {
                 'question_dict': question_dict,
@@ -183,6 +203,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
         question_dict['id'] = None
+        question_dict['version'] = 0
         self.post_json(
             feconf.NEW_QUESTION_URL, {
                 'question_dict': question_dict,
@@ -196,6 +217,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
         question_dict['id'] = None
+        question_dict['version'] = 0
         self.post_json(
             feconf.NEW_QUESTION_URL, {
                 'question_dict': question_dict,
@@ -209,6 +231,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
         question_dict['id'] = None
+        question_dict['version'] = 0
         self.post_json(
             feconf.NEW_QUESTION_URL, {
                 'question_dict': question_dict,
@@ -228,6 +251,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
         question_dict['id'] = None
+        question_dict['version'] = 0
         self.post_json(
             feconf.NEW_QUESTION_URL, {
                 'question_dict': question_dict,
@@ -248,6 +272,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         question_dict = self.question.to_dict()
         question_dict['id'] = None
         question_dict['question_state_data'] = 'invalid_question_state_data'
+        question_dict['version'] = 0
         self.post_json(
             feconf.NEW_QUESTION_URL, {
                 'question_dict': question_dict,
@@ -263,6 +288,84 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
             feconf.NEW_QUESTION_URL, {
                 'skill_ids': skill_ids
             }, csrf_token=csrf_token, expected_status_int=400)
+        self.logout()
+
+    def test_post_with_valid_images(self):
+        """Test question creation with valid images."""
+        self.login(self.ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        filename = 'img.png'
+        question_dict = self.question.to_dict()
+        question_dict['id'] = None
+        question_dict['version'] = 0
+        content_html = (
+            '<oppia-noninteractive-image filepath-with-value='
+            '"&quot;img.png&quot;" caption-with-value="&quot;&quot;" '
+            'alt-with-value="&quot;Image&quot;"></oppia-noninteractive-image>'
+        )
+        question_dict['question_state_data']['content']['html'] = content_html
+        post_data = {
+            'question_dict': question_dict,
+            'skill_ids': [self.skill_id],
+            'skill_difficulties': [0.6]
+        }
+
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
+            'rb', encoding=None) as f:
+            raw_image = f.read()
+        self.post_json(
+            feconf.NEW_QUESTION_URL, post_data,
+            csrf_token=csrf_token,
+            upload_files=(
+                (filename, filename, raw_image), )
+        )
+        all_models = question_models.QuestionModel.get_all()
+        questions = [
+            question_fetchers.get_question_from_model(model)
+            for model in all_models
+        ]
+        self.assertEqual(len(questions), 2)
+        self.logout()
+
+    def test_post_with_invalid_images(self):
+        """Test question creation with invalid images."""
+        self.login(self.ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        question_dict = self.question.to_dict()
+        question_dict['id'] = None
+        question_dict['version'] = 0
+        content_html = (
+            '<oppia-noninteractive-image filepath-with-value='
+            '"&quot;img.svg&quot;" caption-with-value="&quot;&quot;" '
+            'alt-with-value="&quot;Image&quot;"></oppia-noninteractive-image>'
+        )
+        question_dict['question_state_data']['content']['html'] = content_html
+        post_data = {
+            'question_dict': question_dict,
+            'skill_ids': [self.skill_id],
+            'skill_difficulties': [0.6]
+        }
+
+        response_dict = self.post_json(
+            feconf.NEW_QUESTION_URL, post_data,
+            csrf_token=csrf_token,
+            expected_status_int=400)
+        self.assertIn(
+            'No image data provided for file with name img.svg.',
+            response_dict['error'])
+
+        large_image = '<svg><path d="%s" /></svg>' % (
+            'M150 0 L75 200 L225 200 Z ' * 4000)
+        response_dict = self.post_json(
+            feconf.NEW_QUESTION_URL, post_data,
+            csrf_token=csrf_token,
+            upload_files=(
+                ('img.svg', 'img.svg', large_image),
+            ), expected_status_int=400)
+        self.assertIn(
+            'Image exceeds file size limit of 100 KB.',
+            response_dict['error'])
         self.logout()
 
 
@@ -289,7 +392,13 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
         self.put_json(
             '%s/%s' % (
                 feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id
-            ), {'new_difficulty': 0.6, 'action': 'update_difficulty'},
+            ), {
+                'skill_ids_task_list': [{
+                    'id': 'skill_2',
+                    'task': 'update_difficulty',
+                    'difficulty': 0.9
+                }]
+            },
             csrf_token=csrf_token,
             expected_status_int=401)
         self.logout()
@@ -298,9 +407,9 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id, self.skill_id, 0.5)
         (
-            question_summaries, merged_question_skill_links, _) = (
+            question_summaries, merged_question_skill_links) = (
                 question_services.get_displayable_question_skill_link_details(
-                    5, [self.skill_id], ''))
+                    5, [self.skill_id], 0))
         self.assertEqual(len(question_summaries), 1)
         self.assertEqual(
             merged_question_skill_links[0].skill_difficulties, [0.5])
@@ -311,26 +420,27 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
             '%s/%s' % (
                 feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id
             ), {
-                'new_difficulty': 0.9,
-                'action': 'update_difficulty',
-                'skill_id': self.skill_id
+                'skill_ids_task_list': [{
+                    'id': self.skill_id,
+                    'task': 'update_difficulty',
+                    'difficulty': 0.9
+                }]
             }, csrf_token=csrf_token)
 
         self.put_json(
             '%s/%s' % (
                 feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id
             ), {
-                'difficulty': 0.6,
-                'action': 'edit_links',
                 'skill_ids_task_list': [{
                     'id': 'skill_2',
-                    'task': 'add'
+                    'task': 'add',
+                    'difficulty': 0.6
                 }]
             }, csrf_token=csrf_token)
         (
-            question_summaries, merged_question_skill_links, _) = (
+            question_summaries, merged_question_skill_links) = (
                 question_services.get_displayable_question_skill_link_details(
-                    5, [self.skill_id, 'skill_2'], ''))
+                    5, [self.skill_id, 'skill_2'], 0))
         self.assertEqual(len(question_summaries), 1)
         self.assertEqual(len(merged_question_skill_links), 1)
         self.assertEqual(
@@ -340,16 +450,14 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
             '%s/%s' % (
                 feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id
             ), {
-                'difficulty': 0.9,
-                'action': 'edit_links',
                 'skill_ids_task_list': [{
                     'id': 'skill_2',
                     'task': 'remove'
                 }]
             }, csrf_token=csrf_token)
-        question_summaries, _, _ = (
+        question_summaries, _, = (
             question_services.get_displayable_question_skill_link_details(
-                5, ['skill_2'], ''))
+                5, ['skill_2'], 0))
         self.assertEqual(len(question_summaries), 0)
         self.logout()
 
@@ -360,47 +468,27 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
             '%s/%s' % (
                 feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id
             ), {
-                'new_difficulty': 0.9,
-                'action': 'update_difficulty'
-            }, csrf_token=csrf_token, expected_status_int=400)
-        self.put_json(
-            '%s/%s' % (
-                feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id
-            ), {
-                'skill_id': 'skill_id',
-                'action': 'update_difficulty'
-            }, csrf_token=csrf_token, expected_status_int=400)
-        self.put_json(
-            '%s/%s' % (
-                feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id
-            ), {
-                'new_difficulty': 0.9,
-                'action': 'invalid_action',
-                'skill_id': 'skill_id'
-            }, csrf_token=csrf_token, expected_status_int=400)
-        self.put_json(
-            '%s/%s' % (
-                feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id
-            ), {
-                'action': 'edit_links',
                 'skill_ids_task_list': [{
-                    'id': 'skill_2',
-                    'task': 'add'
+                    'task': 'update_difficulty',
+                    'difficulty': 0.9
                 }]
             }, csrf_token=csrf_token, expected_status_int=400)
         self.put_json(
             '%s/%s' % (
                 feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id
             ), {
-                'action': 'edit_links',
-                'difficulty': 0.5
+                'skill_ids_task_list': {
+                    'task': 'invalid_task'
+                }
             }, csrf_token=csrf_token, expected_status_int=400)
         self.put_json(
             '%s/%s' % (
                 feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id
+            ), {}, csrf_token=csrf_token, expected_status_int=400)
+        self.put_json(
+            '%s/%s' % (
+                feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id
             ), {
-                'action': 'edit_links',
-                'difficulty': 0.5,
                 'skill_ids_task_list': [{
                     'id': 'skill_2',
                     'task': 'invalid'
@@ -410,8 +498,6 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
             '%s/%s' % (
                 feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id
             ), {
-                'action': 'edit_links',
-                'difficulty': 0.5,
                 'skill_ids_task_list': [{
                     'task': 'add'
                 }]
@@ -428,14 +514,16 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
             '%s/%s' % (
                 feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id
             ), {
-                'new_difficulty': 0.6,
-                'action': 'update_difficulty',
-                'skill_id': self.skill_id
+                'skill_ids_task_list': [{
+                    'id': self.skill_id,
+                    'task': 'update_difficulty',
+                    'difficulty': 0.6
+                }]
             }, csrf_token=csrf_token)
         (
-            question_summaries, merged_question_skill_links, _) = (
+            question_summaries, merged_question_skill_links) = (
                 question_services.get_displayable_question_skill_link_details(
-                    5, [self.skill_id], ''))
+                    5, [self.skill_id], 0))
         self.assertEqual(len(question_summaries), 1)
         self.assertEqual(len(merged_question_skill_links), 1)
         self.assertEqual(
@@ -550,6 +638,30 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
                 feconf.QUESTION_EDITOR_DATA_URL_PREFIX, self.question_id),
             expected_status_int=200)
         self.logout()
+
+    def test_put_with_long_commit_message_fails(self):
+        payload = {}
+        new_question_data = self._create_valid_question_data('DEF')
+        change_list = [{
+            'cmd': 'update_question_property',
+            'property_name': 'question_state_data',
+            'new_value': new_question_data.to_dict(),
+            'old_value': self.question.question_state_data.to_dict()
+        }]
+        payload['change_list'] = change_list
+        payload['commit_message'] = (
+            'a' * (constants.MAX_COMMIT_MESSAGE_LENGTH + 1))
+
+        self.login(self.ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        response_json = self.put_json(
+            '%s/%s' % (
+                feconf.QUESTION_EDITOR_DATA_URL_PREFIX, self.question_id),
+            payload,
+            csrf_token=csrf_token, expected_status_int=400)
+        self.assertEqual(
+            response_json['error'],
+            'Commit messages must be at most 375 characters long.')
 
     def test_put_with_admin_email_allows_question_editing(self):
         payload = {}

@@ -19,8 +19,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import logging
-
 import python_utils
 import schema_utils
 import utils
@@ -57,13 +55,12 @@ def get_full_customization_args(customization_args, ca_specs):
 
 def validate_customization_args_and_values(
         item_name, item_type, customization_args,
-        ca_specs_to_validate_against):
+        ca_specs_to_validate_against, fail_on_validation_errors=False):
     """Validates the given `customization_args` dict against the specs set
     out in 'ca_specs_to_validate_against'. 'item_name' and 'item_type' are
     used to populate any error messages that arise during validation.
     Note that this may modify the given customization_args dict, if it has
-    extra or missing keys. It also normalizes any HTML in the
-    customization_args dict.
+    extra keys. It also normalizes any HTML in the customization_args dict.
 
     Args:
         item_name: str. This is always 'interaction'.
@@ -79,9 +76,13 @@ def validate_customization_args_and_values(
                 - description: str. The customization variable description.
                 - default_value: *. The default value of the customization
                     variable.
+        fail_on_validation_errors: bool. Whether to raise errors if
+            validation fails for customization args.
 
     Raises:
-        ValidationError: The given 'customization_args' is not valid.
+        ValidationError. The given 'customization_args' is not valid.
+        ValidationError. The given 'customization_args' is missing at least one
+            key.
     """
     ca_spec_names = [
         ca_spec.name for ca_spec in ca_specs_to_validate_against]
@@ -91,35 +92,29 @@ def validate_customization_args_and_values(
             'Expected customization args to be a dict, received %s'
             % customization_args)
 
-    # Validate and clean up the customization args.
-
-    # Populate missing keys with the default values.
-    customization_args = get_full_customization_args(
-        customization_args, ca_specs_to_validate_against)
-
-    # Remove extra keys.
-    extra_args = []
+    # Check for extra invalid keys.
     for arg_name in customization_args.keys():
         if not isinstance(arg_name, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Invalid customization arg name: %s' % arg_name)
         if arg_name not in ca_spec_names:
-            extra_args.append(arg_name)
-            logging.warning(
+            raise utils.ValidationError(
                 '%s %s does not support customization arg %s.'
                 % (item_name.capitalize(), item_type, arg_name))
-    for extra_arg in extra_args:
-        del customization_args[extra_arg]
 
     # Check that each value has the correct type.
     for ca_spec in ca_specs_to_validate_against:
+        if ca_spec.name not in customization_args:
+            raise utils.ValidationError(
+                'Customization argument is missing key: %s' % ca_spec.name)
         try:
             customization_args[ca_spec.name]['value'] = (
                 schema_utils.normalize_against_schema(
                     customization_args[ca_spec.name]['value'],
                     ca_spec.schema))
-        except Exception:
+        except Exception as e:
             # TODO(sll): Raise an actual exception here if parameters are
             # not involved (If they are, can we get sample values for the
             # state context parameters?).
-            pass
+            if fail_on_validation_errors:
+                raise utils.ValidationError(e)

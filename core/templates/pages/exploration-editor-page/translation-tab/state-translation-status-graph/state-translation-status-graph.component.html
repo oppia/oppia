@@ -1,0 +1,20 @@
+<span class="oppia-exploration-overview-text">
+  <strong>Exploration Overview</strong>
+</span>
+
+<md-card class="oppia-translation-graph-container">
+  <div id="tutorialTranslationOverview" class="oppia-translation-state-graph-container protractor-test-translation-graph">
+    <div state-graph-visualization graph-data="getGraphData()" current-state-id="getActiveStateName()" on-click-function="onClickStateInMap" allow-panning="true" center-at-current-state="true" node-colors="nodeColors()" show-translation-warnings="true" class="h-100">
+    </div>
+  </div>
+</md-card>
+<style>
+  state-translation-status-graph .oppia-exploration-overview-text {
+    font-size: 16px;
+  }
+  state-translation-status-graph .oppia-translation-graph-container {
+    background-color: white;
+    margin: 20px 0;
+    padding: 8px;
+  }
+</style>

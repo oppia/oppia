@@ -31,27 +31,27 @@ import feconf
 
 
 def get_questions_and_skill_descriptions_by_skill_ids(
-        question_count, skill_ids, start_cursor):
+        question_count, skill_ids, offset):
     """Returns the questions linked to the given skill ids.
 
     Args:
         question_count: int. The number of questions to return.
         skill_ids: list(str). The ID of the skills to which the questions are
             linked.
-        start_cursor: str. The starting point from which the batch of
-            questions are to be returned. This value should be urlsafe.
+        offset: int. Number of query results to skip.
 
     Returns:
-        list(Question), list(list(str)), str. The list of questions and the
-            corresponding linked skill descriptions which are linked to the
-            given skill ids and the next cursor value to be used for the next
-            batch of questions (or None if no more pages are left). The returned
-            next cursor value is urlsafe.
+        list(Question), list(list(str)). The list of questions and the
+        corresponding linked skill descriptions which are linked to the
+        given skill ids.
     """
-    question_skill_link_models, next_cursor = (
+    if not skill_ids:
+        return [], []
+
+    question_skill_link_models = (
         question_models.QuestionSkillLinkModel
         .get_question_skill_links_by_skill_ids(
-            question_count, skill_ids, start_cursor))
+            question_count, skill_ids, offset))
     question_ids = []
     grouped_skill_ids = []
     grouped_skill_descriptions = []
@@ -68,7 +68,7 @@ def get_questions_and_skill_descriptions_by_skill_ids(
             [skill.description if skill else None for skill in skills])
 
     questions = get_questions_by_ids(question_ids)
-    return questions, grouped_skill_descriptions, next_cursor
+    return questions, grouped_skill_descriptions
 
 
 def get_questions_by_ids(question_ids):
@@ -120,8 +120,9 @@ def get_question_from_model(question_model):
         state_domain.State.from_dict(versioned_question_state['state']),
         versioned_question_state['state_schema_version'],
         question_model.language_code, question_model.version,
-        question_model.linked_skill_ids, question_model.created_on,
-        question_model.last_updated)
+        question_model.linked_skill_ids,
+        question_model.inapplicable_skill_misconception_ids,
+        question_model.created_on, question_model.last_updated)
 
 
 def _migrate_state_schema(versioned_question_state):
@@ -139,7 +140,7 @@ def _migrate_state_schema(versioned_question_state):
                 state data.
 
     Raises:
-        Exception: The given state_schema_version is invalid.
+        Exception. The given state_schema_version is invalid.
     """
     state_schema_version = versioned_question_state[
         'state_schema_version']

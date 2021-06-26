@@ -1,0 +1,205 @@
+<div class="oppia-story-viewer-container">
+  <div *ngIf="storyIsLoaded">
+    <div class="oppia-story-viewer-inner-container">
+      <div *ngIf="storyPlaythroughObject" class="oppia-story-player-tiles-container">
+        <div class="oppia-story-viewer-title">
+          {{ storyTitle }}
+        </div>
+        <div class="oppia-story-viewer-description">
+          {{ storyDescription }}
+        </div>
+
+        <div *ngIf="showChapters()" class="d-md-block oppia-story-viewer-card-container">
+          <a *ngFor="let node of storyPlaythroughObject.getStoryNodes();let last = isLast;let index = index"
+             [href]="getExplorationUrl(node)">
+
+            <div>
+              <div class="fx-row">
+                <div class="oppia-lesson-track protractor-test-lesson-track">
+                  <svg *ngIf="!last"
+                       width="9px"
+                       height="530px"
+                       xmlns="http://www.w3.org/1600/svg">
+                    <path fill="none"
+                          [attr.stroke]="node.isCompleted() && '#296E5F' || 'rgb(204, 204, 204)'"
+                          stroke-dasharray="30,16"
+                          stroke-linecap="round"
+                          stroke-width="9"
+                          d="M5 30 L5 530">
+                    </path>
+                  </svg>
+
+                  <img class="oppia-lesson-icon-completed protractor-test-lesson-icon-completed"
+                       [src]="getStaticImageUrl('/general/collection_paw.svg')"
+                       *ngIf="node.isCompleted()">
+                  <div *ngIf="!node.isCompleted() && (node.getId() === storyPlaythroughObject.getNextPendingNodeId())"
+                       class="oppia-lesson-icon-uncompleted protractor-test-lesson-icon-uncompleted">
+                  </div>
+                  <div *ngIf="!node.isCompleted() && (node.getId() !== storyPlaythroughObject.getNextPendingNodeId())"
+                       class="oppia-lesson-icon-uncompleted oppia-lesson-icon-unavailable protractor-test-lesson-icon-uncompleted">
+                  </div>
+                </div>
+
+                <div class="oppia-story-viewer-card">
+                  <span class="oppia-chapter-title protractor-chapter-title" aria-live="assertive">
+                    <span [innerHTML]="'I18N_TOPIC_VIEWER_CHAPTER' | translate"></span> {{index + 1}}: {{ node.getTitle() }}
+                  </span>
+
+                  <div class="oppia-story-viewer-card-content">
+                    <svg width="320"
+                         height="180"
+                         xmlns="http://www.w3.org/1600/svg"
+                         xmlns:xlink="http://www.w3.org/1999/xlink"
+                         version="1.1"
+                         class="oppia-story-viewer-card-content-img">
+                      <defs>
+                        <pattern id="image{{index}}" patternUnits="userSpaceOnUse" height="180" width="320">
+                          <rect width="320"
+                                height="180"
+                                [attr.fill]="pathIconParameters[index]?.thumbnailBgColor">
+                          </rect>
+
+                          <image x="0"
+                                 y="0"
+                                 height="180"
+                                 width="320"
+                                 [attr.xlink:href]="pathIconParameters[index]?.thumbnailIconUrl"
+                                 xlink:href="">
+                          </image>
+                        </pattern>
+                        <filter id="blur" x="0" y="0">
+                          <feGaussianBlur in="SourceGraphic" stdDeviation="20"/>
+                        </filter>
+                      </defs>
+                      <a xlink:href="getExplorationUrl(node)">
+                        <rect width="320"
+                              height="180"
+                              attr.fill="url(#image{{index}})"
+                              rx="4">
+                        </rect>
+                      </a>
+                    </svg>
+
+                    <div class="oppia-story-viewer-card-description-box">
+                      <p class="oppia-story-description-text">{{node.getDescription()}}</p>
+                    </div>
+                  </div>
+
+                  <div class="oppia-story-viewer-mobile-card-content">
+                    <svg width="192"
+                         height="108"
+                         xmlns="http://www.w3.org/1600/svg"
+                         xmlns:xlink="http://www.w3.org/1999/xlink"
+                         version="1.1">
+                      <defs>
+                        <pattern id="image2{{index}}" patternUnits="userSpaceOnUse" height="108" width="192">
+                          <rect width="192"
+                                height="108"
+                                [attr.fill]="pathIconParameters[index]?.thumbnailBgColor">
+                          </rect>
+
+                          <image x="0"
+                                 y="0"
+                                 width="192"
+                                 height="108"
+                                 [attr.xlink:href]="pathIconParameters[index]?.thumbnailIconUrl"
+                                 xlink:href="">
+                          </image>
+                        </pattern>
+                        <filter id="blur-mobile" x="0" y="0">
+                          <feGaussianBlur in="SourceGraphic" stdDeviation="20"/>
+                        </filter>
+                      </defs>
+                      <a xlink:href="getExplorationUrl(node)">
+                        <rect width="192"
+                              height="108"
+                              attr.fill="url(#image2{{index}})"
+                        ></rect>
+                      </a>
+                    </svg>
+
+                    <div class="oppia-story-viewer-mobile-card-description-box">
+                      <p>{{ node.getDescription() }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+    <attribution-guide></attribution-guide>
+    <div *ngIf="!isLoggedIn"  class="story-viewer-login-container">
+      <h2>Learn More about {{ storyPlaythroughObject.topicName }}</h2>
+      <div class="mt-2">
+        <button class="mat-raised-button oppia-login-button text-light protractor-test-login-button" (click)="signIn()">
+          LOG IN
+        </button>
+        <span class="m-2 oppia-login-or-signup-text">or</span>
+        <button class="mat-raised-button oppia-sign-up-button text-light" (click)="signIn()">
+          SIGN UP
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<style>
+  .oppia-story-viewer-container a {
+    text-decoration: none;
+  }
+
+  .oppia-story-viewer-container a:hover, a:hover span {
+    color: #0844aa;
+  }
+
+  .oppia-story-description-text {
+    font-size: 20px;
+  }
+
+  .oppia-story-viewer-card-description-box {
+    margin-left: 10px;
+  }
+
+  .story-viewer-login-container {
+    background-color: rgba(255, 255, 255, 0.8);
+    bottom: 0;
+    padding: 2em;
+    position: sticky;
+    text-align: center;
+    width: 100%;
+  }
+
+  .story-viewer-login-container .md-raised {
+    font-size: 1.2em;
+    min-width: max-content;
+    padding: 1em;
+    width: 8em;
+  }
+
+  .story-viewer-login-container .oppia-login-button.mat-raised-button {
+    background-color: #00645C;
+    font-size: 19.2px;
+    height: 60px;
+    width: 154px;
+  }
+
+  .story-viewer-login-container .oppia-login-or-signup-text {
+    display: inline;
+    padding: 10px;
+  }
+
+  .story-viewer-login-container .oppia-sign-up-button.mat-raised-button {
+    background-color: #00609C;
+    font-size: 19.2px;
+    height: 60px;
+    width: 154px;
+  }
+
+  @media screen and (max-width: 450px) {
+    .story-viewer-login-container .oppia-login-or-signup-text {
+      display: block;
+    }
+  }
+
+</style>

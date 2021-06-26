@@ -1,0 +1,82 @@
+<div class="exp-editor-content-container"
+     ng-joy-ride="$ctrl.tutorialInProgress"
+     config="$ctrl.EDITOR_TUTORIAL_OPTIONS"
+     on-finish="$ctrl.onFinishTutorial()"
+     on-skip="$ctrl.onSkipTutorial()">
+  <div class="exp-editor-main-editor">
+    <div class="oppia-editor-cards-container protractor-test-editor-cards-container">
+      <div class="oppia-editor-header">
+        <state-name-editor></state-name-editor>
+      </div>
+      <div>
+        <md-checkbox class="checkpoint-selection-checkbox"
+                     ng-change="$ctrl.onChangeCardIsCheckpoint()"
+                     ng-model="$ctrl.stateCardIsCheckpointService.displayed">
+          Set as a checkpoint for learners
+        </md-checkbox>
+      </div>
+      <div ng-if="$ctrl.areParametersEnabled()">
+        <state-param-changes-editor></state-param-changes-editor>
+      </div>
+
+      <state-editor on-save-state-content="$ctrl.saveStateContent"
+                    on-save-interaction-customization-args="$ctrl.saveInteractionCustomizationArgs"
+                    on-save-next-content-id-index="$ctrl.saveNextContentIdIndex"
+                    on-save-interaction-id="$ctrl.saveInteractionId"
+                    on-save-interaction-default-outcome="$ctrl.saveInteractionDefaultOutcome"
+                    on-save-interaction-answer-groups="$ctrl.saveInteractionAnswerGroups"
+                    on-save-linked-skill-id="$ctrl.saveLinkedSkillId"
+                    on-save-solution="$ctrl.saveSolution"
+                    on-save-hints="$ctrl.saveHints"
+                    on-save-solicit-answer-details="$ctrl.saveSolicitAnswerDetails"
+                    recompute-graph="$ctrl.recomputeGraph"
+                    show-mark-all-audio-as-needing-update-modal-if-required="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired"
+                    state-content-placeholder="$ctrl.getStateContentPlaceholder()"
+                    state-content-save-button-placeholder="$ctrl.getStateContentSaveButtonPlaceholder()"
+                    navigate-to-state="$ctrl.navigateToState"
+                    add-state="$ctrl.addState"
+                    refresh-warnings="$ctrl.refreshWarnings"
+                    interaction-is-shown="$ctrl.interactionIsShown"
+                    exploration-is-linked-to-story="$ctrl.explorationIsLinkedToStory">
+      </state-editor>
+    </div>
+  </div>
+  <div class="exp-editor-overview">
+    <div class="exp-editor-overview-content">
+      <exploration-graph></exploration-graph>
+      <unresolved-answers-overview></unresolved-answers-overview>
+    </div>
+  </div>
+  <attribution-guide></attribution-guide>
+</div>
+
+<style>
+  exploration-editor-tab .exp-editor-content-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  exploration-editor-tab .exp-editor-main-editor {
+    margin-right: 3%;
+    width: 40%;
+  }
+  exploration-editor-tab .exp-editor-overview {
+    width: 30%;
+  }
+  exploration-editor-tab .exp-editor-overview-content {
+    margin-top: 40px;
+  }
+  @media screen and (max-width: 768px) {
+    exploration-editor-tab .exp-editor-main-editor {
+      margin-right: 0;
+      width: 100%;
+    }
+  }
+  md-checkbox.checkpoint-selection-checkbox.md-icon {
+    border-color: #0d48a1;
+    top: 2px;
+  }
+  md-checkbox.checkpoint-selection-checkbox.md-checked .md-icon {
+    background-color: rgba(71, 151, 136, 1);
+  }
+</style>

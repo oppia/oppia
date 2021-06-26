@@ -25,6 +25,7 @@ import python_utils
 
 class ForumRedirectPage(base.BaseHandler):
     """A handler to redirect to Oppia's Google group."""
+
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
@@ -42,6 +43,7 @@ class AboutRedirectPage(base.BaseHandler):
 
 class FoundationRedirectPage(base.BaseHandler):
     """A page that redirects to the separate Oppia Foundation site."""
+
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
@@ -69,12 +71,3 @@ class ConsoleErrorPage(base.BaseHandler):
         # backend test environment, the HTML template file is not generated at
         # all.
         self.render_template('console_errors.html')  # pragma: no cover
-
-
-class MaintenancePage(base.BaseHandler):
-    """Page describing that Oppia is down for maintenance mode."""
-
-    @acl_decorators.open_access
-    def get(self, *args, **kwargs):
-        """Handles GET requests."""
-        self.render_template('maintenance-page.mainpage.html')

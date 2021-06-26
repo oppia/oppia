@@ -7,7 +7,6 @@ instance_class: F2
 version: default
 
 builtins:
-- appstats: on
 - deferred: on
 - remote_api: on
 
@@ -57,22 +56,22 @@ handlers:
   secure: always
   application_readable: true
   expiration: "0"
-# Serve js scripts and css files under core/templates/dev/head.
+# Serve js scripts and css files under core/templates.
 # This regex allows us to recursively serve js scripts.
 # "\1" inserts text captured by the capture group in the URL pattern.
-- url: /templates/dev/head/(.*\.(css))$
-  static_files: core/templates/dev/head/\1
-  upload: core/templates/dev/head/(.*\.(css))$
+- url: /templates/(.*\.(css))$
+  static_files: core/templates/\1
+  upload: core/templates/(.*\.(css))$
   secure: always
   expiration: "0"
-- url: /templates/dev/head/(.*\.(js))$
-  static_files: local_compiled_js/core/templates/dev/head/\1
-  upload: local_compiled_js/core/templates/dev/head/(.*\.(js))$
+- url: /templates/(.*\.(js))$
+  static_files: local_compiled_js/core/templates/\1
+  upload: local_compiled_js/core/templates/(.*\.(js))$
   secure: always
   expiration: "0"
-- url: /templates/dev/head/(.*\.(html))$
-  static_files: core/templates/dev/head/\1
-  upload: core/templates/dev/head/(.*\.(html))$
+- url: /templates/(.*\.(html))$
+  static_files: core/templates/\1
+  upload: core/templates/(.*\.(html))$
   secure: always
   expiration: "0"
   application_readable: true
@@ -176,7 +175,7 @@ handlers:
     X-Xss-Protection: "1; mode=block"
   secure: always
   expiration: "0"
-- url: /get_started
+- url: /get-started
   static_files: webpack_bundles/get-started-page.mainpage.html
   upload: webpack_bundles/get-started-page.mainpage.html
   http_headers:
@@ -187,9 +186,9 @@ handlers:
     X-Xss-Protection: "1; mode=block"
   secure: always
   expiration: "0"
-- url: /privacy
-  static_files: webpack_bundles/privacy-page.mainpage.html
-  upload: webpack_bundles/privacy-page.mainpage.html
+- url: /license
+  static_files: webpack_bundles/license.mainpage.html
+  upload: webpack_bundles/license.mainpage.html
   http_headers:
     Pragma: no-cache
     Strict-Transport-Security: "max-age=31536000; includeSubDomains"
@@ -198,9 +197,42 @@ handlers:
     X-Xss-Protection: "1; mode=block"
   secure: always
   expiration: "0"
-- url: /splash
-  static_files: webpack_bundles/splash-page.mainpage.html
-  upload: webpack_bundles/splash-page.mainpage.html
+- url: /login
+  static_files: webpack_bundles/login-page.mainpage.html
+  upload: webpack_bundles/login-page.mainpage.html
+  http_headers:
+    Pragma: no-cache
+    Strict-Transport-Security: "max-age=31536000; includeSubDomains"
+    X-Content-Type-Options: "nosniff"
+    X-Frame-Options: "DENY"
+    X-Xss-Protection: "1; mode=block"
+  secure: always
+  expiration: "0"
+- url: /logout
+  static_files: webpack_bundles/logout-page.mainpage.html
+  upload: webpack_bundles/logout-page.mainpage.html
+  http_headers:
+    Pragma: no-cache
+    Strict-Transport-Security: "max-age=31536000; includeSubDomains"
+    X-Content-Type-Options: "nosniff"
+    X-Frame-Options: "DENY"
+    X-Xss-Protection: "1; mode=block"
+  secure: always
+  expiration: "0"
+- url: /creator-guidelines
+  static_files: webpack_bundles/playbook.mainpage.html
+  upload: webpack_bundles/playbook.mainpage.html
+  http_headers:
+    Pragma: no-cache
+    Strict-Transport-Security: "max-age=31536000; includeSubDomains"
+    X-Content-Type-Options: "nosniff"
+    X-Frame-Options: "DENY"
+    X-Xss-Protection: "1; mode=block"
+  secure: always
+  expiration: "0"
+- url: /privacy-policy
+  static_files: webpack_bundles/privacy-page.mainpage.html
+  upload: webpack_bundles/privacy-page.mainpage.html
   http_headers:
     Pragma: no-cache
     Strict-Transport-Security: "max-age=31536000; includeSubDomains"
@@ -247,18 +279,35 @@ handlers:
   secure: always
 
 libraries:
-- name: jinja2
-  version: "2.6"
 - name: PIL
   version: "1.1.7"
 # This is needed for sending requests to a mailgun HTTPS URL.
 - name: ssl
   version: "2.7.11"
-- name: webapp2
-  version: "2.5.2"
+- name: grpcio
+  version: 1.0.0
+- name: setuptools
+  version: 36.6.0
+
+# This is an access connector that connects to the Google Cloud Redis instance
+# used for memory caching. Please replace PROJECT_ID with the correct project id
+# for oppia on the production server.
+vpc_access_connector:
+  name: projects/PROJECT_ID/locations/us-central1/connectors/oppia-redis-connector-1
 
 env_variables:
   PYTHONHTTPSVERIFY: 1
+# GAE_USE_SOCKETS_HTTPLIB is needed for the redis connector in the Python 2
+# runtime. More information can be found here:
+# https://cloud.google.com/appengine/docs/standard/python/connecting-vpc#configuring
+# (The second note under 'Configuring your app to use a connector') which
+# redirects to these instructions to disable URL fetch:
+# https://cloud.google.com/appengine/docs/standard/python/sockets#making_httplib_use_sockets
+  GAE_USE_SOCKETS_HTTPLIB : "anyvalue"
+# FIREBASE_AUTH_EMULATOR_HOST is needed to allow the Firebase SDK to connect
+# with the Firebase emulator. THIS MUST NOT BE DEPLOYED TO PRODUCTION. We
+# protect against this in the build script.
+  FIREBASE_AUTH_EMULATOR_HOST: "localhost:9099"
 
 skip_files:
 # .pyc and .pyo files
@@ -271,29 +320,34 @@ skip_files:
 - ^core/(.*/)?.*\.ts$
 # Typescript output log file
 - ^(.*/)tsc_output_log.txt$
+# Python test files
+- ^(.*/)?.*_test\.py$
 # Other folders to ignore
-- tests/
-- scripts/
-- integrations/
-- integrations_dev/
+- core/tests/
 - node_modules/
+- scripts/
 # Some third_party static scripts are directly imported, namely: jquery,
 # jqueryui, angularjs, jqueryui-touch-punch, MathJax, code-mirror,
 # ui-codemirror, d3js, midi-js, ui-map, guppy, skulpt, math-expressions.
 # We exclude some of the scripts that are not directly imported in order to
 # reduce deployed file count.
 # TODO(sll): Find a more structured way of doing this.
+#
+# Please do not remove line below this, as it is used for testing purpose.
+# Third party files:
 - third_party/static/angular-audio-1.7.4/
-- third_party/static/angular-scroll-1.0.0/
 - third_party/static/angular-toastr-1.7.0/
 - third_party/static/bootstrap-4.3.1/
 - third_party/static/bower-angular-translate-2.18.1/
 - third_party/static/bower-angular-translate-interpolation-messageformat-2.18.1/
 - third_party/static/bower-angular-translate-loader-partial-2.18.1/
 - third_party/static/bower-angular-translate-loader-static-files-2.18.1/
-- third_party/static/bower-angular-cookies-1.7.9/
-- third_party/static/bower-angular-translate-storage-cookie-2.18.1,/
+- third_party/static/bower-angular-translate-storage-cookie-2.18.1/
 - third_party/static/bower-material-1.1.19/
+- third_party/python_libs/google/appengine/
+- third_party/python_libs/google/net/
+- third_party/python_libs/google/pyglib/
+- third_party/python_libs/grpc/
 # CKEditor-4.12.1 plugins in the download from the CKEditor website include
 # only a11yhelp, about, clipboard, colordialog, copyformatting, dialog, div,
 # find, flash, forms, iframe, image, link, liststyle, magicline, pagebreak,
@@ -367,8 +421,8 @@ skip_files:
 - third_party/static/ckeditor-bootstrapck-1.0.0/skins/bootstrapck/sample/
 - third_party/static/ckeditor-bootstrapck-1.0.0/skins/bootstrapck/scss/
 - third_party/static/fontawesome-free-5.9.0-web/
-- third_party/static/guppy-b5055b/site/
-- third_party/static/guppy-b5055b/test/
+- third_party/static/guppy-7509f3/site/
+- third_party/static/guppy-7509f3/test/
 - third_party/static/MathJax-2.7.5/docs/
 - third_party/static/MathJax-2.7.5/fonts/HTML-CSS/Gyre-Pagella/
 - third_party/static/MathJax-2.7.5/fonts/HTML-CSS/Gyre-Termes/
@@ -419,6 +473,4 @@ skip_files:
 - third_party/static/MathJax-2.7.5/test/
 - third_party/static/MathJax-2.7.5/unpacked/
 - third_party/static/messageformat-2.0.5/
-- third_party/static/ng-img-crop-0.3.2/
-- third_party/static/nginfinitescroll-1.0.0/
 - third_party/static/popperJs-1.15.0/

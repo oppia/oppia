@@ -20,29 +20,23 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import base64
 import datetime
 import hmac
-import http.cookies
 import json
 import logging
 import os
-import sys
 import time
-import traceback
 
-from constants import constants
+from core.domain import auth_domain
+from core.domain import auth_services
 from core.domain import config_domain
 from core.domain import config_services
-from core.domain import rights_manager
 from core.domain import user_services
-from core.platform import models
 import feconf
-import jinja_utils
 import python_utils
 import utils
 
+import backports.functools_lru_cache
 import webapp2
 
-current_user_services = models.Registry.import_current_user_services()
-(user_models,) = models.Registry.import_models([models.NAMES.user])
 
 ONE_DAY_AGO_IN_SECS = -24 * 60 * 60
 DEFAULT_CSRF_SECRET = 'oppia csrf secret'
@@ -50,41 +44,46 @@ CSRF_SECRET = config_domain.ConfigProperty(
     'oppia_csrf_secret', {'type': 'unicode'},
     'Text used to encrypt CSRF tokens.', DEFAULT_CSRF_SECRET)
 
+# NOTE: These handlers manage user sessions. Thus, we should never reject or
+# replace them when running in maintenance mode; otherwise admins will be unable
+# to access the site.
+AUTH_HANDLER_PATHS = (
+    '/csrfhandler',
+    '/session_begin',
+    '/session_end',
+)
 
-def _clear_login_cookies(response_headers):
-    """Clears login cookies from the given response headers.
+
+@backports.functools_lru_cache.lru_cache(maxsize=128)
+def load_template(filename):
+    """Return the HTML file contents at filepath.
 
     Args:
-        response_headers: webapp2.ResponseHeaders.
-            Response headers are used to give a more detailed
-            context of the response.
+        filename: str. Name of the requested HTML file.
+
+    Returns:
+        str. The HTML file content.
     """
-    # App Engine sets the ACSID cookie for http:// and the SACSID cookie
-    # for https:// . We just unset both below. We also unset dev_appserver_login
-    # cookie used in local server.
-    for cookie_name in [b'ACSID', b'SACSID', b'dev_appserver_login']:
-        cookie = http.cookies.SimpleCookie()
-        cookie[cookie_name] = ''
-        cookie[cookie_name]['expires'] = (
-            datetime.datetime.utcnow() +
-            datetime.timedelta(seconds=ONE_DAY_AGO_IN_SECS)
-        ).strftime('%a, %d %b %Y %H:%M:%S GMT')
-        response_headers.add_header(*cookie.output().split(b': ', 1))
+    filepath = os.path.join(feconf.FRONTEND_TEMPLATES_DIR, filename)
+    with python_utils.open_file(filepath, 'r') as f:
+        html_text = f.read()
+    return html_text
 
 
-class LogoutPage(webapp2.RequestHandler):
-    """Class which handles the logout URL."""
+class SessionBeginHandler(webapp2.RequestHandler):
+    """Handler for creating new authentication sessions."""
 
     def get(self):
-        """Logs the user out, and returns them to a specified follow-up
-        page (or the home page if no follow-up page is specified).
-        """
+        """Establishes a new auth session."""
+        auth_services.establish_auth_session(self.request, self.response)
 
-        _clear_login_cookies(self.response.headers)
-        url_to_redirect_to = (
-            python_utils.convert_to_bytes(
-                self.request.get('redirect_url', '/')))
-        self.redirect(url_to_redirect_to)
+
+class SessionEndHandler(webapp2.RequestHandler):
+    """Handler for destroying existing authentication sessions."""
+
+    def get(self):
+        """Destroys an existing auth session."""
+        auth_services.destroy_auth_session(self.response)
 
 
 class UserFacingExceptions(python_utils.OBJECT):
@@ -93,17 +92,39 @@ class UserFacingExceptions(python_utils.OBJECT):
     class NotLoggedInException(Exception):
         """Error class for users that are not logged in (error code 401)."""
 
+        pass
+
     class InvalidInputException(Exception):
         """Error class for invalid input on the user side (error code 400)."""
+
+        pass
 
     class UnauthorizedUserException(Exception):
         """Error class for unauthorized access."""
 
+        pass
+
     class PageNotFoundException(Exception):
         """Error class for a page not found error (error code 404)."""
 
+        pass
+
     class InternalErrorException(Exception):
         """Error class for an internal server side error (error code 500)."""
+
+        pass
+
+    class TemporaryMaintenanceException(Exception):
+        """Error class for when the server is currently down for temporary
+        maintenance (error code 503).
+        """
+
+        def __init__(self):
+            super(
+                UserFacingExceptions.TemporaryMaintenanceException, self
+            ).__init__(
+                'Oppia is currently being upgraded, and the site should be up '
+                'and running again in a few hours. Thanks for your patience!')
 
 
 class BaseHandler(webapp2.RequestHandler):
@@ -124,15 +145,6 @@ class BaseHandler(webapp2.RequestHandler):
     PUT_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     DELETE_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @webapp2.cached_property
-    def jinja2_env(self):
-        """Returns a Jinja2 environment cached for frontend templates.
-
-        Returns:
-            Environment. A Jinja2 environment object used to load templates.
-        """
-        return jinja_utils.get_jinja_env(feconf.FRONTEND_TEMPLATES_DIR)
-
     def __init__(self, request, response):  # pylint: disable=super-init-not-called
         # Set self.request, self.response and self.app.
         self.initialize(request, response)
@@ -142,26 +154,60 @@ class BaseHandler(webapp2.RequestHandler):
         # Initializes the return dict for the handlers.
         self.values = {}
 
-        self.gae_id = current_user_services.get_current_gae_id()
+        if self.request.get('payload'):
+            self.payload = json.loads(self.request.get('payload'))
+        else:
+            self.payload = None
+        self.iframed = False
+
         self.user_id = None
         self.username = None
+        self.email = None
         self.partially_logged_in = False
         self.user_is_scheduled_for_deletion = False
+        self.current_user_is_super_admin = False
 
-        if self.gae_id:
-            user_settings = user_services.get_user_settings_by_gae_id(
-                self.gae_id, strict=False)
+        try:
+            auth_claims = auth_services.get_auth_claims_from_request(request)
+        except auth_domain.StaleAuthSessionError:
+            auth_services.destroy_auth_session(self.response)
+            self.redirect(user_services.create_login_url(self.request.uri))
+            return
+        except auth_domain.InvalidAuthSessionError:
+            logging.exception('User session is invalid!')
+            auth_services.destroy_auth_session(self.response)
+            self.redirect(user_services.create_login_url(self.request.uri))
+            return
+        else:
+            self.current_user_is_super_admin = (
+                auth_claims is not None and auth_claims.role_is_super_admin)
+
+        if auth_claims:
+            auth_id = auth_claims.auth_id
+            user_settings = user_services.get_user_settings_by_auth_id(auth_id)
             if user_settings is None:
-                email = current_user_services.get_current_user_email()
-                user_settings = user_services.create_new_user(
-                    self.gae_id, email)
+                # If the user settings are not yet created and the request leads
+                # to signup page create a new user settings. Otherwise logout
+                # the not-fully registered user.
+                email = auth_claims.email
+                if 'signup?' in self.request.uri:
+                    user_settings = (
+                        user_services.create_new_user(auth_id, email))
+                else:
+                    logging.exception(
+                        'Cannot find user %s with email %s on page %s' % (
+                            auth_id, email, self.request.uri))
+                    auth_services.destroy_auth_session(self.response)
+                    return
+
+            self.email = user_settings.email
             self.values['user_email'] = user_settings.email
             self.user_id = user_settings.user_id
 
             if user_settings.deleted:
                 self.user_is_scheduled_for_deletion = user_settings.deleted
-            elif (self.REDIRECT_UNFINISHED_SIGNUPS and not
-                  user_services.has_fully_registered(user_settings.user_id)):
+            elif (self.REDIRECT_UNFINISHED_SIGNUPS and
+                  not user_services.has_fully_registered_account(self.user_id)):
                 self.partially_logged_in = True
             else:
                 self.username = user_settings.username
@@ -178,36 +224,36 @@ class BaseHandler(webapp2.RequestHandler):
         self.role = (
             feconf.ROLE_ID_GUEST
             if self.user_id is None else user_settings.role)
-        self.user = user_services.UserActionsInfo(self.user_id)
+        self.user = user_services.get_user_actions_info(self.user_id)
 
-        self.is_super_admin = (
-            current_user_services.is_current_user_super_admin())
+        if not self._is_requested_path_currently_accessible_to_user():
+            auth_services.destroy_auth_session(self.response)
+            return
 
-        self.values['iframed'] = False
-        self.values['is_moderator'] = user_services.is_at_least_moderator(
-            self.user_id)
+        self.values['is_moderator'] = (
+            user_services.is_at_least_moderator(self.user_id))
         self.values['is_admin'] = user_services.is_admin(self.user_id)
         self.values['is_topic_manager'] = (
             user_services.is_topic_manager(self.user_id))
-        self.values['is_super_admin'] = self.is_super_admin
-
-        if self.request.get('payload'):
-            self.payload = json.loads(self.request.get('payload'))
-        else:
-            self.payload = None
+        self.values['is_super_admin'] = self.current_user_is_super_admin
 
     def dispatch(self):
         """Overrides dispatch method in webapp2 superclass.
 
         Raises:
-            Exception: The CSRF token is missing.
-            UnauthorizedUserException: The CSRF token is invalid.
+            Exception. The CSRF token is missing.
+            UnauthorizedUserException. The CSRF token is invalid.
         """
         # If the request is to the old demo server, redirect it permanently to
         # the new demo server.
         if self.request.uri.startswith('https://oppiaserver.appspot.com'):
             self.redirect(
                 b'https://oppiatestserver.appspot.com', permanent=True)
+            return
+
+        if not self._is_requested_path_currently_accessible_to_user():
+            self.handle_exception(
+                self.TemporaryMaintenanceException(), self.app.debug)
             return
 
         if self.user_is_scheduled_for_deletion:
@@ -244,26 +290,51 @@ class BaseHandler(webapp2.RequestHandler):
                         'Your session has expired, and unfortunately your '
                         'changes cannot be saved. Please refresh the page.')
             except Exception as e:
-                logging.error('%s: payload %s', e, self.payload)
+                logging.exception('%s: payload %s', e, self.payload)
 
                 self.handle_exception(e, self.app.debug)
                 return
 
         super(BaseHandler, self).dispatch()
 
-    def get(self, *args, **kwargs):  # pylint: disable=unused-argument
-        """Base method to handle GET requests.
+    @property
+    def current_user_is_site_maintainer(self):
+        """Returns whether the current user is a site maintainer.
 
-        Raises:
-            PageNotFoundException: Page not found error (error code 404).
+        A super admin or release coordinator is also a site maintainer.
+
+        Returns:
+            bool. Whether the current user is a site maintainer.
         """
-        raise self.PageNotFoundException
+        return (
+            self.current_user_is_super_admin or
+            self.role == feconf.ROLE_ID_RELEASE_COORDINATOR)
+
+    def _is_requested_path_currently_accessible_to_user(self):
+        """Checks whether the requested path is currently accessible to user.
+
+        Returns:
+            bool. Whether the requested path is currently accessible to user.
+        """
+        return (
+            self.request.path in AUTH_HANDLER_PATHS or
+            not feconf.ENABLE_MAINTENANCE_MODE or
+            self.current_user_is_site_maintainer)
+
+    def get(self, *args, **kwargs):  # pylint: disable=unused-argument
+        """Base method to handle GET requests."""
+        logging.warning('Invalid URL requested: %s', self.request.uri)
+        self.error(404)
+        self._render_exception(
+            404, {
+                'error': 'Could not find the page %s.' % self.request.uri})
+        return
 
     def post(self, *args):  # pylint: disable=unused-argument
         """Base method to handle POST requests.
 
         Raises:
-            PageNotFoundException: Page not found error (error code 404).
+            PageNotFoundException. Page not found error (error code 404).
         """
         raise self.PageNotFoundException
 
@@ -271,7 +342,7 @@ class BaseHandler(webapp2.RequestHandler):
         """Base method to handle PUT requests.
 
         Raises:
-            PageNotFoundException: Page not found error (error code 404).
+            PageNotFoundException. Page not found error (error code 404).
         """
         raise self.PageNotFoundException
 
@@ -279,7 +350,7 @@ class BaseHandler(webapp2.RequestHandler):
         """Base method to handle DELETE requests.
 
         Raises:
-            PageNotFoundException: Page not found error (error code 404).
+            PageNotFoundException. Page not found error (error code 404).
         """
         raise self.PageNotFoundException
 
@@ -327,37 +398,10 @@ class BaseHandler(webapp2.RequestHandler):
                 SAMEORIGIN: The template can only be displayed in a frame
                     on the same origin as the page itself.
         """
-        values = self.values
 
-        scheme, netloc, path, _, _ = python_utils.url_split(self.request.uri)
-
-        values.update({
-            'DEV_MODE': constants.DEV_MODE,
-            'DOMAIN_URL': '%s://%s' % (scheme, netloc),
-            'ACTIVITY_STATUS_PRIVATE': (
-                rights_manager.ACTIVITY_STATUS_PRIVATE),
-            'ACTIVITY_STATUS_PUBLIC': (
-                rights_manager.ACTIVITY_STATUS_PUBLIC),
-            # The 'path' variable starts with a forward slash.
-            'FULL_URL': '%s://%s%s' % (scheme, netloc, path),
-        })
-
-        if 'status_code' not in values:
-            values['status_code'] = 200
-
-        if 'meta_name' not in values:
-            values['meta_name'] = 'Personalized Online Learning from Oppia'
-
-        if 'meta_description' not in values:
-            values['meta_description'] = (
-                'Oppia is a free, open-source learning platform. Join the '
-                'community to create or try an exploration today!')
-
-        # Create a new csrf token for inclusion in HTML responses. This assumes
-        # that tokens generated in one handler will be sent back to a handler
-        # with the same page name.
-
-        self.response.cache_control.no_cache = True
+        # The 'no-store' must be used to properly invalidate the cache when we
+        # deploy a new version, using only 'no-cache' doesn't work properly.
+        self.response.cache_control.no_store = True
         self.response.cache_control.must_revalidate = True
         self.response.headers[b'Strict-Transport-Security'] = (
             b'max-age=31536000; includeSubDomains')
@@ -376,8 +420,7 @@ class BaseHandler(webapp2.RequestHandler):
         self.response.expires = 'Mon, 01 Jan 1990 00:00:00 GMT'
         self.response.pragma = 'no-cache'
 
-        self.response.write(
-            self.jinja2_env.get_template(filepath).render(**values))
+        self.response.write(load_template(filepath))
 
     def _render_exception_json_or_html(self, return_type, values):
         """Renders an error page, or an error JSON response.
@@ -389,21 +432,21 @@ class BaseHandler(webapp2.RequestHandler):
 
         method = self.request.environ['REQUEST_METHOD']
 
-        if return_type == feconf.HANDLER_TYPE_HTML and (
-                method == 'GET'):
+        if return_type == feconf.HANDLER_TYPE_HTML and method == 'GET':
             self.values.update(values)
-            if 'iframed' in self.values and self.values['iframed']:
+            if self.iframed:
                 self.render_template(
-                    'error-iframed.mainpage.html',
-                    iframe_restriction=None)
+                    'error-iframed.mainpage.html', iframe_restriction=None)
+            elif values['status_code'] == 503:
+                self.render_template('maintenance-page.mainpage.html')
             else:
                 self.render_template(
                     'error-page-%s.mainpage.html' % values['status_code'])
         else:
             if return_type != feconf.HANDLER_TYPE_JSON and (
                     return_type != feconf.HANDLER_TYPE_DOWNLOADABLE):
-                logging.warning('Not a recognized return type: '
-                                'defaulting to render JSON.')
+                logging.warning(
+                    'Not a recognized return type: defaulting to render JSON.')
             self.render_json(values)
 
     def _render_exception(self, error_code, values):
@@ -416,7 +459,7 @@ class BaseHandler(webapp2.RequestHandler):
         """
         # The error codes here should be in sync with the error pages
         # generated via webpack.common.config.ts.
-        assert error_code in [400, 401, 404, 500]
+        assert error_code in [400, 401, 404, 500, 503]
         values['status_code'] = error_code
         method = self.request.environ['REQUEST_METHOD']
 
@@ -434,8 +477,7 @@ class BaseHandler(webapp2.RequestHandler):
                 self.DELETE_HANDLER_ERROR_RETURN_TYPE, values)
         else:
             logging.warning('Not a recognized request method.')
-            self._render_exception_json_or_html(
-                None, values)
+            self._render_exception_json_or_html(None, values)
 
     def handle_exception(self, exception, unused_debug_mode):
         """Overwrites the default exception handler.
@@ -459,11 +501,10 @@ class BaseHandler(webapp2.RequestHandler):
                         'error': (
                             'You must be logged in to access this resource.')})
             else:
-                self.redirect(
-                    current_user_services.create_login_url(self.request.uri))
+                self.redirect(user_services.create_login_url(self.request.uri))
             return
 
-        logging.info(b''.join(traceback.format_exception(*sys.exc_info())))
+        logging.exception('Exception raised: %s', exception)
 
         if isinstance(exception, self.PageNotFoundException):
             logging.warning('Invalid URL requested: %s', self.request.uri)
@@ -473,7 +514,7 @@ class BaseHandler(webapp2.RequestHandler):
                     'error': 'Could not find the page %s.' % self.request.uri})
             return
 
-        logging.error('Exception raised: %s', exception)
+        logging.exception('Exception raised: %s', exception)
 
         if isinstance(exception, self.UnauthorizedUserException):
             self.error(401)
@@ -493,6 +534,12 @@ class BaseHandler(webapp2.RequestHandler):
                 exception)})
             return
 
+        if isinstance(exception, self.TemporaryMaintenanceException):
+            self.error(503)
+            self._render_exception(503, {'error': python_utils.convert_to_bytes(
+                exception)})
+            return
+
         self.error(500)
         self._render_exception(
             500, {'error': python_utils.convert_to_bytes(exception)})
@@ -502,6 +549,8 @@ class BaseHandler(webapp2.RequestHandler):
     NotLoggedInException = UserFacingExceptions.NotLoggedInException
     PageNotFoundException = UserFacingExceptions.PageNotFoundException
     UnauthorizedUserException = UserFacingExceptions.UnauthorizedUserException
+    TemporaryMaintenanceException = (
+        UserFacingExceptions.TemporaryMaintenanceException)
 
 
 class Error404Handler(BaseHandler):
@@ -540,7 +589,7 @@ class CsrfTokenManager(python_utils.OBJECT):
             issued_on: float. The timestamp at which the token was issued.
 
         Returns:
-            str: The generated CSRF token.
+            str. The generated CSRF token.
         """
         cls.init_csrf_secret()
 
@@ -626,3 +675,25 @@ class CsrfTokenHandler(BaseHandler):
         self.render_json({
             'token': csrf_token,
         })
+
+
+class OppiaMLVMHandler(BaseHandler):
+    """Base class for the handlers that communicate with Oppia-ML VM instances.
+    """
+
+    def extract_request_message_vm_id_and_signature(self):
+        """Returns the OppiaMLAuthInfo domain object containing
+        information from the incoming request that is necessary for
+        authentication.
+
+        Since incoming request can be either a protobuf serialized binary or
+        a JSON object, the derived classes must implement the necessary
+        logic to decode the incoming request and return a tuple of size 3
+        where message is at index 0, vm_id is at index 1 and signature is at
+        index 2.
+
+        Raises:
+            NotImplementedError. The derived child classes must implement the
+                necessary logic as described above.
+        """
+        raise NotImplementedError

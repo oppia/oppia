@@ -1,0 +1,171 @@
+<div class="story-editor">
+  <div class="navbar-helper">
+    <div class="navbar-tabs">
+      <div class="navbar-text">
+        <[$ctrl.getNavbarText()]>
+      </div>
+      <div class="navbar-icons">
+        <li ng-class="{'navbar-tab-active': $ctrl.isMainEditorTabSelected(), 'uib-dropdown': $ctrl.getTotalWarningsCount()}"
+            ng-attr-uib-dropdown="<[$ctrl.getTotalWarningsCount()]>"
+            class="nav-item icon nav-list-item"
+            ng-click="$ctrl.navigateToStoryEditor()">
+          <a uib-tooltip="Main Editor" tooltip-placement="bottom" class="nav-link navbar-tab">
+            <i class="material-icons navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.isMainEditorTabSelected()}">&#xE254;</i>
+          </a>
+          <div ng-show="$ctrl.getTotalWarningsCount()"
+               class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
+               ng-mouseover="$ctrl.warningsAreShown=true" ng-mouseleave="$ctrl.warningsAreShown=false">
+            <span class="oppia-editor-warnings-count protractor-test-warning-indicator">
+              <[$ctrl.getTotalWarningsCount()]>
+            </span>
+            <ul uib-dropdown-menu class="uib-dropdown-menu oppia-editor-warnings-box story-editor-warning-box" ng-if="$ctrl.warningsAreShown">
+              <span class="oppia-editor-warnings-header">Warnings</span>
+              <li class="oppia-editor-warnings-text protractor-test-warnings-text"
+                  ng-repeat="issue in $ctrl.validationIssues.concat($ctrl.explorationValidationIssues) track by $index">
+                <hr class="oppia-editor-warnings-separator">
+                <[issue]>
+              </li>
+              <li class="oppia-editor-warnings-text protractor-test-warnings-text"
+                  ng-repeat="issue in $ctrl.prepublishValidationIssues track by $index">
+                <hr class="oppia-editor-warnings-separator">
+                <[issue]>
+              </li>
+            </ul>
+          </div>
+        </li>
+
+        <li ng-if="!($ctrl.getActiveTab() === 'chapter_editor')" ng-class="{'navbar-tab-active': $ctrl.getActiveTab() === 'story_preview'}" class="nav-item icon nav-list-item" ng-click="$ctrl.navigateToStoryPreviewTab()">
+          <a class="nav-link navbar-tab" uib-tooltip="Preview" aria-label="Preview" tooltip-placement="bottom">
+            <i class="material-icons navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTab() === 'story_preview'}">&#xE037;</i>
+          </a>
+        </li>
+      </div>
+    </div>
+  </div>
+  <div class="story-editor-parent">
+    <div ng-if="$ctrl.getActiveTab() === 'story_editor'">
+      <story-editor></story-editor>
+    </div>
+    <div ng-if="$ctrl.getActiveTab() === 'chapter_editor'">
+      <chapter-editor-tab></chapter-editor-tab>
+    </div>
+    <div ng-if="$ctrl.getActiveTab() === 'story_preview'">
+      <oppia-story-preview-tab></oppia-story-preview-tab>
+    </div>
+  </div>
+</div>
+
+<style>
+  .story-editor .back-to-topic-button {
+    margin-bottom: 10px;
+    margin-left: 9%;
+    margin-top: 1.5%;
+  }
+  story-editor-page .story-editor {
+    margin-bottom: 80px;
+  }
+  story-editor-page .navbar-helper {
+    background-color: #00609C;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.23);
+    height: 70px;
+    margin-bottom: 20px;
+    position: fixed;
+    text-align: center;
+    top: 56px;
+    width: 100%;
+    z-index: 10;
+  }
+  story-editor-page .navbar-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    height: 100%;
+    justify-content: flex-start;
+    text-align: center;
+  }
+  story-editor-page .navbar-tab-icon {
+    color: #FFF;
+    display: block;
+    font-size: 30px;
+    width: 100%;
+  }
+  story-editor-page .navbar-tab span {
+    color: #FFF;
+    font-size: 12px;
+  }
+  story-editor-page .oppia-editor-warnings-box {
+    cursor: default;
+    max-width: none;
+  }
+  story-editor-page .navbar-tab-active {
+    background-color: #e6e6e6;
+    box-shadow: 0 3px 2px 0 #e6e6e6;
+  }
+  story-editor-page .navbar-tab-active-icon {
+    color: #00609C;
+  }
+  story-editor-page .topic-warning-container {
+    display: block;
+  }
+  story-editor-page .story-editor-parent {
+    margin-top: 100px;
+  }
+
+  @media screen and (max-width: 800px) {
+    story-editor-page .story-editor-parent {
+      margin-top: 40px;
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    story-editor-page .navbar-helper {
+      display: none;
+    }
+  }
+  story-editor-page .navbar-text {
+    align-items: center;
+    color: #FFF;
+    display: flex;
+    font-family: Capriola, Roboto, Arial, sans-serif;
+    font-size: 20px;
+    margin-left: 4%;
+    width: 35%;
+  }
+  story-editor-page .navbar-icons {
+    display: flex;
+  }
+  story-editor-page .nav-list-item {
+    align-items: center;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    width: 90px;
+  }
+  story-editor-page .navbar-icons .nav-list-item:hover {
+    background-color: #4eb0c0;
+  }
+  .story-editor-warning-box {
+    display: block;
+    width: 200px;
+  }
+  story-editor-page .story-warning-count {
+    display: inline-block;
+    height: 20px;
+    margin-left: -10px;
+    width: 20px;
+  }
+
+  @media screen and (max-width: 800px) {
+    story-editor-page .navbar-helper {
+      position: inherit;
+    }
+    story-editor-page .navbar-tabs {
+      justify-content: center;
+    }
+    story-editor-page .navbar-text {
+      display: none;
+    }
+    story-editor-page .topic-editor-main {
+      margin-top: 16px;
+    }
+  }
+</style>

@@ -29,8 +29,7 @@ from core.platform import models
 import feconf
 import python_utils
 
-(base_models, collection_models,) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.collection])
+(collection_models,) = models.Registry.import_models([models.NAMES.collection])
 
 
 class CollectionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -61,7 +60,7 @@ class CollectionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         try:
             collection.validate(strict=False)
         except Exception as e:
-            logging.error(
+            logging.exception(
                 'Collection %s failed validation: %s' % (item.id, e))
             yield (
                 CollectionMigrationOneOffJob._ERROR_KEY,

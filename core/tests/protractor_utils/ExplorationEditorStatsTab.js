@@ -29,37 +29,37 @@ var ExplorationEditorStatsTab = function() {
   /**
      * Workflows
      */
-  var _getNumPassersby = function() {
-    return numPassersby.getText();
+  var _getNumPassersby = async function() {
+    return await numPassersby.getText();
   };
 
-  var _getIssueText = function(issueIndex) {
-    return _getIssueElement(issueIndex).getText();
+  var _getIssueText = async function(issueIndex) {
+    return await _getIssueElement(issueIndex).getText();
   };
 
-  var _getIssueTitle = function() {
-    return issueTitle.getText();
+  var _getIssueTitle = async function() {
+    return await issueTitle.getText();
   };
 
   var _getIssueElement = function(issueIndex) {
     return element(by.css(issueElementStr + issueIndex.toString()));
   };
 
-  this.expectNumPassersbyToBe = function(numPassersby) {
-    expect(_getNumPassersby()).toMatch(numPassersby);
+  this.expectNumPassersbyToBe = async function(numPassersby) {
+    expect(await _getNumPassersby()).toMatch(numPassersby);
   };
 
-  this.clickIssue = function(issueIndex, expectedIssueText) {
-    expect(_getIssueText(issueIndex)).toMatch(expectedIssueText);
-    _getIssueElement(issueIndex).click();
+  this.clickIssue = async function(issueIndex, expectedIssueText) {
+    expect(await _getIssueText(issueIndex)).toMatch(expectedIssueText);
+    await _getIssueElement(issueIndex).click();
   };
 
-  this.expectIssueTitleToBe = function(issueTitle) {
-    expect(_getIssueTitle()).toMatch(issueTitle);
+  this.expectIssueTitleToBe = async function(issueTitle) {
+    expect(await _getIssueTitle()).toMatch(issueTitle);
   };
 
-  this.markResolved = function() {
-    resolveBtn.click();
+  this.markResolved = async function() {
+    await resolveBtn.click();
   };
 };
 

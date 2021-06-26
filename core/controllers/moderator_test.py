@@ -64,7 +64,7 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
         self.signup(self.user_email, self.username)
         self.set_moderators([self.MODERATOR_USERNAME])
         self.user_id = self.get_user_id_from_email(self.user_email)
-        self.user = user_services.UserActionsInfo(self.user_id)
+        self.user = user_services.get_user_actions_info(self.user_id)
         self.save_new_valid_exploration(self.EXP_ID_1, self.user_id)
         rights_manager.publish_exploration(self.user, self.EXP_ID_1)
 
@@ -123,8 +123,9 @@ class EmailDraftHandlerTests(test_utils.GenericTestBase):
         d_text = self.get_json(
             '/moderatorhandler/email_draft')['draft_email_body']
         self.assertEqual(d_text, '')
-        expected_draft_text_body = ('I\'m writing to inform you that '
-                                    'I have unpublished the above exploration.')
+        expected_draft_text_body = (
+            'I\'m writing to inform you that '
+            'I have unpublished the above exploration.')
         with self.can_send_emails_ctx, self.can_send_email_moderator_action_ctx:
             d_text = self.get_json(
                 '/moderatorhandler/email_draft')['draft_email_body']

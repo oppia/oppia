@@ -1,0 +1,99 @@
+<style>
+  .oppia-share-publish-modal .oppia-share-publish-body,
+  .oppia-share-publish-body p {
+    text-align: center;
+  }
+
+  .oppia-share-publish-modal .oppia-share-publish-close {
+    background-color: #015c53;
+    border-radius: 4px;
+    color: #fff;
+    font-family: "Roboto", Arial, sans-serif;
+    font-size: 14px;
+    margin-top: 10px;
+    text-align: center;
+    text-transform: uppercase;
+    width: 200px;
+  }
+
+  .oppia-share-publish-modal .oppia-share-publish-close:hover {
+    background-color: #05beb2;
+    color: #fff;
+  }
+
+  .oppia-share-publish-modal .oppia-share-publish-header {
+    background: #009688;
+    border-radius: 5px 5px 0 0;
+    text-align: center;
+  }
+
+  .oppia-share-publish-modal .oppia-share-publish-header h3 {
+    color: #FFF;
+    font-size: 1.3em;
+  }
+
+  .oppia-share-publish-modal .oppia-share-publish-header img {
+    width: 40%;
+  }
+
+  .oppia-share-publish-body .oppia-share-publish-link {
+    display: inline;
+  }
+
+  .oppia-share-publish-body .oppia-share-publish-link div {
+    background-color: #fcfcfc;
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-block;
+    margin-bottom: 2px;
+    margin-top: 10px;
+    max-width: 350px;
+    overflow: hidden;
+    padding: 10px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .oppia-share-publish-body .oppia-share-publish-link div:hover {
+    background-color: #f9f9f9;
+  }
+
+  .oppia-share-publish-body .oppia-share-publish-link span {
+    left: 481px;
+    position: absolute;
+    top: 124px;
+  }
+
+  .oppia-share-publish-body .oppia-share-publish-link i {
+    color: #3F9187;
+    padding-left: 6px;
+  }
+</style>
+
+<div class="oppia-share-publish-modal protractor-test-share-publish-modal">
+  <div class="modal-header oppia-share-publish-header">
+    <img ng-src="<[congratsImgUrl]>">
+    <h3>Awesome!</h3>
+  </div>
+
+  <div class="modal-body oppia-long-text oppia-share-publish-body">
+    <p>
+      Now that you're a published Oppia teacher, you can share your creation.
+    </p>
+    <div class="oppia-share-publish-link">
+      Here's your exploration link:<br>
+      <div ng-click="selectText($event)"><[explorationLink]></div>
+      <span ng-show="explorationLinkCopied">Copied<i class="fa fa-check" aria-hidden="true"></i></span>
+    </div>
+    <sharing-links layout-type="row"
+                   layout-align-type="center center"
+                   share-type="exploration"
+                   [exploration-id]="explorationId">
+    </sharing-links>
+    <button class="btn btn-secondary oppia-share-publish-close protractor-test-share-publish-close"
+            ng-click="cancel()">
+      Close
+    </button>
+  </div>
+</div>

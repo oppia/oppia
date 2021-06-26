@@ -1,0 +1,349 @@
+<div class="history-tab-container">
+  <md-card class="oppia-editor-card history-table-card">
+    <div class="oppia-mobile-collapsible-card-header">
+      <h3 class="history-card-header-text">History</h3>
+    </div>
+    <div class="oppia-mobile-collapsible-card-content">
+      <div class="history-tab-header">
+        <div>
+          Displaying <[$ctrl.startingIndex]>-<[$ctrl.endIndex]> of <[$ctrl.totalExplorationVersionMetadata.length]>
+        </div>
+        <div class="history-tab-pagination-container">
+          <div class="history-tab-select">
+            <span>View</span>
+            <select class="form-control" ng-model="$ctrl.VERSIONS_PER_PAGE"
+                    ng-change="$ctrl.changeItemsPerPage()"
+                    ng-options="choice as choice for choice in $ctrl.versionChoices">
+            </select>
+          </div>
+          <div uib-pagination
+               class="pagination"
+               boundary-link-numbers="true"
+               rotate="false"
+               max-size="5"
+               items-per-page="$ctrl.VERSIONS_PER_PAGE"
+               next-text=">"
+               previous-text="<"
+               total-items="$ctrl.versionCheckboxArray.length"
+               ng-model="$ctrl.displayedCurrentPageNumber"
+               ng-change="$ctrl.changeItemsPerPage()">
+          </div>
+        </div>
+      </div>
+      <div class="filter-container">
+        <span>Filter</span>
+        <input class="form-control oppia-autofocus" type="text" ng-change="$ctrl.filterByUsername()" ng-model="$ctrl.username" placeholder="Search for a user" focus-on="usernameInputField">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="history-table-header">
+        <div class="history-table-header-version">
+          <span>Version No.</span>
+        </div>
+        <div class="history-table-header-message">
+          <span>Notes</span>
+        </div>
+        <div class="history-table-header-profile">
+          <span>User</span>
+        </div>
+        <div class="history-table-header-date" ng-click="$ctrl.reverseDateOrder()">
+          <span>Date</span>
+        </div>
+      </div>
+      <div class="display-container">
+        <span>Displaying <[$ctrl.startingIndex]>-<[$ctrl.endIndex]> of <[$ctrl.totalExplorationVersionMetadata.length]></span>
+      </div>
+      <div ng-repeat="metadata in $ctrl.explorationVersionMetadata track by $index" class="history-list-item protractor-test-history-list-item">
+        <div class="history-table-index">
+          <[metadata.versionNumber]>.
+        </div>
+        <div class="history-table-message">
+          <[metadata.commitMessage]>
+        </div>
+        <div class="history-table-profile">
+          <strong><profile-link-text [username]="metadata.committerId"></profile-link-text></strong>
+        </div>
+        <div class="history-table-version" title="<[metadata.tooltipText]>">
+          <em class="protractor-test-history-tab-commit-date"><[metadata.createdOnMsecsStr]></em>
+        </div>
+        <div class="history-table-options protractor-test-history-list-options">
+          <div class="dropdown">
+            <div type="button" id="<['dropdownMenuButton-' + $index]>" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <i class="fa fa-ellipsis-v"></i>
+            </div>
+            <div class="dropdown-menu dropdown-menu-left" aria-labelledby="<['dropdownMenuButton-' + $index]>">
+              <a class="dropdown-item protractor-test-revert-version" href="#" ng-if="metadata.versionNumber !== $ctrl.currentVersion && $ctrl.isEditable()" ng-click="$ctrl.showRevertExplorationModal(metadata.versionNumber)">
+                Revert
+              </a>
+              <a class="dropdown-item" href="#" ng-click="$ctrl.downloadExplorationWithVersion(metadata.versionNumber)"
+                 title="Download exploration as a zip file.">
+                Download
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <br>
+      <div class="pagination-mobile">
+        <div uib-pagination
+             class="pagination"
+             boundary-link-numbers="true"
+             rotate="false"
+             max-size="5"
+             items-per-page="$ctrl.VERSIONS_PER_PAGE"
+             next-text=">"
+             previous-text="<"
+             total-items="$ctrl.versionCheckboxArray.length"
+             ng-model="$ctrl.displayedCurrentPageNumber"
+             ng-change="$ctrl.changeItemsPerPage()">
+        </div>
+      </div>
+    </div>
+  </md-card>
+  <md-card class="oppia-editor-card oppia-mobile-collapsible-card">
+    <div class="compare-revision-header oppia-mobile-collapsible-card-header">
+      <h3 class="compare-header-text">Compare Revisions</h3>
+      <i class="fa fa-caret-down"
+         ng-if="!prerequisiteSkillIsShown"
+         aria-hidden="true">
+      </i>
+      <i class="fa fa-caret-up"
+         ng-if="prerequisiteSkillIsShown"
+         aria-hidden="true">
+      </i>
+    </div>
+    <div class="oppia-mobile-collapsible-card-content">
+      <div class="revision-container">
+        <div class="revision-select-container">
+          <span>Revision #1</span>
+          <select class="form-control protractor-test-history-version-dropdown-first" ng-model="$ctrl.firstVersion" ng-change="$ctrl.changeSelectedVersions($ctrl.firstVersion, 1)" ng-options="choice as choice.versionNumber for choice in $ctrl.totalExplorationVersionMetadata"></select>
+        </div>
+        <div class="revision-select-container">
+          <span>Revision #2</span>
+          <select class="form-control protractor-test-history-version-dropdown-second" ng-model="$ctrl.secondVersion" ng-change="$ctrl.changeSelectedVersions($ctrl.secondVersion, 2)" ng-options="choice as choice.versionNumber for choice in $ctrl.totalExplorationVersionMetadata"></select>
+        </div>
+        <button ng-click="$ctrl.resetGraph()" class="btn btn-outline-secondary oppia-reset-button protractor-test-reset-graph">Reset</button>
+      </div>
+      <div ng-if="$ctrl.diffData && !$ctrl.hideHistoryGraph && $ctrl.explorationVersionMetadata" class="graph-diff-container">
+        <h3>
+          Changes from version <[$ctrl.compareVersionMetadata.earlierVersion.versionNumber]>
+          to version <[$ctrl.compareVersionMetadata.laterVersion.versionNumber]>
+        </h3>
+        <version-diff-visualization diff-data="$ctrl.diffData"
+                                    earlier-version-header="$ctrl.earlierVersionHeader"
+                                    later-version-header="$ctrl.laterVersionHeader">
+        </version-diff-visualization>
+      </div>
+    </div>
+  </md-card>
+</div>
+<style>
+  history-tab .history-tab-container {
+    font-family: Roboto, Arial, sans-serif;
+    word-wrap: break-word;
+  }
+  history-tab .history-table-header {
+    border-bottom: 2px solid #000;
+    display: flex;
+    padding-left: 0.5em;
+  }
+  history-tab .history-table-header-date,
+  history-tab .history-table-header-message,
+  history-tab .history-table-header-profile,
+  history-tab .history-table-header-version {
+    font-weight: bold;
+  }
+  history-tab  .history-table-header-message {
+    width: 39%;
+  }
+  history-tab .history-table-header-profile,
+  history-tab .history-table-header-date,
+  history-tab .history-table-header-version {
+    width: 20%;
+  }
+  history-tab .history-table-header-date {
+    cursor: pointer;
+  }
+  history-tab .history-list-item {
+    border-bottom: 1px solid #e6e6e6;
+    display: flex;
+    flex-wrap: wrap;
+    padding: 16px 10px;
+    position: relative;
+  }
+  history-tab .history-table-message {
+    width: 40%;
+  }
+  history-tab .history-table-index,
+  history-tab .history-table-profile,
+  history-tab .history-table-version {
+    width: 20%;
+  }
+  history-tab .pagination-page,
+  history-tab .pagination-prev,
+  history-tab .pagination-next {
+    padding: 0 10px;
+  }
+  history-tab .pagination-page a {
+    color: #333;
+    font-size: 14px;
+    font-weight: bold;
+  }
+  history-tab .active {
+    align-items: center;
+    background-color: rgba(65, 152, 137,0.2);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    opacity: 0.8;
+    text-align: center;
+  }
+  history-tab .pagination-prev a,
+  history-tab .pagination-next a {
+    color: #000;
+  }
+  history-tab .disabled {
+    opacity: 0.4;
+  }
+  history-tab .history-tab-header,
+  history-tab .history-tab-pagination-container {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+  history-tab .history-tab-header {
+    margin-bottom: 20px;
+    margin-top: 20px;
+  }
+  history-tab .history-tab-pagination-container {
+    width: 47%;
+  }
+  history-tab .history-tab-select {
+    align-items: center;
+    display: flex;
+    width: 30%;
+  }
+  history-tab .history-tab-select span {
+    margin-right: 5%;
+  }
+  history-tab .history-table-options {
+    position: absolute;
+    right: 0;
+  }
+  history-tab .filter-container {
+    margin: 0 0 30px;
+    position: relative;
+    width: 35%;
+  }
+  history-tab .filter-container i {
+    bottom: 14%;
+    color: #707070;
+    position: absolute;
+    right: 5%;
+  }
+  history-tab .revision-container {
+    align-items: flex-end;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+  history-tab .revision-container .revision-select-container {
+    width: 35%;
+  }
+  history-tab .graph-diff-container {
+    border-top: 1px solid #707070;
+    margin-top: 30px;
+  }
+  history-tab .history-card-header-text {
+    font-size: 22px;
+    margin-bottom: 0;
+  }
+  history-tab .history-table-profile a {
+    color: #00609C;
+  }
+  history-tab .filter-container span {
+    display: block;
+    font-weight: bold;
+  }
+  history-tab .compare-header-text {
+    font-size: 20px;
+  }
+  history-tab .revision-select-container span {
+    font-weight: bold;
+  }
+  history-tab .pagination-mobile, .display-container {
+    display: none;
+  }
+  history-tab .compare-revision-header i {
+    display: none;
+  }
+  history-tab .oppia-reset-button {
+    height: 35px;
+  }
+  @media screen and (max-width: 768px) {
+    history-tab .revision-container .revision-select-container {
+      width: 47%;
+    }
+    history-tab .compare-revision-header {
+      display: flex;
+      justify-content: space-between;
+    }
+    history-tab .compare-header-text {
+      margin: 0;
+    }
+    history-tab .history-tab-select {
+      display: none;
+    }
+    history-tab .history-table-card {
+      padding: 0;
+    }
+    history-tab .history-card-header-text {
+      margin: 0;
+    }
+    history-tab .history-table-message {
+      order: 10;
+      width: 100%;
+    }
+    history-tab .history-table-profile {
+      order: 2;
+      width: 90%;
+    }
+    history-tab .history-table-version {
+      color: #707070;
+      order: 8;
+      width: 100%;
+    }
+    history-tab .history-table-header {
+      display: none;
+    }
+    history-tab .dropdown-menu-left {
+      left: -140px;
+    }
+    history-tab .history-table-options {
+      right: 40px;
+    }
+    history-tab .pagination-mobile {
+      display: block;
+      margin: 0 auto;
+    }
+    history-tab .history-tab-header {
+      display: none;
+    }
+    history-tab .history-list-item {
+      margin: 0 auto;
+      padding: 10px 0;
+    }
+    history-tab .pagination {
+      justify-content: center;
+    }
+    history-tab .display-container {
+      color: #707070;
+    }
+    history-tab .filter-container {
+      margin: 0 0 20px;
+    }
+    history-tab .compare-revision-header i {
+      display: block;
+    }
+  }
+</style>

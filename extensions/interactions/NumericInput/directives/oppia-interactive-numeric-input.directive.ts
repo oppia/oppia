@@ -22,35 +22,43 @@
 
 require('interactions/NumericInput/directives/numeric-input-rules.service.ts');
 require(
+  'interactions/NumericInput/directives/numeric-input-validation.service.ts');
+require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 require('services/contextual/window-dimensions.service.ts');
-require('services/stateful/focus-manager.service.ts');
 
 angular.module('oppia').directive('oppiaInteractiveNumericInput', [
   function() {
     return {
       restrict: 'E',
       scope: {},
-      bindToController: {},
+      bindToController: {
+        savedSolution: '<'
+      },
       template: require('./numeric-input-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$attrs', 'FocusManagerService', 'NumericInputRulesService',
-        'WindowDimensionsService', 'CurrentInteractionService',
+        '$attrs', 'CurrentInteractionService', 'NumericInputRulesService',
+        'NumericInputValidationService',
         function(
-            $attrs, FocusManagerService, NumericInputRulesService,
-            WindowDimensionsService, CurrentInteractionService) {
+            $attrs, CurrentInteractionService, NumericInputRulesService,
+            NumericInputValidationService) {
           var ctrl = this;
+          ctrl.errorString = '';
           var isAnswerValid = function() {
             return (
               ctrl.answer !== undefined &&
-              ctrl.answer !== null && ctrl.answer !== '');
+              ctrl.answer !== null && ctrl.answer !== '' &&
+              angular.isUndefined(
+                NumericInputValidationService.getErrorString(
+                  ctrl.answer)));
           };
 
           ctrl.submitAnswer = function(answer) {
             if (isAnswerValid()) {
               CurrentInteractionService.onSubmit(
-                answer, NumericInputRulesService);
+                answer,
+                NumericInputRulesService);
             }
           };
 
@@ -58,7 +66,10 @@ angular.module('oppia').directive('oppiaInteractiveNumericInput', [
             ctrl.submitAnswer(ctrl.answer);
           };
           ctrl.$onInit = function() {
-            ctrl.answer = '';
+            ctrl.answer = (
+              ctrl.savedSolution !== undefined ?
+              ctrl.savedSolution : ''
+            );
             ctrl.labelForFocusTarget = $attrs.labelForFocusTarget || null;
 
             ctrl.NUMERIC_INPUT_FORM_SCHEMA = {

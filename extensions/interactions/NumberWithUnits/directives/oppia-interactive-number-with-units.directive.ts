@@ -16,6 +16,9 @@
  * @fileoverview Directive for the NumberWithUnits interaction.
  */
 
+require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 require('domain/objects/NumberWithUnitsObjectFactory.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
@@ -31,16 +34,16 @@ angular.module('oppia').directive('oppiaInteractiveNumberWithUnits', [
     return {
       restrict: 'E',
       scope: {},
-      bindToController: {},
+      bindToController: {
+        savedSolution: '<'
+      },
       template: require('./number-with-units-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$attrs', '$uibModal', 'NumberWithUnitsObjectFactory',
-        'NumberWithUnitsRulesService', 'NUMBER_WITH_UNITS_PARSING_ERRORS',
-        'CurrentInteractionService', function(
-            $scope, $attrs, $uibModal, NumberWithUnitsObjectFactory,
-            NumberWithUnitsRulesService, NUMBER_WITH_UNITS_PARSING_ERRORS,
-            CurrentInteractionService) {
+        '$attrs', '$scope', '$uibModal', 'CurrentInteractionService',
+        'NumberWithUnitsObjectFactory', 'NumberWithUnitsRulesService', function(
+            $attrs, $scope, $uibModal, CurrentInteractionService,
+            NumberWithUnitsObjectFactory, NumberWithUnitsRulesService) {
           var ctrl = this;
           var errorMessage = '';
           // Label for errors caused whilst parsing number with units.
@@ -66,8 +69,8 @@ angular.module('oppia').directive('oppiaInteractiveNumberWithUnits', [
             if (ctrl.NumberWithUnitsForm === undefined) {
               return true;
             }
-            return (!ctrl.NumberWithUnitsForm.$invalid &&
-              ctrl.answer !== '');
+            return (
+              !ctrl.NumberWithUnitsForm.$invalid && ctrl.answer !== '');
           };
 
           var submitAnswerFn = function() {
@@ -78,23 +81,17 @@ angular.module('oppia').directive('oppiaInteractiveNumberWithUnits', [
               template: require(
                 './number-with-units-help-modal.directive.html'),
               backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
-                  $scope.close = function() {
-                    $uibModalInstance.close();
-                  };
-                }
-              ]
+              controller: 'ConfirmOrCancelModalController'
             }).result.then(function() {}, function() {
-
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
           ctrl.$onInit = function() {
             $scope.$watch('$ctrl.answer', function(newValue) {
               try {
-                var numberWithUnits =
-                  NumberWithUnitsObjectFactory.fromRawInputString(newValue);
+                NumberWithUnitsObjectFactory.fromRawInputString(newValue);
                 errorMessage = '';
                 ctrl.NumberWithUnitsForm.answer.$setValidity(
                   FORM_ERROR_TYPE, true);
@@ -104,7 +101,14 @@ angular.module('oppia').directive('oppiaInteractiveNumberWithUnits', [
                   FORM_ERROR_TYPE, false);
               }
             });
-            ctrl.answer = '';
+            if (ctrl.savedSolution !== undefined) {
+              let savedSolution = ctrl.savedSolution;
+              savedSolution = NumberWithUnitsObjectFactory.fromDict(
+                savedSolution).toString();
+              ctrl.answer = savedSolution;
+            } else {
+              ctrl.answer = '';
+            }
             ctrl.labelForFocusTarget = $attrs.labelForFocusTarget || null;
 
             ctrl.NUMBER_WITH_UNITS_FORM_SCHEMA = {

@@ -81,7 +81,8 @@ class FeedbackThread(python_utils.OBJECT):
             dict. A dict representation of the FeedbackThread object.
         """
         return {
-            'last_updated': utils.get_time_in_millisecs(self.last_updated),
+            'last_updated_msecs': (
+                utils.get_time_in_millisecs(self.last_updated)),
             'original_author_username': (
                 user_services.get_username(self.original_author_id)
                 if self.original_author_id else None),
@@ -116,7 +117,7 @@ class FeedbackThread(python_utils.OBJECT):
 
         Returns:
             list(str|None). The ids of the last two messages of the thread. If
-                the message does not exist, None is returned.
+            the message does not exist, None is returned.
         """
         return [
             self._get_full_message_id(i) if i >= 0 else None
@@ -188,15 +189,28 @@ class FeedbackMessage(python_utils.OBJECT):
             'author_username': (
                 user_services.get_username(self.author_id)
                 if self.author_id else None),
-            'created_on': utils.get_time_in_millisecs(self.created_on),
+            'created_on_msecs': utils.get_time_in_millisecs(self.created_on),
             'entity_type': self.entity_type,
             'entity_id': self.entity_id,
             'message_id': self.message_id,
             'text': self.text,
             'updated_status': self.updated_status,
-            'updated_subject': self.updated_subject,
-            'received_via_email': self.received_via_email
+            'updated_subject': self.updated_subject
         }
+
+
+class FullyQualifiedMessageIdentifier(python_utils.OBJECT):
+    """Domain object representing the full identifier of a message in a
+    feedback thread.
+
+    Attributes:
+        thread_id: str. The ID of the thread.
+        message_id: str. The ID of a message beloning to the thread.
+    """
+
+    def __init__(self, thread_id, message_id):
+        self.thread_id = thread_id
+        self.message_id = message_id
 
 
 class FeedbackAnalytics(python_utils.OBJECT):
@@ -314,7 +328,8 @@ class FeedbackThreadSummary(python_utils.OBJECT):
         return {
             'status': self.status,
             'original_author_id': self.original_author_id,
-            'last_updated': utils.get_time_in_millisecs(self.last_updated),
+            'last_updated_msecs': (
+                utils.get_time_in_millisecs(self.last_updated)),
             'last_message_text': self.last_message_text,
             'total_message_count': self.total_message_count,
             'last_message_is_read': self.last_message_is_read,

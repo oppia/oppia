@@ -1,0 +1,21 @@
+<form autocomplete="off" ng-disabled="$ctrl.RatioExpressionInputForm.$invalid" ng-submit="$ctrl.submitAnswer($ctrl.answer)" role="form" class="form-horizontal">
+  <!-- This ng-form is needed for submitting answer on hitting enter. -->
+  <ng-form name="$ctrl.RatioExpressionInputForm" class="input">
+    <input type="text" name="answer" placeholder="<[$ctrl.placeholder]>" ng-model="$ctrl.answer" class="form-control">
+  </ng-form>
+
+  <div class="oppia-form-error oppia-ratio-expression-input-error">
+    <[$ctrl.getWarningText()]>
+  </div>
+</form>
+
+<style>
+  .oppia-ratio-expression-input-error {
+    margin-top: 10px;
+  }
+
+  .ng-invalid {
+    border-color: red;
+    outline-color: red;
+  }
+</style>

@@ -20,7 +20,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
-import imghdr
 import logging
 
 from constants import constants
@@ -32,6 +31,7 @@ from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import fs_services
+from core.domain import image_validation_services
 from core.domain import question_services
 from core.domain import rights_manager
 from core.domain import search_services
@@ -39,14 +39,8 @@ from core.domain import state_domain
 from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import user_services
-from core.platform import models
 import feconf
 import utils
-
-app_identity_services = models.Registry.import_app_identity_services()
-current_user_services = models.Registry.import_current_user_services()
-(stats_models, user_models) = models.Registry.import_models(
-    [models.NAMES.statistics, models.NAMES.user])
 
 
 def _require_valid_version(version_from_payload, exploration_version):
@@ -64,12 +58,12 @@ def _require_valid_version(version_from_payload, exploration_version):
 
 class EditorHandler(base.BaseHandler):
     """Base class for all handlers for the editor page."""
+
     pass
 
 
 class ExplorationPage(EditorHandler):
     """The editor page for a single exploration."""
-
 
     @acl_decorators.can_play_exploration
     def get(self, unused_exploration_id):
@@ -109,6 +103,9 @@ class ExplorationHandler(EditorHandler):
                 self.user_id and not has_seen_editor_tutorial)
             exploration_data['show_state_translation_tutorial_on_load'] = (
                 self.user_id and not has_seen_translation_tutorial)
+            exploration_data['exploration_is_linked_to_story'] = (
+                exp_services.get_story_id_linked_to_exploration(
+                    exploration_id) is not None)
         except:
             raise self.PageNotFoundException
 
@@ -123,16 +120,31 @@ class ExplorationHandler(EditorHandler):
         _require_valid_version(version, exploration.version)
 
         commit_message = self.payload.get('commit_message')
+
+        if (commit_message is not None and
+                len(commit_message) > constants.MAX_COMMIT_MESSAGE_LENGTH):
+            raise self.InvalidInputException(
+                'Commit messages must be at most %s characters long.'
+                % constants.MAX_COMMIT_MESSAGE_LENGTH)
+
         change_list_dict = self.payload.get('change_list')
-        change_list = [
-            exp_domain.ExplorationChange(change) for change in change_list_dict]
+
         try:
-            exploration_rights = rights_manager.get_exploration_rights(
-                exploration_id)
-            can_edit = rights_manager.check_can_edit_activity(
-                self.user, exploration_rights)
-            can_voiceover = rights_manager.check_can_voiceover_activity(
-                self.user, exploration_rights)
+            change_list = [
+                exp_domain.ExplorationChange(change)
+                for change in change_list_dict
+            ]
+        except utils.ValidationError as e:
+            raise self.InvalidInputException(e)
+
+        exploration_rights = rights_manager.get_exploration_rights(
+            exploration_id)
+        can_edit = rights_manager.check_can_edit_activity(
+            self.user, exploration_rights)
+        can_voiceover = rights_manager.check_can_voiceover_activity(
+            self.user, exploration_rights)
+
+        try:
             if can_edit:
                 exp_services.update_exploration(
                     self.user_id, exploration_id, change_list, commit_message)
@@ -221,7 +233,9 @@ class ExplorationRightsHandler(EditorHandler):
             if new_member_id is None:
                 raise self.InvalidInputException(
                     'Sorry, we could not find the specified user.')
-
+            if new_member_id == self.user_id:
+                raise self.InvalidInputException(
+                    'Users are not allowed to assign other roles to themselves')
             rights_manager.assign_role_for_exploration(
                 self.user, exploration_id, new_member_id, new_member_role)
             email_manager.send_role_notification_email(
@@ -251,6 +265,25 @@ class ExplorationRightsHandler(EditorHandler):
                 exploration_id).to_dict()
         })
 
+    @acl_decorators.can_modify_exploration_roles
+    def delete(self, exploration_id):
+        """Deletes user roles from the exploration."""
+        username = self.request.get('username')
+        user_id = user_services.get_user_id_from_username(username)
+        if user_id is None:
+            raise self.InvalidInputException(
+                'Sorry, we could not find the specified user.')
+        if self.user.user_id == user_id:
+            raise self.InvalidInputException(
+                'Sorry, users cannot remove their own roles.')
+
+        rights_manager.deassign_role_for_exploration(
+            self.user, exploration_id, user_id)
+        self.render_json({
+            'rights': rights_manager.get_exploration_rights(
+                exploration_id).to_dict()
+        })
+
 
 class ExplorationStatusHandler(EditorHandler):
     """Handles publishing of an exploration."""
@@ -262,7 +295,7 @@ class ExplorationStatusHandler(EditorHandler):
             exploration_id: str. Id of the exploration.
 
         Raises:
-            InvalidInputException: Given exploration is invalid.
+            InvalidInputException. Given exploration is invalid.
         """
         exploration = exp_fetchers.get_exploration_by_id(exploration_id)
         try:
@@ -340,7 +373,7 @@ class UserExplorationEmailsHandler(EditorHandler):
             exploration_id: str. The exploration id.
 
         Raises:
-            InvalidInputException: Invalid message type.
+            InvalidInputException. Invalid message type.
         """
 
         mute = self.payload.get('mute')
@@ -386,9 +419,12 @@ class ExplorationFileDownloader(EditorHandler):
             version = exploration.version
 
         # If the title of the exploration has changed, we use the new title.
-        filename = utils.to_ascii(
-            'oppia-%s-v%s.zip'
-            % (exploration.title.replace(' ', ''), version)).decode('utf-8')
+        if not exploration.title:
+            init_filename = 'oppia-unpublished_exploration-v%s.zip' % version
+        else:
+            init_filename = 'oppia-%s-v%s.zip' % (
+                exploration.title.replace(' ', ''), version)
+        filename = utils.to_ascii(init_filename).decode('utf-8')
 
         if output_format == feconf.OUTPUT_FORMAT_ZIP:
             self.render_downloadable_file(
@@ -496,7 +532,7 @@ class ExplorationStatisticsHandler(EditorHandler):
             exploration_id, current_exploration.version).to_frontend_dict())
 
 
-class StateRulesStatsHandler(EditorHandler):
+class StateInteractionStatsHandler(EditorHandler):
     """Returns detailed learner answer statistics for a state."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -509,16 +545,13 @@ class StateRulesStatsHandler(EditorHandler):
 
         state_name = utils.unescape_encoded_uri_component(escaped_state_name)
         if state_name not in current_exploration.states:
-            logging.error('Could not find state: %s' % state_name)
-            logging.error('Available states: %s' % (
+            logging.exception('Could not find state: %s' % state_name)
+            logging.exception('Available states: %s' % (
                 list(current_exploration.states.keys())))
             raise self.PageNotFoundException
 
-        self.render_json({
-            'visualizations_info': stats_services.get_visualizations_info(
-                current_exploration.id, state_name,
-                current_exploration.states[state_name].interaction.id),
-        })
+        # TODO(#11475): Return visualizations info based on Apache Beam job.
+        self.render_json({'visualizations_info': []})
 
 
 class FetchIssuesHandler(EditorHandler):
@@ -526,6 +559,7 @@ class FetchIssuesHandler(EditorHandler):
     exploration. This removes the invalid issues and returns the remaining
     unresolved ones.
     """
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_view_exploration_stats
@@ -543,7 +577,7 @@ class FetchIssuesHandler(EditorHandler):
                 unresolved_issues.append(issue)
         exp_issues.unresolved_issues = unresolved_issues
         exp_issues_dict = exp_issues.to_dict()
-        self.render_json(exp_issues_dict['unresolved_issues'])
+        self.render_json(exp_issues_dict)
 
 
 class FetchPlaythroughHandler(EditorHandler):
@@ -573,8 +607,7 @@ class ResolveIssueHandler(EditorHandler):
         """Handles POST requests."""
         exp_issue_dict = self.payload.get('exp_issue_dict')
         try:
-            unused_exp_issue = stats_domain.ExplorationIssue.from_dict(
-                exp_issue_dict)
+            stats_domain.ExplorationIssue.from_dict(exp_issue_dict)
         except utils.ValidationError as e:
             raise self.PageNotFoundException(e)
 
@@ -605,7 +638,7 @@ class ResolveIssueHandler(EditorHandler):
         # instances.
         stats_services.delete_playthroughs_multi(
             issue_to_remove.playthrough_ids)
-        stats_services.save_exp_issues_model_transactional(exp_issues)
+        stats_services.save_exp_issues_model(exp_issues)
 
         self.render_json({})
 
@@ -627,38 +660,12 @@ class ImageUploadHandler(EditorHandler):
         filename_prefix = self.payload.get('filename_prefix')
         if filename_prefix is None:
             filename_prefix = self._FILENAME_PREFIX
-        if not raw:
-            raise self.InvalidInputException('No image supplied')
 
-        allowed_formats = ', '.join(
-            list(feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.keys()))
-
-        # Verify that the data is recognized as an image.
-        file_format = imghdr.what(None, h=raw)
-        if file_format not in feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS:
-            raise self.InvalidInputException('Image not recognized')
-
-        # Verify that the file type matches the supplied extension.
-        if not filename:
-            raise self.InvalidInputException('No filename supplied')
-        if filename.rfind('.') == 0:
-            raise self.InvalidInputException('Invalid filename')
-        if '/' in filename or '..' in filename:
-            raise self.InvalidInputException(
-                'Filenames should not include slashes (/) or consecutive '
-                'dot characters.')
-        if '.' not in filename:
-            raise self.InvalidInputException(
-                'Image filename with no extension: it should have '
-                'one of the following extensions: %s.' % allowed_formats)
-
-        dot_index = filename.rfind('.')
-        extension = filename[dot_index + 1:].lower()
-        if (extension not in
-                feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS[file_format]):
-            raise self.InvalidInputException(
-                'Expected a filename ending in .%s, received %s' %
-                (file_format, filename))
+        try:
+            file_format = image_validation_services.validate_image_and_filename(
+                raw, filename)
+        except utils.ValidationError as e:
+            raise self.InvalidInputException(e)
 
         file_system_class = fs_services.get_entity_file_system_class()
         fs = fs_domain.AbstractFileSystem(file_system_class(
@@ -669,9 +676,11 @@ class ImageUploadHandler(EditorHandler):
             raise self.InvalidInputException(
                 'A file with the name %s already exists. Please choose a '
                 'different name.' % filename)
-
+        image_is_compressible = (
+            file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
         fs_services.save_original_and_compressed_versions_of_image(
-            filename, entity_type, entity_id, raw, filename_prefix)
+            filename, entity_type, entity_id, raw, filename_prefix,
+            image_is_compressible)
 
         self.render_json({'filename': filename})
 
@@ -699,14 +708,19 @@ class EditorAutosaveHandler(ExplorationHandler):
             change_list = [
                 exp_domain.ExplorationChange(change)
                 for change in change_list_dict]
-            version = self.payload.get('version')
+        except utils.ValidationError as e:
+            # We leave any pre-existing draft changes in the datastore.
+            raise self.InvalidInputException(e)
 
-            exploration_rights = rights_manager.get_exploration_rights(
-                exploration_id)
-            can_edit = rights_manager.check_can_edit_activity(
-                self.user, exploration_rights)
-            can_voiceover = rights_manager.check_can_voiceover_activity(
-                self.user, exploration_rights)
+        version = self.payload.get('version')
+        exploration_rights = rights_manager.get_exploration_rights(
+            exploration_id)
+        can_edit = rights_manager.check_can_edit_activity(
+            self.user, exploration_rights)
+        can_voiceover = rights_manager.check_can_voiceover_activity(
+            self.user, exploration_rights)
+
+        try:
             if can_edit:
                 exp_services.create_or_update_draft(
                     exploration_id, self.user_id, change_list, version,
@@ -715,18 +729,17 @@ class EditorAutosaveHandler(ExplorationHandler):
                 exp_services.create_or_update_draft(
                     exploration_id, self.user_id, change_list, version,
                     datetime.datetime.utcnow(), is_by_voice_artist=True)
-
         except utils.ValidationError as e:
             # We leave any pre-existing draft changes in the datastore.
             raise self.InvalidInputException(e)
-        exp_user_data = user_models.ExplorationUserDataModel.get(
+
+        exp_user_data = exp_services.get_user_exploration_data(
             self.user_id, exploration_id)
-        draft_change_list_id = exp_user_data.draft_change_list_id
         # If the draft_change_list_id is False, have the user discard the draft
         # changes. We save the draft to the datastore even if the version is
         # invalid, so that it is available for recovery later.
         self.render_json({
-            'draft_change_list_id': draft_change_list_id,
+            'draft_change_list_id': exp_user_data['draft_change_list_id'],
             'is_version_of_draft_valid': exp_services.is_version_of_draft_valid(
                 exploration_id, version)})
 
@@ -743,20 +756,10 @@ class StateAnswerStatisticsHandler(EditorHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_view_exploration_stats
-    def get(self, exploration_id):
+    def get(self, unused_exploration_id):
         """Handles GET requests."""
-        current_exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-
-        top_state_answers = stats_services.get_top_state_answer_stats_multi(
-            exploration_id, current_exploration.states)
-        top_state_interaction_ids = {
-            state_name: current_exploration.states[state_name].interaction.id
-            for state_name in top_state_answers
-        }
-        self.render_json({
-            'answers': top_state_answers,
-            'interaction_ids': top_state_interaction_ids,
-        })
+        # TODO(#11475): Return visualizations info based on Apache Beam job.
+        self.render_json({'answers': {}, 'interaction_ids': {}})
 
 
 class TopUnresolvedAnswersHandler(EditorHandler):
@@ -765,19 +768,10 @@ class TopUnresolvedAnswersHandler(EditorHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_edit_exploration
-    def get(self, exploration_id):
+    def get(self, unused_exploration_id):
         """Handles GET requests for unresolved answers."""
-        state_name = self.request.get('state_name')
-        if not state_name:
-            raise self.PageNotFoundException
-
-        unresolved_answers_with_frequency = (
-            stats_services.get_top_state_unresolved_answers(
-                exploration_id, state_name))
-
-        self.render_json({
-            'unresolved_answers': unresolved_answers_with_frequency
-        })
+        # TODO(#11475): Return visualizations info based on Apache Beam job.
+        self.render_json({'unresolved_answers': []})
 
 
 class LearnerAnswerInfoHandler(EditorHandler):

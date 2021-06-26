@@ -1,0 +1,254 @@
+<div class="parent-container">
+  <div class="oppia-story-viewer-title">
+    {{ story.getTitle() }}
+  </div>
+  <div class="oppia-story-viewer-description">
+    {{ story.getDescription() }}
+  </div>
+  <div class="oppia-story-header-text">
+    <strong>
+  <!-- Angular here attempts to resolve nodes.length before it is resolved from our component file.
+  This gives errors in console like "cannot read property length of undefined"
+  so we are using "safe navigation operator(?.)" to avoid rendering content,until data is retrieved.-->
+  1 out of {{ nodes?.length }} Chapters Completed
+    </strong>
+  </div>
+  <div class="d-md-block oppia-story-viewer-card-container">
+    <div *ngFor="let node of storyContents?._nodes let i = index;"
+         target="_blank" rel="noopener">
+      <div class="oppia-story-viewer-desktop">
+        <div [ngStyle]="(i > 0 && {'opacity': '0.5', 'display': 'flex'}) || { 'display': 'flex' }">
+          <a class="oppia-story-viewer-card" [href]="getExplorationUrl(node)">
+            <span class="oppia-chapter-title" aria-live="assertive">
+              <span [innerHTML]="'I18N_TOPIC_VIEWER_CHAPTER' | translate"></span> {{i + 1}}: {{ node.getTitle() }}
+            </span>
+            <div class="oppia-story-viewer-card-content">
+              <svg width="320"
+                   height="180"
+                   xmlns="http://www.w3.org/1600/svg"
+                   xmlns:xlink="http://www.w3.org/1999/xlink"
+                   version="1.1"
+                   class="oppia-story-viewer-card-img">
+                <defs>
+                  <pattern id="image{{i}}" patternUnits="userSpaceOnUse" height="180" width="320">
+                    <rect width="320"
+                          height="180"
+                          [attr.fill]="pathIconParameters[i].thumbnailBgColor">
+                    </rect>
+
+                    <image x="0"
+                           y="0"
+                           height="180"
+                           width="320"
+                           [attr.xlink:href]="pathIconParameters[i].thumbnailIconUrl"
+                           xlink:href="">
+                    </image>
+                  </pattern>
+                </defs>
+                <a target="_blank" rel="noopener">
+                  <rect width="320"
+                        height="180"
+                        attr.fill="url(#image{{i}})"
+                        rx="4">
+                  </rect>
+                </a>
+              </svg>
+
+              <div class="oppia-story-viewer-card-description-box">
+                <p class="oppia-description-text">{{node.getDescription()}}</p>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+      <div class="oppia-story-viewer-mobile-card-content" >
+        <div class="story-thumbnail-image">
+          <svg xmlns="http://www.w3.org/1600/svg"
+               xmlns:xlink="http://www.w3.org/1999/xlink"
+               version="1.1"
+               viewBox="0 0 192 108" preserveAspectRatio="xMidYMid Meet">
+            <defs>
+              <pattern id="image2{{i}}" patternUnits="userSpaceOnUse" height="108" width="192">
+                <rect width="192"
+                      height="108"
+                      [attr.fill]="pathIconParameters[i].thumbnailBgColor">
+                </rect>
+
+                <image x="0"
+                       y="0"
+                       width="192"
+                       height="108"
+                       [attr.xlink:href]="pathIconParameters[i].thumbnailIconUrl"
+                       xlink:href="">
+                </image>
+              </pattern>
+            </defs>
+            <a xlink:href="getExplorationUrl(node)">
+              <rect width="192"
+                    height="108"
+                    x="0"
+                    y="0"
+                    attr.fill="url(#image2{{i}})">
+              </rect>
+            </a>
+          </svg>
+        </div>
+        <div class="story-text">
+          <span class="oppia-chapter-title" aria-live="assertive">
+            <span [innerHTML]="'I18N_TOPIC_VIEWER_CHAPTER' | translate"></span> {{i + 1}}: {{node.getTitle()}}
+          </span>
+          <div class="oppia-story-viewer-mobile-card-description-box">
+            <p>{{node.getDescription()}}</p>
+          </div>
+          <i class="fa fa-check chapter-complete-icon"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<style>
+  .parent-container {
+    background-color: #FFF;
+    border-radius: 4px;
+    box-shadow: 0 0 8px 6px rgba(0, 0, 0, 0.05);
+    margin: 0 auto;
+    min-height: 500px;
+    padding-top: 30px;
+    width: 60%;
+  }
+  .oppia-story-viewer-desktop {
+    display: block;
+  }
+  .oppia-story-viewer-mobile-card-content {
+    display: none;
+  }
+  .oppia-story-header-text {
+    display: none;
+  }
+  .oppia-story-viewer-title {
+    color: #00645C;
+    font-family: Capriola, Roboto, Arial, sans-serif;
+    font-size: 2.4em;
+    font-weight: 500;
+    letter-spacing: 0.58px;
+    margin-bottom: 0;
+    padding-left: 60px;
+    padding-top: 30px;
+    text-align: left;
+  }
+  .oppia-story-viewer-description {
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 1.2em;
+    padding-bottom: 4vh;
+    padding-left: 60px;
+    padding-right: 45px;
+    text-align: left;
+  }
+  .oppia-story-viewer-card-container {
+    padding: 40px 110px;
+  }
+  .oppia-story-viewer-card {
+    color: rgb(51, 51, 51);
+    flex: 1;
+    font-family: Roboto, Arial, sans-serif;
+    margin-bottom: 50px;
+    margin-right: 60px;
+    text-decoration: none;
+  }
+
+  .oppia-story-viewer-card-content {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 16px;
+  }
+
+  .oppia-story-viewer-card-description-box {
+    border-radius: 4px;
+    box-shadow: 0 0 4px #00000029;
+    display: flex;
+    flex: 1;
+    max-height: 180px;
+    min-width: 120px;
+    padding: 20px;
+  }
+
+  .oppia-chapter-title {
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 23px;
+    font-weight: 600;
+    letter-spacing: 0.43px;
+    padding-top: 3px;
+  }
+
+  .oppia-story-viewer-card-img {
+    margin-bottom: 10px;
+    margin-right: 10px;
+  }
+
+  .oppia-description-text {
+    font-size: 20px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .parent-container {
+      margin-top: -50px;
+      padding-bottom: 50px;
+      padding-top: 0;
+      width: 100%;
+    }
+    .oppia-story-viewer-desktop {
+      display: none;
+    }
+    .oppia-story-viewer-title {
+      font-size: 20px;
+      padding-left: 1%;
+    }
+    .oppia-story-viewer-description {
+      display: none;
+    }
+    .oppia-story-viewer-card-container {
+      margin: 0 auto;
+      padding: 0;
+      width: 80%;
+    }
+    .oppia-story-viewer-card {
+      margin-bottom: 0;
+      margin-right: 0;
+    }
+    .oppia-story-viewer-mobile-card-content {
+      border: 2px solid #009C8A;
+      border-radius: 4px;
+      display: block;
+      margin: 0 0 40px;
+      position: relative;
+    }
+    .chapter-complete-icon {
+      bottom: 10px;
+      color: #009C8A;
+      position: absolute;
+      right: 10px;
+    }
+    .story-thumbnail-image {
+      border-bottom: 2px solid #009C8A;
+    }
+    .oppia-chapter-title {
+      display: block;
+      font-size: 16px;
+      margin-left: 0;
+      padding: 10px 0 0;
+    }
+    .oppia-story-viewer-mobile-card-description-box {
+      margin: 5px 0 12px;
+    }
+    .story-text {
+      margin: 0 auto;
+      width: 90%;
+    }
+    .oppia-story-header-text {
+      display: block;
+      font-size: 19px;
+      margin: 25px auto 6px;
+      width: 80%;
+    }
+  }
+</style>

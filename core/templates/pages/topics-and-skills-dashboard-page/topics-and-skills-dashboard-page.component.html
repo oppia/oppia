@@ -1,0 +1,689 @@
+<background-banner></background-banner>
+<div class="oppia-topics-and-skills-dashboard position-relative">
+  <div>
+    <h2 class="dashboard-title" translate="I18N_DASHBOARD_TOPICS_AND_SKILLS_DASHBOARD"
+        ng-if="($ctrl.totalTopicSummaries.length === 0 && $ctrl.untriagedSkillSummaries.length === 0)">
+    </h2>
+    <div class="create-buttons" ng-if="!($ctrl.topicSummaries.length === 0 && $ctrl.untriagedSkillSummaries.length === 0)">
+      <button ng-click="$ctrl.createTopic()" ng-if="$ctrl.userCanCreateTopic"
+              class="btn oppia-navbar-button oppia-transition-200">
+        <span class="oppia-navbar-tab-content">Create Topic</span>
+      </button>
+      <button ng-click="$ctrl.createSkill()" ng-if="$ctrl.userCanCreateSkill"
+              class="btn oppia-navbar-button oppia-transition-200">
+        <span class="oppia-navbar-tab-content">Create Skill</span>
+      </button>
+    </div>
+  </div>
+  <div class="create-button-mobile">
+    <div ng-if="($ctrl.activeTab === $ctrl.TAB_NAME_TOPICS) && $ctrl.totalTopicSummaries.length">
+      <i class="fa fa-plus-circle" aria-hidden="true" ng-click="$ctrl.createTopic()" ng-if="$ctrl.userCanCreateTopic" tabindex="-1"></i>
+    </div>
+    <div ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_SKILLS && $ctrl.skillSummaries.length">
+      <i class="fa fa-plus-circle" aria-hidden="true" ng-click="$ctrl.createSkill()" ng-if="$ctrl.userCanCreateSkill" tabindex="-1"></i>
+    </div>
+  </div>
+  <div ng-if="$ctrl.totalTopicSummaries.length > 0 || $ctrl.untriagedSkillSummaries.length > 0">
+    <div class="dashboard-content">
+      <div class="dashboard-content-primary">
+        <div>
+          <ul class="dashboard-tabs protractor-test-topics-tab">
+            <li ng-class="{'dashboard-tabs-active': $ctrl.activeTab === $ctrl.TAB_NAME_TOPICS}">
+              <a class="dashboard-tabs-text"
+                 ng-click="$ctrl.setActiveTab($ctrl.TAB_NAME_TOPICS)">
+                Topics
+              </a>
+            </li>
+            <li ng-class="{'dashboard-tabs-active': $ctrl.activeTab === $ctrl.TAB_NAME_SKILLS}">
+              <a class="dashboard-tabs-text protractor-test-skills-tab"
+                 ng-click="$ctrl.setActiveTab($ctrl.TAB_NAME_SKILLS)">
+                Skills
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div class="filter-mobile-box">
+          <button class="btn btn-default" ng-click="$ctrl.toggleFilterBox()">
+            <span ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_TOPICS">TOPIC FILTERS</span>
+            <span ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_SKILLS">SKILL FILTERS</span>
+          </button>
+        </div>
+        <div class="dashboard-list">
+          <div class="dashboard-list-header" ng-if="$ctrl.topicSummaries.length>0 || $ctrl.skillSummaries.length>0">
+            <div class="dashboard-list-header-count" ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_TOPICS">
+              <span>Displaying <[$ctrl.pageNumber * $ctrl.itemsPerPage + 1]> - <[$ctrl.getUpperLimitValueForPagination()]> of <[$ctrl.currentCount]></span>
+            </div>
+            <div class="dashboard-list-header-count" ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_SKILLS">
+              <span>Displaying <[$ctrl.pageNumber * $ctrl.itemsPerPage + 1]> - <[$ctrl.getUpperLimitValueForPagination()]> of <[$ctrl.getTotalCountValueForSkills()]></span>
+            </div>
+            <div class="dashboard-list-pagination">
+              <div>
+                <span>Items Per Page: </span>
+                <select ng-options="choice as choice for choice in $ctrl.itemsPerPageChoice"
+                        ng-model="$ctrl.itemsPerPage"
+                        ng-change="$ctrl.refreshPagination()"
+                        aria-label="Items Per Page">
+                </select>
+              </div>
+              <div ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_TOPICS">
+                <i class="fa fa-angle-left topic-pagination-arrow" aria-label="Previous Page" ng-click="$ctrl.changePageByOne($ctrl.MOVE_TO_PREV_PAGE)"></i>
+                <span class="dashboard-list-pagination-value"
+                      ng-repeat="n in $ctrl.generateNumbersTillRange($ctrl.currentCount/$ctrl.itemsPerPage) track by $index" ng-click="$ctrl.goToPageNumber($index)">
+                  <span ng-if="$ctrl.pageNumber === $index" class="dashboard-list-pagination-active">
+                    <span><[$index+1]></span>
+                  </span>
+                  <span ng-if="$ctrl.pageNumber !== $index"><[$index+1]></span>
+                </span>
+                <i class="fa fa-angle-right topic-pagination-arrow" aria-label="Next Page" ng-click="$ctrl.changePageByOne($ctrl.MOVE_TO_NEXT_PAGE)"></i>
+              </div>
+              <div ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_SKILLS">
+                <i class="fa fa-angle-left topic-pagination-arrow" aria-label="Previous Page" ng-click="$ctrl.navigateSkillPage($ctrl.MOVE_TO_PREV_PAGE)"></i>
+                <span class="dashboard-list-pagination-value">
+                  <span class="dashboard-list-pagination-active"><[$ctrl.skillPageNumber+1]></span>
+                </span>
+                <i class="fa fa-angle-right topic-pagination-arrow" aria-label="Next Page" ng-click="$ctrl.navigateSkillPage($ctrl.MOVE_TO_NEXT_PAGE)"></i>
+              </div>
+            </div>
+          </div>
+
+          <div ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_TOPICS">
+            <oppia-topics-list [topic-summaries]="$ctrl.displayedTopicSummaries"
+                               [page-number]="$ctrl.pageNumber"
+                               [items-per-page]="$ctrl.itemsPerPage"
+                               ng-if="$ctrl.topicSummaries.length > 0"
+                               [user-can-delete-topic]="$ctrl.userCanDeleteTopic">
+            </oppia-topics-list>
+            <p class="intro-card-message" ng-if="!$ctrl.topicSummaries.length">
+              No topics to display.
+            </p>
+          </div>
+          <div ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_SKILLS">
+            <oppia-skills-list [skill-summaries]="$ctrl.displayedSkillSummaries"
+                               ng-if="$ctrl.displayedSkillSummaries.length > 0"
+                               [page-number]="$ctrl.pageNumber"
+                               [items-per-page]="$ctrl.itemsPerPage"
+                               [editable-topic-summaries]="$ctrl.editableTopicSummaries"
+                               [mergeable-skill-summaries]="$ctrl.mergeableSkillSummaries"
+                               [untriaged-skill-summaries]="$ctrl.untriagedSkillSummaries"
+                               [user-can-create-skill]="$ctrl.userCanCreateSkill"
+                               [user-can-delete-skill]="$ctrl.userCanDeleteSkill"
+                               [skills-categorized-by-topics]="$ctrl.skillsCategorizedByTopics">
+            </oppia-skills-list>
+            <p class="intro-card-message protractor-test-no-skills-present-message" ng-if="!$ctrl.displayedSkillSummaries.length">
+              No skills to display.
+            </p>
+          </div>
+          <div class="pagination-mobile">
+            <div ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_TOPICS">
+              <i class="fa fa-angle-left topic-pagination-arrow" aria-label="Previous Page" ng-click="$ctrl.changePageByOne($ctrl.MOVE_TO_PREV_PAGE)"></i>
+              <span class="dashboard-list-pagination-value"
+                    ng-repeat="n in $ctrl.generateNumbersTillRange($ctrl.currentCount/$ctrl.itemsPerPage) track by $index" ng-click="$ctrl.goToPageNumber($index)">
+                <span ng-if="$ctrl.pageNumber === $index" class="dashboard-list-pagination-active"><[$index+1]></span>
+                <span ng-if="$ctrl.pageNumber !== $index"><[$index+1]></span>
+              </span>
+              <i class="fa fa-angle-right topic-pagination-arrow" aria-label="Next Page" ng-click="$ctrl.changePageByOne($ctrl.MOVE_TO_NEXT_PAGE)"></i>
+            </div>
+            <div ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_SKILLS">
+              <i class="fa fa-angle-left topic-pagination-arrow" aria-label="Previous Page" ng-click="$ctrl.navigateSkillPage($ctrl.MOVE_TO_PREV_PAGE)"></i>
+              <span class="dashboard-list-pagination-active"><[$ctrl.skillPageNumber+1]></span>
+              <i class="fa fa-angle-right topic-pagination-arrow" aria-label="Next Page" ng-click="$ctrl.navigateSkillPage($ctrl.MOVE_TO_NEXT_PAGE)"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="dashboard-content-secondary">
+        <div class="topic-skill-count">
+          <div class="topic-count">
+            <span class="topic-count-value"><[$ctrl.totalTopicSummaries.length]></span>
+            <span class="topic-count-text">Topics</span>
+          </div>
+          <div class="skill-count">
+            <span class="skill-count-value"><[$ctrl.totalSkillCount]></span>
+            <span class="skill-count-text">Skills</span>
+          </div>
+          <div class="create-topic-skill">
+            <div ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_TOPICS && $ctrl.userCanCreateTopic"  ng-click="$ctrl.createTopic()" class="protractor-test-create-topic-button create-topic-button
+            oppia-autofocus" focus-on="createTopicBtn">
+              <i class="fa fa-plus-circle"></i>
+              <span>Create New Topic</span>
+            </div>
+            <div ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_SKILLS && $ctrl.userCanCreateSkill"  ng-click="$ctrl.createSkill()" class="protractor-test-create-skill-button-circle create-skill-button
+            oppia-autofocus" focus-on="createSkillBtn">
+              <i class="fa fa-plus-circle"></i>
+              <span>Create New Skill</span>
+            </div>
+          </div>
+        </div>
+        <div class="topic-skill-filter" ng-if="$ctrl.filterBoxIsShown">
+          <div class="topic-skill-filter-content">
+            <div class="topic-skill-filter-header">
+              <span class="topic-skill-filter-heading">Filter</span>
+              <span class="topic-skill-filter-reset protractor-test-topic-filter-reset" ng-click="$ctrl.resetFilters()">Reset</span>
+              <i class="fa fa-times dashboard-cross-icon" ng-click="$ctrl.toggleFilterBox()"></i>
+            </div>
+            <div class="topic-skill-filter-header-mobile">
+              <div class="topic-skill-filter-heading">
+                <span>Filter</span>
+              </div>
+              <div class="topic-skill-filter-action-box">
+                <i class="fa fa-times dashboard-cross-icon" ng-click="$ctrl.toggleFilterBox()"></i>
+                <div class="topic-skill-filter-action-reset">
+                  <span ng-click="$ctrl.resetFilters()">Reset</span>
+                </div>
+              </div>
+            </div>
+            <div class="topic-skill-filter-row">
+              <div class="topic-skill-filter-key">
+                <span>Status</span>
+              </div>
+              <div class="topic-skill-filter-value">
+                <div ng-if="$ctrl.select2DropdownIsShown && $ctrl.activeTab === $ctrl.TAB_NAME_TOPICS">
+                  <select2-dropdown class="protractor-test-select-status-dropdown"
+                                    choices="$ctrl.statusOptions"
+                                    item="$ctrl.filterObject.status"
+                                    placeholder="Status options"
+                                    width="100%"
+                                    on-selection-change="$ctrl.applyFilters()">
+                  </select2-dropdown>
+                </div>
+                <div ng-if="$ctrl.select2DropdownIsShown && $ctrl.activeTab === $ctrl.TAB_NAME_SKILLS">
+                  <select2-dropdown class="protractor-test-select-skill-status-dropdown"
+                                    choices="$ctrl.skillStatusOptions"
+                                    item="$ctrl.filterObject.status"
+                                    placeholder="Status options"
+                                    width="100%"
+                                    on-selection-change="$ctrl.applyFilters()">
+                  </select2-dropdown>
+                </div>
+              </div>
+            </div>
+            <div class="topic-skill-filter-row">
+              <div class="topic-skill-filter-key">
+                <span>Classroom</span>
+              </div>
+              <div class="topic-skill-filter-value">
+                <div ng-if="$ctrl.select2DropdownIsShown && $ctrl.activeTab === $ctrl.TAB_NAME_TOPICS">
+                  <select2-dropdown item="$ctrl.filterObject.classroom"
+                                    class="classroom-dropdown protractor-test-select-classroom-dropdown"
+                                    choices="$ctrl.classrooms"
+                                    placeholder="Classrooms"
+                                    width="100%"
+                                    on-selection-change="$ctrl.applyFilters()">
+                  </select2-dropdown>
+                </div>
+                <div ng-if="$ctrl.select2DropdownIsShown && $ctrl.activeTab === $ctrl.TAB_NAME_SKILLS">
+                  <select2-dropdown item="$ctrl.filterObject.classroom"
+                                    class="classroom-dropdown protractor-test-select-classroom-dropdown"
+                                    choices="$ctrl.skillClassrooms"
+                                    placeholder="Classrooms"
+                                    width="100%"
+                                    on-selection-change="$ctrl.applyFilters()">
+                  </select2-dropdown>
+                </div>
+              </div>
+            </div>
+            <div class="topic-skill-filter-row">
+              <div class="topic-skill-filter-key">
+                <span>Sort</span>
+              </div>
+              <div class="topic-skill-filter-value">
+                <div ng-if="$ctrl.select2DropdownIsShown">
+                  <select2-dropdown class="protractor-test-select-sort-dropdown"
+                                    choices="$ctrl.sortOptions"
+                                    item="$ctrl.filterObject.sort"
+                                    placeholder="Status Options"
+                                    width="100%"
+                                    on-selection-change="$ctrl.applyFilters()">
+                  </select2-dropdown>
+                </div>
+              </div>
+            </div>
+            <div class="topic-skill-filter-row">
+              <div class="topic-skill-filter-key">
+                <span>Keywords</span>
+              </div>
+              <div class="topic-skill-filter-value">
+                <div ng-if="$ctrl.select2DropdownIsShown">
+                  <select2-dropdown item="$ctrl.filterObject.keywords"
+                                    class="protractor-test-select-keyword-dropdown"
+                                    choices="$ctrl.filterObject.keywords"
+                                    allow-multiple-choices="true"
+                                    new-choice-regex="<[::$ctrl.TAG_REGEX_STRING]>"
+                                    placeholder="Multiple allowed"
+                                    width="100%"
+                                    on-selection-change="$ctrl.applyFilters()">
+                  </select2-dropdown>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-sm-8 intro-card-wrapper" ng-if="($ctrl.totalTopicSummaries.length === 0 && $ctrl.untriagedSkillSummaries.length === 0)">
+    <blockquote class="intro-card">
+      <p class="intro-card-message">
+        No topics or skills have been created yet.
+      </p>
+      <button class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-create-button-text protractor-test-create-topic-button"
+              ng-click="$ctrl.createTopic()"
+              ng-if="$ctrl.userCanCreateTopic">
+        Create Topic
+      </button>
+      <button class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-create-button-text protractor-test-create-skill-button"
+              ng-click="$ctrl.createSkill()"
+              ng-if="$ctrl.userCanCreateSkill">
+        Create Skill
+      </button>
+    </blockquote>
+  </div>
+</div>
+<style>
+  .oppia-topics-and-skills-dashboard .intro-card-wrapper {
+    margin: 0 auto;
+    padding-top: 10px;
+  }
+  .oppia-topics-and-skills-dashboard .dashboard-content {
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin: 0 auto;
+    padding-top: 50px;
+    width: 95%;
+  }
+  .oppia-topics-and-skills-dashboard .dashboard-content-primary {
+    background-color: #fff;
+    border: 2px solid #aaaac1;
+    border-radius: 8px;
+    display: inline-block;
+    margin-bottom: 50px;
+    overflow: auto;
+    width: 70%;
+  }
+  .oppia-topics-and-skills-dashboard .dashboard-content-secondary {
+    display: inline-block;
+    margin-left: 1%;
+    position: fixed;
+    width: 25%;
+  }
+  .oppia-topics-and-skills-dashboard .dashboard-list {
+    margin: 30px auto;
+    width: 95%;
+  }
+  .oppia-topics-and-skills-dashboard .dashboard-cross-icon,
+  .oppia-topics-and-skills-dashboard .filter-mobile-box,
+  .oppia-topics-and-skills-dashboard .create-button-mobile,
+  .oppia-topics-and-skills-dashboard .topic-skill-filter-header-mobile {
+    display: none;
+  }
+  .oppia-topics-and-skills-dashboard .topic-skill-count {
+    align-items: center;
+    background-color: #fff;
+    border: 2px solid #aaaac1;
+    border-radius: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    height: 100px;
+    justify-content: center;
+  }
+  .oppia-topics-and-skills-dashboard .topic-skill-count .topic-count,
+  .oppia-topics-and-skills-dashboard .topic-skill-count .skill-count,
+  .oppia-topics-and-skills-dashboard .create-topic-skill {
+    border-right: 2px solid #aaaac1;
+    display: inline-block;
+    text-align: center;
+    width: 33%;
+  }
+  .oppia-topics-and-skills-dashboard .topic-skill-filter {
+    background-color: #fff;
+    border: 2px solid #aaaac1;
+    border-radius: 8px;
+    margin-top: 40px;
+    padding-bottom: 20px;
+  }
+  .oppia-topics-and-skills-dashboard .topic-count-value, .skill-count-value {
+    display: block;
+    font-size: 34px;
+    height: 40px;
+  }
+  .oppia-topics-and-skills-dashboard .create-skill-button,
+  .oppia-topics-and-skills-dashboard .create-topic-button {
+    cursor: pointer;
+  }
+  .oppia-topics-and-skills-dashboard .create-topic-skill {
+    align-content: center;
+    border-right: none;
+    display: flex;
+    flex-wrap: wrap;
+    height: 100%;
+  }
+  .oppia-topics-and-skills-dashboard .pagination-mobile {
+    display: none;
+  }
+  .oppia-topics-and-skills-dashboard .create-topic-skill i {
+    color: #00645C;
+    font-size: 30px;
+    width: 100%;
+  }
+  .oppia-topics-and-skills-dashboard .create-topic-skill span {
+    color: #00645C;
+    display: inline-block;
+    font-size: 16px;
+    line-height: 17px;
+    width: 100%;
+  }
+  .oppia-topics-and-skills-dashboard .topic-skill-filter-content {
+    margin: 0 auto;
+    width: 90%;
+  }
+  .oppia-topics-and-skills-dashboard .topic-skill-filter-value {
+    width: 65%;
+  }
+  .oppia-topics-and-skills-dashboard .topic-skill-filter-value input,
+  .oppia-topics-and-skills-dashboard .topic-skill-filter-value select {
+    width: 100%;
+  }
+  .oppia-topics-and-skills-dashboard .classroom-dropdown .select2-results {
+    text-transform: capitalize;
+  }
+  .oppia-topics-and-skills-dashboard .topic-skill-filter-header {
+    margin: 10px 0 15px;
+    position: relative;
+  }
+  .oppia-topics-and-skills-dashboard .topic-skill-filter-heading {
+    font-size: 30px;
+    font-weight: bold;
+  }
+  .oppia-topics-and-skills-dashboard .topic-skill-filter-reset {
+    bottom: 0;
+    color: #00645C;
+    cursor: pointer;
+    position: absolute;
+    right: 0;
+  }
+  .oppia-topics-and-skills-dashboard .navigation-button {
+    background-color: transparent;
+    border: 2px solid #009688;
+    color: #009688;
+  }
+  .oppia-topics-and-skills-dashboard .topic-skill-filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin: 8px 0;
+  }
+  .oppia-topics-and-skills-dashboard .topic-skill-filter-key {
+    display: inline-block;
+    text-align: right;
+    width: 25%;
+  }
+  .oppia-topics-and-skills-dashboard .topic-pagination-arrow {
+    cursor: pointer;
+  }
+  .oppia-topics-and-skills-dashboard .dashboard-list-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin: 30px 0 50px;
+  }
+  .oppia-topics-and-skills-dashboard .dashboard-list-pagination {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    width: 35%;
+  }
+  .oppia-topics-and-skills-dashboard .dashboard-list-pagination-value {
+    cursor: pointer;
+    font-size: 16px;
+    outline: none;
+    padding: 0 4px;
+  }
+  .oppia-topics-and-skills-dashboard .dashboard-list-pagination-active {
+    background-color: #00645C;
+    border-radius: 50%;
+    box-shadow: 0 3px 3px #707070;
+    color: #FFF;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 16px;
+    height: 23px;
+    outline: none;
+    padding: 0 4px;
+    text-align: center;
+    width: 23px;
+  }
+  .oppia-topics-and-skills-dashboard .dashboard-list-pagination-active span {
+    color: #FFF;
+    font-size: 16px;
+    outline: none;
+  }
+  .oppia-topics-and-skills-dashboard .dashboard-tabs {
+    display: flex;
+    display: -webkit-flex;
+    flex-wrap: wrap;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+  }
+  .oppia-topics-and-skills-dashboard .create-buttons {
+    display: none;
+    margin-left: 40vw;
+  }
+  .oppia-topics-and-skills-dashboard .dashboard-tabs li {
+    display: flex;
+    display: -webkit-flex;
+    margin-bottom: 0;
+    width: 50%;
+  }
+  .oppia-topics-and-skills-dashboard .dashboard-title {
+    color: #01645c;
+    font-family: Capriola, Roboto, Arial, sans-serif;
+    font-size: 3em;
+    margin-bottom: 25px;
+    margin-top: 0;
+    padding-top: 78.5px;
+    text-align: center;
+  }
+  .oppia-topics-and-skills-dashboard .intro-card {
+    background: #fff;
+    border-left: none;
+    border-radius: 5px;
+    margin: 0 auto;
+    padding: 37px 30px;
+    text-align: center;
+    width: 100%;
+  }
+  .oppia-topics-and-skills-dashboard .intro-card:before {
+    background: #fff;
+    border-bottom-right-radius: 80px 50px;
+    bottom: -1.7em;
+    content: "";
+    display: block;
+    height: 30px;
+    position: absolute;
+    width: 50px;
+    z-index: 10;
+  }
+  .oppia-topics-and-skills-dashboard .intro-card:after {
+    background: #e8e7e3;
+    border-bottom-right-radius: 40px 50px;
+    bottom: -1.7em;
+    content: "";
+    display: block;
+    height: 27px;
+    position: absolute;
+    width: 20px;
+    z-index: 10;
+  }
+  .oppia-topics-and-skills-dashboard .intro-card-message {
+    font-family: Capriola, Roboto, Arial, sans-serif;
+    font-size: 18px;
+    padding-top: 6px;
+    text-align: center;
+  }
+  .oppia-topics-and-skills-dashboard .dashboard-tabs .dashboard-tabs-text {
+    border-bottom: 2px solid #aaaac1;
+    color: #00645D;
+    font-size: 16px;
+    padding: 10px;
+    text-decoration: none;
+    text-transform: uppercase;
+    width: 100%;
+  }
+  .oppia-topics-and-skills-dashboard .dashboard-tabs-active .dashboard-tabs-text,
+  .oppia-topics-and-skills-dashboard .dashboard-tabs-active .dashboard-tabs-text:hover {
+    background-color: #d8f4f2;
+    border-bottom: 4px solid #00645D;
+    border-radius: 0;
+    color: #00645D;
+  }
+  .oppia-topics-and-skills-dashboard .dashboard-tabs .dashboard-tabs-text:hover {
+    color: #00645D;
+    font-size: 16px;
+    padding: 10px;
+    text-decoration: none;
+    text-transform: uppercase;
+    width: 100%;
+  }
+  .oppia-topics-and-skills-dashboard .dashboard-tabs .dashboard-tabs-text:hover,
+  .oppia-topics-and-skills-dashboard .dashboard-tabs .dashboard-tabs-text:focus {
+    text-decoration: none;
+  }
+  .oppia-topics-and-skills-dashboard .dashboard-tabs .list-card-view-toggle {
+    margin-left: auto;
+    margin-right: 7.5px;
+    width: auto;
+  }
+  .oppia-topics-and-skills-dashboard .oppia-create-button-text {
+    color: #FFF;
+    text-decoration: none;
+  }
+  @media screen and (max-width: 1200px) {
+    .oppia-topics-and-skills-dashboard .dashboard-content {
+      width: 100%;
+    }
+    .oppia-topics-and-skills-dashboard .dashboard-content-primary {
+      width: 70%;
+    }
+    .oppia-topics-and-skills-dashboard .dashboard-content-secondary {
+      display: inline-block;
+      width: 29%;
+    }
+  }
+
+  @media only screen and (max-width: 830px) {
+    topics-and-skill-dashboard-page .oppia-topics-and-skills-dashboard {
+      z-index: 50;
+    }
+    .oppia-topics-and-skills-dashboard .dashboard-content {
+      padding-top: 0;
+      width: 100%;
+    }
+    .oppia-topics-and-skills-dashboard .dashboard-content-primary {
+      border: 0;
+      border-radius: 0;
+      width: 100%;
+    }
+    .oppia-topics-and-skills-dashboard .dashboard-content-secondary {
+      margin-left: 0;
+      position: static;
+      width: 100%;
+    }
+    .oppia-topics-and-skills-dashboard .dashboard-tabs {
+      box-shadow: 0 0 5px #333;
+    }
+    .oppia-topics-and-skills-dashboard .dashboard-tabs li {
+      background-color: #00645C;
+      width: 50%;
+    }
+    .oppia-topics-and-skills-dashboard .dashboard-tabs-active .dashboard-tabs-text,
+    .oppia-topics-and-skills-dashboard .dashboard-tabs-active .dashboard-tabs-text:hover {
+      background-color: #00645C;
+      border-bottom: 2px solid #FFF;
+      border-radius: 0;
+      color: #FFF;
+    }
+    .oppia-topics-and-skills-dashboard .create-buttons,
+    .oppia-topics-and-skills-dashboard .topic-skill-count,
+    .oppia-topics-and-skills-dashboard .dashboard-list-pagination,
+    .oppia-topics-and-skills-dashboard .topic-skill-filter-header {
+      display: none;
+    }
+    .oppia-topics-and-skills-dashboard .topic-skill-filter {
+      background-color: #FFF;
+      border: 0;
+      border-radius: 0;
+      height: 100vh;
+      margin-top: 0;
+      padding-bottom: 0;
+      position: absolute;
+      top: 0;
+      width: 100%;
+    }
+    .oppia-topics-and-skills-dashboard .topic-count-value, .skill-count-value {
+      display: block;
+      font-size: 34px;
+      height: 40px;
+    }
+    .oppia-topics-and-skills-dashboard .filter-mobile-box {
+      display: block;
+      text-align: center;
+    }
+    .oppia-topics-and-skills-dashboard .filter-mobile-box button {
+      border: 1px solid #0844aa;
+      margin-top: 10px;
+      width: 70%;
+    }
+    .oppia-topics-and-skills-dashboard .topic-skill-filter-row {
+      margin: 7vh 0;
+    }
+    .oppia-topics-and-skills-dashboard .topic-skill-filter-key {
+      font-weight: bold;
+      text-align: left;
+      width: 100%;
+    }
+    .oppia-topics-and-skills-dashboard .topic-skill-filter-value {
+      width: 100%;
+    }
+    .oppia-topics-and-skills-dashboard .create-button-mobile {
+      color: #0844aa;
+      display: block;
+    }
+    .oppia-topics-and-skills-dashboard .create-button-mobile i {
+      bottom: 10vh;
+      font-size: 40px;
+      position: fixed;
+      right: 3vw;
+    }
+    .oppia-topics-and-skills-dashboard .dashboard-list-header {
+      margin: 0;
+    }
+    .oppia-topics-and-skills-dashboard .topic-skill-filter-header-mobile {
+      align-items: center;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+    .oppia-topics-and-skills-dashboard .dashboard-cross-icon {
+      color: #000;
+      display: block;
+      font-size: 20px;
+    }
+    .oppia-topics-and-skills-dashboard .topic-skill-filter-action-box {
+      margin-top: 10px;
+      text-align: center;
+    }
+    .oppia-topics-and-skills-dashboard .topic-skill-filter-action-box span {
+      color: #00645C;
+      font-size: 15px;
+    }
+    .oppia-topics-and-skills-dashboard .topic-skill-filter-action-reset {
+      margin-top: 10px;
+    }
+    .oppia-topics-and-skills-dashboard .pagination-mobile {
+      display: block;
+      text-align: center;
+    }
+  }
+</style>

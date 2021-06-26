@@ -25,6 +25,7 @@ from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_jobs_one_off
 from core.domain import story_services
+from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.platform import models
 from core.tests import test_utils
@@ -39,6 +40,29 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
     ALBERT_NAME = 'albert'
 
     STORY_ID = 'story_id'
+    MIGRATED_STORY_CONTENTS_DICT = {
+        'initial_node_id': 'node_1',
+        'next_node_id': 'node_2',
+        'nodes': [{
+            'acquired_skill_ids': [],
+            'destination_node_ids': [],
+            'exploration_id': None,
+            'id': 'node_1',
+            'outline': (
+                '<p>Value</p><oppia-noninteractive-'
+                'math math_content-with-value="{&amp;quot'
+                ';raw_latex&amp;quot;: &amp;quot;+,-,-,+'
+                '&amp;quot;, &amp;quot;svg_filename&amp;'
+                'quot;: &amp;quot;&amp;quot;}"></oppia'
+                '-noninteractive-math>'),
+            'outline_is_finalized': False,
+            'prerequisite_skill_ids': [],
+            'description': '',
+            'thumbnail_bg_color': None,
+            'thumbnail_filename': None,
+            'title': 'Chapter 1'
+        }]
+    }
 
     def setUp(self):
         super(StoryMigrationOneOffJobTests, self).setUp()
@@ -46,7 +70,7 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         # Setup user who will own the test stories.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.TOPIC_ID = topic_services.get_new_topic_id()
+        self.TOPIC_ID = topic_fetchers.get_new_topic_id()
         self.story_id_1 = 'story_id_1'
         self.story_id_2 = 'story_id_2'
         self.story_id_3 = 'story_id_3'
@@ -54,13 +78,12 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         self.skill_id_2 = 'skill_id_2'
         self.save_new_topic(
             self.TOPIC_ID, self.albert_id, name='Name',
-            abbreviated_name='abbrev', thumbnail_filename=None,
             description='Description',
             canonical_story_ids=[self.story_id_1, self.story_id_2],
             additional_story_ids=[self.story_id_3],
             uncategorized_skill_ids=[self.skill_id_1, self.skill_id_2],
             subtopics=[], next_subtopic_id=1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def test_migration_job_does_not_convert_up_to_date_story(self):
         """Tests that the story migration job does not convert a
@@ -69,7 +92,8 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         # Create a new story that should not be affected by the
         # job.
         story = story_domain.Story.create_default_story(
-            self.STORY_ID, 'A title', self.TOPIC_ID)
+            self.STORY_ID, 'A title', 'Description', self.TOPIC_ID,
+            'title-one')
         story_services.save_new_story(self.albert_id, story)
         topic_services.add_canonical_story(
             self.albert_id, self.TOPIC_ID, story.id)
@@ -81,7 +105,7 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         job_id = (
             story_jobs_one_off.StoryMigrationOneOffJob.create_new())
         story_jobs_one_off.StoryMigrationOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         # Verify the story is exactly the same after migration.
         updated_story = (
@@ -100,7 +124,8 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         and does not attempt to migrate.
         """
         story = story_domain.Story.create_default_story(
-            self.STORY_ID, 'A title', self.TOPIC_ID)
+            self.STORY_ID, 'A title', 'Description', self.TOPIC_ID,
+            'title-two')
         story_services.save_new_story(self.albert_id, story)
         topic_services.add_canonical_story(
             self.albert_id, self.TOPIC_ID, story.id)
@@ -120,7 +145,7 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
 
         # This running without errors indicates the deleted story is
         # being ignored.
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         # Ensure the story is still deleted.
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
@@ -138,43 +163,77 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         """
         # Generate story with old(v1) story contents data.
         self.save_new_story_with_story_contents_schema_v1(
-            self.STORY_ID, self.albert_id, 'A title',
+            self.STORY_ID, 'image.svg', '#F8BF74', self.albert_id, 'A title',
             'A description', 'A note', self.TOPIC_ID)
         topic_services.add_canonical_story(
             self.albert_id, self.TOPIC_ID, self.STORY_ID)
-        story = (
-            story_fetchers.get_story_by_id(self.STORY_ID))
-        self.assertEqual(story.story_contents_schema_version, 1)
+        story_model = (
+            story_models.StoryModel.get(self.STORY_ID))
+        self.assertEqual(story_model.story_contents_schema_version, 1)
+        self.assertEqual(
+            story_model.story_contents,
+            {
+                'initial_node_id': 'node_1',
+                'next_node_id': 'node_2',
+                'nodes': [{
+                    'acquired_skill_ids': [],
+                    'destination_node_ids': [],
+                    'exploration_id': None,
+                    'id': 'node_1',
+                    'outline': (
+                        '<p>Value</p><oppia-noninteractive-math raw_l'
+                        'atex-with-value="&amp;quot;+,-,-,+&amp;quot'
+                        ';"></oppia-noninteractive-math>'),
+                    'outline_is_finalized': False,
+                    'prerequisite_skill_ids': [],
+                    'title': 'Chapter 1'
+                }]
+            })
+        story = story_fetchers.get_story_by_id(self.STORY_ID)
+        self.assertEqual(story.story_contents_schema_version, 4)
+        self.assertEqual(
+            story.story_contents.to_dict(),
+            self.MIGRATED_STORY_CONTENTS_DICT)
 
         # Start migration job.
         job_id = (
             story_jobs_one_off.StoryMigrationOneOffJob.create_new())
         story_jobs_one_off.StoryMigrationOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         # Verify the story migrates correctly.
+        updated_story = (
+            story_models.StoryModel.get(self.STORY_ID))
+        self.assertEqual(
+            updated_story.story_contents_schema_version,
+            feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION)
         updated_story = (
             story_fetchers.get_story_by_id(self.STORY_ID))
         self.assertEqual(
             updated_story.story_contents_schema_version,
             feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION)
+        self.assertEqual(
+            updated_story.story_contents.to_dict(),
+            self.MIGRATED_STORY_CONTENTS_DICT)
 
-        output = story_jobs_one_off.StoryMigrationOneOffJob.get_output(job_id) # pylint: disable=line-too-long
+        output = story_jobs_one_off.StoryMigrationOneOffJob.get_output(job_id)
         expected = [[u'story_migrated',
                      [u'1 stories successfully migrated.']]]
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 
     def test_migration_job_skips_updated_story_failing_validation(self):
-
-        def _mock_get_story_by_id(unused_story_id):
-            """Mocks get_story_by_id()."""
-            return 'invalid_story'
-
         story = story_domain.Story.create_default_story(
-            self.STORY_ID, 'A title', self.TOPIC_ID)
+            self.STORY_ID, 'A title', 'Description', self.TOPIC_ID,
+            'title-three')
         story_services.save_new_story(self.albert_id, story)
         topic_services.add_canonical_story(
             self.albert_id, self.TOPIC_ID, story.id)
+        story.description = 123
+
+        def _mock_get_story_by_id(unused_story_id):
+            """Mocks get_story_by_id()."""
+            return story
+
         get_story_by_id_swap = self.swap(
             story_fetchers, 'get_story_by_id', _mock_get_story_by_id)
 
@@ -182,13 +241,13 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
             job_id = (
                 story_jobs_one_off.StoryMigrationOneOffJob.create_new())
             story_jobs_one_off.StoryMigrationOneOffJob.enqueue(job_id)
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
-        output = story_jobs_one_off.StoryMigrationOneOffJob.get_output(
-            job_id)
+        output = story_jobs_one_off.StoryMigrationOneOffJob.get_output(job_id)
 
         # If the story had been successfully migrated, this would include a
         # 'successfully migrated' message. Its absence means that the story
         # could not be processed.
         for x in output:
-            self.assertRegexpMatches(x, 'object has no attribute \'validate\'')
+            self.assertRegexpMatches(
+                x, 'Expected description to be a string, received 123')

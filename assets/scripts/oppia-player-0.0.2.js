@@ -66,8 +66,9 @@
     function OppiaEmbed(oppiaNode) {
       // Validate the incoming node.
       if (oppiaNode.tagName !== 'OPPIA') {
-        throw ('Error: expected OppiaEmbed to be defined using a node of ' +
-               'type <oppia>, not ' + oppiaNode.tagName);
+        throw new Error(
+          'Expected OppiaEmbed to be defined using a node of ' +
+          'type <oppia>, not ' + oppiaNode.tagName);
       }
 
       // This attribute is set to true when the iframe has loaded.
