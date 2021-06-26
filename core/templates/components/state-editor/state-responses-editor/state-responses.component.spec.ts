@@ -795,4 +795,129 @@ fdescribe('StateResponsesComponent', () => {
 
     expect(AlertsService.clearWarnings).toHaveBeenCalledTimes(2);
   });
+
+  it('should update active answer group for newly tagged misconception', () => {
+    spyOn(ResponsesService, 'updateActiveAnswerGroup').and.callFake(
+      ({}, callback) => {
+        callback();
+      }
+    );
+    $scope.saveTaggedMisconception('misconception1', 'skill1');
+    expect(ctrl.onSaveInteractionAnswerGroups).toHaveBeenCalled();
+  });
+
+  it('should update active answer group when feedback is changed', () => {
+    spyOn(ResponsesService, 'updateActiveAnswerGroup').and.callFake(
+      ({}, callback) => {
+        callback();
+      }
+    );
+    $scope.saveActiveAnswerGroupFeedback(defaultOutcome);
+    expect(ctrl.onSaveInteractionAnswerGroups).toHaveBeenCalled();
+  });
+
+  it('should update active answer group when destination is changed', () => {
+    spyOn(ResponsesService, 'updateActiveAnswerGroup').and.callFake(
+      ({}, callback) => {
+        callback();
+      }
+    );
+    $scope.saveActiveAnswerGroupDest(defaultOutcome);
+    expect(ctrl.onSaveInteractionAnswerGroups).toHaveBeenCalled();
+  });
+
+
+  it('should update active answer group when correctness' +
+    ' label is changed', () => {
+    spyOn(ResponsesService, 'updateActiveAnswerGroup').and.callFake(
+      ({}, callback) => {
+        callback();
+      }
+    );
+    $scope.saveActiveAnswerGroupCorrectnessLabel(defaultOutcome);
+    expect(ctrl.onSaveInteractionAnswerGroups).toHaveBeenCalled();
+  });
+
+
+  it('should update active answer group when answer rules are changed', () => {
+    spyOn(ResponsesService, 'updateActiveAnswerGroup').and.callFake(
+      ({}, callback) => {
+        callback();
+      }
+    );
+    $scope.saveActiveAnswerGroupRules(new Rule('', null, null));
+    expect(ctrl.onSaveInteractionAnswerGroups).toHaveBeenCalled();
+  });
+
+
+  it('should update default outcome when default' +
+    ' outcome feedback is changed', () => {
+    spyOn(ResponsesService, 'updateDefaultOutcome').and.callFake(
+      ({}, callback) => {
+        callback();
+      }
+    );
+    $scope.saveDefaultOutcomeFeedback(defaultOutcome);
+    expect(ctrl.onSaveInteractionDefaultOutcome).toHaveBeenCalled();
+  });
+
+  it('should update default outcome when default' +
+    ' outcome destination is changed', () => {
+    spyOn(ResponsesService, 'updateDefaultOutcome').and.callFake(
+      ({}, callback) => {
+        callback();
+      }
+    );
+    $scope.saveDefaultOutcomeDest(defaultOutcome);
+    expect(ctrl.onSaveInteractionDefaultOutcome).toHaveBeenCalled();
+  });
+
+  it('should update default outcome when default' +
+    ' outcome correctness label is changed', () => {
+    spyOn(ResponsesService, 'updateDefaultOutcome').and.callFake(
+      ({}, callback) => {
+        callback();
+      }
+    );
+    $scope.saveDefaultOutcomeCorrectnessLabel(defaultOutcome);
+    expect(ctrl.onSaveInteractionDefaultOutcome).toHaveBeenCalled();
+  });
+
+  it('should return summary of answer group', () => {
+    expect($scope.summarizeAnswerGroup(
+      answerGroupObjectFactory.createNew(
+        [],
+        outcomeObjectFactory.createNew('unused', '1', 'Feedback text', []),
+        [], '0'), '1', {}, true))
+      .toBe('[Answer] Feedback text');
+  });
+
+  it('should get summary default outcome when outcome is linear', () => {
+    expect($scope.summarizeDefaultOutcome(
+      outcomeObjectFactory.createNew(
+        'unused', '1', 'Feedback Text', []), 'Continue', 0, true))
+      .toBe('[When the button is clicked] Feedback Text');
+  });
+
+  it('should get summary default outcome when answer group count' +
+    ' is greater than 0', () => {
+    expect($scope.summarizeDefaultOutcome(
+      outcomeObjectFactory.createNew(
+        'unused', '1', 'Feedback Text', []), 'TextInput', 1, true))
+      .toBe('[All other answers] Feedback Text');
+  });
+
+  it('should get summary default outcome when answer group count' +
+    ' is equal to 0', () => {
+    expect($scope.summarizeDefaultOutcome(
+      outcomeObjectFactory.createNew(
+        'unused', '1', 'Feedback Text', []), 'TextInput', 0, true))
+      .toBe('[All answers] Feedback Text');
+  });
+
+  it('should get an empty summary when default outcome' +
+    ' is a falsy value', () => {
+    expect($scope.summarizeDefaultOutcome(null, 'Continue', 0, true))
+      .toBe('');
+  });
 });
