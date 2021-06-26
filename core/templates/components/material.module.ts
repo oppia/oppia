@@ -22,6 +22,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatExpansionModule } from '@angular/material/expansion';
+import { MatListModule } from '@angular/material/list';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatRadioModule } from '@angular/material/radio';
@@ -40,6 +41,7 @@ import { MatDividerModule } from '@angular/material/divider';
     MatCardModule,
     MatCheckboxModule,
     MatExpansionModule,
+    MatListModule,
     MatProgressBarModule,
     MatProgressSpinnerModule,
     MatRadioModule,
@@ -55,6 +57,7 @@ import { MatDividerModule } from '@angular/material/divider';
     MatCardModule,
     MatCheckboxModule,
     MatExpansionModule,
+    MatListModule,
     MatProgressBarModule,
     MatProgressSpinnerModule,
     MatRadioModule,
