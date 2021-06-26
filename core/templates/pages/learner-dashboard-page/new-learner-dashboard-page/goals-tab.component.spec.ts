@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for for CollectionSummaryTileComponent.
+ * @fileoverview Unit tests for for GoalsTabComponent.
  */
 
 import { async, ComponentFixture, fakeAsync, TestBed } from
