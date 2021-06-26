@@ -28,6 +28,7 @@ import feconf
 
 class ClassroomPage(base.BaseHandler):
     """Renders the classroom page."""
+
     URL_PATH_ARGS_SCHEMAS = {
         'classroom_url_fragment': {
             'type': 'string'
@@ -101,6 +102,7 @@ class ClassroomPromosStatusHandler(base.BaseHandler):
 
 class DefaultClassroomRedirectPage(base.BaseHandler):
     """Redirects to the default classroom page."""
+
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {'GET': {}}
 

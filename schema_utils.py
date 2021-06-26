@@ -482,6 +482,7 @@ class _Validators(python_utils.OBJECT):
             bool. Whether the given object has length at most `max_value`.
         """
         return len(obj) <= max_value
+
     @staticmethod
     def does_not_contain_email(obj):
         """Ensures that obj doesn't contain a valid email.

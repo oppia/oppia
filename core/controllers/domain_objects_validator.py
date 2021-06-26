@@ -21,8 +21,9 @@ handler arguments.
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from core.domain import exp_domain
 from core.domain import config_domain
+from core.domain import exp_domain
+
 
 def validate_exploration_change(obj):
     """Validates exploration change.
@@ -33,6 +34,7 @@ def validate_exploration_change(obj):
     # No explicit call to validate_dict method is necessary, because
     # ExplorationChange calls it while initialization.
     exp_domain.ExplorationChange(obj)
+
 
 def validate_new_config_property_values(obj):
     """Validates new config property values.
