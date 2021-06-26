@@ -1071,3 +1071,15 @@ def partition(iterable, predicate=bool, enumerated=False):
     return (
         (i for i, predicate_is_true in true_part if predicate_is_true),
         (i for i, predicate_is_true in false_part if not predicate_is_true))
+
+
+def quoted(s):
+    """Returns a string enclosed in quotes, escaping any quotes within it.
+
+    Args:
+        s: str. The string to quote.
+
+    Returns:
+        str. The quoted string.
+    """
+    return json.dumps(s)
