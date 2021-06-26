@@ -107,14 +107,14 @@
           <div *ngSwitchCase="'hints'"  class="state-edit-desc">
             <div *ngIf="lostChange.getRelativeChangeToGroups() === 'added'">
               Added hints
-              <ul style="list-style-type:none;">
+              <ul>
                 <li *ngFor="let hint of lostChange.newValue" [innerHTML]="hint.hint_content.html"></li>
               </ul>
             </div>
 
             <span *ngIf="lostChange.getRelativeChangeToGroups() === 'edited'">
               Edited hints
-              <ul style="list-style-type:none;">
+              <ul>
                 <li *ngFor="let hint of lostChange.newValue" [innerHTML]="hint.hint_content.html"></li>
               </ul>
             </span>
