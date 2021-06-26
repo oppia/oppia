@@ -29,7 +29,7 @@ class ConceptCardDataHandler(base.BaseHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
         'comma_separated_skill_ids': {
-            'type': 'unicode'
+            'type': 'string'
         }
     }
     HANDLER_ARGS_SCHEMAS = {'GET': {}}

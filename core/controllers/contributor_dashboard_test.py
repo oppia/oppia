@@ -563,9 +563,7 @@ class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
                 'content_ids': '["content"]',
             }, expected_status_int=400)
 
-        error_msg = (
-            'Schema validation for \'target_language_code\' failed: Missing '
-            'keys: [u\'target_language_code\'], Extra keys: []')
+        error_msg = ('Missing key in handler args: target_language_code.')
         self.assertEqual(
             output['error'], error_msg)
 
@@ -586,9 +584,7 @@ class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
                 'target_language_code': 'es'
             }, expected_status_int=400)
 
-        error_msg = (
-            'Schema validation for \'exp_id\' failed: Missing '
-            'keys: [u\'exp_id\'], Extra keys: []')
+        error_msg = ('Missing key in handler args: exp_id.')
         self.assertEqual(
             output['error'], error_msg)
 
@@ -609,9 +605,7 @@ class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
                 'target_language_code': 'es'
             }, expected_status_int=400)
 
-        error_msg = (
-            'Schema validation for \'state_name\' failed: Missing '
-            'keys: [u\'state_name\'], Extra keys: []')
+        error_msg = ('Missing key in handler args: state_name.')
         self.assertEqual(
             output['error'], error_msg)
 
@@ -680,9 +674,7 @@ class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
             }, expected_status_int=400
         )
 
-        error_msg = (
-            'Schema validation for \'content_ids\' failed: Missing '
-            'keys: [u\'content_ids\'], Extra keys: []')
+        error_msg = ('Missing key in handler args: content_ids.')
         self.assertEqual(
             output['error'], error_msg)
 

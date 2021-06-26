@@ -54,17 +54,17 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
         'opportunity_type': {
-            'type': 'unicode'
+            'type': 'string'
         }
     }
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'cursor': {
-                'type': 'unicode',
+                'type': 'string',
                 'default_value': None
             },
            'language_code': {
-                'type': 'unicode',
+                'type': 'string',
                 'validators': [{
                     'id': 'is_supported_audio_language_code'
                 }],
@@ -78,7 +78,7 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
         """Handles GET requests."""
         if not config_domain.CONTRIBUTOR_DASHBOARD_IS_ENABLED.value:
             raise self.PageNotFoundException
-        search_cursor = self.request.get('cursor', None)
+        search_cursor = self.normalized_request.get('cursor')
 
         if opportunity_type == constants.OPPORTUNITY_TYPE_SKILL:
             opportunities, next_cursor, more = (
@@ -221,13 +221,13 @@ class TranslatableTextHandler(base.BaseHandler):
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'language_code': {
-                'type': 'unicode',
+                'type': 'string',
                 'valiadtors': [{
                     'id': 'is_supported_audio_language_code'
                 }]
             },
             'exp_id': {
-                'type': 'unicode'
+                'type': 'string'
             }
         }
     }
@@ -235,8 +235,8 @@ class TranslatableTextHandler(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        language_code = self.request.get('language_code')
-        exp_id = self.request.get('exp_id')
+        language_code = self.normalized_request.get('language_code')
+        exp_id = self.normalized_request.get('exp_id')
 
         if not utils.is_supported_audio_language_code(language_code):
             raise self.InvalidInputException('Invalid language_code: %s' % (
@@ -318,16 +318,16 @@ class MachineTranslationStateTextsHandler(base.BaseHandler):
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'exp_id': {
-                'type': 'unicode'
+                'type': 'string'
             },
             'state_name': {
-                'type': 'unicode'
+                'type': 'string'
             },
             'content_ids': {
-                'type': 'unicode'
+                'type': 'string'
             },
             'target_language_code': {
-                'type': 'unicode',
+                'type': 'string',
                 'validators': [{
                     'id': 'is_supported_audio_language_code'
                 }]
@@ -367,15 +367,15 @@ class MachineTranslationStateTextsHandler(base.BaseHandler):
             404 (Not Found): PageNotFoundException. At least one identifier does
                 not correspond to an entry in the datastore.
         """
-        exp_id = self.request.get('exp_id')
+        exp_id = self.normalized_request.get('exp_id')
         if not exp_id:
             raise self.InvalidInputException('Missing exp_id')
 
-        state_name = self.request.get('state_name')
+        state_name = self.normalized_request.get('state_name')
         if not state_name:
             raise self.InvalidInputException('Missing state_name')
 
-        content_ids_string = self.request.get('content_ids')
+        content_ids_string = self.normalized_request.get('content_ids')
         content_ids = []
         try:
             content_ids = json.loads(content_ids_string)
@@ -383,7 +383,8 @@ class MachineTranslationStateTextsHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Improperly formatted content_ids: %s' % content_ids_string)
 
-        target_language_code = self.request.get('target_language_code')
+        target_language_code = self.normalized_request.get(
+            'target_language_code')
         if not target_language_code:
             raise self.InvalidInputException('Missing target_language_code')
 
