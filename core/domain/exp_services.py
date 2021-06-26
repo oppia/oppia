@@ -73,6 +73,10 @@ SEARCH_INDEX_EXPLORATIONS = 'explorations'
 # search query.
 MAX_ITERATIONS = 10
 
+# NOTE TO DEVELOPERS: The get_story_ids_linked_to_explorations function was
+# removed in #13021 as part of the migration to Apache Beam. Please refer to
+# that PR if you need to reinstate it.
+
 
 def is_exp_summary_editable(exp_summary, user_id=None):
     """Checks if a given user has permissions to edit the exploration.
@@ -252,23 +256,6 @@ def get_story_id_linked_to_exploration(exp_id):
     if exploration_context_model is not None:
         return exploration_context_model.story_id
     return None
-
-
-def get_story_ids_linked_to_explorations(exp_ids):
-    """Returns a list of IDs of the story that the explorations are a part of.
-
-    Args:
-        exp_ids: list(str). The IDs of the explorations.
-
-    Returns:
-        list(str). A list of IDs of the story that the exploration is linked to.
-    """
-    exploration_context_models = exp_models.ExplorationContextModel.get_multi(
-        exp_ids)
-    linked_story_ids = [
-        exp_context_model.story_id for exp_context_model in (
-            exploration_context_models) if exp_context_model is not None]
-    return linked_story_ids
 
 
 def get_all_exploration_summaries():
