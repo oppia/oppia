@@ -28,6 +28,7 @@ class PayloadValidationUnitTests(test_utils.GenericTestBase):
         # List of 3-tuples, where the first element is an invalid argument dict,
         # the second element is a schema dict and the third element
         # is a list of errors.
+
         list_of_invalid_args_with_schema_and_errors = [
             ({
                 'exploration_id': 2
@@ -35,7 +36,8 @@ class PayloadValidationUnitTests(test_utils.GenericTestBase):
                 'exploration_id': {
                     'type': 'unicode'
                 }
-            }, ['Schema validation for \'exploration_id\' failed: '
+            }, [
+                'Schema validation for \'exploration_id\' failed: '
                 'Expected unicode string, received 2']),
             ({
                 'version': 'random_string'
@@ -43,37 +45,47 @@ class PayloadValidationUnitTests(test_utils.GenericTestBase):
                 'version': {
                     'type': 'int'
                 }
-            }, ['Schema validation for \'version\' failed: '
+            }, [
+                'Schema validation for \'version\' failed: '
                 'Could not convert unicode to int: random_string']),
             ({
                 'exploration_id': 'any_exp_id'
-            }, {}, ['Found extra args: [u\'exploration_id\'].'])
+            }, {}, [
+                'Found extra args: [u\'exploration_id\'].']),
+            ({}, {
+                'exploration_id': {
+                    'type': 'unicode'
+                }
+            }, [
+                'Missing key in handler args: exploration_id.'])
         ]
         for handler_args, handler_args_schema, error_msg in (
                 list_of_invalid_args_with_schema_and_errors):
-            errors = payload_validator.validate(
+            normalized_value, errors = payload_validator.validate(
                 handler_args, handler_args_schema, False)
 
+            self.assertEqual(normalized_value, {})
             self.assertEqual(error_msg, errors)
 
     def test_valid_args_do_not_raises_exception(self):
 
-        # List of 2-tuples, where the first element is a valid argument dict,
-        # and the second element is a schema dict.
+        # List of 3-tuples, where the first element is a valid argument dict,
+        # the second element is a schema dict and the third element is the
+        # normalized value of the corresponding argument.
         list_of_valid_args_with_schmea = [
             ({}, {
                 'exploration_id': {
                     'type': 'unicode',
                     'default_value': None
                 }
-            }),
-            ({
-                'exploration_id': None
-            }, {
+            }, {}),
+            ({}, {
                 'exploration_id': {
                     'type': 'unicode',
-                    'default_value': None
+                    'default_value': 'default_exp_id'
                 }
+            }, {
+                'exploration_id': 'default_exp_id'
             }),
             ({
                 'exploration_id': 'any_exp_id'
@@ -81,9 +93,15 @@ class PayloadValidationUnitTests(test_utils.GenericTestBase):
                 'exploration_id': {
                     'type': 'unicode'
                 }
+            }, {
+                'exploration_id': 'any_exp_id'
             })
         ]
-        for handler_args, handler_args_schema in list_of_valid_args_with_schmea:
-            errors = payload_validator.validate(
+        for handler_args, handler_args_schema, normalized_value_for_args in (
+                list_of_valid_args_with_schmea):
+            normalized_value_for_args, errors = payload_validator.validate(
                 handler_args, handler_args_schema, False)
+
+            self.assertEqual(
+                normalized_value_for_args, normalized_value_for_args)
             self.assertEqual(errors, [])
