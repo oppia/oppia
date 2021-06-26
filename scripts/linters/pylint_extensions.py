@@ -42,7 +42,9 @@ ALLOWED_TERMINATING_PUNCTUATIONS = ['.', '?', '}', ']', ')']
 # the punctuation and capital letter checks will be skipped for that
 # comment or docstring.
 EXCLUDED_PHRASES = [
-    'coding:', 'pylint:', 'http://', 'https://', 'scripts/', 'extract_node']
+    'coding:', 'pylint:', 'http://', 'https://', 'scripts/', 'extract_node',
+    'type:'
+]
 
 import astroid  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
 from pylint import checkers  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
