@@ -725,6 +725,7 @@ DEMO_EXPLORATIONS = {
     u'23': 'rating_test.yaml',
     u'24': 'learner_flow_test.yaml',
     u'25': 'exploration_player_test.yaml',
+    u'26': 'android_interactions',
 }
 
 DEMO_COLLECTIONS = {
