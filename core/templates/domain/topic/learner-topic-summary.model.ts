@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { DegreesOfMastery } from 'domain/topic_viewer/read-only-topic-object.factory';
-import { SubtopicBackendDict, Subtopic, SkillIdToDescriptionMap } from './subtopic.model';
-
 /**
  * @fileoverview Frontend Model for learner topic summary.
  */
+
+import { DegreesOfMastery } from 'domain/topic_viewer/read-only-topic-object.factory';
+import { SubtopicBackendDict, Subtopic, SkillIdToDescriptionMap } from './subtopic.model';
 
 export interface LearnerTopicSummaryBackendDict {
   'id': string;
@@ -57,7 +57,7 @@ export class LearnerTopicSummary {
       topicSummaryBackendDict: LearnerTopicSummaryBackendDict
   ): LearnerTopicSummary {
     let subtopics = topicSummaryBackendDict.subtopics.map(subtopic => {
-      return Subtopic.create(
+      return Subtopic.createFromBackendDict(
         subtopic, topicSummaryBackendDict.skill_descriptions);
     });
 
