@@ -16,235 +16,241 @@
  * @fileoverview Unit tests for the create new subtopic modal controller.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils';
-// ^^^ This block is to be removed.
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { Topic, TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
+import { SubtopicValidationService } from '../services/subtopic-validation.service';
+import { CreateNewSubtopicModalComponent } from './create-new-subtopic-modal.component';
 
-describe('Create new subtopic modal', function() {
-  importAllAngularServices();
+describe('Create new subtopic modal', () => {
+  let topicObjectFactory: TopicObjectFactory;
+  let subtopicValidationService: SubtopicValidationService;
+  let topic: Topic;
+  let component: CreateNewSubtopicModalComponent;
+  let fixture: ComponentFixture<CreateNewSubtopicModalComponent>;
+  let ngbActiveModal: NgbActiveModal;
 
-  beforeEach(angular.mock.module('oppia'));
+  beforeEach(() => {
+    topicObjectFactory = TestBed.inject(TopicObjectFactory);
+    ngbActiveModal = TestBed.inject(NgbActiveModal);
+    subtopicValidationService = TestBed.inject(SubtopicValidationService);
+    topic = topicObjectFactory.createInterstitialTopic();
+  });
 
-  var $scope = null;
-  var ctrl = null;
-  var $uibModalInstance = null;
-  var TopicObjectFactory = null;
-  var SubtopicValidationService = null;
-  var topic = null;
-  beforeEach(angular.mock.inject(function($injector, $controller) {
-    var $rootScope = $injector.get('$rootScope');
-
-    $uibModalInstance = jasmine.createSpyObj(
-      '$uibModalInstance', ['close', 'dismiss']);
-    TopicObjectFactory =
-            $injector.get('TopicObjectFactory');
-    SubtopicValidationService = $injector.get('SubtopicValidationService');
-    $scope = $rootScope.$new();
-    topic = TopicObjectFactory.createInterstitialTopic();
-    ctrl = $controller('CreateNewSubtopicModalController', {
-      $scope: $scope,
-      $uibModalInstance: $uibModalInstance,
-      topic: topic
-    });
-    ctrl.$onInit();
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      declarations: [
+        CreateNewSubtopicModalComponent,
+      ],
+      providers: [
+        SubtopicValidationService,
+        TopicObjectFactory
+      ]
+    }).compileComponents();
   }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(CreateNewSubtopicModalComponent);
+    component = fixture.componentInstance;
+  });
 
 
   it('should initialize controller properties after its initialization',
-    function() {
-      ctrl.$onInit();
-      expect(ctrl.topic).toEqual(topic);
-      expect(ctrl.SUBTOPIC_PAGE_SCHEMA).toEqual({
+    () => {
+      component.ngOnInit();
+      expect(component.topic).toEqual(topic);
+      expect(component.SUBTOPIC_PAGE_SCHEMA).toEqual({
         type: 'html',
         ui_config: {
           rows: 100
         }});
-      expect(ctrl.allowedBgColors).toEqual(['#FFFFFF']);
-      expect(ctrl.MAX_CHARS_IN_SUBTOPIC_TITLE).toEqual(64);
+      expect(component.allowedBgColors).toEqual(['#FFFFFF']);
+      expect(component.MAX_CHARS_IN_SUBTOPIC_TITLE).toEqual(64);
     });
 
   it('should close the modal and save the subtopicId', function() {
-    ctrl.subtopicTitle = 'Subtopic1';
-    ctrl.subtopicId = 1;
-    ctrl.save();
-    expect($uibModalInstance.close).toHaveBeenCalledWith(1);
+    component.subtopicTitle = 'Subtopic1';
+    component.subtopicId = 1;
+    component.save();
+    expect(ngbActiveModal.close).toHaveBeenCalledWith(1);
   });
 
   it('should show schema editor', function() {
-    expect(ctrl.schemaEditorIsShown).toEqual(false);
-    ctrl.showSchemaEditor();
-    expect(ctrl.schemaEditorIsShown).toEqual(true);
+    expect(component.schemaEditorIsShown).toEqual(false);
+    component.showSchemaEditor();
+    expect(component.schemaEditorIsShown).toEqual(true);
   });
 
   it('should show error message if subtopic name is invalid', function() {
-    expect(ctrl.errorMsg).toEqual(null);
+    expect(component.errorMsg).toEqual(null);
     spyOn(
-      SubtopicValidationService,
+      subtopicValidationService,
       'checkValidSubtopicName').and.returnValue(false);
-    ctrl.subtopicTitle = 'Subtopic1';
-    ctrl.save();
+    component.subtopicTitle = 'Subtopic1';
+    component.save();
 
-    var errorMessage = 'A subtopic with this title already exists';
-    expect(ctrl.errorMsg).toEqual(errorMessage);
+    let errorMessage = 'A subtopic with this title already exists';
+    expect(component.errorMsg).toEqual(errorMessage);
   });
 
   it('should show reset the error message', function() {
-    expect(ctrl.errorMsg).toEqual(null);
+    expect(component.errorMsg).toEqual(null);
     spyOn(
-      SubtopicValidationService,
+      subtopicValidationService,
       'checkValidSubtopicName').and.returnValue(false);
-    ctrl.subtopicTitle = 'Subtopic1';
-    ctrl.save();
+    component.subtopicTitle = 'Subtopic1';
+    component.save();
 
-    var errorMessage = 'A subtopic with this title already exists';
-    expect(ctrl.errorMsg).toEqual(errorMessage);
+    let errorMessage = 'A subtopic with this title already exists';
+    expect(component.errorMsg).toEqual(errorMessage);
 
-    ctrl.resetErrorMsg();
-    expect(ctrl.errorMsg).toEqual(null);
+    component.resetErrorMsg();
+    expect(component.errorMsg).toEqual(null);
   });
 
   it('should check if subtopic with url fragment exists', function() {
-    expect(ctrl.subtopicUrlFragmentExists).toEqual(false);
+    expect(component.subtopicUrlFragmentExists).toEqual(false);
     spyOn(
-      SubtopicValidationService,
+      subtopicValidationService,
       'doesSubtopicWithUrlFragmentExist').and.returnValue(true);
-    ctrl.checkSubtopicExistence();
-    expect(ctrl.subtopicUrlFragmentExists).toEqual(true);
+    component.checkSubtopicExistence();
+    expect(component.subtopicUrlFragmentExists).toEqual(true);
   });
 
   it('should return the validity of the subtopic', function() {
     // Fails when all fields are empty.
-    ctrl.editableThumbnailFilename = '';
-    ctrl.subtopicTitle = '';
-    ctrl.htmlData = '';
-    ctrl.editableUrlFragment = '';
-    expect(ctrl.isSubtopicValid()).toEqual(false);
+    component.editableThumbnailFilename = '';
+    component.subtopicTitle = '';
+    component.htmlData = '';
+    component.editableUrlFragment = '';
+    expect(component.isSubtopicValid()).toEqual(false);
 
     // Fails when subtopicTitle is empty but other fields are valid.
-    ctrl.htmlData = 'Subtopic description';
-    ctrl.editableThumbnailFilename = 'img_316_512.svg';
-    ctrl.editableUrlFragment = 'subtopic-url';
-    expect(ctrl.isSubtopicValid()).toEqual(false);
+    component.htmlData = 'Subtopic description';
+    component.editableThumbnailFilename = 'img_316_512.svg';
+    component.editableUrlFragment = 'subtopic-url';
+    expect(component.isSubtopicValid()).toEqual(false);
 
     // Fails when editableThumbnailFilename is empty but other fields
     // are valid.
-    ctrl.editableThumbnailFilename = '';
-    ctrl.subtopicTitle = 'Subtopic1';
-    expect(ctrl.isSubtopicValid()).toEqual(false);
+    component.editableThumbnailFilename = '';
+    component.subtopicTitle = 'Subtopic1';
+    expect(component.isSubtopicValid()).toEqual(false);
 
     // Fails when htmlData is empty but other fields are valid.
-    ctrl.htmlData = '';
-    ctrl.editableThumbnailFilename = 'img_316_512.svg';
-    expect(ctrl.isSubtopicValid()).toEqual(false);
+    component.htmlData = '';
+    component.editableThumbnailFilename = 'img_316_512.svg';
+    expect(component.isSubtopicValid()).toEqual(false);
 
     // Fails when editableUrlFragment is empty but other fields are valid.
-    ctrl.htmlData = 'Subtopic description';
-    ctrl.editableUrlFragment = '';
-    expect(ctrl.isSubtopicValid()).toEqual(false);
+    component.htmlData = 'Subtopic description';
+    component.editableUrlFragment = '';
+    expect(component.isSubtopicValid()).toEqual(false);
 
     // Fails when editableUrlFragment contains an invalid character.
-    ctrl.editableUrlFragment = 'ABC 123';
-    expect(ctrl.isSubtopicValid()).toEqual(false);
+    component.editableUrlFragment = 'ABC 123';
+    expect(component.isSubtopicValid()).toEqual(false);
 
     // Fails when only editableThumbnailFilename and subtopicTitle are
     // valid but others are empty.
-    ctrl.editableThumbnailFilename = 'img_316_512.svg';
-    ctrl.subtopicTitle = 'Subtopic1';
-    ctrl.htmlData = '';
-    ctrl.editableUrlFragment = '';
-    expect(ctrl.isSubtopicValid()).toEqual(false);
+    component.editableThumbnailFilename = 'img_316_512.svg';
+    component.subtopicTitle = 'Subtopic1';
+    component.htmlData = '';
+    component.editableUrlFragment = '';
+    expect(component.isSubtopicValid()).toEqual(false);
 
     // Fails when only editableThumbnailFilename and htmlData are
     // valid but others are empty.
-    ctrl.editableThumbnailFilename = 'img_316_512.svg';
-    ctrl.subtopicTitle = '';
-    ctrl.htmlData = 'Subtopic description';
-    ctrl.editableUrlFragment = '';
-    expect(ctrl.isSubtopicValid()).toEqual(false);
+    component.editableThumbnailFilename = 'img_316_512.svg';
+    component.subtopicTitle = '';
+    component.htmlData = 'Subtopic description';
+    component.editableUrlFragment = '';
+    expect(component.isSubtopicValid()).toEqual(false);
 
     // Fails when only editableThumbnailFilename and editableUrlFragment are
     // valid but others are empty.
-    ctrl.editableThumbnailFilename = 'img_316_512.svg';
-    ctrl.subtopicTitle = '';
-    ctrl.htmlData = '';
-    ctrl.editableUrlFragment = 'subtopic-url';
-    expect(ctrl.isSubtopicValid()).toEqual(false);
+    component.editableThumbnailFilename = 'img_316_512.svg';
+    component.subtopicTitle = '';
+    component.htmlData = '';
+    component.editableUrlFragment = 'subtopic-url';
+    expect(component.isSubtopicValid()).toEqual(false);
 
     // Fails when only subtopicTitle and htmlData are
     // valid but others are empty.
-    ctrl.editableThumbnailFilename = '';
-    ctrl.subtopicTitle = 'Subtopic1';
-    ctrl.htmlData = 'Subtopic description';
-    ctrl.editableUrlFragment = '';
-    expect(ctrl.isSubtopicValid()).toEqual(false);
+    component.editableThumbnailFilename = '';
+    component.subtopicTitle = 'Subtopic1';
+    component.htmlData = 'Subtopic description';
+    component.editableUrlFragment = '';
+    expect(component.isSubtopicValid()).toEqual(false);
 
     // Fails when only subtopicTitle and editableUrlFragment are
     // valid but others are empty.
-    ctrl.editableThumbnailFilename = '';
-    ctrl.subtopicTitle = 'Subtopic1';
-    ctrl.htmlData = '';
-    ctrl.editableUrlFragment = 'subtopic-url';
-    expect(ctrl.isSubtopicValid()).toEqual(false);
+    component.editableThumbnailFilename = '';
+    component.subtopicTitle = 'Subtopic1';
+    component.htmlData = '';
+    component.editableUrlFragment = 'subtopic-url';
+    expect(component.isSubtopicValid()).toEqual(false);
 
     // Fails when only htmlData and editableUrlFragment are
     // valid but others are empty.
-    ctrl.editableThumbnailFilename = '';
-    ctrl.subtopicTitle = '';
-    ctrl.htmlData = 'Subtopic description';
-    ctrl.editableUrlFragment = 'subtopic-url';
-    expect(ctrl.isSubtopicValid()).toEqual(false);
+    component.editableThumbnailFilename = '';
+    component.subtopicTitle = '';
+    component.htmlData = 'Subtopic description';
+    component.editableUrlFragment = 'subtopic-url';
+    expect(component.isSubtopicValid()).toEqual(false);
 
     // Fails validation if only subtopicTitle is valid.
-    ctrl.subtopicTitle = 'Subtopic1';
-    ctrl.htmlData = '';
-    ctrl.editableThumbnailFilename = '';
-    ctrl.editableUrlFragment = '';
-    expect(ctrl.isSubtopicValid()).toEqual(false);
+    component.subtopicTitle = 'Subtopic1';
+    component.htmlData = '';
+    component.editableThumbnailFilename = '';
+    component.editableUrlFragment = '';
+    expect(component.isSubtopicValid()).toEqual(false);
 
     // Fails validation if only htmlData is valid.
-    ctrl.subtopicTitle = '';
-    ctrl.htmlData = 'Subtopic description';
-    ctrl.editableThumbnailFilename = '';
-    ctrl.editableUrlFragment = '';
-    expect(ctrl.isSubtopicValid()).toEqual(false);
+    component.subtopicTitle = '';
+    component.htmlData = 'Subtopic description';
+    component.editableThumbnailFilename = '';
+    component.editableUrlFragment = '';
+    expect(component.isSubtopicValid()).toEqual(false);
 
     // Fails validation if only editableThumbnailFilename is valid.
-    ctrl.subtopicTitle = '';
-    ctrl.htmlData = '';
-    ctrl.editableThumbnailFilename = 'img_316_512.svg';
-    ctrl.editableUrlFragment = '';
-    expect(ctrl.isSubtopicValid()).toEqual(false);
+    component.subtopicTitle = '';
+    component.htmlData = '';
+    component.editableThumbnailFilename = 'img_316_512.svg';
+    component.editableUrlFragment = '';
+    expect(component.isSubtopicValid()).toEqual(false);
 
     // Fails validation if only editableUrlFragment is valid.
-    ctrl.subtopicTitle = '';
-    ctrl.htmlData = '';
-    ctrl.editableThumbnailFilename = '';
-    ctrl.editableUrlFragment = 'subtopic-url';
-    expect(ctrl.isSubtopicValid()).toEqual(false);
+    component.subtopicTitle = '';
+    component.htmlData = '';
+    component.editableThumbnailFilename = '';
+    component.editableUrlFragment = 'subtopic-url';
+    expect(component.isSubtopicValid()).toEqual(false);
 
     // Passes validation when all fields are valid.
-    ctrl.subtopicTitle = 'Subtopic1';
-    ctrl.htmlData = 'Subtopic description';
-    ctrl.editableThumbnailFilename = 'img_316_512.svg';
-    ctrl.editableUrlFragment = 'subtopic-url';
-    expect(ctrl.isSubtopicValid()).toEqual(true);
+    component.subtopicTitle = 'Subtopic1';
+    component.htmlData = 'Subtopic description';
+    component.editableThumbnailFilename = 'img_316_512.svg';
+    component.editableUrlFragment = 'subtopic-url';
+    expect(component.isSubtopicValid()).toEqual(true);
   });
 
   it('should dismiss the modal on cancel', function() {
-    ctrl.cancel();
-    expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
+    component.cancel();
+    expect(ngbActiveModal.dismiss).toHaveBeenCalledWith('cancel');
   });
 
   it('should update the subtopic thumbnail filename', function() {
-    expect(ctrl.editableThumbnailFilename).toEqual('');
-    ctrl.updateSubtopicThumbnailFilename('img_512.svg');
-    expect(ctrl.editableThumbnailFilename).toEqual('img_512.svg');
+    expect(component.editableThumbnailFilename).toEqual('');
+    component.updateSubtopicThumbnailFilename('img_512.svg');
+    expect(component.editableThumbnailFilename).toEqual('img_512.svg');
   });
 
   it('should update the subtopic thumbnail bg color', function() {
-    expect(ctrl.editableThumbnailBgColor).toEqual('');
-    ctrl.updateSubtopicThumbnailBgColor('#FFFFFF');
-    expect(ctrl.editableThumbnailBgColor).toEqual('#FFFFFF');
+    expect(component.editableThumbnailBgColor).toEqual('');
+    component.updateSubtopicThumbnailBgColor('#FFFFFF');
+    expect(component.editableThumbnailBgColor).toEqual('#FFFFFF');
   });
 });

@@ -29,8 +29,7 @@ import { EntityCreationService } from './entity-creation.service';
 import { TopicEditorRoutingService } from './topic-editor-routing.service';
 import { TopicEditorStateService } from './topic-editor-state.service';
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Entity creation service', () => {
+describe('Entity creation service', () => {
   let topicObjectFactory: TopicObjectFactory;
   let topicEditorStateService: TopicEditorStateService;
   let topicEditorRoutingService: TopicEditorRoutingService;
@@ -106,6 +105,7 @@ fdescribe('Entity creation service', () => {
     }));
 
   it('should create a skill', () => {
+    spyOn(topicEditorStateService.getTopic(), 'getId').and.callThrough();
     entityCreationService.createSkill();
     expect(createNewSkillModalService.createNewSkill).toHaveBeenCalled();
   });
