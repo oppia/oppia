@@ -301,7 +301,7 @@ describe('Goals tab Component', () => {
     component.topicIdsInCompletedGoals = ['1', '2'];
     const learnerGoalsSpy = spyOn(
       learnerDashboardActivityBackendApiService, 'addToLearnerGoals')
-      .and.returnValue(true);
+      .and.returnValue(Promise.resolve(true));
     component.addToLearnerGoals(component.editGoals[0], '3', 1);
     fixture.detectChanges();
 
