@@ -38,6 +38,7 @@ from core.controllers import features
 from core.controllers import feedback
 from core.controllers import improvements
 from core.controllers import learner_dashboard
+from core.controllers import learner_goals
 from core.controllers import learner_playlist
 from core.controllers import library
 from core.controllers import moderator
@@ -417,6 +418,10 @@ URLS = MAPREDUCE_HANDLERS + [
         reader.LearnerIncompleteActivityHandler),
 
     get_redirect_route(
+        r'%s/<activity_type>/<topic_id>' % feconf.LEARNER_GOALS_DATA_URL,
+        learner_goals.LearnerGoalsHandler),
+
+    get_redirect_route(
         r'%s/<activity_type>/<activity_id>' % feconf.LEARNER_PLAYLIST_DATA_URL,
         learner_playlist.LearnerPlaylistHandler),
 
@@ -475,6 +480,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/profilehandler/data/<username>', profile.ProfileHandler),
     get_redirect_route(feconf.PREFERENCES_URL, profile.PreferencesPage),
+    get_redirect_route(
+        r'%s/<secret>' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT,
+        profile.BulkEmailWebhookEndpoint),
     get_redirect_route(
         feconf.PREFERENCES_DATA_URL, profile.PreferencesHandler),
     get_redirect_route(
