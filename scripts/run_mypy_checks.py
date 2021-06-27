@@ -28,9 +28,6 @@ import sys
 
 from scripts import common
 from scripts import install_third_party_libs
-# This installs third party libraries before importing other files or importing
-# libraries that use the builtins python module (e.g. build, python_utils).
-install_third_party_libs.main()
 
 import python_utils # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
@@ -750,11 +747,26 @@ _PARSER = argparse.ArgumentParser(
 )
 
 _PARSER.add_argument(
+    '--skip-install',
+    help='If true, skips installing dependencies. The default value is false.',
+    action='store_true')
+
+_PARSER.add_argument(
     '--files',
     help='Files to type-check',
     action='store',
     nargs='+'
 )
+
+
+def install_third_party_libraries(skip_install):
+    """Run the installation script.
+
+    Args:
+        skip_install: bool. Whether to skip running the installation script.
+    """
+    if not skip_install:
+        install_third_party_libs.main()
 
 
 def get_mypy_cmd(files):
@@ -794,6 +806,7 @@ def main(args=None):
     """Runs the MyPy type checks."""
     parsed_args = _PARSER.parse_args(args=args)
 
+    install_third_party_libraries(parsed_args.skip_install)
     common.fix_third_party_imports()
 
     python_utils.PRINT('Installing Mypy and stubs for third party libraries.')
