@@ -139,7 +139,7 @@ describe('Lost Changes Modal Component', () => {
 
   it('should export the lost changes and close the modal', () => {
     spyOn(
-      fixture.elementRef.nativeElement, 'getElementByClassName'
+      fixture.elementRef.nativeElement, 'getElementsByClassName'
     ).withArgs('oppia-lost-changes').and.returnValue([
       {
         innerText: 'Dummy Inner Text'
