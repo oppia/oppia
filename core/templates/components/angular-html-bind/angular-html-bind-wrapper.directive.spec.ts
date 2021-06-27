@@ -70,7 +70,12 @@ describe('Angular Html Bind Wrapper Directive', () => {
 
     it('should call applyAsync on initialization', function() {
       const ctrl = $componentController('angularHtmlBindWrapper');
-      ctrl.$onChanges();
+      ctrl.$onChanges({
+        htmlData: {
+          currentValue: 'newValue',
+          previousValue: 'oldValue'
+        }
+      });
       expect(applySpy).toHaveBeenCalled();
     });
   });
