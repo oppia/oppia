@@ -152,9 +152,11 @@
 /core/controllers/creator_dashboard*.py @nithusha21
 /core/controllers/email_dashboard*.py @nithusha21
 /core/controllers/learner_dashboard*.py @nithusha21
+/core/controllers/learner_goals*.py @nithusha21
 /core/controllers/learner_playlist*.py @nithusha21
 /core/controllers/subscriptions*.py @nithusha21
 /core/domain/activity*.py @nithusha21
+/core/domain/learner_goals_services*.py @nithusha21
 /core/domain/learner_playlist_services*.py @nithusha21
 /core/domain/learner_progress*.py @nithusha21
 /core/domain/subscription_services*.py @nithusha21
@@ -518,9 +520,14 @@
 /core/templates/Polyfills.ts @srijanreddy98
 # TODO(#13119): Set @vojtechjelinek as owner after 2021-07-06
 /extensions/extensions.module.ts @srijanreddy98
+# TODO(#13119): Set @vojtechjelinek as owner after 2021-07-06
+/mypy.ini @sajalasati
+# TODO(#13119): Set @vojtechjelinek as owner after 2021-07-06
+/mypy_requirements.txt @sajalasati
+/python_utils*.py @DubeySandeep
 /schema_utils*.py @DubeySandeep
 /utils*.py @aks681
-/python_utils*.py @DubeySandeep
+
 
 
 # Restricted pages.

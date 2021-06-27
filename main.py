@@ -39,6 +39,7 @@ from core.controllers import features
 from core.controllers import feedback
 from core.controllers import improvements
 from core.controllers import learner_dashboard
+from core.controllers import learner_goals
 from core.controllers import learner_playlist
 from core.controllers import library
 from core.controllers import moderator
@@ -413,6 +414,10 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<activity_type>/<activity_id>' %
         feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
         reader.LearnerIncompleteActivityHandler),
+
+    get_redirect_route(
+        r'%s/<activity_type>/<topic_id>' % feconf.LEARNER_GOALS_DATA_URL,
+        learner_goals.LearnerGoalsHandler),
 
     get_redirect_route(
         r'%s/<activity_type>/<activity_id>' % feconf.LEARNER_PLAYLIST_DATA_URL,
