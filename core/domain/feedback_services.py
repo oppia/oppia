@@ -1221,12 +1221,10 @@ def handle_thread_status_changed(exp_id, old_status, new_status):
 @transaction_services.run_in_transaction_wrapper
 def _increment_open_threads_count_transactional(exp_id):
     """Increments count of open threads by one."""
-    model = feedback_models.FeedbackAnalyticsModel.get(exp_id, strict=False)
-    if model is None:
-        model = feedback_models.FeedbackAnalyticsModel(
-            id=exp_id, num_open_threads=1)
-    else:
-        model.num_open_threads = (model.num_open_threads or 0) + 1
+    model = (
+        feedback_models.FeedbackAnalyticsModel.get(exp_id, strict=False) or
+        feedback_models.FeedbackAnalyticsModel(id=exp_id, num_open_threads=0))
+    model.num_open_threads = (model.num_open_threads or 0) + 1
     model.update_timestamps()
     model.put()
 
@@ -1234,12 +1232,10 @@ def _increment_open_threads_count_transactional(exp_id):
 @transaction_services.run_in_transaction_wrapper
 def _increment_total_threads_count_transactional(exp_id):
     """Increments count of total threads by one."""
-    model = feedback_models.FeedbackAnalyticsModel.get(exp_id, strict=False)
-    if model is None:
-        model = feedback_models.FeedbackAnalyticsModel(
-            id=exp_id, num_total_threads=1)
-    else:
-        model.num_total_threads = (model.num_total_threads or 0) + 1
+    model = (
+        feedback_models.FeedbackAnalyticsModel.get(exp_id, strict=False) or
+        feedback_models.FeedbackAnalyticsModel(id=exp_id, num_total_threads=0))
+    model.num_total_threads = (model.num_total_threads or 0) + 1
     model.update_timestamps()
     model.put()
 
@@ -1247,11 +1243,9 @@ def _increment_total_threads_count_transactional(exp_id):
 @transaction_services.run_in_transaction_wrapper
 def _decrement_open_threads_count_transactional(exp_id):
     """Decrements count of open threads by one."""
-    model = feedback_models.FeedbackAnalyticsModel.get(exp_id, strict=False)
-    if model is None:
-        model = feedback_models.FeedbackAnalyticsModel(
-            id=exp_id, num_open_threads=0)
-    else:
-        model.num_open_threads = (model.num_open_threads or 1) - 1
+    model = (
+        feedback_models.FeedbackAnalyticsModel.get(exp_id, strict=False) or
+        feedback_models.FeedbackAnalyticsModel(id=exp_id, num_open_threads=0))
+    model.num_open_threads = (model.num_open_threads or 1) - 1
     model.update_timestamps()
     model.put()
