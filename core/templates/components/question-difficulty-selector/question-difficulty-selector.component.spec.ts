@@ -48,17 +48,18 @@ describe('QuestionDifficultySelectorComponent', () => {
 
   it('should update skill\'s difficulty', () => {
     component.skillWithDifficulty = new SkillDifficulty('id', '', 0.6);
-    spyOn(component.skillWithDifficulty, 'setDifficulty');
+    // spyOn(component.skillWithDifficulty, 'setDifficulty');
     spyOn(component.skillWithDifficultyChange, 'emit');
     let mockMatRadioChange: MatRadioChange = {
       source: null,
       value: 0.9
     };
 
+    expect(component.skillWithDifficulty.getDifficulty()).toBe(0.6);
+
     component.updateSkillWithDifficulty(mockMatRadioChange);
 
-    expect(component.skillWithDifficulty.setDifficulty)
-      .toHaveBeenCalledWith(0.9);
+    expect(component.skillWithDifficulty.getDifficulty()).toBe(0.9);
     expect(component.skillWithDifficultyChange.emit).toHaveBeenCalled();
   });
 });

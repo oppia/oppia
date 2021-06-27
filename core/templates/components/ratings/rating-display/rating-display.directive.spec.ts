@@ -52,6 +52,13 @@ describe('Rating display directive', function() {
     }));
 
   it('should display the correct number of stars', function() {
+    // Pre checks -- here ratingValue is 5 as given in the template.
+    expect(ctrlScope.stars[0].cssClass).toBe('fas fa-star');
+    expect(ctrlScope.stars[1].cssClass).toBe('fas fa-star');
+    expect(ctrlScope.stars[2].cssClass).toBe('fas fa-star');
+    expect(ctrlScope.stars[3].cssClass).toBe('fas fa-star');
+    expect(ctrlScope.stars[4].cssClass).toBe('fas fa-star');
+
     ctrlScope.ratingValue = 4.2;
     outerScope.$digest();
     // Note the array here is zero-indexed but ratings are one-indexed.

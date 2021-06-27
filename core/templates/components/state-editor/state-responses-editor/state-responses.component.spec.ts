@@ -431,6 +431,8 @@ describe('StateResponsesComponent', () => {
     spyOn(ResponsesService, 'getActiveAnswerGroupIndex').and.returnValue(-1);
     spyOn(ExternalSaveService.onExternalSave, 'emit');
 
+    expect($scope.activeAnswerGroupIndex).toBe(undefined);
+
     ctrl.$onInit();
     $scope.ANSWER_GROUP_LIST_SORTABLE_OPTIONS.start('', ui);
 
