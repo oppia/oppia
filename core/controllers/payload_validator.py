@@ -185,6 +185,7 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'LearnerDashboardHandler',
     'LearnerDashboardIdsHandler',
     'LearnerDashboardPage',
+    'LearnerGoalsHandler',
     'LearnerIncompleteActivityHandler',
     'LearnerPlaylistHandler',
     'LeaveForRefresherExpEventHandler',
