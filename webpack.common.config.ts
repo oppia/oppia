@@ -466,6 +466,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['license'],
       filename: 'license.mainpage.html',
+      hybrid: true,
       meta: {
         name: defaultMeta.name,
         description: 'License terms that Oppia is attributed under.'
