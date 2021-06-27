@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for LostChangesModalComponent.
  */
 
-import { Component, ElementRef, NO_ERRORS_SCHEMA } from '@angular/core';
+import { Component, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
@@ -49,7 +49,6 @@ describe('Lost Changes Modal Component', () => {
   let ngbActiveModal: NgbActiveModal;
   let loggerService: LoggerService;
   let logSpy = null;
-  let elRef: ElementRef;
 
   const lostChanges = [{
     cmd: 'add_state',
@@ -88,7 +87,6 @@ describe('Lost Changes Modal Component', () => {
     ngbActiveModal = TestBed.inject(NgbActiveModal);
     loggerService = TestBed.inject(LoggerService);
     logSpy = spyOn(loggerService, 'error').and.callThrough();
-    elRef = TestBed.inject(ElementRef);
     fixture.detectChanges();
   });
 
@@ -139,9 +137,9 @@ describe('Lost Changes Modal Component', () => {
       'copy and paste these changes before discarding them.');
   });
 
-  it('should export the lost changes and close the modal', () => {
+  fit('should export the lost changes and close the modal', () => {
     spyOn(
-      elRef.nativeElement, 'getElementByClassName'
+      fixture.elementRef.nativeElement, 'getElementByClassName'
     ).withArgs('oppia-lost-changes').and.returnValue([
       {
         innerText: 'Dummy Inner Text'

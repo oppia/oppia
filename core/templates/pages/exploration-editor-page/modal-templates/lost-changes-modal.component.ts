@@ -63,9 +63,7 @@ export class LostChangesModalComponent
     var elem = this.windowRef.nativeWindow.document.createElement('a');
     elem.href = URL.createObjectURL(blob);
     elem.download = 'lostChanges.txt';
-    document.body.appendChild(elem);
     elem.click();
-    document.body.removeChild(elem);
     this.ngbActiveModal.dismiss();
   }
 }

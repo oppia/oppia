@@ -39,6 +39,7 @@ from core.domain import activity_services
 from core.domain import caching_services
 from core.domain import classifier_services
 from core.domain import draft_upgrade_services
+from core.domain import email_manager
 from core.domain import email_subscription_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -2110,6 +2111,11 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
             # Here we will send the changelist, version, latest_version,
             # and exploration to the admin, so that the conditions
             # can be reviewed.
+            if feconf.CAN_SEND_EMAILS:
+                email_manager.send_mail_to_admin(
+                    'Adding/Deleting State Changes not mergeable',
+                    'The deleted skills: %s are still present in topic with '
+                    'id %s' % (exp_id, change_list))
             return False
 
         changes_are_mergeable = False

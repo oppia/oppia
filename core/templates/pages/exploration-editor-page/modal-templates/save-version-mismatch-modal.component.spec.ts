@@ -101,7 +101,6 @@ describe('Save Version Mismatch Modal Component', () => {
   let loggerService: LoggerService;
   let logSpy = null;
   let explorationDataService: MockExplorationDataService;
-  let elRef: ElementRef;
 
   beforeEach(waitForAsync(() => {
     windowRef = new MockWindowRef();
@@ -138,7 +137,6 @@ describe('Save Version Mismatch Modal Component', () => {
 
     loggerService = TestBed.inject(LoggerService);
     logSpy = spyOn(loggerService, 'error').and.callThrough();
-    elRef = TestBed.inject(ElementRef);
 
     fixture.detectChanges();
   });
@@ -200,9 +198,9 @@ describe('Save Version Mismatch Modal Component', () => {
       'copy and paste these changes before discarding them.');
   });
 
-  it('should export the lost changes and close the modal', () => {
+  fit('should export the lost changes and close the modal', () => {
     spyOn(
-      elRef.nativeElement, 'getElementByClassName'
+      fixture.elementRef.nativeElement, 'getElementsByClassName'
     ).withArgs('oppia-lost-changes').and.returnValue([
       {
         innerText: 'Dummy Inner Text'
