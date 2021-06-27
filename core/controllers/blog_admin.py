@@ -40,6 +40,7 @@ class BlogAdminHandler(base.BaseHandler):
 
     @acl_decorators.can_access_blog_admin_page
     def get(self):
+        # type: () -> None
         """Handles GET requests."""
         config_properties = config_domain.Registry.get_config_property_schemas()
         config_prop_for_blog_admin = {
@@ -64,6 +65,7 @@ class BlogAdminHandler(base.BaseHandler):
 
     @acl_decorators.can_access_blog_admin_page
     def post(self):
+        # type: () -> None
         """Handles POST requests."""
         try:
             result = {}
@@ -96,6 +98,7 @@ class BlogAdminRolesHandler(base.BaseHandler):
 
     @acl_decorators.can_manage_blog_post_editors
     def post(self):
+        # type: () -> None
         """Handles POST requests."""
         username = self.payload.get('username')
         role = self.payload.get('role')
@@ -111,6 +114,7 @@ class BlogAdminRolesHandler(base.BaseHandler):
 
     @acl_decorators.can_manage_blog_post_editors
     def put(self):
+        # type: () -> None
         """Handles PUT requests."""
         username = self.payload.get('username', None)
         if username is None:

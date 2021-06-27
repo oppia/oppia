@@ -29,6 +29,7 @@ import utils
 
 
 def get_blog_card_summary_dicts_for_dashboard(summaries):
+    # type: (list[BlogPostSummaries]) -> list[BlogPostSummayDicts]
     """Creates summary dicts for use in blog dashboard.
 
     Args:
@@ -53,6 +54,7 @@ class BlogDashboardDataHandler(base.BaseHandler):
 
     @acl_decorators.can_access_blog_dashboard
     def get(self):
+        # type: () -> None
         """Handles GET requests."""
 
         user_settings = user_services.get_user_settings(self.user_id)
@@ -92,12 +94,11 @@ class BlogDashboardDataHandler(base.BaseHandler):
 
     @acl_decorators.can_access_blog_dashboard
     def post(self):
+        # type: () -> None
         """Handles POST requests to create a new blog post draft."""
 
         new_blog_post = blog_services.create_new_blog_post(self.user_id)
-        self.render_json({
-            'blog_post_id': new_blog_post.id
-        })
+        self.render_json({'blog_post_id': new_blog_post.id})
 
 
 class BlogPostHandler(base.BaseHandler):
@@ -107,6 +108,7 @@ class BlogPostHandler(base.BaseHandler):
 
     @acl_decorators.can_access_blog_dashboard
     def get(self, blog_post_id):
+        # type: (str) -> None
         """Populates the data on the blog dashboard editor page."""
         if len(blog_post_id) != 12:
             raise self.PageNotFoundException(
@@ -143,6 +145,7 @@ class BlogPostHandler(base.BaseHandler):
 
     @acl_decorators.can_edit_blog_post
     def put(self, blog_post_id):
+        # type: (str) -> None
         """Updates properties of the given blog post."""
         blog_post_rights = (
             blog_services.get_blog_post_rights(blog_post_id, strict=False))
@@ -173,6 +176,7 @@ class BlogPostHandler(base.BaseHandler):
 
     @acl_decorators.can_edit_blog_post
     def post(self, blog_post_id):
+        # type: (str) -> None
         """Stores thumbnail of the blog post in the datastore."""
 
         raw_image = self.request.get('image')
@@ -196,6 +200,7 @@ class BlogPostHandler(base.BaseHandler):
 
     @acl_decorators.can_delete_blog_post
     def delete(self, blog_post_id):
+        # type: (str) -> None
         """Handles Delete requests."""
         blog_post = (
             blog_services.get_blog_post_by_id(blog_post_id, strict=False))
