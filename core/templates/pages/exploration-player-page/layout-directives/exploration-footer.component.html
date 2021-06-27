@@ -30,7 +30,7 @@
             </a>
             <ul ngbDropdownMenu class="author-profile-dropdown-menu"
                 aria-labelledby="dropdownMenu2">
-              <li *ngFor="let name of contributorNames | limitTo: 5">
+              <li *ngFor="let name of contributorNames | limitTo: 5" ngbDropdownItem>
                 <a href="/profile/{{ name }}" target="_blank" rel="noopener">{{ name }}</a>
               </li>
             </ul>
@@ -107,8 +107,8 @@
     float: left;
     list-style-type: none;
     top: auto !important;
-    margin-bottom: -47px;
-    margin-left: -14px;
+    will-change: auto !important;
+    transform: none !important;
   }
 
   .oppia-exploration-footer .author-profile-dropdown-menu li {
