@@ -515,9 +515,14 @@
 /core/templates/Polyfills.ts @srijanreddy98
 # TODO(#13119): Set @vojtechjelinek as owner after 2021-07-06
 /extensions/extensions.module.ts @srijanreddy98
+# TODO(#13119): Set @vojtechjelinek as owner after 2021-07-06
+/mypy.ini @sajalasati
+# TODO(#13119): Set @vojtechjelinek as owner after 2021-07-06
+/mypy_requirements.txt @sajalasati
+/python_utils*.py @DubeySandeep
 /schema_utils*.py @DubeySandeep
 /utils*.py @aks681
-/python_utils*.py @DubeySandeep
+
 
 
 # Restricted pages.
