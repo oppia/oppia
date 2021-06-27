@@ -94,7 +94,6 @@ import { LearnerDashboardActivityBackendApiService} from 'domain/learner_dashboa
 import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import { LearnerDashboardIdsBackendApiService } from 'domain/learner_dashboard/learner-dashboard-ids-backend-api.service';
 import { SuggestionModalForLearnerDashboardService } from 'pages/learner-dashboard-page/suggestion-modal/suggestion-modal-for-learner-dashboard.service';
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { NumberWithUnitsObjectFactory } from 'domain/objects/NumberWithUnitsObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { PlatformFeatureAdminBackendApiService } from 'domain/platform_feature/platform-feature-admin-backend-api.service';
@@ -362,8 +361,11 @@ import { DeleteAccountBackendApiService } from 'pages/delete-account-page/servic
 import { CollectionLinearizerService } from 'pages/collection-editor-page/services/collection-linearizer.service';
 import { RefresherExplorationConfirmationModalService } from 'pages/exploration-player-page/services/refresher-exploration-confirmation-modal.service';
 import { ExplorationPlayerStateService } from 'pages/exploration-player-page/services/exploration-player-state.service';
+import { TopicEditorRoutingService } from 'pages/topic-editor-page/services/topic-editor-routing.service';
+import { SubtopicValidationService } from 'pages/topic-editor-page/services/subtopic-validation-service';
 import { NavigationService } from './navigation.service';
 import { OppiaRteParserService } from './oppia-rte-parser.service';
+import { TopicEditorStateService } from 'pages/topic-editor-page/services/topic-editor-state.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AdminBackendApiService', AdminBackendApiService],
@@ -495,7 +497,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['FormatRtePreviewPipe', FormatRtePreviewPipe],
   ['FractionInputRulesService', FractionInputRulesService],
   ['FractionInputValidationService', FractionInputValidationService],
-  ['FractionObjectFactory', FractionObjectFactory],
   ['GenerateContentIdService', GenerateContentIdService],
   ['GraphDetailService', GraphDetailService],
   ['GraphInputRulesService', GraphInputRulesService],
@@ -699,6 +700,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['StoryViewerBackendApiService', StoryViewerBackendApiService],
   ['SubtitledUnicodeObjectFactory', SubtitledUnicodeObjectFactory],
   ['SubtopicViewerBackendApiService', SubtopicViewerBackendApiService],
+  ['SubtopicValidationService', SubtopicValidationService],
   ['SuggestionModalService', SuggestionModalService],
   ['SuggestionThreadObjectFactory', SuggestionThreadObjectFactory],
   ['SuggestionsService', SuggestionsService],
@@ -711,6 +713,8 @@ export const angularServices: [string, Type<{}>][] = [
   ['ThreadDataBackendApiService', ThreadDataBackendApiService],
   ['ThreadStatusDisplayService', ThreadStatusDisplayService],
   ['TopicCreationBackendApiService', TopicCreationBackendApiService],
+  ['TopicEditorRoutingService', TopicEditorRoutingService],
+  ['TopicEditorStateService', TopicEditorStateService],
   ['TopicObjectFactory', TopicObjectFactory],
   ['TopicRightsBackendApiService', TopicRightsBackendApiService],
   ['TopicViewerBackendApiService', TopicViewerBackendApiService],
