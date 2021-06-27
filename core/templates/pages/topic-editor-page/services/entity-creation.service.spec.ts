@@ -16,69 +16,97 @@
  * @fileoverview Unit tests for EntityCreationService.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// topic-editor-state.service.ts is upgraded to Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils';
-// ^^^ This block is to be removed.
-
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { fakeAsync, TestBed, waitForAsync } from '@angular/core/testing';
+import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
+import { NgbModal, NgbModalRef, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { Subtopic } from 'domain/topic/subtopic.model';
+import { Topic, TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
+import { CreateNewSkillModalComponent } from 'pages/topics-and-skills-dashboard-page/create-new-skill-modal.component';
+import { CreateNewSkillModalService } from './create-new-skill-modal.service';
+import { EntityCreationService } from './entity-creation.service';
+import { TopicEditorRoutingService } from './topic-editor-routing.service';
+import { TopicEditorStateService } from './topic-editor-state.service';
 
-describe('Entity creation service', function() {
-  importAllAngularServices();
+// eslint-disable-next-line oppia/no-test-blockers
+fdescribe('Entity creation service', () => {
+  let topicObjectFactory: TopicObjectFactory;
+  let topicEditorStateService: TopicEditorStateService;
+  let topicEditorRoutingService: TopicEditorRoutingService;
+  let entityCreationService: EntityCreationService;
+  let ngbModal: NgbModal;
+  let topic: Topic;
+  let createNewSkillModalService: CreateNewSkillModalService;
 
-  beforeEach(angular.mock.module('oppia'));
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [
+        BrowserDynamicTestingModule,
+        HttpClientTestingModule,
+        NgbModule
+      ],
+      declarations: [CreateNewSkillModalComponent],
+      providers: [
+        EntityCreationService,
+        TopicEditorStateService,
+        TopicEditorRoutingService
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).overrideModule(BrowserDynamicTestingModule, {
+      set: {
+        entryComponents: [CreateNewSkillModalComponent],
+      }
+    }).compileComponents();
+  });
 
-  var $rootScope = null;
-  var $uibModal = null;
-  var $q = null;
-  var TopicObjectFactory = null;
-  var TopicEditorStateService = null;
-  var TopicEditorRoutingService = null;
-  var EntityCreationService = null;
+  beforeEach(waitForAsync(() => {
+    topicEditorRoutingService = TestBed.inject(TopicEditorRoutingService);
+    topicObjectFactory = TestBed.inject(TopicObjectFactory);
+    topicEditorStateService = TestBed.inject(TopicEditorStateService);
+    entityCreationService = TestBed.inject(EntityCreationService);
+    ngbModal = TestBed.inject(NgbModal);
+    createNewSkillModalService = TestBed.inject(CreateNewSkillModalService);
 
-  beforeEach(angular.mock.inject(function($injector) {
-    $rootScope = $injector.get('$rootScope');
-    $q = $injector.get('$q');
-    $uibModal = $injector.get('$uibModal');
-    TopicEditorRoutingService = $injector.get('TopicEditorRoutingService');
-    TopicObjectFactory = $injector.get('TopicObjectFactory');
-    TopicEditorStateService = $injector.get('TopicEditorStateService');
-    EntityCreationService = $injector.get('EntityCreationService');
-
-    var topic = TopicObjectFactory.createInterstitialTopic();
-    var subtopic1 = Subtopic.createFromBackendDict(
+    topic = topicObjectFactory.createInterstitialTopic();
+    let subtopic1 = Subtopic.createFromBackendDict(
       {id: 1, title: 'Subtopic1', skill_ids: [], thumbnail_filename: null,
         thumbnail_bg_color: null, url_fragment: null}, {});
-    var subtopic2 = Subtopic.createFromBackendDict(
+    let subtopic2 = Subtopic.createFromBackendDict(
       {id: 1, title: 'Subtopic1', skill_ids: [], thumbnail_filename: null,
         thumbnail_bg_color: null, url_fragment: null}, {});
-    var subtopic3 = Subtopic.createFromBackendDict(
+    let subtopic3 = Subtopic.createFromBackendDict(
       {id: 1, title: 'Subtopic1', skill_ids: [], thumbnail_filename: null,
         thumbnail_bg_color: null, url_fragment: null}, {});
-    topic.getSubtopics = function() {
+    topic.getSubtopics = () => {
       return [subtopic1, subtopic2, subtopic3];
     };
-    spyOn(TopicEditorStateService, 'getTopic').and.returnValue(topic);
+    spyOn(topicEditorStateService, 'getTopic').and.returnValue(topic);
   }));
 
 
   it('should call TopicEditorRoutingService to navigate to subtopic editor',
-    function() {
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve('1')
-      });
+    fakeAsync(() => {
+      class MockNgbModalRef {
+        result = Promise.resolve({
+          subtopicId: 123
+        });
+        componentInstance = {
+          topic: topic
+        };
+      }
+      let ngbModalRef = new MockNgbModalRef();
 
-      var routingSpy = (
-        spyOn(TopicEditorRoutingService, 'navigateToSubtopicEditorWithId'));
-      EntityCreationService.createSubtopic();
-      $rootScope.$apply();
-      expect(routingSpy).toHaveBeenCalledWith('1');
-    });
+      const modalSpy = spyOn(ngbModal, 'open').and.returnValue(
+        <NgbModalRef>ngbModalRef);
 
-  it('should open create subtopic modal', function() {
-    var spy = spyOn($uibModal, 'open').and.callThrough();
-    EntityCreationService.createSubtopic();
+      spyOn(topicEditorRoutingService, 'navigateToSubtopicEditorWithId');
+      entityCreationService.createSubtopic(topic);
+      expect(modalSpy).toHaveBeenCalled();
+    }));
 
-    expect(spy).toHaveBeenCalled();
+  it('should create a skill', () => {
+    entityCreationService.createSkill();
+    expect(createNewSkillModalService.createNewSkill).toHaveBeenCalled();
   });
 });

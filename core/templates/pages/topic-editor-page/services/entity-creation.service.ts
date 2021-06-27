@@ -59,11 +59,6 @@ export class EntityCreationService {
     let topicId = this.topicEditorStateService.getTopic().getId();
     this.createNewSkillModalService.createNewSkill([topicId]);
   }
-
-  // return {
-  //   createSubtopic: createSubtopic,
-  //   createSkill: createSkill
-  // };
 }
 
 angular.module('oppia').factory(

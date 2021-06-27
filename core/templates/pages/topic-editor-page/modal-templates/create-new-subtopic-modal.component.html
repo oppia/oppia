@@ -12,7 +12,7 @@
         </div>
         <input class="form-control oppia-new-subtopic-editable-field protractor-test-new-subtopic-title-field required"
                placeholder="Enter a brief description for the subtopic that students can easily understand, e.g. 'Adding Fractions'"
-               [(ngModel)]="subtopicTitle" ng-change="resetErrorMsg()" maxlength="MAX_CHARS_IN_SUBTOPIC_TITLE" autofocus>
+               [(ngModel)]="subtopicTitle" (ngModelChange)="resetErrorMsg()" maxlength="MAX_CHARS_IN_SUBTOPIC_TITLE" autofocus>
         <span class="oppia-input-box-subtitle">
           <em>
             Subtopic title should be at most {{ MAX_CHARS_IN_SUBTOPIC_TITLE }} characters.
@@ -28,10 +28,10 @@
       <input class="form-control oppia-new-subtopic-editable-field protractor-test-new-subtopic-url-fragment-field"
              ngClass="{'is-invalid': editableUrlFragment && (!isUrlFragmentValid() || subtopicUrlFragmentExists)}"
              placeholder="Enter a url fragment for the subtopic."
-             [(ngModel)]="editableUrlFragment" ng-change="checkSubtopicExistence()" maxlength="<[MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT]>">
+             [(ngModel)]="editableUrlFragment" (ngModelChange)="checkSubtopicExistence()" maxlength="MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT">
       <span class="oppia-input-box-subtitle">
         <em>
-          The subtopic URL fragment is used to uniquely access the subtopic viewer page. It should consist of one or more hyphen-separated words, all in lowercase, with at most <[MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT]> characters in total and must be unique across the topic. Please use meaningful keywords, and avoid using words like "and", "of", or "the".
+          The subtopic URL fragment is used to uniquely access the subtopic viewer page. It should consist of one or more hyphen-separated words, all in lowercase, with at most {{ MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT }} characters in total and must be unique across the topic. Please use meaningful keywords, and avoid using words like "and", "of", or "the".
           This subtopic can be accessed at the following URL:<br>
           {{ hostname }}/learn/{{ classroomUrlFragment }}/{{ topic.getUrlFragment() }}/revision/{{ editableUrlFragment }}
         </em>
@@ -46,9 +46,9 @@
         </div>
         <div class="description-editor protractor-test-subtopic-description-editor" *ngIf="schemaEditorIsShown">
           <div class="oppia-editor-card-body" >
-            <schema-based-editor schema="SUBTOPIC_PAGE_SCHEMA"
-                                 class="protractor-test-create-subtopic-page-content"
-                                 [localValue]="htmlData">
+            <schema-based-editor class="protractor-test-create-subtopic-page-content"
+                                 [schema]="getHtmlSchema.bind(this)"
+                                 [localValue]="activeWrittenTranslation.html">
             </schema-based-editor>
           </div>
         </div>
@@ -106,36 +106,36 @@
     font-size: 12px;
   }
   @media screen and (max-width: 768px) {
-    .create-new-subtopic .modal-dialog {
+    .modal-dialog {
       border: 0;
       border-radius: 0;
       margin: 0;
       padding: 0;
       width: 100vw;
     }
-    .create-new-subtopic .modal-content {
+    .modal-content {
       border: 0;
       border-radius: 0;
       height: 100vh;
       overflow: auto;
     }
-    .create-new-subtopic .modal-header {
+    .modal-header {
       align-items: center;
       background-color: #00609C;
       display: flex;
     }
-    .create-new-subtopic .modal-header h3 {
+    .modal-header h3 {
       color: #FFF;
     }
-    .create-new-subtopic .create-new-subtopic-input-field {
+    .create-new-subtopic-input-field {
       margin: 25px 0;
     }
-    .create-new-subtopic .modal-close-button {
+    .modal-close-button {
       color: #FFF;
       display: block;
       font-size: 20px;
     }
-    .create-new-subtopic .ng-touched.ng-empty.required {
+    .ng-touched.ng-empty.required {
      outline: 1px solid #F00;
     }
   }

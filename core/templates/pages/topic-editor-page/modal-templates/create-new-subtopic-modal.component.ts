@@ -16,7 +16,7 @@
  * @fileoverview Component for create new subtopic modal controller.
  */
 
-import { Component, Input } from '@angular/core';
+import { ChangeDetectorRef, Component, Input } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
 import createSubtopicConstants from 'assets/constants';
@@ -56,6 +56,8 @@ export class CreateNewSubtopicModalComponent {
   errorMsg: string;
   subtopicUrlFragmentExists: boolean;
   subtopicPage: SubtopicPage;
+  activeWrittenTranslation: {html: string} = {html: ''};
+  changeDetectorRef: ChangeDetectorRef;
 
   constructor(
     private topicEditorStateService: TopicEditorStateService,
@@ -77,7 +79,6 @@ export class CreateNewSubtopicModalComponent {
     };
     this.htmlData = '';
     this.schemaEditorIsShown = false;
-    this.editableThumbnailFilename = '';
     this.editableThumbnailBgColor = '';
     this.editableUrlFragment = '';
     this.allowedBgColors = (
@@ -93,6 +94,10 @@ export class CreateNewSubtopicModalComponent {
       this.topic, this.subtopicTitle,
       this.editableUrlFragment, this.allowedBgColors,
       this.editableThumbnailFilename);
+  }
+
+  getHtmlSchema(): SubtopicPageSchema {
+    return this.SUBTOPIC_PAGE_SCHEMA;
   }
 
   showSchemaEditor(): void {

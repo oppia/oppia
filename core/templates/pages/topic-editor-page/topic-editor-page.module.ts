@@ -24,20 +24,15 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { InteractionExtensionsModule } from 'interactions/interactions.module';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
-
-import { PracticeTabComponent } from
-  'pages/topic-viewer-page/practice-tab/practice-tab.component';
-import { StoriesListComponent } from
-  'pages/topic-viewer-page/stories-list/topic-viewer-stories-list.component';
-import { SubtopicsListComponent } from
-  'pages/topic-viewer-page/subtopics-list/subtopics-list.component';
+import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
+import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
+import { PracticeTabComponent } from 'pages/topic-viewer-page/practice-tab/practice-tab.component';
+import { StoriesListComponent } from 'pages/topic-viewer-page/stories-list/topic-viewer-stories-list.component';
+import { SubtopicsListComponent } from 'pages/topic-viewer-page/subtopics-list/subtopics-list.component';
 import { SubtopicPreviewTab } from './subtopic-editor/subtopic-preview-tab.component';
 import { TopicPreviewTabComponent } from './preview-tab/topic-preview-tab.component';
 import { TopicEditorNavbarBreadcrumbComponent } from './navbar/topic-editor-navbar-breadcrumb.component';
+import { CreateNewSubtopicModalComponent } from './modal-templates/create-new-subtopic-modal.component';
 
 @NgModule({
   imports: [
@@ -47,6 +42,7 @@ import { TopicEditorNavbarBreadcrumbComponent } from './navbar/topic-editor-navb
     SharedComponentsModule
   ],
   declarations: [
+    CreateNewSubtopicModalComponent,
     OppiaAngularRootComponent,
     PracticeTabComponent,
     StoriesListComponent,
@@ -56,6 +52,7 @@ import { TopicEditorNavbarBreadcrumbComponent } from './navbar/topic-editor-navb
     TopicEditorNavbarBreadcrumbComponent,
   ],
   entryComponents: [
+    CreateNewSubtopicModalComponent,
     OppiaAngularRootComponent,
     PracticeTabComponent,
     StoriesListComponent,
