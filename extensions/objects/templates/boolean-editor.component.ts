@@ -26,7 +26,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
   styleUrls: []
 })
 export class BooleanEditorComponent {
-  @Input() value;
+  @Input() value: boolean = false;
   @Output() valueChanged: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   setValue(e: boolean): void {
