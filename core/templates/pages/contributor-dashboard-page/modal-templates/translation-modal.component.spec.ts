@@ -35,7 +35,7 @@ class MockChangeDetectorRef {
   detectChanges(): void {}
 }
 
-fdescribe('Translation Modal Component', () => {
+describe('Translation Modal Component', () => {
   let contextService: ContextService;
   let translateTextService: TranslateTextService;
   let translationLanguageService: TranslationLanguageService;
@@ -90,14 +90,14 @@ fdescribe('Translation Modal Component', () => {
     translationLanguageService.setActiveLanguageCode('es');
   });
 
-  fit('should invoke change detection when html is updated', () => {
+  it('should invoke change detection when html is updated', () => {
     component.activeWrittenTranslation.html = 'old';
     spyOn(changeDetectorRef, 'detectChanges').and.callThrough();
     component.updateHtml('new');
     expect(component.activeWrittenTranslation.html).toEqual('new');
   });
 
-  fit('should not invoke change detection when html is not updated', () => {
+  it('should not invoke change detection when html is not updated', () => {
     component.activeWrittenTranslation.html = 'old';
     spyOn(changeDetectorRef, 'detectChanges').and.callThrough();
     component.updateHtml('old');
@@ -109,14 +109,14 @@ fdescribe('Translation Modal Component', () => {
     httpTestingController.verify();
   });
 
-  fit('should close', () => {
+  it('should close', () => {
     spyOn(activeModal, 'close');
     component.close();
     expect(activeModal.close).toHaveBeenCalled();
   });
 
-  fdescribe('when initialized', () => {
-    fdescribe('with an rtl language', () => {
+  describe('when initialized', () => {
+    describe('with an rtl language', () => {
       beforeEach(fakeAsync(() => {
         translationLanguageService.setActiveLanguageCode('ar');
         spyOn(translateTextService, 'init').and.callFake(
@@ -124,13 +124,13 @@ fdescribe('Translation Modal Component', () => {
         component.ngOnInit();
       }));
 
-      fit('should set the schema constant correctly', () => {
+      it('should set the schema constant correctly', () => {
         expect(component.getHtmlSchema().ui_config.languageDirection)
           .toBe('rtl');
       });
     });
 
-    fdescribe('with an ltr language', () => {
+    describe('with an ltr language', () => {
       beforeEach(fakeAsync(() => {
         translationLanguageService.setActiveLanguageCode('es');
         spyOn(translateTextService, 'init').and.callFake(
@@ -138,13 +138,13 @@ fdescribe('Translation Modal Component', () => {
         component.ngOnInit();
       }));
 
-      fit('should set the schema constant correctly', () => {
+      it('should set the schema constant correctly', () => {
         expect(component.getHtmlSchema().ui_config.languageDirection)
           .toBe('ltr');
       });
     });
 
-    fit('should set context correctly', fakeAsync(() => {
+    it('should set context correctly', fakeAsync(() => {
       contextService.removeCustomEntityContext();
       contextService.resetImageSaveDestination();
       spyOn(translateTextService, 'init').and.callFake(
@@ -157,7 +157,7 @@ fdescribe('Translation Modal Component', () => {
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
     }));
 
-    fit('should initialize translateTextService', fakeAsync(() => {
+    it('should initialize translateTextService', fakeAsync(() => {
       spyOn(translateTextService, 'init').and.callThrough();
       spyOn(translateTextService, 'getTextToTranslate').and.callThrough();
       spyOn(translateTextService, 'getPreviousTextToTranslate')
@@ -196,7 +196,7 @@ fdescribe('Translation Modal Component', () => {
       expect(component.moreAvailable).toBeTrue();
     }));
 
-    fit('should set the schema constant based on the active language', fakeAsync(
+    it('should set the schema constant based on the active language', fakeAsync(
       () => {
         translationLanguageService.setActiveLanguageCode('ar');
         spyOn(translateTextService, 'init').and.callFake(
@@ -207,7 +207,7 @@ fdescribe('Translation Modal Component', () => {
       }));
   });
 
-  fdescribe('when clicking on the translatable content', () => {
+  describe('when clicking on the translatable content', () => {
     const nonParagraphTarget: HTMLElement = document.createElement('div');
     const mathTarget: HTMLElement = document.createElement(
       'oppia-noninteractive-math');
@@ -232,43 +232,43 @@ fdescribe('Translation Modal Component', () => {
       };
     }));
 
-    fit('should not broadcast the clicked paragraph element', () => {
+    it('should not broadcast the clicked paragraph element', () => {
       paragraphTarget.click();
       expect(broadcastSpy).not.toHaveBeenCalledWith(paragraphTarget);
     });
 
-    fit('should broadcast the clicked non paragraph element', () => {
+    it('should broadcast the clicked non paragraph element', () => {
       nonParagraphTarget.click();
       expect(broadcastSpy).toHaveBeenCalledWith(nonParagraphTarget);
     });
 
-    fit('should broadcast the clicked math element', () => {
+    it('should broadcast the clicked math element', () => {
       paragraphTarget.append(mathTarget);
       paragraphTarget.click();
       expect(broadcastSpy).toHaveBeenCalledWith(paragraphTarget);
     });
 
-    fdescribe('when copy mode is active', () => {
+    describe('when copy mode is active', () => {
       beforeEach(() => {
         ckEditorCopyContentService.toggleCopyMode();
       });
 
-      fit('should prevent default behavior', () => {
+      it('should prevent default behavior', () => {
         nonParagraphTarget.click();
         expect(propagationSpy).toHaveBeenCalled();
       });
     });
 
-    fdescribe('when copy mode is inactive', () => {
-      fit('should not prevent default behavior', () => {
+    describe('when copy mode is inactive', () => {
+      it('should not prevent default behavior', () => {
         nonParagraphTarget.click();
         expect(propagationSpy).not.toHaveBeenCalled();
       });
     });
   });
 
-  fdescribe('when skipping the active translation', () => {
-    fdescribe('when there is available text', () => {
+  describe('when skipping the active translation', () => {
+    describe('when there is available text', () => {
       beforeEach(fakeAsync(() => {
         component.ngOnInit();
 
@@ -289,14 +289,14 @@ fdescribe('Translation Modal Component', () => {
       }));
 
 
-      fit('should retrieve remaining text and availability', () => {
+      it('should retrieve remaining text and availability', () => {
         expect(component.textToTranslate).toBe('text2');
         expect(component.moreAvailable).toBeFalse();
       });
     });
   });
 
-  fdescribe('when suggesting translated text', () => {
+  describe('when suggesting translated text', () => {
     let expectedPayload, imagesData;
     beforeEach(fakeAsync(() => {
       expectedPayload = {
@@ -333,7 +333,7 @@ fdescribe('Translation Modal Component', () => {
       component.activeWrittenTranslation.html = 'texto1';
     }));
 
-    fit('should remove paragraph error', fakeAsync(() => {
+    it('should remove paragraph error', fakeAsync(() => {
       component.hadCopyParagraphError = true;
 
       component.suggestTranslatedText();
@@ -348,7 +348,7 @@ fdescribe('Translation Modal Component', () => {
       flushMicrotasks();
     }));
 
-    fit('should correctly submit a translation suggestion', fakeAsync(() => {
+    it('should correctly submit a translation suggestion', fakeAsync(() => {
       component.suggestTranslatedText();
 
       const req = httpTestingController.expectOne(
@@ -360,7 +360,7 @@ fdescribe('Translation Modal Component', () => {
       flushMicrotasks();
     }));
 
-    fit('should correctly submit a translation suggestion', fakeAsync(() => {
+    it('should correctly submit a translation suggestion', fakeAsync(() => {
       spyOn(
         translateTextService,
         'getPreviousTextToTranslate'
@@ -377,8 +377,8 @@ fdescribe('Translation Modal Component', () => {
       expect(component.isSubmitted()).toBeTrue();
     }));
 
-    fdescribe('when already uploading a translation', () => {
-      fit('should not submit the translation', fakeAsync(() => {
+    describe('when already uploading a translation', () => {
+      it('should not submit the translation', fakeAsync(() => {
         spyOn(translateTextService, 'suggestTranslatedText').and.callThrough();
 
         component.suggestTranslatedText();
@@ -397,8 +397,8 @@ fdescribe('Translation Modal Component', () => {
       }));
     });
 
-    fdescribe('when currently loading data', () => {
-      fit('should not submit the translation', () => {
+    describe('when currently loading data', () => {
+      it('should not submit the translation', () => {
         component.loadingData = true;
         spyOn(translateTextService, 'suggestTranslatedText').and.callThrough();
 
@@ -409,8 +409,8 @@ fdescribe('Translation Modal Component', () => {
       });
     });
 
-    fdescribe('when all images are not copied', () => {
-      fit('should not submit the translation', () => {
+    describe('when all images are not copied', () => {
+      it('should not submit the translation', () => {
         component.textToTranslate = '<oppia-noninteractive-image alt-with-val' +
           'ue="&amp;quot;Image description&amp;quot;" caption-with-value="&' +
           'amp;quot;Image caption&amp;quot;" filepath-with-value="&amp;quot;' +
@@ -426,8 +426,8 @@ fdescribe('Translation Modal Component', () => {
       });
     });
 
-    fdescribe('when alt text is not changed in copied images', () => {
-      fit('should not submit the translation', () => {
+    describe('when alt text is not changed in copied images', () => {
+      it('should not submit the translation', () => {
         component.textToTranslate = '<oppia-noninteractive-image alt-with-' +
           'value="&amp;quot;Image description&amp;quot;" caption-with-value=' +
           '"&amp;quot;Image caption&amp;quot;" filepath-with-value="&amp;quot' +
@@ -447,8 +447,8 @@ fdescribe('Translation Modal Component', () => {
       });
     });
 
-    fdescribe('when caption is not changed in copied images', () => {
-      fit('should not submit the translation', () => {
+    describe('when caption is not changed in copied images', () => {
+      it('should not submit the translation', () => {
         component.textToTranslate = '<oppia-noninteractive-image alt-with-' +
           'value="&amp;quot;Image description&amp;quot;" caption-with-value=' +
           '"&amp;quot;Image caption&amp;quot;" filepath-with-value="&amp;quot' +
@@ -468,8 +468,8 @@ fdescribe('Translation Modal Component', () => {
       });
     });
 
-    fdescribe('when translation is not completed', () => {
-      fit('should not submit the translation', () => {
+    describe('when translation is not completed', () => {
+      it('should not submit the translation', () => {
         component.textToTranslate = '<p>First para</p><p>Second para</p>';
         component.activeWrittenTranslation.html = '<p>New First para</p>';
         spyOn(translateTextService, 'suggestTranslatedText').and.callThrough();
@@ -481,9 +481,9 @@ fdescribe('Translation Modal Component', () => {
       });
     });
 
-    fdescribe('when translation elements are not matching with the elements ' +
+    describe('when translation elements are not matching with the elements ' +
         'of the text to translate', () => {
-      fit('should not submit the translation', () => {
+      it('should not submit the translation', () => {
         component.textToTranslate = '<p>First para</p><p>Second para</p>';
         component.activeWrittenTranslation.html = '<p>New First para</p><div>' +
           '</div>';
@@ -496,8 +496,8 @@ fdescribe('Translation Modal Component', () => {
       });
     });
 
-    fdescribe('when original text has paragraphs with spaces', () => {
-      fit('should exclude paragraphs with spaces', () => {
+    describe('when original text has paragraphs with spaces', () => {
+      it('should exclude paragraphs with spaces', () => {
         component.textToTranslate = '<p>First para</p><p>&nbsp;</p>';
 
         const filteredText = component.modifyContentToValidate(
@@ -507,9 +507,9 @@ fdescribe('Translation Modal Component', () => {
       });
     });
 
-    fdescribe('when translated content has elements with missing child' +
+    describe('when translated content has elements with missing child' +
         ' elements', () => {
-      fit('should not submit the translation', () => {
+      it('should not submit the translation', () => {
         component.textToTranslate = '<p><strong>First</strong> para</p>';
         component.activeWrittenTranslation.html = '<p>New First para</p>';
         spyOn(translateTextService, 'suggestTranslatedText').and.callThrough();
@@ -521,9 +521,9 @@ fdescribe('Translation Modal Component', () => {
       });
     });
 
-    fdescribe('when translated content have elements with incorrect child' +
+    describe('when translated content have elements with incorrect child' +
         ' elements', () => {
-      fit('should not submit the translation', () => {
+      it('should not submit the translation', () => {
         component.textToTranslate = '<p><strong>First</strong> para</p>';
         component.activeWrittenTranslation.html = '<p><i>New</i> Para</p>';
         spyOn(translateTextService, 'suggestTranslatedText').and.callThrough();
@@ -535,8 +535,8 @@ fdescribe('Translation Modal Component', () => {
       });
     });
 
-    fdescribe('when alt text/caption is not included in original text', () => {
-      fit('should submit the translation', () => {
+    describe('when alt text/caption is not included in original text', () => {
+      it('should submit the translation', () => {
         component.textToTranslate = '<oppia-noninteractive-image filepath-' +
           'with-value="&amp;quot;img_20210624_184112_z05ty41osl_height_69_w' +
           'idth_363.png&amp;quot;" ng-version="11.2.14"></oppia-noninteract' +
@@ -555,7 +555,7 @@ fdescribe('Translation Modal Component', () => {
       });
     });
 
-    fdescribe('when suggesting the last available text', () => {
+    describe('when suggesting the last available text', () => {
       beforeEach(() => {
         expectedPayload = {
           suggestion_type: 'translate_content',
@@ -577,7 +577,7 @@ fdescribe('Translation Modal Component', () => {
         component.activeWrittenTranslation.html = 'texto2';
       });
 
-      fit('should close the modal', fakeAsync(() => {
+      it('should close the modal', fakeAsync(() => {
         spyOn(component, 'close');
         component.suggestTranslatedText();
 
@@ -592,7 +592,7 @@ fdescribe('Translation Modal Component', () => {
       }));
     });
 
-    fit('should register a contributor dashboard submit suggestion event',
+    it('should register a contributor dashboard submit suggestion event',
       () => {
         spyOn(
           siteAnalyticsService,
@@ -602,7 +602,7 @@ fdescribe('Translation Modal Component', () => {
         component.suggestTranslatedText();
       });
 
-    fit('should flush stored image data',
+    it('should flush stored image data',
       fakeAsync(() => {
         imagesData = [{
           filename: 'imageFilename1',
@@ -634,7 +634,7 @@ fdescribe('Translation Modal Component', () => {
         flushMicrotasks();
       }));
 
-    fit('should not reset the image save destination', () => {
+    it('should not reset the image save destination', () => {
       spyOn(translateTextService, 'suggestTranslatedText').and.stub();
       expect(contextService.getImageSaveDestination()).toBe(
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
@@ -643,7 +643,7 @@ fdescribe('Translation Modal Component', () => {
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
     });
 
-    fit('should reset the image save destination', fakeAsync(() => {
+    it('should reset the image save destination', fakeAsync(() => {
       component.suggestTranslatedText();
       const req = httpTestingController.expectOne(
         '/suggestionhandler/');

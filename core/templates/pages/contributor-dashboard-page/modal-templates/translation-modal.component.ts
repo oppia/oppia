@@ -308,8 +308,7 @@ export class TranslationModalComponent {
         this.addViolationMessage(
           originalElement.outerHTML,
           filteredTranslatedElements[i].outerHTML);
-      }
-      else {
+      } else {
         Array.from(originalElement.children).some((element, index) => {
           if (element.nodeName !== (
             filteredTranslatedElements[i].children[index].nodeName)) {
