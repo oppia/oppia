@@ -199,7 +199,7 @@ describe('Context service', () => {
       expect(ecs.getEntityType()).toBe('topic');
     });
 
-    it('should throw error if entity type is nulll', () => {
+    it('should throw error if entity type is null', () => {
       spyOn(urlService, 'getPathname').and.returnValue('//');
       spyOn(urlService, 'getHash').and.returnValue('');
       expect(() => ecs.getEntityType()).toThrowError('No Entity Type found!');

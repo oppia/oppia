@@ -71,14 +71,12 @@ export class CkEditorCopyContentService {
         containedWidgetTagName = currentTagName;
         break;
       }
-      if (currentElement.parentElement !== null) {
-        if (currentElement.parentElement.tagName ===
-              this.OUTPUT_VIEW_TAG_NAME
-        ) {
-          break;
-        }
-        currentElement = currentElement.parentElement;
+
+      if (currentElement.parentElement.tagName === this.OUTPUT_VIEW_TAG_NAME) {
+        break;
       }
+
+      currentElement = currentElement.parentElement;
     }
 
     let descendants = Array.from(target.childNodes);
@@ -123,7 +121,7 @@ export class CkEditorCopyContentService {
       containedWidgetTagName || element.tagName.toLowerCase());
     let html = element.outerHTML;
 
-    if (!containedWidgetTagName && editor !== undefined) {
+    if (!containedWidgetTagName) {
       editor.insertHtml(html);
     } else {
       const widgetName = elementTagName.replace('-noninteractive-', '');
