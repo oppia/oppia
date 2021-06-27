@@ -49,7 +49,6 @@ export interface BlogAdminPageData {
   updatableRoles: UserRolesBackendResponse;
 }
 
-
 @Injectable({
   providedIn: 'root'
 })
