@@ -18,7 +18,7 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, fakeAsync, flush, flushMicrotasks, TestBed, tick } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 
 import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
@@ -39,10 +39,10 @@ class MockWindowRef {
       search: 'search',
       hash: 'hash'
     },
-    open(){
+    open() {
       return;
     }
-  }
+  };
 }
 
 class MockReaderObject {
@@ -54,7 +54,7 @@ class MockReaderObject {
     };
   }
   readAsText(file) {
-    this.onload({target: {result : 'result'}});
+    this.onload({target: {result: 'result'}});
     return 'The file is loaded';
   }
 }
@@ -502,12 +502,13 @@ describe('Admin misc tab component ', () => {
   });
 
   it('should sumbit query when clicking on submit query button', () => {
-    let setQueryDataSpy = spyOn(component, 'setDataExtractionQueryStatusMessage').and.callThrough();
+    let setQueryDataSpy = spyOn(
+      component, 'setDataExtractionQueryStatusMessage').and.callThrough();
 
     component.submitQuery();
 
     expect(setQueryDataSpy).toHaveBeenCalledWith(
-      'Data extraction query has been submitted. Please wait.')
+      'Data extraction query has been submitted. Please wait.');
   });
 
   it('should reset form data on clicking reset button', () => {

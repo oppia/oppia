@@ -87,7 +87,7 @@ export class AdminMiscTabComponent {
     this.setStatusMessage.emit('Regenerating opportunities...');
     this.adminBackendApiService.regenerateOpportunitiesRelatedToTopicAsync(
       this.topicIdForRegeneratingOpportunities).then(response => {
-        this.setStatusMessage.emit(
+      this.setStatusMessage.emit(
         'No. of opportunities model created: ' +
         response);
     }, errorResponse => {

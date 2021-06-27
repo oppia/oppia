@@ -187,7 +187,6 @@ export class AdminBackendApiService {
       this.http.post<void>(
         handlerUrl, { action, ...payload }).toPromise()
         .then(response => {
-          console.log(response)
           resolve(response);
         }, errorResponse => {
           reject(errorResponse.error.error);
