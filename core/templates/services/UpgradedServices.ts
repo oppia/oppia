@@ -381,8 +381,6 @@ import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import { SpeechSynthesisChunkerService } from
   'services/speech-synthesis-chunker.service';
-import { StateCardObjectFactory } from
-  'domain/state_card/StateCardObjectFactory';
 import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
 import { StateContentService } from
@@ -1092,9 +1090,6 @@ export class UpgradedServices {
       new SkillRightsBackendApiService(
         upgradedServices['HttpClient'],
         upgradedServices['UrlInterpolationService']);
-    upgradedServices['StateCardObjectFactory'] =
-      new StateCardObjectFactory(
-        upgradedServices['AudioTranslationLanguageService']);
     upgradedServices['StateClassifierMappingService'] =
       new StateClassifierMappingService(
         upgradedServices['AppService'],
@@ -1191,8 +1186,6 @@ export class UpgradedServices {
     upgradedServices['ProfileLinkImageBackendApiService'] =
       new ProfileLinkImageBackendApiService(
         upgradedServices['HttpClient']);
-    upgradedServices['StateCardObjectFactory'] = new StateCardObjectFactory(
-      upgradedServices['AudioTranslationLanguageService']);
     upgradedServices['UserExplorationPermissionsService'] = (
       new UserExplorationPermissionsService(
         upgradedServices['ExplorationPermissionsBackendApiService']));

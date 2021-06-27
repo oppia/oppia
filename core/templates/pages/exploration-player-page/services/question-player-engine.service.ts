@@ -23,7 +23,7 @@ import { AppConstants } from 'app.constants';
 import { BindableVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { Question, QuestionBackendDict, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { State } from 'domain/state/StateObjectFactory';
-import { StateCard, StateCardObjectFactory } from 'domain/state_card/StateCardObjectFactory';
+import { StateCard } from 'domain/state_card/state-card.model';
 import { ExpressionInterpolationService } from 'expressions/expression-interpolation.service';
 import { InteractionAnswer } from 'interactions/answer-defs';
 import { AnswerClassificationService, InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
@@ -32,6 +32,8 @@ import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import { AudioTranslationLanguageService } from
+  'pages/exploration-player-page/services/audio-translation-language.service';
 
 @Injectable({
   providedIn: 'root'
@@ -45,13 +47,12 @@ export class QuestionPlayerEngineService {
   constructor(
       private alertsService: AlertsService,
       private answerClassificationService: AnswerClassificationService,
+      private audioTranslationLanguageService: AudioTranslationLanguageService,
       private contextService: ContextService,
       private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
       private expressionInterpolationService: ExpressionInterpolationService,
       private focusManagerService: FocusManagerService,
-      private questionObjectFactory: QuestionObjectFactory,
-      private stateCardObjectFactory: StateCardObjectFactory) {
-
+      private questionObjectFactory: QuestionObjectFactory) {
   }
 
   // Evaluate feedback.
@@ -112,10 +113,11 @@ export class QuestionPlayerEngineService {
         null);
     }
     const initialCard =
-      this.stateCardObjectFactory.createNewCard(
+      StateCard.createNewCard(
         null, questionHtml, interactionHtml, interaction,
         initialState.recordedVoiceovers,
-        initialState.writtenTranslations, initialState.content.contentId);
+        initialState.writtenTranslations, initialState.content.contentId,
+        this.audioTranslationLanguageService);
     successCallback(initialCard, nextFocusLabel);
   }
 
@@ -301,12 +303,13 @@ export class QuestionPlayerEngineService {
           AppConstants.ENTITY_TYPE.QUESTION,
           this.questions[this.nextIndex].getId());
       }
-      nextCard = this.stateCardObjectFactory.createNewCard(
+      nextCard = StateCard.createNewCard(
         'true', questionHtml, nextInteractionHtml,
         this.getNextStateData().interaction,
         this.getNextStateData().recordedVoiceovers,
         this.getNextStateData().writtenTranslations,
-        this.getNextStateData().content.contentId
+        this.getNextStateData().content.contentId,
+        this.audioTranslationLanguageService
       );
     } else if (!onSameCard) {
       this.contextService.removeCustomEntityContext();

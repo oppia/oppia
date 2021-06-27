@@ -27,7 +27,7 @@ import { Injectable } from '@angular/core';
 import cloneDeep from 'lodash/cloneDeep';
 
 import { LoggerService } from 'services/contextual/logger.service';
-import { StateCard } from 'domain/state_card/StateCardObjectFactory';
+import { StateCard } from 'domain/state_card/state-card.model';
 
 @Injectable({
   providedIn: 'root'

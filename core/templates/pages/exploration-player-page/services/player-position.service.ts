@@ -21,8 +21,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
-import { StateCard } from
-  'domain/state_card/StateCardObjectFactory';
+import { StateCard } from 'domain/state_card/state-card.model';
 
 interface HelpCardEventResponse {
   helpCardHtml: string;
