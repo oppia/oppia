@@ -24,6 +24,7 @@ from core.tests import test_utils
 class PayloadValidationUnitTests(test_utils.GenericTestBase):
 
     def test_invalid_args_raises_exceptions(self):
+        # type: () -> None
 
         # List of 3-tuples, where the first element is an invalid argument dict,
         # the second element is a schema dict and the third element
@@ -68,6 +69,7 @@ class PayloadValidationUnitTests(test_utils.GenericTestBase):
             self.assertEqual(error_msg, errors)
 
     def test_valid_args_do_not_raises_exception(self):
+        # type: () -> None
 
         # List of 3-tuples, where the first element is a valid argument dict,
         # the second element is a schema dict and the third element is the
