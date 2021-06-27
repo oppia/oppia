@@ -1,10 +1,10 @@
 <ng-template #tree let-node>
   <ng-container *ngFor="let childNode of node.children">
     <ng-container>
-        <ng-template [cdkPortalOutlet]="childNode.portal"></ng-template>
+      <ng-template [cdkPortalOutlet]="childNode.portal"></ng-template>
     </ng-container>
   </ng-container>
-</ng-template> 
+</ng-template>
 <ng-container *ngIf="show">
   <ng-container *ngTemplateOutlet="tree; context:{ $implicit: node }"></ng-container>
 </ng-container>
@@ -70,18 +70,18 @@
 <!-- Oppia Non Interactive *. -->
 <ng-template #collapsible let-attrs>
   <oppia-noninteractive-collapsible [headingWithValue]="attrs.headingWithValue" attr.heading-with-value="{{attrs.headingWithValue}}"
-                                     [contentWithValue]="attrs.contentWithValue" attr.content-with-value="{{attrs.contentWithValue}}">
+                                    [contentWithValue]="attrs.contentWithValue" attr.content-with-value="{{attrs.contentWithValue}}">
   </oppia-noninteractive-collapsible>
 </ng-template>
 <ng-template #image let-attrs>
   <oppia-noninteractive-image [filepathWithValue]="attrs.filepathWithValue" attr.filepath-with-value="{{attrs.filepathWithValue}}"
-                               [altWithValue]="attrs.altWithValue" attr.alt-with-value="{{attrs.altWithValue}}"
-                               [captionWithValue]="attrs.captionWithValue" attr.caption-with-value="{{attrs.captionWithValue}}">
+                              [altWithValue]="attrs.altWithValue" attr.alt-with-value="{{attrs.altWithValue}}"
+                              [captionWithValue]="attrs.captionWithValue" attr.caption-with-value="{{attrs.captionWithValue}}">
   </oppia-noninteractive-image>
 </ng-template>
 <ng-template #link let-attrs>
   <oppia-noninteractive-link [urlWithValue]="attrs.urlWithValue" attr.url-with-value="{{attrs.urlWithValue}}"
-                              [textWithValue]="attrs.textWithValue" attr.text-with-value="{{attrs.textWithValue}}">
+                             [textWithValue]="attrs.textWithValue" attr.text-with-value="{{attrs.textWithValue}}">
   </oppia-noninteractive-link>
 </ng-template>
 <ng-template #math let-attrs>
@@ -90,12 +90,12 @@
 </ng-template>
 <ng-template #skillreview let-attrs>
   <oppia-noninteractive-skillreview [skillIdWithValue]="attrs.skillIdWithValue" attr.skill_id-with-value="{{attrs.skillIdWithValue}}"
-                                     [textWithValue]="attrs.textWithValue" attr.text-with-value="{{attrs.textWithValue}}">
+                                    [textWithValue]="attrs.textWithValue" attr.text-with-value="{{attrs.textWithValue}}">
   </oppia-noninteractive-skillreview>
 </ng-template>
 <ng-template #svgdiagram let-attrs>
   <oppia-noninteractive-svgdiagram [svgFilenameWithValue]="attrs.svgFilenameWithValue" attr.svg_filename-with-value="{{attrs.svgFilenameWithValue}}"
-                                    [altWithValue]="attrs.altWithValue" attr.alt-with-value="{{attrs.altWithValue}}">
+                                   [altWithValue]="attrs.altWithValue" attr.alt-with-value="{{attrs.altWithValue}}">
   </oppia-noninteractive-svgdiagram>
 </ng-template>
 <ng-template #tabs let-attrs>
@@ -104,8 +104,8 @@
 </ng-template>
 <ng-template #video let-attrs>
   <oppia-noninteractive-video [autoplayWithValue]="attrs.autoplayWithValue" attr.autoplay-with-value="{{attrs.autoplayWithValue}}"
-                               [endWithValue]="attrs.endWithValue" attr.end-with-value="{{attrs.endWithValue}}"
-                               [startWithValue]="attrs.startWithValue" attr.start-with-value="{{attrs.startWithValue}}"
-                               [videoIdWithValue]="attrs.videoIdWithValue" attr.video_id-with-value="{{attrs.videoIdWithValue}}">
+                              [endWithValue]="attrs.endWithValue" attr.end-with-value="{{attrs.endWithValue}}"
+                              [startWithValue]="attrs.startWithValue" attr.start-with-value="{{attrs.startWithValue}}"
+                              [videoIdWithValue]="attrs.videoIdWithValue" attr.video_id-with-value="{{attrs.videoIdWithValue}}">
   </oppia-noninteractive-video>
 </ng-template>

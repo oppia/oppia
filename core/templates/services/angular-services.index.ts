@@ -363,6 +363,7 @@ import { CollectionLinearizerService } from 'pages/collection-editor-page/servic
 import { RefresherExplorationConfirmationModalService } from 'pages/exploration-player-page/services/refresher-exploration-confirmation-modal.service';
 import { ExplorationPlayerStateService } from 'pages/exploration-player-page/services/exploration-player-state.service';
 import { NavigationService } from './navigation.service';
+import { OppiaRteParserService } from './oppia-rte-parser.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AdminBackendApiService', AdminBackendApiService],
@@ -578,6 +579,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['NumericInputRulesService', NumericInputRulesService],
   ['NumericInputValidationService', NumericInputValidationService],
   ['OutcomeObjectFactory', OutcomeObjectFactory],
+  ['OppiaRteParserService', OppiaRteParserService],
   ['PageTitleService', PageTitleService],
   ['ParamChangeObjectFactory', ParamChangeObjectFactory],
   ['ParamChangesObjectFactory', ParamChangesObjectFactory],
