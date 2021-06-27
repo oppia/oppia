@@ -24,7 +24,8 @@ module.exports = merge(common, {
   mode: 'development',
   output: {
     filename: '[name].bundle.js',
-    path: path.resolve(__dirname, 'webpack_bundles')
+    path: path.resolve(__dirname, 'webpack_bundles'),
+    publicPath: '/webpack_bundles/'
   },
   devtool: 'eval',
   watchOptions: {

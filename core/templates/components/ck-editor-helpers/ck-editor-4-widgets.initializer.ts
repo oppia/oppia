@@ -54,6 +54,9 @@ export class CkEditorInitializerService {
       rteHelperService: RteHelperService,
       htmlEscaperService: HtmlEscaperService,
       contextService: ContextService, ngZone: NgZone): void {
+    if (rteHelperService === undefined) {
+      return;
+    }
     ngZone.runOutsideAngular(() => {
       var _RICH_TEXT_COMPONENTS = rteHelperService.getRichTextComponents();
       _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {

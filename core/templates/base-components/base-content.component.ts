@@ -16,7 +16,7 @@
  * @fileoverview Component for the Base Transclusion Component.
  */
 
-import { Component } from '@angular/core';
+import { Component, Directive } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { BottomNavbarStatusService } from 'services/bottom-navbar-status.service';
@@ -66,6 +66,11 @@ export class BaseContentComponent {
       (message: string) => this.loadingMessage = message
     );
     this.keyboardShortcutService.bindNavigationShortcuts();
+
+    // TODO(sll): Use 'touchstart' for mobile.
+    this.windowRef.nativeWindow.document.addEventListener('click', () => {
+      this.sidebarStatusService.onDocumentClick();
+    });
   }
 
   getHeaderText(): string {
@@ -113,6 +118,14 @@ export class BaseContentComponent {
     mainContentElement.focus();
   }
 }
+
+/**
+ * This directive is used as selector for navbar breadcrumb transclusion.
+ */
+@Directive({
+  selector: 'navbar-breadcrumb'
+})
+export class BaseContentNavBarBreadCrumbDirective {}
 
 angular.module('oppia').directive('oppiaBaseContent',
   downgradeComponent({

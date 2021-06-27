@@ -28,91 +28,25 @@ require('app.constants.ajs.ts');
  */
 
 angular.module('oppia').controller('Base', [
-  '$document', '$rootScope', '$scope', 'AlertsService', 'BackgroundMaskService',
+  '$rootScope', '$scope',
   'CsrfTokenService', 'DocumentAttributeCustomizationService', 'LoaderService',
-  'MetaTagCustomizationService', 'SidebarStatusService',
-  'UrlInterpolationService', 'UrlService', 'DEV_MODE',
-  'SITE_FEEDBACK_FORM_URL', 'SITE_NAME', 'SUPPORTED_SITE_LANGUAGES',
+  'UrlInterpolationService', 'SUPPORTED_SITE_LANGUAGES',
   function(
-      $document, $rootScope, $scope, AlertsService, BackgroundMaskService,
+      $rootScope, $scope,
       CsrfTokenService, DocumentAttributeCustomizationService, LoaderService,
-      MetaTagCustomizationService, SidebarStatusService,
-      UrlInterpolationService, UrlService, DEV_MODE,
-      SITE_FEEDBACK_FORM_URL, SITE_NAME, SUPPORTED_SITE_LANGUAGES) {
+      UrlInterpolationService, SUPPORTED_SITE_LANGUAGES) {
     var ctrl = this;
     $scope.getAssetUrl = function(path) {
       return UrlInterpolationService.getFullStaticAssetUrl(path);
     };
 
-    $scope.isBackgroundMaskActive = () => BackgroundMaskService.isMaskActive();
-    $scope.isSidebarShown = () => SidebarStatusService.isSidebarShown();
-    $scope.closeSidebarOnSwipe = () => SidebarStatusService.closeSidebar();
-
-    $scope.skipToMainContent = function() {
-      var mainContentElement = document.getElementById(
-        'oppia-main-content');
-
-      if (!mainContentElement) {
-        throw new Error('Variable mainContentElement is undefined.');
-      }
-      mainContentElement.tabIndex = -1;
-      mainContentElement.scrollIntoView();
-      mainContentElement.focus();
-    };
     ctrl.$onInit = function() {
-      $scope.siteName = SITE_NAME;
       $scope.currentLang = 'en';
       $scope.direction = 'ltr';
-      $scope.pageUrl = UrlService.getCurrentLocation().href;
-      $scope.iframed = UrlService.isIframed();
-      $scope.AlertsService = AlertsService;
-      $rootScope.DEV_MODE = DEV_MODE;
       // If this is nonempty, the whole page goes into 'Loading...' mode.
       LoaderService.hideLoadingScreen();
 
       CsrfTokenService.initializeToken();
-      MetaTagCustomizationService.addMetaTags([
-        {
-          propertyType: 'name',
-          propertyValue: 'application-name',
-          content: SITE_NAME
-        },
-        {
-          propertyType: 'name',
-          propertyValue: 'msapplication-square310x310logo',
-          content: $scope.getAssetUrl(
-            '/assets/images/logo/msapplication-large.png')
-        },
-        {
-          propertyType: 'name',
-          propertyValue: 'msapplication-wide310x150logo',
-          content: $scope.getAssetUrl(
-            '/assets/images/logo/msapplication-wide.png')
-        },
-        {
-          propertyType: 'name',
-          propertyValue: 'msapplication-square150x150logo',
-          content: $scope.getAssetUrl(
-            '/assets/images/logo/msapplication-square.png')
-        },
-        {
-          propertyType: 'name',
-          propertyValue: 'msapplication-square70x70logo',
-          content: $scope.getAssetUrl(
-            '/assets/images/logo/msapplication-tiny.png')
-        },
-        {
-          propertyType: 'property',
-          propertyValue: 'og:url',
-          content: $scope.pageUrl
-        },
-        {
-          propertyType: 'property',
-          propertyValue: 'og:image',
-          content: UrlInterpolationService.getStaticImageUrl(
-            '/logo/288x288_logo_mint.webp')
-        }
-      ]);
 
       // Listener function to catch the change in language preference.
       $rootScope.$on('$translateChangeSuccess', function(evt, response) {
@@ -124,13 +58,9 @@ angular.module('oppia').controller('Base', [
           }
         }
       });
-      $scope.siteFeedbackFormUrl = SITE_FEEDBACK_FORM_URL;
+
       DocumentAttributeCustomizationService.addAttribute(
         'lang', $scope.currentLang);
-      // TODO(sll): Use 'touchstart' for mobile.
-      $document.on('click', function() {
-        SidebarStatusService.onDocumentClick();
-      });
     };
   }
 ]);

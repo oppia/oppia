@@ -16,7 +16,7 @@
  * @fileoverview Component for changing site language.
  */
 
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
@@ -38,6 +38,7 @@ export class I18nLanguageSelectorComponent {
   supportedSiteLanguages: readonly SiteLanguage[];
 
   constructor(
+    private changeDetectorRef: ChangeDetectorRef,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private userService: UserService,
     private userBackendApiService: UserBackendApiService
@@ -47,6 +48,12 @@ export class I18nLanguageSelectorComponent {
     this.currentLanguageCode = this.i18nLanguageCodeService
       .getCurrentI18nLanguageCode();
     this.supportedSiteLanguages = AppConstants.SUPPORTED_SITE_LANGUAGES;
+    this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe((code) => {
+      if (this.currentLanguageCode !== code) {
+        this.currentLanguageCode = code;
+        this.changeDetectorRef.detectChanges();
+      }
+    });
   }
 
   changeLanguage(): void {

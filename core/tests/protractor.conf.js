@@ -309,10 +309,6 @@ exports.config = {
   // with relative paths will be prepended with this.
   baseUrl: 'http://localhost:9001',
 
-  // Selector for the element housing the angular app - this defaults to
-  // body, but is necessary if ng-app is on a descendant of <body>.
-  rootElement: 'body',
-
   // A callback function called once protractor is ready and available, and
   // before the specs are executed
   // You can specify a file containing code to run by setting onPrepare to
