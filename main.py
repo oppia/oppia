@@ -222,7 +222,7 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'%s' % feconf.ADMIN_URL, admin.AdminPage),
     get_redirect_route(
         r'/initialize_android_test_data',
-        android_e2e_config.InitializeAndroidTestData),
+        android_e2e_config.InitializeAndroidTestDataHandler),
     get_redirect_route(r'/adminhandler', admin.AdminHandler),
     get_redirect_route(r'/adminrolehandler', admin.AdminRoleHandler),
     get_redirect_route(

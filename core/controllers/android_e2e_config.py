@@ -20,6 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import os
 
 from constants import constants
+from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -43,9 +44,10 @@ import feconf
 import python_utils
 
 
-class InitializeAndroidTestData(base.BaseHandler):
+class InitializeAndroidTestDataHandler(base.BaseHandler):
     """Handler to initialize android specific structures."""
 
+    @acl_decorators.open_access
     def post(self):
         if not constants.DEV_MODE:
             raise Exception('Cannot load new structures data in production.')
