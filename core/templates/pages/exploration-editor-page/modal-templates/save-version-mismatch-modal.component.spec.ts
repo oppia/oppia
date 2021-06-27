@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for SaveVersionMismatchModalComponent.
  */
 
-import { Component, ElementRef, NO_ERRORS_SCHEMA } from '@angular/core';
+import { Component, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { WindowRef } from 'services/contextual/window-ref.service';
