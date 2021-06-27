@@ -185,6 +185,9 @@ PERIOD_TO_MARK_MODELS_AS_DELETED = datetime.timedelta(weeks=4)
 # limit applies to both the explorations playlist and the collections playlist.
 MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT = 10
 
+# The maximum number of goals allowed in the learner goals of the learner.
+MAX_CURRENT_GOALS_COUNT = 5
+
 # The minimum number of training samples required for training a classifier.
 MIN_TOTAL_TRAINING_EXAMPLES = 50
 
@@ -818,6 +821,7 @@ LEARNER_DASHBOARD_URL = '/learner-dashboard'
 LEARNER_DASHBOARD_DATA_URL = '/learnerdashboardhandler/data'
 LEARNER_DASHBOARD_IDS_DATA_URL = '/learnerdashboardidshandler/data'
 LEARNER_DASHBOARD_FEEDBACK_THREAD_DATA_URL = '/learnerdashboardthreadhandler'
+LEARNER_GOALS_DATA_URL = '/learnergoalshandler'
 LEARNER_PLAYLIST_DATA_URL = '/learnerplaylistactivityhandler'
 LEARNER_INCOMPLETE_ACTIVITY_DATA_URL = '/learnerincompleteactivityhandler'
 LIBRARY_GROUP_DATA_URL = '/librarygrouphandler'

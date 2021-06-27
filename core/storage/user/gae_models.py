@@ -416,7 +416,7 @@ class CompletedActivitiesModel(base_models.BaseModel):
             'collection_ids': base_models.EXPORT_POLICY.EXPORTED,
             'story_ids': base_models.EXPORT_POLICY.EXPORTED,
             'learnt_topic_ids': base_models.EXPORT_POLICY.EXPORTED,
-            'mastered_topic_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'mastered_topic_ids': base_models.EXPORT_POLICY.EXPORTED
         })
 
     @classmethod
@@ -464,7 +464,8 @@ class CompletedActivitiesModel(base_models.BaseModel):
             'exploration_ids': user_model.exploration_ids,
             'collection_ids': user_model.collection_ids,
             'story_ids': user_model.story_ids,
-            'learnt_topic_ids': user_model.learnt_topic_ids
+            'learnt_topic_ids': user_model.learnt_topic_ids,
+            'mastered_topic_ids': user_model.mastered_topic_ids
         }
 
 
@@ -512,7 +513,7 @@ class IncompleteActivitiesModel(base_models.BaseModel):
             'story_ids': base_models.EXPORT_POLICY.EXPORTED,
             'partially_learnt_topic_ids': base_models.EXPORT_POLICY.EXPORTED,
             'partially_mastered_topic_ids': (
-                base_models.EXPORT_POLICY.NOT_APPLICABLE)
+                base_models.EXPORT_POLICY.EXPORTED)
         })
 
     @classmethod
@@ -559,7 +560,10 @@ class IncompleteActivitiesModel(base_models.BaseModel):
             'exploration_ids': user_model.exploration_ids,
             'collection_ids': user_model.collection_ids,
             'story_ids': user_model.story_ids,
-            'partially_learnt_topic_ids': user_model.partially_learnt_topic_ids
+            'partially_learnt_topic_ids': (
+                user_model.partially_learnt_topic_ids),
+            'partially_mastered_topic_ids': (
+                user_model.partially_mastered_topic_ids)
         }
 
 
@@ -701,6 +705,81 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
             }
 
         return user_data
+
+
+class LearnerGoalsModel(base_models.BaseModel):
+    """Keeps track of all the topics to learn.
+
+    Instances of this class are keyed by the user id.
+    """
+
+    # IDs of all the topics selected by the user to learn.
+    topic_ids_to_learn = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
+    # IDs of all the topics selected by the user to master.
+    topic_ids_to_master = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
+
+    @staticmethod
+    def get_deletion_policy():
+        """Model contains data to delete corresponding to a user: id field."""
+        return base_models.DELETION_POLICY.DELETE
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model is exported as one instance per user."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
+
+    @classmethod
+    def get_export_policy(cls):
+        """Model contains data to export corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'topic_ids_to_learn': base_models.EXPORT_POLICY.EXPORTED,
+            'topic_ids_to_master': base_models.EXPORT_POLICY.EXPORTED
+        })
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id):
+        """Delete instance of LearnerGoalsModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        cls.delete_by_id(user_id)
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether LearnerGoalsModel exists for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether the model for user_id exists.
+        """
+        return cls.get_by_id(user_id) is not None
+
+    @staticmethod
+    def export_data(user_id):
+        """(Takeout) Export user-relevant properties of LearnerGoalsModel.
+
+        Args:
+            user_id: str. The user_id denotes which user's data to extract.
+
+        Returns:
+            dict or None. A dict with one keys, 'topic_ids_to_learn'.
+            The corresponding values is the list of IDs of the topics
+            which the given user has as their goal.
+            If the user_id is invalid, returns None instead.
+        """
+        user_model = LearnerGoalsModel.get(user_id, strict=False)
+        if user_model is None:
+            return {}
+
+        return {
+            'topic_ids_to_learn': user_model.topic_ids_to_learn,
+            'topic_ids_to_master': user_model.topic_ids_to_master
+        }
 
 
 class LearnerPlaylistModel(base_models.BaseModel):
