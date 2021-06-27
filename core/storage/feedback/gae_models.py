@@ -735,7 +735,7 @@ class FeedbackAnalyticsModel(base_models.BaseMapReduceBatchResultsModel):
     The key of each instance is the exploration ID.
     """
 
-    # NOTE TO DEVELOPERS: The method create() was removed in #XXX as part of
+    # NOTE TO DEVELOPERS: The method create() was removed in #13237 as part of
     # the migration to Apache Beam. Please refer to that PR if you need to
     # reinstate it.
 
