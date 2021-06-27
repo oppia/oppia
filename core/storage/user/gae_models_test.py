@@ -339,7 +339,8 @@ class CompletedActivitiesModelTests(test_utils.GenericTestBase):
             'exploration_ids': self.EXPLORATION_IDS_1,
             'collection_ids': self.COLLECTION_IDS_1,
             'story_ids': self.STORY_IDS_1,
-            'learnt_topic_ids': self.TOPIC_IDS_1
+            'learnt_topic_ids': self.TOPIC_IDS_1,
+            'mastered_topic_ids': []
         }
         self.assertEqual(expected_data, user_data)
 
@@ -418,7 +419,78 @@ class IncompleteActivitiesModelTests(test_utils.GenericTestBase):
             'exploration_ids': self.EXPLORATION_IDS_1,
             'collection_ids': self.COLLECTION_IDS_1,
             'story_ids': self.STORY_IDS_1,
-            'partially_learnt_topic_ids': self.TOPIC_IDS_1
+            'partially_learnt_topic_ids': self.TOPIC_IDS_1,
+            'partially_mastered_topic_ids': []
+        }
+        self.assertEqual(expected_data, user_data)
+
+
+class LearnerGoalsModelTests(test_utils.GenericTestBase):
+    """Tests for the LearnerGoalsModel."""
+
+    NONEXISTENT_USER_ID = 'id_x'
+    USER_1_ID = 'id_1'
+    USER_2_ID = 'id_2'
+    TOPIC_IDS = ['topic_1', 'topic_2', 'topic_3']
+
+    def setUp(self):
+        """Set up user models in datastore for use in testing."""
+        super(LearnerGoalsModelTests, self).setUp()
+
+        user_models.LearnerGoalsModel(
+            id=self.USER_1_ID,
+            topic_ids_to_learn=self.TOPIC_IDS,
+            topic_ids_to_master=[]
+        ).put()
+        user_models.LearnerGoalsModel(
+            id=self.USER_2_ID,
+            topic_ids_to_learn=self.TOPIC_IDS,
+            topic_ids_to_master=[],
+            deleted=True
+        ).put()
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.LearnerGoalsModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
+
+    def test_apply_deletion_policy(self):
+        user_models.LearnerGoalsModel.apply_deletion_policy(
+            self.USER_1_ID)
+        self.assertIsNone(
+            user_models.LearnerGoalsModel.get_by_id(self.USER_1_ID))
+        # Test that calling apply_deletion_policy with no existing model
+        # doesn't fail.
+        user_models.LearnerGoalsModel.apply_deletion_policy(
+            self.NONEXISTENT_USER_ID)
+
+    def test_has_reference_to_user_id(self):
+        self.assertTrue(
+            user_models.LearnerGoalsModel
+            .has_reference_to_user_id(self.USER_1_ID)
+        )
+        self.assertTrue(
+            user_models.LearnerGoalsModel
+            .has_reference_to_user_id(self.USER_2_ID)
+        )
+        self.assertFalse(
+            user_models.LearnerGoalsModel
+            .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
+        )
+
+    def test_export_data_on_nonexistent_user(self):
+        """Test if export_data returns None when user is not in datastore."""
+        user_data = user_models.LearnerGoalsModel.export_data(
+            self.NONEXISTENT_USER_ID)
+        self.assertEqual({}, user_data)
+
+    def test_export_data_on_existent_user(self):
+        """Test if export_data works as intended on a user in datastore."""
+        user_data = (
+            user_models.LearnerGoalsModel.export_data(self.USER_1_ID))
+        expected_data = {
+            'topic_ids_to_learn': self.TOPIC_IDS,
+            'topic_ids_to_master': []
         }
         self.assertEqual(expected_data, user_data)
 

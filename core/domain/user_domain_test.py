@@ -826,6 +826,44 @@ class CompletedActivitiesTests(test_utils.GenericTestBase):
             completed_activities.learnt_topic_ids, [])
 
 
+class LearnerGoalsTests(test_utils.GenericTestBase):
+    """Testing domain object for learner goals model."""
+
+    def test_initialization(self):
+        """Testing init method."""
+        learner_goals = (
+            user_domain.LearnerGoals('user_id0', ['topic_id0'], []))
+
+        self.assertListEqual(
+            learner_goals.topic_ids_to_learn, ['topic_id0'])
+
+    def test_add_topic_id_to_learn(self):
+        """Testing add_topic_id_to_learn."""
+        learner_goals = (
+            user_domain.LearnerGoals('user_id0', ['topic_id0'], []))
+
+        self.assertListEqual(
+            learner_goals.topic_ids_to_learn, ['topic_id0'])
+
+        learner_goals.add_topic_id_to_learn('topic_id1')
+
+        self.assertListEqual(
+            learner_goals.topic_ids_to_learn, ['topic_id0', 'topic_id1'])
+
+    def test_remove_topic_id_to_learn(self):
+        """Testing remove_topic_id_to_learn."""
+        learner_goals = (
+            user_domain.LearnerGoals('user_id0', ['topic_id0'], []))
+
+        self.assertListEqual(
+            learner_goals.topic_ids_to_learn, ['topic_id0'])
+
+        learner_goals.remove_topic_id_from_learn('topic_id0')
+
+        self.assertListEqual(
+            learner_goals.topic_ids_to_learn, [])
+
+
 class LearnerPlaylistTests(test_utils.GenericTestBase):
     """Testing domain object for the learner playlist."""
 

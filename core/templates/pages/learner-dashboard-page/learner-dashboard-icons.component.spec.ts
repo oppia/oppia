@@ -78,6 +78,7 @@ describe('Learner Dashboard Icons Component', () => {
         completed_collection_ids: [],
         completed_story_ids: [],
         learnt_topic_ids: [],
+        topic_ids_to_learn: [],
         exploration_playlist_ids: [],
         collection_playlist_ids: []
       });
@@ -165,6 +166,7 @@ describe('Learner Dashboard Icons Component', () => {
         completed_collection_ids: [],
         completed_story_ids: [],
         learnt_topic_ids: [],
+        topic_ids_to_learn: [],
         exploration_playlist_ids: [],
         collection_playlist_ids: []
       });
@@ -189,6 +191,7 @@ describe('Learner Dashboard Icons Component', () => {
         completed_collection_ids: [],
         completed_story_ids: [],
         learnt_topic_ids: [],
+        topic_ids_to_learn: [],
         exploration_playlist_ids: ['1'],
         collection_playlist_ids: []
       });
@@ -214,6 +217,7 @@ describe('Learner Dashboard Icons Component', () => {
         completed_collection_ids: [],
         completed_story_ids: [],
         learnt_topic_ids: [],
+        topic_ids_to_learn: [],
         exploration_playlist_ids: ['1'],
         collection_playlist_ids: []
       });
@@ -239,6 +243,7 @@ describe('Learner Dashboard Icons Component', () => {
         completed_collection_ids: [],
         completed_story_ids: [],
         learnt_topic_ids: [],
+        topic_ids_to_learn: [],
         exploration_playlist_ids: [],
         collection_playlist_ids: ['1']
       });
@@ -264,6 +269,7 @@ describe('Learner Dashboard Icons Component', () => {
         completed_collection_ids: [],
         completed_story_ids: [],
         learnt_topic_ids: [],
+        topic_ids_to_learn: [],
         exploration_playlist_ids: [],
         collection_playlist_ids: []
       });
@@ -289,6 +295,7 @@ describe('Learner Dashboard Icons Component', () => {
         completed_collection_ids: ['1'],
         completed_story_ids: [],
         learnt_topic_ids: [],
+        topic_ids_to_learn: [],
         exploration_playlist_ids: [],
         collection_playlist_ids: []
       });
@@ -314,6 +321,7 @@ describe('Learner Dashboard Icons Component', () => {
         completed_collection_ids: [],
         completed_story_ids: ['1'],
         learnt_topic_ids: [],
+        topic_ids_to_learn: [],
         exploration_playlist_ids: [],
         collection_playlist_ids: []
       });
@@ -339,6 +347,7 @@ describe('Learner Dashboard Icons Component', () => {
         completed_collection_ids: [],
         completed_story_ids: [],
         learnt_topic_ids: ['1'],
+        topic_ids_to_learn: [],
         exploration_playlist_ids: [],
         collection_playlist_ids: []
       });
@@ -364,6 +373,7 @@ describe('Learner Dashboard Icons Component', () => {
         completed_collection_ids: [],
         completed_story_ids: [],
         learnt_topic_ids: [],
+        topic_ids_to_learn: [],
         exploration_playlist_ids: [],
         collection_playlist_ids: []
       });
@@ -389,6 +399,7 @@ describe('Learner Dashboard Icons Component', () => {
         completed_collection_ids: [],
         completed_story_ids: [],
         learnt_topic_ids: [],
+        topic_ids_to_learn: [],
         exploration_playlist_ids: [],
         collection_playlist_ids: []
       });
@@ -414,6 +425,7 @@ describe('Learner Dashboard Icons Component', () => {
         completed_collection_ids: [],
         completed_story_ids: [],
         learnt_topic_ids: [],
+        topic_ids_to_learn: [],
         exploration_playlist_ids: [],
         collection_playlist_ids: []
       });
@@ -439,6 +451,7 @@ describe('Learner Dashboard Icons Component', () => {
         completed_collection_ids: [],
         completed_story_ids: [],
         learnt_topic_ids: [],
+        topic_ids_to_learn: [],
         exploration_playlist_ids: [],
         collection_playlist_ids: []
       });
@@ -464,6 +477,7 @@ describe('Learner Dashboard Icons Component', () => {
         completed_collection_ids: [],
         completed_story_ids: [],
         learnt_topic_ids: [],
+        topic_ids_to_learn: [],
         exploration_playlist_ids: [],
         collection_playlist_ids: []
       });
@@ -489,6 +503,7 @@ describe('Learner Dashboard Icons Component', () => {
         completed_collection_ids: [],
         completed_story_ids: [],
         learnt_topic_ids: [],
+        topic_ids_to_learn: [],
         exploration_playlist_ids: [],
         collection_playlist_ids: []
       });
@@ -514,6 +529,7 @@ describe('Learner Dashboard Icons Component', () => {
         completed_collection_ids: [],
         completed_story_ids: [],
         learnt_topic_ids: [],
+        topic_ids_to_learn: [],
         exploration_playlist_ids: [],
         collection_playlist_ids: []
       });
@@ -539,6 +555,7 @@ describe('Learner Dashboard Icons Component', () => {
         completed_collection_ids: [],
         completed_story_ids: [],
         learnt_topic_ids: [],
+        topic_ids_to_learn: [],
         exploration_playlist_ids: [],
         collection_playlist_ids: []
       });
@@ -564,6 +581,7 @@ describe('Learner Dashboard Icons Component', () => {
         completed_collection_ids: [],
         completed_story_ids: [],
         learnt_topic_ids: [],
+        topic_ids_to_learn: [],
         exploration_playlist_ids: [],
         collection_playlist_ids: []
       });
@@ -589,6 +607,7 @@ describe('Learner Dashboard Icons Component', () => {
         completed_collection_ids: [],
         completed_story_ids: [],
         learnt_topic_ids: [],
+        topic_ids_to_learn: [],
         exploration_playlist_ids: [],
         collection_playlist_ids: []
       });
@@ -614,6 +633,7 @@ describe('Learner Dashboard Icons Component', () => {
         completed_collection_ids: [],
         completed_story_ids: [],
         learnt_topic_ids: [],
+        topic_ids_to_learn: [],
         exploration_playlist_ids: [],
         collection_playlist_ids: []
       });
@@ -639,6 +659,7 @@ describe('Learner Dashboard Icons Component', () => {
         completed_collection_ids: [],
         completed_story_ids: [],
         learnt_topic_ids: [],
+        topic_ids_to_learn: [],
         exploration_playlist_ids: [],
         collection_playlist_ids: []
       });
@@ -706,6 +727,7 @@ describe('Learner Dashboard Icons Component', () => {
         completed_collection_ids: [],
         completed_story_ids: [],
         learnt_topic_ids: [],
+        topic_ids_to_learn: [],
         exploration_playlist_ids: [],
         collection_playlist_ids: []
       });
@@ -738,6 +760,7 @@ describe('Learner Dashboard Icons Component', () => {
         completed_collection_ids: [],
         completed_story_ids: [],
         learnt_topic_ids: [],
+        topic_ids_to_learn: [],
         exploration_playlist_ids: [],
         collection_playlist_ids: []
       });
@@ -770,6 +793,7 @@ describe('Learner Dashboard Icons Component', () => {
         completed_collection_ids: [],
         completed_story_ids: [],
         learnt_topic_ids: [],
+        topic_ids_to_learn: [],
         exploration_playlist_ids: [],
         collection_playlist_ids: []
       });
@@ -802,6 +826,7 @@ describe('Learner Dashboard Icons Component', () => {
         completed_collection_ids: [],
         completed_story_ids: [],
         learnt_topic_ids: [],
+        topic_ids_to_learn: [],
         exploration_playlist_ids: [],
         collection_playlist_ids: []
       });

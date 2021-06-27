@@ -30,8 +30,9 @@ class LearnerProgress(python_utils.OBJECT):
             incomplete_collection_summaries,
             partially_learnt_topic_summaries, completed_exp_summaries,
             completed_collection_summaries, completed_story_summaries,
-            learnt_topic_summaries, exploration_playlist,
-            collection_playlist, completed_to_incomplete_collection_titles,
+            learnt_topic_summaries, topics_to_learn_summaries,
+            exploration_playlist, collection_playlist,
+            completed_to_incomplete_collection_titles,
             completed_to_incomplete_story_titles,
             learnt_to_partially_learnt_topic_titles):
         """Constructs a LearnerProgress domain object.
@@ -53,6 +54,8 @@ class LearnerProgress(python_utils.OBJECT):
                 summaries of the stories completed by the learner.
             learnt_topic_summaries: list(TopicSummary). The
                 summaries of the topics learnt by the learner.
+            topics_to_learn_summaries: list(TopicSummary). The
+                summaries of the topics to learn.
             exploration_playlist: list(ExplorationSummary). The summaries of the
                 explorations in the learner playlist.
             collection_playlist: list(CollectionSummary). The summaries of the
@@ -77,6 +80,7 @@ class LearnerProgress(python_utils.OBJECT):
         self.completed_collection_summaries = completed_collection_summaries
         self.completed_story_summaries = completed_story_summaries
         self.learnt_topic_summaries = learnt_topic_summaries
+        self.topics_to_learn_summaries = topics_to_learn_summaries
         self.exploration_playlist_summaries = exploration_playlist
         self.collection_playlist_summaries = collection_playlist
         self.completed_to_incomplete_collections = (
@@ -96,7 +100,7 @@ class ActivityIdsInLearnerDashboard(python_utils.OBJECT):
             self, completed_exploration_ids, completed_collection_ids,
             completed_story_ids, learnt_topic_ids,
             incomplete_exploration_ids, incomplete_collection_ids,
-            partially_learnt_topic_ids,
+            partially_learnt_topic_ids, topic_ids_to_learn,
             exploration_playlist_ids, collection_playlist_ids):
         """Constructs a ActivityIdsInLearnerDashboard domain object.
 
@@ -115,6 +119,7 @@ class ActivityIdsInLearnerDashboard(python_utils.OBJECT):
                 currently in progress.
             partially_learnt_topic_ids: list(str). The ids of the topics
                 partially learnt.
+            topic_ids_to_learn: list(str). The ids of the topics to learn.
             exploration_playlist_ids: list(str). The ids of the explorations
                 in the playlist of the user.
             collection_playlist_ids: list(str). The ids of the collections
@@ -127,6 +132,7 @@ class ActivityIdsInLearnerDashboard(python_utils.OBJECT):
         self.incomplete_exploration_ids = incomplete_exploration_ids
         self.incomplete_collection_ids = incomplete_collection_ids
         self.partially_learnt_topic_ids = partially_learnt_topic_ids
+        self.topic_ids_to_learn = topic_ids_to_learn
         self.exploration_playlist_ids = exploration_playlist_ids
         self.collection_playlist_ids = collection_playlist_ids
 
@@ -149,6 +155,8 @@ class ActivityIdsInLearnerDashboard(python_utils.OBJECT):
                     collections that are incomplete.
                 'partially_learnt_topic_ids': list(str). The ids of the
                     topics that are partially learnt.
+                'topic_ids_to_learn': list(str). The ids of the topics
+                    to learn.
                 'exploration_playlist_ids': list(str). The ids of the
                     explorations that are in the playlist
                 'collection_playlist_ids': list(str). The ids of the
@@ -163,6 +171,7 @@ class ActivityIdsInLearnerDashboard(python_utils.OBJECT):
             'incomplete_exploration_ids': self.incomplete_exploration_ids,
             'incomplete_collection_ids': self.incomplete_collection_ids,
             'partially_learnt_topic_ids': self.partially_learnt_topic_ids,
+            'topic_ids_to_learn': self.topic_ids_to_learn,
             'exploration_playlist_ids': self.exploration_playlist_ids,
-            'collection_playlist_ids': self.collection_playlist_ids
+            'collection_playlist_ids': self.collection_playlist_ids,
         }
