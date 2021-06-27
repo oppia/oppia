@@ -36,7 +36,7 @@ import { NoninteractiveSkillreview } from './Skillreview/directives/oppia-nonint
 import { OppiaNoninteractiveSkillreviewConceptCardModalComponent } from './Skillreview/directives/oppia-noninteractive-skillreview-concept-card-modal.component';
 import { ConceptCardComponent } from 'components/concept-card/concept-card.directive';
 import { PortalModule } from '@angular/cdk/portal';
-import { RteOutputDisplayComponent } from './rte-output-display.component';
+import { OppiaRteTextNodeDirective, RteOutputDisplayComponent } from './rte-output-display.component';
 
 
 @NgModule({
@@ -63,7 +63,8 @@ import { RteOutputDisplayComponent } from './rte-output-display.component';
     NoninteractiveTabs,
     NoninteractiveVideo,
     OppiaNoninteractiveSkillreviewConceptCardModalComponent,
-    RteOutputDisplayComponent
+    RteOutputDisplayComponent,
+    OppiaRteTextNodeDirective
   ],
   entryComponents: [
     NoninteractiveCollapsible,
@@ -88,7 +89,8 @@ import { RteOutputDisplayComponent } from './rte-output-display.component';
     NoninteractiveTabs,
     NoninteractiveVideo,
     OppiaNoninteractiveSkillreviewConceptCardModalComponent,
-    RteOutputDisplayComponent
+    RteOutputDisplayComponent,
+    OppiaRteTextNodeDirective
   ],
 })
 

@@ -325,8 +325,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnDestroy {
       $('.cke_button_icon')
         .css('height', '24px')
         .css('width', '24px');
-      const wrapper = wrapComponents(this.value);
-      ck.setData(wrapper);
+      ck.setData(wrapComponents(this.value));
     });
 
     // Angular rendering of components confuses CKEditor's undo system, so

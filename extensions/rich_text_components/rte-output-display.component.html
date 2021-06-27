@@ -65,7 +65,7 @@
   </em>
 </ng-template>
 <ng-template #text let-childNode>
-  {{childNode.value}}
+  <ng-container [oppiaRteTextNode]="childNode.value"></ng-container>
 </ng-template>
 <!-- Oppia Non Interactive *. -->
 <ng-template #collapsible let-attrs>

@@ -17,7 +17,8 @@
  */
 
 import { TemplatePortal } from '@angular/cdk/portal';
-import { AfterViewInit, ChangeDetectorRef, Component, Input, SimpleChanges, TemplateRef, ViewChild, ViewContainerRef } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, Directive, ElementRef, Input, SecurityContext, SimpleChanges, TemplateRef, ViewChild, ViewContainerRef } from '@angular/core';
+import { DomSanitizer } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { OppiaRteParserService, OppiaRteNode, TextNode } from 'services/oppia-rte-parser.service';
 
@@ -78,6 +79,7 @@ export class RteOutputDisplayComponent implements AfterViewInit {
     // There is no other via user input to get <p></p>, so this wouldn't
     // affect any other data.
     this.rteString = this.rteString.replace(/<p><\/p>/g, '<p>&nbsp;</p>');
+    this.rteString = this.rteString.replace(/\n/g, '');
     let domparser = new DOMParser();
     let dom = domparser.parseFromString(this.rteString, 'text/html').body;
     this.node = this.oppiaHtmlParserService.constructFromDomParser(dom);
@@ -137,3 +139,29 @@ export class RteOutputDisplayComponent implements AfterViewInit {
 angular.module('oppia').directive('oppiaRteOutputDisplay', downgradeComponent({
   component: RteOutputDisplayComponent
 }));
+
+/**
+ * The directive below is required because of the following reasons:
+ * 1. Angular adds a space in front and at the back while using string
+ *    interpolation. This causes problems in Displaying <pre></pre> content.
+ * 2. We have &nbsp; in the string, this has to be passed inside innerHTML.
+ *    String interpolation is a very safe operation and these values are not
+ *    displayed as is.
+ * 3. We can't use innerHTML for ng-container (we can, but ng-container is
+ *    nothing but a comment in dom, so adding innerHTML to ng-container won't
+ *    display any output as it is part of the dom.
+ */
+@Directive({ selector: '[oppiaRteTextNode]' })
+export class OppiaRteTextNodeDirective implements AfterViewInit {
+  constructor(
+    private elementRef: ElementRef,
+    private sanitizer: DomSanitizer
+  ) { }
+  @Input() oppiaRteTextNode: string = '';
+  ngAfterViewInit(): void {
+    this.elementRef.nativeElement.parentElement.innerHTML = (
+      this.elementRef.nativeElement.parentElement.innerHTML.trim() +
+      this.sanitizer.sanitize(SecurityContext.HTML, this.oppiaRteTextNode)
+    );
+  }
+}
