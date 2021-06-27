@@ -34,7 +34,7 @@ class PayloadValidationUnitTests(test_utils.GenericTestBase):
                 'exploration_id': 2
             }, {
                 'exploration_id': {
-                    'type': 'unicode'
+                    'type': 'string'
                 }
             }, [
                 'Schema validation for \'exploration_id\' failed: '
@@ -54,7 +54,7 @@ class PayloadValidationUnitTests(test_utils.GenericTestBase):
                 'Found extra args: [u\'exploration_id\'].']),
             ({}, {
                 'exploration_id': {
-                    'type': 'unicode'
+                    'type': 'string'
                 }
             }, [
                 'Missing key in handler args: exploration_id.'])
@@ -75,13 +75,13 @@ class PayloadValidationUnitTests(test_utils.GenericTestBase):
         list_of_valid_args_with_schmea = [
             ({}, {
                 'exploration_id': {
-                    'type': 'unicode',
+                    'type': 'string',
                     'default_value': None
                 }
             }, {}),
             ({}, {
                 'exploration_id': {
-                    'type': 'unicode',
+                    'type': 'string',
                     'default_value': 'default_exp_id'
                 }
             }, {
@@ -91,7 +91,7 @@ class PayloadValidationUnitTests(test_utils.GenericTestBase):
                 'exploration_id': 'any_exp_id'
             }, {
                 'exploration_id': {
-                    'type': 'unicode'
+                    'type': 'string'
                 }
             }, {
                 'exploration_id': 'any_exp_id'

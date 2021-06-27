@@ -38,7 +38,7 @@ class ValidateExplorationChangeTests(test_utils.GenericTestBase):
     def test_correct_object_do_not_raises_exception(self):
         exploration_change = {
             'cmd': 'edit_exploration_property',
-            'new_value': 'nik',
+            'new_value': 'arbitary_new_value',
             'old_value': '',
             'property_name': 'title'
         }
