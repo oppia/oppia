@@ -48,7 +48,6 @@ describe('QuestionDifficultySelectorComponent', () => {
 
   it('should update skill\'s difficulty', () => {
     component.skillWithDifficulty = new SkillDifficulty('id', '', 0.6);
-    // spyOn(component.skillWithDifficulty, 'setDifficulty');
     spyOn(component.skillWithDifficultyChange, 'emit');
     let mockMatRadioChange: MatRadioChange = {
       source: null,
