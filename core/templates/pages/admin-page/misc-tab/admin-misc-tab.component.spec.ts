@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for Admin misc tab component.
+ * @fileoverview UnitTests for Admin misc tab component.
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
