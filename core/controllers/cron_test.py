@@ -162,6 +162,7 @@ class CronJobTests(test_utils.GenericTestBase):
     def test_cron_user_deletion_handler(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
+        self.assertEqual(self.task_status, 'Not Started')
         with self.testapp_swap, self.taskqueue_service_defer_swap:
             self.get_html_response('/cron/users/user_deletion')
             self.assertEqual(self.task_status, 'Started')
@@ -170,6 +171,7 @@ class CronJobTests(test_utils.GenericTestBase):
     def test_cron_fully_complete_user_deletion_handler(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
+        self.assertEqual(self.task_status, 'Not Started')
         with self.testapp_swap, self.taskqueue_service_defer_swap:
             self.get_html_response('/cron/users/fully_complete_user_deletion')
             self.assertEqual(self.task_status, 'Started')
