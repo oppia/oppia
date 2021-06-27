@@ -44,7 +44,7 @@ class MockWindowRef {
   };
 }
 
-describe('Admin misc tab component ', () => {
+describe('Admin config tab component ', () => {
   let component: AdminConfigTabComponent;
   let fixture: ComponentFixture<AdminConfigTabComponent>;
 

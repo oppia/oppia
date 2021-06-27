@@ -46,7 +46,7 @@ class MockWindowRef {
   };
 }
 
-describe('Admin misc tab component ', () => {
+describe('Admin Page component ', () => {
   let component: AdminPageComponent;
   let fixture: ComponentFixture<AdminPageComponent>;
 
@@ -57,9 +57,7 @@ describe('Admin misc tab component ', () => {
   beforeEach(() => {
     mockWindowRef = new MockWindowRef();
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule
-      ],
+      imports: [HttpClientTestingModule],
       declarations: [AdminPageComponent],
       providers: [
         AdminRouterService,
@@ -87,35 +85,45 @@ describe('Admin misc tab component ', () => {
   it('should check whether the admin activities tab is open', () => {
     // Setting admin activities tab to be open.
     spyOn(adminRouterService, 'isActivitiesTabOpen').and.returnValue(true);
+
     let result = component.isActivitiesTabOpen();
+
     expect(result).toBe(true);
   });
 
   it('should check whether the admin config tab is open', () => {
     // Setting admin config tab to be open.
     spyOn(adminRouterService, 'isConfigTabOpen').and.returnValue(true);
+
     let result = component.isConfigTabOpen();
+
     expect(result).toBe(true);
   });
 
   it('should check whether the admin features tab is open', () => {
     // Setting admin features tab to be open.
     spyOn(adminRouterService, 'isFeaturesTabOpen').and.returnValue(true);
+
     let result = component.isFeaturesTabOpen();
+
     expect(result).toBe(true);
   });
 
   it('should check whether the admin roles tab is open', () => {
     // Setting admin roles tab to be open.
     spyOn(adminRouterService, 'isRolesTabOpen').and.returnValue(true);
+
     let result = component.isRolesTabOpen();
+
     expect(result).toBe(true);
   });
 
   it('should check whether the admin misc tab is open', () => {
     // Setting admin misc tab to be open.
     spyOn(adminRouterService, 'isMiscTabOpen').and.returnValue(true);
+
     let result = component.isMiscTabOpen();
+
     expect(result).toBe(true);
   });
 
