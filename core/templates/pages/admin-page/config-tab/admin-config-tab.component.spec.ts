@@ -156,7 +156,8 @@ describe('Admin misc tab component ', () => {
   });
 
   describe('when clicking on revert to default button ', () => {
-    it('should revert to default config property successfully', fakeAsync(() => {
+    it('should revert to default config property ' +
+      'successfully', fakeAsync(() => {
       // Setting confirm button clicked to be true.
       confirmSpy.and.returnValue(true);
       spyOn(adminBackendApiService, 'revertConfigPropertyAsync')
