@@ -149,9 +149,11 @@
 /core/controllers/creator_dashboard*.py @nithusha21
 /core/controllers/email_dashboard*.py @nithusha21
 /core/controllers/learner_dashboard*.py @nithusha21
+/core/controllers/learner_goals*.py @nithusha21
 /core/controllers/learner_playlist*.py @nithusha21
 /core/controllers/subscriptions*.py @nithusha21
 /core/domain/activity*.py @nithusha21
+/core/domain/learner_goals_services*.py @nithusha21
 /core/domain/learner_playlist_services*.py @nithusha21
 /core/domain/learner_progress*.py @nithusha21
 /core/domain/subscription_services*.py @nithusha21
