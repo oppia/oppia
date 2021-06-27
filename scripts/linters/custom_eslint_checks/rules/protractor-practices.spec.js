@@ -122,23 +122,18 @@ ruleTester.run('protractor-practices', rule, {
     },
     {
       code:
-      'await expSummaryRowTitleElements.first()',
+      'await element.all(by.css(".collection-exploration")).first()',
       errors: [{
-        message: 'Please do not use await for "first()"',
+        message: 'Please do not use await for',
       }],
     },
     {
       code:
-      'await conversationContent.los.last()',
+      `var oneOffJob = element.all(by.css('.one-off-jobs-rows'));
+      await oneOffJob.get()
+      await invalid.get()`,
       errors: [{
-        message: 'Please do not use await for "last()"',
-      }],
-    },
-    {
-      code:
-      'var text = await unfinishedOneOffJobRows.get(i);',
-      errors: [{
-        message: 'Please do not use await for "get()"',
+        message: 'Please do not use await for',
       }],
     },
   ]

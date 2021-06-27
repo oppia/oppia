@@ -318,7 +318,7 @@ var TopicEditorPage = function() {
       }
     }
     expect(uncategorizedSkillIndex).not.toEqual(-1);
-    var toMove = await uncategorizedSkills.get(uncategorizedSkillIndex);
+    var toMove = uncategorizedSkills.get(uncategorizedSkillIndex);
     await dragAndDrop(toMove, target);
   };
 
@@ -401,7 +401,7 @@ var TopicEditorPage = function() {
   };
 
   this.navigateToSubtopicWithIndex = async function(subtopicIndex) {
-    var subtopic = await subtopics.get(subtopicIndex);
+    var subtopic = subtopics.get(subtopicIndex);
     await subtopic.click();
     await waitFor.pageToFullyLoad();
   };
@@ -435,7 +435,7 @@ var TopicEditorPage = function() {
   this.navigateToStoryWithIndex = async function(index) {
     await waitFor.visibilityOf(
       storyListTable, 'Story list table takes too long to appear.');
-    var storyItem = await storyListItems.get(index);
+    var storyItem = storyListItems.get(index);
     await storyItem.click();
     await waitFor.pageToFullyLoad();
     await waitFor.invisibilityOf(

@@ -36,11 +36,13 @@ module.exports = {
       disallowedBrowserMethods: (
         'Please do not use browser.{{methodName}}() in protractor files'),
       disallowThen: 'Please do not use .then(), consider async/await instead',
-      disallowAwait: 'Please do not use await for "{{propertyName}}()"'
+      disallowAwait: 'Please do not use await for'
     },
   },
 
   create: function(context) {
+    var elementAllSelector = (
+      'CallExpression[callee.object.name=element][callee.property.name=all]');
     var invalidAwaitSelector = (
       'AwaitExpression[argument.callee.property.name=/^(first|last|get)$/]');
     var disallowedBrowserMethods = [
@@ -50,16 +52,32 @@ module.exports = {
     var disallowedBrowserMethodsSelector = (
       'CallExpression[callee.object.name=browser][callee.property.name=' +
       disallowedBrowserMethodsRegex + ']');
+    var elementAllIdName = [];
 
     var reportDisallowInvalidAwait = function(node) {
-      context.report({
-        node: node,
-        messageId: 'disallowAwait',
-        data: {
-          propertyName: node.argument.callee.property.name
+      if (node.type === 'CallExpression') {
+        if (node.parent.type === 'VariableDeclarator') {
+          elementAllIdName.push(node.parent.id.name);
         }
-      });
+        if ((node.parent.parent.parent.type === 'AwaitExpression') &&
+          (/^(first|last|get)$/).test(node.parent.property.name)) {
+          context.report({
+            node: node,
+            messageId: 'disallowAwait'
+          });
+        }
+      } else {
+        for (var i = 0; i < elementAllIdName.length; i++) {
+          if (node.argument.callee.object.name === elementAllIdName[i]) {
+            context.report({
+              node: node,
+              messageId: 'disallowAwait'
+            });
+          }
+        }
+      }
     };
+
 
     var reportDisallowedBrowserMethod = function(node) {
       context.report({
@@ -87,6 +105,9 @@ module.exports = {
     };
 
     return {
+      [elementAllSelector]: function(node) {
+        reportDisallowInvalidAwait(node);
+      },
       [invalidAwaitSelector]: function(node) {
         reportDisallowInvalidAwait(node);
       },
