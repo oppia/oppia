@@ -14,6 +14,24 @@
 
 /**
  * @fileoverview Directive for CK Editor.
+ * NOTE: The way we show rich text components in CKEditor is by using Web
+ * components. We don't create an angular view inside ckeditor. In our case,
+ * the web components can't have the same selector as the angular component even
+ * though they are literally the same component and use the same class. This is
+ * because using the same selector is causing issues in the angular view as
+ * angular creates a component instance and adds it to the view. When adding to
+ * the view, it will also create a node with the selector we have specified.
+ * Usually, this has no effect as there is no element in the web-browser
+ * registered by the selector. But in our case, we did it to show rte components
+ * in the ck-editor view. In order to overcome this situation, ck-editor uses
+ * the same component but we register it with a different selector. The selector
+ * prefix is now oppia-noninteractive-ckeditor-* instead of oppia-noninteractive
+ * we have for the angular counterpart. This just an internal representation and
+ * the value emitted to the parent component doesn't have
+ * oppia-noninteractive-ckeditor-* tags, They have the normal
+ * oppia-noninteractive tags in them. Similarly for the value thats passed,
+ * we don't expect oppia-noninteractive-ckeditor-* tags. We expect the normal
+ * angular version of our tags and that is converted on the fly.
  */
 
 import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnDestroy, Output } from '@angular/core';

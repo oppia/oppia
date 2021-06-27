@@ -130,8 +130,9 @@ export class CkEditorCopyContentService {
       const widgetName = elementTagName.replace('-noninteractive-', '');
 
       // Look for x-with-value="y" to extract x and y.
-      //  Group 1 (\w+): Any word containing [a-zA-Z0-9_] characters. This is
-      //    the name of the property.
+      //  Group 1 ([\w-]+): Any word containing [a-zA-Z0-9_-] characters. This
+      //    is the name of the property. (Note that this will also catch
+      //    ng-reflect-* which is added by angular).
       //  Group 2 (-with-value="): Matches characters literally.
       //  Group 3 ([^"]+): Matches any characters excluding ". This is the
       //    value of the property.
@@ -143,6 +144,12 @@ export class CkEditorCopyContentService {
 
       while ((match = valueMatcher.exec(html)) !== null) {
         const key = match[1];
+        // Angular adds a new attribute for each @Input() variable. The
+        // attribute starts with ng-reflect and the full attribute is
+        // ng-reflect-attribute-name. ng-reflect has char limit on how much
+        // is added to the dom. So if these are not ignored we will get data
+        // parsing errors in the components we are trying to copy over to the
+        // editor.
         if (key.startsWith('ng-reflect')) {
           continue;
         }
