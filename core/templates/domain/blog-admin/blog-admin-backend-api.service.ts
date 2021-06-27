@@ -57,7 +57,6 @@ export interface BlogAdminPageData {
 export class BlogAdminBackendApiService {
   constructor(private http: HttpClient) {}
 
-
   async getDataAsync(): Promise<BlogAdminPageData> {
     return new Promise((resolve, reject) => {
       this.http.get<BlogAdminPageDataBackendDict>(
@@ -74,7 +73,7 @@ export class BlogAdminBackendApiService {
   }
 
   private async _postRequestAsync(
-      handlerUrl: string, payload?: Object, action?: string): Promise<void> {
+      handlerUrl: string, payload: Object, action?: string): Promise<void> {
     return new Promise((resolve, reject) => {
       this.http.post<void>(
         handlerUrl, { action, ...payload }).toPromise()
@@ -92,8 +91,7 @@ export class BlogAdminBackendApiService {
     let payload = {
       new_config_property_values: newConfigPropertyValues
     };
-    return this._postRequestAsync (
-      '/blogadminhandler', payload, action);
+    return this._postRequestAsync('/blogadminhandler', payload, action);
   }
 
   async revertConfigPropertyAsync(configPropertyId: string): Promise<void> {
@@ -101,24 +99,16 @@ export class BlogAdminBackendApiService {
     let payload = {
       config_property_id: configPropertyId
     };
-    return this._postRequestAsync (
-      '/blogadminhandler', payload, action);
+    return this._postRequestAsync('/blogadminhandler', payload, action);
   }
 
   async updateUserRoleAsync(
       newRole: string, username: string): Promise<void> {
-    return new Promise((resolve, reject) => {
-      this.http.post<void>(
-        '/blogadminrolehandler', {
+        let payload = {
           role: newRole,
           username: username,
         }
-      ).toPromise().then(response => {
-        resolve(response);
-      }, errorResponse => {
-        reject(errorResponse.error.error);
-      });
-    });
+        return this._postRequestAsync('/blogadminrolehandler', payload);
   }
 
   async removeBlogEditorAsync(username: string): Promise<void> {
