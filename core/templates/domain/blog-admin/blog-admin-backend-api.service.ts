@@ -103,11 +103,11 @@ export class BlogAdminBackendApiService {
 
   async updateUserRoleAsync(
       newRole: string, username: string): Promise<void> {
-        let payload = {
-          role: newRole,
-          username: username,
-        }
-        return this._postRequestAsync('/blogadminrolehandler', payload);
+    let payload = {
+      role: newRole,
+      username: username,
+    };
+    return this._postRequestAsync('/blogadminrolehandler', payload);
   }
 
   async removeBlogEditorAsync(username: string): Promise<void> {
