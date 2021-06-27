@@ -48,7 +48,7 @@ export class CreateNewSubtopicModalComponent {
   editableThumbnailFilename: string;
   editableThumbnailBgColor: string;
   editableUrlFragment: string;
-  allowedBgColors: string | readonly ['#FFFFFF'];
+  allowedBgColors: string;
   subtopicId: number;
   MAX_CHARS_IN_SUBTOPIC_TITLE: number;
   MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT: number;
@@ -81,8 +81,13 @@ export class CreateNewSubtopicModalComponent {
     this.schemaEditorIsShown = false;
     this.editableThumbnailBgColor = '';
     this.editableUrlFragment = '';
-    this.allowedBgColors = (
-      createSubtopicConstants.ALLOWED_THUMBNAIL_BG_COLORS.subtopic);
+    // This throws "Type 'readonly ["#FFFFFF"]' is not assignable to type
+    // 'string'.". We need to suppress this error because allowedBgColors
+    // is passed to addSubtopic function as an argument which expects it
+    // a string.
+    // @ts-ignore
+    this.allowedBgColors =
+      createSubtopicConstants.ALLOWED_THUMBNAIL_BG_COLORS.subtopic;
     this.subtopicId = this.topic.getNextSubtopicId();
     this.MAX_CHARS_IN_SUBTOPIC_TITLE = AppConstants.MAX_CHARS_IN_SUBTOPIC_TITLE;
     this.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT = (
