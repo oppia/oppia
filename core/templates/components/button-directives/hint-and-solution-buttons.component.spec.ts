@@ -20,6 +20,7 @@ import { InteractionObjectFactory } from 'domain/exploration/InteractionObjectFa
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTranslationsObjectFactory';
 import { StateCard } from 'domain/state_card/state-card.model';
+import { AudioTranslationLanguageService } from 'pages/exploration-player-page/services/audio-translation-language.service';
 import { ExplorationPlayerStateService } from 'pages/exploration-player-page/services/exploration-player-state.service';
 import { HintAndSolutionModalService } from 'pages/exploration-player-page/services/hint-and-solution-modal.service';
 import { HintsAndSolutionManagerService } from 'pages/exploration-player-page/services/hints-and-solution-manager.service';
@@ -44,6 +45,7 @@ describe('HintAndSolutionButtonsComponent', () => {
   let explorationPlayerStateService: ExplorationPlayerStateService;
   let statsReportingService: StatsReportingService;
   let newCard: StateCard;
+  let audioTranslationLanguageService: AudioTranslationLanguageService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -66,6 +68,8 @@ describe('HintAndSolutionButtonsComponent', () => {
     explorationPlayerStateService = TestBed.inject(
       ExplorationPlayerStateService);
     statsReportingService = TestBed.inject(StatsReportingService);
+    audioTranslationLanguageService = (
+      TestBed.inject(AudioTranslationLanguageService));
 
     spyOn(playerPositionService, 'onNewCardOpened').and.returnValue(
       new EventEmitter<StateCard>());
@@ -131,7 +135,7 @@ describe('HintAndSolutionButtonsComponent', () => {
       }),
       RecordedVoiceovers.createEmpty(),
       writtenTranslationsObjectFactory.createEmpty(),
-      'content', null);
+      'content', audioTranslationLanguageService);
   });
 
   it('should subscribe to events on initialization', () => {
@@ -158,7 +162,8 @@ describe('HintAndSolutionButtonsComponent', () => {
     let oldCard: StateCard = StateCard.createNewCard(
       'State 1', '<p>Content</p>', '<interaction></interaction>',
       null, RecordedVoiceovers.createEmpty(),
-      writtenTranslationsObjectFactory.createEmpty(), 'content', null);
+      writtenTranslationsObjectFactory.createEmpty(), 'content',
+      audioTranslationLanguageService);
     spyOn(hintsAndSolutionManagerService, 'getNumHints').and.returnValue(1);
 
     component.displayedCard = oldCard;
@@ -245,7 +250,8 @@ describe('HintAndSolutionButtonsComponent', () => {
         hints: [],
         solution: null,
       }), RecordedVoiceovers.createEmpty(),
-      writtenTranslationsObjectFactory.createEmpty(), 'content', null);
+      writtenTranslationsObjectFactory.createEmpty(), 'content',
+      audioTranslationLanguageService);
 
     expect(component.isHintButtonVisible(0)).toBe(false);
 
