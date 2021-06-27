@@ -459,10 +459,6 @@ describe('screenreader and keyboard user accessibility features', function() {
       await holdCtrlAndPressKey('5');
       await waitFor.urlRedirection(PREFERENCES_URL);
 
-
-      await holdCtrlAndPressKey('5');
-      await waitFor.urlRedirection(PREFERENCES_URL);
-
       await browser.get('creator-dashboard');
       await waitFor.urlRedirection(CREATOR_DASHBOARD_URL);
       await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
