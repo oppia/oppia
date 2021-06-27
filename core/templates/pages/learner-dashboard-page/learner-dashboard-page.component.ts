@@ -41,6 +41,8 @@ import { DateTimeFormatService } from 'services/date-time-format.service';
 import { LoaderService } from 'services/loader.service';
 import { UserService } from 'services/user.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import { StorySummary } from 'domain/story/story-summary.model';
+import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
 
 
 @Component({
@@ -98,6 +100,7 @@ export class LearnerDashboardPageComponent implements OnInit {
   PAGE_SIZE = 8;
   Math = window.Math;
   username: string = '';
+  newLearnerDashboardPageIsDisplayed: boolean = false;
 
   isCurrentExpSortDescending: boolean;
   isCurrentSubscriptionSortDescending: boolean;
@@ -112,6 +115,8 @@ export class LearnerDashboardPageComponent implements OnInit {
 
   completedExplorationsList: LearnerExplorationSummary[];
   completedCollectionsList: CollectionSummary[];
+  completedStoriesList: StorySummary[];
+  partiallyLearntTopicsList: LearnerTopicSummary[];
   incompleteExplorationsList: LearnerExplorationSummary[];
   incompleteCollectionsList: CollectionSummary[];
   subscriptionsList: ProfileSummary[];
@@ -205,6 +210,10 @@ export class LearnerDashboardPageComponent implements OnInit {
           responseData.completedExplorationsList);
         this.completedCollectionsList = (
           responseData.completedCollectionsList);
+        this.completedStoriesList = (
+          responseData.completedStoriesList);
+        this.partiallyLearntTopicsList = (
+          responseData.partiallyLearntTopicsList);
         this.incompleteExplorationsList = (
           responseData.incompleteExplorationsList);
         this.incompleteCollectionsList = (

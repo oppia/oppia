@@ -1430,6 +1430,7 @@ def get_displayable_story_summary_dicts(user_id, story_summaries):
             'all_node_dicts': [
                 node.to_dict() for node in stories[index].story_contents.nodes
             ],
+            'topic_name': topics[index].name,
             'topic_url_fragment': topics[index].url_fragment,
             'classroom_url_fragment': (
                 classroom_services.get_classroom_url_fragment_for_topic_id(

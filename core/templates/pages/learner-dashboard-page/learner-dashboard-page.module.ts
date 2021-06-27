@@ -24,6 +24,7 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
 
+import { ProgressTabComponent } from './new-learner-dashboard/progress-tab.component';
 import { LearnerDashboardPageComponent } from './learner-dashboard-page.component';
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
@@ -39,12 +40,14 @@ import { LearnerDashboardSuggestionModalComponent } from './suggestion-modal/lea
   declarations: [
     OppiaAngularRootComponent,
     LearnerDashboardPageComponent,
+    ProgressTabComponent,
     RemoveActivityModalComponent,
     LearnerDashboardSuggestionModalComponent
   ],
   entryComponents: [
     OppiaAngularRootComponent,
     LearnerDashboardPageComponent,
+    ProgressTabComponent,
     RemoveActivityModalComponent,
     LearnerDashboardSuggestionModalComponent
   ],

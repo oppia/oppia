@@ -34,6 +34,7 @@ export interface StorySummaryBackendDict {
   'all_node_dicts': StoryNodeBackendDict[],
   // This property is optional because it is only present in the
   // story summary dict of learner dashboard page.
+  'topic_name'?: string;
   'topic_url_fragment'?: string,
   'classroom_url_fragment'?: string
 }
@@ -50,6 +51,7 @@ export class StorySummary {
     private _completedNodeTitles: string[],
     private _urlFragment: string,
     private _allNodes: StoryNode[],
+    private _topicName: string,
     private _topicUrlFragment: string,
     private _classroomUrlFragment: string
   ) {}
@@ -80,6 +82,14 @@ export class StorySummary {
 
   getDescription(): string {
     return this._description;
+  }
+
+  getCompletedNodeTitles(): string[] {
+    return this._completedNodeTitles;
+  }
+
+  getTopicName(): string {
+    return this._topicName;
   }
 
   isStoryPublished(): boolean {
@@ -120,6 +130,7 @@ export class StorySummary {
       storySummaryBackendDict.completed_node_titles,
       storySummaryBackendDict.url_fragment,
       allNodes,
+      storySummaryBackendDict.topic_name,
       storySummaryBackendDict.topic_url_fragment,
       storySummaryBackendDict.classroom_url_fragment
     );
