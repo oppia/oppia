@@ -18,15 +18,13 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ChangeDetectorRef, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { FormsModule } from '@angular/forms';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { truncate } from 'lodash';
 
-import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { PlatformFeatureService } from 'services/platform-feature.service';
 import { AdminPageComponent } from './admin-page.component';
 import { AdminRouterService } from './services/admin-router.service';
-import { AdminTaskManagerService } from './services/admin-task-manager.service';
 
 class MockWindowRef {
   nativeWindow = {
@@ -42,43 +40,106 @@ class MockWindowRef {
     },
     open() {
       return;
+    },
+    onhashchange() {
+      return;
     }
   };
 }
 
-describe('Admin misc tab component ', () => {
-    let component: AdminPageComponent;
-    let fixture: ComponentFixture<AdminPageComponent>;
-  
-    let adminRouterService: AdminRouterService;
-    let changeDetectorRef: ChangeDetectorRef;
-    let platformFeatureService: PlatformFeatureService;
-    let mockWindowRef: MockWindowRef;
-  
-    beforeEach(() => {
-      mockWindowRef = new MockWindowRef();
-      TestBed.configureTestingModule({
-        imports: [
-          HttpClientTestingModule,
-          FormsModule
-        ],
-        declarations: [AdminPageComponent],
-        providers: [
-        
-          {
-            provide: WindowRef,
-            useValue: mockWindowRef
-          }
-        ],
-        schemas: [NO_ERRORS_SCHEMA]
-      }).compileComponents();
-  
-      fixture = TestBed.createComponent(AdminPageComponent);
-      component = fixture.componentInstance;
-    });
-  
-    beforeEach(() => {
+fdescribe('Admin misc tab component ', () => {
+  let component: AdminPageComponent;
+  let fixture: ComponentFixture<AdminPageComponent>;
 
-    });
+  let adminRouterService: AdminRouterService;
+  let changeDetectorRef: ChangeDetectorRef;
+  let platformFeatureService: PlatformFeatureService;
+  let mockWindowRef: MockWindowRef;
 
+  beforeEach(() => {
+    mockWindowRef = new MockWindowRef();
+    TestBed.configureTestingModule({
+      imports: [
+        HttpClientTestingModule
+      ],
+      declarations: [AdminPageComponent],
+      providers: [
+        AdminRouterService,
+        ChangeDetectorRef,
+        PlatformFeatureService,
+        {
+          provide: WindowRef,
+          useValue: mockWindowRef
+        }
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(AdminPageComponent);
+    component = fixture.componentInstance;
+  });
+
+  beforeEach(() => {
+    adminRouterService = TestBed.inject(AdminRouterService);
+    changeDetectorRef = TestBed.inject(ChangeDetectorRef);
+    platformFeatureService = TestBed.inject(PlatformFeatureService);
+
+    spyOn(adminRouterService, 'showTab').and.returnValue(null);
+  });
+
+  it('should check whether the admin activities tab is open', () => {
+    // Setting admin activities tab to be open.
+    spyOn(adminRouterService, 'isActivitiesTabOpen').and.returnValue(true);
+    let result = component.isActivitiesTabOpen();
+    expect(result).toBe(true);
+  });
+
+  it('should check whether the admin config tab is open', () => {
+    // Setting admin config tab to be open.
+    spyOn(adminRouterService, 'isConfigTabOpen').and.returnValue(true);
+    let result = component.isConfigTabOpen();
+    expect(result).toBe(true);
+  });
+
+  it('should check whether the admin features tab is open', () => {
+    // Setting admin features tab to be open.
+    spyOn(adminRouterService, 'isFeaturesTabOpen').and.returnValue(true);
+    let result = component.isFeaturesTabOpen();
+    expect(result).toBe(true);
+  });
+
+  it('should check whether the admin roles tab is open', () => {
+    // Setting admin roles tab to be open.
+    spyOn(adminRouterService, 'isRolesTabOpen').and.returnValue(true);
+    let result = component.isRolesTabOpen();
+    expect(result).toBe(true);
+  });
+
+  it('should check whether the admin misc tab is open', () => {
+    // Setting admin misc tab to be open.
+    spyOn(adminRouterService, 'isMiscTabOpen').and.returnValue(true);
+    let result = component.isMiscTabOpen();
+    expect(result).toBe(true);
+  });
+
+  it('should set status message when calling \'setStatusMessage\'', () => {
+    expect(component.statusMessage).toBe('');
+
+    component.ngOnInit();
+    mockWindowRef.nativeWindow.onhashchange();
+    component.setStatusMessage('message');
+
+    expect(component.statusMessage).toBe('message');
+  });
+
+  it('should check whether the dummy features enabled', () => {
+    // Setting dummy features enabled to be false.
+    spyOnProperty(
+      platformFeatureService.status.DummyFeature, 'isEnabled')
+      .and.returnValue(false);
+
+    let result = component.isDummyFeatureEnabled();
+
+    expect(result).toBe(false);
+  });
 });
