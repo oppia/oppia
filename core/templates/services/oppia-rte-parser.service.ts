@@ -117,7 +117,7 @@ export class OppiaRteParserService {
        *   Zone 3 = From index of first </b> to end.
        *   As we can see that this can get very complicated soon when there are
        *   multiple child elements having the same tag. Fortunately, the fix for
-       *   this is easy. WE can remove children that have already been parsed.
+       *   this is easy. We can remove children that have already been parsed.
        *   That will mean we only need to look at the first indexOf of tag and
        *   keep a track of the text we have already loaded. Here is a dry run of
        *   the algorithm on the sample case listed above:
