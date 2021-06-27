@@ -150,12 +150,12 @@ class MypyScriptChecks(test_utils.GenericTestBase):
                 with self.assertRaisesRegexp(SystemExit, '1'):
                     run_mypy_checks.main(args=[])
 
-    def test_main_install_prerequisites_success(self):
+    def test_main_with_install_prerequisites_success(self):
         with self.popen_swap_success, self.install_swap:
             process = run_mypy_checks.main(args=[])
             self.assertEqual(process, 0)
 
-    def test_main_install_prerequisites_failure(self):
+    def test_main_with_install_prerequisites_failure(self):
         with self.popen_swap_failure, self.install_swap:
             with self.assertRaisesRegexp(SystemExit, '1'):
                 run_mypy_checks.main(args=[])
