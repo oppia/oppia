@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,8 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Scripts for the error page.
+ * @fileoverview Directive scripts for the oppia pages.
  */
+
 import 'core-js/es7/reflect';
 import 'zone.js';
 
@@ -22,15 +23,15 @@ import 'zone.js';
 import 'pages/mock-ajs';
 import 'Polyfills.ts';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { ErrorPageModule } from './error-page.module';
 import { AppConstants } from 'app.constants';
 import { enableProdMode } from '@angular/core';
+import { OppiaRootModule } from './app.module';
 
 if (!AppConstants.DEV_MODE) {
   enableProdMode();
 }
 
-platformBrowserDynamic().bootstrapModule(ErrorPageModule).catch(
+platformBrowserDynamic().bootstrapModule(OppiaRootModule).catch(
   // eslint-disable-next-line no-console
   (err) => console.error(err)
 );

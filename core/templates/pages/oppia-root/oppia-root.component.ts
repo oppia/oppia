@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,19 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Root component for error page.
+ * @fileoverview Oppia root component.
  */
 
-import { Component, Input } from '@angular/core';
+import { Component } from '@angular/core';
 
 @Component({
-  selector: 'oppia-error-page-root',
-  templateUrl: './error-page-root.component.html'
+  selector: 'oppia-root',
+  templateUrl: './oppia-root.component.html'
 })
-export class ErrorPageRootComponent {
-  @Input() statusCode: string;
-
-  ngOnInit(): void {
-    console.log(this.statusCode);
-  }
-}
+export class OppiaRootComponent {}

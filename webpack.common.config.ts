@@ -111,6 +111,8 @@ module.exports = {
     notifications_dashboard:
       commonPrefix + '/pages/notifications-dashboard-page/' +
       'notifications-dashboard-page.import.ts',
+    oppia_root:
+      commonPrefix + '/pages/oppia-root/index.ts',
     pending_account_deletion:
       commonPrefix + '/pages/pending-account-deletion-page/' +
       'pending-account-deletion-page.import.ts',
@@ -341,6 +343,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['error'],
       filename: 'error-page-400.mainpage.html',
+      hybrid: true,
       meta: defaultMeta,
       template: commonPrefix + '/pages/error-pages/error-page.mainpage.html',
       minify: htmlMinifyConfig,
@@ -350,6 +353,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['error'],
       filename: 'error-page-401.mainpage.html',
+      hybrid: true,
       meta: defaultMeta,
       template: commonPrefix + '/pages/error-pages/error-page.mainpage.html',
       minify: htmlMinifyConfig,
@@ -368,6 +372,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['error'],
       filename: 'error-page-500.mainpage.html',
+      hybrid: true,
       meta: defaultMeta,
       template: commonPrefix + '/pages/error-pages/error-page.mainpage.html',
       minify: htmlMinifyConfig,
@@ -523,6 +528,16 @@ module.exports = {
         '/pages/notifications-dashboard-page/' +
         'notifications-dashboard-page.mainpage.html'
       ),
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['oppia_root'],
+      filename: 'oppia-root.mainpage.html',
+      meta: defaultMeta,
+      template:
+          commonPrefix + '/pages/oppia-root/' +
+          'index.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
