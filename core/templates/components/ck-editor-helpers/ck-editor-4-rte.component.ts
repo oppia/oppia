@@ -29,7 +29,7 @@
  * we have for the angular counterpart. This just an internal representation and
  * the value emitted to the parent component doesn't have
  * oppia-noninteractive-ckeditor-* tags, They have the normal
- * oppia-noninteractive tags in them. Similarly for the value thats passed,
+ * oppia-noninteractive tags in them. Similarly, for the value that's passed in,
  * we don't expect oppia-noninteractive-ckeditor-* tags. We expect the normal
  * angular version of our tags and that is converted on the fly.
  */
