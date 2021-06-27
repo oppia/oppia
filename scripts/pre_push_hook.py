@@ -332,7 +332,7 @@ def start_linter(files):
 def start_mypy_checks():
     """Starts the mypy type checks."""
     task = subprocess.Popen(
-        [PYTHON_CMD, '-m', MYPY_TYPE_CHECK_MODULE])
+        [PYTHON_CMD, '-m', MYPY_TYPE_CHECK_MODULE, '--skip-install'])
     task.communicate()
     return task.returncode
 

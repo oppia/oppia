@@ -26,7 +26,6 @@ import subprocess
 import sys
 
 
-from scripts import common
 from scripts import install_third_party_libs
 
 import python_utils # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
@@ -807,7 +806,6 @@ def main(args=None):
     parsed_args = _PARSER.parse_args(args=args)
 
     install_third_party_libraries(parsed_args.skip_install)
-    common.fix_third_party_imports()
 
     python_utils.PRINT('Installing Mypy and stubs for third party libraries.')
     return_code = install_mypy_prerequisites()
