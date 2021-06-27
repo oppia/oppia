@@ -806,6 +806,15 @@ def main(args=None):
     """Runs the MyPy type checks."""
     parsed_args = _PARSER.parse_args(args=args)
 
+    for directory in common.DIRS_TO_ADD_TO_SYS_PATH:
+        if not os.path.exists(os.path.dirname(directory)):
+            raise Exception('Directory %s does not exist.' % directory)
+
+        # The directories should only be inserted starting at index 1. See
+        # https://stackoverflow.com/a/10095099 and
+        # https://stackoverflow.com/q/10095037 for more details.
+        sys.path.insert(1, directory)
+
     install_third_party_libraries(parsed_args.skip_install)
     common.fix_third_party_imports()
 
