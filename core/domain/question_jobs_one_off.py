@@ -23,10 +23,11 @@ import ast
 import logging
 
 from core import jobs
-from core.domain import fs_domain, question_fetchers
+from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import html_cleaner
 from core.domain import question_domain
+from core.domain import question_fetchers
 from core.domain import question_services
 from core.platform import models
 import feconf
