@@ -25,6 +25,7 @@ export interface LearnerDashboardActivityIdsDict {
   'completed_story_ids': string[];
   'learnt_topic_ids': string[];
   'completed_collection_ids': string[];
+  'topic_ids_to_learn': string[];
   'exploration_playlist_ids': string[];
   'collection_playlist_ids': string[];
 }
@@ -37,6 +38,7 @@ export class LearnerDashboardActivityIds {
   completedCollectionIds: string[];
   completedStoryIds: string[];
   learntTopicIds: string[];
+  topicIdsToLearn: string[];
   explorationPlaylistIds: string[];
   collectionPlaylistIds: string[];
 
@@ -45,6 +47,7 @@ export class LearnerDashboardActivityIds {
       partiallyLearntTopicIds: string[],
       completedExplorationIds: string[], completedCollectionIds: string[],
       completedStoryIds: string[], learntTopicIds: string[],
+      topicIdsToLearn: string[],
       explorationPlaylistIds: string[], collectionPlaylistIds: string[]) {
     this.incompleteExplorationIds = incompleteExplorationIds;
     this.incompleteCollectionIds = incompleteCollectionIds;
@@ -53,6 +56,7 @@ export class LearnerDashboardActivityIds {
     this.completedCollectionIds = completedCollectionIds;
     this.completedStoryIds = completedStoryIds;
     this.learntTopicIds = learntTopicIds;
+    this.topicIdsToLearn = topicIdsToLearn;
     this.explorationPlaylistIds = explorationPlaylistIds;
     this.collectionPlaylistIds = collectionPlaylistIds;
   }
@@ -66,7 +70,8 @@ export class LearnerDashboardActivityIds {
         this.explorationPlaylistIds.indexOf(activityId) !== -1 ||
         this.completedStoryIds.indexOf(activityId) !== -1 ||
         this.partiallyLearntTopicIds.indexOf(activityId) !== -1 ||
-        this.learntTopicIds.indexOf(activityId) !== -1) {
+        this.learntTopicIds.indexOf(activityId) !== -1 ||
+        this.topicIdsToLearn.indexOf(activityId) !== -1) {
       return true;
     }
     return false;
@@ -85,6 +90,14 @@ export class LearnerDashboardActivityIds {
     }
     return false;
   }
+
+  belongsToTopicsToLearn(topicId: string): boolean {
+    if (this.topicIdsToLearn.indexOf(topicId) !== -1) {
+      return true;
+    }
+    return false;
+  }
+
 
   belongsToCompletedExplorations(explorationId: string): boolean {
     if (this.completedExplorationIds.indexOf(explorationId) !== -1) {
@@ -157,6 +170,17 @@ export class LearnerDashboardActivityIds {
     }
   }
 
+  addToTopicLearn(topicId: string): void {
+    this.topicIdsToLearn.push(topicId);
+  }
+
+  removeTopicFromLearn(topicId: string): void {
+    var index = this.topicIdsToLearn.indexOf(topicId);
+    if (index !== -1) {
+      this.topicIdsToLearn.splice(index, 1);
+    }
+  }
+
   static createFromBackendDict(
       learnerDashboardActivityIdsDict: LearnerDashboardActivityIdsDict):
       LearnerDashboardActivityIds {
@@ -168,6 +192,7 @@ export class LearnerDashboardActivityIds {
       learnerDashboardActivityIdsDict.completed_collection_ids,
       learnerDashboardActivityIdsDict.completed_story_ids,
       learnerDashboardActivityIdsDict.learnt_topic_ids,
+      learnerDashboardActivityIdsDict.topic_ids_to_learn,
       learnerDashboardActivityIdsDict.exploration_playlist_ids,
       learnerDashboardActivityIdsDict.collection_playlist_ids);
   }
