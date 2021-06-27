@@ -56,9 +56,11 @@
       <p *ngIf="hasIncompleteTranslationError">
         Translation is incomplete. Please make sure all elements in the original content are included in the translated content.
       </p>
-      <p *ngIf="elementViolation">
-        {{elementViolation}}
-      </p>
+      <ul *ngIf="elementViolations.length > 0">
+        <li *ngFor="let violation of elementViolations">
+          <code>{{violation}}</code>
+        </li>
+      </ul>
     </div>
     <strong *ngIf="isSubmitted()">Submitted translation:</strong>
     <div *ngIf="isSubmitted()" class="oppia-text-to-translate-container">

@@ -99,6 +99,7 @@ export class TranslationModalComponent {
   hadCopyParagraphError = false;
   hasImgTextError = false;
   hasIncompleteTranslationError = false;
+  elementViolations: string[] = [];
   elementViolation: string;
 
   constructor(
@@ -272,42 +273,57 @@ export class TranslationModalComponent {
     return originalElements.some(hasMatchingTranslatedElement);
   }
 
+  addViolationMessage(
+      originalText: string,
+      trnaslatedText: string): void {
+    this.elementViolations.push(
+      '"' + trnaslatedText + '"' + ' does ' +
+      'not match ' + '"' + originalText + '"' + '.');
+  }
+
   isTranslationCompleted(
       originalElements: HTMLElement[],
       translatedElements: HTMLElement[]): boolean {
+    this.elementViolations = [];
     const filteredOriginalElements = originalElements.filter(
       element => element.nodeType === Node.ELEMENT_NODE);
     const filteredTranslatedElements = translatedElements.filter(
       element => element.nodeType === Node.ELEMENT_NODE);
 
     if (filteredOriginalElements.length !== filteredTranslatedElements.length) {
+      this.addViolationMessage(
+        this.textToTranslate, this.activeWrittenTranslation.html);
       return false;
     }
 
     for (const [i, originalElement] of filteredOriginalElements.entries()) {
       if (originalElement.nodeName !== filteredTranslatedElements[
         i].nodeName) {
-        this.elementViolation = (
-          '"' + filteredTranslatedElements[i].outerHTML + '"' + ' does ' +
-          'not match ' + '"' + originalElement.outerHTML + '"' + '.');
-        return false;
+        this.addViolationMessage(
+          originalElement.outerHTML,
+          filteredTranslatedElements[i].outerHTML);
       }
       if (originalElement.children.length !== filteredTranslatedElements[
         i].children.length) {
-        this.elementViolation = (
-          '"' + filteredTranslatedElements[i].outerHTML + '"' + ' does ' +
-          'not match ' + '"' + originalElement.outerHTML + '"' + '.');
-        return false;
+        this.addViolationMessage(
+          originalElement.outerHTML,
+          filteredTranslatedElements[i].outerHTML);
       }
-      for (let index = 0; index < originalElement.children.length; index++) {
-        if (originalElement.children[index].nodeName !== (
-          filteredTranslatedElements[i].children[index].nodeName)) {
-          this.elementViolation = (
-            '"' + filteredTranslatedElements[i].outerHTML + '"' + ' does ' +
-            'not match ' + '"' + originalElement.outerHTML + '"' + '.');
-          return false;
-        }
+      else {
+        Array.from(originalElement.children).some((element, index) => {
+          if (element.nodeName !== (
+            filteredTranslatedElements[i].children[index].nodeName)) {
+            this.addViolationMessage(
+              originalElement.outerHTML,
+              filteredTranslatedElements[i].outerHTML);
+            return false;
+          }
+        });
       }
+    }
+
+    if (this.elementViolations.length > 0) {
+      return false;
     }
     return true;
   }
@@ -338,24 +354,22 @@ export class TranslationModalComponent {
   }
 
   modifyContentToValidate(text: string): string {
-    const lineBreakLessText = text.replace(/(\r\n|\n|\r)/gm, '');
+    const textWithNoLineBreak = text.replace(/(\r\n|\n|\r)/gm, '');
 
     // These fake wrappers are added in order to wrap all the unwrapped texts
-    // to validate. See issue https://github.com/oppia/oppia/issues/13173
-    const fakeDiv = $('<div />', {html: lineBreakLessText});
+    // to validate. See issue https://github.com/oppia/oppia/issues/13173.
+    const fakeDiv = $('<div />', {html: textWithNoLineBreak});
     fakeDiv.contents().filter(function() {
       if (this.outerHTML === '<p>&nbsp;</p>') {
         this.parentElement.removeChild(this);
       }
-      return (this.nodeType === 3);
+      return (this.nodeType === Node.TEXT_NODE);
     }).wrap('<p />');
 
     return fakeDiv.html();
   }
 
   suggestTranslatedText(): void {
-    this.elementViolation = null;
-
     const originalElements = Array.from(angular.element(
       this.modifyContentToValidate(this.textToTranslate)));
     const translatedElements = Array.from(angular.element(
