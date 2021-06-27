@@ -137,7 +137,7 @@ describe('Lost Changes Modal Component', () => {
       'copy and paste these changes before discarding them.');
   });
 
-  fit('should export the lost changes and close the modal', () => {
+  it('should export the lost changes and close the modal', () => {
     spyOn(
       fixture.elementRef.nativeElement, 'getElementByClassName'
     ).withArgs('oppia-lost-changes').and.returnValue([

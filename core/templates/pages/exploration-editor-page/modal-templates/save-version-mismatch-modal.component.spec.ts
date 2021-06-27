@@ -198,7 +198,7 @@ describe('Save Version Mismatch Modal Component', () => {
       'copy and paste these changes before discarding them.');
   });
 
-  fit('should export the lost changes and close the modal', () => {
+  it('should export the lost changes and close the modal', () => {
     spyOn(
       fixture.elementRef.nativeElement, 'getElementsByClassName'
     ).withArgs('oppia-lost-changes').and.returnValue([
