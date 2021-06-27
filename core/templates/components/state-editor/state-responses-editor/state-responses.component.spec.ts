@@ -280,6 +280,7 @@ describe('StateResponsesComponent', () => {
     expect($scope.answerGroups).toEqual(answerGroups);
     expect(ResponsesService.changeActiveAnswerGroupIndex)
       .toHaveBeenCalledWith(0);
+
     ctrl.$onDestroy();
   });
 
@@ -812,7 +813,9 @@ describe('StateResponsesComponent', () => {
         callback();
       }
     );
+
     $scope.saveTaggedMisconception('misconception1', 'skill1');
+
     expect(ctrl.onSaveInteractionAnswerGroups).toHaveBeenCalled();
   });
 
@@ -822,7 +825,9 @@ describe('StateResponsesComponent', () => {
         callback();
       }
     );
+
     $scope.saveActiveAnswerGroupFeedback(defaultOutcome);
+
     expect(ctrl.onSaveInteractionAnswerGroups).toHaveBeenCalled();
   });
 
@@ -831,7 +836,9 @@ describe('StateResponsesComponent', () => {
       .and.callFake(({dest, expId, skillId}, callback) => {
         callback();
       });
+
     $scope.saveActiveAnswerGroupDest(defaultOutcome);
+
     expect(ctrl.onSaveInteractionAnswerGroups).toHaveBeenCalled();
   });
 
@@ -843,7 +850,9 @@ describe('StateResponsesComponent', () => {
         callback();
       }
     );
+
     $scope.saveActiveAnswerGroupCorrectnessLabel(defaultOutcome);
+
     expect(ctrl.onSaveInteractionAnswerGroups).toHaveBeenCalled();
   });
 
@@ -854,7 +863,9 @@ describe('StateResponsesComponent', () => {
         callback();
       }
     );
+
     $scope.saveActiveAnswerGroupRules(new Rule('', null, null));
+
     expect(ctrl.onSaveInteractionAnswerGroups).toHaveBeenCalled();
   });
 
@@ -866,7 +877,9 @@ describe('StateResponsesComponent', () => {
         callback();
       }
     );
+
     $scope.saveDefaultOutcomeFeedback(defaultOutcome);
+
     expect(ctrl.onSaveInteractionDefaultOutcome).toHaveBeenCalled();
   });
 
@@ -876,7 +889,9 @@ describe('StateResponsesComponent', () => {
       .and.callFake(({dest, expId, skillId}, callback) => {
         callback();
       });
+
     $scope.saveDefaultOutcomeDest(defaultOutcome);
+
     expect(ctrl.onSaveInteractionDefaultOutcome).toHaveBeenCalled();
   });
 
@@ -887,7 +902,9 @@ describe('StateResponsesComponent', () => {
         callback();
       }
     );
+
     $scope.saveDefaultOutcomeCorrectnessLabel(defaultOutcome);
+
     expect(ctrl.onSaveInteractionDefaultOutcome).toHaveBeenCalled();
   });
 
@@ -950,6 +967,7 @@ describe('StateResponsesComponent', () => {
   it('should check if no action is expected for misconception', () => {
     spyOn(ResponsesService, 'getAnswerGroups').and.returnValue(answerGroups);
     $scope.inapplicableSkillMisconceptionIds = ['misconception2'];
+
     // Here, misconception1 is assigned to answerGroup, so no action is
     // expected.
     expect($scope.isNoActionExpected('misconception1')).toBe(true);
@@ -990,6 +1008,7 @@ describe('StateResponsesComponent', () => {
           'm2', 'Misconception 2', 'note', '', true)
       ]
     };
+
     expect($scope.getUnaddressedMisconceptionNames())
       .toEqual(['Misconception 2']);
   });

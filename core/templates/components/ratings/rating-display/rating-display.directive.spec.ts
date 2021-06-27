@@ -61,6 +61,7 @@ describe('Rating display directive', function() {
 
     ctrlScope.ratingValue = 4.2;
     outerScope.$digest();
+
     // Note the array here is zero-indexed but ratings are one-indexed.
     expect(ctrlScope.stars[0].cssClass).toBe('fas fa-star');
     expect(ctrlScope.stars[1].cssClass).toBe('fas fa-star');
@@ -70,6 +71,7 @@ describe('Rating display directive', function() {
 
     ctrlScope.ratingValue = 1.7;
     outerScope.$digest();
+
     expect(ctrlScope.stars[0].cssClass).toBe('fas fa-star');
     expect(ctrlScope.stars[1].cssClass).toBe('far fa-star-half');
     expect(ctrlScope.stars[2].cssClass).toBe('far fa-star');
@@ -78,6 +80,7 @@ describe('Rating display directive', function() {
 
     ctrlScope.ratingValue = 1.9;
     outerScope.$digest();
+
     expect(ctrlScope.stars[0].cssClass).toBe('fas fa-star');
     expect(ctrlScope.stars[1].cssClass).toBe('fas fa-star');
     expect(ctrlScope.stars[2].cssClass).toBe('far fa-star');
@@ -86,6 +89,7 @@ describe('Rating display directive', function() {
 
     ctrlScope.ratingValue = undefined;
     outerScope.$digest();
+
     expect(ctrlScope.stars[0].cssClass).toBe('far fa-star');
     expect(ctrlScope.stars[1].cssClass).toBe('far fa-star');
     expect(ctrlScope.stars[2].cssClass).toBe('far fa-star');
@@ -95,6 +99,7 @@ describe('Rating display directive', function() {
     ctrlScope.status = 'active';
     ctrlScope.ratingValue = 4.3;
     outerScope.$digest();
+
     expect(ctrlScope.stars[0].cssClass)
       .toBe('fas fa-star oppia-rating-star-active');
     expect(ctrlScope.stars[1].cssClass)
