@@ -1,4 +1,4 @@
-# Copyright 2014 The Oppia Authors. All Rights Reserved.
+# Copyright 2021 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,8 +17,13 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import os
+
 from constants import constants
+from core.domain import exp_fetchers
 from core.domain import platform_parameter_domain
+from core.domain import skill_fetchers
+from core.domain import story_fetchers
 from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.platform import models
@@ -33,6 +38,8 @@ import python_utils
     models.NAMES.audit, models.NAMES.exploration, models.NAMES.opportunity,
     models.NAMES.user
 ])
+
+EXPLORATION_ID = '26'
 
 BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
 BOTH_MODERATOR_AND_ADMIN_USERNAME = 'moderatorandadm1n'
@@ -59,7 +66,38 @@ class AndroidConfigTest(test_utils.GenericTestBase):
         topic = topic_fetchers.get_topic_by_name('Android test')
         topic_rights = topic_fetchers.get_topic_rights(
             topic.id, strict=False)
+
+        exploration = exp_fetchers.get_exploration_by_id(EXPLORATION_ID)
+        story = story_fetchers.get_story_by_url_fragment(
+            'android-end-to-end-testing')
+        skill = skill_fetchers.get_skill_by_description(
+            'Dummy Skill for android')
+        skill.validate()
+        story.validate()
+        topic.validate(strict=True)
+        exploration.validate(strict=True)
+        for node in story.story_contents.nodes:
+            self.assertTrue(node.exploration_id == EXPLORATION_ID)
+        self.get_custom_response(
+            '/assetsdevhandler/topic/%s/assets/thumbnail/test_svg.svg' %
+            topic.id, 'image/svg+xml')
+        self.get_custom_response(
+            '/assetsdevhandler/story/%s/assets/thumbnail/test_svg.svg' %
+            story.id, 'image/svg+xml')
+
         self.assertTrue(topic_rights.topic_is_published)
+
+    def test_exploration_assets_are_loaded(self):
+        self.post_req(
+            '/initialize_android_test_data')
+        filelist = os.listdir(
+            os.path.join(
+                'data', 'explorations', 'android_interactions', 'assets',
+                'image'))
+        for filename in filelist:
+            self.get_custom_response(
+                '/assetsdevhandler/exploration/26/assets/image/%s' %
+                filename, 'image/png')
 
     def test_check_if_topic_is_already_published(self):
         self.post_req(

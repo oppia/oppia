@@ -1,4 +1,4 @@
-# Copyright 2014 The Oppia Authors. All Rights Reserved.
+# Copyright 2021 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -47,145 +47,133 @@ class InitializeAndroidTestData(base.BaseHandler):
     """Handler to initialize android specific structures."""
 
     def post(self):
-        if constants.DEV_MODE:
-            if topic_services.does_topic_with_name_exist(
-                    'Android test'):
-                topic = topic_fetchers.get_topic_by_name('Android test')
-                topic_rights = topic_fetchers.get_topic_rights(
-                    topic.id, strict=False)
-                if topic_rights.topic_is_published:
-                    raise Exception('The topic is already published.')
-                else:
-                    raise Exception('The topic exists but not published.')
-
-            # TODO(#13170): Change this to "26" after #13029 is merged.
-            exp_id = '15'
-            user_id = feconf.SYSTEM_COMMITTER_ID
-            topic_id = topic_fetchers.get_new_topic_id()
-            story_id = story_services.get_new_story_id()
-            skill_id = skill_services.get_new_skill_id()
-            question_id = question_services.get_new_question_id()
-            skill = self._create_dummy_skill(
-                skill_id, 'Dummy Skill 1', '<p>Dummy Explanation 1</p>')
-            question = self._create_dummy_question(
-                question_id, 'Question 1', [skill_id])
-            question_services.add_question(user_id, question)
-
-            question_services.create_new_question_skill_link(
-                user_id, question_id, skill_id, 0.3)
-
-            if topic_services.does_topic_with_name_exist('Android test'):
-                return
-
-            topic = topic_domain.Topic.create_default_topic(
-                topic_id, 'Android test', 'test-topic-one', 'description')
-            topic.update_url_fragment('test-topic')
-            topic.update_meta_tag_content('tag')
-            topic.update_page_title_fragment_for_web('page title for topic')
-            topic.update_thumbnail_filename('test_svg.svg')
-            topic.update_thumbnail_bg_color('#C6DCDA')
-
-            topic.add_canonical_story(story_id)
-            topic.add_uncategorized_skill_id(skill_id)
-            topic.add_subtopic(1, 'Test Subtopic Title')
-            topic.update_subtopic_url_fragment(1, 'suburl')
-            topic.update_subtopic_thumbnail_filename(1, 'test_svg.svg')
-            topic.update_subtopic_thumbnail_bg_color(1, '#FFFFFF')
-
-            topic.move_skill_id_to_subtopic(None, 1, skill_id)
-
-            subtopic_page = (
-                subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
-                    1, topic_id))
-
-            exp_services.load_demo(python_utils.convert_to_bytes(
-                exp_id))
-            rights_manager.release_ownership_of_exploration(
-                user_services.get_system_user(), python_utils.convert_to_bytes(
-                    exp_id))
-            exp_services.update_exploration(
-                user_id, exp_id, [exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                    'property_name': 'correctness_feedback_enabled',
-                    'new_value': True
-                })], 'Changed correctness_feedback_enabled.')
-            story = story_domain.Story.create_default_story(
-                story_id, 'Android End to End testing', 'Description',
-                topic_id, 'android-end-to-end-testing')
-
-            story_node_dicts = [{
-                'exp_id': exp_id,
-                'title': 'Testing with UI Automator',
-                'description': 'In order to test all android interactions'
-            }]
-
-            def generate_dummy_story_nodes(node_id, exp_id, title, description):
-                """Generates and connects sequential story nodes.
-
-                Args:
-                    node_id: int. The node id.
-                    exp_id: str. The exploration id.
-                    title: str. The title of the story node.
-                    description: str. The description of the story node.
-                """
-
-                story.add_node(
-                    '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
-                    title)
-                story.update_node_description(
-                    '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
-                    description)
-                story.update_node_exploration_id(
-                    '%s%d' % (story_domain.NODE_ID_PREFIX, node_id), exp_id)
-
-                story.update_node_thumbnail_filename(
-                    '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
-                    'test_svg.svg')
-                story.update_node_thumbnail_bg_color(
-                    '%s%d' % (story_domain.NODE_ID_PREFIX, node_id), '#F8BF74')
-                story.update_meta_tag_content('tag')
-                story.update_thumbnail_filename('test_svg.svg')
-                story.update_thumbnail_bg_color(
-                    constants.ALLOWED_THUMBNAIL_BG_COLORS['story'][0])
-
-                if node_id != len(story_node_dicts):
-                    story.update_node_destination_node_ids(
-                        '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
-                        ['%s%d' % (story_domain.NODE_ID_PREFIX, node_id + 1)])
-
-                exp_services.update_exploration(
-                    user_id, exp_id, [exp_domain.ExplorationChange({
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'category',
-                        'new_value': 'Astronomy'
-                    })], 'Change category')
-
-            for i, story_node_dict in enumerate(story_node_dicts):
-                generate_dummy_story_nodes(i + 1, **story_node_dict)
-
-            skill_services.save_new_skill(user_id, skill)
-            story_services.save_new_story(user_id, story)
-            topic_services.save_new_topic(user_id, topic)
-            subtopic_page_services.save_subtopic_page(
-                user_id, subtopic_page, 'Added subtopic',
-                [topic_domain.TopicChange({
-                    'cmd': topic_domain.CMD_ADD_SUBTOPIC,
-                    'subtopic_id': 1,
-                    'title': 'Dummy Subtopic Title'
-                })]
-            )
-
-            # Generates translation opportunities for the Contributor Dashboard.
-            exp_ids_in_story = story.story_contents.get_all_linked_exp_ids()
-            opportunity_services.add_new_exploration_opportunities(
-                story_id, exp_ids_in_story)
-
-            topic_services.publish_story(topic_id, story_id, user_id)
-            topic_services.publish_topic(topic_id, user_id)
-            self._upload_thumbnail(topic_id, feconf.ENTITY_TYPE_TOPIC)
-            self._upload_thumbnail(story_id, feconf.ENTITY_TYPE_STORY)
-        else:
+        if not constants.DEV_MODE:
             raise Exception('Cannot load new structures data in production.')
+        if topic_services.does_topic_with_name_exist(
+                'Android test'):
+            topic = topic_fetchers.get_topic_by_name('Android test')
+            topic_rights = topic_fetchers.get_topic_rights(
+                topic.id, strict=False)
+            if topic_rights.topic_is_published:
+                raise Exception('The topic is already published.')
+            else:
+                raise Exception('The topic exists but not published.')
+
+        exp_id = '26'
+        user_id = feconf.SYSTEM_COMMITTER_ID
+        topic_id = topic_fetchers.get_new_topic_id()
+        story_id = story_services.get_new_story_id()
+        skill_id = skill_services.get_new_skill_id()
+        question_id = question_services.get_new_question_id()
+        skill = self._create_dummy_skill(
+            skill_id, 'Dummy Skill for android', '<p>Dummy Explanation 1</p>')
+        question = self._create_dummy_question(
+            question_id, 'Question 1', [skill_id])
+        question_services.add_question(user_id, question)
+
+        question_services.create_new_question_skill_link(
+            user_id, question_id, skill_id, 0.3)
+
+        topic = topic_domain.Topic.create_default_topic(
+            topic_id, 'Android test', 'test-topic-one', 'description')
+        topic.update_url_fragment('test-topic')
+        topic.update_meta_tag_content('tag')
+        topic.update_page_title_fragment_for_web('page title for topic')
+        topic.update_thumbnail_filename('test_svg.svg')
+        topic.update_thumbnail_bg_color('#C6DCDA')
+
+        topic.add_canonical_story(story_id)
+        topic.add_uncategorized_skill_id(skill_id)
+        topic.add_subtopic(1, 'Test Subtopic Title')
+        topic.update_subtopic_url_fragment(1, 'suburl')
+        topic.update_subtopic_thumbnail_filename(1, 'test_svg.svg')
+        topic.update_subtopic_thumbnail_bg_color(1, '#FFFFFF')
+
+        topic.move_skill_id_to_subtopic(None, 1, skill_id)
+
+        subtopic_page = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                1, topic_id))
+
+        exp_services.load_demo(python_utils.convert_to_bytes(
+            exp_id))
+        rights_manager.release_ownership_of_exploration(
+            user_services.get_system_user(), python_utils.convert_to_bytes(
+                exp_id))
+        exp_services.update_exploration(
+            user_id, exp_id, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'correctness_feedback_enabled',
+                'new_value': True
+            })], 'Changed correctness_feedback_enabled.')
+        story = story_domain.Story.create_default_story(
+            story_id, 'Android End to End testing', 'Description',
+            topic_id, 'android-end-to-end-testing')
+
+        story_node_dicts = [{
+            'exp_id': exp_id,
+            'title': 'Testing with UI Automator',
+            'description': 'In order to test all android interactions'
+        }]
+
+        def generate_dummy_story_nodes(node_id, exp_id, title, description):
+            """Generates and connects sequential story nodes.
+
+            Args:
+                node_id: int. The node id.
+                exp_id: str. The exploration id.
+                title: str. The title of the story node.
+                description: str. The description of the story node.
+            """
+
+            story.add_node(
+                '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
+                title)
+            story.update_node_description(
+                '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
+                description)
+            story.update_node_exploration_id(
+                '%s%d' % (story_domain.NODE_ID_PREFIX, node_id), exp_id)
+
+            story.update_node_thumbnail_filename(
+                '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
+                'test_svg.svg')
+            story.update_node_thumbnail_bg_color(
+                '%s%d' % (story_domain.NODE_ID_PREFIX, node_id), '#F8BF74')
+            story.update_meta_tag_content('tag')
+            story.update_thumbnail_filename('test_svg.svg')
+            story.update_thumbnail_bg_color(
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['story'][0])
+
+            if node_id != len(story_node_dicts):
+                story.update_node_destination_node_ids(
+                    '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
+                    ['%s%d' % (story_domain.NODE_ID_PREFIX, node_id + 1)])
+
+        for i, story_node_dict in enumerate(story_node_dicts):
+            generate_dummy_story_nodes(i + 1, **story_node_dict)
+
+        skill_services.save_new_skill(user_id, skill)
+        story_services.save_new_story(user_id, story)
+        topic_services.save_new_topic(user_id, topic)
+        subtopic_page_services.save_subtopic_page(
+            user_id, subtopic_page, 'Added subtopic',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': 1,
+                'title': 'Dummy Subtopic Title'
+            })]
+        )
+
+        # Generates translation opportunities for the Contributor Dashboard.
+        exp_ids_in_story = story.story_contents.get_all_linked_exp_ids()
+        opportunity_services.add_new_exploration_opportunities(
+            story_id, exp_ids_in_story)
+
+        topic_services.publish_story(topic_id, story_id, user_id)
+        topic_services.publish_topic(topic_id, user_id)
+        self._upload_thumbnail(topic_id, feconf.ENTITY_TYPE_TOPIC)
+        self._upload_thumbnail(story_id, feconf.ENTITY_TYPE_STORY)
 
     def _upload_thumbnail(self, structure_id, structure_type):
         """Uploads images to the local datastore to be fetched using the
