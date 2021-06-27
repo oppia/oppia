@@ -62,6 +62,9 @@ class UserDeletionOneOffJobTests(test_utils.GenericTestBase):
             id=self.user_1_id, exploration_ids=[], collection_ids=[],
             story_ids=[], partially_learnt_topic_ids=[]
         ).put()
+        user_models.LearnerGoalsModel(
+            id=self.user_1_id, topic_ids_to_learn=[]
+        ).put()
         user_models.LearnerPlaylistModel(
             id=self.user_1_id, exploration_ids=[], collection_ids=[]
         ).put()
@@ -84,6 +87,8 @@ class UserDeletionOneOffJobTests(test_utils.GenericTestBase):
             user_models.CompletedActivitiesModel.get_by_id(self.user_1_id))
         self.assertIsNone(
             user_models.IncompleteActivitiesModel.get_by_id(self.user_1_id))
+        self.assertIsNone(
+            user_models.LearnerGoalsModel.get_by_id(self.user_1_id))
         self.assertIsNone(
             user_models.LearnerPlaylistModel.get_by_id(self.user_1_id))
 
@@ -127,6 +132,9 @@ class FullyCompleteUserDeletionOneOffJobTests(test_utils.GenericTestBase):
         user_models.IncompleteActivitiesModel(
             id=self.user_1_id, exploration_ids=[], collection_ids=[],
             story_ids=[], partially_learnt_topic_ids=[]
+        ).put()
+        user_models.LearnerGoalsModel(
+            id=self.user_1_id, topic_ids_to_learn=[]
         ).put()
         user_models.LearnerPlaylistModel(
             id=self.user_1_id, exploration_ids=[], collection_ids=[]
