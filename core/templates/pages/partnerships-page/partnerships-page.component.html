@@ -1,6 +1,6 @@
 <div class="partnerships-page">
   <div class="row oppia-partnerships-banner">
-    <div class="oppia-partnerships-banner-content col-8 flex-gt-md-55">
+    <div class="oppia-partnerships-banner-content flex-gt-md-55">
       <h1 class="oppia-partnerships-h1">
         Partnerships with the Oppia Foundation
       </h1>
@@ -30,8 +30,13 @@
       </div>
     </div>
 
-    <div class="oppia-partnerships-banner-image col-4 flex-45">
+    <div class="oppia-partnerships-banner-image
+                hide-xs hide-sm hide-md col-4 flex-45">
       <img alt="Partnerships page hero image - Desktop view"
+           [src]="partnershipsImgUrl">
+    </div>
+    <div class="oppia-partnerships-banner-image hide-gt-md">
+      <img alt="Partnerships page hero image - Mobile view"
            [src]="partnershipsImgUrl">
     </div>
   </div>
@@ -40,16 +45,16 @@
     <h3 class="oppia-partnerships-h3">Benefits of being an Oppia partner</h3>
 
     <div class="row">
-      <div class="col">
+      <div class="col col-lg-3 col-md-3 col-sm-12">
         <span class="oppia-partnerships-emphasized">1.</span> Access to
         Oppia-specific tips for curriculum building and lesson usage
       </div>
-      <div class="col">
+      <div class="col col-lg-3 col-md-3 col-sm-12">
         <span class="oppia-partnerships-emphasized">2.</span> Personalized
         guidance for how to best make use of Oppia's lessons for the learners
         you work with
       </div>
-      <div class="col">
+      <div class="col col-lg-3 col-md-3 col-sm-12">
         <span class="oppia-partnerships-emphasized">3.</span> Direct support and
         collaboration with one of the Oppia Partnership Leads
       </div>
@@ -228,6 +233,20 @@
     margin: 0 4em 0 4.5em;
   }
 
+  @media screen and (max-width: 900px) {
+    .oppia-partnerships-h1 {
+      font-size: 1.7em;
+    }
+
+    .oppia-partnerships-h3 {
+      font-size: 1em;
+    }
+
+    .oppia-partnerships-list {
+      font-size: 0.9em;
+    }
+  }
+
   .oppia-partnerships-emphasized {
     color: #047c74;
     font-family: "Rubik, regular", "Roboto", Arial, sans-serif;
@@ -241,7 +260,14 @@
   }
 
   .oppia-partnerships-benefits .row {
+    justify-content: center;
     margin: 2.5em 8em;
+  }
+
+  @media screen and (max-width: 900px) {
+    .oppia-partnerships-benefits .row {
+      margin: 2.5em 4em;
+    }
   }
 
   .oppia-partnerships-benefits .col {
@@ -249,7 +275,7 @@
     color: #383838;
     font-family: "Rubik, regular", "Roboto", Arial, sans-serif;
     font-size: 1.1em;
-    margin: 0 1em;
+    margin: 1em;
     min-height: 180px;
     padding: 2em;
     text-align: start;
@@ -263,6 +289,12 @@
 
   .oppia-partnerships-cta .row {
     margin: 0 8em;
+  }
+
+  @media screen and (max-width: 900px) {
+    .oppia-partnerships-cta .row {
+      margin: 0;
+    }
   }
 
   .oppia-partnerships-cta .col {
@@ -325,5 +357,14 @@
     font-family: "Roboto", Arial, sans-serif;
     font-size: 1.2em;
     text-align: start;
+  }
+
+  @media screen and (max-width: 900px) {
+    .oppia-partnerships-faq-card mat-panel-title {
+      font-size: 0.7em;
+    }
+    .oppia-partnerships-faq-card p {
+      font-size: 0.8em;
+    }
   }
 </style>
