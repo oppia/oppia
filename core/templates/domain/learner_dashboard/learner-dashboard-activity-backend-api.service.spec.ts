@@ -173,6 +173,7 @@ describe('Learner playlist Backend Api service ', () => {
         completed_story_ids: [],
         learnt_topic_ids: [],
         partially_learnt_topic_ids: [],
+        topic_ids_to_learn: []
       });
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
       setTimeout(opt.beforeDismiss);
@@ -207,6 +208,7 @@ describe('Learner playlist Backend Api service ', () => {
         completed_story_ids: [],
         learnt_topic_ids: [],
         partially_learnt_topic_ids: [],
+        topic_ids_to_learn: []
       });
 
     learnerDashboardActivityBackendApiService.removeFromLearnerPlaylistModal(
@@ -239,6 +241,7 @@ describe('Learner playlist Backend Api service ', () => {
         completed_story_ids: [],
         learnt_topic_ids: [],
         partially_learnt_topic_ids: [],
+        topic_ids_to_learn: []
       });
 
     learnerDashboardActivityBackendApiService.removeFromLearnerPlaylistModal(
@@ -272,6 +275,7 @@ describe('Learner playlist Backend Api service ', () => {
         completed_story_ids: [],
         learnt_topic_ids: [],
         partially_learnt_topic_ids: [],
+        topic_ids_to_learn: []
       });
 
     learnerDashboardActivityBackendApiService.removeFromLearnerPlaylistModal(
