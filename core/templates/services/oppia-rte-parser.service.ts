@@ -69,8 +69,8 @@ export class OppiaRteNode {
 })
 export class OppiaRteParserService {
   NON_INTERACTIVE_PREFIX = 'oppia-noninteractive-';
-
-  convertKebabCaseToCamelCase(key: string): string {
+  domparser = new DOMParser();
+  private _convertKebabCaseToCamelCase(key: string): string {
     let arr = key.replace(/_/g, '-').split('-');
     let capital = arr.map((item, index) => {
       // eslint-disable-next-line max-len
@@ -87,15 +87,12 @@ export class OppiaRteParserService {
 
       // Create attributes Object from NamedNodeMap.
       for (let i = 0; i < node.attributes.length; i++) {
-        attrs[this.convertKebabCaseToCamelCase(node.attributes[i].nodeName)] =
+        attrs[this._convertKebabCaseToCamelCase(node.attributes[i].nodeName)] =
           node.attributes[i].nodeValue;
       }
 
       // Check if it an RTE component.
-      if (
-        tagName.startsWith(this.NON_INTERACTIVE_PREFIX) &&
-        selectorToComponentClassMap[tagName]
-      ) {
+      if (tagName.startsWith(this.NON_INTERACTIVE_PREFIX)) {
         return new OppiaRteNode(tagName, attrs);
       }
 
@@ -107,6 +104,52 @@ export class OppiaRteParserService {
       }
 
       // Continue Recursion.
+      /**
+       * Case: <p>Hi <em> This is tricky </em> Can't <b>with</b> DOM parser </p>
+       * Problem: We don't get the text nodes as children. It isn't stored in
+       *   DomParsers representation separately but only as a part of innerHTML.
+       * Solution: The innerHTML of the case is:
+       *   "Hi <em> This is tricky </em> Can't <b>with</b> DOM parser ". There
+       *   are two children (em, b). That means there are three zones for texts:
+       *   "Zone 1 <em>...</em> Zone 2 <b>...</b> Zone 3".
+       *   Zone 1 = From start to the first index of <em.
+       *   Zone 2 = From index of first </em> to first indexOf <b>
+       *   Zone 3 = From index of first </b> to end.
+       *   As we can see that this can get very complicated soon when there are
+       *   multiple child elements having the same tag. Fortunately, the fix for
+       *   this is easy. WE can remove children that have already been parsed.
+       *   That will mean we only need to look at the first indexOf of tag and
+       *   keep a track of the text we have already loaded. Here is a dry run of
+       *   the algorithm on the sample case listed above:
+       *   ------------------------------- Data --------------------------------
+       *   node.children = [Node: em, Node: b]
+       *   node.innerHTML = ("Hi <em> This is tricky </em> Can't <b>with</b> DOM
+       *     parser ")
+       *   max = 2
+       *   ---------------------------- Iteration 0 ----------------------------
+       *   prevPointer = 0
+       *   child = 0
+       *   t = "em"
+       *   node.innerHTML.indexOf('<' + t) = 3
+       *   text = node.innerHTML.substring(
+       *     prevPointer, node.innerHTML.indexOf('<' + t)) = "Hi ";
+       *   node.removeChild(em)
+       *   ---------------------------- Iteration 1 ----------------------------
+       *   prevPointer = 3
+       *   child = 1
+       *   t = "b"
+       *   node.innerHTML = "Hi  Can't <b>with</b> DOM parser "
+       *   node.innerHTML.indexOf('<' + t) = 10
+       *   text = node.innerHTML.substring(
+       *     prevPointer, node.innerHTML.indexOf('<' + t)) = " Can't ";
+       *   node.removeChild(b)
+       *  ------------------------- Outside for loop ---------------------------
+       *  prevPointer = 10
+       *  node.innerHTML = "Hi  Can't  DOM parser "
+       *  text = " DOM parser "
+       *  -------------------------- End of Dry Run ----------------------------
+       * Note that the text extracted are trimmed.
+       */
       let prevPointer = 0;
       const max = Object.keys(node.children).length;
       const childNode = new OppiaRteNode(tagName, attrs);
@@ -123,10 +166,24 @@ export class OppiaRteParserService {
         node.removeChild(node.children[0]);
         childNode.children.push(temp);
       }
+      if (prevPointer + 1 < node.innerHTML.length) {
+        const text = node.innerHTML.substring(
+          prevPointer, node.innerHTML.length
+        ).replace(/[\t\n]/g, '').trim();
+        if (text !== '') {
+          childNode.children.push(new TextNode(text));
+        }
+      }
       return childNode;
     };
 
     // Return dfs of body.
     return dfs(body);
+  }
+
+  constructFromRteString(rteString: string): OppiaRteNode {
+    return this.constructFromDomParser(
+      this.domparser.parseFromString(rteString, 'text/html').body
+    );
   }
 }

@@ -81,11 +81,8 @@ export class RteOutputDisplayComponent implements AfterViewInit {
     let domparser = new DOMParser();
     let dom = domparser.parseFromString(this.rteString, 'text/html').body;
     this.node = this.oppiaHtmlParserService.constructFromDomParser(dom);
-    const dfs = (node: OppiaRteNode | TextNode | string) => {
-      if (typeof node === 'string') {
-        return;
-      }
-      node.portal = this.getTemplatePortal(node);
+    const dfs = (node: OppiaRteNode | TextNode) => {
+      node.portal = this._getTemplatePortal(node);
       if (!('children' in node)) {
         return;
       }
@@ -97,17 +94,15 @@ export class RteOutputDisplayComponent implements AfterViewInit {
     this.cdRef.detectChanges();
   }
 
-  isLeaf(node: OppiaRteNode | string): boolean {
-    return typeof node === 'string';
-  }
-
   ngAfterViewInit(): void {
     this._updateNode();
     this.show = true;
     this.cdRef.detectChanges();
   }
 
-  getTemplatePortal(node: OppiaRteNode | TextNode): TemplatePortal<unknown> {
+  private _getTemplatePortal(
+      node: OppiaRteNode | TextNode
+  ): TemplatePortal<unknown> {
     if ('value' in node) {
       return new TemplatePortal(
         this.textTagPortal,
