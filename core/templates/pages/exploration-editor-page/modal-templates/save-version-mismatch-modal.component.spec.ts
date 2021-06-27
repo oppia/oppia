@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for SaveVersionMismatchModalComponent.
  */
 
-import { Component, NO_ERRORS_SCHEMA } from '@angular/core';
+import { Component, ElementRef, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -101,6 +101,7 @@ describe('Save Version Mismatch Modal Component', () => {
   let loggerService: LoggerService;
   let logSpy = null;
   let explorationDataService: MockExplorationDataService;
+  let elRef: ElementRef;
 
   beforeEach(waitForAsync(() => {
     windowRef = new MockWindowRef();
@@ -137,6 +138,7 @@ describe('Save Version Mismatch Modal Component', () => {
 
     loggerService = TestBed.inject(LoggerService);
     logSpy = spyOn(loggerService, 'error').and.callThrough();
+    elRef = TestBed.inject(ElementRef);
 
     fixture.detectChanges();
   });
@@ -196,5 +198,34 @@ describe('Save Version Mismatch Modal Component', () => {
     expect(modalBody).toBe(
       'The lost changes are displayed below. You may want to export or ' +
       'copy and paste these changes before discarding them.');
+  });
+
+  it('should export the lost changes and close the modal', () => {
+    spyOn(
+      elRef.nativeElement, 'getElementByClassName'
+    ).withArgs('oppia-lost-changes').and.returnValue([
+      {
+        innerText: 'Dummy Inner Text'
+      }
+    ]);
+    const spyObj = jasmine.createSpyObj('a', ['click']);
+    const reloadSpy = jasmine.createSpy('reload');
+    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
+      location: {
+        reload: reloadSpy
+      }
+    });
+    spyOn(document, 'createElement').and.returnValue(spyObj);
+    component.hasLostChanges = true;
+    component.exportAndDiscardChanges();
+    expect(document.createElement).toHaveBeenCalledTimes(1);
+    expect(document.createElement).toHaveBeenCalledWith('a');
+    expect(spyObj.download).toBe('lostChanges.txt');
+    expect(spyObj.click).toHaveBeenCalledTimes(1);
+    expect(spyObj.click).toHaveBeenCalledWith();
+    waitForAsync(() => {
+      expect(explorationDataService.discardDraftAsync).toHaveBeenCalled();
+      expect(reloadSpy).toHaveBeenCalled();
+    });
   });
 });

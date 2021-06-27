@@ -56,19 +56,16 @@ export class LostChangesModalComponent
   }
 
   exportChangesAndClose(): void {
-    let lostChangesData = this.elRef.nativeElement.getElementsByClassName(
-      'oppia-lost-changes');
+    let lostChangesData: HTMLElement = (
+      this.elRef.nativeElement.getElementsByClassName(
+        'oppia-lost-changes'));
     let blob = new Blob([lostChangesData[0].innerText], {type: 'text/plain'});
-    if (this.windowRef.nativeWindow.navigator.msSaveOrOpenBlob) {
-      this.windowRef.nativeWindow.navigator.msSaveBlob(blob, 'lostChanges.txt');
-    } else {
-      var elem = this.windowRef.nativeWindow.document.createElement('a');
-      elem.href = URL.createObjectURL(blob);
-      elem.download = 'lostChanges.txt';
-      document.body.appendChild(elem);
-      elem.click();
-      document.body.removeChild(elem);
-    }
+    var elem = this.windowRef.nativeWindow.document.createElement('a');
+    elem.href = URL.createObjectURL(blob);
+    elem.download = 'lostChanges.txt';
+    document.body.appendChild(elem);
+    elem.click();
+    document.body.removeChild(elem);
     this.ngbActiveModal.dismiss();
   }
 }

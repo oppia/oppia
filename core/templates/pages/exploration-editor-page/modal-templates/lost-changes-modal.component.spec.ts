@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for LostChangesModalComponent.
  */
 
-import { Component, NO_ERRORS_SCHEMA } from '@angular/core';
+import { Component, ElementRef, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
@@ -25,7 +25,6 @@ import { LostChange, LostChangeObjectFactory } from
 
 import { LostChangesModalComponent } from './lost-changes-modal.component';
 import { LoggerService } from 'services/contextual/logger.service';
-
 @Component({
   selector: 'oppia-changes-in-human-readable-form',
   template: ''
@@ -50,6 +49,7 @@ describe('Lost Changes Modal Component', () => {
   let ngbActiveModal: NgbActiveModal;
   let loggerService: LoggerService;
   let logSpy = null;
+  let elRef: ElementRef;
 
   const lostChanges = [{
     cmd: 'add_state',
@@ -88,7 +88,7 @@ describe('Lost Changes Modal Component', () => {
     ngbActiveModal = TestBed.inject(NgbActiveModal);
     loggerService = TestBed.inject(LoggerService);
     logSpy = spyOn(loggerService, 'error').and.callThrough();
-
+    elRef = TestBed.inject(ElementRef);
     fixture.detectChanges();
   });
 
@@ -137,5 +137,25 @@ describe('Lost Changes Modal Component', () => {
     expect(modalBody).toBe(
       'The lost changes are displayed below. You may want to export or ' +
       'copy and paste these changes before discarding them.');
+  });
+
+  it('should export the lost changes and close the modal', () => {
+    spyOn(
+      elRef.nativeElement, 'getElementByClassName'
+    ).withArgs('oppia-lost-changes').and.returnValue([
+      {
+        innerText: 'Dummy Inner Text'
+      }
+    ]);
+    const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
+    const spyObj = jasmine.createSpyObj('a', ['click']);
+    spyOn(document, 'createElement').and.returnValue(spyObj);
+    component.exportChangesAndClose();
+    expect(document.createElement).toHaveBeenCalledTimes(1);
+    expect(document.createElement).toHaveBeenCalledWith('a');
+    expect(spyObj.download).toBe('lostChanges.txt');
+    expect(spyObj.click).toHaveBeenCalledTimes(1);
+    expect(spyObj.click).toHaveBeenCalledWith();
+    expect(dismissSpy).toHaveBeenCalledWith();
   });
 });
