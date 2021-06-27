@@ -45,7 +45,6 @@ export class AdminMiscTabComponent {
   userIdToDelete: string;
   usernameToDelete: string;
   expVersion: number;
-  reader: FileReader;
   stateName: string;
   numAnswers: number;
   expId: string;
@@ -100,8 +99,8 @@ export class AdminMiscTabComponent {
     let file = (
       <HTMLInputElement>document.getElementById(
         'topicSimilaritiesFile')).files[0];
-    this.reader = new FileReader();
-    this.reader.onload = (e) => {
+    let reader = new FileReader();
+    reader.onload = (e) => {
       let data = (<FileReader>e.target).result;
       this.adminBackendApiService.uploadTopicSimilaritiesAsync(data as string)
         .then(() => {
@@ -111,7 +110,7 @@ export class AdminMiscTabComponent {
           this.setStatusMessage.emit('Server error: ' + errorResponse);
         });
     };
-    this.reader.readAsText(file);
+    reader.readAsText(file);
   }
 
   downloadTopicSimilaritiesFile(): void {

@@ -38,27 +38,27 @@ class MockWindowRef {
       pathname: 'pathname',
       search: 'search',
       hash: 'hash'
+    },
+    open(){
+      return;
     }
   }
 }
 
 class MockReaderObject {
   result = null;
-  onloadend = null;
+  onload = null;
   constructor() {
-    this.onloadend = () => {
+    this.onload = ($evt) => {
       return 'Fake onload executed';
     };
   }
-  readAsDataURL(file) {
-    this.onloadend();
+  readAsText(file) {
+    this.onload({target: {result : 'result'}});
     return 'The file is loaded';
   }
-  readAsText(){
-    return;
-  }
 }
-
+for(let i=0; i<100; i++){
 fdescribe('Admin misc tab component ', () => {
   let component: AdminMiscTabComponent;
   let fixture: ComponentFixture<AdminMiscTabComponent>;
@@ -267,4 +267,261 @@ fdescribe('Admin misc tab component ', () => {
     expect(mockWindowRef.nativeWindow.location.href).toEqual(downloadHandler);
   });
 
+  it('should set data extraction query message ' +
+    'on clicking submit query button', () => {
+    let message = 'message';
+    // Pre-checks.
+    expect(component.showDataExtractionQueryStatus).toBe(undefined);
+    expect(component.dataExtractionQueryStatusMessage).toBe(undefined);
+
+    component.setDataExtractionQueryStatusMessage(message);
+
+    expect(component.showDataExtractionQueryStatus).toBe(true);
+    expect(component.dataExtractionQueryStatusMessage).toBe(message);
+  });
+
+  describe('when clicking on send mail to admin button ', () => {
+    it('should send mail successfully', fakeAsync(() => {
+      let sendMailSpy = spyOn(
+        adminBackendApiService, 'sendDummyMailToAdminAsync')
+        .and.returnValue(Promise.resolve());
+
+      component.sendDummyMailToAdmin();
+      tick();
+
+      expect(sendMailSpy).toHaveBeenCalled();
+      expect(statusMessageSpy).toHaveBeenCalledWith(
+        'Success! Mail sent to admin.');
+    }));
+
+    it('should not send mail to admin in case of backend ' +
+      'error', fakeAsync(() => {
+      let sendMailSpy = spyOn(
+        adminBackendApiService, 'sendDummyMailToAdminAsync')
+        .and.rejectWith('Internal Server Error.');
+
+      component.sendDummyMailToAdmin();
+      tick();
+
+      expect(sendMailSpy).toHaveBeenCalled();
+      expect(statusMessageSpy).toHaveBeenCalledWith(
+        'Server error: Internal Server Error.');
+    }));
+  });
+
+  describe('when clicking on update username button ', () => {
+    it('should update username successfully', fakeAsync(() => {
+      component.oldUsername = 'oldUsername';
+      component.newUsername = 'newUsername';
+      let updateUsernameSpy = spyOn(
+        adminBackendApiService, 'updateUserNameAsync')
+        .and.returnValue(Promise.resolve());
+
+      component.updateUsername();
+      tick();
+
+      expect(updateUsernameSpy).toHaveBeenCalled();
+      expect(statusMessageSpy).toHaveBeenCalledWith(
+        'Successfully renamed oldUsername to newUsername!');
+    }));
+
+    it('should not update username in case of backend ' +
+      'error', fakeAsync(() => {
+      component.oldUsername = 'oldUsername';
+      component.newUsername = 'newUsername';
+      let updateUsernameSpy = spyOn(
+        adminBackendApiService, 'updateUserNameAsync')
+        .and.rejectWith('Internal Server Error.');
+
+      component.updateUsername();
+      tick();
+
+      expect(updateUsernameSpy).toHaveBeenCalled();
+      expect(statusMessageSpy).toHaveBeenCalledWith(
+        'Server error: Internal Server Error.');
+    }));
+  });
+
+  describe('when clicking on number of deletion requests button ', () => {
+    it('should show number of deletion requests successfully', fakeAsync(() => {
+      let updateUsernameSpy = spyOn(
+        adminBackendApiService, 'getNumberOfPendingDeletionRequestAsync')
+        .and.returnValue(Promise.resolve(
+          {number_of_pending_deletion_models: '5'}));
+
+      component.getNumberOfPendingDeletionRequestModels();
+      tick();
+
+      expect(updateUsernameSpy).toHaveBeenCalled();
+      expect(statusMessageSpy).toHaveBeenCalledWith(
+        'The number of users that are being deleted is: 5');
+    }));
+
+    it('should not show number of deletion requests in case of backend ' +
+      'error', fakeAsync(() => {
+      let updateUsernameSpy = spyOn(
+        adminBackendApiService, 'getNumberOfPendingDeletionRequestAsync')
+        .and.rejectWith('Internal Server Error.');
+
+      component.getNumberOfPendingDeletionRequestModels();
+      tick();
+
+      expect(updateUsernameSpy).toHaveBeenCalled();
+      expect(statusMessageSpy).toHaveBeenCalledWith(
+        'Server error: Internal Server Error.');
+    }));
+  });
+
+  describe('when clicking on grant permissions button ', () => {
+    it('should grant super admin permissions successfully', fakeAsync(() => {
+      let permissionsSpy = spyOn(
+        adminBackendApiService, 'grantSuperAdminPrivilegesAsync')
+        .and.returnValue(Promise.resolve());
+
+      component.grantSuperAdminPrivileges();
+      tick();
+
+      expect(permissionsSpy).toHaveBeenCalled();
+      expect(statusMessageSpy).toHaveBeenCalledWith('Success!');
+    }));
+
+    it('should not grant super admin permissions in case of backend ' +
+      'error', fakeAsync(() => {
+      let permissionsSpy = spyOn(
+        adminBackendApiService, 'grantSuperAdminPrivilegesAsync')
+        .and.rejectWith({ error: {error: 'Internal Server Error.'}});
+
+      component.grantSuperAdminPrivileges();
+      tick();
+
+      expect(permissionsSpy).toHaveBeenCalled();
+      expect(statusMessageSpy).toHaveBeenCalledWith(
+        'Server error: Internal Server Error.');
+    }));
+  });
+
+  describe('when clicking on revoke permissions button ', () => {
+    it('should revoke super admin permissions successfully', fakeAsync(() => {
+      let permissionsSpy = spyOn(
+        adminBackendApiService, 'revokeSuperAdminPrivilegesAsync')
+        .and.returnValue(Promise.resolve());
+
+      component.revokeSuperAdminPrivileges();
+      tick();
+
+      expect(permissionsSpy).toHaveBeenCalled();
+      expect(statusMessageSpy).toHaveBeenCalledWith('Success!');
+    }));
+
+    it('should not revoke super admin permissions in case of backend ' +
+      'error', fakeAsync(() => {
+      let permissionsSpy = spyOn(
+        adminBackendApiService, 'revokeSuperAdminPrivilegesAsync')
+        .and.rejectWith({ error: {error: 'Internal Server Error.'}});
+
+      component.revokeSuperAdminPrivileges();
+      tick();
+
+      expect(permissionsSpy).toHaveBeenCalled();
+      expect(statusMessageSpy).toHaveBeenCalledWith(
+        'Server error: Internal Server Error.');
+    }));
+  });
+
+
+  describe('when clicking on get models related to users button ', () => {
+    it('should return user models successfully if they exist', fakeAsync(() => {
+      let uesrModelSpy = spyOn(
+        adminBackendApiService, 'getModelsRelatedToUserAsync')
+        .and.returnValue(Promise.resolve(true));
+
+      component.getModelsRelatedToUser();
+      tick();
+
+      expect(uesrModelSpy).toHaveBeenCalled();
+      expect(statusMessageSpy).toHaveBeenCalledWith(
+        'Some related models exist, see logs ' +
+        'to find out the exact models');
+    }));
+
+    it('should not return user models if they does not exist', fakeAsync(() => {
+      let uesrModelSpy = spyOn(
+        adminBackendApiService, 'getModelsRelatedToUserAsync')
+        .and.returnValue(Promise.resolve(false));
+
+      component.getModelsRelatedToUser();
+      tick();
+
+      expect(uesrModelSpy).toHaveBeenCalled();
+      expect(statusMessageSpy).toHaveBeenCalledWith(
+        'No related models exist');
+    }));
+
+    it('should not return user models in case of backend ' +
+      'error', fakeAsync(() => {
+      let uesrModelSpy = spyOn(
+        adminBackendApiService, 'getModelsRelatedToUserAsync')
+        .and.rejectWith('Internal Server Error.');
+
+      component.getModelsRelatedToUser();
+      tick();
+
+      expect(uesrModelSpy).toHaveBeenCalled();
+      expect(statusMessageSpy).toHaveBeenCalledWith(
+        'Server error: Internal Server Error.');
+    }));
+  });
+
+  describe('when clicking on delete user button ', () => {
+    it('should delete the user account successfully', fakeAsync(() => {
+      let uesrModelSpy = spyOn(
+        adminBackendApiService, 'deleteUserAsync')
+        .and.returnValue(Promise.resolve());
+
+      component.deleteUser();
+      tick();
+
+      expect(uesrModelSpy).toHaveBeenCalled();
+      expect(statusMessageSpy).toHaveBeenCalledWith(
+        'The deletion process was started.');
+    }));
+
+    it('should not delete user account in case of backend ' +
+      'error', fakeAsync(() => {
+      let uesrModelSpy = spyOn(
+        adminBackendApiService, 'deleteUserAsync')
+        .and.rejectWith('Internal Server Error.');
+
+      component.deleteUser();
+      tick();
+
+      expect(uesrModelSpy).toHaveBeenCalled();
+      expect(statusMessageSpy).toHaveBeenCalledWith(
+        'Server error: Internal Server Error.');
+    }));
+  });
+
+  it('should sumbit query when clicking on submit query button', () => {
+    let setQueryDataSpy = spyOn(component, 'setDataExtractionQueryStatusMessage').and.callThrough();
+
+    component.submitQuery();
+
+    expect(setQueryDataSpy).toHaveBeenCalledWith(
+      'Data extraction query has been submitted. Please wait.')
+  });
+
+  it('should reset form data on clicking reset button', () => {
+    component.showDataExtractionQueryStatus = true;
+    component.expId = 'expId';
+    component.expVersion = 10;
+    component.stateName = 'stateName';
+
+    component.resetForm();
+
+    expect(component.showDataExtractionQueryStatus).toBe(false);
+    expect(component.expId).toBe('');
+    expect(component.expVersion).toBe(0);
+    expect(component.stateName).toBe('');
+  });
 });
+}
