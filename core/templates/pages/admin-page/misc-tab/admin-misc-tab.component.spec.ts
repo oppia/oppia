@@ -58,8 +58,8 @@ class MockReaderObject {
     return 'The file is loaded';
   }
 }
-for(let i=0; i<100; i++){
-fdescribe('Admin misc tab component ', () => {
+
+describe('Admin misc tab component ', () => {
   let component: AdminMiscTabComponent;
   let fixture: ComponentFixture<AdminMiscTabComponent>;
 
@@ -524,4 +524,3 @@ fdescribe('Admin misc tab component ', () => {
     expect(component.stateName).toBe('');
   });
 });
-}
