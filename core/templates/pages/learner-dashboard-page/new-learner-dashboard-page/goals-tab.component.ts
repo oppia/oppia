@@ -104,13 +104,14 @@ export class GoalsTabComponent {
       this.currentGoalsStoryIsShown[index]);
   }
 
-  addToLearnerGoals(
-      topic: LearnerTopicSummary, topicId: string, index: number): void {
+  async addToLearnerGoals(
+      topic: LearnerTopicSummary, topicId: string,
+      index: number): Promise<void> {
     var activityId = topicId;
     var activityType = constants.ACTIVITY_TYPE_LEARN_TOPIC;
     if (!this.topicIdsInCurrentGoals.includes(activityId)) {
       var isSuccessfullyAdded = (
-        this.learnerDashboardActivityBackendApiService.addToLearnerGoals(
+        await this.learnerDashboardActivityBackendApiService.addToLearnerGoals(
           activityId, activityType));
       if (isSuccessfullyAdded &&
         this.topicIdsInCurrentGoals.length < this.MAX_CURRENT_GOALS_LENGTH &&

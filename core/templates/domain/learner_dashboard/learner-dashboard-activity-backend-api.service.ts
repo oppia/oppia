@@ -130,7 +130,8 @@ export class LearnerDashboardActivityBackendApiService {
     });
   }
 
-  addToLearnerGoals(activityId: string, activityType: string): boolean {
+  async addToLearnerGoals(
+      activityId: string, activityType: string): Promise<boolean> {
     this.successfullyAdded = true;
     this.addToLearnerGoalsUrl = (
       this.urlInterpolationService.interpolateUrl(
@@ -138,25 +139,23 @@ export class LearnerDashboardActivityBackendApiService {
           activityType: activityType,
           activityId: activityId
         }));
-    this.http.post<LearnerGoalsResponseObject>(
-      this.addToLearnerGoalsUrl, {}).toPromise()
-      .then(response => {
-        if (response.belongs_to_learnt_list) {
-          this.successfullyAdded = false;
-          this.alertsService.addInfoMessage(
-            'You have already learnt this activity.');
-        }
-        if (response.goals_limit_exceeded) {
-          this.successfullyAdded = false;
-          this.alertsService.addInfoMessage(
-            'Your \'Current Goals\' list is full! Please finish existing ' +
-            'goals or remove some to add new goals to your list.');
-        }
-        if (this.successfullyAdded) {
-          this.alertsService.addSuccessMessage(
-            'Successfully added to your \'Current Goals\' list.');
-        }
-      });
+    var response = await this.http.post<LearnerGoalsResponseObject>(
+      this.addToLearnerGoalsUrl, {}).toPromise();
+    if (response.belongs_to_learnt_list) {
+      this.successfullyAdded = false;
+      this.alertsService.addInfoMessage(
+        'You have already learnt this activity.');
+    }
+    if (response.goals_limit_exceeded) {
+      this.successfullyAdded = false;
+      this.alertsService.addInfoMessage(
+        'Your \'Current Goals\' list is full! Please finish existing ' +
+        'goals or remove some to add new goals to your list.');
+    }
+    if (this.successfullyAdded) {
+      this.alertsService.addSuccessMessage(
+        'Successfully added to your \'Current Goals\' list.');
+    }
     return this.successfullyAdded;
   }
 
