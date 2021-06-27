@@ -95,7 +95,7 @@ describe('Admin misc tab component ', () => {
     topicSummaries: [],
     featureFlags: []
   };
-  
+
   beforeEach(() => {
     mockWindowRef = new MockWindowRef();
     TestBed.configureTestingModule({
@@ -127,7 +127,7 @@ describe('Admin misc tab component ', () => {
       .and.returnValue(null);
     spyOn(adminTaskManagerService, 'startTask').and.returnValue(null);
     spyOn(adminTaskManagerService, 'finishTask').and.returnValue(null);
-    spyOn(adminBackendApiService, 'getDataAsync').and.resolveTo(adminPageData)
+    spyOn(adminBackendApiService, 'getDataAsync').and.resolveTo(adminPageData);
     confirmSpy = spyOn(mockWindowRef.nativeWindow, 'confirm');
   });
 
@@ -141,7 +141,7 @@ describe('Admin misc tab component ', () => {
   }));
 
   it('should check whether an object is non empty when calling ' +
-    '\'isNonemptyObject\'',() => {
+    '\'isNonemptyObject\'', () => {
     let result = component.isNonemptyObject({});
     expect(result).toBe(false);
 
@@ -150,14 +150,14 @@ describe('Admin misc tab component ', () => {
   });
 
   it('should return schema callback when calling ' +
-    '\'getSchemaCallback\'',() => {
+    '\'getSchemaCallback\'', () => {
     let result = component.getSchemaCallback({type: 'bool'});
     expect(result()).toEqual({type: 'bool'});
   });
 
   describe('when clicking on revert to default button ', () => {
-    it('should revert to default config property successfully',fakeAsync(() => {
-      // Setting confirm button clicked to be true. 
+    it('should revert to default config property successfully', fakeAsync(() => {
+      // Setting confirm button clicked to be true.
       confirmSpy.and.returnValue(true);
       spyOn(adminBackendApiService, 'revertConfigPropertyAsync')
         .and.returnValue(Promise.resolve());
@@ -170,8 +170,8 @@ describe('Admin misc tab component ', () => {
     }));
 
     it('should not revert to default config property ' +
-      'in case of backend error',fakeAsync(() => {
-      // Setting confirm button clicked to be true. 
+      'in case of backend error', fakeAsync(() => {
+      // Setting confirm button clicked to be true.
       confirmSpy.and.returnValue(true);
       spyOn(adminBackendApiService, 'revertConfigPropertyAsync')
         .and.returnValue(Promise.reject('Internal Server Error.'));
@@ -183,9 +183,9 @@ describe('Admin misc tab component ', () => {
         'Server error: Internal Server Error.');
     }));
 
-    it('should not request backend to  revert to default config property ' +
-      'if cancel button is clicked in the alert',fakeAsync(() => {
-      // Setting confirm button clicked to be false. 
+    it('should not request backend to revert to default config property ' +
+      'if cancel button is clicked in the alert', fakeAsync(() => {
+      // Setting confirm button clicked to be false.
       confirmSpy.and.returnValue(false);
       let revertConfigSpy = spyOn(
         adminBackendApiService, 'revertConfigPropertyAsync');
@@ -198,8 +198,8 @@ describe('Admin misc tab component ', () => {
   });
 
   describe('when clicking on save button ', () => {
-    it('should save config properties successfully',fakeAsync(() => {
-      // Setting confirm button clicked to be true. 
+    it('should save config properties successfully', fakeAsync(() => {
+      // Setting confirm button clicked to be true.
       confirmSpy.and.returnValue(true);
       spyOn(adminBackendApiService, 'saveConfigPropertiesAsync')
         .and.returnValue(Promise.resolve());
@@ -213,8 +213,8 @@ describe('Admin misc tab component ', () => {
     }));
 
     it('should not save config properties ' +
-      'in case of backend error',fakeAsync(() => {
-      // Setting confirm button clicked to be true. 
+      'in case of backend error', fakeAsync(() => {
+      // Setting confirm button clicked to be true.
       confirmSpy.and.returnValue(true);
       spyOn(adminBackendApiService, 'saveConfigPropertiesAsync')
         .and.returnValue(Promise.reject('Internal Server Error.'));
@@ -227,7 +227,7 @@ describe('Admin misc tab component ', () => {
     }));
 
     it('should not save config properties ' +
-      'if a task is still running in the queue',fakeAsync(() => {
+      'if a task is still running in the queue', fakeAsync(() => {
       // Setting task is still running to be true.
       spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(true);
       let saveConfigSpy = spyOn(
@@ -240,8 +240,8 @@ describe('Admin misc tab component ', () => {
     }));
 
     it('should not request backend to save config properties ' +
-      'if cancel button is clicked in the alert',fakeAsync(() => {
-      // Setting confirm button clicked to be false. 
+      'if cancel button is clicked in the alert', fakeAsync(() => {
+      // Setting confirm button clicked to be false.
       confirmSpy.and.returnValue(false);
       let saveConfigSpy = spyOn(
         adminBackendApiService, 'saveConfigPropertiesAsync');

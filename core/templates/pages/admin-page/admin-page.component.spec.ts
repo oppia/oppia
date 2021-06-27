@@ -19,7 +19,6 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ChangeDetectorRef, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { truncate } from 'lodash';
 
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { PlatformFeatureService } from 'services/platform-feature.service';
@@ -47,12 +46,11 @@ class MockWindowRef {
   };
 }
 
-fdescribe('Admin misc tab component ', () => {
+describe('Admin misc tab component ', () => {
   let component: AdminPageComponent;
   let fixture: ComponentFixture<AdminPageComponent>;
 
   let adminRouterService: AdminRouterService;
-  let changeDetectorRef: ChangeDetectorRef;
   let platformFeatureService: PlatformFeatureService;
   let mockWindowRef: MockWindowRef;
 
@@ -81,7 +79,6 @@ fdescribe('Admin misc tab component ', () => {
 
   beforeEach(() => {
     adminRouterService = TestBed.inject(AdminRouterService);
-    changeDetectorRef = TestBed.inject(ChangeDetectorRef);
     platformFeatureService = TestBed.inject(PlatformFeatureService);
 
     spyOn(adminRouterService, 'showTab').and.returnValue(null);
