@@ -198,7 +198,7 @@ describe('Admin roles tab component ', function() {
     expect(component.userRolesResult).toEqual({});
   }));
 
-  it('should handle error responses sent form the backend', () => {
+  it('should handle error responses sent from the backend', () => {
     component.handleErrorResponse('User name does not exist.');
     expect(statusMessageSpy).toHaveBeenCalledWith(
       'Server error: User name does not exist.');
@@ -282,7 +282,7 @@ describe('Admin roles tab component ', function() {
     }));
 
     it('should not send request to backend if a task ' +
-      'is still running in the que', fakeAsync(() => {
+      'is still running in the queue', fakeAsync(() => {
       // Setting task running to be true.
       spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(true);
 
@@ -326,7 +326,7 @@ describe('Admin roles tab component ', function() {
     }));
 
     it('should not send request to backend if a task ' +
-      'is still running in the que', fakeAsync(() => {
+      'is still running in the queue', fakeAsync(() => {
       // Setting task running to be true.
       spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(true);
 
@@ -441,7 +441,7 @@ describe('Admin roles tab component ', function() {
     }));
 
     it('should not send request to backend if a task ' +
-      'is still running in the que', fakeAsync(() => {
+      'is still running in the queue', fakeAsync(() => {
       // Setting task running to be true.
       spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(true);
       const viewContributorsResponse: ViewContributionBackendResponse = {
@@ -492,7 +492,7 @@ describe('Admin roles tab component ', function() {
     }));
 
     it('should not send request to backend if a task ' +
-      'is still running in the que', fakeAsync(() => {
+      'is still running in the queue', fakeAsync(() => {
       // Setting task running to be true.
       spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(true);
 
@@ -538,7 +538,7 @@ describe('Admin roles tab component ', function() {
     }));
 
     it('should not send request to backend if a task ' +
-      'is still running in the que', fakeAsync(() => {
+      'is still running in the queue', fakeAsync(() => {
       // Setting task running to be true.
       spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(true);
 
