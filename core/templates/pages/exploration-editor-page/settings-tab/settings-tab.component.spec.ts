@@ -45,7 +45,7 @@ import { ReadOnlyExplorationBackendApiService } from
   'domain/exploration/read-only-exploration-backend-api.service';
 
 import { Subscription } from 'rxjs';
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { ChangeListService } from '../services/change-list.service';
 import { ExplorationDataService } from '../services/exploration-data.service';
 

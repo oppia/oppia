@@ -20,7 +20,7 @@
  * followed by the name of the arg.
  */
 
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 describe('EndExplorationValidationService', function() {
   let ctrl;

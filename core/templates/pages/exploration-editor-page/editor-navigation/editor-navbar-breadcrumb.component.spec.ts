@@ -18,7 +18,7 @@
 
 import { EventEmitter } from '@angular/core';
 // TODO(#7222): Remove usage of UpgradedServices once upgraded to Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 describe('Editor Navbar Breadcrumb directive', function() {
   var ctrl = null;

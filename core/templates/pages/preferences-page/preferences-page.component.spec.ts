@@ -21,7 +21,7 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-import { TranslatorProviderForTests } from 'tests/test.extras';
+import { TranslatorProviderForTests } from 'tests/unit-test-utils.ajs';
 
 require('pages/preferences-page/preferences-page.component.ts');
 

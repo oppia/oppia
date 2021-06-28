@@ -24,7 +24,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { InteractiveNumericExpressionInput } from './oppia-interactive-numeric-expression-input.component';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 describe('NumericExpressionInputInteractive', () => {
   importAllAngularServices();

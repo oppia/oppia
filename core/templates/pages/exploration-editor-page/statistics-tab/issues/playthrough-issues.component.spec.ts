@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for playthroughIssues.
  */
 
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 describe('Playthrough Issues Component', function() {
   var $q = null;

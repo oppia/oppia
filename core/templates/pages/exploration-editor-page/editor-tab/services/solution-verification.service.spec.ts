@@ -25,7 +25,7 @@ import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory'
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { SolutionVerificationService } from 'pages/exploration-editor-page/editor-tab/services/solution-verification.service';
 import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 

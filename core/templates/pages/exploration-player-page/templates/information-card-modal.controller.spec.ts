@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for InformationCardModalController.
  */
 
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 describe('Information Card Modal Controller', function() {
   var $scope = null;

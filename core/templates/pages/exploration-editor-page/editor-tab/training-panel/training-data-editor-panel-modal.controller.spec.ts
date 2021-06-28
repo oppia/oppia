@@ -22,7 +22,7 @@ import { TestBed } from '@angular/core/testing';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
 import { UpgradedServices } from 'services/UpgradedServices';
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 describe('TrainingDataEditorPanelServiceModalController', function() {
   importAllAngularServices();

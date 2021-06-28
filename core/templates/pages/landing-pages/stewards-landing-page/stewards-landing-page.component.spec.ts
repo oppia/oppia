@@ -22,7 +22,7 @@ import { WindowDimensionsService } from
 import { UrlService } from
   'services/contextual/url.service';
 import { of } from 'rxjs';
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 require(
   'pages/landing-pages/stewards-landing-page/' +

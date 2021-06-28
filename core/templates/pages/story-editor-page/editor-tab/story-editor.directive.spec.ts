@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the story editor directive.
  */
 
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 describe('Story editor Directive', function() {
   beforeEach(angular.mock.module('oppia'));

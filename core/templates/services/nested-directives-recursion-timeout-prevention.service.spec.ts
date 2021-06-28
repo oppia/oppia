@@ -17,7 +17,7 @@
  * NestedDirectivesRecursionTimeoutPreventionService.
  */
 
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 require('services/nested-directives-recursion-timeout-prevention.service');
 require('services/contextual/logger.service');

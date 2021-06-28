@@ -17,7 +17,7 @@
  */
 
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { TestBed } from '@angular/core/testing';
 

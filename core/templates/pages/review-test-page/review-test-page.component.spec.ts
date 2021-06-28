@@ -22,7 +22,7 @@ import { ReviewTestBackendApiService } from
 import { PageTitleService } from 'services/page-title.service';
 import { ReviewTestEngineService } from
   'pages/review-test-page/review-test-engine.service';
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 describe('Review test page component', function() {
   var ctrl = null;

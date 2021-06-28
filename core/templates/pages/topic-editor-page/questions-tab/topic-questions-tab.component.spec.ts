@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for topic questions tab.
  */
 
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { EventEmitter } from '@angular/core';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { QuestionsListService } from 'services/questions-list.service';

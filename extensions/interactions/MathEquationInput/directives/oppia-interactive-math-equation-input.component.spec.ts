@@ -23,7 +23,7 @@ import { GuppyInitializationService } from 'services/guppy-initialization.servic
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { InteractiveMathEquationInput } from './oppia-interactive-math-equation-input.component';
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 describe('MathEquationInputInteractive', () => {
   importAllAngularServices();

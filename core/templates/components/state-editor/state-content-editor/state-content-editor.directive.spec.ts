@@ -21,7 +21,7 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-import { TranslatorProviderForTests } from 'tests/test.extras';
+import { TranslatorProviderForTests } from 'tests/unit-test-utils.ajs';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { TestBed } from '@angular/core/testing';
 import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';

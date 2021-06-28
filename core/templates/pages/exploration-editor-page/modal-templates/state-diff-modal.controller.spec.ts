@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for StateDiffModalController.
  */
 
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 describe('State Diff Modal Controller', function() {
   var $flushPendingTasks = null;

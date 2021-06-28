@@ -33,7 +33,7 @@ import {AudioTranslationLanguageService} from
 
 // TODO(#7222): Remove usage of importAllAngularServices once upgraded to
 // Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 describe('Exploration Player Suggestion Modal Controller', function() {
   importAllAngularServices();

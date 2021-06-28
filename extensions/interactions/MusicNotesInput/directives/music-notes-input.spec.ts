@@ -21,7 +21,7 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-import { TranslatorProviderForTests } from 'tests/test.extras';
+import { TranslatorProviderForTests } from 'tests/unit-test-utils.ajs';
 
 describe('MusicNotesInput interaction', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {

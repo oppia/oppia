@@ -18,7 +18,7 @@
 
 import { TestBed } from '@angular/core/testing';
 import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 describe('Training Modal Controller', function() {
   var $rootScope = null;

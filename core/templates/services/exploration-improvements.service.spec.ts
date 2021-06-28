@@ -44,7 +44,7 @@ import { StateTopAnswersStatsService } from
   'services/state-top-answers-stats.service';
 
 // TODO(#7222): Remove usage of UpgradedServices once upgraded to Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { ChangeListService } from 'pages/exploration-editor-page/services/change-list.service';
 
 /**
