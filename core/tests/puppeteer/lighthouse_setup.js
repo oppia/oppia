@@ -77,9 +77,9 @@ var confirmSkillCreationButton =
 var skillReviewMaterialInput = '.oppia-rte';
 var skillCkEditor = '.protractor-test-ck-editor';
 
-var updateFormName = '.protractor-update-form-name';
-var updateFormSubmit = '.protractor-update-form-submit';
-var roleSelect = '.protractor-update-form-role-select';
+var updateFormName = '.protractor-test-update-form-name';
+var updateFormSubmit = '.protractor-test-update-form-submit';
+var roleSelect = '.protractor-test-update-form-role-select';
 var statusMessage = '.protractor-test-status-message';
 
 const login = async function(browser, page) {
@@ -117,7 +117,7 @@ const setRole = async function(browser, page, role) {
       'http://127.0.0.1:8181/admin#/roles', { waitUntil: networkIdle });
     await page.waitForSelector(updateFormName);
     await page.type(updateFormName, 'username1');
-    await page.select(roleSelect, 'string:' + role);
+    await page.select(roleSelect, role);
     await page.waitForSelector(updateFormSubmit);
     await page.click(updateFormSubmit);
     await page.waitForSelector(statusMessage, {visible: true});

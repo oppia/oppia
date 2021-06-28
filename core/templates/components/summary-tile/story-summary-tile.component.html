@@ -35,10 +35,11 @@
     </span>
   </div>
   <div class="story-details">
-    <div class="story-thumbnail"
+    <div class="story-thumbnail protractor-test-story-thumbnail"
          [ngStyle]="{background: thumbnailBgColor}">
       <a [href]="storyLink">
-        <img [src]="thumbnailUrl"
+        <img *ngIf="thumbnailUrl !== null"
+             [src]="thumbnailUrl"
              alt=""
              class="img-thumbnail"
              [ngStyle]="{background: thumbnailBgColor}">

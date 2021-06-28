@@ -108,7 +108,7 @@ describe('Library index page', function() {
     await waitFor.pageToFullyLoad();
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setLanguage(LANGUAGE_FRANCAIS);
-    await explorationEditorPage.saveChanges('change language');
+    await explorationEditorPage.publishChanges('change language');
     await users.logout();
 
     await users.login('celebrimor@publicationAndLibrary.com');

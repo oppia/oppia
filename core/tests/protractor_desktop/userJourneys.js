@@ -71,8 +71,9 @@ describe('Basic user journeys', function() {
     it('should create moderators', async function() {
       await users.createModerator(
         'mod@userManagement.com', 'moderatorUserManagement');
-
       await users.login('mod@userManagement.com');
+      await general.checkForConsoleErrors([
+        'Failed to load resource: the server responded with a status of 401']);
       await moderatorPage.get();
       await moderatorPage.expectModeratorPageToBeVisible();
       await general.openProfileDropdown();
@@ -264,14 +265,16 @@ describe('Site language', function() {
       // Checking collection player page.
       await browser.get('/collection/' + collectionId);
       await waitFor.pageToFullyLoad();
-      expect(await element(by.css('.oppia-share-collection-footer')).getText())
+      expect(await element(
+        by.css('.protractor-test-share-collection-footer')).getText())
         .toEqual('COMPARTIR ESTA COLECCIÓN');
       await general.ensurePageHasNoTranslationIds();
 
       // Checking exploration player page.
       await browser.get('/explore/' + firstExplorationId);
       await waitFor.pageToFullyLoad();
-      expect(await element(by.css('.author-profile-text')).getText())
+      expect(await element(
+        by.css('.protractor-test-author-profile-text')).getText())
         .toEqual('PERFILES DE AUTORES');
       await general.ensurePageHasNoTranslationIds();
     }

@@ -21,7 +21,7 @@
 var rule = require('./protractor-practices');
 var RuleTester = require('eslint').RuleTester;
 
-var ruleTester = new RuleTester();
+var ruleTester = new RuleTester({ parserOptions: { ecmaVersion: 2016 } });
 ruleTester.run('protractor-practices', rule, {
   valid: [{
     code:
@@ -30,7 +30,15 @@ ruleTester.run('protractor-practices', rule, {
   }, {
     code:
     `action.click(elem);
-    browser.action.sleep();`,
+    browser.action.waitForAngular();`,
+  }, {
+    code:
+    `action.click(elem);
+    browser.action.explore();`,
+  }, {
+    code:
+    `action.click(elem);
+    browser.action.pause();`,
   }, {
     code: 'card.then = 3;',
   }, {
@@ -39,9 +47,28 @@ ruleTester.run('protractor-practices', rule, {
     code: 'then().age;',
   }, {
     code: 'sam.then.age;',
+  }, {
+    code: `var profileLink = element(by.css(
+          '.protractor-test-profile-link'));`
+  }, {
+    code: 'const SKILL_DESCRIPTIONS = 1;'
+  }, {
+    code: 'var modal = element.all(by.css(".modal-dialog")).last();'
+  }, {
+    code: 'var modal = element(by.css("option:checked"));'
   }],
 
   invalid: [
+    {
+      code:
+      `var hideHeightWarningIcon = element(
+        by.css('.oppia-hide-card-height-warning-icon'));`,
+      errors: [{
+        message: (
+          'Please use “.protractor-test-” prefix classname selector instead ' +
+          'of “.oppia-hide-card-height-warning-icon”'),
+      }],
+    },
     {
       code:
       `it('should test a feature', function() {
@@ -54,11 +81,49 @@ ruleTester.run('protractor-practices', rule, {
     },
     {
       code:
+      `it('should test a feature', function() {
+        browser.explore();
+      });`,
+      errors: [{
+        message: 'Please do not use browser.explore() in protractor files',
+        type: 'CallExpression',
+      }],
+    },
+    {
+      code:
+      `it('should test a feature', function() {
+        browser.pause();
+      });`,
+      errors: [{
+        message: 'Please do not use browser.pause() in protractor files',
+        type: 'CallExpression',
+      }],
+    },
+    {
+      code:
+      `it('should test a feature', function() {
+        browser.waitForAngular();
+      });`,
+      errors: [{
+        message: (
+          'Please do not use browser.waitForAngular() in protractor files'),
+        type: 'CallExpression',
+      }],
+    },
+    {
+      code:
       `toPromise.then(function() {
         numLessons = 3;
       });`,
       errors: [{
         message: 'Please do not use .then(), consider async/await instead',
+      }],
+    },
+    {
+      code:
+      'const Value = 5;',
+      errors: [{
+        message: 'Please make sure that constant name “Value” are in all-caps',
       }],
     },
   ]

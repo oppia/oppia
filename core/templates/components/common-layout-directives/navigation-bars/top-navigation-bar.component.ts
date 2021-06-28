@@ -116,7 +116,8 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.getProfileImageDataAsync();
-    this.currentUrl = window.location.pathname.split('/')[1];
+    this.currentUrl =
+      this.windowRef.nativeWindow.location.pathname.split('/')[1];
     this.labelForClearingFocus = AppConstants.LABEL_FOR_CLEARING_FOCUS;
     this.focusManagerService.setFocus(this.labelForClearingFocus);
     this.logoutUrl = AppConstants.LOGOUT_URL;
@@ -285,7 +286,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   }
 
   navigateToClassroomPage(classroomUrl: string): void {
-    this.siteAnalyticsService.registerClassoomHeaderClickEvent();
+    this.siteAnalyticsService.registerClassroomHeaderClickEvent();
     setTimeout(() => {
       this.windowRef.nativeWindow.location.href = classroomUrl;
     }, 150);
