@@ -408,7 +408,7 @@ def apply_change_list(exploration_id, change_list, frontend_version):
                     elif (change.property_name ==
                           exp_domain.STATE_PROPERTY_INTERACTION_HANDLERS):
                         raise utils.InvalidInputException(
-                            'Editing interaction handlers is no'
+                            'Editing interaction handlers is no '
                             'longer supported')
                     elif (change.property_name ==
                           exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
@@ -647,7 +647,7 @@ def apply_change_list(exploration_id, change_list, frontend_version):
                     elif (change.property_name ==
                           exp_domain.STATE_PROPERTY_INTERACTION_HANDLERS):
                         raise utils.InvalidInputException(
-                            'Editing interaction handlers'
+                            'Editing interaction handlers '
                             'is no longer supported')
                     elif (change.property_name ==
                           exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
