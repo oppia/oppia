@@ -271,8 +271,7 @@ def apply_change_list(topic_id, change_list):
                       topic_domain.TOPIC_PROPERTY_LANGUAGE_CODE):
                     topic.update_language_code(change.new_value)
                 elif (change.property_name ==
-                      topic_domain.TOPIC_PROPERTY_THUMBNAIL_FILENAME):
-                    topic.update_thumbnail_filename(change.new_value)
+                      topic_domain.TOPIC_PROPERTY_THUMBNAIL_FILENAME_AND_SIZE_IN_BYTES): # pylint: disable=line-too-long
                     try:
                         fs = fs_domain.AbstractFileSystem(
                             fs_domain.GcsFileSystem(
@@ -281,8 +280,8 @@ def apply_change_list(topic_id, change_list):
                             '%s/%s' % (
                                 ASSET_TYPE_THUMBNAIL,
                                 topic.thumbnail_filename)))
-                        topic.update_thumbnail_size_in_bytes(
-                            thumbnail_size_in_bytes)
+                        topic.update_thumbnail_filename_and_size_in_bytes(
+                            change.new_value, thumbnail_size_in_bytes)
                     except Exception as e:
                         raise Exception(
                             'File thumbnail/%s not found' % (

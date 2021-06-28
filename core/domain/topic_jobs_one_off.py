@@ -120,7 +120,8 @@ class UpdateTopicThumbnailSizeOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             # updating thumbnail_filename in topic_services.py file.
             commit_cmds = [topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
-                'property_name': topic_domain.TOPIC_PROPERTY_THUMBNAIL_FILENAME,
+                'property_name': (
+                    topic_domain.TOPIC_PROPERTY_THUMBNAIL_FILENAME_AND_SIZE_IN_BYTES), # pylint: disable=line-too-long
                 'new_value': topic.thumbnail_filename,
                 'old_value': topic.thumbnail_filename
             })]
