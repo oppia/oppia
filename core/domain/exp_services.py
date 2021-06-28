@@ -1762,6 +1762,8 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
     backend_version_exploration = exp_fetchers.get_exploration_by_id(exp_id)
     if backend_version_exploration.version == frontend_version:
         return True
+    if backend_version_exploration.version > frontend_version:
+        return False
     else:
         # A complete list of changes from one version to another
         # is composite_change_list.
@@ -1921,8 +1923,10 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
 
         changes_are_mergeable = False
 
-        # state_names_of_renamed_states: Stores the changes in states names
-        # in change_list.
+        # state_names_of_renamed_states: dict. Stores the changes in
+        # states names in change_list where the key is the state name in
+        # frontend version and the value is the renamed name from the
+        # change list if there is any rename state change.
         state_names_of_renamed_states = {}
         for change in change_list:
             change_is_mergeable = False
