@@ -44,9 +44,9 @@ describe('HintAndSolutionButtonsComponent', () => {
   let hintAndSolutionModalService: HintAndSolutionModalService;
   let explorationPlayerStateService: ExplorationPlayerStateService;
   let statsReportingService: StatsReportingService;
-  let audioTranslationLanguageService: AudioTranslationLanguageService;
 
   let newCard: StateCard;
+  let audioTranslationLanguageService: AudioTranslationLanguageService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -69,8 +69,8 @@ describe('HintAndSolutionButtonsComponent', () => {
     explorationPlayerStateService = TestBed.inject(
       ExplorationPlayerStateService);
     statsReportingService = TestBed.inject(StatsReportingService);
-    audioTranslationLanguageService = TestBed.inject(
-      AudioTranslationLanguageService);
+    audioTranslationLanguageService = (
+      TestBed.inject(AudioTranslationLanguageService));
 
     spyOn(playerPositionService, 'onNewCardOpened').and.returnValue(
       new EventEmitter<StateCard>());
