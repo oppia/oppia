@@ -106,6 +106,9 @@
     box-shadow: 0 -6px 12px rgba(0, 0, 0, 0.176);
     float: left;
     list-style-type: none;
+    /** ngbDropdownMenu adds inline styles which conflicts with our own.
+     *  The usage of !important is unavoidable here to override inline styles.
+     */
     top: auto !important;
     transform: none !important;
     will-change: auto !important;
