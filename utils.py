@@ -708,7 +708,7 @@ def require_valid_name(name, name_type, allow_empty=False):
         raise ValidationError(
             'Adjacent whitespace in %s should be collapsed.' % name_type)
 
-    for character in constants.INVALID_NAME_CHARS: # type: ignore[attr-defined]
+    for character in constants.INVALID_NAME_CHARS:
         if character in name:
             raise ValidationError(
                 'Invalid character %s in %s: %s' %
@@ -744,8 +744,7 @@ def require_valid_url_fragment(name, name_type, allowed_length):
             '%s field should not exceed %d characters, '
             'received %s.' % (name_type, allowed_length, name))
 
-    if not re.match(
-            constants.VALID_URL_FRAGMENT_REGEX, name): # type: ignore[attr-defined] # pylint: disable=line-too-long
+    if not re.match(constants.VALID_URL_FRAGMENT_REGEX, name):
         raise ValidationError(
             '%s field contains invalid characters. Only lowercase words'
             ' separated by hyphens are allowed. Received %s.' % (
@@ -806,11 +805,10 @@ def require_valid_meta_tag_content(meta_tag_content):
         raise ValidationError(
             'Expected meta tag content to be a string, received %s'
             % meta_tag_content)
-    if len(meta_tag_content) > (
-            constants.MAX_CHARS_IN_META_TAG_CONTENT): # type: ignore[attr-defined] # pylint: disable=line-too-long
+    if len(meta_tag_content) > constants.MAX_CHARS_IN_META_TAG_CONTENT:
         raise ValidationError(
             'Meta tag content should not be longer than %s characters.'
-            % constants.MAX_CHARS_IN_META_TAG_CONTENT) # type: ignore[attr-defined] # pylint: disable=line-too-long
+            % constants.MAX_CHARS_IN_META_TAG_CONTENT)
 
 
 def require_valid_page_title_fragment_for_web(page_title_fragment_for_web):
@@ -825,7 +823,7 @@ def require_valid_page_title_fragment_for_web(page_title_fragment_for_web):
         ValidationError. Page title fragment is too lengthy.
     """
     max_chars_in_page_title_frag_for_web = (
-        constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB) # type: ignore[attr-defined] # pylint: disable=line-too-long
+        constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB)
     if not isinstance(page_title_fragment_for_web, python_utils.BASESTRING):
         raise ValidationError(
             'Expected page title fragment to be a string, received %s'
@@ -833,7 +831,7 @@ def require_valid_page_title_fragment_for_web(page_title_fragment_for_web):
     if len(page_title_fragment_for_web) > max_chars_in_page_title_frag_for_web:
         raise ValidationError(
             'Page title fragment should not be longer than %s characters.'
-            % constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB) # type: ignore[attr-defined] # pylint: disable=line-too-long
+            % constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB)
 
 
 def capitalize_string(input_string):
@@ -883,9 +881,8 @@ def get_thumbnail_icon_url_for_category(category):
         str. Path to the Thumbnail Icon assigned to that category.
     """
     icon_name = (
-        category if category in (
-            constants.CATEGORIES_TO_COLORS) # type: ignore[attr-defined]
-        else constants.DEFAULT_THUMBNAIL_ICON) # type: ignore[attr-defined]
+        category if category in constants.CATEGORIES_TO_COLORS
+        else constants.DEFAULT_THUMBNAIL_ICON)
     # Remove all spaces from the string.
     return '/subjects/%s.svg' % (icon_name.replace(' ', ''))
 
@@ -900,8 +897,7 @@ def is_supported_audio_language_code(language_code):
     Returns:
         bool. Whether the language code is supported audio language code or not.
     """
-    language_codes = [lc['id'] for lc in (
-        constants.SUPPORTED_AUDIO_LANGUAGES)] # type: ignore[attr-defined]
+    language_codes = [lc['id'] for lc in constants.SUPPORTED_AUDIO_LANGUAGES]
     return language_code in language_codes
 
 
@@ -916,8 +912,7 @@ def is_valid_language_code(language_code):
         bool. Whether the language code is valid or not.
     """
     language_codes = [
-        lc['code'] for lc in (
-            constants.SUPPORTED_CONTENT_LANGUAGES)] # type: ignore[attr-defined]
+        lc['code'] for lc in constants.SUPPORTED_CONTENT_LANGUAGES]
     return language_code in language_codes
 
 
@@ -935,8 +930,7 @@ def get_supported_audio_language_description(language_code):
     Raises:
         Exception. If the given language code is unsupported.
     """
-    for language in (
-            constants.SUPPORTED_AUDIO_LANGUAGES): # type: ignore[attr-defined]
+    for language in constants.SUPPORTED_AUDIO_LANGUAGES:
         if language['id'] == language_code:
             return language['description'] # type: ignore[no-any-return]
     raise Exception('Unsupported audio language code: %s' % language_code)
@@ -1020,7 +1014,7 @@ def get_asset_dir_prefix():
         null string.
     """
     asset_dir_prefix = ''
-    if not constants.DEV_MODE: # type: ignore[attr-defined]
+    if not constants.DEV_MODE:
         asset_dir_prefix = '/build'
 
     return asset_dir_prefix
