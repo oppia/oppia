@@ -22,6 +22,7 @@ import { Collection, CollectionBackendDict } from 'domain/collection/collection.
 import { CollectionUpdateService } from 'domain/collection/collection-update.service';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
+import { BackendChangeObject, Change } from 'domain/editor/undo_redo/change.model';
 
 describe('Collection update service', () => {
   let collectionUpdateService: CollectionUpdateService = null;
@@ -109,6 +110,55 @@ describe('Collection update service', () => {
       }]);
     }
   );
+
+  it('should swap nodes of a collection given indices when undo ' +
+    'opertaion is performed', ()=> {
+    let swapCollectionSpy = spyOn(
+      _sampleCollection, 'swapCollectionNodes').and.callThrough();
+
+    collectionUpdateService.swapNodes(_sampleCollection, 1, 2);
+    // Triggering undo operation.
+    undoRedoService.undoChange(_sampleCollection);
+
+    expect(swapCollectionSpy).toHaveBeenCalled();
+  });
+
+  it('should return true when we add a collection node ' +
+    'to collection successfully', ()=> {
+    const applyFunc = jasmine.createSpy('applyChange');
+    const reverseFunc = jasmine.createSpy('reverseChange');
+
+    const backendChangeObject: BackendChangeObject = {
+      cmd: 'add_collection_node',
+      exploration_id: 'exp_id0'
+    };
+
+    const changeObject = new Change(
+      backendChangeObject, applyFunc, reverseFunc);
+
+    let result = collectionUpdateService.isAddingCollectionNode(changeObject);
+
+    expect(result).toBe(true);
+  });
+
+  it('should return exploration id from change object when calling ' +
+    '\'getExplorationIdFromChangeObject\'', ()=> {
+    const applyFunc = jasmine.createSpy('applyChange');
+    const reverseFunc = jasmine.createSpy('reverseChange');
+
+    const backendChangeObject: BackendChangeObject = {
+      cmd: 'add_collection_node',
+      exploration_id: 'exp_id0'
+    };
+
+    const changeObject = new Change(
+      backendChangeObject, applyFunc, reverseFunc);
+
+    let expId = (
+      collectionUpdateService.getExplorationIdFromChangeObject(changeObject));
+
+    expect(expId).toBe('exp_id0');
+  });
 
   it('should remove/add a collection node from/to a collection', ()=> {
     expect(_sampleCollection.getExplorationIds()).toEqual(['exp_id0']);
