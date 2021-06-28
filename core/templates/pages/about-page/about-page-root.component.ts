@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,18 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Production environment config file for Webpack.
+ * @fileoverview About-page-root component.
  */
 
-const { merge } = require('webpack-merge');
-const common = require('./webpack.common.config.ts');
-const path = require('path');
+import { Component } from '@angular/core';
 
-module.exports = merge(common, {
-  mode: 'production',
-  output: {
-    filename: '[name].[contenthash].bundle.js',
-    path: path.resolve(__dirname, 'backend_prod_files/webpack_bundles'),
-    publicPath: '/build/webpack_bundles/'
-  }
-});
+@Component({
+  selector: 'oppia-about-page-root',
+  templateUrl: './about-page-root.component.html'
+})
+export class AboutPageRootComponent {}
