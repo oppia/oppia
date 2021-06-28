@@ -37,9 +37,9 @@ var AdminPage = function() {
   var adminRolesTab = element(by.css('.protractor-test-admin-roles-tab'));
   var adminRolesTabContainer = element(
     by.css('.protractor-test-roles-tab-container'));
-  var updateFormName = element(by.css('.protractor-update-form-name'));
-  var updateFormSubmit = element(by.css('.protractor-update-form-submit'));
-  var roleSelect = element(by.css('.protractor-update-form-role-select'));
+  var updateFormName = element(by.css('.protractor-test-update-form-name'));
+  var updateFormSubmit = element(by.css('.protractor-test-update-form-submit'));
+  var roleSelect = element(by.css('.protractor-test-update-form-role-select'));
   var statusMessage = element(by.css('.protractor-test-status-message'));
 
   var addContributionRightsForm = element(
@@ -196,7 +196,8 @@ var AdminPage = function() {
     var count = await featureFlagElements.count();
     for (let i = 0; i < count; i++) {
       var elem = await featureFlagElements.get(i);
-      if ((await elem.element(by.css('h2.oppia-feature-name')).getText()) ===
+      if ((await elem.element(
+        by.css('.protractor-test-feature-name')).getText()) ===
           'dummy_feature') {
         return elem;
       }
