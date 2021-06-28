@@ -77,9 +77,9 @@ var confirmSkillCreationButton =
 var skillReviewMaterialInput = '.oppia-rte';
 var skillCkEditor = '.protractor-test-ck-editor';
 
-var updateFormName = '.protractor-update-form-name';
-var updateFormSubmit = '.protractor-update-form-submit';
-var roleSelect = '.protractor-update-form-role-select';
+var updateFormName = '.protractor-test-update-form-name';
+var updateFormSubmit = '.protractor-test-update-form-submit';
+var roleSelect = '.protractor-test-update-form-role-select';
 var statusMessage = '.protractor-test-status-message';
 
 const login = async function(browser, page) {

@@ -337,7 +337,7 @@ describe('Learner dashboard functionality', function() {
     // The collection player has two sets of SVGs -- one which is
     // rendered for desktop and the other which is rendered for mobile.
     var firstExploration = browser.isMobile ? await element.all(
-      by.css('.protractor-mobile-test-collection-exploration')).first() :
+      by.css('.protractor-test-mobile-collection-exploration')).first() :
       await element.all(
         by.css('.protractor-test-collection-exploration')).first();
     // Click first exploration in collection.
@@ -372,7 +372,7 @@ describe('Learner dashboard functionality', function() {
     // The collection player has two sets of SVGs -- one which is
     // rendered for desktop and the other which is rendered for mobile.
     var firstExploration = browser.isMobile ? await element.all(
-      by.css('.protractor-mobile-test-collection-exploration')).first() :
+      by.css('.protractor-test-mobile-collection-exploration')).first() :
       await element.all(
         by.css('.protractor-test-collection-exploration')).first();
     // Click first exploration in collection.

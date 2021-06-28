@@ -27,7 +27,7 @@ var CollectionEditorPage = function() {
   var closeSaveModalButton = element(
     by.css('.protractor-test-close-save-modal-button'));
   var collectionEditorObjectiveInput = element(
-    by.css('.protractor-collection-editor-objective-input'));
+    by.css('.protractor-test-collection-editor-objective-input'));
   var commitMessageInput = element(
     by.css('.protractor-test-commit-message-input'));
   var editorCategoryDropdown = element.all(
@@ -41,7 +41,7 @@ var CollectionEditorPage = function() {
   var editorShiftRight = element.all(
     by.css('.protractor-test-editor-shift-right'));
   var editorTitleInput = element(
-    by.css('.protractor-collection-editor-title-input'));
+    by.css('.protractor-test-collection-editor-title-input'));
   var saveChangesButton = element(
     by.css('.protractor-test-collection-save-changes-button'));
   var saveDraftButton = element(

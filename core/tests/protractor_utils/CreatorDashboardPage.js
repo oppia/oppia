@@ -32,7 +32,7 @@ var CreatorDashboardPage = function() {
     element(by.css('.protractor-test-exploration-dashboard-card'));
   var collectionCard = element(by.css('.protractor-test-collection-card'));
   var collectionEditorContainer = element(
-    by.css('.collection-editor-cards-container'));
+    by.css('.protractor-test-collection-editor-cards-container'));
   var subscriptionTab = element(by.css('.protractor-test-subscription-tab'));
   var createActivityButton =
     element(by.css('.protractor-test-create-activity'));

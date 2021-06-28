@@ -48,10 +48,27 @@ ruleTester.run('protractor-practices', rule, {
   }, {
     code: 'sam.then.age;',
   }, {
+    code: `var profileLink = element(by.css(
+          '.protractor-test-profile-link'));`
+  }, {
     code: 'const SKILL_DESCRIPTIONS = 1;'
+  }, {
+    code: 'var modal = element.all(by.css(".modal-dialog")).last();'
+  }, {
+    code: 'var modal = element(by.css("option:checked"));'
   }],
 
   invalid: [
+    {
+      code:
+      `var hideHeightWarningIcon = element(
+        by.css('.oppia-hide-card-height-warning-icon'));`,
+      errors: [{
+        message: (
+          'Please use “.protractor-test-” prefix classname selector instead ' +
+          'of “.oppia-hide-card-height-warning-icon”'),
+      }],
+    },
     {
       code:
       `it('should test a feature', function() {

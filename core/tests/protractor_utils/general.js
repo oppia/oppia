@@ -150,7 +150,7 @@ var ensurePageHasNoTranslationIds = async function() {
   // The use of the InnerHTML is hacky, but is faster than checking each
   // individual component that contains text.
   var oppiaBaseContainer = element(by.css(
-    '.oppia-base-container'));
+    '.protractor-test-base-container'));
   await waitFor.visibilityOf(
     oppiaBaseContainer,
     'Oppia base container taking too long to appear.');

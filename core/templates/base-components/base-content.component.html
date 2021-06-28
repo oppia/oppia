@@ -32,7 +32,7 @@
     </oppia-promo-bar>
     <div *ngIf="isBackgroundMaskActive()" class="ng-cloak oppia-background-mask">
     </div>
-    <div class="oppia-base-container"
+    <div class="oppia-base-container protractor-test-base-container"
          [ngClass]="{'oppia-sidebar-menu-open': isSidebarShown(), 'oppia-sidebar-menu-closed': !isSidebarShown()}"
          (swipeleft)="closeSidebarOnSwipe()">
       <div class="oppia-content-container protractor-test-content-container">

@@ -82,7 +82,7 @@ var StoryEditorPage = function() {
     by.css('.protractor-test-add-chapter-description'));
   var nodeOutlineEditor = element(
     by.css('.protractor-test-add-chapter-outline'));
-  var nodeOutlineEditorRteContent = element.all(by.css('.oppia-rte'));
+  var nodeOutlineEditorRteContent = element.all(by.css('.protractor-test-rte'));
   var nodeOutlineFinalizeCheckbox = element(
     by.css('.protractor-test-finalize-outline'));
   var nodeOutlineSaveButton = element(
@@ -108,15 +108,19 @@ var StoryEditorPage = function() {
   var warningTextElements = element.all(
     by.css('.protractor-test-warnings-text'));
   var storyThumbnailImageElement = element(
-    by.css('.story-thumbnail .protractor-test-custom-photo'));
+    by.css('.protractor-test-story-thumbnail .protractor-test-custom-photo'));
   var storyThumbnailButton = element(
-    by.css('.story-thumbnail .protractor-test-photo-button'));
+    by.css('.protractor-test-story-thumbnail .protractor-test-photo-button'));
   var chapterThumbnailImageElement = element(
-    by.css('.story-node-thumbnail .protractor-test-custom-photo'));
+    by.css(
+      '.protractor-test-story-node-thumbnail .protractor-test-custom-photo'));
   var chapterThumbnailButton = element(
-    by.css('.story-node-thumbnail .protractor-test-photo-button'));
+    by.css(
+      '.protractor-test-story-node-thumbnail .protractor-test-photo-button'));
   var createChapterThumbnailButton = element(
-    by.css('.chapter-input-thumbnail .protractor-test-photo-button'));
+    by.css(
+      '.protractor-test-chapter-input-thumbnail .protractor-test-photo-button')
+  );
   var explorationAlreadyPresentMsg = element(
     by.css('.protractor-test-invalid-exp-id'));
   var discardOption = element(by.css('.protractor-test-show-discard-option'));

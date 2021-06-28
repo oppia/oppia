@@ -35,7 +35,7 @@ interface UiConfig {
   selector: 'ck-editor-4-rte',
   template: '<div><div></div>' +
             '<div contenteditable="true" ' +
-            'class="oppia-rte-resizer oppia-rte">' +
+            'class="oppia-rte-resizer oppia-rte protractor-test-rte">' +
             '</div></div>',
   styleUrls: []
 })

@@ -91,7 +91,7 @@
                      placeholder="Enter username"
                      [(ngModel)]="formData.updateRole.username"
                      [ngModelOptions]="{standalone: true}"
-                     class="form-control protractor-update-form-name">
+                     class="form-control protractor-test-update-form-name">
             </div>
           </div>
 
@@ -101,7 +101,7 @@
               <select id="label-target-update-form-role-select"
                       [(ngModel)]="formData.updateRole.newRole"
                       [ngModelOptions]="{standalone: true}"
-                      class="form-control protractor-update-form-role-select">
+                      class="form-control protractor-test-update-form-role-select">
                 <option *ngFor="let role of UPDATABLE_ROLES | keyvalue" [value]="role.key">{{ role.value }}</option>
               </select>
             </div>
@@ -112,12 +112,12 @@
             <div class="col-md-8 col-lg-8 col-sm-8">
               <select [(ngModel)]="formData.updateRole.topicId"
                       [ngModelOptions]="{standalone: true}"
-                      class="form-control protractor-update-form-role-select">
+                      class="form-control protractor-test-update-form-role-select">
                 <option *ngFor="let topic of topicSummaries" [value]="topic.getId()">{{ topic.getName() }}</option>
               </select>
             </div>
           </div>
-          <button type="submit" class="btn btn-success protractor-update-form-submit" [disabled]="!formData.updateRole.isValid()" value="update role">Update Role</button>
+          <button type="submit" class="btn btn-success protractor-test-update-form-submit" [disabled]="!formData.updateRole.isValid()" value="update role">Update Role</button>
         </form>
       </mat-card>
 
