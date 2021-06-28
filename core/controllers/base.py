@@ -308,7 +308,7 @@ class BaseHandler(webapp2.RequestHandler):
         """
         return (
             self.current_user_is_super_admin or
-            self.role == feconf.ROLE_ID_RELEASE_COORDINATOR)
+            feconf.ROLE_ID_RELEASE_COORDINATOR in self.roles)
 
     def _is_requested_path_currently_accessible_to_user(self):
         """Checks whether the requested path is currently accessible to user.
