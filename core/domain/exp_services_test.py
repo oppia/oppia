@@ -10414,7 +10414,7 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
 
         rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
 
-         # Changes to the various properties of the first and
+        # Changes to the various properties of the first and
         # second state.
         change_list = [exp_domain.ExplorationChange({
             'old_value': 'TextInput',
