@@ -204,7 +204,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'question-editor.directive.ts',
     'question-player.directive.ts',
     'question-update.service.ts',
-    'questions-list.directive.ts',
+    'questions-list.component.ts',
     'random-selector.directive.ts',
     'rating-display.directive.ts',
     'real-editor.component.ts',

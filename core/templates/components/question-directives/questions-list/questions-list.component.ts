@@ -67,12 +67,8 @@ import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
 import { Subscription } from 'rxjs';
 
-angular.module('oppia').directive('questionsList', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {
+angular.module('oppia').component('questionsList', {
+      bindings: {
         skillDescriptionsAreShown: '&skillDescriptionsAreShown',
         selectSkillModalIsShown: '&selectSkillModalIsShown',
         getSkillIds: '&skillIds',
@@ -84,10 +80,7 @@ angular.module('oppia').directive('questionsList', [
         getSkillsCategorizedByTopics: '=',
         getUntriagedSkillSummaries: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/question-directives/questions-list/' +
-        'questions-list.directive.html'),
-      controllerAs: '$ctrl',
+      template: require('./questions-list.component.html'),
       controller: [
         '$location', '$rootScope', '$timeout', '$uibModal', 'AlertsService',
         'ContextService', 'EditableQuestionBackendApiService',
@@ -96,7 +89,7 @@ angular.module('oppia').directive('questionsList', [
         'QuestionObjectFactory', 'QuestionUndoRedoService',
         'QuestionValidationService', 'QuestionsListService',
         'SkillBackendApiService',
-        'SkillEditorRoutingService',
+        'SkillEditorRoutingService', 'UrlInterpolationService',
         'UtilsService', 'WindowDimensionsService',
         'DEFAULT_SKILL_DIFFICULTY', 'INTERACTION_SPECS',
         'NUM_QUESTIONS_PER_PAGE',
@@ -108,7 +101,7 @@ angular.module('oppia').directive('questionsList', [
             QuestionObjectFactory, QuestionUndoRedoService,
             QuestionValidationService, QuestionsListService,
             SkillBackendApiService,
-            SkillEditorRoutingService,
+            SkillEditorRoutingService, UrlInterpolationService,
             UtilsService, WindowDimensionsService,
             DEFAULT_SKILL_DIFFICULTY, INTERACTION_SPECS,
             NUM_QUESTIONS_PER_PAGE) {
@@ -666,5 +659,4 @@ angular.module('oppia').directive('questionsList', [
           };
         }
       ]
-    };
-  }]);
+  });
