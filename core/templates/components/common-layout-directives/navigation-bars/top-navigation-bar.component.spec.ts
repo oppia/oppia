@@ -234,7 +234,6 @@ describe('TopNavigationBarComponent', () => {
     mockResizeEmitter.emit();
 
     fixture.whenStable().then(() => {
-      fixture.detectChanges();
       expect(component.navElementsVisibilityStatus[donateElement]).toBe(true);
     });
     component.ngOnDestroy();
