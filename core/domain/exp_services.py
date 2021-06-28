@@ -1799,6 +1799,12 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
         # related (affected by or affecting) customization args. This list
         # can be changed when any new property is added or deleted which
         # affects or is affected by customization args.
+        # This list is similar to the other two lists just below this but
+        # don't merge them or make them one because they are for different
+        # properties so if in the future any new property is added which
+        # is affected by cust_args only then in that case we'll add that
+        # property name in properties_related_to_cust_args only.
+        # So we should keep a common list.
         properties_related_to_cust_args = ['solution', 'recorded_voiceovers',
                                            'answer_groups',
                                            'widget_customization_args']
