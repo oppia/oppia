@@ -495,6 +495,7 @@
 	"I18N_PREFERENCES_EMAIL_RECEIVE_FEEDBACK_NEWS": "Recevoir des courriels quand quelqu’un vous envoie un commentaire sur une exploration",
 	"I18N_PREFERENCES_EMAIL_RECEIVE_NEWS": "Recevoir des nouvelles et des mises à jour du site",
 	"I18N_PREFERENCES_EMAIL_RECEIVE_SUBSCRIPTION_NEWS": "Recevoir des courriels lorsqu’un créateur auquel vous êtes abonné{{GENDER:||e}} publie une nouvelle exploration",
+	"I18N_PREFERENCES_EMAIL_SIGNUP_TEXT": "Nous ne pouvons pas vous ajouter automatiquement à notre liste de diffusion. Veuillez visiter le lien suivant pour vous inscrire à celle-ci.",
 	"I18N_PREFERENCES_HEADING": "Préférences",
 	"I18N_PREFERENCES_HEADING_SUBTEXT": "Toute modification que vous ferez sur cette page sera automatiquement enregistrée.",
 	"I18N_PREFERENCES_NO_SUBSCRIPTIONS": "Vous ne vous êtes encore abonné à aucun créateur. Vous pouvez librement vous abonner à votre auteur favori en cliquant sur le bouton « s’abonner » dans la page de profil de l’auteur. En vous abonnant à un auteur, vous serez notifié{{GENDER:||e}} par courriel quand l’auteur publiera une nouvelle leçon.",

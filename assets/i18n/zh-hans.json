@@ -451,6 +451,7 @@
 	"I18N_PREFERENCES_EMAIL_RECEIVE_FEEDBACK_NEWS": "当有人向您发送对某个探险的反馈时接收电子邮件",
 	"I18N_PREFERENCES_EMAIL_RECEIVE_NEWS": "接收有关网站的新闻和更新",
 	"I18N_PREFERENCES_EMAIL_RECEIVE_SUBSCRIPTION_NEWS": "当您订阅的创建者发布了新的探险时接收电子邮件",
+	"I18N_PREFERENCES_EMAIL_SIGNUP_TEXT": "我们无法自动将您加入我们的邮件列表。请访问下面的链接以注册到我们的邮件列表：",
 	"I18N_PREFERENCES_HEADING": "参数设置",
 	"I18N_PREFERENCES_HEADING_SUBTEXT": "在此页面做出的任何更改都将被自动保存。",
 	"I18N_PREFERENCES_NO_SUBSCRIPTIONS": "您尚未订阅任何创建者。",
