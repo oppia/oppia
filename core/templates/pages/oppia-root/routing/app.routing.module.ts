@@ -1,12 +1,12 @@
 import { APP_BASE_HREF } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { Route, RouterModule } from '@angular/router';
-import { ErrorPageRootComponent } from 'pages/error-pages/error-page-root.component';
 
 const routes: Route[] = [
   {
     path: '**',
-    component: ErrorPageRootComponent
+    loadChildren: () => import('pages/error-pages/error-page.module')
+      .then(m => m.ErrorPageModule)
   }
 ];
 

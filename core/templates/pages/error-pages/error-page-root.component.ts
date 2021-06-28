@@ -24,8 +24,4 @@ import { Component, Input } from '@angular/core';
 })
 export class ErrorPageRootComponent {
   @Input() statusCode: string;
-
-  ngOnInit(): void {
-    console.log(this.statusCode);
-  }
 }

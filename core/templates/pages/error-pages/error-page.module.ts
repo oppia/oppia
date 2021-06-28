@@ -29,11 +29,11 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 import { ErrorPageRootComponent } from './error-page-root.component';
+import { ErrorPageRoutingModule } from './error-page-routing.module';
 
 @NgModule({
   imports: [
-    BrowserModule,
-    HttpClientModule,
+    ErrorPageRoutingModule,
     SharedComponentsModule
   ],
   declarations: [
@@ -45,19 +45,6 @@ import { ErrorPageRootComponent } from './error-page-root.component';
     ErrorPageComponent,
     ErrorPageRootComponent,
     OppiaAngularRootComponent
-  ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
-      multi: true
-    }
   ],
   bootstrap: [ErrorPageRootComponent]
 })
