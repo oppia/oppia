@@ -21,7 +21,7 @@ import { fakeAsync } from '@angular/core/testing';
 import { AnswerStats } from 'domain/exploration/answer-stats.model';
 import { StateTopAnswersStats } from
   'domain/statistics/state-top-answers-stats-object.factory';
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
 // ^^^ This block is to be removed.
 
