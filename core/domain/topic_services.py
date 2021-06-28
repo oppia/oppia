@@ -284,7 +284,9 @@ def apply_change_list(topic_id, change_list):
                         topic.update_thumbnail_size_in_bytes(
                             thumbnail_size_in_bytes)
                     except Exception as e:
-                        pass
+                        raise Exception(
+                            'File thumbnail/%s not found' % (
+                                topic.thumbnail_filename))
                 elif (change.property_name ==
                       topic_domain.TOPIC_PROPERTY_THUMBNAIL_BG_COLOR):
                     topic.update_thumbnail_bg_color(change.new_value)

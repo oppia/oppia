@@ -615,11 +615,6 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'new_value': 'url-name'
         }), topic_domain.TopicChange({
             'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
-            'property_name': topic_domain.TOPIC_PROPERTY_THUMBNAIL_FILENAME,
-            'old_value': '',
-            'new_value': 'thumbnail.svg'
-        }), topic_domain.TopicChange({
-            'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
             'property_name': topic_domain.TOPIC_PROPERTY_THUMBNAIL_BG_COLOR,
             'old_value': '',
             'new_value': '#C6DCDA'
@@ -649,14 +644,12 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic.description, 'New Description')
         self.assertEqual(topic.abbreviated_name, 'short-name')
         self.assertEqual(topic.url_fragment, 'url-name')
-        self.assertEqual(topic.thumbnail_filename, 'thumbnail.svg')
         self.assertEqual(topic.thumbnail_bg_color, '#C6DCDA')
         self.assertEqual(topic.version, 3)
         self.assertEqual(topic.practice_tab_is_displayed, True)
         self.assertEqual(topic.meta_tag_content, 'topic meta tag content')
         self.assertEqual(topic.page_title_fragment_for_web, 'topic page title')
         self.assertEqual(topic_summary.version, 3)
-        self.assertEqual(topic_summary.thumbnail_filename, 'thumbnail.svg')
         self.assertEqual(topic_summary.thumbnail_bg_color, '#C6DCDA')
 
         # Test whether a topic_manager can edit a topic.
