@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,22 +13,23 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the MathEquationInput short response.
+ * @fileoverview Component for the NumericInput response.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
 
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 
 @Component({
-  selector: 'oppia-short-response-math-equation-input',
-  templateUrl: './math-equation-input-short-response.component.html'
+  selector: 'oppia-response-numeric-input',
+  templateUrl: './numeric-input-response.component.html',
+  styleUrls: []
 })
-export class ShortResponseMathEquationInput implements OnInit {
+export class ResponseNumericInput implements OnInit {
   @Input() answer: string;
   displayAnswer: Object;
 
@@ -38,11 +39,13 @@ export class ShortResponseMathEquationInput implements OnInit {
 
   ngOnInit(): void {
     this.displayAnswer = this.htmlEscaperService.escapedJsonToObj(this.answer);
+    if ((this.displayAnswer as number) % 1 === 0) {
+      this.displayAnswer = Math.round(this.displayAnswer as number);
+    }
   }
 }
 
 angular.module('oppia').directive(
-  'oppiaShortResponseMathEquationInput', downgradeComponent({
-    component: ShortResponseMathEquationInput
-  }) as angular.IDirectiveFactory
-);
+  'oppiaResponseNumericInput', downgradeComponent(
+    {component: ResponseNumericInput}
+  ) as angular.IDirectiveFactory);
