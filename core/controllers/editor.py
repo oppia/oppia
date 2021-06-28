@@ -146,12 +146,6 @@ class ExplorationHandler(EditorHandler):
 
         are_changes_mergeable = exp_services.are_changes_mergeable(
             exploration_id, version, change_list)
-        if not are_changes_mergeable:
-            raise base.BaseHandler.InvalidInputException(
-                'Trying to update change list to version %s of exploration '
-                'from version %s, which is not mergeable.'
-                ' Please reload the page and try again.'
-                % (exploration.version, version))
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id)
         can_edit = rights_manager.check_can_edit_activity(
