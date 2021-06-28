@@ -17,7 +17,7 @@
  */
 
 import { EventEmitter } from '@angular/core';
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 describe('Training Data Editor Panel Service', function() {
   importAllAngularServices();
