@@ -103,76 +103,18 @@ export class OppiaRteParserService {
         return childNode;
       }
 
-      // Continue Recursion.
-      /**
-       * Case: <p>Hi <em> This is tricky </em> Can't <b>with</b> DOM parser </p>
-       * Problem: We don't get the text nodes as children. It isn't stored in
-       *   DomParsers representation separately but only as a part of innerHTML.
-       * Solution: The innerHTML of the case is:
-       *   "Hi <em> This is tricky </em> Can't <b>with</b> DOM parser ". There
-       *   are two children (em, b). That means there are three zones for texts:
-       *   "Zone 1 <em>...</em> Zone 2 <b>...</b> Zone 3".
-       *   Zone 1 = From start to the first index of <em.
-       *   Zone 2 = From index of first </em> to first indexOf <b>
-       *   Zone 3 = From index of first </b> to end.
-       *   As we can see that this can get very complicated soon when there are
-       *   multiple child elements having the same tag. Fortunately, the fix for
-       *   this is easy. We can remove children that have already been parsed.
-       *   That will mean we only need to look at the first indexOf of tag and
-       *   keep a track of the text we have already loaded. Here is a dry run of
-       *   the algorithm on the sample case listed above:
-       *   ------------------------------- Data --------------------------------
-       *   node.children = [Node: em, Node: b]
-       *   node.innerHTML = ("Hi <em> This is tricky </em> Can't <b>with</b> DOM
-       *     parser ")
-       *   max = 2
-       *   ---------------------------- Iteration 0 ----------------------------
-       *   prevPointer = 0
-       *   child = 0
-       *   t = "em"
-       *   node.innerHTML.indexOf('<' + t) = 3
-       *   text = node.innerHTML.substring(
-       *     prevPointer, node.innerHTML.indexOf('<' + t)) = "Hi ";
-       *   node.removeChild(em)
-       *   ---------------------------- Iteration 1 ----------------------------
-       *   prevPointer = 3
-       *   child = 1
-       *   t = "b"
-       *   node.innerHTML = "Hi  Can't <b>with</b> DOM parser "
-       *   node.innerHTML.indexOf('<' + t) = 10
-       *   text = node.innerHTML.substring(
-       *     prevPointer, node.innerHTML.indexOf('<' + t)) = " Can't ";
-       *   node.removeChild(b)
-       *  ------------------------- Outside for loop ---------------------------
-       *  prevPointer = 10
-       *  node.innerHTML = "Hi  Can't  DOM parser "
-       *  text = " DOM parser "
-       *  -------------------------- End of Dry Run ----------------------------
-       * Note that the text extracted are trimmed.
-       */
       let prevPointer = 0;
-      const max = Object.keys(node.children).length;
+      const max = Object.keys(node.childNodes).length;
       const childNode = new OppiaRteNode(tagName, attrs);
       for (let child = 0; child < max; child++) {
-        const temp = dfs(node.children[0] as HTMLElement);
-        const t = node.children[0].tagName.toLowerCase();
-        const text = node.innerHTML.substring(
-          prevPointer, node.innerHTML.indexOf('<' + t)
-        ).replace(/[\t\n]/g, '').trim();
-        if (text !== '') {
+        if (node.childNodes[child].nodeType === 3) {
+          const text = node.childNodes[child].nodeValue.replace(
+            /[\t\n]/g, '');
           childNode.children.push(new TextNode(text));
+          continue;
         }
-        prevPointer = node.innerHTML.indexOf('<' + t);
-        node.removeChild(node.children[0]);
+        const temp = dfs(node.childNodes[child] as HTMLElement);
         childNode.children.push(temp);
-      }
-      if (prevPointer + 1 < node.innerHTML.length) {
-        const text = node.innerHTML.substring(
-          prevPointer, node.innerHTML.length
-        ).replace(/[\t\n]/g, '').trim();
-        if (text !== '') {
-          childNode.children.push(new TextNode(text));
-        }
       }
       return childNode;
     };
