@@ -8,12 +8,12 @@ interface Language {
 }
 
 @Component({
-  selector: 'oppia-preferred-site-language',
+  selector: 'oppia-preferred-language',
   templateUrl: './preferred-site-language.component.html'
 })
 export class PreferredSiteLanguage {
-  @Input() preferredSiteLanguageCode: string;
-  @Output() preferredSiteLanguageCodeChange: EventEmitter<string> = (
+  @Input() preferredLanguageCode: string;
+  @Output() preferredLanguageCodeChange: EventEmitter<string> = (
     new EventEmitter());
   @Input() choices: Language[];
   filteredChoices: Language[];
@@ -28,7 +28,7 @@ export class PreferredSiteLanguage {
   }
 
   updateLanguage(code: string): void {
-    this.preferredSiteLanguageCode = code;
-    this.preferredSiteLanguageCodeChange.emit(this.preferredSiteLanguageCode);
+    this.preferredLanguageCode = code;
+    this.preferredLanguageCodeChange.emit(this.preferredLanguageCode);
   }
 }

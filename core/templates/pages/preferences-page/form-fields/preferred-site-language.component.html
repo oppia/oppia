@@ -1,6 +1,6 @@
-<mat-form-field class="site-language-field">
+<mat-form-field class="language-field">
   <mat-select placeholder="Site language"
-              [value]="preferredSiteLanguageCode"
+              [value]="preferredLanguageCode"
               (valueChange)="updateLanguage($event)">
     <mat-option>
       <ngx-mat-select-search ngModel
@@ -16,7 +16,7 @@
 </mat-form-field>
 
 <style>
-.site-language-field {
+.language-field {
   width: 100%;
 }
 </style>

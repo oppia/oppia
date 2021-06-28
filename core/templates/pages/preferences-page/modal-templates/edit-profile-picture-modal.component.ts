@@ -81,7 +81,7 @@ export class EditProfilePictureModalComponent extends ConfirmOrCancelModal {
     this.cropppedImageDataUrl = (
       this.cropper.getCroppedCanvas({
         height: 150,
-        width: 50
+        width: 150
       }).toDataURL());
     super.confirm(this.cropppedImageDataUrl);
   }
