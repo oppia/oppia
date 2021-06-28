@@ -39,14 +39,6 @@ INVALID_PYTHON3_FILEPATH = os.path.join(
 INVALID_DOCSTRING_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_docstring.py')
 
-INVALID_JOBS_ONE_OFF_FILEPATHS = [
-    'scripts/linters/test_files/invalid_duplicate_jobs_one_off.py']
-VALID_JOBS_ONE_OFF_FILEPATHS = [
-    'scripts/linters/test_files/valid_jobs_one_off.py']
-INVALID_PROD_VALIDATION_JOBS_ONE_OFF_FILEPATHS = [
-    'scripts/linters/test_files/invalid_duplicate_prod_validation_jobs_one_off'
-    '.py', 'scripts/linters/test_files/invalid_prod_validation_jobs_one_off.py']
-
 NAME_SPACE = multiprocessing.Manager().Namespace()
 PROCESSES = multiprocessing.Manager().dict()
 NAME_SPACE.files = pre_commit_linter.FileCache()
@@ -72,45 +64,6 @@ class PythonLintChecksManagerTests(test_utils.LinterTestBase):
             lint_task_report.get_report())
         self.assertEqual('Import order', lint_task_report.name)
         self.assertFalse(lint_task_report.failed)
-
-    def test_all_jobs_are_listed_in_the_job_registry_file_with_duplicacy(self):
-        lint_task_report = python_linter.PythonLintChecksManager(
-            INVALID_JOBS_ONE_OFF_FILEPATHS + VALID_JOBS_ONE_OFF_FILEPATHS,
-            FILE_CACHE
-        ).check_that_all_jobs_are_listed_in_the_job_registry_file()
-        self.assert_same_list_elements([
-            'Found one-off jobs with duplicate names: '
-            'CollectionMigrationOneOffJob'], lint_task_report.trimmed_messages)
-        self.assert_same_list_elements([
-            'Found one-off jobs not listed in jobs_registry file: '
-            'CollectionsMigrationOneOffJob'], lint_task_report.trimmed_messages)
-        self.assertEqual('Job registry', lint_task_report.name)
-        self.assertTrue(lint_task_report.failed)
-
-    def test_all_jobs_are_listed_in_the_job_registry_file_with_success(self):
-        lint_task_report = python_linter.PythonLintChecksManager(
-            VALID_JOBS_ONE_OFF_FILEPATHS, FILE_CACHE
-        ).check_that_all_jobs_are_listed_in_the_job_registry_file()
-        self.assertEqual(
-            ['SUCCESS  Job registry check passed'],
-            lint_task_report.get_report())
-        self.assertEqual('Job registry', lint_task_report.name)
-        self.assertFalse(lint_task_report.failed)
-
-    def test_jobs_are_listed_in_job_registry_file_with_duplicate_prod_job(self):
-        lint_task_report = python_linter.PythonLintChecksManager(
-            INVALID_PROD_VALIDATION_JOBS_ONE_OFF_FILEPATHS, FILE_CACHE
-        ).check_that_all_jobs_are_listed_in_the_job_registry_file()
-        self.assert_same_list_elements([
-            'Found validation jobs with duplicate names: '
-            'PendingDeletionRequestModelAuditOneOffJob'
-            ], lint_task_report.trimmed_messages)
-        self.assert_same_list_elements([
-            'Found validation jobs not listed in jobs_registry file: '
-            'PendingDeletionRequestModelAuditOneOffJobs'
-            ], lint_task_report.trimmed_messages)
-        self.assertEqual('Job registry', lint_task_report.name)
-        self.assertTrue(lint_task_report.failed)
 
     def test_valid_file_with_pylint(self):
         lint_task_report = python_linter.ThirdPartyPythonLintChecksManager(
@@ -171,15 +124,6 @@ class PythonLintChecksManagerTests(test_utils.LinterTestBase):
             'Pylint for Python 3 compatibility', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
-    def test_custom_linter_with_no_files(self):
-        lint_task_report = python_linter.PythonLintChecksManager(
-            [], FILE_CACHE).perform_all_lint_checks()
-        self.assert_same_list_elements(
-            ['There are no Python files to lint.'],
-            lint_task_report[0].get_report())
-        self.assertEqual('Python lint', lint_task_report[0].name)
-        self.assertFalse(lint_task_report[0].failed)
-
     def test_third_party_linter_with_no_files(self):
         lint_task_report = python_linter.ThirdPartyPythonLintChecksManager(
             []).perform_all_lint_checks()
@@ -194,12 +138,6 @@ class PythonLintChecksManagerTests(test_utils.LinterTestBase):
             [INVALID_PYCODESTYLE_FILEPATH]).perform_all_lint_checks()
         self.assertTrue(isinstance(lint_task_report, list))
 
-    def test_custom_perform_all_lint_checks(self):
-        lint_task_report = python_linter.PythonLintChecksManager(
-            [INVALID_PYCODESTYLE_FILEPATH], FILE_CACHE
-        ).perform_all_lint_checks()
-        self.assertTrue(isinstance(lint_task_report, list))
-
     def test_pycodestyle_with_error_message(self):
         lint_task_report = python_linter.ThirdPartyPythonLintChecksManager(
             [INVALID_PYCODESTYLE_FILEPATH]).lint_py_files()
@@ -211,9 +149,8 @@ class PythonLintChecksManagerTests(test_utils.LinterTestBase):
 
     def test_get_linters_with_success(self):
         custom_linter, third_party_linter = python_linter.get_linters(
-            [VALID_PY_FILEPATH], FILE_CACHE)
-        self.assertTrue(
-            isinstance(custom_linter, python_linter.PythonLintChecksManager))
+            [VALID_PY_FILEPATH])
+        self.assertIsNone(custom_linter)
         self.assertTrue(
             isinstance(
                 third_party_linter,

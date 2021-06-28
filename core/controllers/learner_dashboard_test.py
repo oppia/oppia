@@ -75,11 +75,15 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
     STORY_TITLE_1 = 'Story title 1'
     STORY_ID_2 = 'STORY_2'
     STORY_TITLE_2 = 'Story title 2'
+    STORY_ID_3 = 'STORY_3'
+    STORY_TITLE_3 = 'Story title 3'
 
     TOPIC_ID_1 = 'TOPIC_1'
     TOPIC_NAME_1 = 'Topic title 1'
     TOPIC_ID_2 = 'TOPIC_2'
     TOPIC_NAME_2 = 'Topic title 2'
+    TOPIC_ID_3 = 'TOPIC_3'
+    TOPIC_NAME_3 = 'Topic title 3'
 
     subtopic_0 = topic_domain.Subtopic(
         0, 'Title 1', ['skill_id_1'], 'image.svg',
@@ -257,6 +261,33 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
             response['partially_learnt_topics_list'][0]['id'], self.TOPIC_ID_1)
         self.logout()
 
+    def test_can_see_topics_to_learn(self):
+        self.login(self.VIEWER_EMAIL)
+
+        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['topics_to_learn']), 0)
+
+        self.save_new_topic(
+            self.TOPIC_ID_1, self.owner_id, name=self.TOPIC_NAME_1,
+            url_fragment='topic-one',
+            description='A new topic', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[self.subtopic_0], next_subtopic_id=1)
+        topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id)
+        self.save_new_story(self.STORY_ID_2, self.owner_id, self.TOPIC_ID_1)
+        topic_services.add_canonical_story(
+            self.owner_id, self.TOPIC_ID_1, self.STORY_ID_2)
+        topic_services.publish_story(
+            self.TOPIC_ID_1, self.STORY_ID_2, self.admin_id)
+
+        learner_progress_services.validate_and_add_topic_to_learn_goal(
+            self.viewer_id, self.TOPIC_ID_1)
+        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['topics_to_learn']), 1)
+        self.assertEqual(
+            response['topics_to_learn'][0]['id'], self.TOPIC_ID_1)
+        self.logout()
+
     def test_can_see_exploration_playlist(self):
         self.login(self.VIEWER_EMAIL)
 
@@ -359,6 +390,20 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
             self.TOPIC_ID_2, self.STORY_ID_2, self.admin_id)
         topic_services.publish_topic(self.TOPIC_ID_2, self.admin_id)
 
+        self.save_new_topic(
+            self.TOPIC_ID_3, self.owner_id, name=self.TOPIC_NAME_3,
+            url_fragment='topic-three',
+            description='A new topic', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[self.subtopic_1], next_subtopic_id=1)
+        self.save_new_story(self.STORY_ID_3, self.owner_id, self.TOPIC_ID_3)
+        topic_services.add_canonical_story(
+            self.owner_id, self.TOPIC_ID_3, self.STORY_ID_3)
+
+        topic_services.publish_story(
+            self.TOPIC_ID_3, self.STORY_ID_3, self.admin_id)
+        topic_services.publish_topic(self.TOPIC_ID_3, self.admin_id)
+
         state_name = 'state_name'
         version = 1
 
@@ -383,6 +428,8 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
             self.viewer_id, self.TOPIC_ID_1)
         learner_progress_services.record_topic_started(
             self.viewer_id, self.TOPIC_ID_2)
+        learner_progress_services.validate_and_add_topic_to_learn_goal(
+            self.viewer_id, self.TOPIC_ID_3)
 
         response = self.get_json(feconf.LEARNER_DASHBOARD_IDS_DATA_URL)
         learner_dashboard_activity_ids = (
@@ -418,6 +465,9 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(
             learner_dashboard_activity_ids['partially_learnt_topic_ids'],
             [self.TOPIC_ID_2])
+        self.assertEqual(
+            learner_dashboard_activity_ids['topic_ids_to_learn'],
+            [self.TOPIC_ID_3])
 
     def test_get_threads_after_updating_thread_summaries(self):
         self.login(self.OWNER_EMAIL)
