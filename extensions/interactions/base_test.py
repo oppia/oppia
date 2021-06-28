@@ -59,8 +59,10 @@ INTERACTIONS_THAT_USE_COMPONENTS = [
     'MultipleChoiceInput',
     'NumericExpressionInput',
     'RatioExpressionInput',
+    'NumericInput',
     'SetInput',
-    'TextInput'
+    'TextInput',
+    'MathEquationInput'
 ]
 
 _INTERACTION_CONFIG_SCHEMA = [

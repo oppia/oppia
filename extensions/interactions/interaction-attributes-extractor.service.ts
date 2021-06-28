@@ -38,11 +38,14 @@ export class InteractionAttributesExtractorService {
     'GraphInput',
     'ImageClickInput',
     'CodeRepl',
+    'NumericExpressionInput',
+    'NumericInput',
     'InteractiveMap',
     'LogicProof',
     'MultipleChoiceInput',
     'SetInput',
     'TextInput',
+    'MathEquationInput'
   ];
 
   constructor(
