@@ -338,8 +338,7 @@ describe('Learner dashboard functionality', function() {
     // rendered for desktop and the other which is rendered for mobile.
     var firstExploration = browser.isMobile ? element.all(
       by.css('.protractor-mobile-test-collection-exploration')).first() :
-      element.all(
-        by.css('.protractor-test-collection-exploration')).first();
+      element.all(by.css('.protractor-test-collection-exploration')).first();
     // Click first exploration in collection.
     await action.click('First exploration', firstExploration);
     await waitFor.pageToFullyLoad();
@@ -373,8 +372,7 @@ describe('Learner dashboard functionality', function() {
     // rendered for desktop and the other which is rendered for mobile.
     var firstExploration = browser.isMobile ? element.all(
       by.css('.protractor-mobile-test-collection-exploration')).first() :
-      element.all(
-        by.css('.protractor-test-collection-exploration')).first();
+      element.all(by.css('.protractor-test-collection-exploration')).first();
     // Click first exploration in collection.
     await action.click('First exploration', firstExploration);
     await waitFor.pageToFullyLoad();

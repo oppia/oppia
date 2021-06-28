@@ -59,10 +59,27 @@ ruleTester.run('protractor-practices', rule, {
   }, {
     code: 'sam.then.age;',
   }, {
+    code: `var profileLink = element(by.css(
+          '.protractor-test-profile-link'));`
+  }, {
     code: 'const SKILL_DESCRIPTIONS = 1;'
+  }, {
+    code: 'var modal = element.all(by.css(".modal-dialog")).last();'
+  }, {
+    code: 'var modal = element(by.css("option:checked"));'
   }],
 
   invalid: [
+    {
+      code:
+      `var hideHeightWarningIcon = element(
+        by.css('.oppia-hide-card-height-warning-icon'));`,
+      errors: [{
+        message: (
+          'Please use “.protractor-test-” prefix classname selector instead ' +
+          'of “.oppia-hide-card-height-warning-icon”'),
+      }],
+    },
     {
       code:
       `it('should test a feature', function() {
@@ -122,14 +139,16 @@ ruleTester.run('protractor-practices', rule, {
     },
     {
       code:
-      'await element.all(by.css(".collection-exploration")).first()',
+      `await element.all(
+      by.css(".protractor-test-collection-exploration")).first()`,
       errors: [{
         message: 'Please do not use await for "first()"',
       }],
     },
     {
       code:
-      `var oneOffJob = element.all(by.css('.one-off-jobs-rows'));
+      `var oneOffJob = element.all(
+      by.css('.protractor-test-one-off-jobs-rows'));
       await oneOffJob.get()
       await invalid.get()`,
       errors: [{

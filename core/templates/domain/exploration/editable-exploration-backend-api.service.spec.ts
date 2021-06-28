@@ -22,7 +22,7 @@ import { ReadOnlyExplorationBackendApiService } from
   'domain/exploration/read-only-exploration-backend-api.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { HttpTestingController, HttpClientTestingModule } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
