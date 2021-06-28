@@ -19,11 +19,14 @@
 import { DOCUMENT } from '@angular/common';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { AppConstants } from 'app.constants';
 import { LimitToPipe } from 'filters/limit-to.pipe';
+import { CookieModule } from 'ngx-cookie';
 import { Observable, of } from 'rxjs';
 import { BottomNavbarStatusService } from 'services/bottom-navbar-status.service';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { OppiaCookieService } from 'services/cookie.service';
 import { KeyboardShortcutService } from 'services/keyboard-shortcut.service';
 import { LoaderService } from 'services/loader.service';
 import { PageTitleService } from 'services/page-title.service';
@@ -33,6 +36,9 @@ import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { BaseContentComponent } from './base-content.component';
 
 describe('Base Content Component', () => {
+  // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
+  const NOW_MILLIS = 1416563100000;
+  const ONE_YEAR_FROM_NOW_MILLIS = 1448099100000;
   let fixture: ComponentFixture<BaseContentComponent>;
   let componentInstance: BaseContentComponent;
   let isIframed: boolean = false;
@@ -47,6 +53,8 @@ describe('Base Content Component', () => {
   let loaderService: LoaderService;
   let keyboardShortcutService: KeyboardShortcutService;
   let sidebarStatusService: SidebarStatusService;
+  let oppiaCookieService: OppiaCookieService;
+  let OldDate = Date;
 
   class MockUrlService {
     isIframed(): boolean {
@@ -87,6 +95,7 @@ describe('Base Content Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
+      imports: [CookieModule.forRoot()],
       declarations: [
         BaseContentComponent,
         MockTranslatePipe,
@@ -103,6 +112,7 @@ describe('Base Content Component', () => {
         },
         BackgroundMaskService,
         BottomNavbarStatusService,
+        OppiaCookieService,
         KeyboardShortcutService,
         {
           provide: LoaderService,
@@ -137,6 +147,7 @@ describe('Base Content Component', () => {
     backgroundMaskService = TestBed.inject(BackgroundMaskService);
     backgroundMaskService = (backgroundMaskService as unknown) as
      jasmine.SpyObj<BackgroundMaskService>;
+    oppiaCookieService = TestBed.inject(OppiaCookieService);
   });
 
   it('should create', () => {
@@ -203,5 +214,41 @@ describe('Base Content Component', () => {
     spyOn(document, 'getElementById').and.returnValue(null);
     expect(componentInstance.skipToMainContent).toThrowError(
       'Variable mainContentElement is undefined.');
+  });
+
+  it('should show the cookie banner if there is no cookie set', () => {
+    spyOn(oppiaCookieService, 'getObject').and.returnValue(null);
+    expect(componentInstance.hasAcknowledgedCookies()).toBeFalse();
+  });
+
+  it('should show the cookie banner if a cookie exists but the policy has ' +
+     'been updated', () => {
+    spyOn(oppiaCookieService, 'getObject').and.returnValue(
+      AppConstants.COOKIE_POLICY_LAST_UPDATED_MSECS - 100000);
+    expect(componentInstance.hasAcknowledgedCookies()).toBeFalse();
+  });
+
+  it('should not show the cookie banner if a valid cookie exists', () => {
+    spyOn(oppiaCookieService, 'getObject').and.returnValue(
+      AppConstants.COOKIE_POLICY_LAST_UPDATED_MSECS + 100000);
+    expect(componentInstance.hasAcknowledgedCookies()).toBeTrue();
+  });
+
+  it('should be able to acknowledge cookies', () => {
+    // This throws "Argument of type '(arg: any) => 1448099100000 | { valueOf:
+    // () => number; }' is not assignable to parameter of type 'DateConstructor'
+    // .". We need to suppress this error because the actual 'Date' has more
+    // properties than 'MockDateContructor'. We have only defined the properties
+    // we need in 'MockDateContructor'.
+    spyOn(window, 'Date')
+      // @ts-expect-error
+      .withArgs().and.returnValue(new OldDate(NOW_MILLIS))
+      // @ts-expect-error
+      .withArgs(ONE_YEAR_FROM_NOW_MILLIS).and.callThrough();
+    spyOn(oppiaCookieService, 'putObject');
+    componentInstance.acknowledgeCookies();
+    expect(oppiaCookieService.putObject).toHaveBeenCalledWith(
+      'OPPIA_COOKIES_ACKNOWLEDGED', NOW_MILLIS,
+      { expires: new OldDate(ONE_YEAR_FROM_NOW_MILLIS) });
   });
 });
