@@ -59,7 +59,7 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
             if topic_rights.topic_is_published:
                 raise Exception('The topic is already published.')
             else:
-                raise Exception('The topic exists but not published.')
+                raise Exception('The topic exists but is not published.')
 
         exp_id = '26'
         user_id = feconf.SYSTEM_COMMITTER_ID
@@ -112,48 +112,28 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
             story_id, 'Android End to End testing', 'Description',
             topic_id, 'android-end-to-end-testing')
 
-        story_node_dicts = [{
-            'exp_id': exp_id,
-            'title': 'Testing with UI Automator',
-            'description': 'In order to test all android interactions'
-        }]
+        story.add_node(
+            '%s%d' % (story_domain.NODE_ID_PREFIX, 1),
+            'Testing with UI Automator'
+        )
 
-        def generate_dummy_story_nodes(node_id, exp_id, title, description):
-            """Generates and connects sequential story nodes.
-
-            Args:
-                node_id: int. The node id.
-                exp_id: str. The exploration id.
-                title: str. The title of the story node.
-                description: str. The description of the story node.
-            """
-
-            story.add_node(
-                '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
-                title)
-            story.update_node_description(
-                '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
-                description)
-            story.update_node_exploration_id(
-                '%s%d' % (story_domain.NODE_ID_PREFIX, node_id), exp_id)
-
-            story.update_node_thumbnail_filename(
-                '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
-                'test_svg.svg')
-            story.update_node_thumbnail_bg_color(
-                '%s%d' % (story_domain.NODE_ID_PREFIX, node_id), '#F8BF74')
-            story.update_meta_tag_content('tag')
-            story.update_thumbnail_filename('test_svg.svg')
-            story.update_thumbnail_bg_color(
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['story'][0])
-
-            if node_id != len(story_node_dicts):
-                story.update_node_destination_node_ids(
-                    '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
-                    ['%s%d' % (story_domain.NODE_ID_PREFIX, node_id + 1)])
-
-        for i, story_node_dict in enumerate(story_node_dicts):
-            generate_dummy_story_nodes(i + 1, **story_node_dict)
+        story.update_node_description(
+            '%s%d' % (story_domain.NODE_ID_PREFIX, 1),
+            'To test all android interactions'
+        )
+        story.update_node_exploration_id(
+            '%s%d' % (story_domain.NODE_ID_PREFIX, 1),
+            exp_id
+        )
+        story.update_node_thumbnail_filename(
+            '%s%d' % (story_domain.NODE_ID_PREFIX, 1),
+            'test_svg.svg')
+        story.update_node_thumbnail_bg_color(
+            '%s%d' % (story_domain.NODE_ID_PREFIX, 1), '#F8BF74')
+        story.update_meta_tag_content('tag')
+        story.update_thumbnail_filename('test_svg.svg')
+        story.update_thumbnail_bg_color(
+            constants.ALLOWED_THUMBNAIL_BG_COLORS['story'][0])
 
         skill_services.save_new_skill(user_id, skill)
         story_services.save_new_story(user_id, story)
