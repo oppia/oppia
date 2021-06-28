@@ -201,7 +201,7 @@ describe('Exploration translation and voiceover tab', function() {
       await explorationEditorTranslationTab.navigateToFeedbackTab();
       await explorationEditorTranslationTab.setTranslation(
         await forms.toRichText('Sample Translation.'));
-      await explorationEditorPage.saveChanges('Adds one translation.');
+      await explorationEditorPage.publishChanges('Adds one translation.');
       explorationEditorTranslationTab.expectFeedbackTabToBeActive();
       await users.logout();
     });
