@@ -13,12 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating new frontend instances of State
+ * @fileoverview Model class for creating new frontend instances of State
  * card domain objects used in the exploration player.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 import cloneDeep from 'lodash/cloneDeep';
 
 import { AppConstants } from 'app.constants';
@@ -242,14 +240,6 @@ export class StateCard {
   get contentId(): string {
     return this._contentId;
   }
-}
-
-@Injectable({
-  providedIn: 'root'
-})
-export class StateCardObjectFactory {
-  constructor(
-    private audioTranslationLanguageService: AudioTranslationLanguageService) {}
 
   /**
    * @param {string} stateName - The state name for the current card.
@@ -261,19 +251,18 @@ export class StateCardObjectFactory {
    *        the properties of the card's interaction.
    * @param {RecordedVoiceovers} recordedVoiceovers
    * @param {string} contentId
+   * @param {AudioTranslationLanguageService} audioTranslationLanguageService
    */
-  createNewCard(
+  static createNewCard(
       stateName: string, contentHtml: string, interactionHtml: string,
       interaction: Interaction, recordedVoiceovers: RecordedVoiceovers,
-      writtenTranslations: WrittenTranslations, contentId: string): StateCard {
+      writtenTranslations: WrittenTranslations, contentId: string,
+      audioTranslationLanguageService: AudioTranslationLanguageService
+  ): StateCard {
     return new StateCard(
       stateName, contentHtml, interactionHtml,
       cloneDeep(interaction), [],
       recordedVoiceovers, writtenTranslations, contentId,
-      this.audioTranslationLanguageService);
+      audioTranslationLanguageService);
   }
 }
-
-angular.module('oppia').factory(
-  'StateCardObjectFactory',
-  downgradeInjectable(StateCardObjectFactory));
