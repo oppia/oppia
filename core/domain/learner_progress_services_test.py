@@ -143,7 +143,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         topic.subtopics = [
             topic_domain.Subtopic(
                 1, 'Title', ['skill_id_1'], 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 0,
                 'dummy-subtopic-url')]
         topic.next_subtopic_id = 2
         subtopic_page = (
@@ -186,7 +186,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         topic.subtopics = [
             topic_domain.Subtopic(
                 1, 'Title 1', ['skill_id_1'], 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 0,
                 'dummy-subtopic-url-one')]
         topic.next_subtopic_id = 2
         subtopic_page = (
@@ -230,7 +230,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         topic.subtopics = [
             topic_domain.Subtopic(
                 1, 'Title 1', ['skill_id_1'], 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 0,
                 'dummy-subtopic-url-one')]
         topic.next_subtopic_id = 2
         subtopic_page = (

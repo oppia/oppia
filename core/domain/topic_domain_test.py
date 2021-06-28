@@ -43,7 +43,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.subtopics = [
             topic_domain.Subtopic(
                 1, 'Title', ['skill_id_1'], 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 0,
                 'dummy-subtopic-url')]
         self.topic.next_subtopic_id = 2
 
@@ -254,7 +254,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             topic_domain.Subtopic(
                 1, 'Title', ['skill_id_1', 'skill_id_2', 'skill_id_3'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 0,
                 'dummy-subtopic-three')]
 
         skill_ids = self.topic.subtopics[0].skill_ids
@@ -325,9 +325,12 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
     def test_rearrange_subtopic(self):
         self.topic.subtopics = [
-            topic_domain.Subtopic(1, 'Title1', [], None, None, 'title-one'),
-            topic_domain.Subtopic(2, 'Title2', [], None, None, 'title-two'),
-            topic_domain.Subtopic(3, 'Title3', [], None, None, 'title-three')]
+            topic_domain.Subtopic(
+                1, 'Title1', [], None, None, None, 'title-one'),
+            topic_domain.Subtopic(
+                2, 'Title2', [], None, None, None, 'title-two'),
+            topic_domain.Subtopic(
+                3, 'Title3', [], None, None, None, 'title-three')]
 
         subtopics = self.topic.subtopics
 
@@ -734,7 +737,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.subtopics.append(
             topic_domain.Subtopic(
                 'id_2', 'Title2', ['skill_id_2'], 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 0,
                 'dummy-title-two'))
         with self.assertRaisesRegexp(
             Exception,
@@ -910,11 +913,11 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.subtopics = [
             topic_domain.Subtopic(
                 1, 'Title', ['skill_id_1'], 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 0,
                 'dummy-subtopic-one'),
             topic_domain.Subtopic(
                 2, 'Another title', ['skill_id_1'], 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 0,
                 'dummy-subtopic-two')]
         with self.assertRaisesRegexp(
             Exception,
