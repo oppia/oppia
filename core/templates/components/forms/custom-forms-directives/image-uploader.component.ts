@@ -61,14 +61,13 @@ export class ImageUploaderComponent {
     this.dropAreaRef.nativeElement.addEventListener(
       'drop', (event: DragEvent) => {
         this.onDragEnd(event);
-        if (event.dataTransfer === null) {
-          throw new Error('No Files Exist');
-        }
-        let file = event.dataTransfer.files[0];
-        this.errorMessage = this.validateUploadedFile(file, file.name);
-        if (!this.errorMessage) {
-          // Only fire this event if validations pass.
-          this.fileChanged.emit(file);
+        if (event.dataTransfer !== null) {
+          let file = event.dataTransfer.files[0];
+          this.errorMessage = this.validateUploadedFile(file, file.name);
+          if (!this.errorMessage) {
+            // Only fire this event if validations pass.
+            this.fileChanged.emit(file);
+          }
         }
       });
 
@@ -104,9 +103,13 @@ export class ImageUploaderComponent {
       /(\\|\/)/g).pop();
     this.errorMessage = this.validateUploadedFile(file, filename);
     if (!this.errorMessage) {
-      // Only fir this event if validation pass.
+      // Only fire this event if validation pass.
       this.fileChanged.emit(file);
     }
+    // After the file has been emitted, the file input can be cleared. This is
+    // to allow reupload of the same file after modification (e.g. manually
+    // fixing validation errors).
+    this.imageInputRef.nativeElement.value = '';
   }
 
   validateUploadedFile(file: File, filename: string): string | null {

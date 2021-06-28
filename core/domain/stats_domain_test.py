@@ -217,6 +217,14 @@ class ExplorationStatsTests(test_utils.GenericTestBase):
         self.assertEqual(
             exploration_stats.to_frontend_dict(), expected_frontend_dict)
 
+    def test_clone_instance(self):
+        exploration_stats = (stats_domain.ExplorationStats.create_default(
+            'exp_id1', 1, {}))
+        expected_clone_object = exploration_stats.clone()
+        self.assertEqual(
+            exploration_stats.to_dict(), expected_clone_object.to_dict()
+        )
+
 
 class StateStatsTests(test_utils.GenericTestBase):
     """Tests the StateStats domain object."""

@@ -1,12 +1,16 @@
 <div class="modal-header">
-  <h3>Review translation</h3>
-  <span title="<[subheading]>"
-        class="oppia-translation-modal-subheading protractor-translation-suggestion-review-subheading"
-        aria-hidden="false"> <[subheading]>
-  </span>
-  <button type="button" class="close oppia-close-button-position" ng-click="cancel()" aria-label="Close">
-    <span aria-hidden="true">&times;</span>
-  </button>
+  <div class="row align-items-start">
+    <h3 class="col-3">Review translation</h3>
+    <span title="<[subheading]>"
+          class="col-8 pt-1 mt-4 oppia-translation-modal-subheading protractor-translation-suggestion-review-subheading"
+          aria-hidden="false"> <[subheading]>
+    </span>
+    <button type="button" class="col-1 close oppia-close-button-position" ng-click="cancel()" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    <div class="w-100"></div>
+    <h4 class="col oppia-translation-modal-author-header">Submitted by <[authorName]> in <[languageDescription]> language</h4>
+  </div>
 </div>
 
 <div class="modal-body">
@@ -68,6 +72,10 @@
 </div>
 
 <style>
+  .oppia-translation-modal-author-header {
+    margin-top: -12px;
+  }
+
   .oppia-translation-modal-subheading {
     margin: 18px 12px;
   }
