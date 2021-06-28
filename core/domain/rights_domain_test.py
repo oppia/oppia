@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
 
+from constants import constants
 from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import user_services
@@ -107,6 +108,13 @@ class ActivityRightsTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception, 'A user cannot be both a voice artist and a viewer.'):
             self.activity_rights.validate()
+
+    def test_update_activity_first_published_msec(self):
+        rights_manager.update_activity_first_published_msec(
+            constants.ACTIVITY_TYPE_EXPLORATION, self.exp_id, 0.0)
+
+        activity_rights = rights_manager.get_exploration_rights(self.exp_id)
+        self.assertEqual(activity_rights.first_published_msec, 0.0)
 
     def test_cannot_update_activity_first_published_msec_for_invalid_activity(
             self):

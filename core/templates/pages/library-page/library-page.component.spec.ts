@@ -30,7 +30,7 @@ import { ClassroomBackendApiService } from
 import { UserService } from 'services/user.service';
 // TODO(#7222): Remove usage of importAllAngularServices once upgraded to
 // Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 
 describe('Library controller', function() {
@@ -276,9 +276,9 @@ describe('Library controller', function() {
         var carouselMock = $(document.createElement('div'));
         spyOn(carouselMock, 'scrollLeft').and.returnValue(100);
         var animateSpy = spyOn(carouselMock, 'animate').and.callFake(
-          // This throws an error of argument type because animate expect to
-          // receive properties with different names from css and
-          // animationSettings.
+          // This throws an error of argument type. We need to suppress this
+          // error because animate expect to receive properties with different
+          // names from css and animationSettings.
           // @ts-expect-error
           (css, animationSettings) => {
             cssValue = css;
@@ -316,9 +316,9 @@ describe('Library controller', function() {
         var carouselMock = $(document.createElement('div'));
         spyOn(carouselMock, 'scrollLeft').and.returnValue(100);
         var animateSpy = spyOn(carouselMock, 'animate').and.callFake(
-          // This throws an error of argument type because animate expect to
-          // receive properties with different names from css and
-          // animationSettings.
+          // This throws an error of argument type. We need to suppress this
+          // error because animate expect to receive properties with different
+          // names from css and animationSettings.
           // @ts-expect-error
           (css, animationSettings) => {
             cssValue = css;

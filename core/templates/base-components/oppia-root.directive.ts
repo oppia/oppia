@@ -23,7 +23,7 @@ import { OppiaAngularRootComponent } from
 import { angularServices } from 'services/angular-services.index';
 
 angular.module('oppia').directive('oppiaRoot', [
-  '$translate', function($translate) {
+  '$translate', 'RteHelperService', function($translate, RteHelperService) {
     return {
       template: require('./oppia-root.directive.html'),
       scope: {},
@@ -32,7 +32,7 @@ angular.module('oppia').directive('oppiaRoot', [
       controller: ['$scope',
         function($scope) {
           $scope.initialized = false;
-
+          OppiaAngularRootComponent.rteHelperService = RteHelperService;
           $scope.onInit = function() {
             const map: Record<string, unknown[]> = {};
             for (let [serviceName, serviceType] of angularServices) {
@@ -89,10 +89,8 @@ angular.module('oppia').directive('oppiaRoot', [
               'SchemaDefaultValueService',
               'SchemaUndefinedLastElementService', 'SidebarStatusService',
               'SiteAnalyticsService', 'SkillObjectFactory',
-              'SolutionObjectFactory',
-              'SpeechSynthesisChunkerService',
-              'StateCardObjectFactory', 'StateClassifierMappingService',
-              'StateInteractionStatsService',
+              'SolutionObjectFactory', 'SpeechSynthesisChunkerService',
+              'StateClassifierMappingService', 'StateInteractionStatsService',
               'StateObjectFactory', 'StateTopAnswersStatsBackendApiService',
               'StateTopAnswersStatsService', 'StatesObjectFactory',
               'StoryContentsObjectFactory',
@@ -117,28 +115,10 @@ angular.module('oppia').directive('oppiaRoot', [
               );
             }
 
-            // TODO(#12793): Remove the use of (
-            // OppiaAngularRootComponent.ajsTranslate).
-            OppiaAngularRootComponent.ajsTranslate = $translate;
-            const translateService = (
-              OppiaAngularRootComponent.translateService);
-            const translateCacheService = (
-              OppiaAngularRootComponent.translateCacheService);
-            const i18nLanguageCodeService = (
-              OppiaAngularRootComponent.i18nLanguageCodeService);
-
-            i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(
+            OppiaAngularRootComponent.translateService.onLangChange.subscribe(
               (code) => {
-                translateService.use(code);
-                $translate.use(code);
-              }
-            );
-            translateCacheService.init();
-
-            const cachedLanguage = translateCacheService.getCachedLanguage();
-            if (cachedLanguage) {
-              i18nLanguageCodeService.setI18nLanguageCode(cachedLanguage);
-            }
+                $translate.use(code.lang);
+              });
 
             // The next line allows the transcluded content to start executing.
             $scope.initialized = true;

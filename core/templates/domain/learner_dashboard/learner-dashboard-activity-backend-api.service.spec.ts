@@ -169,7 +169,11 @@ describe('Learner playlist Backend Api service ', () => {
         completed_exploration_ids: [],
         completed_collection_ids: [],
         exploration_playlist_ids: [],
-        collection_playlist_ids: []
+        collection_playlist_ids: [],
+        completed_story_ids: [],
+        learnt_topic_ids: [],
+        partially_learnt_topic_ids: [],
+        topic_ids_to_learn: []
       });
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
       setTimeout(opt.beforeDismiss);
@@ -200,7 +204,11 @@ describe('Learner playlist Backend Api service ', () => {
         completed_exploration_ids: [],
         completed_collection_ids: [],
         exploration_playlist_ids: ['0', '1', '2'],
-        collection_playlist_ids: []
+        collection_playlist_ids: [],
+        completed_story_ids: [],
+        learnt_topic_ids: [],
+        partially_learnt_topic_ids: [],
+        topic_ids_to_learn: []
       });
 
     learnerDashboardActivityBackendApiService.removeFromLearnerPlaylistModal(
@@ -229,7 +237,11 @@ describe('Learner playlist Backend Api service ', () => {
         completed_exploration_ids: [],
         completed_collection_ids: [],
         exploration_playlist_ids: [],
-        collection_playlist_ids: ['0', '1', '2']
+        collection_playlist_ids: ['0', '1', '2'],
+        completed_story_ids: [],
+        learnt_topic_ids: [],
+        partially_learnt_topic_ids: [],
+        topic_ids_to_learn: []
       });
 
     learnerDashboardActivityBackendApiService.removeFromLearnerPlaylistModal(
@@ -259,7 +271,11 @@ describe('Learner playlist Backend Api service ', () => {
         completed_exploration_ids: [],
         completed_collection_ids: [],
         exploration_playlist_ids: [],
-        collection_playlist_ids: ['0', '1', '2']
+        collection_playlist_ids: ['0', '1', '2'],
+        completed_story_ids: [],
+        learnt_topic_ids: [],
+        partially_learnt_topic_ids: [],
+        topic_ids_to_learn: []
       });
 
     learnerDashboardActivityBackendApiService.removeFromLearnerPlaylistModal(

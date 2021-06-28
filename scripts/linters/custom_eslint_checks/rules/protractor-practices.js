@@ -31,30 +31,54 @@ module.exports = {
     fixable: null,
     schema: [],
     messages: {
-      disallowSleep: 'Please do not use browser.sleep() in protractor files',
+      constInAllCaps: (
+        'Please make sure that constant name “{{constName}}” are in all-caps'),
+      disallowedBrowserMethods: (
+        'Please do not use browser.{{methodName}}() in protractor files'),
       disallowThen: 'Please do not use .then(), consider async/await instead'
     },
   },
 
   create: function(context) {
-    var checkSleepCall = function(node) {
-      var callee = node.callee;
-      if (callee.property && callee.property.name !== 'sleep') {
-        return;
-      }
+    var disallowedBrowserMethods = [
+      'sleep', 'explore', 'pause', 'waitForAngular'];
+    var disallowedBrowserMethodsRegex = (
+      `/^(${disallowedBrowserMethods.join('|')})$/`);
+    var disallowedBrowserMethodsSelector = (
+      'CallExpression[callee.object.name=browser][callee.property.name=' +
+      disallowedBrowserMethodsRegex + ']');
 
-      if (callee.object && callee.object.name === 'browser') {
+    var reportDisallowedBrowserMethod = function(node) {
+      context.report({
+        node: node,
+        loc: node.callee.loc,
+        messageId: 'disallowedBrowserMethods',
+        data: {
+          methodName: node.callee.property.name
+        }
+      });
+    };
+
+    var checkConstName = function(node) {
+      var constantName = node.declarations[0].id.name;
+      if ((node.declarations[0].id.type === 'Identifier') &&
+        (constantName !== constantName.toUpperCase())) {
         context.report({
           node: node,
-          loc: callee.loc,
-          messageId: 'disallowSleep'
+          messageId: 'constInAllCaps',
+          data: {
+            constName: constantName
+          }
         });
       }
     };
 
     return {
-      CallExpression: function(node) {
-        checkSleepCall(node);
+      'VariableDeclaration[kind=const]': function(node) {
+        checkConstName(node);
+      },
+      [disallowedBrowserMethodsSelector]: function(node) {
+        reportDisallowedBrowserMethod(node);
       },
       'CallExpression[callee.property.name=\'then\']': function(node) {
         context.report({

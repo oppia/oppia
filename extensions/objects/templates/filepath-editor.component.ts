@@ -96,6 +96,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
   @Input() modalId;
   @Input() value;
   @Output() valueChanged = new EventEmitter();
+  @Output() validityChange = new EventEmitter<Record<'empty', boolean>>();
   MODE_EMPTY = 1;
   MODE_UPLOADED = 2;
   MODE_SAVED = 3;
@@ -171,6 +172,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
   ) {}
 
   ngOnInit(): void {
+    this.validityChange.emit({empty: false});
     this.CROP_CURSORS[this.MOUSE_TOP_LEFT] = 'nwse-resize';
     this.CROP_CURSORS[this.MOUSE_TOP] = 'ns-resize';
     this.CROP_CURSORS[this.MOUSE_TOP_RIGHT] = 'nesw-resize';
@@ -257,6 +259,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
         height: dimensions.height + 'px',
         width: dimensions.width + 'px'
       };
+      this.validityChange.emit({empty: true});
     }
   }
 
@@ -554,6 +557,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
       tags: [],
       attrs: []
     };
+    this.validityChange.emit({empty: false});
   }
 
   validate(data: FilepathData): boolean {
@@ -895,6 +899,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
       this.alertsService.clearWarnings();
       this.value = filename;
       this.valueChanged.emit(filename);
+      this.validityChange.emit({empty: true});
       this.resetComponent(filename);
     }
   }

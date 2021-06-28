@@ -73,8 +73,12 @@ describe('Learner Dashboard Icons Component', () => {
       .createFromBackendDict({
         incomplete_exploration_ids: [],
         incomplete_collection_ids: [],
+        partially_learnt_topic_ids: [],
         completed_exploration_ids: [],
         completed_collection_ids: [],
+        completed_story_ids: [],
+        learnt_topic_ids: [],
+        topic_ids_to_learn: [],
         exploration_playlist_ids: [],
         collection_playlist_ids: []
       });
@@ -157,8 +161,12 @@ describe('Learner Dashboard Icons Component', () => {
       .createFromBackendDict({
         incomplete_exploration_ids: [],
         incomplete_collection_ids: [],
+        partially_learnt_topic_ids: [],
         completed_exploration_ids: [],
         completed_collection_ids: [],
+        completed_story_ids: [],
+        learnt_topic_ids: [],
+        topic_ids_to_learn: [],
         exploration_playlist_ids: [],
         collection_playlist_ids: []
       });
@@ -178,8 +186,12 @@ describe('Learner Dashboard Icons Component', () => {
       .createFromBackendDict({
         incomplete_exploration_ids: [],
         incomplete_collection_ids: [],
+        partially_learnt_topic_ids: [],
         completed_exploration_ids: [],
         completed_collection_ids: [],
+        completed_story_ids: [],
+        learnt_topic_ids: [],
+        topic_ids_to_learn: [],
         exploration_playlist_ids: ['1'],
         collection_playlist_ids: []
       });
@@ -200,8 +212,12 @@ describe('Learner Dashboard Icons Component', () => {
       .createFromBackendDict({
         incomplete_exploration_ids: [],
         incomplete_collection_ids: [],
+        partially_learnt_topic_ids: [],
         completed_exploration_ids: [],
         completed_collection_ids: [],
+        completed_story_ids: [],
+        learnt_topic_ids: [],
+        topic_ids_to_learn: [],
         exploration_playlist_ids: ['1'],
         collection_playlist_ids: []
       });
@@ -222,8 +238,12 @@ describe('Learner Dashboard Icons Component', () => {
       .createFromBackendDict({
         incomplete_exploration_ids: [],
         incomplete_collection_ids: [],
+        partially_learnt_topic_ids: [],
         completed_exploration_ids: [],
         completed_collection_ids: [],
+        completed_story_ids: [],
+        learnt_topic_ids: [],
+        topic_ids_to_learn: [],
         exploration_playlist_ids: [],
         collection_playlist_ids: ['1']
       });
@@ -244,8 +264,12 @@ describe('Learner Dashboard Icons Component', () => {
       .createFromBackendDict({
         incomplete_exploration_ids: [],
         incomplete_collection_ids: [],
+        partially_learnt_topic_ids: [],
         completed_exploration_ids: ['1'],
         completed_collection_ids: [],
+        completed_story_ids: [],
+        learnt_topic_ids: [],
+        topic_ids_to_learn: [],
         exploration_playlist_ids: [],
         collection_playlist_ids: []
       });
@@ -266,8 +290,64 @@ describe('Learner Dashboard Icons Component', () => {
       .createFromBackendDict({
         incomplete_exploration_ids: [],
         incomplete_collection_ids: [],
+        partially_learnt_topic_ids: [],
         completed_exploration_ids: [],
         completed_collection_ids: ['1'],
+        completed_story_ids: [],
+        learnt_topic_ids: [],
+        topic_ids_to_learn: [],
+        exploration_playlist_ids: [],
+        collection_playlist_ids: []
+      });
+
+    let result = component.belongsToCompletedActivities();
+
+    fixture.detectChanges();
+
+    expect(result).toBe(true);
+  }
+  ));
+
+  it('should return true if the curent story belongs to the' +
+    ' completed playlist', fakeAsync(() => {
+    component.activityType = 'story';
+    component.activityId = '1';
+    component.learnerDashboardActivityIds = LearnerDashboardActivityIds
+      .createFromBackendDict({
+        incomplete_exploration_ids: [],
+        incomplete_collection_ids: [],
+        partially_learnt_topic_ids: [],
+        completed_exploration_ids: [],
+        completed_collection_ids: [],
+        completed_story_ids: ['1'],
+        learnt_topic_ids: [],
+        topic_ids_to_learn: [],
+        exploration_playlist_ids: [],
+        collection_playlist_ids: []
+      });
+
+    let result = component.belongsToCompletedActivities();
+
+    fixture.detectChanges();
+
+    expect(result).toBe(true);
+  }
+  ));
+
+  it('should return true if the curent topic belongs to the' +
+    ' learnt playlist', fakeAsync(() => {
+    component.activityType = 'learn topic';
+    component.activityId = '1';
+    component.learnerDashboardActivityIds = LearnerDashboardActivityIds
+      .createFromBackendDict({
+        incomplete_exploration_ids: [],
+        incomplete_collection_ids: [],
+        partially_learnt_topic_ids: [],
+        completed_exploration_ids: [],
+        completed_collection_ids: [],
+        completed_story_ids: [],
+        learnt_topic_ids: ['1'],
+        topic_ids_to_learn: [],
         exploration_playlist_ids: [],
         collection_playlist_ids: []
       });
@@ -288,8 +368,12 @@ describe('Learner Dashboard Icons Component', () => {
       .createFromBackendDict({
         incomplete_exploration_ids: ['1'],
         incomplete_collection_ids: [],
+        partially_learnt_topic_ids: [],
         completed_exploration_ids: [],
         completed_collection_ids: [],
+        completed_story_ids: [],
+        learnt_topic_ids: [],
+        topic_ids_to_learn: [],
         exploration_playlist_ids: [],
         collection_playlist_ids: []
       });
@@ -310,8 +394,38 @@ describe('Learner Dashboard Icons Component', () => {
       .createFromBackendDict({
         incomplete_exploration_ids: [],
         incomplete_collection_ids: ['1'],
+        partially_learnt_topic_ids: [],
         completed_exploration_ids: [],
         completed_collection_ids: [],
+        completed_story_ids: [],
+        learnt_topic_ids: [],
+        topic_ids_to_learn: [],
+        exploration_playlist_ids: [],
+        collection_playlist_ids: []
+      });
+
+    let result = component.belongsToIncompleteActivities();
+
+    fixture.detectChanges();
+
+    expect(result).toBe(true);
+  }
+  ));
+
+  it('should return true if the curent topic belongs to the' +
+    ' partially learnt playlist', fakeAsync(() => {
+    component.activityType = 'learn topic';
+    component.activityId = '1';
+    component.learnerDashboardActivityIds = LearnerDashboardActivityIds
+      .createFromBackendDict({
+        incomplete_exploration_ids: [],
+        incomplete_collection_ids: [],
+        partially_learnt_topic_ids: ['1'],
+        completed_exploration_ids: [],
+        completed_collection_ids: [],
+        completed_story_ids: [],
+        learnt_topic_ids: [],
+        topic_ids_to_learn: [],
         exploration_playlist_ids: [],
         collection_playlist_ids: []
       });
@@ -332,8 +446,12 @@ describe('Learner Dashboard Icons Component', () => {
       .createFromBackendDict({
         incomplete_exploration_ids: [],
         incomplete_collection_ids: [],
+        partially_learnt_topic_ids: [],
         completed_exploration_ids: [],
         completed_collection_ids: [],
+        completed_story_ids: [],
+        learnt_topic_ids: [],
+        topic_ids_to_learn: [],
         exploration_playlist_ids: [],
         collection_playlist_ids: []
       });
@@ -354,8 +472,12 @@ describe('Learner Dashboard Icons Component', () => {
       .createFromBackendDict({
         incomplete_exploration_ids: [],
         incomplete_collection_ids: [],
+        partially_learnt_topic_ids: [],
         completed_exploration_ids: [],
         completed_collection_ids: [],
+        completed_story_ids: [],
+        learnt_topic_ids: [],
+        topic_ids_to_learn: [],
         exploration_playlist_ids: [],
         collection_playlist_ids: []
       });
@@ -376,8 +498,12 @@ describe('Learner Dashboard Icons Component', () => {
       .createFromBackendDict({
         incomplete_exploration_ids: [],
         incomplete_collection_ids: [],
+        partially_learnt_topic_ids: [],
         completed_exploration_ids: [],
         completed_collection_ids: [],
+        completed_story_ids: [],
+        learnt_topic_ids: [],
+        topic_ids_to_learn: [],
         exploration_playlist_ids: [],
         collection_playlist_ids: []
       });
@@ -398,8 +524,64 @@ describe('Learner Dashboard Icons Component', () => {
       .createFromBackendDict({
         incomplete_exploration_ids: [],
         incomplete_collection_ids: [],
+        partially_learnt_topic_ids: [],
         completed_exploration_ids: [],
         completed_collection_ids: [],
+        completed_story_ids: [],
+        learnt_topic_ids: [],
+        topic_ids_to_learn: [],
+        exploration_playlist_ids: [],
+        collection_playlist_ids: []
+      });
+
+    let result = component.belongsToCompletedActivities();
+
+    fixture.detectChanges();
+
+    expect(result).toBe(false);
+  }
+  ));
+
+  it('should return false if the curent story belongs to the' +
+    ' completed playlist', fakeAsync(() => {
+    component.activityType = 'story';
+    component.activityId = '1';
+    component.learnerDashboardActivityIds = LearnerDashboardActivityIds
+      .createFromBackendDict({
+        incomplete_exploration_ids: [],
+        incomplete_collection_ids: [],
+        partially_learnt_topic_ids: [],
+        completed_exploration_ids: [],
+        completed_collection_ids: [],
+        completed_story_ids: [],
+        learnt_topic_ids: [],
+        topic_ids_to_learn: [],
+        exploration_playlist_ids: [],
+        collection_playlist_ids: []
+      });
+
+    let result = component.belongsToCompletedActivities();
+
+    fixture.detectChanges();
+
+    expect(result).toBe(false);
+  }
+  ));
+
+  it('should return false if the curent topic belongs to the' +
+    ' learnt playlist', fakeAsync(() => {
+    component.activityType = 'learn topic';
+    component.activityId = '1';
+    component.learnerDashboardActivityIds = LearnerDashboardActivityIds
+      .createFromBackendDict({
+        incomplete_exploration_ids: [],
+        incomplete_collection_ids: [],
+        partially_learnt_topic_ids: [],
+        completed_exploration_ids: [],
+        completed_collection_ids: [],
+        completed_story_ids: [],
+        learnt_topic_ids: [],
+        topic_ids_to_learn: [],
         exploration_playlist_ids: [],
         collection_playlist_ids: []
       });
@@ -420,8 +602,12 @@ describe('Learner Dashboard Icons Component', () => {
       .createFromBackendDict({
         incomplete_exploration_ids: [],
         incomplete_collection_ids: [],
+        partially_learnt_topic_ids: [],
         completed_exploration_ids: [],
         completed_collection_ids: [],
+        completed_story_ids: [],
+        learnt_topic_ids: [],
+        topic_ids_to_learn: [],
         exploration_playlist_ids: [],
         collection_playlist_ids: []
       });
@@ -442,8 +628,38 @@ describe('Learner Dashboard Icons Component', () => {
       .createFromBackendDict({
         incomplete_exploration_ids: [],
         incomplete_collection_ids: [],
+        partially_learnt_topic_ids: [],
         completed_exploration_ids: [],
         completed_collection_ids: [],
+        completed_story_ids: [],
+        learnt_topic_ids: [],
+        topic_ids_to_learn: [],
+        exploration_playlist_ids: [],
+        collection_playlist_ids: []
+      });
+
+    let result = component.belongsToIncompleteActivities();
+
+    fixture.detectChanges();
+
+    expect(result).toBe(false);
+  }
+  ));
+
+  it('should return false if the curent topic belongs to the' +
+    ' partially learnt playlist', fakeAsync(() => {
+    component.activityType = 'learn topic';
+    component.activityId = '1';
+    component.learnerDashboardActivityIds = LearnerDashboardActivityIds
+      .createFromBackendDict({
+        incomplete_exploration_ids: [],
+        incomplete_collection_ids: [],
+        partially_learnt_topic_ids: [],
+        completed_exploration_ids: [],
+        completed_collection_ids: [],
+        completed_story_ids: [],
+        learnt_topic_ids: [],
+        topic_ids_to_learn: [],
         exploration_playlist_ids: [],
         collection_playlist_ids: []
       });
@@ -506,8 +722,12 @@ describe('Learner Dashboard Icons Component', () => {
       .createFromBackendDict({
         incomplete_exploration_ids: [],
         incomplete_collection_ids: [],
+        partially_learnt_topic_ids: [],
         completed_exploration_ids: [],
         completed_collection_ids: [],
+        completed_story_ids: [],
+        learnt_topic_ids: [],
+        topic_ids_to_learn: [],
         exploration_playlist_ids: [],
         collection_playlist_ids: []
       });
@@ -535,8 +755,12 @@ describe('Learner Dashboard Icons Component', () => {
       .createFromBackendDict({
         incomplete_exploration_ids: [],
         incomplete_collection_ids: [],
+        partially_learnt_topic_ids: [],
         completed_exploration_ids: [],
         completed_collection_ids: [],
+        completed_story_ids: [],
+        learnt_topic_ids: [],
+        topic_ids_to_learn: [],
         exploration_playlist_ids: [],
         collection_playlist_ids: []
       });
@@ -564,8 +788,12 @@ describe('Learner Dashboard Icons Component', () => {
       .createFromBackendDict({
         incomplete_exploration_ids: [],
         incomplete_collection_ids: [],
+        partially_learnt_topic_ids: [],
         completed_exploration_ids: [],
         completed_collection_ids: [],
+        completed_story_ids: [],
+        learnt_topic_ids: [],
+        topic_ids_to_learn: [],
         exploration_playlist_ids: [],
         collection_playlist_ids: []
       });
@@ -593,8 +821,12 @@ describe('Learner Dashboard Icons Component', () => {
       .createFromBackendDict({
         incomplete_exploration_ids: [],
         incomplete_collection_ids: [],
+        partially_learnt_topic_ids: [],
         completed_exploration_ids: [],
         completed_collection_ids: [],
+        completed_story_ids: [],
+        learnt_topic_ids: [],
+        topic_ids_to_learn: [],
         exploration_playlist_ids: [],
         collection_playlist_ids: []
       });
