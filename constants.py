@@ -22,7 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import json
 import os
 import re
-from typing import Any # pylint: disable=unused-import, import-only-modules
+from typing import Any, Text # isort:skip # pylint: disable=unused-import, import-only-modules
 
 import python_utils
 
@@ -60,11 +60,11 @@ class Constants(dict):
     """Transforms dict to object, attributes can be accessed by dot notation."""
 
     def __setattr__(self, name, value):
-        # type: (str, Any) -> None
+        # type: (Text, Any) -> None
         self[name] = value
 
     def __getattr__(self, name):
-        # type: (str) -> Any
+        # type: (Text) -> Any
         return self[name]
 
 
