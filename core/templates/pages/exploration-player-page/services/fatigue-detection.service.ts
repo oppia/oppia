@@ -30,7 +30,7 @@ export class FatigueDetectionService {
   private SPAM_COUNT_THRESHOLD: number = 4;
   private SPAM_WINDOW_MSEC: number = 10000;
   // Function shift return result type T | undefined
-  // so WidnowStartTime can be undefined.
+  // so WindowStartTime can be undefined.
   private windowStartTime!: number | undefined;
   private windowEndTime!: number;
 
@@ -49,8 +49,6 @@ export class FatigueDetectionService {
         this.windowStartTime.valueOf() < this.SPAM_WINDOW_MSEC)
       ) {
         return true;
-      } else {
-        return false;
       }
     }
     return false;

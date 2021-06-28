@@ -32,7 +32,7 @@ export class StoryEditorNavigationService {
     activeTab: string = 'story_editor';
     chapterId!: string;
     // 'chapterIndex' is null when we are navigating to a chapter with its ID.
-    chapterIndex!: number | null;
+    chapterIndex: number | null = null;
 
     constructor(private windowRef: WindowRef) {}
 
