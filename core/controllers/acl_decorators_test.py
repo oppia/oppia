@@ -1262,13 +1262,20 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
         self.signup(self.user_email, self.username)
         self.signup(self.banned_user_email, self.banned_username)
         self.signup(self.VOICE_ARTIST_EMAIL, self.VOICE_ARTIST_USERNAME)
+        self.signup(self.VOICEOVER_ADMIN_EMAIL, self.VOICEOVER_ADMIN_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.voice_artist_id = self.get_user_id_from_email(
             self.VOICE_ARTIST_EMAIL)
+        self.voiceover_admin_id = self.get_user_id_from_email(
+            self.VOICEOVER_ADMIN_EMAIL)
         self.set_moderators([self.MODERATOR_USERNAME])
         self.set_admins([self.ADMIN_USERNAME])
         self.set_banned_users([self.banned_username])
         self.owner = user_services.get_user_actions_info(self.owner_id)
+        self.set_user_role(
+            self.VOICEOVER_ADMIN_USERNAME, feconf.ROLE_ID_VOICEOVER_ADMIN)
+        self.voiceover_admin = user_services.get_user_actions_info(
+            self.voiceover_admin_id)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -1285,10 +1292,8 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
         rights_manager.publish_exploration(self.owner, self.published_exp_id_2)
 
         rights_manager.assign_role_for_exploration(
-            self.owner, self.published_exp_id_1, self.voice_artist_id,
+            self.voiceover_admin, self.published_exp_id_1, self.voice_artist_id,
             self.role)
-        rights_manager.assign_role_for_exploration(
-            self.owner, self.private_exp_id_1, self.voice_artist_id, self.role)
 
     def test_banned_user_cannot_voiceover_exploration(self):
         self.login(self.banned_user_email)
@@ -1337,20 +1342,6 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock/%s' % self.published_exp_id_2, expected_status_int=401)
-        self.logout()
-
-    def test_voice_artist_can_only_voiceover_assigned_private_exploration(self):
-        self.login(self.VOICE_ARTIST_EMAIL)
-        # Checking voice artist can voiceover assigned private exploration.
-        with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock/%s' % self.private_exp_id_1)
-        self.assertEqual(response['exploration_id'], self.private_exp_id_1)
-
-        # Checking voice artist cannot voiceover private exploration which
-        # he/she is not assigned for.
-        with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json(
-                '/mock/%s' % self.private_exp_id_2, expected_status_int=401)
         self.logout()
 
     def test_user_without_voice_artist_role_of_exploration_cannot_voiceover_public_exploration(self): # pylint: disable=line-too-long
@@ -1406,7 +1397,11 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
         self.set_moderators([self.MODERATOR_USERNAME])
         self.set_admins([self.ADMIN_USERNAME])
         self.set_banned_users([self.banned_username])
+        user_services.update_user_role(
+            self.voiceover_admin_id, feconf.ROLE_ID_VOICEOVER_ADMIN)
         self.owner = user_services.get_user_actions_info(self.owner_id)
+        self.voiceover_admin = user_services.get_user_actions_info(
+            self.voiceover_admin_id)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route(
                 '/mock/<entity_type>/<entity_id>', self.MockHandler)],
@@ -1423,12 +1418,8 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
         rights_manager.publish_exploration(self.owner, self.published_exp_id_2)
 
         rights_manager.assign_role_for_exploration(
-            self.owner, self.published_exp_id_1, self.voice_artist_id,
+            self.voiceover_admin, self.published_exp_id_1, self.voice_artist_id,
             self.role)
-        rights_manager.assign_role_for_exploration(
-            self.owner, self.private_exp_id_1, self.voice_artist_id, self.role)
-        user_services.update_user_role(
-            self.voiceover_admin_id, feconf.ROLE_ID_VOICEOVER_ADMIN)
 
     def test_voiceover_admin_can_manage_voice_artist_in_public_exp(self):
         self.login(self.VOICEOVER_ADMIN_EMAIL)
@@ -3710,13 +3701,21 @@ class SaveExplorationTests(test_utils.GenericTestBase):
         self.signup(self.user_email, self.username)
         self.signup(self.banned_user_email, self.banned_username)
         self.signup(self.VOICE_ARTIST_EMAIL, self.VOICE_ARTIST_USERNAME)
+        self.signup(self.VOICEOVER_ADMIN_EMAIL, self.VOICEOVER_ADMIN_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.voice_artist_id = self.get_user_id_from_email(
             self.VOICE_ARTIST_EMAIL)
+        self.voiceover_admin_id = self.get_user_id_from_email(
+            self.VOICEOVER_ADMIN_EMAIL)
+
         self.set_moderators([self.MODERATOR_USERNAME])
         self.set_admins([self.ADMIN_USERNAME])
         self.set_banned_users([self.banned_username])
+        self.set_user_role(
+            self.VOICEOVER_ADMIN_USERNAME, feconf.ROLE_ID_VOICEOVER_ADMIN)
         self.owner = user_services.get_user_actions_info(self.owner_id)
+        self.voiceover_admin = user_services.get_user_actions_info(
+            self.voiceover_admin_id)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -3733,10 +3732,8 @@ class SaveExplorationTests(test_utils.GenericTestBase):
         rights_manager.publish_exploration(self.owner, self.published_exp_id_2)
 
         rights_manager.assign_role_for_exploration(
-            self.owner, self.published_exp_id_1, self.voice_artist_id,
+            self.voiceover_admin, self.published_exp_id_1, self.voice_artist_id,
             self.role)
-        rights_manager.assign_role_for_exploration(
-            self.owner, self.private_exp_id_1, self.voice_artist_id, self.role)
 
     def test_unautheticated_user_cannot_save_exploration(self):
         with self.swap(self, 'testapp', self.mock_testapp):
