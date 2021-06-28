@@ -62,7 +62,7 @@ angular.module('oppia').directive('oppiaRoot', [
               'ExplorationRecommendationsService', 'ExpressionEvaluatorService',
               'ExpressionParserService', 'ExpressionSyntaxTreeService',
               'ExtensionTagAssemblerService',
-              'ExtractImageFilenamesFromStateService',
+              'ExtractImageFilenamesFromModelService',
               'FeedbackThreadObjectFactory',
               'FocusManagerService', 'GuestCollectionProgressService',
               'HtmlEscaperService', 'I18nLanguageCodeService',

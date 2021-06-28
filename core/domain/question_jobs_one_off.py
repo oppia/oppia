@@ -23,7 +23,11 @@ import ast
 import logging
 
 from core import jobs
+from core.domain import fs_domain
+from core.domain import fs_services
+from core.domain import html_cleaner
 from core.domain import question_domain
+from core.domain import question_fetchers
 from core.domain import question_services
 from core.platform import models
 import feconf
@@ -55,7 +59,7 @@ class QuestionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             return
 
         # Note: the read will bring the question up to the newest version.
-        question = question_services.get_question_by_id(item.id)
+        question = question_fetchers.get_question_from_model(item)
         try:
             question.validate()
         except Exception as e:
@@ -88,6 +92,62 @@ class QuestionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 sum(ast.literal_eval(v) for v in values))])
         elif key == QuestionMigrationOneOffJob._MIGRATED_KEY:
             yield (key, ['%d questions successfully migrated.' % (
+                sum(ast.literal_eval(v) for v in values))])
+        else:
+            yield (key, values)
+
+
+class FixQuestionImagesStorageOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """This job is used to ensure that all question related images are present
+    in the correct storage path.
+    """
+
+    _IMAGE_COPIED = 'question_image_copied'
+    _DELETED_KEY = 'question_deleted'
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [question_models.QuestionModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            yield (FixQuestionImagesStorageOneOffJob._DELETED_KEY, 1)
+            return
+
+        question = question_fetchers.get_question_from_model(item)
+        html_list = question.question_state_data.get_all_html_content_strings()
+        image_filenames = html_cleaner.get_image_filenames_from_html_strings(
+            html_list)
+        file_system_class = fs_services.get_entity_file_system_class()
+        question_fs = fs_domain.AbstractFileSystem(file_system_class(
+            feconf.ENTITY_TYPE_QUESTION, question.id))
+        success_count = 0
+        # For each image filename, check if it exists in the correct path. If
+        # not, copy the image file to the correct path else continue.
+        for image_filename in image_filenames:
+            if not question_fs.isfile('image/%s' % image_filename):
+                for skill_id in question.linked_skill_ids:
+                    skill_fs = fs_domain.AbstractFileSystem(file_system_class(
+                        feconf.ENTITY_TYPE_SKILL, skill_id))
+                    if skill_fs.isfile('image/%s' % image_filename):
+                        fs_services.copy_images(
+                            feconf.ENTITY_TYPE_SKILL, skill_id,
+                            feconf.ENTITY_TYPE_QUESTION, question.id,
+                            [image_filename])
+                        success_count += 1
+                        break
+        if success_count > 0:
+            yield (
+                FixQuestionImagesStorageOneOffJob._IMAGE_COPIED,
+                '%s image paths were fixed for question id %s with '
+                'linked_skill_ids: %r' % (
+                    success_count, question.id, question.linked_skill_ids))
+
+    @staticmethod
+    def reduce(key, values):
+        if key == FixQuestionImagesStorageOneOffJob._DELETED_KEY:
+            yield (key, ['Encountered %d deleted questions.' % (
                 sum(ast.literal_eval(v) for v in values))])
         else:
             yield (key, values)

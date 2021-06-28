@@ -879,7 +879,12 @@ class SuggestionAddQuestion(BaseSuggestion):
         question = question_domain.Question.from_dict(question_dict)
         question.validate()
 
-        self._copy_new_images_to_target_entity_storage()
+        # Images need to be stored in the storage path corresponding to the
+        # question.
+        new_image_filenames = self.get_new_image_filenames_added_in_suggestion()
+        fs_services.copy_images(
+            self.image_context, self.target_id, feconf.ENTITY_TYPE_QUESTION,
+            question_dict['id'], new_image_filenames)
 
         question_services.add_question(self.author_id, question)
 

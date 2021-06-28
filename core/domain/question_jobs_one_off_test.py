@@ -20,14 +20,19 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
+import os
 
+from core.domain import fs_domain
+from core.domain import fs_services
 from core.domain import question_domain
 from core.domain import question_jobs_one_off
 from core.domain import question_services
+from core.domain import state_domain
 from core.domain import taskqueue_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 
 (question_models,) = models.Registry.import_models([models.NAMES.question])
 
@@ -182,6 +187,129 @@ class QuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
                      [u'Question %s failed validation: linked_skill_ids is '
                       'either null or an empty list' % question_id]]]
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+
+
+class FixQuestionImagesStorageOneOffJobTests(test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    QUESTION_ID = 'question_id'
+    IMAGE_UPLOAD_URL_PREFIX = '/createhandler/imageupload'
+
+    def setUp(self):
+        super(FixQuestionImagesStorageOneOffJobTests, self).setUp()
+
+        # Setup user who will own the test questions.
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.set_admins([self.ALBERT_NAME])
+        self.process_and_flush_pending_mapreduce_tasks()
+        self.skill_id_1 = 'skill_id_1'
+        self.skill_id_2 = 'skill_id_2'
+        self.save_new_skill(
+            self.skill_id_1, self.albert_id, description='Skill Description')
+        self.save_new_skill(
+            self.skill_id_2, self.albert_id, description='Skill Description')
+        dummy_question_state_data = self._create_valid_question_data('ABC')
+        dummy_question_state_data.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'content',
+                'html': (
+                    '<oppia-noninteractive-image filepath-with-value='
+                    '"&quot;img.png&quot;" caption-with-value="&quot;&quot;" '
+                    'alt-with-value="&quot;Image&quot;">'
+                    '</oppia-noninteractive-image>'
+                    '<oppia-noninteractive-image filepath-with-value='
+                    '"&quot;test_svg.svg&quot;" caption-with-value="&quot;'
+                    '&quot;" alt-with-value="&quot;Image&quot;">'
+                    '</oppia-noninteractive-image>')
+            })
+        )
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
+            'rb', encoding=None) as f:
+            raw_png_image = f.read()
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
+            'rb', encoding=None) as f:
+            raw_svg_image = f.read()
+        self.login(self.ALBERT_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '%s/skill/%s' % (self.IMAGE_UPLOAD_URL_PREFIX, self.skill_id_1),
+            {'filename': 'img.png'},
+            csrf_token=csrf_token,
+            upload_files=(('image', 'unused_filename', raw_png_image),))
+        self.post_json(
+            '%s/skill/%s' % (self.IMAGE_UPLOAD_URL_PREFIX, self.skill_id_2),
+            {'filename': 'test_svg.svg'},
+            csrf_token=csrf_token,
+            upload_files=(('image', 'unused_filename', raw_svg_image),))
+        self.save_new_question(
+            self.QUESTION_ID, self.albert_id,
+            dummy_question_state_data, [self.skill_id_1, self.skill_id_2])
+
+    def test_copy_question_images_to_the_correct_storage_path(self):
+        """Tests that the question images are copied to the correct storage
+        path.
+        """
+        file_system_class = fs_services.get_entity_file_system_class()
+        question_fs = fs_domain.AbstractFileSystem(file_system_class(
+            feconf.ENTITY_TYPE_QUESTION, self.QUESTION_ID))
+
+        # Assert that the storage paths do not exist before the job is run.
+        self.assertFalse(question_fs.isfile('image/img.png'))
+        self.assertFalse(question_fs.isfile('image/test_svg.svg'))
+
+        # Start the job.
+        job_id = (
+            question_jobs_one_off.FixQuestionImagesStorageOneOffJob.create_new()
+        )
+        question_jobs_one_off.FixQuestionImagesStorageOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        # Verify that the storage paths exist and the status is reported in the
+        # job output.
+        self.assertTrue(question_fs.isfile('image/img.png'))
+        self.assertTrue(question_fs.isfile('image/test_svg.svg'))
+
+        output = (
+            question_jobs_one_off.FixQuestionImagesStorageOneOffJob.get_output(
+                job_id))
+        expected = [[u'question_image_copied',
+                     [u'2 image paths were fixed for question id question_id '
+                      u'with linked_skill_ids: '
+                      u'[u\'skill_id_1\', u\'skill_id_2\']']]]
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+
+    def test_deleted_question_are_not_processed(self):
+        """Tests that the job does not process deleted questions."""
+        # Delete the question before migration occurs.
+        question_services.delete_question(
+            self.albert_id, self.QUESTION_ID)
+
+        # Ensure the question is deleted.
+        with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
+            question_services.get_question_by_id(self.QUESTION_ID)
+
+        # Start migration job on sample question.
+        job_id = (
+            question_jobs_one_off.FixQuestionImagesStorageOneOffJob.create_new()
+        )
+        question_jobs_one_off.FixQuestionImagesStorageOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        # Ensure that the question is still deleted and the output is None.
+        with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
+            question_services.get_question_by_id(self.QUESTION_ID)
+
+        output = (
+            question_jobs_one_off.FixQuestionImagesStorageOneOffJob.get_output(
+                job_id))
+        self.assertEqual(
+            [[u'question_deleted', [u'Encountered 1 deleted questions.']]],
+            [ast.literal_eval(x) for x in output])
 
 
 class QuestionSnapshotsMigrationJobTests(test_utils.GenericTestBase):

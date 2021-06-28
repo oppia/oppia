@@ -25,6 +25,7 @@ import { ContentTranslationManagerService } from
   'pages/exploration-player-page/services/content-translation-manager.service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { State } from 'domain/state/StateObjectFactory';
+import { Skill } from 'domain/skill/SkillObjectFactory';
 import {
   DragAndDropSortInputCustomizationArgs,
   ImageClickInputCustomizationArgs,
@@ -40,7 +41,7 @@ type CustomizationArgsWithChoices = (
 @Injectable({
   providedIn: 'root'
 })
-export class ExtractImageFilenamesFromStateService {
+export class ExtractImageFilenamesFromModelService {
   constructor(
     private htmlEscaperService: HtmlEscaperService,
     private contentTranslationManagerService: ContentTranslationManagerService,
@@ -271,19 +272,49 @@ export class ExtractImageFilenamesFromStateService {
         filenamesInState.push(filename);
       }
       let allHtmlOfState = this._getAllHtmlOfState(state);
-      allHtmlOfState.forEach((htmlStr) => {
-        filenamesInState = filenamesInState.concat(
-          this._extractFilepathValueFromOppiaNonInteractiveImageTag(htmlStr));
-        filenamesInState = filenamesInState.concat(
-          this._extractSvgFilenameFromOppiaNonInteractiveMathTag(htmlStr));
-      });
-      return filenamesInState;
+      return [
+        ...filenamesInState,
+        ... this._extractFilenamesFromHtmlList(allHtmlOfState)
+      ];
     }
 
+    /**
+     * Gets the filenames of all the images that are a part of a skill.
+     * @param {object} skill - The skill from which the filenames of the image
+     *                         should be extracted.
+     */
+    _getImageFilenamesInSkill(skill: Skill): string[] {
+      let htmlList = [];
+      for (let misconception of skill.getMisconceptions()) {
+        htmlList.push(misconception.getFeedback(), misconception.getNotes());
+      }
+      for (let workedExample of skill.getConceptCard().getWorkedExamples()) {
+        htmlList.push(
+          workedExample.getExplanation().html,
+          workedExample.getQuestion().html);
+      }
+      htmlList.push(skill.getConceptCard().getExplanation().html);
+      skill.getRubrics().forEach(rubric => {
+        htmlList.push(...rubric.getExplanations());
+      });
+      return this._extractFilenamesFromHtmlList(htmlList);
+    }
+
+    _extractFilenamesFromHtmlList(htmlList: string[]): string[] {
+      let filenames = [];
+      htmlList.forEach((htmlStr) => {
+        filenames.push(
+          ...this._extractFilepathValueFromOppiaNonInteractiveImageTag(htmlStr),
+          ...this._extractSvgFilenameFromOppiaNonInteractiveMathTag(htmlStr));
+      });
+      return filenames;
+    }
+
+    getImageFilenamesInSkill = this._getImageFilenamesInSkill;
     getImageFilenamesInState = this._getImageFilenamesInState;
 }
 
 
 angular.module('oppia').factory(
-  'ExtractImageFilenamesFromStateService',
-  downgradeInjectable(ExtractImageFilenamesFromStateService));
+  'ExtractImageFilenamesFromModelService',
+  downgradeInjectable(ExtractImageFilenamesFromModelService));

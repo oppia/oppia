@@ -22,7 +22,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { AppConstants } from 'app.constants';
 import { Exploration } from 'domain/exploration/ExplorationObjectFactory';
-import { ExtractImageFilenamesFromStateService } from 'pages/exploration-player-page/services/extract-image-filenames-from-state.service';
+import { ExtractImageFilenamesFromModelService } from 'pages/exploration-player-page/services/extract-image-filenames-from-model.service';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { ComputeGraphService } from 'services/compute-graph.service';
 import { ContextService } from 'services/context.service';
@@ -47,8 +47,8 @@ export class ImagePreloaderService {
       private assetsBackendApiService: AssetsBackendApiService,
       private computeGraphService: ComputeGraphService,
       private contextService: ContextService,
-      private extractImageFilenamesFromStateService:
-        ExtractImageFilenamesFromStateService,
+      private ExtractImageFilenamesFromModelService:
+        ExtractImageFilenamesFromModelService,
       private svgSanitizerService: SvgSanitizerService) {}
 
   private filenamesOfImageCurrentlyDownloading: string[] = [];
@@ -87,7 +87,7 @@ export class ImagePreloaderService {
     this.filenamesOfImageToBeDownloaded = (
       this.getImageFilenamesInBfsOrder(sourceStateName));
     const imageFilesInGivenState = (
-      this.extractImageFilenamesFromStateService.getImageFilenamesInState(
+      this.ExtractImageFilenamesFromModelService.getImageFilenamesInState(
         this.exploration.states.getState(sourceStateName)));
     this.filenamesOfImageFailedToDownload = (
       this.filenamesOfImageFailedToDownload.filter(
@@ -123,7 +123,7 @@ export class ImagePreloaderService {
       let numImageFilesCurrentlyDownloading = 0;
       let numImagesNeitherInCacheNorDownloading = 0;
 
-      this.extractImageFilenamesFromStateService.getImageFilenamesInState(
+      this.ExtractImageFilenamesFromModelService.getImageFilenamesInState(
         state
       ).forEach(filename => {
         var isFileCurrentlyDownloading = (
@@ -278,7 +278,7 @@ export class ImagePreloaderService {
 
     stateNamesInBfsOrder.forEach(stateName => {
       var state = this.exploration.states.getState(stateName);
-      this.extractImageFilenamesFromStateService.getImageFilenamesInState(state)
+      this.ExtractImageFilenamesFromModelService.getImageFilenamesInState(state)
         .forEach(filename => imageFilenames.push(filename));
     });
     return imageFilenames;
