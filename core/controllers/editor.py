@@ -124,7 +124,7 @@ class ExplorationHandler(EditorHandler):
             raise base.BaseHandler.InvalidInputException(
                 'Trying to update version %s of exploration from version %s, '
                 'which is not possible. Please reload the page and try again.'
-                % (exploration_version, version_from_payload))
+                % (exploration.version, version))
 
         commit_message = self.payload.get('commit_message')
 
@@ -740,7 +740,6 @@ class EditorAutosaveHandler(ExplorationHandler):
             exploration_id, version, change_list)
         try:
             if can_edit and are_changes_mergeable:
-                print("lololo")
                 exp_services.create_or_update_draft(
                     exploration_id, self.user_id, change_list, version,
                     datetime.datetime.utcnow())
