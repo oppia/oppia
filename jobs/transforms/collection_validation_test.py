@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.domain import rights_domain
 from core.platform import models
 from jobs import job_test_utils
 from jobs.transforms import collection_validation
@@ -212,4 +213,193 @@ class ValidateCollectionSnapshotMetadataModelTests(
                 'Value for property_name in cmd edit_collection_property: '
                 'invalid is not allowed')
         ])
+
+
+class ValidateCollectionRightsSnapshotMetadataModelTests(
+        job_test_utils.PipelinedTestBase):
+
+    def test_collection_rights_change_object_with_missing_cmd(self):
+        commit_dict = {'invalid': 'data'}
+        invalid_commit_cmd_model = (
+            collection_models.CollectionRightsSnapshotMetadataModel(
+                id='123',
+                created_on=self.YEAR_AGO,
+                last_updated=self.NOW,
+                committer_id='committer_id',
+                commit_type='create',
+                commit_cmds=[commit_dict])
+        )
+
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(
+                collection_validation
+                .ValidateCollectionRightsSnapshotMetadataModel())
+        )
+
+        self.assert_pcoll_equal(output, [
+            base_validation_errors.CommitCmdsValidateError(
+                invalid_commit_cmd_model,
+                commit_dict,
+                'Missing cmd key in change dict')
+        ])
+
+    def test_collection_rights_change_object_with_invalid_cmd(self):
+        commit_dict = {'cmd': 'invalid'}
+        invalid_commit_cmd_model = (
+            collection_models.CollectionRightsSnapshotMetadataModel(
+                id='123',
+                created_on=self.YEAR_AGO,
+                last_updated=self.NOW,
+                committer_id='committer_id',
+                commit_type='create',
+                commit_cmds=[commit_dict])
+        )
+
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(
+                collection_validation
+                .ValidateCollectionRightsSnapshotMetadataModel())
+        )
+
+        self.assert_pcoll_equal(output, [
+            base_validation_errors.CommitCmdsValidateError(
+                invalid_commit_cmd_model,
+                commit_dict,
+                'Command invalid is not allowed')
+        ])
+
+    def test_collection_rights_change_object_with_missing_attribute_in_cmd(
+        self):
+        commit_dict = {
+                'cmd': 'change_role',
+                'assignee_id': 'assignee_id',
+            }
+        invalid_commit_cmd_model = (
+            collection_models.CollectionRightsSnapshotMetadataModel(
+                id='123',
+                created_on=self.YEAR_AGO,
+                last_updated=self.NOW,
+                committer_id='committer_id',
+                commit_type='edit',
+                commit_cmds=[commit_dict])
+        )
+
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(
+                collection_validation
+                .ValidateCollectionRightsSnapshotMetadataModel())
+        )
+
+        self.assert_pcoll_equal(output, [
+            base_validation_errors.CommitCmdsValidateError(
+                invalid_commit_cmd_model,
+                commit_dict,
+                'The following required attributes are missing: '
+                'new_role, old_role')
+        ])
+
+    def test_collection_rights_change_object_with_extra_attribute_in_cmd(self):
+        commit_dict = {
+                'cmd': 'change_private_viewability',
+                'old_viewable_if_private': 'old_viewable_if_private',
+                'new_viewable_if_private': 'new_viewable_if_private',
+                'invalid': 'invalid'
+            }
+        invalid_commit_cmd_model = (
+            collection_models.CollectionRightsSnapshotMetadataModel(
+                id='123',
+                created_on=self.YEAR_AGO,
+                last_updated=self.NOW,
+                committer_id='committer_id',
+                commit_type='edit',
+                commit_cmds=[commit_dict])
+        )
+
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(
+                collection_validation
+                .ValidateCollectionRightsSnapshotMetadataModel())
+        )
+
+        self.assert_pcoll_equal(output, [
+            base_validation_errors.CommitCmdsValidateError(
+                invalid_commit_cmd_model,
+                commit_dict,
+                'The following extra attributes are present: invalid')
+        ])
+
+    def test_collection_rights_change_object_with_invalid_role(self):
+        commit_dict = {
+                'cmd': 'change_role',
+                'assignee_id': 'assignee_id',
+                'old_role': rights_domain.ROLE_OWNER,
+                'new_role': 'invalid',
+            }
+        invalid_commit_cmd_model = (
+            collection_models.CollectionRightsSnapshotMetadataModel(
+                id='123',
+                created_on=self.YEAR_AGO,
+                last_updated=self.NOW,
+                committer_id='committer_id',
+                commit_type='edit',
+                commit_cmds=[commit_dict])
+        )
+
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(
+                collection_validation
+                .ValidateCollectionRightsSnapshotMetadataModel())
+        )
+
+        self.assert_pcoll_equal(output, [
+            base_validation_errors.CommitCmdsValidateError(
+                invalid_commit_cmd_model,
+                commit_dict,
+                'Value for new_role in cmd change_role: '
+                'invalid is not allowed')
+        ])
+
+    def test_collection_rights_change_object_with_invalid_status(self):
+        commit_dict = {
+                'cmd': 'change_collection_status',
+                'old_status': rights_domain.ACTIVITY_STATUS_PRIVATE,
+                'new_status': 'invalid'
+            }
+        invalid_commit_cmd_model = (
+            collection_models.CollectionRightsSnapshotMetadataModel(
+                id='123',
+                created_on=self.YEAR_AGO,
+                last_updated=self.NOW,
+                committer_id='committer_id',
+                commit_type='edit',
+                commit_cmds=[commit_dict])
+        )
+
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(
+                collection_validation
+                .ValidateCollectionRightsSnapshotMetadataModel())
+        )
+
+        self.assert_pcoll_equal(output, [
+            base_validation_errors.CommitCmdsValidateError(
+                invalid_commit_cmd_model,
+                commit_dict,
+                'Value for new_status in cmd change_collection_status: '
+                'invalid is not allowed')
+        ])
+
+
 
