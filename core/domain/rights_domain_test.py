@@ -218,7 +218,7 @@ class ActivityRightsTests(test_utils.GenericTestBase):
                 '123456', rights_domain.ROLE_OWNER)
 
         self.activity_rights.assign_new_role(
-                '123456', rights_domain.ROLE_EDITOR)
+            '123456', rights_domain.ROLE_EDITOR)
         with self.assertRaisesRegexp(
             Exception, 'This user already can edit this exploration.'):
             self.activity_rights.assign_new_role(
