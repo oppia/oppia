@@ -46,6 +46,10 @@ EXCLUDED_PHRASES = [
     'type:'
 ]
 
+# If import from any of these is made, it may not be a module.
+EXCLUDED_IMPORT_MODULES = ['__future__', 'typing']
+
+
 import astroid  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
 from pylint import checkers  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
 from pylint import interfaces  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
@@ -1381,6 +1385,9 @@ class ImportOnlyModulesChecker(checkers.BaseChecker):
         try:
             imported_module = node.do_import_module(node.modname)
         except astroid.AstroidBuildingException:
+            return
+
+        if node.modname in EXCLUDED_IMPORT_MODULES:
             return
 
         if node.level is None:
