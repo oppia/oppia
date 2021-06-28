@@ -31,14 +31,14 @@ import { CookieOptions, CookieService } from 'ngx-cookie';
 export class OppiaCookieService {
   constructor(private ngxCookieService: CookieService) { }
 
-  getObject(key: string): null | object {
+  getCookie(key: string): string | null {
     if (!this.ngxCookieService.hasKey(key)) {
       return null;
     }
-    return this.ngxCookieService.getObject(key);
+    return this.ngxCookieService.get(key);
   }
 
-  putObject(key: string, value: object, options?: CookieOptions): void {
-    this.ngxCookieService.putObject(key, value, options);
+  putCookie(key: string, value: string, options?: CookieOptions): void {
+    this.ngxCookieService.put(key, value, options);
   }
 }

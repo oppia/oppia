@@ -123,11 +123,11 @@ export class BaseContentComponent {
   }
 
   hasAcknowledgedCookies(): boolean {
-    let cookieSetDateMsecs = this.oppiaCookieService.getObject(
+    let cookieSetDateMsecs = this.oppiaCookieService.getCookie(
       this.COOKIE_NAME_COOKIES_ACKNOWLEDGED);
     return (
       !!cookieSetDateMsecs &&
-      cookieSetDateMsecs > AppConstants.COOKIE_POLICY_LAST_UPDATED_MSECS
+      Number(cookieSetDateMsecs) > AppConstants.COOKIE_POLICY_LAST_UPDATED_MSECS
     );
   }
 
@@ -136,8 +136,8 @@ export class BaseContentComponent {
     let cookieOptions = {
       expires: new Date(currentDateInUnixTimeMsecs + this.ONE_YEAR_IN_MSECS)
     };
-    this.oppiaCookieService.putObject(
-      this.COOKIE_NAME_COOKIES_ACKNOWLEDGED, currentDateInUnixTimeMsecs,
+    this.oppiaCookieService.putCookie(
+      this.COOKIE_NAME_COOKIES_ACKNOWLEDGED, String(currentDateInUnixTimeMsecs),
       cookieOptions);
   }
 }

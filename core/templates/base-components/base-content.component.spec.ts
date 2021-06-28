@@ -217,39 +217,39 @@ describe('Base Content Component', () => {
   });
 
   it('should show the cookie banner if there is no cookie set', () => {
-    spyOn(oppiaCookieService, 'getObject').and.returnValue(null);
+    spyOn(oppiaCookieService, 'getCookie').and.returnValue(null);
     expect(componentInstance.hasAcknowledgedCookies()).toBeFalse();
   });
 
   it('should show the cookie banner if a cookie exists but the policy has ' +
      'been updated', () => {
-    spyOn(oppiaCookieService, 'getObject').and.returnValue(
-      AppConstants.COOKIE_POLICY_LAST_UPDATED_MSECS - 100000);
+    spyOn(oppiaCookieService, 'getCookie').and.returnValue(
+      String(AppConstants.COOKIE_POLICY_LAST_UPDATED_MSECS - 100000));
     expect(componentInstance.hasAcknowledgedCookies()).toBeFalse();
   });
 
   it('should not show the cookie banner if a valid cookie exists', () => {
-    spyOn(oppiaCookieService, 'getObject').and.returnValue(
-      AppConstants.COOKIE_POLICY_LAST_UPDATED_MSECS + 100000);
+    spyOn(oppiaCookieService, 'getCookie').and.returnValue(
+      String(AppConstants.COOKIE_POLICY_LAST_UPDATED_MSECS + 100000));
     expect(componentInstance.hasAcknowledgedCookies()).toBeTrue();
   });
 
   it('should be able to acknowledge cookies', () => {
     spyOn(window, 'Date')
       // This throws "Argument of type 'Date' is not assignable to parameter of
-      // type 'string'.ts(2345)". We need to suppress this error to be able to
-      // mock the Date constructor.
+      // type 'string'.". We need to suppress this error because DateConstructor
+      // cannot be mocked without it.
       // @ts-expect-error
       .withArgs().and.returnValue(new OldDate(NOW_MILLIS))
-      // This throws "Argument of type 'Date' is not assignable to parameter of
-      // type 'string'.ts(2345)". We need to suppress this error to be able to
-      // mock the Date constructor.
+      // This throws "Expected 0 arguments, but got 1.". We need to suppress
+      // this error because we pass an argument to the Date constructor in the
+      // component code.
       // @ts-expect-error
       .withArgs(ONE_YEAR_FROM_NOW_MILLIS).and.callThrough();
-    spyOn(oppiaCookieService, 'putObject');
+    spyOn(oppiaCookieService, 'putCookie');
     componentInstance.acknowledgeCookies();
-    expect(oppiaCookieService.putObject).toHaveBeenCalledWith(
-      'OPPIA_COOKIES_ACKNOWLEDGED', NOW_MILLIS,
+    expect(oppiaCookieService.putCookie).toHaveBeenCalledWith(
+      'OPPIA_COOKIES_ACKNOWLEDGED', String(NOW_MILLIS),
       { expires: new OldDate(ONE_YEAR_FROM_NOW_MILLIS) });
   });
 });
