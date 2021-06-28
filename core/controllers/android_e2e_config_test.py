@@ -104,7 +104,7 @@ class AndroidConfigTest(test_utils.GenericTestBase):
             self.post_req(
                 '/initialize_android_test_data')
 
-    def test_check_if_topic_exists_and_not_published(self):
+    def test_initialize_twice_raises_unpublished_topic_exception(self):
         self.post_req('/initialize_android_test_data')
         topic = topic_fetchers.get_topic_by_name('Android test')
         topic_services.unpublish_topic(
