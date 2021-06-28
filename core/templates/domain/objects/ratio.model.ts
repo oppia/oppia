@@ -92,7 +92,7 @@ export class Ratio {
    * Returns this Ratio in its most simplified form.
    */
   convertToSimplestForm(): number[] {
-    var gcd = (x: number, y: number) => {
+    var gcd: (x: number, y: number) => number = (x: number, y: number) => {
       return y === 0 ? x : gcd(y, x % y);
     };
     var gcdResult = this.components.reduce(gcd);

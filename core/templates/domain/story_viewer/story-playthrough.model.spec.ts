@@ -16,11 +16,10 @@
  * @fileoverview Tests for StoryPlaythroughModel.
  */
 
-import { StoryPlaythrough } from
-  'domain/story_viewer/story-playthrough.model';
+import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
 
 describe('Story playthrough model', () => {
-  var _samplePlaythroughObject = null;
+  var _samplePlaythroughObject: StoryPlaythrough;
 
   beforeEach(() => {
     var firstSampleReadOnlyStoryNodeBackendDict = {
