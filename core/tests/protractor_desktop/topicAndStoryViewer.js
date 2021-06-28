@@ -83,11 +83,6 @@ describe('Topic and Story viewer functionality', function() {
     subTopicViewerPage = new SubTopicViewerPage.SubTopicViewerPage();
     await users.createAndLoginAdminUser(
       'creator@storyViewer.com', 'creatorStoryViewer');
-    await adminPage.editConfigProperty(
-      'Make classroom page accessible.',
-      'Boolean', async function(elem) {
-        await elem.setValue(true);
-      });
     await createDummyExplorations();
     var handle = await browser.getWindowHandle();
     await topicsAndSkillsDashboardPage.get();
@@ -166,11 +161,10 @@ describe('Topic and Story viewer functionality', function() {
 
     // Signing up with the login button should redirect the user back to the
     // exploration.
-    const loginButton = element(by.css('.protractor-test-login-button'));
+    var loginButton = element(by.css('.protractor-test-login-button'));
     await action.click('Login button', loginButton);
-    const useManualNavigation = false;
     await users.createAndLoginUser(
-      'newStoryViewer@storyviewer.com', 'newStoryViewer', useManualNavigation);
+      'newStoryViewer@storyviewer.com', 'newStoryViewer', false);
 
     await explorationPlayerPage.submitAnswer('Continue', null);
     await topicAndStoryViewerPage.get(

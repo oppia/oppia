@@ -57,7 +57,17 @@ export class MathExpressionContentEditorComponent implements OnInit {
     // part of an editable list).
     this.svgString = '';
     this.numberOfElementsInQueue = 0;
-    this.value.mathExpressionSvgIsBeingProcessed = true;
+    // If svg_filename and raw_latex values are already initialised, it means
+    // that an existing math expression is being edited. In this case, the
+    // editor template can be initialised with the actual values instead of
+    // default ones.
+    if (this.value.svg_filename && this.value.raw_latex) {
+      this.localValue.label = this.value.raw_latex;
+      this.value.mathExpressionSvgIsBeingProcessed = false;
+      this.convertLatexStringToSvg(this.localValue.label);
+    } else {
+      this.value.mathExpressionSvgIsBeingProcessed = true;
+    }
     this.valueChanged.emit(this.value);
     this.directiveSubscriptions.add(
       this.externalRteSaveService.onExternalRteSave.subscribe(() => {
@@ -94,8 +104,15 @@ export class MathExpressionContentEditorComponent implements OnInit {
     this.numberOfElementsInQueue++;
     MathJax.Hub.Queue(() => {
       if (outputElement.getElementsByTagName('svg')[0] !== undefined) {
-        this.svgString = (
-          outputElement.getElementsByTagName('svg')[0].outerHTML);
+        let svgElement = outputElement.getElementsByTagName('svg')[0];
+        // This is required so that DOMParser can correctly set the namespaceURI
+        // for the document when parsing the SVG string in SVGSanitizerService.
+        // Without this change, getting the 'outerHTML' property on the parsed
+        // document will result in xmlns being removed in Firefox browsers and
+        // the image rendered will appear broken. Note that Chrome's
+        // implementation of outerHTML does not remove xmlns.
+        svgElement.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+        this.svgString = svgElement.outerHTML;
       }
       this.numberOfElementsInQueue--;
       // We need to ensure that all the typepsetting requests in the

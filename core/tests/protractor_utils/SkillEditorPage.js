@@ -51,7 +51,7 @@ var SkillEditorPage = function() {
   var deleteWorkedExampleButton = function(index) {
     return element(
       by.css('.protractor-test-worked-example-' + index))
-      .element(by.css('.oppia-delete-example-button'));
+      .element(by.css('.protractor-test-delete-example-button'));
   };
   var confirmDeleteWorkedExample = element(
     by.css('.protractor-test-confirm-delete-worked-example-button'));
@@ -74,7 +74,7 @@ var SkillEditorPage = function() {
   var deleteMisconceptionButton = function(index) {
     return element(
       by.css('.protractor-test-misconception-' + index))
-      .element(by.css('.oppia-delete-example-button'));
+      .element(by.css('.protractor-test-delete-example-button'));
   };
   var confirmDeleteMisconception =
     element(by.css('.protractor-test-confirm-delete-misconception-button'));
@@ -259,10 +259,9 @@ var SkillEditorPage = function() {
 
     await (await browser.switchTo().activeElement()).sendKeys(explanation);
 
-    await waitFor.elementToBeClickable(
-      saveConceptCardExplanationButton,
-      'Save Concept Card Explanation button takes too long to be clickable');
-    await saveConceptCardExplanationButton.click();
+    await action.click(
+      'Save Concept Card Explanation Button',
+      saveConceptCardExplanationButton);
     await waitFor.invisibilityOf(
       editor, 'Explanation Editor takes too long to close');
   };

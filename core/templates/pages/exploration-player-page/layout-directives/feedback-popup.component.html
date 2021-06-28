@@ -6,16 +6,22 @@
     <br>
 
     <div>
-      <textarea [(ngModel)]="feedbackText" rows="5" class="protractor-test-exploration-feedback-textarea oppia-feedback-popover-textarea"
+      <textarea [(ngModel)]="feedbackText" rows="5" class="protractor-test-exploration-feedback-textarea oppia-feedback-popover-textarea" [attr.maxlength]="MAX_REVIEW_MESSAGE_LENGTH"
                 placeholder="{{ 'I18N_PLAYER_LEAVE_FEEDBACK' | translate }}" [oppiaFocusOn]="feedbackPopoverId">
       </textarea>
+      <span class="oppia-input-box-subtitle">
+        <em>
+          Feedback message should be at most
+          {{ MAX_REVIEW_MESSAGE_LENGTH }} characters.
+        </em>
+      </span>
     </div>
 
     <!-- The z-index ensures that the button is not overlapped by the checkbox div. -->
     <button mat-button class="float-right oppia-exploration-feedback-submit-btn protractor-test-exploration-feedback-submit-btn"
             [ngClass]="{'oppia-feedback-popover-submit-btn-enabled': feedbackText}"
             (click)="saveFeedback()"
-            [disabled]="!feedbackText">
+            [disabled]="!feedbackText || feedbackText.length > MAX_REVIEW_MESSAGE_LENGTH">
       {{ 'I18N_PLAYER_SUBMIT_BUTTON' | translate }}
     </button>
     <div class="checkbox oppia-checkbox" *ngIf="isLoggedIn">
@@ -38,7 +44,7 @@
     margin-top: 4px;
     padding: 4px;
     resize: none;
-    width: 200px;
+    width: 250px;
   }
   input {
     position: relative;
