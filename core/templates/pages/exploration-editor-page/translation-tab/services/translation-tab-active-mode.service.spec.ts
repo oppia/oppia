@@ -21,7 +21,6 @@ import { TranslationTabActiveModeService } from 'pages/exploration-editor-page/t
 
 describe('Translation tab active mode service', () => {
   let translationTabActiveModeService: TranslationTabActiveModeService;
-  beforeEach(angular.mock.module('oppia'));
 
   beforeEach(()=> {
     translationTabActiveModeService = TestBed.get(

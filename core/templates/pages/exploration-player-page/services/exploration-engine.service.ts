@@ -25,7 +25,7 @@ import { ParamChange } from 'domain/exploration/ParamChangeObjectFactory';
 import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { BindableVoiceovers, RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { State } from 'domain/state/StateObjectFactory';
-import { StateCard, StateCardObjectFactory } from 'domain/state_card/StateCardObjectFactory';
+import { StateCard } from 'domain/state_card/state-card.model';
 import { ExpressionInterpolationService } from 'expressions/expression-interpolation.service';
 import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
@@ -86,7 +86,6 @@ export class ExplorationEngineService {
      private playerTranscriptService: PlayerTranscriptService,
      private readOnlyExplorationBackendApiService:
        ReadOnlyExplorationBackendApiService,
-     private stateCardObjectFactory: StateCardObjectFactory,
      private statsReportingService: StatsReportingService,
      private urlService: UrlService
    ) {
@@ -241,11 +240,11 @@ export class ExplorationEngineService {
      }
 
      let initialCard =
-       this.stateCardObjectFactory.createNewCard(
+       StateCard.createNewCard(
          this.currentStateName, questionHtml, interactionHtml,
          interaction, initialState.recordedVoiceovers,
          initialState.writtenTranslations,
-         initialState.content.contentId);
+         initialState.content.contentId, this.audioTranslationLanguageService);
      successCallback(initialCard, nextFocusLabel);
    }
 
@@ -522,12 +521,13 @@ export class ExplorationEngineService {
      questionHtml = questionHtml + this._getRandomSuffix();
      nextInteractionHtml = nextInteractionHtml + this._getRandomSuffix();
 
-     let nextCard = this.stateCardObjectFactory.createNewCard(
+     let nextCard = StateCard.createNewCard(
        this.nextStateName, questionHtml, nextInteractionHtml,
        this.exploration.getInteraction(this.nextStateName),
        this.exploration.getState(this.nextStateName).recordedVoiceovers,
        this.exploration.getState(this.nextStateName).writtenTranslations,
-       this.exploration.getState(this.nextStateName).content.contentId);
+       this.exploration.getState(this.nextStateName).content.contentId,
+       this.audioTranslationLanguageService);
      successCallback(
        nextCard, refreshInteraction, feedbackHtml,
        feedbackAudioTranslations, refresherExplorationId,
