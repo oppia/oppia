@@ -551,7 +551,6 @@ def can_access_blog_dashboard(handler):
         function. The newly decorated function that now checks if the user has
         permission to access the blog dashboard.
     """
-
     def test_can_access_blog_dashboard(self, **kwargs):
         """Checks if the user is logged in and can access blog dashboard.
 
@@ -589,7 +588,6 @@ def can_delete_blog_post(handler):
         function. The newly decorated function that checks if a user has
         permission to delete a given blog post.
     """
-
     def test_can_delete(self, blog_post_id, **kwargs):
         """Checks if the user can delete the blog post.
 
@@ -638,7 +636,6 @@ def can_edit_blog_post(handler):
         function. The newly decorated function that checks if a user has
         permission to edit a given blog post.
     """
-
     def test_can_edit(self, blog_post_id, **kwargs):
         """Checks if the user can edit the blog post.
 
