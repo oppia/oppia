@@ -98,14 +98,27 @@ export class RteOutputDisplayComponent implements AfterViewInit {
     // bindings). New lines and spaces inside the pre-tags are treated
     // differently when compared to other tags. So with the comments come new
     // line inside pre tags. These cause the rte output to look differently than
-    // what it was shown in ck-editor.
+    // what it was shown in ck-editor. So we remove all the comments and empty
+    // TextNode. Am empty TextNode is a TextNode whose nodeValue only consists
+    // of whiteSpace characters and new lines. The setTimeout is needed to run
+    // it in the next clock cycle so that the view has been rendered.
     setTimeout(() => {
       (
         this.elementRef.nativeElement as HTMLElement
       ).querySelectorAll('pre').forEach(preNode => {
-        preNode.innerHTML = preNode.innerHTML.replace(
-          /<!--[^>]*-->/g, ''
-        ).trim();
+        for (let i = 0; i < preNode.childNodes.length; i++) {
+          if (preNode.childNodes[i].nodeType === 8) {
+            preNode.removeChild(preNode.childNodes[i]);
+            i--;
+            continue;
+          }
+          if (preNode.childNodes[i].nodeType === 3) {
+            if (preNode.childNodes[i].nodeValue.replace(/\s/g, '') === '') {
+              preNode.removeChild(preNode.childNodes[i]);
+              i--;
+            }
+          }
+        }
       });
     });
   }
