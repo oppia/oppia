@@ -144,7 +144,7 @@ class MypyScriptChecks(test_utils.GenericTestBase):
                 with self.assertRaisesRegexp(SystemExit, '1'):
                     run_mypy_checks.main(args=['--files', 'file1.py'])
 
-    def test_main_failure_with_mypy_errors(self):
+    def test_main_failure_due_to_mypy_errors(self):
         with self.popen_swap_failure:
             with self.swap_install_success, self.install_swap:
                 with self.assertRaisesRegexp(SystemExit, '1'):
