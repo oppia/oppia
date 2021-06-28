@@ -100,7 +100,6 @@ export class TranslationModalComponent {
   hasImgTextError = false;
   hasIncompleteTranslationError = false;
   elementViolations: string[] = [];
-  elementViolation: string;
 
   constructor(
     private readonly activeModal: NgbActiveModal,
