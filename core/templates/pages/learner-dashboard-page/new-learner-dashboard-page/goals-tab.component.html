@@ -50,6 +50,7 @@
         <p *ngIf="topicBelongToLearntToPartiallyLearntTopics(topic.name)" class="oppia-new-story-content" [innerHTML]="'I18N_LEARNER_DASHBOARD_NEW_STORY_CONTENT' | translate">
         </p>
       </a>
+      <img [src]="getStaticImageUrl('/learner_dashboard/book.svg')" alt="book image" class="oppia-svg-book-image" *ngIf="getTopicClassification(topic.id) == 1" ngbTooltip="You have completed this topic.">
       <mat-checkbox color="primary" *ngIf="getTopicClassification(topic.id) == 2" class="oppia-checkbox" (click)="addToLearnerGoals(topic, topic.id, i)" [disabled]="this.currentGoals.length == this.MAX_CURRENT_GOALS_LENGTH"></mat-checkbox>
       <mat-checkbox color="primary" *ngIf="getTopicClassification(topic.id) == 0" checked disabled class="oppia-checkbox"></mat-checkbox>
     </div>
@@ -193,7 +194,7 @@
     opacity: 1;
     position: relative;
     text-align: left;
-    width: 150px;
+    width: 270px;
   }
   .oppia-new-story-content {
     color: #00645C;
@@ -244,6 +245,12 @@
     position: relative;
     width: 32px;
   }
+  .oppia-svg-book-image {
+    left: 670px;
+    position: absolute;
+    text-align: center;
+    transform: translateY(0%);
+  }
   .oppia-svg-star-image {
     filter: invert(95%) sepia(49%) saturate(2374%) hue-rotate(320deg) brightness(91%) contrast(89%);
     float: right;
@@ -289,6 +296,9 @@
   @media screen and (max-width: 1200px) {
     .oppia-checkbox {
       left: 570px;
+    }
+    .oppia-svg-book-image {
+      left: 565px;
     }
   }
   @media screen and (max-width: 768px) {
@@ -339,7 +349,11 @@
       width: 300px;
     }
     .oppia-goals-topic-name {
-      width: 134px;
+      width: 270px;
+    }
+    .oppia-svg-book-image {
+      left: 263px;
+      text-align: start;
     }
     .oppia-svg-paw-image {
       left: 47px;
@@ -366,6 +380,12 @@
       left: 215px;
       text-align: end;
       width: 188px;
+    }
+    .oppia-svg-book-image {
+      left: 382px;
+    }
+    .oppia-current-goals-content {
+      width: 410px;
     }
   }
 </style>

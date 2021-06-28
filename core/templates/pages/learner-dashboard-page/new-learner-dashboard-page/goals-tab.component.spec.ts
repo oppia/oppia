@@ -254,8 +254,8 @@ describe('Goals tab Component', () => {
     expect(component.topicIdsInCurrentGoals)
       .toEqual(learnerDashboardActivityIds.topicIdsToLearn);
     expect(learnerDashboardSpy).toHaveBeenCalled();
-  }
-  ));
+  }));
+
   it('should check where the topicId belongs to current goal', () => {
     component.topicIdsInCurrentGoals = ['1', '2', '3'];
 
@@ -263,8 +263,7 @@ describe('Goals tab Component', () => {
     fixture.detectChanges();
 
     expect(topicBelongsTo).toEqual(0);
-  }
-  );
+  });
 
   it('should check where the topicId belongs to completed goal', () => {
     component.topicIdsInCompletedGoals = ['1', '2', '3'];
@@ -273,8 +272,7 @@ describe('Goals tab Component', () => {
     fixture.detectChanges();
 
     expect(topicBelongsTo).toEqual(1);
-  }
-  );
+  });
 
   it('should check if the topicName belongs to learntToPartiallyLearntTopics',
     () => {
