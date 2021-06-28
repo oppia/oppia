@@ -202,7 +202,7 @@ class EditorTests(BaseEditorControllerTests):
         # A request with the wrong version number is invalid.
         response_dict = _put_and_expect_400_error(
             _get_payload('New state', version=123))
-        self.assertIn('which is too old', response_dict['error'])
+        self.assertIn('which is not possible', response_dict['error'])
 
         # A request with an empty state name is invalid.
         response_dict = _put_and_expect_400_error(
@@ -2587,7 +2587,7 @@ class EditorAutosaveTest(BaseEditorControllerTests):
         response = self.put_json(
             '/createhandler/autosave_draft/%s' % self.EXP_ID2, {
                 'change_list': self.INVALID_CHANGELIST,
-                'version': 2,
+                'version': 1,
             }, csrf_token=self.csrf_token,
             expected_status_int=400)
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
@@ -2615,7 +2615,7 @@ class EditorAutosaveTest(BaseEditorControllerTests):
         self.assertTrue(response['is_version_of_draft_valid'])
         self.assertEqual(response['draft_change_list_id'], 2)
 
-    def test_draft_updated_version_invalid(self):
+    def test_draft_does_not_updated_version_invalid(self):
         payload = {
             'change_list': self.NEW_CHANGELIST,
             'version': 10,
@@ -2625,8 +2625,8 @@ class EditorAutosaveTest(BaseEditorControllerTests):
             csrf_token=self.csrf_token)
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
             '%s.%s' % (self.owner_id, self.EXP_ID2))
-        self.assertEqual(exp_user_data.draft_change_list, self.NEW_CHANGELIST)
-        self.assertEqual(exp_user_data.draft_change_list_exp_version, 10)
+        self.assertEqual(exp_user_data.draft_change_list, self.DRAFT_CHANGELIST)
+        self.assertEqual(exp_user_data.draft_change_list_exp_version, 2)
         self.assertFalse(response['is_version_of_draft_valid'])
         self.assertEqual(response['draft_change_list_id'], 2)
 

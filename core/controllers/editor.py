@@ -115,10 +115,16 @@ class ExplorationHandler(EditorHandler):
     @acl_decorators.can_save_exploration
     def put(self, exploration_id):
         """Updates properties of the given exploration."""
+        exploration = exp_fetchers.get_exploration_by_id(exploration_id)
         version = self.payload.get('version')
         if version is None:
             raise base.BaseHandler.InvalidInputException(
                 'Invalid POST request: a version must be specified.')
+        if version > exploration.version:
+            raise base.BaseHandler.InvalidInputException(
+                'Trying to update version %s of exploration from version %s, '
+                'which is not possible. Please reload the page and try again.'
+                % (exploration_version, version_from_payload))
 
         commit_message = self.payload.get('commit_message')
 
@@ -140,6 +146,12 @@ class ExplorationHandler(EditorHandler):
 
         are_changes_mergeable = exp_services.are_changes_mergeable(
             exploration_id, version, change_list)
+        if not are_changes_mergeable:
+            raise base.BaseHandler.InvalidInputException(
+                'Trying to update change list to version %s of exploration '
+                'from version %s, which is not mergeable.'
+                ' Please reload the page and try again.'
+                % (exploration.version, version))
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id)
         can_edit = rights_manager.check_can_edit_activity(
@@ -728,6 +740,7 @@ class EditorAutosaveHandler(ExplorationHandler):
             exploration_id, version, change_list)
         try:
             if can_edit and are_changes_mergeable:
+                print("lololo")
                 exp_services.create_or_update_draft(
                     exploration_id, self.user_id, change_list, version,
                     datetime.datetime.utcnow())
