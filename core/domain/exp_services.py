@@ -1993,7 +1993,7 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
     backend_version_exploration = exp_fetchers.get_exploration_by_id(exp_id)
     if backend_version_exploration.version == frontend_version:
         return True
-    if backend_version_exploration.version > frontend_version:
+    elif backend_version_exploration.version < frontend_version:
         return False
     else:
         # A complete list of changes from one version to another
@@ -2025,6 +2025,16 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
         # Changed_translations: dict. List of all the translations changed
         # according to the state and content_id name.
         changed_translations = {}
+
+        # NOTE: List properties_related_to_cust_args,
+        # properties_related_to_answer_groups, and
+        # properties_related_to_solution should remain separate lists
+        # irrespective of its content. This is because they are for
+        # different unique properties so if in the future any new
+        # property is added which is affected by that unique property
+        # only then in that case we'll add that property name in the
+        # list of that unique property only. Therefore we can not keep
+        # a common list.
 
         # properties_related_to_cust_args: List of the properties
         # related (affected by or affecting) customization args. This list
