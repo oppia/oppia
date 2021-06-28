@@ -79,10 +79,13 @@ import { LoadingMessageComponent } from '../base-components/loading-message.comp
 import { CreateActivityButtonComponent } from './button-directives/create-activity-button.component';
 import { CreateActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/create-activity-modal.component';
 import { UploadActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/upload-activity-modal.component';
+import { ThumbnailUploaderComponent } from './forms/custom-forms-directives/thumbnail-uploader.component';
+import { EditThumbnailModalComponent } from './forms/custom-forms-directives/edit-thumbnail-modal.component';
 import { TopNavigationBarComponent } from './common-layout-directives/navigation-bars/top-navigation-bar.component';
 import { CorrectnessFooterComponent } from 'pages/exploration-player-page/layout-directives/correctness-footer.component';
 import { ContinueButtonComponent } from 'pages/exploration-player-page/learner-experience/continue-button.component';
-import { BaseContentComponent } from '../base-components/base-content.component';
+import { BaseContentComponent, BaseContentNavBarBreadCrumbDirective } from '../base-components/base-content.component';
+import { QuestionDifficultySelectorComponent } from './question-difficulty-selector/question-difficulty-selector.component';
 import { PreviewThumbnailComponent } from 'pages/topic-editor-page/modal-templates/preview-thumbnail.component';
 import { InputResponsePairComponent } from 'pages/exploration-player-page/learner-experience/input-response-pair.component';
 import { I18nLanguageSelectorComponent } from '../base-components/i18n-language-selector.component';
@@ -232,6 +235,7 @@ const toastrConfig = {
     AttributionGuideComponent,
     BackgroundBannerComponent,
     BaseContentComponent,
+    BaseContentNavBarBreadCrumbDirective,
     CorrectnessFooterComponent,
     ContinueButtonComponent,
     CreateNewSkillModalComponent,
@@ -255,10 +259,10 @@ const toastrConfig = {
     OnScreenKeyboardComponent,
     OppiaFooterComponent,
     OutcomeFeedbackEditorComponent,
-    PreviewThumbnailComponent,
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
     PromoBarComponent,
+    QuestionDifficultySelectorComponent,
     SelectSkillModalComponent,
     RubricsEditorComponent,
     SharingLinksComponent,
@@ -271,6 +275,8 @@ const toastrConfig = {
     SubtopicSummaryTileDirective,
     SummaryListHeaderComponent,
     TakeBreakModalComponent,
+    ThumbnailUploaderComponent,
+    EditThumbnailModalComponent,
     TopNavigationBarComponent,
     WrapTextWithEllipsisPipe,
     WarningsAndAlertsComponent,
@@ -283,7 +289,8 @@ const toastrConfig = {
     UploadActivityModalComponent,
     PromoBarComponent,
     SortByPipe,
-    LearnerDashboardIconsComponent
+    LearnerDashboardIconsComponent,
+    PreviewThumbnailComponent
   ],
 
   entryComponents: [
@@ -324,17 +331,21 @@ const toastrConfig = {
     OppiaFooterComponent,
     PreviewThumbnailComponent,
     PromoBarComponent,
+    QuestionDifficultySelectorComponent,
     RubricsEditorComponent,
     SideNavigationBarComponent,
     StorySummaryTileComponent,
     SummaryListHeaderComponent,
     ThumbnailDisplayComponent,
+    ThumbnailUploaderComponent,
+    EditThumbnailModalComponent,
     UploadActivityModalComponent,
     ThreadTableComponent,
     TopNavigationBarComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     WarningsAndAlertsComponent,
-    LearnerDashboardIconsComponent
+    LearnerDashboardIconsComponent,
+    PreviewThumbnailComponent
   ],
 
   exports: [
@@ -362,6 +373,7 @@ const toastrConfig = {
     AlertMessageComponent,
     BackgroundBannerComponent,
     BaseContentComponent,
+    BaseContentNavBarBreadCrumbDirective,
     CorrectnessFooterComponent,
     ContinueButtonComponent,
     CreateNewSkillModalComponent,
@@ -387,6 +399,7 @@ const toastrConfig = {
     OnScreenKeyboardComponent,
     OppiaFooterComponent,
     OutcomeFeedbackEditorComponent,
+    QuestionDifficultySelectorComponent,
     StateSkillEditorComponent,
     SelectSkillModalComponent,
     SideNavigationBarComponent,
@@ -398,6 +411,8 @@ const toastrConfig = {
     SummaryListHeaderComponent,
     TakeBreakModalComponent,
     ThumbnailDisplayComponent,
+    ThumbnailUploaderComponent,
+    EditThumbnailModalComponent,
     TopNavigationBarComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     WarningsAndAlertsComponent,
@@ -407,7 +422,7 @@ const toastrConfig = {
     TruncatePipe,
     SummarizeNonnegativeNumberPipe,
     SortByPipe,
-    LearnerDashboardIconsComponent
+    LearnerDashboardIconsComponent,
   ],
 })
 

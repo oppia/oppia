@@ -28,10 +28,8 @@ import feconf
 from jobs import job_utils
 from jobs.types import base_validation_errors
 from jobs.types import model_property
-import python_utils
 
-(base_models, user_models, topic_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.user, models.NAMES.topic])
+(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -52,16 +50,14 @@ class FooError(base_validation_errors.BaseAuditError):
     """A simple test-only error."""
 
     def __init__(self, model):
-        super(FooError, self).__init__(model)
-        self.message = 'foo'
+        super(FooError, self).__init__('foo', model)
 
 
 class BarError(base_validation_errors.BaseAuditError):
     """A simple test-only error."""
 
     def __init__(self, model):
-        super(BarError, self).__init__(model)
-        self.message = 'bar'
+        super(BarError, self).__init__('bar', model)
 
 
 class AuditErrorsTestBase(core_test_utils.TestBase):
@@ -81,8 +77,7 @@ class BaseAuditErrorTests(AuditErrorsTestBase):
     def test_message(self):
         error = FooError(self.model)
 
-        self.assertEqual(
-            error.message, 'FooError in BaseModel(id=\'123\'): foo')
+        self.assertEqual(error.stderr, 'FooError in BaseModel(id="123"): foo')
 
     def test_stdout(self):
         error = FooError(self.model)
@@ -92,80 +87,27 @@ class BaseAuditErrorTests(AuditErrorsTestBase):
     def test_stderr(self):
         error = FooError(self.model)
 
-        self.assertEqual(
-            error.stderr, 'FooError in BaseModel(id=\'123\'): foo')
-
-    def test_message_raises_not_implemented_error_if_not_assigned_a_value(self):
-        class ErrorWithoutMessage(base_validation_errors.BaseAuditError):
-            """Subclass that does not assign a value to self.message."""
-
-            pass
-
-        error = ErrorWithoutMessage(self.model)
-
-        self.assertRaisesRegexp(
-            NotImplementedError,
-            'self.message must be assigned a value in __init__',
-            lambda: error.message)
-
-    def test_message_raises_type_error_if_reassigned_a_value(self):
-        class ErrorWithUpdateMessageMethod(
-                base_validation_errors.BaseAuditError):
-            """Subclass that tries to reassign to self.message in a method."""
-
-            def __init__(self, model):
-                super(ErrorWithUpdateMessageMethod, self).__init__(model)
-                self.message = 'initial message'
-
-            def update_message(self):
-                """Tries to reassign self.message."""
-                self.message = 'updated message'
-
-        error = ErrorWithUpdateMessageMethod(self.model)
-
-        self.assertEqual(
-            error.message,
-            'ErrorWithUpdateMessageMethod in BaseModel(id=\'123\'): initial '
-            'message')
-        self.assertRaisesRegexp(
-            TypeError, 'self.message must be assigned to exactly once',
-            error.update_message)
-        self.assertEqual(
-            error.message,
-            'ErrorWithUpdateMessageMethod in BaseModel(id=\'123\'): initial '
-            'message')
+        self.assertEqual(error.stderr, 'FooError in BaseModel(id="123"): foo')
 
     def test_message_raises_type_error_if_assigned_a_non_string_value(self):
         class ErrorWithIntMessage(base_validation_errors.BaseAuditError):
-            """Subclass that tries to assign an int value to self.message."""
+            """Subclass that tries to assign an int value to self.stderr."""
 
             def __init__(self, model):
-                super(ErrorWithIntMessage, self).__init__(model)
-                self.message = 123
+                super(ErrorWithIntMessage, self).__init__(123, model)
 
-        self.assertRaisesRegexp(
-            TypeError, 'self.message must be a string',
-            lambda: ErrorWithIntMessage(self.model))
+        with self.assertRaisesRegexp(TypeError, 'must be a string'):
+            ErrorWithIntMessage(self.model)
 
     def test_message_raises_value_error_if_assigned_an_empty_value(self):
         class ErrorWithEmptyMessage(base_validation_errors.BaseAuditError):
-            """Subclass that tries to assign an empty value to self.message."""
+            """Subclass that tries to assign an empty value to self.stderr."""
 
             def __init__(self, model):
-                super(ErrorWithEmptyMessage, self).__init__(model)
-                self.message = ''
+                super(ErrorWithEmptyMessage, self).__init__('', model)
 
-        self.assertRaisesRegexp(
-            ValueError, 'self.message must be a non-empty string',
-            lambda: ErrorWithEmptyMessage(self.model))
-
-    def test_str(self):
-        self.assertEqual(
-            repr(FooError(self.model)),
-            'u"FooError in BaseModel(id=\'123\'): foo"')
-        self.assertEqual(
-            python_utils.UNICODE(FooError(self.model)),
-            'u"FooError in BaseModel(id=\'123\'): foo"')
+        with self.assertRaisesRegexp(ValueError, 'must be a non-empty string'):
+            ErrorWithEmptyMessage(self.model)
 
     def test_equality_between_different_types(self):
         self.assertNotEqual(FooError(self.model), BarError(self.model))
@@ -186,13 +128,6 @@ class BaseAuditErrorTests(AuditErrorsTestBase):
             FooError(job_utils.clone_model(self.model)),
         }
         self.assertEqual(len(set_of_errors), 1)
-
-    def test_pickling_base_class_raises_not_implemented_error(self):
-        self.assertRaisesRegexp(
-            NotImplementedError,
-            'self.message must be assigned a value in __init__',
-            lambda: pickle.dumps(
-                base_validation_errors.BaseAuditError(self.model)))
 
     def test_pickling_sub_classes(self):
         foo_error, bar_error = FooError(self.model), BarError(self.model)
@@ -217,8 +152,8 @@ class InconsistentTimestampsErrorTests(AuditErrorsTestBase):
         error = base_validation_errors.InconsistentTimestampsError(model)
 
         self.assertEqual(
-            error.message,
-            'InconsistentTimestampsError in BaseModel(id=\'123\'): '
+            error.stderr,
+            'InconsistentTimestampsError in BaseModel(id="123"): '
             'created_on=%r is later than last_updated=%r' % (
                 self.NOW, self.YEAR_AGO))
 
@@ -237,8 +172,8 @@ class InvalidCommitStatusErrorTests(AuditErrorsTestBase):
             commit_cmds=[])
         error = base_validation_errors.InvalidCommitStatusError(model)
         self.assertEqual(
-            error.message,
-            'InvalidCommitStatusError in BaseCommitLogEntryModel(id=\'123\'): '
+            error.stderr,
+            'InvalidCommitStatusError in BaseCommitLogEntryModel(id="123"): '
             'post_commit_status is invalid')
 
     def test_message_for_private_post_commit_status(self):
@@ -254,9 +189,9 @@ class InvalidCommitStatusErrorTests(AuditErrorsTestBase):
         error = base_validation_errors.InvalidPrivateCommitStatusError(model)
 
         self.assertEqual(
-            error.message,
+            error.stderr,
             'InvalidPrivateCommitStatusError in '
-            'BaseCommitLogEntryModel(id=\'123\'): post_commit_status="private" '
+            'BaseCommitLogEntryModel(id="123"): post_commit_status=private '
             'but post_commit_is_private=False')
 
     def test_message_for_public_post_commit_status(self):
@@ -272,9 +207,9 @@ class InvalidCommitStatusErrorTests(AuditErrorsTestBase):
         error = base_validation_errors.InvalidPrivateCommitStatusError(model)
 
         self.assertEqual(
-            error.message,
+            error.stderr,
             'InvalidPrivateCommitStatusError in '
-            'BaseCommitLogEntryModel(id=\'123\'): post_commit_status="public" '
+            'BaseCommitLogEntryModel(id="123"): post_commit_status=public '
             'but post_commit_is_private=True')
 
     def test_message_for_public_post_commit_status_raise_exception(self):
@@ -290,9 +225,9 @@ class InvalidCommitStatusErrorTests(AuditErrorsTestBase):
         error = base_validation_errors.InvalidPublicCommitStatusError(model)
 
         self.assertEqual(
-            error.message,
+            error.stderr,
             'InvalidPublicCommitStatusError in '
-            'BaseCommitLogEntryModel(id=\'123\'): post_commit_status="public" '
+            'BaseCommitLogEntryModel(id="123"): post_commit_status=public '
             'but post_commit_community_owned=False')
 
 
@@ -306,8 +241,8 @@ class ModelMutatedDuringJobErrorTests(AuditErrorsTestBase):
         error = base_validation_errors.ModelMutatedDuringJobError(model)
 
         self.assertEqual(
-            error.message,
-            'ModelMutatedDuringJobError in BaseModel(id=\'123\'): '
+            error.stderr,
+            'ModelMutatedDuringJobError in BaseModel(id="123"): '
             'last_updated=%r is later than the audit job\'s start time' % (
                 model.last_updated))
 
@@ -322,9 +257,9 @@ class ModelIdRegexErrorTests(AuditErrorsTestBase):
         error = base_validation_errors.ModelIdRegexError(model, '[abc]{3}')
 
         self.assertEqual(
-            error.message,
-            'ModelIdRegexError in BaseModel(id=\'?!"\'): id does not '
-            'match the expected regex=u\'[abc]{3}\'')
+            error.stderr,
+            'ModelIdRegexError in BaseModel(id="?!\\""): id does not '
+            'match the expected regex="[abc]{3}"')
 
 
 class ModelExpiredErrorTests(AuditErrorsTestBase):
@@ -338,8 +273,8 @@ class ModelExpiredErrorTests(AuditErrorsTestBase):
         error = base_validation_errors.ModelExpiredError(model)
 
         self.assertEqual(
-            error.message,
-            'ModelExpiredError in BaseModel(id=\'123\'): deleted=True when '
+            error.stderr,
+            'ModelExpiredError in BaseModel(id="123"): deleted=True when '
             'older than %d days' % (
                 feconf.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED.days))
 
@@ -358,10 +293,10 @@ class ModelDomainObjectValidateErrorTests(AuditErrorsTestBase):
             model, error_message)
 
         msg = (
-            'ModelDomainObjectValidateError in BaseModel(id=\'123\'): Entity'
+            'ModelDomainObjectValidateError in BaseModel(id="123"): Entity'
             ' fails domain validation with the error: %s' % error_message)
 
-        self.assertEqual(error.message, msg)
+        self.assertEqual(error.stderr, msg)
 
 
 class InvalidCommitTypeErrorTests(AuditErrorsTestBase):
@@ -378,8 +313,8 @@ class InvalidCommitTypeErrorTests(AuditErrorsTestBase):
         error = base_validation_errors.InvalidCommitTypeError(model)
 
         self.assertEqual(
-            error.message,
-            'InvalidCommitTypeError in BaseCommitLogEntryModel(id=\'123\'): '
+            error.stderr,
+            'InvalidCommitTypeError in BaseCommitLogEntryModel(id="123"): '
             'Commit type invalid-type is not allowed')
 
 
@@ -391,9 +326,9 @@ class ModelRelationshipErrorTests(AuditErrorsTestBase):
             'BarModel', '123')
 
         self.assertEqual(
-            error.message,
-            'ModelRelationshipError in FooModel(id=\'123\'): '
-            'FooModel.bar_id=\'123\' should correspond to the ID of an '
+            error.stderr,
+            'ModelRelationshipError in FooModel(id="123"): '
+            'FooModel.bar_id="123" should correspond to the ID of an '
             'existing BarModel, but no such model exists')
 
 
@@ -411,8 +346,8 @@ class CommitCmdsNoneErrorTests(AuditErrorsTestBase):
         error = base_validation_errors.CommitCmdsNoneError(model)
 
         self.assertEqual(
-            error.message,
-            'CommitCmdsNoneError in BaseCommitLogEntryModel(id=\'invalid\'): '
+            error.stderr,
+            'CommitCmdsNoneError in BaseCommitLogEntryModel(id="invalid"): '
             'No commit command domain object '
             'defined for entity with commands: [{}]')
 
@@ -434,8 +369,8 @@ class CommitCmdsValidateErrorTests(AuditErrorsTestBase):
             error_message)
 
         self.assertEqual(
-            error.message,
+            error.stderr,
             'CommitCmdsValidateError in BaseCommitLogEntryModel'
-            '(id=\'invalid\'): Commit command domain validation for '
+            '(id="invalid"): Commit command domain validation for '
             'command: {u\'cmd-invalid\': u\'invalid_test_command\'} failed '
             'with error: Missing cmd key in change dict')

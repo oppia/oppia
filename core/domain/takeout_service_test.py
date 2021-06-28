@@ -70,6 +70,10 @@ class TakeoutServiceProfileUserUnitTests(test_utils.GenericTestBase):
     EXPLORATION_IDS_2 = ['exp_2']
     COLLECTION_IDS = ['23', '42', '4']
     COLLECTION_IDS_2 = ['32', '44', '6']
+    STORY_IDS = ['12', '22', '32']
+    STORY_IDS_2 = ['42', '52', '62']
+    TOPIC_IDS = ['11', '21', '31']
+    TOPIC_IDS_2 = ['41', '51', '61']
     SKILL_ID_1 = 'skill_id_1'
     SKILL_ID_2 = 'skill_id_2'
     SKILL_ID_3 = 'skill_id_3'
@@ -85,14 +89,15 @@ class TakeoutServiceProfileUserUnitTests(test_utils.GenericTestBase):
         1) Simulates skill mastery of user_1 and profile_1.
         2) Simulates completion of some activities of user_1 and profile_1.
         3) Simulates incomplete status of some activities.
-        4) Populates ExpUserLastPlaythroughModel of user.
-        5) Creates user LearnerPlaylsts.
-        6) Simulates collection progress of user.
-        7) Simulates story progress of user.
-        8) Creates new collection rights.
-        9) Simulates a general suggestion.
-        10) Creates new exploration rights.
-        11) Populates user settings.
+        4) Creates user LearnerGoals.
+        5) Populates ExpUserLastPlaythroughModel of user.
+        6) Creates user LearnerPlaylsts.
+        7) Simulates collection progress of user.
+        8) Simulates story progress of user.
+        9) Creates new collection rights.
+        10) Simulates a general suggestion.
+        11) Creates new exploration rights.
+        12) Populates user settings.
         """
         # Setup for UserSkillModel.
         user_models.UserSkillMasteryModel(
@@ -112,17 +117,23 @@ class TakeoutServiceProfileUserUnitTests(test_utils.GenericTestBase):
         user_models.CompletedActivitiesModel(
             id=self.USER_ID_1,
             exploration_ids=self.EXPLORATION_IDS_2,
-            collection_ids=self.COLLECTION_IDS_2).put()
+            collection_ids=self.COLLECTION_IDS_2,
+            story_ids=self.STORY_IDS_2,
+            learnt_topic_ids=self.TOPIC_IDS_2).put()
         user_models.CompletedActivitiesModel(
             id=self.PROFILE_ID_1,
             exploration_ids=self.EXPLORATION_IDS,
-            collection_ids=self.COLLECTION_IDS).put()
+            collection_ids=self.COLLECTION_IDS,
+            story_ids=self.STORY_IDS,
+            learnt_topic_ids=self.TOPIC_IDS).put()
 
         # Setup for IncompleteACtivitiesModel.
         user_models.IncompleteActivitiesModel(
             id=self.PROFILE_ID_1,
             exploration_ids=self.EXPLORATION_IDS,
-            collection_ids=self.COLLECTION_IDS).put()
+            collection_ids=self.COLLECTION_IDS,
+            story_ids=self.STORY_IDS_2,
+            partially_learnt_topic_ids=self.TOPIC_IDS).put()
 
         # Setup for ExpUserLastPlaythroughModel.
         user_models.ExpUserLastPlaythroughModel(
@@ -130,6 +141,11 @@ class TakeoutServiceProfileUserUnitTests(test_utils.GenericTestBase):
             user_id=self.PROFILE_ID_1, exploration_id=self.EXPLORATION_IDS[0],
             last_played_exp_version=self.EXP_VERSION,
             last_played_state_name=self.STATE_NAME).put()
+
+        # Setup for LearnerGoalsModel.
+        user_models.LearnerGoalsModel(
+            id=self.PROFILE_ID_1,
+            topic_ids_to_learn=self.TOPIC_IDS).put()
 
         # Setup for LearnerPlaylistModel.
         user_models.LearnerPlaylistModel(
@@ -271,10 +287,15 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
     ]
     EXPLORATION_IDS = ['exp_1']
     EXPLORATION_IDS_2 = ['exp_2']
+    STORY_IDS = ['12', '22', '32']
+    STORY_IDS_2 = ['42', '52', '62']
+    TOPIC_IDS = ['11', '21', '31']
+    TOPIC_IDS_2 = ['41', '51', '61']
     CREATOR_IDS = ['4', '8', '16']
     CREATOR_USERNAMES = ['username4', 'username8', 'username16']
     COLLECTION_IDS = ['23', '42', '4']
     COLLECTION_IDS_2 = ['32', '44', '6']
+    TOPIC_IDS = ['12', '13', '14']
     GENERAL_FEEDBACK_THREAD_IDS = ['42', '4', '8']
     MESSAGE_IDS_READ_BY_USER = [0, 1]
     SKILL_ID_1 = 'skill_id_1'
@@ -351,18 +372,19 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         5) Creates an ExplorationUserDataModel.
         6) Simulates completion of some activities.
         7) Simulates incomplete status of some activities.
-        8) Populates ExpUserLastPlaythroughModel of user.
-        9) Creates user LearnerPlaylsts.
-        10) Simulates collection progress of user.
-        11) Simulates story progress of user.
-        12) Creates new collection rights.
-        13) Simulates a general suggestion.
-        14) Creates new exploration rights.
-        15) Populates user settings.
-        16) Creates two reply-to ids for feedback.
-        17) Creates a task closed by the user.
-        18) Simulates user_1 scrubbing a report.
-        19) Creates new BlogPostModel and BlogPostRightsModel.
+        8) Creates user LearnerGoals.
+        9) Populates ExpUserLastPlaythroughModel of user.
+        10) Creates user LearnerPlaylsts.
+        11) Simulates collection progress of user.
+        12) Simulates story progress of user.
+        13) Creates new collection rights.
+        14) Simulates a general suggestion.
+        15) Creates new exploration rights.
+        16) Populates user settings.
+        17) Creates two reply-to ids for feedback.
+        18) Creates a task closed by the user.
+        19) Simulates user_1 scrubbing a report.
+        20) Creates new BlogPostModel and BlogPostRightsModel.
         """
         # Setup for UserStatsModel.
         user_models.UserStatsModel(
@@ -436,17 +458,23 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         user_models.CompletedActivitiesModel(
             id=self.USER_ID_1,
             exploration_ids=self.EXPLORATION_IDS,
-            collection_ids=self.COLLECTION_IDS).put()
+            collection_ids=self.COLLECTION_IDS,
+            story_ids=self.STORY_IDS,
+            learnt_topic_ids=self.TOPIC_IDS).put()
         user_models.CompletedActivitiesModel(
             id=self.PROFILE_ID_1,
             exploration_ids=self.EXPLORATION_IDS_2,
-            collection_ids=self.COLLECTION_IDS_2).put()
+            collection_ids=self.COLLECTION_IDS_2,
+            story_ids=self.STORY_IDS_2,
+            learnt_topic_ids=self.TOPIC_IDS_2).put()
 
         # Setup for IncompleteACtivitiesModel.
         user_models.IncompleteActivitiesModel(
             id=self.USER_ID_1,
             exploration_ids=self.EXPLORATION_IDS,
-            collection_ids=self.COLLECTION_IDS).put()
+            collection_ids=self.COLLECTION_IDS,
+            story_ids=self.STORY_IDS,
+            partially_learnt_topic_ids=self.TOPIC_IDS).put()
 
         # Setup for ExpUserLastPlaythroughModel.
         user_models.ExpUserLastPlaythroughModel(
@@ -454,6 +482,14 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             user_id=self.USER_ID_1, exploration_id=self.EXPLORATION_IDS[0],
             last_played_exp_version=self.EXP_VERSION,
             last_played_state_name=self.STATE_NAME).put()
+
+        # Setup for LearnerGoalsModel.
+        user_models.LearnerGoalsModel(
+            id=self.USER_ID_1,
+            topic_ids_to_learn=self.TOPIC_IDS).put()
+        user_models.LearnerGoalsModel(
+            id=self.PROFILE_ID_1,
+            topic_ids_to_learn=self.TOPIC_IDS_2).put()
 
         # Setup for LearnerPlaylistModel.
         user_models.LearnerPlaylistModel(
@@ -842,6 +878,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         general_feedback_thread_user_data = {}
         general_suggestion_data = {}
         last_playthrough_data = {}
+        learner_goals_data = {}
         learner_playlist_data = {}
         incomplete_activities_data = {}
         user_settings_data = {
@@ -921,6 +958,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'completed_activities': completed_activities_data,
             'incomplete_activities': incomplete_activities_data,
             'exp_user_last_playthrough': last_playthrough_data,
+            'learner_goals': learner_goals_data,
             'learner_playlist': learner_playlist_data,
             'task_entry': task_entry_data,
             'topic_rights': topic_rights_data,
@@ -1215,17 +1253,24 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         }
         expected_completed_activities_data = {
             'completed_exploration_ids': self.EXPLORATION_IDS,
-            'completed_collection_ids': self.COLLECTION_IDS
+            'completed_collection_ids': self.COLLECTION_IDS,
+            'completed_story_ids': self.STORY_IDS,
+            'learnt_topic_ids': self.TOPIC_IDS
         }
         expected_incomplete_activities_data = {
             'incomplete_exploration_ids': self.EXPLORATION_IDS,
-            'incomplete_collection_ids': self.COLLECTION_IDS
+            'incomplete_collection_ids': self.COLLECTION_IDS,
+            'incomplete_story_ids': self.STORY_IDS,
+            'partially_learnt_topic_ids': self.TOPIC_IDS
         }
         expected_last_playthrough_data = {
             self.EXPLORATION_IDS[0]: {
                 'exp_version': self.EXP_VERSION,
                 'state_name': self.STATE_NAME
             }
+        }
+        expected_learner_goals_data = {
+            'topic_ids_to_learn': self.TOPIC_IDS
         }
         expected_learner_playlist_data = {
             'playlist_exploration_ids': self.EXPLORATION_IDS,
@@ -1525,6 +1570,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'completed_activities': expected_completed_activities_data,
             'incomplete_activities': expected_incomplete_activities_data,
             'exp_user_last_playthrough': expected_last_playthrough_data,
+            'learner_goals': expected_learner_goals_data,
             'learner_playlist': expected_learner_playlist_data,
             'task_entry': expected_task_entry_data,
             'topic_rights': expected_topic_data,
@@ -1628,10 +1674,13 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         }
         completed_activities_data = {
             'completed_exploration_ids': self.EXPLORATION_IDS_2,
-            'completed_collection_ids': self.COLLECTION_IDS_2
+            'completed_collection_ids': self.COLLECTION_IDS_2,
+            'completed_story_ids': self.STORY_IDS,
+            'learnt_topic_ids': self.TOPIC_IDS
         }
         incomplete_activities_data = {}
         last_playthrough_data = {}
+        learner_goals_data = {}
         learner_playlist_data = {
             'playlist_exploration_ids': self.EXPLORATION_IDS_2,
             'playlist_collection_ids': self.COLLECTION_IDS_2
@@ -1648,6 +1697,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'completed_activities': completed_activities_data,
             'incomplete_activities': incomplete_activities_data,
             'exp_user_last_playthrough': last_playthrough_data,
+            'learner_goals': learner_goals_data,
             'learner_playlist': learner_playlist_data,
             'collection_progress': collection_progress_data,
             'story_progress': story_progress_data,
