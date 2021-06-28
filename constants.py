@@ -22,9 +22,10 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import json
 import os
 import re
-from typing import Any, Text # isort:skip # pylint: disable=unused-import, import-only-modules
 
 import python_utils
+
+from typing import Any, Text # isort:skip # pylint: disable=unused-import, import-only-modules
 
 
 def parse_json_from_js(js_file):
