@@ -115,28 +115,10 @@ angular.module('oppia').directive('oppiaRoot', [
               );
             }
 
-            // TODO(#12793): Remove the use of (
-            // OppiaAngularRootComponent.ajsTranslate).
-            OppiaAngularRootComponent.ajsTranslate = $translate;
-            const translateService = (
-              OppiaAngularRootComponent.translateService);
-            const translateCacheService = (
-              OppiaAngularRootComponent.translateCacheService);
-            const i18nLanguageCodeService = (
-              OppiaAngularRootComponent.i18nLanguageCodeService);
-
-            i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(
+            OppiaAngularRootComponent.translateService.onLangChange.subscribe(
               (code) => {
-                translateService.use(code);
-                $translate.use(code);
-              }
-            );
-            translateCacheService.init();
-
-            const cachedLanguage = translateCacheService.getCachedLanguage();
-            if (cachedLanguage) {
-              i18nLanguageCodeService.setI18nLanguageCode(cachedLanguage);
-            }
+                $translate.use(code.lang);
+              });
 
             // The next line allows the transcluded content to start executing.
             $scope.initialized = true;
