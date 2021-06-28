@@ -235,14 +235,15 @@ describe('Base Content Component', () => {
   });
 
   it('should be able to acknowledge cookies', () => {
-    // This throws "Argument of type '(arg: any) => 1448099100000 | { valueOf:
-    // () => number; }' is not assignable to parameter of type 'DateConstructor'
-    // .". We need to suppress this error because the actual 'Date' has more
-    // properties than 'MockDateContructor'. We have only defined the properties
-    // we need in 'MockDateContructor'.
     spyOn(window, 'Date')
+      // This throws "Argument of type 'Date' is not assignable to parameter of
+      // type 'string'.ts(2345)". We need to suppress this error to be able to
+      // mock the Date constructor.
       // @ts-expect-error
       .withArgs().and.returnValue(new OldDate(NOW_MILLIS))
+      // This throws "Argument of type 'Date' is not assignable to parameter of
+      // type 'string'.ts(2345)". We need to suppress this error to be able to
+      // mock the Date constructor.
       // @ts-expect-error
       .withArgs(ONE_YEAR_FROM_NOW_MILLIS).and.callThrough();
     spyOn(oppiaCookieService, 'putObject');

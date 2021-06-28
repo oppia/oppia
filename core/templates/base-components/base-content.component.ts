@@ -129,17 +129,17 @@ export class BaseContentComponent {
       !!cookieSetDateMsecs &&
       cookieSetDateMsecs > AppConstants.COOKIE_POLICY_LAST_UPDATED_MSECS
     );
-  };
+  }
 
   acknowledgeCookies(): void {
     let currentDateInUnixTimeMsecs = new Date().valueOf();
     let cookieOptions = {
       expires: new Date(currentDateInUnixTimeMsecs + this.ONE_YEAR_IN_MSECS)
-    }
+    };
     this.oppiaCookieService.putObject(
       this.COOKIE_NAME_COOKIES_ACKNOWLEDGED, currentDateInUnixTimeMsecs,
       cookieOptions);
-  };
+  }
 }
 
 /**
