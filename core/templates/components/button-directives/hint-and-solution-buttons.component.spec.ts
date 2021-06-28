@@ -68,8 +68,8 @@ describe('HintAndSolutionButtonsComponent', () => {
     explorationPlayerStateService = TestBed.inject(
       ExplorationPlayerStateService);
     statsReportingService = TestBed.inject(StatsReportingService);
-    audioTranslationLanguageService =
-      TestBed.inject(AudioTranslationLanguageService);
+    audioTranslationLanguageService = (
+      TestBed.inject(AudioTranslationLanguageService));
 
     spyOn(playerPositionService, 'onNewCardOpened').and.returnValue(
       new EventEmitter<StateCard>());
