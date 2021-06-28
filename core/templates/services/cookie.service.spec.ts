@@ -40,8 +40,8 @@ describe('Oppia Cookie Service', () => {
     'should set a value and' +
     ' return the cookie-value when an existing key is requested',
     () => {
-      oppiaCookieService.putObject('Random-Key', 'Random Value');
-      expect(oppiaCookieService.getObject('Random-Key')).toBe('Random Value');
+      oppiaCookieService.putCookie('Random-Key', 'Random Value');
+      expect(oppiaCookieService.getCookie('Random-Key')).toBe('Random Value');
     }
   );
 
@@ -49,12 +49,12 @@ describe('Oppia Cookie Service', () => {
     'should set a non-string value and' +
     ' return the cookie-value when an existing key is requested',
     () => {
-      oppiaCookieService.putObject('Random-Key', true);
-      expect(oppiaCookieService.getObject('Random-Key')).toBe(true);
+      oppiaCookieService.putCookie('Random-Key', 'true');
+      expect(oppiaCookieService.getCookie('Random-Key')).toBe('true');
     }
   );
 
   it('should return null when a non-existing key is requested', () => {
-    expect(oppiaCookieService.getObject('non-existing-key')).toBeNull();
+    expect(oppiaCookieService.getCookie('non-existing-key')).toBeNull();
   });
 });
