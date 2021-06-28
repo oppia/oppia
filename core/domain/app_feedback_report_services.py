@@ -259,9 +259,7 @@ def _update_report_stats_model_in_transaction(
         app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
             stats_id))
     if stats_model is None:
-        if delta < 0:
-            raise utils.InvalidInputException(
-                'Cannot decrement counts from a stats model without reports.')
+        assert(delta > 0)
         # Create new stats model entity. These are the individual report fields
         # that we will want to splice aggregate stats by and they will each have
         # a count of 1 since this is the first report added for this entity.
@@ -661,54 +659,58 @@ def reassign_ticket(report, new_ticket):
         raise NotImplementedError(
             'Assigning web reports to tickets has not been implemented yet.')
 
-    old_ticket_id = report.ticket_id
     # Update the old ticket model to remove the report from the old ticket's
     # list of reports.
-    if old_ticket_id is not None:
-        ticket_model = (
-            app_feedback_report_models.AppFeedbackReportTicketModel.get_by_id(
-                old_ticket_id))
-        if ticket_model is None:
-            raise utils.InvalidInputException(
-                'The report has an invalid ticket id.')
-        ticket_obj = get_ticket_from_model(ticket_model)
-        ticket_obj.reports.remove(report)
-        if ticket_obj.newest_report_creation_timestamp == (
-                report.submitted_on_timestamp):
-            report_models = get_report_models(ticket_obj.reports)
-            latest_timestamp = report_models[0].submitted_on_datetime
-            for index in python_utils.RANGE(1, len(report_models)):
-                if report_models[index].submitted_on_datetime > (
-                        latest_timestamp):
-                    latest_timestamp = (
-                        report_models[index].submitted_on_datetime)
-        ticket_obj.newest_report_creation_timestamp = latest_timestamp
-        _save_ticket(ticket_obj)
+    old_ticket_id = report.ticket_id
+    if old_ticket_id is None:
+        # If the report was unticketed, remove the it from unticketed reports.
+        old_ticket_id = constants.UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID
+    old_ticket_model = (
+        app_feedback_report_models.AppFeedbackReportTicketModel.get_by_id(
+            old_ticket_id))
+    if old_ticket_model is None:
+        raise utils.InvalidInputException(
+            'The report is being removed from an invalid ticket id: %s.'
+            % old_ticket_id)
+    old_ticket_obj = get_ticket_from_model(old_ticket_model)
+    old_ticket_obj.reports.remove(report)
+    if old_ticket_obj.newest_report_creation_timestamp == (
+            report.submitted_on_timestamp):
+        report_models = get_report_models(old_ticket_obj.reports)
+        latest_timestamp = report_models[0].submitted_on_datetime
+        for index in python_utils.RANGE(1, len(report_models)):
+            if report_models[index].submitted_on_datetime > (
+                    latest_timestamp):
+                latest_timestamp = (
+                    report_models[index].submitted_on_datetime)
+        old_ticket_obj.newest_report_creation_timestamp = latest_timestamp
+    _save_ticket(old_ticket_obj)
+    _update_report_stats_model_in_transaction(
+        old_ticket_id, platform, stats_date, report, -1)
+
+    # Get the info of the new ticket to add the report to.
+    new_ticket_id = constants.UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID
+    if new_ticket is not None:
+        new_ticket_id = new_ticket.ticket_id
+    new_ticket_model = (
+        app_feedback_report_models.AppFeedbackReportTicketModel.get_by_id(
+            new_ticket_id))
+    new_ticket_obj = get_ticket_from_model(new_ticket_model)
+    new_ticket_obj.reports.add(report)
+    if report.submitted_on_timestamp > (
+            new_ticket_obj.newest_report_creation_timestamp):
+        new_ticket_obj.newest_report_creation_timestamp = (
+            report.submitted_on_timestamp)
+    _save_ticket(new_ticket_obj)
+
+    platform = report.platform
+    stats_date = report.submitted_on_timestamp.date()
+    _update_report_stats_model_in_transaction(
+        new_ticket_id, platform, stats_date, report, 1)
 
     # Update the report model to the new ticket id.
     report.ticket_id = new_ticket.ticket_id
     save_feedback_report_to_storage(report)
-
-    # Update the stats models.
-    platform = report.platform
-    stats_date = report.submitted_on_timestamp.date()
-
-    if old_ticket_id is None:
-        # If the report was unticked, remove the it from the stats for
-        # unticketed reports.
-        old_ticket_id = constants.UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID
-    _update_report_stats_model_in_transaction(
-        old_ticket_id, platform, stats_date, report, -1)
-
-    # Get the ID of the ticket to add the report to.
-    new_ticket_id = new_ticket.ticket_id
-    if new_ticket is None:
-        # If the report is not assigned to a new ticket, update the stats for
-        # the unticked reports.
-        new_ticket_id = constants.UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID
-    _update_report_stats_model_in_transaction(
-        new_ticket_id, platform, stats_date, report, 1)
-
 
 def edit_ticket_name(ticket, new_name):
     """Updates the ticket name.

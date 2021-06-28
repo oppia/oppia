@@ -91,6 +91,7 @@ ALLOWED_SELECTION_ITEMS_CATEGORIES = [
     CATEGORY.language_audio_issue, CATEGORY.language_text_issue,
     CATEGORY.topics_issue, CATEGORY.profile_issue]
 ALLOWED_STATS_PARAMETERS = [
+    STATS_PARAMETER_NAMES.platform,
     STATS_PARAMETER_NAMES.report_type,
     STATS_PARAMETER_NAMES.country_locale_code,
     STATS_PARAMETER_NAMES.entry_point_name,

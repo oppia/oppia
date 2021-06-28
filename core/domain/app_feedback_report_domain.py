@@ -1377,9 +1377,9 @@ class AppFeedbackReportDailyStats(python_utils.OBJECT):
             raise utils.ValidationError(
                 'The total number of submitted reports should be an int, '
                 'received: %r' % self.total_reports_submitted)
-        if self.total_reports_submitted < 1:
+        if self.total_reports_submitted < 0:
             raise utils.ValidationError(
-                'The total number of submitted reports should be a positive '
+                'The total number of submitted reports should be a non-negative '
                 'int, received: %d' % self.total_reports_submitted)
         self.require_valid_daily_param_stats(self.daily_param_stats)
 
@@ -1412,14 +1412,16 @@ class AppFeedbackReportDailyStats(python_utils.OBJECT):
         """
         if not isinstance(param_stats, dict):
             raise utils.ValidationError(
-                'The param stats should be a dict, received: %r' % param_stats)
+                'The parameter stats should be a dict, '
+                'received: %r' % param_stats)
+        allowed_parameter_names = [
+            parameter.name for parameter in constants.ALLOWED_STATS_PARAMETERS]
         for (param_name, param_count_obj) in param_stats.items():
-            if param_name not in constants.ALLOWED_STATS_PARAMETERS:
+            if param_name not in allowed_parameter_names:
                 raise utils.ValidationError(
-                    'The param %s is not a valid param to aggregate stats on, '
-                    'must be one of %s' % (
-                        param_name,
-                        constants.ALLOWED_STATS_PARAMETERS))
+                    'The parameter %s is not a valid parameter to aggregate '
+                    'stats on, must be one of %s' % (
+                        param_name, allowed_parameter_names))
             param_count_obj.validate()
 
 
@@ -1462,11 +1464,11 @@ class ReportStatsParameterValueCounts(python_utils.OBJECT):
         for (param_value, param_count) in self.parameter_value_counts.items():
             if not isinstance(param_value, python_utils.BASESTRING):
                 raise utils.ValidationError(
-                    'The param value should be a string, received: %r' % (
+                    'The parameter value should be a string, received: %r' % (
                         param_value))
-            if not isinstance(param_count, int) or param_count < 1:
+            if not isinstance(param_count, int) or param_count < 0:
                 raise utils.ValidationError(
-                    'The param value count should be a positive int, '
+                    'The parameter value count should be a non-negative int, '
                     'received: %r' % param_count)
 
 

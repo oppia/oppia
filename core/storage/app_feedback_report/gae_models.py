@@ -462,7 +462,8 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
             github_issue_number: int|None. The Github issue number associated
                 with the ticket, if it has one.
             newest_report_timestamp: datetime.datetime. The date and time of the
-                newest report that is a part of this ticket.
+                newest report that is a part of this ticket, by submission
+                datetime.
             report_ids: list(str). The report_ids that are a part of this
                 ticket.
 

@@ -1129,10 +1129,10 @@ class AppFeedbackReportTicketDomainTests(test_utils.GenericTestBase):
             ticket_obj.validate()
 
 
-class AppFeedbackReportStatsDomainTests(test_utils.GenericTestBase):
+class AppFeedbackReportDailyStatsDomainTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(AppFeedbackReportStatsDomainTests, self).setUp()
+        super(AppFeedbackReportDailyStatsDomainTests, self).setUp()
 
         self.ticket_id = (
             app_feedback_report_models.AppFeedbackReportTicketModel.generate_id(
@@ -1161,7 +1161,7 @@ class AppFeedbackReportStatsDomainTests(test_utils.GenericTestBase):
                 app_feedback_report_domain.ReportStatsParameterValueCounts({
                     REPORT_TYPE_SUGGESTION.name: 1})
             ),
-            'country_local_code': (
+            'country_locale_code': (
                 app_feedback_report_domain.ReportStatsParameterValueCounts({
                     COUNTRY_LOCALE_CODE_INDIA: 1})
             ),
@@ -1177,9 +1177,9 @@ class AppFeedbackReportStatsDomainTests(test_utils.GenericTestBase):
                 app_feedback_report_domain.ReportStatsParameterValueCounts({
                     LANGUAGE_LOCALE_CODE_ENGLISH: 1})
             ),
-            'sdk_version': (
+            'android_sdk_version': (
                 app_feedback_report_domain.ReportStatsParameterValueCounts({
-                    ANDROID_SDK_VERSION: 1})
+                    python_utils.UNICODE(ANDROID_SDK_VERSION): 1})
             ),
             'version_name': (
                 app_feedback_report_domain.ReportStatsParameterValueCounts({
@@ -1204,15 +1204,19 @@ class AppFeedbackReportStatsDomainTests(test_utils.GenericTestBase):
             'daily_param_stats': {
                 'platform': {PLATFORM_ANDROID: 1},
                 'report_type': {REPORT_TYPE_SUGGESTION.name: 1},
-                'country_local_code': {COUNTRY_LOCALE_CODE_INDIA: 1},
+                'country_locale_code': {COUNTRY_LOCALE_CODE_INDIA: 1},
                 'entry_point_name': {ENTRY_POINT_NAVIGATION_DRAWER: 1},
                 'text_language_code': {LANGUAGE_LOCALE_CODE_ENGLISH: 1},
                 'audio_language_code': {LANGUAGE_LOCALE_CODE_ENGLISH: 1},
-                'sdk_version': {ANDROID_SDK_VERSION: 1},
+                'android_sdk_version': {
+                    python_utils.UNICODE(ANDROID_SDK_VERSION): 1},
                 'version_name': {ANDROID_PLATFORM_VERSION: 1}
             }
         }
         self.assertDictEqual(expected_dict, self.stats_obj.to_dict())
+
+    def test_validation_on_valid_stats_does_not_fail(self):
+        self.stats_obj.validate()
 
     def test_validation_stats_id_is_not_a_string_fails(self):
         self.stats_obj.stats_id = 123
@@ -1230,16 +1234,17 @@ class AppFeedbackReportStatsDomainTests(test_utils.GenericTestBase):
             self.stats_obj,
             'The total number of submitted reports should be an int')
 
-    def test_validation_total_reports_submitted_is_less_than_1_fails(self):
-        self.stats_obj.total_reports_submitted = 0
+    def test_validation_total_reports_submitted_is_less_than_0_fails(self):
+        self.stats_obj.total_reports_submitted = -1
         self._assert_validation_error(
             self.stats_obj,
-            'The total number of submitted reports should be a positive int')
+            'The total number of submitted reports should be a non-negative '
+            'int')
 
     def test_validation_daily_param_stats_is_not_a_dict_fails(self):
         self.stats_obj.daily_param_stats = 123
         self._assert_validation_error(
-            self.stats_obj, 'The param stats should be a dict')
+            self.stats_obj, 'The parameter stats should be a dict')
 
     def test_validation_invalid_daily_param_stats_fails(self):
         self.stats_obj.daily_param_stats = {
@@ -1249,8 +1254,22 @@ class AppFeedbackReportStatsDomainTests(test_utils.GenericTestBase):
         }
         self._assert_validation_error(
             self.stats_obj,
-            'The param %s is not a valid param to aggregate stats on' % (
+            'The parameter %s is not a valid parameter to aggregate stats on' % (
                 'invalid_stat_name'))
+
+    def test_validation_parameter_value_counts_objects_are_invalid_fails(self):
+        self.stats_obj.daily_param_stats = {
+            'report_type': (
+                app_feedback_report_domain.ReportStatsParameterValueCounts(
+                    {
+                        123: 1
+                    }
+                )
+            )
+        }
+        self._assert_validation_error(
+            self.stats_obj, 'The parameter value should be a string')
+
 
     def _assert_validation_error(
             self, stats_obj, expected_error_substring):
@@ -1288,15 +1307,16 @@ class ReportStatsParameterValueCountsDomainTests(test_utils.GenericTestBase):
                 2: 1
             })
         self._assert_validation_error(
-            counts_obj, 'The param value should be a string')
+            counts_obj, 'The parameter value should be a string')
 
     def test_validation_with_invalid_parameter_counts_fails(self):
         counts_obj = app_feedback_report_domain.ReportStatsParameterValueCounts(
             {
-                'value_1': 0,
+                'value_1': -1,
             })
         self._assert_validation_error(
-            counts_obj, 'The param value count should be a positive int')
+            counts_obj, 'The parameter value count should be a non-negative '
+            'int')
 
     def _assert_validation_error(
             self, counts_obj, expected_error_substring):
