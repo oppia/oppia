@@ -360,10 +360,11 @@ class BaseHandler(webapp2.RequestHandler):
                     handler_class_name))
 
         schema_for_url_path_args = self.URL_PATH_ARGS_SCHEMAS
-        self.normalized_request, errors = (
+        normalized_value, errors = (
             payload_validator.validate(
                 url_path_args, schema_for_url_path_args, extra_args_are_allowed)
         )
+
         if errors:
             raise self.InvalidInputException('\n'.join(errors))
 
@@ -375,12 +376,15 @@ class BaseHandler(webapp2.RequestHandler):
                 'Missing schema for %s method in %s handler class.' % (
                     request_method, handler_class_name))
 
-        self.normalized_request, errors = (
+        normalized_value, errors = (
             payload_validator.validate(
                 handler_args, schema_for_request_method, extra_args_are_allowed)
         )
         if request_method in ['PUT', 'POST']:
-            self.normalized_payload = self.normalized_request
+            self.normalized_payload = normalized_value
+        else:
+            self.normalized_request = normalized_value
+
         if errors:
             raise self.InvalidInputException('\n'.join(errors))
 
