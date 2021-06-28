@@ -1786,7 +1786,7 @@ class SchemaValidationUrlArgsTests(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
         error_msg = (
             'Missing schema for url path args in '
-            'MockHandlerWithMissingUrlPathSchema handler class')
+            'MockHandlerWithMissingUrlPathSchema handler class.')
 
         with self.swap(self, 'testapp', self.mock_testapp3):
             response = self.get_json('/mock_play_exploration/%s' % self.exp_id,
