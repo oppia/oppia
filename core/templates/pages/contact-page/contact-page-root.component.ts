@@ -13,13 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Contact page root component.
+ * @fileoverview Root component for contact page.
  */
 
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'contact-page-root',
+  selector: 'oppia-contact-page-root',
   templateUrl: './contact-page-root.component.html'
 })
 export class ContactPageRootComponent {}

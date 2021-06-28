@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for Topic Landing Page.
+ * @fileoverview Root component for topic landing psage.
  */
 
 import { Component } from '@angular/core';

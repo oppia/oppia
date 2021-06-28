@@ -13,13 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Get started page root component.
+ * @fileoverview Root component for get started page.
  */
 
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'get-started-page-root',
+  selector: 'oppia-get-started-page-root',
   templateUrl: './get-started-page-root.component.html'
 })
 export class GetStartedPageRootComponent {}

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for the collection player page.
+ * @fileoverview Module for the contact page.
  */
 
 import { APP_INITIALIZER, NgModule } from '@angular/core';

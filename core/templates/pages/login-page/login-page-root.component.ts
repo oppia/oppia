@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Root component for Login Page.
+ * @fileoverview Root component for login page.
  */
 
 import { Component } from '@angular/core';

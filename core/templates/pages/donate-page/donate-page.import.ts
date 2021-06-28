@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Scripts for the donate page.
+ * @fileoverview Directive scripts for the donate page.
  */
 
 import 'core-js/es7/reflect';
@@ -35,3 +35,8 @@ platformBrowserDynamic().bootstrapModule(DonatePageModule).catch(
   // eslint-disable-next-line no-console
   (err) => console.error(err)
 );
+
+// This prevents angular pages to cause side effects to hybrid pages.
+// TODO(#13080): Remove window.name statement from import.ts files
+// after migration is complete.
+window.name = '';

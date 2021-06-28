@@ -13,13 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Donate page root component.
+ * @fileoverview Root Component for donate page.
  */
 
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'donate-page-root',
+  selector: 'oppia-donate-page-root',
   templateUrl: './donate-page-root.component.html'
 })
 export class DonatePageRootComponent {}

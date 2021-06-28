@@ -13,13 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Delete Account page root component.
+ * @fileoverview Root component for delete account page.
  */
 
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'delete-account-page-root',
+  selector: 'oppia-delete-account-page-root',
   templateUrl: './delete-account-page-root.component.html'
 })
 export class DeleteAccountPageRootComponent {}

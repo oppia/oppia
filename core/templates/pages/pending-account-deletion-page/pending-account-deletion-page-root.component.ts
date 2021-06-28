@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Root component for Pending Account Deletion Page.
+ * @fileoverview Root component for pending account deletion Page.
  */
 
 import { Component } from '@angular/core';
