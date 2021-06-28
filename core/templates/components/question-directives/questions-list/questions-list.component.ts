@@ -358,6 +358,7 @@ angular.module('oppia').component('questionsList', {
           };
 
           ctrl.populateMisconceptions = function(skillIds) {
+            console.error(skillIds)
             ctrl.misconceptionsBySkill = {};
             SkillBackendApiService.fetchMultiSkillsAsync(
               skillIds).then(
