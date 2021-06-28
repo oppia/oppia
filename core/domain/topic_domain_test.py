@@ -64,6 +64,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'url_fragment': 'abbrev',
             'thumbnail_filename': None,
             'thumbnail_bg_color': None,
+            'thumbnail_size_in_bytes': None,
             'description': 'description',
             'canonical_story_references': [],
             'additional_story_references': [],
