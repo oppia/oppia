@@ -37,7 +37,7 @@ angular.module('oppia').directive('angularHtmlBindWrapper', [
           var ctrl = this;
           ctrl.$onInit = function() {
             $rootScope.$applyAsync();
-          }
+          };
           // Manually implementing the OnChanges lifecycle hook to trigger the
           // digest loop. Without this, there seems to be change detection
           // issues.
