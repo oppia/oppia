@@ -19,6 +19,7 @@
 
 import { ThreadMessage } from 'domain/feedback_message/ThreadMessage.model';
 
+require('domain/utilities/language-util.service.ts');
 require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/site-analytics.service.ts');
@@ -29,16 +30,16 @@ angular.module('oppia').controller(
   'TranslationSuggestionReviewModalController', [
     '$http', '$scope', '$uibModalInstance', 'AlertsService', 'ContextService',
     'ContributionAndReviewService', 'ContributionOpportunitiesService',
-    'SiteAnalyticsService', 'UrlInterpolationService', 'UserService',
-    'ValidatorsService', 'initialSuggestionId', 'reviewable', 'subheading',
-    'suggestionIdToContribution', 'ACTION_ACCEPT_SUGGESTION',
+    'LanguageUtilService', 'SiteAnalyticsService', 'UrlInterpolationService',
+    'UserService', 'ValidatorsService', 'initialSuggestionId', 'reviewable',
+    'subheading', 'suggestionIdToContribution', 'ACTION_ACCEPT_SUGGESTION',
     'ACTION_REJECT_SUGGESTION', 'IMAGE_CONTEXT', 'MAX_REVIEW_MESSAGE_LENGTH',
     function(
         $http, $scope, $uibModalInstance, AlertsService, ContextService,
         ContributionAndReviewService, ContributionOpportunitiesService,
-        SiteAnalyticsService, UrlInterpolationService, UserService,
-        ValidatorsService, initialSuggestionId, reviewable, subheading,
-        suggestionIdToContribution, ACTION_ACCEPT_SUGGESTION,
+        LanguageUtilService, SiteAnalyticsService, UrlInterpolationService,
+        UserService, ValidatorsService, initialSuggestionId, reviewable,
+        subheading, suggestionIdToContribution, ACTION_ACCEPT_SUGGESTION,
         ACTION_REJECT_SUGGESTION, IMAGE_CONTEXT, MAX_REVIEW_MESSAGE_LENGTH) {
       var resolvedSuggestionIds = [];
       $scope.reviewable = reviewable;
@@ -46,6 +47,10 @@ angular.module('oppia').controller(
       $scope.activeContribution = suggestionIdToContribution[
         $scope.activeSuggestionId];
       $scope.activeSuggestion = $scope.activeContribution.suggestion;
+      $scope.authorName = $scope.activeSuggestion.author_name;
+      $scope.languageDescription = (
+        LanguageUtilService.getAudioLanguageDescription(
+          $scope.activeSuggestion.language_code));
       $scope.activeContributionDetails = $scope.activeContribution.details;
       $scope.subheading = subheading;
       $scope.MAX_REVIEW_MESSAGE_LENGTH = MAX_REVIEW_MESSAGE_LENGTH;

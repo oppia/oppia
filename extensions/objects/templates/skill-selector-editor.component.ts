@@ -83,6 +83,10 @@ export class SkillSelectorEditorComponent implements OnInit, OnDestroy {
       (response) => {
         this.skills = response.skills;
         this.filterSkills('');
+        // If a skill was previously selected, show that as the first entry in
+        // the list.
+        this.skillsToShow.sort(
+          (x, y) => x.id === this.value ? -1 : y.id === this.value ? 1 : 0);
         this.showLoading = false;
       }
     );

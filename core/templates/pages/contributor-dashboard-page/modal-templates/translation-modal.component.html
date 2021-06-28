@@ -37,7 +37,8 @@
     <div *ngIf="!isSubmitted()" class="oppia-translation-editor-section">
       <div class="protractor-test-state-translation-editor">
         <ck-editor-copy-toolbar></ck-editor-copy-toolbar>
-        <schema-based-editor [schema]="getHtmlSchema.bind(this)"
+        <schema-based-editor *ngIf="editorIsShown"
+                             [schema]="getHtmlSchema.bind(this)"
                              [localValue]="activeWrittenTranslation.html"
                              (localValueChange)="updateHtml($event)">
         </schema-based-editor>
