@@ -34,7 +34,8 @@ describe('Learner dashboard activity ids model', () => {
       completed_story_ids: ['10', '11'],
       learnt_topic_ids: ['12', '13'],
       exploration_playlist_ids: ['14', '15'],
-      collection_playlist_ids: ['16', '17']
+      collection_playlist_ids: ['16', '17'],
+      topic_ids_to_learn: ['18', '19']
     };
   });
 
@@ -82,6 +83,20 @@ describe('Learner dashboard activity ids model', () => {
       ['16', '17', '12', '13']);
   });
 
+  it('should add topic to learn', () => {
+    var learnerDashboardActivityIds = (
+      LearnerDashboardActivityIds.createFromBackendDict(
+        learnerDashboardActivityIdsDict));
+
+    learnerDashboardActivityIds.addToTopicLearn('12');
+    expect(learnerDashboardActivityIds.topicIdsToLearn).toEqual(
+      ['18', '19', '12']);
+
+    learnerDashboardActivityIds.addToTopicLearn('13');
+    expect(learnerDashboardActivityIds.topicIdsToLearn).toEqual(
+      ['18', '19', '12', '13']);
+  });
+
   it('should remove exploration from learner playlist', () => {
     var learnerDashboardActivityIds = (
       LearnerDashboardActivityIds.createFromBackendDict(
@@ -106,6 +121,19 @@ describe('Learner dashboard activity ids model', () => {
 
     learnerDashboardActivityIds.removeFromCollectionLearnerPlaylist('17');
     expect(learnerDashboardActivityIds.collectionPlaylistIds).toEqual([]);
+  });
+
+  it('should remove topic from learn', () => {
+    var learnerDashboardActivityIds = (
+      LearnerDashboardActivityIds.createFromBackendDict(
+        learnerDashboardActivityIdsDict));
+
+    learnerDashboardActivityIds.removeTopicFromLearn('18');
+    expect(learnerDashboardActivityIds.topicIdsToLearn).toEqual(
+      ['19']);
+
+    learnerDashboardActivityIds.removeTopicFromLearn('19');
+    expect(learnerDashboardActivityIds.topicIdsToLearn).toEqual([]);
   });
 
   it('should fetch the learner dashboard activity ids domain object from ' +
@@ -175,6 +203,28 @@ describe('Learner dashboard activity ids model', () => {
     expect(learnerDashboardActivityIds.belongsToCollectionPlaylist('6'))
       .toBe(false);
     expect(learnerDashboardActivityIds.belongsToCollectionPlaylist('8'))
+      .toBe(false);
+  });
+
+  it('should check if topicId belongs to learn', () => {
+    var learnerDashboardActivityIds = (
+      LearnerDashboardActivityIds.createFromBackendDict(
+        learnerDashboardActivityIdsDict));
+
+    expect(learnerDashboardActivityIds.belongsToTopicsToLearn('18'))
+      .toBe(true);
+    expect(learnerDashboardActivityIds.belongsToTopicsToLearn('19'))
+      .toBe(true);
+
+    expect(learnerDashboardActivityIds.belongsToTopicsToLearn('0'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToTopicsToLearn('2'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToTopicsToLearn('4'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToTopicsToLearn('6'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToTopicsToLearn('10'))
       .toBe(false);
   });
 

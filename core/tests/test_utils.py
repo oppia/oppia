@@ -2243,10 +2243,32 @@ title: Title
         return self._parse_json_response(json_response, expect_errors)
 
     def post_json(
-            self, url, payload, csrf_token=None, expected_status_int=200,
-            upload_files=None):
-        """Post an object to the server by JSON; return the received object."""
-        data = {'payload': json.dumps(payload)}
+            self, url, data, csrf_token=None, expected_status_int=200,
+            upload_files=None, use_payload=True):
+        """Post an object to the server by JSON; return the received object.
+
+        Args:
+            url: str. The URL to send the POST request to.
+            data: dict. The dictionary that acts as the body of the request.
+            csrf_token: str. The csrf token to identify the user.
+            expected_status_int: int. Expected return status of the POST
+                request.
+            upload_files: list(tuple). List of
+                (fieldname, filename, file_content) tuples. Can also provide
+                just (fieldname, filename) to have the file contents be
+                read from disk.
+            use_payload: bool. If true, a new dict is created (which is sent as
+                the body of the POST request) with one key - 'payload' - and the
+                dict passed in 'data' is used as the value for that key. If
+                false, the dict in 'data' is directly passed as the body of the
+                request. For all requests called from the frontend, this should
+                be set to 'true'.
+
+        Returns:
+            dict. The JSON response for the request in dict form.
+        """
+        if use_payload:
+            data = {'payload': json.dumps(data)}
         if csrf_token:
             data['csrf_token'] = csrf_token
 
