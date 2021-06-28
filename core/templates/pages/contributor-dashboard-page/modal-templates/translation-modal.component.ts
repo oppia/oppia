@@ -313,8 +313,7 @@ export class TranslationModalComponent {
         this.addViolationMessage(
           originalElement.outerHTML,
           filteredTranslatedElements[i].outerHTML);
-      }
-      if (originalElement.children.length !== filteredTranslatedElements[
+      } else if (originalElement.children.length !== filteredTranslatedElements[
         i].children.length) {
         this.addViolationMessage(
           originalElement.outerHTML,
