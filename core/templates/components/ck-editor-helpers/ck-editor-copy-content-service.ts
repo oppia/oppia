@@ -123,7 +123,7 @@ export class CkEditorCopyContentService {
     let elementTagName = (
       containedWidgetTagName || element.tagName.toLowerCase());
     let html = element.outerHTML;
-    html = html.replace(/<!--[^>]*-->/g, '');
+    html = html.replace(/<!--[^>]*-->/g, '').trim();
     if (!containedWidgetTagName) {
       editor.insertHtml(html);
     } else {

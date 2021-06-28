@@ -43,6 +43,7 @@ describe('RTE display component', () => {
   it('should display a rte string', () => {
     let rteString = (
       '<p>Hi<em>Hello</em>Hello</p>' +
+      '<pre> Hello </pre>' +
       '<oppia-noninteractive-link ' +
       'url-with-value="&quot;https://oppia.org&quot;" ' +
       'text-with-value="&quot;Oppia&quot;">' +
@@ -59,7 +60,6 @@ describe('RTE display component', () => {
         currentValue: rteString,
         firstChange: true,
         isFirstChange: () => true
-
       }
     };
     component.rteString = rteString;

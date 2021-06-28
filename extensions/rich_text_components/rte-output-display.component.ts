@@ -17,8 +17,7 @@
  */
 
 import { TemplatePortal } from '@angular/cdk/portal';
-import { AfterViewInit, ChangeDetectorRef, Component, Directive, ElementRef, Input, SecurityContext, SimpleChanges, TemplateRef, ViewChild, ViewContainerRef } from '@angular/core';
-import { DomSanitizer } from '@angular/platform-browser';
+import { AfterViewInit, ChangeDetectorRef, Component, Directive, ElementRef, Input, SimpleChanges, TemplateRef, ViewChild, ViewContainerRef } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { OppiaRteParserService, OppiaRteNode, TextNode } from 'services/oppia-rte-parser.service';
 
@@ -58,6 +57,7 @@ export class RteOutputDisplayComponent implements AfterViewInit {
   constructor(
     private _viewContainerRef: ViewContainerRef,
     private cdRef: ChangeDetectorRef,
+    private elementRef: ElementRef,
     private oppiaHtmlParserService: OppiaRteParserService
   ) {}
 
@@ -94,6 +94,20 @@ export class RteOutputDisplayComponent implements AfterViewInit {
     };
     dfs(this.node);
     this.cdRef.detectChanges();
+    // The following logic is to remove comment tags (used by angular for
+    // bindings). New lines and spaces inside the pre-tags are treated
+    // differently when compared to other tags. So with the comments come new
+    // line inside pre tags. These cause the rte output to look differently than
+    // what it was shown in ck-editor.
+    setTimeout(() => {
+      (
+        this.elementRef.nativeElement as HTMLElement
+      ).querySelectorAll('pre').forEach(preNode => {
+        preNode.innerHTML = preNode.innerHTML.replace(
+          /<!--[^>]*-->/g, ''
+        ).trim();
+      });
+    });
   }
 
   ngAfterViewInit(): void {
@@ -142,26 +156,23 @@ angular.module('oppia').directive('oppiaRteOutputDisplay', downgradeComponent({
 
 /**
  * The directive below is required because of the following reasons:
- * 1. Angular adds a space in front and at the back while using string
- *    interpolation. This causes problems in Displaying <pre></pre> content.
- * 2. We have &nbsp; in the string, this has to be passed inside innerHTML.
+ * 1. We have &nbsp; in the string, this has to be passed inside innerHTML.
  *    String interpolation is a very safe operation and these values are not
  *    displayed as is.
- * 3. We can't use innerHTML for ng-container (we can, but ng-container is
+ * 2. We can't use innerHTML for ng-container (we can, but ng-container is
  *    nothing but a comment in dom, so adding innerHTML to ng-container won't
  *    display any output as it is part of the dom.
  */
 @Directive({ selector: '[oppiaRteTextNode]' })
 export class OppiaRteTextNodeDirective implements AfterViewInit {
   constructor(
-    private elementRef: ElementRef,
-    private sanitizer: DomSanitizer
+    private elementRef: ElementRef
   ) { }
   @Input() oppiaRteTextNode: string = '';
   ngAfterViewInit(): void {
-    this.elementRef.nativeElement.parentElement.innerHTML = (
-      this.elementRef.nativeElement.parentElement.innerHTML.trim() +
-      this.sanitizer.sanitize(SecurityContext.HTML, this.oppiaRteTextNode)
-    );
+    // Creating a text node makes it safe from any XSS attacks.
+    const node = document.createTextNode(this.oppiaRteTextNode);
+    const parentNode = this.elementRef.nativeElement.parentNode;
+    parentNode.insertBefore(node, this.elementRef.nativeElement);
   }
 }
