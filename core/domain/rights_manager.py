@@ -776,7 +776,8 @@ def _assign_role(
     activity_rights = _get_activity_rights(activity_type, activity_id)
 
     user_can_assign_role = False
-    if new_role == rights_domain.ROLE_VOICE_ARTIST:
+    if new_role == rights_domain.ROLE_VOICE_ARTIST and (
+            activity_type == constants.ACTIVITY_TYPE_EXPLORATION):
         user_can_assign_role = check_can_manage_voice_artist_in_activity(
             committer, activity_rights)
     else:
@@ -904,7 +905,8 @@ def _deassign_role(committer, removed_user_id, activity_id, activity_type):
     activity_rights = _get_activity_rights(activity_type, activity_id)
 
     user_can_deassign_role = False
-    if activity_rights.is_voice_artist(removed_user_id):
+    if activity_rights.is_voice_artist(removed_user_id) and (
+            activity_type == constants.ACTIVITY_TYPE_EXPLORATION):
         user_can_deassign_role = check_can_manage_voice_artist_in_activity(
             committer, activity_rights)
     else:
