@@ -204,7 +204,8 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             'extensions/objects/templates/' +
             'math-expression-content-editor.component.ts',
             'oppia-rte-parser.service.ts',
-            'rte-output-display.component.spec.ts'),
+            'rte-output-display.component.spec.ts',
+            'rte-output-display.component.ts'),
         'excluded_dirs': ('core/tests/',)
     },
     {
