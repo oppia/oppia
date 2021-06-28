@@ -380,7 +380,8 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
 
         feedback_services.create_message(
             threads_exp_1[0].id, self.user_id,
-            feedback_models.STATUS_CHOICES_FIXED, None, 'not used here')
+            feedback_models.STATUS_CHOICES_FIXED, None,
+            'feedback message not used here')
 
         self.assertEqual(len(feedback_services.get_closed_threads(
             'exploration', self.EXP_ID_1, False)), 1)
