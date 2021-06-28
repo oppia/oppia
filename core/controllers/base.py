@@ -302,7 +302,7 @@ class BaseHandler(webapp2.RequestHandler):
 
         schema_validation_succeeded = True
         try:
-            self.validate_args_schema()
+            self.vaidate_and_normalize_args()
         except self.InvalidInputException as e:
             self.handle_exception(e, self.app.debug)
             schema_validation_succeeded = False
@@ -317,7 +317,7 @@ class BaseHandler(webapp2.RequestHandler):
 
         super(BaseHandler, self).dispatch()
 
-    def validate_args_schema(self):
+    def vaidate_and_normalize_args(self):
         """Validates schema for controller layer handler class arguments.
 
         Raises:
@@ -329,6 +329,9 @@ class BaseHandler(webapp2.RequestHandler):
         url_path_args = self.request.route_kwargs
         handler_class_names_with_no_schema = (
             payload_validator.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA)
+
+        if handler_class_name in handler_class_names_with_no_schema:
+            return
 
         if request_method in ['GET', 'DELETE']:
             handler_args = {}
@@ -343,20 +346,17 @@ class BaseHandler(webapp2.RequestHandler):
             # handler_args must be initialized with empty dict.
             handler_args = {}
 
-        if handler_class_name in handler_class_names_with_no_schema:
-            return
-
-        if self.URL_PATH_ARGS_SCHEMAS is None:
-            raise NotImplementedError(
-                'Missing schema for url path args in %s '
-                'handler class' % (handler_class_name))
-
         # For html handlers, extra args are allowed (to accommodate
         # e.g. utm parameters which are not used by the backend but
         # needed for analytics).
         extra_args_are_allowed = (
             self.GET_HANDLER_ERROR_RETURN_TYPE == 'html' and
             request_method == 'GET')
+
+        if self.URL_PATH_ARGS_SCHEMAS is None:
+            raise NotImplementedError(
+                'Missing schema for url path args in %s handler class.' % (
+                    handler_class_name))
 
         schema_for_url_path_args = self.URL_PATH_ARGS_SCHEMAS
         self.normalized_request, errors = (
@@ -379,7 +379,7 @@ class BaseHandler(webapp2.RequestHandler):
                 handler_args, schema_for_request_method, extra_args_are_allowed)
         )
         if request_method in ['PUT', 'POST']:
-            self.payload = self.normalized_request
+            self.normalized_payload = self.normalized_request
         if errors:
             raise self.InvalidInputException('\n'.join(errors))
 
