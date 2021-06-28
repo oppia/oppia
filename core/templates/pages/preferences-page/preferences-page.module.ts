@@ -33,6 +33,7 @@ import { PreferencesPageComponent } from './preferences-page.component';
   imports: [
     BrowserModule,
     HttpClientModule,
+    NgbPopoverModule,
     ReactiveFormsModule,
     SharedComponentsModule
   ],
@@ -78,6 +79,7 @@ import { SubjectInterestsComponent } from './form-fields/subject-interests.compo
 import { ReactiveFormsModule } from '@angular/forms';
 import { PreferredLanguagesComponent } from './form-fields/preferred-languages.component';
 import { PreferredSiteLanguage } from './form-fields/preferred-site-language.component';
+import { NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

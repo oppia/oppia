@@ -98,28 +98,28 @@
       <label class="col-lg-4 col-md-4 col-sm-4">{{ 'I18N_PREFERENCES_SUBSCRIBED_CREATORS' | translate }}</label>
       <div class="col-lg-8 col-md-8 col-sm-8">
         <span *ngIf="subscriptionList?.length === 0" class="form-text oppia-form-text">{{ 'I18N_PREFERENCES_NO_SUBSCRIPTIONS' | translate }}</span>
-        <ng-container *ngIf="subscriptionList?.length > 0">
-          <mat-card class="oppia-subscription-card oppia-subscription-list-container"
-                    *ngFor="let subscription of subscriptionList">
-            <a class="oppia-subscription-profile-link" href="/profile/{{ subscription.creator_username }}" rel="noopener" target="_blank">
-              <img [src]="subscription.creator_picture_data_url" class="oppia-subscription-card-profile-picture rounded-circle">
-              <span class="oppia-subscription-card-summary">
-                <div class="oppia-subscription-card-summary-text-container">
-                  <!-- <strong class="protractor-test-subscription-name"
-                          popover-append-to-body
-                          popover-trigger="{{ showUsernamePopover(subscription.creator_username) }}"
-                          ng-attr-uib-popover="{{ subscription.creator_username }}">
-                    {{ subscription.creator_username| truncate:10 }}
-                  </strong> -->
-                </div>
-                <div class="oppia-impact-text">
-                  <span>Impact</span>
-                  <span>{{ subscription.creator_impact || 0 }}</span>
-                </div>
-              </span>
-            </a>
-          </mat-card>
-        </ng-container>
+        <mat-grid-list *ngIf="subscriptionList?.length > 0" cols="2" rowHeight="100px">
+          <mat-grid-tile *ngFor="let subscription of subscriptionList">
+            <mat-card class="oppia-subscription-card oppia-subscription-list-container">
+              <a class="oppia-subscription-profile-link" href="/profile/{{ subscription.creator_username }}" rel="noopener" target="_blank">
+                <img [src]="subscription.creator_picture_data_url" class="oppia-subscription-card-profile-picture rounded-circle">
+                <span class="oppia-subscription-card-summary">
+                  <div class="oppia-subscription-card-summary-text-container">
+                    <strong class="protractor-test-subscription-name"
+                            [ngbPopover]="subscription.creator_username"
+                            [triggers]="showUsernamePopover(subscription.creator_username)">
+                      {{ subscription.creator_username| truncate:10 }}
+                    </strong>
+                  </div>
+                  <div class="oppia-impact-text">
+                    <span>Impact</span>
+                    <span> {{ subscription.creator_impact || 0 }}</span>
+                  </div>
+                </span>
+              </a>
+            </mat-card>
+          </mat-grid-tile>
+        </mat-grid-list>
       </div>
     </div>
 
@@ -319,6 +319,10 @@
 
   .oppia-checkbox {
     padding-top: 0;
+  }
+
+  .oppia-subscription-card.mat-card {
+    padding: 0;
   }
 
   .oppia-subscription-list-container {
