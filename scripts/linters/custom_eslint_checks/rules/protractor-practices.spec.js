@@ -124,7 +124,7 @@ ruleTester.run('protractor-practices', rule, {
       code:
       'await element.all(by.css(".collection-exploration")).first()',
       errors: [{
-        message: 'Please do not use await for',
+        message: 'Please do not use await for "first()"',
       }],
     },
     {
@@ -133,7 +133,7 @@ ruleTester.run('protractor-practices', rule, {
       await oneOffJob.get()
       await invalid.get()`,
       errors: [{
-        message: 'Please do not use await for',
+        message: 'Please do not use await for "get()"',
       }],
     },
   ]

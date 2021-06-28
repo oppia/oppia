@@ -36,7 +36,7 @@ module.exports = {
       disallowedBrowserMethods: (
         'Please do not use browser.{{methodName}}() in protractor files'),
       disallowThen: 'Please do not use .then(), consider async/await instead',
-      disallowAwait: 'Please do not use await for'
+      disallowAwait: 'Please do not use await for "{{propertyName}}()"'
     },
   },
 
@@ -63,7 +63,10 @@ module.exports = {
           (/^(first|last|get)$/).test(node.parent.property.name)) {
           context.report({
             node: node,
-            messageId: 'disallowAwait'
+            messageId: 'disallowAwait',
+            data: {
+              propertyName: node.parent.property.name
+            }
           });
         }
       } else {
@@ -71,7 +74,10 @@ module.exports = {
           if (node.argument.callee.object.name === elementAllIdName[i]) {
             context.report({
               node: node,
-              messageId: 'disallowAwait'
+              messageId: 'disallowAwait',
+              data: {
+                propertyName: node.argument.callee.property.name
+              }
             });
           }
         }
