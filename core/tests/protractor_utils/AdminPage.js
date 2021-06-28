@@ -38,11 +38,12 @@ var AdminPage = function() {
   var adminRolesTabContainer = element(
     by.css('.protractor-test-roles-tab-container'));
   var usernameInputFieldForRolesEditing = element(
-    by.css('.protractor-username-for-role-editor'));
-  var editUserRoleButton = element(by.css('.protractor-role-edit-button'));
-  var addNewRoleButton = element(by.css('.protractor-add-new-role-button'));
-  var progressSpinner = element(by.css('.protractor-progress-spinner'));
-  var roleSelector = element(by.css('.protractor-new-role-selector'));
+    by.css('.protractor-test-username-for-role-editor'));
+  var editUserRoleButton = element(by.css('.protractor-test-role-edit-button'));
+  var addNewRoleButton = element(
+    by.css('.protractor-test-add-new-role-button'));
+  var progressSpinner = element(by.css('.protractor-test-progress-spinner'));
+  var roleSelector = element(by.css('.protractor-test-new-role-selector'));
   var statusMessage = element(by.css('.protractor-test-status-message'));
 
   var addContributionRightsForm = element(
@@ -199,7 +200,8 @@ var AdminPage = function() {
     var count = await featureFlagElements.count();
     for (let i = 0; i < count; i++) {
       var elem = await featureFlagElements.get(i);
-      if ((await elem.element(by.css('h2.oppia-feature-name')).getText()) ===
+      if ((await elem.element(
+        by.css('.protractor-test-feature-name')).getText()) ===
           'dummy_feature') {
         return elem;
       }

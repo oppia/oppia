@@ -24,7 +24,7 @@ import { ConstructTranslationIdsService } from
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 // TODO(#7222): Remove usage of importAllAngularServices once upgraded to
 // Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { NavigationService } from 'services/navigation.service';
 
 var MockWindow = function() {

@@ -19,7 +19,7 @@
 var waitFor = require('./waitFor.js');
 
 var autoSaveIndicatorElement = element(
-  by.css('.protractor-autosave-indicator'));
+  by.css('.protractor-test-autosave-indicator'));
 
 // Waits for the invisibility of the autosave message.
 var waitForAutosave = async function() {
