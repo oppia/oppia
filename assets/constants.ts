@@ -5501,6 +5501,8 @@ export default {
 
   "NUM_QUESTIONS_PER_PAGE": 10,
 
+  "BULK_EMAIL_SERVICE_SIGNUP_URL": "",
+
   // The default number of opportunities to show on the contributor dashboard
   // page.
   "OPPORTUNITIES_PAGE_SIZE": 10,
@@ -5605,6 +5607,8 @@ export default {
   "FIREBASE_CONFIG_MESSAGING_SENDER_ID": "",
   "FIREBASE_CONFIG_APP_ID": "",
   "FIREBASE_CONFIG_GOOGLE_CLIENT_ID": "",
+
+  "BEAM_JOBS_ARE_ENABLED": false,
 
   "ALLOW_YAML_FILE_UPLOAD": false,
 
