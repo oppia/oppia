@@ -22,6 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.domain import collection_domain
 from core.domain import rights_domain
 from core.platform import models
+from jobs import job_utils
 from jobs.decorators import validation_decorators
 from jobs.transforms import base_validation
 
@@ -60,7 +61,35 @@ class ValidateCollectionRightsSnapshotMetadataModel(
             input_model: datastore_services.Model. Entity to validate.
 
         Returns:
-            collection_domain.CollectionChange. A domain object class for the
+            rights_domain.CollectionRightsChange. A domain object class for the
             changes made by commit commands of the model.
         """
         return rights_domain.CollectionRightsChange
+
+
+@validation_decorators.AuditsExisting(
+    collection_models.CollectionCommitLogEntryModel)
+class ValidateCollectionCommitLogEntryModel(
+        base_validation.BaseValidateCommitCmdsSchema):
+    """Overrides _get_change_domain_class for collection models."""
+
+    def _get_change_domain_class(self, input_model): # pylint: disable=unused-argument
+        """Returns a change domain class.
+
+        Args:
+            input_model: datastore_services.Model. Entity to validate.
+
+        Returns:
+            collection_domain.CollectionChange|
+            rights_domain.CollectionRightsChange.
+            A domain object class for the changes made by commit commands of
+            the model.
+        """
+        model = job_utils.clone_model(input_model)
+
+        if model.id.startswith('rights'):
+            return rights_domain.CollectionRightsChange
+        elif model.id.startswith('collection'):
+            return collection_domain.CollectionChange
+        else:
+            return None
