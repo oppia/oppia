@@ -279,7 +279,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'subtopic-summary-tile.directive.ts',
     'subtopic.model.ts',
     'suggestion-modal-for-exploration-editor.service.ts',
-    'summarize-nonnegative-number.pipe.ts',
     'supplemental-card.directive.ts',
     'svm-prediction.service.ts',
     'teacher.ts',
@@ -300,7 +299,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'truncate.filter.ts',
     'truncate.pipe.ts',
     'tutor-card.directive.ts',
-    'unit-test-utils.ts', # Please don't try to cover this file.
+    'unit-test-utils.ajs.ts', # Please don't try to cover this file.
     'url-interpolation.service.ts',
     'utils.service.ts',
     'version-diff-visualization.directive.ts',
