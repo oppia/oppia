@@ -300,6 +300,7 @@
 	"I18N_LEARNER_DASHBOARD_RETURN_TO_FEEDBACK_THREADS_MESSAGE": "Text that appears in the learner dashboard on hovering over a back button. The back buttons takes the learner back to the list of threads.",
 	"I18N_LEARNER_DASHBOARD_SEND_FEEDBACK_THREAD_MESSAGE": "The name of a button that appears in the learner dashboard. On clicking this button the message written by the user is sent to the feedback thread.\n{{Identical|Send}}",
 	"I18N_LEARNER_DASHBOARD_SEND_FEEDBACK_THREAD_MESSAGE_IN_PROGRESS": "Text that appears in the learner dashboard. It indicates that the message written by the user is being sent to the feedback thread.",
+	"I18N_LEARNER_DASHBOARD_STORIES_COMPLETED_SECTION": "Text for the stories completed section in the learner dashboard.",
 	"I18N_LEARNER_DASHBOARD_SUBSCRIPTIONS_SECTION": "Text for the subscriptions section in the learner dashboard. The header asks the user if he/she is sure to remove the activity from the learner dashboard.",
 	"I18N_LEARNER_DASHBOARD_SUGGESTION_CURRENT_STATE_CONTENT_HEADER": "Text that appears in the learner dashboard when a suggestion is opened. It is the header for the box which shows the current content of the state in a suggestion.",
 	"I18N_LEARNER_DASHBOARD_SUGGESTION_DESCRIPTION": "Text that appears in the learner dashboard in the suggestion modal. It gives a brief description of changes suggested by the learner.",
