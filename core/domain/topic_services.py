@@ -273,14 +273,18 @@ def apply_change_list(topic_id, change_list):
                 elif (change.property_name ==
                       topic_domain.TOPIC_PROPERTY_THUMBNAIL_FILENAME):
                     topic.update_thumbnail_filename(change.new_value)
-                    fs = fs_domain.AbstractFileSystem(
-                        fs_domain.GcsFileSystem(
-                            feconf.ENTITY_TYPE_TOPIC, topic_id))
-                    thumbnail_size_in_bytes = len(fs.get(
-                        '%s/%s' % (
-                            ASSET_TYPE_THUMBNAIL, topic.thumbnail_filename)))
-                    topic.update_thumbnail_size_in_bytes(
-                        thumbnail_size_in_bytes)
+                    try:
+                        fs = fs_domain.AbstractFileSystem(
+                            fs_domain.GcsFileSystem(
+                                feconf.ENTITY_TYPE_TOPIC, topic_id))
+                        thumbnail_size_in_bytes = len(fs.get(
+                            '%s/%s' % (
+                                ASSET_TYPE_THUMBNAIL,
+                                topic.thumbnail_filename)))
+                        topic.update_thumbnail_size_in_bytes(
+                            thumbnail_size_in_bytes)
+                    except Exception as e:
+                        pass
                 elif (change.property_name ==
                       topic_domain.TOPIC_PROPERTY_THUMBNAIL_BG_COLOR):
                     topic.update_thumbnail_bg_color(change.new_value)
