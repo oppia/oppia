@@ -26,7 +26,7 @@ import { WindowDimensionsService } from
 import { UserService } from 'services/user.service';
 // TODO(#7222): Remove usage of importAllAngularServices once upgraded to
 // Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 describe('Activity tiles infinity grid component', function() {
   var ctrl = null;

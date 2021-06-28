@@ -24,27 +24,32 @@ import { CamelCaseToHyphensPipe } from
 import { ContextService } from 'services/context.service';
 import { ExplorationObjectFactory } from
   'domain/exploration/ExplorationObjectFactory';
-import { ExtractImageFilenamesFromStateService } from
+import { ExtractImageFilenamesFromModelService } from
   // eslint-disable-next-line max-len
-  'pages/exploration-player-page/services/extract-image-filenames-from-state.service';
+  'pages/exploration-player-page/services/extract-image-filenames-from-model.service';
 import { ContentTranslationManagerService } from 'pages/exploration-player-page/services/content-translation-manager.service';
+import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 
 
 describe('Extracting Image file names in the state service', () => {
-  let eifss: ExtractImageFilenamesFromStateService;
+  let eifms: ExtractImageFilenamesFromModelService;
   let eof: ExplorationObjectFactory;
+  let sof: SkillObjectFactory;
   let ecs: ContextService;
   let ctms: ContentTranslationManagerService;
   let explorationDict;
   let ImageFilenamesInExploration;
+  let skillDict;
+  let expectedImageFilenamesInSkill: string[];
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [CamelCaseToHyphensPipe]
     });
-    eof = TestBed.get(ExplorationObjectFactory);
-    ecs = TestBed.get(ContextService);
-    eifss = TestBed.get(ExtractImageFilenamesFromStateService);
-    ctms = TestBed.get(ContentTranslationManagerService);
+    eof = TestBed.inject(ExplorationObjectFactory);
+    ecs = TestBed.inject(ContextService);
+    eifms = TestBed.inject(ExtractImageFilenamesFromModelService);
+    ctms = TestBed.inject(ContentTranslationManagerService);
+    sof = TestBed.inject(SkillObjectFactory);
     spyOn(ecs, 'getExplorationId').and.returnValue('1');
     spyOn(ctms, 'getTranslatedHtml').and.callFake(
       (unusedWrittenTranslations, unusedLanguageCode, content) => {
@@ -801,6 +806,149 @@ describe('Extracting Image file names in the state service', () => {
       Introduction: ['sIMultipleChoice1.png', 'sIMultipleChoice2.png',
         'sIOutcomeFeedback.png']
     };
+
+    const misconceptionDict1 = {
+      id: '2',
+      name: 'test name 1',
+      notes: (
+        '<p><oppia-noninteractive-image alt-with-value="&amp;' +
+        'quot;f&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"' +
+        'filepath-with-value="&amp;quot;misconception-dict-1-notes' +
+        '.png&amp;quot;"></oppia-noninteractive-image>This is a text ' +
+        'input.</p>'
+      ),
+      feedback: (
+        '<p><oppia-noninteractive-image alt-with-value="&amp;' +
+        'quot;f&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"' +
+        'filepath-with-value="&amp;quot;misconception-dict-1-feedback' +
+        '.png&amp;quot;"></oppia-noninteractive-image>This is a text ' +
+        'input.</p>'
+      ),
+      must_be_addressed: true,
+    };
+
+    const misconceptionDict2 = {
+      id: '4',
+      name: 'test name 2',
+      notes: (
+        '<p><oppia-noninteractive-image alt-with-value="&amp;' +
+        'quot;f&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"' +
+        'filepath-with-value="&amp;quot;misconception-dict-2-notes' +
+        '.png&amp;quot;"></oppia-noninteractive-image>This is a text ' +
+        'input.</p>'
+      ),
+      feedback: (
+        '<p><oppia-noninteractive-image alt-with-value="&amp;' +
+        'quot;f&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"' +
+        'filepath-with-value="&amp;quot;misconception-dict-2-feedback' +
+        '.png&amp;quot;"></oppia-noninteractive-image>This is a text ' +
+        'input.</p>'
+      ),
+      must_be_addressed: true,
+    };
+
+    const rubricDict = {
+      difficulty: 'Easy',
+      explanations: [
+        '<p><oppia-noninteractive-image alt-with-value="&amp;' +
+        'quot;f&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"' +
+        'filepath-with-value="&amp;quot;rubric-dict-easy-explanation' +
+        '.png&amp;quot;"></oppia-noninteractive-image>This is a text ' +
+        'input.</p>'
+      ],
+    };
+
+    const example1 = {
+      question: {
+        html: (
+          '<p><oppia-noninteractive-image alt-with-value="&amp;' +
+          'quot;f&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"' +
+          'filepath-with-value="&amp;quot;worked-example-1-question' +
+          '.png&amp;quot;"></oppia-noninteractive-image>This is a text ' +
+          'input.</p>'
+        ),
+        content_id: 'worked_example_q_1',
+      },
+      explanation: {
+        html: (
+          '<p><oppia-noninteractive-image alt-with-value="&amp;' +
+          'quot;f&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"' +
+          'filepath-with-value="&amp;quot;worked-example-1-explanation' +
+          '.png&amp;quot;"></oppia-noninteractive-image>This is a text ' +
+          'input.</p>'
+        ),
+        content_id: 'worked_example_e_1',
+      },
+    };
+
+    const example2 = {
+      question: {
+        html: (
+          '<p><oppia-noninteractive-image alt-with-value="&amp;' +
+          'quot;f&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"' +
+          'filepath-with-value="&amp;quot;worked-example-2-question' +
+          '.png&amp;quot;"></oppia-noninteractive-image>This is a text ' +
+          'input.</p>'
+        ),
+        content_id: 'worked_example_q_2',
+      },
+      explanation: {
+        html: (
+          '<p><oppia-noninteractive-image alt-with-value="&amp;' +
+          'quot;f&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"' +
+          'filepath-with-value="&amp;quot;worked-example-2-explanation' +
+          '.png&amp;quot;"></oppia-noninteractive-image>This is a text ' +
+          'input.</p>'
+        ),
+        content_id: 'worked_example_e_2',
+      },
+    };
+
+    const skillContentsDict = {
+      explanation: {
+        html: (
+          '<p><oppia-noninteractive-image alt-with-value="&amp;' +
+          'quot;f&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"' +
+          'filepath-with-value="&amp;quot;skill-concept-card-explanation' +
+          '.png&amp;quot;"></oppia-noninteractive-image>This is a text ' +
+          'input.</p>'
+        ),
+        content_id: 'explanation',
+      },
+      worked_examples: [example1, example2],
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          explanation: {},
+          worked_example_q_1: {},
+          worked_example_e_1: {},
+          worked_example_q_2: {},
+          worked_example_e_2: {},
+        },
+      },
+    };
+
+    skillDict = {
+      id: '1',
+      description: 'test description',
+      misconceptions: [misconceptionDict1, misconceptionDict2],
+      rubrics: [rubricDict],
+      skill_contents: skillContentsDict,
+      language_code: 'en',
+      version: 3,
+      prerequisite_skill_ids: ['skill_1'],
+    };
+    expectedImageFilenamesInSkill = [
+      'misconception-dict-1-notes.png',
+      'misconception-dict-1-feedback.png',
+      'misconception-dict-2-notes.png',
+      'misconception-dict-2-feedback.png',
+      'rubric-dict-easy-explanation.png',
+      'worked-example-1-question.png',
+      'worked-example-1-explanation.png',
+      'worked-example-2-question.png',
+      'worked-example-2-explanation.png',
+      'skill-concept-card-explanation.png'
+    ];
   });
 
   it('should get all the filenames of the images in a state',
@@ -810,10 +958,18 @@ describe('Extracting Image file names in the state service', () => {
       let stateNames = states.getStateNames();
       stateNames.forEach((statename) => {
         let filenamesInState = (
-          eifss.getImageFilenamesInState(states.getState(statename)));
+          eifms.getImageFilenamesInState(states.getState(statename)));
         filenamesInState.forEach(function(filename) {
           expect(ImageFilenamesInExploration[statename]).toContain(filename);
         });
       });
+    });
+
+  it('should get all the filenames of the images in a skill',
+    () => {
+      let skill = sof.createFromBackendDict(skillDict);
+      let imageFilenamesInSkill = eifms.getImageFilenamesInSkill(skill).sort();
+      expect(imageFilenamesInSkill).toEqual(
+        expectedImageFilenamesInSkill.sort());
     });
 });
