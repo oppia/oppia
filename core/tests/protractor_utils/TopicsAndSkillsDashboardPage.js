@@ -311,7 +311,8 @@ var TopicsAndSkillsDashboardPage = function() {
     var editor = element(by.css('.protractor-test-concept-card-text'));
     await waitFor.visibilityOf(
       editor, 'Explanation Editor takes too long to appear');
-    var skillReviewMaterialInput = editor.element(by.css('.oppia-rte'));
+    var skillReviewMaterialInput = editor.element(
+      by.css('.protractor-test-rte'));
     await action.sendKeys(
       'Skill Review Material Field', skillReviewMaterialInput,
       reviewMaterial, true);

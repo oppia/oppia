@@ -12,8 +12,8 @@
 </div>
 
 <div ng-if="!contentEditorIsOpen">
-  <div ng-if="isCardHeightLimitReached() && cardHeightLimitWarningIsShown" class="oppia-card-height-limit-warning">
-    <i class="material-icons oppia-hide-card-height-warning-icon" uib-tooltip="Hide warning" ng-click="hideCardHeightLimitWarning()">&#xe002;</i>
+  <div ng-if="isCardHeightLimitReached() && cardHeightLimitWarningIsShown" class="oppia-card-height-limit-warning protractor-test-card-height-limit-warning">
+    <i class="material-icons oppia-hide-card-height-warning-icon protractor-test-hide-card-height-warning-icon" uib-tooltip="Hide warning" ng-click="hideCardHeightLimitWarning()">&#xe002;</i>
     <span translate="I18N_CARD_HEIGHT_LIMIT_WARNING_MESSAGE"></span>
   </div>
   <div class="protractor-test-edit-content"
@@ -44,8 +44,8 @@
   <!-- TODO(sll): Find a way to do this without resorting to private properties like _html -->
   <schema-based-editor schema="HTML_SCHEMA" local-value="StateContentService.displayed._html">
   </schema-based-editor>
-  <div ng-if="isCardHeightLimitReached() && cardHeightLimitWarningIsShown" class="oppia-card-height-limit-warning mt-2">
-    <i class="material-icons oppia-hide-card-height-warning-icon" uib-tooltip="Hide warning" ng-click="hideCardHeightLimitWarning()">&#xe002;</i>
+  <div ng-if="isCardHeightLimitReached() && cardHeightLimitWarningIsShown" class="oppia-card-height-limit-warning protractor-test-card-height-limit-warning mt-2">
+    <i class="material-icons oppia-hide-card-height-warning-icon protractor-test-hide-card-height-warning-icon" uib-tooltip="Hide warning" ng-click="hideCardHeightLimitWarning()">&#xe002;</i>
     <span translate="I18N_CARD_HEIGHT_LIMIT_WARNING_MESSAGE"></span>
   </div>
   <div class="mt-2">
