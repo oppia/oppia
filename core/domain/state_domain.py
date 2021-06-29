@@ -2187,7 +2187,7 @@ class RuleSpec(python_utils.OBJECT):
 class SubtitledHtml(python_utils.OBJECT):
     """Value object representing subtitled HTML."""
 
-    def __init__(self, content_id, html):
+    def __init__(self, content_id, html, image_sizes_in_bytes):
         """Initializes a SubtitledHtml domain object. Note that initializing
         the SubtitledHtml object does not clean the html. This is because we
         sometimes need to initialize SubtitledHtml and migrate the contained
@@ -2204,9 +2204,12 @@ class SubtitledHtml(python_utils.OBJECT):
             html: str. A piece of user-submitted HTML. Note that this is NOT
                 cleaned in such a way as to contain a restricted set of HTML
                 tags. To clean it, the validate() method must be called.
+            image_sizes_in_bytes: dict. A mapping of rich text images filename
+                to their sizes in bytes, contained in the html.
         """
         self.content_id = content_id
         self.html = html
+        self.image_sizes_in_bytes = image_sizes_in_bytes
 
     def to_dict(self):
         """Returns a dict representing this SubtitledHtml domain object.
@@ -2216,7 +2219,8 @@ class SubtitledHtml(python_utils.OBJECT):
         """
         return {
             'content_id': self.content_id,
-            'html': self.html
+            'html': self.html,
+            'image_sizes_in_bytes': self.image_sizes_in_bytes
         }
 
     @classmethod
@@ -2231,7 +2235,8 @@ class SubtitledHtml(python_utils.OBJECT):
             SubtitledHtml. The corresponding SubtitledHtml domain object.
         """
         return cls(
-            subtitled_html_dict['content_id'], subtitled_html_dict['html'])
+            subtitled_html_dict['content_id'], subtitled_html_dict['html'],
+            subtitled_html_dict['image_sizes_in_bytes'])
 
     def validate(self):
         """Validates properties of the SubtitledHtml, and cleans the html.
@@ -2262,7 +2267,7 @@ class SubtitledHtml(python_utils.OBJECT):
             SubtitledHtml. A default SubtitledHtml domain object, some
             attribute of that object will be ''.
         """
-        return cls(content_id, '')
+        return cls(content_id, '', {})
 
 
 class SubtitledUnicode(python_utils.OBJECT):

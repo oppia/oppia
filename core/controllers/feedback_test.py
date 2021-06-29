@@ -519,7 +519,7 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
 
     def test_feedback_threads_with_suggestions(self):
         new_content = state_domain.SubtitledHtml(
-            'content', '<p>new content html</p>').to_dict()
+            'content', '<p>new content html</p>', {}).to_dict()
         change_cmd = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
@@ -588,7 +588,7 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         new_content = state_domain.SubtitledHtml(
-            'content', '<p>new content html</p>').to_dict()
+            'content', '<p>new content html</p>', {}).to_dict()
         change = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,

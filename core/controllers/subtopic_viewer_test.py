@@ -114,7 +114,8 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
         self.subtopic_page_1.update_page_contents_html(
             state_domain.SubtitledHtml.from_dict({
                 'html': '<p>hello world</p>',
-                'content_id': 'content'
+                'content_id': 'content',
+                'image_sizes_in_bytes': {}
             }))
         self.subtopic_page_1.update_page_contents_audio(
             state_domain.RecordedVoiceovers.from_dict(
@@ -132,7 +133,8 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
         self.subtopic_page_2.update_page_contents_html(
             state_domain.SubtitledHtml.from_dict({
                 'html': '<p>hello world 2</p>',
-                'content_id': 'content'
+                'content_id': 'content',
+                'image_sizes_in_bytes': {}
             }))
         self.subtopic_page_2.update_page_contents_audio(
             state_domain.RecordedVoiceovers.from_dict(
