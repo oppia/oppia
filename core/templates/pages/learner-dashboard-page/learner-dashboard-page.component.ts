@@ -100,7 +100,7 @@ export class LearnerDashboardPageComponent implements OnInit {
   PAGE_SIZE = 8;
   Math = window.Math;
   username: string = '';
-  newLearnerDashboardPageIsDisplayed: boolean = false;
+  newLearnerDashboardPageIsDisplayed: boolean = true;
 
   isCurrentExpSortDescending: boolean;
   isCurrentSubscriptionSortDescending: boolean;
@@ -116,6 +116,7 @@ export class LearnerDashboardPageComponent implements OnInit {
   completedExplorationsList: LearnerExplorationSummary[];
   completedCollectionsList: CollectionSummary[];
   completedStoriesList: StorySummary[];
+  learntTopicsList: LearnerTopicSummary[];
   partiallyLearntTopicsList: LearnerTopicSummary[];
   incompleteExplorationsList: LearnerExplorationSummary[];
   incompleteCollectionsList: CollectionSummary[];
@@ -212,6 +213,8 @@ export class LearnerDashboardPageComponent implements OnInit {
           responseData.completedCollectionsList);
         this.completedStoriesList = (
           responseData.completedStoriesList);
+        this.learntTopicsList = (
+          responseData.learntTopicsList);
         this.partiallyLearntTopicsList = (
           responseData.partiallyLearntTopicsList);
         this.incompleteExplorationsList = (

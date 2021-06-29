@@ -38,6 +38,9 @@ export class PracticeTabComponent implements OnInit {
   @Input() topicName: string;
   @Input() startButtonIsDisabled: boolean = false;
   @Input() subtopicsList: Subtopic[];
+  @Input() displayArea: string = 'topicViewer';
+  @Input() topicUrl: string = '';
+  @Input() classroomUrl: string = '';
   selectedSubtopics: Subtopic[] = [];
   availableSubtopics: Subtopic[] = [];
   selectedSubtopicIndices: boolean[] = [];
@@ -102,14 +105,25 @@ export class PracticeTabComponent implements OnInit {
           this.availableSubtopics[idx].getId());
       }
     }
-    const practiceSessionsUrl = this.urlInterpolationService.interpolateUrl(
-      PracticeSessionPageConstants.PRACTICE_SESSIONS_URL, {
-        topic_url_fragment: (
-          this.urlService.getTopicUrlFragmentFromLearnerUrl()),
-        classroom_url_fragment: (
-          this.urlService.getClassroomUrlFragmentFromLearnerUrl()),
-        comma_separated_subtopic_ids: selectedSubtopicIds.join(',')
-      });
+    let practiceSessionsUrl;
+    if (this.displayArea === 'topicViewer') {
+      practiceSessionsUrl = this.urlInterpolationService.interpolateUrl(
+        PracticeSessionPageConstants.PRACTICE_SESSIONS_URL, {
+          topic_url_fragment: (
+            this.urlService.getTopicUrlFragmentFromLearnerUrl()),
+          classroom_url_fragment: (
+            this.urlService.getClassroomUrlFragmentFromLearnerUrl()),
+          comma_separated_subtopic_ids: selectedSubtopicIds.join(',')
+        });
+    } else {
+      practiceSessionsUrl = this.urlInterpolationService.interpolateUrl(
+        PracticeSessionPageConstants.PRACTICE_SESSIONS_URL, {
+          topic_url_fragment: (
+            this.topicUrl),
+          classroom_url_fragment: (
+            this.classroomUrl),
+          comma_separated_subtopic_ids: selectedSubtopicIds.join(',') });
+    }
     this.windowRef.nativeWindow.location.href = practiceSessionsUrl;
   }
 

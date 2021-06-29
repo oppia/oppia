@@ -30,8 +30,6 @@ import { SharedComponentsModule } from 'components/shared-component.module';
 import { TopicViewerNavbarBreadcrumbComponent } from
   // eslint-disable-next-line max-len
   'pages/topic-viewer-page/navbar-breadcrumb/topic-viewer-navbar-breadcrumb.component';
-import { PracticeTabComponent } from
-  'pages/topic-viewer-page/practice-tab/practice-tab.component';
 import { StoriesListComponent } from
   'pages/topic-viewer-page/stories-list/topic-viewer-stories-list.component';
 import { SubtopicsListComponent } from
@@ -48,7 +46,6 @@ import { TopicViewerPageComponent } from
   ],
   declarations: [
     OppiaAngularRootComponent,
-    PracticeTabComponent,
     StoriesListComponent,
     SubtopicsListComponent,
     TopicViewerNavbarBreadcrumbComponent,
@@ -56,7 +53,6 @@ import { TopicViewerPageComponent } from
   ],
   entryComponents: [
     OppiaAngularRootComponent,
-    PracticeTabComponent,
     StoriesListComponent,
     SubtopicsListComponent,
     TopicViewerNavbarBreadcrumbComponent,

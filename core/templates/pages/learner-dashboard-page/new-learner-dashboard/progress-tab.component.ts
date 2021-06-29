@@ -31,6 +31,10 @@ import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
 export class ProgressTabComponent implements OnInit {
   @Input() completedStoriesList: StorySummary[];
   @Input() partiallyLearntTopicsList: LearnerTopicSummary[];
+  @Input() learntTopicsList: LearnerTopicSummary[];
+  topicsInSkillProficiency: LearnerTopicSummary[] = [];
+  emptySkillProficiency: boolean = true;
+  displaySkills: boolean[];
   width: number;
 
   constructor(
@@ -40,6 +44,26 @@ export class ProgressTabComponent implements OnInit {
 
   ngOnInit(): void {
     this.width = 233 * (this.completedStoriesList.length);
+    this.topicsInSkillProficiency.push(
+      ...this.partiallyLearntTopicsList, ...this.learntTopicsList);
+    this.displaySkills = new Array(
+      this.topicsInSkillProficiency.length).fill(false);
+    let topic: LearnerTopicSummary;
+    let atLeastOnetopicHasPracticeTabEnabled = false;
+    for (topic of this.topicsInSkillProficiency) {
+      if (topic.practiceTabIsDisplayed === true) {
+        atLeastOnetopicHasPracticeTabEnabled = true;
+        break;
+      }
+    }
+    if (atLeastOnetopicHasPracticeTabEnabled === true &&
+      this.topicsInSkillProficiency.length !== 0) {
+      this.emptySkillProficiency = false;
+    }
+  }
+
+  showSkills(index: number): void {
+    this.displaySkills[index] = !this.displaySkills[index];
   }
 
   getStaticImageUrl(imagePath: string): string {

@@ -1,3 +1,39 @@
+<div class="skill-proficiency" [ngClass]="{'empty-section': emptySkillProficiency}">
+  <div class="skill-proficiency-heading">
+    <p class="skill-proficiency-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_SKILL_PROFICIENCY_SECTION' | translate">
+    </p>
+    <img [src]="getStaticImageUrl('/learner_dashboard/info.svg')" alt="info image" class="oppia-svg-info-image" *ngIf="!emptySkillProficiency">
+  </div>
+  <div *ngIf="emptySkillProficiency">
+    <p class="empty-skill-proficiency" [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_SKILL_PROFICIENCY' | translate">
+    </p>
+  </div>
+  <div *ngIf="!emptySkillProficiency">
+    <div *ngFor="let tile of topicsInSkillProficiency; index as i" class="skill-proficiency-content">
+      <div class="skill-proficiency-topic-tile" [ngStyle]="displaySkills[i] && {'border-bottom': 'none', 'margin-bottom': '0'}" *ngIf="tile.practiceTabIsDisplayed">
+        <span class="skill-proficiency-topic-title">
+          {{tile.name}}
+        </span>
+        <span class="progress-text">
+          Progress: 
+        </span>
+        <img [src]="getStaticImageUrl('/learner_dashboard/dropdown.svg')" alt="dropdown image" class="oppia-svg-dropdown-image" (click)="showSkills(i)" *ngIf="!displaySkills[i]">
+        <img [src]="getStaticImageUrl('/learner_dashboard/up.svg')" alt="up image" class="oppia-svg-up-image" (click)="showSkills(i)" *ngIf="displaySkills[i]">
+      </div>
+      <div class="skill-proficiency-skill-content" *ngIf="displaySkills[i]">
+        <span class="skills-text">
+          Skills
+        </span>
+        <practice-tab [topicName]="tile.name"
+                      [subtopicsList]="tile.subtopics"
+                      [displayArea]="'progressTab'"
+                      [topicUrl]="tile.urlFragment"
+                      [classroomUrl]="tile.classroom">
+        </practice-tab>
+      </div>
+    </div>
+  </div>
+</div>
 <div class="completed-stories" *ngIf="completedStoriesList.length !== 0">
   <div class="completed-stories-heading">
     <p class="completed-stories-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_STORIES_COMPLETED_SECTION' | translate">
@@ -28,6 +64,48 @@
     padding: 0 0 30px 40px;
     width: 736px;
   }
+  .skill-proficiency {
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: 0 0 4px #0000001a;
+    margin: auto;
+    min-height: 206px;
+    opacity: 1;
+    padding: 0 0 30px 40px;
+    width: 736px;
+  }
+  .empty-section {
+    padding: 0 113px 30px 40px;
+  }
+  .empty-skill-proficiency {
+    text-align: left;
+    font-size: 18px;
+    color: #333333;
+  }
+  .skill-proficiency-topic-tile {
+    border-bottom: 1px solid;
+    height: 43px;
+    margin-bottom: 16px;
+    width: 656px;
+  }
+  .skill-proficiency-topic-title {
+    color: #333333;
+    font-size: 19px;
+    font-weight: 500;
+    letter-spacing: 0;
+    opacity: 1;
+    text-align: left;
+  }
+  .progress-text {
+    color: #00645C;
+    float: right;
+    font-size: 14px;
+    letter-spacing: 0;
+    opacity: 1;
+    position: relative;
+    right: 40px;
+    text-align: left;
+  }
   .completed-stories-content {
     display: inline-block;
   }
@@ -35,7 +113,8 @@
     display: inline-block;
     padding: 0 30px 0 0;
   }
-  .completed-stories-title {
+  .completed-stories-title,
+  .skill-proficiency-title {
     color: #00645C;
     display: inline-block;
     font-family: "Capriola", "Roboto", Arial, sans-serif;
@@ -44,7 +123,8 @@
     opacity: 1;
     text-align: left;
   }
-  .completed-stories-heading {
+  .completed-stories-heading,
+  .skill-proficiency-heading {
     padding: 32px 0;
   }
   .completed-stories-length {
@@ -56,6 +136,26 @@
   .oppia-svg-star-image {
     bottom: 4px;
     filter: invert(95%) sepia(49%) saturate(2374%) hue-rotate(320deg) brightness(91%) contrast(89%);
+    position: relative;
+    width: 20px;
+  }
+  .skills-text {
+    color: #333333;
+    font-size: 18px;
+    text-align: left;
+    text-transform: uppercase;
+  }
+  .oppia-svg-dropdown-image,
+  .oppia-svg-up-image {
+    bottom: 5px;
+    left: 87px;
+    float: right;
+    position: relative;
+    width: 30px;
+  }
+  .oppia-svg-info-image {
+    bottom: 3px;
+    left: 10px;
     position: relative;
     width: 20px;
   }

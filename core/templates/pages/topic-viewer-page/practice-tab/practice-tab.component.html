@@ -1,21 +1,25 @@
 <div class="practice-tab">
-  <div class="oppia-practice-tab-container">
+  <div class="oppia-practice-tab-container" [ngClass]="{'practice-tab-for-learner-dashboard': displayArea === 'progressTab'}">
     <mat-card class="oppia-page-card oppia-long-text">
-      <h2 class="tab-title">
+      <h2 class="tab-title" *ngIf="displayArea === 'topicViewer'">
         <span [innerHTML]="'I18N_TOPIC_VIEWER_MASTER_SKILLS' | translate: {topicName: topicName}"></span>
       </h2>
-      <div class="practice-content">
+      <div class="practice-content" *ngIf="displayArea === 'topicViewer'">
         <span [innerHTML]="'I18N_TOPIC_VIEWER_SELECT_SKILLS' | translate: {topicName: topicName}"></span>
       </div>
       <mat-card-content>
         <div *ngFor="let subtopic of availableSubtopics; let i = index" class="practice-tab-subtopic-item">
           <mat-checkbox color="primary" class="practice-tab-mat-checkbox protractor-test-skill-checkbox" [(ngModel)]="selectedSubtopicIndices[i]"
                         (change)="checkIfQuestionsExist(selectedSubtopicIndices)">
-            {{ subtopic.getTitle() }}
+            <span [ngClass]="{'subtopic-title': displayArea === 'progressTab'}">
+              {{ subtopic.getTitle() }}
+            </span>
           </mat-checkbox>
+          <div class="capsule-progress" *ngIf="displayArea === 'progressTab'">
+          </div>
         </div>
       </mat-card-content>
-      <mat-card-actions>
+      <mat-card-actions class="card-actions">
         <div class="fx-row fx-main-center fx-cross-center full-width">
           <button mat-raised-button [disabled]="isStartButtonDisabled()" (click)="openNewPracticeSession()" class="practice-session-button protractor-test-practice-start-button">
             <span *ngIf="questionsStatusCallIsComplete" class="font-heavy" [innerHTML]="'I18N_TOPIC_VIEWER_START_PRACTICE' | translate"></span>
@@ -39,6 +43,48 @@
     padding-left: 48px;
     padding-right: 48px;
     width: 550px;
+  }
+
+  .practice-tab .practice-tab-for-learner-dashboard .oppia-page-card {
+    box-shadow: none;
+    margin-bottom: 0;
+    margin-top: 0;
+    padding-right: 0;
+    position: relative;
+    right: 41px;
+    width: 691px;
+  }
+
+  .practice-tab .practice-tab-for-learner-dashboard .capsule-progress {
+    height: 16px;
+    width: 256px;
+    margin: 0 auto;
+    background: transparent;
+    border-radius: 80px;
+    top: 12px;
+    position: relative;
+    float: right;
+    border: 1px solid black;
+  }
+
+  .practice-tab .practice-tab-for-learner-dashboard .subtopic-title {
+    font-size: 18px;
+    color: #333;
+  }
+
+  .practice-tab .practice-tab-for-learner-dashboard .practice-tab-subtopic-item {
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 0;
+    padding-bottom: 14px;
+  }
+
+  .practice-tab .practice-tab-for-learner-dashboard .card-actions {
+    border-bottom: 1px solid;
+  }
+
+  .practice-tab .practice-tab-for-learner-dashboard .full-width .practice-session-button {
+    bottom: 21px;
+    position: relative;
   }
 
   .practice-tab .font-heavy {
