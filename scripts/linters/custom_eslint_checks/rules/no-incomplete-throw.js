@@ -55,7 +55,7 @@ module.exports = {
     };
 
     return {
-      'ThrowStatement': function(node) {
+      ThrowStatement: function(node) {
         reportThrow(node);
       },
       'MemberExpression[property.name=toThrow]': function(node) {
@@ -64,3 +64,4 @@ module.exports = {
     };
   }
 };
+
