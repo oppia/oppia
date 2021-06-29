@@ -91,7 +91,8 @@ class AdminHandler(base.BaseHandler):
                     'regenerate_topic_related_opportunities',
                     'regenerate_missing_exploration_stats',
                     'update_feature_flag_rules'
-                ]
+                ],
+                'default_value': None
             },
             'exploration_id': {
                 'type': 'basestring',
