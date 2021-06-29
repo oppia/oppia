@@ -168,14 +168,13 @@ angular.module('oppia').directive('oppiaRteOutputDisplay', downgradeComponent({
 }));
 
 /**
- * The directive below is required because of the following reasons:
- * 1. We have &nbsp; in the string. String interpolation is a very safe
- *    operation in angular and these values are changed to show the characters
- *    &nbsp; (they actually show &#160, the machine code for &nbsp;) instead of
- *    whitespace. In order to get around this, I have created this directive and
- *    used it instead of `{{}}` and `[innerHTML]. This is a very safe operation
- *    because I am using TextNodes. It will prevent any HTML injection attacks
- *    including XSS attacks.
+ * The directive below is required because we have &nbsp; in the string. String
+ * interpolation is a very safe operation in angular and these values are
+ * changed to show the characters &nbsp; (they actually show &#160, the machine
+ * code for &nbsp;) instead of whitespace. In order to get around this, the
+ * directive is used instead of `{{}}` and `[innerHTML]`. This is a very safe
+ * operation because of TextNodes. It should prevent all HTML injection attacks
+ * including XSS attacks.
  */
 @Directive({ selector: '[oppiaRteTextNode]' })
 export class OppiaRteTextNodeDirective implements AfterViewInit {
