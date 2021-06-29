@@ -693,7 +693,8 @@ class Exploration(python_utils.OBJECT):
             state = exploration.states[state_name]
 
             state.content = state_domain.SubtitledHtml(
-                sdict['content']['content_id'], sdict['content']['html'])
+                sdict['content']['content_id'], sdict['content']['html'],
+                sdict['content']['image_sizes_in_bytes'])
             state.content.validate()
 
             state.param_changes = [param_domain.ParamChange(
@@ -1859,22 +1860,22 @@ class Exploration(python_utils.OBJECT):
     @classmethod
     def _convert_states_v45_dict_to_v46_dict(cls, exp_id, states_dict):
         """Converts from version 45 to 46. Version 46 contains the attribute
-           image_sizes_in_bytes for subtitled_html.
+        image_sizes_in_bytes for subtitled_html.
 
-           Args:
-               exp_id: str. The id of the exploration to which are linked to.
-               states_dict: dict. A dict where each key-value pair represents,
+        Args:
+            exp_id: str. The id of the exploration to which are linked to.
+            states_dict: dict. A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initialize a
                 State domain object.
 
-            Returns:
+        Returns:
             dict. The converted states_dict.
         """
         for state_dict in states_dict.values():
             image_sizes_in_bytes = {}
             image_filenames = (
-                    html_cleaner.get_image_filenames_from_html_strings(
-                        [state_dict['content']]))
+                html_cleaner.get_image_filenames_from_html_strings(
+                    [state_dict['content']]))
 
             for image_filename in image_filenames:
                 fs = fs_domain.AbstractFileSystem(
@@ -2026,7 +2027,21 @@ class Exploration(python_utils.OBJECT):
 
     @classmethod
     def _convert_v50_dict_to_v51_dict(cls, exp_id, exploration_dict):
+        """Converts a v50 exploration dict into a v51 exploration dict.
+        Version 51 contains image_sizes_in_bytes in exploration state content.
+
+        Args:
+            exp_id: str. ID of the exploration.
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v50.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v51.
+        """
+
         exploration_dict['schema_version'] = 51
+
         exploration_dict['states'] = cls._convert_states_v45_dict_to_v46_dict(
             exp_id, exploration_dict['states'])
         exploration_dict['states_schema_version'] = 46
@@ -2114,7 +2129,8 @@ class Exploration(python_utils.OBJECT):
                 outside the range [EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION,
                 CURRENT_EXP_SCHEMA_VERSION].
         """
-        exploration_dict = cls._migrate_to_latest_yaml_version(yaml_content)
+        exploration_dict = cls._migrate_to_latest_yaml_version(
+            yaml_content, exploration_id)
         exploration_dict['id'] = exploration_id
         return Exploration.from_dict(exploration_dict)
 

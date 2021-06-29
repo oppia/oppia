@@ -1019,7 +1019,8 @@ class InteractionCustomizationArg(python_utils.OBJECT):
 
             if schema_obj_type == schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML:
                 return SubtitledHtml(
-                    ca_value['content_id'], ca_value['html'])
+                    ca_value['content_id'], ca_value['html'],
+                    ca_value['image_sizes_in_bytes'])
 
         ca_value = InteractionCustomizationArg.traverse_by_schema_and_convert(
             ca_schema,
@@ -3213,7 +3214,7 @@ class State(python_utils.OBJECT):
             feconf.DEFAULT_INIT_STATE_CONTENT_STR if is_initial_state else '')
         content_id = feconf.DEFAULT_NEW_STATE_CONTENT_ID
         return cls(
-            SubtitledHtml(content_id, content_html),
+            SubtitledHtml(content_id, content_html, {}),
             [],
             InteractionInstance.create_default_interaction(
                 default_dest_state_name),

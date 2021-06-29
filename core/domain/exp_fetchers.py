@@ -39,7 +39,8 @@ import python_utils
 datastore_services = models.Registry.import_datastore_services()
 
 
-def _migrate_states_schema(versioned_exploration_states, init_state_name, exp_id):
+def _migrate_states_schema(
+        versioned_exploration_states, init_state_name, exp_id):
     """Holds the responsibility of performing a step-by-step, sequential update
     of an exploration states structure based on the schema version of the input
     exploration dictionary. This is very similar to the YAML conversion process
