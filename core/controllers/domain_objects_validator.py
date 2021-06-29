@@ -21,10 +21,7 @@ handler arguments.
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-<<<<<<< HEAD
 from core.domain import config_domain
-=======
->>>>>>> 181c17a81a1492da761cbbaf3352d59fbea357e0
 from core.domain import exp_domain
 
 from typing import Any, Dict # isort:skip  pylint: disable=wrong-import-order, wrong-import-position, unused-import, import-only-modules
@@ -39,7 +36,6 @@ def validate_exploration_change(obj):
     """
     # No explicit call to validate_dict method is necessary, because
     # ExplorationChange calls it while initialization.
-<<<<<<< HEAD
 
     exp_domain.ExplorationChange(obj) # type: ignore[no-untyped-call]
 
@@ -57,6 +53,3 @@ def validate_new_config_property_values(obj):
             raise Exception('%s do not have any schema.' % name)
 
         config_property.normalize(value)
-=======
-    exp_domain.ExplorationChange(obj) # type: ignore[no-untyped-call]
->>>>>>> 181c17a81a1492da761cbbaf3352d59fbea357e0

@@ -285,19 +285,11 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'TopicViewerPage',
     'TopicsAndSkillsDashboardPage',
     'TopicsAndSkillsDashboardPageDataHandler',
-<<<<<<< HEAD
-=======
-    'TrainedClassifierHandler',
->>>>>>> 181c17a81a1492da761cbbaf3352d59fbea357e0
     'TranslatableTextHandler',
     'UnsentFeedbackEmailHandler',
     'UnsubscribeHandler',
     'UpdateQuestionSuggestionHandler',
     'UpdateTranslationSuggestionHandler',
-<<<<<<< HEAD
-=======
-    'UpdateUsernameHandler',
->>>>>>> 181c17a81a1492da761cbbaf3352d59fbea357e0
     'UploadExplorationHandler',
     'UrlHandler',
     'UserContributionRightsDataHandler',
@@ -308,10 +300,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'UsernameCheckHandler',
     'ValidateExplorationsHandler',
     'ValueGeneratorHandler',
-<<<<<<< HEAD
-=======
-    'VerifyUserModelsDeletedHandler'
->>>>>>> 181c17a81a1492da761cbbaf3352d59fbea357e0
     ]
 
 # These handlers do not require any schema validation.
