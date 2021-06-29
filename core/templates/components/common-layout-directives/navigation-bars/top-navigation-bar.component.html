@@ -224,12 +224,6 @@
               User Avatar
             </span>
           </span>
-          <div class="oppia-navbar-dashboard-indicator"
-               *ngIf="numUnseenNotifications > 0">
-            <span class="oppia-navbar-dashboard-indicator-text">
-              {{ numUnseenNotifications }}
-            </span>
-          </div>
           <div class="oppia-navbar-role-indicator"
                *ngIf="isAdmin || isModerator">
             <!--
@@ -291,16 +285,6 @@
              href="/topics-and-skills-dashboard"
              class="dropdown-item nav-link protractor-test-topics-and-skills-dashboard-link">
             <span [innerHTML]="'I18N_TOPNAV_TOPICS_AND_SKILLS_DASHBOARD' | translate"></span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a (click)="closeSubmenuIfNotMobile($event)"
-             href="/notifications"
-             class="dropdown-item nav-link protractor-test-notifications-link">
-            <span [innerHTML]="'I18N_TOPNAV_NOTIFICATIONS' | translate"></span>
-            <span *ngIf="numUnseenNotifications > 0">
-              ({{ numUnseenNotifications }})
-            </span>
           </a>
         </li>
         <li class="nav-item">

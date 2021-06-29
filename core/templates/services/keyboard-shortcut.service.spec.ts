@@ -125,11 +125,6 @@ describe('Keyboard Shortcuts', () => {
     expect(windowRef.nativeWindow.location.href).toBe('');
 
     Mousetrap.trigger('ctrl+5');
-    expect(windowRef.nativeWindow.location.href).toEqual('/notifications');
-    mockWindow.location.href = '';
-    expect(windowRef.nativeWindow.location.href).toBe('');
-
-    Mousetrap.trigger('ctrl+6');
     expect(windowRef.nativeWindow.location.href).toEqual('/preferences');
     mockWindow.location.href = '';
     expect(windowRef.nativeWindow.location.href).toBe('');
