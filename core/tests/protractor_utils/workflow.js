@@ -32,9 +32,9 @@ var imageUploadInput = element(
 var imageSubmitButton = element(
   by.css('.protractor-test-photo-upload-submit'));
 var thumbnailResetButton = element(by.css(
-  '.protractor-thumbnail-reset-button'));
+  '.protractor-test-thumbnail-reset-button'));
 var stateNameText = element(
-  by.css('.oppia-state-name-text'));
+  by.css('.protractor-test-state-name-text'));
 
 // Check if the save roles button is clickable.
 var canAddRolesToUsers = async function() {
@@ -251,7 +251,15 @@ var addExplorationCollaborator = async function(username) {
 };
 
 var addExplorationVoiceArtist = async function(username) {
-  await _addExplorationRole('Voice Artist', username);
+  await action.click('Edit voice artist role button', element(
+    by.css('.protractor-test-edit-voice-artist-roles')));
+  await action.sendKeys(
+    'New voice artist username input',
+    element(by.css('.protractor-test-new-voice-artist-username')), username);
+  await action.click('Add voice artist button', element(
+    by.css('.protractor-test-add-voice-artist-role-button')));
+  await waitFor.visibilityOf(element(by.css(
+    '.protractor-test-voice-artist-' + username)));
 };
 
 var addExplorationPlaytester = async function(username) {
