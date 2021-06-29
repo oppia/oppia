@@ -51,7 +51,7 @@ var SkillEditorPage = function() {
   var deleteWorkedExampleButton = function(index) {
     return element(
       by.css('.protractor-test-worked-example-' + index))
-      .element(by.css('.oppia-delete-example-button'));
+      .element(by.css('.protractor-test-delete-example-button'));
   };
   var confirmDeleteWorkedExample = element(
     by.css('.protractor-test-confirm-delete-worked-example-button'));
@@ -74,7 +74,7 @@ var SkillEditorPage = function() {
   var deleteMisconceptionButton = function(index) {
     return element(
       by.css('.protractor-test-misconception-' + index))
-      .element(by.css('.oppia-delete-example-button'));
+      .element(by.css('.protractor-test-delete-example-button'));
   };
   var confirmDeleteMisconception =
     element(by.css('.protractor-test-confirm-delete-misconception-button'));

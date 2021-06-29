@@ -20,7 +20,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed, waitForAsync } from '@angular/core/testing';
 import { Subtopic } from 'domain/topic/subtopic.model';
 import { TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
-import { SubtopicValidationService } from './subtopic-validation-service';
+import { SubtopicValidationService } from './subtopic-validation.service';
 import { TopicEditorStateService } from './topic-editor-state.service';
 
 describe('Subtopic validation service', () => {

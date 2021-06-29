@@ -42,7 +42,7 @@ import { AngularNameService } from
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { AlertsService } from 'services/alerts.service';
-import { importAllAngularServices, setupAndGetUpgradedComponentAsync } from 'tests/unit-test-utils';
+import { importAllAngularServices, setupAndGetUpgradedComponentAsync } from 'tests/unit-test-utils.ajs';
 import { ExplorationDataService } from '../services/exploration-data.service';
 import { ParamChangesEditorDirective } from './param-changes-editor.component';
 
