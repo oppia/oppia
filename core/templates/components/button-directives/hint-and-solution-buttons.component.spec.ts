@@ -44,6 +44,7 @@ describe('HintAndSolutionButtonsComponent', () => {
   let hintAndSolutionModalService: HintAndSolutionModalService;
   let explorationPlayerStateService: ExplorationPlayerStateService;
   let statsReportingService: StatsReportingService;
+
   let newCard: StateCard;
   let audioTranslationLanguageService: AudioTranslationLanguageService;
 
@@ -162,8 +163,8 @@ describe('HintAndSolutionButtonsComponent', () => {
     let oldCard: StateCard = StateCard.createNewCard(
       'State 1', '<p>Content</p>', '<interaction></interaction>',
       null, RecordedVoiceovers.createEmpty(),
-      writtenTranslationsObjectFactory.createEmpty(), 'content',
-      audioTranslationLanguageService);
+      writtenTranslationsObjectFactory.createEmpty(),
+      'content', audioTranslationLanguageService);
     spyOn(hintsAndSolutionManagerService, 'getNumHints').and.returnValue(1);
 
     component.displayedCard = oldCard;
