@@ -36,7 +36,6 @@ platformBrowserDynamic().bootstrapModule(TopicLandingPageModule).catch(
   (err) => console.error(err)
 );
 
-
 // This prevents angular pages to cause side effects to hybrid pages.
 // TODO(#13080): Remove window.name statement from import.ts files
 // after migration is complete.

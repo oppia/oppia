@@ -39,11 +39,13 @@ import { TopicLandingPageRootComponent } from './topic-landing-page-root.compone
   ],
   declarations: [
     OppiaAngularRootComponent,
-    TopicLandingPageComponent
+    TopicLandingPageComponent,
+    TopicLandingPageRootComponent
   ],
   entryComponents: [
     OppiaAngularRootComponent,
-    TopicLandingPageComponent
+    TopicLandingPageComponent,
+    TopicLandingPageRootComponent
   ],
   providers: [
     {
