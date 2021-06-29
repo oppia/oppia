@@ -24,7 +24,7 @@ import { CreatorExplorationSummary } from 'domain/summary/creator-exploration-su
 import { ProfileSummary } from 'domain/user/profile-summary.model';
 import { Suggestion } from 'domain/suggestion/suggestion.model';
 import { ThreadMessage } from 'domain/feedback_message/ThreadMessage.model';
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 require('pages/creator-dashboard-page/creator-dashboard-page.component.ts');
 
