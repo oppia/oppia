@@ -31,10 +31,6 @@ import { AudioTranslationLanguageService, ExplorationLanguageInfo } from '../ser
 import { AudioTranslationManagerService } from '../services/audio-translation-manager.service';
 import { PlayerPositionService } from '../services/player-position.service';
 
-interface Track {
-  progress: (progressPercentage: number) => number;
-}
-
 @Component({
   selector: 'oppia-audio-bar',
   templateUrl: './audio-bar.component.html'
@@ -49,7 +45,6 @@ export class AudioBarComponent {
   audioLoadingIndicatorIsShown: boolean = false;
   explorationPlayerModeIsActive: boolean;
   selectedLanguage: { value: string };
-  track: Track;
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
@@ -68,15 +63,6 @@ export class AudioBarComponent {
       .getLanguageOptionsForDropdown();
     this.selectedLanguage = {
       value: this.audioTranslationLanguageService.getCurrentAudioLanguageCode()
-    };
-
-    this.track = {
-      progress: (progressPercentage: number) => {
-        if (progressPercentage) {
-          this.audioPlayerService.setProgress(progressPercentage / 100);
-        }
-        return this.audioPlayerService.getProgress() * 100;
-      }
     };
   }
 
