@@ -44,10 +44,14 @@ export class ContextService {
   static imageSaveDestination: string = (
     AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
 
+  // Page Context is null initially when no shared service exist.
   pageContext: string | null = null;
+  // Null ExplorationId implies that no exploration has been created.
   explorationId: string | null = null;
   explorationIsLinkedToStory: boolean = false;
   questionPlayerIsManuallySet: boolean = false;
+  // Context of the editor is null until initialized by init fuctions
+  // at respective editors.
   editorContext: string | null = null;
   // Depending on this value, new images can be either saved in the localStorage
   // or uploaded directly to the datastore.

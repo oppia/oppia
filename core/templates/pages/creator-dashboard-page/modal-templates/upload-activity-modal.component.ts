@@ -20,7 +20,7 @@ import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AlertsService } from 'services/alerts.service';
 
-interface explorationObj {
+interface ExplorationObj {
   yamlFile: File | null
 }
 
@@ -34,7 +34,7 @@ export class UploadActivityModalComponent {
      private activeModal: NgbActiveModal
   ) {}
   save(): void {
-    let returnObj: explorationObj = {
+    let returnObj: ExplorationObj = {
       yamlFile: null
     };
     let label =
