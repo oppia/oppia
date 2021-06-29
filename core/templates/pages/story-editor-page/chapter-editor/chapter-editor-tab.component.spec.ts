@@ -25,7 +25,7 @@ import { EditableStoryBackendApiService } from
 import { StoryEditorNavigationService } from
   'pages/story-editor-page/services/story-editor-navigation.service';
 import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 describe('Chapter Editor tab', function() {
   var $scope = null;

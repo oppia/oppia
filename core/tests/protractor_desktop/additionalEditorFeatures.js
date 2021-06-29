@@ -67,7 +67,7 @@ describe('Full exploration editor', function() {
 
       await workflow.createExploration(true);
 
-      var postTutorialPopover = element(by.css('.popover-content'));
+      var postTutorialPopover = element(by.css('.ng-joyride .popover-content'));
       var stateEditButton = element(
         by.css('.protractor-test-edit-content-pencil-button'));
       await waitFor.invisibilityOf(
@@ -83,7 +83,8 @@ describe('Full exploration editor', function() {
 
       var content = 'line1\n\n\n\nline2\n\n\n\nline3\n\n\nline4';
 
-      var heightMessage = element(by.css('.oppia-card-height-limit-warning'));
+      var heightMessage = element(
+        by.css('.protractor-test-card-height-limit-warning'));
       await richTextEditor.appendPlainText(content);
       expect(await heightMessage.isPresent()).toBe(false);
 
@@ -99,7 +100,7 @@ describe('Full exploration editor', function() {
         heightMessage, 'Card height limit message not displayed');
 
       var hideHeightWarningIcon = element(
-        by.css('.oppia-hide-card-height-warning-icon'));
+        by.css('.protractor-test-hide-card-height-warning-icon'));
       await action.click('Hide Height Warning icon', hideHeightWarningIcon);
       await waitFor.invisibilityOf(
         heightMessage, 'Height message taking too long to disappear.');
