@@ -36,7 +36,13 @@ import { Schema } from 'services/schema-default-value.service';
 
 
 interface UserRolesBackendResponse {
-  [username: string]: string[];
+  roles: string[];
+  topic_ids: string[];
+  banned: boolean;
+}
+
+interface UpdatableRolesBackendResponse {
+  [role: string]: string;
 }
 
 interface RoleToActionsBackendResponse {
@@ -125,10 +131,10 @@ export interface AdminPageDataBackendDict {
   'demo_collections': string[][];
   'demo_exploration_ids': string[];
   'human_readable_current_time': string;
-  'updatable_roles': UserRolesBackendResponse;
+  'updatable_roles': UpdatableRolesBackendResponse;
   'role_to_actions': RoleToActionsBackendResponse;
   'config_properties': ConfigPropertiesBackendResponse;
-  'viewable_roles': UserRolesBackendResponse;
+  'viewable_roles': string[];
   'topic_summaries': CreatorTopicSummaryBackendDict[];
   'feature_flags': PlatformParameterBackendDict[];
 }
@@ -137,10 +143,10 @@ export interface AdminPageData {
   demoExplorations: string[][];
   demoCollections: string[][];
   demoExplorationIds: string[];
-  updatableRoles: UserRolesBackendResponse;
+  updatableRoles: UpdatableRolesBackendResponse;
   roleToActions: RoleToActionsBackendResponse;
   configProperties: ConfigPropertiesBackendResponse;
-  viewableRoles: UserRolesBackendResponse;
+  viewableRoles: string[];
   topicSummaries: CreatorTopicSummary[];
   featureFlags: PlatformParameter[];
 }
@@ -249,7 +255,7 @@ export class AdminBackendApiService {
             role: newRole,
             username: username,
             topic_id: topicId,
-            remove_from_all_topics: removeFromAllTopics
+            remove_from_all_topics: removeFromAllTopics ? 'true' : 'false'
           }
         }
       ).toPromise().then(resolve, errorResponse => {

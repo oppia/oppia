@@ -75,9 +75,7 @@ describe('Admin backend api service', () => {
         'welcome.yaml'
       ]
     ],
-    viewable_roles: {
-      TOPIC_MANAGER: 'topic manager'
-    },
+    viewable_roles: ['topic manager'],
     feature_flags: [{
       name: 'dummy_feature',
       description: 'this is a dummy feature',
