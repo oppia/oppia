@@ -144,7 +144,7 @@ class ActivityRightsTests(test_utils.GenericTestBase):
             self.owner, None))
 
     def test_check_cannot_modify_activity_roles_with_no_activity_rights(self):
-        self.assertFalse(rights_manager.check_can_modify_activity_roles(
+        self.assertFalse(rights_manager.check_can_modify_core_activity_roles(
             self.owner, None))
 
     def test_check_cannot_release_ownership_with_no_activity_rights(self):
@@ -224,6 +224,13 @@ class ActivityRightsTests(test_utils.GenericTestBase):
             Exception, 'This user already owns this exploration.'):
             self.activity_rights.assign_new_role(
                 '123456', rights_domain.ROLE_OWNER)
+
+        self.activity_rights.assign_new_role(
+            '123456', rights_domain.ROLE_EDITOR)
+        with self.assertRaisesRegexp(
+            Exception, 'This user already can edit this exploration.'):
+            self.activity_rights.assign_new_role(
+                '123456', rights_domain.ROLE_EDITOR)
 
     def test_cannot_assign_viewer_to_public_exp(self):
         self.activity_rights.owner_ids = []

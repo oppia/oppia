@@ -478,7 +478,7 @@ def check_can_access_activity(user, activity_rights):
     Args:
         user: UserActionsInfo. Object having user_id, role and actions for
             given user.
-        activity_rights: AcitivityRights or None. Rights object for the given
+        activity_rights: ActivityRights or None. Rights object for the given
             activity.
 
     Returns:
@@ -566,6 +566,27 @@ def check_can_voiceover_activity(user, activity_rights):
     return False
 
 
+def check_can_manage_voice_artist_in_activity(user, activity_rights):
+    """Check whether the user can manage voice artist for an activity.
+
+    Args:
+        user: UserActionInfo. Object having user_id, role, and actions for
+            given user.
+        activity_rights: ActivityRights or None. Rights object for the given
+            activity.
+
+    Returns:
+        bool. Whether the user can assign voice artist.
+    """
+    if activity_rights is None:
+        return False
+    elif (role_services.ACTION_CAN_MANAGE_VOICE_ARTIST in user.actions and (
+            activity_rights.community_owned or activity_rights.is_published())):
+        return True
+    else:
+        return False
+
+
 def check_can_save_activity(user, activity_rights):
     """Checks whether the user can save given activity.
 
@@ -611,8 +632,9 @@ def check_can_delete_activity(user, activity_rights):
     return False
 
 
-def check_can_modify_activity_roles(user, activity_rights):
-    """Checks whether the user can modify roles for given activity.
+def check_can_modify_core_activity_roles(user, activity_rights):
+    """Checks whether the user can modify core roles for the given activity. The
+    core roles for an activity includes owner, editor etc.
 
     Args:
         user: UserActionsInfo. Object having user_id, role and actions for
@@ -630,10 +652,10 @@ def check_can_modify_activity_roles(user, activity_rights):
             activity_rights.cloned_from):
         return False
 
-    if (role_services.ACTION_MODIFY_ROLES_FOR_ANY_ACTIVITY in
+    if (role_services.ACTION_MODIFY_CORE_ROLES_FOR_ANY_ACTIVITY in
             user.actions):
         return True
-    if (role_services.ACTION_MODIFY_ROLES_FOR_OWNED_ACTIVITY in
+    if (role_services.ACTION_MODIFY_CORE_ROLES_FOR_OWNED_ACTIVITY in
             user.actions):
         if activity_rights.is_owner(user.user_id):
             return True
@@ -658,7 +680,7 @@ def check_can_release_ownership(user, activity_rights):
     if activity_rights.is_private():
         return False
 
-    return check_can_modify_activity_roles(
+    return check_can_modify_core_activity_roles(
         user, activity_rights)
 
 
@@ -753,7 +775,16 @@ def _assign_role(
     committer_id = committer.user_id
     activity_rights = _get_activity_rights(activity_type, activity_id)
 
-    if not check_can_modify_activity_roles(committer, activity_rights):
+    user_can_assign_role = False
+    if new_role == rights_domain.ROLE_VOICE_ARTIST and (
+            activity_type == constants.ACTIVITY_TYPE_EXPLORATION):
+        user_can_assign_role = check_can_manage_voice_artist_in_activity(
+            committer, activity_rights)
+    else:
+        user_can_assign_role = check_can_modify_core_activity_roles(
+            committer, activity_rights)
+
+    if not user_can_assign_role:
         logging.error(
             'User %s tried to allow user %s to be a(n) %s of activity %s '
             'but was refused permission.' % (
@@ -873,7 +904,16 @@ def _deassign_role(committer, removed_user_id, activity_id, activity_type):
     committer_id = committer.user_id
     activity_rights = _get_activity_rights(activity_type, activity_id)
 
-    if not check_can_modify_activity_roles(committer, activity_rights):
+    user_can_deassign_role = False
+    if activity_rights.is_voice_artist(removed_user_id) and (
+            activity_type == constants.ACTIVITY_TYPE_EXPLORATION):
+        user_can_deassign_role = check_can_manage_voice_artist_in_activity(
+            committer, activity_rights)
+    else:
+        user_can_deassign_role = check_can_modify_core_activity_roles(
+            committer, activity_rights)
+
+    if not user_can_deassign_role:
         logging.error(
             'User %s tried to remove user %s from an activity %s '
             'but was refused permission.' % (

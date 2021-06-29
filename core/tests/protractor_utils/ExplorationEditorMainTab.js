@@ -79,7 +79,7 @@ var ExplorationEditorMainTab = function() {
     by.css('.protractor-test-open-outcome-dest-editor'));
   var openOutcomeFeedBackEditor = element(
     by.css('.protractor-test-open-outcome-feedback-editor'));
-  var postTutorialPopover = element(by.css('.popover-content'));
+  var postTutorialPopover = element(by.css('.ng-joyride .popover-content'));
   var responseBody = function(responseNum) {
     return element(by.css('.protractor-test-response-body-' + responseNum));
   };
@@ -160,7 +160,7 @@ var ExplorationEditorMainTab = function() {
       editorWelcomeModal, 'Editor Welcome modal takes too long to disappear');
 
     // Otherwise, if the editor tutorial shows up, exit it.
-    var buttons = element.all(by.css('.skipBtn'));
+    var buttons = element.all(by.css('.ng-joyride .skipBtn'));
     if (await buttons.count() === 1) {
       await action.click('Skip button', buttons.get(0));
     } else if (await buttons.count() !== 0) {
@@ -199,7 +199,8 @@ var ExplorationEditorMainTab = function() {
       await waitFor.visibilityOf(
         tutorialTabHeadingElement, 'Tutorial: ' + HEADING + 'is not visible');
       // Progress to the next instruction in the tutorial.
-      var nextTutorialStageButtons = element.all(by.css('.nextBtn'));
+      var nextTutorialStageButtons = element.all(
+        by.css('.ng-joyride .nextBtn'));
       await waitFor.elementToBeClickable(
         nextTutorialStageButtons.first(),
         'Next Tutorial Stage button is not clickable');
@@ -296,8 +297,8 @@ var ExplorationEditorMainTab = function() {
       if (responseNum === 'default') {
         headerElem = defaultResponseTab;
       } else {
-        await waitFor.visibilityOf(await responseTab.first());
-        headerElem = await responseTab.get(
+        await waitFor.visibilityOf(responseTab.first());
+        headerElem = responseTab.get(
           responseNum);
       }
 
@@ -764,7 +765,7 @@ var ExplorationEditorMainTab = function() {
     var answerDescriptionFragment = element.all(
       by.css('.protractor-test-answer-description-fragment'));
     for (var i = 0; i < parameterValues.length; i++) {
-      var parameterElement = await answerDescriptionFragment.get(i * 2 + 1);
+      var parameterElement = answerDescriptionFragment.get(i * 2 + 1);
       var parameterEditor = await forms.getEditor(
         parameterTypes[i])(parameterElement);
 
@@ -837,7 +838,7 @@ var ExplorationEditorMainTab = function() {
     var answerDescription = element(
       by.css('.protractor-test-answer-description'));
     await action.click('Answer Description', answerDescription);
-    var ruleDropdownElement = await element.all(by.cssContainingText(
+    var ruleDropdownElement = element.all(by.cssContainingText(
       '.select2-results__option', ruleDescriptionInDropdown)).first();
     await action.click('Rule Dropdown Element', ruleDropdownElement);
   };

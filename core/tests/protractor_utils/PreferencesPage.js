@@ -29,7 +29,7 @@ var PreferencesPage = function() {
     by.css('.protractor-test-editor-role-email-checkbox'));
   var feedbackMessageEmailsCheckbox = element(
     by.css('.protractor-test-feedback-message-email-checkbox'));
-  var navBar = element(by.css('.oppia-navbar-dropdown-toggle'));
+  var navBar = element(by.css('.protractor-test-navbar-dropdown-toggle'));
   var pageHeader = element(by.css('.protractor-test-preferences-title'));
   var preferredAudioLanguageSelector = element(
     by.css('.protractor-test-preferred-audio-language-selector'));
