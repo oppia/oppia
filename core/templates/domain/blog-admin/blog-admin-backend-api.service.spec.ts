@@ -21,7 +21,7 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { BlogAdminPageData, BlogAdminBackendApiService } from './blog-admin-backend-api.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 
-fdescribe('Blog Admin backend api service', () => {
+describe('Blog Admin backend api service', () => {
   let babas: BlogAdminBackendApiService;
   let httpTestingController: HttpTestingController;
   let csrfService: CsrfTokenService = null;
