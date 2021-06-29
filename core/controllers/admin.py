@@ -81,7 +81,7 @@ class AdminHandler(base.BaseHandler):
         'GET': {},
         'POST': {
             'action': {
-                'type': 'string',
+                'type': 'basestring',
                 'choices': [
                     'reload_exploration', 'reload_collection',
                     'generate_dummy_explorations', 'clear_search_index',
@@ -92,15 +92,14 @@ class AdminHandler(base.BaseHandler):
                     'cancel_job', 'regenerate_topic_related_opportunities',
                     'start_new_job', 'regenerate_missing_exploration_stats',
                     'update_feature_flag_rules'
-                ],
-                'default_value': None
+                ]
             },
             'exploration_id': {
-                'type': 'string',
+                'type': 'basestring',
                 'default_value': None
             },
             'collection_id': {
-                'type': 'string',
+                'type': 'basestring',
                 'default_value': None
             },
             'num_dummy_exps_to_generate': {
@@ -118,35 +117,23 @@ class AdminHandler(base.BaseHandler):
                 'default_value': None
             },
             'config_property_id': {
-                'type': 'string',
-                'default_value': None
-            },
-            'job_type': {
-                'type': 'string',
-                'default_value': None
-            },
-            'job_id': {
-                'type': 'string',
-                'default_value': None
-            },
-            'computation_type': {
-                'type': 'string',
+                'type': 'basestring',
                 'default_value': None
             },
             'data': {
-                'type': 'string',
+                'type': 'basestring',
                 'default_value': None
             },
             'topic_id': {
-                'type': 'string',
+                'type': 'basestring',
                 'default_value': None
             },
             'feature_name': {
-                'type': 'string',
+                'type': 'basestring',
                 'default_value': None
             },
             'commit_message': {
-                'type': 'string',
+                'type': 'basestring',
                 'default_value': None
             },
             'new_rules': {
@@ -170,10 +157,6 @@ class AdminHandler(base.BaseHandler):
                         }
                     }]
                 },
-                'default_value': None
-            },
-            'exp_id': {
-                'type': 'string',
                 'default_value': None
             }
         }
@@ -218,19 +201,19 @@ class AdminHandler(base.BaseHandler):
     @acl_decorators.can_access_admin_page
     def post(self):
         """Handles POST requests."""
-        action = self.payload.get('action')
+        action = self.normalized_payload.get('action')
         try:
             result = {}
             if action == 'reload_exploration':
-                exploration_id = self.payload.get('exploration_id')
+                exploration_id = self.normalized_payload.get('exploration_id')
                 self._reload_exploration(exploration_id)
             elif action == 'reload_collection':
-                collection_id = self.payload.get('collection_id')
+                collection_id = self.normalized_payload.get('collection_id')
                 self._reload_collection(collection_id)
             elif action == 'generate_dummy_explorations':
-                num_dummy_exps_to_generate = self.payload.get(
+                num_dummy_exps_to_generate = self.normalized_payload.get(
                     'num_dummy_exps_to_generate')
-                num_dummy_exps_to_publish = self.payload.get(
+                num_dummy_exps_to_publish = self.normalized_payload.get(
                     'num_dummy_exps_to_publish')
 
                 if num_dummy_exps_to_generate < num_dummy_exps_to_publish:
@@ -247,7 +230,7 @@ class AdminHandler(base.BaseHandler):
             elif action == 'generate_dummy_new_skill_data':
                 self._generate_dummy_skill_and_questions()
             elif action == 'save_config_properties':
-                new_config_property_values = self.payload.get(
+                new_config_property_values = self.normalized_payload.get(
                     'new_config_property_values')
                 logging.info(
                     '[ADMIN] %s saved config property values: %s' %
@@ -255,19 +238,18 @@ class AdminHandler(base.BaseHandler):
                 for (name, value) in new_config_property_values.items():
                     config_services.set_property(self.user_id, name, value)
             elif action == 'revert_config_property':
-                config_property_id = (
-                    self.payload.get(
-                        'config_property_id'))
+                config_property_id = (self.normalized_payload.get(
+                    'config_property_id'))
                 logging.info(
                     '[ADMIN] %s reverted config property: %s' %
                     (self.user_id, config_property_id))
                 config_services.revert_property(
                     self.user_id, config_property_id)
             elif action == 'upload_topic_similarities':
-                data = self.payload.get('data')
+                data = self.normalized_payload.get('data')
                 recommendations_services.update_topic_similarities(data)
             elif action == 'regenerate_topic_related_opportunities':
-                topic_id = self.payload.get('topic_id')
+                topic_id = self.normalized_payload.get('topic_id')
                 opportunities_count = (
                     opportunity_services
                     .regenerate_opportunities_related_to_topic(
@@ -275,24 +257,11 @@ class AdminHandler(base.BaseHandler):
                 result = {
                     'opportunities_count': opportunities_count
                 }
-            elif self.payload.get('action') == 'update_feature_flag_rules':
-                feature_name = self.payload.get('feature_name')
-                new_rule_dicts = self.payload.get('new_rules')
-                commit_message = self.payload.get('commit_message')
-                if not isinstance(feature_name, python_utils.BASESTRING):
-                    raise self.InvalidInputException(
-                        'feature_name should be string, received \'%s\'.' % (
-                            feature_name))
-                elif not isinstance(commit_message, python_utils.BASESTRING):
-                    raise self.InvalidInputException(
-                        'commit_message should be string, received \'%s\'.' % (
-                            commit_message))
-                elif (not isinstance(new_rule_dicts, list) or not all(
-                        [isinstance(rule_dict, dict)
-                         for rule_dict in new_rule_dicts])):
-                    raise self.InvalidInputException(
-                        'new_rules should be a list of dicts, received'
-                        ' \'%s\'.' % new_rule_dicts)
+            elif self.normalized_payload.get('action') == 'update_feature_flag_rules':
+                feature_name = self.normalized_payload.get('feature_name')
+                new_rule_dicts = self.normalized_payload.get('new_rules')
+                commit_message = self.normalized_payload.get('commit_message')
+
                 try:
                     feature_services.update_feature_flag_rules(
                         feature_name, self.user_id, commit_message,
@@ -689,27 +658,30 @@ class AdminRoleHandler(base.BaseHandler):
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'filter_criterion': {
-                'type': 'string',
-                'choices': ['role', 'username']
+                'type': 'basestring',
+                'choices': [
+                    feconf.USER_FILTER_CRITERION_ROLE,
+                    feconf.USER_FILTER_CRITERION_USERNAME
+                ]
             },
             'role': {
-                'type': 'string',
+                'type': 'basestring',
                 'default_value': None
             },
             'username': {
-                'type': 'string',
+                'type': 'basestring',
                 'default_value': None
             }
         },
         'POST': {
             'role': {
-                'type': 'string'
+                'type': 'basestring'
             },
             'username': {
-                'type': 'string'
+                'type': 'basestring'
             },
             'topic_id': {
-                'type': 'string',
+                'type': 'basestring',
                 'default_value': None
             }
         }
@@ -744,15 +716,12 @@ class AdminRoleHandler(base.BaseHandler):
                 username: user_services.get_user_role_from_id(user_id)
             }
             self.render_json(user_role_dict)
-        else:
-            raise self.InvalidInputException(
-                'Invalid filter criterion to view roles.')
 
     @acl_decorators.can_access_admin_page
     def post(self):
-        username = self.payload.get('username')
-        role = self.payload.get('role')
-        topic_id = self.payload.get('topic_id')
+        username = self.normalized_payload.get('username')
+        role = self.normalized_payload.get('role')
+        topic_id = self.normalized_payload.get('topic_id')
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
             raise self.InvalidInputException(
@@ -787,12 +756,12 @@ class AdminSuperAdminPrivilegesHandler(base.BaseHandler):
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
             'username': {
-                'type': 'string'
+                'type': 'basestring'
             }
         },
         'DELETE': {
             'username': {
-                'type': 'string'
+                'type': 'basestring'
             }
         }
     }
@@ -803,7 +772,7 @@ class AdminSuperAdminPrivilegesHandler(base.BaseHandler):
             raise self.UnauthorizedUserException(
                 'Only the default system admin can manage super admins')
 
-        username = self.payload.get('username')
+        username = self.normalized_payload.get('username')
 
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
@@ -854,16 +823,16 @@ class DataExtractionQueryHandler(base.BaseHandler):
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'exp_id': {
-                'type': 'string'
+                'type': 'basestring'
             },
             'exp_version': {
-                'type': 'string'
+                'type': 'basestring'
             },
             'state_name': {
-                'type': 'string'
+                'type': 'basestring'
             },
             'num_answers': {
-                'type': 'string'
+                'type': 'basestring'
             }
         }
     }
@@ -916,17 +885,19 @@ class AddContributionRightsHandler(base.BaseHandler):
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
             'username': {
-                'type': 'string'
+                'type': 'basestring'
             },
             'category': {
-                'type': 'string',
+                'type': 'basestring',
                 'choices': [
-                    'translation', 'voiceover',
-                    'question', 'submit_question'
+                    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+                    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
+                    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
+                    constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION
                 ]
             },
             'language_code': {
-                'type': 'string',
+                'type': 'basestring',
                 'validators': [{
                     'id': 'is_supported_audio_language_code'
                 }],
@@ -937,14 +908,14 @@ class AddContributionRightsHandler(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def post(self):
-        username = self.payload.get('username')
+        username = self.normalized_payload.get('username')
         user_id = user_services.get_user_id_from_username(username)
 
         if user_id is None:
             raise self.InvalidInputException('Invalid username: %s' % username)
 
-        category = self.payload.get('category')
-        language_code = self.payload.get('language_code')
+        category = self.normalized_payload.get('category')
+        language_code = self.normalized_payload.get('language_code')
 
         if category == constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION:
             if user_services.can_review_translation_suggestions(
@@ -993,22 +964,27 @@ class RemoveContributionRightsHandler(base.BaseHandler):
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
             'username': {
-                'type': 'string'
+                'type': 'basestring'
             },
             'removal_type': {
-                'type': 'string',
-                'choices': ['all', 'specific']
+                'type': 'basestring',
+                'choices': [
+                    constants.ACTION_REMOVE_ALL_REVIEW_RIGHTS,
+                    constants.ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS
+                ]
             },
             'category': {
-                'type': 'string',
+                'type': 'basestring',
                 'choices': [
-                    'translation', 'voiceover',
-                    'question', 'submit_question'
+                    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+                    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
+                    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
+                    constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION
                 ],
                 'default_value': None
             },
             'language_code': {
-                'type': 'string',
+                'type': 'basestring',
                 'validators': [{
                     'id': 'is_supported_audio_language_code'
                 }],
@@ -1019,20 +995,20 @@ class RemoveContributionRightsHandler(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def put(self):
-        username = self.payload.get('username')
+        username = self.normalized_payload.get('username')
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
             raise self.InvalidInputException(
                 'Invalid username: %s' % username)
 
-        language_code = self.payload.get('language_code')
+        language_code = self.normalized_payload.get('language_code')
 
-        removal_type = self.payload.get('removal_type')
+        removal_type = self.normalized_payload.get('removal_type')
         if removal_type == constants.ACTION_REMOVE_ALL_REVIEW_RIGHTS:
             user_services.remove_contribution_reviewer(user_id)
         elif (removal_type ==
               constants.ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS):
-            category = self.payload.get('category')
+            category = self.normalized_payload.get('category')
             if (category ==
                     constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION):
                 if not user_services.can_review_translation_suggestions(
@@ -1085,14 +1061,16 @@ class ContributorUsersListHandler(base.BaseHandler):
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'category': {
-                'type': 'string',
+                'type': 'basestring',
                 'choices': [
-                    'translation', 'voiceover',
-                    'question', 'submit_question'
+                    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+                    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
+                    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
+                    constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION
                 ]
             },
             'language_code': {
-                'type': 'string',
+                'type': 'basestring',
                 'validators': [{
                     'id': 'is_supported_audio_language_code'
                 }],
@@ -1119,7 +1097,7 @@ class ContributionRightsDataHandler(base.BaseHandler):
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'username': {
-                'type': 'string'
+                'type': 'basestring'
             }
         }
     }
@@ -1166,10 +1144,10 @@ class UpdateUsernameHandler(base.BaseHandler):
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
             'old_username': {
-                'type': 'string'
+                'type': 'basestring'
             },
             'new_username': {
-                'type': 'string',
+                'type': 'basestring',
                 'validators': [{
                     'id': 'is_length_atmost',
                     'max_value': (constants.MAX_USERNAME_LENGTH - 1)
@@ -1180,8 +1158,8 @@ class UpdateUsernameHandler(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def put(self):
-        old_username = self.payload.get('old_username')
-        new_username = self.payload.get('new_username')
+        old_username = self.normalized_payload.get('old_username')
+        new_username = self.normalized_payload.get('new_username')
 
         user_id = user_services.get_user_id_from_username(old_username)
         if user_id is None:
@@ -1222,7 +1200,7 @@ class VerifyUserModelsDeletedHandler(base.BaseHandler):
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'user_id': {
-                'type': 'string'
+                'type': 'basestring'
             }
         }
     }
@@ -1243,10 +1221,10 @@ class DeleteUserHandler(base.BaseHandler):
     HANDLER_ARGS_SCHEMAS = {
         'DELETE': {
             'user_id': {
-                'type': 'string'
+                'type': 'basestring'
             },
             'username': {
-                'type': 'string'
+                'type': 'basestring'
             }
         }
     }

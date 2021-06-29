@@ -41,6 +41,7 @@ def validate_exploration_change(obj):
 
 
 def validate_new_config_property_values(obj):
+    # type: (Dict[Any, Any]) -> None
     """Validates new config property values.
 
     Args:
@@ -48,7 +49,7 @@ def validate_new_config_property_values(obj):
         to be validated.
     """
     for (name, value) in obj.items():
-        config_property = config_domain.Registry.get_config_property(name)
+        config_property = config_domain.Registry.get_config_property(name) # type: ignore[no-untyped-call]
         if config_property is None:
             raise Exception('%s do not have any schema.' % name)
 

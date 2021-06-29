@@ -54,14 +54,14 @@ class TrainedClassifierHandler(base.OppiaMLVMHandler):
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'exploration_id': {
-                'type': 'string'
+                'type': 'basestring'
             },
             'exploration_version': {
                 'type': 'int',
                 'default_value': None
             },
             'state_name': {
-                'type': 'string'
+                'type': 'basestring'
             }
         },
         'POST': {}
@@ -204,13 +204,13 @@ class NextJobHandler(base.OppiaMLVMHandler):
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
             'vm_id': {
-                'type': 'string'
+                'type': 'basestring'
             },
             'message': {
-                'type': 'string'
+                'type': 'basestring'
             },
             'signature': {
-                'type': 'string'
+                'type': 'basestring'
             }
         }
     }
