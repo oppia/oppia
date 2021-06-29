@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Lint check to report incomplete 'throw' and 'toThrow'.
+ * @fileoverview Lint check to report incomplete 'toThrow'.
  */
 
 'use strict';
@@ -22,44 +22,24 @@ module.exports = {
   meta: {
     type: 'problem',
     docs: {
-      description: 'Lint check to report incomplete "throw" and "toThrow".',
+      description: 'Lint check to report incomplete "toThrow".',
       category: 'Possible Errors',
       recommended: true,
     },
     fixable: null,
     schema: [],
     messages: {
-      useThrowNewError: 'Please use "throw new Error" instead of "throw".',
       useToThrowError: 'Please use “toThrowError”  instead of “toThrow”.'
     },
   },
 
   create: function(context) {
-    var reportThrow = function(node) {
-      var typesOfError = (
-        ['Error', 'TypeError', 'RangeError', 'SyntaxError', 'DimensionError']);
-      if (node.argument.type !== 'NewExpression' ||
-        typesOfError.indexOf(node.argument.callee.name) === -1) {
-        context.report({
-          node: node,
-          messageId: 'useThrowNewError'
-        });
-      }
-    };
-
-    var reportToThrow = function(node) {
-      context.report({
-        node: node.property,
-        messageId: 'useToThrowError'
-      });
-    };
-
     return {
-      ThrowStatement: function(node) {
-        reportThrow(node);
-      },
       'MemberExpression[property.name=toThrow]': function(node) {
-        reportToThrow(node);
+        context.report({
+          node: node.property,
+          messageId: 'useToThrowError'
+        });
       }
     };
   }

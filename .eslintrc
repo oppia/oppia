@@ -282,6 +282,7 @@
     "no-undef": [
       "off"
     ],
+    "no-throw-literal": "error",
     "no-unused-vars": [
       "off"
     ],

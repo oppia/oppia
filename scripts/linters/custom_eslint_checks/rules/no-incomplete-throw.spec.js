@@ -51,23 +51,6 @@ ruleTester.run('no-incomplete-throw', rule, {
   invalid: [
     {
       code:
-        `angular.module('oppia').directive('codemirrorMergeview', [
-        function() {
-          return {
-            link: function(scope, element, attrs) {
-              if (angular.isUndefined(window.CodeMirror)) {
-                throw Error('CodeMirror not found.');
-              }
-            }
-          };
-        }]
-        );`,
-      errors: [{
-        message: 'Please use "throw new Error" instead of "throw".'
-      }]
-    },
-    {
-      code:
         `describe('Build questions', function() {
           it('should forbid the use of reserved words', function() {
             expect(function() {
