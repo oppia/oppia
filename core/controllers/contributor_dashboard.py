@@ -54,17 +54,17 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
         'opportunity_type': {
-            'type': 'string'
+            'type': 'basestring'
         }
     }
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'cursor': {
-                'type': 'string',
+                'type': 'basestring',
                 'default_value': None
             },
             'language_code': {
-                'type': 'string',
+                'type': 'basestring',
                 'validators': [{
                     'id': 'is_supported_audio_language_code'
                 }],
@@ -86,7 +86,7 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
                     search_cursor))
 
         elif opportunity_type == constants.OPPORTUNITY_TYPE_TRANSLATION:
-            language_code = self.request.get('language_code')
+            language_code = self.normalized_request.get('language_code')
             if language_code is None or not (
                     utils.is_supported_audio_language_code(language_code)):
                 raise self.InvalidInputException
@@ -95,7 +95,7 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
                     language_code, search_cursor))
 
         elif opportunity_type == constants.OPPORTUNITY_TYPE_VOICEOVER:
-            language_code = self.request.get('language_code')
+            language_code = self.normalized_request.get('language_code')
             if language_code is None or not (
                     utils.is_supported_audio_language_code(language_code)):
                 raise self.InvalidInputException
@@ -221,13 +221,13 @@ class TranslatableTextHandler(base.BaseHandler):
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'language_code': {
-                'type': 'string',
+                'type': 'basestring',
                 'valiadtors': [{
                     'id': 'is_supported_audio_language_code'
                 }]
             },
             'exp_id': {
-                'type': 'string'
+                'type': 'basestring'
             }
         }
     }
@@ -318,16 +318,16 @@ class MachineTranslationStateTextsHandler(base.BaseHandler):
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'exp_id': {
-                'type': 'string'
+                'type': 'basestring'
             },
             'state_name': {
-                'type': 'string'
+                'type': 'basestring'
             },
             'content_ids': {
-                'type': 'string'
+                'type': 'basestring'
             },
             'target_language_code': {
-                'type': 'string',
+                'type': 'basestring',
                 'validators': [{
                     'id': 'is_supported_audio_language_code'
                 }]
@@ -368,12 +368,8 @@ class MachineTranslationStateTextsHandler(base.BaseHandler):
                 not correspond to an entry in the datastore.
         """
         exp_id = self.normalized_request.get('exp_id')
-        if not exp_id:
-            raise self.InvalidInputException('Missing exp_id')
 
         state_name = self.normalized_request.get('state_name')
-        if not state_name:
-            raise self.InvalidInputException('Missing state_name')
 
         content_ids_string = self.normalized_request.get('content_ids')
         content_ids = []
@@ -385,8 +381,6 @@ class MachineTranslationStateTextsHandler(base.BaseHandler):
 
         target_language_code = self.normalized_request.get(
             'target_language_code')
-        if not target_language_code:
-            raise self.InvalidInputException('Missing target_language_code')
 
         # TODO(#12341): Tidy up this logic once we have a canonical list of
         # language codes.
