@@ -1151,6 +1151,8 @@ class Topic(python_utils.OBJECT):
         introduces the thumbnail_size_in_bytes field
 
         Args:
+            topic_id: str. The id of the topic to which the subtopic is linked
+                to.
             subtopic_dict: dict. A dict used to initialize a Subtopic domain
                 object.
 
@@ -1201,7 +1203,8 @@ class Topic(python_utils.OBJECT):
         return subtopic_dict
 
     @classmethod
-    def update_subtopics_from_model(cls, versioned_subtopics, current_version, topic_id):
+    def update_subtopics_from_model(
+            cls, versioned_subtopics, current_version, topic_id):
         """Converts the subtopics blob contained in the given
         versioned_subtopics dict from current_version to
         current_version + 1. Note that the versioned_subtopics being
@@ -1214,6 +1217,8 @@ class Topic(python_utils.OBJECT):
                 - subtopics: list(dict). The list of dicts comprising the
                     subtopics of the topic.
             current_version: int. The current schema version of subtopics.
+            topic_id: str. The topic_id of the topic to which the subtopics
+                are linked to.
         """
         versioned_subtopics['schema_version'] = current_version + 1
 

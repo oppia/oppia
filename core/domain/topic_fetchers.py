@@ -43,6 +43,7 @@ def _migrate_subtopics_to_latest_schema(versioned_subtopics, topic_id):
           - schema_version: int. The schema version for the subtopics dict.
           - subtopics: list(dict). The list of dicts comprising the topic's
               subtopics.
+        topic_id: str. The id of the topic to which the subtopics are part of.
 
     Raises:
         Exception. The schema version of subtopics is outside of what
