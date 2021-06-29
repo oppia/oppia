@@ -100,16 +100,23 @@ class BlogAdminRolesHandler(base.BaseHandler):
     def post(self):
         # type: () -> None
         """Handles POST requests."""
+        if self.payload.get('action') != 'update_user_role':
+            raise self.InvalidInputException('Invalid action')
         username = self.payload.get('username')
         role = self.payload.get('role')
-        user_id = user_services.get_user_id_from_username(username)
-        if user_id is None:
+        if role == (BLOG_ADMIN or BLOG_POST_EDITOR):
+            user_id = user_services.get_user_id_from_username(username)
+            if user_id is None:
+                raise self.InvalidInputException(
+                    'User with given username does not exist.')
+            user_services.update_user_role(user_id, role)
+            role_services.log_role_query(
+                self.user_id, feconf.ROLE_ACTION_UPDATE, role=role,
+                username=username)
+        else:
             raise self.InvalidInputException(
-                'User with given username does not exist.')
-        user_services.update_user_role(user_id, role)
-        role_services.log_role_query(
-            self.user_id, feconf.ROLE_ACTION_UPDATE, role=role,
-            username=username)
+                'Invalid role or role that cannot be updated through '
+                '\'Blog Admin\' page is provided.')
         self.render_json({})
 
     @acl_decorators.can_manage_blog_post_editors

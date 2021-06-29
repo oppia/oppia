@@ -212,7 +212,7 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
         self.login(self.BLOG_EDITOR_EMAIL)
         self.get_json(
             '%s/%s' % (feconf.BLOG_EDITOR_DATA_URL_PREFIX, '123'),
-            expected_status_int=404)
+            expected_status_int=500)
 
         blog_services.delete_blog_post(self.blog_post.id)
         self.get_json(
@@ -279,7 +279,7 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
                 'tags': ['Newsletter', 'Learners'],
                 'thumbnail_filename': 'file.svg'
             },
-            'is_blog_post_published': True
+            'new_publish_status': True
         }
 
         self.put_json(

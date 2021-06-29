@@ -19,6 +19,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import blog_domain
 from core.domain import blog_services
 from core.domain import config_domain
 from core.domain import fs_services
@@ -28,7 +29,7 @@ import feconf
 import utils
 
 
-def get_blog_card_summary_dicts_for_dashboard(summaries):
+def _get_blog_card_summary_dicts_for_dashboard(summaries):
     # type: (list[BlogPostSummaries]) -> list[BlogPostSummayDicts]
     """Creates summary dicts for use in blog dashboard.
 
@@ -56,7 +57,6 @@ class BlogDashboardDataHandler(base.BaseHandler):
     def get(self):
         # type: () -> None
         """Handles GET requests."""
-
         user_settings = user_services.get_user_settings(self.user_id)
 
         no_of_published_blog_posts = 0
@@ -69,7 +69,7 @@ class BlogDashboardDataHandler(base.BaseHandler):
         if published_post_summaries:
             no_of_published_blog_posts = len(published_post_summaries)
             published_post_summary_dicts = (
-                get_blog_card_summary_dicts_for_dashboard(
+                _get_blog_card_summary_dicts_for_dashboard(
                     published_post_summaries))
 
         draft_blog_post_summaries = (
@@ -78,7 +78,7 @@ class BlogDashboardDataHandler(base.BaseHandler):
         if draft_blog_post_summaries:
             no_of_draft_blog_posts = len(draft_blog_post_summaries)
             draft_blog_post_summary_dicts = (
-                get_blog_card_summary_dicts_for_dashboard(
+                _get_blog_card_summary_dicts_for_dashboard(
                     draft_blog_post_summaries))
 
         self.values.update({
@@ -96,7 +96,6 @@ class BlogDashboardDataHandler(base.BaseHandler):
     def post(self):
         # type: () -> None
         """Handles POST requests to create a new blog post draft."""
-
         new_blog_post = blog_services.create_new_blog_post(self.user_id)
         self.render_json({'blog_post_id': new_blog_post.id})
 
@@ -110,10 +109,7 @@ class BlogPostHandler(base.BaseHandler):
     def get(self, blog_post_id):
         # type: (str) -> None
         """Populates the data on the blog dashboard editor page."""
-        if len(blog_post_id) != 12:
-            raise self.PageNotFoundException(
-                Exception('The given blog post id is invalid.'))
-
+        blog_domain.BlogPost.require_valid_blog_post_id(blog_post_id)
         blog_post = (
             blog_services.get_blog_post_by_id(blog_post_id, strict=False))
         if blog_post is None:
@@ -147,6 +143,7 @@ class BlogPostHandler(base.BaseHandler):
     def put(self, blog_post_id):
         # type: (str) -> None
         """Updates properties of the given blog post."""
+        blog_domain.BlogPost.require_valid_blog_post_id(blog_post_id)
         blog_post_rights = (
             blog_services.get_blog_post_rights(blog_post_id, strict=False))
         if blog_post_rights is None:
@@ -160,8 +157,8 @@ class BlogPostHandler(base.BaseHandler):
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
-        is_blog_post_published = self.payload.get('is_blog_post_published')
-        if is_blog_post_published:
+        new_publish_status = self.payload.get('new_publish_status')
+        if new_publish_status:
             blog_services.publish_blog_post(blog_post_id)
         elif blog_post_currently_published:
             blog_services.unpublish_blog_post(blog_post_id)
@@ -178,7 +175,7 @@ class BlogPostHandler(base.BaseHandler):
     def post(self, blog_post_id):
         # type: (str) -> None
         """Stores thumbnail of the blog post in the datastore."""
-
+        blog_domain.BlogPost.require_valid_blog_post_id(blog_post_id)
         raw_image = self.request.get('image')
         thumbnail_filename = self.payload.get('thumbnail_filename')
         try:
@@ -202,6 +199,7 @@ class BlogPostHandler(base.BaseHandler):
     def delete(self, blog_post_id):
         # type: (str) -> None
         """Handles Delete requests."""
+        blog_domain.BlogPost.require_valid_blog_post_id(blog_post_id)
         blog_post = (
             blog_services.get_blog_post_by_id(blog_post_id, strict=False))
         if blog_post is None:

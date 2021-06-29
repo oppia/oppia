@@ -27,6 +27,9 @@ from core.domain import html_cleaner
 import python_utils
 import utils
 
+# This is same as base_models.ID_Length.
+BLOG_POST_ID_LENGTH = 12
+
 
 class BlogPost(python_utils.OBJECT):
     """Domain object for an Oppia Blog Post."""
@@ -312,6 +315,20 @@ class BlogPost(python_utils.OBJECT):
         """
         self.require_valid_tags(tags, True)
         self.tags = tags
+
+    @classmethod
+    def require_valid_blog_post_id(cls, blog_id):
+        """Checks whether the blog id is a valid one.
+
+        Args:
+            blog_id: str. The blog post id to validate.
+        """
+        if not isinstance(blog_id, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Blog Post ID should be a string, received: %s' % blog_id)
+
+        if len(blog_id) != BLOG_POST_ID_LENGTH:
+            raise utils.ValidationError('Blog id %s is invalid' % blog_id)
 
 
 class BlogPostSummary(python_utils.OBJECT):

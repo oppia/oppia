@@ -36,10 +36,13 @@ describe('Blog Admin backend api service', () => {
         description: 'List of tags',
         value: ['Learners', 'News'],
         schema: {
+          type: 'list',
           items: {
             type: 'unicode'
           },
-          type: 'list'
+          validators: [{
+            id: 'is_uniquified',
+          }],
         }
       }
     },
@@ -182,7 +185,7 @@ describe('Blog Admin backend api service', () => {
   }
   ));
 
-  it('should fail to remove all contribution rights when user does' +
+  it('should remove blog editor rights when user does' +
   'not exists when calling removeBlogEditorAsync', fakeAsync(() => {
     let username = 'InvalidUser';
     let payload = {
@@ -203,8 +206,7 @@ describe('Blog Admin backend api service', () => {
     flushMicrotasks();
 
     expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith(
-      'User with given username does not exist.');
+    expect(failHandler).toHaveBeenCalled();
   }
   ));
 

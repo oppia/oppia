@@ -19,6 +19,13 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+interface ConfigSchema {
+  type: string,
+  items?: {
+      type: string,
+  },
+  validators?: {}[],
+}
 
 interface UserRolesBackendResponse {
   [role: string]: string;
@@ -29,7 +36,11 @@ interface RoleToActionsBackendResponse {
 }
 
 interface ConfigPropertiesBackendResponse {
-  [property: string]: Object;
+  [property: string]: {
+    description: string,
+    value: string[] | number,
+    schema: ConfigSchema;
+  }
 }
 
 interface ConfigPropertyValues {
@@ -72,7 +83,7 @@ export class BlogAdminBackendApiService {
   }
 
   private async _postRequestAsync(
-      handlerUrl: string, payload: Object, action?: string): Promise<void> {
+      handlerUrl: string, payload: Object, action: string): Promise<void> {
     return new Promise((resolve, reject) => {
       this.http.post<void>(
         handlerUrl, { action, ...payload }).toPromise()
@@ -103,25 +114,21 @@ export class BlogAdminBackendApiService {
 
   async updateUserRoleAsync(
       newRole: string, username: string): Promise<void> {
+    let action = 'update_user_role';
     let payload = {
       role: newRole,
       username: username,
     };
-    return this._postRequestAsync('/blogadminrolehandler', payload);
+    return this._postRequestAsync(
+      '/blogadminrolehandler', payload, action);
   }
 
-  async removeBlogEditorAsync(username: string): Promise<void> {
-    return new Promise((resolve, reject) => {
-      this.http.put<void>(
-        '/blogadminrolehandler', {
-          username: username,
-        }
-      ).toPromise().then(response => {
-        resolve(response);
-      }, errorResponse => {
-        reject(errorResponse.error.error);
-      });
-    });
+  async removeBlogEditorAsync(username: string): Promise<Object> {
+    return this.http.put(
+      '/blogadminrolehandler', {
+        username: username,
+      }
+    ).toPromise();
   }
 }
 
