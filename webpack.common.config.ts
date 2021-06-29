@@ -705,7 +705,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['teach'],
       filename: 'teach-page.mainpage.html',
-      hybrid: true,
       meta: {
         name: defaultMeta.name,
         description: 'The Oppia library is full of user-created lessons ' +
