@@ -24,7 +24,6 @@ export interface ExplorationPermissionsBackendDict {
   'can_delete': boolean;
   'can_modify_roles': boolean;
   'can_edit': boolean;
-  'can_manage_voice_artist': boolean;
 }
 
 export class ExplorationPermissions {
@@ -35,12 +34,11 @@ export class ExplorationPermissions {
   canDelete: boolean;
   canModifyRoles: boolean;
   canEdit: boolean;
-  canManageVoiceArtist: boolean;
 
   constructor(
       canUnpublish: boolean, canReleaseOwnership: boolean, canPublish: boolean,
       canVoiceover: boolean, canDelete: boolean, canModifyRoles: boolean,
-      canEdit: boolean, canManageVoiceArtist: boolean) {
+      canEdit: boolean) {
     this.canUnpublish = canUnpublish;
     this.canReleaseOwnership = canReleaseOwnership;
     this.canPublish = canPublish;
@@ -48,7 +46,6 @@ export class ExplorationPermissions {
     this.canDelete = canDelete;
     this.canModifyRoles = canModifyRoles;
     this.canEdit = canEdit;
-    this.canManageVoiceArtist = canManageVoiceArtist;
   }
 
   static createFromBackendDict(
@@ -57,6 +54,6 @@ export class ExplorationPermissions {
       backendDict.can_unpublish, backendDict.can_release_ownership,
       backendDict.can_publish, backendDict.can_voiceover,
       backendDict.can_delete, backendDict.can_modify_roles,
-      backendDict.can_edit, backendDict.can_manage_voice_artist);
+      backendDict.can_edit);
   }
 }

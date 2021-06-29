@@ -42,7 +42,6 @@ describe('User Exploration Permissions Service', () => {
     can_publish: false,
     can_delete: false,
     can_modify_roles: false,
-    can_manage_voice_artist: false
   };
   let permissionsResponse: ExplorationPermissions;
 
