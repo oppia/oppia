@@ -1159,13 +1159,16 @@ class Topic(python_utils.OBJECT):
         Returns:
             dict. The converted subtopic_dict.
         """
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.GcsFileSystem(
-                feconf.ENTITY_TYPE_TOPIC, topic_id))
-        thumbnail_size_in_bytes = len(fs.get(
-            '%s/%s' % (
-                'thumbnail', subtopic_dict['thumbnail_filename'])))
-        subtopic_dict['thumbnail_size_in_bytes'] = thumbnail_size_in_bytes
+        if subtopic_dict['thumbnail_filename'] is not None:
+            fs = fs_domain.AbstractFileSystem(
+                fs_domain.GcsFileSystem(
+                    feconf.ENTITY_TYPE_TOPIC, topic_id))
+            thumbnail_size_in_bytes = len(fs.get(
+                '%s/%s' % (
+                    'thumbnail', subtopic_dict['thumbnail_filename'])))
+            subtopic_dict['thumbnail_size_in_bytes'] = thumbnail_size_in_bytes
+        else:
+            subtopic_dict['thumbnail_size_in_bytes'] = None
 
         return subtopic_dict
 
