@@ -34,6 +34,7 @@ import { LazyLoadingComponent } from 'components/common-layout-directives/common
 import { SchemaBasedEditorDirective } from 'components/forms/schema-based-editors/schema-based-editor.directive';
 import { AngularHtmlBindWrapperDirective } from 'components/angular-html-bind/angular-html-bind-wrapper.directive';
 import { CkEditorCopyToolbarComponent } from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
+import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
 
 describe('Translation opportunities component', () => {
   let contributionOpportunitiesService: ContributionOpportunitiesService;
@@ -59,6 +60,7 @@ describe('Translation opportunities component', () => {
     TestBed.configureTestingModule({
       imports: [
         HttpClientTestingModule,
+        RichTextComponentsModule
       ],
       declarations: [
         AngularHtmlBindWrapperDirective,
