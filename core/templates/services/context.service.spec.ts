@@ -199,12 +199,6 @@ describe('Context service', () => {
       expect(ecs.getEntityType()).toBe('topic');
     });
 
-    it('should throw error if entity type is null', () => {
-      spyOn(urlService, 'getPathname').and.returnValue('//');
-      spyOn(urlService, 'getHash').and.returnValue('');
-      expect(() => ecs.getEntityType()).toThrowError('No Entity Type found!');
-    });
-
     it('should correctly set and retrieve the page context', () => {
       expect(ecs.getPageContext()).toBe('other');
       spyOn(urlService, 'getPathname').and.returnValue('/topic_editor/123');
@@ -350,14 +344,6 @@ describe('Context service', () => {
       expect(ecs.getPageContext()).toBe('other');
       spyOn(urlService, 'getPathname').and.returnValue('/question_editor/123');
       expect(ecs.getPageContext()).toBe('question_editor');
-    });
-
-    it ('should throw error if Exploration ID is null', () => {
-      ecs.explorationId = null;
-      spyOn(ecs, 'isInQuestionPlayerMode').and.returnValue(true);
-      expect(() => {
-        ecs.getExplorationId();
-      }).toThrowError('Exploratiod Id is possibly null');
     });
 
     it('should correctly retrieve the page context as question player', () => {

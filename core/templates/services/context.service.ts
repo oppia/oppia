@@ -192,7 +192,7 @@ export class ContextService {
   }
 
   // Add constants for entity type.
-  getEntityType(): string {
+  getEntityType(): string | undefined {
     if (ContextService.customEntityContext !== null) {
       return ContextService.customEntityContext.getType();
     }
@@ -220,12 +220,11 @@ export class ContextService {
         return AppConstants.ENTITY_TYPE.SKILL;
       }
     }
-    throw new Error('No Entity Type found!');
   }
 
   // Returns a string representing the explorationId (obtained from the
   // URL).
-  getExplorationId(): string {
+  getExplorationId(): string | undefined {
     if (this.explorationId) {
       return this.explorationId;
     } else if (!this.isInQuestionPlayerMode()) {
@@ -244,12 +243,10 @@ export class ContextService {
           return this.explorationId;
         }
       }
-
       throw new Error(
         'ContextService should not be used outside the ' +
         'context of an exploration or a question.');
     }
-    throw new Error('Exploratiod Id is possibly null');
   }
 
   // Following method helps to know whether exploration editor is
