@@ -19,7 +19,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import copy
 import inspect
 
 from core.domain import email_manager
@@ -66,13 +65,13 @@ SCHEMA_TYPE_FLOAT = schema_utils.SCHEMA_TYPE_FLOAT
 SCHEMA_TYPE_HTML = schema_utils.SCHEMA_TYPE_HTML
 SCHEMA_TYPE_INT = schema_utils.SCHEMA_TYPE_INT
 SCHEMA_TYPE_LIST = schema_utils.SCHEMA_TYPE_LIST
-SCHEMA_TYPE_STRING = schema_utils.SCHEMA_TYPE_STRING
+SCHEMA_TYPE_BASESTRING = schema_utils.SCHEMA_TYPE_BASESTRING
 SCHEMA_TYPE_UNICODE = schema_utils.SCHEMA_TYPE_UNICODE
 SCHEMA_TYPE_UNICODE_OR_NONE = schema_utils.SCHEMA_TYPE_UNICODE_OR_NONE
 SCHEMA_TYPE_OBJECT_DICT = schema_utils.SCHEMA_TYPE_OBJECT_DICT
 ALLOWED_SCHEMA_TYPES = [
     SCHEMA_TYPE_BOOL, SCHEMA_TYPE_CUSTOM, SCHEMA_TYPE_DICT, SCHEMA_TYPE_FLOAT,
-    SCHEMA_TYPE_HTML, SCHEMA_TYPE_INT, SCHEMA_TYPE_LIST, SCHEMA_TYPE_STRING,
+    SCHEMA_TYPE_HTML, SCHEMA_TYPE_INT, SCHEMA_TYPE_LIST, SCHEMA_TYPE_BASESTRING,
     SCHEMA_TYPE_UNICODE, SCHEMA_TYPE_UNICODE_OR_NONE, SCHEMA_TYPE_OBJECT_DICT]
 ALLOWED_CUSTOM_OBJ_TYPES = [
     'Filepath', 'LogicQuestion', 'MathExpressionContent', 'MusicPhrase',
@@ -786,14 +785,12 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
         validate_schema(schema)
 
         for raw_value, expected_value in mappings:
-            schema1 = copy.deepcopy(schema)
             self.assertEqual(
-                schema_utils.normalize_against_schema(raw_value, schema1),
+                schema_utils.normalize_against_schema(raw_value, schema),
                 expected_value)
         for value, error_msg in invalid_items_with_error_messages:
-            schema1 = copy.deepcopy(schema)
             with self.assertRaisesRegexp(Exception, error_msg):
-                schema_utils.normalize_against_schema(value, schema1)
+                schema_utils.normalize_against_schema(value, schema)
 
     def test_float_schema(self):
         schema = {
@@ -1008,7 +1005,7 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
 
     def test_string_schema(self):
         schema = {
-            'type': schema_utils.SCHEMA_TYPE_STRING,
+            'type': schema_utils.SCHEMA_TYPE_BASESTRING,
         }
         mappings = [('test1', 'test1'), ('test2', 'test2')]
         invalid_values_with_error_messages = [

@@ -171,6 +171,7 @@ class BaseHandler(webapp2.RequestHandler):
         self.user_is_scheduled_for_deletion = False
         self.current_user_is_super_admin = False
         self.normalized_request = None
+        self.normalized_payload = None
 
         try:
             auth_claims = auth_services.get_auth_claims_from_request(request)
@@ -302,7 +303,7 @@ class BaseHandler(webapp2.RequestHandler):
 
         schema_validation_succeeded = True
         try:
-            self.validate_args_schema()
+            self.vaidate_and_normalize_args()
         except self.InvalidInputException as e:
             self.handle_exception(e, self.app.debug)
             schema_validation_succeeded = False
@@ -317,7 +318,7 @@ class BaseHandler(webapp2.RequestHandler):
 
         super(BaseHandler, self).dispatch()
 
-    def validate_args_schema(self):
+    def vaidate_and_normalize_args(self):
         """Validates schema for controller layer handler class arguments.
 
         Raises:
@@ -329,6 +330,9 @@ class BaseHandler(webapp2.RequestHandler):
         url_path_args = self.request.route_kwargs
         handler_class_names_with_no_schema = (
             payload_validator.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA)
+
+        if handler_class_name in handler_class_names_with_no_schema:
+            return
 
         if request_method in ['GET', 'DELETE']:
             handler_args = {}
@@ -343,14 +347,6 @@ class BaseHandler(webapp2.RequestHandler):
             # handler_args must be initialized with empty dict.
             handler_args = {}
 
-        if handler_class_name in handler_class_names_with_no_schema:
-            return
-
-        if self.URL_PATH_ARGS_SCHEMAS is None:
-            raise NotImplementedError(
-                'Missing schema for url path args in %s '
-                'handler class' % (handler_class_name))
-
         # For html handlers, extra args are allowed (to accommodate
         # e.g. utm parameters which are not used by the backend but
         # needed for analytics).
@@ -358,11 +354,17 @@ class BaseHandler(webapp2.RequestHandler):
             self.GET_HANDLER_ERROR_RETURN_TYPE == 'html' and
             request_method == 'GET')
 
+        if self.URL_PATH_ARGS_SCHEMAS is None:
+            raise NotImplementedError(
+                'Missing schema for url path args in %s handler class.' % (
+                    handler_class_name))
+
         schema_for_url_path_args = self.URL_PATH_ARGS_SCHEMAS
-        self.normalized_request, errors = (
+        normalized_value, errors = (
             payload_validator.validate(
                 url_path_args, schema_for_url_path_args, extra_args_are_allowed)
         )
+
         if errors:
             raise self.InvalidInputException('\n'.join(errors))
 
@@ -374,12 +376,15 @@ class BaseHandler(webapp2.RequestHandler):
                 'Missing schema for %s method in %s handler class.' % (
                     request_method, handler_class_name))
 
-        self.normalized_request, errors = (
+        normalized_value, errors = (
             payload_validator.validate(
                 handler_args, schema_for_request_method, extra_args_are_allowed)
         )
         if request_method in ['PUT', 'POST']:
-            self.payload = self.normalized_request
+            self.normalized_payload = normalized_value
+        else:
+            self.normalized_request = normalized_value
+
         if errors:
             raise self.InvalidInputException('\n'.join(errors))
 

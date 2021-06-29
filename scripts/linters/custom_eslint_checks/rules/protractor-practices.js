@@ -31,27 +31,37 @@ module.exports = {
     fixable: null,
     schema: [],
     messages: {
-      disallowSleep: 'Please do not use browser.sleep() in protractor files',
-      disallowThen: 'Please do not use .then(), consider async/await instead',
       constInAllCaps: (
-        'Please make constant name “{{constName}}” are in all-caps')
+        'Please make sure that constant name “{{constName}}” are in all-caps'),
+      disallowedBrowserMethods: (
+        'Please do not use browser.{{methodName}}() in protractor files'),
+      disallowThen: 'Please do not use .then(), consider async/await instead',
+      useProtractorTest: (
+        'Please use “.protractor-test-” prefix classname selector instead of ' +
+        '“{{incorrectClassname}}”')
     },
   },
 
   create: function(context) {
-    var checkSleepCall = function(node) {
-      var callee = node.callee;
-      if (callee.property && callee.property.name !== 'sleep') {
-        return;
-      }
+    var disallowedBrowserMethods = [
+      'sleep', 'explore', 'pause', 'waitForAngular'];
+    var disallowedBrowserMethodsRegex = (
+      `/^(${disallowedBrowserMethods.join('|')})$/`);
+    var disallowedBrowserMethodsSelector = (
+      'CallExpression[callee.object.name=browser][callee.property.name=' +
+      disallowedBrowserMethodsRegex + ']');
+    var byCssSelector = (
+      'CallExpression[callee.object.name=by][callee.property.name=css]');
 
-      if (callee.object && callee.object.name === 'browser') {
-        context.report({
-          node: node,
-          loc: callee.loc,
-          messageId: 'disallowSleep'
-        });
-      }
+    var reportDisallowedBrowserMethod = function(node) {
+      context.report({
+        node: node,
+        loc: node.callee.loc,
+        messageId: 'disallowedBrowserMethods',
+        data: {
+          methodName: node.callee.property.name
+        }
+      });
     };
 
     var checkConstName = function(node) {
@@ -68,12 +78,37 @@ module.exports = {
       }
     };
 
+    var checkElementSelector = function(node) {
+      var thirdPartySelectorPrefixes = (
+        ['.modal', '.select2', '.CodeMirror', '.toast', '.ng-joyride', '.mat']);
+      for (var i = 0; i < thirdPartySelectorPrefixes.length; i++) {
+        if ((node.arguments[0].type === 'Literal') &&
+          (node.arguments[0].value.startsWith(thirdPartySelectorPrefixes[i]))) {
+          return;
+        }
+        if ((node.arguments[0].type === 'Literal') &&
+         (node.arguments[0].value.startsWith('option'))) {
+          return;
+        }
+      }
+      if ((node.arguments[0].type === 'Literal') &&
+        (!node.arguments[0].value.startsWith('.protractor-test-'))) {
+        context.report({
+          node: node.arguments[0],
+          messageId: 'useProtractorTest',
+          data: {
+            incorrectClassname: node.arguments[0].value
+          }
+        });
+      }
+    };
+
     return {
       'VariableDeclaration[kind=const]': function(node) {
         checkConstName(node);
       },
-      CallExpression: function(node) {
-        checkSleepCall(node);
+      [disallowedBrowserMethodsSelector]: function(node) {
+        reportDisallowedBrowserMethod(node);
       },
       'CallExpression[callee.property.name=\'then\']': function(node) {
         context.report({
@@ -81,6 +116,9 @@ module.exports = {
           loc: node.callee.property.loc,
           messageId: 'disallowThen'
         });
+      },
+      [byCssSelector]: function(node) {
+        checkElementSelector(node);
       }
     };
   }

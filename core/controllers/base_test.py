@@ -1291,7 +1291,7 @@ class IframeRestrictionTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS = {
             'GET': {
                 'iframe_restriction': {
-                    'type': 'unicode',
+                    'type': 'basestring',
                     'default_value': None
                 }
             }
@@ -1405,9 +1405,9 @@ class OppiaMLVMHandlerTests(test_utils.GenericTestBase):
         URL_PATH_ARGS_SCHEMAS = {}
         HANDLER_ARGS_SCHEMAS = {
             'POST': {
-                'vm_id': {'type': 'unicode'},
-                'signature': {'type': 'unicode'},
-                'message': {'type': 'unicode'},
+                'vm_id': {'type': 'basestring'},
+                'signature': {'type': 'basestring'},
+                'message': {'type': 'basestring'},
             }
         }
 
@@ -1424,9 +1424,9 @@ class OppiaMLVMHandlerTests(test_utils.GenericTestBase):
         URL_PATH_ARGS_SCHEMAS = {}
         HANDLER_ARGS_SCHEMAS = {
             'POST': {
-                'vm_id': {'type': 'string'},
-                'signature': {'type': 'string'},
-                'message': {'type': 'string'},
+                'vm_id': {'type': 'basestring'},
+                'signature': {'type': 'basestring'},
+                'message': {'type': 'basestring'},
             }
         }
 
@@ -1723,7 +1723,7 @@ class SchemaValidationUrlArgsTests(test_utils.GenericTestBase):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'exploration_id': {
-                'type': 'unicode'
+                'type': 'basestring'
             }
         }
         HANDLER_ARGS_SCHEMAS = {'GET': {}}
@@ -1786,7 +1786,7 @@ class SchemaValidationUrlArgsTests(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
         error_msg = (
             'Missing schema for url path args in '
-            'MockHandlerWithMissingUrlPathSchema handler class')
+            'MockHandlerWithMissingUrlPathSchema handler class.')
 
         with self.swap(self, 'testapp', self.mock_testapp3):
             response = self.get_json('/mock_play_exploration/%s' % self.exp_id,
@@ -1806,7 +1806,7 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS = {
             'GET': {
                 'exploration_id': {
-                'type': 'int'
+                    'type': 'int'
                 }
             }
         }
