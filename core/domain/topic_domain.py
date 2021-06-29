@@ -20,12 +20,14 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
+import functools
 import json
 import re
 
 import android_validation_constants
 from constants import constants
 from core.domain import change_domain
+from core.domain import fs_domain
 from core.domain import subtopic_page_domain
 from core.domain import user_services
 import feconf
@@ -1144,7 +1146,7 @@ class Topic(python_utils.OBJECT):
             feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION, '', False, '')
 
     @classmethod
-    def _convert_subtopic_v3_dict_to_v4_dict(cls, subtopic_dict):
+    def _convert_subtopic_v3_dict_to_v4_dict(cls, topic_id, subtopic_dict):
         """Converts old Subtopic schema to the modern v4 schema. v4 schema
         introduces the thumbnail_size_in_bytes field
 
@@ -1155,7 +1157,14 @@ class Topic(python_utils.OBJECT):
         Returns:
             dict. The converted subtopic_dict.
         """
-        subtopic_dict['thumbnail_size_in_bytes'] = None
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_TOPIC, topic_id))
+        thumbnail_size_in_bytes = len(fs.get(
+            '%s/%s' % (
+                'thumbnail', subtopic_dict['thumbnail_filename'])))
+        subtopic_dict['thumbnail_size_in_bytes'] = thumbnail_size_in_bytes
+
         return subtopic_dict
 
     @classmethod
@@ -1192,7 +1201,7 @@ class Topic(python_utils.OBJECT):
         return subtopic_dict
 
     @classmethod
-    def update_subtopics_from_model(cls, versioned_subtopics, current_version):
+    def update_subtopics_from_model(cls, versioned_subtopics, current_version, topic_id):
         """Converts the subtopics blob contained in the given
         versioned_subtopics dict from current_version to
         current_version + 1. Note that the versioned_subtopics being
@@ -1211,6 +1220,9 @@ class Topic(python_utils.OBJECT):
         conversion_fn = getattr(
             cls, '_convert_subtopic_v%s_dict_to_v%s_dict' % (
                 current_version, current_version + 1))
+
+        if current_version == 3:
+            conversion_fn = functools.partial(conversion_fn, topic_id)
 
         updated_subtopics = []
         for subtopic in versioned_subtopics['subtopics']:

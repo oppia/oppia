@@ -31,7 +31,7 @@ import python_utils
     models.NAMES.skill, models.NAMES.topic])
 
 
-def _migrate_subtopics_to_latest_schema(versioned_subtopics):
+def _migrate_subtopics_to_latest_schema(versioned_subtopics, topic_id):
     """Holds the responsibility of performing a step-by-step, sequential update
     of the subtopics structure based on the schema version of the input
     subtopics dictionary. If the current subtopics schema changes, a
@@ -58,7 +58,7 @@ def _migrate_subtopics_to_latest_schema(versioned_subtopics):
     while (subtopic_schema_version <
            feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
         topic_domain.Topic.update_subtopics_from_model(
-            versioned_subtopics, subtopic_schema_version)
+            versioned_subtopics, subtopic_schema_version, topic_id)
         subtopic_schema_version += 1
 
 
@@ -121,7 +121,8 @@ def get_topic_from_model(topic_model):
     }
     if (topic_model.subtopic_schema_version !=
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
-        _migrate_subtopics_to_latest_schema(versioned_subtopics)
+        _migrate_subtopics_to_latest_schema(
+            versioned_subtopics, topic_model.id)
     if (topic_model.story_reference_schema_version !=
             feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION):
         _migrate_story_references_to_latest_schema(
