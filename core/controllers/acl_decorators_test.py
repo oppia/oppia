@@ -1350,7 +1350,7 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.mark_user_banned(self.banned_username)
         self.owner = user_services.get_user_actions_info(self.owner_id)
-        self.set_user_role(
+        self.add_user_role(
             self.VOICEOVER_ADMIN_USERNAME, feconf.ROLE_ID_VOICEOVER_ADMIN)
         self.voiceover_admin = user_services.get_user_actions_info(
             self.voiceover_admin_id)
@@ -1476,7 +1476,7 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
         self.set_moderators([self.MODERATOR_USERNAME])
         self.set_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.set_banned_users([self.banned_username])
-        user_services.update_user_role(
+        user_services.add_user_role(
             self.voiceover_admin_id, feconf.ROLE_ID_VOICEOVER_ADMIN)
         self.owner = user_services.get_user_actions_info(self.owner_id)
         self.voiceover_admin = user_services.get_user_actions_info(
@@ -4024,7 +4024,7 @@ class SaveExplorationTests(test_utils.GenericTestBase):
         self.set_moderators([self.MODERATOR_USERNAME])
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.mark_user_banned(self.banned_username)
-        self.set_user_role(
+        self.add_user_role(
             self.VOICEOVER_ADMIN_USERNAME, feconf.ROLE_ID_VOICEOVER_ADMIN)
         self.owner = user_services.get_user_actions_info(self.owner_id)
         self.voiceover_admin = user_services.get_user_actions_info(

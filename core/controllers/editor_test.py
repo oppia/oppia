@@ -71,7 +71,7 @@ class BaseEditorControllerTests(test_utils.GenericTestBase):
 
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.set_moderators([self.MODERATOR_USERNAME])
-        self.set_user_role('voiceoverManager', feconf.ROLE_ID_VOICEOVER_ADMIN)
+        self.add_user_role('voiceoverManager', feconf.ROLE_ID_VOICEOVER_ADMIN)
 
         self.owner = user_services.get_user_actions_info(self.owner_id)
         self.system_user = user_services.get_system_user()

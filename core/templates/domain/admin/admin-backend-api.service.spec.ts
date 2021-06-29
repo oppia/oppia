@@ -336,29 +336,28 @@ describe('Admin backend api service', () => {
   }
   ));
 
-
   it('should remove the user role when calling removeUserRoleAsync',
     fakeAsync(() => {
-    let topicId = null;
-    let newRole = 'ADMIN';
-    let username = 'validUser';
+      let topicId = null;
+      let newRole = 'ADMIN';
+      let username = 'validUser';
 
-    abas.removeUserRoleAsync(newRole, username, topicId, false)
-      .then(successHandler, failHandler);
+      abas.removeUserRoleAsync(newRole, username, topicId, false)
+        .then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne(
-      '/adminrolehandler?role=ADMIN&username=validUser&' +
+      let req = httpTestingController.expectOne(
+        '/adminrolehandler?role=ADMIN&username=validUser&' +
       'topic_id=null&remove_from_all_topics=false');
-    expect(req.request.method).toEqual('DELETE');
+      expect(req.request.method).toEqual('DELETE');
 
-    req.flush(
-      { status: 200, statusText: 'Success.'});
-    flushMicrotasks();
+      req.flush(
+        { status: 200, statusText: 'Success.'});
+      flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
-  }
-  ));
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }
+    ));
 
   it('should fail to remove user role when user does' +
     'not exists when calling removeUserRoleAsync', fakeAsync(() => {
@@ -372,6 +371,86 @@ describe('Admin backend api service', () => {
     let req = httpTestingController.expectOne(
       '/adminrolehandler?role=ADMIN&username=InvalidUser&' +
       'topic_id=null&remove_from_all_topics=false');
+    expect(req.request.method).toEqual('DELETE');
+
+    req.flush(
+      { error: 'User with given username does not exist'},
+      { status: 500, statusText: 'Internal Server Error'});
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      'User with given username does not exist');
+  }
+  ));
+
+  it('should mark a user banned when calling markUserBannedAsync',
+    fakeAsync(() => {
+      let username = 'validUser';
+
+      abas.markUserBannedAsync(username).then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne('/bannedusershandler');
+      expect(req.request.method).toEqual('PUT');
+      expect(req.request.body).toEqual({ username });
+
+      req.flush(
+        { status: 200, statusText: 'Success.'});
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }
+    ));
+
+  it('should fail to mark a user banned when user does' +
+    'not exists when calling markUserBannedAsync', fakeAsync(() => {
+    let username = 'InvalidUser';
+
+    abas.markUserBannedAsync(username).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne('/bannedusershandler');
+    expect(req.request.method).toEqual('PUT');
+    expect(req.request.body).toEqual({ username });
+
+    req.flush(
+      { error: 'User with given username does not exist'},
+      { status: 500, statusText: 'Internal Server Error'});
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      'User with given username does not exist');
+  }
+  ));
+
+  it('should unmark a banned user when calling unmarkUserBannedAsync',
+    fakeAsync(() => {
+      let username = 'validUser';
+
+      abas.unmarkUserBannedAsync(username).then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/bannedusershandler?username=validUser');
+      expect(req.request.method).toEqual('DELETE');
+
+      req.flush(
+        { status: 200, statusText: 'Success.'});
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }
+    ));
+
+  it('should fail to unmark a banned user when user does' +
+    'not exists when calling markUserBannedAsync', fakeAsync(() => {
+    let username = 'InvalidUser';
+
+    abas.unmarkUserBannedAsync(username).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      '/bannedusershandler?username=InvalidUser');
     expect(req.request.method).toEqual('DELETE');
 
     req.flush(

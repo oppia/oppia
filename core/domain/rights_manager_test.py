@@ -69,8 +69,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             self.user_id_moderator)
         self.system_user = user_services.get_system_user()
         self.login(self.MODERATOR_EMAIL)
-        user_services.update_user_role(
-            self.user_id_voiceover_admin, feconf.ROLE_ID_VOICEOVER_ADMIN)
+
         self.user_voiceover_admin = user_services.get_user_actions_info(
             self.user_id_voiceover_admin)
 
@@ -122,7 +121,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
                 self.user_a, exp_rights))
         self.assertFalse(
             rights_manager.check_can_manage_voice_artist_in_activity(
-                self.user_admin, exp_rights))
+                self.user_moderator, exp_rights))
         self.assertFalse(
             rights_manager.check_can_manage_voice_artist_in_activity(
                 self.user_a, None))

@@ -2054,7 +2054,7 @@ title: Title
             voiceover_admin_username: list(str). List of usernames.
         """
         for name in voiceover_admin_username:
-            self.set_user_role(name, feconf.ROLE_ID_VOICEOVER_ADMIN)
+            self.add_user_role(name, feconf.ROLE_ID_VOICEOVER_ADMIN)
 
     def mark_user_banned(self, banned_username):
         """Marks a user banned.

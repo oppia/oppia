@@ -693,10 +693,19 @@ class BannedUsersHandler(base.BaseHandler):
     """Handler for roles tab of admin page. Used to view and update roles."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    @acl_decorators.can_access_admin_page
-    def get(self):
-        pass
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'username': {
+                'type': 'basestring'
+            }
+        },
+        'DELETE': {
+            'username': {
+                'type': 'basestring'
+            }
+        }
+    }
 
     @acl_decorators.can_access_admin_page
     def put(self):

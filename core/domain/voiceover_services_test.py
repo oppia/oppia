@@ -109,7 +109,7 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
                 'new_value': '0'
             })], 'Changes.')
 
-        self.set_user_role(
+        self.add_user_role(
             self.CURRICULUM_ADMIN_USERNAME, feconf.ROLE_ID_VOICEOVER_ADMIN)
 
     def test_voiceover_application_creation(self):
