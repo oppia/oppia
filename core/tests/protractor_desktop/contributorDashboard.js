@@ -128,7 +128,7 @@ describe('Contributor dashboard page', function() {
       SKILL_DESCRIPTIONS[0], TOPIC_NAMES[0]);
     await skillEditorPage.confirmSkillDifficulty();
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('Question 1'));
+      await forms.toRichText('Question 1'), true);
     await explorationEditorMainTab.setInteraction('TextInput');
     await explorationEditorMainTab.addResponse(
       'TextInput', await forms.toRichText('Correct Answer'), null, false,
