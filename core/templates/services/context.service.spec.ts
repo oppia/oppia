@@ -194,6 +194,7 @@ describe('Context service', () => {
     });
 
     it('should correctly set and retrieve the entity type', () => {
+      expect(ecs.getEntityType()).toBeUndefined();
       spyOn(urlService, 'getPathname').and.returnValue('/topic_editor/123');
       spyOn(urlService, 'getHash').and.returnValue('');
       expect(ecs.getEntityType()).toBe('topic');
@@ -277,6 +278,7 @@ describe('Context service', () => {
     });
 
     it('should correctly retrieve the entity type', () => {
+      expect(ecs.getEntityType()).toBeUndefined();
       spyOn(urlService, 'getPathname').and.returnValue('/story_editor/123');
       expect(ecs.getEntityType()).toBe('story');
     });
@@ -314,6 +316,7 @@ describe('Context service', () => {
     });
 
     it('should correctly retrieve the entity type', () => {
+      expect(ecs.getEntityType()).toBeUndefined();
       spyOn(urlService, 'getPathname').and.returnValue('/skill_editor/123');
       spyOn(urlService, 'getHash').and.returnValue('');
       expect(ecs.getEntityType()).toBe('skill');
@@ -406,6 +409,7 @@ describe('Context service', () => {
 
     it('should set and get custom entity id and type', () => {
       expect(ecs.getEntityId()).toBe('undefined');
+      expect(ecs.getEntityType()).toBeUndefined();
       ecs.setCustomEntityContext('other', '100');
       expect(ecs.getEntityId()).toBe('100');
       expect(ecs.getEntityType()).toBe('other');
