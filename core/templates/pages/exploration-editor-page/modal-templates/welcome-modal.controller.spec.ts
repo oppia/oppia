@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for WelcomeModalController.
  */
 
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 describe('Welcome Modal Controller', function() {
   var $scope = null;

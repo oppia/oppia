@@ -35,7 +35,10 @@ module.exports = {
         'Please make sure that constant name “{{constName}}” are in all-caps'),
       disallowedBrowserMethods: (
         'Please do not use browser.{{methodName}}() in protractor files'),
-      disallowThen: 'Please do not use .then(), consider async/await instead'
+      disallowThen: 'Please do not use .then(), consider async/await instead',
+      useProtractorTest: (
+        'Please use “.protractor-test-” prefix classname selector instead of ' +
+        '“{{incorrectClassname}}”')
     },
   },
 
@@ -47,6 +50,8 @@ module.exports = {
     var disallowedBrowserMethodsSelector = (
       'CallExpression[callee.object.name=browser][callee.property.name=' +
       disallowedBrowserMethodsRegex + ']');
+    var byCssSelector = (
+      'CallExpression[callee.object.name=by][callee.property.name=css]');
 
     var reportDisallowedBrowserMethod = function(node) {
       context.report({
@@ -73,6 +78,31 @@ module.exports = {
       }
     };
 
+    var checkElementSelector = function(node) {
+      var thirdPartySelectorPrefixes = (
+        ['.modal', '.select2', '.CodeMirror', '.toast', '.ng-joyride', '.mat']);
+      for (var i = 0; i < thirdPartySelectorPrefixes.length; i++) {
+        if ((node.arguments[0].type === 'Literal') &&
+          (node.arguments[0].value.startsWith(thirdPartySelectorPrefixes[i]))) {
+          return;
+        }
+        if ((node.arguments[0].type === 'Literal') &&
+         (node.arguments[0].value.startsWith('option'))) {
+          return;
+        }
+      }
+      if ((node.arguments[0].type === 'Literal') &&
+        (!node.arguments[0].value.startsWith('.protractor-test-'))) {
+        context.report({
+          node: node.arguments[0],
+          messageId: 'useProtractorTest',
+          data: {
+            incorrectClassname: node.arguments[0].value
+          }
+        });
+      }
+    };
+
     return {
       'VariableDeclaration[kind=const]': function(node) {
         checkConstName(node);
@@ -86,6 +116,9 @@ module.exports = {
           loc: node.callee.property.loc,
           messageId: 'disallowThen'
         });
+      },
+      [byCssSelector]: function(node) {
+        checkElementSelector(node);
       }
     };
   }

@@ -58,7 +58,7 @@ var ExplorationPlayerPage = function() {
   var viewSolutionButton = element(by.css('.protractor-test-view-solution'));
   var continueToSolutionButton = element(
     by.css('.protractor-test-continue-to-solution-btn'));
-  var gotItButton = element(by.css('.oppia-learner-got-it-button'));
+  var gotItButton = element(by.css('.protractor-test-learner-got-it-button'));
   var confirmRedirectionButton =
       element(by.css('.protractor-test-confirm-redirection-button'));
   var cancelRedirectionButton = element(
@@ -136,7 +136,7 @@ var ExplorationPlayerPage = function() {
     let submitButton = await element.all(by.tagName('button')).get(1);
     await action.click('Submit Button', submitButton);
     let afterSubmitText = await element(
-      by.css('.protractor-exploration-flagged-success-message')).getText();
+      by.css('.protractor-test-exploration-flagged-success-message')).getText();
     expect(afterSubmitText).toMatch(
       'Your report has been forwarded to the moderators for review.');
   };

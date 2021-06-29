@@ -21,7 +21,7 @@ import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { ChangeListService } from 'pages/exploration-editor-page/services/change-list.service';
 import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
 import { AlertsService } from 'services/alerts.service';
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 require('pages/exploration-editor-page/services/change-list.service.ts');
 require('pages/exploration-editor-page/services/exploration-title.service.ts');
