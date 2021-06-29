@@ -49,13 +49,13 @@ describe('PlatformFeatureService', () => {
     // This throws "Type 'null' is not assignable to type 'FeatureStatusSummary'
     // ." We need to suppress this error because of the need to manually clear
     // the state of PlatformFeatureService after each test.
-    // @ts-expect-error
+    // @ts-ignore
     PlatformFeatureService.featureStatusSummary = null;
     PlatformFeatureService._isInitializedWithError = false;
     // This throws "Type 'null' is not assignable to type 'Promise<void>'."
     // We need to suppress this error because of the need to manually clear the
     // state of PlatformFeatureService after each test.
-    // @ts-expect-error
+    // @ts-ignore
     PlatformFeatureService.initializationPromise = null;
   };
 
