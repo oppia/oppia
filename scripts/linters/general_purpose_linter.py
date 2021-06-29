@@ -203,9 +203,7 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             'core/templates/directives/mathjax.directive.ts',
             'extensions/objects/templates/' +
             'math-expression-content-editor.component.ts',
-            'oppia-rte-parser.service.ts',
-            'rte-output-display.component.spec.ts',
-            'rte-output-display.component.ts'),
+            'rte-output-display.component.spec.ts'),
         'excluded_dirs': ('core/tests/',)
     },
     {
