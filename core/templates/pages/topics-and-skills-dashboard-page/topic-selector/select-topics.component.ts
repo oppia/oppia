@@ -40,7 +40,7 @@ export class SelectTopicsComponent {
     let topic = this.topicSummaries.find(
       topic => topic.id === topicId);
     if (topic === undefined) {
-      throw new Error('Topic summary is null');
+      throw new Error('No Topic with given topicId exists!');
     }
     let index: number = this.topicSummaries.indexOf(topic);
     if (!this.topicSummaries[index].isSelected) {

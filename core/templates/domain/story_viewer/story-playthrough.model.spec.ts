@@ -127,4 +127,11 @@ describe('Story playthrough model', () => {
     expect(_samplePlaythroughObject.getMetaTagContent()).toEqual(
       'Story meta tag content');
   });
+
+  it('should throw an error if there are no nodes', () => {
+    _samplePlaythroughObject.nodes.length = 0;
+    expect(() => {
+      _samplePlaythroughObject.getNextPendingNodeId();
+    }).toThrowError('No story nodes found!');
+  });
 });

@@ -114,6 +114,6 @@ describe('Topic Selector Component', () => {
      ' topicSummaries exist', () => {
     expect(() => {
       componentInstance.selectOrDeselectTopic('');
-    }).toThrowError('Topic summary is null');
+    }).toThrowError('No Topic with given topicId exists!');
   });
 });
