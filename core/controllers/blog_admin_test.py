@@ -49,7 +49,9 @@ class BlogAdminRolesHandlerTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
         response_dict = self.post_json(
             feconf.BLOG_ADMIN_ROLE_HANDLER_URL,
-            {'role': feconf.ROLE_ID_BLOG_ADMIN, 'username': username},
+            {   'action': 'update_user_role',
+                'role': feconf.ROLE_ID_BLOG_ADMIN,
+                'username': username},
             csrf_token=csrf_token,
             expected_status_int=200)
         self.assertEqual(response_dict, {})
@@ -71,7 +73,9 @@ class BlogAdminRolesHandlerTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
         self.post_json(
             feconf.BLOG_ADMIN_ROLE_HANDLER_URL,
-            {'role': feconf.ROLE_ID_BLOG_ADMIN, 'username': username},
+            {   'action': 'update_user_role',
+                'role': feconf.ROLE_ID_BLOG_ADMIN,
+                'username': username},
             csrf_token=csrf_token,
             expected_status_int=400)
 

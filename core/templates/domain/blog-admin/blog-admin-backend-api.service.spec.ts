@@ -21,7 +21,7 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { BlogAdminPageData, BlogAdminBackendApiService } from './blog-admin-backend-api.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 
-describe('Blog Admin backend api service', () => {
+fdescribe('Blog Admin backend api service', () => {
   let babas: BlogAdminBackendApiService;
   let httpTestingController: HttpTestingController;
   let csrfService: CsrfTokenService = null;
@@ -118,6 +118,7 @@ describe('Blog Admin backend api service', () => {
     let newRole = 'BLOG_EDITOR';
     let username = 'validUser';
     let payload = {
+      action: 'update_user_role',
       role: newRole,
       username: username,
     };
@@ -142,6 +143,7 @@ describe('Blog Admin backend api service', () => {
     let newRole = 'BLOG_EDITOR';
     let username = 'InvalidUser';
     let payload = {
+      action: 'update_user_role',
       role: newRole,
       username: username,
     };
