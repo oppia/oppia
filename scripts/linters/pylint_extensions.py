@@ -2154,14 +2154,16 @@ class DisallowHandlerWithoutSchema(checkers.BaseChecker):
     msgs = {
         'C0035': (
             'Please add schema in URL_ARGS_PATH_SCHEMA for %s class. \nVisit '
-            'https://github.com/oppia/oppia/wiki/Validation-of-handler-args'
+            'https://github.com/oppia/oppia/wiki/Writing-schema-for-'
+            'handler-args'
             'to learn how to write schema for handlers.',
             'no-schema-for-url-path-elements',
             'Enforce writing schema for url path arguments of handler class.'
         ),
         'C0036': (
             'Please add schema in HANDLER_ARGS_SCHEMA for %s class. \nVisit '
-            'https://github.com/oppia/oppia/wiki/Validation-of-handler-args'
+            'https://github.com/oppia/oppia/wiki/Writing-schema-for-'
+            'handler-args'
             'to learn how to write schema for handlers.',
             'no-schema-for-handler-args',
             'Enforce writing schema for request arguments of handler class.'
