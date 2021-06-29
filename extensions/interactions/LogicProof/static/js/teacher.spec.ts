@@ -52,6 +52,7 @@ describe('Build questions', function() {
     expect(function() {
       logicProofTeacher.buildQuestion(
         'f(x,y)=z', 'f(x)=z', logicProofData.BASE_VOCABULARY);
+      // eslint-disable-next-line oppia/no-incomplete-throw
     }).toThrow(
       {
         message: 'f must have 1 arguments.'
@@ -63,6 +64,7 @@ describe('Build questions', function() {
     expect(function() {
       logicProofTeacher.buildQuestion(
         'we\u2227you', 'p=q', logicProofData.BASE_VOCABULARY);
+      // eslint-disable-next-line oppia/no-incomplete-throw
     }).toThrow(
       {
         message: (

@@ -66,6 +66,7 @@ describe('Full system', function() {
   it('should reject proofs with any error', function() {
     expect(function() {
       completeCheck('p', 'p', 'we knew p');
+      // eslint-disable-next-line oppia/no-incomplete-throw
     }).toThrow(
       sharedErrorWrapper(
         'The phrase starting \'we\' could not be identified; please ' +
@@ -75,6 +76,7 @@ describe('Full system', function() {
 
     expect(function() {
       completeCheck('p', 'p', 'we know q');
+      // eslint-disable-next-line oppia/no-incomplete-throw
     }).toThrow(
       sharedErrorWrapper(
         'This line uses q, so you need to have an earlier line proving ' +
@@ -87,6 +89,7 @@ describe('Full system', function() {
         '  from A(c)∧B(c) we have A(c)',
         'c was arbitrary so ∀x.A(x)',
         'from ∀x.A(x) and p have (∀x.A(x))∧p'].join('\n'));
+      // eslint-disable-next-line oppia/no-incomplete-throw
     }).toThrow(
       sharedErrorWrapper(
         'We are trying to prove ∀x.A(x) so it should be given by the ' +
@@ -98,6 +101,7 @@ describe('Full system', function() {
         '  from ∀x.(A(x)∧B(x)) at c we have A(c)∧B(c)',
         '  from A(c)∧B(c) we have A(c)',
         'd was arbitrary so ∀x.A(x)'].join('\n'));
+      // eslint-disable-next-line oppia/no-incomplete-throw
     }).toThrow(
       sharedErrorWrapper(
         'You haven\'t said where d comes from; if you want it to be ' +

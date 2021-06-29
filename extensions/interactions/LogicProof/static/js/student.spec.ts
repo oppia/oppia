@@ -600,6 +600,7 @@ describe('Match expression to expression template', function() {
 
     it('should reject unknown layouts', function() {
       expect(
+        // eslint-disable-next-line oppia/no-incomplete-throw
         errorWrapper(requireIdentifiable, 'from p we have p\u2228q')).toThrow(
         {
           message: (
@@ -760,6 +761,7 @@ describe('Match expression to expression template', function() {
         expect(function() {
           buildThenDisplay(
             'from a and b we have a\u2227b\nfrom a and b we have b\u2227a');
+          // eslint-disable-next-line oppia/no-incomplete-throw
         }).toThrow(
           sharedErrorWrapper(
             'The conclusion you are allowed to make here is \'From' +
@@ -786,6 +788,7 @@ describe('Match expression to expression template', function() {
               testCheck([
                 'from p and q we have p\u2227q',
                 '  from p and p\u2227q we have p\u2227(p\u2227q)'].join('\n'));
+              // eslint-disable-next-line oppia/no-incomplete-throw
             }).toThrow(
               sharedErrorWrapper(
                 'The last line of a proof should not be indented; you need ' +
@@ -799,6 +802,7 @@ describe('Match expression to expression template', function() {
                 'a was arbitrary hence \u2200x.p',
                 '  from p and q we have p\u2227q',
                 '  b was arbitrary hence \u2200x.q'].join('\n'));
+              // eslint-disable-next-line oppia/no-incomplete-throw
             }).toThrow(
               sharedErrorWrapper(
                 'We originally took a as our arbitrary variable so this, ' +
@@ -823,6 +827,7 @@ describe('Match expression to expression template', function() {
         expect(function() {
           logicProofStudent.validateProof(
             'from A and B we have A\u2227\n', sampleInteraction);
+          // eslint-disable-next-line oppia/no-incomplete-throw
         }).toThrow(
           {
             message: (
