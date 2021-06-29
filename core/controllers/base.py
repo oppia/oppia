@@ -25,6 +25,7 @@ import logging
 import os
 import time
 
+from core.controllers import payload_validator
 from core.domain import auth_domain
 from core.domain import auth_services
 from core.domain import config_domain
@@ -145,6 +146,9 @@ class BaseHandler(webapp2.RequestHandler):
     PUT_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     DELETE_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    URL_PATH_ARGS_SCHEMAS = None
+    HANDLER_ARGS_SCHEMAS = None
+
     def __init__(self, request, response):  # pylint: disable=super-init-not-called
         # Set self.request, self.response and self.app.
         self.initialize(request, response)
@@ -166,6 +170,8 @@ class BaseHandler(webapp2.RequestHandler):
         self.partially_logged_in = False
         self.user_is_scheduled_for_deletion = False
         self.current_user_is_super_admin = False
+        self.normalized_request = None
+        self.normalized_payload = None
 
         try:
             auth_claims = auth_services.get_auth_claims_from_request(request)
@@ -295,7 +301,92 @@ class BaseHandler(webapp2.RequestHandler):
                 self.handle_exception(e, self.app.debug)
                 return
 
+        schema_validation_succeeded = True
+        try:
+            self.vaidate_and_normalize_args()
+        except self.InvalidInputException as e:
+            self.handle_exception(e, self.app.debug)
+            schema_validation_succeeded = False
+        # TODO(#13155): Remove this clause once all the handlers have had
+        # schema validation implemented.
+        except NotImplementedError as e:
+            self.handle_exception(e, self.app.debug)
+            schema_validation_succeeded = False
+
+        if not schema_validation_succeeded:
+            return
+
         super(BaseHandler, self).dispatch()
+
+    def vaidate_and_normalize_args(self):
+        """Validates schema for controller layer handler class arguments.
+
+        Raises:
+            InvalidInputException. Schema validation failed.
+            NotImplementedError. Schema is not provided in handler class.
+        """
+        handler_class_name = self.__class__.__name__
+        request_method = self.request.environ['REQUEST_METHOD']
+        url_path_args = self.request.route_kwargs
+        handler_class_names_with_no_schema = (
+            payload_validator.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA)
+
+        if handler_class_name in handler_class_names_with_no_schema:
+            return
+
+        if request_method in ['GET', 'DELETE']:
+            handler_args = {}
+            for arg in self.request.arguments():
+                handler_args[arg] = self.request.get(arg)
+        else:
+            # When request_method in ['PUT', 'POST']
+            handler_args = self.payload
+        if handler_args is None:
+            # When a handler class expects an argument but it is missing in
+            # payloads then for raising exception for missing args,
+            # handler_args must be initialized with empty dict.
+            handler_args = {}
+
+        # For html handlers, extra args are allowed (to accommodate
+        # e.g. utm parameters which are not used by the backend but
+        # needed for analytics).
+        extra_args_are_allowed = (
+            self.GET_HANDLER_ERROR_RETURN_TYPE == 'html' and
+            request_method == 'GET')
+
+        if self.URL_PATH_ARGS_SCHEMAS is None:
+            raise NotImplementedError(
+                'Missing schema for url path args in %s handler class.' % (
+                    handler_class_name))
+
+        schema_for_url_path_args = self.URL_PATH_ARGS_SCHEMAS
+        normalized_value, errors = (
+            payload_validator.validate(
+                url_path_args, schema_for_url_path_args, extra_args_are_allowed)
+        )
+
+        if errors:
+            raise self.InvalidInputException('\n'.join(errors))
+
+        try:
+            schema_for_request_method = self.HANDLER_ARGS_SCHEMAS[
+                request_method]
+        except Exception:
+            raise NotImplementedError(
+                'Missing schema for %s method in %s handler class.' % (
+                    request_method, handler_class_name))
+
+        normalized_value, errors = (
+            payload_validator.validate(
+                handler_args, schema_for_request_method, extra_args_are_allowed)
+        )
+        if request_method in ['PUT', 'POST']:
+            self.normalized_payload = normalized_value
+        else:
+            self.normalized_request = normalized_value
+
+        if errors:
+            raise self.InvalidInputException('\n'.join(errors))
 
     @property
     def current_user_is_site_maintainer(self):
