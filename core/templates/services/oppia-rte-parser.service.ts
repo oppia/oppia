@@ -103,7 +103,6 @@ export class OppiaRteParserService {
         return childNode;
       }
 
-      let prevPointer = 0;
       const max = Object.keys(node.childNodes).length;
       const childNode = new OppiaRteNode(tagName, attrs);
       for (let child = 0; child < max; child++) {

@@ -28,11 +28,6 @@
     </div>
     <div *ngIf="!loadingData && !uploadingTranslation" class="oppia-text-to-translate-container">
       <!-- textToTranslate contains the html content of an exploration state -->
-      <!-- <angular-html-bind-wrapper [ngClass]="{'oppia-rte-editor-focused': isCopyModeActive()}"
-                                 (click)="onContentClick($event)"
-                                 [htmlData]="textToTranslate"
-                                 class="oppia-rte-editor">
-      </angular-html-bind-wrapper> -->
       <oppia-rte-output-display [ngClass]="{'oppia-rte-editor-focused': isCopyModeActive()}"
                                 [rteString]="textToTranslate"
                                 (click)="onContentClick($event)"

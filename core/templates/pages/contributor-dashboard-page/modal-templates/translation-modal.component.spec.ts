@@ -26,6 +26,7 @@ import { CkEditorCopyContentService } from 'components/ck-editor-helpers/ck-edit
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { TranslationModalComponent, TranslationOpportunity } from 'pages/contributor-dashboard-page/modal-templates/translation-modal.component';
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
+import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
 import { ContextService } from 'services/context.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
@@ -58,7 +59,8 @@ describe('Translation Modal Component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
-        HttpClientTestingModule
+        HttpClientTestingModule,
+        RichTextComponentsModule
       ],
       declarations: [
         TranslationModalComponent
