@@ -38,7 +38,7 @@ var ExplorationEditorTranslationTab = function() {
       'Translation welcome modal takes too long to disappear');
 
     // Otherwise, if the translation tutorial shows up, exit it.
-    var buttons = element.all(by.css('.skipBtn'));
+    var buttons = element.all(by.css('.ng-joyride .skipBtn'));
     if (await buttons.count() === 1) {
       await action.click('Skip button', button.get(0));
     } else if (await buttons.count() !== 0) {
@@ -51,11 +51,11 @@ var ExplorationEditorTranslationTab = function() {
     // Finish the tutorial.
     var finishTutorialButton = element.all(by.buttonText('Finish'));
     await waitFor.elementToBeClickable(
-      await finishTutorialButton.first(),
+      finishTutorialButton.first(),
       'Finish Tutorial Stage button is not clickable');
     var buttons = finishTutorialButton;
     if (await buttons.count() === 1) {
-      await (await buttons.get(0)).click();
+      await buttons.get(0).click();
     } else {
       throw new Error('There is more than 1 Finish button!');
     }
@@ -76,13 +76,13 @@ var ExplorationEditorTranslationTab = function() {
       await waitFor.visibilityOf(
         tutorialTabHeadingElement, 'Tutorial: ' + HEADING + ' is not visible');
       // Progress to the next instruction in the tutorial.
-      var nextTutorialStageButton = element.all(by.css('.nextBtn'));
+      var nextTutorialStageButton = element.all(by.css('.ng-joyride .nextBtn'));
       await waitFor.elementToBeClickable(
-        await nextTutorialStageButton.first(),
+        nextTutorialStageButton.first(),
         'Next Tutorial Stage button is not clickable');
       var buttons = nextTutorialStageButton;
       if (await buttons.count() === 1) {
-        await (await buttons.get(0)).click();
+        await buttons.get(0).click();
         await waitFor.invisibilityOf(
           tutorialTabHeadingElement,
           'Tutorial stage takes too long to disappear');
@@ -169,7 +169,7 @@ var ExplorationEditorTranslationTab = function() {
   var stateGraph = element(
     by.css('.protractor-test-translation-graph'));
   var feedbackList = element.all(
-    by.css('li.protractor-test-translation-feedback'));
+    by.css('.protractor-test-translation-feedback'));
   var stateBackgroundNodes = stateGraph.all(
     by.css('.protractor-test-node-background'));
   var stateNodes = stateGraph.all(
@@ -538,7 +538,7 @@ var ExplorationEditorTranslationTab = function() {
   this.expectFeedbackTabToBeActive = function() {
     expect(
       element(by.css('.protractor-test-translation-feedback-tab'))[0]
-    ).toEqual(element(by.css('.oppia-active-translation-tab'))[0]);
+    ).toEqual(element(by.css('.protractor-test-active-translation-tab'))[0]);
   };
 
   this.moveToState = async function(targetName) {
