@@ -29,9 +29,12 @@ import { ProfileLinkImageBackendApiService } from
   styleUrls: []
 })
 export class ProfileLinkImageComponent implements OnInit {
-  @Input() username: string;
-  profileImageUrl: string;
-  profilePicture: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() username!: string;
+  profileImageUrl!: string;
+  profilePicture!: string;
   constructor(
     private profileLinkImageBackendApiService:
       ProfileLinkImageBackendApiService,
@@ -55,7 +58,8 @@ export class ProfileLinkImageComponent implements OnInit {
     // image if user is not logged in or has not uploaded a profile
     // picture, or the player is in preview mode.
     this.profileLinkImageBackendApiService.fetchProfilePictureDataAsync(
-      this.profileImageUrl).then((base64ProfilePicture: string) => {
+      this.profileImageUrl
+    ).then((base64ProfilePicture: string | null) => {
       this.profilePicture = (
         base64ProfilePicture || DEFAULT_PROFILE_IMAGE_PATH);
     });
