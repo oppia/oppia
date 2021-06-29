@@ -36,6 +36,7 @@ module.exports = {
       disallowedBrowserMethods: (
         'Please do not use browser.{{methodName}}() in protractor files'),
       disallowThen: 'Please do not use .then(), consider async/await instead',
+      disallowAwait: 'Please do not use await for "{{propertyName}}()"',
       useProtractorTest: (
         'Please use “.protractor-test-” prefix classname selector instead of ' +
         '“{{incorrectClassname}}”')
@@ -43,6 +44,10 @@ module.exports = {
   },
 
   create: function(context) {
+    var elementAllSelector = (
+      'CallExpression[callee.object.name=element][callee.property.name=all]');
+    var invalidAwaitSelector = (
+      'AwaitExpression[argument.callee.property.name=/^(first|last|get)$/]');
     var disallowedBrowserMethods = [
       'sleep', 'explore', 'pause', 'waitForAngular'];
     var disallowedBrowserMethodsRegex = (
@@ -52,6 +57,37 @@ module.exports = {
       disallowedBrowserMethodsRegex + ']');
     var byCssSelector = (
       'CallExpression[callee.object.name=by][callee.property.name=css]');
+    var elementAllIdName = [];
+
+    var reportDisallowInvalidAwait = function(node) {
+      if (node.type === 'CallExpression') {
+        if (node.parent.type === 'VariableDeclarator') {
+          elementAllIdName.push(node.parent.id.name);
+        }
+        if ((node.parent.parent.parent.type === 'AwaitExpression') &&
+          (/^(first|last|get)$/).test(node.parent.property.name)) {
+          context.report({
+            node: node,
+            messageId: 'disallowAwait',
+            data: {
+              propertyName: node.parent.property.name
+            }
+          });
+        }
+      } else {
+        for (var i = 0; i < elementAllIdName.length; i++) {
+          if (node.argument.callee.object.name === elementAllIdName[i]) {
+            context.report({
+              node: node,
+              messageId: 'disallowAwait',
+              data: {
+                propertyName: node.argument.callee.property.name
+              }
+            });
+          }
+        }
+      }
+    };
 
     var reportDisallowedBrowserMethod = function(node) {
       context.report({
@@ -104,6 +140,12 @@ module.exports = {
     };
 
     return {
+      [elementAllSelector]: function(node) {
+        reportDisallowInvalidAwait(node);
+      },
+      [invalidAwaitSelector]: function(node) {
+        reportDisallowInvalidAwait(node);
+      },
       'VariableDeclaration[kind=const]': function(node) {
         checkConstName(node);
       },
