@@ -246,7 +246,10 @@ def _get_all_test_targets_from_shard(shard_name):
     """
     with python_utils.open_file(SHARDS_SPEC_PATH, 'r') as shards_file:
         shards_spec = json.load(shards_file)
-    return shards_spec[shard_name]
+    all_specs = []
+    for specs in shards_spec.values():
+        all_specs.extend(specs)
+    return all_specs
 
 
 def _check_shards_match_tests(include_load_tests=True):
