@@ -1110,4 +1110,97 @@ describe('Graph Input service', () => {
       })).toBe(false);
     });
   });
+
+  describe('\'is not strongly_connected, weakly_connected, acyclic' +
+  ' and regular\' rule', () => {
+    it('should return false for no rule', () => {
+      expect(girs.HasGraphProperty(undirectedEmptyGraph(), {
+        p: 'no_rule'
+      })).toBe(false);
+
+      expect(girs.HasGraphProperty(undirectedNullGraph(9), {
+        p: 'no_rule'
+      })).toBe(false);
+
+      expect(girs.HasGraphProperty(undirectedCompleteGraph(8), {
+        p: 'no_rule'
+      })).toBe(false);
+
+      expect(girs.HasGraphProperty(undirectedCycleGraph(3), {
+        p: 'no_rule'
+      })).toBe(false);
+
+      expect(girs.HasGraphProperty(undirectedCycleGraph(4), {
+        p: 'no_rule'
+      })).toBe(false);
+
+      expect(girs.HasGraphProperty(undirectedStarGraph(4), {
+        p: 'no_rule'
+      })).toBe(false);
+
+      expect(girs.HasGraphProperty({
+        vertices: [{
+          label: '',
+          x: 0.0,
+          y: 0.0
+        }, {
+          label: '',
+          x: 0.0,
+          y: 0.0
+        }, {
+          label: '',
+          x: 0.0,
+          y: 0.0
+        }],
+        edges: [{
+          src: 0,
+          dst: 1,
+          weight: 1
+        }],
+        isDirected: false,
+        isWeighted: false,
+        isLabeled: false
+      }, {
+        p: 'no_rule'
+      })).toBe(false);
+
+      expect(girs.HasGraphProperty({
+        vertices: [{
+          label: '',
+          x: 0.0,
+          y: 0.0
+        }, {
+          label: '',
+          x: 0.0,
+          y: 0.0
+        }, {
+          label: '',
+          x: 0.0,
+          y: 0.0
+        }, {
+          label: '',
+          x: 0.0,
+          y: 0.0
+        }],
+        edges: [{
+          src: 0,
+          dst: 1,
+          weight: 1
+        }, {
+          src: 2,
+          dst: 1,
+          weight: 1
+        }, {
+          src: 3,
+          dst: 1,
+          weight: 1
+        }],
+        isDirected: false,
+        isWeighted: false,
+        isLabeled: false
+      }, {
+        p: 'no_rule'
+      })).toBe(false);
+    });
+  });
 });
