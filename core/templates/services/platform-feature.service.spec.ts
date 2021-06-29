@@ -46,9 +46,17 @@ describe('PlatformFeatureService', () => {
   // each test, so we need to manually clear the state of
   // PlatformFeatureService.
   const clearStaticProperties = () => {
-    PlatformFeatureService.featureStatusSummary;
+    // This throws "Type 'null' is not assignable to type 'FeatureStatusSummary'
+    // ." We need to suppress this error because of the need to manually clear
+    // the state of PlatformFeatureService after each test.
+    // @ts-expect-error
+    PlatformFeatureService.featureStatusSummary = null;
     PlatformFeatureService._isInitializedWithError = false;
-    PlatformFeatureService.initializationPromise;
+    // This throws "Type 'null' is not assignable to type 'Promise<void>'."
+    // We need to suppress this error because of the need to manually clear the
+    // state of PlatformFeatureService after each test.
+    // @ts-expect-error
+    PlatformFeatureService.initializationPromise = null;
   };
 
   beforeEach(() => {
@@ -166,7 +174,6 @@ describe('PlatformFeatureService', () => {
         platformFeatureService = TestBed.inject(PlatformFeatureService);
 
         flushMicrotasks();
-
         const sessionItem = (
           windowRef.nativeWindow.sessionStorage.getItem('SAVED_FEATURE_FLAGS'));
         expect(sessionItem).not.toBeNull();
