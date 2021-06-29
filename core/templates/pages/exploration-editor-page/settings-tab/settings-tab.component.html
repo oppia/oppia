@@ -308,19 +308,6 @@
             </ul>
           </div>
 
-          <div ng-show="$ctrl.ExplorationRightsService.voiceArtistNames.length > 0">
-            <strong>Voice Artists</strong>
-            <ul>
-              <li ng-repeat="voiceArtistName in $ctrl.ExplorationRightsService.voiceArtistNames track by $index">
-                <div class="oppia-user-list-item">
-                  <span><[voiceArtistName]></span>
-                  <span ng-hide="!$ctrl.isRolesFormOpen" type="button" uib-tooltip="Remove user" class="material-icons oppia-delete-user-button" ng-click="$ctrl.removeRole(voiceArtistName, 'Voice Artists')">highlight_off
-                  </span>
-                </div>
-              </li>
-            </ul>
-          </div>
-
           <div ng-show="$ctrl.ExplorationRightsService.viewerNames.length > 0">
             <strong>Playtesters</strong>
             <ul>
@@ -357,6 +344,69 @@
                   Cancel
                 </button>
                 <p ng-show="!$ctrl.rolesSaveButtonEnabled" class="text-danger protractor-test-title-warning"><[$ctrl.errorMessage]></p>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </md-card>
+
+  <md-card class="oppia-settings-card-container oppia-editor-card oppia-roles-editor-card oppia-mobile-collapsible-card">
+    <div ng-if="$ctrl.ExplorationRightsService.ownerNames.length > 0 && !$ctrl.ExplorationRightsService.isCloned()">
+      <div class="oppia-roles-container">
+        <div class="oppia-basic-settings-header oppia-mobile-collapsible-card-header" ng-click="$ctrl.toggleCards('roles')">
+          <h3>Voice Artists</h3>
+          <i class="fa fa-caret-down"
+             ng-if="!$ctrl.rolesCardIsShown"
+             aria-hidden="true">
+          </i>
+          <i class="fa fa-caret-up"
+             ng-if="$ctrl.rolesCardIsShown"
+             aria-hidden="true">
+          </i>
+        </div>
+        <div class="oppia-mobile-collapsible-card-content" ng-if="$ctrl.rolesCardIsShown">
+          <div>
+            <div ng-show="!$ctrl.isVoiceoverFormOpen" class="oppia-no-voice-artist-message" ng-if="!$ctrl.ExplorationRightsService.voiceArtistNames.length">
+              No voice artists are assigned to this exploration.
+            </div>
+            <div ng-if="$ctrl.canManageVoiceArtist" ng-hide="$ctrl.isVoiceoverFormOpen" class="oppia-edit-roles-btn-container">
+              <span ng-click="$ctrl.openVoiceoverRolesForm()" class="oppia-edit-roles-btn protractor-test-edit-voice-artist-roles">
+                EDIT
+              </span>
+            </div>
+          </div>
+
+          <div ng-show="$ctrl.ExplorationRightsService.voiceArtistNames.length > 0">
+            <ul>
+              <li ng-repeat="voiceArtistName in $ctrl.ExplorationRightsService.voiceArtistNames track by $index">
+                <div class="oppia-user-list-item protractor-test-voice-artist-{{voiceArtistName}}">
+                  <span><[voiceArtistName]></span>
+                  <span ng-show="$ctrl.isVoiceoverFormOpen" type="button" uib-tooltip="Remove user" class="material-icons" ng-click="$ctrl.removeVoiceArtist(voiceArtistName)">highlight_off
+                  </span>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <div ng-if="$ctrl.canManageVoiceArtist" ng-show="$ctrl.isVoiceoverFormOpen">
+            <div class="form-group">
+              <form ng-submit="$ctrl.editVoiseArtist($ctrl.newVoicAartistUsername)">
+                <div>
+                  <label>Add new voice artsit: </label>
+                  <input id="$ctrl.newVoicAartistUsername"
+                         class="form-control protractor-test-new-voice-artist-username"
+                         ng-model="$ctrl.newVoicAartistUsername"
+                         placeholder="Voice artist username"
+                         type="text">
+                </div>
+                <input type="submit" class="btn btn-secondary protractor-test-add-voice-artist-role-button" value="Save">
+                <button type="button"
+                        class="btn btn-secondary"
+                        ng-click="$ctrl.closeVoiceoverForm()">
+                  Cancel
+                </button>
               </form>
             </div>
           </div>
@@ -683,5 +733,8 @@
   }
   .oppia-user-list-item:hover {
     background-color: rgba(189, 189, 189, 0.678);
+  }
+  .oppia-no-voice-artist-message {
+    float: left;
   }
 </style>

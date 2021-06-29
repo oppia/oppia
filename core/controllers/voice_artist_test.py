@@ -36,12 +36,19 @@ class BaseVoiceArtistControllerTests(test_utils.GenericTestBase):
         super(BaseVoiceArtistControllerTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VOICE_ARTIST_EMAIL, self.VOICE_ARTIST_USERNAME)
+        self.signup('voiceoveradmin@app.com', 'voiceoverManager')
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
+
         self.voice_artist_id = self.get_user_id_from_email(
             self.VOICE_ARTIST_EMAIL)
 
-        self.owner = user_services.get_user_actions_info(self.owner_id)
+        self.voiceover_admin_id = self.get_user_id_from_email(
+            'voiceoveradmin@app.com')
+        self.set_user_role('voiceoverManager', feconf.ROLE_ID_VOICEOVER_ADMIN)
+        self.voiceover_admin = user_services.get_user_actions_info(
+            self.voiceover_admin_id)
 
 
 class VoiceArtistTest(BaseVoiceArtistControllerTests):
@@ -68,9 +75,11 @@ class VoiceArtistTest(BaseVoiceArtistControllerTests):
         super(VoiceArtistTest, self).setUp()
         self.login(self.OWNER_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
+        self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id, end_state_name='End card')
+        self.publish_exploration(self.owner_id, self.EXP_ID)
         rights_manager.assign_role_for_exploration(
-            self.owner,
+            self.voiceover_admin,
             self.EXP_ID,
             self.voice_artist_id,
             rights_domain.ROLE_VOICE_ARTIST
@@ -192,8 +201,9 @@ class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
         self.login(self.OWNER_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
+        self.publish_exploration(self.owner_id, self.EXP_ID)
         rights_manager.assign_role_for_exploration(
-            self.owner,
+            self.voiceover_admin,
             self.EXP_ID,
             self.voice_artist_id,
             rights_domain.ROLE_VOICE_ARTIST
@@ -283,8 +293,9 @@ class TranslationFirstTimeTutorialTest(BaseVoiceArtistControllerTests):
         self.login(self.OWNER_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
+        self.publish_exploration(self.owner_id, self.EXP_ID)
         rights_manager.assign_role_for_exploration(
-            self.owner,
+            self.voiceover_admin,
             self.EXP_ID,
             self.voice_artist_id,
             rights_domain.ROLE_VOICE_ARTIST
@@ -302,3 +313,106 @@ class TranslationFirstTimeTutorialTest(BaseVoiceArtistControllerTests):
             '/createhandler/started_translation_tutorial_event/%s'
             % self.EXP_ID, {}, csrf_token=self.csrf_token,
             expected_status_int=200)
+
+
+class VoiceArtistManagementTests(test_utils.GenericTestBase):
+
+    published_exp_id_1 = 'exp_1'
+    published_exp_id_2 = 'exp_2'
+    private_exp_id_1 = 'exp_3'
+    private_exp_id_2 = 'exp_4'
+
+    def setUp(self):
+        """Completes the sign-up process for self.VOICE_ARTIST_EMAIL."""
+        super(VoiceArtistManagementTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.VOICE_ARTIST_EMAIL, self.VOICE_ARTIST_USERNAME)
+        self.signup(self.VOICEOVER_ADMIN_EMAIL, self.VOICEOVER_ADMIN_USERNAME)
+
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.voice_artist_id = self.get_user_id_from_email(
+            self.VOICE_ARTIST_EMAIL)
+        self.voiceover_admin_id = self.get_user_id_from_email(
+            self.VOICEOVER_ADMIN_EMAIL)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
+        self.save_new_valid_exploration(
+            self.published_exp_id_1, self.owner_id)
+        self.save_new_valid_exploration(
+            self.published_exp_id_2, self.owner_id)
+        self.save_new_valid_exploration(
+            self.private_exp_id_1, self.owner_id)
+        self.save_new_valid_exploration(
+            self.private_exp_id_2, self.owner_id)
+        rights_manager.publish_exploration(self.owner, self.published_exp_id_1)
+        rights_manager.publish_exploration(self.owner, self.published_exp_id_2)
+        user_services.update_user_role(
+            self.voiceover_admin_id, feconf.ROLE_ID_VOICEOVER_ADMIN)
+
+    def test_owner_cannot_assign_voice_artist(self):
+        self.login(self.OWNER_EMAIL)
+        params = {
+            'username': self.VOICE_ARTIST_USERNAME
+        }
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/voice_artist_management_handler/exploration/%s'
+            % self.published_exp_id_1, params,
+            csrf_token=csrf_token, expected_status_int=401)
+        self.logout()
+
+    def test_voiceover_admin_can_manage_voice_artist(self):
+        self.login(self.VOICEOVER_ADMIN_EMAIL)
+        params = {
+            'username': self.VOICE_ARTIST_USERNAME
+        }
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/voice_artist_management_handler/exploration/%s'
+            % self.published_exp_id_1, params, csrf_token=csrf_token)
+        self.logout()
+
+    def test_voiceover_admin_can_deassign_voice_artist(self):
+        self.login(self.VOICEOVER_ADMIN_EMAIL)
+        params = {
+            'username': self.VOICE_ARTIST_USERNAME
+        }
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/voice_artist_management_handler/exploration/%s'
+            % self.published_exp_id_1, params, csrf_token=csrf_token)
+        self.delete_json(
+            '/voice_artist_management_handler/exploration/%s'
+            % self.published_exp_id_1, params={
+                'voice_artist': self.VOICE_ARTIST_USERNAME})
+        self.logout()
+
+    def test_cannot_assign_voice_artist_to_random_user(self):
+        self.login(self.VOICEOVER_ADMIN_EMAIL)
+        params = {
+            'username': 'random_user'
+        }
+        csrf_token = self.get_new_csrf_token()
+        response = self.post_json(
+            '/voice_artist_management_handler/exploration/%s'
+            % self.published_exp_id_1, params,
+            csrf_token=csrf_token, expected_status_int=400)
+        self.assertEqual(
+            response['error'], 'Sorry, we could not find the specified user.')
+        self.logout()
+
+    def test_cannot_deassign_random_user_from_voice_artist(self):
+        self.login(self.VOICEOVER_ADMIN_EMAIL)
+        params = {
+            'username': self.VOICE_ARTIST_USERNAME
+        }
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/voice_artist_management_handler/exploration/%s'
+            % self.published_exp_id_1, params, csrf_token=csrf_token)
+        response = self.delete_json(
+            '/voice_artist_management_handler/exploration/%s'
+            % self.published_exp_id_1, params={
+                'voice_artist': 'random_user'}, expected_status_int=400)
+        self.assertEqual(
+            response['error'], 'Sorry, we could not find the specified user.')
+        self.logout()

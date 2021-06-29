@@ -68,13 +68,13 @@ describe('When account is deleted it', function() {
   });
 
   it('should delete private exploration', async function() {
-    await users.createUser('voiceArtist@oppia.com', 'voiceArtist');
+    await users.createUser('ExpCollaborator@oppia.com', 'ExpCollaborator');
     await users.createAndLoginUser('user2@delete.com', 'userToDelete2');
     await workflow.createExploration(true);
     var explorationId = await general.getExplorationIdFromEditor();
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setTitle('voice artists');
-    await workflow.addExplorationVoiceArtist('voiceArtist');
+    await workflow.addExplorationCollaborator('ExpCollaborator');
     await deleteAccountPage.get();
     await deleteAccountPage.requestAccountDeletion('userToDelete2');
     await waitFor.visibilityOf(
@@ -83,7 +83,7 @@ describe('When account is deleted it', function() {
     expect(await browser.getCurrentUrl()).toEqual(
       'http://localhost:9001/pending-account-deletion');
 
-    await users.login('voiceArtist@oppia.com');
+    await users.login('ExpCollaborator@oppia.com');
     await general.openEditor(explorationId, false);
     await general.expectErrorPage(404);
     expectedConsoleErrors.push(
