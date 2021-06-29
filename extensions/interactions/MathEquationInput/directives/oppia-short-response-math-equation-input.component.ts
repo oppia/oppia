@@ -20,18 +20,29 @@
  * followed by the name of the arg.
  */
 
-require('services/html-escaper.service.ts');
+import { Component, OnInit, Input } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { HtmlEscaperService } from 'services/html-escaper.service';
 
-angular.module('oppia').component(
-  'oppiaShortResponseMathEquationInput', {
-    template: require('./math-equation-input-short-response.component.html'),
-    controller: ['$attrs', 'HtmlEscaperService',
-      function($attrs, HtmlEscaperService) {
-        const ctrl = this;
-        ctrl.$onInit = function() {
-          ctrl.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        };
-      }
-    ]
+@Component({
+  selector: 'oppia-short-response-math-equation-input',
+  templateUrl: './math-equation-input-short-response.component.html'
+})
+export class ShortResponseMathEquationInput implements OnInit {
+  @Input() answer: string;
+  displayAnswer: Object;
+
+  constructor(
+    private htmlEscaperService: HtmlEscaperService
+  ) {}
+
+  ngOnInit(): void {
+    this.displayAnswer = this.htmlEscaperService.escapedJsonToObj(this.answer);
   }
+}
+
+angular.module('oppia').directive(
+  'oppiaShortResponseMathEquationInput', downgradeComponent({
+    component: ShortResponseMathEquationInput
+  }) as angular.IDirectiveFactory
 );
