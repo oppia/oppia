@@ -90,19 +90,21 @@ var TopicEditorPage = function() {
   var selectSkillDropdown = element(
     by.css('.protractor-test-select-skill-dropdown'));
   var subtopicThumbnailImageElement = element(
-    by.css('.subtopic-thumbnail .protractor-test-custom-photo'));
+    by.css(
+      '.protractor-test-subtopic-thumbnail .protractor-test-custom-photo'));
   var subtopicThumbnailButton = element(
-    by.css('.subtopic-thumbnail .protractor-test-photo-button'));
+    by.css(
+      '.protractor-test-subtopic-thumbnail .protractor-test-photo-button'));
   var topicThumbnailImageElement = element(
-    by.css('.thumbnail-editor .protractor-test-custom-photo'));
+    by.css('.protractor-test-thumbnail-editor .protractor-test-custom-photo'));
   var topicThumbnailButton = element(
-    by.css('.thumbnail-editor .protractor-test-photo-button'));
+    by.css('.protractor-test-thumbnail-editor .protractor-test-photo-button'));
   var thumbnailContainer = element(
     by.css('.protractor-test-thumbnail-container'));
   var newStoryDescriptionField = element(
     by.css('.protractor-test-new-story-description-field'));
   var storyThumbnailButton = element(
-    by.css('.thumbnail-editor .protractor-test-photo-button'));
+    by.css('.protractor-test-thumbnail-editor .protractor-test-photo-button'));
   var topicMetaTagContentField = element(
     by.css('.protractor-test-topic-meta-tag-content-field'));
   var topicMetaTagContentLabel = element(
@@ -119,7 +121,7 @@ var TopicEditorPage = function() {
     await browser.executeScript(dragAndDropScript, fromElement, toElement);
   };
   var saveRearrangedSkillsButton = element(
-    by.css('.protractor-save-rearrange-skills'));
+    by.css('.protractor-test-save-rearrange-skills'));
   var practiceTabCheckbox = element(
     by.css('.protractor-test-toggle-practice-tab'));
 
@@ -221,7 +223,7 @@ var TopicEditorPage = function() {
       '.protractor-test-edit-subtopic-page-contents'));
     await waitFor.visibilityOf(
       pageEditor, 'Subtopic html editor takes too long to appear');
-    var pageEditorInput = pageEditor.element(by.css('.oppia-rte'));
+    var pageEditorInput = pageEditor.element(by.css('.protractor-test-rte'));
     await pageEditorInput.click();
     await pageEditorInput.clear();
     await pageEditorInput.sendKeys(content);
