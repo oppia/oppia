@@ -45,11 +45,10 @@ def validate_new_config_property_values(obj):
     """Validates new config property values.
 
     Args:
-        obj: dict. The new config property values data that needs
-        to be validated.
+        obj: dict. Data that needs to be validated.
     """
     for (name, value) in obj.items():
-        config_property = config_domain.Registry.get_config_property(name) # type: ignore[no-untyped-call]
+        config_property = config_domain.Registry.get_config_property(name) # type: ignore[no-untyped-call] # pylint: disable=line-too-long
         if config_property is None:
             raise Exception('%s do not have any schema.' % name)
 
