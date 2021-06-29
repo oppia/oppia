@@ -29,7 +29,7 @@ require(
   'state-skill-editor.component.ts');
 require(
   'components/state-editor/state-responses-editor/' +
-  'state-responses.component.ts');
+  'state-responses.directive.ts');
 require(
   'components/state-editor/state-solution-editor/' +
   'state-solution-editor.directive.ts');
