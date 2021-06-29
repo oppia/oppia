@@ -245,7 +245,7 @@ import { ContentTranslationManagerService } from 'pages/exploration-player-page/
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { ExplorationEngineService } from 'pages/exploration-player-page/services/exploration-engine.service';
 import { ExplorationRecommendationsService } from 'pages/exploration-player-page/services/exploration-recommendations.service';
-import { ExtractImageFilenamesFromStateService } from 'pages/exploration-player-page/services/extract-image-filenames-from-state.service';
+import { ExtractImageFilenamesFromModelService } from 'pages/exploration-player-page/services/extract-image-filenames-from-model.service';
 import { FatigueDetectionService } from 'pages/exploration-player-page/services/fatigue-detection.service';
 import { HintsAndSolutionManagerService } from 'pages/exploration-player-page/services/hints-and-solution-manager.service';
 import { ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
@@ -482,8 +482,8 @@ export const angularServices: [string, Type<{}>][] = [
   ['ExtensionTagAssemblerService', ExtensionTagAssemblerService],
   ['ExternalRteSaveService', ExternalRteSaveService],
   ['ExternalSaveService', ExternalSaveService],
-  ['ExtractImageFilenamesFromStateService',
-    ExtractImageFilenamesFromStateService],
+  ['ExtractImageFilenamesFromModelService',
+    ExtractImageFilenamesFromModelService],
   ['EventBusService', EventBusService],
   ['FatigueDetectionService',
     FatigueDetectionService],
