@@ -88,9 +88,8 @@ class AdminHandler(base.BaseHandler):
                     'generate_dummy_new_structures_data',
                     'generate_dummy_new_skill_data', 'save_config_properties',
                     'revert_config_property', 'upload_topic_similarities',
-                    'start_computation', 'stop_computation',
-                    'cancel_job', 'regenerate_topic_related_opportunities',
-                    'start_new_job', 'regenerate_missing_exploration_stats',
+                    'regenerate_topic_related_opportunities',
+                    'regenerate_missing_exploration_stats',
                     'update_feature_flag_rules'
                 ]
             },
@@ -130,7 +129,8 @@ class AdminHandler(base.BaseHandler):
             },
             'feature_name': {
                 'type': 'basestring',
-                'default_value': None
+                'default_value': None,
+                'choices': feature_services.ALL_FEATURES_NAMES_SET
             },
             'commit_message': {
                 'type': 'basestring',

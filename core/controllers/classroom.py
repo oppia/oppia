@@ -59,6 +59,7 @@ class ClassroomDataHandler(base.BaseHandler):
     @acl_decorators.does_classroom_exist
     def get(self, classroom_url_fragment):
         """Handles GET requests."""
+
         classroom = classroom_services.get_classroom_by_url_fragment(
             classroom_url_fragment)
 
