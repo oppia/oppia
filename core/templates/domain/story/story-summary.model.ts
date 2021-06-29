@@ -34,8 +34,8 @@ export interface StorySummaryBackendDict {
   'all_node_dicts': StoryNodeBackendDict[],
   // This property is optional because it is only present in the
   // story summary dict of learner dashboard page.
-  'topic_url_fragment'?: string | undefined,
-  'classroom_url_fragment'?: string | undefined
+  'topic_url_fragment'?: string,
+  'classroom_url_fragment'?: string
 }
 
 export class StorySummary {
