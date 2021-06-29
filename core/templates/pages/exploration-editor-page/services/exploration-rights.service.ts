@@ -135,6 +135,36 @@ angular.module('oppia').factory('ExplorationRightsService', [
             data.rights.community_owned, data.rights.viewable_if_private);
         });
       },
+      assignVoiceArtistRoleAsync: function(newVoiceArtistUsername) {
+        var that = this;
+        var requestUrl = (
+          '/voice_artist_management_handler/' + 'exploration/' +
+          ExplorationDataService.explorationId);
+
+        return $http.post(requestUrl, {
+          username: newVoiceArtistUsername}).then(() => {
+          AlertsService.clearWarnings();
+          that.voiceArtistNames.push(newVoiceArtistUsername);
+        });
+      },
+      removeVoiceArtistRoleAsync: function(voiceArtistUsername) {
+        var that = this;
+        var requestUrl = (
+          '/voice_artist_management_handler/' + 'exploration/' +
+          ExplorationDataService.explorationId);
+        return $http.delete(requestUrl, {
+          params: {
+            voice_artist: voiceArtistUsername
+          }
+        }).then(function(response) {
+          AlertsService.clearWarnings();
+          that.voiceArtistNames.forEach((username, index) => {
+            if (username === voiceArtistUsername) {
+              that.voiceArtistNames.splice(index, 1);
+            }
+          });
+        });
+      },
       checkUserAlreadyHasRoles: function(username) {
         return [...this.ownerNames, ...this.editorNames, ...this.viewerNames,
           ...this.voiceArtistNames].includes(username);
