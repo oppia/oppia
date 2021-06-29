@@ -24,8 +24,11 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.domain import config_domain
 from core.domain import exp_domain
 
+from typing import Any, Dict # isort:skip  pylint: disable=wrong-import-order, wrong-import-position, unused-import, import-only-modules
+
 
 def validate_exploration_change(obj):
+    # type: (Dict[Any, Any]) -> None
     """Validates exploration change.
 
     Args:
@@ -33,13 +36,16 @@ def validate_exploration_change(obj):
     """
     # No explicit call to validate_dict method is necessary, because
     # ExplorationChange calls it while initialization.
-    exp_domain.ExplorationChange(obj)
+
+    exp_domain.ExplorationChange(obj) # type: ignore[no-untyped-call]
 
 
 def validate_new_config_property_values(obj):
     """Validates new config property values.
 
-    Args: dict. The new config property values data that needs to be validated.
+    Args:
+        obj: dict. The new config property values data that needs
+        to be validated.
     """
     for (name, value) in obj.items():
         config_property = config_domain.Registry.get_config_property(name)

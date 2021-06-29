@@ -19,7 +19,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import copy
 import inspect
 
 from core.domain import email_manager
@@ -786,14 +785,12 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
         validate_schema(schema)
 
         for raw_value, expected_value in mappings:
-            schema1 = copy.deepcopy(schema)
             self.assertEqual(
-                schema_utils.normalize_against_schema(raw_value, schema1),
+                schema_utils.normalize_against_schema(raw_value, schema),
                 expected_value)
         for value, error_msg in invalid_items_with_error_messages:
-            schema1 = copy.deepcopy(schema)
             with self.assertRaisesRegexp(Exception, error_msg):
-                schema_utils.normalize_against_schema(value, schema1)
+                schema_utils.normalize_against_schema(value, schema)
 
     def test_float_schema(self):
         schema = {

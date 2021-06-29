@@ -24,6 +24,7 @@ from core.tests import test_utils
 class PayloadValidationUnitTests(test_utils.GenericTestBase):
 
     def test_invalid_args_raises_exceptions(self):
+        # type: () -> None
 
         # List of 3-tuples, where the first element is an invalid argument dict,
         # the second element is a schema dict and the third element
@@ -34,7 +35,7 @@ class PayloadValidationUnitTests(test_utils.GenericTestBase):
                 'exploration_id': 2
             }, {
                 'exploration_id': {
-                    'type': 'unicode'
+                    'type': 'string'
                 }
             }, [
                 'Schema validation for \'exploration_id\' failed: '
@@ -54,7 +55,7 @@ class PayloadValidationUnitTests(test_utils.GenericTestBase):
                 'Found extra args: [u\'exploration_id\'].']),
             ({}, {
                 'exploration_id': {
-                    'type': 'unicode'
+                    'type': 'string'
                 }
             }, [
                 'Missing key in handler args: exploration_id.'])
@@ -68,6 +69,7 @@ class PayloadValidationUnitTests(test_utils.GenericTestBase):
             self.assertEqual(error_msg, errors)
 
     def test_valid_args_do_not_raises_exception(self):
+        # type: () -> None
 
         # List of 3-tuples, where the first element is a valid argument dict,
         # the second element is a schema dict and the third element is the
@@ -75,13 +77,13 @@ class PayloadValidationUnitTests(test_utils.GenericTestBase):
         list_of_valid_args_with_schmea = [
             ({}, {
                 'exploration_id': {
-                    'type': 'unicode',
+                    'type': 'string',
                     'default_value': None
                 }
             }, {}),
             ({}, {
                 'exploration_id': {
-                    'type': 'unicode',
+                    'type': 'string',
                     'default_value': 'default_exp_id'
                 }
             }, {
@@ -91,7 +93,7 @@ class PayloadValidationUnitTests(test_utils.GenericTestBase):
                 'exploration_id': 'any_exp_id'
             }, {
                 'exploration_id': {
-                    'type': 'unicode'
+                    'type': 'string'
                 }
             }, {
                 'exploration_id': 'any_exp_id'

@@ -23,8 +23,12 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import schema_utils
 
+from typing import Any, Dict, List, Text, Tuple # isort:skip  pylint: disable= wrong-import-order, wrong-import-position, unused-import, import-only-modules
+
 
 def validate(handler_args, handler_args_schemas, allowed_extra_args):
+    # type: (Any, Any, bool) -> Tuple[Dict[Any, Any], List[Text]]
+
     """Calls schema utils for normalization of object against its schema
     and collects all the errors.
 
@@ -34,7 +38,9 @@ def validate(handler_args, handler_args_schemas, allowed_extra_args):
         allowed_extra_args: bool. Whether extra args are allowed in handler.
 
     Returns:
-        errors: list(str). List of all errors.
+        *. A two tuple, where the first element represents the normalized value
+        in dict format and the second element represents the lists of errors
+        after validation.
     """
     # Collect all errors and present them at once.
     errors = []
@@ -54,7 +60,7 @@ def validate(handler_args, handler_args_schemas, allowed_extra_args):
                 continue
 
         try:
-            normalized_value[arg_key] = schema_utils.normalize_against_schema(
+            normalized_value[arg_key] = schema_utils.normalize_against_schema( # type: ignore[no-untyped-call] # pylint: disable=line-too-long
                 handler_args[arg_key], arg_schema)
         except Exception as e:
             errors.append(
@@ -100,9 +106,7 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'CronDashboardStatsHandler',
     'CronExplorationRecommendationsHandler',
     'CronFullyCompleteUserDeletionHandler',
-    'CronMailAdminContributorDashboardBottleneckHandler',
     'CronMailAdminContributorDashboardBottlenecksHandler',
-    'CronMailReviewerContributorDashboardSuggestionsHandler',
     'CronMailReviewersContributorDashboardSuggestionsHandler',
     'CronMapreduceCleanupHandler',
     'CronModelsCleanupHandler',
@@ -170,6 +174,7 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'LearnerDashboardHandler',
     'LearnerDashboardIdsHandler',
     'LearnerDashboardPage',
+    'LearnerGoalsHandler',
     'LearnerIncompleteActivityHandler',
     'LearnerPlaylistHandler',
     'LeaveForRefresherExpEventHandler',

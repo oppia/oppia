@@ -25,20 +25,22 @@ class ValidateExplorationChangeTests(test_utils.GenericTestBase):
     """Tests to validate domain objects coming from API."""
 
     def test_incorrect_object_raises_exception(self):
+        # type: () -> None
         exploration_change = {
             'old_value': '',
             'property_name': 'title',
             'new_value': 'newValue'
         }
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'Missing cmd key in change dict'):
             domain_objects_validator.validate_exploration_change(
                 exploration_change)
 
     def test_correct_object_do_not_raises_exception(self):
+        # type: () -> None
         exploration_change = {
             'cmd': 'edit_exploration_property',
-            'new_value': 'nik',
+            'new_value': 'arbitary_new_value',
             'old_value': '',
             'property_name': 'title'
         }
