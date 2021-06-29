@@ -152,7 +152,7 @@ var SkillEditorPage = function() {
     await this.selectDifficultyForRubric(difficulty);
     var editRubricExplanationButtons = element.all(
       by.css('.protractor-test-edit-rubric-explanation-' + difficulty));
-    var button = await editRubricExplanationButtons.get(explIndex);
+    var button = editRubricExplanationButtons.get(explIndex);
     await waitFor.elementToBeClickable(
       button, 'Edit Rubric Explanation button takes too long to be clickable');
     await button.click();
@@ -172,7 +172,7 @@ var SkillEditorPage = function() {
     var editRubricExplanationButtons = element.all(
       by.css('.protractor-test-edit-rubric-explanation-' + difficulty));
     await waitFor.elementToBeClickable(
-      await editRubricExplanationButtons.get(explIndex),
+      editRubricExplanationButtons.get(explIndex),
       'Edit Rubric Explanation button takes too long to be clickable');
     await editRubricExplanationButtons.get(explIndex).click();
     var editor = element(
@@ -193,7 +193,7 @@ var SkillEditorPage = function() {
       by.css('.protractor-test-rubric-explanation-' + difficulty));
     var explanationCount = await rubricExplanationsForDifficulty.count();
     for (var i = 0; i < explanationCount; i++) {
-      var text = await (await rubricExplanationsForDifficulty.get(i)).getText();
+      var text = await rubricExplanationsForDifficulty.get(i).getText();
       expect(text).toMatch(explanations[i]);
     }
   };

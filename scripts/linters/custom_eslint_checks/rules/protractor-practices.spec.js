@@ -21,9 +21,20 @@
 var rule = require('./protractor-practices');
 var RuleTester = require('eslint').RuleTester;
 
-var ruleTester = new RuleTester({ parserOptions: { ecmaVersion: 2016 } });
+var ruleTester = new RuleTester({
+  parserOptions: {
+    ecmaVersion: 2016,
+  },
+  parser: require.resolve('@typescript-eslint/parser')
+});
+
 ruleTester.run('protractor-practices', rule, {
   valid: [{
+    code:
+    `expSummaryRowTitleElements.first()
+    conversationContent.los.last()
+    var text = unfinishedOneOffJobRows.get(i);`
+  }, {
     code:
     `action.click(elem);
     action.sleep();`,
@@ -124,6 +135,24 @@ ruleTester.run('protractor-practices', rule, {
       'const Value = 5;',
       errors: [{
         message: 'Please make sure that constant name “Value” are in all-caps',
+      }],
+    },
+    {
+      code:
+      `await element.all(
+      by.css(".protractor-test-collection-exploration")).first()`,
+      errors: [{
+        message: 'Please do not use await for "first()"',
+      }],
+    },
+    {
+      code:
+      `var oneOffJob = element.all(
+      by.css('.protractor-test-one-off-jobs-rows'));
+      await oneOffJob.get()
+      await invalid.get()`,
+      errors: [{
+        message: 'Please do not use await for "get()"',
       }],
     },
   ]

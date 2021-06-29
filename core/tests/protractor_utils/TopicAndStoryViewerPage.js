@@ -37,7 +37,7 @@ var TopicAndStoryViewerPage = function() {
   };
 
   this.goToChapterIndex = async function(index) {
-    var chapter = await chapterTitleList.get(index);
+    var chapter = chapterTitleList.get(index);
     await action.click('Chapter title', chapter);
     await waitFor.pageToFullyLoad();
   };

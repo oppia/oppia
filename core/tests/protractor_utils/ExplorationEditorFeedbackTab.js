@@ -87,7 +87,7 @@ var ExplorationEditorFeedbackTab = function() {
     var rows = element.all(by.css(suggestionRowClassName));
     var rowCount = await rows.count();
     for (var i = 0; i < rowCount; i++) {
-      var row = await rows.get(i);
+      var row = rows.get(i);
       var subject = (
         await row.element(by.css(feedbackSubjectClassName)).getText());
       threads.push(subject);
@@ -107,7 +107,7 @@ var ExplorationEditorFeedbackTab = function() {
     var rows = element.all(by.css(suggestionRowClassName));
     var rowCount = await rows.count();
     for (var i = 0; i < rowCount; i++) {
-      var row = await rows.get(i);
+      var row = rows.get(i);
       await action.click(`suggestionRow at row index ${i}`, row);
       await waitFor.visibilityOf(
         explorationFeedback, 'Feedback message text is not visible');

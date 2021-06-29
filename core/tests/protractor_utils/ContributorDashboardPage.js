@@ -139,7 +139,7 @@ var ContributorDashboardPage = function() {
     var opportunityCount = await opportunityListItems.count();
     var opportunityElements = [];
     for (var i = 0; i < opportunityCount; i++) {
-      var opportunityElement = await opportunityListItems.get(i);
+      var opportunityElement = opportunityListItems.get(i);
       if (await opportunityElement.isDisplayed()) {
         opportunityElements.push(opportunityElement);
       }

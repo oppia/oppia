@@ -336,10 +336,9 @@ describe('Learner dashboard functionality', function() {
     await waitFor.pageToFullyLoad();
     // The collection player has two sets of SVGs -- one which is
     // rendered for desktop and the other which is rendered for mobile.
-    var firstExploration = browser.isMobile ? await element.all(
+    var firstExploration = browser.isMobile ? element.all(
       by.css('.protractor-test-mobile-collection-exploration')).first() :
-      await element.all(
-        by.css('.protractor-test-collection-exploration')).first();
+      element.all(by.css('.protractor-test-collection-exploration')).first();
     // Click first exploration in collection.
     await action.click('First exploration', firstExploration);
     await waitFor.pageToFullyLoad();
@@ -371,10 +370,9 @@ describe('Learner dashboard functionality', function() {
     await waitFor.pageToFullyLoad();
     // The collection player has two sets of SVGs -- one which is
     // rendered for desktop and the other which is rendered for mobile.
-    var firstExploration = browser.isMobile ? await element.all(
+    var firstExploration = browser.isMobile ? element.all(
       by.css('.protractor-test-mobile-collection-exploration')).first() :
-      await element.all(
-        by.css('.protractor-test-collection-exploration')).first();
+      element.all(by.css('.protractor-test-collection-exploration')).first();
     // Click first exploration in collection.
     await action.click('First exploration', firstExploration);
     await waitFor.pageToFullyLoad();

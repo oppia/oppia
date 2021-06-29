@@ -213,7 +213,7 @@ var ExplorationEditorPage = function() {
     expect(explorationLanguage).toMatch(language);
     for (var i = 0; i < await explorationTags.count(); i++) {
       expect(
-        await (await explorationTags.get(i)).getText()
+        await explorationTags.get(i).getText()
       ).toMatch(tags[i]);
     }
   };
