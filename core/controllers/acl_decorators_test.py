@@ -1483,8 +1483,8 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
         self.voice_artist_id = self.get_user_id_from_email(
             self.VOICE_ARTIST_EMAIL)
         self.set_moderators([self.MODERATOR_USERNAME])
-        self.set_admins([self.CURRICULUM_ADMIN_USERNAME])
-        self.set_banned_users([self.banned_username])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.mark_user_banned(self.banned_username)
         user_services.add_user_role(
             self.voiceover_admin_id, feconf.ROLE_ID_VOICEOVER_ADMIN)
         self.owner = user_services.get_user_actions_info(self.owner_id)
