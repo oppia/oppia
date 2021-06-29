@@ -1291,7 +1291,7 @@ class IframeRestrictionTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS = {
             'GET': {
                 'iframe_restriction': {
-                    'type': 'string',
+                    'type': 'basestring',
                     'default_value': None
                 }
             }
@@ -1405,9 +1405,9 @@ class OppiaMLVMHandlerTests(test_utils.GenericTestBase):
         URL_PATH_ARGS_SCHEMAS = {}
         HANDLER_ARGS_SCHEMAS = {
             'POST': {
-                'vm_id': {'type': 'string'},
-                'signature': {'type': 'string'},
-                'message': {'type': 'string'},
+                'vm_id': {'type': 'basestring'},
+                'signature': {'type': 'basestring'},
+                'message': {'type': 'basestring'},
             }
         }
 
@@ -1424,9 +1424,9 @@ class OppiaMLVMHandlerTests(test_utils.GenericTestBase):
         URL_PATH_ARGS_SCHEMAS = {}
         HANDLER_ARGS_SCHEMAS = {
             'POST': {
-                'vm_id': {'type': 'string'},
-                'signature': {'type': 'string'},
-                'message': {'type': 'string'},
+                'vm_id': {'type': 'basestring'},
+                'signature': {'type': 'basestring'},
+                'message': {'type': 'basestring'},
             }
         }
 
@@ -1723,7 +1723,7 @@ class SchemaValidationUrlArgsTests(test_utils.GenericTestBase):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'exploration_id': {
-                'type': 'string'
+                'type': 'basestring'
             }
         }
         HANDLER_ARGS_SCHEMAS = {'GET': {}}
