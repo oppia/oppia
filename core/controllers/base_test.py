@@ -1486,7 +1486,7 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
     handler_class_names_with_no_schema = (
         payload_validator.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA)
     wiki_page_link = (
-        'https://github.com/oppia/oppia/wiki/Validation-of-handler-args')
+        'https://github.com/oppia/oppia/wiki/Writing-schema-for-handler-args')
 
     def _get_list_of_routes_which_need_schemas(self):
         """This method iterates over all the routes and returns those routes
