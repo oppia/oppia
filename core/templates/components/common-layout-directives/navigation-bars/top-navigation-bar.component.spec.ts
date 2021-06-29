@@ -81,7 +81,7 @@ describe('TopNavigationBarComponent', () => {
 
   let userInfo = {
     _isModerator: true,
-    _isAdmin: true,
+    _isCurriculumAdmin: true,
     _isTopicManager: false,
     _isSuperAdmin: false,
     _canCreateCollections: true,
@@ -90,7 +90,7 @@ describe('TopNavigationBarComponent', () => {
     _email: 'tester@example.org',
     _isLoggedIn: true,
     isModerator: () => true,
-    isAdmin: () => false,
+    isCurriculumAdmin: () => false,
     isSuperAdmin: () => false,
     isTopicManager: () => false,
     canCreateCollections: () => true,
@@ -187,7 +187,7 @@ describe('TopNavigationBarComponent', () => {
       .and.resolveTo(true);
 
     expect(component.isModerator).toBe(undefined);
-    expect(component.isAdmin).toBe(undefined);
+    expect(component.isCurriculumAdmin).toBe(undefined);
     expect(component.isTopicManager).toBe(undefined);
     expect(component.isSuperAdmin).toBe(undefined);
     expect(component.userIsLoggedIn).toBe(undefined);
@@ -198,7 +198,7 @@ describe('TopNavigationBarComponent', () => {
     tick();
 
     expect(component.isModerator).toBe(true);
-    expect(component.isAdmin).toBe(false);
+    expect(component.isCurriculumAdmin).toBe(false);
     expect(component.isTopicManager).toBe(false);
     expect(component.isSuperAdmin).toBe(false);
     expect(component.userIsLoggedIn).toBe(true);

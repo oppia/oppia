@@ -4425,10 +4425,10 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
     specific suggestion types.
     """
 
-    ADMIN_1_USERNAME = 'user1'
-    ADMIN_1_EMAIL = 'user1@community.org'
-    ADMIN_2_USERNAME = 'user2'
-    ADMIN_2_EMAIL = 'user2@community.org'
+    CURRICULUM_ADMIN_1_USERNAME = 'user1'
+    CURRICULUM_ADMIN_1_EMAIL = 'user1@community.org'
+    CURRICULUM_ADMIN_2_USERNAME = 'user2'
+    CURRICULUM_ADMIN_2_EMAIL = 'user2@community.org'
     AUTHOR_EMAIL = 'author@example.com'
     target_id = 'exp1'
     skill_id = 'skill_123456'

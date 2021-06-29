@@ -284,8 +284,8 @@ describe('Admin backend api service', () => {
   }
   ));
 
-  it('should update the role of the user given the name' +
-    'when calling updateUserRoleAsync', fakeAsync(() => {
+  it('should add the role to the user given the name' +
+    'when calling addUserRoleAsync', fakeAsync(() => {
     let topicId = null;
     let newRole = 'ADMIN';
     let username = 'validUser';
@@ -294,11 +294,11 @@ describe('Admin backend api service', () => {
       username: username,
       topic_id: topicId
     };
-    abas.updateUserRoleAsync(newRole, username, topicId)
+    abas.addUserRoleAsync(newRole, username, topicId)
       .then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne('/adminrolehandler');
-    expect(req.request.method).toEqual('POST');
+    expect(req.request.method).toEqual('PUT');
     expect(req.request.body).toEqual(payload);
 
     req.flush(
@@ -310,8 +310,8 @@ describe('Admin backend api service', () => {
   }
   ));
 
-  it('should fail to update the role of user when user does' +
-    'not exists when calling updateUserRoleAsync', fakeAsync(() => {
+  it('should fail to add the role to user when user does' +
+    'not exists when calling addUserRoleAsync', fakeAsync(() => {
     let topicId = null;
     let newRole = 'ADMIN';
     let username = 'InvalidUser';
@@ -320,12 +320,61 @@ describe('Admin backend api service', () => {
       username: username,
       topic_id: topicId
     };
-    abas.updateUserRoleAsync(newRole, username, topicId)
+    abas.addUserRoleAsync(newRole, username, topicId)
       .then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne('/adminrolehandler');
-    expect(req.request.method).toEqual('POST');
+    expect(req.request.method).toEqual('PUT');
     expect(req.request.body).toEqual(payload);
+
+    req.flush(
+      { error: 'User with given username does not exist'},
+      { status: 500, statusText: 'Internal Server Error'});
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      'User with given username does not exist');
+  }
+  ));
+
+
+  it('should remove the user role when calling removeUserRoleAsync',
+    fakeAsync(() => {
+    let topicId = null;
+    let newRole = 'ADMIN';
+    let username = 'validUser';
+
+    abas.removeUserRoleAsync(newRole, username, topicId, false)
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      '/adminrolehandler?role=ADMIN&username=validUser&' +
+      'topic_id=null&remove_from_all_topics=false');
+    expect(req.request.method).toEqual('DELETE');
+
+    req.flush(
+      { status: 200, statusText: 'Success.'});
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it('should fail to remove user role when user does' +
+    'not exists when calling removeUserRoleAsync', fakeAsync(() => {
+    let topicId = null;
+    let newRole = 'ADMIN';
+    let username = 'InvalidUser';
+
+    abas.removeUserRoleAsync(newRole, username, topicId, false)
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      '/adminrolehandler?role=ADMIN&username=InvalidUser&' +
+      'topic_id=null&remove_from_all_topics=false');
+    expect(req.request.method).toEqual('DELETE');
 
     req.flush(
       { error: 'User with given username does not exist'},
