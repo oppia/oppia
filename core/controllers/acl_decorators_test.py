@@ -1262,13 +1262,20 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
         self.signup(self.user_email, self.username)
         self.signup(self.banned_user_email, self.banned_username)
         self.signup(self.VOICE_ARTIST_EMAIL, self.VOICE_ARTIST_USERNAME)
+        self.signup(self.VOICEOVER_ADMIN_EMAIL, self.VOICEOVER_ADMIN_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.voice_artist_id = self.get_user_id_from_email(
             self.VOICE_ARTIST_EMAIL)
+        self.voiceover_admin_id = self.get_user_id_from_email(
+            self.VOICEOVER_ADMIN_EMAIL)
         self.set_moderators([self.MODERATOR_USERNAME])
         self.set_admins([self.ADMIN_USERNAME])
         self.set_banned_users([self.banned_username])
         self.owner = user_services.get_user_actions_info(self.owner_id)
+        self.set_user_role(
+            self.VOICEOVER_ADMIN_USERNAME, feconf.ROLE_ID_VOICEOVER_ADMIN)
+        self.voiceover_admin = user_services.get_user_actions_info(
+            self.voiceover_admin_id)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -1285,10 +1292,8 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
         rights_manager.publish_exploration(self.owner, self.published_exp_id_2)
 
         rights_manager.assign_role_for_exploration(
-            self.owner, self.published_exp_id_1, self.voice_artist_id,
+            self.voiceover_admin, self.published_exp_id_1, self.voice_artist_id,
             self.role)
-        rights_manager.assign_role_for_exploration(
-            self.owner, self.private_exp_id_1, self.voice_artist_id, self.role)
 
     def test_banned_user_cannot_voiceover_exploration(self):
         self.login(self.banned_user_email)
@@ -1339,20 +1344,6 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
                 '/mock/%s' % self.published_exp_id_2, expected_status_int=401)
         self.logout()
 
-    def test_voice_artist_can_only_voiceover_assigned_private_exploration(self):
-        self.login(self.VOICE_ARTIST_EMAIL)
-        # Checking voice artist can voiceover assigned private exploration.
-        with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock/%s' % self.private_exp_id_1)
-        self.assertEqual(response['exploration_id'], self.private_exp_id_1)
-
-        # Checking voice artist cannot voiceover private exploration which
-        # he/she is not assigned for.
-        with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json(
-                '/mock/%s' % self.private_exp_id_2, expected_status_int=401)
-        self.logout()
-
     def test_user_without_voice_artist_role_of_exploration_cannot_voiceover_public_exploration(self): # pylint: disable=line-too-long
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -1366,6 +1357,144 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
             self.get_json(
                 '/mock/%s' % self.private_exp_id_1, expected_status_int=401)
         self.logout()
+
+
+class VoiceArtistManagementTests(test_utils.GenericTestBase):
+
+    role = rights_domain.ROLE_VOICE_ARTIST
+    username = 'user'
+    user_email = 'user@example.com'
+    banned_username = 'banneduser'
+    banned_user_email = 'banneduser@example.com'
+    published_exp_id_1 = 'exp_1'
+    published_exp_id_2 = 'exp_2'
+    private_exp_id_1 = 'exp_3'
+    private_exp_id_2 = 'exp_4'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+        @acl_decorators.can_manage_voice_artist
+        def post(self, entity_type, entity_id):
+            self.render_json({
+                'entity_type': entity_type,
+                'entity_id': entity_id})
+
+    def setUp(self):
+        super(VoiceArtistManagementTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.VOICEOVER_ADMIN_EMAIL, self.VOICEOVER_ADMIN_USERNAME)
+        self.signup(self.user_email, self.username)
+        self.signup(self.banned_user_email, self.banned_username)
+        self.signup(self.VOICE_ARTIST_EMAIL, self.VOICE_ARTIST_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.voiceover_admin_id = self.get_user_id_from_email(
+            self.VOICEOVER_ADMIN_EMAIL)
+        self.voice_artist_id = self.get_user_id_from_email(
+            self.VOICE_ARTIST_EMAIL)
+        self.set_moderators([self.MODERATOR_USERNAME])
+        self.set_admins([self.ADMIN_USERNAME])
+        self.set_banned_users([self.banned_username])
+        user_services.update_user_role(
+            self.voiceover_admin_id, feconf.ROLE_ID_VOICEOVER_ADMIN)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
+        self.voiceover_admin = user_services.get_user_actions_info(
+            self.voiceover_admin_id)
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route(
+                '/mock/<entity_type>/<entity_id>', self.MockHandler)],
+            debug=feconf.DEBUG,))
+        self.save_new_valid_exploration(
+            self.published_exp_id_1, self.owner_id)
+        self.save_new_valid_exploration(
+            self.published_exp_id_2, self.owner_id)
+        self.save_new_valid_exploration(
+            self.private_exp_id_1, self.owner_id)
+        self.save_new_valid_exploration(
+            self.private_exp_id_2, self.owner_id)
+        rights_manager.publish_exploration(self.owner, self.published_exp_id_1)
+        rights_manager.publish_exploration(self.owner, self.published_exp_id_2)
+
+        rights_manager.assign_role_for_exploration(
+            self.voiceover_admin, self.published_exp_id_1, self.voice_artist_id,
+            self.role)
+
+    def test_voiceover_admin_can_manage_voice_artist_in_public_exp(self):
+        self.login(self.VOICEOVER_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.post_json(
+                '/mock/exploration/%s' % self.published_exp_id_1,
+                {}, csrf_token=csrf_token)
+        self.logout()
+
+    def test_assigning_voice_artist_for_unsupported_entity_type_raise_400(self):
+        unsupported_entity_type = 'topic'
+        self.login(self.VOICEOVER_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.post_json(
+                '/mock/%s/%s' % (
+                    unsupported_entity_type, self.published_exp_id_1),
+                {}, csrf_token=csrf_token, expected_status_int=400)
+            self.assertEqual(
+                response['error'],
+                'Unsupported entity_type: topic')
+        self.logout()
+
+    def test_voiceover_admin_cannot_assign_voice_artist_in_private_exp(self):
+        self.login(self.VOICEOVER_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.post_json(
+                '/mock/exploration/%s' % self.private_exp_id_1, {},
+                csrf_token=csrf_token, expected_status_int=401)
+            self.assertEqual(
+                response['error'],
+                'You do not have credentials to manage voice artists.')
+        self.logout()
+
+    def test_owner_cannot_assign_voice_artist_in_public_exp(self):
+        self.login(self.OWNER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.post_json(
+                '/mock/exploration/%s' % self.private_exp_id_1, {},
+                csrf_token=csrf_token, expected_status_int=401)
+            self.assertEqual(
+                response['error'],
+                'You do not have credentials to manage voice artists.')
+        self.logout()
+
+    def test_random_user_cannot_assign_voice_artist_in_public_exp(self):
+        self.login(self.user_email)
+        csrf_token = self.get_new_csrf_token()
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.post_json(
+                '/mock/exploration/%s' % self.private_exp_id_1, {},
+                csrf_token=csrf_token, expected_status_int=401)
+            self.assertEqual(
+                response['error'],
+                'You do not have credentials to manage voice artists.')
+        self.logout()
+
+    def test_voiceover_admin_cannot_assign_voice_artist_in_invalid_exp(self):
+        self.login(self.VOICEOVER_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.post_json(
+                '/mock/exploration/invalid_exp_id', {},
+                csrf_token=csrf_token, expected_status_int=404)
+        self.logout()
+
+    def test_voiceover_admin_cannot_assign_voice_artist_without_login(self):
+        csrf_token = self.get_new_csrf_token()
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.post_json(
+                '/mock/exploration/%s' % self.private_exp_id_1, {},
+                csrf_token=csrf_token, expected_status_int=401)
 
 
 class EditExplorationTests(test_utils.GenericTestBase):
@@ -3572,13 +3701,21 @@ class SaveExplorationTests(test_utils.GenericTestBase):
         self.signup(self.user_email, self.username)
         self.signup(self.banned_user_email, self.banned_username)
         self.signup(self.VOICE_ARTIST_EMAIL, self.VOICE_ARTIST_USERNAME)
+        self.signup(self.VOICEOVER_ADMIN_EMAIL, self.VOICEOVER_ADMIN_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.voice_artist_id = self.get_user_id_from_email(
             self.VOICE_ARTIST_EMAIL)
+        self.voiceover_admin_id = self.get_user_id_from_email(
+            self.VOICEOVER_ADMIN_EMAIL)
+
         self.set_moderators([self.MODERATOR_USERNAME])
         self.set_admins([self.ADMIN_USERNAME])
         self.set_banned_users([self.banned_username])
+        self.set_user_role(
+            self.VOICEOVER_ADMIN_USERNAME, feconf.ROLE_ID_VOICEOVER_ADMIN)
         self.owner = user_services.get_user_actions_info(self.owner_id)
+        self.voiceover_admin = user_services.get_user_actions_info(
+            self.voiceover_admin_id)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -3595,10 +3732,8 @@ class SaveExplorationTests(test_utils.GenericTestBase):
         rights_manager.publish_exploration(self.owner, self.published_exp_id_2)
 
         rights_manager.assign_role_for_exploration(
-            self.owner, self.published_exp_id_1, self.voice_artist_id,
+            self.voiceover_admin, self.published_exp_id_1, self.voice_artist_id,
             self.role)
-        rights_manager.assign_role_for_exploration(
-            self.owner, self.private_exp_id_1, self.voice_artist_id, self.role)
 
     def test_unautheticated_user_cannot_save_exploration(self):
         with self.swap(self, 'testapp', self.mock_testapp):
