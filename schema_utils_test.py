@@ -623,6 +623,15 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         self.assertTrue(is_at_most(2, 2)) # boundary
         self.assertFalse(is_at_most(2, 1))
 
+    def test_is_length_atmost_validator(self):
+        """Tests if static method is_length_atmost true iff obj
+        has at most a length.
+        """
+        is_length_atmost = schema_utils.get_validator('is_length_atmost')
+        self.assertTrue(is_length_atmost('arbitary_text', 15))
+        self.assertTrue(is_length_atmost('python', 6)) #boundary
+        self.assertFalse(is_length_atmost('Angular', 5))
+
     def test_has_length_at_least_validator(self):
         """Tests if static method has_length_at_least returns true iff
         given list has length of at least the given value.

@@ -1150,7 +1150,7 @@ class UpdateUsernameHandler(base.BaseHandler):
                 'type': 'basestring',
                 'validators': [{
                     'id': 'is_length_atmost',
-                    'max_value': (constants.MAX_USERNAME_LENGTH - 1)
+                    'max_value': constants.MAX_USERNAME_LENGTH
                 }]
             }
         }
