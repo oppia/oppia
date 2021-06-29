@@ -157,7 +157,7 @@ class ExpSnapshotsMigrationJob(jobs.BaseMapReduceOneOffJobManager):
         while current_state_schema_version < target_state_schema_version:
             exp_domain.Exploration.update_states_from_model(
                 versioned_exploration_states,
-                current_state_schema_version, init_state_name)
+                current_state_schema_version, init_state_name, exp_id)
             current_state_schema_version += 1
 
             if target_state_schema_version == current_state_schema_version:

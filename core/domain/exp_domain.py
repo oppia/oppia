@@ -26,12 +26,15 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
 import copy
+import functools
 import json
 import re
 import string
 
 from constants import constants
 from core.domain import change_domain
+from core.domain import fs_domain
+from core.domain import html_cleaner
 from core.domain import param_domain
 from core.domain import state_domain
 from core.platform import models
@@ -1854,9 +1857,42 @@ class Exploration(python_utils.OBJECT):
         return states_dict
 
     @classmethod
+    def _convert_states_v45_dict_to_v46_dict(cls, exp_id, states_dict):
+        """Converts from version 45 to 46. Version 46 contains the attribute
+           image_sizes_in_bytes for subtitled_html.
+
+           Args:
+               exp_id: str. The id of the exploration to which are linked to.
+               states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+            Returns:
+            dict. The converted states_dict.
+        """
+        for state_dict in states_dict.values():
+            image_sizes_in_bytes = {}
+            image_filenames = (
+                    html_cleaner.get_image_filenames_from_html_strings(
+                        [state_dict['content']]))
+
+            for image_filename in image_filenames:
+                fs = fs_domain.AbstractFileSystem(
+                    fs_domain.GcsFileSystem(
+                        feconf.ENTITY_TYPE_EXPLORATION, exp_id))
+                image_size_in_bytes = len(fs.get(
+                    '%s/%s' % (
+                        'image', image_filename)))
+                image_sizes_in_bytes[image_filename] = image_size_in_bytes
+
+            state_dict['content']['image_sizes_in_bytes'] = image_sizes_in_bytes
+
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states,
-            current_states_schema_version, init_state_name):
+            current_states_schema_version, init_state_name, exp_id):
         """Converts the states blob contained in the given
         versioned_exploration_states dict from current_states_schema_version to
         current_states_schema_version + 1.
@@ -1873,6 +1909,7 @@ class Exploration(python_utils.OBJECT):
             current_states_schema_version: int. The current states
                 schema version.
             init_state_name: str. Name of initial state.
+            exp_id: str. Id of the exploration.
         """
         versioned_exploration_states['states_schema_version'] = (
             current_states_schema_version + 1)
@@ -1882,6 +1919,10 @@ class Exploration(python_utils.OBJECT):
         if current_states_schema_version == 43:
             versioned_exploration_states['states'] = conversion_fn(
                 versioned_exploration_states['states'], init_state_name)
+        elif current_states_schema_version == 45:
+            conversion_fn = functools.partial(conversion_fn, exp_id)
+            versioned_exploration_states['states'] = conversion_fn(
+                versioned_exploration_states['states'])
         else:
             versioned_exploration_states['states'] = conversion_fn(
                 versioned_exploration_states['states'])
@@ -1890,7 +1931,7 @@ class Exploration(python_utils.OBJECT):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 50
+    CURRENT_EXP_SCHEMA_VERSION = 51
     EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
 
     @classmethod
@@ -1984,12 +2025,22 @@ class Exploration(python_utils.OBJECT):
         return exploration_dict
 
     @classmethod
-    def _migrate_to_latest_yaml_version(cls, yaml_content):
+    def _convert_v50_dict_to_v51_dict(cls, exp_id, exploration_dict):
+        exploration_dict['schema_version'] = 51
+        exploration_dict['states'] = cls._convert_states_v45_dict_to_v46_dict(
+            exp_id, exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 46
+
+        return exploration_dict
+
+    @classmethod
+    def _migrate_to_latest_yaml_version(cls, yaml_content, exp_id):
         """Return the YAML content of the exploration in the latest schema
         format.
 
         Args:
             yaml_content: str. The YAML representation of the exploration.
+            exp_id: str. The ID of the exploration.
 
         Returns:
             tuple(dict, int). The dict 'exploration_dict' is the representation
@@ -2038,6 +2089,11 @@ class Exploration(python_utils.OBJECT):
             exploration_dict = cls._convert_v49_dict_to_v50_dict(
                 exploration_dict)
             exploration_schema_version = 50
+
+        if exploration_schema_version == 50:
+            exploration_dict = cls._convert_v50_dict_to_v51_dict(
+                exp_id, exploration_dict)
+            exploration_schema_version = 51
 
         return exploration_dict
 

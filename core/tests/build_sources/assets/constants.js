@@ -534,7 +534,8 @@ var constants = {
       "classifier_model_id": null,
       "content": {
           "html": "",
-          "content_id": "content"
+          "content_id": "content",
+          "image_sizes_in_bytes": {}
       },
       "interaction": {
             "id": null,
