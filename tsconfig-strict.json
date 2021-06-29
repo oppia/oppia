@@ -263,6 +263,7 @@
     "core/templates/pages/profile-page/profile-page-domain.constants.ts",
     "core/templates/pages/skill-editor-page/skill-editor-page.constants.ts",
     "core/templates/pages/story-editor-page/story-editor-page.constants.ts",
+    "core/templates/pages/topics-and-skills-dashboard-page/modals/assign-skill-to-topic-modal.component.ts",
     "core/templates/pages/topics-and-skills-dashboard-page/modals/assign-skill-to-topic-modal.component.spec.ts",
     "core/templates/pages/topics-and-skills-dashboard-page/navbar/topics-and-skills-dashboard-navbar-breadcrumb.component.ts",
     "core/templates/pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants.ts",
@@ -381,8 +382,7 @@
     "extensions/objects/templates/positive-int-editor.component.spec.ts",
     "extensions/objects/templates/sanitized-url-editor.component.ts",
     "extensions/objects/templates/set-of-unicode-string-editor.component.ts",
-    "extensions/objects/templates/svg-filename-editor.constants.ts",
-    "core/templates/pages/topics-and-skills-dashboard-page/modals/assign-skill-to-topic-modal.component.ts"
+    "extensions/objects/templates/svg-filename-editor.constants.ts"
   ],
   "include": [
     "core/templates/pages/delete-account-page/services/*.ts",
