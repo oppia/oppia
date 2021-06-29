@@ -158,7 +158,7 @@ var CreatorDashboardPage = function() {
     var expSummaryTileTitleElements = element.all(
       by.css('.protractor-test-exp-summary-tile-title'));
     await waitFor.visibilityOf(
-      await expSummaryTileTitleElements.first(),
+      expSummaryTileTitleElements.first(),
       'Unable to find exploration titles');
     return expSummaryTileTitleElements;
   };
@@ -168,7 +168,7 @@ var CreatorDashboardPage = function() {
     var expSummaryTileRatingElements = element.all(
       by.css('.protractor-test-exp-summary-tile-rating'));
     await waitFor.visibilityOf(
-      await expSummaryTileRatingElements.first(),
+      expSummaryTileRatingElements.first(),
       'Unable to find exploration ratings');
     return expSummaryTileRatingElements;
   };
@@ -178,7 +178,7 @@ var CreatorDashboardPage = function() {
     var expSummaryTileFeedbackElements = element.all(
       by.css('.protractor-test-exp-summary-tile-open-feedback'));
     await waitFor.visibilityOf(
-      await expSummaryTileFeedbackElements.first(),
+      expSummaryTileFeedbackElements.first(),
       'Unable to find exploration feedbacks');
     return expSummaryTileFeedbackElements;
   };
@@ -188,7 +188,7 @@ var CreatorDashboardPage = function() {
     var expSummaryTileViewsElements = element.all(
       by.css('.protractor-test-exp-summary-tile-num-views'));
     await waitFor.visibilityOf(
-      await expSummaryTileViewsElements.first(),
+      expSummaryTileViewsElements.first(),
       'Unable to find exploration views');
     return expSummaryTileViewsElements;
   };
@@ -198,7 +198,7 @@ var CreatorDashboardPage = function() {
     var expSummaryRowTitleElements = element.all(
       by.css('.protractor-test-exp-summary-row-title'));
     await waitFor.visibilityOf(
-      await expSummaryRowTitleElements.first(),
+      expSummaryRowTitleElements.first(),
       'Unable to find exploration titles');
     return expSummaryRowTitleElements;
   };
@@ -208,7 +208,7 @@ var CreatorDashboardPage = function() {
     var expSummaryRowRatingElements = element.all(
       by.css('.protractor-test-exp-summary-row-rating'));
     await waitFor.visibilityOf(
-      await expSummaryRowRatingElements.first(),
+      expSummaryRowRatingElements.first(),
       'Unable to find exploration ratings');
     return expSummaryRowRatingElements;
   };
@@ -218,7 +218,7 @@ var CreatorDashboardPage = function() {
     var expSummaryRowFeedbackElements = element.all(
       by.css('.protractor-test-exp-summary-row-open-feedback'));
     await waitFor.visibilityOf(
-      await expSummaryRowFeedbackElements.first(),
+      expSummaryRowFeedbackElements.first(),
       'Unable to find exploration feedbacks');
     return expSummaryRowFeedbackElements;
   };
@@ -228,7 +228,7 @@ var CreatorDashboardPage = function() {
     var expSummaryRowViewsElements = element.all(
       by.css('.protractor-test-exp-summary-row-num-views'));
     await waitFor.visibilityOf(
-      await expSummaryRowViewsElements.first(),
+      expSummaryRowViewsElements.first(),
       'Unable to find exploration views');
     return expSummaryRowViewsElements;
   };

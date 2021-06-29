@@ -51,11 +51,11 @@ var ExplorationEditorTranslationTab = function() {
     // Finish the tutorial.
     var finishTutorialButton = element.all(by.buttonText('Finish'));
     await waitFor.elementToBeClickable(
-      await finishTutorialButton.first(),
+      finishTutorialButton.first(),
       'Finish Tutorial Stage button is not clickable');
     var buttons = finishTutorialButton;
     if (await buttons.count() === 1) {
-      await (await buttons.get(0)).click();
+      await buttons.get(0).click();
     } else {
       throw new Error('There is more than 1 Finish button!');
     }
@@ -78,11 +78,11 @@ var ExplorationEditorTranslationTab = function() {
       // Progress to the next instruction in the tutorial.
       var nextTutorialStageButton = element.all(by.css('.ng-joyride .nextBtn'));
       await waitFor.elementToBeClickable(
-        await nextTutorialStageButton.first(),
+        nextTutorialStageButton.first(),
         'Next Tutorial Stage button is not clickable');
       var buttons = nextTutorialStageButton;
       if (await buttons.count() === 1) {
-        await (await buttons.get(0)).click();
+        await buttons.get(0).click();
         await waitFor.invisibilityOf(
           tutorialTabHeadingElement,
           'Tutorial stage takes too long to disappear');
