@@ -28,12 +28,15 @@ from core.domain import feedback_services
 from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import taskqueue_services
+from core.domain import user_services
 from core.platform import models
 import feconf
 import python_utils
 
-(stats_models, feedback_models) = models.Registry.import_models([
-    models.NAMES.statistics, models.NAMES.feedback])
+(feedback_models, stats_models, user_models) = models.Registry.import_models([
+    models.NAMES.feedback, models.NAMES.statistics, models.NAMES.user])
+
+transaction_services = models.Registry.import_transaction_services()
 
 
 class BaseEventHandler(python_utils.OBJECT):
@@ -177,6 +180,7 @@ class StartExplorationEventHandler(BaseEventHandler):
         stats_models.StartExplorationEventLogEntryModel.create(
             exp_id, exp_version, state_name, session_id, params,
             play_type)
+        handle_exploration_start(exp_id)
 
 
 class MaybeLeaveExplorationEventHandler(BaseEventHandler):
@@ -216,6 +220,7 @@ class RateExplorationEventHandler(BaseEventHandler):
     def _handle_event(cls, exploration_id, user_id, rating, old_rating):
         stats_models.RateExplorationEventLogEntryModel.create(
             exploration_id, user_id, rating, old_rating)
+        handle_exploration_rating(exp_id, rating, old_rating)
 
 
 class StateHitEventHandler(BaseEventHandler):
@@ -311,3 +316,82 @@ class Registry(python_utils.OBJECT):
         if event_type not in cls._event_types_to_classes:
             cls._refresh_registry()
         return cls._event_types_to_classes[event_type]
+
+
+def handle_exploration_start(exp_id):
+    """Handles a user's start of an exploration.
+
+    Args:
+        exp_id: str. The exploration which has been started.
+    """
+    exp_summary = exp_fetchers.get_exploration_summary_by_id(exp_id)
+    if exp_summary:
+        for user_id in exp_summary.owner_ids:
+            _increment_total_plays_count_transactional(user_id)
+
+
+def handle_exploration_rating(exp_id, rating, old_rating):
+    """Handles a new rating for an exploration.
+
+    Args:
+        exp_id: str. The exploration which has been rated.
+        rating: int. The new rating of the exploration.
+        old_rating: int. The old rating of the exploration before
+            refreshing.
+    """
+    exp_summary = exp_fetchers.get_exploration_summary_by_id(exp_id)
+    if exp_summary:
+        for user_id in exp_summary.owner_ids:
+            _refresh_average_ratings_transactional(user_id, rating, old_rating)
+
+
+@transaction_services.run_in_transaction_wrapper
+def _refresh_average_ratings_transactional(user_id, new_rating, old_rating):
+    """Refreshes the average rating for a user.
+
+    Args:
+        user_id: str. The id of the user.
+        new_rating: int. The new rating of the exploration.
+        old_rating: int|None. The old rating of the exploration before
+            refreshing, or None if the exploration hasn't been rated by the user
+            yet.
+    """
+    user_stats_model = user_models.UserStatsModel.get(user_id, strict=False)
+    if model is None:
+        user_models.UserStatsModel(
+            id=user_id, average_ratings=new_rating, num_ratings=1).put()
+        return
+
+    num_ratings = model.num_ratings
+    average_ratings = model.average_ratings
+    if average_ratings is None:
+        average_ratings = new_rating
+        num_ratings += 1
+    else:
+        sum_of_ratings = (average_ratings * num_ratings) + new_rating
+        if old_rating is None:
+            num_ratings += 1
+        else:
+            sum_of_ratings -= old_rating
+        average_ratings = python_utils.divide(sum_of_ratings, float(num_ratings))
+    model.average_ratings = average_ratings
+    model.num_ratings = num_ratings
+    model.update_timestamps()
+    model.put()
+
+
+@transaction_services.run_in_transaction_wrapper
+def _increment_total_plays_count_transactional(user_id):
+    """Increments the total plays count of the exploration.
+
+    Args:
+        user_id: str. The id of the user.
+    """
+    user_stats_model = user_models.UserStatsModel.get(user_id, strict=False)
+    if user_stats_model is None:
+        user_models.UserStatsModel(id=user_id, total_plays=1).put()
+    else:
+        user_stats_model.total_plays += 1
+        user_stats_model.update_timestamps()
+        user_stats_model.put()
+

@@ -33,7 +33,6 @@ from core.domain import rights_manager
 from core.domain import subscription_services
 from core.domain import suggestion_services
 from core.domain import taskqueue_services
-from core.domain import user_jobs_continuous
 from core.domain import user_jobs_one_off
 from core.domain import user_services
 from core.platform import models
@@ -76,29 +75,6 @@ class OldCreatorDashboardRedirectPageTest(test_utils.GenericTestBase):
             '/creator_dashboard', expected_status_int=301)
         self.assertEqual(
             'http://localhost/creator-dashboard', response.headers['location'])
-
-
-class MockUserStatsAggregator(
-        user_jobs_continuous.UserStatsAggregator):
-    """A modified UserStatsAggregator that does not start a new
-     batch job when the previous one has finished.
-    """
-
-    @classmethod
-    def _get_batch_job_manager_class(cls):
-        return MockUserStatsMRJobManager
-
-    @classmethod
-    def _kickoff_batch_job_after_previous_one_ends(cls):
-        pass
-
-
-class MockUserStatsMRJobManager(
-        user_jobs_continuous.UserStatsMRJobManager):
-
-    @classmethod
-    def _get_continuous_computation_class(cls):
-        return MockUserStatsAggregator
 
 
 class HomePageTests(test_utils.GenericTestBase):
@@ -165,17 +141,6 @@ class CreatorDashboardStatisticsTests(test_utils.GenericTestBase):
                 user_id, exp_id, ratings[ind])
         self.process_and_flush_pending_tasks()
 
-    def _run_user_stats_aggregator_job(self):
-        """Runs the User Stats Aggregator job."""
-        MockUserStatsAggregator.start_computation()
-        self.assertEqual(
-            self.count_jobs_in_mapreduce_taskqueue(
-                taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
-        self.process_and_flush_pending_mapreduce_tasks()
-        self.assertEqual(
-            self.count_jobs_in_mapreduce_taskqueue(
-                taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
-
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
         self.assertEqual(
@@ -192,7 +157,6 @@ class CreatorDashboardStatisticsTests(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL_1)
         response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(response['explorations_list'], [])
-        self._run_user_stats_aggregator_job()
         self.assertIsNone(user_models.UserStatsModel.get(
             self.owner_id_1, strict=False))
         self.logout()
@@ -211,7 +175,6 @@ class CreatorDashboardStatisticsTests(test_utils.GenericTestBase):
 
         self._record_start(exp_id, exp_version, state)
 
-        self._run_user_stats_aggregator_job()
         user_model = user_models.UserStatsModel.get(self.owner_id_1)
         self.assertEqual(user_model.total_plays, 1)
         self.assertEqual(
@@ -231,7 +194,6 @@ class CreatorDashboardStatisticsTests(test_utils.GenericTestBase):
         exp_id = self.EXP_ID_1
         self._rate_exploration(exp_id, [4])
 
-        self._run_user_stats_aggregator_job()
         user_model = user_models.UserStatsModel.get(self.owner_id_1)
         self.assertEqual(user_model.total_plays, 0)
         self.assertEqual(
@@ -256,8 +218,6 @@ class CreatorDashboardStatisticsTests(test_utils.GenericTestBase):
         self._record_start(exp_id, exp_version, state)
 
         self._rate_exploration(exp_id, [3])
-
-        self._run_user_stats_aggregator_job()
 
         def _mock_get_date_after_one_week():
             """Returns the date of the next week."""
@@ -319,7 +279,6 @@ class CreatorDashboardStatisticsTests(test_utils.GenericTestBase):
 
         self._rate_exploration(exp_id, [3, 4, 5])
 
-        self._run_user_stats_aggregator_job()
         user_model = user_models.UserStatsModel.get(self.owner_id_1)
         self.assertEqual(user_model.total_plays, 4)
         self.assertEqual(
@@ -347,7 +306,6 @@ class CreatorDashboardStatisticsTests(test_utils.GenericTestBase):
 
         self._rate_exploration(exp_id_1, [4])
 
-        self._run_user_stats_aggregator_job()
         user_model = user_models.UserStatsModel.get(self.owner_id_1)
         self.assertEqual(user_model.total_plays, 1)
         self.assertEqual(
@@ -379,8 +337,6 @@ class CreatorDashboardStatisticsTests(test_utils.GenericTestBase):
 
         self._rate_exploration(exp_id_1, [4])
         self._rate_exploration(exp_id_2, [3, 3])
-
-        self._run_user_stats_aggregator_job()
 
         user_model = user_models.UserStatsModel.get(self.owner_id_1)
         self.assertEqual(user_model.total_plays, 3)
@@ -418,8 +374,6 @@ class CreatorDashboardStatisticsTests(test_utils.GenericTestBase):
         self.assertEqual(len(response['explorations_list']), 1)
 
         self._rate_exploration(exp_id, [3, 4, 5])
-
-        self._run_user_stats_aggregator_job()
 
         user_model_1 = user_models.UserStatsModel.get(
             self.owner_id_1)
@@ -470,8 +424,6 @@ class CreatorDashboardStatisticsTests(test_utils.GenericTestBase):
 
         self._rate_exploration(exp_id_1, [5, 3])
         self._rate_exploration(exp_id_2, [5, 5])
-
-        self._run_user_stats_aggregator_job()
 
         expected_results = {
             'total_plays': 5,
