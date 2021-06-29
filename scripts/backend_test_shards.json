@@ -9,6 +9,8 @@
         "core.controllers.resources_test",
         "core.controllers.cron_test",
         "extensions.interactions.base_test",
+        "core.controllers.payload_validator_test",
+        "core.controllers.domain_objects_validator_test",
         "core.controllers.classroom_test",
         "extensions.rich_text_components.components_test",
         "core.controllers.topic_editor_test",

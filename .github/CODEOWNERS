@@ -673,6 +673,12 @@
 /core/domain/draft_upgrade_services*.py @DubeySandeep
 
 
+# Data stability.
+# TODO(#13119): Add @vojtechjelinek as owner after 2021-07-06
+/core/controllers/domain_objects_validator*.py @rohitkatlaa
+/core/controllers/payload_validator*.py @rohitkatlaa
+
+
 # QA team.
 /core/tests/ @nithusha21
 /assets/ @nithusha21

@@ -47,6 +47,9 @@ SCHEMA_KEY_NAME = 'name'
 SCHEMA_KEY_SCHEMA = 'schema'
 SCHEMA_KEY_OBJ_TYPE = 'obj_type'
 SCHEMA_KEY_VALIDATORS = 'validators'
+SCHEMA_KEY_DEFAULT_VALUE = 'default_value'
+SCHEMA_KEY_OBJECT_CLASS = 'object_class'
+SCHEMA_KEY_VALIDATION_METHOD = 'validation_method'
 
 SCHEMA_TYPE_BOOL = 'bool'
 SCHEMA_TYPE_CUSTOM = 'custom'
@@ -56,7 +59,9 @@ SCHEMA_TYPE_HTML = 'html'
 SCHEMA_TYPE_INT = 'int'
 SCHEMA_TYPE_LIST = 'list'
 SCHEMA_TYPE_UNICODE = 'unicode'
+SCHEMA_TYPE_BASESTRING = 'basestring'
 SCHEMA_TYPE_UNICODE_OR_NONE = 'unicode_or_none'
+SCHEMA_TYPE_OBJECT_DICT = 'object_dict'
 
 SCHEMA_OBJ_TYPE_SUBTITLED_HTML = 'SubtitledHtml'
 SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE = 'SubtitledUnicode'
@@ -104,10 +109,12 @@ def normalize_against_schema(
         assert isinstance(obj, dict), ('Expected dict, received %s' % obj)
         expected_dict_keys = [
             p[SCHEMA_KEY_NAME] for p in schema[SCHEMA_KEY_PROPERTIES]]
+
+        missing_keys = list(set(expected_dict_keys) - set(obj.keys()))
+        extra_keys = list(set(obj.keys()) - set(expected_dict_keys))
+
         assert set(obj.keys()) == set(expected_dict_keys), (
-            'Missing keys: %s, Extra keys: %s' % (
-                list(set(expected_dict_keys) - set(obj.keys())),
-                list(set(obj.keys()) - set(expected_dict_keys))))
+            'Missing keys: %s, Extra keys: %s' % (missing_keys, extra_keys))
 
         normalized_obj = {}
         for prop in schema[SCHEMA_KEY_PROPERTIES]:
@@ -158,6 +165,10 @@ def normalize_against_schema(
                 item, item_schema, global_validators=global_validators
             ) for item in obj
         ]
+    elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_BASESTRING:
+        assert isinstance(obj, python_utils.BASESTRING), (
+            'Expected unicode string, received %s' % obj)
+        normalized_obj = obj
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_UNICODE:
         assert isinstance(obj, python_utils.BASESTRING), (
             'Expected unicode string, received %s' % obj)
@@ -178,6 +189,26 @@ def normalize_against_schema(
                 obj = python_utils.UNICODE(obj)
             assert isinstance(obj, python_utils.UNICODE), (
                 'Expected unicode, received %s' % obj)
+        normalized_obj = obj
+    elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_OBJECT_DICT:
+        # The schema type 'object_dict' accepts either of the keys
+        # 'object_class' or 'validation_method'.
+        # 'object_class' key is the most commonly used case, when the object is
+        # initialized from_dict() method and the validation is done from
+        # validate() method.
+        # 'validation_method' key is used for some rare cases like if they have
+        # validate_dict method instead of validate method, or if they need some
+        # extra flags like for strict validation. The methods are written in the
+        # domain_objects_validator file.
+
+        if SCHEMA_KEY_OBJECT_CLASS in schema:
+            validate_class = schema[SCHEMA_KEY_OBJECT_CLASS]
+            domain_object = validate_class.from_dict(obj)
+            domain_object.validate()
+        else:
+            validation_method = schema[SCHEMA_KEY_VALIDATION_METHOD]
+            validation_method(obj)
+
         normalized_obj = obj
     else:
         raise Exception('Invalid schema type: %s' % schema[SCHEMA_KEY_TYPE])
