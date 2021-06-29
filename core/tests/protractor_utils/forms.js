@@ -25,7 +25,6 @@ var richTextComponents = require(
 var objects = require('../../../extensions/objects/protractor.js');
 var waitFor = require('./waitFor.js');
 var action = require('./action.js');
-const { browser } = require('protractor');
 
 var DictionaryEditor = function(elem) {
   return {
