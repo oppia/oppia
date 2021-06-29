@@ -26,13 +26,16 @@ import python_utils
 
 import elasticsearch
 
+# This timeout is selected because 30 seconds results in reloading a 
+# exploration and exp_services.load_demo() fails with a ReadTimeoutError 
+# if the 30 seconds timeout isn't used
 ES = elasticsearch.Elasticsearch(
     ('localhost:%s' % feconf.ES_LOCALHOST_PORT)
     if feconf.ES_CLOUD_ID is None else None,
     cloud_id=feconf.ES_CLOUD_ID,
     http_auth=(
         (feconf.ES_USERNAME, feconf.ES_PASSWORD)
-        if feconf.ES_CLOUD_ID else None), timeout=60)
+        if feconf.ES_CLOUD_ID else None), timeout=30)
 
 
 def _create_index(index_name):
