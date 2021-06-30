@@ -33,9 +33,9 @@ var AdminPage = function() {
   var adminRolesTab = element(by.css('.protractor-test-admin-roles-tab'));
   var adminRolesTabContainer = element(
     by.css('.protractor-test-roles-tab-container'));
-  var updateFormName = element(by.css('.protractor-update-form-name'));
-  var updateFormSubmit = element(by.css('.protractor-update-form-submit'));
-  var roleSelect = element(by.css('.protractor-update-form-role-select'));
+  var updateFormName = element(by.css('.protractor-test-update-form-name'));
+  var updateFormSubmit = element(by.css('.protractor-test-update-form-submit'));
+  var roleSelect = element(by.css('.protractor-test-update-form-role-select'));
   var statusMessage = element(by.css('.protractor-test-status-message'));
 
   var roleDropdown = element(by.css('.protractor-test-role-method'));
@@ -170,8 +170,9 @@ var AdminPage = function() {
 
     var count = await featureFlagElements.count();
     for (let i = 0; i < count; i++) {
-      var elem = await featureFlagElements.get(i);
-      if ((await elem.element(by.css('h2.oppia-feature-name')).getText()) ===
+      var elem = featureFlagElements.get(i);
+      if ((await elem.element(
+        by.css('.protractor-test-feature-name')).getText()) ===
           'dummy_feature') {
         return elem;
       }
@@ -254,7 +255,7 @@ var AdminPage = function() {
 
   this._startOneOffJob = async function(jobName, i) {
     await waitFor.visibilityOf(
-      await oneOffJobRows.first(),
+      oneOffJobRows.first(),
       'Starting one off jobs taking too long to appear.');
     await waitFor.visibilityOf(
       oneOffJobRows.get(i), 'Could not get One Off Jobs');
@@ -315,6 +316,8 @@ var AdminPage = function() {
     await _switchToRolesTab();
 
     // Change values for "update role" form, and submit it.
+    await waitFor.visibilityOf(
+      updateFormName, 'Update Form name taking too long to appear.');
     await action.sendKeys('Update Form Name', updateFormName, name);
     await action.select('Role Drop Down', roleSelect, newRole);
     await action.click('Update Form Submit', updateFormSubmit);

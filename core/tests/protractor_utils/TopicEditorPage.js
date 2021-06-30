@@ -90,19 +90,21 @@ var TopicEditorPage = function() {
   var selectSkillDropdown = element(
     by.css('.protractor-test-select-skill-dropdown'));
   var subtopicThumbnailImageElement = element(
-    by.css('.subtopic-thumbnail .protractor-test-custom-photo'));
+    by.css(
+      '.protractor-test-subtopic-thumbnail .protractor-test-custom-photo'));
   var subtopicThumbnailButton = element(
-    by.css('.subtopic-thumbnail .protractor-test-photo-button'));
+    by.css(
+      '.protractor-test-subtopic-thumbnail .protractor-test-photo-button'));
   var topicThumbnailImageElement = element(
-    by.css('.thumbnail-editor .protractor-test-custom-photo'));
+    by.css('.protractor-test-thumbnail-editor .protractor-test-custom-photo'));
   var topicThumbnailButton = element(
-    by.css('.thumbnail-editor .protractor-test-photo-button'));
+    by.css('.protractor-test-thumbnail-editor .protractor-test-photo-button'));
   var thumbnailContainer = element(
     by.css('.protractor-test-thumbnail-container'));
   var newStoryDescriptionField = element(
     by.css('.protractor-test-new-story-description-field'));
   var storyThumbnailButton = element(
-    by.css('.thumbnail-editor .protractor-test-photo-button'));
+    by.css('.protractor-test-thumbnail-editor .protractor-test-photo-button'));
   var topicMetaTagContentField = element(
     by.css('.protractor-test-topic-meta-tag-content-field'));
   var topicMetaTagContentLabel = element(
@@ -119,7 +121,7 @@ var TopicEditorPage = function() {
     await browser.executeScript(dragAndDropScript, fromElement, toElement);
   };
   var saveRearrangedSkillsButton = element(
-    by.css('.protractor-save-rearrange-skills'));
+    by.css('.protractor-test-save-rearrange-skills'));
   var practiceTabCheckbox = element(
     by.css('.protractor-test-toggle-practice-tab'));
 
@@ -221,7 +223,7 @@ var TopicEditorPage = function() {
       '.protractor-test-edit-subtopic-page-contents'));
     await waitFor.visibilityOf(
       pageEditor, 'Subtopic html editor takes too long to appear');
-    var pageEditorInput = pageEditor.element(by.css('.oppia-rte'));
+    var pageEditorInput = pageEditor.element(by.css('.protractor-test-rte'));
     await pageEditorInput.click();
     await pageEditorInput.clear();
     await pageEditorInput.sendKeys(content);
@@ -318,7 +320,7 @@ var TopicEditorPage = function() {
       }
     }
     expect(uncategorizedSkillIndex).not.toEqual(-1);
-    var toMove = await uncategorizedSkills.get(uncategorizedSkillIndex);
+    var toMove = uncategorizedSkills.get(uncategorizedSkillIndex);
     await dragAndDrop(toMove, target);
   };
 
@@ -401,7 +403,7 @@ var TopicEditorPage = function() {
   };
 
   this.navigateToSubtopicWithIndex = async function(subtopicIndex) {
-    var subtopic = await subtopics.get(subtopicIndex);
+    var subtopic = subtopics.get(subtopicIndex);
     await subtopic.click();
     await waitFor.pageToFullyLoad();
   };
@@ -435,7 +437,7 @@ var TopicEditorPage = function() {
   this.navigateToStoryWithIndex = async function(index) {
     await waitFor.visibilityOf(
       storyListTable, 'Story list table takes too long to appear.');
-    var storyItem = await storyListItems.get(index);
+    var storyItem = storyListItems.get(index);
     await storyItem.click();
     await waitFor.pageToFullyLoad();
     await waitFor.invisibilityOf(
@@ -501,7 +503,15 @@ var TopicEditorPage = function() {
   };
 
   this.expectTopicNameToBe = async function(name) {
-    expect(await topicNameField.getAttribute('value')).toEqual(name);
+    await waitFor.visibilityOf(
+      topicNameField,
+      'topicNameField takes too long to be visible'
+    );
+    let desc = await browser.executeScript(() => {
+      return document.getElementsByClassName(
+        'protractor-test-topic-name-field')[0].value;
+    });
+    await expect(desc).toMatch(name);
   };
 
   this.changeTopicDescription = async function(newDescription) {
@@ -512,8 +522,15 @@ var TopicEditorPage = function() {
   };
 
   this.expectTopicDescriptionToBe = async function(description) {
-    expect(await topicDescriptionField.getAttribute('value')).toEqual(
-      description);
+    await waitFor.visibilityOf(
+      topicDescriptionField,
+      'topicDescriptionField takes too long to be visible'
+    );
+    let desc = await browser.executeScript(() => {
+      return document.getElementsByClassName(
+        'protractor-test-topic-description-field')[0].value;
+    });
+    await expect(desc).toMatch(description);
   };
 
   this.saveTopic = async function(commitMessage) {
@@ -523,7 +540,8 @@ var TopicEditorPage = function() {
     await saveTopicButton.click();
     await waitFor.visibilityOf(
       commitMessageField, 'Commit Message field taking too long to appear.');
-    await commitMessageField.sendKeys(commitMessage);
+    await action.sendKeys(
+      'commit message field', commitMessageField, commitMessage);
 
     await action.click('Close save modal button', closeSaveModalButton);
     await waitFor.visibilityOfSuccessToast(

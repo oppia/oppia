@@ -15,7 +15,7 @@
 /**
  * @fileoverview Unit tests for contributor dashboard page component.
  */
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
