@@ -25,7 +25,6 @@ import { map } from 'rxjs/operators';
 import { BeamJobRunResult, BeamJobRunResultBackendDict } from 'domain/jobs/beam-job-run-result.model';
 import { BeamJobRun, BeamJobRunBackendDict } from 'domain/jobs/beam-job-run.model';
 import { BeamJob, BeamJobBackendDict } from 'domain/jobs/beam-job.model';
-import { ComputationData, ComputationDataBackendDict } from 'domain/admin/computation-data.model';
 import { JobStatusSummary, JobStatusSummaryBackendDict } from 'domain/admin/job-status-summary.model';
 import { Job, JobDataBackendDict } from 'domain/admin/job.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -41,7 +40,6 @@ export interface JobsDataBackendDict {
   'audit_job_status_summaries': JobStatusSummaryBackendDict[];
   'unfinished_job_data': JobDataBackendDict[];
   'recent_job_data': JobDataBackendDict[];
-  'continuous_computations_data': ComputationDataBackendDict[];
 }
 
 interface MemoryCacheProfileResponse {
@@ -64,7 +62,6 @@ export interface JobsData {
   auditJobStatusSummaries: JobStatusSummary[];
   unfinishedJobData: Job[];
   recentJobData: Job[];
-  continuousComputationsData: ComputationData[];
 }
 
 @Injectable({
@@ -89,8 +86,6 @@ export class ReleaseCoordinatorBackendApiService {
             Job.createFromBackendDict),
           recentJobData: response.recent_job_data.map(
             Job.createFromBackendDict),
-          continuousComputationsData: response.continuous_computations_data.map(
-            ComputationData.createFromBackendDict),
         });
       }, errorResponse => {
         reject(errorResponse.error.error);
@@ -100,15 +95,8 @@ export class ReleaseCoordinatorBackendApiService {
 
   private async _postRequestAsync(
       payload?: Object, action?: string): Promise<void> {
-    return new Promise((resolve, reject) => {
-      this.http.post<void>(
-        '/jobshandler', { action, ...payload }).toPromise()
-        .then(response => {
-          resolve(response);
-        }, errorResponse => {
-          reject(errorResponse.error.error);
-        });
-    });
+    return this.http.post<void>(
+      '/jobshandler', { action, ...payload }).toPromise();
   }
 
   async startNewJobAsync(jobType: string): Promise<void> {
@@ -124,22 +112,6 @@ export class ReleaseCoordinatorBackendApiService {
     let payload = {
       job_id: jobId,
       job_type: jobType
-    };
-    return this._postRequestAsync(payload, action);
-  }
-
-  async startComputationAsync(computationType: string): Promise<void> {
-    let action = 'start_computation';
-    let payload = {
-      computation_type: computationType
-    };
-    return this._postRequestAsync(payload, action);
-  }
-
-  async stopComputationAsync(computationType: string): Promise<void> {
-    let action = 'stop_computation';
-    let payload = {
-      computation_type: computationType
     };
     return this._postRequestAsync(payload, action);
   }
