@@ -115,7 +115,7 @@ class TopicModel(base_models.VersionedModel):
     thumbnail_bg_color = datastore_services.StringProperty(indexed=True)
     # The thumbnail size in bytes of the topic.
     thumbnail_size_in_bytes = (
-        datastore_services.IntegerProperty(indexed=True, default=None))
+        datastore_services.IntegerProperty(indexed=True))
     # The description of the topic.
     description = datastore_services.TextProperty(indexed=False)
     # This consists of the list of objects referencing canonical stories that

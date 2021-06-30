@@ -24,7 +24,6 @@ import logging
 
 from core.domain import caching_services
 from core.domain import feedback_services
-from core.domain import fs_domain
 from core.domain import opportunity_services
 from core.domain import rights_domain
 from core.domain import role_services
@@ -271,21 +270,8 @@ def apply_change_list(topic_id, change_list):
                       topic_domain.TOPIC_PROPERTY_LANGUAGE_CODE):
                     topic.update_language_code(change.new_value)
                 elif (change.property_name ==
-                      topic_domain.TOPIC_PROPERTY_THUMBNAIL_FILENAME_AND_SIZE_IN_BYTES): # pylint: disable=line-too-long
-                    try:
-                        fs = fs_domain.AbstractFileSystem(
-                            fs_domain.GcsFileSystem(
-                                feconf.ENTITY_TYPE_TOPIC, topic_id))
-                        thumbnail_size_in_bytes = len(fs.get(
-                            '%s/%s' % (
-                                ASSET_TYPE_THUMBNAIL,
-                                topic.thumbnail_filename)))
-                        topic.update_thumbnail_filename_and_size_in_bytes(
-                            change.new_value, thumbnail_size_in_bytes)
-                    except Exception as e:
-                        raise Exception(
-                            'File thumbnail/%s not found' % (
-                                topic.thumbnail_filename))
+                      topic_domain.TOPIC_PROPERTY_THUMBNAIL_FILENAME):
+                    topic.update_thumbnail_filename(change.new_value)
                 elif (change.property_name ==
                       topic_domain.TOPIC_PROPERTY_THUMBNAIL_BG_COLOR):
                     topic.update_thumbnail_bg_color(change.new_value)
