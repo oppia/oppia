@@ -42,6 +42,11 @@ export class TextInputTokenizer {
     var tokenPattern = '\\b\\w\\w+\\b';
     var regexp = new RegExp(tokenPattern, 'g');
     tokenizedTextInput = textInput.match(regexp);
+    if (tokenizedTextInput === null) {
+      throw new Error(
+        'Text Input is either empty or contains less than two ' +
+        'alphanumeric characters.');
+    }
     return tokenizedTextInput;
   }
 }

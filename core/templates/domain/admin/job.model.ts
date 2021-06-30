@@ -21,7 +21,7 @@ export interface JobDataBackendDict {
   'time_finished_msec': number;
   'job_type': string;
   'status_code': string;
-  'error': string;
+  'error': string | null;
   'is_cancelable': boolean;
   'id': string;
   'time_started_msec': number;
@@ -37,8 +37,8 @@ export class Job {
   timeFinishedMsec: number;
   jobType: string;
   statusCode: string;
-  error: string;
-  canBeCanceled: boolean;
+  error: string | null;
+  canBeCanceled: boolean | undefined;
   isCancelable: boolean;
   id: string;
   timeStartedMsec: number;
@@ -46,8 +46,8 @@ export class Job {
 
   constructor(
       humanReadableTimeFinished: string, timeFinishedMsec: number,
-      jobType: string, statusCode: string, error: string,
-      canBeCanceled: boolean, isCancelable: boolean, id: string,
+      jobType: string, statusCode: string, error: string | null,
+      canBeCanceled: boolean | undefined, isCancelable: boolean, id: string,
       timeStartedMsec: number, humanReadableTimeStarted: string) {
     this.humanReadableTimeFinished = humanReadableTimeFinished;
     this.timeFinishedMsec = timeFinishedMsec;
