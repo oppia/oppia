@@ -59,8 +59,7 @@ describe('Translation Modal Component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
-        HttpClientTestingModule,
-        RichTextComponentsModule
+        HttpClientTestingModule
       ],
       declarations: [
         TranslationModalComponent
