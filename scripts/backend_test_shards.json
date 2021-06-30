@@ -9,6 +9,8 @@
         "core.controllers.resources_test",
         "core.controllers.cron_test",
         "extensions.interactions.base_test",
+        "core.controllers.payload_validator_test",
+        "core.controllers.domain_objects_validator_test",
         "core.controllers.classroom_test",
         "extensions.rich_text_components.components_test",
         "core.controllers.topic_editor_test",
@@ -227,7 +229,7 @@
     "9": [
         "core.storage.app_feedback_report.gae_models_test",
         "core.domain.user_jobs_one_off_test",
-        "jobs.base_validation_jobs_test",
+        "jobs.batch_jobs.validation_jobs_test",
         "jobs.base_jobs_test",
         "jobs.decorators.validation_decorators_test",
         "jobs.io.stub_io_test",
