@@ -51,7 +51,14 @@ class CollectionDataHandler(base.BaseHandler):
             'type': 'basestring'
         }
     }
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'v': {
+                'type': 'basestring',
+                'default_value': None
+            }
+        }
+    }
 
     @acl_decorators.can_play_collection
     def get(self, collection_id):
