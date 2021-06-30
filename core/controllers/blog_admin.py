@@ -21,6 +21,7 @@ import logging
 
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.controllers import domain_objects_validator as validation_method
 from core.domain import blog_services
 from core.domain import config_domain
 from core.domain import config_services
@@ -37,6 +38,27 @@ class BlogAdminHandler(base.BaseHandler):
     """Handler for the blog admin page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'POST': {
+            'action': {
+                'type': 'basestring',
+                'choices': [
+                    'save_config_properties', 'revert_config_property']
+            },
+            'new_config_property_values': {
+                'type': 'object_dict',
+                'validation_method': (
+                    validation_method.validate_new_config_property_values),
+                'default_value': None
+            },
+            'config_property_id': {
+                'type': 'basestring',
+                'default_value': None
+            },
+        }
+    }
 
     @acl_decorators.can_access_blog_admin_page
     def get(self):
@@ -69,16 +91,19 @@ class BlogAdminHandler(base.BaseHandler):
         """Handles POST requests."""
         try:
             result = {}
-            if self.payload.get('action') == 'save_config_properties':
-                new_config_property_values = self.payload.get(
+            if self.normalized_payload.get(
+                    'action') == 'save_config_properties':
+                new_config_property_values = self.normalized_payload.get(
                     'new_config_property_values')
-                for (name, value) in new_config_property_values.items():
-                    config_services.set_property(self.user_id, name, value)
                 logging.info(
                     '[BLOG ADMIN] %s saved config property values: %s' %
                     (self.user_id, new_config_property_values))
-            elif self.payload.get('action') == 'revert_config_property':
-                config_property_id = self.payload.get('config_property_id')
+                for (name, value) in new_config_property_values.items():
+                    config_services.set_property(self.user_id, name, value)
+            elif self.normalized_payload.get(
+                    'action') == 'revert_config_property':
+                config_property_id = (
+                    self.normalized_payload.get('config_property_id'))
                 config_services.revert_property(
                     self.user_id, config_property_id)
                 logging.info(
@@ -95,15 +120,34 @@ class BlogAdminRolesHandler(base.BaseHandler):
     """Handler for the blog admin page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'action': {
+                'type': 'basestring',
+            },
+            'role': {
+                'type': 'basestring'
+            },
+            'username': {
+                'type': 'basestring'
+            },
+        },
+        'PUT': {
+            'username': {
+                'type': 'basestring'
+            },
+        }
+    }
 
     @acl_decorators.can_manage_blog_post_editors
     def post(self):
         # type: () -> None
         """Handles POST requests."""
-        if self.payload.get('action') != 'update_user_role':
+        if self.normalized_payload.get('action') != 'update_user_role':
             raise self.InvalidInputException('Invalid action')
-        username = self.payload.get('username')
-        role = self.payload.get('role')
+        username = self.normalized_payload.get('username')
+        role = self.normalized_payload.get('role')
         if role == (BLOG_ADMIN or BLOG_POST_EDITOR):
             user_id = user_services.get_user_id_from_username(username)
             if user_id is None:
@@ -123,7 +167,7 @@ class BlogAdminRolesHandler(base.BaseHandler):
     def put(self):
         # type: () -> None
         """Handles PUT requests."""
-        username = self.payload.get('username', None)
+        username = self.normalized_payload.get('username')
         if username is None:
             raise self.InvalidInputException('Missing username param')
         user_id = user_services.get_user_id_from_username(username)

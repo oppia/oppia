@@ -232,7 +232,7 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
                 'tags': ['Newsletter', 'Learners'],
                 'thumbnail_filename': 'file.svg'
             },
-            'is_blog_post_published': False
+            'new_publish_status': False
         }
 
         json_response = self.put_json(
@@ -255,7 +255,7 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
             'change_dict': {
                 'title': 'Sample Title',
             },
-            'is_blog_post_published': False
+            'new_publish_status': False
         }
 
         self.put_json(
@@ -292,7 +292,7 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
         payload = {
             'change_dict': {},
-            'is_blog_post_published': False
+            'new_publish_status': False
         }
         self.put_json(
             '%s/%s' % (feconf.BLOG_EDITOR_DATA_URL_PREFIX, self.blog_post.id),

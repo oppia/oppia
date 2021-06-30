@@ -1134,6 +1134,10 @@ class CanAccessBlogAdminPageDecoratorTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {
+            'GET': {},
+        }
 
         @acl_decorators.can_access_blog_admin_page
         def get(self):
@@ -1203,6 +1207,10 @@ class CanManageBlogPostEditorsDecoratorTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {
+            'GET': {},
+        }
 
         @acl_decorators.can_manage_blog_post_editors
         def get(self):
@@ -1273,6 +1281,10 @@ class CanAccessBlogDashboardDecoratorTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {
+            'GET': {},
+        }
 
         @acl_decorators.can_access_blog_dashboard
         def get(self):
@@ -1344,6 +1356,14 @@ class CanDeleteBlogPostTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'blog_post_id': {
+                'type': 'unicode'
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {
+            'GET': {},
+        }
 
         @acl_decorators.can_delete_blog_post
         def get(self, blog_post_id):
@@ -1419,6 +1439,14 @@ class CanEditBlogPostTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'blog_post_id': {
+                'type': 'unicode'
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {
+            'GET': {},
+        }
 
         @acl_decorators.can_edit_blog_post
         def get(self, blog_post_id):
