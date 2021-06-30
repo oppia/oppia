@@ -54,8 +54,9 @@
 /core/templates/services/loader.service*.ts @srijanreddy98 @darksun27
 /core/templates/components/code-mirror/ @srijanreddy98 @darksun27
 /core/templates/components/material.module.ts @srijanreddy98 @darksun27
-/core/templates/components/oppia-angular-root.component.ts @srijanreddy98 @darksun27
+/core/templates/components/oppia-angular-root.component.* @srijanreddy98 @darksun27
 /core/templates/pages/missing-translation-custom-handler*.ts @srijanreddy98 @darksun27
+/core/templates/pages/mock-ajs.ts @srijanreddy98 @darksun27
 /core/templates/pages/translate-cache.factory*.ts @srijanreddy98 @darksun27
 /core/templates/pages/translate-custom-parser*.ts @srijanreddy98 @darksun27
 /core/templates/pages/translate-loader.factory*.ts @srijanreddy98 @darksun27
@@ -163,7 +164,6 @@
 /core/templates/pages/creator-dashboard-page/ @nithusha21
 /core/templates/pages/email-dashboard-pages/ @nithusha21
 /core/templates/pages/learner-dashboard-page/ @nithusha21
-/core/templates/pages/notifications-dashboard-page/ @nithusha21
 
 
 # Dev workflow team.
@@ -670,6 +670,12 @@
 
 # Draft version upgrade.
 /core/domain/draft_upgrade_services*.py @DubeySandeep
+
+
+# Data stability.
+# TODO(#13119): Add @vojtechjelinek as owner after 2021-07-06
+/core/controllers/domain_objects_validator*.py @rohitkatlaa
+/core/controllers/payload_validator*.py @rohitkatlaa
 
 
 # QA team.
