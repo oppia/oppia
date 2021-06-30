@@ -108,9 +108,6 @@ module.exports = {
       commonPrefix + '/pages/maintenance-page/maintenance-page.import.ts',
     moderator:
       commonPrefix + '/pages/moderator-page/moderator-page.import.ts',
-    notifications_dashboard:
-      commonPrefix + '/pages/notifications-dashboard-page/' +
-      'notifications-dashboard-page.import.ts',
     pending_account_deletion:
       commonPrefix + '/pages/pending-account-deletion-page/' +
       'pending-account-deletion-page.import.ts',
@@ -511,23 +508,6 @@ module.exports = {
       meta: defaultMeta,
       template:
         commonPrefix + '/pages/moderator-page/moderator-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['notifications_dashboard'],
-      filename: 'notifications-dashboard-page.mainpage.html',
-      hybrid: true,
-      meta: {
-        name: defaultMeta.name,
-        description: 'Keep track of the lessons you have created, as well ' +
-          'as feedback from learners.'
-      },
-      template: (
-        commonPrefix +
-        '/pages/notifications-dashboard-page/' +
-        'notifications-dashboard-page.mainpage.html'
-      ),
       minify: htmlMinifyConfig,
       inject: false
     }),
