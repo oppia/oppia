@@ -23,7 +23,6 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { SaveVersionMismatchModalComponent } from './save-version-mismatch-modal.component';
 import { LostChange, LostChangeObjectFactory } from 'domain/exploration/LostChangeObjectFactory';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { LoggerService } from 'services/contextual/logger.service';
 import { ExplorationDataService } from '../services/exploration-data.service';
 
 @Component({
@@ -89,17 +88,9 @@ describe('Save Version Mismatch Modal Component', () => {
     state_name: 'State name',
   } as unknown as LostChange];
 
-  const lostChangesResponse = [{
-    utilsService: {},
-    cmd: 'add_state',
-    stateName: 'State name',
-  }];
-
   let component: SaveVersionMismatchModalComponent;
   let fixture: ComponentFixture<SaveVersionMismatchModalComponent>;
   let windowRef: MockWindowRef;
-  let loggerService: LoggerService;
-  let logSpy = null;
   let explorationDataService: MockExplorationDataService;
 
   beforeEach(waitForAsync(() => {
@@ -112,7 +103,6 @@ describe('Save Version Mismatch Modal Component', () => {
         ChangesInHumanReadableFormComponentStub
       ],
       providers: [
-        LoggerService,
         LostChangeObjectFactory,
         {
           provide: ExplorationDataService,
@@ -135,17 +125,7 @@ describe('Save Version Mismatch Modal Component', () => {
     component = fixture.componentInstance;
     component.lostChanges = lostChanges;
 
-    loggerService = TestBed.inject(LoggerService);
-    logSpy = spyOn(loggerService, 'error').and.callThrough();
-
     fixture.detectChanges();
-  });
-
-  it('should evaluates lostChanges when controller is initialized', () => {
-    expect(component.lostChanges[0].cmd).toBe('add_state');
-    expect(component.lostChanges[0].stateName).toBe('State name');
-    expect(logSpy).toHaveBeenCalledWith(
-      'Lost changes: ' + JSON.stringify(lostChangesResponse));
   });
 
   it('should remove exploration draft from local storage when modal is closed',

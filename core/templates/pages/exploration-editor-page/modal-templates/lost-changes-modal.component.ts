@@ -47,8 +47,6 @@ export class LostChangesModalComponent
     this.hasLostChanges = (this.lostChanges && this.lostChanges.length > 0);
     this.lostChanges = this.lostChanges.map(
       this.lostChangeObjectFactory.createNew);
-    this.loggerService.error(
-      'Lost changes: ' + JSON.stringify(this.lostChanges));
   }
 
   cancel(): void {

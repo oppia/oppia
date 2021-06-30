@@ -48,12 +48,8 @@ export class SaveVersionMismatchModalComponent
   ngOnInit(): void {
     this.hasLostChanges = (this.lostChanges && this.lostChanges.length > 0);
     if (this.hasLostChanges) {
-      // TODO(sll): This should also include changes to exploration
-      // properties (such as the exploration title, category, etc.).
       this.lostChanges = this.lostChanges.map(
         this.lostChangeObjectFactory.createNew);
-      this.loggerService.error(
-        'Lost changes: ' + JSON.stringify(this.lostChanges));
     }
   }
 
