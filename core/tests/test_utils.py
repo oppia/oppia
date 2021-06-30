@@ -2751,7 +2751,7 @@ title: Title
 
     def save_new_story_with_story_contents_schema_v1(
             self, story_id, thumbnail_filename, thumbnail_bg_color,
-            thumbnail_size_in_bytes=21131, owner_id, title, description,
+            thumbnail_size_in_bytes, owner_id, title, description,
             notes, corresponding_topic_id,
             language_code=constants.DEFAULT_LANGUAGE_CODE,
             url_fragment='story-frag',
