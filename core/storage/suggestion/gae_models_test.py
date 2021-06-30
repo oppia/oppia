@@ -1388,3 +1388,232 @@ class CommunityContributionStatsModelUnitTests(test_utils.GenericTestBase):
             ),
             base_models.DELETION_POLICY.NOT_APPLICABLE
         )
+
+
+class TranslationContributionStatsModelUnitTests(test_utils.GenericTestBase):
+    """Tests the TranslationContributionStatsModel class."""
+
+    LANGUAGE_CODE = 'es'
+    CONTRIBUTOR_USER_ID = 'user_id'
+    TOPIC_ID = 'topic_id'
+    SUBMITTED_TRANSLATIONS_COUNT = 2
+    SUBMITTED_TRANSLATION_WORD_COUNT = 100
+    ACCEPTED_TRANSLATIONS_COUNT = 1
+    ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT = 0
+    ACCEPTED_TRANSLATION_WORD_COUNT = 50
+    REJECTED_TRANSLATIONS_COUNT = 0
+    REJECTED_TRANSLATION_WORD_COUNT = 0
+    # Timestamp dates in sec since epoch for Mar 19 2021 UTC.
+    CONTRIBUTION_DATES = [
+        datetime.date.fromtimestamp(1616173836),
+        datetime.date.fromtimestamp(1616173837)
+    ]
+
+    def test_get_returns_model_when_it_exists(self):
+        suggestion_models.TranslationContributionStatsModel.create(
+            language_code=self.LANGUAGE_CODE,
+            contributor_user_id=self.CONTRIBUTOR_USER_ID,
+            topic_id=self.TOPIC_ID,
+            submitted_translations_count=self.SUBMITTED_TRANSLATIONS_COUNT,
+            submitted_translation_word_count=(
+                self.SUBMITTED_TRANSLATION_WORD_COUNT),
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_without_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
+            rejected_translation_word_count=(
+                self.REJECTED_TRANSLATION_WORD_COUNT),
+            contribution_dates=self.CONTRIBUTION_DATES
+        )
+
+        translation_contribution_stats_model = (
+            suggestion_models.TranslationContributionStatsModel.get(
+                self.LANGUAGE_CODE, self.CONTRIBUTOR_USER_ID, self.TOPIC_ID
+            )
+        )
+
+        self.assertEqual(
+            translation_contribution_stats_model.language_code,
+            self.LANGUAGE_CODE
+        )
+        self.assertEqual(
+            translation_contribution_stats_model.contributor_user_id,
+            self.CONTRIBUTOR_USER_ID
+        )
+        self.assertEqual(
+            translation_contribution_stats_model.submitted_translations_count,
+            self.SUBMITTED_TRANSLATIONS_COUNT
+        )
+        self.assertEqual(
+            (
+                translation_contribution_stats_model
+                .submitted_translation_word_count
+            ),
+            self.SUBMITTED_TRANSLATION_WORD_COUNT
+        )
+        self.assertEqual(
+            translation_contribution_stats_model.accepted_translations_count,
+            self.ACCEPTED_TRANSLATIONS_COUNT
+        )
+        self.assertEqual(
+            (
+                translation_contribution_stats_model
+                .accepted_translations_without_reviewer_edits_count
+            ),
+            self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT
+        )
+        self.assertEqual(
+            (
+                translation_contribution_stats_model
+                .accepted_translation_word_count
+            ),
+            self.ACCEPTED_TRANSLATION_WORD_COUNT
+        )
+        self.assertEqual(
+            translation_contribution_stats_model.rejected_translations_count,
+            self.REJECTED_TRANSLATIONS_COUNT
+        )
+        self.assertEqual(
+            (
+                translation_contribution_stats_model
+                .rejected_translation_word_count
+            ),
+            self.REJECTED_TRANSLATION_WORD_COUNT
+        )
+        self.assertEqual(
+            translation_contribution_stats_model.contribution_dates,
+            self.CONTRIBUTION_DATES
+        )
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            (
+                suggestion_models.TranslationContributionStatsModel
+                .get_deletion_policy()
+            ),
+            base_models.DELETION_POLICY.DELETE)
+
+    def test_apply_deletion_policy(self):
+        suggestion_models.TranslationContributionStatsModel.create(
+            language_code=self.LANGUAGE_CODE,
+            contributor_user_id=self.CONTRIBUTOR_USER_ID,
+            topic_id=self.TOPIC_ID,
+            submitted_translations_count=self.SUBMITTED_TRANSLATIONS_COUNT,
+            submitted_translation_word_count=(
+                self.SUBMITTED_TRANSLATION_WORD_COUNT),
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_without_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
+            rejected_translation_word_count=(
+                self.REJECTED_TRANSLATION_WORD_COUNT),
+            contribution_dates=self.CONTRIBUTION_DATES
+        )
+        self.assertTrue(
+            suggestion_models.TranslationContributionStatsModel
+            .has_reference_to_user_id(self.CONTRIBUTOR_USER_ID))
+
+        (
+            suggestion_models.TranslationContributionStatsModel
+            .apply_deletion_policy(self.CONTRIBUTOR_USER_ID)
+        )
+
+        self.assertFalse(
+            suggestion_models.TranslationContributionStatsModel
+            .has_reference_to_user_id(self.CONTRIBUTOR_USER_ID))
+
+    def test_export_data_trivial(self):
+        user_data = (
+            suggestion_models.TranslationContributionStatsModel
+            .export_data('non_existent_user'))
+        self.assertEqual(user_data, {})
+
+    def test_export_data_nontrivial(self):
+        topic_id_2 = 'topic ID 2'
+        # Seed translation stats data for two different topics.
+        model_1_id = suggestion_models.TranslationContributionStatsModel.create(
+            language_code=self.LANGUAGE_CODE,
+            contributor_user_id=self.CONTRIBUTOR_USER_ID,
+            topic_id=self.TOPIC_ID,
+            submitted_translations_count=self.SUBMITTED_TRANSLATIONS_COUNT,
+            submitted_translation_word_count=(
+                self.SUBMITTED_TRANSLATION_WORD_COUNT),
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_without_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
+            rejected_translation_word_count=(
+                self.REJECTED_TRANSLATION_WORD_COUNT),
+            contribution_dates=self.CONTRIBUTION_DATES
+        )
+        model_2_id = suggestion_models.TranslationContributionStatsModel.create(
+            language_code=self.LANGUAGE_CODE,
+            contributor_user_id=self.CONTRIBUTOR_USER_ID,
+            topic_id=topic_id_2,
+            submitted_translations_count=self.SUBMITTED_TRANSLATIONS_COUNT,
+            submitted_translation_word_count=(
+                self.SUBMITTED_TRANSLATION_WORD_COUNT),
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_without_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
+            rejected_translation_word_count=(
+                self.REJECTED_TRANSLATION_WORD_COUNT),
+            contribution_dates=self.CONTRIBUTION_DATES
+        )
+        dates_in_iso_format = [
+            date.isoformat() for date in self.CONTRIBUTION_DATES]
+        expected_data = {
+            model_1_id: {
+                'language_code': self.LANGUAGE_CODE,
+                'topic_id': self.TOPIC_ID,
+                'submitted_translations_count': (
+                    self.SUBMITTED_TRANSLATIONS_COUNT),
+                'submitted_translation_word_count': (
+                    self.SUBMITTED_TRANSLATION_WORD_COUNT),
+                'accepted_translations_count': (
+                    self.ACCEPTED_TRANSLATIONS_COUNT),
+                'accepted_translations_without_reviewer_edits_count': (
+                    self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+                'accepted_translation_word_count': (
+                    self.ACCEPTED_TRANSLATION_WORD_COUNT),
+                'rejected_translations_count': (
+                    self.REJECTED_TRANSLATIONS_COUNT),
+                'rejected_translation_word_count': (
+                    self.REJECTED_TRANSLATION_WORD_COUNT),
+                'contribution_dates': dates_in_iso_format
+            },
+            model_2_id: {
+                'language_code': self.LANGUAGE_CODE,
+                'topic_id': topic_id_2,
+                'submitted_translations_count': (
+                    self.SUBMITTED_TRANSLATIONS_COUNT),
+                'submitted_translation_word_count': (
+                    self.SUBMITTED_TRANSLATION_WORD_COUNT),
+                'accepted_translations_count': (
+                    self.ACCEPTED_TRANSLATIONS_COUNT),
+                'accepted_translations_without_reviewer_edits_count': (
+                    self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+                'accepted_translation_word_count': (
+                    self.ACCEPTED_TRANSLATION_WORD_COUNT),
+                'rejected_translations_count': (
+                    self.REJECTED_TRANSLATIONS_COUNT),
+                'rejected_translation_word_count': (
+                    self.REJECTED_TRANSLATION_WORD_COUNT),
+                'contribution_dates': dates_in_iso_format
+            }
+        }
+
+        user_data = (
+            suggestion_models.TranslationContributionStatsModel
+            .export_data(self.CONTRIBUTOR_USER_ID))
+
+        self.assertEqual(expected_data, user_data)
