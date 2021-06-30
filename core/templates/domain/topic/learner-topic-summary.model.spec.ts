@@ -58,7 +58,7 @@ describe('Learner Topic summary model', () => {
       thumbnail_bg_color: '#C6DCDA',
       classroom: 'math',
       practice_tab_is_displayed: false,
-      canonical_story_dicts: [{
+      canonical_story_summary_dict: [{
         id: '0',
         title: 'Story Title',
         description: 'Story Description',
@@ -116,7 +116,7 @@ describe('Learner Topic summary model', () => {
       url_fragment: 'subtopic-name'
     }, _sampleLearnerTopicSummary.skillDescriptions)]);
     let expectedStorySummary = (
-      _sampleLearnerTopicSummary.getCanonicalStoryDicts()[0]);
+      _sampleLearnerTopicSummary.getCanonicalStorySummaryDicts()[0]);
     expect(expectedStorySummary.getId()).toEqual('0');
     expect(expectedStorySummary.getTitle()).toEqual('Story Title');
     expect(expectedStorySummary.getDescription()).toEqual('Story Description');

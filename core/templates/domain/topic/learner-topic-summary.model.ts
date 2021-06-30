@@ -27,7 +27,7 @@ export interface LearnerTopicSummaryBackendDict {
   'description': string;
   'version': number;
   'story_titles': string[];
-  'canonical_story_dicts': StorySummaryBackendDict[];
+  'canonical_story_summary_dict': StorySummaryBackendDict[];
   'thumbnail_filename': string;
   'thumbnail_bg_color': string;
   'classroom': string;
@@ -46,7 +46,7 @@ export class LearnerTopicSummary {
       public description: string,
       public version: number,
       public storyTitles: string[],
-      public canonicalStoryDicts: StorySummary[],
+      public canonicalStorySummaryDicts: StorySummary[],
       public thumbnailFilename: string,
       public thumbnailBgColor: string,
       public classroom: string,
@@ -63,9 +63,10 @@ export class LearnerTopicSummary {
       return Subtopic.create(
         subtopic, topicSummaryBackendDict.skill_descriptions);
     });
-    let stories = topicSummaryBackendDict.canonical_story_dicts.map(story =>{
-      return StorySummary.createFromBackendDict(story);
-    });
+    let canonicalStorySummaries = (
+      topicSummaryBackendDict.canonical_story_summary_dict.map(story => {
+        return StorySummary.createFromBackendDict(story);
+      }));
 
     return new LearnerTopicSummary(
       topicSummaryBackendDict.id,
@@ -73,7 +74,7 @@ export class LearnerTopicSummary {
       topicSummaryBackendDict.language_code,
       topicSummaryBackendDict.description,
       topicSummaryBackendDict.version,
-      topicSummaryBackendDict.story_titles, stories,
+      topicSummaryBackendDict.story_titles, canonicalStorySummaries,
       topicSummaryBackendDict.thumbnail_filename,
       topicSummaryBackendDict.thumbnail_bg_color,
       topicSummaryBackendDict.classroom,
@@ -107,8 +108,8 @@ export class LearnerTopicSummary {
     return this.storyTitles;
   }
 
-  getCanonicalStoryDicts(): StorySummary[] {
-    return this.canonicalStoryDicts;
+  getCanonicalStorySummaryDicts(): StorySummary[] {
+    return this.canonicalStorySummaryDicts;
   }
 
   getThumbnailFilename(): string {

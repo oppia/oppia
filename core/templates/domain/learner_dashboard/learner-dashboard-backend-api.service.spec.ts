@@ -190,7 +190,7 @@ describe('Learner Dashboard Backend API Service', () => {
       thumbnail_bg_color: '#C6DCDA',
       classroom: 'math',
       practice_tab_is_displayed: false,
-      canonical_story_dicts: [{
+      canonical_story_summary_dict: [{
         id: '0',
         title: 'Story Title',
         description: 'Story Description',
@@ -224,7 +224,7 @@ describe('Learner Dashboard Backend API Service', () => {
       thumbnail_bg_color: '#C6DCDA',
       classroom: 'math',
       practice_tab_is_displayed: false,
-      canonical_story_dicts: [{
+      canonical_story_summary_dict: [{
         id: '0',
         title: 'Story Title',
         description: 'Story Description',
@@ -258,7 +258,7 @@ describe('Learner Dashboard Backend API Service', () => {
       thumbnail_bg_color: '#C6DCDA',
       classroom: 'math',
       practice_tab_is_displayed: false,
-      canonical_story_dicts: [{
+      canonical_story_summary_dict: [{
         id: '0',
         title: 'Story Title',
         description: 'Story Description',
@@ -292,7 +292,7 @@ describe('Learner Dashboard Backend API Service', () => {
       thumbnail_bg_color: '#C6DCDA',
       classroom: 'math',
       practice_tab_is_displayed: false,
-      canonical_story_dicts: [{
+      canonical_story_summary_dict: [{
         id: '0',
         title: 'Story Title',
         description: 'Story Description',
@@ -326,7 +326,7 @@ describe('Learner Dashboard Backend API Service', () => {
       thumbnail_bg_color: '#C6DCDA',
       classroom: 'math',
       practice_tab_is_displayed: false,
-      canonical_story_dicts: [{
+      canonical_story_summary_dict: [{
         id: '0',
         title: 'Story Title',
         description: 'Story Description',
