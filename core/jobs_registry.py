@@ -46,12 +46,7 @@ ONE_OFF_JOB_MANAGERS = [
     skill_jobs_one_off.SkillMigrationOneOffJob,
     skill_jobs_one_off.SkillCommitCmdMigrationOneOffJob,
     story_jobs_one_off.StoryMigrationOneOffJob,
-<<<<<<< HEAD
-    story_jobs_one_off.DeleteStoryCommitLogsOneOffJob,
     story_jobs_one_off.UpdateStoryThumbnailSizeOneOffJob,
-    suggestion_jobs_one_off.ContentSuggestionFormatUpdateOneOffJob,
-=======
->>>>>>> 9b0478905fc8037c23536546af7b6819a805d498
     suggestion_jobs_one_off.QuestionSuggestionMigrationJobManager,
     topic_jobs_one_off.TopicMigrationOneOffJob,
 ]
