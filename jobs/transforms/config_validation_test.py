@@ -42,9 +42,6 @@ class ValidateConfigPropertySnapshotMetadataModelTests(
                 last_updated=self.NOW,
                 committer_id='committer_id',
                 commit_type='create',
-                commit_cmds_user_ids=[
-                    'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
-                content_user_ids=['content_user_1_id', 'content_user_2_id'],
                 commit_cmds=[{
                     'cmd': base_models.VersionedModel.CMD_DELETE_COMMIT}])
         )
@@ -66,9 +63,6 @@ class ValidateConfigPropertySnapshotMetadataModelTests(
                 last_updated=self.NOW,
                 committer_id='committer_id',
                 commit_type='create',
-                commit_cmds_user_ids=[
-                    'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
-                content_user_ids=['content_user_1_id', 'content_user_2_id'],
                 commit_cmds=[{'invalid': 'data'}])
         )
 
@@ -94,9 +88,6 @@ class ValidateConfigPropertySnapshotMetadataModelTests(
                 last_updated=self.NOW,
                 committer_id='committer_id',
                 commit_type='create',
-                commit_cmds_user_ids=[
-                    'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
-                content_user_ids=['content_user_1_id', 'content_user_2_id'],
                 commit_cmds=[{'cmd': 'invalid'}])
         )
 
@@ -122,9 +113,6 @@ class ValidateConfigPropertySnapshotMetadataModelTests(
                 last_updated=self.NOW,
                 committer_id='committer_id',
                 commit_type='create',
-                commit_cmds_user_ids=[
-                    'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
-                content_user_ids=['content_user_1_id', 'content_user_2_id'],
                 commit_cmds=[{'cmd': 'change_property_value'}])
         )
 
@@ -144,6 +132,11 @@ class ValidateConfigPropertySnapshotMetadataModelTests(
         ])
 
     def test_config_property_change_object_with_extra_attribute_in_cmd(self):
+        commit_dict = {
+            'cmd': 'change_property_value',
+            'new_value': 'new_value',
+            'invalid': 'invalid'
+        }
         invalid_commit_cmd_model = (
             config_models.ConfigPropertySnapshotMetadataModel(
                 id='model_id-1',
@@ -151,14 +144,7 @@ class ValidateConfigPropertySnapshotMetadataModelTests(
                 last_updated=self.NOW,
                 committer_id='committer_id',
                 commit_type='create',
-                commit_cmds_user_ids=[
-                    'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
-                content_user_ids=['content_user_1_id', 'content_user_2_id'],
-                commit_cmds=[{
-                    'cmd': 'change_property_value',
-                    'new_value': 'new_value',
-                    'invalid': 'invalid'
-                }])
+                commit_cmds=[commit_dict])
         )
 
         output = (
@@ -171,11 +157,7 @@ class ValidateConfigPropertySnapshotMetadataModelTests(
         self.assert_pcoll_equal(output, [
             base_validation_errors.CommitCmdsValidateError(
                 invalid_commit_cmd_model,
-                {
-                    'cmd': 'change_property_value',
-                    'new_value': 'new_value',
-                    'invalid': 'invalid'
-                },
+                commit_dict,
                 'The following extra attributes are present: invalid')
         ])
 
@@ -193,9 +175,6 @@ class ValidatePlatformParameterSnapshotMetadataModelTests(
                 last_updated=self.NOW,
                 committer_id='committer_id',
                 commit_type='create',
-                commit_cmds_user_ids=[
-                    'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
-                content_user_ids=['content_user_1_id', 'content_user_2_id'],
                 commit_cmds=[{
                     'cmd': base_models.VersionedModel.CMD_DELETE_COMMIT}])
         )
@@ -218,9 +197,6 @@ class ValidatePlatformParameterSnapshotMetadataModelTests(
                 last_updated=self.NOW,
                 committer_id='committer_id',
                 commit_type='create',
-                commit_cmds_user_ids=[
-                    'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
-                content_user_ids=['content_user_1_id', 'content_user_2_id'],
                 commit_cmds=[{'invalid': 'data'}])
         )
 
@@ -247,9 +223,6 @@ class ValidatePlatformParameterSnapshotMetadataModelTests(
                 last_updated=self.NOW,
                 committer_id='committer_id',
                 commit_type='create',
-                commit_cmds_user_ids=[
-                    'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
-                content_user_ids=['content_user_1_id', 'content_user_2_id'],
                 commit_cmds=[{'cmd': 'invalid'}])
         )
 
@@ -277,9 +250,6 @@ class ValidatePlatformParameterSnapshotMetadataModelTests(
                 last_updated=self.NOW,
                 committer_id='committer_id',
                 commit_type='create',
-                commit_cmds_user_ids=[
-                    'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
-                content_user_ids=['content_user_1_id', 'content_user_2_id'],
                 commit_cmds=[{'cmd': self.CMD_EDIT_RULES}])
         )
 
@@ -300,6 +270,11 @@ class ValidatePlatformParameterSnapshotMetadataModelTests(
 
     def test_param_change_object_with_extra_attribute_in_cmd_raises_exception(
             self):
+        commit_dict = {
+            'cmd': self.CMD_EDIT_RULES,
+            'new_rules': [],
+            'invalid': 'invalid'
+        }
         invalid_commit_cmd_model = (
             config_models.PlatformParameterSnapshotMetadataModel(
                 id='model_id-1',
@@ -307,14 +282,7 @@ class ValidatePlatformParameterSnapshotMetadataModelTests(
                 last_updated=self.NOW,
                 committer_id='committer_id',
                 commit_type='create',
-                commit_cmds_user_ids=[
-                    'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
-                content_user_ids=['content_user_1_id', 'content_user_2_id'],
-                commit_cmds=[{
-                    'cmd': self.CMD_EDIT_RULES,
-                    'new_rules': [],
-                    'invalid': 'invalid'
-                }])
+                commit_cmds=[commit_dict])
         )
 
         output = (
@@ -328,10 +296,6 @@ class ValidatePlatformParameterSnapshotMetadataModelTests(
         self.assert_pcoll_equal(output, [
             base_validation_errors.CommitCmdsValidateError(
                 invalid_commit_cmd_model,
-                {
-                    'cmd': self.CMD_EDIT_RULES,
-                    'new_rules': [],
-                    'invalid': 'invalid'
-                },
+                commit_dict,
                 'The following extra attributes are present: invalid')
         ])
