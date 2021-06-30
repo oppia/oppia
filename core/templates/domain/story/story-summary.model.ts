@@ -80,7 +80,7 @@ export class StorySummary {
     return this._thumbnailBgColor;
   }
 
-  getDescription(): string {
+  getDescription(): string | undefined {
     return this._description;
   }
 
