@@ -15,7 +15,7 @@
 # limitations under the License.
 
 """Implements additional custom Pylint checkers to be used as part of
-presubmit checks. Next message id would be C0035.
+presubmit checks. Next message id would be C0039.
 """
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
@@ -27,6 +27,7 @@ import re
 import sys
 import tokenize
 
+from core.controllers import payload_validator
 import python_utils
 from .. import docstrings_checker
 
@@ -2141,6 +2142,111 @@ class DisallowDunderMetaclassChecker(checkers.BaseChecker):
             self.add_message('no-dunder-metaclass', node=node)
 
 
+class DisallowHandlerWithoutSchema(checkers.BaseChecker):
+    """Custom pylint checker prohibiting handlers which do not have schema
+    defined within the class.
+    """
+
+    __implements__ = interfaces.IAstroidChecker
+
+    name = 'disallow-handlers-without-schema'
+    priority = -1
+    msgs = {
+        'C0035': (
+            'Please add schema in URL_ARGS_PATH_SCHEMA for %s class. \nVisit '
+            'https://github.com/oppia/oppia/wiki/Writing-schema-for-'
+            'handler-args'
+            'to learn how to write schema for handlers.',
+            'no-schema-for-url-path-elements',
+            'Enforce writing schema for url path arguments of handler class.'
+        ),
+        'C0036': (
+            'Please add schema in HANDLER_ARGS_SCHEMA for %s class. \nVisit '
+            'https://github.com/oppia/oppia/wiki/Writing-schema-for-'
+            'handler-args'
+            'to learn how to write schema for handlers.',
+            'no-schema-for-handler-args',
+            'Enforce writing schema for request arguments of handler class.'
+        ),
+        'C0037': (
+            'URL_PATH_ARGS_SCHEMAS for %s class must be dict.',
+            'url-path-args-schemas-must-be-dict',
+            'Enforce URL_ARGS_PATH_SCHEMAS to be of dict type.'
+        ),
+        'C0038': (
+            'HANDLER_ARGS_SCHEMAS for %s class must be dict.',
+            'handler-args-schemas-must-be-dict',
+            'Enforce HANDLER_ARGS_SCHEMAS to be of dict type.'
+        )
+    }
+
+    def check_given_variable_is_a_dict(self, node, variable_name):
+        """Checks whether schema variable of a handlers class is of dict type.
+
+        Args:
+            node: astroid.nodes.ClassDef. Node for a class definition
+                in the AST.
+            variable_name: str. Name of the variable which contains schemas.
+
+        Returns:
+            bool. Whether schema variable of a class is of dict type.
+        """
+        generator_object_for_value_of_schemas = (
+            node.locals[variable_name][0].assigned_stmts())
+
+        for value_of_schemas in generator_object_for_value_of_schemas:
+            if value_of_schemas.name != 'dict':
+                return False
+        return True
+
+    def check_parent_class_is_basehandler(self, node):
+        """Checks whether the parent class of given class is BaseHandler.
+
+        Args:
+            node: astroid.nodes.ClassDef. Node for a class definition
+                in the AST.
+
+        Returns:
+            bool. Whether the parent class of given class is BaseHandler.
+        """
+        for ancestor_node in node.ancestors():
+            if ancestor_node.name == u'BaseHandler':
+                return True
+        return False
+
+    def visit_classdef(self, node):
+        """Visit each class definition in controllers layer module and check
+        if it contains schema or not.
+
+        Args:
+            node: astroid.nodes.ClassDef. Node for a class definition
+                in the AST.
+        """
+        if not self.check_parent_class_is_basehandler(node):
+            return
+
+        if node.name in payload_validator.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA:
+            return
+
+        if 'URL_PATH_ARGS_SCHEMAS' not in node.locals:
+            self.add_message(
+                'no-schema-for-url-path-elements', node=node, args=(node.name))
+        elif not self.check_given_variable_is_a_dict(
+                node, 'URL_PATH_ARGS_SCHEMAS'):
+            self.add_message(
+                'url-path-args-schemas-must-be-dict',
+                node=node, args=(node.name))
+
+        if 'HANDLER_ARGS_SCHEMAS' not in node.locals:
+            self.add_message(
+                'no-schema-for-handler-args', node=node, args=(node.name))
+        elif not self.check_given_variable_is_a_dict(
+                node, 'HANDLER_ARGS_SCHEMAS'):
+            self.add_message(
+                'handler-args-schemas-must-be-dict',
+                node=node, args=(node.name))
+
+
 def register(linter):
     """Registers the checker with pylint.
 
@@ -2164,3 +2270,4 @@ def register(linter):
     linter.register_checker(NonTestFilesFunctionNameChecker(linter))
     linter.register_checker(DisallowedFunctionsChecker(linter))
     linter.register_checker(DisallowDunderMetaclassChecker(linter))
+    linter.register_checker(DisallowHandlerWithoutSchema(linter))

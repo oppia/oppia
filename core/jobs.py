@@ -985,14 +985,6 @@ class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
             'must implement the _get_continuous_computation_class() method.')
 
     @staticmethod
-    def _get_job_queued_msec():
-        """Returns the time when the job got queued, in milliseconds past the
-        Epoch.
-        """
-        return float(context.get().mapreduce_spec.mapper.params[
-            MAPPER_PARAM_KEY_QUEUED_TIME_MSECS])
-
-    @staticmethod
     def entity_created_before_job_queued(entity):
         """Checks that the given entity was created before the MR job was
         queued.
@@ -1316,25 +1308,6 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
         """
         return cls._get_realtime_datastore_class().get_realtime_id(
             cls._get_active_realtime_index(), entity_id)
-
-    @classmethod
-    def get_multi_active_realtime_layer_ids(cls, entity_ids):
-        """Returns a list of IDs of elements in the currently active realtime
-        datastore layer corresponding to the given entity ids.
-
-        Args:
-            entity_ids: str. Collection of unique identifiers for entities.
-
-        Returns:
-            list(str). Unique identifiers for each given entity for storage in
-            the currently active realtime layer.
-        """
-        realtime_datastore_class = cls._get_realtime_datastore_class()
-        active_realtime_index = cls._get_active_realtime_index()
-        return [
-            realtime_datastore_class.get_realtime_id(
-                active_realtime_index, entity_id
-            ) for entity_id in entity_ids]
 
     @classmethod
     def _switch_active_realtime_class(cls):

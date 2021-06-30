@@ -51,9 +51,9 @@ export class StorySummary {
     private _completedNodeTitles: string[],
     private _urlFragment: string,
     private _allNodes: StoryNode[],
-    private _topicName: string,
-    private _topicUrlFragment: string,
-    private _classroomUrlFragment: string
+    private _topicName: string | undefined,
+    private _topicUrlFragment: string | undefined,
+    private _classroomUrlFragment: string | undefined
   ) {}
 
   getId(): string {
@@ -88,7 +88,7 @@ export class StorySummary {
     return this._completedNodeTitles;
   }
 
-  getTopicName(): string {
+  getTopicName(): string | undefined {
     return this._topicName;
   }
 
@@ -104,11 +104,11 @@ export class StorySummary {
     return this._allNodes;
   }
 
-  getTopicUrlFragment(): string {
+  getTopicUrlFragment(): string | undefined {
     return this._topicUrlFragment;
   }
 
-  getClassroomUrlFragment(): string {
+  getClassroomUrlFragment(): string | undefined {
     return this._classroomUrlFragment;
   }
 
