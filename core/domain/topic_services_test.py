@@ -615,6 +615,11 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'new_value': 'url-name'
         }), topic_domain.TopicChange({
             'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+            'property_name': topic_domain.TOPIC_PROPERTY_THUMBNAIL_FILENAME,
+            'old_value': '',
+            'new_value': 'thumbnail.svg'
+        }), topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
             'property_name': topic_domain.TOPIC_PROPERTY_THUMBNAIL_BG_COLOR,
             'old_value': '',
             'new_value': '#C6DCDA'
@@ -651,6 +656,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic.page_title_fragment_for_web, 'topic page title')
         self.assertEqual(topic_summary.version, 3)
         self.assertEqual(topic.thumbnail_filename, 'thumbnail.svg')
+        self.assertEqual(topic.thumbnail_size_in_bytes, None)
         self.assertEqual(topic_summary.thumbnail_bg_color, '#C6DCDA')
 
         # Test whether a topic_manager can edit a topic.
