@@ -1164,7 +1164,8 @@ class Topic(python_utils.OBJECT):
         fs = fs_domain.AbstractFileSystem(file_system_class(
             feconf.ENTITY_TYPE_TOPIC, topic_id))
         filename_prefix = 'thumbnail'
-        filepath = '%s/%s' % (filename_prefix, subtopic_dict['thumbnail_filename'])
+        filepath = '%s/%s' % (
+            filename_prefix, subtopic_dict['thumbnail_filename'])
         if fs.isfile(filepath):
             subtopic_dict['thumbnail_size_in_bytes'] = len(fs.get(filepath))
 

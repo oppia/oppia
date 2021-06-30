@@ -24,7 +24,6 @@ import logging
 
 from core.domain import caching_services
 from core.domain import feedback_services
-from core.domain import fs_domain
 from core.domain import opportunity_services
 from core.domain import rights_domain
 from core.domain import role_services
