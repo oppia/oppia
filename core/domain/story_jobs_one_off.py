@@ -95,6 +95,7 @@ class StoryMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         else:
             yield (key, values)
 
+
 class UpdateStoryThumbnailSizeOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job to update the thumbnail_size_in_bytes in story models. """
 
