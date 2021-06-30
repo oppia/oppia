@@ -230,7 +230,7 @@ var StoryEditorPage = function() {
 
   this.dragChapterToAnotherChapter = (async function(chapter1, chapter2) {
     await waitFor.visibilityOf(
-      await chapterTitles.first(),
+      chapterTitles.first(),
       'Chapter titles taking too long to appear.');
     var matchFound = false;
     for (var i = 0; i < await chapterTitles.count(); i++) {
@@ -403,7 +403,7 @@ var StoryEditorPage = function() {
     // Function scrollToTop is added to prevent chapterTitles from being hidden
     // by the navbar.
     await general.scrollToTop();
-    var chapterTitleButton = await chapterTitles.get(index);
+    var chapterTitleButton = chapterTitles.get(index);
     await chapterTitleButton.click();
   };
 
@@ -464,12 +464,12 @@ var StoryEditorPage = function() {
   };
 
   this.deleteAcquiredSkillByIndex = async function(index) {
-    var deleteButton = await deleteAcquiredSkillButton.get(index);
+    var deleteButton = deleteAcquiredSkillButton.get(index);
     await action.click('Delete Acquired Skill Button', deleteButton);
   };
 
   this.deletePrerequisiteSkillByIndex = async function(index) {
-    var deleteButton = await deletePrerequisiteSkillButton.get(index);
+    var deleteButton = deletePrerequisiteSkillButton.get(index);
     await action.click('Delete Prerequisite Skill Button', deleteButton);
   };
 
@@ -502,7 +502,8 @@ var StoryEditorPage = function() {
     var warningElemCount = await warningTextElements.count();
     var matchFound = false;
     for (var i = 0; i < warningElemCount; i++) {
-      var text = await warningTextElements.get(i).getText();
+      var text = await action.getText(
+        'Warning Text', warningTextElements.get(i));
       if (warning.test(text)) {
         matchFound = true;
         break;
