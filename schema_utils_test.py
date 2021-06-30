@@ -27,6 +27,8 @@ import feconf
 import python_utils
 import schema_utils
 
+from typing import Any, Dict, List, Text, Tuple, Union # isort:skip # pylint: disable=unused-import, import-only-modules
+
 SCHEMA_KEY_ITEMS = schema_utils.SCHEMA_KEY_ITEMS
 SCHEMA_KEY_LEN = schema_utils.SCHEMA_KEY_LEN
 SCHEMA_KEY_PROPERTIES = schema_utils.SCHEMA_KEY_PROPERTIES
@@ -113,7 +115,7 @@ UI_CONFIG_SPECS = {
             'type': SCHEMA_TYPE_UNICODE,
         },
     },
-}
+} # type: Dict[Text, Dict[Text, Any]]
 
 # Schemas for validators for the various types.
 VALIDATOR_SPECS = {
@@ -194,10 +196,11 @@ VALIDATOR_SPECS = {
             }
         }
     },
-}
+} # type: Dict[Text, Dict[Text, Any]]
 
 
 def _validate_ui_config(obj_type, ui_config):
+    # type: (Text, Dict[Text, Any]) -> None
     """Validates the value of a UI configuration.
 
         Args:
@@ -218,6 +221,7 @@ def _validate_ui_config(obj_type, ui_config):
 
 
 def _validate_validator(obj_type, validator):
+    # type: (Text, Dict[Text, Any]) -> None
     """Validates the value of a 'validator' field.
 
     Args:
@@ -266,6 +270,7 @@ def _validate_validator(obj_type, validator):
 
 
 def _validate_dict_keys(dict_to_check, required_keys, optional_keys):
+    # type: (Dict[Text, Any], List[Text], List[Text]) -> None
     """Checks that all of the required keys, and possibly some of the optional
     keys, are in the given dict.
 
@@ -285,6 +290,7 @@ def _validate_dict_keys(dict_to_check, required_keys, optional_keys):
 
 
 def validate_schema(schema):
+    # type: (Dict[Text, Any]) -> None
     """Validates a schema.
 
     This is meant to be a utility function that should be used by tests to
@@ -407,9 +413,10 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
 
     GLOBAL_VALIDATORS = [{
         'id': 'does_not_contain_email'
-    }]
+    }] # List[Dict[Text, Any]]
 
     def test_schemas_are_correctly_validated(self):
+        # type: () -> None
         """Test validation of schemas."""
         invalid_schemas_with_error_messages = [
             ([
@@ -559,23 +566,27 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
             'ui_config': {
                 'coding_mode': 'python',
             }
-        }]
+        }] # type: List[Dict[Text, Any]]
 
         for schema in valid_schemas:
             validate_schema(schema)
-        for schema, error_msg in invalid_schemas_with_error_messages:
-            with self.assertRaisesRegexp((AssertionError, KeyError), error_msg):
-                validate_schema(schema)
+        for schemas, error_msg in invalid_schemas_with_error_messages:
+            with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+                (AssertionError, KeyError), error_msg):
+                validate_schema(schemas) # type: ignore[arg-type]
 
     def test_normalize_against_schema_raises_exception(self):
+        # type: () -> None
         """Tests if normalize against schema raises exception
         for invalid key.
         """
-        with self.assertRaisesRegexp(Exception, 'Invalid schema type: invalid'):
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+            Exception, 'Invalid schema type: invalid'):
             schema = {SCHEMA_KEY_TYPE: 'invalid'}
             schema_utils.normalize_against_schema('obj', schema)
 
     def test_is_nonempty_validator(self):
+        # type: () -> None
         """Tests if static method is_nonempty returns true iff obj
         is not an empty str.
         """
@@ -586,6 +597,7 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         self.assertFalse(is_nonempty(''))
 
     def test_is_at_most_validator(self):
+        # type: () -> None
         """Tests if static method is_at_most returns true iff obj
         is at most a value.
         """
@@ -595,6 +607,7 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         self.assertFalse(is_at_most(2, 1))
 
     def test_has_length_at_least_validator(self):
+        # type: () -> None
         """Tests if static method has_length_at_least returns true iff
         given list has length of at least the given value.
         """
@@ -604,15 +617,17 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         self.assertFalse(has_len_at_least(['elem'], 2))
 
     def test_get_raises_invalid_validator_id(self):
+        # type: () -> None
         """Tests if class method 'get' in _Validator raises exception
         for invalid validator id.
         """
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception,
             'Invalid validator id: some invalid validator method name'):
             schema_utils.get_validator('some invalid validator method name')
 
     def test_is_valid_algebraic_expression_validator(self):
+        # type: () -> None
         """Tests for the is_valid_algebraic_expression static method with
         algebraic type.
         """
@@ -623,6 +638,7 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         self.assertFalse(is_valid_algebraic_expression('3+4/2'))
 
     def test_is_valid_numeric_expression_validator(self):
+        # type: () -> None
         """Tests for the is_valid_numeric_expression static method with
         numeric type.
         """
@@ -633,6 +649,7 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         self.assertTrue(is_valid_numeric_expression('3+4/2'))
 
     def test_is_valid_math_equation_validator(self):
+        # type: () -> None
         """Tests for the is_valid_math_equation static method."""
         is_valid_math_equation = schema_utils.get_validator(
             'is_valid_math_equation')
@@ -671,6 +688,7 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         self.assertFalse(is_valid_math_equation('a+b=c:)'))
 
     def test_is_supported_audio_language_code(self):
+        # type: () -> None
         is_supported_audio_language_code = schema_utils.get_validator(
             'is_supported_audio_language_code')
 
@@ -683,6 +701,7 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         self.assertFalse(is_supported_audio_language_code('test'))
 
     def test_is_url_fragment(self):
+        # type: () -> None
         validate_url_fragment = schema_utils.get_validator(
             'is_url_fragment')
 
@@ -695,7 +714,8 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         self.assertFalse(validate_url_fragment('!@#$%^&*()_+='))
 
     def test_global_validators_raise_exception_when_error_in_dict(self):
-        with self.assertRaisesRegexp(
+        # type: () -> None
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             AssertionError,
             r'^Validation failed: does_not_contain_email .* email@email.com$'
         ):
@@ -709,7 +729,8 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
             )
 
     def test_global_validators_raise_exception_when_error_in_list(self):
-        with self.assertRaisesRegexp(
+        # type: () -> None
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             AssertionError,
             r'^Validation failed: does_not_contain_email .* email2@email.com$'
         ):
@@ -723,6 +744,7 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
             )
 
     def test_global_validators_pass_when_no_error(self):
+        # type: () -> None
         obj = {
             'unicodeListProp': ['not email', 'not email 2'],
             'unicodeProp': 'not email'
@@ -739,6 +761,7 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
 
     def check_normalization(
             self, schema, mappings, invalid_items_with_error_messages):
+        # type: (Dict[Text, Any], List[Tuple[Any, Any]], List[Tuple[Any, Text]]) -> None # pylint: disable=line-too-long
         """Validates the schema and tests that values are normalized correctly.
 
         Args:
@@ -760,10 +783,12 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
                 schema_utils.normalize_against_schema(raw_value, schema),
                 expected_value)
         for value, error_msg in invalid_items_with_error_messages:
-            with self.assertRaisesRegexp(Exception, error_msg):
+            with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+                Exception, error_msg):
                 schema_utils.normalize_against_schema(value, schema)
 
     def test_float_schema(self):
+        # type: () -> None
         schema = {
             'type': schema_utils.SCHEMA_TYPE_FLOAT,
         }
@@ -776,6 +801,7 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
             schema, mappings, invalid_values_with_error_messages)
 
     def test_int_schema(self):
+        # type: () -> None
         schema = {
             'type': schema_utils.SCHEMA_TYPE_INT,
         }
@@ -788,17 +814,19 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
             schema, mappings, invalid_values_with_error_messages)
 
     def test_unicode_or_none_schema(self):
+        # type: () -> None
         schema = {
             'type': schema_utils.SCHEMA_TYPE_UNICODE_OR_NONE,
         }
         mappings = [('a', 'a'), ('', ''), (b'bytes', 'bytes'), (None, None)]
         invalid_values_with_error_messages = [
             ([], r'Expected unicode string or None, received'),
-        ]
+        ] # type: List[Tuple[List[Any], Text]]
         self.check_normalization(
             schema, mappings, invalid_values_with_error_messages)
 
     def test_list_schema_with_len(self):
+        # type: () -> None
         schema = {
             'type': schema_utils.SCHEMA_TYPE_LIST,
             'items': {
@@ -823,6 +851,7 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
             schema, mappings, invalid_values_with_error_messages)
 
     def test_html_schema(self):
+        # type: () -> None
         """Tests for valid html schema, an html string. Note that
         html.cleaner() is called in normalize_against_schema.
         """
@@ -845,6 +874,7 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
             schema, mappings, invalid_values_with_error_messages)
 
     def test_schema_key_post_normalizers(self):
+        # type: () -> None
         """Test post normalizers in schema using basic html schema."""
         schema_1 = {
             'type': schema_utils.SCHEMA_TYPE_HTML,
@@ -867,6 +897,7 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
         self.assertEqual(u'http://www.oppia.org/splash/', normalize_obj_2)
 
     def test_list_schema(self):
+        # type: () -> None
         schema = {
             'type': schema_utils.SCHEMA_TYPE_LIST,
             'items': {
@@ -890,6 +921,7 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
             schema, mappings, invalid_values_with_error_messages)
 
     def test_dict_schema(self):
+        # type: () -> None
         schema = {
             'type': schema_utils.SCHEMA_TYPE_DICT,
             'properties': [{
@@ -975,6 +1007,7 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
             schema, mappings, invalid_values_with_error_messages)
 
     def test_notification_user_ids_list_validator(self):
+        # type: () -> None
         schema = email_manager.NOTIFICATION_USER_IDS_LIST_SCHEMA
         valid_user_id_list = [
             'uid_%s' % (chr(97 + i) * feconf.USER_ID_RANDOM_PART_LENGTH)
@@ -1004,6 +1037,7 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
             schema, mappings, invalid_values_with_error_messages)
 
     def test_normalize_spaces(self):
+        # type: () -> None
         """Test static method normalize_spaces; should collapse multiple
         spaces.
         """
@@ -1014,6 +1048,7 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
         self.assertNotEqual('dog cat', normalize_spaces('dogcat'))
 
     def test_normalizer_get(self):
+        # type: () -> None
         """Tests the class method 'get' of Normalizers, should return the
         normalizer method corresponding to the given normalizer id.
         """
@@ -1021,20 +1056,22 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
         self.assertEqual('normalize_spaces', normalize_spaces.__name__)
 
     def test_normalizer_get_raises_exception_for_invalid_id(self):
+        # type: () -> None
         """Tests if class method get of Normalizers raises exception when given
         an invalid normalizer id.
         """
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception,
             'Invalid normalizer id: some invalid normalizer method name'):
             schema_utils.Normalizers.get('some invalid normalizer method name')
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'Invalid normalizer id: normalize_space'):
             # Test substring of an actual id.
             schema_utils.Normalizers.get('normalize_space')
 
     def test_normalizer_sanitize_url(self):
+        # type: () -> None
         """Tests if static method sanitize_url of Normalizers correctly
         sanitizes a URL when given its string representation and raises
         error for invalid URLs.
@@ -1063,13 +1100,13 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
 
         # Raise AssertionError if string does not start with http:// or
         # https://.
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             AssertionError,
             'Invalid URL: Sanitized URL should start with \'http://\' or'
             ' \'https://\'; received oppia.org'):
             sanitize_url('oppia.org')
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             AssertionError,
             'Invalid URL: Sanitized URL should start with \'http://\' or'
             ' \'https://\'; received www.oppia.org'):
