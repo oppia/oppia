@@ -1,3 +1,4 @@
+/* eslint-disable oppia/no-test-blockers */
 // Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,7 +27,7 @@ import { PlayerPositionService } from 'pages/exploration-player-page/services/pl
 import { EventEmitter } from '@angular/core';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 
-describe('GraphVizComponent', () => {
+fdescribe('GraphVizComponent', () => {
   let component: GraphVizComponent;
   let graphDetailService: GraphDetailService;
   let deviceInfoService: DeviceInfoService;
@@ -52,6 +53,24 @@ describe('GraphVizComponent', () => {
     fixture = TestBed.createComponent(GraphVizComponent);
     component = fixture.componentInstance;
 
+    // Graph visulization
+    //      1
+    // p----------p
+    //          -
+    //     1   -
+    //      -
+    //    -
+    //  -        p
+    // p
+    //
+    // Note: Here 'p' represents the points, '-' represents the line and the
+    // number above the line represents it's weight.
+    //
+    // These values are random, however the values have been injected into the
+    // code during execution via the console to test if the values are valid.
+    // I have used round number for x. y to make the tests easier to
+    // understand. There is one vertex with floating point number to make sure
+    // that the tests do not fail when a floating point number is used.
     component.graph = {
       vertices: [
         {
@@ -103,9 +122,14 @@ describe('GraphVizComponent', () => {
     component.canEditOptions = true;
   });
 
-  it('should initialise component, when a graph is visualized', () => {
+  // This compoenent gets executed when a graph made is diaplyed in the editor
+  // or the interaction in the player.
+  it('should initialise component, when a graph is displayed', () => {
     component.ngOnInit();
 
+    // Only the basic values are initialised in ngOnInit() function. The rest
+    // of the values are initialised in ngAfterViewInit(), .i.e, after the
+    // initialisation of the components view is completed.
     expect(component.VERTEX_RADIUS).toBe(graphDetailService.VERTEX_RADIUS);
     expect(component.EDGE_WIDTH).toBe(graphDetailService.EDGE_WIDTH);
     expect(component.selectedEdgeWeightValue).toBe(0);
@@ -136,8 +160,7 @@ describe('GraphVizComponent', () => {
     expect(component.state.currentMode).toBeNull();
   });
 
-  it('should intialise after angular has completed initialization of the' +
-  ' component\'s view', () => {
+  it('should set graph properties after the view is initialized', () => {
     spyOn(Element.prototype, 'querySelectorAll').and.callFake(
       jasmine.createSpy('querySelectorAll').and
         .returnValue([{
@@ -319,7 +342,7 @@ describe('GraphVizComponent', () => {
   });
 
   it('should set help text when user in mobile and user can move' +
-  'vertices in the graph', () => {
+  ' vertices in the graph', () => {
     spyOn(component, 'initButtons').and.callThrough();
     component.canMoveVertex = true;
     component.canAddEdge = false;
@@ -349,7 +372,7 @@ describe('GraphVizComponent', () => {
   });
 
   it('should not set help text when user is in mobile and cannot move' +
-  'vertices and add edges', () => {
+  ' vertices and add edges', () => {
     spyOn(component, 'initButtons').and.callThrough();
     component.canAddEdge = false;
     component.canMoveVertex = false;
@@ -371,21 +394,6 @@ describe('GraphVizComponent', () => {
     // The help text must be displayed only if the user is using a mobile.
     // Therefore we check that the value of isMobile is true.
     expect(component.isMobile).toBe(true);
-    expect(component.helpText).toBe('');
-  });
-
-  it('should not set help text when user is not in mobile', () => {
-    spyOn(component, 'initButtons').and.callThrough();
-    component.isMobile = false;
-    component.helpText = null;
-
-    component.init();
-
-    expect(component.initButtons).toHaveBeenCalled();
-    // The help text must be displayed only if the user is using a mobile.
-    // Therefore we check that the value of isMobile is false to make sure that
-    // the help text was not set.
-    expect(component.isMobile).toBe(false);
     expect(component.helpText).toBe('');
   });
 
@@ -631,6 +639,8 @@ describe('GraphVizComponent', () => {
   });
 
   it('should change location of vertex when dragged by mouse', () => {
+    // These values are the coordinates of the mouse when the mouse event
+    // was triggered.
     let dummyMouseEvent = new MouseEvent('mousemove', {
       clientX: 775,
       clientY: 307
@@ -692,6 +702,8 @@ describe('GraphVizComponent', () => {
   ' active', () => {
     component.state.currentlyDraggedVertex = 0;
     component.interactionIsActive = false;
+    // These values are the coordinates of the mouse when the mouse event
+    // was triggered.
     let dummyMouseEvent = new MouseEvent('mousemove', {
       clientX: 775,
       clientY: 307
@@ -903,8 +915,6 @@ describe('GraphVizComponent', () => {
   it('should set selectedVertex to null if hoveredVertex is null', () => {
     component.state.selectedVertex = 1;
 
-    expect(component.state.selectedVertex).toBe(1);
-
     component.onClickGraphSVG();
 
     expect(component.interactionIsActive).toBe(true);
@@ -930,8 +940,6 @@ describe('GraphVizComponent', () => {
 
   it('should set selectedEdge to null if hoveredVertex is null', () => {
     component.state.selectedEdge = 1;
-
-    expect(component.state.selectedEdge).toBe(1);
 
     component.onClickGraphSVG();
 
@@ -969,7 +977,7 @@ describe('GraphVizComponent', () => {
   });
 
   it('should toggle isWeighted option when user selects' +
-  'Weighted option', () => {
+  ' Weighted option', () => {
     expect(component.graph.isWeighted).toBe(true);
 
     component.toggleGraphOption('isWeighted');
@@ -1026,10 +1034,7 @@ describe('GraphVizComponent', () => {
 
     expect(component.helpText).toBe('');
 
-    let dummyMouseEvent = new MouseEvent('click', {
-      clientX: 775,
-      clientY: 307
-    });
+    let dummyMouseEvent = new MouseEvent('click');
 
     component.onClickModeButton(component._MODES.MOVE, dummyMouseEvent);
 
@@ -1052,10 +1057,7 @@ describe('GraphVizComponent', () => {
 
     expect(component.helpText).toBe('');
 
-    let dummyMouseEvent = new MouseEvent('click', {
-      clientX: 775,
-      clientY: 307
-    });
+    let dummyMouseEvent = new MouseEvent('click');
 
     component.onClickModeButton(component._MODES.MOVE, dummyMouseEvent);
 
@@ -1079,10 +1081,7 @@ describe('GraphVizComponent', () => {
 
     expect(component.helpText).toBe('');
 
-    let dummyMouseEvent = new MouseEvent('click', {
-      clientX: 775,
-      clientY: 307
-    });
+    let dummyMouseEvent = new MouseEvent('click');
 
     component.onClickModeButton(component._MODES.ADD_EDGE, dummyMouseEvent);
 
@@ -1105,10 +1104,7 @@ describe('GraphVizComponent', () => {
 
     expect(component.helpText).toBe('');
 
-    let dummyMouseEvent = new MouseEvent('click', {
-      clientX: 775,
-      clientY: 307
-    });
+    let dummyMouseEvent = new MouseEvent('click');
 
     component.onClickModeButton(component._MODES.ADD_EDGE, dummyMouseEvent);
 
@@ -1132,10 +1128,7 @@ describe('GraphVizComponent', () => {
 
     expect(component.helpText).toBe('');
 
-    let dummyMouseEvent = new MouseEvent('click', {
-      clientX: 775,
-      clientY: 307
-    });
+    let dummyMouseEvent = new MouseEvent('click');
 
     component.onClickModeButton(component._MODES.ADD_VERTEX, dummyMouseEvent);
 
@@ -1159,10 +1152,7 @@ describe('GraphVizComponent', () => {
 
     expect(component.helpText).toBe('');
 
-    let dummyMouseEvent = new MouseEvent('click', {
-      clientX: 775,
-      clientY: 307
-    });
+    let dummyMouseEvent = new MouseEvent('click');
 
     component.onClickModeButton(component._MODES.ADD_VERTEX, dummyMouseEvent);
 
@@ -1185,10 +1175,7 @@ describe('GraphVizComponent', () => {
 
     expect(component.helpText).toBe('');
 
-    let dummyMouseEvent = new MouseEvent('click', {
-      clientX: 775,
-      clientY: 307
-    });
+    let dummyMouseEvent = new MouseEvent('click');
 
     component.onClickModeButton(component._MODES.DELETE, dummyMouseEvent);
 
@@ -1212,10 +1199,7 @@ describe('GraphVizComponent', () => {
 
     expect(component.helpText).toBe('');
 
-    let dummyMouseEvent = new MouseEvent('click', {
-      clientX: 775,
-      clientY: 307
-    });
+    let dummyMouseEvent = new MouseEvent('click');
 
     component.onClickModeButton(component._MODES.DELETE, dummyMouseEvent);
 
@@ -1232,10 +1216,7 @@ describe('GraphVizComponent', () => {
     spyOn(component, 'setMode');
     component.interactionIsActive = false;
 
-    let dummyMouseEvent = new MouseEvent('click', {
-      clientX: 775,
-      clientY: 307
-    });
+    let dummyMouseEvent = new MouseEvent('click');
 
     component.onClickModeButton(component._MODES.DELETE, dummyMouseEvent);
     expect(component.setMode).not.toHaveBeenCalled();
@@ -1368,7 +1349,7 @@ describe('GraphVizComponent', () => {
     expect(component.state.addEdgeVertex).toBeNull();
   });
 
-  it('should stop moving vertex when users using a mobile clicks on the' +
+  it('should stop moving vertex when user is using a mobile clicks on the' +
   ' graph', () => {
     component.state.currentMode = component._MODES.MOVE;
     component.state.addEdgeVertex = 1;
@@ -1484,7 +1465,7 @@ describe('GraphVizComponent', () => {
     expect(component.state.hoveredVertex).toBeNull();
   });
 
-  it('should edit vertex label when user click the label', () => {
+  it('should edit vertex label when user clicks the label', () => {
     component.graph.isLabeled = true;
     spyOn(component, 'beginEditVertexLabel').and.callThrough();
     spyOn(focusManagerService, 'setFocus');
@@ -1690,7 +1671,7 @@ describe('GraphVizComponent', () => {
       ]);
     }));
 
-  it('should not add edge if an edge an edge is already present between' +
+  it('should not add edge if an edge is already present between' +
   'the destination and source for a non directed graph', fakeAsync(() => {
     component.state.currentMode = component._MODES.ADD_EDGE;
     component.state.hoveredVertex = 0;
