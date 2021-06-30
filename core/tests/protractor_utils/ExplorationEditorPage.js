@@ -89,6 +89,8 @@ var ExplorationEditorPage = function() {
     by.css('.protractor-test-confirm-discard-changes'));
   var discardChangesButton = element(
     by.css('.protractor-test-discard-changes'));
+  var discardLostChangesButton = element(
+    by.css('.protractor-test-discard-lost-changes-button'));
   var navigateToImprovementsTabButton = element(
     by.css('.protractor-test-improvements-tab'));
   var navigateToFeedbackTabButton = element(
@@ -258,6 +260,12 @@ var ExplorationEditorPage = function() {
       loadingModal, 'Loading modal taking too long to disappear');
     await waitFor.invisibilityOfInfoToast(
       'Changes take too long to be discarded.');
+    // Expect editor page to completely reload.
+    await waitFor.pageToFullyLoad();
+  };
+
+  this.discardLostChanges = async function() {
+    await action.click('Discard Lost Changes button', discardLostChangesButton);
     // Expect editor page to completely reload.
     await waitFor.pageToFullyLoad();
   };

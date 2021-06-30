@@ -383,6 +383,50 @@ describe('Full exploration editor', function() {
     await users.logout();
   });
 
+  fit('should open a lost changes modal', async function() {
+    await users.createUser('user9@editorAndPlayer.com', 'user9EditorAndPlayer');
+    await users.createUser(
+      'user10@editorAndPlayer.com',
+      'user10EditorAndPlayer');
+    await users.login('user9@editorAndPlayer.com');
+    await workflow.createExploration(true);
+    var explorationId = await general.getExplorationIdFromEditor();
+    await explorationEditorPage.navigateToSettingsTab();
+    await explorationEditorMainTab.setStateName('first card');
+    await explorationEditorSettingsTab.setTitle('Testing lost changes modal');
+    await explorationEditorSettingsTab.setCategory('Algebra');
+    await explorationEditorSettingsTab.setObjective('To assess happiness.');
+    await explorationEditorSettingsTab.openAndClosePreviewSummaryTile();
+    await explorationEditorPage.saveChanges();
+    await workflow.addExplorationManager('user10EditorAndPlayer');
+
+    await explorationEditorMainTab.setContent(async function(richTextEditor) {
+      await richTextEditor.appendPlainText('How are you feeling?');
+    });
+
+    await users.logout();
+    await users.login('user10@editorAndPlayer.com');
+    await general.openEditor(explorationId, true);
+    await explorationEditorMainTab.setContent(async function(richTextEditor) {
+      await richTextEditor.appendPlainText('You must be feeling great?');
+    });
+    await explorationEditorPage.saveChanges();
+    await users.logout();
+
+    await users.login('user9@editorAndPlayer.com');
+    await general.openEditor(explorationId, true);
+    await waitFor.visibilityOf(
+      element(by.css('.modal-content')),
+      'Lost Changes Modal taking too long to appear');
+    await explorationEditorPage.discardLostChanges();
+    await explorationEditorMainTab.expectContentToMatch(
+      async function(richTextChecker) {
+        await richTextChecker.readPlainText('You must be feeling great?');
+      }
+    );
+    await users.logout();
+  });
+
   afterEach(async function() {
     await general.checkForConsoleErrors([]);
   });
