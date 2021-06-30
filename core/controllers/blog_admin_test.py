@@ -50,7 +50,6 @@ class BlogAdminRolesHandlerTest(test_utils.GenericTestBase):
         response_dict = self.post_json(
             feconf.BLOG_ADMIN_ROLE_HANDLER_URL,
             {
-                'action': 'update_user_role',
                 'role': feconf.ROLE_ID_BLOG_ADMIN,
                 'username': username
             },
@@ -76,7 +75,6 @@ class BlogAdminRolesHandlerTest(test_utils.GenericTestBase):
         self.post_json(
             feconf.BLOG_ADMIN_ROLE_HANDLER_URL,
             {
-                'action': 'update_user_role',
                 'role': feconf.ROLE_ID_BLOG_ADMIN,
                 'username': username
             },

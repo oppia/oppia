@@ -133,7 +133,7 @@ class BlogPostHandler(base.BaseHandler):
                 'type': 'basestring'
             },
             'image': {
-                'type': 'basestring'
+                'type': 'basestring',
             }
         },
         'DELETE': {}

@@ -123,11 +123,9 @@ class BlogAdminRolesHandler(base.BaseHandler):
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
-            'action': {
-                'type': 'basestring',
-            },
             'role': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'choices': [BLOG_ADMIN, BLOG_POST_EDITOR]
             },
             'username': {
                 'type': 'basestring'
@@ -144,23 +142,16 @@ class BlogAdminRolesHandler(base.BaseHandler):
     def post(self):
         # type: () -> None
         """Handles POST requests."""
-        if self.normalized_payload.get('action') != 'update_user_role':
-            raise self.InvalidInputException('Invalid action')
         username = self.normalized_payload.get('username')
         role = self.normalized_payload.get('role')
-        if role == (BLOG_ADMIN or BLOG_POST_EDITOR):
-            user_id = user_services.get_user_id_from_username(username)
-            if user_id is None:
-                raise self.InvalidInputException(
-                    'User with given username does not exist.')
-            user_services.update_user_role(user_id, role)
-            role_services.log_role_query(
-                self.user_id, feconf.ROLE_ACTION_UPDATE, role=role,
-                username=username)
-        else:
+        user_id = user_services.get_user_id_from_username(username)
+        if user_id is None:
             raise self.InvalidInputException(
-                'Invalid role or role that cannot be updated through '
-                '\'Blog Admin\' page is provided.')
+                'User with given username does not exist.')
+        user_services.update_user_role(user_id, role)
+        role_services.log_role_query(
+            self.user_id, feconf.ROLE_ACTION_UPDATE, role=role,
+            username=username)
         self.render_json({})
 
     @acl_decorators.can_manage_blog_post_editors
@@ -168,8 +159,6 @@ class BlogAdminRolesHandler(base.BaseHandler):
         # type: () -> None
         """Handles PUT requests."""
         username = self.normalized_payload.get('username')
-        if username is None:
-            raise self.InvalidInputException('Missing username param')
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
             raise self.InvalidInputException(

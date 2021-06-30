@@ -30,7 +30,7 @@ from typing import Any, Dict # isort:skip  pylint: disable=wrong-import-order, w
 
 
 def validate_exploration_change(obj):
-    # type: (Dict[Any, Any]) -> None
+    # type: (Dict[String, Any]) -> None
     """Validates exploration change.
 
     Args:
@@ -53,9 +53,8 @@ def validate_new_config_property_values(obj):
             raise Exception(
                 'config property name should be a string, received'
                 ': %s' % name)
-        config_property = (
-            config_domain.Registry.get_config_property(name)
-            ) # type: ignore[no-untyped-call]
+        config_property = config_domain.Registry.get_config_property(
+            name) # type: ignore[no-untyped-call]
         if config_property is None:
             raise Exception('%s do not have any schema.' % name)
 
@@ -74,8 +73,7 @@ def validate_change_dict_for_blog_post(change_dict):
             change_dict['title'], True) # type: ignore[no-untyped-call]
     if 'thumbnail_filename' in change_dict:
         blog_domain.BlogPost.require_valid_thumbnail_filename(
-            change_dict['thumbnail_filename']
-            ) # type: ignore[no-untyped-call]
+            change_dict['thumbnail_filename']) # type: ignore[no-untyped-call]
     if 'tags' in change_dict:
         blog_domain.BlogPost.require_valid_tags(
             change_dict['tags'], True)# type: ignore[no-untyped-call]

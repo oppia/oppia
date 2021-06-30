@@ -50,7 +50,7 @@ class ValidateExplorationChangeTests(test_utils.GenericTestBase):
 
 
 class ValidateNewConfigPropertyValuesTests(test_utils.GenericTestBase):
-    """Tests to validate domain objects coming from API."""
+    """Tests to validate config properties dict coming from API."""
 
     def test_invalid_object_raises_exception(self):
         config_properties = {'some_config_property': 20, }
@@ -77,8 +77,7 @@ class ValidateNewConfigPropertyValuesTests(test_utils.GenericTestBase):
 class ValidateChangeDictForBlogPost(test_utils.GenericTestBase):
     """Tests to validate change_dict coming from API."""
 
-    def test_invalid_dict_raises_exception(self):
-        # Invalid Title.
+    def test_invalid_title_raises_exception(self):
         blog_post_change = {
             'title': 123,
             'tags': ['News'],
@@ -88,7 +87,7 @@ class ValidateChangeDictForBlogPost(test_utils.GenericTestBase):
             domain_objects_validator.validate_change_dict_for_blog_post(
                 blog_post_change)
 
-        # Invalid Tags.
+    def test_invalid_tags_raises_exception(self):
         blog_post_change = {
             'title': 'Hello Bloggers',
             'tags': ['News', 'Some Tag'],

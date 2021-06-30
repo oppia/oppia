@@ -229,7 +229,7 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
             'change_dict': {
                 'title': 'Sample Title',
                 'content': '<p>Hello<p>',
-                'tags': ['Newsletter', 'Learners'],
+                'tags': ['New lessons', 'Learners'],
                 'thumbnail_filename': 'file.svg'
             },
             'new_publish_status': False
@@ -276,7 +276,7 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
             'change_dict': {
                 'title': 'Sample Title',
                 'content': '<p>Hello<p>',
-                'tags': ['Newsletter', 'Learners'],
+                'tags': ['New lessons', 'Learners'],
                 'thumbnail_filename': 'file.svg'
             },
             'new_publish_status': True
