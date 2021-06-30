@@ -24,6 +24,7 @@ import logging
 
 from core.domain import exp_domain
 from core.domain import exp_fetchers
+from core.domain import feedback_services
 from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import taskqueue_services
@@ -267,7 +268,7 @@ class FeedbackThreadCreatedEventHandler(BaseEventHandler):
 
     @classmethod
     def _handle_event(cls, exp_id):
-        pass
+        feedback_services.handle_new_thread_created(exp_id)
 
 
 class FeedbackThreadStatusChangedEventHandler(BaseEventHandler):
@@ -277,7 +278,8 @@ class FeedbackThreadStatusChangedEventHandler(BaseEventHandler):
 
     @classmethod
     def _handle_event(cls, exp_id, old_status, new_status):
-        pass
+        feedback_services.handle_thread_status_changed(
+            exp_id, old_status, new_status)
 
 
 class Registry(python_utils.OBJECT):

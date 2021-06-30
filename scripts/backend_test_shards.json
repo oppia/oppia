@@ -134,7 +134,6 @@
         "core.domain.user_query_services_test",
         "core.domain.user_services_test",
         "core.domain.fs_services_test",
-        "core.domain.feedback_jobs_continuous_test",
         "core.domain.recommendations_services_test",
         "core.platform.search.elastic_search_services_test",
         "scripts.typescript_checks_test",

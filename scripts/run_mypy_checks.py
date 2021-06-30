@@ -232,8 +232,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/expression_parser_test.py',
     'core/domain/feedback_domain.py',
     'core/domain/feedback_domain_test.py',
-    'core/domain/feedback_jobs_continuous.py',
-    'core/domain/feedback_jobs_continuous_test.py',
     'core/domain/feedback_jobs_one_off.py',
     'core/domain/feedback_jobs_one_off_test.py',
     'core/domain/feedback_services.py',
