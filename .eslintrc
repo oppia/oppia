@@ -115,6 +115,13 @@
       "rules": {
         "oppia/no-testonly": "off"
       }
+    },
+    {
+      "files": ["*.js", "*.ts"],
+      "excludedFiles": ["UpgradedServices.ts"],
+      "rules": {
+        "oppia/disallow-flags": "error"
+      }
     }
   ],
   "rules": {
