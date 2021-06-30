@@ -35,13 +35,13 @@ class ValidateConfigPropertySnapshotMetadataModel(
     """Overrides _get_change_domain_class for config models."""
 
     def _get_change_domain_class(self, input_model): # pylint: disable=unused-argument
-        """Returns a Change domain class.
+        """Returns a change domain class.
 
         Args:
             input_model: datastore_services.Model. Entity to validate.
 
         Returns:
-            change_domain.BaseChange. A domain object class for the
+            config_domain.ConfigPropertyChange. A domain object class for the
             changes made by commit commands of the model.
         """
         return config_domain.ConfigPropertyChange
@@ -54,13 +54,13 @@ class ValidatePlatformParameterSnapshotMetadataModel(
     """Overrides _get_change_domain_class for platform parameter models."""
 
     def _get_change_domain_class(self, input_model): # pylint: disable=unused-argument
-        """Returns a Change domain class.
+        """Returns a change domain class.
 
         Args:
             input_model: datastore_services.Model. Entity to validate.
 
         Returns:
-            change_domain.BaseChange. A domain object class for the
-            changes made by commit commands of the model.
+            parameter_domain.PlatformParameterChange. A domain object class
+            for the changes made by commit commands of the model.
         """
         return parameter_domain.PlatformParameterChange

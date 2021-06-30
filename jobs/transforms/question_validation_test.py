@@ -190,3 +190,55 @@ class ValidateQuestionSnapshotMetadataModelTests(
                 'Value for property_name in cmd update_question_property: '
                 'wrong is not allowed')
         ])
+
+
+class ValidateQuestionCommitLogEntryModelTests(
+        job_test_utils.PipelinedTestBase):
+
+    def test_validate_question_model(self):
+        invalid_commit_cmd_model = (
+            question_models.QuestionCommitLogEntryModel(
+                id='question_123',
+                created_on=self.YEAR_AGO,
+                last_updated=self.NOW,
+                question_id='123',
+                user_id='',
+                commit_type='delete',
+                post_commit_status='private',
+                commit_cmds=[{
+                    'cmd': base_models.VersionedModel.CMD_DELETE_COMMIT}])
+        )
+
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(
+                question_validation.ValidateQuestionCommitLogEntryModel())
+        )
+
+        self.assert_pcoll_equal(output, [])
+
+    def test_raises_commit_cmd_none_error(self):
+        invalid_commit_cmd_model = (
+            question_models.QuestionCommitLogEntryModel(
+                id='model_123',
+                created_on=self.YEAR_AGO,
+                last_updated=self.NOW,
+                question_id='123',
+                user_id='',
+                commit_type='delete',
+                post_commit_status='private',
+                commit_cmds=[{
+                    'cmd': base_models.VersionedModel.CMD_DELETE_COMMIT}])
+        )
+
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(
+                question_validation.ValidateQuestionCommitLogEntryModel())
+        )
+
+        self.assert_pcoll_equal(output, [
+            base_validation_errors.CommitCmdsNoneError(invalid_commit_cmd_model)
+        ])

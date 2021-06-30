@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import question_domain
 from core.platform import models
+from jobs import job_utils
 from jobs.decorators import validation_decorators
 from jobs.transforms import base_validation
 
@@ -34,13 +35,37 @@ class ValidateQuestionSnapshotMetadataModel(
     """Overrides _get_change_domain_class for question models."""
 
     def _get_change_domain_class(self, input_model): # pylint: disable=unused-argument
-        """Returns a Change domain class.
+        """Returns a change domain class.
 
         Args:
             input_model: datastore_services.Model. Entity to validate.
 
         Returns:
-            change_domain.BaseChange. A domain object class for the
+            question_domain.QuestionChange. A domain object class for the
             changes made by commit commands of the model.
         """
         return question_domain.QuestionChange
+
+
+@validation_decorators.AuditsExisting(
+    question_models.QuestionCommitLogEntryModel)
+class ValidateQuestionCommitLogEntryModel(
+        base_validation.BaseValidateCommitCmdsSchema):
+    """Overrides _get_change_domain_class for question models."""
+
+    def _get_change_domain_class(self, input_model): # pylint: disable=unused-argument
+        """Returns a change domain class.
+
+        Args:
+            input_model: datastore_services.Model. Entity to validate.
+
+        Returns:
+            question_domain.QuestionChange. A domain object class for the
+            changes made by commit commands of the model.
+        """
+        model = job_utils.clone_model(input_model)
+
+        if model.id.startswith('question'):
+            return question_domain.QuestionChange
+        else:
+            return None
