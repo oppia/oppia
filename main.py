@@ -412,6 +412,16 @@ URLS = MAPREDUCE_HANDLERS + [
         learner_playlist.LearnerPlaylistHandler),
 
     get_redirect_route(
+        r'%s/<blog_post_url>' % feconf.BLOG_HOMEPAGE_URL,
+        blog_homepage.BlogPostHandler),
+    get_redirect_route(
+        r'%s/data' % feconf.BLOG_HOMEPAGE_URL,
+        blog_homepage.BlogHomepageDataHandler),
+    get_redirect_route(
+        r'%s/<author_username>/data' % feconf.BLOG_HOMEPAGE_URL,
+        blog_homepage.AuthorsPageHandler),
+
+    get_redirect_route(
         r'/assetsdevhandler/<page_context>/<page_identifier>/'
         'assets/<asset_type:(image|audio|thumbnail)>/<encoded_filename>',
         resources.AssetDevHandler),

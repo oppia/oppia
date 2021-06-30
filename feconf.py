@@ -635,6 +635,17 @@ MINIMUM_SCORE_REQUIRED_TO_REVIEW = 10
 # questions.
 MAX_NUMBER_OF_SKILL_IDS = 20
 
+# The maximum number of blog post cards to be visible on each page in blog
+# homepage.
+MAX_LIMIT_FOR_CARDS_ON_HOMEPAGE_PAGE = 10
+
+# The maximum number of blog post cards to be visible on each page in blog
+# author's page
+MAX_LIMIT_FOR_CARDS_ON_BLOG_AUTHORS_PAGE = 12
+
+# The maximum number of blog post cards to be visible on  blog post page
+MAX_LIMIT_FOR_CARDS_ON_BLOG_POST_PAGE = 2
+
 # The prefix for an 'accepted suggestion' commit message.
 COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX = 'Accepted suggestion by'
 
@@ -775,6 +786,7 @@ BLOG_DASHBOARD_DATA_URL = '/blogdashboardhandler/data'
 BLOG_DASHBOARD_URL = '/blog-dashboard'
 BLOG_EDITOR_DATA_URL_PREFIX = '/blogeditorhandler/data'
 BULK_EMAIL_WEBHOOK_ENDPOINT = '/bulk_email_webhook_endpoint'
+BLOG_HOMEPAGE_URL = '/blog-homepage'
 CLASSROOM_DATA_HANDLER = '/classroom_data_handler'
 COLLECTION_DATA_URL_PREFIX = '/collection_handler/data'
 COLLECTION_EDITOR_DATA_URL_PREFIX = '/collection_editor_handler/data'

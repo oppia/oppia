@@ -334,17 +334,23 @@ class BlogPostRightsModel(base_models.BaseModel):
             cls.editor_ids == user_id).get(keys_only=True) is not None
 
     @classmethod
-    def get_by_user(cls, user_id):
+    def get_by_user(cls, user_id, number=None):
         """Retrieves the rights object for all blog posts assigned to given user
 
         Args:
             user_id: str. ID of user.
+            number: int | None. Number of BlogPostRightsModel to be fetched. All
+                existing models will be fetched if none.
 
         Returns:
             list(BlogPostRightsModel). The list of BlogPostRightsModel objects
             in which the given user is a editor.
         """
-        return cls.query(cls.editor_ids == user_id).fetch()
+        if number:
+            return cls.query(cls.editor_ids == user_id).order(
+                -cls.last_updated).fetch(number)
+        else:
+            return cls.query(cls.editor_ids == user_id).fetch()
 
     @staticmethod
     def get_model_association_to_user():
