@@ -47,19 +47,11 @@ describe('Lost Changes Modal Component', () => {
   let component: LostChangesModalComponent;
   let fixture: ComponentFixture<LostChangesModalComponent>;
   let ngbActiveModal: NgbActiveModal;
-  let loggerService: LoggerService;
-  let logSpy = null;
 
   const lostChanges = [{
     cmd: 'add_state',
     state_name: 'State name',
   } as unknown as LostChange];
-
-  const lostChangesResponse = [{
-    utilsService: {},
-    cmd: 'add_state',
-    stateName: 'State name',
-  }];
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -85,16 +77,7 @@ describe('Lost Changes Modal Component', () => {
     component.lostChanges = lostChanges;
 
     ngbActiveModal = TestBed.inject(NgbActiveModal);
-    loggerService = TestBed.inject(LoggerService);
-    logSpy = spyOn(loggerService, 'error').and.callThrough();
     fixture.detectChanges();
-  });
-
-  it('should evaluates lostChanges when component is initialized', () => {
-    expect(component.lostChanges[0].cmd).toBe('add_state');
-    expect(component.lostChanges[0].stateName).toBe('State name');
-    expect(logSpy).toHaveBeenCalledWith(
-      'Lost changes: ' + JSON.stringify(lostChangesResponse));
   });
 
   it('should close the modal', () => {
