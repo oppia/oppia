@@ -19,13 +19,10 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
-import 'angular-ui-sortable';
-import uiValidate from 'angular-ui-validate';
-
 angular.module('oppia', [
   require('angular-cookies'), 'headroom', 'ngAnimate',
   'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap', 'ui.sortable', uiValidate
+  'toastr', 'ui.bootstrap'
 ]);
 
 require('Polyfills.ts');
