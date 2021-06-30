@@ -1,4 +1,3 @@
-/* eslint-disable oppia/no-test-blockers */
 // Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,7 +26,7 @@ import { PlayerPositionService } from 'pages/exploration-player-page/services/pl
 import { EventEmitter } from '@angular/core';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 
-fdescribe('GraphVizComponent', () => {
+describe('GraphVizComponent', () => {
   let component: GraphVizComponent;
   let graphDetailService: GraphDetailService;
   let deviceInfoService: DeviceInfoService;
@@ -1739,16 +1738,18 @@ fdescribe('GraphVizComponent', () => {
       expect(component.state.currentlyDraggedVertex).toBeNull();
     }));
 
-  it('should execute debounce when user releases mouse button', () => {
-    // Currently there is no method to test a private Method Decorator.
-    // The following lines execute but DO NOT test the debounce private
-    // function. However if the debounce function is exectued a timer is set to
-    // 10 seconds after which the onMouseupDocument function gets executed.
-    // The timer is tested while testing for onMouseupDocument, which verifies
-    // that the debounce function was executed.
-    let evt = new MouseEvent('mouseup', {});
-    document.dispatchEvent(evt);
-  });
+  it('should execute debounce when user releases mouse button',
+    fakeAsync(() => {
+      spyOn(window, 'clearTimeout');
+      spyOn(window, 'setTimeout');
+      let evt = new MouseEvent('mouseup', {});
+
+      document.dispatchEvent(evt);
+      tick(10);
+
+      expect(clearTimeout).toHaveBeenCalled();
+      expect(setTimeout).toHaveBeenCalledWith(jasmine.any(Function), 5);
+    }));
 
   it('should return selected vertex label when called', () => {
     component.state.selectedVertex = 0;
