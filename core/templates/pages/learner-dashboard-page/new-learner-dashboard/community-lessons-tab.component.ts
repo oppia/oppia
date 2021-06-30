@@ -62,8 +62,13 @@ export class CommunityLessonsTabComponent {
   displayInCommunityLessons: (
     LearnerExplorationSummary | CollectionSummary)[] = [];
   selectedSection: string;
+  completed: string = 'Completed';
+  incomplete: string = 'Incomplete';
+  all: string = 'All';
+  moveToPrevPage: string = 'MOVE_TO_PREV_PAGE';
+  moveToNextPage: string = 'MOVE_TO_NEXT_PAGE';
   dropdownEnabled: boolean;
-  showMore = {
+  showMoreInSection = {
     incomplete: false,
     completed: false,
     playlist: false,
@@ -105,7 +110,7 @@ export class CommunityLessonsTabComponent {
       this.displayLessonsInPlaylist = this.totalLessonsInPlaylist.slice(0, 3);
     }
     this.displayInCommunityLessons = this.allCommunityLessons;
-    this.selectedSection = 'All';
+    this.selectedSection = this.all;
     this.dropdownEnabled = false;
   }
 
@@ -117,18 +122,18 @@ export class CommunityLessonsTabComponent {
     return this.deviceInfoService.isMobileDevice();
   }
 
-  enableDropdown(): void {
+  toggleDropdown(): void {
     this.dropdownEnabled = !this.dropdownEnabled;
   }
 
   changeSection(section: string): void {
     this.dropdownEnabled = !this.dropdownEnabled;
     this.selectedSection = section;
-    if (section === 'Completed') {
+    if (section === this.completed) {
       this.displayInCommunityLessons = this.totalCompletedLessonsList;
-    } else if (section === 'Incomplete') {
+    } else if (section === this.incomplete) {
       this.displayInCommunityLessons = this.totalIncompleteLessonsList;
-    } else if (section === 'All') {
+    } else if (section === this.all) {
       this.displayInCommunityLessons = [];
       this.displayInCommunityLessons.push(
         ...this.totalIncompleteLessonsList, ...this.totalCompletedLessonsList);
@@ -140,9 +145,9 @@ export class CommunityLessonsTabComponent {
 
   getLessonType(tile: LearnerExplorationSummary | CollectionSummary): string {
     if (this.totalIncompleteLessonsList.includes(tile)) {
-      return 'Incomplete';
+      return this.incomplete;
     } else if (this.totalCompletedLessonsList.includes(tile)) {
-      return 'Completed';
+      return this.completed;
     }
   }
 
@@ -158,22 +163,28 @@ export class CommunityLessonsTabComponent {
   }
 
   handleShowMore(section: string): void {
-    this.showMore[section] = !this.showMore[section];
-    if (section === 'incomplete' && this.showMore.incomplete === true) {
+    this.showMoreInSection[section] = !this.showMoreInSection[section];
+    if (
+      section === 'incomplete' && this.showMoreInSection.incomplete === true) {
       this.displayIncompleteLessonsList = this.totalIncompleteLessonsList;
-    } else if (section === 'incomplete' && this.showMore.incomplete === false) {
+    } else if (
+      section === 'incomplete' && this.showMoreInSection.incomplete === false) {
       this.displayIncompleteLessonsList = this.totalIncompleteLessonsList.slice(
         0, 3);
-    } else if (section === 'completed' && this.showMore.completed === true) {
+    } else if (
+      section === 'completed' && this.showMoreInSection.completed === true) {
       this.displayCompletedLessonsList = this.totalCompletedLessonsList;
-    } else if (section === 'completed' && this.showMore.completed === false) {
+    } else if (
+      section === 'completed' && this.showMoreInSection.completed === false) {
       this.displayCompletedLessonsList = this.totalCompletedLessonsList.slice(
         0, 3);
-    } else if (section === 'playlist' && this.showMore.playlist === true) {
+    } else if (
+      section === 'playlist' && this.showMoreInSection.playlist === true) {
       this.displayLessonsInPlaylist = this.totalLessonsInPlaylist;
       this.startIndexInPlaylist = 0;
       this.endIndexInPlaylist = this.totalLessonsInPlaylist.length;
-    } else if (section === 'playlist' && this.showMore.playlist === false) {
+    } else if (
+      section === 'playlist' && this.showMoreInSection.playlist === false) {
       this.startIndexInPlaylist = 0;
       this.endIndexInPlaylist = this.pageSize;
     }
@@ -189,14 +200,14 @@ export class CommunityLessonsTabComponent {
   changePageByOne(direction: string, section: string): void {
     if (section === 'communityLessons') {
       let totalPages = this.displayInCommunityLessons.length / this.pageSize;
-      if (direction === 'MOVE_TO_PREV_PAGE' &&
+      if (direction === this.moveToPrevPage &&
         this.pageNumberInCommunityLessons > 1) {
         this.pageNumberInCommunityLessons -= 1;
       }
       if (totalPages > Math.floor(totalPages)) {
         totalPages = Math.floor(totalPages) + 1;
       }
-      if (direction === 'MOVE_TO_NEXT_PAGE' &&
+      if (direction === this.moveToNextPage &&
         this.pageNumberInCommunityLessons < totalPages) {
         this.pageNumberInCommunityLessons += 1;
       }
@@ -207,14 +218,14 @@ export class CommunityLessonsTabComponent {
         this.displayInCommunityLessons.length);
     } else if (section === 'playlist') {
       let totalPages = this.displayLessonsInPlaylist.length / this.pageSize;
-      if (direction === 'MOVE_TO_PREV_PAGE' &&
+      if (direction === this.moveToPrevPage &&
         this.pageNumberInPlaylist > 1) {
         this.pageNumberInPlaylist -= 1;
       }
       if (totalPages > Math.floor(totalPages)) {
         totalPages = Math.floor(totalPages) + 1;
       }
-      if (direction === 'MOVE_TO_NEXT_PAGE' &&
+      if (direction === this.moveToNextPage &&
         this.pageNumberInPlaylist < totalPages) {
         this.pageNumberInPlaylist += 1;
       }
@@ -252,13 +263,13 @@ export class CommunityLessonsTabComponent {
             if (index !== -1) {
               this.totalIncompleteLessonsList.splice(index, 1);
             }
-          } if (this.showMore.incomplete === true) {
+          } if (this.showMoreInSection.incomplete === true) {
             this.displayIncompleteLessonsList = (
               this.totalIncompleteLessonsList);
-          } else if (this.showMore.incomplete === false) {
+          } else if (this.showMoreInSection.incomplete === false) {
             this.displayIncompleteLessonsList = (
               this.totalIncompleteLessonsList.slice(0, 3));
-          } if (this.selectedSection === 'All') {
+          } if (this.selectedSection === this.all) {
             this.displayInCommunityLessons = [];
             this.displayInCommunityLessons.push(
               ...this.totalIncompleteLessonsList,
@@ -289,9 +300,9 @@ export class CommunityLessonsTabComponent {
             if (index !== -1) {
               this.totalLessonsInPlaylist.splice(index, 1);
             }
-          } if (this.showMore.playlist === true) {
+          } if (this.showMoreInSection.playlist === true) {
             this.displayLessonsInPlaylist = this.totalLessonsInPlaylist;
-          } else if (this.showMore.playlist === false) {
+          } else if (this.showMoreInSection.playlist === false) {
             this.displayLessonsInPlaylist = (
               this.totalLessonsInPlaylist.slice(0, 3));
           } if (this.checkMobileView()) {

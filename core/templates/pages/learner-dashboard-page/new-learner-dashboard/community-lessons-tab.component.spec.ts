@@ -123,7 +123,7 @@ describe('Community lessons tab Component', () => {
 
   it('should enable the dropdown', () => {
     expect(component.dropdownEnabled).toEqual(false);
-    component.enableDropdown();
+    component.toggleDropdown();
     expect(component.dropdownEnabled).toEqual(true);
   });
 
@@ -208,7 +208,7 @@ describe('Community lessons tab Component', () => {
   });
 
   it('should handle show more button', () => {
-    expect(component.showMore.incomplete).toEqual(false);
+    expect(component.showMoreInSection.incomplete).toEqual(false);
     const exp1 = {
       last_updated_msec: 1591296737470.528,
       community_owned: false,
@@ -317,13 +317,13 @@ describe('Community lessons tab Component', () => {
     component.totalIncompleteLessonsList = [
       summary1, summary2, summary3, summary4];
     component.handleShowMore('incomplete');
-    expect(component.showMore.incomplete).toEqual(true);
+    expect(component.showMoreInSection.incomplete).toEqual(true);
     expect(component.displayIncompleteLessonsList).toEqual(
       component.totalIncompleteLessonsList);
 
-    component.showMore.incomplete = true;
+    component.showMoreInSection.incomplete = true;
     component.handleShowMore('incomplete');
-    expect(component.showMore.incomplete).toEqual(false);
+    expect(component.showMoreInSection.incomplete).toEqual(false);
     expect(component.displayIncompleteLessonsList).toEqual(
       component.totalIncompleteLessonsList.slice(0, 3));
 
@@ -331,13 +331,13 @@ describe('Community lessons tab Component', () => {
       summary1, summary2, summary3, summary4];
     component.totalIncompleteLessonsList = [];
     component.handleShowMore('completed');
-    expect(component.showMore.completed).toEqual(true);
+    expect(component.showMoreInSection.completed).toEqual(true);
     expect(component.displayCompletedLessonsList).toEqual(
       component.totalCompletedLessonsList);
 
-    component.showMore.completed = true;
+    component.showMoreInSection.completed = true;
     component.handleShowMore('completed');
-    expect(component.showMore.completed).toEqual(false);
+    expect(component.showMoreInSection.completed).toEqual(false);
     expect(component.displayCompletedLessonsList).toEqual(
       component.totalCompletedLessonsList.slice(0, 3));
 
@@ -345,13 +345,13 @@ describe('Community lessons tab Component', () => {
       summary1, summary2, summary3, summary4];
     component.totalCompletedLessonsList = [];
     component.handleShowMore('playlist');
-    expect(component.showMore.playlist).toEqual(true);
+    expect(component.showMoreInSection.playlist).toEqual(true);
     expect(component.displayLessonsInPlaylist).toEqual(
       component.totalLessonsInPlaylist);
 
-    component.showMore.playlist = true;
+    component.showMoreInSection.playlist = true;
     component.handleShowMore('playlist');
-    expect(component.showMore.playlist).toEqual(false);
+    expect(component.showMoreInSection.playlist).toEqual(false);
     expect(component.startIndexInPlaylist).toEqual(0);
     expect(component.endIndexInPlaylist).toEqual(3);
   });
@@ -617,7 +617,7 @@ describe('Community lessons tab Component', () => {
         collection);
       component.collectionPlaylist = [collectionSummary];
       component.totalLessonsInPlaylist = [collectionSummary];
-      component.showMore.playlist = true;
+      component.showMoreInSection.playlist = true;
       let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
       let subsectionName = 'I18N_DASHBOARD_COLLECTIONS';
 
@@ -711,7 +711,7 @@ describe('Community lessons tab Component', () => {
         collection);
       component.incompleteCollectionsList = [collectionSummary];
       component.totalIncompleteLessonsList = [collectionSummary];
-      component.showMore.incomplete = true;
+      component.showMoreInSection.incomplete = true;
       let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
       let subsectionName = 'I18N_DASHBOARD_COLLECTIONS';
 
