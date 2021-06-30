@@ -16,7 +16,7 @@
  * @fileoverview Tests for ExplorationStatesService.
  */
 
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { ChangeListService } from './change-list.service';
 import { TestBed } from '@angular/core/testing';
 

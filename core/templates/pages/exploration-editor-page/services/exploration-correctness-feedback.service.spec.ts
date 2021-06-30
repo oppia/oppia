@@ -18,7 +18,7 @@
 
 import { TestBed } from '@angular/core/testing';
 import { ExplorationDataService } from './exploration-data.service';
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 /* eslint-disable-next-line max-len */
 require('pages/exploration-editor-page/services/exploration-correctness-feedback.service');
 
