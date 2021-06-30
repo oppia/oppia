@@ -80,7 +80,8 @@ class ActivityReference(python_utils.OBJECT):
         """Return the ActivityReference object from a dict.
 
         Args:
-            obj: dict. Dictionary representation of the object.
+            activity_reference_dict: dict. Dictionary representation
+                of the object.
 
         Returns:
             ActivityReference. The correcponding ActivityReference object.
