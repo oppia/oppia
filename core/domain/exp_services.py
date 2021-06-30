@@ -2620,8 +2620,8 @@ def get_exp_with_draft_applied(exp_id, user_id):
     updated_exploration = None
 
     if (exp_user_data and exp_user_data.draft_change_list and
-            are_changes_mergeable(
-                exp_id, draft_change_list_exp_version, draft_change_list)):
+            is_version_of_draft_valid(
+                exp_id, draft_change_list_exp_version)):
         updated_exploration = apply_change_list(
             exp_id, draft_change_list,
             draft_change_list_exp_version)
