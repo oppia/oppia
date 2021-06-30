@@ -24,6 +24,7 @@ module.exports = merge(common, {
   mode: 'production',
   output: {
     filename: '[name].[contenthash].bundle.js',
-    path: path.resolve(__dirname, 'backend_prod_files/webpack_bundles')
+    path: path.resolve(__dirname, 'backend_prod_files/webpack_bundles'),
+    publicPath: '/build/webpack_bundles/'
   }
 });
