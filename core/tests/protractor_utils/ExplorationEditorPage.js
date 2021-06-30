@@ -91,6 +91,8 @@ var ExplorationEditorPage = function() {
     by.css('.protractor-test-discard-changes'));
   var discardLostChangesButton = element(
     by.css('.protractor-test-discard-lost-changes-button'));
+  var discardAndExportLostChangesButton = element(
+    by.css('.protractor-test-discard-and-export-lost-changes-button'));
   var navigateToImprovementsTabButton = element(
     by.css('.protractor-test-improvements-tab'));
   var navigateToFeedbackTabButton = element(
@@ -266,6 +268,19 @@ var ExplorationEditorPage = function() {
 
   this.discardLostChanges = async function() {
     await action.click('Discard Lost Changes button', discardLostChangesButton);
+    // Expect editor page to completely reload.
+    await waitFor.pageToFullyLoad();
+  };
+
+  this.discardAndExportLostChanges = async function() {
+    await action.click(
+      'Discard Lost Changes button', discardAndExportLostChangesButton);
+    await browser.driver.get('chrome://downloads/');
+    var items = (
+      await browser.executeScript(
+        'return downloads.Manager.get().items_'));
+    expect(items.length).toBe(1);
+    expect(items[0].file_name).toBe('lostChanges.txt');
     // Expect editor page to completely reload.
     await waitFor.pageToFullyLoad();
   };

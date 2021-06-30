@@ -31,6 +31,8 @@ var ExplorationEditorPage =
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
+const { element } = require('protractor');
+const { expect } = require('globalthis/implementation');
 
 describe('Full exploration editor', function() {
   var explorationPlayerPage = null;
@@ -383,51 +385,214 @@ describe('Full exploration editor', function() {
     await users.logout();
   });
 
-  it('should open a lost changes modal', async function() {
-    await users.createUser('user9@editorAndPlayer.com', 'user9EditorAndPlayer');
-    await users.createUser(
-      'user10@editorAndPlayer.com',
-      'user10EditorAndPlayer');
-    await users.login('user9@editorAndPlayer.com');
-    await workflow.createExploration(true);
-    var explorationId = await general.getExplorationIdFromEditor();
-    await explorationEditorMainTab.setStateName('first card');
-    await explorationEditorPage.navigateToSettingsTab();
-    await explorationEditorSettingsTab.setTitle('Testing lost changes modal');
-    await explorationEditorSettingsTab.setCategory('Algebra');
-    await explorationEditorSettingsTab.setObjective('To assess happiness.');
-    await explorationEditorSettingsTab.openAndClosePreviewSummaryTile();
-    await explorationEditorPage.saveChanges();
-    await workflow.addExplorationManager('user10EditorAndPlayer');
-    await explorationEditorPage.navigateToMainTab();
+  it(
+    'should show merge changes when the changes are not conflicting',
+    async function() {
+      await users.createUser(
+        'user9@editor.com',
+        'user9Editor');
+      await users.createUser(
+        'user10@editor.com',
+        'user10Editor');
+      await users.login('user9@editor.com');
+      await workflow.createExploration(true);
+      var explorationId = await general.getExplorationIdFromEditor();
+      await explorationEditorMainTab.setStateName('first card');
+      await explorationEditorPage.navigateToSettingsTab();
+      await explorationEditorSettingsTab.setTitle('Testing lost changes modal');
+      await explorationEditorSettingsTab.setCategory('Algebra');
+      await explorationEditorSettingsTab.setObjective('To assess happiness.');
+      await explorationEditorSettingsTab.openAndClosePreviewSummaryTile();
+      await explorationEditorPage.saveChanges();
+      await workflow.addExplorationManager('user10Editor');
+      await explorationEditorPage.navigateToMainTab();
 
-    await explorationEditorMainTab.setContent(async function(richTextEditor) {
-      await richTextEditor.appendPlainText('How are you feeling?');
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('How are you feeling?');
+      });
+      await action.waitForAutosave();
+      await users.logout();
+
+      await users.login('user10@editor.com');
+      await general.openEditor(explorationId, true);
+      await explorationEditorMainTab.setStateName('changed card');
+      await explorationEditorPage.navigateToSettingsTab();
+      await explorationEditorSettingsTab.setTitle('Title Changed');
+      await explorationEditorSettingsTab.setObjective('Objective Changed.');
+      await explorationEditorPage.saveChanges();
+      await users.logout();
+
+      await users.login('user9@editor.com');
+      await general.openEditor(explorationId, false);
+      await explorationEditorPage.saveChanges();
+      await explorationEditorMainTab.expectContentToMatch(
+        async function(richTextChecker) {
+          await richTextChecker.readPlainText('You must be feeling great?');
+        }
+      );
+      await explorationEditorPage.verifyExplorationSettingFields(
+        'Title Changed',
+        'Algebra',
+        'Objective Changed.',
+        'English',
+        []
+      );
+      await users.logout();
     });
-    await action.waitForAutosave();
-    await users.logout();
 
-    await users.login('user10@editorAndPlayer.com');
-    await general.openEditor(explorationId, true);
-    await explorationEditorMainTab.setContent(async function(richTextEditor) {
-      await richTextEditor.appendPlainText('You must be feeling great?');
+  it(
+    'should show a discard changes modal when the changes are conflicting',
+    async function() {
+      await users.createUser(
+        'user9@editor.com',
+        'user9Editor');
+      await users.createUser(
+        'user10@editor.com',
+        'user10Editor');
+      await users.login('user9@editor.com');
+      await workflow.createExploration(true);
+      var explorationId = await general.getExplorationIdFromEditor();
+      await explorationEditorMainTab.setStateName('first card');
+      await explorationEditorPage.navigateToSettingsTab();
+      await explorationEditorSettingsTab.setTitle('Testing lost changes modal');
+      await explorationEditorSettingsTab.setCategory('Algebra');
+      await explorationEditorSettingsTab.setObjective('To assess happiness.');
+      await explorationEditorSettingsTab.openAndClosePreviewSummaryTile();
+      await explorationEditorPage.saveChanges();
+      await workflow.addExplorationManager('user10Editor');
+      await explorationEditorPage.navigateToMainTab();
+
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('How are you feeling?');
+      });
+      await action.waitForAutosave();
+      await users.logout();
+
+      await users.login('user10@editor.com');
+      await general.openEditor(explorationId, true);
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('You must be feeling great?');
+      });
+      await explorationEditorPage.saveChanges();
+      await users.logout();
+
+      await users.login('user9@editor.com');
+      await general.openEditor(explorationId, false);
+      var lostChangesContent = (
+        '<div class="oppia-lost-changes">' +
+        '<ul>' +
+        '<li>' +
+        '<div>' +
+        '<strong>' +
+        'Edits to state:' +
+        '</strong> ' + 'first card' +
+        ' <div>' +
+        '<strong>' +
+        'Edits to property:' +
+        '</strong> ' + 'content' +
+        ' </div>' +
+        '<div>' +
+        '<div class="state-edit-desc">' +
+        '<strong>Edited content: </strong>' +
+        '<div class="content">' + '<p>How are you feeling?</p>' +
+        '</div>' +
+        '</div>' +
+        '</div>' +
+        '</div>' +
+        '</li>' +
+        '</ul>' +
+        '</div>'
+      );
+      await waitFor.visibilityOf(
+        element(by.css('.modal-content')),
+        'Lost Changes Modal taking too long to appear');
+      expect(await element(by.css(
+        '.protractor-test-oppia-lost-changes'))).toEqual(lostChangesContent);
+      await explorationEditorPage.discardLostChanges();
+      await explorationEditorMainTab.expectContentToMatch(
+        async function(richTextChecker) {
+          await richTextChecker.readPlainText('You must be feeling great?');
+        }
+      );
+      await users.logout();
     });
-    await explorationEditorPage.saveChanges();
-    await users.logout();
 
-    await users.login('user9@editorAndPlayer.com');
-    await general.openEditor(explorationId, false);
-    await waitFor.visibilityOf(
-      element(by.css('.modal-content')),
-      'Lost Changes Modal taking too long to appear');
-    await explorationEditorPage.discardLostChanges();
-    await explorationEditorMainTab.expectContentToMatch(
-      async function(richTextChecker) {
-        await richTextChecker.readPlainText('You must be feeling great?');
-      }
-    );
-    await users.logout();
-  });
+  it(
+    'should show a discard the changes and download the lost changes file',
+    async function() {
+      await users.createUser(
+        'user9@editor.com',
+        'user9Editor');
+      await users.createUser(
+        'user10@editor.com',
+        'user10Editor');
+      await users.login('user9@editor.com');
+      await workflow.createExploration(true);
+      var explorationId = await general.getExplorationIdFromEditor();
+      await explorationEditorMainTab.setStateName('first card');
+      await explorationEditorPage.navigateToSettingsTab();
+      await explorationEditorSettingsTab.setTitle('Testing lost changes modal');
+      await explorationEditorSettingsTab.setCategory('Algebra');
+      await explorationEditorSettingsTab.setObjective('To assess happiness.');
+      await explorationEditorSettingsTab.openAndClosePreviewSummaryTile();
+      await explorationEditorPage.saveChanges();
+      await workflow.addExplorationManager('user10Editor');
+      await explorationEditorPage.navigateToMainTab();
+
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('How are you feeling?');
+      });
+      await action.waitForAutosave();
+      await users.logout();
+
+      await users.login('user10@editor.com');
+      await general.openEditor(explorationId, true);
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('You must be feeling great?');
+      });
+      await explorationEditorPage.saveChanges();
+      await users.logout();
+
+      await users.login('user9@editor.com');
+      await general.openEditor(explorationId, false);
+      var lostChangesContent = (
+        '<div class="oppia-lost-changes">' +
+        '<ul>' +
+        '<li>' +
+        '<div>' +
+        '<strong>' +
+        'Edits to state:' +
+        '</strong> ' + 'first card' +
+        ' <div>' +
+        '<strong>' +
+        'Edits to property:' +
+        '</strong> ' + 'content' +
+        ' </div>' +
+        '<div>' +
+        '<div class="state-edit-desc">' +
+        '<strong>Edited content: </strong>' +
+        '<div class="content">' + '<p>How are you feeling?</p>' +
+        '</div>' +
+        '</div>' +
+        '</div>' +
+        '</div>' +
+        '</li>' +
+        '</ul>' +
+        '</div>'
+      );
+      await waitFor.visibilityOf(
+        element(by.css('.modal-content')),
+        'Lost Changes Modal taking too long to appear');
+      expect(await element(by.css(
+        '.protractor-test-oppia-lost-changes'))).toEqual(lostChangesContent);
+      await explorationEditorPage.discardLostChanges();
+      await explorationEditorMainTab.expectContentToMatch(
+        async function(richTextChecker) {
+          await richTextChecker.readPlainText('You must be feeling great?');
+        }
+      );
+      await users.logout();
+    });
 
   afterEach(async function() {
     await general.checkForConsoleErrors([]);
