@@ -18,6 +18,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
+import logging
 import re
 import zipfile
 
@@ -439,7 +440,7 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
         csrf_token = self.get_new_csrf_token()
-        self.post_json(
+        json_response = self.post_json(
             feconf.SIGNUP_DATA_URL,
             {
                 'username': self.EDITOR_USERNAME,
@@ -447,6 +448,8 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
                 'can_receive_email_updates': True
             },
             csrf_token=csrf_token)
+        self.assertFalse(
+            json_response['bulk_email_signup_message_should_be_shown'])
 
         # The email update preference should be True in all cases.
         editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
@@ -474,6 +477,31 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
             self.assertEqual(
                 email_preferences.can_receive_subscription_email,
                 feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
+
+    def test_user_cannot_be_added_to_bulk_email_mailing_list(self):
+        self.login(self.EDITOR_EMAIL)
+        self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
+        csrf_token = self.get_new_csrf_token()
+
+        def _mock_true_function(*unused):
+            """Mock function that returns True.
+
+            Returns:
+                bool. True.
+            """
+            return True
+
+        with self.swap(
+            user_services, 'update_email_preferences', _mock_true_function):
+            json_response = self.post_json(
+                feconf.SIGNUP_DATA_URL,
+                {
+                    'username': self.EDITOR_USERNAME,
+                    'agreed_to_terms': True,
+                    'can_receive_email_updates': True
+                }, csrf_token=csrf_token)
+            self.assertTrue(
+                json_response['bulk_email_signup_message_should_be_shown'])
 
     def test_user_disallowing_emails_on_signup(self):
         self.login(self.EDITOR_EMAIL)
@@ -802,6 +830,90 @@ class DeleteAccountPageTests(test_utils.GenericTestBase):
     def test_get_delete_account_page_disabled(self):
         with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', False):
             self.get_html_response('/delete-account', expected_status_int=404)
+
+
+class BulkEmailWebhookEndpointTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(BulkEmailWebhookEndpointTests, self).setUp()
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.swap_secret = self.swap(
+            feconf, 'MAILCHIMP_WEBHOOK_SECRET', 'secret')
+        self.swap_audience_id = (
+            self.swap(feconf, 'MAILCHIMP_AUDIENCE_ID', 'audience_id'))
+        user_services.update_email_preferences(
+            self.editor_id, feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE,
+            feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+            feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
+            feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
+
+    def test_get_function(self):
+        # The GET function should not throw any error and should return status
+        # 200. No other check required here.
+        with self.swap_secret:
+            self.get_html_response(
+                '%s/secret' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT)
+
+    def test_post_with_different_audience_id(self):
+        with self.swap_secret, self.swap_audience_id:
+            json_response = self.post_json(
+                '%s/secret' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT, {
+                    'data[list_id]': 'invalid_audience_id',
+                    'data[email]': self.EDITOR_EMAIL
+                }, use_payload=False)
+            self.assertEqual(json_response, {})
+
+    def test_post_with_invalid_email_id(self):
+        with self.swap_secret, self.swap_audience_id:
+            json_response = self.post_json(
+                '%s/secret' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT, {
+                    'data[list_id]': 'audience_id',
+                    'data[email]': 'invalid_email'
+                }, use_payload=False)
+            self.assertEqual(json_response, {})
+
+    def test_post_with_invalid_secret(self):
+        with self.swap_secret:
+            with self.capture_logging(min_level=logging.ERROR) as captured_logs:
+                self.post_json(
+                    '%s/invalid_secret' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT, {
+                        'data[list_id]': 'audience_id',
+                        'data[email]': 'invalid_email'
+                    }, use_payload=False, expected_status_int=404)
+                self.assertIn(
+                    'Invalid Mailchimp webhook request received with secret: '
+                    'invalid_secret', captured_logs)
+
+    def test_post(self):
+        with self.swap_secret, self.swap_audience_id:
+            email_preferences = user_services.get_email_preferences(
+                self.editor_id)
+            self.assertEqual(email_preferences.can_receive_email_updates, False)
+
+            # User subscribed externally.
+            json_response = self.post_json(
+                '%s/secret' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT, {
+                    'data[list_id]': 'audience_id',
+                    'data[email]': self.EDITOR_EMAIL,
+                    'type': 'subscribe'
+                }, use_payload=False)
+            self.assertEqual(json_response, {})
+            email_preferences = user_services.get_email_preferences(
+                self.editor_id)
+            self.assertEqual(email_preferences.can_receive_email_updates, True)
+
+            # User unsubscribed externally.
+            json_response = self.post_json(
+                '%s/secret' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT, {
+                    'data[list_id]': 'audience_id',
+                    'data[email]': self.EDITOR_EMAIL,
+                    'type': 'unsubscribe'
+                }, use_payload=False)
+            self.assertEqual(json_response, {})
+            email_preferences = user_services.get_email_preferences(
+                self.editor_id)
+            self.assertEqual(email_preferences.can_receive_email_updates, False)
 
 
 class DeleteAccountHandlerTests(test_utils.GenericTestBase):

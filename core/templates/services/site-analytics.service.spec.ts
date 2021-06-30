@@ -567,6 +567,14 @@ describe('Site Analytics Service', () => {
     });
   });
 
+  it('should register classroom page viewed', () => {
+    spyOn(sas, '_sendEventToGoogleAnalytics');
+
+    sas.registerClassroomPageViewed();
+    expect(sas._sendEventToGoogleAnalytics).toHaveBeenCalledWith(
+      'ClassroomEngagement', 'impression', 'ViewClassroom');
+  });
+
   it('should register active classroom lesson usage', () => {
     let explorationId = '123';
     sas.registerClassroomLessonActiveUse('Fractions', explorationId);
@@ -578,7 +586,7 @@ describe('Site Analytics Service', () => {
   });
 
   it('should register classroom header click event', () => {
-    sas.registerClassoomHeaderClickEvent();
+    sas.registerClassroomHeaderClickEvent();
 
     expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
       event_category: 'ClassroomEngagement',

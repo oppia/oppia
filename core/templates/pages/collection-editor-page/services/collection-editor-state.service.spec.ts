@@ -24,7 +24,6 @@ import { CollectionUpdateService } from 'domain/collection/collection-update.ser
 import { Collection, CollectionBackendDict } from 'domain/collection/collection.model';
 import { EditableCollectionBackendApiService } from 'domain/collection/editable-collection-backend-api.service';
 import { Subscription } from 'rxjs';
-import { TranslatorProviderForTests } from 'tests/test.extras';
 import { CollectionEditorStateService } from './collection-editor-state.service';
 
 describe('Collection editor state service', () => {
@@ -90,7 +89,6 @@ describe('Collection editor state service', () => {
   }
 
   beforeEach(waitForAsync(() => {
-    angular.mock.module('oppia', TranslatorProviderForTests);
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [

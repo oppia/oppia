@@ -173,7 +173,6 @@ import { FractionInputRulesService } from
   'interactions/FractionInput/directives/fraction-input-rules.service';
 import { FractionInputValidationService } from
   'interactions/FractionInput/directives/fraction-input-validation.service';
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { GraphDetailService } from
   'interactions/GraphInput/directives/graph-detail.service';
@@ -382,8 +381,6 @@ import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import { SpeechSynthesisChunkerService } from
   'services/speech-synthesis-chunker.service';
-import { StateCardObjectFactory } from
-  'domain/state_card/StateCardObjectFactory';
 import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
 import { StateContentService } from
@@ -564,7 +561,6 @@ export class UpgradedServices {
       new ExplorationFeaturesService();
     upgradedServices['ExpressionParserService'] = new ExpressionParserService();
     upgradedServices['ExternalSaveService'] = new ExternalSaveService();
-    upgradedServices['FractionObjectFactory'] = new FractionObjectFactory();
     upgradedServices['GraphDetailService'] = new GraphDetailService();
     upgradedServices['GraphUtilsService'] = new GraphUtilsService();
     upgradedServices['I18nLanguageCodeService'] = new I18nLanguageCodeService();
@@ -686,11 +682,9 @@ export class UpgradedServices {
       new FeedbackThreadObjectFactory();
     upgradedServices['FractionInputRulesService'] =
       new FractionInputRulesService(
-        upgradedServices['FractionObjectFactory'],
         upgradedServices['UtilsService']);
     upgradedServices['FractionInputValidationService'] =
       new FractionInputValidationService(
-        upgradedServices['FractionObjectFactory'],
         upgradedServices['baseInteractionValidationService']);
     upgradedServices['GraphInputRulesService'] =
       new GraphInputRulesService(
@@ -744,8 +738,7 @@ export class UpgradedServices {
         upgradedServices['baseInteractionValidationService']);
     upgradedServices['NumberWithUnitsObjectFactory'] =
       new NumberWithUnitsObjectFactory(
-        upgradedServices['UnitsObjectFactory'],
-        upgradedServices['FractionObjectFactory']);
+        upgradedServices['UnitsObjectFactory']);
     upgradedServices['NumericExpressionInputValidationService'] =
       new NumericExpressionInputValidationService(
         upgradedServices['baseInteractionValidationService']);
@@ -1097,9 +1090,6 @@ export class UpgradedServices {
       new SkillRightsBackendApiService(
         upgradedServices['HttpClient'],
         upgradedServices['UrlInterpolationService']);
-    upgradedServices['StateCardObjectFactory'] =
-      new StateCardObjectFactory(
-        upgradedServices['AudioTranslationLanguageService']);
     upgradedServices['StateClassifierMappingService'] =
       new StateClassifierMappingService(
         upgradedServices['AppService'],
@@ -1146,9 +1136,7 @@ export class UpgradedServices {
         upgradedServices['UrlInterpolationService']);
     upgradedServices['UserBackendApiService'] =
       new UserBackendApiService(
-        upgradedServices['HttpClient'],
-        upgradedServices['WindowRef'],
-        upgradedServices['Title']);
+        upgradedServices['HttpClient']);
     upgradedServices['UserService'] = new UserService(
       upgradedServices['UrlInterpolationService'],
       upgradedServices['UrlService'],
@@ -1196,8 +1184,6 @@ export class UpgradedServices {
     upgradedServices['ProfileLinkImageBackendApiService'] =
       new ProfileLinkImageBackendApiService(
         upgradedServices['HttpClient']);
-    upgradedServices['StateCardObjectFactory'] = new StateCardObjectFactory(
-      upgradedServices['AudioTranslationLanguageService']);
     upgradedServices['UserExplorationPermissionsService'] = (
       new UserExplorationPermissionsService(
         upgradedServices['ExplorationPermissionsBackendApiService']));
@@ -1235,7 +1221,6 @@ export class UpgradedServices {
     upgradedServices['StateInteractionStatsService'] =
       new StateInteractionStatsService(
         upgradedServices['AnswerClassificationService'],
-        upgradedServices['FractionObjectFactory'],
         upgradedServices['InteractionRulesRegistryService'],
         upgradedServices['StateInteractionStatsBackendApiService']);
     upgradedServices['StateTopAnswersStatsService'] =
