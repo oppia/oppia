@@ -19,7 +19,7 @@ import { Interaction, InteractionObjectFactory } from 'domain/exploration/Intera
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { Rule } from 'domain/exploration/RuleObjectFactory';
 import { MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 /**
  * @fileoverview Unit tests for paramChangesEditor.
