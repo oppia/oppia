@@ -62,6 +62,12 @@ class PlayExplorationDecoratorTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'exploration_id': {
+                'type': 'basestring'
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_play_exploration
         def get(self, exploration_id):
@@ -141,6 +147,12 @@ class PlayCollectionDecoratorTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'collection_id': {
+                'type': 'basestring'
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_play_collection
         def get(self, collection_id):
@@ -229,6 +241,12 @@ class EditCollectionDecoratorTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'collection_id': {
+                'type': 'basestring'
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_edit_collection
         def get(self, collection_id):
@@ -334,6 +352,8 @@ class CreateExplorationDecoratorTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_create_exploration
         def get(self):
@@ -382,6 +402,8 @@ class CreateCollectionDecoratorTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_create_collection
         def get(self):
@@ -439,6 +461,8 @@ class AccessCreatorDashboardTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_access_creator_dashboard
         def get(self):
@@ -477,6 +501,12 @@ class CommentOnFeedbackThreadTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'thread_id': {
+                'type': 'basestring'
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_comment_on_feedback_thread
         def get(self, thread_id):
@@ -591,6 +621,12 @@ class CreateFeedbackThreadTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'exploration_id': {
+                'type': 'basestring'
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_create_feedback_thread
         def get(self, exploration_id):
@@ -673,6 +709,12 @@ class ViewFeedbackThreadTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'thread_id': {
+                'type': 'basestring'
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_view_feedback_thread
         def get(self, thread_id):
@@ -767,6 +809,16 @@ class ManageEmailDashboardTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'query_id': {
+                'type': 'basestring',
+                'default_value': None
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {
+            'GET': {},
+            'PUT': {}
+        }
 
         @acl_decorators.can_manage_email_dashboard
         def get(self):
@@ -818,6 +870,12 @@ class RateExplorationTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'exploration_id': {
+                'type': 'basestring'
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_rate_exploration
         def get(self, exploration_id):
@@ -850,6 +908,8 @@ class AccessModeratorPageTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_access_moderator_page
         def get(self):
@@ -888,6 +948,12 @@ class FlagExplorationTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'exploration_id': {
+                'type': 'basestring'
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_flag_exploration
         def get(self, exploration_id):
@@ -922,6 +988,8 @@ class SubscriptionToUsersTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_subscribe_to_users
         def get(self):
@@ -954,6 +1022,8 @@ class SendModeratorEmailsTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_send_moderator_emails
         def get(self):
@@ -990,6 +1060,8 @@ class CanAccessReleaseCoordinatorPageDecoratorTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_access_release_coordinator_page
         def get(self):
@@ -1422,6 +1494,8 @@ class CanRunAnyJobDecoratorTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_run_any_job
         def get(self):
@@ -1491,6 +1565,8 @@ class CanManageMemcacheDecoratorTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_manage_memcache
         def get(self):
@@ -1563,6 +1639,8 @@ class DeleteAnyUserTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_delete_any_user
         def get(self):
@@ -1610,6 +1688,12 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'exploration_id': {
+                'type': 'basestring'
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_voiceover_exploration
         def get(self, exploration_id):
@@ -1734,6 +1818,15 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'entity_type': {
+                'type': 'basestring'
+            },
+            'entity_id': {
+                'type': 'basestring'
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'POST': {}}
 
         @acl_decorators.can_manage_voice_artist
         def post(self, entity_type, entity_id):
@@ -1868,6 +1961,12 @@ class EditExplorationTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'exploration_id': {
+                'type': 'basestring'
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_edit_exploration
         def get(self, exploration_id):
@@ -1955,6 +2054,8 @@ class ManageOwnAccountTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_manage_own_account
         def get(self):
@@ -1989,6 +2090,8 @@ class UploadExplorationTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_upload_exploration
         def get(self):
@@ -2036,6 +2139,12 @@ class DeleteExplorationTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'exploration_id': {
+                'type': 'basestring'
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_delete_exploration
         def get(self, exploration_id):
@@ -2121,6 +2230,12 @@ class SuggestChangesToExplorationTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'exploration_id': {
+                'type': 'basestring'
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_suggest_changes_to_exploration
         def get(self, exploration_id):
@@ -2162,6 +2277,8 @@ class SuggestChangesDecoratorsTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_suggest_changes
         def get(self):
@@ -2212,6 +2329,12 @@ class ResubmitSuggestionDecoratorsTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'suggestion_id': {
+                'type': 'basestring'
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_resubmit_suggestion
         def get(self, suggestion_id):
@@ -2274,6 +2397,15 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'suggestion_id': {
+                'type': 'basestring'
+            },
+            'target_id': {
+                'type': 'basestring'
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.get_decorator_for_accepting_suggestion(
             acl_decorators.can_edit_exploration)
@@ -2347,6 +2479,12 @@ class PublishExplorationTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'exploration_id': {
+                'type': 'basestring'
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_publish_exploration
         def get(self, exploration_id):
@@ -2420,6 +2558,12 @@ class ModifyExplorationRolesTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'exploration_id': {
+                'type': 'basestring'
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_modify_exploration_roles
         def get(self, exploration_id):
@@ -2474,6 +2618,12 @@ class CollectionPublishStatusTests(test_utils.GenericTestBase):
 
     class MockPublishHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'collection_id': {
+                'type': 'basestring'
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_publish_collection
         def get(self, collection_id):
@@ -2481,6 +2631,12 @@ class CollectionPublishStatusTests(test_utils.GenericTestBase):
 
     class MockUnpublishHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'collection_id': {
+                'type': 'basestring'
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_unpublish_collection
         def get(self, collection_id):
@@ -2588,6 +2744,8 @@ class AccessLearnerDashboardDecoratorTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_access_learner_dashboard
         def get(self):
@@ -2627,6 +2785,12 @@ class EditTopicDecoratorTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'topic_id': {
+                'type': 'basestring'
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_edit_topic
         def get(self, topic_id):
@@ -2699,6 +2863,12 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'story_id': {
+                'type': 'basestring'
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_edit_story
         def get(self, story_id):
@@ -2785,6 +2955,12 @@ class AddStoryToTopicTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'topic_id': {
+                'type': 'basestring'
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_add_new_story_to_topic
         def get(self, topic_id):
@@ -2881,12 +3057,37 @@ class StoryViewerTests(test_utils.GenericTestBase):
 
     class MockDataHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'topic_url_fragment': {
+                'type': 'basestring'
+            },
+            'story_url_fragment': {
+                'type': 'basestring'
+            },
+            'classroom_url_fragment': {
+                'type': 'basestring'
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_access_story_viewer_page
         def get(self, story_url_fragment):
             self.render_json({'story_url_fragment': story_url_fragment})
 
     class MockPageHandler(base.BaseHandler):
+        URL_PATH_ARGS_SCHEMAS = {
+            'topic_url_fragment': {
+                'type': 'basestring'
+            },
+            'story_url_fragment': {
+                'type': 'basestring'
+            },
+            'classroom_url_fragment': {
+                'type': 'basestring'
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
         @acl_decorators.can_access_story_viewer_page
         def get(self, _):
             self.render_template('story-viewer-page.mainpage.html')
@@ -3032,12 +3233,37 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
 
     class MockDataHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'topic_url_fragment': {
+                'type': 'basestring'
+            },
+            'subtopic_url_fragment': {
+                'type': 'basestring'
+            },
+            'classroom_url_fragment': {
+                'type': 'basestring'
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_access_subtopic_viewer_page
         def get(self, unused_topic_url_fragment, subtopic_url_fragment):
             self.render_json({'subtopic_url_fragment': subtopic_url_fragment})
 
     class MockPageHandler(base.BaseHandler):
+        URL_PATH_ARGS_SCHEMAS = {
+            'topic_url_fragment': {
+                'type': 'basestring'
+            },
+            'subtopic_url_fragment': {
+                'type': 'basestring'
+            },
+            'classroom_url_fragment': {
+                'type': 'basestring'
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
         @acl_decorators.can_access_subtopic_viewer_page
         def get(self, unused_topic_url_fragment, unused_subtopic_url_fragment):
             self.render_template('subtopic-viewer-page.mainpage.html')
@@ -3169,12 +3395,31 @@ class TopicViewerTests(test_utils.GenericTestBase):
 
     class MockDataHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'topic_url_fragment': {
+                'type': 'basestring'
+            },
+            'classroom_url_fragment': {
+                'type': 'basestring'
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_access_topic_viewer_page
         def get(self, topic_name):
             self.render_json({'topic_name': topic_name})
 
     class MockPageHandler(base.BaseHandler):
+        URL_PATH_ARGS_SCHEMAS = {
+            'topic_url_fragment': {
+                'type': 'basestring'
+            },
+            'classroom_url_fragment': {
+                'type': 'basestring'
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
         @acl_decorators.can_access_topic_viewer_page
         def get(self, unused_topic_name):
             self.render_template('topic-viewer-page.mainpage.html')
@@ -3276,6 +3521,8 @@ class CreateSkillTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_create_skill
         def get(self):
@@ -3331,6 +3578,12 @@ class ManageQuestionSkillStatusTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'skill_id': {
+                'type': 'basestring'
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_manage_question_skill_status
         def get(self, skill_id):
@@ -3395,6 +3648,8 @@ class CreateTopicTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_create_topic
         def get(self):
@@ -3449,6 +3704,12 @@ class ManageRightsForTopicTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'topic_id': {
+                'type': 'basestring'
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_manage_rights_for_topic
         def get(self, topic_id):
@@ -3506,6 +3767,12 @@ class ChangeTopicPublicationStatusTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'topic_id': {
+                'type': 'basestring'
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_change_topic_publication_status
         def get(self, topic_id):
@@ -3581,6 +3848,8 @@ class PerformCronTaskTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_perform_cron_tasks
         def get(self):
@@ -3630,6 +3899,12 @@ class EditSkillDecoratorTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'skill_id': {
+                'type': 'basestring'
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_edit_skill
         def get(self, skill_id):
@@ -3698,6 +3973,12 @@ class EditQuestionDecoratorTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'question_id': {
+                'type': 'basestring'
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_edit_question
         def get(self, question_id):
@@ -3781,6 +4062,12 @@ class PlayQuestionDecoratorTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'question_id': {
+                'type': 'basestring'
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_play_question
         def get(self, question_id):
@@ -3816,6 +4103,15 @@ class PlayEntityDecoratorTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'entity_type': {
+                'type': 'basestring'
+            },
+            'entity_id': {
+                'type': 'basestring'
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_play_entity
         def get(self, entity_type, entity_id):
@@ -3903,6 +4199,15 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'entity_type': {
+                'type': 'basestring'
+            },
+            'entity_id': {
+                'type': 'basestring'
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_edit_entity
         def get(self, entity_type, entity_id):
@@ -4049,6 +4354,12 @@ class SaveExplorationTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'exploration_id': {
+                'type': 'basestring'
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_save_exploration
         def get(self, exploration_id):
@@ -4164,6 +4475,20 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
     class MockHandler(base.OppiaMLVMHandler):
         REQUIRE_PAYLOAD_CSRF_CHECK = False
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {
+            'POST': {
+                'vm_id': {
+                    'type': 'basestring'
+                },
+                'message': {
+                    'type': 'basestring'
+                },
+                'signature': {
+                    'type': 'basestring'
+                }
+            }
+        }
 
         def extract_request_message_vm_id_and_signature(self):
             """Returns message, vm_id and signature retrived from incoming
@@ -4273,6 +4598,12 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'suggestion_id': {
+                'type': 'basestring'
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_update_suggestion
         def get(self, suggestion_id):
