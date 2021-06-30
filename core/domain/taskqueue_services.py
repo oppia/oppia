@@ -31,8 +31,6 @@ platform_taskqueue_services = models.Registry.import_taskqueue_services()
 # NOTE: The following constants should match the queue names in queue.yaml.
 # Taskqueue for backing up state.
 QUEUE_NAME_BACKUPS = 'backups'
-# Taskqueue for running continuous computation jobs.
-QUEUE_NAME_CONTINUOUS_JOBS = 'continuous-jobs'
 # Default queue for processing tasks (including MapReduce ones).
 QUEUE_NAME_DEFAULT = 'default'
 # Taskqueue for sending email.

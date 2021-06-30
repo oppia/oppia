@@ -112,7 +112,7 @@ class JobsHandlerTest(test_utils.GenericTestBase):
         self.login(self.RELEASE_COORDINATOR_EMAIL)
         response = self.get_json('/jobshandler')
         self.assertItemsEqual(list(response), [
-            'continuous_computations_data', 'human_readable_current_time',
+            'human_readable_current_time',
             'one_off_job_status_summaries', 'audit_job_status_summaries',
             'recent_job_data', 'unfinished_job_data'])
         self.logout()
