@@ -99,6 +99,7 @@
 
 # Blog project
 /core/domain/blog*.py @iamprayush
+/core/controllers/blog_homepage*.py @iamprayush
 
 
 # Collection project.
