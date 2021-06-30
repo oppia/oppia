@@ -23,7 +23,7 @@ import appengine_config
 from core.tests import test_utils
 import pkg_resources
 
-from typing import Text # isort:skip # pylint: disable=unused-import, import-only-modules
+from typing import Text # isort:skip # pylint: disable=unused-import
 
 
 class AppengineConfigTests(test_utils.GenericTestBase):

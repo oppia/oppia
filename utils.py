@@ -37,9 +37,9 @@ from constants import constants
 import feconf
 import python_utils
 
-from typing import ( # isort:skip # pylint: disable=unused-import, import-only-modules
-    Any, Callable, cast, Dict, Generator, Iterable, Iterator, List, # isort:skip # pylint: disable=unused-import, import-only-modules
-    Optional, Text, Tuple, TypeVar, Union) # isort:skip # pylint: disable=unused-import, import-only-modules
+from typing import ( # isort:skip # pylint: disable=unused-import
+    Any, Callable, cast, Dict, Generator, Iterable, Iterator, List, # isort:skip # pylint: disable=unused-import
+    Optional, Text, Tuple, TypeVar, Union) # isort:skip # pylint: disable=unused-import
 
 
 _YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-5.1.2')

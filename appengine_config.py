@@ -25,7 +25,7 @@ import python_utils
 from google.appengine.ext import vendor
 import pkg_resources
 
-from typing import Any, Text # isort:skip # pylint: disable=unused-import, import-only-modules
+from typing import Any, Text # isort:skip # pylint: disable=unused-import
 
 # Root path of the app.
 ROOT_PATH = os.path.dirname(__file__)

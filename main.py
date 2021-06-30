@@ -73,7 +73,7 @@ from mapreduce import parameters as mapreduce_parameters
 import webapp2
 from webapp2_extras import routes
 
-from typing import Any, Dict, Optional, Text, Type # isort:skip # pylint: disable=unused-import, import-only-modules
+from typing import Any, Dict, Optional, Text, Type # isort:skip # pylint: disable=unused-import
 
 transaction_services = (
     models.Registry.import_transaction_services(# type: ignore[no-untyped-call]

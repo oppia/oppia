@@ -27,7 +27,7 @@ import feconf
 import python_utils
 import schema_utils
 
-from typing import Any, Dict, List, Text, Tuple, Union # isort:skip # pylint: disable=unused-import, import-only-modules
+from typing import Any, Dict, List, Text, Tuple, Union # isort:skip # pylint: disable=unused-import
 
 SCHEMA_KEY_ITEMS = schema_utils.SCHEMA_KEY_ITEMS
 SCHEMA_KEY_LEN = schema_utils.SCHEMA_KEY_LEN

@@ -25,7 +25,7 @@ import os
 
 from constants import constants
 
-from typing import Dict, Text # isort:skip # pylint: disable=unused-import, import-only-modules
+from typing import Dict, Text # isort:skip # pylint: disable=unused-import
 
 # The datastore model ID for the list of featured activity references. This
 # value should not be changed.

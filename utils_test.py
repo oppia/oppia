@@ -30,7 +30,7 @@ import feconf
 import python_utils
 import utils
 
-from typing import Any, Dict, List, Text, Union # isort:skip # pylint: disable=unused-import, import-only-modules
+from typing import Any, Dict, List, Text, Union # isort:skip # pylint: disable=unused-import
 
 # TODO(#13059): Remove #type: ignore[attr-defined] from constants after
 # introduction of protobuf for constants.

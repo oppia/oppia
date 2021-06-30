@@ -25,7 +25,7 @@ import re
 
 import python_utils
 
-from typing import Any, Dict, Text, TextIO # isort:skip # pylint: disable=unused-import, import-only-modules
+from typing import Any, Dict, Text, TextIO # isort:skip # pylint: disable=unused-import
 
 
 def parse_json_from_js(js_file):
