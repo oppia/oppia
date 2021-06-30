@@ -39,7 +39,7 @@
                                  is-active="$index === activeAnswerGroupIndex"
                                  on-delete-fn="deleteAnswerGroup"
                                  outcome="answerGroup.outcome"
-                                 navigate-to-state="navigateToState"
+                                 navigate-to-state="$ctrl.navigateToState"
                                  num-rules="answerGroup.rules.length"
                                  is-response="true">
                 </response-header>
@@ -55,13 +55,13 @@
                                          on-save-answer-group-dest="saveActiveAnswerGroupDest"
                                          on-save-answer-group-correctness-label="saveActiveAnswerGroupCorrectnessLabel"
                                          on-save-answer-group-rules="saveActiveAnswerGroupRules"
-                                         on-save-next-content-id-index="onSaveNextContentIdIndex"
+                                         on-save-next-content-id-index="$ctrl.onSaveNextContentIdIndex"
                                          on-save-tagged-misconception="saveTaggedMisconception"
                                          is-editable="EditabilityService.isEditable()"
                                          display-feedback="!isLinearWithNoFeedback(answerGroup.outcome)"
                                          class="protractor-test-response-body"
-                                         add-state="addState"
-                                         show-mark-all-audio-as-needing-update-modal-if-required="showMarkAllAudioAsNeedingUpdateModalIfRequired">
+                                         add-state="$ctrl.addState"
+                                         show-mark-all-audio-as-needing-update-modal-if-required="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired">
                     </answer-group-editor>
                   </div>
                 </div>
@@ -84,7 +84,7 @@
                                  summary="summarizeDefaultOutcome(defaultOutcome, getCurrentInteractionId(), answerGroups.length, false)"
                                  short-summary="summarizeDefaultOutcome(defaultOutcome, getCurrentInteractionId(), answerGroups.length, true)"
                                  outcome="defaultOutcome"
-                                 navigate-to-state="navigateToState"
+                                 navigate-to-state="$ctrl.navigateToState"
                                  is-response="true">
                 </response-header>
               </a>
@@ -98,13 +98,13 @@
                                          on-save-answer-group-feedback="saveDefaultOutcomeFeedback"
                                          on-save-answer-group-dest="saveDefaultOutcomeDest"
                                          on-save-answer-group-correctness-label="saveDefaultOutcomeCorrectnessLabel"
-                                         on-save-next-content-id-index="onSaveNextContentIdIndex"
+                                         on-save-next-content-id-index="$ctrl.onSaveNextContentIdIndex"
                                          is-editable="EditabilityService.isEditable()"
                                          suppress-warnings="suppressDefaultAnswerGroupWarnings()"
                                          display-feedback="!isLinearWithNoFeedback(defaultOutcome)"
                                          class="protractor-test-response-body"
-                                         add-state="addState"
-                                         show-mark-all-audio-as-needing-update-modal-if-required="showMarkAllAudioAsNeedingUpdateModalIfRequired">
+                                         add-state="$ctrl.addState"
+                                         show-mark-all-audio-as-needing-update-modal-if-required="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired">
                     </answer-group-editor>
                   </div>
                 </div>
