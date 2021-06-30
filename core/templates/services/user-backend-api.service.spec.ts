@@ -25,14 +25,12 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { UserBackendApiService } from 'services/user-backend-api.service';
-import { Title } from '@angular/platform-browser';
 
 describe('User Backend Api Service', () => {
   let userBackendApiService: UserBackendApiService;
   let urlInterpolationService: UrlInterpolationService;
   let httpTestingController: HttpTestingController;
   let csrfService: CsrfTokenService;
-  let titleService: Title;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -42,7 +40,6 @@ describe('User Backend Api Service', () => {
     userBackendApiService = TestBed.inject(UserBackendApiService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     csrfService = TestBed.inject(CsrfTokenService);
-    titleService = TestBed.inject(Title);
 
 
     spyOn(csrfService, 'getTokenAsync').and.callFake(
@@ -182,23 +179,6 @@ describe('User Backend Api Service', () => {
     req.flush(sampleUserContributionRightsDict);
 
     flushMicrotasks();
-  }));
-
-  it('should show number of Unseen Notifications', fakeAsync(() => {
-    let response = {
-      num_unseen_notifications: 10
-    };
-    userBackendApiService.showUnseenNotifications();
-    titleService.setTitle('home');
-    expect(titleService.getTitle()).toEqual('home');
-    userBackendApiService.numUnseenNotifications = 10;
-    expect(userBackendApiService.numUnseenNotifications).toEqual(10);
-    let req = httpTestingController.expectOne(
-      '/notificationshandler');
-    expect(req.request.method).toEqual('GET');
-    req.flush(response);
-    flushMicrotasks();
-    expect(titleService.getTitle()).toBe('(10) home');
   }));
 
   it('should update preferred site langauge', fakeAsync(() => {

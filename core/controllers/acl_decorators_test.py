@@ -1457,6 +1457,15 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'entity_type': {
+                'type': 'basestring'
+            },
+            'entity_id': {
+                'type': 'basestring'
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'POST': {}}
 
         @acl_decorators.can_manage_voice_artist
         def post(self, entity_type, entity_id):
