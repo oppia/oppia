@@ -21,7 +21,7 @@ var action = require('../protractor_utils/action.js');
 var waitFor = require('./waitFor.js');
 
 var TopicAndStoryViewerPage = function() {
-  var chapterTitleList = element.all(by.css('.protractor-chapter-title'));
+  var chapterTitleList = element.all(by.css('.protractor-test-chapter-title'));
   var lessonCompletedIcons = element.all(
     by.css('.protractor-test-lesson-icon-completed'));
   var lessonUncompletedIcons = element.all(
@@ -37,7 +37,7 @@ var TopicAndStoryViewerPage = function() {
   };
 
   this.goToChapterIndex = async function(index) {
-    var chapter = await chapterTitleList.get(index);
+    var chapter = chapterTitleList.get(index);
     await action.click('Chapter title', chapter);
     await waitFor.pageToFullyLoad();
   };

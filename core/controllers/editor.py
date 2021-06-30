@@ -196,7 +196,7 @@ class UserExplorationPermissionsHandler(EditorHandler):
             'can_edit': rights_manager.check_can_edit_activity(
                 self.user, exploration_rights),
             'can_modify_roles': (
-                rights_manager.check_can_modify_activity_roles(
+                rights_manager.check_can_modify_core_activity_roles(
                     self.user, exploration_rights)),
             'can_publish': rights_manager.check_can_publish_activity(
                 self.user, exploration_rights),
@@ -208,6 +208,9 @@ class UserExplorationPermissionsHandler(EditorHandler):
                     self.user, exploration_rights)),
             'can_unpublish': rights_manager.check_can_unpublish_activity(
                 self.user, exploration_rights),
+            'can_manage_voice_artist':
+                rights_manager.check_can_manage_voice_artist_in_activity(
+                    self.user, exploration_rights),
         })
         self.render_json(self.values)
 
