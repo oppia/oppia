@@ -39,7 +39,7 @@ class ValidateCollectionSnapshotMetadataModelTests(
             collection_models.CollectionSnapshotMetadataModel(
                 id='model_id-1',
                 committer_id='committer_id',
-                commit_type='delete', # create, revert, edit, delete
+                commit_type='delete',
                 created_on=self.YEAR_AGO,
                 last_updated=self.NOW,
                 commit_cmds=[{
@@ -427,10 +427,10 @@ class ValidateCollectionCommitLogEntryModelTests(
 
         self.assert_pcoll_equal(output, [])
 
-    def test_validate_exploration_model(self):
+    def test_validate_collection_model(self):
         invalid_commit_cmd_model = (
             collection_models.CollectionCommitLogEntryModel(
-                id='rights_id123',
+                id='collection_id123',
                 created_on=self.YEAR_AGO,
                 last_updated=self.NOW,
                 collection_id='collection_id',
