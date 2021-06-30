@@ -38,9 +38,6 @@ EXCLUDED_DIRECTORIES = [
 # NOTE TO DEVELOPERS: do not add any new files to this list without asking
 # @nithusha21 first.
 NOT_FULLY_COVERED_FILENAMES = [
-    'admin-config-tab.component.ts',
-    'admin-misc-tab.component.ts',
-    'admin-page.component.ts',
     'admin-roles-tab.component.ts',
     'angular-html-bind.directive.ts',
     'answer-classification.service.ts',
@@ -279,7 +276,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'topic-editor-navbar.directive.ts',
     'topic-editor-state.service.ts',
     'topic-editor-stories-list.directive.ts',
-    'topic-summary-tile.directive.ts',
+    'topic-summary-tile.component.ts',
     'TopicObjectFactory.ts',
     'translatable-html-content-id.component.ts',
     'translate-text.service.ts',
