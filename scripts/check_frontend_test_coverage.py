@@ -279,7 +279,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'topic-editor-navbar.directive.ts',
     'topic-editor-state.service.ts',
     'topic-editor-stories-list.directive.ts',
-    'topic-summary-tile.directive.ts',
+    'topic-summary-tile.component.ts',
     'TopicObjectFactory.ts',
     'translatable-html-content-id.component.ts',
     'translate-text.service.ts',
