@@ -42,7 +42,7 @@ def validate_exploration_change(obj):
 
 
 def validate_new_config_property_values(obj):
-    # type: (Dict[Any, Any]) -> None
+    # type: (Dict[String, Any]) -> None
     """Validates new config property values.
 
     Args:
