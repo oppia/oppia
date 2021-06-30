@@ -2827,7 +2827,7 @@ title: Title
             thumbnail_filename='topic.svg',
             thumbnail_bg_color=(
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0]),
-            thumbnail_size_in_bytes=21131,
+            thumbnail_size_in_bytes=None,
             description='description', canonical_story_ids=None,
             additional_story_ids=None, uncategorized_skill_ids=None,
             subtopics=None, next_subtopic_id=0,
