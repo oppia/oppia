@@ -45,7 +45,7 @@ export class EditProfilePictureModalComponent extends ConfirmOrCancelModal {
     super(ngbActiveModal);
   }
 
-  initialiseCropper(): void {
+  initializeCropper(): void {
     this.changeDetectorRef.detectChanges();
     let profilePicture = this.croppableImageRef.nativeElement;
     this.cropper = new Cropper(profilePicture, {
@@ -61,7 +61,7 @@ export class EditProfilePictureModalComponent extends ConfirmOrCancelModal {
     reader.onload = (e) => {
       this.uploadedImage = this.svgSanitizerService.getTrustedSvgResourceUrl(
         (<FileReader>e.target).result as string);
-      this.initialiseCropper();
+      this.initializeCropper();
     };
 
     reader.readAsDataURL(file);

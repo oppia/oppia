@@ -37,7 +37,7 @@ require('cropperjs/dist/cropper.min.css');
   templateUrl: './preferences-page.component.html'
 })
 export class PreferencesPageComponent {
-  @Input() subjectInterests: string[];
+  @Input() subjectInterests: string;
   @Input() preferredLanguageCodes;
   @Input() preferredSiteLanguageCode: string;
   @Input() preferredAudioLanguageCode: string;
@@ -96,7 +96,7 @@ export class PreferencesPageComponent {
     this.preventPageUnloadEventService.addListener();
   }
 
-  onSubjectInterestsSelectionChange(subjectInterests: string[]): void {
+  onSubjectInterestsSelectionChange(subjectInterests: string): void {
     this.alertsService.clearWarnings();
     this.subjectInterestsChangeAtLeastOnce = true;
     this._saveDataItem('subject_interests', subjectInterests);
