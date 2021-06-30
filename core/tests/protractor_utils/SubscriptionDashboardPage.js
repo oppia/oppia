@@ -33,14 +33,14 @@ var SubscriptionDashboardPage = function() {
   };
 
   this.expectSubscriptionFirstNameToMatch = async function(name) {
-    var firstSubscriberNameElem = await subscriptionName.first();
+    var firstSubscriberNameElem = subscriptionName.first();
     await waitFor.visibilityOf(
       firstSubscriberNameElem, 'First Subscriber Name is not visible');
     expect(await firstSubscriberNameElem.getText()).toMatch(name);
   };
 
   this.expectSubscriptionLastNameToMatch = async function(name) {
-    var lastSubscriberNameElem = await subscriptionName.last();
+    var lastSubscriberNameElem = subscriptionName.last();
     await waitFor.visibilityOf(
       lastSubscriberNameElem, 'Last Subscriber Name is not visible');
     expect(await lastSubscriberNameElem.getText()).toMatch(name);
@@ -48,7 +48,7 @@ var SubscriptionDashboardPage = function() {
 
   this.expectSubscriptionCountToEqual = async function(value) {
     await waitFor.visibilityOf(
-      await subscriptionName.first(),
+      subscriptionName.first(),
       'Subscriber Name Card takes too long to appear');
     expect(await subscriptionName.count()).toEqual(value);
   };
