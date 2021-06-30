@@ -155,7 +155,8 @@ var LearnerDashboardPage = function() {
   };
 
   this.checkCompleteExplorationSection = async function(explorationTitle) {
-    var completedSectionVisible = await completedExplorationsSection.isDisplayed();
+    var completedSectionVisible = await(
+      completedExplorationsSection.isDisplayed());
     if (!completedSectionVisible) {
       await this.navigateToCompletedSection();
     }
