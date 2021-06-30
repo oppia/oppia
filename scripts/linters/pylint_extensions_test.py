@@ -1875,6 +1875,13 @@ class ImportOnlyModulesCheckerTests(unittest.TestCase):
         with checker_test_object.assertNoMessages():
             checker_test_object.checker.visit_importfrom(importfrom_node6)
 
+        importfrom_node7 = astroid.extract_node(
+            """
+            from __future__ import invalid_module #@
+        """)
+        with checker_test_object.assertNoMessages():
+            checker_test_object.checker.visit_importfrom(importfrom_node7)
+
 
 class BackslashContinuationCheckerTests(unittest.TestCase):
 
