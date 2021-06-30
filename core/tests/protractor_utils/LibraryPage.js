@@ -75,8 +75,8 @@ var LibraryPage = function() {
 
     // Function get is a zero-based index.
     var searchInput = (
-      browser.isMobile ? await searchInputs.get(1) :
-      await searchInputs.first());
+      browser.isMobile ? searchInputs.get(1) :
+      searchInputs.first());
     await action.clear('Search input', searchInput);
     await action.sendKeys('Search input', searchInput, searchQuery);
     let searchButtonExists = await searchButton.isPresent();
