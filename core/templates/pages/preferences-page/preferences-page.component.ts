@@ -37,13 +37,13 @@ require('cropperjs/dist/cropper.min.css');
   templateUrl: './preferences-page.component.html'
 })
 export class PreferencesPageComponent {
-  @Input() subjectInterests;
+  @Input() subjectInterests: string[];
   @Input() preferredLanguageCodes;
-  @Input() preferredSiteLanguageCode;
-  @Input() preferredAudioLanguageCode;
+  @Input() preferredSiteLanguageCode: string;
+  @Input() preferredAudioLanguageCode: string;
   subjectInterestsChangeAtLeastOnce: boolean;
   exportingData = false;
-  profilePictureDataUrl;
+  profilePictureDataUrl: string;
   DASHBOARD_TYPE_CREATOR = AppConstants.DASHBOARD_TYPE_CREATOR;
   DASHBOARD_TYPE_LEARNER = AppConstants.DASHBOARD_TYPE_LEARNER;
   username: string = '';
