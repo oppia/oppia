@@ -123,6 +123,7 @@ ONE_OFF_JOB_MANAGERS = [
     story_jobs_one_off.StoryExplorationsAuditOneOffJob,
     story_jobs_one_off.StoryMigrationOneOffJob,
     story_jobs_one_off.DeleteStoryCommitLogsOneOffJob,
+    story_jobs_one_off.UpdateStoryThumbnailSizeOneOffJob,
     suggestion_jobs_one_off.ContentSuggestionFormatUpdateOneOffJob,
     suggestion_jobs_one_off.QuestionSuggestionMigrationJobManager,
     suggestion_jobs_one_off.PopulateFinalReviewerIdOneOffJob,

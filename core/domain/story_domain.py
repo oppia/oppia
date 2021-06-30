@@ -24,6 +24,8 @@ import re
 import android_validation_constants
 from constants import constants
 from core.domain import change_domain
+from core.domain import fs_domain
+from core.domain import fs_services
 from core.domain import html_cleaner
 from core.domain import html_validation_service
 import feconf
@@ -1105,15 +1107,13 @@ class Story(python_utils.OBJECT):
                 story.
         """
         self.thumbnail_filename = thumbnail_filename
-
-    def update_thumbnail_size_in_bytes(self, new_thumbnail_size_in_bytes):
-        """Updates the size of thumbnail of the story.
-
-        Args:
-            new_thumbnail_size_in_bytes: int|None. The new thumbnail size of the
-                story.
-        """
-        self.thumbnail_size_in_bytes = new_thumbnail_size_in_bytes
+        file_system_class = fs_services.get_entity_file_system_class()
+        fs = fs_domain.AbstractFileSystem(file_system_class(
+            feconf.ENTITY_TYPE_STORY, self.id))
+        filename_prefix = 'thumbnail'
+        filepath = '%s/%s' % (filename_prefix, self.thumbnail_filename)
+        if fs.isfile(filepath):
+            self.thumbnail_size_in_bytes = len(fs.get(filepath))
 
     def update_thumbnail_bg_color(self, thumbnail_bg_color):
         """Updates the thumbnail background color of the story.

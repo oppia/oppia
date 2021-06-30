@@ -166,6 +166,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(story.title, 'New Title')
         self.assertEqual(story.description, 'New Description')
         self.assertEqual(story.thumbnail_filename, 'image.svg')
+        self.assertEqual(story.thumbnail_size_in_bytes, None)
         self.assertEqual(
             story.thumbnail_bg_color,
             constants.ALLOWED_THUMBNAIL_BG_COLORS['story'][0])

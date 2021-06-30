@@ -48,7 +48,6 @@ class DescriptionLengthAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     def reduce(key, values):
         yield ('Topic Id: %s' % key, 'Story Id: %s' % values)
 
-
 class StoryMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """A reusable one-time job that may be used to migrate story schema
     versions. This job will load all existing story from the data store
@@ -65,16 +64,6 @@ class StoryMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @classmethod
     def entity_classes_to_map_over(cls):
         return [story_models.StoryModel]
-
-    @staticmethod
-    def compute_thumbnail_size_in_bytes(thumbnail_filename, item_id):
-        """thumbnail_url = (
-           'https://storage.googleapis.com/oppiaserver-resources/story/%s/'
-           'assets/thumbnail/%s' %(item_id, thumbnail_filename))
-        thumbnail_size_in_bytes = python_utils.url_open(
-            thumbnail_url).headers['Content-Length']
-        return thumbnail_size_in_bytes.
-        """
 
     @staticmethod
     def map(item):
@@ -122,7 +111,6 @@ class StoryMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         else:
             yield (key, values)
 
-
 class RegenerateStorySummaryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job to regenerate story summaries."""
 
@@ -160,7 +148,6 @@ class RegenerateStorySummaryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 sum(ast.literal_eval(v) for v in values))])
         else:
             yield (key, values)
-
 
 class StoryExplorationsAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job to validate explorations in stories."""
@@ -202,7 +189,6 @@ class StoryExplorationsAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             values = ['Successfully processed %d stories.' % num_processed]
         yield (key, values)
 
-
 class DeleteStoryCommitLogsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job to delete unneeded story commit logs."""
 
@@ -221,3 +207,54 @@ class DeleteStoryCommitLogsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def reduce(key, values):
         yield (key, len(values))
+
+class UpdateStoryThumbnailSizeOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job to update the thumbnail_size_in_bytes in story models. """
+
+    _DELETED_KEY = 'story_deleted'
+    _ERROR_KEY = 'update_error'
+    _SUCCESS_KEY = 'thumbnail_size_updated'
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [story_models.StoryModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        story = story_fetchers.get_story_by_id(item.id)
+
+        try:
+            # We are not updating thumbnail_filename here, but using it call the
+            # update for story thumbnail_size_in_bytes.
+            # old_value and new_value are same here, because the update for
+            # thumbnail_size_in_bytes is called from within the code for
+            # updating thumbnail_filename in story_services.py file.
+            commit_cmds = [story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_PROPERTY_THUMBNAIL_FILENAME),
+                'new_value': story.thumbnail_filename,
+                'old_value': story.thumbnail_filename
+            })]
+
+            story_services.update_story(
+                feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
+                'Update story thumbnail size'
+            )
+            yield (UpdateStoryThumbnailSizeOneOffJob._SUCCESS_KEY, 1)
+        except Exception as e:
+            logging.exception(
+                'Updating story thumbnail_size_in_bytes %s failed validation'
+                ': %s' % (item.id, e))
+            yield (
+                UpdateStoryThumbnailSizeOneOffJob._ERROR_KEY,
+                'Updating story thumbnail_size_in_bytes %s failed validation'
+                ': %s' % (item.id, e))
+            return
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)

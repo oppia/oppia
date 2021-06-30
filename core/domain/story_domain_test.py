@@ -344,6 +344,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'title': 'Title',
             'thumbnail_filename': None,
             'thumbnail_bg_color': None,
+            'thumbnail_size_in_bytes': None,
             'description': 'Description',
             'notes': feconf.DEFAULT_STORY_NOTES,
             'story_contents': {
