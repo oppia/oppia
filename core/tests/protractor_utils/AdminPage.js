@@ -37,9 +37,9 @@ var AdminPage = function() {
   var adminRolesTab = element(by.css('.protractor-test-admin-roles-tab'));
   var adminRolesTabContainer = element(
     by.css('.protractor-test-roles-tab-container'));
-  var updateFormName = element(by.css('.protractor-update-form-name'));
-  var updateFormSubmit = element(by.css('.protractor-update-form-submit'));
-  var roleSelect = element(by.css('.protractor-update-form-role-select'));
+  var updateFormName = element(by.css('.protractor-test-update-form-name'));
+  var updateFormSubmit = element(by.css('.protractor-test-update-form-submit'));
+  var roleSelect = element(by.css('.protractor-test-update-form-role-select'));
   var statusMessage = element(by.css('.protractor-test-status-message'));
 
   var addContributionRightsForm = element(
@@ -195,8 +195,9 @@ var AdminPage = function() {
 
     var count = await featureFlagElements.count();
     for (let i = 0; i < count; i++) {
-      var elem = await featureFlagElements.get(i);
-      if ((await elem.element(by.css('h2.oppia-feature-name')).getText()) ===
+      var elem = featureFlagElements.get(i);
+      if ((await elem.element(
+        by.css('.protractor-test-feature-name')).getText()) ===
           'dummy_feature') {
         return elem;
       }
@@ -279,7 +280,7 @@ var AdminPage = function() {
 
   this._startOneOffJob = async function(jobName, i) {
     await waitFor.visibilityOf(
-      await oneOffJobRows.first(),
+      oneOffJobRows.first(),
       'Starting one off jobs taking too long to appear.');
     await waitFor.visibilityOf(
       oneOffJobRows.get(i), 'Could not get One Off Jobs');
