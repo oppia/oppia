@@ -37,6 +37,7 @@ from core.controllers import features
 from core.controllers import feedback
 from core.controllers import improvements
 from core.controllers import learner_dashboard
+from core.controllers import learner_goals
 from core.controllers import learner_playlist
 from core.controllers import library
 from core.controllers import moderator
@@ -240,21 +241,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s' % feconf.CONTRIBUTOR_DASHBOARD_URL,
         contributor_dashboard.ContributorDashboardPage),
-
-    get_redirect_route(
-        '/notifications_dashboard',
-        creator_dashboard.OldNotificationsDashboardRedirectPage),
     get_redirect_route(
         '/contributor_dashboard',
         creator_dashboard.OldContributorDashboardRedirectPage),
-    get_redirect_route(
-        feconf.NOTIFICATIONS_DASHBOARD_URL,
-        creator_dashboard.NotificationsDashboardPage),
-    get_redirect_route(
-        r'/notificationsdashboardhandler/data',
-        creator_dashboard.NotificationsDashboardHandler),
-    get_redirect_route(
-        r'/notificationshandler', creator_dashboard.NotificationsHandler),
     get_redirect_route(
         '/creator_dashboard',
         creator_dashboard.OldCreatorDashboardRedirectPage),
@@ -411,6 +400,10 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<activity_type>/<activity_id>' %
         feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
         reader.LearnerIncompleteActivityHandler),
+
+    get_redirect_route(
+        r'%s/<activity_type>/<topic_id>' % feconf.LEARNER_GOALS_DATA_URL,
+        learner_goals.LearnerGoalsHandler),
 
     get_redirect_route(
         r'%s/<activity_type>/<activity_id>' % feconf.LEARNER_PLAYLIST_DATA_URL,
@@ -868,6 +861,10 @@ URLS = MAPREDUCE_HANDLERS + [
 
     get_redirect_route(
         r'/learn/<classroom_url_fragment>', classroom.ClassroomPage),
+
+    get_redirect_route(
+        r'/voice_artist_management_handler/<entity_type>/<entity_id>',
+        voice_artist.VoiceArtistManagementHandler),
 ]
 
 # Adding redirects for topic landing pages.

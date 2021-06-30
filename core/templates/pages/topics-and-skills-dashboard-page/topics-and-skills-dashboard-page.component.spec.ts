@@ -23,7 +23,7 @@ import { TopicsAndSkillsDashboardFilter } from
   'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-filter.model';
 import { CreatorTopicSummary, CreatorTopicSummaryBackendDict } from
   'domain/topic/creator-topic-summary.model';
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 // ^^^ This block is to be removed.
 
 require(

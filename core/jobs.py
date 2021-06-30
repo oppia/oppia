@@ -985,14 +985,6 @@ class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
             'must implement the _get_continuous_computation_class() method.')
 
     @staticmethod
-    def _get_job_queued_msec():
-        """Returns the time when the job got queued, in milliseconds past the
-        Epoch.
-        """
-        return float(context.get().mapreduce_spec.mapper.params[
-            MAPPER_PARAM_KEY_QUEUED_TIME_MSECS])
-
-    @staticmethod
     def entity_created_before_job_queued(entity):
         """Checks that the given entity was created before the MR job was
         queued.
