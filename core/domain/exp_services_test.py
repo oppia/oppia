@@ -11200,3 +11200,119 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
         changes_are_not_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 1, change_list_2)
         self.assertEqual(changes_are_not_mergeable, False)
+
+    def test_changes_are_not_mergeable_when_frontend_version_exceeds_backend_version(self): # pylint: disable=line-too-long
+        self.save_new_valid_exploration(
+            self.EXP_0_ID, self.owner_id, end_state_name='End')
+
+        rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
+
+        # Changes to the various properties of the first and
+        # second state.
+        change_list = [exp_domain.ExplorationChange({
+            'old_value': 'TextInput',
+            'cmd': 'edit_state_property',
+            'property_name': 'widget_id',
+            'new_value': None,
+            'state_name': 'Introduction'
+        }), exp_domain.ExplorationChange({
+            'old_value': {
+                'placeholder': {
+                    'value': {
+                        'content_id': 'ca_placeholder_0',
+                        'unicode_str': ''
+                    }
+                },
+                'rows': {
+                    'value': 1
+                }
+            },
+            'cmd': 'edit_state_property',
+            'property_name': 'widget_customization_args',
+            'new_value': {},
+            'state_name': 'Introduction'
+        }), exp_domain.ExplorationChange({
+            'old_value': None,
+            'cmd': 'edit_state_property',
+            'property_name': 'widget_id',
+            'new_value': 'NumericInput',
+            'state_name': 'Introduction'
+        }), exp_domain.ExplorationChange({
+            'old_value': 1,
+            'cmd': 'edit_state_property',
+            'property_name': 'next_content_id_index',
+            'new_value': 2,
+            'state_name': 'Introduction'
+        }), exp_domain.ExplorationChange({
+            'old_value': [],
+            'cmd': 'edit_state_property',
+            'property_name': 'answer_groups',
+            'new_value': [
+                {
+                    'tagged_skill_misconception_id': None,
+                    'rule_specs': [
+                        {
+                            'rule_type': 'IsLessThanOrEqualTo',
+                            'inputs': {
+                                'x': 50
+                            }
+                        }
+                    ],
+                    'training_data': [],
+                    'outcome': {
+                        'param_changes': [],
+                        'dest': 'End',
+                        'missing_prerequisite_skill_id': None,
+                        'feedback': {
+                            'content_id': 'feedback_1',
+                            'html': ''
+                        },
+                        'labelled_as_correct': False,
+                        'refresher_exploration_id': None
+                    }
+                }
+            ],
+            'state_name': 'Introduction'
+        }), exp_domain.ExplorationChange({
+            'old_value': [],
+            'cmd': 'edit_state_property',
+            'property_name': 'hints',
+            'new_value': [
+                {
+                    'hint_content': {
+                        'content_id': 'hint_2',
+                        'html': '<p>Hint.</p>'
+                    }
+                }
+            ],
+            'state_name': 'Introduction'
+        }), exp_domain.ExplorationChange({
+            'old_value': 2,
+            'cmd': 'edit_state_property',
+            'property_name': 'next_content_id_index',
+            'new_value': 3,
+            'state_name': 'Introduction'
+        }), exp_domain.ExplorationChange({
+            'old_value': {
+                'content_id': 'content',
+                'html': 'Congratulations, you have finished!'
+            },
+            'cmd': 'edit_state_property',
+            'property_name': 'content',
+            'new_value': {
+                'content_id': 'content',
+                'html': '<p>2Congratulations, you have finished!</p>'
+            },
+            'state_name': 'End'
+        })]
+
+        # Changes are mergeable when updating the same version.
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 1, change_list)
+        self.assertEqual(changes_are_mergeable, True)
+
+        # Changes are not mergeable when updating from version
+        # more than that on the backend.
+        changes_are_not_mergeable = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 3, change_list)
+        self.assertEqual(changes_are_not_mergeable, False)
