@@ -26,6 +26,8 @@ import re
 import android_validation_constants
 from constants import constants
 from core.domain import change_domain
+from core.domain import fs_domain
+from core.domain import fs_services
 from core.domain import subtopic_page_domain
 from core.domain import user_services
 import feconf
@@ -45,7 +47,7 @@ ROLE_NONE = feconf.ROLE_NONE
 # compatibility with previous change dicts.
 TOPIC_PROPERTY_NAME = 'name'
 TOPIC_PROPERTY_ABBREVIATED_NAME = 'abbreviated_name'
-TOPIC_PROPERTY_THUMBNAIL_FILENAME_AND_SIZE_IN_BYTES = 'thumbnail_filename'
+TOPIC_PROPERTY_THUMBNAIL_FILENAME = 'thumbnail_filename'
 TOPIC_PROPERTY_THUMBNAIL_BG_COLOR = 'thumbnail_bg_color'
 TOPIC_PROPERTY_DESCRIPTION = 'description'
 TOPIC_PROPERTY_CANONICAL_STORY_REFERENCES = 'canonical_story_references'
@@ -114,7 +116,7 @@ class TopicChange(change_domain.BaseChange):
         TOPIC_PROPERTY_CANONICAL_STORY_REFERENCES,
         TOPIC_PROPERTY_ADDITIONAL_STORY_REFERENCES,
         TOPIC_PROPERTY_LANGUAGE_CODE,
-        TOPIC_PROPERTY_THUMBNAIL_FILENAME_AND_SIZE_IN_BYTES,
+        TOPIC_PROPERTY_THUMBNAIL_FILENAME,
         TOPIC_PROPERTY_THUMBNAIL_BG_COLOR,
         TOPIC_PROPERTY_URL_FRAGMENT,
         TOPIC_PROPERTY_META_TAG_CONTENT,
@@ -1262,18 +1264,21 @@ class Topic(python_utils.OBJECT):
         """
         self.url_fragment = new_url_fragment
 
-    def update_thumbnail_filename_and_size_in_bytes(
-            self, new_thumbnail_filename, new_thumbnail_size_in_bytes):
-        """Updates the thumbnail filename of a topic object.
+    def update_thumbnail_filename(self, new_thumbnail_filename):
+        """Updates the thumbnail filename and file size of a topic object.
 
         Args:
             new_thumbnail_filename: str|None. The updated thumbnail filename
                 for the topic.
-            new_thumbnail_size_in_bytes: int|None. The size of topic's new
-                thumbnail in bytes for the topic.
         """
         self.thumbnail_filename = new_thumbnail_filename
-        self.thumbnail_size_in_bytes = new_thumbnail_size_in_bytes
+        file_system_class = fs_services.get_entity_file_system_class()
+        fs = fs_domain.AbstractFileSystem(file_system_class(
+            feconf.ENTITY_TYPE_TOPIC, self.id))
+        filename_prefix = 'thumbnail'
+        filepath = '%s/%s' % (filename_prefix, self.thumbnail_filename)
+        if fs.isfile(filepath):
+            self.thumbnail_size_in_bytes = len(fs.get(filepath))
 
     def update_thumbnail_bg_color(self, new_thumbnail_bg_color):
         """Updates the thumbnail background color of a topic object.
@@ -1283,15 +1288,6 @@ class Topic(python_utils.OBJECT):
                 color for the topic.
         """
         self.thumbnail_bg_color = new_thumbnail_bg_color
-
-    def update_thumbnail_size_in_bytes(self, new_thumbnail_size_in_bytes):
-        """Updates the thumbnail size(in bytes) of a topic object.
-
-        Args:
-            new_thumbnail_size_in_bytes: int|None. The size of topic's
-                new thumbnail in bytes.
-        """
-        self.thumbnail_size_in_bytes = new_thumbnail_size_in_bytes
 
     def update_description(self, new_description):
         """Updates the description of a topic object.

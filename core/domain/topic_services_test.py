@@ -650,6 +650,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic.meta_tag_content, 'topic meta tag content')
         self.assertEqual(topic.page_title_fragment_for_web, 'topic page title')
         self.assertEqual(topic_summary.version, 3)
+        self.assertEqual(topic.thumbnail_filename, 'thumbnail.svg')
         self.assertEqual(topic_summary.thumbnail_bg_color, '#C6DCDA')
 
         # Test whether a topic_manager can edit a topic.
