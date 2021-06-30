@@ -383,7 +383,7 @@ describe('Full exploration editor', function() {
     await users.logout();
   });
 
-  fit('should open a lost changes modal', async function() {
+  it('should open a lost changes modal', async function() {
     await users.createUser('user9@editorAndPlayer.com', 'user9EditorAndPlayer');
     await users.createUser(
       'user10@editorAndPlayer.com',
@@ -391,20 +391,22 @@ describe('Full exploration editor', function() {
     await users.login('user9@editorAndPlayer.com');
     await workflow.createExploration(true);
     var explorationId = await general.getExplorationIdFromEditor();
-    await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorMainTab.setStateName('first card');
+    await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setTitle('Testing lost changes modal');
     await explorationEditorSettingsTab.setCategory('Algebra');
     await explorationEditorSettingsTab.setObjective('To assess happiness.');
     await explorationEditorSettingsTab.openAndClosePreviewSummaryTile();
     await explorationEditorPage.saveChanges();
     await workflow.addExplorationManager('user10EditorAndPlayer');
+    await explorationEditorPage.navigateToMainTab();
 
     await explorationEditorMainTab.setContent(async function(richTextEditor) {
       await richTextEditor.appendPlainText('How are you feeling?');
     });
-
+    await action.waitForAutosave();
     await users.logout();
+
     await users.login('user10@editorAndPlayer.com');
     await general.openEditor(explorationId, true);
     await explorationEditorMainTab.setContent(async function(richTextEditor) {
@@ -414,7 +416,7 @@ describe('Full exploration editor', function() {
     await users.logout();
 
     await users.login('user9@editorAndPlayer.com');
-    await general.openEditor(explorationId, true);
+    await general.openEditor(explorationId, false);
     await waitFor.visibilityOf(
       element(by.css('.modal-content')),
       'Lost Changes Modal taking too long to appear');
