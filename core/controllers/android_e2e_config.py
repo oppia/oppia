@@ -60,7 +60,7 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
                 raise Exception('The topic is already published.')
             else:
                 raise Exception('The topic exists but is not published.')
-
+        result = {}
         exp_id = '26'
         user_id = feconf.SYSTEM_COMMITTER_ID
         topic_id = topic_fetchers.get_new_topic_id()
@@ -68,7 +68,7 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
         skill_id = skill_services.get_new_skill_id()
         question_id = question_services.get_new_question_id()
         skill = self._create_dummy_skill(
-            skill_id, 'Dummy Skill for android', '<p>Dummy Explanation 1</p>')
+            skill_id, 'Dummy Skill for Android', '<p>Dummy Explanation 1</p>')
         question = self._create_dummy_question(
             question_id, 'Question 1', [skill_id])
         question_services.add_question(user_id, question)
@@ -119,7 +119,7 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
 
         story.update_node_description(
             '%s%d' % (story_domain.NODE_ID_PREFIX, 1),
-            'To test all android interactions'
+            'To test all Android interactions'
         )
         story.update_node_exploration_id(
             '%s%d' % (story_domain.NODE_ID_PREFIX, 1),
@@ -156,6 +156,7 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
         topic_services.publish_topic(topic_id, user_id)
         self._upload_thumbnail(topic_id, feconf.ENTITY_TYPE_TOPIC)
         self._upload_thumbnail(story_id, feconf.ENTITY_TYPE_STORY)
+        self.render_json(result)
 
     def _upload_thumbnail(self, structure_id, structure_type):
         """Uploads images to the local datastore to be fetched using the

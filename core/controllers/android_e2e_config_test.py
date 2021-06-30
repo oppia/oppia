@@ -48,12 +48,14 @@ class AndroidConfigTest(test_utils.GenericTestBase):
         assert_raises_regexp_context_manager = self.assertRaisesRegexp(
             Exception, 'Cannot load new structures data in production.')
         with assert_raises_regexp_context_manager, prod_mode_swap:
-            self.post_json('/initialize_android_test_data', {
-            }, use_payload=False, csrf_token=None, return_json=False)
+            self.post_json(
+                '/initialize_android_test_data', {}, use_payload=False,
+                csrf_token=None)
 
     def test_initialize_topic_is_published(self):
-        self.post_json('/initialize_android_test_data', {
-        }, use_payload=False, csrf_token=None, return_json=False)
+        self.post_json(
+            '/initialize_android_test_data', {}, use_payload=False,
+            csrf_token=None)
         self.assertTrue(topic_services.does_topic_with_name_exist(
             'Android test'))
         topic = topic_fetchers.get_topic_by_name('Android test')
@@ -63,22 +65,24 @@ class AndroidConfigTest(test_utils.GenericTestBase):
         self.assertTrue(topic_rights.topic_is_published)
 
     def test_initialize_structures_are_valid(self):
-        self.post_json('/initialize_android_test_data', {
-        }, use_payload=False, csrf_token=None, return_json=False)
+        self.post_json(
+            '/initialize_android_test_data', {}, use_payload=False,
+            csrf_token=None)
         topic = topic_fetchers.get_topic_by_name('Android test')
         exploration = exp_fetchers.get_exploration_by_id(EXPLORATION_ID)
         story = story_fetchers.get_story_by_url_fragment(
             'android-end-to-end-testing')
         skill = skill_fetchers.get_skill_by_description(
-            'Dummy Skill for android')
+            'Dummy Skill for Android')
         skill.validate()
         story.validate()
         topic.validate(strict=True)
         exploration.validate(strict=True)
 
     def test_initialize_structure_thumbnails_exists(self):
-        self.post_json('/initialize_android_test_data', {
-        }, use_payload=False, csrf_token=None, return_json=False)
+        self.post_json(
+            '/initialize_android_test_data', {}, use_payload=False,
+            csrf_token=None)
         topic = topic_fetchers.get_topic_by_name('Android test')
         story = story_fetchers.get_story_by_url_fragment(
             'android-end-to-end-testing')
@@ -90,8 +94,9 @@ class AndroidConfigTest(test_utils.GenericTestBase):
             story.id, 'image/svg+xml')
 
     def test_exploration_assets_are_loaded(self):
-        self.post_json('/initialize_android_test_data', {
-        }, use_payload=False, csrf_token=None, return_json=False)
+        self.post_json(
+            '/initialize_android_test_data', {}, use_payload=False,
+            csrf_token=None)
         filelist = os.listdir(
             os.path.join(
                 'data', 'explorations', 'android_interactions', 'assets',
@@ -102,22 +107,26 @@ class AndroidConfigTest(test_utils.GenericTestBase):
                 filename, 'image/png')
 
     def test_initialize_twice_raises_already_published_exception(self):
-        self.post_json('/initialize_android_test_data', {
-        }, use_payload=False, csrf_token=None, return_json=False)
+        self.post_json(
+            '/initialize_android_test_data', {}, use_payload=False,
+            csrf_token=None)
         assert_raises_regexp_context_manager = self.assertRaisesRegexp(
             Exception, 'The topic is already published.')
         with assert_raises_regexp_context_manager:
-            self.post_json('/initialize_android_test_data', {
-            }, use_payload=False, csrf_token=None, return_json=False)
+            self.post_json(
+                '/initialize_android_test_data', {}, use_payload=False,
+                csrf_token=None)
 
     def test_initialize_twice_raises_unpublished_topic_exception(self):
-        self.post_json('/initialize_android_test_data', {
-        }, use_payload=False, csrf_token=None, return_json=False)
+        self.post_json(
+            '/initialize_android_test_data', {}, use_payload=False,
+            csrf_token=None)
         topic = topic_fetchers.get_topic_by_name('Android test')
         topic_services.unpublish_topic(
             topic.id, feconf.SYSTEM_COMMITTER_ID)
         assert_raises_regexp_context_manager = self.assertRaisesRegexp(
             Exception, 'The topic exists but is not published.')
         with assert_raises_regexp_context_manager:
-            self.post_json('/initialize_android_test_data', {
-            }, use_payload=False, csrf_token=None, return_json=False)
+            self.post_json(
+                '/initialize_android_test_data', {}, use_payload=False,
+                csrf_token=None)
