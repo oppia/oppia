@@ -43,7 +43,7 @@ EXPLORATION_ID = '26'
 class AndroidConfigTest(test_utils.GenericTestBase):
     """Server integration tests for operations on the admin page."""
 
-    def test_initialize_in_production_gives_an_exception(self):
+    def test_initialize_in_production_raises_exception(self):
         prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
         assert_raises_regexp_context_manager = self.assertRaisesRegexp(
             Exception, 'Cannot load new structures data in production.')
@@ -78,8 +78,10 @@ class AndroidConfigTest(test_utils.GenericTestBase):
         story.validate()
         topic.validate(strict=True)
         exploration.validate(strict=True)
+        for node in story.story_contents.nodes:
+            self.assertEqual(node.exploration_id, EXPLORATION_ID)
 
-    def test_initialize_structure_thumbnails_exists(self):
+    def test_initialize_structure_thumbnails_exist(self):
         self.post_json(
             '/initialize_android_test_data', {}, use_payload=False,
             csrf_token=None)
