@@ -415,7 +415,6 @@ describe('Full exploration editor', function() {
 
       await users.login('user10@editor.com');
       await general.openEditor(explorationId, true);
-      await explorationEditorMainTab.setStateName('changed card');
       await explorationEditorPage.navigateToSettingsTab();
       await explorationEditorSettingsTab.setTitle('Title Changed');
       await explorationEditorSettingsTab.setObjective('Objective Changed.');
@@ -424,12 +423,14 @@ describe('Full exploration editor', function() {
 
       await users.login('user9@editor.com');
       await general.openEditor(explorationId, false);
+      await waitFor.pageToFullyLoad();
       await explorationEditorPage.saveChanges();
       await explorationEditorMainTab.expectContentToMatch(
         async function(richTextChecker) {
-          await richTextChecker.readPlainText('You must be feeling great?');
+          await richTextChecker.readPlainText('How are you feeling?');
         }
       );
+      await explorationEditorPage.navigateToSettingsTab();
       await explorationEditorPage.verifyExplorationSettingFields(
         'Title Changed',
         'Algebra',
@@ -478,36 +479,9 @@ describe('Full exploration editor', function() {
 
       await users.login('user9@editor.com');
       await general.openEditor(explorationId, false);
-      var lostChangesContent = (
-        '<div class="oppia-lost-changes">' +
-        '<ul>' +
-        '<li>' +
-        '<div>' +
-        '<strong>' +
-        'Edits to state:' +
-        '</strong> ' + 'first card' +
-        ' <div>' +
-        '<strong>' +
-        'Edits to property:' +
-        '</strong> ' + 'content' +
-        ' </div>' +
-        '<div>' +
-        '<div class="state-edit-desc">' +
-        '<strong>Edited content: </strong>' +
-        '<div class="content">' + '<p>How are you feeling?</p>' +
-        '</div>' +
-        '</div>' +
-        '</div>' +
-        '</div>' +
-        '</li>' +
-        '</ul>' +
-        '</div>'
-      );
       await waitFor.visibilityOf(
         element(by.css('.modal-content')),
         'Lost Changes Modal taking too long to appear');
-      expect(await element(by.css(
-        '.protractor-test-oppia-lost-changes'))).toEqual(lostChangesContent);
       await explorationEditorPage.discardLostChanges();
       await explorationEditorMainTab.expectContentToMatch(
         async function(richTextChecker) {
@@ -555,36 +529,9 @@ describe('Full exploration editor', function() {
 
       await users.login('user9@editor.com');
       await general.openEditor(explorationId, false);
-      var lostChangesContent = (
-        '<div class="oppia-lost-changes">' +
-        '<ul>' +
-        '<li>' +
-        '<div>' +
-        '<strong>' +
-        'Edits to state:' +
-        '</strong> ' + 'first card' +
-        ' <div>' +
-        '<strong>' +
-        'Edits to property:' +
-        '</strong> ' + 'content' +
-        ' </div>' +
-        '<div>' +
-        '<div class="state-edit-desc">' +
-        '<strong>Edited content: </strong>' +
-        '<div class="content">' + '<p>How are you feeling?</p>' +
-        '</div>' +
-        '</div>' +
-        '</div>' +
-        '</div>' +
-        '</li>' +
-        '</ul>' +
-        '</div>'
-      );
       await waitFor.visibilityOf(
         element(by.css('.modal-content')),
         'Lost Changes Modal taking too long to appear');
-      expect(await element(by.css(
-        '.protractor-test-oppia-lost-changes'))).toEqual(lostChangesContent);
       await explorationEditorPage.discardLostChanges();
       await explorationEditorMainTab.expectContentToMatch(
         async function(richTextChecker) {
