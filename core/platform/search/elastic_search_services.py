@@ -26,9 +26,8 @@ import python_utils
 
 import elasticsearch
 
-# This timeout is selected because 30 seconds results in reloading a
-# exploration and exp_services.load_demo() failing with a ReadTimeoutError
-# if the 30 seconds timeout isn't used.
+# A timeout of 30 seconds is needed to avoid calls to 
+# exp_services.load_demo() failing with a ReadTimeoutError.
 ES = elasticsearch.Elasticsearch(
     ('localhost:%s' % feconf.ES_LOCALHOST_PORT)
     if feconf.ES_CLOUD_ID is None else None,
