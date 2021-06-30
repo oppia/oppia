@@ -32,6 +32,7 @@ import feconf
 (story_models,) = models.Registry.import_models([models.NAMES.story])
 
 
+<<<<<<< HEAD
 class DescriptionLengthAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that audits and validates description length"""
 
@@ -48,6 +49,8 @@ class DescriptionLengthAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     def reduce(key, values):
         yield ('Topic Id: %s' % key, 'Story Id: %s' % values)
 
+=======
+>>>>>>> 9b0478905fc8037c23536546af7b6819a805d498
 class StoryMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """A reusable one-time job that may be used to migrate story schema
     versions. This job will load all existing story from the data store
@@ -110,6 +113,7 @@ class StoryMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 sum(ast.literal_eval(v) for v in values))])
         else:
             yield (key, values)
+<<<<<<< HEAD
 
 class RegenerateStorySummaryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job to regenerate story summaries."""
@@ -258,3 +262,5 @@ class UpdateStoryThumbnailSizeOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def reduce(key, values):
         yield (key, values)
+=======
+>>>>>>> 9b0478905fc8037c23536546af7b6819a805d498

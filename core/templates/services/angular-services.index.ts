@@ -116,7 +116,6 @@ import { SkillMasteryBackendApiService } from 'domain/skill/skill-mastery-backen
 import { SkillRightsBackendApiService } from 'domain/skill/skill-rights-backend-api.service';
 import { SkillUpdateService } from 'domain/skill/skill-update.service';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
-import { StateCardObjectFactory } from 'domain/state_card/StateCardObjectFactory';
 import { LearnerActionObjectFactory } from 'domain/statistics/LearnerActionObjectFactory';
 import { PlaythroughIssueObjectFactory } from 'domain/statistics/PlaythroughIssueObjectFactory';
 import { PlaythroughObjectFactory } from 'domain/statistics/PlaythroughObjectFactory';
@@ -246,7 +245,7 @@ import { ContentTranslationManagerService } from 'pages/exploration-player-page/
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { ExplorationEngineService } from 'pages/exploration-player-page/services/exploration-engine.service';
 import { ExplorationRecommendationsService } from 'pages/exploration-player-page/services/exploration-recommendations.service';
-import { ExtractImageFilenamesFromStateService } from 'pages/exploration-player-page/services/extract-image-filenames-from-state.service';
+import { ExtractImageFilenamesFromModelService } from 'pages/exploration-player-page/services/extract-image-filenames-from-model.service';
 import { FatigueDetectionService } from 'pages/exploration-player-page/services/fatigue-detection.service';
 import { HintsAndSolutionManagerService } from 'pages/exploration-player-page/services/hints-and-solution-manager.service';
 import { ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
@@ -260,7 +259,6 @@ import { PredictionAlgorithmRegistryService } from 'pages/exploration-player-pag
 import { QuestionPlayerEngineService } from 'pages/exploration-player-page/services/question-player-engine.service';
 import { StateClassifierMappingService } from 'pages/exploration-player-page/services/state-classifier-mapping.service';
 import { StatsReportingService } from 'pages/exploration-player-page/services/stats-reporting.service';
-import { NotificationsDashboardPageBackendApiService } from 'pages/notifications-dashboard-page/notifications-dashboard-page-backend-api.service';
 import { ProfilePageBackendApiService } from 'pages/profile-page/profile-page-backend-api.service';
 import { ReviewTestEngineService } from 'pages/review-test-page/review-test-engine.service';
 import { ReleaseCoordinatorBackendApiService } from 'pages/release-coordinator-page/services/release-coordinator-backend-api.service';
@@ -361,7 +359,10 @@ import { DeleteAccountBackendApiService } from 'pages/delete-account-page/servic
 import { CollectionLinearizerService } from 'pages/collection-editor-page/services/collection-linearizer.service';
 import { RefresherExplorationConfirmationModalService } from 'pages/exploration-player-page/services/refresher-exploration-confirmation-modal.service';
 import { ExplorationPlayerStateService } from 'pages/exploration-player-page/services/exploration-player-state.service';
+import { TopicEditorRoutingService } from 'pages/topic-editor-page/services/topic-editor-routing.service';
+import { SubtopicValidationService } from 'pages/topic-editor-page/services/subtopic-validation.service';
 import { NavigationService } from './navigation.service';
+import { TopicEditorStateService } from 'pages/topic-editor-page/services/topic-editor-state.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AdminBackendApiService', AdminBackendApiService],
@@ -480,8 +481,8 @@ export const angularServices: [string, Type<{}>][] = [
   ['ExtensionTagAssemblerService', ExtensionTagAssemblerService],
   ['ExternalRteSaveService', ExternalRteSaveService],
   ['ExternalSaveService', ExternalSaveService],
-  ['ExtractImageFilenamesFromStateService',
-    ExtractImageFilenamesFromStateService],
+  ['ExtractImageFilenamesFromModelService',
+    ExtractImageFilenamesFromModelService],
   ['EventBusService', EventBusService],
   ['FatigueDetectionService',
     FatigueDetectionService],
@@ -564,8 +565,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['NormalizeWhitespacePipe', NormalizeWhitespacePipe],
   ['NormalizeWhitespacePunctuationAndCasePipe',
     NormalizeWhitespacePunctuationAndCasePipe],
-  ['NotificationsDashboardPageBackendApiService',
-    NotificationsDashboardPageBackendApiService],
   ['NumberAttemptsService', NumberAttemptsService],
   ['NumberWithUnitsObjectFactory', NumberWithUnitsObjectFactory],
   ['NumberWithUnitsRulesService', NumberWithUnitsRulesService],
@@ -653,7 +652,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['SolutionVerificationService', SolutionVerificationService],
   ['SpeechSynthesisChunkerService', SpeechSynthesisChunkerService],
   ['StateCardIsCheckpointService', StateCardIsCheckpointService],
-  ['StateCardObjectFactory', StateCardObjectFactory],
   ['StateClassifierMappingService', StateClassifierMappingService],
   ['StateContentService', StateContentService],
   ['StateLinkedSkillIdService', StateLinkedSkillIdService],
@@ -695,6 +693,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['StoryViewerBackendApiService', StoryViewerBackendApiService],
   ['SubtitledUnicodeObjectFactory', SubtitledUnicodeObjectFactory],
   ['SubtopicViewerBackendApiService', SubtopicViewerBackendApiService],
+  ['SubtopicValidationService', SubtopicValidationService],
   ['SuggestionModalService', SuggestionModalService],
   ['SuggestionThreadObjectFactory', SuggestionThreadObjectFactory],
   ['SuggestionsService', SuggestionsService],
@@ -707,6 +706,8 @@ export const angularServices: [string, Type<{}>][] = [
   ['ThreadDataBackendApiService', ThreadDataBackendApiService],
   ['ThreadStatusDisplayService', ThreadStatusDisplayService],
   ['TopicCreationBackendApiService', TopicCreationBackendApiService],
+  ['TopicEditorRoutingService', TopicEditorRoutingService],
+  ['TopicEditorStateService', TopicEditorStateService],
   ['TopicObjectFactory', TopicObjectFactory],
   ['TopicRightsBackendApiService', TopicRightsBackendApiService],
   ['TopicViewerBackendApiService', TopicViewerBackendApiService],

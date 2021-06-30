@@ -239,6 +239,43 @@ describe('Exploration rights service', function() {
       sampleDataResultsCopy.rights.viewer_names);
   });
 
+  it('should save a new voice artist', function() {
+    ers.init(['abc'], [], [], [], 'public', '1234', true);
+    expect(ers.voiceArtistNames).toEqual([]);
+
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    $httpBackend.expect(
+      'POST', '/voice_artist_management_handler/exploration/12345').respond(
+      200, {});
+    ers.assignVoiceArtistRoleAsync('voiceArtist').then(
+      successHandler, failHandler);
+    $httpBackend.flush();
+    expect(ers.voiceArtistNames).toEqual(['voiceArtist']);
+  });
+
+  it('should remove existing voice artist', function() {
+    ers.init(['abc'], [], ['voiceArtist'], [], 'public', '1234', true);
+    expect(ers.voiceArtistNames).toEqual(['voiceArtist']);
+
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    $httpBackend.expectDELETE(
+      '/voice_artist_management_handler/exploration/12345' +
+      '?voice_artist=voiceArtist').respond(200, {});
+
+    ers.removeVoiceArtistRoleAsync('voiceArtist').then(
+      successHandler, failHandler);
+    $httpBackend.flush();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+
+    expect(ers.voiceArtistNames).toEqual([]);
+  });
+
   it('should check user already has roles', function() {
     var sampleDataResultsCopy = angular.copy(sampleDataResults);
     sampleDataResultsCopy.rights.owner_names.push('newOwner');
