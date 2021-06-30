@@ -13,71 +13,73 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the classroom.
+ * @fileoverview Component for the classroom page.
  */
 
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
+import { Component } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { AppConstants } from 'app.constants';
+import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
+import { ClassroomData } from 'domain/classroom/classroom-data.model';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { CapitalizePipe } from 'filters/string-utility-filters/capitalize.pipe';
+import { AlertsService } from 'services/alerts.service';
+import { UrlService } from 'services/contextual/url.service';
+import { LoaderService } from 'services/loader.service';
+import { PageTitleService } from 'services/page-title.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
 
-require('base-components/base-content.component.ts');
-require(
-  'components/common-layout-directives/common-elements/' +
-  'background-banner.component.ts');
-require('components/summary-tile/topic-summary-tile.directive.ts');
+@Component({
+  selector: 'oppia-classroom-page',
+  templateUrl: './classroom-page.component.html'
+})
+export class ClassroomPageComponent {
+  classroomDisplayName: string = '';
+  classroomUrlFragment: string = '';
+  bannerImageFileUrl: string = '';
+  classroomData: ClassroomData;
 
-require('filters/string-utility-filters/capitalize.filter.ts');
-require('pages/library-page/search-bar/search-bar.component.ts');
-require('services/alerts.service.ts');
-require('services/contextual/url.service.ts');
-require('services/contextual/window-dimensions.service.ts');
-require('services/page-title.service.ts');
-require('services/site-analytics.service.ts');
+  constructor(
+    private alertsService: AlertsService,
+    private capitalizePipe: CapitalizePipe,
+    private classroomBackendApiService: ClassroomBackendApiService,
+    private loaderService: LoaderService,
+    private pageTitleService: PageTitleService,
+    private siteAnalyticsService: SiteAnalyticsService,
+    private urlInterpolationService: UrlInterpolationService,
+    private urlService: UrlService,
+  ) {}
 
-angular.module('oppia').component('classroomPage', {
-  template: require('./classroom-page.component.html'),
-  controller: [
-    '$filter', '$rootScope', 'AlertsService', 'LoaderService',
-    'SiteAnalyticsService', 'UrlInterpolationService',
-    'UrlService', 'FATAL_ERROR_CODES',
-    function(
-        $filter, $rootScope, AlertsService, LoaderService,
-        SiteAnalyticsService, UrlInterpolationService,
-        UrlService, FATAL_ERROR_CODES) {
-      var ctrl = this;
+  ngOnInit(): void {
+    this.classroomUrlFragment = (
+      this.urlService.getClassroomUrlFragmentFromUrl());
+    this.bannerImageFileUrl = this.urlInterpolationService.getStaticImageUrl(
+      '/splash/books.svg');
 
-      ctrl.classroomBackendApiService = (
-        OppiaAngularRootComponent.classroomBackendApiService);
-      ctrl.pageTitleService = OppiaAngularRootComponent.pageTitleService;
+    this.loaderService.showLoadingScreen('Loading');
+    this.classroomBackendApiService.fetchClassroomDataAsync(
+      this.classroomUrlFragment).then((classroomData) => {
+      this.classroomData = classroomData;
+      this.classroomDisplayName = this.capitalizePipe.transform(
+        classroomData.getName());
+      this.pageTitleService.setPageTitle(
+        `Learn ${this.classroomDisplayName} with Oppia | Oppia`);
+      this.loaderService.hideLoadingScreen();
+      this.classroomBackendApiService.onInitializeTranslation.emit();
+      this.siteAnalyticsService.registerClassroomPageViewed();
+    }, (errorResponse) => {
+      if (AppConstants.FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
+        this.alertsService.addWarning('Failed to get dashboard data');
+      }
+    });
+  }
 
-      ctrl.getStaticImageUrl = function(imagePath) {
-        return UrlInterpolationService.getStaticImageUrl(imagePath);
-      };
+  getStaticImageUrl(imagePath: string): string {
+    return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  }
+}
 
-      ctrl.$onInit = function() {
-        ctrl.classroomDisplayName = null;
-        ctrl.classroomUrlFragment = (
-          UrlService.getClassroomUrlFragmentFromUrl());
-        ctrl.bannerImageFileUrl = UrlInterpolationService.getStaticImageUrl(
-          '/splash/books.svg');
-
-        LoaderService.showLoadingScreen('Loading');
-        ctrl.classroomBackendApiService.fetchClassroomDataAsync(
-          ctrl.classroomUrlFragment).then(function(classroomData) {
-          ctrl.classroomData = classroomData;
-          ctrl.classroomDisplayName = (
-            $filter('capitalize')(classroomData.getName()));
-          ctrl.pageTitleService.setPageTitle(
-            `Learn ${ctrl.classroomDisplayName} with Oppia | Oppia`);
-          LoaderService.hideLoadingScreen();
-          ctrl.classroomBackendApiService.onInitializeTranslation.emit();
-          SiteAnalyticsService.registerClassroomPageViewed();
-          $rootScope.$applyAsync();
-        }, function(errorResponse) {
-          if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
-            AlertsService.addWarning('Failed to get dashboard data');
-          }
-        });
-      };
-    }
-  ]
-});
+angular.module('oppia').directive('oppiaClassroomPage',
+  downgradeComponent({
+    component: ClassroomPageComponent
+  }) as angular.IDirectiveFactory);

@@ -13,85 +13,174 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for searchBar.
+ * @fileoverview Unit tests for Search bar.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { EventEmitter } from '@angular/core';
-
-import { ConstructTranslationIdsService } from
-  'services/construct-translation-ids.service';
+import { EventEmitter, Pipe } from '@angular/core';
+import { ComponentFixture, TestBed, waitForAsync}
+  from '@angular/core/testing';
+import { HttpClientTestingModule } from
+  '@angular/common/http/testing';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-// TODO(#7222): Remove usage of importAllAngularServices once upgraded to
-// Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { SearchBarComponent } from 'pages/library-page/search-bar/search-bar.component';
+import { WindowRef } from 'services/contextual/window-ref.service';
 import { NavigationService } from 'services/navigation.service';
+import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
+import { FormsModule } from '@angular/forms';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { TranslateService } from '@ngx-translate/core';
+import { SearchService, SelectionDetails } from 'services/search.service';
+import { ConstructTranslationIdsService } from 'services/construct-translation-ids.service';
+import { LanguageUtilService } from 'domain/utilities/language-util.service';
+import { UrlService } from 'services/contextual/url.service';
 
-var MockWindow = function() {
-  this.location = {
-    pathname: '',
-    href: ''
+
+@Pipe({name: 'truncate'})
+class MockTrunctePipe {
+  transform(value: string, params: Object | undefined): string {
+    return value;
+  }
+}
+
+class MockWindowRef {
+  nativeWindow = {
+    location: {
+      pathname: '/search/find',
+      href: '',
+      toString() {
+        return 'http://localhost/test_path';
+      }
+    },
+    history: {
+      pushState(data, title: string, url?: string | null) {}
+    }
   };
-};
+}
 
-describe('Search bar component', function() {
-  var ctrl = null;
-  var $httpBackend = null;
-  var $location = null;
-  var $scope = null;
-  var $rootScope = null;
-  var classroomBackendApiService = null;
-  var constructTranslationIdsService = null;
-  var i18nLanguageCodeService = null;
-  var navigationService = null;
-  var urlService = null;
+class MockTranslateService {
+  onLangChange: EventEmitter<string> = new EventEmitter();
 
-  var initTranslationEmitter = new EventEmitter();
-  var preferredLanguageCodesLoadedEmitter = new EventEmitter();
-  var mockWindow = null;
-  importAllAngularServices();
+  instant(key: string, interpolateParams?: Object): string {
+    return key;
+  }
+}
 
-  beforeEach(function() {
-    constructTranslationIdsService = TestBed.get(
-      ConstructTranslationIdsService);
-    i18nLanguageCodeService = TestBed.get(I18nLanguageCodeService);
-    navigationService = TestBed.get(NavigationService);
-  });
+class MockNavigationService {
+  KEYBOARD_EVENT_TO_KEY_CODES = {
+    enter: {
+      shiftKeyIsPressed: false,
+      keyCode: 13
+    },
+    tab: {
+      shiftKeyIsPressed: false,
+      keyCode: 9
+    },
+    shiftTab: {
+      shiftKeyIsPressed: true,
+      keyCode: 9
+    }
+  };
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    mockWindow = new MockWindow();
-    $provide.value('$window', mockWindow);
+  onMenuKeypress(): void {}
+
+  openSubmenu(evt: KeyboardEvent, menuName: string): void {}
+
+  ACTION_OPEN: string = 'open';
+  ACTION_CLOSE: string = 'close';
+}
+
+describe('Search bar component', () => {
+  let classroomBackendApiService: ClassroomBackendApiService;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
+  let navigationService: NavigationService;
+  let searchService: SearchService;
+  let translateService: TranslateService;
+  let languageUtilService: LanguageUtilService;
+  let constructTranslationIdsService: ConstructTranslationIdsService;
+  let windowRef: MockWindowRef;
+  let urlService: UrlService;
+  let component: SearchBarComponent;
+  let fixture: ComponentFixture<SearchBarComponent>;
+  let initTranslationEmitter = new EventEmitter();
+  let preferredLanguageCodesLoadedEmitter = new EventEmitter();
+  let selectionDetailsStub: SelectionDetails;
+
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [
+        HttpClientTestingModule,
+        FormsModule
+      ],
+      declarations: [
+        SearchBarComponent,
+        MockTranslatePipe,
+        MockTrunctePipe
+      ],
+      providers: [
+        {
+          provide: WindowRef,
+          useClass: MockWindowRef
+        },
+        {
+          provide: TranslateService,
+          useClass: MockTranslateService
+        },
+        {
+          provide: NavigationService,
+          useClass: MockNavigationService
+        }
+      ],
+    }).compileComponents();
   }));
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $httpBackend = $injector.get('$httpBackend');
-    $location = $injector.get('$location');
-    $rootScope = $injector.get('$rootScope');
-    classroomBackendApiService = $injector.get('ClassroomBackendApiService');
-    urlService = $injector.get('UrlService');
+  beforeEach(() => {
+    selectionDetailsStub = {
+      categories: {
+        description: 'description',
+        itemsName: 'categories',
+        masterList: [
+          {
+            id: 'id',
+            text: 'category 1'
+          },
+          {
+            id: 'id_2',
+            text: 'category 2'
+          },
+          {
+            id: 'id_3',
+            text: 'category 3'
+          }
+        ],
+        selections: { id: true, id_2: true, id_3: true },
+        numSelections: 0,
+        summary: 'all categories'
+      },
+      languageCodes: {
+        description: 'English',
+        itemsName: 'languages',
+        masterList: [
+          {
+            id: 'en',
+            text: 'English'
+          },
+          {
+            id: 'es',
+            text: 'Spanish'
+          }
+        ],
+        numSelections: 1,
+        selections: {en: true},
+        summary: 'English'
+      }
+    };
 
-    $scope = $rootScope.$new();
-    ctrl = $componentController('searchBar', {
-      $location: $location,
-      $rootScope: $rootScope,
-      $scope: $scope,
-      ConstructTranslationIdsService: constructTranslationIdsService,
-      I18nLanguageCodeService: i18nLanguageCodeService,
-      NavigationService: navigationService
-    });
-
-    // This approach was choosen because spyOn() doesn't work on properties
-    // that doesn't have a get access type.
-    // Without this approach the test will fail because it'll throw
-    // 'Property classroomBackendApiService does not have access type get'
-    // or 'Property classroomBackendApiService does not have access type set'
-    // error.
-    Object.defineProperty(ctrl, 'classroomBackendApiService', {
-      get: () => undefined,
-      set: () => {}
-    });
-    spyOnProperty(ctrl, 'classroomBackendApiService').and.returnValue(
-      classroomBackendApiService);
+    fixture = TestBed.createComponent(SearchBarComponent);
+    component = fixture.componentInstance;
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+    classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
+    navigationService = TestBed.inject(NavigationService);
+    windowRef = TestBed.inject(WindowRef);
     spyOnProperty(
       classroomBackendApiService,
       'onInitializeTranslation').and.returnValue(initTranslationEmitter);
@@ -99,167 +188,173 @@ describe('Search bar component', function() {
       i18nLanguageCodeService,
       'onPreferredLanguageCodesLoaded').and.returnValue(
       preferredLanguageCodesLoadedEmitter);
-    ctrl.$onInit();
-  }));
+    searchService = TestBed.inject(SearchService);
+    translateService = TestBed.inject(TranslateService);
+    constructTranslationIdsService = (
+      TestBed.inject(ConstructTranslationIdsService));
+    languageUtilService = TestBed.inject(LanguageUtilService);
+    urlService = TestBed.inject(UrlService);
 
-  afterEach(function() {
-    ctrl.$onDestroy();
+    component.ngOnInit();
+    fixture.detectChanges();
   });
 
-  it('should initialize controller properties after its initialization',
-    function() {
-      expect(Object.keys(ctrl.selectionDetails)).toContain('categories');
-      expect(Object.keys(ctrl.selectionDetails)).toContain('languageCodes');
-
-      expect(ctrl.translationData).toEqual({
-        categoriesCount: 0,
-        languagesCount: 0
-      });
-    });
-
-  it('should get placeholder and button text translation when translation' +
-    ' is initialized', function() {
-    initTranslationEmitter.emit();
-
-    expect(ctrl.searchBarPlaceholder).toBe('I18N_LIBRARY_SEARCH_PLACEHOLDER');
-    expect(ctrl.categoryButtonText).toBe('I18N_LIBRARY_ALL_CATEGORIES');
-    expect(ctrl.languageButtonText).toBe('I18N_LIBRARY_ALL_LANGUAGES');
+  it('should update selection details if selected languages' +
+  ' are greater than zero', () => {
+    expect(component.selectionDetails.languageCodes.description).toEqual(
+      'I18N_LIBRARY_ALL_LANGUAGES_SELECTED');
+    component.selectionDetails = selectionDetailsStub;
+    spyOn(translateService, 'instant').and.returnValue('English');
+    component.updateSelectionDetails('languageCodes');
+    expect(component.selectionDetails.languageCodes.description).toEqual(
+      'English');
   });
 
-  it('should search for all content in given languages', function() {
-    expect(ctrl.isSearchInProgress()).toBe(false);
-
-    mockWindow.location.pathname = '/search/find';
-    preferredLanguageCodesLoadedEmitter.emit(['en', 'es', 'hi']);
-    expect(ctrl.isSearchInProgress()).toBe(true);
-
-    expect(ctrl.translationData).toEqual({
-      categoriesCount: 0,
-      languagesCount: 3
-    });
-    expect($location.url()).toBe(
-      '/find?q=&language_code=(%22en%22%20OR%20%22es%22%20OR%20%22hi%22)');
-
-    preferredLanguageCodesLoadedEmitter.emit(['en']);
-
-    expect(ctrl.translationData).toEqual({
-      categoriesCount: 0,
-      languagesCount: 2
-    });
-    expect($location.url()).toBe(
-      '/find?q=&language_code=(%22es%22%20OR%20%22hi%22)');
+  it('should update selection details if there are no selections', () => {
+    spyOn(translateService, 'instant').and.returnValue('key');
+    component.updateSelectionDetails('categories');
+    expect(component.selectionDetails.categories.numSelections).toEqual(0);
   });
 
-  it('should filter and search content by categories, language and text when' +
-    'changing language code', function() {
-    var getUrlParamsSpy = spyOn(urlService, 'getUrlParams');
+  it ('should search', () => {
+    component.classroomPageIsActive = true;
+    const search = {
+      target: {
+        value: 'search'
+      }
+    };
+    expect(component.searchToBeExec(search)).toBeNull();
 
-    $httpBackend.expectGET(
-      '/searchhandler/data?q=%22mars%22&' +
-      'category=("astronomy")&language_code=("pt")').respond({});
-    getUrlParamsSpy.and.returnValue({q: 'mars'});
-    mockWindow.location.pathname = '/search/find';
-    mockWindow.location.search = (
-      '?q=%22mars%22&language_code=(%22pt%22)&category=(%22astronomy%22)');
-    preferredLanguageCodesLoadedEmitter.emit([]);
-
-    expect($location.url()).toBe(
-      '/find?q=%22mars%22&category=(%22astronomy%22)&' +
-      'language_code=(%22pt%22)');
-
-    $httpBackend.expectGET(
-      '/searchhandler/data?q=%22sun%22&category=("astronomy")&' +
-      'language_code=("es")').respond({});
-    mockWindow.location.pathname = '';
-    mockWindow.location.search = (
-      '?q=%22sun%22&language_code=(%22es%22)&category=(%22astronomy%22)');
-    getUrlParamsSpy.and.returnValue({q: 'sun'});
-    preferredLanguageCodesLoadedEmitter.emit([]);
-    $scope.$digest();
-
-    expect(mockWindow.location.href).toBe(
-      '/search/find?q=%22sun%22&category=("astronomy")&language_code=("es")');
+    spyOn(component.searchQueryChanged, 'next');
+    component.classroomPageIsActive = false;
+    component.searchToBeExec(search);
+    expect(component.searchQueryChanged.next).toHaveBeenCalled();
   });
 
-  it('should filter and search content by categories, language and text' +
-    ' when url location changes', function() {
-    var getUrlParamsSpy = spyOn(urlService, 'getUrlParams');
-
-    $httpBackend.expectGET(
-      '/searchhandler/data?q=%22mars%22&' +
-      'category=("astronomy")&language_code=("pt")').respond({});
-    getUrlParamsSpy.and.returnValue({q: 'mars'});
-    mockWindow.location.pathname = '/search/find';
-    mockWindow.location.search = (
-      '?q=%22mars%22&language_code=(%22pt%22)&category=(%22astronomy%22)');
-    preferredLanguageCodesLoadedEmitter.emit([]);
-
-    expect($location.url()).toBe(
-      '/find?q=%22mars%22&category=(%22astronomy%22)&' +
-        'language_code=(%22pt%22)');
-
-    $httpBackend.expectGET(
-      '/searchhandler/data?q=%22sun%22&category=("astronomy")&' +
-      'language_code=("es")').respond({});
-    mockWindow.location.pathname = '';
-    mockWindow.location.search = (
-      '?q=%22sun%22&language_code=(%22es%22)&category=(%22astronomy%22)');
-    getUrlParamsSpy.and.returnValue({q: 'sun'});
-    $rootScope.$broadcast('$locationChangeSuccess');
-    $scope.$digest();
-
-    expect(mockWindow.location.href).toBe(
-      '/search/find?q=%22sun%22&category=("astronomy")&language_code=("es")');
+  it ('should open submenu', () => {
+    spyOn(navigationService, 'openSubmenu');
+    component.openSubmenu(null, null);
+    expect(navigationService.openSubmenu).toHaveBeenCalled();
   });
 
-  it('should toggle select languages when searching content', function() {
-    preferredLanguageCodesLoadedEmitter.emit(['en', 'es', 'hi']);
-
-    expect(ctrl.translationData).toEqual({
-      categoriesCount: 0,
-      languagesCount: 3
-    });
-
-    ctrl.toggleSelection('languageCodes', 'en');
-
-    expect(ctrl.translationData).toEqual({
-      categoriesCount: 0,
-      languagesCount: 2
-    });
-
-    ctrl.toggleSelection('languageCodes', 'pt');
-
-    expect(ctrl.translationData).toEqual({
-      categoriesCount: 0,
-      languagesCount: 3
-    });
-  });
-
-  it('should deselect all selected languages at once', function() {
-    preferredLanguageCodesLoadedEmitter.emit(['en', 'es', 'hi']);
-
-    expect(ctrl.translationData).toEqual({
-      categoriesCount: 0,
-      languagesCount: 3
-    });
-
-    ctrl.deselectAll('languageCodes');
-
-    expect(ctrl.translationData).toEqual({
-      categoriesCount: 0,
-      languagesCount: 0
-    });
-  });
-
-  it('should open submenu and key down an action when clicking on language or' +
-    ' category button', function() {
+  it('should handle menu keypress', () => {
     spyOn(navigationService, 'onMenuKeypress');
-    var event = new Event('click');
-    ctrl.openSubmenu(event, 'menuName');
-    ctrl.onMenuKeypress(event, 'menuName', {enter: 'open'});
+    let activeMenuName = 'test_menu';
+    navigationService.activeMenuName = activeMenuName;
+    component.onMenuKeypress(null, null, null);
+    expect(component.activeMenuName).toEqual(activeMenuName);
+  });
 
-    expect(navigationService.onMenuKeypress)
-      .toHaveBeenCalledWith(event, 'menuName', {enter: 'open'});
-    expect(ctrl.activeMenuName).toBe('menuName');
+  it('should toggle selection', () => {
+    spyOn(component, 'updateSelectionDetails');
+    spyOn(component, 'onSearchQueryChangeExec');
+    component.toggleSelection('categories', 'id_1');
+    component.toggleSelection('categories', 'id_1');
+    expect(component.updateSelectionDetails).toHaveBeenCalled();
+    expect(component.onSearchQueryChangeExec).toHaveBeenCalled();
+  });
+
+  it('should deselectAll', () => {
+    spyOn(component, 'updateSelectionDetails');
+    spyOn(component, 'onSearchQueryChangeExec');
+    component.deselectAll('categories');
+    expect(component.selectionDetails.categories.selections).toEqual({});
+    expect(component.updateSelectionDetails).toHaveBeenCalled();
+    expect(component.onSearchQueryChangeExec).toHaveBeenCalled();
+  });
+
+  it('should handle search query change', () => {
+    spyOn(searchService, 'executeSearchQuery').and.callFake(
+      (
+          searchQuery: string, categorySelections: object,
+          languageCodeSelections: object, callb: () => void) => {
+        callb();
+      });
+    spyOn(searchService, 'getSearchUrlQueryString').and.returnValue(
+      'search_query');
+    spyOn(windowRef.nativeWindow.history, 'pushState');
+    windowRef.nativeWindow.location = new URL('http://localhost/search/find');
+
+    component.onSearchQueryChangeExec();
+
+    expect(windowRef.nativeWindow.history.pushState).toHaveBeenCalled();
+    windowRef.nativeWindow.location = new URL('http://localhost/not/search/find');
+    component.onSearchQueryChangeExec();
+    expect(windowRef.nativeWindow.location.href).toEqual(
+      '/search/find?q=search_query');
+  });
+
+  it('should update search fields based on url query', () => {
+    spyOn(component, 'updateSelectionDetails');
+    spyOn(component, 'onSearchQueryChangeExec');
+    spyOn(searchService, 'updateSearchFieldsBasedOnUrlQuery')
+      .and.returnValue('test_query');
+    component.updateSearchFieldsBasedOnUrlQuery();
+    expect(component.updateSelectionDetails).toHaveBeenCalled();
+    expect(component.onSearchQueryChangeExec).toHaveBeenCalled();
+  });
+
+  it('should refresh search bar labels', () => {
+    let testLabel = 'test_label';
+    spyOn(translateService, 'instant').and.returnValue(testLabel);
+    component.refreshSearchBarLabels();
+    expect(component.searchBarPlaceholder).toEqual(testLabel);
+    expect(component.categoryButtonText).toEqual(testLabel);
+    expect(component.languageButtonText).toEqual(testLabel);
+  });
+
+  it('should search dropdown categories', () => {
+    spyOn(constructTranslationIdsService, 'getLibraryId');
+    expect(component.searchDropdownCategories()).toBeDefined();
+  });
+
+  it('should initialize', () => {
+    spyOn(component, 'searchDropdownCategories').and.returnValue([]);
+    spyOn(languageUtilService, 'getLanguageIdsAndTexts').and.returnValue([]);
+    spyOn(component, 'updateSelectionDetails');
+    spyOn(component, 'refreshSearchBarLabels');
+    spyOn(component, 'onSearchQueryChangeExec');
+    spyOn(component, 'updateSearchFieldsBasedOnUrlQuery');
+    spyOn(searchService.onSearchBarLoaded, 'emit');
+    spyOn(i18nLanguageCodeService.onPreferredLanguageCodesLoaded, 'subscribe')
+      .and.callFake((callb) => {
+        callb(['en', 'es']);
+        callb(['en', 'es']);
+        return null;
+      });
+    spyOn(translateService.onLangChange, 'subscribe').and.callFake((callb) => {
+      callb();
+      return null;
+    });
+    spyOn(classroomBackendApiService.onInitializeTranslation, 'subscribe')
+      .and.callFake((callb) => {
+        callb();
+        return null;
+      });
+    spyOn(urlService, 'getUrlParams').and.returnValue({ q: '' });
+    component.searchQueryChanged.next();
+    component.ngOnInit();
+    expect(component.searchDropdownCategories).toHaveBeenCalled();
+    expect(languageUtilService.getLanguageIdsAndTexts).toHaveBeenCalled();
+    expect(component.updateSelectionDetails).toHaveBeenCalled();
+    expect(component.refreshSearchBarLabels).toHaveBeenCalled();
+    expect(component.onSearchQueryChangeExec).toHaveBeenCalled();
+    expect(component.updateSearchFieldsBasedOnUrlQuery).toHaveBeenCalled();
+    expect(searchService.onSearchBarLoaded.emit).toHaveBeenCalled();
+    expect(i18nLanguageCodeService.onPreferredLanguageCodesLoaded.subscribe)
+      .toHaveBeenCalled();
+    expect(translateService.onLangChange.subscribe).toHaveBeenCalled();
+    expect(classroomBackendApiService.onInitializeTranslation.subscribe)
+      .toHaveBeenCalled();
+    expect(urlService.getUrlParams).toHaveBeenCalled();
+  });
+
+  it('should tell searching status', () => {
+    spyOn(searchService, 'isSearchInProgress').and.returnValue(false);
+    expect(component.isSearchInProgress()).toBeFalse();
+  });
+
+  it('should open sub menu', () => {
+    component.openSubmenu(null, null);
   });
 });

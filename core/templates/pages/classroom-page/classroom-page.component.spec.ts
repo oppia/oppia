@@ -16,158 +16,141 @@
  * @fileoverview Unit tests for classroom page component.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-import { Subscription } from 'rxjs';
-
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 import { ClassroomData } from 'domain/classroom/classroom-data.model';
-// ^^^ This block is to be removed.
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { CapitalizePipe } from 'filters/string-utility-filters/capitalize.pipe';
+import { AlertsService } from 'services/alerts.service';
+import { UrlService } from 'services/contextual/url.service';
+import { LoaderService } from 'services/loader.service';
+import { PageTitleService } from 'services/page-title.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { ClassroomPageComponent } from './classroom-page.component';
 
-require('pages/classroom-page/classroom-page.component.ts');
+class MockCapitalizePipe {
+  transform(input: string): string {
+    return input;
+  }
+}
 
-describe('Classroom page', () => {
-  var ctrl = null;
-  var $q = null;
-  var $rootScope = null;
 
-  var AlertsService = null;
-  var ClassroomBackendApiService = null;
-  var LoaderService = null;
-  var PageTitleService = null;
-  var UrlService = null;
+describe('Classroom Page Component', () => {
+  let component: ClassroomPageComponent;
+  let fixture: ComponentFixture<ClassroomPageComponent>;
+  let urlInterpolationService: UrlInterpolationService;
+  let urlService: UrlService;
+  let loaderService: LoaderService;
+  let classroomBackendApiService: ClassroomBackendApiService;
+  let pageTitleService: PageTitleService;
+  let siteAnalyticsService: SiteAnalyticsService;
+  let alertsService: AlertsService;
 
-  var loadingMessage = null;
-  var subscriptions = [];
-  var testSubscriptions = null;
-
-  const translationInitializedSpy = jasmine.createSpy('topicInitialized');
-  var classroomData = {};
-
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $q = $injector.get('$q');
-    $rootScope = $injector.get('$rootScope');
-
-    AlertsService = $injector.get('AlertsService');
-    ClassroomBackendApiService = $injector.get('ClassroomBackendApiService');
-    LoaderService = $injector.get('LoaderService');
-    PageTitleService = $injector.get('PageTitleService');
-    UrlService = $injector.get('UrlService');
-
-    subscriptions.push(LoaderService.onLoadingMessageChange.subscribe(
-      (message: string) => loadingMessage = message
-    ));
-
-    ctrl = $componentController('classroomPage', {
-      $rootScope: $rootScope
-    });
-
-    // This approach was choosen because spyOn() doesn't work on properties
-    // that doesn't have a get access type.
-    // Without this approach the test will fail because it'll throw
-    // 'Property classroomBackendApiService does not have access type get'
-    // or 'Property classroomBackendApiService does not have access type set'
-    // error.
-    Object.defineProperty(ctrl, 'classroomBackendApiService', {
-      get: () => undefined,
-      set: () => {}
-    });
-    Object.defineProperty(ctrl, 'pageTitleService', {
-      get: () => undefined,
-      set: () => {}
-    });
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [
+        HttpClientTestingModule
+      ],
+      declarations: [
+        ClassroomPageComponent,
+        MockTranslatePipe
+      ],
+      providers: [
+        AlertsService,
+        {
+          provide: CapitalizePipe,
+          useClass: MockCapitalizePipe
+        },
+        ClassroomBackendApiService,
+        LoaderService,
+        PageTitleService,
+        SiteAnalyticsService,
+        UrlInterpolationService,
+        UrlService,
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
 
   beforeEach(() => {
-    testSubscriptions = new Subscription();
-    testSubscriptions.add(
-      ClassroomBackendApiService.onInitializeTranslation.subscribe(
-        translationInitializedSpy));
+    fixture = TestBed.createComponent(ClassroomPageComponent);
+    component = fixture.componentInstance;
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
+    urlService = TestBed.inject(UrlService);
+    loaderService = TestBed.inject(LoaderService);
+    classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
+    pageTitleService = TestBed.inject(PageTitleService);
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
+    alertsService = TestBed.inject(AlertsService);
   });
 
-  afterEach(() => {
-    testSubscriptions.unsubscribe();
+  it('should create', () => {
+    expect(component).toBeDefined();
   });
 
-  afterEach(function() {
-    for (let subscription of subscriptions) {
-      subscription.unsubscribe();
-    }
+  it('should provide static image url', () => {
+    let imageUrl = 'image_url';
+    spyOn(urlInterpolationService, 'getStaticImageUrl')
+      .and.returnValue(imageUrl);
+    expect(component.getStaticImageUrl('test')).toEqual(imageUrl);
   });
 
-  it('should get static image url', function() {
-    var imagePath = '/path/to/image.png';
-    expect(ctrl.getStaticImageUrl(imagePath)).toBe(
-      '/assets/images/path/to/image.png');
-  });
+  it('should initialize', fakeAsync(() => {
+    let classroomUrlFragment = 'test_fragment';
+    let bannerImageUrl = 'banner_image_url';
+    spyOn(urlService, 'getClassroomUrlFragmentFromUrl')
+      .and.returnValue(classroomUrlFragment);
+    spyOn(urlInterpolationService, 'getStaticImageUrl')
+      .and.returnValue(bannerImageUrl);
+    spyOn(loaderService, 'showLoadingScreen');
+    spyOn(pageTitleService, 'setPageTitle');
+    spyOn(loaderService, 'hideLoadingScreen');
+    spyOn(classroomBackendApiService.onInitializeTranslation, 'emit');
+    spyOn(siteAnalyticsService, 'registerClassroomPageViewed');
+    let classroomData = ClassroomData.createFromBackendData(
+      'Math', [], 'Course details', 'Topics covered');
+    spyOn(classroomBackendApiService, 'fetchClassroomDataAsync')
+      .and.returnValue(Promise.resolve(classroomData));
 
-  describe('when fetching dashboard data successfully', function() {
-    beforeEach(function() {
-      spyOnProperty(ctrl, 'classroomBackendApiService').and.returnValue(
-        ClassroomBackendApiService);
-      classroomData = ClassroomData.createFromBackendData(
-        'Math', [], 'Course details', 'Topics covered'
-      );
-      spyOn(
-        ClassroomBackendApiService,
-        'fetchClassroomDataAsync').and.returnValue($q.resolve(classroomData));
-      spyOnProperty(ctrl, 'pageTitleService').and.returnValue(PageTitleService);
-      spyOn(PageTitleService, 'setPageTitle').and.callThrough();
-      spyOn(UrlService, 'getClassroomUrlFragmentFromUrl').and.returnValue(
-        'mock');
-    });
+    component.ngOnInit();
+    tick();
+    expect(component.classroomUrlFragment).toEqual(classroomUrlFragment);
+    expect(component.bannerImageFileUrl).toEqual(bannerImageUrl);
+    expect(loaderService.showLoadingScreen).toHaveBeenCalled();
+    expect(classroomBackendApiService.fetchClassroomDataAsync)
+      .toHaveBeenCalled();
+    expect(component.classroomData).toEqual(classroomData);
+    expect(component.classroomDisplayName).toEqual(classroomData.getName());
+    expect(pageTitleService.setPageTitle).toHaveBeenCalled();
+    expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
+    expect(classroomBackendApiService.onInitializeTranslation.emit)
+      .toHaveBeenCalled();
+    expect(siteAnalyticsService.registerClassroomPageViewed).toHaveBeenCalled();
+  }));
 
-    it('should evaluate data get from backend, set page title and init' +
-      ' translation', function() {
-      ctrl.$onInit();
-      expect(loadingMessage).toBe('Loading');
-
-      $rootScope.$apply();
-
-      expect(loadingMessage).toBe('');
-      expect(ctrl.bannerImageFileUrl).toBe('/assets/images/splash/books.svg');
-      expect(ctrl.classroomDisplayName).toBe('Math');
-
-      expect(PageTitleService.setPageTitle).toHaveBeenCalledWith(
-        'Learn Math with Oppia | Oppia');
-
-      expect(translationInitializedSpy).toHaveBeenCalled();
-      expect(ctrl.classroomData.getName()).toEqual('Math');
-    });
-  });
-
-  describe('when fetching dashboard data fails', function() {
-    beforeEach(function() {
-      spyOnProperty(ctrl, 'classroomBackendApiService').and.returnValue(
-        ClassroomBackendApiService);
-      spyOn(
-        ClassroomBackendApiService,
-        'fetchClassroomDataAsync').and.returnValue(
-        $q.reject({
-          status: 404
-        }));
-      spyOn(AlertsService, 'addWarning').and.callThrough();
-      spyOn(UrlService, 'getClassroomUrlFragmentFromUrl').and.returnValue(
-        'mock');
-    });
-
-    it('should use reject handler', function() {
-      ctrl.$onInit();
-      expect(loadingMessage).toBe('Loading');
-
-      $rootScope.$apply();
-
-      expect(loadingMessage).toBe('Loading');
-      expect(AlertsService.addWarning).toHaveBeenCalledWith(
+  it('should display alert when unable to fetch classroom data',
+    fakeAsync(() => {
+      let classroomUrlFragment = 'test_fragment';
+      let bannerImageUrl = 'banner_image_url';
+      spyOn(urlService, 'getClassroomUrlFragmentFromUrl')
+        .and.returnValue(classroomUrlFragment);
+      spyOn(urlInterpolationService, 'getStaticImageUrl')
+        .and.returnValue(bannerImageUrl);
+      spyOn(loaderService, 'showLoadingScreen');
+      spyOn(classroomBackendApiService, 'fetchClassroomDataAsync')
+        .and.returnValue(Promise.reject({ status: 500 }));
+      spyOn(alertsService, 'addWarning');
+      component.ngOnInit();
+      tick();
+      expect(component.classroomUrlFragment).toEqual(classroomUrlFragment);
+      expect(component.bannerImageFileUrl).toEqual(bannerImageUrl);
+      expect(loaderService.showLoadingScreen).toHaveBeenCalled();
+      expect(classroomBackendApiService.fetchClassroomDataAsync)
+        .toHaveBeenCalled();
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
         'Failed to get dashboard data');
-      expect(ctrl.classroomData).toBeUndefined();
-    });
-  });
+    }));
 });
