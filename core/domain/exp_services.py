@@ -618,7 +618,7 @@ def apply_change_list(exploration_id, change_list, frontend_version):
                             state_names_of_renamed_states[change.state_name])
                         new_state_name = (
                             state_names_of_renamed_states[change.state_name])
-                    if change.state_name in old_to_new_state_names:
+                    if old_state_name in old_to_new_state_names:
                         new_state_name = old_to_new_state_names[old_state_name]
                     state = exploration.states[new_state_name]
                     if (change.property_name ==
@@ -736,7 +736,7 @@ def apply_change_list(exploration_id, change_list, frontend_version):
                             state_names_of_renamed_states[change.state_name])
                         new_state_name = (
                             state_names_of_renamed_states[change.state_name])
-                    if change.state_name in old_to_new_state_names:
+                    if old_state_name in old_to_new_state_names:
                         new_state_name = (
                             old_to_new_state_names[old_state_name])
                     exploration.states[new_state_name].add_written_translation(
@@ -752,7 +752,7 @@ def apply_change_list(exploration_id, change_list, frontend_version):
                             state_names_of_renamed_states[change.state_name])
                         new_state_name = (
                             state_names_of_renamed_states[change.state_name])
-                    if change.state_name in old_to_new_state_names:
+                    if old_state_name in old_to_new_state_names:
                         new_state_name = old_to_new_state_names[old_state_name]
                     exploration.states[
                         new_state_name
@@ -2196,7 +2196,7 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
                         state_names_of_renamed_states[change.state_name])
                     new_state_name = (
                         state_names_of_renamed_states[change.state_name])
-                if change.state_name in old_to_new_state_names:
+                if old_state_name in old_to_new_state_names:
                     new_state_name = old_to_new_state_names[old_state_name]
                 if old_state_name not in changed_translations:
                     changed_translations[old_state_name] = []
@@ -2352,7 +2352,7 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
                         state_names_of_renamed_states[change.state_name])
                     new_state_name = (
                         state_names_of_renamed_states[change.state_name])
-                if change.state_name in old_to_new_state_names:
+                if old_state_name in old_to_new_state_names:
                     new_state_name = old_to_new_state_names[old_state_name]
                 if old_state_name not in changed_translations:
                     changed_translations[old_state_name] = []
