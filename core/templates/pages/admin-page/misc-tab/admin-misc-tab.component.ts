@@ -35,7 +35,6 @@ export class AdminMiscTabComponent {
   irreversibleActionMessage: string = (
     'This action is irreversible. Are you sure?');
   MAX_USERNAME_LENGTH: number = AppConstants.MAX_USERNAME_LENGTH;
-  regenerationMessage: string;
   showDataExtractionQueryStatus: boolean;
   dataExtractionQueryStatusMessage: string;
   oldUsername: string;
@@ -85,14 +84,14 @@ export class AdminMiscTabComponent {
     if (!this.windowRef.nativeWindow.confirm(this.irreversibleActionMessage)) {
       return;
     }
-    this.regenerationMessage = 'Regenerating opportunities...';
+    this.setStatusMessage.emit('Regenerating opportunities...');
     this.adminBackendApiService.regenerateOpportunitiesRelatedToTopicAsync(
       this.topicIdForRegeneratingOpportunities).then(response => {
-      this.regenerationMessage = (
+      this.setStatusMessage.emit(
         'No. of opportunities model created: ' +
         response);
     }, errorResponse => {
-      this.regenerationMessage = ('Server error: ' + errorResponse);
+      this.setStatusMessage.emit('Server error: ' + errorResponse);
     });
   }
 
