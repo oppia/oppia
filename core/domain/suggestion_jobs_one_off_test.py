@@ -486,7 +486,7 @@ class PopulateTranslationContributionStatsOneOffJobTests(
             'skill_id': skill_id,
             'skill_difficulty': 0.3
         }
-        suggestion = suggestion_services.create_suggestion(
+        suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_ADD_QUESTION,
             feconf.ENTITY_TYPE_SKILL, skill_id, 1,
             self.author_id, suggestion_change, 'test description')
