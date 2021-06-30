@@ -41,8 +41,6 @@ import feconf
 import python_utils
 import utils
 
-ASSET_TYPE_THUMBNAIL = 'thumbnail'
-
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
 datastore_services = models.Registry.import_datastore_services()
 
