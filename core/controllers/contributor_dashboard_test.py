@@ -563,7 +563,7 @@ class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
                 'content_ids': '["content"]',
             }, expected_status_int=400)
 
-        error_msg = ('Missing key in handler args: target_language_code.')
+        error_msg = 'Missing key in handler args: target_language_code.'
         self.assertEqual(
             output['error'], error_msg)
 
@@ -584,7 +584,7 @@ class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
                 'target_language_code': 'es'
             }, expected_status_int=400)
 
-        error_msg = ('Missing key in handler args: exp_id.')
+        error_msg = 'Missing key in handler args: exp_id.'
         self.assertEqual(
             output['error'], error_msg)
 
@@ -605,7 +605,7 @@ class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
                 'target_language_code': 'es'
             }, expected_status_int=400)
 
-        error_msg = ('Missing key in handler args: state_name.')
+        error_msg = 'Missing key in handler args: state_name.'
         self.assertEqual(
             output['error'], error_msg)
 
@@ -674,7 +674,7 @@ class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
             }, expected_status_int=400
         )
 
-        error_msg = ('Missing key in handler args: content_ids.')
+        error_msg = 'Missing key in handler args: content_ids.'
         self.assertEqual(
             output['error'], error_msg)
 

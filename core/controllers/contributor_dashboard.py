@@ -79,6 +79,7 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
         if not config_domain.CONTRIBUTOR_DASHBOARD_IS_ENABLED.value:
             raise self.PageNotFoundException
         search_cursor = self.normalized_request.get('cursor')
+        language_code = self.normalized_request.get('language_code')
 
         if opportunity_type == constants.OPPORTUNITY_TYPE_SKILL:
             opportunities, next_cursor, more = (
@@ -86,18 +87,14 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
                     search_cursor))
 
         elif opportunity_type == constants.OPPORTUNITY_TYPE_TRANSLATION:
-            language_code = self.normalized_request.get('language_code')
-            if language_code is None or not (
-                    utils.is_supported_audio_language_code(language_code)):
+            if language_code is None:
                 raise self.InvalidInputException
             opportunities, next_cursor, more = (
                 self._get_translation_opportunity_dicts(
                     language_code, search_cursor))
 
         elif opportunity_type == constants.OPPORTUNITY_TYPE_VOICEOVER:
-            language_code = self.normalized_request.get('language_code')
-            if language_code is None or not (
-                    utils.is_supported_audio_language_code(language_code)):
+            if language_code is None:
                 raise self.InvalidInputException
             opportunities, next_cursor, more = (
                 self._get_voiceover_opportunity_dicts(
@@ -222,7 +219,7 @@ class TranslatableTextHandler(base.BaseHandler):
         'GET': {
             'language_code': {
                 'type': 'basestring',
-                'valiadtors': [{
+                'validators': [{
                     'id': 'is_supported_audio_language_code'
                 }]
             },
@@ -237,10 +234,6 @@ class TranslatableTextHandler(base.BaseHandler):
         """Handles GET requests."""
         language_code = self.normalized_request.get('language_code')
         exp_id = self.normalized_request.get('exp_id')
-
-        if not utils.is_supported_audio_language_code(language_code):
-            raise self.InvalidInputException('Invalid language_code: %s' % (
-                language_code))
 
         if not opportunity_services.is_exploration_available_for_contribution(
                 exp_id):
