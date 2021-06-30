@@ -26,7 +26,7 @@ import python_utils
 
 import elasticsearch
 
-# A timeout of 30 seconds is needed to avoid calls to 
+# A timeout of 30 seconds is needed to avoid calls to
 # exp_services.load_demo() failing with a ReadTimeoutError.
 ES = elasticsearch.Elasticsearch(
     ('localhost:%s' % feconf.ES_LOCALHOST_PORT)
