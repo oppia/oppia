@@ -26,9 +26,9 @@ import 'third-party-imports/ui-codemirror.import';
 import 'third-party-imports/ui-tree.import';
 
 angular.module('oppia', [
-  require('angular-cookies'), 'dndLists', 'headroom', 'ngAnimate',
+  require('angular-cookies'), 'dndLists', 'ngAnimate',
   'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree',
+  'ui.bootstrap', 'ui.sortable', 'ui.tree',
   uiValidate
 ]);
 

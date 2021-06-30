@@ -18,14 +18,13 @@
 
 import 'angular-ui-sortable';
 import uiValidate from 'angular-ui-validate';
-import 'third-party-imports/ng-audio.import';
 import 'third-party-imports/ng-joy-ride.import';
 import 'third-party-imports/ui-tree.import';
 
 declare var angular: ng.IAngularStatic;
 
 angular.module('oppia', [
-  require('angular-cookies'), 'ngAnimate', 'ngAudio', 'ngJoyRide',
+  require('angular-cookies'), 'ngAnimate', 'ngJoyRide',
   'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', uiValidate
+  'ui.bootstrap', 'ui.sortable', 'ui.tree', uiValidate
 ]);

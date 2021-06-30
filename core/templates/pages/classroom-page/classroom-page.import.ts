@@ -20,9 +20,9 @@ import 'core-js/es7/reflect';
 import 'zone.js';
 
 angular.module('oppia', [
-  require('angular-cookies'), 'headroom', 'ngAnimate',
+  require('angular-cookies'), 'ngAnimate',
   'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap'
+  'ui.bootstrap'
 ]);
 
 require('Polyfills.ts');

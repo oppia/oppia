@@ -24,17 +24,15 @@ import 'angular-ui-sortable';
 import uiValidate from 'angular-ui-validate';
 import 'third-party-imports/guppy.import';
 import 'third-party-imports/midi-js.import';
-import 'third-party-imports/ng-audio.import';
 import 'third-party-imports/ng-joy-ride.import';
 import 'third-party-imports/skulpt.import';
 import 'third-party-imports/ui-tree.import';
 
 angular.module('oppia', [
-  require('angular-cookies'), 'headroom', 'ngAnimate',
-  'ngAudio', 'ngJoyRide', 'ngMaterial',
+  require('angular-cookies'), 'ngAnimate',
+  'ngJoyRide', 'ngMaterial',
   'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap', 'ui-leaflet',
-  'ui.sortable', 'ui.tree', uiValidate,
+  'ui.bootstrap', 'ui-leaflet', 'ui.sortable', 'ui.tree', uiValidate,
 ]);
 
 require('Polyfills.ts');
