@@ -23,15 +23,17 @@
  * the view, it will also create a node with the selector we have specified.
  * Usually, this has no effect as there is no element in the web-browser
  * registered by the selector. But in our case, we did it to show rte components
- * in the ck-editor view. In order to overcome this situation, ck-editor uses
- * the same component but we register it with a different selector. The selector
- * prefix is now oppia-noninteractive-ckeditor-* instead of oppia-noninteractive
- * we have for the angular counterpart. This just an internal representation and
- * the value emitted to the parent component doesn't have
- * oppia-noninteractive-ckeditor-* tags, They have the normal
- * oppia-noninteractive tags in them. Similarly, for the value that's passed in,
- * we don't expect oppia-noninteractive-ckeditor-* tags. We expect the normal
- * angular version of our tags and that is converted on the fly.
+ * in the ck-editor view.
+ *
+ * In order to overcome this situation, ck-editor uses the same component but we
+ * register it with a different selector. The selector prefix is now
+ * oppia-noninteractive-ckeditor-* instead of oppia-noninteractive we have for
+ * the angular counterpart. This just an internal representation and the value
+ * emitted to the parent component doesn't have oppia-noninteractive-ckeditor-*
+ * tags, They have the normal oppia-noninteractive tags in them. Similarly, for
+ * the value that's passed in, we don't expect oppia-noninteractive-ckeditor-*
+ * tags. We expect the normal angular version of our tags and that is converted
+ * on the fly.
  */
 
 import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnDestroy, Output } from '@angular/core';

@@ -172,7 +172,7 @@ angular.module('oppia').directive('oppiaRteOutputDisplay', downgradeComponent({
  * interpolation is a very safe operation in angular and these values are
  * changed to show the characters &nbsp; (they actually show &#160, the machine
  * code for &nbsp;) instead of whitespace. In order to get around this, the
- * directive is used instead of `{{}}` and `[innerHTML]`. This is a very safe
+ * directive is used instead of `{{}}` and `[innerHtml]`. This is a very safe
  * operation because of TextNodes. It should prevent all HTML injection attacks
  * including XSS attacks.
  */
