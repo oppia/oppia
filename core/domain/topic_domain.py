@@ -28,6 +28,7 @@ import android_validation_constants
 from constants import constants
 from core.domain import change_domain
 from core.domain import fs_domain
+from core.domain import fs_services
 from core.domain import subtopic_page_domain
 from core.domain import user_services
 import feconf
@@ -1505,25 +1506,14 @@ class Topic(python_utils.OBJECT):
                 'The subtopic with id %s does not exist.' % subtopic_id)
         self.subtopics[subtopic_index].thumbnail_filename = (
             new_thumbnail_filename)
-
-    def update_subtopic_thumbnail_size_in_bytes(
-            self, subtopic_id, new_thumbnail_size_in_bytes):
-        """Updates the thumbnail size in bytes property of the new subtopic.
-
-        Args:
-            subtopic_id: str. The id of the subtopic to edit.
-            new_thumbnail_size_in_bytes: str. The new thumbnail size in bytes
-                for the subtopic.
-
-        Raises:
-            Exception. The subtopic with the given id doesn't exist.
-        """
-        subtopic_index = self.get_subtopic_index(subtopic_id)
-        if subtopic_index is None:
-            raise Exception(
-                'The subtopic with id %s does not exist.' % subtopic_id)
-        self.subtopics[subtopic_index].thumbnail_size_in_bytes = (
-            new_thumbnail_size_in_bytes)
+        file_system_class = fs_services.get_entity_file_system_class()
+        fs = fs_domain.AbstractFileSystem(file_system_class(
+            feconf.ENTITY_TYPE_TOPIC, self.id))
+        filename_prefix = 'thumbnail'
+        filepath = '%s/%s' % (filename_prefix, new_thumbnail_filename)
+        if fs.isfile(filepath):
+            self.subtopics[subtopic_index].thumbnail_size_in_bytes = len(
+                fs.get(filepath))
 
     def update_subtopic_url_fragment(self, subtopic_id, new_url_fragment):
         """Updates the url fragment of the subtopic.
