@@ -221,6 +221,7 @@ describe('TopNavigationBarComponent', () => {
     spyOn(component, 'truncateNavbar').and.stub();
 
     component.ngOnInit();
+    tick(10);
 
     searchService.onSearchBarLoaded.emit();
     tick(101);
@@ -235,6 +236,7 @@ describe('TopNavigationBarComponent', () => {
     spyOn(debouncerService, 'debounce').and.stub();
 
     component.ngOnInit();
+    tick(10);
 
     component.currentWindowWidth = 600;
     component.navElementsVisibilityStatus[donateElement] = false;
