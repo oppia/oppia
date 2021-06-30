@@ -37,7 +37,6 @@ import utils
 STORY_PROPERTY_TITLE = 'title'
 STORY_PROPERTY_THUMBNAIL_BG_COLOR = 'thumbnail_bg_color'
 STORY_PROPERTY_THUMBNAIL_FILENAME = 'thumbnail_filename'
-STORY_PROPERTY_THUMBNAIL_SIZE_IN_BYTES = 'thumbnail_size_in_bytes'
 STORY_PROPERTY_DESCRIPTION = 'description'
 STORY_PROPERTY_NOTES = 'notes'
 STORY_PROPERTY_LANGUAGE_CODE = 'language_code'
@@ -106,7 +105,6 @@ class StoryChange(change_domain.BaseChange):
     STORY_PROPERTIES = (
         STORY_PROPERTY_TITLE, STORY_PROPERTY_THUMBNAIL_BG_COLOR,
         STORY_PROPERTY_THUMBNAIL_FILENAME,
-        STORY_PROPERTY_THUMBNAIL_SIZE_IN_BYTES,
         STORY_PROPERTY_DESCRIPTION, STORY_PROPERTY_NOTES,
         STORY_PROPERTY_LANGUAGE_CODE, STORY_PROPERTY_URL_FRAGMENT,
         STORY_PROPERTY_META_TAG_CONTENT)
@@ -1049,22 +1047,6 @@ class Story(python_utils.OBJECT):
             node['outline'] = (
                 html_validation_service.add_math_content_to_math_rte_components(
                     node['outline']))
-        return story_contents_dict
-
-    @classmethod
-    def _convert_story_contents_v4_dict_to_v5_dict(cls, story_contents_dict):
-        """Converts old Story Contents schema to the modern v5 schema.
-        v5 schema introduces the thumbnail_size_in_bytes fields for Story.
-
-        Args:
-            story_contents_dict: dict. A dict used to initialize a Story
-                Contents domain object.
-
-        Returns:
-            dict. The converted story_contents_dict.
-        """
-        for index in python_utils.RANGE(len(story_contents_dict['nodes'])):
-            story_contents_dict['nodes'][index]['thumbnail_size_in_bytes'] = 0
         return story_contents_dict
 
     @classmethod
