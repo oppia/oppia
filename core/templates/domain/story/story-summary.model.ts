@@ -82,6 +82,10 @@ export class StorySummary {
     return this._description;
   }
 
+  getCompletedNodeTitles(): string[] {
+    return this._completedNodeTitles;
+  }
+
   isStoryPublished(): boolean {
     return this._storyIsPublished;
   }
