@@ -287,37 +287,6 @@ class FeedbackThreadStatusChangedEventHandler(BaseEventHandler):
             exp_id, old_status, new_status)
 
 
-class Registry(python_utils.OBJECT):
-    """Registry of event handlers."""
-
-    # Dict mapping event types to their classes.
-    _event_types_to_classes = {}
-
-    @classmethod
-    def _refresh_registry(cls):
-        """Regenerates the event handler registry."""
-        cls._event_types_to_classes.clear()
-
-        # Find all subclasses of BaseEventHandler in the current module.
-        for obj_name, obj in globals().items():
-            if inspect.isclass(obj) and issubclass(obj, BaseEventHandler):
-                if obj_name == 'BaseEventHandler':
-                    continue
-
-                cls._event_types_to_classes[obj.EVENT_TYPE] = obj
-
-    @classmethod
-    def get_event_class_by_type(cls, event_type):
-        """Gets an event handler class by its type.
-
-        Refreshes once if the event type is not found; subsequently, throws an
-        error.
-        """
-        if event_type not in cls._event_types_to_classes:
-            cls._refresh_registry()
-        return cls._event_types_to_classes[event_type]
-
-
 def handle_exploration_start(exp_id):
     """Handles a user's start of an exploration.
 
