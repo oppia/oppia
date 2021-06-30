@@ -81,14 +81,6 @@ export class SubtopicPreviewTab {
       this.subtopicId);
   }
 
-  changeContent(itemToDisplay: string): void {
-    if (itemToDisplay === this.THUMBNAIL) {
-      this.thumbnailIsShown = true;
-      return;
-    }
-    this.thumbnailIsShown = false;
-  }
-
   ngOnInit(): void {
     this.directiveSubscriptions.add(
       this.topicEditorStateService.onSubtopicPageLoaded.subscribe(() => {

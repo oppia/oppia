@@ -14,15 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for jobs.base_validation_jobs."""
+"""Unit tests for jobs.batch_jobs.validation_jobs."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform import models
 import feconf
-from jobs import base_validation_jobs
 from jobs import job_test_utils
+from jobs.batch_jobs import validation_jobs
 from jobs.transforms import base_validation
 from jobs.types import base_validation_errors
 from jobs.types import model_property
@@ -33,7 +33,7 @@ from jobs.types import model_property
 
 class AuditAllStorageModelsJobTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS = base_validation_jobs.AuditAllStorageModelsJob
+    JOB_CLASS = validation_jobs.AuditAllStorageModelsJob
 
     VALID_USER_ID = 'uid_%s' % ('a' * feconf.USER_ID_RANDOM_PART_LENGTH)
 
