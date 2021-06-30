@@ -2242,18 +2242,9 @@ title: Title
 
         return self._parse_json_response(json_response, expect_errors)
 
-    def post_req(self, url, expected_status_int=200):
-        """Post request with no response."""
-        data = {}
-        expect_errors = expected_status_int >= 400
-        json_response = self._send_post_request(
-            self.testapp, url, data, expect_errors,
-            expected_status_int=expected_status_int)
-        self.assertEqual(json_response.status_int, expected_status_int)
-
     def post_json(
             self, url, data, csrf_token=None, expected_status_int=200,
-            upload_files=None, use_payload=True):
+            upload_files=None, use_payload=True, return_json=True):
         """Post an object to the server by JSON; return the received object.
 
         Args:
@@ -2272,6 +2263,8 @@ title: Title
                 false, the dict in 'data' is directly passed as the body of the
                 request. For all requests called from the frontend, this should
                 be set to 'true'.
+            return_json: bool. If true, the response is parsed and returned. If
+                false, only makes a post request.
 
         Returns:
             dict. The JSON response for the request in dict form.
@@ -2296,7 +2289,8 @@ title: Title
         # https://github.com/Pylons/webtest/blob/bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119
         self.assertEqual(json_response.status_int, expected_status_int)
 
-        return self._parse_json_response(json_response, expect_errors)
+        if return_json:
+            return self._parse_json_response(json_response, expect_errors)
 
     def delete_json(self, url, params='', expected_status_int=200):
         """Delete object on the server using a JSON call."""
