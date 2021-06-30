@@ -58,6 +58,23 @@ interface ContributionRightsBackendResponse {
   'can_submit_questions': boolean
 }
 
+export interface TranslationContributionStatsBackendResponse {
+  'translation_contribution_stats': TranslationContributionStats[];
+}
+
+export interface TranslationContributionStats {
+  'language': string,
+  'topic_name': string,
+  'submitted_translations_count': number,
+  'submitted_translation_word_count': number,
+  'accepted_translations_count': number,
+  'accepted_translations_without_reviewer_edits_count': number,
+  'accepted_translation_word_count': number,
+  'rejected_translations_count': number,
+  'rejected_translation_word_count': number,
+  'contribution_months': string[]
+}
+
 interface PendingDeletionRequestBackendResponse {
   'number_of_pending_deletion_models': string
 }
@@ -304,6 +321,23 @@ export class AdminBackendApiService {
           removal_type: method,
           category: category,
           language_code: languageCode
+        }
+      ).toPromise().then(response => {
+        resolve(response);
+      }, errorResponse => {
+        reject(errorResponse.error.error);
+      });
+    });
+  }
+
+  async viewTranslationContributionStatsAsync(
+      username: string): Promise<ContributionRightsBackendResponse> {
+    return new Promise((resolve, reject) => {
+      this.http.get<ContributionRightsBackendResponse>(
+        AdminPageConstants.ADMIN_GET_TRANSLATION_CONTRIBUTION_STATS_HANDLER, {
+          params: {
+            username: username
+          }
         }
       ).toPromise().then(response => {
         resolve(response);

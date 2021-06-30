@@ -239,6 +239,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/contributionrightsdatahandler',
         admin.ContributionRightsDataHandler),
     get_redirect_route(
+        r'/gettranslationcontributionstatshandler',
+        admin.TranslationContributionStatsHandler),
+    get_redirect_route(
         r'%s' % feconf.CONTRIBUTOR_DASHBOARD_URL,
         contributor_dashboard.ContributorDashboardPage),
     get_redirect_route(

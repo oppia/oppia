@@ -47,6 +47,7 @@ from core.domain import story_domain
 from core.domain import story_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
+from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
@@ -937,6 +938,74 @@ class ContributionRightsDataHandler(base.BaseHandler):
             'can_review_questions': user_rights.can_review_questions,
             'can_submit_questions': user_rights.can_submit_questions
         })
+
+
+class TranslationContributionStatsHandler(base.BaseHandler):
+    """Handler to translation contribution stats of a user."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_access_admin_page
+    def get(self):
+        username = self.request.get('username', None)
+        if username is None:
+            raise self.InvalidInputException('Missing username param')
+        user_id = user_services.get_user_id_from_username(username)
+        if user_id is None:
+            raise self.InvalidInputException(
+                'Invalid username: %s' % username)
+        translation_contribution_stats = (
+            suggestion_services.get_all_translation_contribution_stats(user_id)
+        )
+        self.render_json({
+            'translation_contribution_stats': (
+                self._get_complete_translation_contribution_stats(
+                    translation_contribution_stats)
+            )
+        })
+
+    def _get_complete_translation_contribution_stats(
+            self, translation_contribution_stats):
+        """Returns translation contribution stats dicts with all the necessary
+        information for the frontend.
+
+        Args:
+            translation_contribution_stats: list(TranslationContributionStats).
+                TranslationContributionStats domain objects.
+
+        Returns:
+            list(dict(TranslationContributionStats)). Dict representations of
+                TranslationContributionStats domain objects with additional
+                keys:
+                    language: str. Language description.
+                    topic_name: str. Topic name.
+                    contribution_months: str. Unique translation contribution
+                        months of format: "%b %Y", e.g. "Jan 2021".
+                Unnecessary keys language_code, topic_id, contribution_dates,
+                contributor_user_id are consequently deleted.
+        """
+        translation_contribution_stats_dicts = [
+            stats.to_dict() for stats in translation_contribution_stats
+        ]
+        for stats_dict in translation_contribution_stats_dicts:
+            topic = topic_fetchers.get_topic_by_id(
+                stats_dict['topic_id'], strict=False)
+            stats_dict['topic_name'] = (
+                topic.topic_name if topic is not None else 'UNKNOWN'
+            )
+            stats_dict['contribution_months'] = list({
+                contribution_date.strftime('%b %Y')
+                for contribution_date in stats_dict['contribution_dates']
+            })
+            stats_dict['language'] = (
+                utils.get_supported_audio_language_description(
+                    stats_dict['language_code'])
+            )
+            del stats_dict['topic_id']
+            del stats_dict['language_code']
+            del stats_dict['contribution_dates']
+            del stats_dict['contributor_user_id']
+        return translation_contribution_stats_dicts
 
 
 class SendDummyMailToAdminHandler(base.BaseHandler):

@@ -17,6 +17,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import datetime
 import logging
 
 from constants import constants
@@ -52,11 +53,11 @@ import python_utils
 import utils
 
 (
-    audit_models, exp_models, opportunity_models,
+    audit_models, exp_models, opportunity_models, suggestion_models,
     user_models
 ) = models.Registry.import_models([
     models.NAMES.audit, models.NAMES.exploration, models.NAMES.opportunity,
-    models.NAMES.user
+    models.NAMES.suggestion, models.NAMES.user
 ])
 
 BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
@@ -2217,6 +2218,92 @@ class ContributionRightsDataHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(response['error'], 'Missing username param')
         self.logout()
 
+
+class TranslationContributionStatsHandlerTest(test_utils.GenericTestBase):
+    """Tests TranslationContributionStatsHandler."""
+
+    CONTRIBUTOR_EMAIL = 'contributor@example.com'
+    CONTRIBUTOR_USERNAME = 'contributor'
+
+    def setUp(self):
+        super(TranslationContributionStatsHandlerTest, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.signup(self.CONTRIBUTOR_EMAIL, self.CONTRIBUTOR_USERNAME)
+
+    def test_get_stats_without_username_raises_error(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        response = self.get_json(
+            '/gettranslationcontributionstatshandler', {},
+            expected_status_int=400)
+
+        self.assertEqual(response['error'], 'Missing username param')
+
+    def test_get_stats_with_invalid_username_raises_error(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        response = self.get_json(
+            '/gettranslationcontributionstatshandler', {
+                'username': 'invalid',
+            }, expected_status_int=400)
+
+        self.assertEqual(
+            response['error'], 'Invalid username: invalid')
+
+    def test_get_stats_returns_transformed_stats(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        submitted_translations_count=2
+        submitted_translation_word_count=100
+        accepted_translations_count=1
+        accepted_translations_without_reviewer_edits_count=0
+        accepted_translation_word_count=50
+        rejected_translations_count=0
+        rejected_translation_word_count=0
+        suggestion_models.TranslationContributionStatsModel.create(
+            language_code='es',
+            contributor_user_id=self.get_user_id_from_email(
+                self.CONTRIBUTOR_EMAIL),
+            topic_id='topic_id',
+            submitted_translations_count=submitted_translations_count,
+            submitted_translation_word_count=submitted_translation_word_count,
+            accepted_translations_count=accepted_translations_count,
+            accepted_translations_without_reviewer_edits_count=(
+                accepted_translations_without_reviewer_edits_count),
+            accepted_translation_word_count=accepted_translation_word_count,
+            rejected_translations_count=rejected_translations_count,
+            rejected_translation_word_count=rejected_translation_word_count,
+            contribution_dates=[
+                # Timestamp dates in sec since epoch for Mar 19 2021 UTC.
+                datetime.date.fromtimestamp(1616173836),
+                datetime.date.fromtimestamp(1616173837)
+            ]
+        )
+
+        response = self.get_json(
+            '/gettranslationcontributionstatshandler', {
+                'username': self.CONTRIBUTOR_USERNAME,
+            })
+
+        expected_response = {
+            'translation_contribution_stats': [{
+                'language': 'Spanish',
+                'topic_name': 'UNKNOWN',
+                'submitted_translations_count': submitted_translations_count,
+                'submitted_translation_word_count': (
+                    submitted_translation_word_count),
+                'accepted_translations_count': accepted_translations_count,
+                'accepted_translations_without_reviewer_edits_count': (
+                    accepted_translations_without_reviewer_edits_count),
+                'accepted_translation_word_count': (
+                    accepted_translation_word_count),
+                'rejected_translations_count': rejected_translations_count,
+                'rejected_translation_word_count': (
+                    rejected_translation_word_count),
+                'contribution_months': ['Mar 2021']
+            }]
+        }
+        self.assertEqual(response, expected_response)
 
 class NumberOfDeletionRequestsHandlerTest(test_utils.GenericTestBase):
     """Tests NumberOfDeletionRequestsHandler."""

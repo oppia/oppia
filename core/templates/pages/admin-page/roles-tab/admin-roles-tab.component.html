@@ -340,6 +340,59 @@
           </button>
         </form>
       </mat-card>
+
+      <mat-card class="oppia-page-card oppia-long-text">
+        <form class="form-horizontal"
+              (submit)="submitViewTranslationContributionStatsForm(formData.viewTranslationContributionStats)">
+          <legend class="text-center">View Translation Contribution Stats</legend>
+          <div class="d-xl-inline-flex form-group">
+            <label class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Username</label>
+            <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
+              <input type="text"
+                     name="username"
+                     placeholder="Enter username"
+                     [(ngModel)]="formData.viewTranslationContributionStats.username"
+                     [ngModelOptions]="{standalone: true}"
+                     class="form-control protractor-test-username-value">
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-success protractor-test-role-success"
+                  [disabled]="!formData.viewTranslationContributionStats.isValid()"
+                  value="view stats">
+            View Stats
+          </button>
+        </form>
+
+        <div *ngIf="translationContributionStatsFetched">
+          <table class="table text-center view-results-table">
+            <thead>
+              <tr>
+                <td><strong>Months</strong></td>
+                <td><strong>Language</strong></td>
+                <td><strong>Topic Name</strong></td>
+                <td><strong>Submitted Translation Cards</strong></td>
+                <td><strong>Submitted Translation Word Count</strong></td>
+                <td><strong>Accepted Translation Cards</strong></td>
+                <td><strong>Accepted Translation Cards Without Reviewer Edits</strong></td>
+                <td><strong>Accepted Translation Word Count</strong></td>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let stats of translationContributionStatsResults">
+                <td class="protractor-test-roles-result-rows">{{ stats.contribution_months }}</td>
+                <td>{{ stats.language }}</td>
+                <td>{{ stats.topic_name }}</td>
+                <td>{{ stats.submitted_translations_count }}</td>
+                <td>{{ stats.submitted_translation_word_count }}</td>
+                <td>{{ stats.accepted_translations_count }}</td>
+                <td>{{ stats.accepted_translations_without_reviewer_edits_count }}</td>
+                <td>{{ stats.accepted_translation_word_count }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </mat-card>
     </div>
 
     <div class="col-md-4">

@@ -61,6 +61,10 @@ interface RemoveContributionRightsAction {
   username: string
 }
 
+interface ViewTranslationContributionStatsAction {
+  username: string;
+}
+
 interface FormData {
   viewUserRoles: ViewUserRolesAction;
   updateRole: UpdateRoleAction;
@@ -88,6 +92,9 @@ export class AdminRolesTabComponent {
   languageCodesAndDescriptions: { id: string; description: string; }[];
   contributionReviewersResult: ContributionReviewersResult;
   contributionReviewersDataFetched: boolean = false;
+  translationContributionStatsResults: (
+    AdminBackendApiService.TranslationContributionStats[]) = [];
+  translationContributionStatsFetched: boolean = false;
   topicSummaries = {};
   roleToActions;
   formData: FormData;
@@ -271,6 +278,25 @@ export class AdminRolesTabComponent {
     this.adminTaskManagerService.finishTask();
   }
 
+  submitViewTranslationContributionStatsForm(
+      formResponse: ViewTranslationContributionStatsAction): void {
+    if (this.adminTaskManagerService.isTaskRunning()) {
+      return;
+    }
+    this.setStatusMessage.emit('Processing query...');
+    this.adminTaskManagerService.startTask();
+    this.adminBackendApiService.viewTranslationContributionStatsAsync(
+      formResponse.username
+    ).then((response) => {
+      this.translationContributionStatsResults = (
+        response.translation_contribution_stats);
+      this.translationContributionStatsFetched = true;
+      this.setStatusMessage.emit('Success.');
+      this.refreshFormData();
+    }, this.handleErrorResponse.bind(this));
+    this.adminTaskManagerService.finishTask();
+  }
+
   submitRemoveContributionRightsForm(
       formResponse: RemoveContributionRightsAction): void {
     if (this.adminTaskManagerService.isTaskRunning()) {
@@ -380,6 +406,15 @@ export class AdminRolesTabComponent {
             }
             return true;
           }
+        }
+      },
+      viewTranslationContributionStats: {
+        username: '',
+        isValid: function() {
+          if (this.username === '') {
+            return false;
+          }
+          return true;
         }
       }
     };

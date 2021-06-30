@@ -305,6 +305,7 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'TopicsAndSkillsDashboardPageDataHandler',
     'TrainedClassifierHandler',
     'TranslatableTextHandler',
+    'TranslationContributionStatsHandler',
     'UnsentFeedbackEmailHandler',
     'UnsubscribeHandler',
     'UpdateQuestionSuggestionHandler',

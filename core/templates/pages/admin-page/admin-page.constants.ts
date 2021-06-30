@@ -27,6 +27,8 @@ export const AdminPageConstants = {
   ADMIN_CONTRIBUTION_RIGHTS_HANDLER: '/contributionrightsdatahandler',
   ADMIN_GET_CONTRIBUTOR_USERS_HANDLER: '/getcontributorusershandler',
   ADMIN_REMOVE_CONTRIBUTION_RIGHTS_HANDLER: '/removecontributionrightshandler',
+  ADMIN_GET_TRANSLATION_CONTRIBUTION_STATS_HANDLER:
+    '/gettranslationcontributionstatshandler',
   ADMIN_MEMORY_CACHE_HANDLER_URL: '/memorycacheadminhandler',
   ADMIN_UPDATE_USERNAME_HANDLER_URL: '/updateusernamehandler',
   ADMIN_NUMBER_OF_DELETION_REQUEST_HANDLER_URL:
