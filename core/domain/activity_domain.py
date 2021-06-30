@@ -76,7 +76,7 @@ class ActivityReference(python_utils.OBJECT):
         }
 
     @classmethod
-    def from_dict(cls, obj):
+    def from_dict(cls, activity_reference_dict):
         """Return the ActivityReference object from a dict.
 
         Args:
@@ -85,7 +85,8 @@ class ActivityReference(python_utils.OBJECT):
         Returns:
             ActivityReference. The correcponding ActivityReference object.
         """
-        return cls(obj['type'], obj['id'])
+        return cls(
+            activity_reference_dict['type'], activity_reference_dict['id'])
 
 
 class ActivityReferences(python_utils.OBJECT):
