@@ -35,16 +35,5 @@ describe('Text Input tokenizer', function() {
       expect(tokens.length).toEqual(expectedTokens.length);
       expect(tokens).toEqual(expectedTokens);
     });
-    it('should throw error when input contains less than 2 alphanumeric' +
-    ' characters', () => {
-      const emptyInput = '';
-      const textInput = 'I';
-      const errorMessage = 'Text Input is either empty or contains' +
-       ' less than two alphanumeric characters.';
-      expect(
-        () => tokenizer.generateTokens(emptyInput)).toThrowError(errorMessage);
-      expect(
-        () => tokenizer.generateTokens(textInput)).toThrowError(errorMessage);
-    });
   });
 });
