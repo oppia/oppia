@@ -1136,9 +1136,7 @@ export class UpgradedServices {
         upgradedServices['UrlInterpolationService']);
     upgradedServices['UserBackendApiService'] =
       new UserBackendApiService(
-        upgradedServices['HttpClient'],
-        upgradedServices['WindowRef'],
-        upgradedServices['Title']);
+        upgradedServices['HttpClient']);
     upgradedServices['UserService'] = new UserService(
       upgradedServices['UrlInterpolationService'],
       upgradedServices['UrlService'],
