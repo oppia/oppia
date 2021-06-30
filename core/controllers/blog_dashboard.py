@@ -110,10 +110,9 @@ class BlogPostHandler(base.BaseHandler):
     """Handler for blog dashboard editor"""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
         'blog_post_id': {
-            'type': 'unicode'
+            'type': 'basestring'
         }
     }
     HANDLER_ARGS_SCHEMAS = {
