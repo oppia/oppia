@@ -19,7 +19,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import inspect
 import logging
 
 from core.domain import exp_domain
@@ -28,7 +27,6 @@ from core.domain import feedback_services
 from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import taskqueue_services
-from core.domain import user_services
 from core.platform import models
 import feconf
 import python_utils
@@ -342,7 +340,8 @@ def _refresh_average_ratings_transactional(user_id, new_rating, old_rating):
             num_ratings += 1
         else:
             sum_of_ratings -= old_rating
-        average_ratings = python_utils.divide(sum_of_ratings, float(num_ratings))
+        average_ratings = python_utils.divide(
+            sum_of_ratings, float(num_ratings))
     user_stats_model.average_ratings = average_ratings
     user_stats_model.num_ratings = num_ratings
     user_stats_model.update_timestamps()
@@ -363,4 +362,3 @@ def _increment_total_plays_count_transactional(user_id):
         user_stats_model.total_plays += 1
         user_stats_model.update_timestamps()
         user_stats_model.put()
-
