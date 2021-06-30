@@ -28,9 +28,8 @@ from jobs.transforms import base_validation
 
 
 @validation_decorators.AuditsExisting(
-    question_models.QuestionSnapshotMetadataModel,
-    question_models.QuestionCommitLogEntryModel)
-class ValidateQuestionCommitCmdsSchema(
+    question_models.QuestionSnapshotMetadataModel)
+class ValidateQuestionSnapshotMetadataModel(
         base_validation.BaseValidateCommitCmdsSchema):
     """Overrides _get_change_domain_class for question models."""
 
