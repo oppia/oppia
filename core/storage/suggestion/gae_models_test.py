@@ -1495,6 +1495,37 @@ class TranslationContributionStatsModelUnitTests(test_utils.GenericTestBase):
             ),
             base_models.DELETION_POLICY.DELETE)
 
+    def test_apply_deletion_policy(self):
+        suggestion_models.TranslationContributionStatsModel.create(
+            language_code=self.LANGUAGE_CODE,
+            contributor_user_id=self.CONTRIBUTOR_USER_ID,
+            topic_id=self.TOPIC_ID,
+            submitted_translations_count=self.SUBMITTED_TRANSLATIONS_COUNT,
+            submitted_translation_word_count=(
+                self.SUBMITTED_TRANSLATION_WORD_COUNT),
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_without_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
+            rejected_translation_word_count=(
+                self.REJECTED_TRANSLATION_WORD_COUNT),
+            contribution_dates=self.CONTRIBUTION_DATES
+        )
+        self.assertTrue(
+            suggestion_models.TranslationContributionStatsModel
+            .has_reference_to_user_id(self.CONTRIBUTOR_USER_ID))
+
+        (
+            suggestion_models.TranslationContributionStatsModel
+            .apply_deletion_policy(self.CONTRIBUTOR_USER_ID)
+        )
+
+        self.assertFalse(
+            suggestion_models.TranslationContributionStatsModel
+            .has_reference_to_user_id(self.CONTRIBUTOR_USER_ID))
+
     def test_export_data_trivial(self):
         user_data = (
             suggestion_models.TranslationContributionStatsModel

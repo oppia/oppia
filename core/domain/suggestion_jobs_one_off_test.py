@@ -348,7 +348,7 @@ class PopulateTranslationContributionStatsOneOffJobTests(
 
         self.process_and_flush_pending_tasks()
 
-    def test_job_updates_counts_for_translation_suggestions(self):
+    def test_job_updates_counts_for_accepted_translation_suggestions(self):
         # Create two translations suggestions and accept the second.
         self._create_translation_suggestion(self.language_code)
         suggestion_2 = self._create_translation_suggestion(self.language_code)
@@ -425,3 +425,70 @@ class PopulateTranslationContributionStatsOneOffJobTests(
         self.assertEqual(
             translation_contribution_stats.contribution_dates,
             [datetime.datetime.now().date()])
+
+    def test_job_updates_counts_for_rejected_translation_suggestions(self):
+        suggestion = self._create_translation_suggestion(self.language_code)
+        suggestion_services.reject_suggestion(
+            suggestion.suggestion_id, self.reviewer_id, 'review_message'
+        )
+        expected_output = [
+            '[u\'%s.%s.%s\', 1]' % (
+                self.language_code, self.author_id, self.topic_id)
+        ]
+
+        with self.swap(
+            opportunity_services,
+            'get_exploration_opportunity_summaries_by_ids',
+            self.mock_get_opportunities):
+            self._run_job_and_verify_output(expected_output)
+
+        translation_contribution_stats = (
+            suggestion_models.TranslationContributionStatsModel.get(
+                self.language_code, self.author_id, self.topic_id)
+        )
+        self.assertEqual(
+            translation_contribution_stats.submitted_translations_count, 1)
+        # NOTE: len("This is html to translate") = 5. HTML tags/attributes
+        # are not considered part of the word count.
+        self.assertEqual(
+            translation_contribution_stats.submitted_translation_word_count, 5)
+        self.assertEqual(
+            translation_contribution_stats.accepted_translations_count, 0)
+        self.assertEqual(
+            translation_contribution_stats
+            .accepted_translations_without_reviewer_edits_count, 0)
+        # NOTE: len("This is html to translate") = 5.
+        self.assertEqual(
+            translation_contribution_stats.accepted_translation_word_count, 0)
+        self.assertEqual(
+            translation_contribution_stats.rejected_translations_count, 1)
+        self.assertEqual(
+            translation_contribution_stats.rejected_translation_word_count, 5)
+        self.assertEqual(
+            translation_contribution_stats.contribution_dates,
+            [datetime.datetime.now().date()])
+
+    def test_job_only_processes_translation_suggestions(self):
+        skill_id = 'skill_id'
+        suggestion_change = {
+            'cmd': (
+                question_domain
+                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION),
+                'linked_skill_ids': [skill_id],
+                'inapplicable_skill_misconception_ids': []
+            },
+            'skill_id': skill_id,
+            'skill_difficulty': 0.3
+        }
+        suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL, skill_id, 1,
+            self.author_id, suggestion_change, 'test description')
+
+        self._run_job_and_verify_output([])

@@ -110,10 +110,7 @@ class PopulateTranslationContributionStatsOneOffJob(
                     last_updated_date: date. The last updated date of the
                         translation suggestion.
         """
-        if item.target_type != feconf.ENTITY_TYPE_EXPLORATION:
-            return
-        if item.suggestion_type != (
-                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT):
+        if item.suggestion_type != feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
             return
 
         suggestion = suggestion_services.get_suggestion_from_model(item)
