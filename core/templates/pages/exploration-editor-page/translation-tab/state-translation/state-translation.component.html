@@ -57,11 +57,11 @@
           <[getEmptyContentMessage()]>
         </span>
         <span>
-          <angular-html-bind ng-class="{'oppia-rte-editor-focused': isCopyModeActive()}"
-                             ng-click="onContentClick($event)"
-                             html-data="getRequiredHtml(stateContent)"
-                             class="oppia-rte-editor">
-          </angular-html-bind>
+          <oppia-rte-output-display [rte-string]="getRequiredHtml(stateContent)"
+                                    ng-class="{'oppia-rte-editor-focused': isCopyModeActive()}"
+                                    ng-click="onContentClick($event)"
+                                    class="oppia-rte-editor">
+          </oppia-rte-output-display>
         </span>
       </span>
     </div>
