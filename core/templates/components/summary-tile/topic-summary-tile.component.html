@@ -1,5 +1,5 @@
 <div class="topic-card"
-     [ngStyle]="{background: topicSummary.getThumbnailBgColor(), 'pointer-events': !isPublished() ? 'none' : 'auto'}"
+     [ngStyle]="{background: topicSummary.getThumbnailBgColor(), 'pointer-events': !isPublished ? 'none' : 'auto'}"
      [ngClass]="{'faded-topic-card': !isPublished}">
   <a [href]="getTopicPageUrl()" class="protractor-test-topic-link">
     <div class="topic-thumbnail">
