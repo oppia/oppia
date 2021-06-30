@@ -31,7 +31,7 @@ import apache_beam as beam
     [models.NAMES.base_model, models.NAMES.config])
 
 
-class ValidateConfigCommitCmdsSchemaTests(
+class ValidateConfigPropertySnapshotMetadataModelTests(
         job_test_utils.PipelinedTestBase):
 
     def test_validate_change_domain_implemented(self):
@@ -53,7 +53,7 @@ class ValidateConfigCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                config_validation.ValidateConfigCommitCmdsSchema())
+                config_validation.ValidateConfigPropertySnapshotMetadataModel())
         )
 
         self.assert_pcoll_equal(output, [])
@@ -76,7 +76,7 @@ class ValidateConfigCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                config_validation.ValidateConfigCommitCmdsSchema())
+                config_validation.ValidateConfigPropertySnapshotMetadataModel())
         )
 
         self.assert_pcoll_equal(output, [
@@ -104,7 +104,7 @@ class ValidateConfigCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                config_validation.ValidateConfigCommitCmdsSchema())
+                config_validation.ValidateConfigPropertySnapshotMetadataModel())
         )
 
         self.assert_pcoll_equal(output, [
@@ -132,7 +132,7 @@ class ValidateConfigCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                config_validation.ValidateConfigCommitCmdsSchema())
+                config_validation.ValidateConfigPropertySnapshotMetadataModel())
         )
 
         self.assert_pcoll_equal(output, [
@@ -165,7 +165,7 @@ class ValidateConfigCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                config_validation.ValidateConfigCommitCmdsSchema())
+                config_validation.ValidateConfigPropertySnapshotMetadataModel())
         )
 
         self.assert_pcoll_equal(output, [
@@ -180,7 +180,7 @@ class ValidateConfigCommitCmdsSchemaTests(
         ])
 
 
-class ValidatePlatformParameterCommitCmdsSchemaTests(
+class ValidatePlatformParameterSnapshotMetadataModelTests(
         job_test_utils.PipelinedTestBase):
 
     CMD_EDIT_RULES = parameter_domain.PlatformParameterChange.CMD_EDIT_RULES
@@ -204,7 +204,8 @@ class ValidatePlatformParameterCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                config_validation.ValidatePlatformParameterCommitCmdsSchema())
+                config_validation
+                .ValidatePlatformParameterSnapshotMetadataModel())
         )
 
         self.assert_pcoll_equal(output, [])
@@ -227,7 +228,8 @@ class ValidatePlatformParameterCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                config_validation.ValidatePlatformParameterCommitCmdsSchema())
+                config_validation
+                .ValidatePlatformParameterSnapshotMetadataModel())
         )
 
         self.assert_pcoll_equal(output, [
@@ -255,7 +257,8 @@ class ValidatePlatformParameterCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                config_validation.ValidatePlatformParameterCommitCmdsSchema())
+                config_validation
+                .ValidatePlatformParameterSnapshotMetadataModel())
         )
 
         self.assert_pcoll_equal(output, [
@@ -284,7 +287,8 @@ class ValidatePlatformParameterCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                config_validation.ValidatePlatformParameterCommitCmdsSchema())
+                config_validation
+                .ValidatePlatformParameterSnapshotMetadataModel())
         )
 
         self.assert_pcoll_equal(output, [
@@ -317,7 +321,8 @@ class ValidatePlatformParameterCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                config_validation.ValidatePlatformParameterCommitCmdsSchema())
+                config_validation
+                .ValidatePlatformParameterSnapshotMetadataModel())
         )
 
         self.assert_pcoll_equal(output, [

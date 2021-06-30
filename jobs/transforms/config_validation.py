@@ -30,7 +30,7 @@ from jobs.transforms import base_validation
 
 @validation_decorators.AuditsExisting(
     config_models.ConfigPropertySnapshotMetadataModel)
-class ValidateConfigCommitCmdsSchema(
+class ValidateConfigPropertySnapshotMetadataModel(
         base_validation.BaseValidateCommitCmdsSchema):
     """Overrides _get_change_domain_class for config models."""
 
@@ -49,7 +49,7 @@ class ValidateConfigCommitCmdsSchema(
 
 @validation_decorators.AuditsExisting(
     config_models.PlatformParameterSnapshotMetadataModel)
-class ValidatePlatformParameterCommitCmdsSchema(
+class ValidatePlatformParameterSnapshotMetadataModel(
         base_validation.BaseValidateCommitCmdsSchema):
     """Overrides _get_change_domain_class for platform parameter models."""
 
