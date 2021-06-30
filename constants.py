@@ -25,6 +25,8 @@ import re
 
 import python_utils
 
+from typing import Any, Text # isort:skip # pylint: disable=unused-import, import-only-modules
+
 
 def parse_json_from_js(js_file):
     """Extracts JSON object from JS file.
@@ -58,7 +60,13 @@ def remove_comments(text):
 class Constants(dict):
     """Transforms dict to object, attributes can be accessed by dot notation."""
 
-    __getattr__ = dict.__getitem__
+    def __setattr__(self, name, value):
+        # type: (Text, Any) -> None
+        self[name] = value
+
+    def __getattr__(self, name):
+        # type: (Text) -> Any
+        return self[name]
 
 
 with python_utils.open_file(os.path.join('assets', 'constants.ts'), 'r') as f:

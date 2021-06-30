@@ -464,7 +464,8 @@ class UtilsTests(test_utils.GenericTestBase):
         lengthy_meta_tag_content = 'a' * 200
         max_length_error = (
             'Meta tag content should not be longer than %s characters.'
-            % constants.MAX_CHARS_IN_META_TAG_CONTENT) # type: ignore[attr-defined] # pylint: disable=line-too-long
+            % constants.MAX_CHARS_IN_META_TAG_CONTENT)
+
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, max_length_error):
             utils.require_valid_meta_tag_content(lengthy_meta_tag_content)
@@ -485,7 +486,8 @@ class UtilsTests(test_utils.GenericTestBase):
         lengthy_page_title_fragment_for_web = 'a' * 60
         max_length_error = (
             'Page title fragment should not be longer than %s characters.'
-            % constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB) # type: ignore[attr-defined] # pylint: disable=line-too-long
+            % constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB)
+
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, max_length_error):
             utils.require_valid_page_title_fragment_for_web(
