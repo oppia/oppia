@@ -44,7 +44,7 @@ export class TextInputTokenizer {
     tokenizedTextInput = textInput.match(regexp);
     if (tokenizedTextInput === null) {
       // We are not throwing an error because Tokens are being generated in
-      // TextPredictionService which should predict the same as oppia-ml.
+      // TextInputPredictionService which should predict the same as oppia-ml.
       // text_input_training_data is used and it contains input with less than
       // two alphanumeric characters.
       return [];
