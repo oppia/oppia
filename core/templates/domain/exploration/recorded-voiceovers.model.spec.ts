@@ -17,15 +17,12 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-
-import { RecordedVoiceovers } from
-  'domain/exploration/recorded-voiceovers.model';
-import { Voiceover } from
-  'domain/exploration/voiceover.model';
+import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+import { Voiceover } from 'domain/exploration/voiceover.model';
 
 describe('RecordedVoiceovers object factory', () => {
-  var rv = null;
-  var rvDict = {
+  let rv: RecordedVoiceovers;
+  let rvDict = {
     voiceovers_mapping: {
       content: {
         en: {
@@ -124,7 +121,7 @@ describe('RecordedVoiceovers object factory', () => {
   });
 
   it('should get all content id', () => {
-    var contentIdList = [
+    let contentIdList = [
       'content', 'default_outcome', 'feedback_1', 'feedback_2', 'hint_1',
       'hint_2', 'solution'];
     expect(rv.getAllContentIds()).toEqual(contentIdList);
@@ -177,7 +174,7 @@ describe('RecordedVoiceovers object factory', () => {
   });
 
   it('should get all language code for a given content id', () => {
-    var LanguageCodeList = ['en', 'hi'];
+    let LanguageCodeList = ['en', 'hi'];
     expect(rv.getLanguageCodes('hint_1')).toEqual(LanguageCodeList);
   });
 
@@ -202,7 +199,7 @@ describe('RecordedVoiceovers object factory', () => {
 
   it('should delete a given content id', () => {
     rv.deleteContentId('feedback_1');
-    var contentIdList = [
+    let contentIdList = [
       'content', 'default_outcome', 'feedback_2', 'hint_1', 'hint_2',
       'solution'];
     expect(rv.getAllContentIds()).toEqual(contentIdList);

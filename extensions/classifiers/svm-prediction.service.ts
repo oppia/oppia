@@ -39,22 +39,22 @@ export class SVMPredictionService {
   kernel(
       kernelParams: KernelParams, supportVectors: number[][],
       input: number[]): number[] {
-    var kernel = kernelParams.kernel;
-    var kvalues = [];
+    let kernel = kernelParams.kernel;
+    let kvalues = [];
 
     if (kernel === 'rbf') {
-      var gamma = kernelParams.gamma;
-      for (var i = 0; i < supportVectors.length; i++) {
-        var sum = 0;
-        for (var j = 0; j < input.length; j++) {
+      let gamma = kernelParams.gamma;
+      for (let i = 0; i < supportVectors.length; i++) {
+        let sum = 0;
+        for (let j = 0; j < input.length; j++) {
           sum += Math.pow((supportVectors[i][j] - input[j]), 2);
         }
         kvalues.push(Math.exp(-gamma * sum));
       }
     } else if (kernel === 'linear') {
-      for (var i = 0; i < supportVectors.length; i++) {
-        var sum = 0;
-        for (var j = 0; j < input.length; j++) {
+      for (let i = 0; i < supportVectors.length; i++) {
+        let sum = 0;
+        for (let j = 0; j < input.length; j++) {
           sum += supportVectors[i][j] * input[j];
         }
         kvalues.push(sum);
@@ -70,56 +70,56 @@ export class SVMPredictionService {
   // https://github.com/arnaudsj/libsvm/blob/master/svm.cpp#L1829
   calculateMulticlassProbabilities(
       nClasses: number, pairwiseProb: number[][]): number[] {
-    var Q = [];
-    for (var i = 0; i < nClasses; i++) {
+    let Q: number[][] = [];
+    for (let i = 0; i < nClasses; i++) {
       Q.push([]);
-      for (var j = 0; j < nClasses; j++) {
+      for (let j = 0; j < nClasses; j++) {
         Q[i].push(0);
       }
     }
 
-    var Qp = [];
-    for (var i = 0; i < nClasses; i++) {
+    let Qp: number[] = [];
+    for (let i = 0; i < nClasses; i++) {
       Qp.push(0);
     }
 
-    var P = [];
-    for (var i = 0; i < nClasses; i++) {
+    let P: number[] = [];
+    for (let i = 0; i < nClasses; i++) {
       P.push(0);
     }
 
-    var maxIter = Math.max(100, nClasses);
-    var eps = 0.005 / nClasses;
+    let maxIter = Math.max(100, nClasses);
+    let eps = 0.005 / nClasses;
 
-    for (var t = 0; t < nClasses; t++) {
+    for (let t = 0; t < nClasses; t++) {
       P[t] = 1.0 / nClasses;
       Q[t][t] = 0.0;
-      for (var j = 0; j < t; j++) {
+      for (let j = 0; j < t; j++) {
         Q[t][t] += pairwiseProb[j][t] * pairwiseProb[j][t];
         Q[t][j] = Q[j][t];
       }
 
-      for (var j = t + 1; j < nClasses; j++) {
+      for (let j = t + 1; j < nClasses; j++) {
         Q[t][t] += pairwiseProb[j][t] * pairwiseProb[j][t];
         Q[t][j] = -pairwiseProb[j][t] * pairwiseProb[t][j];
       }
     }
 
-    var iter = 0;
+    let iter = 0;
     for (iter = 0; iter < maxIter; iter++) {
-      var pQp = 0.0;
+      let pQp = 0.0;
 
-      for (var t = 0; t < nClasses; t++) {
+      for (let t = 0; t < nClasses; t++) {
         Qp[t] = 0;
-        for (var j = 0; j < nClasses; j++) {
+        for (let j = 0; j < nClasses; j++) {
           Qp[t] += Q[t][j] * P[j];
         }
         pQp += P[t] * Qp[t];
       }
 
-      var maxError = 0;
-      for (var t = 0; t < nClasses; t++) {
-        var error = Math.abs(Qp[t] - pQp);
+      let maxError = 0;
+      for (let t = 0; t < nClasses; t++) {
+        let error = Math.abs(Qp[t] - pQp);
         if (error > maxError) {
           maxError = error;
         }
@@ -129,13 +129,13 @@ export class SVMPredictionService {
         break;
       }
 
-      for (var t = 0; t < nClasses; t++) {
-        var diff = (-Qp[t] + pQp) / Q[t][t];
+      for (let t = 0; t < nClasses; t++) {
+        let diff = (-Qp[t] + pQp) / Q[t][t];
         P[t] += diff;
         pQp = (
           (pQp + diff * (diff * Q[t][t] + 2 * Qp[t])) /
           (1 + diff) / (1 + diff));
-        for (var j = 0; j < nClasses; j++) {
+        for (let j = 0; j < nClasses; j++) {
           Qp[j] = (Qp[j] + diff * Q[t][j]) / (1 + diff);
           P[j] /= (1 + diff);
         }
@@ -151,18 +151,18 @@ export class SVMPredictionService {
 
   predict(
       classifierData: SVM, input: number[]): PredictionResult {
-    var nSupport = classifierData.n_support;
-    var supportVectors = classifierData.support_vectors;
-    var dualCoef = classifierData.dual_coef;
-    var intercept = classifierData.intercept;
-    var classes = classifierData.classes;
-    var kernelParams = classifierData.kernel_params;
-    var probA = classifierData.probA;
-    var probB = classifierData.probB;
+    let nSupport = classifierData.n_support;
+    let supportVectors = classifierData.support_vectors;
+    let dualCoef = classifierData.dual_coef;
+    let intercept = classifierData.intercept;
+    let classes = classifierData.classes;
+    let kernelParams = classifierData.kernel_params;
+    let probA = classifierData.probA;
+    let probB = classifierData.probB;
 
-    var startIndices = [];
+    let startIndices = [];
     startIndices[0] = 0;
-    for (var i = 1; i < nSupport.length; i++) {
+    for (let i = 1; i < nSupport.length; i++) {
       startIndices[i] = startIndices[i - 1] + nSupport[i - 1];
     }
 
@@ -174,39 +174,39 @@ export class SVMPredictionService {
 
     // Find kernel values for supportVectors and given input. Assumes that
     // input has same dimension and data type as any of the supportVectors.
-    var kvalues = this.kernel(kernelParams, supportVectors, input);
+    let kvalues = this.kernel(kernelParams, supportVectors, input);
 
-    var votes = [];
-    for (var i = 0; i < classes.length; i++) {
+    let votes = [];
+    for (let i = 0; i < classes.length; i++) {
       votes.push(0);
     }
 
-    var pairwiseProb = [];
-    for (var i = 0; i < classes.length; i++) {
+    let pairwiseProb: number[][] = [];
+    for (let i = 0; i < classes.length; i++) {
       pairwiseProb.push([]);
-      for (var j = 0; j < classes.length; j++) {
+      for (let j = 0; j < classes.length; j++) {
         pairwiseProb[i].push(0);
       }
     }
 
-    var p = 0;
-    for (var i = 0; i < classes.length; i++) {
-      for (var j = i + 1; j < classes.length; j++) {
-        var si = startIndices[i];
-        var sj = startIndices[j];
-        var ci = nSupport[i];
-        var cj = nSupport[j];
-        var minProb = 1e-7;
+    let p = 0;
+    for (let i = 0; i < classes.length; i++) {
+      for (let j = i + 1; j < classes.length; j++) {
+        let si = startIndices[i];
+        let sj = startIndices[j];
+        let ci = nSupport[i];
+        let cj = nSupport[j];
+        let minProb = 1e-7;
 
-        var coef1 = dualCoef[j - 1];
-        var coef2 = dualCoef[i];
+        let coef1 = dualCoef[j - 1];
+        let coef2 = dualCoef[i];
 
-        var sum = 0;
-        for (var k = 0; k < ci; k++) {
+        let sum = 0;
+        for (let k = 0; k < ci; k++) {
           sum += kvalues[si + k] * coef1[si + k];
         }
 
-        for (var k = 0; k < cj; k++) {
+        for (let k = 0; k < cj; k++) {
           sum += kvalues[sj + k] * coef2[sj + k];
         }
 
@@ -223,8 +223,8 @@ export class SVMPredictionService {
         // https://www.csie.ntu.edu.tw/~cjlin/papers/plattprob.pdf
         // Also take a look at following implementation by LibSVM:
         // https://github.com/arnaudsj/libsvm/blob/master/svm.cpp#L2552
-        var f = probA[p] * sum + probB[p];
-        var prob = 0;
+        let f = probA[p] * sum + probB[p];
+        let prob = 0;
         if (f >= 0) {
           prob = Math.exp(-f) / (1 + Math.exp(-f));
         } else {
@@ -237,18 +237,18 @@ export class SVMPredictionService {
       }
     }
 
-    var probabilities = this.calculateMulticlassProbabilities(
+    let probabilities = this.calculateMulticlassProbabilities(
       classes.length, pairwiseProb);
 
-    var maxProbIdx = 0;
-    for (var i = 1; i < classes.length; i++) {
+    let maxProbIdx = 0;
+    for (let i = 1; i < classes.length; i++) {
       if (probabilities[i] > probabilities[maxProbIdx]) {
         maxProbIdx = i;
       }
     }
 
-    var predictedLabel = classes[maxProbIdx];
-    var prediction = new PredictionResult(
+    let predictedLabel = classes[maxProbIdx];
+    let prediction = new PredictionResult(
       predictedLabel, probabilities[maxProbIdx]);
     return prediction;
   }

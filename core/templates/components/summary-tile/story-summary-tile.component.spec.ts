@@ -12,21 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { StorySummary } from 'domain/story/story-summary.model';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { StorySummaryTileComponent } from './story-summary-tile.component';
-
 /**
  * @fileoverview Unit tests for StorySummaryTileComponent.
  */
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { StorySummary } from 'domain/story/story-summary.model';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { StorySummaryTileComponent } from './story-summary-tile.component';
+
+
 describe('StorySummaryTileComponent', () => {
   let component: StorySummaryTileComponent;
   let fixture: ComponentFixture<StorySummaryTileComponent>;
-  let wds: WindowDimensionsService = null;
+  let wds: WindowDimensionsService;
+  let urlInterpolationService: UrlInterpolationService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -42,6 +45,7 @@ describe('StorySummaryTileComponent', () => {
     fixture = TestBed.createComponent(StorySummaryTileComponent);
     component = fixture.componentInstance;
     wds = TestBed.inject(WindowDimensionsService);
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
   });
 
   it('should set properties on initialization', () => {
@@ -108,7 +112,7 @@ describe('StorySummaryTileComponent', () => {
       all_node_dicts: []
     });
 
-    expect(component.thumbnailUrl).toBe(undefined);
+    expect(component.thumbnailUrl).toBe(null);
 
     component.ngOnInit();
 
@@ -130,7 +134,7 @@ describe('StorySummaryTileComponent', () => {
       all_node_dicts: []
     });
 
-    expect(component.thumbnailUrl).toBe(undefined);
+    expect(component.thumbnailUrl).toBe(null);
 
     component.ngOnInit();
 
@@ -204,7 +208,7 @@ describe('StorySummaryTileComponent', () => {
     // displayed instead of 2.
     spyOn(wds, 'getWidth').and.returnValue(801);
 
-    expect(component.showButton).toBe(undefined);
+    expect(component.showButton).toBe(false);
 
     component.ngOnInit();
 
@@ -455,5 +459,25 @@ describe('StorySummaryTileComponent', () => {
     component.hideExtraChapters();
 
     expect(component.chaptersDisplayed).toBe(2);
+  });
+
+  it('should return \'#\' for storyLink if UrlInterpolation' +
+    ' returns null', () => {
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'fractions';
+    spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(null);
+    component.storySummary = StorySummary.createFromBackendDict({
+      id: 'storyId',
+      title: 'Story Title',
+      node_titles: ['node1'],
+      thumbnail_filename: 'thumbnail.jpg',
+      thumbnail_bg_color: '#FF9933',
+      description: 'This is the story description',
+      story_is_published: true,
+      completed_node_titles: ['node1'],
+      url_fragment: 'story1',
+      all_node_dicts: []
+    });
+    expect(component.getStoryLink()).toBe('#');
   });
 });

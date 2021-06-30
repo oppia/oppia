@@ -26,7 +26,7 @@ import {
   SkillMasteryBackendDict
 } from 'domain/skill/skill-mastery.model';
 
-interface SkillMasteryBackendResponse {
+export interface SkillMasteryBackendResponse {
   'degrees_of_mastery': SkillMasteryBackendDict;
 }
 

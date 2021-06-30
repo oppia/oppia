@@ -87,7 +87,7 @@ describe('ThreadMessageModel', () => {
         entity_type: 'exploration',
         entity_id: 'exploration.exp1.thread1',
         message_id: 1,
-        text: null,
+        text: '',
         updated_subject: null
       });
 
