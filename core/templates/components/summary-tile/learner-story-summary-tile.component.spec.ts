@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for for LearnerStorySummaryTileComponent.
+ * @fileoverview Unit tests for LearnerStorySummaryTileComponent.
  */
 
 import { async, ComponentFixture, TestBed } from

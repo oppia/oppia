@@ -31,6 +31,7 @@ import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
 export class ProgressTabComponent implements OnInit {
   @Input() completedStoriesList: StorySummary[];
   @Input() partiallyLearntTopicsList: LearnerTopicSummary[];
+  widthConst: number = 233;
   width: number;
 
   constructor(
@@ -39,7 +40,7 @@ export class ProgressTabComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.width = 233 * (this.completedStoriesList.length);
+    this.width = this.widthConst * (this.completedStoriesList.length);
   }
 
   getStaticImageUrl(imagePath: string): string {
