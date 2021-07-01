@@ -28,7 +28,6 @@ import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import { LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
 import { GoalsTabComponent } from './goals-tab.component';
-import { LearnerDashboardActivityIds } from 'domain/learner_dashboard/learner-dashboard-activity-ids.model';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 class MockRemoveActivityNgbModalRef {
@@ -45,8 +44,6 @@ describe('Goals tab Component', () => {
   let fixture: ComponentFixture<GoalsTabComponent>;
   let learnerDashboardActivityBackendApiService:
     LearnerDashboardActivityBackendApiService;
-  let learnerDashboardIdsBackendApiService:
-    LearnerDashboardIdsBackendApiService;
   let urlInterpolationService: UrlInterpolationService;
   let ngbModal: NgbModal;
 
@@ -76,8 +73,6 @@ describe('Goals tab Component', () => {
     learnerDashboardActivityBackendApiService =
       TestBed.inject(LearnerDashboardActivityBackendApiService);
     ngbModal = TestBed.inject(NgbModal);
-    learnerDashboardIdsBackendApiService =
-      TestBed.inject(LearnerDashboardIdsBackendApiService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     let subtopic = {
       skill_ids: ['skill_id_2'],
@@ -214,7 +209,6 @@ describe('Goals tab Component', () => {
     component.completedGoals = [LearnerTopicSummary.createFromBackendDict(
       learnerTopicSummaryBackendDict3)];
     component.learntToPartiallyLearntTopics = [];
-    component.MAX_CURRENT_GOALS_LENGTH = 5;
     component.currentGoalsStoryIsShown = [];
     component.topicBelongToCurrentGoals = [];
     component.topicIdsInCompletedGoals = [];
@@ -224,36 +218,10 @@ describe('Goals tab Component', () => {
   });
 
   it('should intialize the component and set values', fakeAsync(() => {
-    let learnerDashboardActivityIds = LearnerDashboardActivityIds
-      .createFromBackendDict({
-        incomplete_exploration_ids: [],
-        incomplete_collection_ids: [],
-        partially_learnt_topic_ids: [],
-        completed_exploration_ids: [],
-        completed_collection_ids: [],
-        completed_story_ids: [],
-        learnt_topic_ids: [],
-        topic_ids_to_learn: [],
-        all_topic_ids: [],
-        new_topic_ids: [],
-        exploration_playlist_ids: [],
-        collection_playlist_ids: []
-      });
-
-    const learnerDashboardSpy = spyOn(
-      learnerDashboardIdsBackendApiService, 'fetchLearnerDashboardIdsAsync')
-      .and.callFake(async() => {
-        return Promise.resolve(learnerDashboardActivityIds);
-      });
-
     component.ngOnInit();
     fixture.detectChanges();
 
-    expect(component.topicIdsInCompletedGoals)
-      .toEqual(learnerDashboardActivityIds.learntTopicIds);
-    expect(component.topicIdsInCurrentGoals)
-      .toEqual(learnerDashboardActivityIds.topicIdsToLearn);
-    expect(learnerDashboardSpy).toHaveBeenCalled();
+    expect(component.MAX_CURRENT_GOALS_LENGTH).toEqual(5);
   }));
 
   it('should check where the topicId belongs to current goal', () => {
