@@ -80,7 +80,6 @@ def validate(handler_args, handler_args_schemas, allowed_extra_args):
 # contains schema.
 HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'AboutRedirectPage',
-    'AddContributionRightsHandler',
     'AdminHandler',
     'AdminPage',
     'AdminRoleHandler',
@@ -107,7 +106,7 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'ContributionRightsDataHandler',
     'ContributorDashboardPage',
     'ContributorRightsDataHandler',
-    'ContributorUsersListHandler',
+    'ContributionRightsHandler',
     'CreatorDashboardHandler',
     'CreatorDashboardPage',
     'CronActivitySearchRankHandler',
@@ -241,7 +240,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'RecentFeedbackMessagesHandler',
     'RecommendationsHandler',
     'ReleaseCoordinatorPage',
-    'RemoveContributionRightsHandler',
     'ResolveIssueHandler',
     'ResubmitSuggestionHandler',
     'ReviewTestsPage',

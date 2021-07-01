@@ -243,7 +243,7 @@ export class AdminBackendApiService {
   ): Promise<void> {
     return new Promise((resolve, reject) => {
       this.http.post<void>(
-        AdminPageConstants.ADMIN_ADD_CONTRIBUTION_RIGHTS_HANDLER, {
+        AdminPageConstants.ADMIN_CONTRIBUTION_RIGHTS_HANDLER, {
           category: category,
           username: username,
           language_code: languageCode
@@ -270,7 +270,7 @@ export class AdminBackendApiService {
     }
     return new Promise((resolve, reject) => {
       this.http.get<ViewContributionBackendResponse>(
-        AdminPageConstants.ADMIN_GET_CONTRIBUTOR_USERS_HANDLER, {
+        AdminPageConstants.ADMIN_CONTRIBUTION_RIGHTS_DATA_HANDLER, {
           params
         }
       ).toPromise().then(response => {
@@ -300,17 +300,24 @@ export class AdminBackendApiService {
 
   async removeContributionReviewerAsync(
       username: string, method: string,
-      category: string, languageCode: string
+      category: string | null, languageCode: string | null
   ): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.http.put<void>(
-        AdminPageConstants.ADMIN_REMOVE_CONTRIBUTION_RIGHTS_HANDLER, {
-          username: username,
-          removal_type: method,
-          category: category,
-          language_code: languageCode
-        }
-      ).toPromise().then(response => {
+      let params = {
+        username: username,
+        removal_type: method,
+        category: category,
+        language_code: languageCode
+      };
+      // Deleting keys with null values.
+      Object.keys(
+        params).forEach((key) => (params[key] === null) && delete params[key]);
+      let query = new URLSearchParams(params);
+      let adminContributionRightsUrl = (
+        AdminPageConstants.ADMIN_CONTRIBUTION_RIGHTS_HANDLER +
+        '?' + query.toString());
+      this.http.delete<void>(
+        adminContributionRightsUrl).toPromise().then(response => {
         resolve(response);
       }, errorResponse => {
         reject(errorResponse.error.error);

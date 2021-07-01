@@ -748,10 +748,30 @@ class DataExtractionQueryHandler(base.BaseHandler):
         self.render_json(response)
 
 
-class AddContributionRightsHandler(base.BaseHandler):
-    """Handles adding contribution rights for contributor dashboard page."""
+class ContributionRightsHandler(base.BaseHandler):
+    """Handles contribution rights of a user on contributor dashboard page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_access_admin_page
+    def get(self):
+        username = self.request.get('username', None)
+        if username is None:
+            raise self.InvalidInputException('Missing username param')
+        user_id = user_services.get_user_id_from_username(username)
+        if user_id is None:
+            raise self.InvalidInputException(
+                'Invalid username: %s' % username)
+        user_rights = (
+            user_services.get_user_contribution_rights(user_id))
+        self.render_json({
+            'can_review_translation_for_language_codes': (
+                user_rights.can_review_translation_for_language_codes),
+            'can_review_voiceover_for_language_codes': (
+                user_rights.can_review_voiceover_for_language_codes),
+            'can_review_questions': user_rights.can_review_questions,
+            'can_submit_questions': user_rights.can_submit_questions
+        })
 
     @acl_decorators.can_access_admin_page
     def post(self):
@@ -811,15 +831,9 @@ class AddContributionRightsHandler(base.BaseHandler):
                 user_id, category, language_code=language_code)
         self.render_json({})
 
-
-class RemoveContributionRightsHandler(base.BaseHandler):
-    """Handles removing contribution rights for contributor dashboard."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
     @acl_decorators.can_access_admin_page
-    def put(self):
-        username = self.payload.get('username', None)
+    def delete(self):
+        username = self.request.get('username', None)
         if username is None:
             raise self.InvalidInputException('Missing username param')
         user_id = user_services.get_user_id_from_username(username)
@@ -827,18 +841,18 @@ class RemoveContributionRightsHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Invalid username: %s' % username)
 
-        language_code = self.payload.get('language_code', None)
+        language_code = self.request.get('language_code', None)
         if language_code is not None and not (
                 utils.is_supported_audio_language_code(language_code)):
             raise self.InvalidInputException(
                 'Invalid language_code: %s' % language_code)
 
-        removal_type = self.payload.get('removal_type')
+        removal_type = self.request.get('removal_type')
         if removal_type == constants.ACTION_REMOVE_ALL_REVIEW_RIGHTS:
             user_services.remove_contribution_reviewer(user_id)
         elif (removal_type ==
               constants.ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS):
-            category = self.payload.get('category')
+            category = self.request.get('category')
             if (category ==
                     constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION):
                 if not user_services.can_review_translation_suggestions(
@@ -889,7 +903,7 @@ class RemoveContributionRightsHandler(base.BaseHandler):
         self.render_json({})
 
 
-class ContributorUsersListHandler(base.BaseHandler):
+class ContributionRightsDataHandler(base.BaseHandler):
     """Handler to show users with contribution rights."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -911,32 +925,6 @@ class ContributorUsersListHandler(base.BaseHandler):
         usernames = user_services.get_contributor_usernames(
             category, language_code=language_code)
         self.render_json({'usernames': usernames})
-
-
-class ContributionRightsDataHandler(base.BaseHandler):
-    """Handler to show the contribution rights of a user."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    @acl_decorators.can_access_admin_page
-    def get(self):
-        username = self.request.get('username', None)
-        if username is None:
-            raise self.InvalidInputException('Missing username param')
-        user_id = user_services.get_user_id_from_username(username)
-        if user_id is None:
-            raise self.InvalidInputException(
-                'Invalid username: %s' % username)
-        user_rights = (
-            user_services.get_user_contribution_rights(user_id))
-        self.render_json({
-            'can_review_translation_for_language_codes': (
-                user_rights.can_review_translation_for_language_codes),
-            'can_review_voiceover_for_language_codes': (
-                user_rights.can_review_voiceover_for_language_codes),
-            'can_review_questions': user_rights.can_review_questions,
-            'can_submit_questions': user_rights.can_submit_questions
-        })
 
 
 class SendDummyMailToAdminHandler(base.BaseHandler):

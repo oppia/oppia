@@ -27,7 +27,7 @@ import { FeatureStage, PlatformParameter } from 'domain/platform_feature/platfor
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { Schema } from 'services/schema-default-value.service';
 
-describe('Admin backend api service', () => {
+fdescribe('Admin backend api service', () => {
   let abas: AdminBackendApiService;
   let httpTestingController: HttpTestingController;
   let csrfService: CsrfTokenService = null;
@@ -353,7 +353,7 @@ describe('Admin backend api service', () => {
     ).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      '/addcontributionrightshandler');
+      '/contributionrightshandler');
     expect(req.request.method).toEqual('POST');
     expect(req.request.body).toEqual(payload);
 
@@ -381,7 +381,7 @@ describe('Admin backend api service', () => {
     ).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      '/addcontributionrightshandler');
+      '/contributionrightshandler');
     expect(req.request.method).toEqual('POST');
     expect(req.request.body).toEqual(payload);
     req.flush(
@@ -405,7 +405,7 @@ describe('Admin backend api service', () => {
     ).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      '/getcontributorusershandler' +
+      '/contributionrightsdatahandler' +
       '?category=voiceover&language_code=en');
     expect(req.request.method).toEqual('GET');
 
@@ -425,7 +425,7 @@ describe('Admin backend api service', () => {
     ).then(successHandler, failHandler);
 
     req = httpTestingController.expectOne(
-      '/getcontributorusershandler' +
+      '/contributionrightsdatahandler' +
       '?category=question');
     expect(req.request.method).toEqual('GET');
 
@@ -448,7 +448,7 @@ describe('Admin backend api service', () => {
     ).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      '/getcontributorusershandler' +
+      '/contributionrightsdatahandler' +
       '?category=InvalidCategory&language_code=en');
     expect(req.request.method).toEqual('GET');
 
@@ -477,7 +477,7 @@ describe('Admin backend api service', () => {
       .then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      '/contributionrightsdatahandler' +
+      '/contributionrightshandler' +
       '?username=validUsername');
     expect(req.request.method).toEqual('GET');
 
@@ -503,7 +503,7 @@ describe('Admin backend api service', () => {
       .then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      '/contributionrightsdatahandler' +
+      '/contributionrightshandler' +
       '?username=InvalidUsername');
     expect(req.request.method).toEqual('GET');
 
@@ -526,7 +526,7 @@ describe('Admin backend api service', () => {
     let languageCode = null;
     let username = 'validUser';
     let method = 'all';
-    let payload = {
+    let params = {
       username: username,
       removal_type: method,
       category: category,
@@ -536,10 +536,12 @@ describe('Admin backend api service', () => {
       username, method, category, languageCode
     ).then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne(
-      '/removecontributionrightshandler');
-    expect(req.request.method).toEqual('PUT');
-    expect(req.request.body).toEqual(payload);
+    Object.keys(
+      params).forEach((key) => (params[key] === null) && delete params[key]);
+    let query = new URLSearchParams(params);
+    let url = '/contributionrightshandler?' + query.toString();
+    let req = httpTestingController.expectOne(url);
+    expect(req.request.method).toEqual('DELETE');
     req.flush(
       { status: 200, statusText: 'Success.'});
     flushMicrotasks();
@@ -555,7 +557,7 @@ describe('Admin backend api service', () => {
     let languageCode = null;
     let username = 'InvalidUser';
     let method = 'all';
-    let payload = {
+    let params = {
       username: username,
       removal_type: method,
       category: category,
@@ -565,10 +567,12 @@ describe('Admin backend api service', () => {
       username, method, category, languageCode
     ).then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne(
-      '/removecontributionrightshandler');
-    expect(req.request.method).toEqual('PUT');
-    expect(req.request.body).toEqual(payload);
+    Object.keys(
+      params).forEach((key) => (params[key] === null) && delete params[key]);
+    let query = new URLSearchParams(params);
+    let url = '/contributionrightshandler?' + query.toString();
+    let req = httpTestingController.expectOne(url);
+    expect(req.request.method).toEqual('DELETE');
 
     req.flush({
       error: 'User with given username does not exist.'
@@ -589,7 +593,7 @@ describe('Admin backend api service', () => {
     let languageCode = 'en';
     let username = 'validUser';
     let method = 'specific';
-    let payload = {
+    let params = {
       username: username,
       removal_type: method,
       category: category,
@@ -599,10 +603,12 @@ describe('Admin backend api service', () => {
       username, method, category, languageCode
     ).then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne(
-      '/removecontributionrightshandler');
-    expect(req.request.method).toEqual('PUT');
-    expect(req.request.body).toEqual(payload);
+    Object.keys(
+      params).forEach((key) => (params[key] === null) && delete params[key]);
+    let query = new URLSearchParams(params);
+    let url = '/contributionrightshandler?' + query.toString();
+    let req = httpTestingController.expectOne(url);
+    expect(req.request.method).toEqual('DELETE');
     req.flush(
       { status: 200, statusText: 'Success.'});
     flushMicrotasks();
@@ -618,7 +624,7 @@ describe('Admin backend api service', () => {
     let languageCode = 'en';
     let username = 'InvalidUser';
     let method = 'specific';
-    let payload = {
+    let params = {
       username: username,
       removal_type: method,
       category: category,
@@ -628,10 +634,12 @@ describe('Admin backend api service', () => {
       username, method, category, languageCode
     ).then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne(
-      '/removecontributionrightshandler');
-    expect(req.request.method).toEqual('PUT');
-    expect(req.request.body).toEqual(payload);
+    Object.keys(
+      params).forEach((key) => (params[key] === null) && delete params[key]);
+    let query = new URLSearchParams(params);
+    let url = '/contributionrightshandler?' + query.toString();
+    let req = httpTestingController.expectOne(url);
+    expect(req.request.method).toEqual('DELETE');
 
     req.flush({
       error: 'User with given username does not exist.'
