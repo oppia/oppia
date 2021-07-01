@@ -48,7 +48,7 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { StateTopAnswersStatsBackendApiService } from
   'services/state-top-answers-stats-backend-api.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { LostChangesModalComponent } from './modal-templates/lost-changes-modal.component';
 import { AutosaveInfoModalsService } from './services/autosave-info-modals.service';
 import { ChangeListService } from './services/change-list.service';

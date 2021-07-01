@@ -21,7 +21,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { EditableStoryBackendApiService } from
   'domain/story/editable-story-backend-api.service';
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 import CONSTANTS from 'assets/constants';
 
