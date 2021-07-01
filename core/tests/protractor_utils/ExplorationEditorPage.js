@@ -114,6 +114,8 @@ var ExplorationEditorPage = function() {
     by.css('.protractor-test-save-draft-button'));
   var saveDraftButtonTextContainer = element(
     by.css('.protractor-test-save-draft-message'));
+  var savePromptSaveButton = element(
+    by.css('.protractor-test-save-prompt-save-button'));
   var publishChangesButtonTextContainer = element(
     by.css('.protractor-test-publish-changes-message'));
   var publishExplorationButton = element(
@@ -298,6 +300,12 @@ var ExplorationEditorPage = function() {
   this.expectCannotPublishChanges = async function() {
     await action.waitForAutosave();
     expect(await publishExplorationButton.isEnabled()).toBeFalsy();
+  };
+
+  this.saveChangesAfterPrompt = async function(commitMessage) {
+    await action.waitForAutosave();
+    await action.click('Save prompt Save Draft button', savePromptSaveButton);
+    this.saveChanges(commitMessage);
   };
 
   // ---- NAVIGATION ----
