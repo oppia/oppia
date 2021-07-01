@@ -144,7 +144,7 @@
           </ul>
         </li>
         <li [ngClass]="{'open': activeMenuName === 'getInvolvedMenu'}"
-            ngDropdown
+            ngbDropdown
             [hidden]="navElementsVisibilityStatus.I18N_TOPNAV_GET_INVOLVED"
             class="nav-item oppia-navbar-clickable-dropdown protractor-test-about-oppia-list-item">
           <a ngbDropdownToggle (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
@@ -201,7 +201,6 @@
         *ngIf="userIsLoggedIn"
         class="nav-item protractor-test-profile-dropdown oppia-navbar-clickable-dropdown">
       <a (keydown)="onMenuKeypress($event, 'profileMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
-         ngbDropdownToggle
          class="nav-link oppia-navbar-dropdown-toggle protractor-test-navbar-dropdown-toggle"
          aria-haspopup="true"
          aria-expanded="false"
@@ -363,9 +362,6 @@
   </ul>
 </div>
 <style>
-  li.nav-item.oppia-navbar-clickable-dropdown.dropdown:hover {
-    background-color: #34665C;
-  }
   .dropdown-menu {
     left: 100 !important;
     right: 0 !important;
