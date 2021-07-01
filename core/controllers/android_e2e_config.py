@@ -61,7 +61,7 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
 
             The Topic contains a story and a subtopic.
 
-            Adding a Exploration to the topic requires a story 
+            Adding a Exploration to the topic requires a story
             with a exploration as a node.
 
             In the Story a exploration from the local assets is added
