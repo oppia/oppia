@@ -150,7 +150,6 @@ class BaseHandler(webapp2.RequestHandler):
     HANDLER_ARGS_SCHEMAS = None
     ARGS_WHICH_DO_NOT_NEED_SCHEMA_VALIDATION = ['csrf_token']
 
-
     def __init__(self, request, response):  # pylint: disable=super-init-not-called
         # Set self.request, self.response and self.app.
         self.initialize(request, response)
