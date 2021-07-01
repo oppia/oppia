@@ -16,7 +16,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { ExplorationDataService } from '../services/exploration-data.service';
 
 /**

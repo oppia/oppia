@@ -84,8 +84,8 @@ import { EditThumbnailModalComponent } from './forms/custom-forms-directives/edi
 import { TopNavigationBarComponent } from './common-layout-directives/navigation-bars/top-navigation-bar.component';
 import { CorrectnessFooterComponent } from 'pages/exploration-player-page/layout-directives/correctness-footer.component';
 import { ContinueButtonComponent } from 'pages/exploration-player-page/learner-experience/continue-button.component';
+import { BaseContentComponent, BaseContentNavBarBreadCrumbDirective } from '../base-components/base-content.component';
 import { QuestionDifficultySelectorComponent } from './question-difficulty-selector/question-difficulty-selector.component';
-import { BaseContentComponent } from '../base-components/base-content.component';
 import { PreviewThumbnailComponent } from 'pages/topic-editor-page/modal-templates/preview-thumbnail.component';
 import { InputResponsePairComponent } from 'pages/exploration-player-page/learner-experience/input-response-pair.component';
 import { I18nLanguageSelectorComponent } from '../base-components/i18n-language-selector.component';
@@ -95,6 +95,7 @@ import { DisplaySolutionModalComponent } from 'pages/exploration-player-page/mod
 import { DisplaySolutionInterstititalModalComponent } from 'pages/exploration-player-page/modals/display-solution-interstitial-modal.component';
 import { DisplayHintModalComponent } from 'pages/exploration-player-page/modals/display-hint-modal.component';
 import { HintAndSolutionButtonsComponent } from './button-directives/hint-and-solution-buttons.component';
+import { SearchBarComponent } from 'pages/library-page/search-bar/search-bar.component';
 
 
 // Directives.
@@ -235,6 +236,7 @@ const toastrConfig = {
     AttributionGuideComponent,
     BackgroundBannerComponent,
     BaseContentComponent,
+    BaseContentNavBarBreadCrumbDirective,
     CorrectnessFooterComponent,
     ContinueButtonComponent,
     CreateNewSkillModalComponent,
@@ -264,6 +266,7 @@ const toastrConfig = {
     QuestionDifficultySelectorComponent,
     SelectSkillModalComponent,
     RubricsEditorComponent,
+    SearchBarComponent,
     SharingLinksComponent,
     SideNavigationBarComponent,
     SkillSelectorComponent,
@@ -332,6 +335,7 @@ const toastrConfig = {
     PromoBarComponent,
     QuestionDifficultySelectorComponent,
     RubricsEditorComponent,
+    SearchBarComponent,
     SideNavigationBarComponent,
     StorySummaryTileComponent,
     SummaryListHeaderComponent,
@@ -372,6 +376,7 @@ const toastrConfig = {
     AlertMessageComponent,
     BackgroundBannerComponent,
     BaseContentComponent,
+    BaseContentNavBarBreadCrumbDirective,
     CorrectnessFooterComponent,
     ContinueButtonComponent,
     CreateNewSkillModalComponent,
@@ -397,6 +402,7 @@ const toastrConfig = {
     OnScreenKeyboardComponent,
     OppiaFooterComponent,
     OutcomeFeedbackEditorComponent,
+    SearchBarComponent,
     QuestionDifficultySelectorComponent,
     StateSkillEditorComponent,
     SelectSkillModalComponent,

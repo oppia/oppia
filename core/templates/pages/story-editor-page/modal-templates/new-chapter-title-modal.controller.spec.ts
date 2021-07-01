@@ -30,7 +30,7 @@ import { ExplorationIdValidationService } from
   'domain/exploration/exploration-id-validation.service';
 import { ExplorationSummaryBackendApiService } from
   'domain/summary/exploration-summary-backend-api.service';
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 describe('Create New Chapter Modal Controller', function() {
   var $scope = null;
