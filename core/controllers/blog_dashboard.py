@@ -110,34 +110,6 @@ class BlogPostHandler(base.BaseHandler):
     """Handler for blog dashboard editor"""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {
-        'blog_post_id': {
-            'type': 'basestring'
-        }
-    }
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {},
-        'PUT': {
-            'new_publish_status': {
-                'type': 'bool',
-            },
-            'change_dict': {
-                'type': 'object_dict',
-                'validation_method': (
-                    validation_method.validate_change_dict_for_blog_post),
-                'default_value': None
-            },
-        },
-        'POST': {
-            'thumbnail_filename': {
-                'type': 'basestring'
-            },
-            'image': {
-                'type': 'basestring',
-            }
-        },
-        'DELETE': {}
-    }
 
     @acl_decorators.can_access_blog_dashboard
     def get(self, blog_post_id):
@@ -184,14 +156,14 @@ class BlogPostHandler(base.BaseHandler):
             raise self.PageNotFoundException(
                 Exception('The blog post with the given id doesn\'t exist.'))
         blog_post_currently_published = blog_post_rights.blog_post_is_published
-        change_dict = self.normalized_payload.get('change_dict')
+        change_dict = self.payload.get('change_dict')
 
         try:
             blog_services.update_blog_post(blog_post_id, change_dict)
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
-        new_publish_status = self.normalized_payload.get('new_publish_status')
+        new_publish_status = self.payload.get('new_publish_status')
         if new_publish_status:
             blog_services.publish_blog_post(blog_post_id)
         elif blog_post_currently_published:
@@ -210,8 +182,8 @@ class BlogPostHandler(base.BaseHandler):
         # type: (str) -> None
         """Stores thumbnail of the blog post in the datastore."""
         blog_domain.BlogPost.require_valid_blog_post_id(blog_post_id)
-        raw_image = self.normalized_request.get('image')
-        thumbnail_filename = self.normalized_payload.get('thumbnail_filename')
+        raw_image = self.request.get('image')
+        thumbnail_filename = self.payload.get('thumbnail_filename')
         try:
             file_format = image_validation_services.validate_image_and_filename(
                 raw_image, thumbnail_filename)
