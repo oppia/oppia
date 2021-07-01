@@ -1291,7 +1291,9 @@ class IframeRestrictionTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS = {
             'GET': {
                 'iframe_restriction': {
-                    'type': 'basestring',
+                    'schema': {
+                        'type': 'basestring'
+                    },
                     'default_value': None
                 }
             }
@@ -1405,9 +1407,9 @@ class OppiaMLVMHandlerTests(test_utils.GenericTestBase):
         URL_PATH_ARGS_SCHEMAS = {}
         HANDLER_ARGS_SCHEMAS = {
             'POST': {
-                'vm_id': {'type': 'basestring'},
-                'signature': {'type': 'basestring'},
-                'message': {'type': 'basestring'},
+                'vm_id': {'schema': {'type': 'basestring'}},
+                'signature': {'schema': {'type': 'basestring'}},
+                'message': {'schema': {'type': 'basestring'}},
             }
         }
 
@@ -1424,9 +1426,9 @@ class OppiaMLVMHandlerTests(test_utils.GenericTestBase):
         URL_PATH_ARGS_SCHEMAS = {}
         HANDLER_ARGS_SCHEMAS = {
             'POST': {
-                'vm_id': {'type': 'basestring'},
-                'signature': {'type': 'basestring'},
-                'message': {'type': 'basestring'},
+                'vm_id': {'schema': {'type': 'basestring'}},
+                'signature': {'schema': {'type': 'basestring'}},
+                'message': {'schema': {'type': 'basestring'}},
             }
         }
 
@@ -1710,7 +1712,9 @@ class SchemaValidationUrlArgsTests(test_utils.GenericTestBase):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'exploration_id': {
-                'type': 'int'
+                'schema': {
+                    'type': 'int'
+                }
             }
         }
         HANDLER_ARGS_SCHEMAS = {'GET': {}}
@@ -1723,7 +1727,9 @@ class SchemaValidationUrlArgsTests(test_utils.GenericTestBase):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'exploration_id': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             }
         }
         HANDLER_ARGS_SCHEMAS = {'GET': {}}
@@ -1806,7 +1812,9 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS = {
             'GET': {
                 'exploration_id': {
-                    'type': 'int'
+                    'schema': {
+                        'type': 'int'
+                    }
                 }
             }
         }
@@ -1906,10 +1914,14 @@ class HandlerClassWithBothRequestAndPayloadTest(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS = {
             'POST': {
                 'arg_b': {
-                    'type': 'basestring'
+                    'schema': {
+                        'type': 'basestring'
+                    }
                 },
                 'arg_a': {
-                    'type': 'basestring'
+                    'schema': {
+                        'type': 'basestring'
+                    }
                 }
             }
         }
@@ -1956,22 +1968,32 @@ class ImageUploadHandlerTest(test_utils.GenericTestBase):
         """Handles image uploads."""
         URL_PATH_ARGS_SCHEMAS = {
             'entity_type': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             },
             'entity_id': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             }
         }
         HANDLER_ARGS_SCHEMAS = {
             'POST': {
                 'image': {
-                    'type': 'basestring'
+                    'schema': {
+                        'type': 'basestring'
+                    }
                 },
                 'filename': {
-                    'type': 'basestring'
+                    'schema': {
+                        'type': 'basestring'
+                    }
                 },
                 'filename_prefix': {
-                    'type': 'basestring',
+                    'schema': {
+                        'type': 'basestring'
+                    },
                     'default_value': None
                 }
             }

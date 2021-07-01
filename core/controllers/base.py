@@ -171,6 +171,7 @@ class BaseHandler(webapp2.RequestHandler):
         self.user_is_scheduled_for_deletion = False
         self.current_user_is_super_admin = False
         self.normalized_request = None
+        self.normalized_payload = None
 
         try:
             auth_claims = auth_services.get_auth_claims_from_request(request)
@@ -333,17 +334,20 @@ class BaseHandler(webapp2.RequestHandler):
         if handler_class_name in handler_class_names_with_no_schema:
             return
 
-        skip_validation_for_args = ['csrf_token', 'source']
         handler_args = {}
-
+        payload_arg_keys = []
+        request_arg_keys = []
+        skip_validation_for_args = ['csrf_token']
         for arg in self.request.arguments():
             if arg in skip_validation_for_args:
                 continue
             if arg == 'payload':
                 payload_args = self.payload
                 if payload_args is not None:
+                    payload_arg_keys = payload_args.keys()
                     handler_args.update(payload_args)
             else:
+                request_arg_keys.append(arg)
                 handler_args[arg] = self.request.get(arg)
 
         # For html handlers, extra args are allowed (to accommodate
@@ -388,7 +392,12 @@ class BaseHandler(webapp2.RequestHandler):
                 handler_args, schema_for_request_method, extra_args_are_allowed)
         )
 
-        self.normalized_request = normalized_value
+        self.normalized_payload = {
+            arg: normalized_value.get(arg) for arg in payload_arg_keys
+        }
+        self.normalized_request = {
+            arg: normalized_value.get(arg) for arg in request_arg_keys
+        }
 
         if errors:
             raise self.InvalidInputException('\n'.join(errors))
