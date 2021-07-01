@@ -54,20 +54,26 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
         'opportunity_type': {
-            'type': 'basestring'
+            'schema': {
+                'type': 'basestring'
+            }
         }
     }
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'cursor': {
-                'type': 'basestring',
+                'schema': {
+                    'type': 'basestring'
+                },
                 'default_value': None
             },
             'language_code': {
-                'type': 'basestring',
-                'validators': [{
-                    'id': 'is_supported_audio_language_code'
-                }],
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_supported_audio_language_code'
+                    }]
+                },
                 'default_value': None
             }
         }
@@ -218,13 +224,17 @@ class TranslatableTextHandler(base.BaseHandler):
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'language_code': {
-                'type': 'basestring',
-                'validators': [{
-                    'id': 'is_supported_audio_language_code'
-                }]
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_supported_audio_language_code'
+                    }]
+                }
             },
             'exp_id': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             }
         }
     }
@@ -311,19 +321,27 @@ class MachineTranslationStateTextsHandler(base.BaseHandler):
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'exp_id': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             },
             'state_name': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             },
             'content_ids': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             },
             'target_language_code': {
-                'type': 'basestring',
-                'validators': [{
-                    'id': 'is_supported_audio_language_code'
-                }]
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_supported_audio_language_code'
+                    }]
+                }
             }
         }
     }
