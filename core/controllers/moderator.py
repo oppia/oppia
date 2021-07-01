@@ -69,7 +69,7 @@ class FeaturedActivitiesHandler(base.BaseHandler):
     @acl_decorators.can_access_moderator_page
     def post(self):
         """Handles POST requests."""
-        featured_activity_reference_dicts = self.normalized_payload.get(
+        featured_activity_reference_dicts = self.normalized_request.get(
             'featured_activity_reference_dicts')
         featured_activity_references = [
             activity_domain.ActivityReference(
