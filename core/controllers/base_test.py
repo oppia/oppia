@@ -1918,11 +1918,11 @@ class HandlerClassWithBothRequestAndPayloadTest(test_utils.GenericTestBase):
             """Handles POST requests. This request method contains both type
             of args, i.e., request args as well as payload args.
             """
-            # arg_a = self.request.get('arg_in_request') is not used, since we
+            # arg_a = self.request.get('arg_a') is not used, since we
             # intend to use normalized value.
             arg_a = self.normalized_request.get('arg_a')
 
-            # arg_b = self.payload.get('arg_in_payload') is not used, since we
+            # arg_b = self.payload.get('arg_b') is not used, since we
             # intend to use normalized value.
             arg_b = self.normalized_request.get('arg_b')
 
