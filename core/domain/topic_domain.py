@@ -1168,6 +1168,8 @@ class Topic(python_utils.OBJECT):
             filename_prefix, subtopic_dict['thumbnail_filename'])
         if fs.isfile(filepath):
             subtopic_dict['thumbnail_size_in_bytes'] = len(fs.get(filepath))
+        else:
+            subtopic_dict['thumbnail_size_in_bytes'] = None
 
         return subtopic_dict
 

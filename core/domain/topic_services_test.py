@@ -1626,10 +1626,11 @@ class SubtopicMigrationTests(test_utils.GenericTestBase):
             'title': 'subtopic_title',
             'skill_ids': []
         }
-        subtopic_v3_dict = {
+        subtopic_v4_dict = {
             'id': 1,
             'thumbnail_filename': None,
             'thumbnail_bg_color': None,
+            'thumbnail_size_in_bytes': None,
             'title': 'subtopic_title',
             'skill_ids': [],
             'url_fragment': 'subtopictitle'
@@ -1653,18 +1654,18 @@ class SubtopicMigrationTests(test_utils.GenericTestBase):
 
         swap_topic_object = self.swap(topic_domain, 'Topic', MockTopicObject)
         current_schema_version_swap = self.swap(
-            feconf, 'CURRENT_SUBTOPIC_SCHEMA_VERSION', 3)
+            feconf, 'CURRENT_SUBTOPIC_SCHEMA_VERSION', 4)
 
         with swap_topic_object, current_schema_version_swap:
             topic = topic_fetchers.get_topic_from_model(model)
 
-        self.assertEqual(topic.subtopic_schema_version, 3)
+        self.assertEqual(topic.subtopic_schema_version, 4)
         self.assertEqual(topic.name, 'name')
         self.assertEqual(topic.canonical_name, 'name')
         self.assertEqual(topic.next_subtopic_id, 1)
         self.assertEqual(topic.language_code, 'en')
         self.assertEqual(len(topic.subtopics), 1)
-        self.assertEqual(topic.subtopics[0].to_dict(), subtopic_v3_dict)
+        self.assertEqual(topic.subtopics[0].to_dict(), subtopic_v4_dict)
 
 
 class StoryReferenceMigrationTests(test_utils.GenericTestBase):
