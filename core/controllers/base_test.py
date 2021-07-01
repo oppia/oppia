@@ -1928,7 +1928,6 @@ class HandlerClassWithBothRequestAndPayloadTest(test_utils.GenericTestBase):
 
             self.render_json({'arg_a': arg_a, 'arg_b': arg_b})
 
-
     def setUp(self):
         super(HandlerClassWithBothRequestAndPayloadTest, self).setUp()
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
