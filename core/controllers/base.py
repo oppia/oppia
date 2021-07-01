@@ -368,6 +368,14 @@ class BaseHandler(webapp2.RequestHandler):
         if errors:
             raise self.InvalidInputException('\n'.join(errors))
 
+        # This check ensures that if a request method is not defined
+        # in the handler class then schema validation will not raise
+        # NotImplementedError for that corresponding request method.
+        if request_method in ['GET', 'POST', 'PUT', 'DELETE'] and (
+                getattr(self.__class__, request_method.lower()) ==
+                getattr(BaseHandler, request_method.lower())):
+            return
+
         try:
             schema_for_request_method = self.HANDLER_ARGS_SCHEMAS[
                 request_method]
