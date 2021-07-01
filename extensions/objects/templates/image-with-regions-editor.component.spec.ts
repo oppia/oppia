@@ -1,3 +1,4 @@
+/* eslint-disable oppia/no-test-blockers */
 // Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -155,6 +156,9 @@ describe('ImageWithRegionsEditorComponent', () => {
     expect(component.valueChanged.emit).toHaveBeenCalledWith(component.value);
   });
 
+  // For the following tests Pre-Checks cannot be added because a state change
+  // does not occur within these functions. They just return css styling for
+  // various components of the region.
   it('should return selected region css styling for the rectangle' +
   ' when a region is selected', () => {
     component.selectedRegion = 0;
@@ -293,11 +297,9 @@ describe('ImageWithRegionsEditorComponent', () => {
           }
         }])
     );
-    let evt = document.createEvent('MouseEvent');
-    evt.initMouseEvent(
-      'move', true, true, window, 1,
-      800, 600, 500, 400, false, false, false, false, 0, null
-    );
+    spyOnProperty(MouseEvent.prototype, 'pageX', 'get').and.returnValue(500);
+    spyOnProperty(MouseEvent.prototype, 'pageY', 'get').and.returnValue(400);
+    let evt = new MouseEvent('Mousemove');
     component.userIsCurrentlyDrawing = true;
     component.originalMouseX = 200;
     component.originalMouseY = 200;
@@ -331,11 +333,9 @@ describe('ImageWithRegionsEditorComponent', () => {
           }
         }])
     );
-    let evt = document.createEvent('MouseEvent');
-    evt.initMouseEvent(
-      'move', true, true, window, 1,
-      800, 600, 700, 600, false, false, false, false, 0, null
-    );
+    spyOnProperty(MouseEvent.prototype, 'pageX', 'get').and.returnValue(700);
+    spyOnProperty(MouseEvent.prototype, 'pageY', 'get').and.returnValue(600);
+    let evt = new MouseEvent('Mousemove');
     component.userIsCurrentlyDragging = true;
     component.originalMouseX = 500;
     component.originalMouseY = 500;
@@ -400,11 +400,9 @@ describe('ImageWithRegionsEditorComponent', () => {
           }
         }])
     );
-    let evt = document.createEvent('MouseEvent');
-    evt.initMouseEvent(
-      'click', true, true, window, 1,
-      800, 600, 2000, 1707, false, false, false, false, 0, null
-    );
+    spyOnProperty(MouseEvent.prototype, 'pageX', 'get').and.returnValue(2000);
+    spyOnProperty(MouseEvent.prototype, 'pageY', 'get').and.returnValue(1707);
+    let evt = new MouseEvent('Mousemove');
     component.userIsCurrentlyDragging = true;
     component.originalMouseX = 500;
     component.originalMouseY = 500;
@@ -469,11 +467,9 @@ describe('ImageWithRegionsEditorComponent', () => {
           }
         }])
     );
-    let evt = document.createEvent('MouseEvent');
-    evt.initMouseEvent(
-      'move', true, true, window, 1,
-      800, 600, 600, 400, false, false, false, false, 0, null
-    );
+    spyOnProperty(MouseEvent.prototype, 'pageX', 'get').and.returnValue(600);
+    spyOnProperty(MouseEvent.prototype, 'pageY', 'get').and.returnValue(400);
+    let evt = new MouseEvent('Mousemove');
     component.userIsCurrentlyDrawing = false;
     component.userIsCurrentlyDragging = false;
     component.userIsCurrentlyResizing = true;
@@ -545,11 +541,9 @@ describe('ImageWithRegionsEditorComponent', () => {
           }
         }])
     );
-    let evt = document.createEvent('MouseEvent');
-    evt.initMouseEvent(
-      'move', true, true, window, 1,
-      2560, 1440, 600, 200, false, false, false, false, 0, null
-    );
+    spyOnProperty(MouseEvent.prototype, 'pageX', 'get').and.returnValue(600);
+    spyOnProperty(MouseEvent.prototype, 'pageY', 'get').and.returnValue(200);
+    let evt = new MouseEvent('Mousemove');
     component.userIsCurrentlyDrawing = false;
     component.userIsCurrentlyDragging = false;
     component.userIsCurrentlyResizing = true;
