@@ -2117,7 +2117,7 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
                     'The exploration id is: %s, \n '
                     'The frontend version is: %s \n '
                     'The changes list is: %s '
-                    'id %s' % (exp_id, frontend_version, change_list))
+                    % (exp_id, frontend_version, change_list))
             return False
 
         changes_are_mergeable = False
@@ -2154,7 +2154,7 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
                             'The exploration id is: %s, \n '
                             'The frontend version is: %s \n '
                             'The changes list is: %s '
-                            'id %s' % (exp_id, frontend_version, change_list))
+                            % (exp_id, frontend_version, change_list))
                     return False
                 if old_state_name not in changed_translations:
                     changed_translations[old_state_name] = []
@@ -2315,7 +2315,7 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
                             'The exploration id is: %s, \n '
                             'The frontend version is: %s \n '
                             'The changes list is: %s '
-                            'id %s' % (exp_id, frontend_version, change_list))
+                            % (exp_id, frontend_version, change_list))
                     return False
                 if old_state_name not in changed_translations:
                     changed_translations[old_state_name] = []
@@ -2414,7 +2414,7 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
                 continue
             else:
                 changes_are_mergeable = False
-                return False
+                break
 
         return changes_are_mergeable
 
