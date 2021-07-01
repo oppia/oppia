@@ -279,5 +279,9 @@ class CronTranslationContributionStatsHandler(base.BaseHandler):
     @acl_decorators.can_perform_cron_tasks
     def get(self):
         """Handles GET requests."""
-        suggestion_jobs_one_off.PopulateTranslationContributionStatsOneOffJob.enqueue(
-            suggestion_jobs_one_off.PopulateTranslationContributionStatsOneOffJob.create_new())
+        (
+            suggestion_jobs_one_off
+            .PopulateTranslationContributionStatsOneOffJob.enqueue(
+                suggestion_jobs_one_off
+                .PopulateTranslationContributionStatsOneOffJob.create_new())
+        )
