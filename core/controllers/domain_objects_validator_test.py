@@ -54,13 +54,13 @@ class ValidateNewConfigPropertyValuesTests(test_utils.GenericTestBase):
 
     def test_invalid_object_raises_exception(self):
         config_properties = {'some_config_property': 20, }
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegexp(
             Exception, 'some_config_property do not have any schema.'):
             domain_objects_validator.validate_new_config_property_values(
                 config_properties)
 
         config_properties = {1234: 20, }
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegexp(
             Exception, 'config property name should be a string, received'
             ': %s' % 1234):
             domain_objects_validator.validate_new_config_property_values(
