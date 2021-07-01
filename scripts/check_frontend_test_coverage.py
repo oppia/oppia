@@ -175,7 +175,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'oppia-short-response-set-input.component.ts',
     'oppia-short-response-text-input.component.ts',
     'oppia-visualization-enumerated-frequency-table.directive.ts',
-    'opportunities-list.component.ts',
     'outcome-destination-editor.directive.ts',
     'outcome-editor.directive.ts',
     'parameter-name-editor.directive.ts',
