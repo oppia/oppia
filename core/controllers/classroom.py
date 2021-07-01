@@ -31,7 +31,9 @@ class ClassroomPage(base.BaseHandler):
 
     URL_PATH_ARGS_SCHEMAS = {
         'classroom_url_fragment': {
-            'type': 'basestring'
+            'schema': {
+                'type': 'basestring'
+            }
         }
     }
     HANDLER_ARGS_SCHEMAS = {'GET': {}}
@@ -51,7 +53,9 @@ class ClassroomDataHandler(base.BaseHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
         'classroom_url_fragment': {
-            'type': 'basestring'
+            'schema': {
+                'type': 'basestring'
+            }
         }
     }
     HANDLER_ARGS_SCHEMAS = {'GET': {}}

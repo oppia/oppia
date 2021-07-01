@@ -81,82 +81,104 @@ class AdminHandler(base.BaseHandler):
         'GET': {},
         'POST': {
             'action': {
-                'type': 'basestring',
-                'choices': [
-                    'reload_exploration', 'reload_collection',
-                    'generate_dummy_explorations', 'clear_search_index',
-                    'generate_dummy_new_structures_data',
-                    'generate_dummy_new_skill_data', 'save_config_properties',
-                    'revert_config_property', 'upload_topic_similarities',
-                    'regenerate_topic_related_opportunities',
-                    'regenerate_missing_exploration_stats',
-                    'update_feature_flag_rules'
-                ],
+                'schema': {
+                    'type': 'basestring',
+                    'choices': [
+                        'reload_exploration', 'reload_collection',
+                        'generate_dummy_explorations', 'clear_search_index',
+                        'generate_dummy_new_structures_data',
+                        'generate_dummy_new_skill_data',
+                        'save_config_properties', 'revert_config_property',
+                        'upload_topic_similarities',
+                        'regenerate_topic_related_opportunities',
+                        'update_feature_flag_rules'
+                    ]
+                },
                 'default_value': None
             },
             'exploration_id': {
-                'type': 'basestring',
+                'schema': {
+                    'type': 'basestring'
+                },
                 'default_value': None
             },
             'collection_id': {
-                'type': 'basestring',
+                'schema': {
+                    'type': 'basestring'
+                },
                 'default_value': None
             },
             'num_dummy_exps_to_generate': {
-                'type': 'int',
+                'schema': {
+                    'type': 'int'
+                },
                 'default_value': None
             },
             'num_dummy_exps_to_publish': {
-                'type': 'int',
+                'schema': {
+                    'type': 'int'
+                },
                 'default_value': None
             },
             'new_config_property_values': {
-                'type': 'object_dict',
-                'validation_method': (
-                    validation_method.validate_new_config_property_values),
+                'schema': {
+                    'type': 'object_dict',
+                    'validation_method': (
+                        validation_method.validate_new_config_property_values)
+                },
                 'default_value': None
             },
             'config_property_id': {
-                'type': 'basestring',
+                'schema': {
+                    'type': 'basestring'
+                },
                 'default_value': None
             },
             'data': {
-                'type': 'basestring',
+                'schema': {
+                    'type': 'basestring'
+                },
                 'default_value': None
             },
             'topic_id': {
-                'type': 'basestring',
+                'schema': {
+                    'type': 'basestring'
+                },
                 'default_value': None
             },
             'feature_name': {
-                'type': 'basestring',
-                'default_value': None,
-                'choices': feature_services.ALL_FEATURES_NAMES_SET
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
             },
             'commit_message': {
-                'type': 'basestring',
+                'schema': {
+                    'type': 'basestring'
+                },
                 'default_value': None
             },
             'new_rules': {
-                'type': 'list',
-                'items': {
-                    'type': 'dict',
-                    'properties': [{
-                        'name': 'value_when_matched',
-                        'schema': {
-                            'type': 'bool'
-                        }
-                    }, {
-                        'name': 'filters',
-                        'schema': {
-                            'type': 'list',
-                            'items': {
-                                'type': 'object_dict',
-                                'object_class': (
-                                    parameter_domain.PlatformParameterFilter)
+                'schema': {
+                    'type': 'list',
+                    'items': {
+                        'type': 'dict',
+                        'properties': [{
+                            'name': 'value_when_matched',
+                            'schema': {
+                                'type': 'bool'
                             }
-                        }
-                    }]
+                        }, {
+                            'name': 'filters',
+                            'schema': {
+                                'type': 'list',
+                                'items': {
+                                    'type': 'object_dict',
+                                    'object_class': parameter_domain.PlatformParameterFilter
+                                }
+                            }
+                        }]
+                    }
                 },
                 'default_value': None
             }
@@ -659,30 +681,42 @@ class AdminRoleHandler(base.BaseHandler):
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'filter_criterion': {
-                'type': 'basestring',
-                'choices': [
-                    feconf.USER_FILTER_CRITERION_ROLE,
-                    feconf.USER_FILTER_CRITERION_USERNAME
-                ]
+                'schema': {
+                    'type': 'basestring',
+                    'choices': [
+                        feconf.USER_FILTER_CRITERION_ROLE,
+                        feconf.USER_FILTER_CRITERION_USERNAME
+                    ]
+                }
             },
             'role': {
-                'type': 'basestring',
+                'schema': {
+                    'type': 'basestring'
+                },
                 'default_value': None
             },
             'username': {
-                'type': 'basestring',
+                'schema': {
+                    'type': 'basestring'
+                },
                 'default_value': None
             }
         },
         'POST': {
             'role': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             },
             'username': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             },
             'topic_id': {
-                'type': 'basestring',
+                'schema': {
+                    'type': 'basestring'
+                },
                 'default_value': None
             }
         }
@@ -757,12 +791,16 @@ class AdminSuperAdminPrivilegesHandler(base.BaseHandler):
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
             'username': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             }
         },
         'DELETE': {
             'username': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             }
         }
     }
@@ -824,16 +862,24 @@ class DataExtractionQueryHandler(base.BaseHandler):
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'exp_id': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             },
             'exp_version': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             },
             'state_name': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             },
             'num_answers': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             }
         }
     }
@@ -886,22 +932,28 @@ class AddContributionRightsHandler(base.BaseHandler):
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
             'username': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             },
             'category': {
-                'type': 'basestring',
-                'choices': [
-                    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
-                    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
-                    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
-                    constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION
-                ]
+                'schema': {
+                    'type': 'basestring',
+                    'choices': [
+                        constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+                        constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
+                        constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
+                        constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION
+                    ]
+                }
             },
             'language_code': {
-                'type': 'basestring',
-                'validators': [{
-                    'id': 'is_supported_audio_language_code'
-                }],
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_supported_audio_language_code'
+                    }]
+                },
                 'default_value': None
             }
         }
@@ -965,30 +1017,38 @@ class RemoveContributionRightsHandler(base.BaseHandler):
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
             'username': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             },
             'removal_type': {
-                'type': 'basestring',
-                'choices': [
-                    constants.ACTION_REMOVE_ALL_REVIEW_RIGHTS,
-                    constants.ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS
-                ]
+                'schema': {
+                    'type': 'basestring',
+                    'choices': [
+                        constants.ACTION_REMOVE_ALL_REVIEW_RIGHTS,
+                        constants.ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS
+                    ]
+                }
             },
             'category': {
-                'type': 'basestring',
-                'choices': [
-                    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
-                    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
-                    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
-                    constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION
-                ],
+                'schema': {
+                    'type': 'basestring',
+                    'choices': [
+                        constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+                        constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
+                        constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
+                        constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION
+                    ]
+                },
                 'default_value': None
             },
             'language_code': {
-                'type': 'basestring',
-                'validators': [{
-                    'id': 'is_supported_audio_language_code'
-                }],
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_supported_audio_language_code'
+                    }]
+                },
                 'default_value': None
             }
         }
@@ -1062,19 +1122,23 @@ class ContributorUsersListHandler(base.BaseHandler):
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'category': {
-                'type': 'basestring',
-                'choices': [
-                    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
-                    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
-                    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
-                    constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION
-                ]
+                'schema': {
+                    'type': 'basestring',
+                    'choices': [
+                        constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+                        constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
+                        constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
+                        constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION
+                    ]
+                }
             },
             'language_code': {
-                'type': 'basestring',
-                'validators': [{
-                    'id': 'is_supported_audio_language_code'
-                }],
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_supported_audio_language_code'
+                    }]
+                },
                 'default_value': None
             }
         }
@@ -1098,7 +1162,9 @@ class ContributionRightsDataHandler(base.BaseHandler):
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'username': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             }
         }
     }
@@ -1145,14 +1211,18 @@ class UpdateUsernameHandler(base.BaseHandler):
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
             'old_username': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             },
             'new_username': {
-                'type': 'basestring',
-                'validators': [{
-                    'id': 'is_length_atmost',
-                    'max_value': constants.MAX_USERNAME_LENGTH
-                }]
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_length_atmost',
+                        'max_value': constants.MAX_USERNAME_LENGTH
+                    }]
+                }
             }
         }
     }
@@ -1201,7 +1271,9 @@ class VerifyUserModelsDeletedHandler(base.BaseHandler):
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'user_id': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             }
         }
     }
@@ -1222,10 +1294,14 @@ class DeleteUserHandler(base.BaseHandler):
     HANDLER_ARGS_SCHEMAS = {
         'DELETE': {
             'user_id': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             },
             'username': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             }
         }
     }
