@@ -89,31 +89,26 @@ class BlogAdminHandler(base.BaseHandler):
     def post(self):
         # type: () -> None
         """Handles POST requests."""
-        try:
-            result = {}
-            if self.normalized_payload.get(
-                    'action') == 'save_config_properties':
-                new_config_property_values = self.normalized_payload.get(
-                    'new_config_property_values')
-                logging.info(
-                    '[BLOG ADMIN] %s saved config property values: %s' %
-                    (self.user_id, new_config_property_values))
-                for (name, value) in new_config_property_values.items():
-                    config_services.set_property(self.user_id, name, value)
-            elif self.normalized_payload.get(
-                    'action') == 'revert_config_property':
-                config_property_id = (
-                    self.normalized_payload.get('config_property_id'))
-                config_services.revert_property(
-                    self.user_id, config_property_id)
-                logging.info(
-                    '[BLOG ADMIN] %s reverted config property: %s' %
-                    (self.user_id, config_property_id))
-            self.render_json(result)
-        except Exception as e:
-            logging.exception('[BLOG ADMIN] %s', e)
-            self.render_json({'error': python_utils.UNICODE(e)})
-            python_utils.reraise_exception()
+        result = {}
+        if self.normalized_payload.get(
+                'action') == 'save_config_properties':
+            new_config_property_values = self.normalized_payload.get(
+                'new_config_property_values')
+            logging.info(
+                '[BLOG ADMIN] %s saved config property values: %s' %
+                (self.user_id, new_config_property_values))
+            for (name, value) in new_config_property_values.items():
+                config_services.set_property(self.user_id, name, value)
+        elif self.normalized_payload.get(
+                'action') == 'revert_config_property':
+            config_property_id = (
+                self.normalized_payload.get('config_property_id'))
+            config_services.revert_property(
+                self.user_id, config_property_id)
+            logging.info(
+                '[BLOG ADMIN] %s reverted config property: %s' %
+                (self.user_id, config_property_id))
+        self.render_json(result)
 
 
 class BlogAdminRolesHandler(base.BaseHandler):

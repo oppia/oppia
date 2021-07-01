@@ -151,9 +151,6 @@ class BlogPostHandler(base.BaseHandler):
         blog_domain.BlogPost.require_valid_blog_post_id(blog_post_id)
         blog_post_rights = (
             blog_services.get_blog_post_rights(blog_post_id, strict=False))
-        if blog_post_rights is None:
-            raise self.PageNotFoundException(
-                Exception('The blog post with the given id doesn\'t exist.'))
         blog_post_currently_published = blog_post_rights.blog_post_is_published
         change_dict = self.payload.get('change_dict')
 
@@ -207,9 +204,6 @@ class BlogPostHandler(base.BaseHandler):
         blog_domain.BlogPost.require_valid_blog_post_id(blog_post_id)
         blog_post = (
             blog_services.get_blog_post_by_id(blog_post_id, strict=False))
-        if blog_post is None:
-            raise self.PageNotFoundException(
-                'The blog post with the given id doesn\'t exist.')
         blog_services.delete_blog_post(blog_post_id)
 
         self.render_json(self.values)

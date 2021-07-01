@@ -69,13 +69,14 @@ class ValidateNewConfigPropertyValuesTests(test_utils.GenericTestBase):
     def test_valid_object_raises_no_exception(self):
         config_properties = {
             'max_number_of_tags_assigned_to_blog_post': 20,
-            }
+        }
         domain_objects_validator.validate_new_config_property_values(
             config_properties)
 
 
 class ValidateChangeDictForBlogPost(test_utils.GenericTestBase):
-    """Tests to validate change_dict coming from API."""
+    """Tests to validate change_dict containing updated values for blog
+    post object coming from API."""
 
     def test_invalid_title_raises_exception(self):
         blog_post_change = {

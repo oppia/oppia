@@ -181,3 +181,30 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
              % self.blog_admin_id])
 
         self.logout()
+
+    def test_invalid_values_for_updating_config_properties(self):
+        self.login(self.BLOG_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        new_config_value = [20]
+
+        response_dict = self.get_json('/blogadminhandler')
+        response_config_properties = response_dict['config_properties']
+        self.assertDictContainsSubset({
+            'value': 10,
+        }, response_config_properties[
+            config_domain.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.name])
+
+        payload = {
+            'action': 'save_config_properties',
+            'new_config_property_values': {
+                config_domain.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.name: (
+                    new_config_value),
+            }
+        }
+        response_dict = self.post_json(
+            '/blogadminhandler', payload, csrf_token=csrf_token,
+            expected_status_int=400)
+        self.assertEqual(
+            response_dict['error'], 'Schema validation for \'new_config_property'
+            '_values\' failed: Could not convert list to int: [20]')
+                
