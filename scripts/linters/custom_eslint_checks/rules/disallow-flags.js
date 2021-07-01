@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Lint check to disallow flags.
+ * @fileoverview Lint check to disallow camelcase and no-explicity flags'.
  */
 
 'use strict';
@@ -22,7 +22,7 @@ module.exports = {
   meta: {
     type: 'problem',
     docs: {
-      description: 'Lint check to disallow flags',
+      description: 'Lint check to disallow camelcase and no-explicity flags',
       category: 'Stylistic Issues',
       recommended: true
     },
