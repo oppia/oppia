@@ -53,6 +53,7 @@ class BlogHomepageDataHandler(base.BaseHandler):
     HANDLER_ARGS_SCHEMAS = {
         'GET': {},
     }
+
     @acl_decorators.open_access
     def get(self):
         # type: () -> None
@@ -84,6 +85,7 @@ class BlogPostHandler(base.BaseHandler):
     HANDLER_ARGS_SCHEMAS = {
         'GET': {},
     }
+
     @acl_decorators.open_access
     def get(self, blog_post_url):
         # type: () -> None
@@ -94,7 +96,8 @@ class BlogPostHandler(base.BaseHandler):
                 Exception(
                     'The blog post page with the given url doesn\'t exist.'))
         user_settings = user_services.get_user_settings(blog_post.author_id)
-        blog_post_dict = blog_services.get_blog_post_from_model(blog_post).to_dict()
+        blog_post_dict = (
+            blog_services.get_blog_post_from_model(blog_post).to_dict())
         blog_post_dict['author_name'] = user_settings.username
         del blog_post_dict['author_id']
         blog_post_summaries = blog_services.get_blog_post_summaries_by_user_id(
@@ -122,6 +125,7 @@ class AuthorsPageHandler(base.BaseHandler):
     HANDLER_ARGS_SCHEMAS = {
         'GET': {},
     }
+
     @acl_decorators.open_access
     def get(self, author_username):
         """Handles GET requests."""

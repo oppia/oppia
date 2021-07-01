@@ -339,8 +339,8 @@ class BlogPostRightsModel(base_models.BaseModel):
 
         Args:
             user_id: str. ID of user.
-            number: int | None. Number of BlogPostRightsModel to be fetched. All
-            existing models will be fetched if none.
+            number: int. Number of BlogPostRightsModel to be fetched. All
+                existing models will be fetched if none.
 
         Returns:
             list(BlogPostRightsModel). The list of BlogPostRightsModel objects

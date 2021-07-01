@@ -87,6 +87,7 @@ class BlogHomepageDataHandlerTest(test_utils.GenericTestBase):
             'Sample Title Two'
         )
 
+
 class BlogPostHandlerTest(test_utils.GenericTestBase):
     """Checks that the data of the blog post and other data on
     BlogPostPage is properly handled."""
@@ -154,6 +155,7 @@ class BlogPostHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             len(json_response['summary_dicts']), 2)
         self.assertIsNotNone(json_response['profile_picture_data_url'])
+
 
 class AuthorsPageHandlerTest(test_utils.GenericTestBase):
     """Checks that the author data and related blog summary cards are
