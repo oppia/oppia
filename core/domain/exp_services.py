@@ -580,47 +580,15 @@ def apply_change_list(exploration_id, change_list, frontend_version):
             python_utils.reraise_exception()
     else:
         exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-        # A complete list of changes from one version to another
-        # is composite_change_list.
-        composite_change_list = get_composite_change_list(
-            exploration_id, frontend_version, backend_version)
-        exp_versions_diff = exp_domain.ExplorationVersionsDiff(
-            composite_change_list)
-
-        # Old_to_new_state_names: dict. Dictionary mapping state names of
-        # prev_exp_version to the state names of current_exp_version.
-        # It doesn't include the name changes of added/deleted states.
-        old_to_new_state_names = exp_versions_diff.old_to_new_state_names
-
-        # state_names_of_renamed_states: Stores the changes in states names
-        # in change_list.
-        state_names_of_renamed_states = {}
         try:
             to_param_domain = param_domain.ParamChange.from_dict
             for change in change_list:
                 if change.cmd == exp_domain.CMD_RENAME_STATE:
-                    change_old_state_name = change.old_state_name
-                    change_new_state_name = change.new_state_name
-                    if change_old_state_name in state_names_of_renamed_states:
-                        state_names_of_renamed_states[change_new_state_name] = (
-                            state_names_of_renamed_states.pop(
-                                change_old_state_name))
-                    else:
-                        state_names_of_renamed_states[change_new_state_name] = (
-                            change_old_state_name)
                     exploration.rename_state(
-                        change_old_state_name, change_new_state_name)
+                        change.old_state_name, change.new_state_name)
                 elif change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
-                    old_state_name = change.state_name
-                    new_state_name = change.state_name
-                    if change.state_name in state_names_of_renamed_states:
-                        old_state_name = (
-                            state_names_of_renamed_states[change.state_name])
-                        new_state_name = (
-                            state_names_of_renamed_states[change.state_name])
-                    if old_state_name in old_to_new_state_names:
-                        new_state_name = old_to_new_state_names[old_state_name]
-                    state = exploration.states[new_state_name]
+                    state_name = change.state_name
+                    state = exploration.states[state_name]
                     if (change.property_name ==
                             exp_domain.STATE_PROPERTY_CONTENT):
                         content = (
@@ -729,33 +697,16 @@ def apply_change_list(exploration_id, change_list, frontend_version):
                                 change.new_value))
                         state.update_recorded_voiceovers(recorded_voiceovers)
                 elif change.cmd == exp_domain.CMD_ADD_WRITTEN_TRANSLATION:
-                    old_state_name = change.state_name
-                    new_state_name = change.state_name
-                    if change.state_name in state_names_of_renamed_states:
-                        old_state_name = (
-                            state_names_of_renamed_states[change.state_name])
-                        new_state_name = (
-                            state_names_of_renamed_states[change.state_name])
-                    if old_state_name in old_to_new_state_names:
-                        new_state_name = (
-                            old_to_new_state_names[old_state_name])
-                    exploration.states[new_state_name].add_written_translation(
+                    state_name = change.state_name
+                    exploration.states[state_name].add_written_translation(
                         change.content_id, change.language_code,
                         change.translation_html, change.data_format)
                 elif (change.cmd ==
                       exp_domain.CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE
                      ):
-                    old_state_name = change.state_name
-                    new_state_name = change.state_name
-                    if change.state_name in state_names_of_renamed_states:
-                        old_state_name = (
-                            state_names_of_renamed_states[change.state_name])
-                        new_state_name = (
-                            state_names_of_renamed_states[change.state_name])
-                    if old_state_name in old_to_new_state_names:
-                        new_state_name = old_to_new_state_names[old_state_name]
+                    state_name = change.state_name
                     exploration.states[
-                        new_state_name
+                        state_name
                     ].mark_written_translations_as_needing_update(
                         change.content_id)
                 elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
@@ -2163,8 +2114,10 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
             if feconf.CAN_SEND_EMAILS:
                 email_manager.send_mail_to_admin(
                     'Adding/Deleting State Changes not mergeable',
-                    'The deleted skills: %s are still present in topic with '
-                    'id %s' % (exp_id, change_list))
+                    'The exploration id is: %s, \n '
+                    'The frontend version is: %s \n '
+                    'The changes list is: %s '
+                    'id %s' % (exp_id, frontend_version, change_list))
             return False
 
         changes_are_mergeable = False
@@ -2194,16 +2147,21 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
                 if change.state_name in state_names_of_renamed_states:
                     old_state_name = (
                         state_names_of_renamed_states[change.state_name])
-                    new_state_name = (
-                        state_names_of_renamed_states[change.state_name])
                 if old_state_name in old_to_new_state_names:
-                    new_state_name = old_to_new_state_names[old_state_name]
+                    if feconf.CAN_SEND_EMAILS:
+                        email_manager.send_mail_to_admin(
+                            'Adding/Deleting State Changes not mergeable',
+                            'The exploration id is: %s, \n '
+                            'The frontend version is: %s \n '
+                            'The changes list is: %s '
+                            'id %s' % (exp_id, frontend_version, change_list))
+                    return False
                 if old_state_name not in changed_translations:
                     changed_translations[old_state_name] = []
                 frontend_exp_states = (
                     frontend_version_exploration.states[old_state_name])
                 backend_exp_states = (
-                    backend_version_exploration.states[new_state_name])
+                    backend_version_exploration.states[old_state_name])
                 if (change.property_name ==
                         exp_domain.STATE_PROPERTY_CONTENT):
                     if old_state_name in changed_properties:
@@ -2350,10 +2308,15 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
                 if change.state_name in state_names_of_renamed_states:
                     old_state_name = (
                         state_names_of_renamed_states[change.state_name])
-                    new_state_name = (
-                        state_names_of_renamed_states[change.state_name])
                 if old_state_name in old_to_new_state_names:
-                    new_state_name = old_to_new_state_names[old_state_name]
+                    if feconf.CAN_SEND_EMAILS:
+                        email_manager.send_mail_to_admin(
+                            'Adding/Deleting State Changes not mergeable',
+                            'The exploration id is: %s, \n '
+                            'The frontend version is: %s \n '
+                            'The changes list is: %s '
+                            'id %s' % (exp_id, frontend_version, change_list))
+                    return False
                 if old_state_name not in changed_translations:
                     changed_translations[old_state_name] = []
                 if old_state_name in changed_properties:
@@ -2620,8 +2583,8 @@ def get_exp_with_draft_applied(exp_id, user_id):
     updated_exploration = None
 
     if (exp_user_data and exp_user_data.draft_change_list and
-            is_version_of_draft_valid(
-                exp_id, draft_change_list_exp_version)):
+            are_changes_mergeable(
+                exp_id, draft_change_list_exp_version, draft_change_list)):
         updated_exploration = apply_change_list(
             exp_id, draft_change_list,
             draft_change_list_exp_version)
