@@ -27,7 +27,7 @@ import { FeatureStage, PlatformParameter } from 'domain/platform_feature/platfor
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { Schema } from 'services/schema-default-value.service';
 
-fdescribe('Admin backend api service', () => {
+describe('Admin backend api service', () => {
   let abas: AdminBackendApiService;
   let httpTestingController: HttpTestingController;
   let csrfService: CsrfTokenService = null;
