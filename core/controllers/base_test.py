@@ -1942,3 +1942,80 @@ class HandlerClassWithBothRequestAndPayloadTest(test_utils.GenericTestBase):
         with self.swap(self, 'testapp', self.testapp):
             self.post_json(
                 '/mock?arg_a=arg_in_request', payload, csrf_token=csrf_token)
+
+
+class ImageUploadHandlerTest(test_utils.GenericTestBase):
+    """This test class ensures that schema validation is done successfully
+    for handlers which upload image files.
+    """
+
+    TEST_LEARNER_EMAIL = 'test.learner@example.com'
+    TEST_LEARNER_USERNAME = 'testlearneruser'
+
+    class MockUploadHandler(base.BaseHandler):
+        """Handles image uploads."""
+        URL_PATH_ARGS_SCHEMAS = {
+            'entity_type': {
+                'type': 'basestring'
+            },
+            'entity_id': {
+                'type': 'basestring'
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {
+            'POST': {
+                'image': {
+                    'type': 'basestring'
+                },
+                'filename': {
+                    'type': 'basestring'
+                },
+                'filename_prefix': {
+                    'type': 'basestring',
+                    'default_value': None
+                }
+            }
+        }
+
+        def post(self, entity_type, entity_id):
+            """Saves an image uploaded by a content creator."""
+
+            raw = self.normalized_request.get('image')
+            filename = self.normalized_request.get('filename')
+            filename_prefix = self.normalized_request.get('filename_prefix')
+
+            self.render_json({'filename': filename})
+
+    def setUp(self):
+        super(ImageUploadHandlerTest, self).setUp()
+        self.signup(self.TEST_LEARNER_EMAIL, self.TEST_LEARNER_USERNAME)
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock_upload/<entity_type>/<entity_id>',
+            self.MockUploadHandler, name='MockUploadHandler')],
+            debug=feconf.DEBUG,
+        ))
+
+        self.system_user = user_services.get_system_user()
+        exp_services.load_demo('0')
+
+        rights_manager.release_ownership_of_exploration(
+            self.system_user, '0')
+
+    def test_image_upload_and_download(self):
+        """Test image uploading and downloading."""
+        self.login(self.TEST_LEARNER_EMAIL)
+        user_id = user_services.get_user_id_from_username('testlearneruser')
+        csrf_token = base.CsrfTokenManager.create_csrf_token(user_id)
+
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
+            'rb', encoding=None) as f:
+            raw_image = f.read()
+        with self.swap(self, 'testapp', self.testapp):
+            response_dict = self.post_json(
+                '/mock_upload/exploration/0', {'filename': 'test.png'},
+                csrf_token=csrf_token,
+                upload_files=(('image', 'unused_filename', raw_image),)
+            )
+            filename = response_dict['filename']
+        self.logout()
