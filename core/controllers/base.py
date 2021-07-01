@@ -148,6 +148,8 @@ class BaseHandler(webapp2.RequestHandler):
 
     URL_PATH_ARGS_SCHEMAS = None
     HANDLER_ARGS_SCHEMAS = None
+    ARGS_WHICH_DO_NOT_NEED_SCHEMA_VALIDATION = ['csrf_token']
+
 
     def __init__(self, request, response):  # pylint: disable=super-init-not-called
         # Set self.request, self.response and self.app.
@@ -158,6 +160,8 @@ class BaseHandler(webapp2.RequestHandler):
         # Initializes the return dict for the handlers.
         self.values = {}
 
+        # TODO(#13155): Remove the if-else part once all the handlers have had
+        # schema validation implemented.
         if self.request.get('payload'):
             self.payload = json.loads(self.request.get('payload'))
         else:
@@ -337,9 +341,8 @@ class BaseHandler(webapp2.RequestHandler):
         handler_args = {}
         payload_arg_keys = []
         request_arg_keys = []
-        skip_validation_for_args = ['csrf_token']
         for arg in self.request.arguments():
-            if arg in skip_validation_for_args:
+            if arg in self.ARGS_WHICH_DO_NOT_NEED_SCHEMA_VALIDATION:
                 continue
             if arg == 'payload':
                 payload_args = self.payload
