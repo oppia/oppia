@@ -101,6 +101,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
                 'id': 1,
                 'thumbnail_filename': 'image.svg',
                 'thumbnail_bg_color': '#FFFFFF',
+                'thumbnail_size_in_bytes': 0,
                 'title': 'Title',
                 'url_fragment': 'dummy-subtopic-url'}])
 
