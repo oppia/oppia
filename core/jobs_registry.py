@@ -22,7 +22,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.domain import activity_jobs_one_off
 from core.domain import collection_jobs_one_off
 from core.domain import exp_jobs_one_off
-from core.domain import feedback_jobs_continuous
 from core.domain import question_jobs_one_off
 from core.domain import recommendations_jobs_one_off
 from core.domain import skill_jobs_one_off
@@ -39,12 +38,14 @@ ONE_OFF_JOB_MANAGERS = [
     collection_jobs_one_off.CollectionMigrationOneOffJob,
     exp_jobs_one_off.ExplorationMigrationJobManager,
     exp_jobs_one_off.ExpSnapshotsMigrationJob,
+    question_jobs_one_off.FixQuestionImagesStorageOneOffJob,
     question_jobs_one_off.QuestionMigrationOneOffJob,
     question_jobs_one_off.QuestionSnapshotsMigrationJob,
     recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob,
     skill_jobs_one_off.SkillMigrationOneOffJob,
     skill_jobs_one_off.SkillCommitCmdMigrationOneOffJob,
     story_jobs_one_off.StoryMigrationOneOffJob,
+    suggestion_jobs_one_off.PopulateTranslationContributionStatsOneOffJob,
     suggestion_jobs_one_off.QuestionSuggestionMigrationJobManager,
     topic_jobs_one_off.TopicMigrationOneOffJob,
 ]
@@ -59,8 +60,6 @@ AUDIT_JOB_MANAGERS = [
 # NOTE TO DEVELOPERS: When a new ContinuousComputation manager is defined,
 # it should be registered here.
 ALL_CONTINUOUS_COMPUTATION_MANAGERS = [
-    feedback_jobs_continuous.FeedbackAnalyticsAggregator,
-    user_jobs_continuous.DashboardRecentUpdatesAggregator,
     user_jobs_continuous.UserStatsAggregator,
 ]
 

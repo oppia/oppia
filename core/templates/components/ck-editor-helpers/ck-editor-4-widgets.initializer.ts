@@ -54,6 +54,9 @@ export class CkEditorInitializerService {
       rteHelperService: RteHelperService,
       htmlEscaperService: HtmlEscaperService,
       contextService: ContextService, ngZone: NgZone): void {
+    if (rteHelperService === undefined) {
+      return;
+    }
     ngZone.runOutsideAngular(() => {
       var _RICH_TEXT_COMPONENTS = rteHelperService.getRichTextComponents();
       _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
@@ -64,7 +67,7 @@ export class CkEditorInitializerService {
         if (CKEDITOR.plugins.registered[ckName] !== undefined) {
           return;
         }
-        var tagName = 'oppia-noninteractive-' + componentDefn.id;
+        var tagName = 'oppia-noninteractive-ckeditor-' + componentDefn.id;
         var customizationArgSpecs = componentDefn.customizationArgSpecs;
         var isInline = rteHelperService.isInlineComponent(componentDefn.id);
 

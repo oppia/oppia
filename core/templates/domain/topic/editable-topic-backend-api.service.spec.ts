@@ -21,16 +21,12 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
-import { TranslatorProviderForTests } from 'tests/test.extras';
 
 describe('Editable topic backend API service', () => {
   let httpTestingController = null;
   let editableTopicBackendApiService = null;
   let sampleDataResults = null;
   let csrfService = null;
-
-  beforeEach(
-    angular.mock.module('oppia', TranslatorProviderForTests));
 
   beforeEach(() => {
     TestBed.configureTestingModule({

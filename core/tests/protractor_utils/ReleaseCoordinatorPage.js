@@ -38,7 +38,7 @@ var ReleaseCoordinatorPage = function() {
 
   this._startOneOffJob = async function(jobName, i) {
     await waitFor.visibilityOf(
-      await oneOffJobRows.first(),
+      oneOffJobRows.first(),
       'Starting one off jobs taking too long to appear.');
     await waitFor.visibilityOf(
       oneOffJobRows.get(i), 'Could not get One Off Jobs');
