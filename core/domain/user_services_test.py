@@ -719,7 +719,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_services.get_user_role_from_id(user_id),
             feconf.ROLE_ID_EXPLORATION_EDITOR)
 
-
     def test_adding_banned_role_to_user_also_updates_roles_and_banned_fields(
             self):
         auth_id = 'test_id'
