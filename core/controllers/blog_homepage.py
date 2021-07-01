@@ -58,6 +58,7 @@ class BlogHomepageDataHandler(base.BaseHandler):
         # type: () -> None
         """Handles GET requests."""
         published_post_summaries = blog_services.get_published_blog_post_cards()
+        published_post_summary_dicts = []
         if published_post_summaries:
             published_post_summary_dicts = (
                 _get_blog_card_summary_dicts_for_homepage(
@@ -65,7 +66,7 @@ class BlogHomepageDataHandler(base.BaseHandler):
         list_of_default_tags = config_domain.Registry.get_config_property(
             'list_of_default_tags_for_blog_post').value
         self.values.update({
-            'published_blog_post_summary_dicts': published_post_summary_dicts,
+            'blog_post_summary_dicts': published_post_summary_dicts,
             'list_of_default_tags': list_of_default_tags
         })
         self.render_json(self.values)
@@ -93,7 +94,7 @@ class BlogPostHandler(base.BaseHandler):
                 Exception(
                     'The blog post page with the given url doesn\'t exist.'))
         user_settings = user_services.get_user_settings(blog_post.author_id)
-        blog_post_dict = blog_services.get_blog_post_from_model(blog_post)
+        blog_post_dict = blog_services.get_blog_post_from_model(blog_post).to_dict()
         blog_post_dict['author_name'] = user_settings.username
         del blog_post_dict['author_id']
         blog_post_summaries = blog_services.get_blog_post_summaries_by_user_id(
@@ -124,7 +125,8 @@ class AuthorsPageHandler(base.BaseHandler):
     @acl_decorators.open_access
     def get(self, author_username):
         """Handles GET requests."""
-        user_settings = user_services.get_user_settings_by_username(author_username)
+        user_settings = (
+            user_services.get_user_settings_from_username(author_username))
         blog_post_summaries = blog_services.get_blog_post_summaries_by_user_id(
             user_settings.user_id,
             feconf.MAX_LIMIT_FOR_CARDS_ON_BLOG_AUTHORS_PAGE)

@@ -17,29 +17,30 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import logging
-
+from core.domain import blog_services
 from core.domain import config_domain
-from core.domain import config_services
 from core.tests import test_utils
 import feconf
 
 
 class BlogHomepageDataHandlerTest(test_utils.GenericTestBase):
-    """Checks the user role handling on the blog admin page."""
+    """Checks that the data for blog homepage is handled properly."""
 
     username = 'user'
     user_email = 'user@example.com'
 
     def setUp(self):
-         """Complete the setup process for testing."""
+        """Complete the setup process for testing."""
         super(BlogHomepageDataHandlerTest, self).setUp()
         self.signup(
-            self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.admin_id = (
-            self.get_user_id_from_email(self.ADMIN_EMAIL))
+            self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
+        self.blog_admin_id = (
+            self.get_user_id_from_email(self.BLOG_ADMIN_EMAIL))
+        self.set_user_role(
+            self.BLOG_ADMIN_USERNAME,
+            feconf.ROLE_ID_BLOG_ADMIN)
         self.signup(self.user_email, self.username)
-        blog_post = blog_services.create_new_blog_post(self.admin_id)
+        blog_post = blog_services.create_new_blog_post(self.blog_admin_id)
         self.change_dict = {
             'title': 'Sample Title',
             'thumbnail_filename': 'thumbnail.svg',
@@ -49,10 +50,147 @@ class BlogHomepageDataHandlerTest(test_utils.GenericTestBase):
         blog_services.update_blog_post(blog_post.id, self.change_dict)
         blog_services.publish_blog_post(blog_post.id)
 
-    def test_get_homepage_data():
+    def test_get_homepage_data(self):
         self.login(self.user_email)
         json_response = self.get_json(
-            '%s/data' % (feconf.BLOG_HOMEPAGE_URL),
+            '%s' % (feconf.BLOG_HOMEPAGE_DATA_URL),
             )
-        default_tags = 
-        self.assertEqual(self.BLOG_EDITOR_USERNAME, json_response['list_of_default_tags'])
+        default_tags = config_domain.Registry.get_config_property(
+            'list_of_default_tags_for_blog_post').value
+        self.assertEqual(default_tags, json_response['list_of_default_tags'])
+        self.assertEqual(
+            self.BLOG_ADMIN_USERNAME,
+            json_response['blog_post_summary_dicts'][0]['author_name'])
+        self.assertTrue(
+            len(json_response['blog_post_summary_dicts']) is 1)
+
+        blog_post_two = blog_services.create_new_blog_post(self.blog_admin_id)
+        change_dict_two = {
+            'title': 'Sample Title Two',
+            'thumbnail_filename': 'thumbnail.svg',
+            'content': '<p>Hello Blog<p>',
+            'tags': ['Newsletter', 'Learners']
+        }
+        blog_services.update_blog_post(blog_post_two.id, change_dict_two)
+        blog_services.publish_blog_post(blog_post_two.id)
+        json_response = self.get_json(
+            '%s' % (feconf.BLOG_HOMEPAGE_DATA_URL)
+            )
+        self.assertEqual(
+            len(json_response['blog_post_summary_dicts']), 2)
+        self.assertTrue(
+            json_response['blog_post_summary_dicts'][0]['published_on'] >
+            json_response['blog_post_summary_dicts'][1]['published_on']
+        )
+        self.assertEqual(
+            json_response['blog_post_summary_dicts'][0]['title'],
+            'Sample Title Two'
+        )
+
+class BlogPostHandlerTest(test_utils.GenericTestBase):
+    """Checks that the data of the blog post and other data on
+    BlogPostPage is properly handled."""
+
+    username = 'user'
+    user_email = 'user@example.com'
+
+    def setUp(self):
+        """Complete the setup process for testing."""
+        super(BlogPostHandlerTest, self).setUp()
+        self.signup(
+            self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
+        self.blog_admin_id = (
+            self.get_user_id_from_email(self.BLOG_ADMIN_EMAIL))
+        self.set_user_role(
+            self.BLOG_ADMIN_USERNAME,
+            feconf.ROLE_ID_BLOG_ADMIN)
+        self.signup(self.user_email, self.username)
+        self.blog_post = blog_services.create_new_blog_post(self.blog_admin_id)
+        self.change_dict = {
+            'title': 'Sample Title',
+            'thumbnail_filename': 'thumbnail.svg',
+            'content': '<p>Hello Bloggers</p>',
+            'tags': ['Newsletter', 'Learners']
+        }
+        blog_services.update_blog_post(self.blog_post.id, self.change_dict)
+        blog_services.publish_blog_post(self.blog_post.id)
+
+    def test_get_post_page_data(self):
+        self.login(self.user_email)
+        blog_post = blog_services.get_blog_post_by_id(self.blog_post.id)
+        json_response = self.get_json(
+            '%s/%s' % (feconf.BLOG_HOMEPAGE_URL, blog_post.url_fragment),
+            )
+        self.assertEqual(
+            self.BLOG_ADMIN_USERNAME,
+            json_response['blog_post_dict']['author_name'])
+        self.assertEqual(
+            '<p>Hello Bloggers</p>',
+            json_response['blog_post_dict']['content'])
+        self.assertTrue(
+            len(json_response['summary_dicts']) is 1)
+        self.assertIsNotNone(json_response['profile_picture_data_url'])
+
+        blog_post_two_id = (
+            blog_services.create_new_blog_post(self.blog_admin_id).id)
+        change_dict_two = {
+            'title': 'Sample Title Two',
+            'thumbnail_filename': 'thumbnail.svg',
+            'content': '<p>Hello Blog</p>',
+            'tags': ['Newsletter', 'Learners']
+        }
+        blog_services.update_blog_post(blog_post_two_id, change_dict_two)
+        blog_services.publish_blog_post(blog_post_two_id)
+        blog_post_two = blog_services.get_blog_post_by_id(blog_post_two_id)
+        json_response = self.get_json(
+            '%s/%s' % (feconf.BLOG_HOMEPAGE_URL, blog_post_two.url_fragment),
+            )
+        self.assertEqual(
+            self.BLOG_ADMIN_USERNAME,
+            json_response['blog_post_dict']['author_name'])
+        self.assertEqual(
+            '<p>Hello Blog</p>',
+            json_response['blog_post_dict']['content'])
+        self.assertEqual(
+            len(json_response['summary_dicts']), 2)
+        self.assertIsNotNone(json_response['profile_picture_data_url'])
+
+class AuthorsPageHandlerTest(test_utils.GenericTestBase):
+    """Checks that the author data and related blog summary cards are
+    properly handled."""
+
+    username = 'user'
+    user_email = 'user@example.com'
+
+    def setUp(self):
+        """Complete the setup process for testing."""
+        super(AuthorsPageHandlerTest, self).setUp()
+        self.signup(
+            self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
+        self.blog_admin_id = (
+            self.get_user_id_from_email(self.BLOG_ADMIN_EMAIL))
+        self.set_user_role(
+            self.BLOG_ADMIN_USERNAME,
+            feconf.ROLE_ID_BLOG_ADMIN)
+        self.signup(self.user_email, self.username)
+        self.blog_post = blog_services.create_new_blog_post(self.blog_admin_id)
+        self.change_dict = {
+            'title': 'Sample Title',
+            'thumbnail_filename': 'thumbnail.svg',
+            'content': '<p>Hello Bloggers</p>',
+            'tags': ['Newsletter', 'Learners']
+        }
+        blog_services.update_blog_post(self.blog_post.id, self.change_dict)
+        blog_services.publish_blog_post(self.blog_post.id)
+
+    def test_get_authors_page_data(self):
+        self.login(self.user_email)
+        json_response = self.get_json(
+            '%s/%s' % (feconf.BLOG_AUTHORS_PAGE_URL, self.BLOG_ADMIN_USERNAME),
+            )
+        self.assertEqual(
+            self.BLOG_ADMIN_USERNAME,
+            json_response['summary_dicts'][0]['author_name'])
+        self.assertTrue(
+            len(json_response['summary_dicts']) is 1)
+        self.assertIsNotNone(json_response['profile_picture_data_url'])

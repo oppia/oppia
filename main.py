@@ -25,6 +25,7 @@ from core.controllers import admin
 from core.controllers import base
 from core.controllers import blog_admin
 from core.controllers import blog_dashboard
+from core.controllers import blog_homepage
 from core.controllers import classifier
 from core.controllers import classroom
 from core.controllers import collection_editor
@@ -412,14 +413,14 @@ URLS = MAPREDUCE_HANDLERS + [
         learner_playlist.LearnerPlaylistHandler),
 
     get_redirect_route(
+        r'%s/<author_username>' % feconf.BLOG_AUTHORS_PAGE_URL,
+        blog_homepage.AuthorsPageHandler),
+    get_redirect_route(
         r'%s/<blog_post_url>' % feconf.BLOG_HOMEPAGE_URL,
         blog_homepage.BlogPostHandler),
     get_redirect_route(
-        r'%s/data' % feconf.BLOG_HOMEPAGE_URL,
+        r'%s' % feconf.BLOG_HOMEPAGE_DATA_URL,
         blog_homepage.BlogHomepageDataHandler),
-    get_redirect_route(
-        r'%s/<author_username>/data' % feconf.BLOG_HOMEPAGE_URL,
-        blog_homepage.AuthorsPageHandler),
 
     get_redirect_route(
         r'/assetsdevhandler/<page_context>/<page_identifier>/'

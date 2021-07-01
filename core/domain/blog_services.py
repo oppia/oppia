@@ -272,8 +272,14 @@ def get_blog_post_summaries_by_user_id(user_id, max_limit):
     """
     blog_rights_models = (
         blog_models.BlogPostRightsModel.get_by_user(user_id, max_limit))
+    if len(blog_rights_models) == 0:
+        return None
+    blog_post_ids = [model.id for model in blog_rights_models]
+    blog_summary_models = (
+        blog_models.BlogPostSummaryModel.get_multi(blog_post_ids))
     blog_post_summaries = [
-        get_blog_post_summary_from_model(model) for model in blog_rights_models]
+        get_blog_post_summary_from_model(model)
+        for model in blog_summary_models]
     return blog_post_summaries
 
 
@@ -595,19 +601,16 @@ def get_published_blog_post_cards(offset=0):
     """
     max_limit = feconf.MAX_LIMIT_FOR_CARDS_ON_HOMEPAGE_PAGE
     blog_post_rights_models = blog_models.BlogPostRightsModel.query().filter(
-        blog_models.BlogPostRightsModel.blog_post_is_published).order(
+        blog_models.BlogPostRightsModel.blog_post_is_published is True).order(
             -blog_models.BlogPostRightsModel.last_updated).fetch(
                 max_limit, offset=offset)
-    if len(blog_post_rights_models) != 0:
+    if len(blog_post_rights_models) == 0:
         return None
+    blog_post_ids = [model.id for model in blog_post_rights_models]
+    blog_post_summary_models = (
+        blog_models.BlogPostSummaryModel.get_multi(blog_post_ids))
     blog_post_summaries = []
-    if blog_post_rights_models:
-        for model in blog_post_rights_models:
-            blog_post_summary_models = (
-                blog_models.BlogPostSummaryModel.query().filter(
-                    blog_models.BlogPostSummaryModel.id == model.id).fetch())
     blog_post_summaries = [
-        get_blog_post_summary_from_model(model)
-        for model in blog_post_summary_models
-        ]
+        get_blog_post_summary_from_model(model) if model is not None else None
+        for model in blog_post_summary_models]
     return blog_post_summaries
