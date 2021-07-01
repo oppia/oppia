@@ -174,7 +174,7 @@ class AdminHandler(base.BaseHandler):
                                 'type': 'list',
                                 'items': {
                                     'type': 'object_dict',
-                                    'object_class': parameter_domain.PlatformParameterFilter
+                                    'object_class': parameter_domain.PlatformParameterFilter # pylint: disable=line-too-long
                                 }
                             }
                         }]
@@ -940,7 +940,7 @@ class AddContributionRightsHandler(base.BaseHandler):
                 'schema': {
                     'type': 'basestring',
                     'choices': [
-                        constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+                        constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION, # pylint: disable=line-too-long
                         constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
                         constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
                         constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION
@@ -1034,7 +1034,7 @@ class RemoveContributionRightsHandler(base.BaseHandler):
                 'schema': {
                     'type': 'basestring',
                     'choices': [
-                        constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+                        constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION, # pylint: disable=line-too-long
                         constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
                         constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
                         constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION
@@ -1125,7 +1125,7 @@ class ContributorUsersListHandler(base.BaseHandler):
                 'schema': {
                     'type': 'basestring',
                     'choices': [
-                        constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+                        constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION, # pylint: disable=line-too-long
                         constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
                         constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
                         constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION
