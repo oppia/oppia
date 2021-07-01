@@ -154,11 +154,7 @@ class BlogPostHandler(base.BaseHandler):
         blog_post_currently_published = blog_post_rights.blog_post_is_published
         change_dict = self.payload.get('change_dict')
 
-        try:
-            blog_services.update_blog_post(blog_post_id, change_dict)
-        except utils.ValidationError as e:
-            raise self.InvalidInputException(e)
-
+        blog_services.update_blog_post(blog_post_id, change_dict)
         new_publish_status = self.payload.get('new_publish_status')
         if new_publish_status:
             blog_services.publish_blog_post(blog_post_id)

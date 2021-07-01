@@ -270,6 +270,20 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
             '%s/%s' % (feconf.BLOG_EDITOR_DATA_URL_PREFIX, self.blog_post.id),
             payload, csrf_token=csrf_token, expected_status_int=404)
 
+    def test_update_blog_post_with_invalid_change_dict(self):
+        self.login(self.BLOG_EDITOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        payload = {
+            'change_dict': {
+                'title': 1234,
+            },
+            'new_publish_status': False
+        }
+        response = self.put_json(
+            '%s/%s' % (feconf.BLOG_EDITOR_DATA_URL_PREFIX, self.blog_post.id),
+            payload, csrf_token=csrf_token, expected_status_int=500)
+        self.assertEqual(response['error'], 'Title should be a string.')
+
     def test_publishing_unpublishing_blog_post(self):
         self.login(self.BLOG_EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()

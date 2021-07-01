@@ -38,7 +38,7 @@ def validate_exploration_change(obj):
     """
     # No explicit call to validate_dict method is necessary, because
     # ExplorationChange calls it while initialization.
-    exp_domain.ExplorationChange(obj) # type: ignore[no-untyped-call]
+    exp_domain.ExplorationChange(obj)
 
 
 def validate_new_config_property_values(obj):
@@ -53,8 +53,7 @@ def validate_new_config_property_values(obj):
             raise Exception(
                 'config property name should be a string, received'
                 ': %s' % name)
-        config_property = config_domain.Registry.get_config_property(
-            name) # type: ignore[no-untyped-call]
+        config_property = config_domain.Registry.get_config_property(name)
         if config_property is None:
             raise Exception('%s do not have any schema.' % name)
 
@@ -70,13 +69,13 @@ def validate_change_dict_for_blog_post(change_dict):
     """
     if 'title' in change_dict:
         blog_domain.BlogPost.require_valid_title(
-            change_dict['title'], True) # type: ignore[no-untyped-call]
+            change_dict['title'], True)
     if 'thumbnail_filename' in change_dict:
         blog_domain.BlogPost.require_valid_thumbnail_filename(
-            change_dict['thumbnail_filename']) # type: ignore[no-untyped-call]
+            change_dict['thumbnail_filename'])
     if 'tags' in change_dict:
         blog_domain.BlogPost.require_valid_tags(
-            change_dict['tags'], True)# type: ignore[no-untyped-call]
+            change_dict['tags'], True)
         # Validates that the tags in the change dict are from the list of
         # default tags set by admin.
         list_of_default_tags = config_domain.Registry.get_config_property(
