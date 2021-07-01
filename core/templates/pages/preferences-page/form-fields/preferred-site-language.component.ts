@@ -25,10 +25,10 @@ interface Language {
 }
 
 @Component({
-  selector: 'oppia-preferred-language',
+  selector: 'oppia-preferred-language-selector',
   templateUrl: './preferred-site-language.component.html'
 })
-export class PreferredSiteLanguage {
+export class PreferredSiteLanguageSelectorComponent {
   @Input() preferredLanguageCode: string;
   @Output() preferredLanguageCodeChange: EventEmitter<string> = (
     new EventEmitter());

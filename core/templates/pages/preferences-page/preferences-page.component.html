@@ -151,10 +151,10 @@
            updated after the initial page load.
         -->
         <div *ngIf="hasPageLoaded">
-          <oppia-preferred-language [choices]="SITE_LANGUAGE_CHOICES"
+          <oppia-preferred-language-selector [choices]="SITE_LANGUAGE_CHOICES"
                                     [preferredLanguageCode]="preferredSiteLanguageCode"
                                     (preferredLanguageCodeChange)="savePreferredSiteLanguageCodes($event)">
-          </oppia-preferred-language>
+          </oppia-preferred-language-selector>
         </div>
         <span class="form-text oppia-form-text">
           {{ 'I18N_PREFERENCES_PREFERRED_SITE_LANGUAGE_EXPLAIN' | translate }}
@@ -172,10 +172,10 @@
            updated after the initial page load.
         -->
         <div *ngIf="hasPageLoaded">
-          <oppia-preferred-language [choices]="AUDIO_LANGUAGE_CHOICES"
+          <oppia-preferred-language-selector [choices]="AUDIO_LANGUAGE_CHOICES"
                                     [preferredLanguageCode]="preferredAudioLanguageCode"
                                     (preferredLanguageCodeChange)="savePreferredAudioLanguageCode($event)">
-          </oppia-preferred-language>
+          </oppia-preferred-language-selector>
         </div>
         <span class="form-text oppia-form-text">
           {{ 'I18N_PREFERENCES_PREFERRED_AUDIO_LANGUAGE_EXPLAIN' | translate }}

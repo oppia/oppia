@@ -42,7 +42,7 @@ import { PreferencesPageComponent } from './preferences-page.component';
     OppiaAngularRootComponent,
     PreferencesPageComponent,
     PreferredLanguagesComponent,
-    PreferredSiteLanguage,
+    PreferredSiteLanguageSelectorComponent,
     SubjectInterestsComponent
   ],
   entryComponents: [
@@ -50,7 +50,7 @@ import { PreferencesPageComponent } from './preferences-page.component';
     OppiaAngularRootComponent,
     PreferencesPageComponent,
     PreferredLanguagesComponent,
-    PreferredSiteLanguage,
+    PreferredSiteLanguageSelectorComponent,
     SubjectInterestsComponent
   ],
   providers: [
@@ -78,8 +78,8 @@ import { EditProfilePictureModalComponent } from './modal-templates/edit-profile
 import { SubjectInterestsComponent } from './form-fields/subject-interests.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { PreferredLanguagesComponent } from './form-fields/preferred-languages.component';
-import { PreferredSiteLanguage } from './form-fields/preferred-site-language.component';
 import { NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
+import { PreferredSiteLanguageSelectorComponent } from './form-fields/preferred-site-language.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

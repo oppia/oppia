@@ -24,8 +24,7 @@ import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { EditProfilePictureModalComponent } from './edit-profile-picture-modal.component';
 import Cropper from 'cropperjs';
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Delete Topic Modal Component', () => {
+describe('Delete Topic Modal Component', () => {
   let fixture: ComponentFixture<EditProfilePictureModalComponent>;
   let componentInstance: EditProfilePictureModalComponent;
   let changeDetectorRef: ChangeDetectorRef;
