@@ -46,12 +46,22 @@ class MockWindowRef {
   };
 }
 
-describe('Admin Page component ', () => {
+class MockPlatformFeatureService {
+  get status() {
+    return {
+      DummyFeature: {
+        isEnabled: true
+      }
+    }
+  }
+}
+
+for(let i = 0; i<100; i++) {
+fdescribe('Admin Page component ', () => {
   let component: AdminPageComponent;
   let fixture: ComponentFixture<AdminPageComponent>;
 
   let adminRouterService: AdminRouterService;
-  let platformFeatureService: PlatformFeatureService;
   let mockWindowRef: MockWindowRef;
 
   beforeEach(() => {
@@ -62,10 +72,13 @@ describe('Admin Page component ', () => {
       providers: [
         AdminRouterService,
         ChangeDetectorRef,
-        PlatformFeatureService,
         {
           provide: WindowRef,
           useValue: mockWindowRef
+        },
+        {
+          provide: PlatformFeatureService,
+          useClass: MockPlatformFeatureService
         }
       ],
       schemas: [NO_ERRORS_SCHEMA]
@@ -77,7 +90,6 @@ describe('Admin Page component ', () => {
 
   beforeEach(() => {
     adminRouterService = TestBed.inject(AdminRouterService);
-    platformFeatureService = TestBed.inject(PlatformFeatureService);
 
     spyOn(adminRouterService, 'showTab').and.returnValue(null);
   });
@@ -138,13 +150,9 @@ describe('Admin Page component ', () => {
   });
 
   it('should check whether the dummy features enabled', () => {
-    // Setting dummy features enabled to be false.
-    spyOnProperty(
-      platformFeatureService.status.DummyFeature, 'isEnabled')
-      .and.returnValue(false);
-
     let result = component.isDummyFeatureEnabled();
 
-    expect(result).toBe(false);
+    // Mocked 'PlatformFeatureService.status' method to return true.
+    expect(result).toBe(true);
   });
-});
+});}
