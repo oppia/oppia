@@ -24,7 +24,7 @@ import datetime
 from core.domain import beam_job_domain
 from core.platform import models
 from core.tests import test_utils
-from jobs import base_validation_jobs
+from jobs.batch_jobs import validation_jobs
 import utils
 
 (beam_job_models,) = models.Registry.import_models([models.NAMES.beam_job])
@@ -35,8 +35,7 @@ class BeamJobTests(test_utils.TestBase):
     NOW = datetime.datetime.utcnow()
 
     def test_usage(self):
-        job = beam_job_domain.BeamJob(
-            base_validation_jobs.AuditAllStorageModelsJob)
+        job = beam_job_domain.BeamJob(validation_jobs.AuditAllStorageModelsJob)
         self.assertEqual(job.name, 'AuditAllStorageModelsJob')
         self.assertEqual(job.argument_names, [])
 
@@ -88,8 +87,7 @@ class BeamJobTests(test_utils.TestBase):
         self.assertFalse(unknown_beam_job_run.in_terminal_state)
 
     def test_to_dict(self):
-        job = beam_job_domain.BeamJob(
-            base_validation_jobs.AuditAllStorageModelsJob)
+        job = beam_job_domain.BeamJob(validation_jobs.AuditAllStorageModelsJob)
         self.assertEqual(job.to_dict(), {
             'name': 'AuditAllStorageModelsJob',
             'argument_names': [],

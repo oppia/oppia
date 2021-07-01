@@ -93,7 +93,8 @@ describe('Settings Tab Component', () => {
     canDelete: true,
     canModifyRoles: true,
     canReleaseOwnership: true,
-    canUnpublish: true
+    canUnpublish: true,
+    canManageVoiceArtist: true
   };
   let mockWindowDimensionsService = {
     isWindowNarrow: () => true
@@ -235,6 +236,7 @@ describe('Settings Tab Component', () => {
         expect(ctrl.canReleaseOwnership).toBe(true);
         expect(ctrl.canUnpublish).toBe(true);
         expect(ctrl.explorationId).toBe(explorationId);
+        expect(ctrl.canManageVoiceArtist).toBe(true);
 
         expect(ctrl.CATEGORY_LIST_FOR_SELECT2[0]).toEqual({
           id: 'Astrology',
@@ -406,6 +408,44 @@ describe('Settings Tab Component', () => {
       expect(
         explorationRightsService.removeRoleAsync).not.toHaveBeenCalled();
     });
+
+    it('should open a modal when removeVoiceArtist is called', function() {
+      spyOn($uibModal, 'open').and.callThrough();
+
+      ctrl.removeVoiceArtist('username');
+
+      expect($uibModal.open).toHaveBeenCalled();
+    });
+
+    it('should remove voice artist when resolving remove-role-modal', () => {
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.resolve('username', 'voice artist')
+      });
+      spyOn(explorationRightsService, 'removeVoiceArtistRoleAsync').and
+        .returnValue($q.resolve());
+
+      ctrl.removeVoiceArtist('username');
+      $scope.$apply();
+
+      expect(
+        explorationRightsService.removeVoiceArtistRoleAsync)
+        .toHaveBeenCalledWith('username');
+    });
+
+    it('should not remove voice artist when rejecting remove-role-modal',
+      () => {
+        spyOn($uibModal, 'open').and.returnValue({
+          result: $q.reject()
+        });
+        spyOn(explorationRightsService, 'removeVoiceArtistRoleAsync');
+
+        ctrl.removeVoiceArtist('username');
+        $scope.$apply();
+
+        expect(
+          explorationRightsService.removeVoiceArtistRoleAsync)
+          .not.toHaveBeenCalled();
+      });
 
     it('should open a modal when reassignRole is called', () => {
       spyOn($uibModal, 'open').and.callThrough();
@@ -633,6 +673,34 @@ describe('Settings Tab Component', () => {
       expect(ctrl.isRolesFormOpen).toBe(false);
       expect(ctrl.newMemberUsername).toBe('');
       expect(ctrl.newMemberRole.value).toBe('owner');
+    });
+
+    it('should open voice artist edit roles form and edit username', () => {
+      ctrl.openVoiceoverRolesForm();
+      explorationRightsService.init(
+        ['owner'], [], [], [], '', false, false, true);
+
+      expect(ctrl.isVoiceoverFormOpen).toBe(true);
+      expect(ctrl.newVoiceArtistUsername).toBe('');
+
+      spyOn(explorationRightsService, 'assignVoiceArtistRoleAsync');
+      ctrl.editVoiseArtist('Username1');
+
+      expect(explorationRightsService.assignVoiceArtistRoleAsync)
+        .toHaveBeenCalledWith('Username1');
+      expect(ctrl.isVoiceoverFormOpen).toBe(false);
+    });
+
+    it('should open voice artist edit roles form and close it', () => {
+      ctrl.openVoiceoverRolesForm();
+
+      expect(ctrl.isVoiceoverFormOpen).toBe(true);
+      expect(ctrl.newVoiceArtistUsername).toBe('');
+
+      ctrl.closeVoiceoverForm();
+
+      expect(ctrl.isVoiceoverFormOpen).toBe(false);
+      expect(ctrl.newVoiceArtistUsername).toBe('');
     });
 
     it('should evaluate when parameters are enabled', () => {
