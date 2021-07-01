@@ -354,7 +354,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
         with self.swap(logging, 'warning', mock_logging_function):
             self.testapp.head('/mock', status=500)
-            self.assertEqual(len(set(observed_log_messages)), 2)
+            self.assertEqual(len(observed_log_messages), 2)
             self.assertEqual(
                 observed_log_messages[0],
                 'Not a recognized request method.')
@@ -1867,3 +1867,30 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
                     expected_status_int=500)
             self.assertEqual(response['error'], error_msg)
         self.logout()
+
+
+class RequestMethodNotInHandlerClassDoNotRaiseMissingSchemaErrorTest(
+        test_utils.GenericTestBase):
+    """This test ensures that, NotImplementedError should not be raised for
+    the request method which are not present in the handler class.
+    """
+
+    class MockHandler(base.BaseHandler):
+        """Mock handler with no get method.
+        """
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {}
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    def setUp(self):
+        super(RequestMethodNotInHandlerClassDoNotRaiseMissingSchemaErrorTest,
+            self).setUp()
+
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock', self.MockHandler, name='MockHandler')],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_get_request_do_not_raise_notimplemented_error(self):
+        with self.swap(self, 'testapp', self.testapp):
+            self.get_json('/mock', expected_status_int=404)
