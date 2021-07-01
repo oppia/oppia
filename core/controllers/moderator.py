@@ -47,10 +47,12 @@ class FeaturedActivitiesHandler(base.BaseHandler):
         'GET': {},
         'POST': {
             'featured_activity_reference_dicts': {
-                'type': 'list',
-                'items': {
-                    'type': 'object_dict',
-                    'object_class': activity_domain.ActivityReference
+                'schema': {
+                    'type': 'list',
+                    'items': {
+                        'type': 'object_dict',
+                        'object_class': activity_domain.ActivityReference
+                    }
                 }
             }
         }
