@@ -404,7 +404,8 @@ class CronJobTests(test_utils.GenericTestBase):
         all_jobs = job_models.JobModel.get_all_unfinished_jobs(3)
         self.assertEqual(len(all_jobs), 1)
         self.assertEqual(
-            all_jobs[0].job_type, 'PopulateTranslationContributionStatsOneOffJob')
+            all_jobs[0].job_type,
+            'PopulateTranslationContributionStatsOneOffJob')
         self.logout()
 
 
