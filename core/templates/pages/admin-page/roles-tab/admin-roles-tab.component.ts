@@ -63,6 +63,7 @@ interface RemoveContributionRightsAction {
 
 interface ViewTranslationContributionStatsAction {
   username: string;
+  isValid: () => boolean;
 }
 
 interface FormData {
@@ -71,6 +72,7 @@ interface FormData {
   viewContributionReviewers: ViewContributionReviewersAction;
   addContributionReviewer: AddContributionRightsAction;
   removeContributionReviewer: RemoveContributionRightsAction;
+  viewTranslationContributionStats: ViewTranslationContributionStatsAction;
 }
 
 interface ContributionReviewersResult {
