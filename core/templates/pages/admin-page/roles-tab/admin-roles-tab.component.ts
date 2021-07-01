@@ -19,7 +19,7 @@
 import { Component, Output, EventEmitter} from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
-import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
+import { AdminBackendApiService, TranslationContributionStats } from 'domain/admin/admin-backend-api.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { AdminDataService } from '../services/admin-data.service';
 import { AdminTaskManagerService } from '../services/admin-task-manager.service';
@@ -92,8 +92,7 @@ export class AdminRolesTabComponent {
   languageCodesAndDescriptions: { id: string; description: string; }[];
   contributionReviewersResult: ContributionReviewersResult;
   contributionReviewersDataFetched: boolean = false;
-  translationContributionStatsResults: (
-    AdminBackendApiService.TranslationContributionStats[]) = [];
+  translationContributionStatsResults: TranslationContributionStats[] = [];
   translationContributionStatsFetched: boolean = false;
   topicSummaries = {};
   roleToActions;

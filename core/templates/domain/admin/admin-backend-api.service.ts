@@ -331,9 +331,9 @@ export class AdminBackendApiService {
   }
 
   async viewTranslationContributionStatsAsync(
-      username: string): Promise<ContributionRightsBackendResponse> {
+      username: string): Promise<TranslationContributionStatsBackendResponse> {
     return new Promise((resolve, reject) => {
-      this.http.get<ContributionRightsBackendResponse>(
+      this.http.get<TranslationContributionStatsBackendResponse>(
         AdminPageConstants.ADMIN_GET_TRANSLATION_CONTRIBUTION_STATS_HANDLER, {
           params: {
             username: username
