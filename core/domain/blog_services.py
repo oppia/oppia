@@ -589,8 +589,8 @@ def create_new_blog_post(author_id):
     return new_blog_post
 
 
-def get_published_blog_post_cards(offset=0):
-    """Returns published BlogPostCardSummaries list.
+def get_published_blog_post_summaries(offset=0):
+    """Returns published BlogPostSummaries list.
 
     Args:
         offset: int. Number of query results to skip from top.
@@ -600,8 +600,8 @@ def get_published_blog_post_cards(offset=0):
         published. None if no blog post is published.
     """
     max_limit = feconf.MAX_LIMIT_FOR_CARDS_ON_HOMEPAGE_PAGE
-    blog_post_rights_models = blog_models.BlogPostRightsModel.query().filter(
-        blog_models.BlogPostRightsModel.blog_post_is_published is True).order(
+    blog_post_rights_models = blog_models.BlogPostRightsModel.query(
+        blog_models.BlogPostRightsModel.blog_post_is_published == True).order( # pylint: disable=singleton-comparison
             -blog_models.BlogPostRightsModel.last_updated).fetch(
                 max_limit, offset=offset)
     if len(blog_post_rights_models) == 0:

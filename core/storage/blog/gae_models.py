@@ -310,7 +310,7 @@ class BlogPostRightsModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user to be removed from editor ids.
         """
-        blog_post_rights_models = cls.query(cls.editor_ids == user_id).fetch()
+        blog_post_rights_models = cls.get_by_user(user_id)
         if blog_post_rights_models:
             for rights_model in blog_post_rights_models:
                 rights_model.editor_ids.remove(user_id)
@@ -334,23 +334,22 @@ class BlogPostRightsModel(base_models.BaseModel):
             cls.editor_ids == user_id).get(keys_only=True) is not None
 
     @classmethod
-    def get_by_user(cls, user_id, number=None):
+    def get_by_user(cls, user_id, limit=None):
         """Retrieves the rights object for all blog posts assigned to given user
 
         Args:
             user_id: str. ID of user.
-            number: int. Number of BlogPostRightsModel to be fetched. All
+            limit: int. Number of BlogPostRightsModel to be fetched. All
                 existing models will be fetched if none.
 
         Returns:
             list(BlogPostRightsModel). The list of BlogPostRightsModel objects
             in which the given user is a editor.
         """
-        if number:
+        if limit:
             return cls.query(cls.editor_ids == user_id).order(
-                -cls.last_updated).fetch(number)
-        else:
-            return cls.query(cls.editor_ids == user_id).fetch()
+                -cls.last_updated).fetch(limit)
+        return cls.query(cls.editor_ids == user_id).fetch()
 
     @staticmethod
     def get_model_association_to_user():

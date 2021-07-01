@@ -58,7 +58,7 @@ class BlogHomepageDataHandler(base.BaseHandler):
     def get(self):
         # type: () -> None
         """Handles GET requests."""
-        published_post_summaries = blog_services.get_published_blog_post_cards()
+        published_post_summaries = blog_services.get_published_blog_post_summaries()
         published_post_summary_dicts = []
         if published_post_summaries:
             published_post_summary_dicts = (
@@ -131,6 +131,10 @@ class AuthorsPageHandler(base.BaseHandler):
         """Handles GET requests."""
         user_settings = (
             user_services.get_user_settings_from_username(author_username))
+        if (user_settings.role != feconf.ROLE_ID_BLOG_ADMIN):
+            raise self.PageNotFoundException(
+                Exception(
+                    'The given user is not a blog post author.'))
         blog_post_summaries = blog_services.get_blog_post_summaries_by_user_id(
             user_settings.user_id,
             feconf.MAX_LIMIT_FOR_CARDS_ON_BLOG_AUTHORS_PAGE)
