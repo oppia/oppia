@@ -118,6 +118,7 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'CronMailReviewersContributorDashboardSuggestionsHandler',
     'CronMapreduceCleanupHandler',
     'CronModelsCleanupHandler',
+    'CronTranslationContributionStatsHandler',
     'CronUserDeletionHandler',
     'DataExtractionQueryHandler',
     'DefaultClassroomRedirectPage',
