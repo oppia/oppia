@@ -34,10 +34,10 @@ class MockNgbModalRef {
     categorizedSkills: null,
     allowSkillsFromOtherTopics: null,
     untriagedSkillSummaries: null
-  }
+  };
 }
 
-fdescribe('QuestionsListComponent', () => {
+describe('QuestionsListComponent', () => {
   let ctrl = null;
   let $rootScope = null;
   let $scope = null;
@@ -287,7 +287,8 @@ fdescribe('QuestionsListComponent', () => {
     );
   });
 
-  it('should fetch misconception ids for selected skill on initialization', () => {
+  it('should fetch misconception ids for selected skill on' +
+    ' initialization', () => {
     spyOn(SkillBackendApiService, 'fetchSkillAsync').and.returnValue($q.resolve(
       {
         skill: skill
@@ -398,7 +399,7 @@ fdescribe('QuestionsListComponent', () => {
     spyOn(QuestionsListService, 'getCurrentPageNumber').and.returnValue(5);
 
     // Question index = NUM_QUESTION_PER_PAGE (10) * current page number (5) +
-    // index + 1 = 10 * 5 + 1 + 1 = 52
+    // index + 1 = 10 * 5 + 1 + 1 = 52.
     expect(ctrl.getQuestionIndex(1)).toBe(52);
   });
 
@@ -494,7 +495,7 @@ fdescribe('QuestionsListComponent', () => {
     ctrl.questionIsBeingUpdated = true;
     spyOn(ctrl.question, 'getValidationErrorMessage').and.returnValue('');
     spyOn(ctrl.question, 'getUnaddressedMisconceptionNames')
-    .and.returnValue([]);
+      .and.returnValue([]);
     spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(true);
     spyOn(EditableQuestionBackendApiService, 'updateQuestionAsync')
       .and.returnValue($q.resolve());
@@ -515,7 +516,7 @@ fdescribe('QuestionsListComponent', () => {
     ctrl.questionIsBeingUpdated = true;
     spyOn(ctrl.question, 'getValidationErrorMessage').and.returnValue('');
     spyOn(ctrl.question, 'getUnaddressedMisconceptionNames')
-    .and.returnValue([]);
+      .and.returnValue([]);
     spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(true);
     spyOn(EditableQuestionBackendApiService, 'updateQuestionAsync')
       .and.returnValue($q.reject());
@@ -539,7 +540,7 @@ fdescribe('QuestionsListComponent', () => {
     ctrl.questionIsBeingUpdated = true;
     spyOn(ctrl.question, 'getValidationErrorMessage').and.returnValue('');
     spyOn(ctrl.question, 'getUnaddressedMisconceptionNames')
-    .and.returnValue([]);
+      .and.returnValue([]);
     spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(true);
     spyOn(AlertsService, 'addWarning');
 
@@ -563,7 +564,7 @@ fdescribe('QuestionsListComponent', () => {
   });
 
   it('should reset image save destination when user clicks confirm on' +
-    '  \'confirm question modal exit\' modal', () => {
+    ' \'confirm question modal exit\' modal', () => {
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.resolve('confirm')
     });
@@ -627,10 +628,10 @@ fdescribe('QuestionsListComponent', () => {
   describe('when user clicks on edit question', () => {
     let questionSummaryForOneSkill = QuestionSummary
       .createFromBackendDict({
-          id: 'qId',
-          interaction_id: '',
-          misconception_ids: [],
-          question_content: ''
+        id: 'qId',
+        interaction_id: '',
+        misconception_ids: [],
+        question_content: ''
       });
     let skillDescription = 'Skill Description';
     let difficulty: 0.9;
@@ -1050,12 +1051,12 @@ fdescribe('QuestionsListComponent', () => {
 
   it('should get cached question summaries for one skill', () => {
     let summary = QuestionSummary
-    .createFromBackendDict({
+      .createFromBackendDict({
         id: 'qId',
         interaction_id: '',
         misconception_ids: [],
         question_content: ''
-    });
+      });
     spyOn(QuestionsListService, 'getCachedQuestionSummaries').and.returnValue(
       summary);
 
