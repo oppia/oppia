@@ -204,30 +204,6 @@ class EventHandlerUnitTests(test_utils.GenericTestBase):
         ], [2])
 
 
-class EventHandlerTaskQueueUnitTests(test_utils.GenericTestBase):
-    """Test that events go into the correct queue."""
-
-    def test_events_go_into_the_events_queue(self):
-        self.assertEqual(
-            self.count_jobs_in_taskqueue(
-                taskqueue_services.QUEUE_NAME_EVENTS),
-            0)
-
-        event_services.CompleteExplorationEventHandler.record(
-            'eid1', 1, 'sid1', 'session1', 100, {}, feconf.PLAY_TYPE_NORMAL)
-        self.assertEqual(
-            self.count_jobs_in_taskqueue(
-                taskqueue_services.QUEUE_NAME_EVENTS),
-            1)
-
-        self.process_and_flush_pending_tasks()
-
-        self.assertEqual(
-            self.count_jobs_in_taskqueue(
-                taskqueue_services.QUEUE_NAME_EVENTS),
-            0)
-
-
 class StatsEventsHandlerUnitTests(test_utils.GenericTestBase):
     """Tests related to the stats events handler."""
 

@@ -45,7 +45,7 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
         with serialization_exception:
             taskqueue_services.defer(
                 taskqueue_services.FUNCTION_ID_DISPATCH_EVENT,
-                taskqueue_services.QUEUE_NAME_EVENTS, arg1)
+                taskqueue_services.QUEUE_NAME_DEFAULT, arg1)
 
     def test_exception_raised_when_email_task_params_is_not_serializable(self):
         params = {

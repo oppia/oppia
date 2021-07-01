@@ -35,8 +35,6 @@ QUEUE_NAME_BACKUPS = 'backups'
 QUEUE_NAME_DEFAULT = 'default'
 # Taskqueue for sending email.
 QUEUE_NAME_EMAILS = 'emails'
-# Deferred queue for processing events outside the request/response cycle.
-QUEUE_NAME_EVENTS = 'events'
 # Taskqueue for running one-off jobs.
 QUEUE_NAME_ONE_OFF_JOBS = 'one-off-jobs'
 # Taskqueue for updating stats models.

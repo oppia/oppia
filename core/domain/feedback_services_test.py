@@ -859,9 +859,6 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             # the email.
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    taskqueue_services.QUEUE_NAME_EVENTS), 1)
-            self.assertEqual(
-                self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EMAILS), 1)
             model = feedback_models.UnsentFeedbackEmailModel.get(self.editor_id)
 
@@ -885,9 +882,6 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             # There are two jobs in the taskqueue: one for the realtime
             # event associated with creating a thread, and one for sending
             # the email.
-            self.assertEqual(
-                self.count_jobs_in_taskqueue(
-                    taskqueue_services.QUEUE_NAME_EVENTS), 1)
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EMAILS), 1)
