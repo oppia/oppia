@@ -29,7 +29,7 @@ import elasticsearch
 # A timeout of 30 seconds is needed to avoid calls to
 # exp_services.load_demo() failing with a ReadTimeoutError
 # where loading a exploration from local yaml file takes
-# takes longer than ElasticSearch expects.
+# longer than ElasticSearch expects.
 ES = elasticsearch.Elasticsearch(
     ('localhost:%s' % feconf.ES_LOCALHOST_PORT)
     if feconf.ES_CLOUD_ID is None else None,

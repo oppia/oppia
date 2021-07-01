@@ -57,7 +57,21 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
             Story
             Exploration
             Subtopic
-            Skill.
+            Skill
+
+            The Topic contains a story and a subtopic.
+
+            Adding a Exploration to the topic requires a story 
+            with a exploration as a node.
+
+            In the Story a exploration from the local assets is added
+            as a node which contains all the android interactions.
+
+            The subtopic is created to validate the topic, a topic
+            requires atleast one subtopic.
+
+            The skill is created to validate the subtopic, a subtopic
+            requires atleast one skill.
         """
 
         if not constants.DEV_MODE:
@@ -96,8 +110,6 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
         topic.update_page_title_fragment_for_web('page title for topic')
         topic.update_thumbnail_filename('test_svg.svg')
         topic.update_thumbnail_bg_color('#C6DCDA')
-        topic.update_subtopic_thumbnail_filename(1, 'test_svg.svg')
-        topic.update_subtopic_thumbnail_bg_color(1, '#FFFFFF')
 
         # Add other structures to the topic.
         topic.add_canonical_story(story_id)
@@ -105,6 +117,8 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
         topic.add_subtopic(1, 'Test Subtopic Title')
 
         # Update and validate subtopic.
+        topic.update_subtopic_thumbnail_filename(1, 'test_svg.svg')
+        topic.update_subtopic_thumbnail_bg_color(1, '#FFFFFF')
         topic.update_subtopic_url_fragment(1, 'suburl')
         topic.move_skill_id_to_subtopic(None, 1, skill_id)
         subtopic_page = (
