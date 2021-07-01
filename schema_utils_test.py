@@ -433,6 +433,7 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
     }] # List[Dict[Text, Any]]
 
     def arbitary_method(self, obj):
+        # type: (Dict[Any, Any]) -> None
         """Only required for testing.
 
         Args:
@@ -1036,6 +1037,7 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
             schema, mappings, invalid_values_with_error_messages)
 
     def test_string_schema(self):
+        # type: () -> None
         schema = {
             'type': schema_utils.SCHEMA_TYPE_BASESTRING,
         }
@@ -1048,6 +1050,7 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
             schema, mappings, invalid_values_with_error_messages)
 
     def test_object_dict_schema_with_validation_method_key(self):
+        # type: () -> None
         schema = {
             'type': SCHEMA_TYPE_OBJECT_DICT,
             'validation_method': validation_method_for_testing
@@ -1073,6 +1076,7 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
             schema, mappings, invalid_values_with_error_messages)
 
     def test_object_dict_schema_with_object_class_key(self):
+        # type: () -> None
         schema = {
             'type': SCHEMA_TYPE_OBJECT_DICT,
             'object_class': ValidateClassForTesting
@@ -1201,6 +1205,7 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
 
 
 def validation_method_for_testing(obj):
+    # type: (Dict[Any, Any]) -> None
     """Method to test 'validation_method' key of schema.
 
     Args:
@@ -1216,6 +1221,7 @@ class ValidateClassForTesting(python_utils.OBJECT):
     """Class to test 'object_class' key of schema."""
 
     def __init__(self, arg_a, arg_b):
+        # type: (Text, Text) -> None
         """Initializes the object.
 
         Args:
@@ -1227,6 +1233,7 @@ class ValidateClassForTesting(python_utils.OBJECT):
 
     @classmethod
     def from_dict(cls, obj):
+        # type: (Dict[Any, Any]) -> ValidateClassForTesting
         """Return the ValidateClassForTesting object from a dict.
 
         Args:
@@ -1238,6 +1245,7 @@ class ValidateClassForTesting(python_utils.OBJECT):
         return cls(obj['arg_a'], obj['arg_b'])
 
     def validate(self):
+        # type: () -> None
         """Method to validate the test object."""
         if not isinstance(self.arg_a, python_utils.BASESTRING):
             raise Exception('Invalid type arg_a.')
