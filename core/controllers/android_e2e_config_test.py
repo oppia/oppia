@@ -82,6 +82,8 @@ class AndroidConfigTest(test_utils.GenericTestBase):
             self.assertEqual(node.exploration_id, EXPLORATION_ID)
 
     def test_initialize_structure_thumbnails_exist(self):
+        # To validate the thumbnails for topic ans story can be fetched
+        # using AssetsDevHandler.
         self.post_json(
             '/initialize_android_test_data', {}, use_payload=False,
             csrf_token=None)

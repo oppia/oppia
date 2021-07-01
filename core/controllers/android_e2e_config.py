@@ -47,8 +47,19 @@ import python_utils
 class InitializeAndroidTestDataHandler(base.BaseHandler):
     """Handler to initialize android specific structures."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'POST': {}}
+
     @acl_decorators.open_access
     def post(self):
+        """This method generates the following structures:
+            Topic
+            Story
+            Exploration
+            Subtopic
+            Skill.
+        """
+
         if not constants.DEV_MODE:
             raise Exception('Cannot load new structures data in production.')
         if topic_services.does_topic_with_name_exist(
@@ -60,22 +71,24 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
                 raise Exception('The topic is already published.')
             else:
                 raise Exception('The topic exists but is not published.')
-        result = {}
         exp_id = '26'
         user_id = feconf.SYSTEM_COMMITTER_ID
+        # Generating new Structure id for topic, story, skill and question.
         topic_id = topic_fetchers.get_new_topic_id()
         story_id = story_services.get_new_story_id()
         skill_id = skill_services.get_new_skill_id()
         question_id = question_services.get_new_question_id()
+
+        # Creating dummy skill and question.
         skill = self._create_dummy_skill(
             skill_id, 'Dummy Skill for Android', '<p>Dummy Explanation 1</p>')
         question = self._create_dummy_question(
             question_id, 'Question 1', [skill_id])
         question_services.add_question(user_id, question)
-
         question_services.create_new_question_skill_link(
             user_id, question_id, skill_id, 0.3)
 
+        # Create and update topic to validate before publishing.
         topic = topic_domain.Topic.create_default_topic(
             topic_id, 'Android test', 'test-topic-one', 'description')
         topic.update_url_fragment('test-topic')
@@ -83,20 +96,22 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
         topic.update_page_title_fragment_for_web('page title for topic')
         topic.update_thumbnail_filename('test_svg.svg')
         topic.update_thumbnail_bg_color('#C6DCDA')
-
-        topic.add_canonical_story(story_id)
-        topic.add_uncategorized_skill_id(skill_id)
-        topic.add_subtopic(1, 'Test Subtopic Title')
-        topic.update_subtopic_url_fragment(1, 'suburl')
         topic.update_subtopic_thumbnail_filename(1, 'test_svg.svg')
         topic.update_subtopic_thumbnail_bg_color(1, '#FFFFFF')
 
-        topic.move_skill_id_to_subtopic(None, 1, skill_id)
+        # Add other structures to the topic.
+        topic.add_canonical_story(story_id)
+        topic.add_uncategorized_skill_id(skill_id)
+        topic.add_subtopic(1, 'Test Subtopic Title')
 
+        # Update and validate subtopic.
+        topic.update_subtopic_url_fragment(1, 'suburl')
+        topic.move_skill_id_to_subtopic(None, 1, skill_id)
         subtopic_page = (
             subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
                 1, topic_id))
 
+        # Upload local exploration to the datastore and enable feedback.
         exp_services.load_demo(python_utils.convert_to_bytes(
             exp_id))
         rights_manager.release_ownership_of_exploration(
@@ -108,6 +123,8 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
                 'property_name': 'correctness_feedback_enabled',
                 'new_value': True
             })], 'Changed correctness_feedback_enabled.')
+
+        # Add and update the exploration/node to the story.
         story = story_domain.Story.create_default_story(
             story_id, 'Android End to End testing', 'Description',
             topic_id, 'android-end-to-end-testing')
@@ -130,11 +147,15 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
             'test_svg.svg')
         story.update_node_thumbnail_bg_color(
             '%s%d' % (story_domain.NODE_ID_PREFIX, 1), '#F8BF74')
+
+        # Update and validate the story.
         story.update_meta_tag_content('tag')
         story.update_thumbnail_filename('test_svg.svg')
         story.update_thumbnail_bg_color(
             constants.ALLOWED_THUMBNAIL_BG_COLORS['story'][0])
 
+        # Save the previously created structures
+        # (skill, story, topic, subtopic).
         skill_services.save_new_skill(user_id, skill)
         story_services.save_new_story(user_id, story)
         topic_services.save_new_topic(user_id, topic)
@@ -152,11 +173,14 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
         opportunity_services.add_new_exploration_opportunities(
             story_id, exp_ids_in_story)
 
+        # Publish the story and topic.
         topic_services.publish_story(topic_id, story_id, user_id)
         topic_services.publish_topic(topic_id, user_id)
+
+        # Upload thumbnails to be accessible through AssetsDevHandler.
         self._upload_thumbnail(topic_id, feconf.ENTITY_TYPE_TOPIC)
         self._upload_thumbnail(story_id, feconf.ENTITY_TYPE_STORY)
-        self.render_json(result)
+        self.render_json({})
 
     def _upload_thumbnail(self, structure_id, structure_type):
         """Uploads images to the local datastore to be fetched using the
