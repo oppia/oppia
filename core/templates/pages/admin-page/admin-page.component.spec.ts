@@ -56,8 +56,7 @@ class MockPlatformFeatureService {
   }
 }
 
-for(let i = 0; i<100; i++) {
-fdescribe('Admin Page component ', () => {
+describe('Admin Page component ', () => {
   let component: AdminPageComponent;
   let fixture: ComponentFixture<AdminPageComponent>;
 
@@ -155,4 +154,4 @@ fdescribe('Admin Page component ', () => {
     // Mocked 'PlatformFeatureService.status' method to return true.
     expect(result).toBe(true);
   });
-});}
+});
