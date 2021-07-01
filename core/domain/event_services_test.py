@@ -26,7 +26,6 @@ import os
 import re
 
 from core.domain import event_services
-from core.domain import taskqueue_services
 from core.platform import models
 from core.tests import test_utils
 import feconf

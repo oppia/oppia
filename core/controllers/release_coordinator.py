@@ -96,18 +96,6 @@ class JobsHandler(base.BaseHandler):
                 if klass.__name__ == job_type:
                     klass.cancel(job_id, self.user_id)
                     break
-        elif action == 'start_computation':
-            computation_type = self.payload.get('computation_type')
-            for klass in jobs_registry.ALL_CONTINUOUS_COMPUTATION_MANAGERS:
-                if klass.__name__ == computation_type:
-                    klass.start_computation()
-                    break
-        elif action == 'stop_computation':
-            computation_type = self.payload.get('computation_type')
-            for klass in jobs_registry.ALL_CONTINUOUS_COMPUTATION_MANAGERS:
-                if klass.__name__ == computation_type:
-                    klass.stop_computation(self.user_id)
-                    break
         else:
             raise self.InvalidInputException('Invalid action: %s' % action)
         self.render_json({})

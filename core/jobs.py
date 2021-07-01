@@ -1042,6 +1042,35 @@ def get_data_for_recent_jobs(recency_msec=DEFAULT_RECENCY_MSEC):
     return [_get_job_dict_from_job_model(model) for model in recent_job_models]
 
 
+def get_data_for_unfinished_jobs():
+    """Returns a list of dicts containing data about all unfinished jobs.
+
+    Returns:
+        list(dict). Each dict represents a continuous computation and contains
+        the following keys:
+            computation_type: str. The type of the computation.
+            status_code: str. The current status of the computation.
+            last_started_msec: float or None. When a batch job for the
+                computation was last started, in milliseconds since the
+                epoch.
+            last_finished_msec: float or None. When a batch job for the
+                computation last finished, in milliseconds since the epoch.
+            last_stopped_msec: float or None. When a batch job for the
+                computation was last stopped, in milliseconds since the
+                epoch.
+            active_realtime_layer_index: int or None. The index of the
+                active realtime layer.
+            is_startable: bool. Whether an admin should be allowed to start
+                this computation.
+            is_stoppable: bool. Whether an admin should be allowed to stop
+                this computation.
+    """
+    unfinished_job_models = job_models.JobModel.get_all_unfinished_jobs(
+        NUM_JOBS_IN_DASHBOARD_LIMIT)
+    return [_get_job_dict_from_job_model(model)
+            for model in unfinished_job_models]
+
+
 def cleanup_old_jobs_pipelines():
     """Clean the pipelines of old jobs."""
     num_cleaned = 0
