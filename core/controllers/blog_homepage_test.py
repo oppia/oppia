@@ -61,8 +61,8 @@ class BlogHomepageDataHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             self.BLOG_ADMIN_USERNAME,
             json_response['blog_post_summary_dicts'][0]['author_name'])
-        self.assertTrue(
-            len(json_response['blog_post_summary_dicts']) == 1)
+        self.assertEqual(
+            len(json_response['blog_post_summary_dicts']), 1)
 
         blog_post_two = blog_services.create_new_blog_post(self.blog_admin_id)
         change_dict_two = {
@@ -75,8 +75,8 @@ class BlogHomepageDataHandlerTest(test_utils.GenericTestBase):
         blog_services.publish_blog_post(blog_post_two.id)
         json_response = self.get_json(
             '%s' % feconf.BLOG_HOMEPAGE_DATA_URL)
-        self.assertTrue(
-            len(json_response['blog_post_summary_dicts']) == 2)
+        self.assertEqual(
+            len(json_response['blog_post_summary_dicts']), 2)
         self.assertTrue(
             json_response['blog_post_summary_dicts'][0]['published_on'] >
             json_response['blog_post_summary_dicts'][1]['published_on']
@@ -127,8 +127,7 @@ class BlogPostHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             '<p>Hello Bloggers</p>',
             json_response['blog_post_dict']['content'])
-        self.assertTrue(
-            len(json_response['summary_dicts']) == 1)
+        self.assertEqual(len(json_response['summary_dicts']), 1)
         self.assertIsNotNone(json_response['profile_picture_data_url'])
 
         blog_post_two_id = (
@@ -151,8 +150,8 @@ class BlogPostHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             '<p>Hello Blog</p>',
             json_response['blog_post_dict']['content'])
-        self.assertTrue(
-            len(json_response['summary_dicts']) == 2)
+        self.assertEqual(
+            len(json_response['summary_dicts']), 2)
         self.assertIsNotNone(json_response['profile_picture_data_url'])
 
 
@@ -192,6 +191,6 @@ class AuthorsPageHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             self.BLOG_ADMIN_USERNAME,
             json_response['summary_dicts'][0]['author_name'])
-        self.assertTrue(
-            len(json_response['summary_dicts']) == 1)
+        self.assertEqual(
+            len(json_response['summary_dicts']), 1)
         self.assertIsNotNone(json_response['profile_picture_data_url'])
