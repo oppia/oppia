@@ -193,7 +193,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'question-editor.directive.ts',
     'question-player.directive.ts',
     'question-update.service.ts',
-    'questions-list.component.ts',
     'random-selector.directive.ts',
     'real-editor.component.ts',
     'refresher-exploration-confirmation-modal.service.ts',
