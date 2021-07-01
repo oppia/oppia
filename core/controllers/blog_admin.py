@@ -28,7 +28,6 @@ from core.domain import config_services
 from core.domain import role_services
 from core.domain import user_services
 import feconf
-import python_utils
 
 BLOG_POST_EDITOR = feconf.ROLE_ID_BLOG_POST_EDITOR
 BLOG_ADMIN = feconf.ROLE_ID_BLOG_ADMIN

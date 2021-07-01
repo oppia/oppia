@@ -102,7 +102,7 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
         self._assert_valid_blog_post_id_for_blog_post(
             'Blog Post ID should be a string, received: 10', 10)
         self._assert_valid_blog_post_id_for_blog_post(
-            'Blog Post ID should be a string, received: \[10\]', [10])
+            r'Blog Post ID should be a string, received: \[10\]', [10])
         self._assert_valid_blog_post_id_for_blog_post(
             'Blog ID abcdef is invalid', 'abcdef')
 

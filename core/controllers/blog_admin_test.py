@@ -205,6 +205,5 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
             '/blogadminhandler', payload, csrf_token=csrf_token,
             expected_status_int=400)
         self.assertEqual(
-            response_dict['error'], 'Schema validation for \'new_config_property'
-            '_values\' failed: Could not convert list to int: [20]')
-                
+            response_dict['error'], 'Schema validation for \'new_config_'
+            'property_values\' failed: Could not convert list to int: [20]')

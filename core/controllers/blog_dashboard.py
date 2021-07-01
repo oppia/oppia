@@ -202,8 +202,5 @@ class BlogPostHandler(base.BaseHandler):
         # type: (str) -> None
         """Handles Delete requests."""
         blog_domain.BlogPost.require_valid_blog_post_id(blog_post_id)
-        blog_post = (
-            blog_services.get_blog_post_by_id(blog_post_id, strict=False))
         blog_services.delete_blog_post(blog_post_id)
-
         self.render_json(self.values)
