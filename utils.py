@@ -1129,7 +1129,7 @@ def grouper(iterable, chunk_len, fillvalue=None):
 
 
 def partition(iterable, predicate=bool, enumerated=False):
-    # type: (Iterable[T], Callable[..., Any], bool) -> Tuple[Iterable[Union[T, Tuple[int,T]]], Iterable[Union[T, Tuple[int,T]]]] # pylint: disable=line-too-long
+    # type: (Iterable[T], Callable[..., Any], bool) -> Tuple[Iterable[Union[T, Tuple[int,T]]], Iterable[Union[T, Tuple[int,T]]]]
     """Returns two generators which split the iterable based on the predicate.
 
     NOTE: The predicate is called AT MOST ONCE per item.

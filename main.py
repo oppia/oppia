@@ -116,7 +116,7 @@ class HomePageRedirectPage(base.BaseHandler):
     @acl_decorators.open_access # type: ignore[misc]
     def get(self):
         # type: () -> None
-        if self.user_id and user_services.has_fully_registered_account( # type: ignore[no-untyped-call] # pylint: disable=line-too-long
+        if self.user_id and user_services.has_fully_registered_account( # type: ignore[no-untyped-call]
                 self.user_id):
             user_settings = (
                 user_services.get_user_settings( # type: ignore[no-untyped-call]
@@ -141,7 +141,7 @@ class SplashRedirectPage(base.BaseHandler):
 
 
 def get_redirect_route(regex_route, handler, defaults=None):
-    # type: (Text, Type[base.BaseHandler], Optional[Dict[Any, Any]]) -> routes.RedirectRoute # pylint: disable=line-too-long
+    # type: (Text, Type[base.BaseHandler], Optional[Dict[Any, Any]]) -> routes.RedirectRoute
     """Returns a route that redirects /foo/ to /foo.
 
     Warning: this method strips off parameters after the trailing slash. URLs
@@ -894,4 +894,4 @@ URLS.append(get_redirect_route(r'/<:.*>', base.Error404Handler))
 app = transaction_services.toplevel_wrapper(  # pylint: disable=invalid-name
     webapp2.WSGIApplication(URLS, debug=feconf.DEBUG))
 
-firebase_auth_services.establish_firebase_connection() # type: ignore[no-untyped-call] # pylint: disable=line-too-long
+firebase_auth_services.establish_firebase_connection() # type: ignore[no-untyped-call]

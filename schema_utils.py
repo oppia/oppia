@@ -101,7 +101,7 @@ def normalize_against_schema(
         # TODO(sll): Either get rid of custom objects or find a way to merge
         # them into the schema framework -- probably the latter.
         from core.domain import object_registry
-        obj_class = object_registry.Registry.get_object_class_by_type( # type: ignore[no-untyped-call] # pylint: disable=line-too-long
+        obj_class = object_registry.Registry.get_object_class_by_type( # type: ignore[no-untyped-call]
             schema[SCHEMA_KEY_OBJ_TYPE])
         if not apply_custom_validators:
             normalized_obj = normalize_against_schema(
@@ -532,7 +532,7 @@ class _Validators(python_utils.OBJECT):
         if len(obj) == 0:
             return True
 
-        if not expression_parser.is_valid_expression(obj): # type: ignore[no-untyped-call] # pylint: disable=line-too-long
+        if not expression_parser.is_valid_expression(obj): # type: ignore[no-untyped-call]
             return False
 
         expression_is_algebraic = (

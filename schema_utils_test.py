@@ -791,7 +791,7 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
 
     def check_normalization(
             self, schema, mappings, invalid_items_with_error_messages):
-        # type: (Dict[Text, Any], List[Tuple[Any, Any]], List[Tuple[Any, Text]]) -> None # pylint: disable=line-too-long
+        # type: (Dict[Text, Any], List[Tuple[Any, Any]], List[Tuple[Any, Text]]) -> None
         """Validates the schema and tests that values are normalized correctly.
 
         Args:

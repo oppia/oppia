@@ -83,7 +83,7 @@ old_get_distribution = pkg_resources.get_distribution # pylint: disable=invalid-
 # and https://github.com/urllib3/urllib3/issues/1138#issuecomment-290325277.
 import requests # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 requests.packages.urllib3.disable_warnings( # type: ignore[no-untyped-call]
-    requests.packages.urllib3.contrib.appengine.AppEnginePlatformWarning # type: ignore[attr-defined] # pylint: disable=line-too-long
+    requests.packages.urllib3.contrib.appengine.AppEnginePlatformWarning # type: ignore[attr-defined]
 )
 
 
