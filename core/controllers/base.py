@@ -334,18 +334,18 @@ class BaseHandler(webapp2.RequestHandler):
         if handler_class_name in handler_class_names_with_no_schema:
             return
 
-        if request_method in ['GET', 'DELETE']:
-            handler_args = {}
-            for arg in self.request.arguments():
-                handler_args[arg] = self.request.get(arg)
-        else:
-            # When request_method in ['PUT', 'POST']
-            handler_args = self.payload
-        if handler_args is None:
-            # When a handler class expects an argument but it is missing in
-            # payloads then for raising exception for missing args,
-            # handler_args must be initialized with empty dict.
-            handler_args = {}
+        skip_validation_for_args = ['csrf_token', 'source']
+        handler_args = {}
+
+        for arg in self.request.arguments():
+            if arg in skip_validation_for_args:
+                continue
+            if arg == 'payload':
+                payload_args = self.payload
+                if payload_args is not None:
+                    handler_args.update(payload_args)
+                continue
+            handler_args[arg] = self.request.get(arg)
 
         # For html handlers, extra args are allowed (to accommodate
         # e.g. utm parameters which are not used by the backend but
@@ -388,10 +388,8 @@ class BaseHandler(webapp2.RequestHandler):
             payload_validator.validate(
                 handler_args, schema_for_request_method, extra_args_are_allowed)
         )
-        if request_method in ['PUT', 'POST']:
-            self.normalized_payload = normalized_value
-        else:
-            self.normalized_request = normalized_value
+
+        self.normalized_request = normalized_value
 
         if errors:
             raise self.InvalidInputException('\n'.join(errors))

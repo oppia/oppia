@@ -1894,3 +1894,52 @@ class RequestMethodNotInHandlerClassDoNotRaiseMissingSchemaErrorTest(
     def test_get_request_do_not_raise_notimplemented_error(self):
         with self.swap(self, 'testapp', self.testapp):
             self.get_json('/mock', expected_status_int=404)
+
+
+class HandlerClassWithBothRequestAndPayloadTest(test_utils.GenericTestBase):
+    """This test class ensures that SVS architecture validates both request args
+    and payload args if they are present in a single request method."""
+
+    class MockHandler(base.BaseHandler):
+        """Fake page for testing autoescaping."""
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {
+            'POST': {
+                'arg_b': {
+                    'type': 'basestring'
+                },
+                'arg_a': {
+                    'type': 'basestring'
+                }
+            }
+        }
+
+        def post(self):
+            """Handles POST requests. This request method contains both type
+            of args, i.e., request args as well as payload args.
+            """
+            # arg_a = self.request.get('arg_in_request') is not used, since we
+            # intend to use normalized value.
+            arg_a = self.normalized_request.get('arg_a')
+
+            # arg_b = self.payload.get('arg_in_payload') is not used, since we
+            # intend to use normalized value.
+            arg_b = self.normalized_request.get('arg_b')
+
+            self.render_json({'arg_a': arg_a, 'arg_b': arg_b})
+
+
+    def setUp(self):
+        super(HandlerClassWithBothRequestAndPayloadTest, self).setUp()
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock', self.MockHandler, name='MockHandler')],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_both_args_in_post_request(self):
+        payload = {'arg_b': 'arg_in_payload'}
+        user_id = user_services.get_user_id_from_username('learneruser')
+        csrf_token = base.CsrfTokenManager.create_csrf_token(user_id)
+        with self.swap(self, 'testapp', self.testapp):
+            self.post_json(
+                '/mock?arg_a=arg_in_request', payload, csrf_token=csrf_token)
