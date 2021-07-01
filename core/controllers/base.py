@@ -171,7 +171,6 @@ class BaseHandler(webapp2.RequestHandler):
         self.user_is_scheduled_for_deletion = False
         self.current_user_is_super_admin = False
         self.normalized_request = None
-        self.normalized_payload = None
 
         try:
             auth_claims = auth_services.get_auth_claims_from_request(request)
@@ -344,8 +343,8 @@ class BaseHandler(webapp2.RequestHandler):
                 payload_args = self.payload
                 if payload_args is not None:
                     handler_args.update(payload_args)
-                continue
-            handler_args[arg] = self.request.get(arg)
+            else:
+                handler_args[arg] = self.request.get(arg)
 
         # For html handlers, extra args are allowed (to accommodate
         # e.g. utm parameters which are not used by the backend but
