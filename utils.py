@@ -333,8 +333,7 @@ def convert_png_binary_to_data_url(content):
     if imghdr.what(None, h=content) == 'png':
         return '%s%s' % (
             PNG_DATA_URL_PREFIX,
-            python_utils.url_quote( # type: ignore[no-untyped-call]
-                base64.b64encode(content))
+            python_utils.url_quote(base64.b64encode(content)) # type: ignore[no-untyped-call]
         )
     else:
         raise Exception('The given string does not represent a PNG image.')
@@ -403,19 +402,14 @@ def set_url_query_parameter(url, param_name, param_value):
             'URL query parameter name must be a string, received %s'
             % param_name)
 
-    scheme, netloc, path, query_string, fragment = (
-        python_utils.url_split(url)) # type: ignore[no-untyped-call]
-    query_params = (
-        python_utils.parse_query_string( # type: ignore[no-untyped-call]
-            query_string))
+    scheme, netloc, path, query_string, fragment = python_utils.url_split(url) # type: ignore[no-untyped-call]
+    query_params = python_utils.parse_query_string(query_string) # type: ignore[no-untyped-call]
 
     query_params[param_name] = [param_value]
-    new_query_string = python_utils.url_encode( # type: ignore[no-untyped-call]
-        query_params, doseq=True)
+    new_query_string = python_utils.url_encode(query_params, doseq=True) # type: ignore[no-untyped-call]
 
-    return ( # type: ignore[no-any-return]
-        python_utils.url_unsplit( # type: ignore[no-untyped-call]
-            (scheme, netloc, path, new_query_string, fragment)))
+    return python_utils.url_unsplit( # type: ignore[no-any-return, no-untyped-call]
+            (scheme, netloc, path, new_query_string, fragment))
 
 
 class JSONEncoderForHTML(json.JSONEncoder):
@@ -463,8 +457,7 @@ def convert_to_hash(input_string, max_length):
     # remain encoded (otherwise encoded_string would be of type unicode).
     encoded_string = base64.b64encode(
         hashlib.sha1(
-            python_utils.convert_to_bytes(  # type: ignore[no-untyped-call]
-                input_string)).digest(),
+            python_utils.convert_to_bytes(input_string)).digest(), # type: ignore[no-untyped-call]
         altchars=b'ab'
     ).replace('=', 'c')
 
@@ -481,9 +474,7 @@ def base64_from_int(value):
     Returns:
         *. Returns the base64 representation of the number passed.
     """
-    byte_value = (
-        b'[' + python_utils.convert_to_bytes( # type: ignore[no-untyped-call]
-            value) + b']')
+    byte_value = b'[' + python_utils.convert_to_bytes(value) + b']' # type: ignore[no-untyped-call]
     return base64.b64encode(byte_value)
 
 
@@ -498,9 +489,7 @@ def get_time_in_millisecs(datetime_obj):
         float. The time in milliseconds since the Epoch.
     """
     msecs = time.mktime(datetime_obj.timetuple()) * 1000.0
-    return ( # type: ignore[no-any-return]
-        msecs + python_utils.divide( # type: ignore[no-untyped-call]
-            datetime_obj.microsecond, 1000.0))
+    return msecs + python_utils.divide(datetime_obj.microsecond, 1000.0) # type: ignore[no-any-return, no-untyped-call]
 
 
 def convert_naive_datetime_to_string(datetime_obj):
@@ -557,9 +546,7 @@ def get_human_readable_time_string(time_msec):
     # Ignoring arg-type because we are preventing direct usage of 'str' for
     # Python3 compatibilty.
     return time.strftime(
-        '%B %d %H:%M:%S', # type: ignore[arg-type]
-        time.gmtime(python_utils.divide( # type: ignore[no-untyped-call]
-            time_msec, 1000.0)))
+        '%B %d %H:%M:%S', time.gmtime(python_utils.divide(time_msec, 1000.0))) # type: ignore[arg-type, no-untyped-call]
 
 
 def create_string_from_largest_unit_in_timedelta(timedelta_obj):
@@ -863,8 +850,7 @@ def get_hex_color_for_category(category):
     Returns:
         str. Color assigned to that category.
     """
-    return ( # type: ignore[no-any-return]
-        constants.CATEGORIES_TO_COLORS[category]
+    return (constants.CATEGORIES_TO_COLORS[category] # type: ignore[no-any-return]
         if category in constants.CATEGORIES_TO_COLORS
         else constants.DEFAULT_COLOR)
 
@@ -983,9 +969,7 @@ def unescape_encoded_uri_component(escaped_string):
     Returns:
         str. Decoded string that was initially encoded with encodeURIComponent.
     """
-    return ( # type: ignore[no-any-return]
-        python_utils.urllib_unquote( # type: ignore[no-untyped-call]
-            escaped_string).decode('utf-8'))
+    return python_utils.urllib_unquote(escaped_string).decode('utf-8') # type: ignore[no-any-return, no-untyped-call]
 
 
 def snake_case_to_camel_case(snake_str):
@@ -1095,8 +1079,7 @@ def compute_list_difference(list_a, list_b):
 
 # Ignoring type-arg because error thrown is 'Missing type parameters for generic
 # type "OrderedDict"' but here we don't need to specify this.
-class OrderedCounter(
-        collections.Counter, collections.OrderedDict): # type: ignore[type-arg]
+class OrderedCounter(collections.Counter, collections.OrderedDict): # type: ignore[type-arg]
     """Counter that remembers the order elements are first encountered."""
 
     pass
@@ -1123,9 +1106,7 @@ def grouper(iterable, chunk_len, fillvalue=None):
     # To understand how/why this works, please refer to the following
     # Stack Overflow answer: https://stackoverflow.com/a/49181132/4859885.
     args = [iter(iterable)] * chunk_len
-    return ( # type: ignore[no-any-return]
-        python_utils.zip_longest( # type: ignore[no-untyped-call]
-            *args, fillvalue=fillvalue))
+    return python_utils.zip_longest(*args, fillvalue=fillvalue) # type: ignore[no-any-return, no-untyped-call]
 
 
 def partition(iterable, predicate=bool, enumerated=False):

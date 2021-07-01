@@ -75,9 +75,7 @@ from webapp2_extras import routes
 
 from typing import Any, Dict, Optional, Text, Type # isort:skip # pylint: disable=unused-import
 
-transaction_services = (
-    models.Registry.import_transaction_services(# type: ignore[no-untyped-call]
-    ))
+transaction_services = models.Registry.import_transaction_services() # type: ignore[no-untyped-call]
 
 # Suppress debug logging for chardet. See https://stackoverflow.com/a/48581323.
 # Without this, a lot of unnecessary debug logs are printed in error logs,
@@ -118,17 +116,14 @@ class HomePageRedirectPage(base.BaseHandler):
         # type: () -> None
         if self.user_id and user_services.has_fully_registered_account( # type: ignore[no-untyped-call]
                 self.user_id):
-            user_settings = (
-                user_services.get_user_settings( # type: ignore[no-untyped-call]
-                    self.user_id))
+            user_settings = user_services.get_user_settings(self.user_id) # type: ignore[no-untyped-call]
             default_dashboard = user_settings.default_dashboard
             if default_dashboard == constants.DASHBOARD_TYPE_CREATOR:
                 self.redirect(feconf.CREATOR_DASHBOARD_URL)
             else:
                 self.redirect(feconf.LEARNER_DASHBOARD_URL)
         else:
-            self.render_template( # type: ignore[no-untyped-call]
-                'splash-page.mainpage.html')
+            self.render_template('splash-page.mainpage.html') # type: ignore[no-untyped-call]
 
 
 class SplashRedirectPage(base.BaseHandler):

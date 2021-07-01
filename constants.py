@@ -73,10 +73,8 @@ class Constants(dict): # type: ignore[type-arg]
         return self[name]
 
 
-with python_utils.open_file( # type: ignore[no-untyped-call]
-    os.path.join('assets', 'constants.ts'), 'r') as f:
+with python_utils.open_file(os.path.join('assets', 'constants.ts'), 'r') as f: # type: ignore[no-untyped-call]
     constants = Constants(parse_json_from_js(f))  # pylint:disable=invalid-name
 
-with python_utils.open_file( # type: ignore[no-untyped-call]
-    'release_constants.json', 'r') as f:
+with python_utils.open_file('release_constants.json', 'r') as f: # type: ignore[no-untyped-call]
     release_constants = Constants(json.loads(f.read()))  # pylint:disable=invalid-name

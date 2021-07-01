@@ -610,8 +610,7 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         """Tests if normalize against schema raises exception
         for invalid key.
         """
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-            Exception, 'Invalid schema type: invalid'):
+        with self.assertRaisesRegexp(Exception, 'Invalid schema type: invalid'): # type: ignore[no-untyped-call]
             schema = {SCHEMA_KEY_TYPE: 'invalid'}
             schema_utils.normalize_against_schema('obj', schema)
 
@@ -813,8 +812,7 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
                 schema_utils.normalize_against_schema(raw_value, schema),
                 expected_value)
         for value, error_msg in invalid_items_with_error_messages:
-            with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-                Exception, error_msg):
+            with self.assertRaisesRegexp(Exception, error_msg): # type: ignore[no-untyped-call]
                 schema_utils.normalize_against_schema(value, schema)
 
     def test_float_schema(self):

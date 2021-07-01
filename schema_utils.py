@@ -323,16 +323,12 @@ class Normalizers(python_utils.OBJECT):
         """
         if obj == '':
             return obj
-        url_components = python_utils.url_split( # type: ignore[no-untyped-call]
-            obj)
+        url_components = python_utils.url_split(obj) # type: ignore[no-untyped-call]
         quoted_url_components = (
-            python_utils.url_quote( # type: ignore[no-untyped-call]
-                component) for component in url_components)
-        raw = python_utils.url_unsplit( # type: ignore[no-untyped-call]
-            quoted_url_components)
+            python_utils.url_quote(component) for component in url_components) # type: ignore[no-untyped-call]
+        raw = python_utils.url_unsplit(quoted_url_components) # type: ignore[no-untyped-call]
 
-        acceptable = html_cleaner.filter_a( # type: ignore[no-untyped-call]
-            'a', 'href', obj)
+        acceptable = html_cleaner.filter_a('a', 'href', obj) # type: ignore[no-untyped-call]
         assert acceptable, (
             'Invalid URL: Sanitized URL should start with '
             '\'http://\' or \'https://\'; received %s' % raw)
@@ -454,8 +450,7 @@ class _Validators(python_utils.OBJECT):
         Returns:
             bool. Whether the given object is a valid URL fragment.
         """
-        return re.match( # type: ignore[return-value]
-            constants.VALID_URL_FRAGMENT_REGEX, obj)
+        return re.match(constants.VALID_URL_FRAGMENT_REGEX, obj) # type: ignore[return-value]
 
     @staticmethod
     def is_at_least(obj, min_value):
@@ -535,8 +530,7 @@ class _Validators(python_utils.OBJECT):
         if not expression_parser.is_valid_expression(obj): # type: ignore[no-untyped-call]
             return False
 
-        expression_is_algebraic = (
-            expression_parser.is_algebraic(obj)) # type: ignore[no-untyped-call]
+        expression_is_algebraic = expression_parser.is_algebraic(obj) # type: ignore[no-untyped-call]
         # If the algebraic flag is true, expression_is_algebraic should
         # also be true, otherwise both should be false which would imply
         # that the expression is numeric.
