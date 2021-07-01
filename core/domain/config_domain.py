@@ -60,7 +60,7 @@ SET_OF_STRINGS_SCHEMA = {
     },
     'validators': [{
         'id': 'is_uniquified',
-    }]
+    }],
 }
 
 SET_OF_CLASSROOM_DICTS_SCHEMA = {
