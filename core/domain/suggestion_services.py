@@ -22,7 +22,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import heapq
 import logging
 import re
-import datetime
 
 from constants import constants
 from core.domain import email_manager

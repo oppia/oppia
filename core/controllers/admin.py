@@ -975,14 +975,13 @@ class TranslationContributionStatsHandler(base.BaseHandler):
 
         Returns:
             list(dict(TranslationContributionStats)). Dict representations of
-                TranslationContributionStats domain objects with additional
-                keys:
-                    language: str. Language description.
-                    topic_name: str. Topic name.
-                    contribution_months: str. Unique translation contribution
-                        months of format: "%b %Y", e.g. "Jan 2021".
-                Unnecessary keys language_code, topic_id, contribution_dates,
-                contributor_user_id are consequently deleted.
+            TranslationContributionStats domain objects with additional keys:
+                language: str. Language description.
+                topic_name: str. Topic name.
+                contribution_months: str. Unique translation contribution
+                    months of format: "%b %Y", e.g. "Jan 2021".
+            Unnecessary keys language_code, topic_id, contribution_dates,
+            contributor_user_id are consequently deleted.
         """
         translation_contribution_stats_dicts = [
             stats.to_dict() for stats in translation_contribution_stats

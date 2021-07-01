@@ -2235,7 +2235,7 @@ class TranslationContributionStatsHandlerTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
         response = self.get_json(
-            '/gettranslationcontributionstatshandler', {},
+            '/gettranslationcontributionstatshandler', params={},
             expected_status_int=400)
 
         self.assertEqual(response['error'], 'Missing username param')
@@ -2244,7 +2244,7 @@ class TranslationContributionStatsHandlerTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
         response = self.get_json(
-            '/gettranslationcontributionstatshandler', {
+            '/gettranslationcontributionstatshandler', params={
                 'username': 'invalid',
             }, expected_status_int=400)
 
@@ -2253,13 +2253,13 @@ class TranslationContributionStatsHandlerTest(test_utils.GenericTestBase):
 
     def test_get_stats_returns_transformed_stats(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        submitted_translations_count=2
-        submitted_translation_word_count=100
-        accepted_translations_count=1
-        accepted_translations_without_reviewer_edits_count=0
-        accepted_translation_word_count=50
-        rejected_translations_count=0
-        rejected_translation_word_count=0
+        submitted_translations_count = 2
+        submitted_translation_word_count = 100
+        accepted_translations_count = 1
+        accepted_translations_without_reviewer_edits_count = 0
+        accepted_translation_word_count = 50
+        rejected_translations_count = 0
+        rejected_translation_word_count = 0
         suggestion_models.TranslationContributionStatsModel.create(
             language_code='es',
             contributor_user_id=self.get_user_id_from_email(
@@ -2281,7 +2281,7 @@ class TranslationContributionStatsHandlerTest(test_utils.GenericTestBase):
         )
 
         response = self.get_json(
-            '/gettranslationcontributionstatshandler', {
+            '/gettranslationcontributionstatshandler', params={
                 'username': self.CONTRIBUTOR_USERNAME,
             })
 
@@ -2304,6 +2304,7 @@ class TranslationContributionStatsHandlerTest(test_utils.GenericTestBase):
             }]
         }
         self.assertEqual(response, expected_response)
+
 
 class NumberOfDeletionRequestsHandlerTest(test_utils.GenericTestBase):
     """Tests NumberOfDeletionRequestsHandler."""
