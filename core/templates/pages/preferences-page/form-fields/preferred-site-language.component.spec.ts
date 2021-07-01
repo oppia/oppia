@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the subject interests component.
+ * @fileoverview Unit tests for the preferred site language component.
  */
 
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
@@ -21,8 +21,7 @@ import { FormsModule } from '@angular/forms';
 import { MaterialModule } from 'components/material.module';
 import { PreferredSiteLanguageSelectorComponent } from './preferred-site-language.component';
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Preferred Site Language Component', () => {
+describe('Preferred Site Language Component', () => {
   let componentInstance: PreferredSiteLanguageSelectorComponent;
   let fixture: ComponentFixture<PreferredSiteLanguageSelectorComponent>;
 
@@ -45,5 +44,32 @@ fdescribe('Preferred Site Language Component', () => {
 
   it('should be defined', () => {
     expect(componentInstance).toBeDefined();
+  });
+
+  it('should initialize', () => {
+    componentInstance.choices = [{
+      id: 'en',
+      text: 'english',
+      dir: 'ltr'
+    }];
+    componentInstance.ngOnInit();
+    expect(componentInstance.filteredChoices).toEqual(
+      componentInstance.choices);
+  });
+
+  it('should filter choices', () => {
+    componentInstance.choices = [{
+      id: 'en',
+      text: 'english',
+      dir: 'ltr'
+    }];
+    componentInstance.filterChoices('eng');
+    expect(componentInstance.filteredChoices).toEqual(
+      componentInstance.choices);
+  });
+
+  it('should update preferred language', () => {
+    componentInstance.updateLanguage('en');
+    expect(componentInstance.preferredLanguageCode).toEqual('en');
   });
 });
