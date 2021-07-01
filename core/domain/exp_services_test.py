@@ -6335,21 +6335,6 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
 
         rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
 
-        # Renamed states to check that changes can be
-        # applied even when the states are renamed.
-        change_list = [exp_domain.ExplorationChange({
-            'cmd': 'rename_state',
-            'new_state_name': 'Intro-Rename',
-            'old_state_name': 'Introduction'
-        }), exp_domain.ExplorationChange({
-            'property_name': 'init_state_name',
-            'cmd': 'edit_exploration_property',
-            'old_value': 'Introduction',
-            'new_value': 'Intro-Rename'
-        })]
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, change_list, 'Renamed State.')
-
         # Making changes in the properties which are
         # not related to the interaction id.
         change_list_2 = [exp_domain.ExplorationChange({
@@ -6357,7 +6342,7 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
                 'content_id': 'content',
                 'html': '<p>This is the first state.</p>'
             },
-            'state_name': 'Intro-Rename',
+            'state_name': 'Introduction',
             'old_value': {
                 'content_id': 'content',
                 'html': ''
@@ -6371,13 +6356,13 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
                     'html': '<p>This is a first hint.</p>'
                 }
             }],
-            'state_name': 'Intro-Rename',
+            'state_name': 'Introduction',
             'old_value': [],
             'cmd': 'edit_state_property',
             'property_name': 'hints'
         }), exp_domain.ExplorationChange({
             'new_value': 2,
-            'state_name': 'Intro-Rename',
+            'state_name': 'Introduction',
             'old_value': 1,
             'cmd': 'edit_state_property',
             'property_name': 'next_content_id_index'
@@ -6393,7 +6378,7 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
                     'html': '<p>This is the second hint.</p>'
                 }
             }],
-            'state_name': 'Intro-Rename',
+            'state_name': 'Introduction',
             'old_value': [{
                 'hint_content': {
                     'content_id': 'hint_1',
@@ -6402,12 +6387,6 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             }],
             'cmd': 'edit_state_property',
             'property_name': 'hints'
-        }), exp_domain.ExplorationChange({
-            'new_value': 3,
-            'state_name': 'Intro-Rename',
-            'old_value': 2,
-            'cmd': 'edit_state_property',
-            'property_name': 'next_content_id_index'
         }), exp_domain.ExplorationChange({
             'new_value': {
                 'content_id': 'content',
@@ -8949,17 +8928,8 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
                 }
             }]
         }), exp_domain.ExplorationChange({
-            'new_state_name': 'Introd-Rename',
-            'cmd': 'rename_state',
-            'old_state_name': 'Introduction'
-        }), exp_domain.ExplorationChange({
-            'property_name': 'init_state_name',
-            'cmd': 'edit_exploration_property',
-            'old_value': 'Introduction',
-            'new_value': 'Introd-Rename'
-        }), exp_domain.ExplorationChange({
             'property_name': 'solution',
-            'state_name': 'Introd-Rename',
+            'state_name': 'Introduction',
             'cmd': 'edit_state_property',
             'old_value': None,
             'new_value': {
@@ -8983,22 +8953,13 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
                 'content_id': 'content'
             }
         }), exp_domain.ExplorationChange({
-            'new_state_name': 'Intro-Rename',
-            'cmd': 'rename_state',
-            'old_state_name': 'Introd-Rename'
-        }), exp_domain.ExplorationChange({
-            'property_name': 'init_state_name',
-            'cmd': 'edit_exploration_property',
-            'old_value': 'Introd-Rename',
-            'new_value': 'Intro-Rename'
-        }), exp_domain.ExplorationChange({
             'property_name': 'title',
             'cmd': 'edit_exploration_property',
             'old_value': 'A title',
             'new_value': 'First Title'
         }), exp_domain.ExplorationChange({
             'property_name': 'solution',
-            'state_name': 'Intro-Rename',
+            'state_name': 'Introduction',
             'cmd': 'edit_state_property',
             'old_value': {
                 'explanation': {
@@ -9811,10 +9772,6 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
                 'content_id': 'content',
                 'html': '<p>Second State Content.</p>'
             }
-        }), exp_domain.ExplorationChange({
-            'new_state_name': 'End-Rename',
-            'cmd': 'rename_state',
-            'old_state_name': 'End'
         })]
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list,
@@ -9846,7 +9803,7 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
                         'html': '<p>Feedback</p>'
                     },
                     'missing_prerequisite_skill_id': None,
-                    'dest': 'End-Rename',
+                    'dest': 'End',
                     'param_changes': [],
                     'refresher_exploration_id': None
                 },
@@ -9948,7 +9905,7 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
         change_list_5 = [exp_domain.ExplorationChange({
             'content_html': 'N/A',
             'translation_html': '<p>State 2 Content Translation.</p>',
-            'state_name': 'End-Rename',
+            'state_name': 'End',
             'language_code': 'de',
             'content_id': 'content',
             'cmd': 'add_written_translation',
@@ -9988,10 +9945,6 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
                     }
                 }
             }
-        }), exp_domain.ExplorationChange({
-            'new_state_name': 'End',
-            'cmd': 'rename_state',
-            'old_state_name': 'End-Rename'
         }), exp_domain.ExplorationChange({
             'property_name': 'default_outcome',
             'old_value': {
