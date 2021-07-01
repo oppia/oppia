@@ -52,7 +52,7 @@ class MockPlatformFeatureService {
       DummyFeature: {
         isEnabled: true
       }
-    }
+    };
   }
 }
 
