@@ -304,12 +304,9 @@ describe('Preferences Page Component', () => {
   }));
 
   it('should handle edit profile picture modal is canceled', fakeAsync(() => {
-    let profilePictureDataUrl = 'profile_picture_data_url';
     spyOn(ngbModal, 'open').and.returnValue({
-      result: Promise.resolve(profilePictureDataUrl)
+      result: Promise.reject()
     } as NgbModalRef);
-    spyOn(userService, 'setProfileImageDataUrlAsync').and.returnValue(
-      Promise.reject());
     componentInstance.showEditProfilePictureModal();
     tick();
     tick();
