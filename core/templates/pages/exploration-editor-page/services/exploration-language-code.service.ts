@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,36 +16,52 @@
  * @fileoverview A data service that stores the exploration language code.
  */
 
-require(
-  'pages/exploration-editor-page/services/exploration-property.service.ts');
-require('services/context.service');
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { ExplorationPropertyService } from './exploration-property.service';
+import { AlertsService } from 'services/alerts.service';
+import { ChangeListService } from './change-list.service';
+import { LoggerService } from 'services/contextual/logger.service';
+import { ContextService } from 'services/context.service';
 
-angular.module('oppia').factory('ExplorationLanguageCodeService', [
-  'ContextService', 'ExplorationPropertyService', 'SUPPORTED_CONTENT_LANGUAGES',
-  'SUPPORTED_CONTENT_LANGUAGES_FOR_ANDROID',
-  function(
-      ContextService, ExplorationPropertyService, SUPPORTED_CONTENT_LANGUAGES,
-      SUPPORTED_CONTENT_LANGUAGES_FOR_ANDROID) {
-    var child = Object.create(ExplorationPropertyService);
-    child.propertyName = 'language_code';
-    child.getSupportedContentLanguages = function() {
-      if (ContextService.isExplorationLinkedToStory()) {
-        return SUPPORTED_CONTENT_LANGUAGES_FOR_ANDROID;
-      }
-      return SUPPORTED_CONTENT_LANGUAGES;
-    };
-    child.getCurrentLanguageDescription = function() {
-      for (var i = 0; i < SUPPORTED_CONTENT_LANGUAGES.length; i++) {
-        if (SUPPORTED_CONTENT_LANGUAGES[i].code === child.displayed) {
-          return SUPPORTED_CONTENT_LANGUAGES[i].description;
-        }
-      }
-    };
-    child._isValid = function(value) {
-      return SUPPORTED_CONTENT_LANGUAGES.some(function(elt) {
-        return elt.code === value;
-      });
-    };
-    return child;
+import constants from 'assets/constants';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ExplorationLanguageCodeService extends ExplorationPropertyService {
+  propertyName: string = 'language_code';
+  constructor(
+    private contextService: ContextService,
+    protected alertsService: AlertsService,
+    protected changeListService: ChangeListService,
+    protected loggerService: LoggerService
+  ) {
+    super(alertsService, changeListService, loggerService);
   }
-]);
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  getSupportedContentLanguages() {
+    if (this.contextService.isExplorationLinkedToStory()) {
+      return constants.SUPPORTED_CONTENT_LANGUAGES_FOR_ANDROID;
+    }
+    return constants.SUPPORTED_CONTENT_LANGUAGES;
+  }
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  getCurrentLanguageDescription() {
+    for (var i = 0; i < constants.SUPPORTED_CONTENT_LANGUAGES.length; i++) {
+      if (constants.SUPPORTED_CONTENT_LANGUAGES[i].code === this.displayed) {
+        return constants.SUPPORTED_CONTENT_LANGUAGES[i].description;
+      }
+    }
+  }
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  _isValid(value) {
+    return constants.SUPPORTED_CONTENT_LANGUAGES.some((elt) => {
+      return elt.code === value;
+    });
+  }
+}
+
+angular.module('oppia').factory(
+  'ExplorationLanguageCodeService', downgradeInjectable(
+    ExplorationLanguageCodeService));

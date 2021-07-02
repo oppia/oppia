@@ -31,7 +31,7 @@ import { LoggerService } from 'services/contextual/logger.service';
   providedIn: 'root'
 })
 export class ExplorationPropertyService {
-  displayed: string;
+  public displayed: string;
   savedMemento: string;
 
   // The backend name for this property. THIS MUST BE SPECIFIED BY
@@ -40,9 +40,9 @@ export class ExplorationPropertyService {
 
   @Output() _explorationPropertyChangedEventEmitter = new EventEmitter();
   constructor(
-    private alertsService: AlertsService,
-    private changeListService: ChangeListService,
-    private loggerService: LoggerService,
+    protected alertsService: AlertsService,
+    protected changeListService: ChangeListService,
+    protected loggerService: LoggerService,
   ) {}
 
   private BACKEND_CONVERSIONS = {

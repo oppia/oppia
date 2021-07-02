@@ -16,26 +16,20 @@
  * @fileoverview Unit tests for the ExplorationInitSateNameService.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
+import { TestBed } from '@angular/core/testing';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
-// ^^^ This block is to be removed.
+import { ExplorationInitStateNameService } from './exploration-init-state-name.service';
 
-require(
-  'pages/exploration-editor-page/' +
-  'services/exploration-init-state-name.service.ts');
+describe('Exploration Init State Name Service', () => {
+  let eisns: ExplorationInitStateNameService = null;
 
-describe('Exploration Init State Name Service', function() {
-  let eisns = null;
-
-  beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
 
-  beforeEach(angular.mock.inject(function($injector) {
-    eisns = $injector.get('ExplorationInitStateNameService');
-  }));
+  beforeEach(() => {
+    eisns = TestBed.inject(ExplorationInitStateNameService);
+  });
 
-  it('should test the child object properties', function() {
+  it('should test the child object properties', () => {
     expect(eisns.propertyName).toBe('init_state_name');
   });
 });
