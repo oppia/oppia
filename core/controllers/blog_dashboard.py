@@ -19,6 +19,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.controllers import domain_objects_validator as validation_method
 from core.domain import blog_domain
 from core.domain import blog_services
 from core.domain import config_domain
@@ -109,6 +110,44 @@ class BlogPostHandler(base.BaseHandler):
     """Handler for blog dashboard editor"""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'blog_post_id': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'PUT': {
+            'new_publish_status': {
+                'schema': {
+                    'type': 'bool',
+                }
+            },
+            'change_dict': {
+                'schema': {
+                    'type': 'object_dict',
+                    'validation_method': (
+                        validation_method.validate_change_dict_for_blog_post),
+                },
+                'default_value': None
+            },
+        },
+        'POST': {
+            'thumbnail_filename': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'image': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+        },
+        'DELETE': {}
+    }
 
     @acl_decorators.can_access_blog_dashboard
     def get(self, blog_post_id):
@@ -152,10 +191,10 @@ class BlogPostHandler(base.BaseHandler):
         blog_post_rights = (
             blog_services.get_blog_post_rights(blog_post_id, strict=False))
         blog_post_currently_published = blog_post_rights.blog_post_is_published
-        change_dict = self.payload.get('change_dict')
+        change_dict = self.normalized_payload.get('change_dict')
 
         blog_services.update_blog_post(blog_post_id, change_dict)
-        new_publish_status = self.payload.get('new_publish_status')
+        new_publish_status = self.normalized_payload.get('new_publish_status')
         if new_publish_status:
             blog_services.publish_blog_post(blog_post_id)
         elif blog_post_currently_published:
@@ -174,8 +213,8 @@ class BlogPostHandler(base.BaseHandler):
         # type: (str) -> None
         """Stores thumbnail of the blog post in the datastore."""
         blog_domain.BlogPost.require_valid_blog_post_id(blog_post_id)
-        raw_image = self.request.get('image')
-        thumbnail_filename = self.payload.get('thumbnail_filename')
+        raw_image = self.normalized_request.get('image')
+        thumbnail_filename = self.normalized_payload.get('thumbnail_filename')
         try:
             file_format = image_validation_services.validate_image_and_filename(
                 raw_image, thumbnail_filename)

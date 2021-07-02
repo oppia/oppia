@@ -42,18 +42,24 @@ class BlogAdminHandler(base.BaseHandler):
         'GET': {},
         'POST': {
             'action': {
-                'type': 'basestring',
-                'choices': [
-                    'save_config_properties', 'revert_config_property']
+                'schema': {
+                    'type': 'basestring',
+                    'choices': [
+                        'save_config_properties', 'revert_config_property']
+                }
             },
             'new_config_property_values': {
-                'type': 'object_dict',
-                'validation_method': (
-                    validation_method.validate_new_config_property_values),
+                'schema': {
+                    'type': 'object_dict',
+                    'validation_method': (
+                        validation_method.validate_new_config_property_values),
+                },
                 'default_value': None
             },
             'config_property_id': {
-                'type': 'basestring',
+                'schema': {
+                    'type': 'basestring',
+                },
                 'default_value': None
             },
         }
@@ -118,16 +124,22 @@ class BlogAdminRolesHandler(base.BaseHandler):
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
             'role': {
-                'type': 'basestring',
-                'choices': [BLOG_ADMIN, BLOG_POST_EDITOR]
+                'schema': {
+                    'type': 'basestring',
+                    'choices': [BLOG_ADMIN, BLOG_POST_EDITOR]
+                }
             },
             'username': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             },
         },
         'PUT': {
             'username': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             },
         }
     }
