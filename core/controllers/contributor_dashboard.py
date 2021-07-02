@@ -340,6 +340,8 @@ class MachineTranslationStateTextsHandler(base.BaseHandler):
                     'type': 'basestring',
                     'validators': [{
                         'id': 'is_supported_audio_language_code'
+                    }, {
+                        'id': 'is_valid_audio_language_code'
                     }]
                 }
             }
@@ -392,16 +394,6 @@ class MachineTranslationStateTextsHandler(base.BaseHandler):
 
         target_language_code = self.normalized_request.get(
             'target_language_code')
-
-        # TODO(#12341): Tidy up this logic once we have a canonical list of
-        # language codes.
-        if not utils.is_supported_audio_language_code(
-                target_language_code
-            ) and not utils.is_valid_language_code(
-                target_language_code
-            ):
-            raise self.InvalidInputException(
-                'Invalid target_language_code: %s' % target_language_code)
 
         exp = exp_fetchers.get_exploration_by_id(exp_id, strict=False)
         if exp is None:
