@@ -48,7 +48,7 @@
         </div>
 
         <div class="oppia-search-bar-container">
-          <search-bar enable-dropup="false"></search-bar>
+          <oppia-search-bar [enable-dropup]="false"></oppia-search-bar>
         </div>
 
         <div class="oppia-classroom-div" ng-if="$ctrl.CLASSROOM_PROMOS_ARE_ENABLED">
@@ -378,7 +378,8 @@
     max-width: 856px;
   }
   library-page .oppia-search-bar-container {
-    margin: 0 auto;
+    margin: 0 auto 5vh auto;
+    padding-bottom: 20px;
     width: max-content;
   }
   library-page .oppia-library-no-exploration-groups {
@@ -442,12 +443,6 @@
       transform: translateY(45px);
     }
   }
-  @media (max-width: 767px) {
-    library-page .oppia-search-bar-container {
-      margin-bottom: 50px;
-      padding-bottom: 20px;
-    }
-  }
   @media (max-width: 450px) {
     library-page .oppia-classroom-text > a {
       font-size: 0.75em;
@@ -475,11 +470,6 @@
     }
     library-page .oppia-classroom-text > a {
       margin-top: 40px;
-    }
-  }
-  @media(min-width: 1126px) {
-    .oppia-search-bar-container {
-      display: none;
     }
   }
 </style>
