@@ -1,20 +1,23 @@
 <div class="topic-card"
-     ng-style="{background: $ctrl.getTopicSummary().getThumbnailBgColor(), 'pointer-events': !$ctrl.isPublished() ? 'none' : 'auto'}">
-  <a ng-href="<[$ctrl.getTopicPageUrl()]>" class="protractor-test-topic-link">
+     [ngStyle]="{background: topicSummary.getThumbnailBgColor(), 'pointer-events': !isPublished ? 'none' : 'auto'}"
+     [ngClass]="{'faded-topic-card': !isPublished}">
+  <a [href]="getTopicPageUrl()" class="protractor-test-topic-link">
     <div class="topic-thumbnail">
-      <span class="topic-coming-soon" ng-if="!$ctrl.isPublished()" translate="I18N_CLASSROOM_PAGE_COMING_SOON"></span>
-      <picture class="fx-row fx-main-center" ng-class="{'grayscale-effect': !$ctrl.isPublished(), 'margin-top-offset': !$ctrl.isPublished()}">
-        <img ng-src="<[$ctrl.thumbnailUrl]>" alt="" class="img-thumbnail" ng-style="{background: $ctrl.getTopicSummary().getThumbnailBgColor()}">
+      <span class="topic-coming-soon" *ngIf="!isPublished">
+        {{ 'I18N_CLASSROOM_PAGE_COMING_SOON' | translate }}
+      </span>
+      <picture class="fx-row fx-main-center" [ngClass]="{'grayscale-effect': !isPublished, 'margin-top-offset': !isPublished}">
+        <img [src]="thumbnailUrl" alt="" class="img-thumbnail" [ngStyle]="{background: topicSummary.getThumbnailBgColor()}">
       </picture>
     </div>
-    <div class="topic-details" ng-style="{'background-color': $ctrl.getDarkerThumbnailBgColor()}" ng-class="{'mask-effect': !$ctrl.isPublished()}">
-      <span class="topic-name"> <[$ctrl.getTopicSummary().getName()]> </span>
-      <[$ctrl.getTopicSummary().getTotalPublishedNodeCount()]>
-      <span ng-if="$ctrl.getTopicSummary().getTotalPublishedNodeCount() === 1">
-        <span translate="I18N_TOPIC_VIEWER_LESSON"></span>
+    <div class="topic-details" [ngStyle]="{'background-color': getDarkerThumbnailBgColor()}" ng-class="{'mask-effect': !isPublished}">
+      <span class="topic-name">{{ topicSummary.getName() }}</span>
+      {{ topicSummary.getTotalPublishedNodeCount() }}
+      <span *ngIf="topicSummary.getTotalPublishedNodeCount() === 1">
+        <span>{{ 'I18N_TOPIC_VIEWER_LESSON' | translate }}</span>
       </span>
-      <span ng-if="$ctrl.getTopicSummary().getTotalPublishedNodeCount() !== 1">
-        <span translate="I18N_TOPIC_VIEWER_LESSONS"></span>
+      <span *ngIf="topicSummary.getTotalPublishedNodeCount() !== 1">
+        <span>{{ 'I18N_TOPIC_VIEWER_LESSONS' | translate }}</span>
       </span>
     </div>
   </a>
