@@ -119,7 +119,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'math-expression-content-editor.component.ts',
     'mathjax-bind.directive.ts',
     'messenger.service.ts',
-    'misconception-editor.directive.ts',
     'music-notes-input-rules.service.ts',
     'music-phrase-editor.component.ts',
     'music-phrase-player.service.ts',
