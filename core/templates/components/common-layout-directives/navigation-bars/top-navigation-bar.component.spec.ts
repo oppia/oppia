@@ -32,7 +32,6 @@ import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { TopNavigationBarComponent } from './top-navigation-bar.component';
 import { DebouncerService } from 'services/debouncer.service';
 import { SidebarStatusService } from 'services/sidebar-status.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 
 class MockWindowRef {
