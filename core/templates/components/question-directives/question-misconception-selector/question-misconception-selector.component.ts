@@ -16,39 +16,37 @@
  * @fileoverview Component for the question misconception selector.
  */
 
-require('directives/angular-html-bind.directive.ts');
+import { Component, Input, OnInit } from '@angular/core';
+import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import { Misconception } from 'domain/skill/MisconceptionObjectFactory';
+import cloneDeep from 'lodash/cloneDeep';
 
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-editor.service.ts');
+@Component({
+  selector: 'oppia-question-misconception-selector',
+  templateUrl: './question-misconception-selector.component.html'
+})
+export class QuestionMisconceptionSelectorComponent implements OnInit {
+  @Input() misconceptionFeedbackIsUsed: boolean;
+  @Input() selectedMisconception: Misconception;
+  @Input() selectedMisconceptionSkillId: string;
+  misconceptionsBySkill: {};
 
-angular.module('oppia').component('questionMisconceptionSelector', {
-  bindings: {
-    misconceptionFeedbackIsUsed: '=',
-    selectedMisconception: '=',
-    selectedMisconceptionSkillId: '=',
-  },
-  template: require(
-    './question-misconception-selector.component.html'),
-  controller: ['StateEditorService',
-    function(StateEditorService) {
-      var ctrl = this;
+  constructor(
+    private stateEditorService: StateEditorService
+  ) {}
 
-      ctrl.selectMisconception = function(
-          misconception, skillId) {
-        ctrl.selectedMisconception = angular.copy(misconception);
-        ctrl.selectedMisconceptionSkillId = skillId;
-      };
+  selectMisconception(misconception: Misconception, skillId: string): void {
+    this.selectedMisconception = cloneDeep(misconception);
+    this.selectedMisconceptionSkillId = skillId;
+  }
 
-      ctrl.toggleMisconceptionFeedbackUsage = function() {
-        ctrl.misconceptionFeedbackIsUsed = (
-          !ctrl.misconceptionFeedbackIsUsed);
-      };
+  toggleMisconceptionFeedbackUsage(): void {
+    this.misconceptionFeedbackIsUsed = (
+      !this.misconceptionFeedbackIsUsed);
+  }
 
-      ctrl.$onInit = function() {
-        ctrl.misconceptionsBySkill = (
-          StateEditorService.getMisconceptionsBySkill());
-      };
-    }
-  ]
-});
+  ngOnInit(): void {
+    this.misconceptionsBySkill = (
+      this.stateEditorService.getMisconceptionsBySkill());
+  }
+}

@@ -43,6 +43,7 @@ export class Outcome {
   paramChanges: readonly ParamChangeBackendDict[];
   refresherExplorationId: string | null;
   missingPrerequisiteSkillId: string | null;
+  newStateName: string | null;
   constructor(
       dest: string, feedback: SubtitledHtml, labelledAsCorrect: boolean,
       paramChanges: readonly ParamChangeBackendDict[],
