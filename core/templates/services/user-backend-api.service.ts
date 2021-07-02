@@ -42,6 +42,10 @@ export interface PreferencesBackendDict {
   'subscription_list': SubscriptionSummary[];
 }
 
+interface UpdatePreferencesResponse {
+  'bulk_email_signup_message_should_be_shown': boolean
+}
+
 interface LoginUrlResponseDict {
   'login_url': string;
 }
@@ -122,8 +126,8 @@ export class UserBackendApiService {
   async updatePreferencesDataAsync(
       updateType: string,
       data: boolean | string | string[] | SubscriptionSummary[]):
-      Promise<Object> {
-    return this.http.put(this.PREFERENCES_DATA_URL, {
+      Promise<UpdatePreferencesResponse> {
+    return this.http.put<UpdatePreferencesResponse>(this.PREFERENCES_DATA_URL, {
       update_type: updateType,
       data: data
     }).toPromise();

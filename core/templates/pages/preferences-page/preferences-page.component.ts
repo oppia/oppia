@@ -61,6 +61,9 @@ export class PreferencesPageComponent {
   TAG_REGEX_STRING: string;
   LANGUAGE_CHOICES: LanguageIdAndText[];
   SITE_LANGUAGE_CHOICES;
+  showEmailSignupLink: boolean = false;
+  emailSignupLink: string = AppConstants.BULK_EMAIL_SERVICE_SIGNUP_URL;
+  userCanExportAccount: boolean;
 
   constructor(
     private ngbModal: NgbModal,
@@ -82,9 +85,14 @@ export class PreferencesPageComponent {
   private _saveDataItem(updateType, data): void {
     this.preventPageUnloadEventService.addListener();
     this.userBackendApiService.updatePreferencesDataAsync(
-      updateType, data).then(() => {
+      updateType, data).then((returnData) => {
       this.preventPageUnloadEventService.removeListener();
-      this.alertsService.addInfoMessage('Saved!', 1000);
+      if (returnData.bulk_email_signup_message_should_be_shown) {
+        this.canReceiveEmailUpdates = false;
+        this.showEmailSignupLink = true;
+      } else {
+        this.alertsService.addInfoMessage('Saved!', 1000);
+      }
     });
   }
 
@@ -162,12 +170,12 @@ export class PreferencesPageComponent {
         .then(() => {
           // The reload is needed in order to update the profile picture
           // in the top-right corner.
-          // this.windowRef.nativeWindow.location.reload();
-        }, () => {
-          // Note to developers:
-          // This callback is triggered when the Cancel button is clicked.
-          // No further action is needed.
+          this.windowRef.nativeWindow.location.reload();
         });
+    }, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
     });
   }
 
@@ -223,7 +231,7 @@ export class PreferencesPageComponent {
     });
 
     this.userCanDeleteAccount = AppConstants.ENABLE_ACCOUNT_DELETION;
-    this.userCanDeleteAccount = AppConstants.ENABLE_ACCOUNT_EXPORT;
+    this.userCanExportAccount = AppConstants.ENABLE_ACCOUNT_EXPORT;
     this.subjectInterestsChangeAtLeastOnce = false;
     this.TAG_REGEX_STRING = '^[a-z ]+$';
     this.LANGUAGE_CHOICES = this.languageUtilService.getLanguageIdsAndTexts();

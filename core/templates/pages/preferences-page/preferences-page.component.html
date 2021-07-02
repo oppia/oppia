@@ -210,13 +210,13 @@
                    (change)="saveEmailPreferences(canReceiveEmailUpdates, canReceiveEditorRoleEmail, canReceiveFeedbackMessageEmail, canReceiveSubscriptionEmail)">
             <span> {{ 'I18N_PREFERENCES_EMAIL_RECEIVE_NEWS' | translate }}</span>
           </label>
-          <div class="alert alert-warning" ng-if="$ctrl.showEmailSignupLink">
-            <span class="help-block oppia-form-text" translate="I18N_PREFERENCES_EMAIL_SIGNUP_TEXT"></span>
+          <div class="alert alert-warning" *ngIf="showEmailSignupLink">
+            <span class="help-block oppia-form-text">{{ 'I18N_PREFERENCES_EMAIL_SIGNUP_TEXT' | translate }}</span>
             <a class="help-block oppia-form-text"
-               href="<[$ctrl.emailSignupLink]>"
+               [href]="emailSignupLink"
                target="_blank"
                rel="noopener">
-              <[$ctrl.emailSignupLink]>
+              {{ emailSignupLink }}
             </a>
           </div>
         </div>
