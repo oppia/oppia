@@ -1494,9 +1494,6 @@ md-card.oppia-dashboard-tile {
   position: absolute;
   top: 0;
 }
-.toast-warning:before {
-  content: "\e002";
-}
 
 @media all and (max-width: 240px) {
   .oppia-toast {

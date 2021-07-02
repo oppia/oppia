@@ -86,7 +86,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   activeMenuName: string;
   profilePageUrl: string;
   labelForClearingFocus: string;
-  numUnseenNotifications: string | number;
   profilePictureDataUrl: string;
   sidebarIsShown: boolean;
   directiveSubscriptions = new Subscription();
@@ -191,10 +190,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
           '/profile/<username>', {
             username: this.username
           });
-      }
-
-      if (this.userIsLoggedIn) {
-        this.userBackendApiService.showUnseenNotifications();
       }
     });
 

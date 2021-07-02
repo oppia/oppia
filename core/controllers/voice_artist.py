@@ -23,6 +23,8 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import fs_domain
 from core.domain import fs_services
+from core.domain import rights_domain
+from core.domain import rights_manager
 from core.domain import user_services
 import feconf
 import python_utils
@@ -128,4 +130,38 @@ class StartedTranslationTutorialEventHandler(base.BaseHandler):
         """Handles POST requests."""
         user_services.record_user_started_state_translation_tutorial(
             self.user_id)
+        self.render_json({})
+
+
+class VoiceArtistManagementHandler(base.BaseHandler):
+    """Handles assignment of voice artists."""
+
+    @acl_decorators.can_manage_voice_artist
+    def post(self, unused_entity_type, entity_id):
+        """Handles Post requests."""
+        voice_artist = self.payload.get('username')
+        voice_artist_id = user_services.get_user_id_from_username(
+            voice_artist)
+        if voice_artist_id is None:
+            raise self.InvalidInputException(
+                'Sorry, we could not find the specified user.')
+        rights_manager.assign_role_for_exploration(
+            self.user, entity_id, voice_artist_id,
+            rights_domain.ROLE_VOICE_ARTIST)
+
+        self.render_json({})
+
+    @acl_decorators.can_manage_voice_artist
+    def delete(self, unused_entity_type, entity_id):
+        """Handles Delete requests."""
+        voice_artist = self.request.get('voice_artist')
+        voice_artist_id = user_services.get_user_id_from_username(
+            voice_artist)
+
+        if voice_artist_id is None:
+            raise self.InvalidInputException(
+                'Sorry, we could not find the specified user.')
+        rights_manager.deassign_role_for_exploration(
+            self.user, entity_id, voice_artist_id)
+
         self.render_json({})
