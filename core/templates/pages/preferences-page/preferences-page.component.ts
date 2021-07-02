@@ -162,7 +162,7 @@ export class PreferencesPageComponent {
         .then(() => {
           // The reload is needed in order to update the profile picture
           // in the top-right corner.
-          this.windowRef.nativeWindow.location.reload();
+          // this.windowRef.nativeWindow.location.reload();
         }, () => {
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.
