@@ -18,7 +18,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { SkillRights, SkillRightsBackendDict } from 'domain/skill/skill-rights.model';
 
 import { SkillUpdateService } from 'domain/skill/skill-update.service';
-import { Skill, SkillBackendDict, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
+import { Skill, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
 import { SkillDescriptionEditorComponent } from './skill-description-editor.component';
 
@@ -26,7 +26,8 @@ import { SkillDescriptionEditorComponent } from './skill-description-editor.comp
  * @fileoverview Unit tests for SkillDescriptionEditorComponent.
  */
 
-describe('Skill Description Editor Component', () => {
+for(let i = 0; i < 200; i++) {
+fdescribe('Skill Description Editor Component', () => {
   let component: SkillDescriptionEditorComponent;
   let fixture: ComponentFixture<SkillDescriptionEditorComponent>;
 
@@ -149,4 +150,4 @@ describe('Skill Description Editor Component', () => {
     component.saveSkillDescription('-invalid-description-');
     expect(saveSkillDescriptionSpy).not.toHaveBeenCalled();
   });
-});
+});}
