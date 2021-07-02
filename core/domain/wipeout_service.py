@@ -217,9 +217,9 @@ def delete_users_pending_to_be_deleted():
         email_message += '-----------------------------------'
         email_message += '\n'
         email_message += (
-            'PendingDeletionRequestModel id: %s'
-            'User id: %s'
-            'Deletion Status: %s'
+            'PendingDeletionRequestModel ID: %s'
+            'User ID: %s'
+            'Deletion status: %s'
         ) % (
             request_model.id, pending_deletion_request.user_id,
             deletion_status
@@ -254,9 +254,9 @@ def check_completion_of_user_deletion():
         email_message += '-----------------------------------'
         email_message += '\n'
         email_message += (
-            'PendingDeletionRequestModel id: %s'
-            'User id: %s'
-            'Completion Status: %s'
+            'PendingDeletionRequestModel ID: %s'
+            'User ID: %s'
+            'Completion status: %s'
         ) % (
             request_model.id, pending_deletion_request.user_id,
             completion_status

@@ -4970,7 +4970,8 @@ class PendingUserDeletionTaskServiceTests(test_utils.GenericTestBase):
 class CheckCompletionOfUserDeletionTaskServiceTests(
         test_utils.GenericTestBase):
     """Provides testing for the check completion of user deletion taskqueue
-    service methods of wipeout service."""
+    service methods of wipeout service.
+    """
 
     USER_1_EMAIL = 'a@example.com'
     USER_1_USERNAME = 'a'
