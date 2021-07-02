@@ -24,7 +24,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.domain import config_domain
 from core.domain import exp_domain
 
-from typing import Any, Dict # isort:skip  pylint: disable=wrong-import-order, wrong-import-position, unused-import, import-only-modules
+from typing import Any, Dict, Text # isort:skip  pylint: disable=wrong-import-order, wrong-import-position, unused-import, import-only-modules
 
 
 def validate_exploration_change(obj):
@@ -48,9 +48,7 @@ def validate_new_config_property_values(obj):
         obj: dict. Data that needs to be validated.
     """
     for (name, value) in obj.items():
-        config_property = (
-            config_domain.Registry.get_config_property(name)
-        ) # type: ignore[no-untyped-call]
+        config_property = config_domain.Registry.get_config_property(name) # type: ignore[no-untyped-call] # pylint: disable=line-too-long
         if config_property is None:
             raise Exception('%s do not have any schema.' % name)
 
