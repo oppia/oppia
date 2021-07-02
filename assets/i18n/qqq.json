@@ -264,6 +264,7 @@
 	"I18N_INTERACTIONS_SET_INPUT_NO_ANSWER": "Text displayed in a set interaction. - The interaction is a dialog between Oppia and the user. This text is shown on the user side of the dialog if the set introduced by the user has no elements.",
 	"I18N_INTERACTIONS_SUBMIT": "Text displayed in an interaction or navigation bar. - The text is shown inside a button. When the user clicks the button, the system checks if the answer is correct and continues to the following action.\n{{Identical|Submit}}",
 	"I18N_LANGUAGE_FOOTER_VIEW_IN": "Text for the site language selector. - When the user selects a different language, the site (not the explorations) is translated into that language.",
+	"I18N_LEARNER_DASHBOARD_COMMUNITY_LESSONS_SECTION": "Text for the community lessons section in the learner dashboard.",
 	"I18N_LEARNER_DASHBOARD_COMPLETED_SECTION": "Text for the completed section in the learner dashboard.",
 	"I18N_LEARNER_DASHBOARD_COMPLETED_TO_INCOMPLETE_COLLECTIONS": "Text displayed in the learner dashboard. - The text is shown when new exporations are added to the collections the user has already completed.",
 	"I18N_LEARNER_DASHBOARD_EMPTY_COLLECTION_PLAYLIST": "Text displayed in the learner dashboard. - This text is shown when there are no collections in the playlist of the user.",
