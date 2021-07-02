@@ -30,7 +30,6 @@ from core.domain import topic_fetchers
 from core.domain import translation_services
 from core.domain import user_services
 import feconf
-import utils
 
 
 class ContributorDashboardPage(base.BaseHandler):
