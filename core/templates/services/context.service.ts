@@ -225,7 +225,7 @@ export class ContextService {
 
   // Returns a string representing the explorationId (obtained from the
   // URL).
-  getExplorationId(): string {
+  getExplorationId(): string | undefined {
     if (this.explorationId) {
       return this.explorationId;
     } else if (!this.isInQuestionPlayerMode()) {
@@ -248,7 +248,6 @@ export class ContextService {
         'ContextService should not be used outside the ' +
         'context of an exploration or a question.');
     }
-    throw new Error('Exploration ID is null');
   }
 
   // Following method helps to know whether exploration editor is
