@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import functools
+import logging
 
 from constants import constants
 from core.controllers import base
@@ -87,6 +88,41 @@ def open_access(handler):
     test_can_access.__wrapped__ = True
 
     return test_can_access
+
+
+def is_source_mailchimp(handler):
+    """Decorator to check whether the request was generated from Mailchimp.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function.
+    """
+
+    def test_is_source_mailchimp(self, secret, **kwargs):
+        """Checks whether the request was generated from Mailchimp.
+
+        Args:
+            secret: str. The key that is used to authenticate that the request
+                has originated from Mailchimp.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+        """
+        if feconf.MAILCHIMP_WEBHOOK_SECRET is None:
+            raise self.PageNotFoundException
+        elif secret != feconf.MAILCHIMP_WEBHOOK_SECRET:
+            logging.error(
+                'Invalid Mailchimp webhook request received with secret: %s'
+                % secret)
+            raise self.PageNotFoundException
+        else:
+            return handler(self, secret, **kwargs)
+    test_is_source_mailchimp.__wrapped__ = True
+
+    return test_is_source_mailchimp
 
 
 def does_classroom_exist(handler):
@@ -1235,6 +1271,58 @@ def can_voiceover_exploration(handler):
     return test_can_voiceover
 
 
+def can_manage_voice_artist(handler):
+    """Decorator to check whether the user can manage voice artist.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks if a user
+        has permission to manage voice artist.
+    """
+
+    def test_can_manage_voice_artist(self, entity_type, entity_id, **kwargs):
+        """Checks if the user can manage a voice artist for the given entity.
+
+        Args:
+            entity_type: str. The type of entity.
+            entity_id: str. The Id of the entity.
+            **kwargs: dict(str: *). Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            InvalidInputException. The given entity type is not supported.
+            PageNotFoundException. The page is not found.
+            UnauthorizedUserException. The user does not have the credentials
+                to manage voice artist.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        if entity_type != feconf.ENTITY_TYPE_EXPLORATION:
+            raise self.InvalidInputException(
+                'Unsupported entity_type: %s' % entity_type)
+
+        exploration_rights = rights_manager.get_exploration_rights(
+            entity_id, strict=False)
+        if exploration_rights is None:
+            raise base.UserFacingExceptions.PageNotFoundException
+
+        if rights_manager.check_can_manage_voice_artist_in_activity(
+                self.user, exploration_rights):
+            return handler(self, entity_type, entity_id, **kwargs)
+        else:
+            raise base.UserFacingExceptions.UnauthorizedUserException(
+                'You do not have credentials to manage voice artists.')
+    test_can_manage_voice_artist.__wrapped__ = True
+
+    return test_can_manage_voice_artist
+
+
 def can_save_exploration(handler):
     """Decorator to check whether user can save exploration.
 
@@ -1590,7 +1678,7 @@ def can_modify_exploration_roles(handler):
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
 
-        if rights_manager.check_can_modify_activity_roles(
+        if rights_manager.check_can_modify_core_activity_roles(
                 self.user, exploration_rights):
             return handler(self, exploration_id, **kwargs)
         else:

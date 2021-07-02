@@ -25,15 +25,14 @@ import { BaseTranslatableObject, InteractionRuleInputs } from
   'interactions/rule-input-defs';
 import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
-import { StateCard } from
-  'domain/state_card/StateCardObjectFactory';
+import { StateCard } from 'domain/state_card/state-card.model';
 import { WrittenTranslation } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { SubtitledHtml } from
   'domain/exploration/subtitled-html.model';
 import { Schema } from 'services/schema-default-value.service';
 import { SchemaConstants } from
-  'components/forms/schema-based-editors/schema-constants';
+  'components/forms/schema-based-editors/schema.constants';
 import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
 import { WrittenTranslations } from
   'domain/exploration/WrittenTranslationsObjectFactory';

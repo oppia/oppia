@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for WelcomeTranslationModalController.
  */
 
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 describe('Welcome Translation Modal Controller', function() {
   let $scope = null;
