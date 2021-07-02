@@ -353,7 +353,8 @@ def apply_change_list(exploration_id, change_list, frontend_version):
         exploration_id: str. The id of the exploration to which the change list
             is to be applied.
         change_list: list(ExplorationChange). The list of changes to apply.
-        frontend_version: int. The exploration version number on the client side.
+        frontend_version: int. The exploration version number on the
+            client side.
 
     Returns:
         Exploration. The exploration domain object that results from applying
@@ -364,17 +365,18 @@ def apply_change_list(exploration_id, change_list, frontend_version):
     """
 
     backend_version = exp_fetchers.get_exploration_by_id(exploration_id).version
-    # If the version where the change list is to be applied is same as the 
-    # latest version of the exploration then this part will execute. This part is
-    # no different from the else block for now, but later on if we add any
+    # If the version where the change list is to be applied is same as the
+    # latest version of the exploration then this part will execute. This part
+    # is no different from the else block for now, but later on if we add any
     # condition where we need to track state renames or any other thing in order
-    # to merge changes to latest version, then we'll need to write it in the else
-    # block. So keeping it separate from now onwards.
+    # to merge changes to latest version, then we'll need to write it in the
+    # else block. So keeping it separate from now onwards.
     # If we are adding any new field in the exploration then we will always
-    # need to add a condition to merge the changes in that field in this if block.
-    # That same condition should be added to the else block only if the changes
-    # in the condition are mergeable even after version mismatch.
-    # frontend_version can also be none when the client is on the latest version.
+    # need to add a condition to merge the changes in that field in this if
+    # block. That same condition should be added to the else block only if the
+    # changes in the condition are mergeable even after version mismatch.
+    # frontend_version can also be none when the client is on the
+    # latest version.
     if (backend_version == frontend_version or
             frontend_version is None):
         exploration = exp_fetchers.get_exploration_by_id(exploration_id)
@@ -2173,9 +2175,10 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
                             'The frontend version is: %s \n '
                             'The backend version is: %s \n'
                             'The changes list is: %s '
-                            % (exp_id, frontend_version,
-                            backend_version_exploration.version,
-                            change_list))
+                            % (
+                                exp_id, frontend_version,
+                                backend_version_exploration.version,
+                                change_list))
                     return False
                 if old_state_name not in changed_translations:
                     changed_translations[old_state_name] = []
@@ -2341,9 +2344,10 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
                             'The frontend version is: %s \n '
                             'The backend version is: %s \n'
                             'The changes list is: %s '
-                            % (exp_id, frontend_version,
-                            backend_version_exploration.version,
-                            change_list))
+                            % (
+                                exp_id, frontend_version,
+                                backend_version_exploration.version,
+                                change_list))
                     return False
                 if old_state_name not in changed_translations:
                     changed_translations[old_state_name] = []
