@@ -41,10 +41,10 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
             ValueError,
             'The args or kwargs passed to the deferred call with '
             'function_identifier, %s, are not json serializable.' %
-            taskqueue_services.FUNCTION_ID_DISPATCH_EVENT)
+            taskqueue_services.FUNCTION_ID_UPDATE_STATS)
         with serialization_exception:
             taskqueue_services.defer(
-                taskqueue_services.FUNCTION_ID_DISPATCH_EVENT,
+                taskqueue_services.FUNCTION_ID_UPDATE_STATS,
                 taskqueue_services.QUEUE_NAME_DEFAULT, arg1)
 
     def test_exception_raised_when_email_task_params_is_not_serializable(self):

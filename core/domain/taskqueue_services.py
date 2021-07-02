@@ -49,7 +49,6 @@ QUEUE_NAME_STATS = 'stats'
 #    correct FUNCTION_ID and defer the function using that FUNCTION_ID.
 # 2. If the function does not exist in the handler, add it to the handler and
 #    add another FUNCTION_ID to this list.
-FUNCTION_ID_DISPATCH_EVENT = 'dispatch_event'
 FUNCTION_ID_UPDATE_STATS = 'update_stats'
 FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS = 'delete_exps_from_user_models'
 FUNCTION_ID_DELETE_EXPS_FROM_ACTIVITIES = 'delete_exps_from_activities'
