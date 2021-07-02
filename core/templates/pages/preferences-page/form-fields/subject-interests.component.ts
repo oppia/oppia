@@ -20,7 +20,7 @@ import { ENTER } from '@angular/cdk/keycodes';
 import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatChipList } from '@angular/material/chips';
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 
