@@ -94,18 +94,12 @@ export class StorySummary {
     return this._allNodes;
   }
 
-  getTopicUrlFragment(): string {
-    if (this._topicUrlFragment !== undefined) {
-      return this._topicUrlFragment;
-    }
-    throw new Error('Topic Url Fragment is undefined');
+  getTopicUrlFragment(): string | undefined {
+    return this._topicUrlFragment;
   }
 
-  getClassroomUrlFragment(): string {
-    if (this._classroomUrlFragment !== undefined) {
-      return this._classroomUrlFragment;
-    }
-    throw new Error('Classroom Url Fragment is undefined');
+  getClassroomUrlFragment(): string | undefined {
+    return this._classroomUrlFragment;
   }
 
   static createFromBackendDict(
