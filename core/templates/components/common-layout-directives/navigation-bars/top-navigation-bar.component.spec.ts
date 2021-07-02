@@ -18,7 +18,7 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { AppConstants } from 'app.constants';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
@@ -78,7 +78,6 @@ describe('TopNavigationBarComponent', () => {
   let deviceInfoService: DeviceInfoService;
   let debouncerService: DebouncerService;
   let sidebarStatusService: SidebarStatusService;
-  let i18nLanguageCodeService: I18nLanguageCodeService;
   let urlInterpolationService: UrlInterpolationService;
 
   let mockResizeEmitter: EventEmitter<void>;
@@ -464,11 +463,11 @@ describe('TopNavigationBarComponent', () => {
       });
 
     component.navElementsVisibilityStatus = {
-      'I18N_TOPNAV_DONATE': true,
-      'I18N_TOPNAV_CLASSROOM': true,
-      'I18N_TOPNAV_ABOUT': true,
-      'I18N_CREATE_EXPLORATION_CREATE': true,
-      'I18N_TOPNAV_LIBRARY': true
+      I18N_TOPNAV_DONATE: true,
+      I18N_TOPNAV_CLASSROOM: true,
+      I18N_TOPNAV_ABOUT: true,
+      I18N_CREATE_EXPLORATION_CREATE: true,
+      I18N_TOPNAV_LIBRARY: true
     };
 
     component.truncateNavbar();
@@ -476,11 +475,11 @@ describe('TopNavigationBarComponent', () => {
 
     fixture.whenStable().then(() => {
       expect(component.navElementsVisibilityStatus).toEqual({
-        'I18N_TOPNAV_DONATE': false,
-        'I18N_TOPNAV_CLASSROOM': true,
-        'I18N_TOPNAV_ABOUT': true,
-        'I18N_CREATE_EXPLORATION_CREATE': true,
-        'I18N_TOPNAV_LIBRARY': true
+        I18N_TOPNAV_DONATE: false,
+        I18N_TOPNAV_CLASSROOM: true,
+        I18N_TOPNAV_ABOUT: true,
+        I18N_CREATE_EXPLORATION_CREATE: true,
+        I18N_TOPNAV_LIBRARY: true
       });
     });
   }));
