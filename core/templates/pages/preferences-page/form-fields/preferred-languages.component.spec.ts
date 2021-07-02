@@ -16,8 +16,9 @@
  * @fileoverview Unit tests for the preferred languages component.
  */
 
+import { ElementRef } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MaterialModule } from 'components/material.module';
 import { PreferredLanguagesComponent } from './preferred-languages.component';
 
@@ -53,8 +54,7 @@ describe('Preferred Site Language Component', () => {
     componentInstance.preferredLanguages = [];
     componentInstance.choices = [{
       id: 'en',
-      text: 'English',
-      dir: 'ltr'
+      text: 'English'
     }];
     componentInstance.formCtrl = {
       valueChanges: {
@@ -62,7 +62,7 @@ describe('Preferred Site Language Component', () => {
           callb(value);
         }
       }
-    };
+    } as FormControl;
     componentInstance.ngOnInit();
     expect(componentInstance.chipList.errorState).toBeFalse();
     value = '';
@@ -72,7 +72,7 @@ describe('Preferred Site Language Component', () => {
           callb(value);
         }
       }
-    };
+    } as FormControl;
     componentInstance.ngOnInit();
     expect(componentInstance.chipList.errorState).toBeTrue();
   });
@@ -81,8 +81,7 @@ describe('Preferred Site Language Component', () => {
     componentInstance.preferredLanguages = [];
     componentInstance.choices = [{
       id: 'en',
-      text: 'English',
-      dir: 'ltr'
+      text: 'English'
     }];
     expect(componentInstance.validInput('en')).toBeTrue();
   });
@@ -91,12 +90,15 @@ describe('Preferred Site Language Component', () => {
     spyOn(componentInstance.preferredLanguagesChange, 'emit');
     spyOn(componentInstance, 'validInput').and.returnValue(true);
     componentInstance.preferredLanguages = [];
-    componentInstance.choices = ['en'];
+    componentInstance.choices = [{
+      id: 'en',
+      text: 'English'
+    }];
     componentInstance.languageInput = {
       nativeElement: {
         value: ''
       }
-    };
+    } as ElementRef;
     componentInstance.add({value: 'en'});
     componentInstance.add({value: ''});
     expect(componentInstance.preferredLanguagesChange.emit).toHaveBeenCalled();
@@ -104,10 +106,14 @@ describe('Preferred Site Language Component', () => {
 
   it('should remove language', () => {
     componentInstance.preferredLanguages = ['en'];
-    componentInstance.choices = ['en'];
+    let choices = [{
+      id: 'en',
+      text: 'English'
+    }];
+    componentInstance.choices = choices;
     componentInstance.remove('en');
     expect(componentInstance.preferredLanguages).toEqual([]);
-    expect(componentInstance.choices).toEqual(['en']);
+    expect(componentInstance.choices).toEqual(choices);
   });
 
   it('should handle when user selects a language', () => {

@@ -19,8 +19,8 @@
 import { ENTER } from '@angular/cdk/keycodes';
 import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { MatChipInputEvent, MatChipList } from '@angular/material/chips';
+import { MatChipList } from '@angular/material/chips';
+import { LanguageIdAndText } from 'domain/utilities/language-util.service';
 
 @Component({
   selector: 'oppia-preferred-languages',
@@ -28,7 +28,7 @@ import { MatChipInputEvent, MatChipList } from '@angular/material/chips';
 })
 export class PreferredLanguagesComponent {
   @Input() preferredLanguages: string[];
-  @Input() choices: string[];
+  @Input() choices: LanguageIdAndText[];
   @Output() preferredLanguagesChange: EventEmitter<string[]> = (
     new EventEmitter());
   selectable = true;

@@ -16,8 +16,9 @@
  * @fileoverview Unit tests for the subject interests component.
  */
 
+import { ElementRef } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MaterialModule } from 'components/material.module';
 import { SubjectInterestsComponent } from './subject-interests.component';
 
@@ -53,11 +54,11 @@ describe('Subject interests form field Component', () => {
     componentInstance.subjectInterests = ['math'];
     componentInstance.formCtrl = {
       valueChanges: {
-        subscribe(callb) {
+        subscribe: (callb: (value: string) => void) => {
           callb(input);
         }
       }
-    };
+    } as FormControl;
     componentInstance.ngOnInit();
     input = 'math';
     componentInstance.formCtrl = {
@@ -66,7 +67,7 @@ describe('Subject interests form field Component', () => {
           callb(input);
         }
       }
-    };
+    } as FormControl;
     componentInstance.ngOnInit();
     expect(componentInstance.allSubjectInterests).toEqual(
       componentInstance.subjectInterests);
@@ -86,7 +87,7 @@ describe('Subject interests form field Component', () => {
       nativeElement: {
         value: ''
       }
-    };
+    } as ElementRef;
     componentInstance.add({value: 'math'});
     componentInstance.add({value: ''});
     expect(componentInstance.subjectInterestsChange.emit).toHaveBeenCalled();
