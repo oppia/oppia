@@ -21,8 +21,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MaterialModule } from 'components/material.module';
 import { PreferredLanguagesComponent } from './preferred-languages.component';
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Preferred Site Language Component', () => {
+describe('Preferred Site Language Component', () => {
   let componentInstance: PreferredLanguagesComponent;
   let fixture: ComponentFixture<PreferredLanguagesComponent>;
 

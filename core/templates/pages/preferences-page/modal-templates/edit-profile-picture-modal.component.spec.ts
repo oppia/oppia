@@ -16,18 +16,16 @@
  * @fileoverview Unit tests for edit profile picture modal.
  */
 
-import { ChangeDetectorRef, NO_ERRORS_SCHEMA } from '@angular/core';
+import { ChangeDetectorRef, ElementRef, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { EditProfilePictureModalComponent } from './edit-profile-picture-modal.component';
-import Cropper from 'cropperjs';
 
 describe('Delete Topic Modal Component', () => {
   let fixture: ComponentFixture<EditProfilePictureModalComponent>;
   let componentInstance: EditProfilePictureModalComponent;
-  let changeDetectorRef: ChangeDetectorRef;
 
   class MockChangeDetectorRef {
     detectChanges(): void {}
@@ -61,18 +59,28 @@ describe('Delete Topic Modal Component', () => {
   });
 
   it('should initialize cropper', () => {
-    componentInstance.croppableImageRef = {
-      nativeElement: document.createElement('img')
-    };
+    fixture.detectChanges();
+    componentInstance.croppableImageRef = (
+      new ElementRef(document.createElement('img')));
     componentInstance.initializeCropper();
     expect(componentInstance.cropper).toBeDefined();
-    expect(changeDetectorRef.detectChanges).toHaveBeenCalled();
   });
 
   it('should reset', () => {
     componentInstance.reset();
     expect(componentInstance.uploadedImage).toBeNull();
     expect(componentInstance.cropppedImageDataUrl).toEqual('');
+  });
+
+  it('should handle image', () => {
+    spyOn(componentInstance, 'initializeCropper');
+    // This is just a mock base 64 in order to test the FileReader event.
+    let dataBase64Mock = 'VEhJUyBJUyBUSEUgQU5TV0VSCg==';
+    const arrayBuffer = Uint8Array.from(
+      window.atob(dataBase64Mock), c => c.charCodeAt(0));
+    let file = new File([arrayBuffer], 'filename.mp3');
+    componentInstance.onFileChanged(file);
+    expect(componentInstance.invalidImageWarningIsShown).toBeFalse();
   });
 
   it('should handle invalid image', () => {
@@ -83,13 +91,15 @@ describe('Delete Topic Modal Component', () => {
   });
 
   it('should confirm profile picture', () => {
-  //   let pictureDataUrl = 'picture_data';
-  //   spyOnProperty(componentInstance, 'cropper').and.returnValue({
-  //     getCroppedCanvas: (params) => {
-  //       return pictureDataUrl;
-  //     }
-  //   });
-  //   componentInstance.confirm();
-  //   expect(componentInstance.cropppedImageDataUrl).toEqual(pictureDataUrl);
+    let pictureDataUrl = 'picture_data';
+    componentInstance.cropper = {
+      getCroppedCanvas(options) {
+        return {
+          toDataURL: () => pictureDataUrl
+        };
+      }
+    };
+    componentInstance.confirm();
+    expect(componentInstance.cropppedImageDataUrl).toEqual(pictureDataUrl);
   });
 });
