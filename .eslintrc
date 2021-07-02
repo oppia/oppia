@@ -130,6 +130,7 @@
     "oppia/dependency-checks": "error",
     "oppia/match-line-break": "error",
     "oppia/no-test-blockers": "error",
+    "oppia/disallow-angularjs-property": "error",
     "angular/di": [
       "error",
       "array"

@@ -165,6 +165,7 @@ describe('Audio translation bar directive', function() {
   }));
 
   afterEach(function() {
+    // eslint-disable-next-line oppia/disallow-angularjs-property
     $rootScope.$broadcast('$destroy');
   });
 

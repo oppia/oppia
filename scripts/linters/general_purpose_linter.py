@@ -178,14 +178,6 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'excluded_dirs': ()
     },
     {
-        'regexp': re.compile(r'\$parent'),
-        'message': 'Please do not access parent properties ' +
-                   'using $parent. Use the scope object' +
-                   'for this purpose.',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
         'regexp': re.compile(r'require\(.*\.\..*\);'),
         'message': 'Please, don\'t use relative imports in require().',
         'excluded_files': (),
@@ -226,19 +218,6 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             'https://github.com/oppia/oppia/wiki/Guide-on-defining-types '
             'if you\'re having trouble declaring types.'),
         'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'\$broadcast'),
-        'message': (
-            'Please do not use $broadcast/$on for propagating events. '
-            'Use @Input/@Output instead.'),
-        'excluded_files': (
-            'core/templates/pages/exploration-editor-page/translation-tab/'
-            'audio-translation-bar/audio-translation-bar.directive.spec.ts',
-            'core/templates/pages/library-page/search-bar/'
-            'search-bar.component.spec.ts',
-            'core/templates/pages/splash-page/splash-page.component.spec.ts'),
         'excluded_dirs': ()
     },
     {
