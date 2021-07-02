@@ -20,7 +20,7 @@
 
 import { Subscription } from 'rxjs';
 import { ContextService } from 'services/context.service';
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 import { SidebarStatusService } from 'services/sidebar-status.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -107,6 +107,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   navElementsVisibilityStatus ={};
 
   constructor(
+    private changeDetectorRef: ChangeDetectorRef,
     private classroomBackendApiService: ClassroomBackendApiService,
     private contextService: ContextService,
     private sidebarStatusService: SidebarStatusService,
@@ -219,6 +220,16 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
         this.sidebarIsShown = this.sidebarStatusService.isSidebarShown();
         this.currentWindowWidth = this.windowDimensionsService.getWidth();
         this.debouncerService.debounce(this.truncateNavbar, 500);
+      })
+    );
+
+    this.directiveSubscriptions.add(
+      this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(
+        (code) => {
+        if (this.currentLanguageCode !== code) {
+          this.currentLanguageCode = code;
+          this.changeDetectorRef.detectChanges();
+        }
       })
     );
     // The function needs to be run after i18n. A timeout of 0 appears

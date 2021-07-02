@@ -223,7 +223,7 @@
     <li [ngClass]="{'open' : activeMenuName === 'profileMenu'}"
         ngbDropdown
         *ngIf="userIsLoggedIn"
-        class="nav-item protractor-test-profile-dropdown oppia-navbar-clickable-dropdown">
+        class="nav-item protractor-test-profile-dropdown oppia-navbar-clickable-dropdown profile-dropdown">
       <a (keydown)="onMenuKeypress($event, 'profileMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
          class="nav-link oppia-navbar-dropdown-toggle protractor-test-navbar-dropdown-toggle"
          aria-haspopup="true"
@@ -529,7 +529,7 @@
     padding: 0;
     width: 190px;
   }
-  .oppia-navbar-profile > li:hover {
+  .oppia-navbar-profile .profile-dropdown:hover {
     background-color: #fff;
    }
   @media screen and (max-width: 768px) {
