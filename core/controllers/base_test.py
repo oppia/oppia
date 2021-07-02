@@ -32,6 +32,7 @@ import types
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.controllers import payload_validator
 from core.domain import auth_domain
 from core.domain import classifier_domain
 from core.domain import classifier_services
@@ -107,6 +108,8 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
     class MockHandlerWithInvalidReturnType(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = 'invalid_type'
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         def get(self):
             self.render_template('invalid_page.html')
@@ -118,16 +121,24 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             self.render_template({'invalid_page.html'})
 
     class MockHandlerForTestingErrorPageWithIframed(base.BaseHandler):
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
         def get(self):
             self.iframed = True
             self.render_template('invalid_page.html')
 
     class MockHandlerForTestingUiAccessWrapper(base.BaseHandler):
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
         def get(self):
             """Handles GET requests."""
             pass
 
     class MockHandlerForTestingAuthorizationWrapper(base.BaseHandler):
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         def get(self):
             """Handles GET requests."""
@@ -803,6 +814,8 @@ class EscapingTests(test_utils.GenericTestBase):
 
     class FakePage(base.BaseHandler):
         """Fake page for testing autoescaping."""
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'POST': {}}
 
         def post(self):
             """Handles POST requests."""
@@ -837,6 +850,9 @@ class RenderDownloadableTests(test_utils.GenericTestBase):
         """Mock handler that subclasses BaseHandler and serves a response
         that is of a 'downloadable' type.
         """
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
         def get(self):
             """Handles GET requests."""
             file_contents = 'example'
@@ -1077,6 +1093,8 @@ class GetHandlerTypeIfExceptionRaisedTests(test_utils.GenericTestBase):
     class FakeHandler(base.BaseHandler):
         """A fake handler class."""
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         def get(self):
             """Handles get requests."""
@@ -1162,6 +1180,8 @@ class CheckAllHandlersHaveDecoratorTests(test_utils.GenericTestBase):
 class GetItemsEscapedCharactersTests(test_utils.GenericTestBase):
     """Test that request.GET.items() correctly retrieves escaped characters."""
     class MockHandler(base.BaseHandler):
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         def get(self):
             self.values.update(list(self.request.GET.items()))
@@ -1267,6 +1287,18 @@ class ControllerClassNameTests(test_utils.GenericTestBase):
 class IframeRestrictionTests(test_utils.GenericTestBase):
 
     class MockHandlerForTestingPageIframing(base.BaseHandler):
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {
+            'GET': {
+                'iframe_restriction': {
+                    'schema': {
+                        'type': 'basestring'
+                    },
+                    'default_value': None
+                }
+            }
+        }
+
         def get(self):
             iframe_restriction = self.request.get(
                 'iframe_restriction', default_value=None)
@@ -1372,6 +1404,14 @@ class OppiaMLVMHandlerTests(test_utils.GenericTestBase):
         """
 
         REQUIRE_PAYLOAD_CSRF_CHECK = False
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {
+            'POST': {
+                'vm_id': {'schema': {'type': 'basestring'}},
+                'signature': {'schema': {'type': 'basestring'}},
+                'message': {'schema': {'type': 'basestring'}},
+            }
+        }
 
         @acl_decorators.is_from_oppia_ml
         def post(self):
@@ -1383,6 +1423,14 @@ class OppiaMLVMHandlerTests(test_utils.GenericTestBase):
         """
 
         REQUIRE_PAYLOAD_CSRF_CHECK = False
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {
+            'POST': {
+                'vm_id': {'schema': {'type': 'basestring'}},
+                'signature': {'schema': {'type': 'basestring'}},
+                'message': {'schema': {'type': 'basestring'}},
+            }
+        }
 
         def extract_request_message_vm_id_and_signature(self):
             """Returns the message, vm_id and signature retrieved from the
@@ -1431,3 +1479,565 @@ class OppiaMLVMHandlerTests(test_utils.GenericTestBase):
         with self.swap(self, 'testapp', self.mock_testapp):
             self.post_json(
                 '/correctmock', payload, expected_status_int=200)
+
+
+class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
+    """Tests all the functionality of SVS(Schema-Validation-System)
+    architecture.
+    """
+    handler_class_names_with_no_schema = (
+        payload_validator.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA)
+    wiki_page_link = (
+        'https://github.com/oppia/oppia/wiki/Writing-schema-for-handler-args')
+
+    def _get_list_of_routes_which_need_schemas(self):
+        """This method iterates over all the routes and returns those routes
+        which need schemas.
+
+        Returns:
+            list(RedirectRoute). A list of RedirectRoute objects.
+        """
+        list_of_routes_which_need_schemas = []
+        # TODO(#13139): Remove if condition from the list comprehension,
+        # once all the MAPREDUCE_HANDLERS are removed from the codebase.
+        return [route for route in main.URLS if not isinstance(route, tuple)]
+
+    def test_every_handler_class_has_schema(self):
+        """This test ensures that every child class of BaseHandler
+        has an associated schema.
+        """
+        list_of_handlers_which_need_schemas = []
+        list_of_routes_which_need_schemas = (
+            self._get_list_of_routes_which_need_schemas())
+
+        for route in list_of_routes_which_need_schemas:
+            handler = route.handler
+
+            handler_class_name = handler.__name__
+            if handler_class_name in self.handler_class_names_with_no_schema:
+                continue
+
+            schema_written_for_request_methods = (
+                handler.HANDLER_ARGS_SCHEMAS is not None)
+            schema_written_for_url_path_args = (
+                handler.URL_PATH_ARGS_SCHEMAS is not None)
+            handler_has_schemas = (schema_written_for_request_methods and
+                schema_written_for_url_path_args)
+
+            if handler_has_schemas is False:
+                list_of_handlers_which_need_schemas.append(handler_class_name)
+
+        error_msg = (
+            'The following handlers have missing schemas: [ %s ].'
+            '\nVisit %s to learn how to write schemas for handler args.' % (
+                ', '.join(
+                    list_of_handlers_which_need_schemas), self.wiki_page_link))
+
+        self.assertEqual(list_of_handlers_which_need_schemas, [], error_msg)
+
+    def test_schema_keys_exactly_match_with_url_path_elements(self):
+        """This test ensures that schema keys in URL_PATH_ARGS_SCHEMAS must
+        exactly match with url path elements.
+        """
+        handlers_with_missing_url_schema_keys = []
+        list_of_routes_which_need_schemas = (
+            self._get_list_of_routes_which_need_schemas())
+
+        for route in list_of_routes_which_need_schemas:
+            handler = route.handler
+
+            handler_class_name = handler.__name__
+            if handler_class_name in self.handler_class_names_with_no_schema:
+                continue
+            if handler.URL_PATH_ARGS_SCHEMAS is None:
+                continue
+
+            regex_pattern = r'<.*?>'
+            url_path_elements = [
+                keyword[1:-1] for keyword in re.findall(
+                    regex_pattern, route.name)]
+            schema_keys = handler.URL_PATH_ARGS_SCHEMAS.keys()
+
+            missing_schema_keys = set(url_path_elements) - set(schema_keys)
+            if missing_schema_keys:
+                handlers_with_missing_url_schema_keys.append(handler_class_name)
+                self.log_line(
+                    'Missing keys in URL_PATH_ARGS_SCHEMAS for %s: %s.' % (
+                        handler_class_name, ', '.join(missing_schema_keys)))
+
+        error_msg = (
+            'Missing schema keys in URL_PATH_ARGS_SCHEMAS for [ %s ] classes.'
+            '\nVisit %s to learn how to write schemas for handler args.' % (
+                ', '.join(handlers_with_missing_url_schema_keys),
+                    self.wiki_page_link))
+
+        self.assertEqual(handlers_with_missing_url_schema_keys, [], error_msg)
+
+    def test_schema_keys_exactly_match_with_request_methods_in_handlers(self):
+        """This test ensures that schema keys in HANDLER_ARGS_SCHEMAS must
+        exactly match with request arguments.
+        """
+        handlers_with_missing_request_schema_keys = []
+        list_of_routes_which_need_schemas = (
+            self._get_list_of_routes_which_need_schemas())
+
+        for route in list_of_routes_which_need_schemas:
+            handler = route.handler
+
+            handler_class_name = handler.__name__
+            if handler_class_name in self.handler_class_names_with_no_schema:
+                continue
+            if handler.HANDLER_ARGS_SCHEMAS is None:
+                continue
+
+            handler_request_methods = []
+            if handler.get != base.BaseHandler.get:
+                handler_request_methods.append('GET')
+            if handler.put != base.BaseHandler.put:
+                handler_request_methods.append('PUT')
+            if handler.post != base.BaseHandler.post:
+                handler_request_methods.append('POST')
+            if handler.delete != base.BaseHandler.delete:
+                handler_request_methods.append('DELETE')
+            methods_defined_in_schema = handler.HANDLER_ARGS_SCHEMAS.keys()
+
+            missing_schema_keys = (
+                set(handler_request_methods) - set(methods_defined_in_schema))
+            if missing_schema_keys:
+                handlers_with_missing_request_schema_keys.append(
+                    handler_class_name)
+                self.log_line(
+                    'Missing keys in HANDLER_ARGS_SCHEMAS for %s: %s.' % (
+                        handler_class_name, ', '.join(missing_schema_keys)))
+
+        error_msg = (
+            'Missing schema keys in HANDLER_ARGS_SCHEMAS for [ %s ] classes.'
+            '\nVisit %s to learn how to write schemas for handler args.' % (
+                ', '.join(handlers_with_missing_request_schema_keys),
+                    self.wiki_page_link))
+
+        self.assertEqual(
+            handlers_with_missing_request_schema_keys, [], error_msg)
+
+    def test_default_value_in_schema_conforms_with_schema(self):
+        """This test checks whether the default_value provided in schema
+        conforms with the rest of the schema.
+        """
+        handlers_with_non_conforming_default_schemas = []
+        list_of_routes_which_need_schemas = (
+            self._get_list_of_routes_which_need_schemas())
+
+        for route in list_of_routes_which_need_schemas:
+            handler = route.handler
+
+            handler_class_name = handler.__name__
+            if handler_class_name in self.handler_class_names_with_no_schema:
+                continue
+            if handler.HANDLER_ARGS_SCHEMAS is None:
+                continue
+
+            schemas = handler.HANDLER_ARGS_SCHEMAS
+            for request_method, request_method_schema in schemas.items():
+                for arg, schema in request_method_schema.items():
+                    if 'default_value' not in schema:
+                        continue
+                    default_value = {arg: schema['default_value']}
+                    default_value_schema = {arg: schema}
+
+                    _, errors = payload_validator.validate(
+                        default_value, default_value_schema, True)
+                    if len(errors) == 0:
+                        continue
+                    self.log_line(
+                        'Handler: %s, argument: %s, default_value '
+                            'validation failed.' % (handler_class_name, arg))
+
+                    if (handler_class_name not in
+                            handlers_with_non_conforming_default_schemas):
+                        handlers_with_non_conforming_default_schemas.append(
+                            handler_class_name)
+
+        error_msg = (
+            'Schema validation for default values failed for handlers: [ %s ].'
+            '\nVisit %s to learn how to write schemas for handler args.' % (
+                ', '.join(handlers_with_non_conforming_default_schemas),
+                        self.wiki_page_link))
+
+        self.assertEqual(
+            handlers_with_non_conforming_default_schemas, [], error_msg)
+
+    def test_handlers_with_schemas_are_not_in_handler_schema_todo_list(self):
+        """This test ensures that the
+        HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS list in payload validator
+        only contains handler class names which require schemas.
+        """
+
+        list_of_handlers_to_be_removed = []
+        handler_names_which_require_schemas = (
+            payload_validator.HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS)
+        list_of_routes_which_need_schemas = (
+            self._get_list_of_routes_which_need_schemas())
+
+        for route in list_of_routes_which_need_schemas:
+            handler = route.handler
+
+            handler_class_name = handler.__name__
+            if handler_class_name not in handler_names_which_require_schemas:
+                continue
+
+            schema_written_for_request_methods = (
+                handler.HANDLER_ARGS_SCHEMAS is not None)
+            schema_written_for_url_path_args = (
+                handler.URL_PATH_ARGS_SCHEMAS is not None)
+            handler_has_schemas = (schema_written_for_request_methods and
+                schema_written_for_url_path_args)
+
+            if handler_has_schemas:
+                list_of_handlers_to_be_removed.append(handler_class_name)
+
+        error_msg = (
+            'Handlers to be removed from schema requiring list in '
+            'payload validator file: [ %s ].' % (
+                ', '.join(list_of_handlers_to_be_removed)))
+
+        self.assertEqual(list_of_handlers_to_be_removed, [], error_msg)
+
+
+class SchemaValidationUrlArgsTests(test_utils.GenericTestBase):
+    """Tests to check schema validation architecture for url path elements."""
+
+    exp_id = 'exp_id'
+
+    class MockHandlerWithInvalidSchema(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'exploration_id': {
+                'schema': {
+                    'type': 'int'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+        @acl_decorators.can_play_exploration
+        def get(self, exploration_id):
+            return self.render_json({'exploration_id': exploration_id})
+
+    class MockHandlerWithValidSchema(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'exploration_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+        @acl_decorators.can_play_exploration
+        def get(self, exploration_id):
+            return self.render_json({'exploration_id': exploration_id})
+
+    class MockHandlerWithMissingUrlPathSchema(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+        @acl_decorators.can_play_exploration
+        def get(self, exploration_id):
+            return self.render_json({'exploration_id': exploration_id})
+
+    def setUp(self):
+        super(SchemaValidationUrlArgsTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.mock_testapp1 = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route(
+                '/mock_play_exploration/<exploration_id>',
+                    self.MockHandlerWithInvalidSchema)], debug=feconf.DEBUG))
+
+        self.mock_testapp2 = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route(
+                '/mock_play_exploration/<exploration_id>',
+                    self.MockHandlerWithValidSchema)], debug=feconf.DEBUG))
+
+        self.mock_testapp3 = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route(
+                '/mock_play_exploration/<exploration_id>',
+                    self.MockHandlerWithMissingUrlPathSchema)],
+                debug=feconf.DEBUG))
+
+        self.save_new_valid_exploration(self.exp_id, self.owner_id)
+
+    def test_cannot_access_exploration_with_incorrect_schema(self):
+        self.login(self.OWNER_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp1):
+            response = self.get_json(
+                '/mock_play_exploration/%s' % self.exp_id,
+                    expected_status_int=400)
+            error_msg = (
+                'Schema validation for \'exploration_id\' failed: Could not '
+                'convert str to int: %s' % self.exp_id)
+            self.assertEqual(response['error'], error_msg)
+        self.logout()
+
+    def test_can_access_exploration_with_correct_schema(self):
+        self.login(self.OWNER_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp2):
+            response = self.get_json(
+                '/mock_play_exploration/%s' % self.exp_id,
+                    expected_status_int=200)
+        self.logout()
+
+    def test_cannot_access_exploration_with_missing_schema(self):
+        self.login(self.OWNER_EMAIL)
+        error_msg = (
+            'Missing schema for url path args in '
+            'MockHandlerWithMissingUrlPathSchema handler class.')
+
+        with self.swap(self, 'testapp', self.mock_testapp3):
+            response = self.get_json('/mock_play_exploration/%s' % self.exp_id,
+                expected_status_int=500)
+            self.assertEqual(response['error'], error_msg)
+        self.logout()
+
+
+class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
+    """Tests to check schema validation architecture for request args."""
+
+    exp_id = 'exp_id'
+
+    class MockHandlerWithInvalidSchema(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {
+            'GET': {
+                'exploration_id': {
+                    'schema': {
+                        'type': 'int'
+                    }
+                }
+            }
+        }
+
+        @acl_decorators.can_play_exploration
+        def get(self):
+            exploration_id = self.request.get('exploration_id')
+            return self.render_json({'exploration_id': exploration_id})
+
+    class MockHandlerWithMissingRequestSchema(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {}
+
+        @acl_decorators.can_play_exploration
+        def get(self):
+            exploration_id = self.request.get('exploration_id')
+            return self.render_json({'exploration_id': exploration_id})
+
+    def setUp(self):
+        super(SchemaValidationRequestArgsTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.mock_testapp1 = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route(
+                '/mock_play_exploration',
+                    self.MockHandlerWithInvalidSchema)], debug=feconf.DEBUG))
+
+        self.mock_testapp2 = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route(
+                '/mock_play_exploration',
+                    self.MockHandlerWithMissingRequestSchema)],
+                debug=feconf.DEBUG))
+
+        self.save_new_valid_exploration(self.exp_id, self.owner_id)
+
+    def test_cannot_access_exploration_with_incorrect_schema(self):
+        self.login(self.OWNER_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp1):
+            response = self.get_json(
+                '/mock_play_exploration?exploration_id=%s' % self.exp_id,
+                    expected_status_int=400)
+            error_msg = (
+                'Schema validation for \'exploration_id\' failed: Could not '
+                'convert unicode to int: %s' % self.exp_id)
+            self.assertEqual(response['error'], error_msg)
+        self.logout()
+
+    def test_cannot_access_exploration_with_missing_schema(self):
+        self.login(self.OWNER_EMAIL)
+        error_msg = (
+            'Missing schema for GET method in '
+            'MockHandlerWithMissingRequestSchema handler class.')
+
+        with self.swap(self, 'testapp', self.mock_testapp2):
+            response = self.get_json(
+                '/mock_play_exploration?exploration_id=%s' % self.exp_id,
+                    expected_status_int=500)
+            self.assertEqual(response['error'], error_msg)
+        self.logout()
+
+
+class RequestMethodNotInHandlerClassDoNotRaiseMissingSchemaErrorTest(
+        test_utils.GenericTestBase):
+    """This test ensures that, NotImplementedError should not be raised for
+    the request method which are not present in the handler class.
+    """
+
+    class MockHandler(base.BaseHandler):
+        """Mock handler with no get method.
+        """
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {}
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    def setUp(self):
+        super(RequestMethodNotInHandlerClassDoNotRaiseMissingSchemaErrorTest,
+            self).setUp()
+
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock', self.MockHandler, name='MockHandler')],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_get_request_do_not_raise_notimplemented_error(self):
+        with self.swap(self, 'testapp', self.testapp):
+            self.get_json('/mock', expected_status_int=404)
+
+
+class HandlerClassWithBothRequestAndPayloadTest(test_utils.GenericTestBase):
+    """This test class ensures that SVS architecture validates both request args
+    and payload args if they are present in a single request method."""
+
+    class MockHandler(base.BaseHandler):
+        """Fake page for testing autoescaping."""
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {
+            'POST': {
+                'arg_b': {
+                    'schema': {
+                        'type': 'basestring'
+                    }
+                },
+                'arg_a': {
+                    'schema': {
+                        'type': 'basestring'
+                    }
+                }
+            }
+        }
+
+        def post(self):
+            """Handles POST requests. This request method contains both type
+            of args, i.e., request args as well as payload args.
+            """
+            # arg_a = self.request.get('arg_a') is not used, since we
+            # intend to use normalized value.
+            arg_a = self.normalized_request.get('arg_a')
+
+            # arg_b = self.payload.get('arg_b') is not used, since we
+            # intend to use normalized value.
+            arg_b = self.normalized_request.get('arg_b')
+
+            self.render_json({'arg_a': arg_a, 'arg_b': arg_b})
+
+    def setUp(self):
+        super(HandlerClassWithBothRequestAndPayloadTest, self).setUp()
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock', self.MockHandler, name='MockHandler')],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_both_args_in_post_request(self):
+        payload = {'arg_b': 'arg_in_payload'}
+        user_id = user_services.get_user_id_from_username('learneruser')
+        csrf_token = base.CsrfTokenManager.create_csrf_token(user_id)
+        with self.swap(self, 'testapp', self.testapp):
+            self.post_json(
+                '/mock?arg_a=arg_in_request', payload, csrf_token=csrf_token)
+
+
+class ImageUploadHandlerTest(test_utils.GenericTestBase):
+    """This test class ensures that schema validation is done successfully
+    for handlers which upload image files.
+    """
+
+    TEST_LEARNER_EMAIL = 'test.learner@example.com'
+    TEST_LEARNER_USERNAME = 'testlearneruser'
+
+    class MockUploadHandler(base.BaseHandler):
+        """Handles image uploads."""
+        URL_PATH_ARGS_SCHEMAS = {
+            'entity_type': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'entity_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {
+            'POST': {
+                'image': {
+                    'schema': {
+                        'type': 'basestring'
+                    }
+                },
+                'filename': {
+                    'schema': {
+                        'type': 'basestring'
+                    }
+                },
+                'filename_prefix': {
+                    'schema': {
+                        'type': 'basestring'
+                    },
+                    'default_value': None
+                }
+            }
+        }
+
+        def post(self, entity_type, entity_id):
+            """Saves an image uploaded by a content creator."""
+
+            raw = self.normalized_request.get('image')
+            filename = self.normalized_request.get('filename')
+            filename_prefix = self.normalized_request.get('filename_prefix')
+
+            self.render_json({'filename': filename})
+
+    def setUp(self):
+        super(ImageUploadHandlerTest, self).setUp()
+        self.signup(self.TEST_LEARNER_EMAIL, self.TEST_LEARNER_USERNAME)
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock_upload/<entity_type>/<entity_id>',
+            self.MockUploadHandler, name='MockUploadHandler')],
+            debug=feconf.DEBUG,
+        ))
+
+        self.system_user = user_services.get_system_user()
+        exp_services.load_demo('0')
+
+        rights_manager.release_ownership_of_exploration(
+            self.system_user, '0')
+
+    def test_image_upload_and_download(self):
+        """Test image uploading and downloading."""
+        self.login(self.TEST_LEARNER_EMAIL)
+        user_id = user_services.get_user_id_from_username('testlearneruser')
+        csrf_token = base.CsrfTokenManager.create_csrf_token(user_id)
+
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
+            'rb', encoding=None) as f:
+            raw_image = f.read()
+        with self.swap(self, 'testapp', self.testapp):
+            response_dict = self.post_json(
+                '/mock_upload/exploration/0', {'filename': 'test.png'},
+                csrf_token=csrf_token,
+                upload_files=(('image', 'unused_filename', raw_image),)
+            )
+            filename = response_dict['filename']
+        self.logout()
