@@ -21,12 +21,10 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import exp_domain
 from core.domain import exp_services
-from core.domain import feedback_jobs_continuous
 from core.domain import feedback_services
 from core.domain import rights_manager
 from core.domain import state_domain
 from core.domain import suggestion_services
-from core.domain import taskqueue_services
 from core.domain import topic_fetchers
 from core.domain import user_services
 from core.platform import models
@@ -45,17 +43,6 @@ EXPECTED_THREAD_KEYS = [
 EXPECTED_MESSAGE_KEYS = [
     'author_username', 'created_on_msecs', 'entity_type', 'message_id',
     'entity_id', 'text', 'updated_status', 'updated_subject']
-
-
-class MockFeedbackAnalyticsAggregator(
-        feedback_jobs_continuous.FeedbackAnalyticsAggregator):
-    """A modified FeedbackAnalyticsAggregator that does not start a new batch
-    job when the previous one has finished.
-    """
-
-    @classmethod
-    def _kickoff_batch_job_after_previous_one_ends(cls):
-        pass
 
 
 class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
@@ -744,25 +731,10 @@ class FeedbackStatsHandlerTests(test_utils.GenericTestBase):
         feedback_services.create_thread(
             'exploration', self.exp_id, self.owner_id, 'subject', 'text')
 
-        feedback_analytics_aggregator_swap = self.swap(
-            feedback_jobs_continuous, 'FeedbackAnalyticsAggregator',
-            MockFeedbackAnalyticsAggregator)
+        response = self.get_json(
+            '%s/%s' % (feconf.FEEDBACK_STATS_URL_PREFIX, self.exp_id))
 
-        with feedback_analytics_aggregator_swap:
-            (
-                feedback_jobs_continuous.FeedbackAnalyticsAggregator
-                .start_computation()
-            )
-            self.assertEqual(
-                self.count_jobs_in_mapreduce_taskqueue(
-                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
-            self.process_and_flush_pending_mapreduce_tasks()
-            self.process_and_flush_pending_tasks()
+        self.assertEqual(response['num_total_threads'], 1)
+        self.assertEqual(response['num_open_threads'], 1)
 
-            response = self.get_json(
-                '%s/%s' % (feconf.FEEDBACK_STATS_URL_PREFIX, self.exp_id))
-
-            self.assertEqual(response['num_total_threads'], 2)
-            self.assertEqual(response['num_open_threads'], 2)
-
-            self.logout()
+        self.logout()

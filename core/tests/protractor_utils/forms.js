@@ -246,7 +246,7 @@ var RichTextEditor = async function(elem) {
         'cke_button__oppia' + componentName.toLowerCase());
 
       // The currently active modal is the last in the DOM.
-      var modal = await element.all(by.css('.modal-dialog')).last();
+      var modal = element.all(by.css('.modal-dialog')).last();
 
       // Need to convert arguments to an actual array; we tell the component
       // which modal to act on but drop the componentName.
@@ -506,8 +506,11 @@ var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
     expect(
       await (await arrayOfElems.get(arrayPointer)).getTagName()
     ).toBe(tagName);
+    // Remove comments introduced by angular for bindings using replace.
     expect(
-      await (await arrayOfElems.get(arrayPointer)).getAttribute('innerHTML')
+      (
+        await (await arrayOfElems.get(arrayPointer)).getAttribute('innerHTML')
+      ).replace(/<!--[^>]*-->/g, '').trim()
     ).toBe(text);
     expect(arrayOfTexts[arrayPointer]).toEqual(text);
     arrayPointer = arrayPointer + 1;
