@@ -64,425 +64,424 @@ class MockWindowRef {
   }
 }
 
-for(let i = 0; i < 100; i++) {
-  fdescribe('TopNavigationBarComponent', () => {
-    let fixture: ComponentFixture<TopNavigationBarComponent>;
-    let component: TopNavigationBarComponent;
-    let mockWindowRef: MockWindowRef;
-    let cbas: ClassroomBackendApiService;
-    let searchService: SearchService;
-    let wds: WindowDimensionsService;
-    let userService: UserService;
-    let siteAnalyticsService: SiteAnalyticsService;
-    let navigationService: NavigationService;
-    let deviceInfoService: DeviceInfoService;
-    let debouncerService: DebouncerService;
-    let sidebarStatusService: SidebarStatusService;
-    let i18nLanguageCodeService: I18nLanguageCodeService;
-    let urlInterpolationService: UrlInterpolationService;
 
-    let mockResizeEmitter: EventEmitter<void>;
+fdescribe('TopNavigationBarComponent', () => {
+  let fixture: ComponentFixture<TopNavigationBarComponent>;
+  let component: TopNavigationBarComponent;
+  let mockWindowRef: MockWindowRef;
+  let cbas: ClassroomBackendApiService;
+  let searchService: SearchService;
+  let wds: WindowDimensionsService;
+  let userService: UserService;
+  let siteAnalyticsService: SiteAnalyticsService;
+  let navigationService: NavigationService;
+  let deviceInfoService: DeviceInfoService;
+  let debouncerService: DebouncerService;
+  let sidebarStatusService: SidebarStatusService;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
+  let urlInterpolationService: UrlInterpolationService;
 
-    let userInfo = {
-      _isModerator: true,
-      _isAdmin: true,
-      _isTopicManager: false,
-      _isSuperAdmin: false,
-      _canCreateCollections: true,
-      _preferredSiteLanguageCode: 'en',
-      _username: 'username1',
-      _email: 'tester@example.org',
-      _isLoggedIn: true,
-      isModerator: () => true,
-      isAdmin: () => false,
-      isSuperAdmin: () => false,
-      isTopicManager: () => false,
-      canCreateCollections: () => true,
-      getPreferredSiteLanguageCode: () =>'en',
-      getUsername: () => 'username1',
-      getEmail: () => 'tester@example.org',
-      isLoggedIn: () => true
-    };
+  let mockResizeEmitter: EventEmitter<void>;
 
-    beforeEach(waitForAsync(() => {
-      mockResizeEmitter = new EventEmitter();
-      mockWindowRef = new MockWindowRef();
-      TestBed.configureTestingModule({
-        imports: [
-          HttpClientTestingModule
-        ],
-        declarations: [
-          TopNavigationBarComponent,
-          MockTranslatePipe
-        ],
-        providers: [
-          NavigationService,
-          UserService,
+  let userInfo = {
+    _isModerator: true,
+    _isAdmin: true,
+    _isTopicManager: false,
+    _isSuperAdmin: false,
+    _canCreateCollections: true,
+    _preferredSiteLanguageCode: 'en',
+    _username: 'username1',
+    _email: 'tester@example.org',
+    _isLoggedIn: true,
+    isModerator: () => true,
+    isAdmin: () => false,
+    isSuperAdmin: () => false,
+    isTopicManager: () => false,
+    canCreateCollections: () => true,
+    getPreferredSiteLanguageCode: () =>'en',
+    getUsername: () => 'username1',
+    getEmail: () => 'tester@example.org',
+    isLoggedIn: () => true
+  };
+
+  beforeEach(waitForAsync(() => {
+    mockResizeEmitter = new EventEmitter();
+    mockWindowRef = new MockWindowRef();
+    TestBed.configureTestingModule({
+      imports: [
+        HttpClientTestingModule
+      ],
+      declarations: [
+        TopNavigationBarComponent,
+        MockTranslatePipe
+      ],
+      providers: [
+        NavigationService,
+        UserService,
+        {
+          provide: WindowRef,
+          useValue: mockWindowRef
+        },
+        {
+          provide: WindowDimensionsService,
+          useValue: {
+            getWidth: () => 700,
+            getResizeEvent: () => mockResizeEmitter,
+            isWindowNarrow: () => false
+          }
+        }
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
+  }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(TopNavigationBarComponent);
+    component = fixture.componentInstance;
+    cbas = TestBed.inject(ClassroomBackendApiService);
+    searchService = TestBed.inject(SearchService);
+    wds = TestBed.inject(WindowDimensionsService);
+    userService = TestBed.inject(UserService);
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
+    navigationService = TestBed.inject(NavigationService);
+    deviceInfoService = TestBed.inject(DeviceInfoService);
+    debouncerService = TestBed.inject(DebouncerService);
+    sidebarStatusService = TestBed.inject(SidebarStatusService);
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
+
+    spyOn(searchService, 'onSearchBarLoaded')
+      .and.returnValue(new EventEmitter<string>());
+  });
+
+  it('should set component properties on initialization', fakeAsync(() => {
+    spyOn(userService, 'getProfileImageDataUrlAsync').and.resolveTo(
+      '%2Fprofile%2Fpicture');
+    spyOn(cbas, 'fetchClassroomPromosAreEnabledStatusAsync')
+      .and.resolveTo(true);
+    spyOn(wds, 'isWindowNarrow').and.returnValue(true);
+    spyOn(component, 'truncateNavbar').and.stub();
+
+    expect(component.currentUrl).toBe(undefined);
+    expect(component.labelForClearingFocus).toBe(undefined);
+    expect(component.logoutUrl).toBe(undefined);
+    expect(component.userMenuIsShown).toBe(undefined);
+    expect(component.inClassroomPage).toBe(undefined);
+    expect(component.windowIsNarrow).toBe(false);
+    expect(component.navElementsVisibilityStatus).toEqual({});
+    expect(component.profilePictureDataUrl).toBe(undefined);
+    expect(component.CLASSROOM_PROMOS_ARE_ENABLED).toBe(false);
+
+    component.ngOnInit();
+    tick(10);
+
+    fixture.whenStable().then(() => {
+      expect(component.currentUrl).toBe('learn');
+      expect(component.labelForClearingFocus)
+        .toBe(AppConstants.LABEL_FOR_CLEARING_FOCUS);
+      expect(component.logoutUrl).toBe(AppConstants.LOGOUT_URL);
+      expect(component.userMenuIsShown).toBe(true);
+      expect(component.inClassroomPage).toBe(true);
+      expect(component.windowIsNarrow).toBe(true);
+      expect(component.navElementsVisibilityStatus).toEqual({
+        I18N_TOPNAV_DONATE: true,
+        I18N_TOPNAV_CLASSROOM: true,
+        I18N_TOPNAV_ABOUT: true,
+        I18N_CREATE_EXPLORATION_CREATE: true,
+        I18N_TOPNAV_LIBRARY: true
+      });
+      expect(component.profilePictureDataUrl).toBe('/profile/picture');
+      expect(component.CLASSROOM_PROMOS_ARE_ENABLED).toBe(true);
+    });
+  }));
+
+  it('should get user info on initialization', fakeAsync(() => {
+    spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo);
+    spyOn(urlInterpolationService, 'interpolateUrl')
+      .and.returnValue('/profile/username1');
+    spyOn(component, 'truncateNavbar').and.stub();
+
+    expect(component.isModerator).toBe(undefined);
+    expect(component.isAdmin).toBe(undefined);
+    expect(component.isTopicManager).toBe(undefined);
+    expect(component.isSuperAdmin).toBe(undefined);
+    expect(component.userIsLoggedIn).toBe(undefined);
+    expect(component.username).toBe(undefined);
+    expect(component.profilePageUrl).toBe(undefined);
+
+    component.ngOnInit();
+    tick(10);
+
+    fixture.whenStable().then(() => {
+      expect(component.isModerator).toBe(true);
+      expect(component.isAdmin).toBe(false);
+      expect(component.isTopicManager).toBe(false);
+      expect(component.isSuperAdmin).toBe(false);
+      expect(component.userIsLoggedIn).toBe(true);
+      expect(component.username).toBe('username1');
+      expect(component.profilePageUrl).toBe('/profile/username1');
+    });
+  }));
+
+  it('should truncate navbar after search bar is loaded', fakeAsync(() => {
+    spyOn(component, 'truncateNavbar').and.stub();
+
+    component.ngOnInit();
+    tick(10);
+
+    searchService.onSearchBarLoaded.emit();
+    tick(101);
+
+    fixture.whenStable().then(() => {
+      expect(component.truncateNavbar).toHaveBeenCalled();
+    });
+  }));
+
+  it('should try displaying the hidden navbar elements if resized' +
+    ' window is larger', fakeAsync(() => {
+    let donateElement = 'I18N_TOPNAV_DONATE';
+    spyOn(component, 'truncateNavbar').and.stub();
+    spyOn(debouncerService, 'debounce').and.stub();
+
+    component.ngOnInit();
+    tick(10);
+
+    component.currentWindowWidth = 600;
+    component.navElementsVisibilityStatus[donateElement] = false;
+
+    mockResizeEmitter.emit();
+    tick(501);
+
+    fixture.whenStable().then(() => {
+      expect(component.navElementsVisibilityStatus[donateElement]).toBe(true);
+    });
+  }));
+
+  it('should show Oppia\'s logos', () => {
+    expect(component.getStaticImageUrl('/logo/288x128_logo_white.webp'))
+      .toBe('/assets/images/logo/288x128_logo_white.webp');
+
+    expect(component.getStaticImageUrl('/logo/288x128_logo_white.png'))
+      .toBe('/assets/images/logo/288x128_logo_white.png');
+  });
+
+  it('should fetch login URL and redirect user to login page when user' +
+    ' clicks on \'Sign In\'', fakeAsync(() => {
+    spyOn(userService, 'getLoginUrlAsync').and.resolveTo('/login/url');
+
+    expect(mockWindowRef.nativeWindow.location.href).toBe('');
+
+    component.onLoginButtonClicked();
+    tick(151);
+
+    fixture.whenStable().then(() => {
+      expect(mockWindowRef.nativeWindow.location.href).toBe('/login/url');
+    });
+  }));
+
+  it('should reload window if fetched login URL is null', fakeAsync(() => {
+    spyOn(userService, 'getLoginUrlAsync').and.resolveTo('');
+    spyOn(mockWindowRef.nativeWindow.location, 'reload');
+
+    expect(mockWindowRef.nativeWindow.location.href).toBe('');
+
+    component.onLoginButtonClicked();
+    tick(151);
+
+    fixture.whenStable().then(() => {
+      expect(mockWindowRef.nativeWindow.location.reload).toHaveBeenCalled();
+    });
+  }));
+
+  it('should register start login event when user is being redirected to' +
+    ' the login page', fakeAsync(() => {
+    spyOn(userService, 'getLoginUrlAsync').and.resolveTo('/login/url');
+    spyOn(siteAnalyticsService, 'registerStartLoginEvent');
+
+    component.onLoginButtonClicked();
+    tick(151);
+
+    fixture.whenStable().then(() => {
+      expect(siteAnalyticsService.registerStartLoginEvent)
+        .toHaveBeenCalledWith('loginButton');
+    });
+  }));
+
+  it('should clear last uploaded audio language on logout', () => {
+    spyOn(mockWindowRef.nativeWindow.localStorage, 'removeItem');
+
+    expect(mockWindowRef.nativeWindow.localStorage.last_uploaded_audio_lang)
+      .toBe('en');
+
+    component.onLogoutButtonClicked();
+
+    expect(mockWindowRef.nativeWindow.localStorage.removeItem)
+      .toHaveBeenCalledWith('last_uploaded_audio_lang');
+  });
+
+  it('should open submenu when user hovers over the menu button', () => {
+    let mouseoverEvent = new KeyboardEvent('mouseover');
+    spyOn(navigationService, 'openSubmenu');
+    spyOn(deviceInfoService, 'isMobileDevice').and.returnValue(false);
+
+    component.openSubmenu(mouseoverEvent, 'classroomMenu');
+
+    expect(navigationService.openSubmenu).toHaveBeenCalledWith(
+      mouseoverEvent, 'classroomMenu');
+  });
+
+  it('should close submenu when user moves the mouse away' +
+    ' from the menu button', () => {
+    let mouseleaveEvent = new KeyboardEvent('mouseleave');
+    spyOn(navigationService, 'closeSubmenu');
+    spyOn(deviceInfoService, 'isMobileDevice').and.returnValue(false);
+
+    component.closeSubmenuIfNotMobile(mouseleaveEvent);
+
+    expect(navigationService.closeSubmenu).toHaveBeenCalledWith(
+      mouseleaveEvent);
+  });
+
+  it('should not close the submenu is the user is on a mobile device', () =>{
+    spyOn(deviceInfoService, 'isMobileDevice').and.returnValue(true);
+    spyOn(navigationService, 'closeSubmenu');
+
+    component.closeSubmenuIfNotMobile(new KeyboardEvent('mouseleave'));
+
+    expect(navigationService.closeSubmenu).not.toHaveBeenCalled();
+  });
+
+  it('should handle keydown events on menus', () => {
+    let keydownEvent = new KeyboardEvent('click', {
+      shiftKey: true,
+      keyCode: 9
+    });
+
+    expect(component.activeMenuName).toBe(undefined);
+
+    component.onMenuKeypress(keydownEvent, 'aboutMenu', {
+      shiftTab: 'open',
+    });
+
+    expect(component.activeMenuName).toBe('aboutMenu');
+  });
+
+  it('should toggle side bar', () => {
+    spyOn(sidebarStatusService, 'isSidebarShown').and.returnValues(false, true);
+    spyOn(wds, 'isWindowNarrow').and.returnValue(true);
+    expect(component.isSidebarShown()).toBe(false);
+
+    component.toggleSidebar();
+
+    expect(component.isSidebarShown()).toBe(true);
+  });
+
+  it('should navigate to classroom page when user clicks' +
+    ' on \'Basic Mathematics\'', fakeAsync(() => {
+    expect(mockWindowRef.nativeWindow.location.href).toBe('');
+
+    component.navigateToClassroomPage('/classroom/url');
+    tick(151);
+
+    expect(mockWindowRef.nativeWindow.location.href).toBe('/classroom/url');
+  }));
+
+  it('should registers classroom header click event when user clicks' +
+    ' on \'Basic Mathematics\'', () => {
+    spyOn(siteAnalyticsService, 'registerClassroomHeaderClickEvent');
+
+    component.navigateToClassroomPage('/classroom/url');
+
+    expect(siteAnalyticsService.registerClassroomHeaderClickEvent)
+      .toHaveBeenCalled();
+  });
+
+  it('should check if i18n has been run', () => {
+    spyOn(document, 'querySelectorAll')
+      .withArgs('.oppia-navbar-tab-content').and.returnValues(
+        [
           {
-            provide: WindowRef,
-            useValue: mockWindowRef
-          },
-          {
-            provide: WindowDimensionsService,
-            useValue: {
-              getWidth: () => 700,
-              getResizeEvent: () => mockResizeEmitter,
-              isWindowNarrow: () => false
-            }
+            // This throws "Type '{ innerText: string; }' is not assignable to
+            // type 'Element'.". We need to suppress this error because if i18n
+            // has not run, then the tabs will not have text content and so
+            // their innerText.length value will be 0.
+            // @ts-expect-error
+            innerText: ''
           }
         ],
-        schemas: [NO_ERRORS_SCHEMA]
-      }).compileComponents();
-    }));
+        [
+          {
+            innerText: 'About'
+          }
+        ]
+      );
 
-    beforeEach(() => {
-      fixture = TestBed.createComponent(TopNavigationBarComponent);
-      component = fixture.componentInstance;
-      cbas = TestBed.inject(ClassroomBackendApiService);
-      searchService = TestBed.inject(SearchService);
-      wds = TestBed.inject(WindowDimensionsService);
-      userService = TestBed.inject(UserService);
-      siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
-      navigationService = TestBed.inject(NavigationService);
-      deviceInfoService = TestBed.inject(DeviceInfoService);
-      debouncerService = TestBed.inject(DebouncerService);
-      sidebarStatusService = TestBed.inject(SidebarStatusService);
-      urlInterpolationService = TestBed.inject(UrlInterpolationService);
+    expect(component.checkIfI18NCompleted()).toBe(false);
+    expect(component.checkIfI18NCompleted()).toBe(true);
+  });
 
-      spyOn(searchService, 'onSearchBarLoaded')
-        .and.returnValue(new EventEmitter<string>());
-    });
+  it('should not truncate navbar if the window is narrow', () => {
+    // The truncateNavbar() function returns, as soon as the check for
+    // narrow window passes.
+    spyOn(wds, 'isWindowNarrow').and.returnValue(true);
+    spyOn(component, 'checkIfI18NCompleted');
+    spyOn(document, 'querySelector');
 
-    it('should set component properties on initialization', fakeAsync(() => {
-      spyOn(userService, 'getProfileImageDataUrlAsync').and.resolveTo(
-        '%2Fprofile%2Fpicture');
-      spyOn(cbas, 'fetchClassroomPromosAreEnabledStatusAsync')
-        .and.resolveTo(true);
-      spyOn(wds, 'isWindowNarrow').and.returnValue(true);
-      spyOn(component, 'truncateNavbar').and.stub();
+    // We also, check if the subsequent function calls have been made or not,
+    // thus confirming that the returned 'undefined' value is because of
+    // narrow window.
+    expect(component.truncateNavbar()).toBe(undefined);
+    expect(component.checkIfI18NCompleted).not.toHaveBeenCalled();
+    expect(document.querySelector).not.toHaveBeenCalled();
+  });
 
-      expect(component.currentUrl).toBe(undefined);
-      expect(component.labelForClearingFocus).toBe(undefined);
-      expect(component.logoutUrl).toBe(undefined);
-      expect(component.userMenuIsShown).toBe(undefined);
-      expect(component.inClassroomPage).toBe(undefined);
-      expect(component.windowIsNarrow).toBe(false);
-      expect(component.navElementsVisibilityStatus).toEqual({});
-      expect(component.profilePictureDataUrl).toBe(undefined);
-      expect(component.CLASSROOM_PROMOS_ARE_ENABLED).toBe(false);
+  it('should retry calling truncate navbar if i18n is not' +
+  ' complete', fakeAsync(() => {
+    spyOn(wds, 'isWindowNarrow').and.returnValues(false, true);
+    spyOn(document, 'querySelector').and.stub();
 
-      component.ngOnInit();
-      tick(10);
+    component.checkIfI18NCompleted = null;
 
-      fixture.whenStable().then(() => {
-        expect(component.currentUrl).toBe('learn');
-        expect(component.labelForClearingFocus)
-          .toBe(AppConstants.LABEL_FOR_CLEARING_FOCUS);
-        expect(component.logoutUrl).toBe(AppConstants.LOGOUT_URL);
-        expect(component.userMenuIsShown).toBe(true);
-        expect(component.inClassroomPage).toBe(true);
-        expect(component.windowIsNarrow).toBe(true);
-        expect(component.navElementsVisibilityStatus).toEqual({
-          I18N_TOPNAV_DONATE: true,
-          I18N_TOPNAV_CLASSROOM: true,
-          I18N_TOPNAV_ABOUT: true,
-          I18N_CREATE_EXPLORATION_CREATE: true,
-          I18N_TOPNAV_LIBRARY: true
-        });
-        expect(component.profilePictureDataUrl).toBe('/profile/picture');
-        expect(component.CLASSROOM_PROMOS_ARE_ENABLED).toBe(true);
-      });
-    }));
+    component.truncateNavbar();
+    tick(101);
 
-    it('should get user info on initialization', fakeAsync(() => {
-      spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo);
-      spyOn(urlInterpolationService, 'interpolateUrl')
-        .and.returnValue('/profile/username1');
-      spyOn(component, 'truncateNavbar').and.stub();
-
-      expect(component.isModerator).toBe(undefined);
-      expect(component.isAdmin).toBe(undefined);
-      expect(component.isTopicManager).toBe(undefined);
-      expect(component.isSuperAdmin).toBe(undefined);
-      expect(component.userIsLoggedIn).toBe(undefined);
-      expect(component.username).toBe(undefined);
-      expect(component.profilePageUrl).toBe(undefined);
-
-      component.ngOnInit();
-      tick(10);
-
-      fixture.whenStable().then(() => {
-        expect(component.isModerator).toBe(true);
-        expect(component.isAdmin).toBe(false);
-        expect(component.isTopicManager).toBe(false);
-        expect(component.isSuperAdmin).toBe(false);
-        expect(component.userIsLoggedIn).toBe(true);
-        expect(component.username).toBe('username1');
-        expect(component.profilePageUrl).toBe('/profile/username1');
-      });
-    }));
-
-    it('should truncate navbar after search bar is loaded', fakeAsync(() => {
-      spyOn(component, 'truncateNavbar').and.stub();
-
-      component.ngOnInit();
-      tick(10);
-
-      searchService.onSearchBarLoaded.emit();
-      tick(101);
-
-      fixture.whenStable().then(() => {
-        expect(component.truncateNavbar).toHaveBeenCalled();
-      });
-    }));
-
-    it('should try displaying the hidden navbar elements if resized' +
-      ' window is larger', fakeAsync(() => {
-      let donateElement = 'I18N_TOPNAV_DONATE';
-      spyOn(component, 'truncateNavbar').and.stub();
-      spyOn(debouncerService, 'debounce').and.stub();
-
-      component.ngOnInit();
-      tick(10);
-
-      component.currentWindowWidth = 600;
-      component.navElementsVisibilityStatus[donateElement] = false;
-
-      mockResizeEmitter.emit();
-      tick(501);
-
-      fixture.whenStable().then(() => {
-        expect(component.navElementsVisibilityStatus[donateElement]).toBe(true);
-      });
-    }));
-
-    it('should show Oppia\'s logos', () => {
-      expect(component.getStaticImageUrl('/logo/288x128_logo_white.webp'))
-        .toBe('/assets/images/logo/288x128_logo_white.webp');
-
-      expect(component.getStaticImageUrl('/logo/288x128_logo_white.png'))
-        .toBe('/assets/images/logo/288x128_logo_white.png');
-    });
-
-    it('should fetch login URL and redirect user to login page when user' +
-      ' clicks on \'Sign In\'', fakeAsync(() => {
-      spyOn(userService, 'getLoginUrlAsync').and.resolveTo('/login/url');
-
-      expect(mockWindowRef.nativeWindow.location.href).toBe('');
-
-      component.onLoginButtonClicked();
-      tick(151);
-
-      fixture.whenStable().then(() => {
-        expect(mockWindowRef.nativeWindow.location.href).toBe('/login/url');
-      });
-    }));
-
-    it('should reload window if fetched login URL is null', fakeAsync(() => {
-      spyOn(userService, 'getLoginUrlAsync').and.resolveTo('');
-      spyOn(mockWindowRef.nativeWindow.location, 'reload');
-
-      expect(mockWindowRef.nativeWindow.location.href).toBe('');
-
-      component.onLoginButtonClicked();
-      tick(151);
-
-      fixture.whenStable().then(() => {
-        expect(mockWindowRef.nativeWindow.location.reload).toHaveBeenCalled();
-      });
-    }));
-
-    it('should register start login event when user is being redirected to' +
-      ' the login page', fakeAsync(() => {
-      spyOn(userService, 'getLoginUrlAsync').and.resolveTo('/login/url');
-      spyOn(siteAnalyticsService, 'registerStartLoginEvent');
-
-      component.onLoginButtonClicked();
-      tick(151);
-
-      fixture.whenStable().then(() => {
-        expect(siteAnalyticsService.registerStartLoginEvent)
-          .toHaveBeenCalledWith('loginButton');
-      });
-    }));
-
-    it('should clear last uploaded audio language on logout', () => {
-      spyOn(mockWindowRef.nativeWindow.localStorage, 'removeItem');
-
-      expect(mockWindowRef.nativeWindow.localStorage.last_uploaded_audio_lang)
-        .toBe('en');
-
-      component.onLogoutButtonClicked();
-
-      expect(mockWindowRef.nativeWindow.localStorage.removeItem)
-        .toHaveBeenCalledWith('last_uploaded_audio_lang');
-    });
-
-    it('should open submenu when user hovers over the menu button', () => {
-      let mouseoverEvent = new KeyboardEvent('mouseover');
-      spyOn(navigationService, 'openSubmenu');
-      spyOn(deviceInfoService, 'isMobileDevice').and.returnValue(false);
-
-      component.openSubmenu(mouseoverEvent, 'classroomMenu');
-
-      expect(navigationService.openSubmenu).toHaveBeenCalledWith(
-        mouseoverEvent, 'classroomMenu');
-    });
-
-    it('should close submenu when user moves the mouse away' +
-      ' from the menu button', () => {
-      let mouseleaveEvent = new KeyboardEvent('mouseleave');
-      spyOn(navigationService, 'closeSubmenu');
-      spyOn(deviceInfoService, 'isMobileDevice').and.returnValue(false);
-
-      component.closeSubmenuIfNotMobile(mouseleaveEvent);
-
-      expect(navigationService.closeSubmenu).toHaveBeenCalledWith(
-        mouseleaveEvent);
-    });
-
-    it('should not close the submenu is the user is on a mobile device', () =>{
-      spyOn(deviceInfoService, 'isMobileDevice').and.returnValue(true);
-      spyOn(navigationService, 'closeSubmenu');
-
-      component.closeSubmenuIfNotMobile(new KeyboardEvent('mouseleave'));
-
-      expect(navigationService.closeSubmenu).not.toHaveBeenCalled();
-    });
-
-    it('should handle keydown events on menus', () => {
-      let keydownEvent = new KeyboardEvent('click', {
-        shiftKey: true,
-        keyCode: 9
-      });
-
-      expect(component.activeMenuName).toBe(undefined);
-
-      component.onMenuKeypress(keydownEvent, 'aboutMenu', {
-        shiftTab: 'open',
-      });
-
-      expect(component.activeMenuName).toBe('aboutMenu');
-    });
-
-    it('should toggle side bar', () => {
-      spyOn(sidebarStatusService, 'isSidebarShown').and.returnValues(false, true);
-      spyOn(wds, 'isWindowNarrow').and.returnValue(true);
-      expect(component.isSidebarShown()).toBe(false);
-
-      component.toggleSidebar();
-
-      expect(component.isSidebarShown()).toBe(true);
-    });
-
-    it('should navigate to classroom page when user clicks' +
-      ' on \'Basic Mathematics\'', fakeAsync(() => {
-      expect(mockWindowRef.nativeWindow.location.href).toBe('');
-
-      component.navigateToClassroomPage('/classroom/url');
-      tick(151);
-
-      expect(mockWindowRef.nativeWindow.location.href).toBe('/classroom/url');
-    }));
-
-    it('should registers classroom header click event when user clicks' +
-      ' on \'Basic Mathematics\'', () => {
-      spyOn(siteAnalyticsService, 'registerClassroomHeaderClickEvent');
-
-      component.navigateToClassroomPage('/classroom/url');
-
-      expect(siteAnalyticsService.registerClassroomHeaderClickEvent)
-        .toHaveBeenCalled();
-    });
-
-    it('should check if i18n has been run', () => {
-      spyOn(document, 'querySelectorAll')
-        .withArgs('.oppia-navbar-tab-content').and.returnValues(
-          [
-            {
-              // This throws "Type '{ innerText: string; }' is not assignable to
-              // type 'Element'.". We need to suppress this error because if i18n
-              // has not run, then the tabs will not have text content and so
-              // their innerText.length value will be 0.
-              // @ts-expect-error
-              innerText: ''
-            }
-          ],
-          [
-            {
-              innerText: 'About'
-            }
-          ]
-        );
-
-      expect(component.checkIfI18NCompleted()).toBe(false);
-      expect(component.checkIfI18NCompleted()).toBe(true);
-    });
-
-    it('should not truncate navbar if the window is narrow', () => {
-      // The truncateNavbar() function returns, as soon as the check for
-      // narrow window passes.
-      spyOn(wds, 'isWindowNarrow').and.returnValue(true);
-      spyOn(component, 'checkIfI18NCompleted');
-      spyOn(document, 'querySelector');
-
-      // We also, check if the subsequent function calls have been made or not,
-      // thus confirming that the returned 'undefined' value is because of
-      // narrow window.
-      expect(component.truncateNavbar()).toBe(undefined);
-      expect(component.checkIfI18NCompleted).not.toHaveBeenCalled();
+    fixture.whenStable().then(() => {
       expect(document.querySelector).not.toHaveBeenCalled();
     });
+  }));
 
-    it('should retry calling truncate navbar if i18n is not' +
-    ' complete', fakeAsync(() => {
-      spyOn(wds, 'isWindowNarrow').and.returnValues(false, true);
-      spyOn(document, 'querySelector').and.stub();
-
-      component.checkIfI18NCompleted = null;
-
-      component.truncateNavbar();
-      tick(101);
-
-      fixture.whenStable().then(() => {
-        expect(document.querySelector).not.toHaveBeenCalled();
+  it('should hide navbar if it\'s height more than 60px', fakeAsync(() => {
+    spyOn(wds, 'isWindowNarrow').and.returnValues(false, true);
+    spyOn(document, 'querySelector')
+    // This throws "Type '{ clientWidth: number; }' is missing the following
+    // properties from type 'Element': assignedSlot, attributes, classList,
+    // className, and 122 more.". We need to suppress this error because
+    // typescript expects around 120 more properties than just one
+    // (clientWidth). We need only one 'clientWidth' for
+    // testing purposes.
+    // @ts-expect-error
+      .withArgs('div.collapse.navbar-collapse').and.returnValue({
+        clientHeight: 61
       });
-    }));
 
-    it('should hide navbar if it\'s height more than 60px', fakeAsync(() => {
-      spyOn(wds, 'isWindowNarrow').and.returnValues(false, true);
-      spyOn(document, 'querySelector')
-      // This throws "Type '{ clientWidth: number; }' is missing the following
-      // properties from type 'Element': assignedSlot, attributes, classList,
-      // className, and 122 more.". We need to suppress this error because
-      // typescript expects around 120 more properties than just one
-      // (clientWidth). We need only one 'clientWidth' for
-      // testing purposes.
-      // @ts-expect-error
-        .withArgs('div.collapse.navbar-collapse').and.returnValue({
-          clientHeight: 61
-        });
+    component.navElementsVisibilityStatus = {
+      'I18N_TOPNAV_DONATE': true,
+      'I18N_TOPNAV_CLASSROOM': true,
+      'I18N_TOPNAV_ABOUT': true,
+      'I18N_CREATE_EXPLORATION_CREATE': true,
+      'I18N_TOPNAV_LIBRARY': true
+    };
 
-      component.navElementsVisibilityStatus = {
-        'I18N_TOPNAV_DONATE': true,
+    component.truncateNavbar();
+    tick(51);
+
+    fixture.whenStable().then(() => {
+      expect(component.navElementsVisibilityStatus).toEqual({
+        'I18N_TOPNAV_DONATE': false,
         'I18N_TOPNAV_CLASSROOM': true,
         'I18N_TOPNAV_ABOUT': true,
         'I18N_CREATE_EXPLORATION_CREATE': true,
         'I18N_TOPNAV_LIBRARY': true
-      };
-
-      component.truncateNavbar();
-      tick(51);
-
-      fixture.whenStable().then(() => {
-        expect(component.navElementsVisibilityStatus).toEqual({
-          'I18N_TOPNAV_DONATE': false,
-          'I18N_TOPNAV_CLASSROOM': true,
-          'I18N_TOPNAV_ABOUT': true,
-          'I18N_CREATE_EXPLORATION_CREATE': true,
-          'I18N_TOPNAV_LIBRARY': true
-        });
       });
-    }));
-  });
-}
+    });
+  }));
+});
