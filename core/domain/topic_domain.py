@@ -1282,8 +1282,8 @@ class Topic(python_utils.OBJECT):
             self.thumbnail_size_in_bytes = len(fs.get(filepath))
         else:
             raise Exception(
-                'The thumbnail %s for topic with id %s does not exist in the filesystem.'
-                % (new_thumbnail_filename, self.id))
+                'The thumbnail %s for topic with id %s does not exist'
+                ' in the filesystem.' % (new_thumbnail_filename, self.id))
 
     def update_thumbnail_bg_color(self, new_thumbnail_bg_color):
         """Updates the thumbnail background color of a topic object.

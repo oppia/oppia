@@ -24,7 +24,9 @@ import logging
 
 from constants import constants
 from core import jobs
-from core.domain import topic_domain, fs_services, fs_domain
+from core.domain import fs_domain
+from core.domain import fs_services
+from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.platform import models
@@ -126,23 +128,23 @@ class PopulateTopicThumbnailSizeOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             if fs.isfile(filepath):
                 item.thumbnail_size_in_bytes = len(fs.get(filepath))
                 item.put()
-                yield(
+                yield (
                     PopulateTopicThumbnailSizeOneOffJob._SUCCESS_KEY, 1)
             else:
                 yield (
-                    PopulateTopicThumbnailSizeOneOffJob._ERROR_KEY ,
+                    PopulateTopicThumbnailSizeOneOffJob._ERROR_KEY,
                     'Thumbnail %s for topic %s not found on the filesystem' % (
                         item.thumbnail_filename,
                         item.id
                     ))
         else:
-            # thumbnail_size_in_bytes is already updated
-            yield(
+            # The attribute thumbnail_size_in_bytes is already updated.
+            yield (
                 PopulateTopicThumbnailSizeOneOffJob._SUCCESS_KEY, 1)
 
     @staticmethod
     def reduce(key, values):
         if key == PopulateTopicThumbnailSizeOneOffJob._SUCCESS_KEY:
-            yield(key, len(values))
+            yield (key, len(values))
         else:
             yield (key, values)
