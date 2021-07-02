@@ -26,8 +26,7 @@ import { SkillDescriptionEditorComponent } from './skill-description-editor.comp
  * @fileoverview Unit tests for SkillDescriptionEditorComponent.
  */
 
-for(let i = 0; i < 200; i++) {
-fdescribe('Skill Description Editor Component', () => {
+describe('Skill Description Editor Component', () => {
   let component: SkillDescriptionEditorComponent;
   let fixture: ComponentFixture<SkillDescriptionEditorComponent>;
 
@@ -150,4 +149,4 @@ fdescribe('Skill Description Editor Component', () => {
     component.saveSkillDescription('-invalid-description-');
     expect(saveSkillDescriptionSpy).not.toHaveBeenCalled();
   });
-});}
+});

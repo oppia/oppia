@@ -27,8 +27,7 @@ import { Subscription } from 'rxjs';
 import { AlertsService } from 'services/alerts.service';
 import { CollectionEditorStateService } from './collection-editor-state.service';
 
-for(let i = 0; i < 200; i++) {
-fdescribe('Collection editor state service', () => {
+describe('Collection editor state service', () => {
   let collectionEditorStateService: CollectionEditorStateService = null;
   let collectionRightsBackendApiService:
     CollectionRightsBackendApiService = null;
@@ -310,4 +309,4 @@ fdescribe('Collection editor state service', () => {
 
     expect(result).toBe(false);
   });
-});}
+});
