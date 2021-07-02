@@ -2120,10 +2120,14 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
         }
 
         if len(added_state_names) > 0 or len(deleted_state_names) > 0:
-            # Here we will send the changelist, frontend_version,
-            # backend_version and exploration to the admin, so
-            # that the conditions can be reviewed and the changes
-            # can be done to handle those cases.
+            # In case of the addition and the deletion of the state,
+            # we are rejecting the mergebility because these cases
+            # change the flow of the exploration and are quite complex
+            # for now to handle. So in such cases, we are sending the
+            # changelist, frontend_version, backend_version and
+            # exploration id to the admin, so that we can look into the
+            # situations and can figure out the way if it’s possible to
+            # handle these cases.
             if feconf.CAN_SEND_EMAILS:
                 email_manager.send_mail_to_admin(
                     'Adding/Deleting State Changes not mergeable',
@@ -2166,8 +2170,9 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
                 if old_state_name in old_to_new_state_names:
                     # Here we will send the changelist, frontend_version,
                     # backend_version and exploration to the admin, so
-                    # that the conditions can be reviewed and the changes
-                    # can be done to handle those cases.
+                    # that the changes related to state renames can be
+                    # reviewed and the proper conditions can be written
+                    # to handle those cases.
                     if feconf.CAN_SEND_EMAILS:
                         email_manager.send_mail_to_admin(
                             'Adding/Deleting State Changes not mergeable',
@@ -2335,8 +2340,9 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
                 if old_state_name in old_to_new_state_names:
                     # Here we will send the changelist, frontend_version,
                     # backend_version and exploration to the admin, so
-                    # that the conditions can be reviewed and the changes
-                    # can be done to handle those cases.
+                    # that the changes related to state renames can be
+                    # reviewed and the proper conditions can be written
+                    # to handle those cases.
                     if feconf.CAN_SEND_EMAILS:
                         email_manager.send_mail_to_admin(
                             'Adding/Deleting State Changes not mergeable',
