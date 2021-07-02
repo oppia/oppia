@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,53 +17,32 @@
  * component.
  */
 
-import { DeviceInfoService } from 'services/contextual/device-info.service.ts';
-import { GuppyConfigurationService } from
-  'services/guppy-configuration.service.ts';
-import { GuppyInitializationService } from
-  'services/guppy-initialization.service.ts';
-import { MathInteractionsService } from 'services/math-interactions.service.ts';
-import { WindowRef } from 'services/contextual/window-ref.service.ts';
+import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
+import { DeviceInfoService } from 'services/contextual/device-info.service';
+import { GuppyInitializationService } from 'services/guppy-initialization.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
+import { InteractiveNumericExpressionInput } from './oppia-interactive-numeric-expression-input.component';
+import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-require(
-  'interactions/NumericExpressionInput/directives/' +
-  'numeric-expression-input-rules.service.ts');
-require(
-  'pages/exploration-player-page/services/current-interaction.service.ts');
-require(
-  'interactions/NumericExpressionInput/directives/' +
-  'oppia-interactive-numeric-expression-input.component.ts');
+describe('NumericExpressionInputInteractive', () => {
+  importAllAngularServices();
 
-describe('NumericExpressionInputInteractive', function() {
-  let ctrl = null, $window = null;
-  let mockCurrentInteractionService = {
-    onSubmit: function(answer, rulesService) {},
-    registerCurrentInteraction: function(submitAnswerFn, validateExpressionFn) {
-      submitAnswerFn();
-    }
-  };
-  let mockNumericExpressionInputRulesService = {};
-  let mockInteractionAttributesExtractorService = {
-    getValuesFromAttributes: function(interactionId, attrs) {
-      return {
-        placeholder: {
-          unicode: null
-        }
-      };
-    }
-  };
+  let component: InteractiveNumericExpressionInput;
+  let fixture: ComponentFixture<InteractiveNumericExpressionInput>;
+  let windowRef: WindowRef;
+  let guppyInitializationService: GuppyInitializationService;
+  let deviceInfoService: DeviceInfoService;
+  let mockCurrentInteractionService;
   let mockGuppyObject = {
+    divId: '1',
     guppyInstance: {
       asciimath: function() {
         return 'Dummy value';
       }
     }
   };
-  let guppyConfigurationService = null;
-  let mathInteractionsService = null;
-  let guppyInitializationService = null;
-  let deviceInfoService = null;
-
   class MockGuppy {
     constructor(id: string, config: Object) {}
 
@@ -79,72 +58,100 @@ describe('NumericExpressionInputInteractive', function() {
     static 'add_global_symbol'(name: string, symbol: Object): void {}
   }
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    guppyConfigurationService = new GuppyConfigurationService();
-    mathInteractionsService = new MathInteractionsService();
-    guppyInitializationService = new GuppyInitializationService();
-    deviceInfoService = new DeviceInfoService(new WindowRef());
+  class MockCurrentInteractionService {
+    onSubmit(answer, rulesService) {}
+    registerCurrentInteraction(submitAnswerFn, validateExpressionFn) {
+      submitAnswerFn();
+      validateExpressionFn();
+    }
+  }
 
-    $provide.value(
-      'CurrentInteractionService', mockCurrentInteractionService);
-    $provide.value(
-      'NumericExpressionInputRulesService',
-      mockNumericExpressionInputRulesService);
-    $provide.value(
-      'InteractionAttributesExtractorService',
-      mockInteractionAttributesExtractorService);
-    $provide.value('$attrs', 'placeholder');
-    $provide.value('GuppyConfigurationService', guppyConfigurationService);
-    $provide.value('MathInteractionsService', mathInteractionsService);
-    $provide.value('GuppyInitializationService', guppyInitializationService);
-  }));
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $window = $injector.get('$window');
-    ctrl = $componentController('oppiaInteractiveNumericExpressionInput');
-    $window.Guppy = MockGuppy;
+  class MockInteractionAttributesExtractorService {
+    getValuesFromAttributes(inputType: string, attributes: Object) {
+      return {
+        useFractionForDivision: {
+          value: {}
+        },
+        placeholder: {
+          value: {
+            unicode: '2^2'
+          }
+        }
+      };
+    }
+  }
+
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule(
+      {
+        declarations: [InteractiveNumericExpressionInput],
+        providers: [
+          {
+            provide: CurrentInteractionService,
+            useClass: MockCurrentInteractionService
+          },
+          {
+            provide: InteractionAttributesExtractorService,
+            useClass: MockInteractionAttributesExtractorService
+          }
+        ]
+      }).compileComponents();
   }));
 
-  it('should add the change handler to guppy', function() {
+  beforeEach(() => {
+    windowRef = TestBed.inject(WindowRef);
+    windowRef.nativeWindow.Guppy = MockGuppy;
+    guppyInitializationService = TestBed.inject(GuppyInitializationService);
+    mockCurrentInteractionService = TestBed.inject(CurrentInteractionService);
+    deviceInfoService = TestBed.inject(DeviceInfoService);
+    fixture = TestBed.createComponent(
+      InteractiveNumericExpressionInput);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should add the change handler to guppy', () => {
     spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
       mockGuppyObject);
-    ctrl.$onInit();
+    component.ngOnInit();
     expect(guppyInitializationService.findActiveGuppyObject).toHaveBeenCalled();
   });
 
   it('should not submit the answer if invalid', function() {
-    ctrl.hasBeenTouched = true;
+    component.hasBeenTouched = true;
     // Invalid answer.
-    ctrl.value = '1/';
-
+    component.value = '1/';
+    fixture.detectChanges();
     spyOn(mockCurrentInteractionService, 'onSubmit');
-    ctrl.submitAnswer();
+    component.submitAnswer();
     expect(mockCurrentInteractionService.onSubmit).not.toHaveBeenCalled();
-    expect(ctrl.warningText).toBe(
+    expect(component.warningText).toBe(
       'Your answer seems to be missing a variable/number after the "/".');
   });
 
   it('should submit the answer if valid', function() {
-    ctrl.hasBeenTouched = true;
-    ctrl.value = '1+1';
-
+    component.hasBeenTouched = true;
+    component.value = '1+1';
     spyOn(mockCurrentInteractionService, 'onSubmit');
-    ctrl.submitAnswer();
+    component.submitAnswer();
     expect(mockCurrentInteractionService.onSubmit).toHaveBeenCalled();
-    expect(ctrl.warningText).toBe('');
+    expect(component.warningText).toBe('');
   });
 
   it('should correctly validate current answer', function() {
     // This should be validated as true if the editor hasn't been touched.
-    ctrl.value = '';
-    expect(ctrl.isCurrentAnswerValid()).toBeTrue();
-    expect(ctrl.warningText).toBe('');
+    component.value = '';
+    fixture.detectChanges();
+    expect(component.isCurrentAnswerValid()).toBeTrue();
+    expect(component.warningText).toBe('');
 
-    ctrl.hasBeenTouched = true;
+    component.hasBeenTouched = true;
     // This should be validated as false if the editor has been touched.
-    ctrl.value = '';
-    expect(ctrl.isCurrentAnswerValid()).toBeFalse();
-    expect(ctrl.warningText).toBe('Please enter an answer before submitting.');
+    component.value = '';
+    fixture.detectChanges();
+    expect(component.isCurrentAnswerValid()).toBeFalse();
+    expect(
+      component.warningText).toBe('Please enter an answer before submitting.');
   });
 
   it('should set the value of showOSK to true', function() {
@@ -152,7 +159,7 @@ describe('NumericExpressionInputInteractive', function() {
     spyOn(deviceInfoService, 'hasTouchEvents').and.returnValue(true);
 
     expect(guppyInitializationService.getShowOSK()).toBeFalse();
-    ctrl.showOSK();
+    component.showOSK();
     expect(guppyInitializationService.getShowOSK()).toBeTrue();
   });
 });

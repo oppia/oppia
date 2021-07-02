@@ -27,7 +27,7 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { HtmlEscaperService } from 'services/html-escaper.service';
-import { ServicesConstants } from 'services/services.constants.ts';
+import { ServicesConstants } from 'services/services.constants';
 
 @Injectable({
   providedIn: 'root'

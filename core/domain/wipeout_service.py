@@ -18,6 +18,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
+import itertools
 import logging
 import re
 
@@ -35,22 +36,25 @@ from core.domain import wipeout_domain
 from core.platform import models
 import feconf
 import python_utils
+import utils
 
 (
-    app_feedback_report_models, base_models, collection_models, config_models,
-    exp_models, feedback_models, question_models,
-    skill_models, story_models, subtopic_models,
+    app_feedback_report_models, base_models, blog_models,
+    collection_models, config_models, exp_models, feedback_models,
+    question_models, skill_models, story_models, subtopic_models,
     suggestion_models, topic_models, user_models
 ) = models.Registry.import_models([
     models.NAMES.app_feedback_report, models.NAMES.base_model,
-    models.NAMES.collection, models.NAMES.config, models.NAMES.exploration,
-    models.NAMES.feedback, models.NAMES.question, models.NAMES.skill,
-    models.NAMES.story, models.NAMES.subtopic, models.NAMES.suggestion,
-    models.NAMES.topic, models.NAMES.user,
+    models.NAMES.blog, models.NAMES.collection, models.NAMES.config,
+    models.NAMES.exploration, models.NAMES.feedback, models.NAMES.question,
+    models.NAMES.skill, models.NAMES.story, models.NAMES.subtopic,
+    models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user,
 ])
 
 datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
+bulk_email_services = models.Registry.import_bulk_email_services()
+
 
 WIPEOUT_LOGS_PREFIX = '[WIPEOUT]'
 PERIOD_AFTER_WHICH_USERNAME_CANNOT_BE_REUSED = datetime.timedelta(weeks=1)
@@ -170,6 +174,8 @@ def pre_delete_user(user_id):
         # ordinary emails that could be sent to the users.
         user_services.update_email_preferences(
             user_id, False, False, False, False)
+        bulk_email_services.permanently_delete_user_from_list(
+            user_settings.email)
 
     date_now = datetime.datetime.utcnow()
     date_before_which_username_should_be_saved = (
@@ -343,6 +349,7 @@ def delete_user(pending_deletion_request):
             'topic_id',
             feconf.TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS,
             ('manager_ids',))
+        _pseudonymize_blog_post_models(pending_deletion_request)
     _delete_models(user_id, models.NAMES.email)
 
 
@@ -524,11 +531,11 @@ def _save_pseudonymizable_entity_mappings_to_same_pseudonym(
         ID.
     """
     if (
-            entity_category not in
+            entity_category.value not in
             pending_deletion_request.pseudonymizable_entity_mappings):
         pseudonymized_id = user_models.PseudonymizedUserModel.get_new_id('')
         pending_deletion_request.pseudonymizable_entity_mappings[
-            entity_category] = {
+            entity_category.value] = {
                 entity_id: pseudonymized_id for entity_id in entity_ids
             }
         save_pending_deletion_requests([pending_deletion_request])
@@ -549,10 +556,10 @@ def _save_pseudonymizable_entity_mappings_to_different_pseudonyms(
     # The pseudonymizable_entity_mappings field might have only been partially
     # generated, so we fill in the missing part for this entity category.
     if (
-            entity_category not in
+            entity_category.value not in
             pending_deletion_request.pseudonymizable_entity_mappings):
         pending_deletion_request.pseudonymizable_entity_mappings[
-            entity_category] = (
+            entity_category.value] = (
                 _generate_entity_to_pseudonymized_ids_mapping(entity_ids))
         save_pending_deletion_requests([pending_deletion_request])
 
@@ -688,7 +695,7 @@ def _pseudonymize_config_models(pending_deletion_request):
 
     config_ids_to_pids = (
         pending_deletion_request.pseudonymizable_entity_mappings[
-            models.NAMES.config])
+            models.NAMES.config.value])
     for config_id, pseudonymized_id in config_ids_to_pids.items():
         config_related_models = [
             model for model in snapshot_metadata_models
@@ -777,7 +784,7 @@ def _pseudonymize_activity_models_without_associated_rights_models(
 
     activity_ids_to_pids = (
         pending_deletion_request.pseudonymizable_entity_mappings[
-            activity_category])
+            activity_category.value])
     for activity_id, pseudonymized_id in activity_ids_to_pids.items():
         activity_related_models = [
             model for model in snapshot_metadata_models
@@ -949,7 +956,7 @@ def _pseudonymize_activity_models_with_associated_rights_models(
 
     activity_ids_to_pids = (
         pending_deletion_request.pseudonymizable_entity_mappings[
-            activity_category])
+            activity_category.value])
     for activity_id, pseudonymized_id in activity_ids_to_pids.items():
         activity_related_snapshot_metadata_models = [
             model for model in snapshot_metadata_models
@@ -1074,7 +1081,7 @@ def _pseudonymize_app_feedback_report_models(pending_deletion_request):
 
     report_ids_to_pids = (
         pending_deletion_request.pseudonymizable_entity_mappings[
-            models.NAMES.app_feedback_report])
+            models.NAMES.app_feedback_report.value])
 
     for i in python_utils.RANGE(
             0, len(feedback_report_models),
@@ -1174,7 +1181,7 @@ def _pseudonymize_feedback_models(pending_deletion_request):
 
     feedback_ids_to_pids = (
         pending_deletion_request.pseudonymizable_entity_mappings[
-            models.NAMES.feedback])
+            models.NAMES.feedback.value])
     for feedback_id, pseudonymized_id in feedback_ids_to_pids.items():
         feedback_related_models = [
             model for model in feedback_thread_models
@@ -1244,7 +1251,7 @@ def _pseudonymize_suggestion_models(pending_deletion_request):
 
     suggestion_ids_to_pids = (
         pending_deletion_request.pseudonymizable_entity_mappings[
-            models.NAMES.suggestion])
+            models.NAMES.suggestion.value])
     for i in python_utils.RANGE(
             0,
             len(voiceover_application_models),
@@ -1253,3 +1260,89 @@ def _pseudonymize_suggestion_models(pending_deletion_request):
             voiceover_application_models[
                 i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION]
         )
+
+
+def _pseudonymize_blog_post_models(pending_deletion_request):
+    """Pseudonymizes the blog post models for the user with user_id.
+       Also removes the user-id from the list of editor ids from the
+       blog post rights model.
+
+    Args:
+        pending_deletion_request: PendingDeletionRequest. The pending
+            deletion request object to be saved in the datastore.
+    """
+    user_id = pending_deletion_request.user_id
+
+    # We want to preserve the same pseudonymous user ID on all the models
+    # related to one blog post. So we collect all the users' blog
+    # post models and blog post summary models then
+    # we generate a pseudonymous user ID and replace the user ID
+    # with that pseudonymous user ID in all the models.
+    blog_post_model_class = blog_models.BlogPostModel
+    blog_post_models_list = blog_post_model_class.query(
+        blog_post_model_class.author_id == user_id
+    ).fetch()
+    blog_post_ids = {model.id for model in blog_post_models_list}
+
+    blog_post_summary_model_class = blog_models.BlogPostSummaryModel
+    blog_post_summary_models = blog_post_summary_model_class.query(
+        blog_post_summary_model_class.author_id == user_id
+    ).fetch()
+    blog_post_ids |= {model.id for model in blog_post_summary_models}
+
+    _save_pseudonymizable_entity_mappings_to_different_pseudonyms(
+        pending_deletion_request, models.NAMES.blog, blog_post_ids)
+
+    # We want to remove the user ID from the list of editor ids on all the
+    # blog post rights models related to the user.
+    blog_models.BlogPostRightsModel.deassign_user_from_all_blog_posts(user_id)
+
+    @transaction_services.run_in_transaction_wrapper
+    def _pseudonymize_models_transactional(
+            blog_posts_related_models, pseudonymized_id):
+        """Pseudonymize user ID fields in the models.
+
+        This function is run in a transaction, with the maximum number of
+        blog_posts_related_models being MAX_NUMBER_OF_OPS_IN_TRANSACTION.
+
+        Args:
+            blog_posts_related_models: list(BaseModel). Models whose user IDs
+                should be pseudonymized.
+            pseudonymized_id: str. New pseudonymized user ID to be used for
+                the models.
+        """
+        blog_post_models_list = [
+            model for model in blog_posts_related_models
+            if isinstance(model, blog_post_model_class)]
+        for blog_post_model in blog_post_models_list:
+            if blog_post_model.author_id == user_id:
+                blog_post_model.author_id = pseudonymized_id
+            blog_post_model.update_timestamps()
+
+        blog_post_summary_models_list = [
+            model for model in blog_posts_related_models
+            if isinstance(model, blog_post_summary_model_class)]
+        for blog_post_summary in blog_post_summary_models_list:
+            if blog_post_summary.author_id == user_id:
+                blog_post_summary.author_id = pseudonymized_id
+            blog_post_summary.update_timestamps()
+
+        datastore_services.put_multi(
+            blog_post_models_list + blog_post_summary_models_list)
+
+    blog_post_ids_to_pids = (
+        pending_deletion_request.pseudonymizable_entity_mappings[
+            models.NAMES.blog.value])
+    for blog_post_id, pseudonymized_id in blog_post_ids_to_pids.items():
+        blog_posts_related_models = [
+            model for model in itertools.chain(
+                blog_post_models_list, blog_post_summary_models)
+            if model.id == blog_post_id
+        ]
+        transaction_slices = utils.grouper(
+            blog_posts_related_models,
+            feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION)
+        for transaction_slice in transaction_slices:
+            _pseudonymize_models_transactional(
+                [m for m in transaction_slice if m is not None],
+                pseudonymized_id)

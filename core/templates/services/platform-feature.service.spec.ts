@@ -339,14 +339,16 @@ describe('PlatformFeatureService', () => {
   });
 
   describe('platformFeatureInitFactory', () => {
-    let factoryFn: (service: PlatformFeatureService) => () => Promise<void>;
+    let factoryFn = (service: PlatformFeatureService) => {
+      return async(): Promise<void> => service.initialize();
+    };
 
     beforeEach(() => {
       factoryFn = platformFeatureInitFactory;
       platformFeatureService = TestBed.get(PlatformFeatureService);
     });
 
-    it('should return a function that calls initialize', () => {
+    it('should return a function that calls initialize', async() => {
       const mockPromise = Promise.resolve(null);
       const spy = spyOn(platformFeatureService, 'initialize')
         .and.returnValue(mockPromise);
@@ -355,7 +357,7 @@ describe('PlatformFeatureService', () => {
       const returnedPromise = returnedFn();
 
       expect(spy).toHaveBeenCalled();
-      expect(returnedPromise).toBe(mockPromise);
+      await expectAsync(returnedPromise).toBeResolvedTo(null);
     });
   });
 });

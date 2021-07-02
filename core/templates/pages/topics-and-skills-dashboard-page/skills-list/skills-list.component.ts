@@ -26,7 +26,7 @@ import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
 import { SkillSummary } from 'domain/skill/skill-summary.model';
 import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service';
-import { TopicSummary } from 'domain/topic/topic-summary.model';
+import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { Subscription } from 'rxjs';
@@ -36,8 +36,8 @@ import { DeleteSkillModalComponent } from '../modals/delete-skill-modal.componen
 import { TopicAssignmentsSummary, UnassignSkillFromTopicsModalComponent } from '../modals/unassign-skill-from-topics-modal.component';
 
 export interface SkillsCategorizedByTopics {
-  [key: string]: {
-    [key: string]: ShortSkillSummary[]
+  [topicName: string]: {
+    [subtopicName: string]: ShortSkillSummary[]
   }
 }
 
@@ -54,7 +54,7 @@ export class SkillsListComponent {
   @Input() skillSummaries: AugmentedSkillSummary[];
   @Input() pageNumber: number;
   @Input() itemsPerPage: number;
-  @Input() editableTopicSummaries: TopicSummary[];
+  @Input() editableTopicSummaries: CreatorTopicSummary[];
   @Input() mergeableSkillSummaries: SkillSummary[];
   @Input() untriagedSkillSummaries: SkillSummary[];
   @Input() userCanDeleteSkill: boolean;
@@ -77,7 +77,7 @@ export class SkillsListComponent {
   ) {}
 
   getSkillEditorUrl(skillId: string): string {
-    let SKILL_EDITOR_URL_TEMPLATE: string = '/skill_editor/<skill_id>';
+    let SKILL_EDITOR_URL_TEMPLATE: string = '/skill_editor/<skill_id>#/';
     return this.urlInterpolationService.interpolateUrl(
       SKILL_EDITOR_URL_TEMPLATE, {
         skill_id: skillId
@@ -95,7 +95,7 @@ export class SkillsListComponent {
     modalRef.componentInstance.skillId = skillId;
 
     modalRef.result.then(() => {
-      this.skillBackendApiService.deleteSkill(skillId).then(
+      this.skillBackendApiService.deleteSkillAsync(skillId).then(
         () => {
           setTimeout(() => {
             this.topicsAndSkillsDashboardBackendApiService.
@@ -104,7 +104,7 @@ export class SkillsListComponent {
             this.alertsService.addSuccessMessage(successToast, 1000);
           }, 100);
         }
-      )['catch']((errorMessage: string) => {
+      ).catch((errorMessage: string) => {
         let errorToast: string = null;
         // This error is thrown as part of a final validation check in
         // the backend, hence the message does not include instructions
@@ -153,7 +153,7 @@ export class SkillsListComponent {
             uncategorized_skill_id: skillId
           });
 
-          this.editableTopicBackendApiService.updateTopic(
+          this.editableTopicBackendApiService.updateTopicAsync(
             topicsToUnassign[topic].topicId,
             topicsToUnassign[topic].topicVersion,
             `Unassigned skill with id ${skillId} from the topic.`,
@@ -178,8 +178,9 @@ export class SkillsListComponent {
 
   assignSkillToTopic(skill: AugmentedSkillSummary): void {
     let skillId: string = skill.id;
-    let topicSummaries: TopicSummary[] = this.editableTopicSummaries.filter(
-      topicSummary => !skill.topicNames.includes(topicSummary.name));
+    let topicSummaries: CreatorTopicSummary[] = (
+      this.editableTopicSummaries.filter(
+        topicSummary => !skill.topicNames.includes(topicSummary.name)));
     let modalRef: NgbModalRef = this.ngbModal
       .open(AssignSkillToTopicModalComponent, {
         backdrop: 'static',
@@ -191,11 +192,11 @@ export class SkillsListComponent {
         cmd: 'add_uncategorized_skill_id',
         new_uncategorized_skill_id: skillId
       }];
-      let topicSummaries: TopicSummary[] = this.editableTopicSummaries;
+      let topicSummaries: CreatorTopicSummary[] = this.editableTopicSummaries;
       for (let i = 0; i < topicIds.length; i++) {
         for (let j = 0; j < topicSummaries.length; j++) {
           if (topicSummaries[j].id === topicIds[i]) {
-            this.editableTopicBackendApiService.updateTopic(
+            this.editableTopicBackendApiService.updateTopicAsync(
               topicIds[i], topicSummaries[j].version,
               'Added skill with id ' + skillId + ' to topic.',
               changeList
@@ -249,7 +250,7 @@ export class SkillsListComponent {
         // that the merged skills are not shown anymore.
         setTimeout(() => {
           this.topicsAndSkillsDashboardBackendApiService.
-            onTopicsAndSkillsDashboardReinitialized.emit();
+            onTopicsAndSkillsDashboardReinitialized.emit(true);
           let successToast: string = 'Merged Skills.';
           this.alertsService.addSuccessMessage(successToast, 1000);
         }, 100);

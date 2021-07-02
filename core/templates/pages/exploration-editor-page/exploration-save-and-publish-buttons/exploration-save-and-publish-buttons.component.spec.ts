@@ -49,13 +49,16 @@ import { ExplorationImprovementsTaskRegistryService } from
 import { ExplorationStatsService } from 'services/exploration-stats.service';
 import { ReadOnlyExplorationBackendApiService } from
   'domain/exploration/read-only-exploration-backend-api.service';
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { ChangeListService } from '../services/change-list.service';
+import { ExplorationChange } from 'domain/exploration/exploration-draft.model';
 
 describe('Exploration save and publish buttons component', function() {
   var ctrl = null;
   var $q = null;
   var $scope = null;
-  var changeListService = null;
+  let changeListService: ChangeListService = null;
+  var $uibModal = null;
   var contextService = null;
   var explorationRightsService = null;
   var explorationSaveService = null;
@@ -71,9 +74,13 @@ describe('Exploration save and publish buttons component', function() {
 
   beforeEach(function() {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
+      providers: [
+        ChangeListService
+      ]
     });
 
+    changeListService = TestBed.inject(ChangeListService);
     contextService = TestBed.get(ContextService);
     spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
     editabilityService = TestBed.get(EditabilityService);
@@ -117,6 +124,7 @@ describe('Exploration save and publish buttons component', function() {
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $q = $injector.get('$q');
     var $rootScope = $injector.get('$rootScope');
+    $uibModal = $injector.get('$uibModal');
     changeListService = $injector.get('ChangeListService');
     explorationRightsService = $injector.get('ExplorationRightsService');
     explorationSaveService = $injector.get('ExplorationSaveService');
@@ -142,6 +150,7 @@ describe('Exploration save and publish buttons component', function() {
     $scope = $rootScope.$new();
     ctrl = $componentController('explorationSaveAndPublishButtons', {
       $scope: $scope,
+      $uibModal: $uibModal,
       EditabilityService: editabilityService,
       UserExplorationPermissionsService: userExplorationPermissionsService
     });
@@ -240,7 +249,8 @@ describe('Exploration save and publish buttons component', function() {
   });
 
   it('should count changes made in an exploration', function() {
-    spyOn(changeListService, 'getChangeList').and.returnValue([{}, {}]);
+    spyOn(changeListService, 'getChangeList').and.returnValue(
+      [{}, {}] as ExplorationChange[]);
     expect($scope.getChangeListLength()).toBe(2);
   });
 
@@ -306,5 +316,70 @@ describe('Exploration save and publish buttons component', function() {
     ctrl.$onDestroy();
 
     expect(ctrl.directiveSubscriptions.unsubscribe).toHaveBeenCalled();
+  });
+
+  it('should open a exploration save prompt modal', function() {
+    spyOn(changeListService, 'getChangeList').and.returnValue(new Array(51));
+    spyOn($uibModal, 'open').and.returnValue({
+      result: $q.resolve()
+    });
+    spyOn($scope, 'saveChanges');
+    $scope.saveIsInProcess = false;
+
+    $scope.getChangeListLength();
+    $scope.$apply();
+
+    expect($uibModal.open).toHaveBeenCalled();
+    expect($scope.saveChanges).toHaveBeenCalled();
+  });
+
+  it('should open a exploration save prompt modal only once',
+    function() {
+      spyOn(changeListService, 'getChangeList').and.returnValue(new Array(51));
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.reject()
+      });
+      spyOn($scope, 'saveChanges');
+      $scope.saveIsInProcess = false;
+
+      $scope.getChangeListLength();
+      $scope.$apply();
+      expect($uibModal.open).toHaveBeenCalledTimes(1);
+      expect($scope.saveChanges).not.toHaveBeenCalled();
+      $scope.getChangeListLength();
+      $scope.$apply();
+
+      expect($uibModal.open).toHaveBeenCalledTimes(1);
+      expect($scope.saveChanges).not.toHaveBeenCalled();
+    });
+
+  it('should open a confirmation modal with rejection', function() {
+    spyOn(changeListService, 'getChangeList').and.returnValue(new Array(51));
+    spyOn($uibModal, 'open').and.returnValue({
+      result: $q.reject()
+    });
+    spyOn($scope, 'saveChanges');
+    $scope.saveIsInProcess = false;
+
+    $scope.getChangeListLength();
+    $scope.$apply();
+
+    expect($uibModal.open).toHaveBeenCalled();
+    expect($scope.saveChanges).not.toHaveBeenCalled();
+  });
+
+  it('should open a confirmation modal when save is in progress', function() {
+    spyOn(changeListService, 'getChangeList').and.returnValue(new Array(51));
+    spyOn($uibModal, 'open').and.returnValue({
+      result: $q.reject()
+    });
+    spyOn($scope, 'saveChanges');
+    $scope.saveIsInProcess = true;
+
+    $scope.getChangeListLength();
+    $scope.$apply();
+
+    expect($uibModal.open).not.toHaveBeenCalled();
+    expect($scope.saveChanges).not.toHaveBeenCalled();
   });
 });

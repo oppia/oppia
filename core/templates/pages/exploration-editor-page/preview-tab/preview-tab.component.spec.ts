@@ -23,7 +23,7 @@ import { EventEmitter } from '@angular/core';
 
 // TODO(#7222): Remove usage of importAllAngularServices once upgraded to
 // Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 describe('Preview Tab Component', function() {
   importAllAngularServices();
@@ -72,7 +72,7 @@ describe('Preview Tab Component', function() {
 
   beforeEach(angular.mock.module(function($provide) {
     $provide.value('ExplorationDataService', {
-      getData: () => $q.resolve()
+      getDataAsync: () => $q.resolve()
     });
   }));
 
@@ -99,7 +99,8 @@ describe('Preview Tab Component', function() {
         stateName);
       spyOn(parameterMetadataService, 'getUnsetParametersInfo').and
         .returnValue(parameters);
-      spyOn(editableExplorationBackendApiService, 'fetchApplyDraftExploration')
+      spyOn(
+        editableExplorationBackendApiService, 'fetchApplyDraftExplorationAsync')
         .and.returnValue($q.resolve(exploration));
       spyOnProperty(
         explorationEngineService,
@@ -229,7 +230,8 @@ describe('Preview Tab Component', function() {
         stateName);
       spyOn(parameterMetadataService, 'getUnsetParametersInfo')
         .and.returnValue([]);
-      spyOn(editableExplorationBackendApiService, 'fetchApplyDraftExploration')
+      spyOn(
+        editableExplorationBackendApiService, 'fetchApplyDraftExplorationAsync')
         .and.returnValue($q.resolve(exploration));
 
       // Mock init just to call the callback directly.

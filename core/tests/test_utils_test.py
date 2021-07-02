@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
 import os
+import re
 
 from constants import constants
 from core import jobs
@@ -596,7 +597,8 @@ class TestUtilsTests(test_utils.GenericTestBase):
         getcwd_swap = self.swap_with_checks(os, 'getcwd', mock_getcwd)
 
         with self.assertRaisesRegexp(
-            ValueError, r'Exception raised from getcwd\(\)'):
+            ValueError, re.escape('Exception raised from getcwd()')
+        ):
             with getcwd_swap:
                 SwapWithCheckTestClass.getcwd_function_without_args()
 

@@ -52,10 +52,6 @@ INVALID_CSS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid.css')
 FILE_IN_EXCLUDED_PATH = os.path.join(
     'core', 'tests', 'build_sources', 'assets', 'constants.js')
 EXTRA_JS_FILEPATH = os.path.join('core', 'templates', 'demo.js')
-INVALID_EXPLORE_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_explore.js')
-INVALID_PAUSE_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_pause.js')
-INVALID_WAIT_FOR_ANGULAR_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_wait_for_angular.js')
 INVALID_INJECT_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_inject.ts')
 INVALID_INNER_HTML_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_innerhtml.ts')
@@ -77,8 +73,10 @@ INVALID_ESLINT_ANY_TYPE_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_eslint_any_type.ts')
 INVALID_BROADCAST_USE_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_broadcast_use.ts')
-INVALID_LODASH_IMPORT_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_lodash_import.ts')
+INVALID_LODASH_GENERAL_IMPORT_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_lodash_general_import.ts')
+INVALID_LODASH_SPECIFIC_IMPORT_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_lodash_specific_import.ts')
 INVALID_HTTP_CLIENT_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_http_client_used.ts')
 
@@ -160,36 +158,6 @@ class HTMLLintTests(test_utils.LinterTestBase):
 
 class JsTsLintTests(test_utils.LinterTestBase):
     """Test the JsTs lint functions."""
-
-    def test_invalid_use_of_browser_explore(self):
-        linter = general_purpose_linter.GeneralPurposeLinter(
-            [INVALID_EXPLORE_FILEPATH], FILE_CACHE)
-        lint_task_report = linter.check_bad_patterns()
-        self.assert_same_list_elements(
-            ['Line 30: In tests, please do not use browser.explore().'],
-            lint_task_report.trimmed_messages)
-        self.assertEqual('Bad pattern', lint_task_report.name)
-        self.assertTrue(lint_task_report.failed)
-
-    def test_invalid_use_of_browser_pause(self):
-        linter = general_purpose_linter.GeneralPurposeLinter(
-            [INVALID_PAUSE_FILEPATH], FILE_CACHE)
-        lint_task_report = linter.check_bad_patterns()
-        self.assert_same_list_elements(
-            ['Line 30: In tests, please do not use browser.pause().'],
-            lint_task_report.trimmed_messages)
-        self.assertEqual('Bad pattern', lint_task_report.name)
-        self.assertTrue(lint_task_report.failed)
-
-    def test_invalid_use_of_browser_wait_for_angular(self):
-        linter = general_purpose_linter.GeneralPurposeLinter(
-            [INVALID_WAIT_FOR_ANGULAR_FILEPATH], FILE_CACHE)
-        lint_task_report = linter.check_bad_patterns()
-        self.assert_same_list_elements([
-            'Line 30: In tests, please do not use '
-            'browser.waitForAngular().'], lint_task_report.trimmed_messages)
-        self.assertEqual('Bad pattern', lint_task_report.name)
-        self.assertTrue(lint_task_report.failed)
 
     def test_invalid_use_of_inject(self):
         linter = general_purpose_linter.GeneralPurposeLinter(
@@ -306,15 +274,29 @@ class JsTsLintTests(test_utils.LinterTestBase):
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
-    def test_invalid_lodash_import(self):
+    def test_invalid_lodash_general_import(self):
         linter = general_purpose_linter.GeneralPurposeLinter(
-            [INVALID_LODASH_IMPORT_FILEPATH], FILE_CACHE)
+            [INVALID_LODASH_GENERAL_IMPORT_FILEPATH], FILE_CACHE)
         lint_task_report = linter.check_bad_patterns()
         self.assert_same_list_elements(
             [
-                'Line 20: Please do not use "import { someFunction } '
-                'from \'lodash\'". Use "import someFunction '
-                'from \'lodash/someFunction\'" instead.',
+                'Line 20: Please do not use "import { someFunction } from '
+                '\'lodash\'" and "import _ from \'lodash\'". Use '
+                '"import someFunction from \'lodash/someFunction\'" instead.',
+            ],
+            lint_task_report.trimmed_messages)
+        self.assertEqual('Bad pattern', lint_task_report.name)
+        self.assertTrue(lint_task_report.failed)
+
+    def test_invalid_lodash_speicfic_import(self):
+        linter = general_purpose_linter.GeneralPurposeLinter(
+            [INVALID_LODASH_SPECIFIC_IMPORT_FILEPATH], FILE_CACHE)
+        lint_task_report = linter.check_bad_patterns()
+        self.assert_same_list_elements(
+            [
+                'Line 20: Please do not use "import { someFunction } from '
+                '\'lodash\'" and "import _ from \'lodash\'". Use '
+                '"import someFunction from \'lodash/someFunction\'" instead.',
             ],
             lint_task_report.trimmed_messages)
         self.assertEqual('Bad pattern', lint_task_report.name)

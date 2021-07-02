@@ -26,7 +26,8 @@ import { GraphVizComponent } from './directives/graph-viz.component';
 import { InteractiveGraphInput } from './directives/oppia-interactive-graph-input.component';
 import { ResponseGraphInput } from './directives/oppia-response-graph-input.component';
 import { ShortResponseGraphInput } from './directives/oppia-short-response-graph-input.component';
-import { TranslateModule } from 'filters/translate.module';
+import { SharedPipesModule } from 'filters/shared-pipes.module';
+import { TranslateModule } from '@ngx-translate/core';
 import { MaterialModule } from 'components/material.module';
 import { DirectivesModule } from 'directives/directives.module';
 
@@ -37,6 +38,7 @@ import { DirectivesModule } from 'directives/directives.module';
     FormsModule,
     MaterialModule,
     DirectivesModule,
+    SharedPipesModule,
     TranslateModule
   ],
   declarations: [

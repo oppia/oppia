@@ -130,6 +130,7 @@
         <p class="sort-by-text" translate="I18N_DASHBOARD_EXPLORATIONS_SORT_BY">Sort By</p>
         <select ng-model="$ctrl.currentSortType"
                 class="sort-options"
+                aria-label="Sort Type"
                 ng-change="$ctrl.setExplorationsSortingOptions($ctrl.currentSortType)"
                 ng-options="$ctrl.EXPLORATIONS_SORT_BY_KEYS[key] as value | translate for (key, value) in $ctrl.HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS">
         </select>
@@ -218,6 +219,7 @@
           <div class="title-section"
                ng-style="{'background-color': exploration.thumbnailBgColor}">
             <img class="thumbnail-image"
+                 alt=""
                  ng-src="<[$ctrl.getCompleteThumbnailIconUrl(exploration.thumbnailIconUrl)]>">
             <h2 class="activity-title protractor-test-exp-summary-tile-title">
               <span><[(exploration.title || $ctrl.DEFAULT_EMPTY_TITLE) | truncate:40]></span>
@@ -229,6 +231,7 @@
         </a>
         <div ng-attr-section="'<['right-section']>">
           <a ng-class="$ctrl.checkMobileView() ? 'oppia-dashboard-mobile-statistics-card-link': 'oppia-dashboard-statistics-card-link'"
+             aria-label="Dashboard Statistics"
              ng-href="<[$ctrl.getExplorationUrl(exploration.id)]>">
           </a>
           <div class="exp-private-text" ng-if="exploration.status === 'private'">
@@ -724,7 +727,7 @@
     text-decoration: none;
   }
   .oppia-dashboard-container .exp-private-text {
-    color: #aaa;
+    color: #757575;
     font-style: italic;
   }
   .oppia-card-view-wrap {

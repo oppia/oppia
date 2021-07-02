@@ -23,6 +23,7 @@ import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed, waitForAsync } f
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
 import { CkEditorCopyContentService } from 'components/ck-editor-helpers/ck-editor-copy-content-service';
+import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { TranslationModalComponent, TranslationOpportunity } from 'pages/contributor-dashboard-page/modal-templates/translation-modal.component';
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import { ContextService } from 'services/context.service';
@@ -71,6 +72,8 @@ describe('Translation Modal Component', () => {
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
+    OppiaAngularRootComponent.contextService = TestBed.inject(ContextService);
+    contextService = OppiaAngularRootComponent.contextService;
   }));
 
   beforeEach(() => {
@@ -79,7 +82,6 @@ describe('Translation Modal Component', () => {
     component.opportunity = opportunity;
     httpTestingController = TestBed.inject(HttpTestingController);
     ckEditorCopyContentService = TestBed.inject(CkEditorCopyContentService);
-    contextService = TestBed.inject(ContextService);
     activeModal = TestBed.inject(NgbActiveModal);
     translateTextService = TestBed.inject(TranslateTextService);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
@@ -143,13 +145,15 @@ describe('Translation Modal Component', () => {
     });
 
     it('should set context correctly', fakeAsync(() => {
+      contextService.removeCustomEntityContext();
+      contextService.resetImageSaveDestination();
       spyOn(translateTextService, 'init').and.callFake(
         (expId, languageCode, successCallback) => successCallback());
       component.ngOnInit();
       expect(contextService.getEntityType()).toBe(
         AppConstants.ENTITY_TYPE.EXPLORATION);
       expect(contextService.getEntityId()).toBe('1');
-      expect(contextService.imageSaveDestination).toBe(
+      expect(contextService.getImageSaveDestination()).toBe(
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
     }));
 
@@ -185,7 +189,11 @@ describe('Translation Modal Component', () => {
       expect(translateTextService.getPreviousTextToTranslate)
         .toHaveBeenCalled();
       expect(component.textToTranslate).toBe('text1');
-      expect(component.moreAvailable).toBeFalse();
+      // The value of moreAvailable will be set to true when the operation
+      // is viewing a previous translation. If the value is false, the
+      // 'save and close' button is shown. This should happen only on the
+      // last translation.
+      expect(component.moreAvailable).toBeTrue();
     }));
 
     it('should set the schema constant based on the active language', fakeAsync(
@@ -200,26 +208,44 @@ describe('Translation Modal Component', () => {
   });
 
   describe('when clicking on the translatable content', () => {
-    let target: HTMLElement;
+    const nonParagraphTarget: HTMLElement = document.createElement('div');
+    const mathTarget: HTMLElement = document.createElement(
+      'oppia-noninteractive-math');
+    let paragraphTarget: HTMLElement;
     let broadcastSpy: jasmine.Spy<(target: HTMLElement) => void>;
     let propagationSpy: jasmine.Spy<() => void>;
     beforeEach(fakeAsync(() => {
+      paragraphTarget = document.createElement('p');
       spyOn(translateTextService, 'init').and.callFake(
         (expId, languageCode, successCallback) => successCallback());
       broadcastSpy = spyOn(
         ckEditorCopyContentService, 'broadcastCopy').and.stub();
 
       component.ngOnInit();
-      target = document.createElement('div');
-      target.onclick = function(this, ev) {
+      nonParagraphTarget.onclick = function(this, ev) {
+        propagationSpy = spyOn(ev, 'stopPropagation').and.stub();
+        component.onContentClick(ev);
+      };
+      paragraphTarget.onclick = function(this, ev) {
         propagationSpy = spyOn(ev, 'stopPropagation').and.stub();
         component.onContentClick(ev);
       };
     }));
 
-    it('should broadcast the clicked element', () => {
-      target.click();
-      expect(broadcastSpy).toHaveBeenCalledWith(target);
+    it('should not broadcast the clicked paragraph element', () => {
+      paragraphTarget.click();
+      expect(broadcastSpy).not.toHaveBeenCalledWith(paragraphTarget);
+    });
+
+    it('should broadcast the clicked non paragraph element', () => {
+      nonParagraphTarget.click();
+      expect(broadcastSpy).toHaveBeenCalledWith(nonParagraphTarget);
+    });
+
+    it('should broadcast the clicked math element', () => {
+      paragraphTarget.append(mathTarget);
+      paragraphTarget.click();
+      expect(broadcastSpy).toHaveBeenCalledWith(paragraphTarget);
     });
 
     describe('when copy mode is active', () => {
@@ -228,14 +254,14 @@ describe('Translation Modal Component', () => {
       });
 
       it('should prevent default behavior', () => {
-        target.click();
+        nonParagraphTarget.click();
         expect(propagationSpy).toHaveBeenCalled();
       });
     });
 
     describe('when copy mode is inactive', () => {
       it('should not prevent default behavior', () => {
-        target.click();
+        nonParagraphTarget.click();
         expect(propagationSpy).not.toHaveBeenCalled();
       });
     });
@@ -280,12 +306,13 @@ describe('Translation Modal Component', () => {
         target_id: '1',
         target_version_at_submission: 1,
         change: {
-          cmd: 'add_translation',
+          cmd: 'add_written_translation',
           content_id: 'contentId1',
           state_name: 'stateName1',
           language_code: 'es',
           content_html: 'text1',
-          translation_html: 'texto1'
+          translation_html: 'texto1',
+          data_format: 'html'
         }
       };
       component.ngOnInit();
@@ -306,6 +333,21 @@ describe('Translation Modal Component', () => {
       component.activeWrittenTranslation.html = 'texto1';
     }));
 
+    it('should remove paragraph error', fakeAsync(() => {
+      component.hadCopyParagraphError = true;
+
+      component.suggestTranslatedText();
+
+      const req = httpTestingController.expectOne(
+        '/suggestionhandler/');
+      expect(component.hadCopyParagraphError).toEqual(false);
+      expect(req.request.method).toEqual('POST');
+      expect(req.request.body.getAll('payload')[0]).toEqual(
+        JSON.stringify(expectedPayload));
+      req.flush({});
+      flushMicrotasks();
+    }));
+
     it('should correctly submit a translation suggestion', fakeAsync(() => {
       component.suggestTranslatedText();
 
@@ -316,6 +358,23 @@ describe('Translation Modal Component', () => {
         JSON.stringify(expectedPayload));
       req.flush({});
       flushMicrotasks();
+    }));
+
+    it('should correctly submit a translation suggestion', fakeAsync(() => {
+      spyOn(
+        translateTextService,
+        'getPreviousTextToTranslate'
+      ).and.returnValue({
+        text: 'abc',
+        more: true,
+        status: 'submitted',
+        translationHtml: 'cba'
+      });
+      expect(component.isSubmitted()).toBeFalse();
+
+      component.returnToPreviousTranslation();
+
+      expect(component.isSubmitted()).toBeTrue();
     }));
 
     describe('when already uploading a translation', () => {
@@ -350,6 +409,93 @@ describe('Translation Modal Component', () => {
       });
     });
 
+    describe('when all images are not copied', () => {
+      it('should not submit the translation', () => {
+        component.textToTranslate = '<oppia-noninteractive-image alt-with-val' +
+          'ue="&amp;quot;Image description&amp;quot;" caption-with-value="&' +
+          'amp;quot;Image caption&amp;quot;" filepath-with-value="&amp;quot;' +
+          'img_20210129_210552_zbv0mdty94_height_54_width_490.png&amp;quot;">' +
+          '</oppia-noninteractive-image>';
+        component.activeWrittenTranslation.html = '';
+        spyOn(translateTextService, 'suggestTranslatedText').and.callThrough();
+
+        component.suggestTranslatedText();
+
+        expect(translateTextService.suggestTranslatedText)
+          .toHaveBeenCalledTimes(0);
+      });
+    });
+
+    describe('when alt text is not changed in copied images', () => {
+      it('should not submit the translation', () => {
+        component.textToTranslate = '<oppia-noninteractive-image alt-with-' +
+          'value="&amp;quot;Image description&amp;quot;" caption-with-value=' +
+          '"&amp;quot;Image caption&amp;quot;" filepath-with-value="&amp;quot' +
+          ';img_20210129_210552_zbv0mdty94_height_54_width_490.png&amp;quot;"' +
+          '></oppia-noninteractive-image>';
+        component.activeWrittenTranslation.html = '<oppia-noninteractive-' +
+          'image alt-with-value="&amp;quot;Image description&amp;quot;' +
+          '" caption-with-value="&amp;quot;New caption&amp;quot;"' +
+          ' filepath-with-value="&amp;quot;img_20210129_210552_zbv0mdty94' +
+          '_height_54_width_490.png&amp;quot;"></oppia-noninteractive-image>';
+        spyOn(translateTextService, 'suggestTranslatedText').and.callThrough();
+
+        component.suggestTranslatedText();
+
+        expect(translateTextService.suggestTranslatedText)
+          .toHaveBeenCalledTimes(0);
+      });
+    });
+
+    describe('when caption is not changed in copied images', () => {
+      it('should not submit the translation', () => {
+        component.textToTranslate = '<oppia-noninteractive-image alt-with-' +
+          'value="&amp;quot;Image description&amp;quot;" caption-with-value=' +
+          '"&amp;quot;Image caption&amp;quot;" filepath-with-value="&amp;quot' +
+          ';img_20210129_210552_zbv0mdty94_height_54_width_490.png&amp;quot;"' +
+          '></oppia-noninteractive-image>';
+        component.activeWrittenTranslation.html = '<oppia-noninteractive' +
+          '-image alt-with-value="&amp;quot;New description&amp;quot;"' +
+          ' caption-with-value="&amp;quot;Image caption&amp;quot;"' +
+          ' filepath-with-value="&amp;quot:img_20210129_210552_zbv0mdty9' +
+          '4_height_54_width_490.png&amp;quot;"></oppia-noninteractive-image>';
+        spyOn(translateTextService, 'suggestTranslatedText').and.callThrough();
+
+        component.suggestTranslatedText();
+
+        expect(translateTextService.suggestTranslatedText)
+          .toHaveBeenCalledTimes(0);
+      });
+    });
+
+    describe('when translation is not completed', () => {
+      it('should not submit the translation', () => {
+        component.textToTranslate = '<p>First para</p><p>Second para</p>';
+        component.activeWrittenTranslation.html = '<p>New First para</p>';
+        spyOn(translateTextService, 'suggestTranslatedText').and.callThrough();
+
+        component.suggestTranslatedText();
+
+        expect(translateTextService.suggestTranslatedText)
+          .toHaveBeenCalledTimes(0);
+      });
+    });
+
+    describe('when translation elements are not matching with the elements ' +
+        'of the text to translate', () => {
+      it('should not submit the translation', () => {
+        component.textToTranslate = '<p>First para</p><p>Second para</p>';
+        component.activeWrittenTranslation.html = '<p>New First para</p><div>' +
+          '</div>';
+        spyOn(translateTextService, 'suggestTranslatedText').and.callThrough();
+
+        component.suggestTranslatedText();
+
+        expect(translateTextService.suggestTranslatedText)
+          .toHaveBeenCalledTimes(0);
+      });
+    });
+
     describe('when suggesting the last available text', () => {
       beforeEach(() => {
         expectedPayload = {
@@ -359,12 +505,13 @@ describe('Translation Modal Component', () => {
           target_id: '1',
           target_version_at_submission: 1,
           change: {
-            cmd: 'add_translation',
+            cmd: 'add_written_translation',
             content_id: 'contentId2',
             state_name: 'stateName2',
             language_code: 'es',
             content_html: 'text2',
-            translation_html: 'texto2'
+            translation_html: 'texto2',
+            data_format: 'html'
           }
         };
         component.skipActiveTranslation();
@@ -428,13 +575,31 @@ describe('Translation Modal Component', () => {
         flushMicrotasks();
       }));
 
-    it('should reset the image save destination', () => {
+    it('should not reset the image save destination', () => {
       spyOn(translateTextService, 'suggestTranslatedText').and.stub();
-      expect(contextService.imageSaveDestination).toBe(
+      expect(contextService.getImageSaveDestination()).toBe(
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
       component.suggestTranslatedText();
-      expect(contextService.imageSaveDestination).toBe(
-        AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
+      expect(contextService.getImageSaveDestination()).toBe(
+        AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
     });
+
+    it('should reset the image save destination', fakeAsync(() => {
+      component.suggestTranslatedText();
+      const req = httpTestingController.expectOne(
+        '/suggestionhandler/');
+      expect(req.request.method).toEqual('POST');
+      expect(req.request.body.getAll('payload')[0]).toEqual(
+        JSON.stringify(expectedPayload));
+      req.flush({
+        error: 'Error'
+      }, {
+        status: 500, statusText: 'Internal Server Error'
+      });
+      flushMicrotasks();
+      component.suggestTranslatedText();
+      expect(contextService.getImageSaveDestination()).toBe(
+        AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
+    }));
   });
 });

@@ -110,6 +110,11 @@ export class SiteAnalyticsService {
     this._sendEventToGoogleAnalytics(
       'GoToDonationSite', 'click', donationSiteName);
   }
+  registerCreateLessonButtonEvent(): void {
+    this._sendEventToGoogleAnalytics(
+      'CreateLessonButton', 'click',
+      this.windowRef.nativeWindow.location.pathname);
+  }
   registerApplyToTeachWithOppiaEvent(): void {
     this._sendEventToGoogleAnalytics('ApplyToTeachWithOppia', 'click', '');
   }
@@ -298,17 +303,27 @@ export class SiteAnalyticsService {
       'PlayerFinishExploration', 'engage', explorationId);
   }
 
-  registerCuratedLessonCompleted(explorationId: string): void {
+  registerCuratedLessonStarted(
+      topicName: string, explorationId: string): void {
     this._sendEventToGoogleAnalytics(
-      'CuratedLessonCompleted', 'engage', explorationId);
+      'CuratedLessonStarted', `start ${topicName}`, explorationId);
   }
 
-  registerClassroomLessonActiveUse(): void {
+  registerCuratedLessonCompleted(
+      topicName: string, explorationId: string): void {
     this._sendEventToGoogleAnalytics(
-      'ClassroomActiveUserStartAndSawCards', 'engage', '');
+      'CuratedLessonCompleted', `start ${topicName}`, explorationId);
   }
 
-  registerClassoomHeaderClickEvent(): void {
+  registerClassroomLessonActiveUse(
+      topicName: string, explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      'ClassroomActiveUserStartAndSawCards',
+      `start ${topicName}`,
+      explorationId);
+  }
+
+  registerClassroomHeaderClickEvent(): void {
     this._sendEventToGoogleAnalytics(
       'ClassroomEngagement', 'click', 'ClickOnClassroom');
   }

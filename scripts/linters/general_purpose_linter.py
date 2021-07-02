@@ -39,11 +39,12 @@ EXCLUDED_PATHS = (
     'core/tests/build_sources/*', '*.mp3', '*.mp4', 'node_modules/*',
     'typings/*', 'local_compiled_js/*', 'webpack_bundles/*',
     'core/tests/services_sources/*', 'core/tests/release_sources/tmp_unzip.zip',
-    'scripts/linters/test_files/*', 'proto/*',
+    'scripts/linters/test_files/*', 'proto_files/*',
     'core/tests/release_sources/tmp_unzip.tar.gz',
     'core/templates/combined-tests.spec.ts',
     'core/templates/css/oppia-material.css',
     'core/templates/google-analytics.initializer.ts',
+    'extensions/classifiers/proto/*',
     '%s/*' % js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH)
 
 GENERATED_FILE_PATHS = (
@@ -112,26 +113,8 @@ BAD_PATTERNS_REGEXP = [
 
 BAD_PATTERNS_JS_AND_TS_REGEXP = [
     {
-        'regexp': re.compile(r'\b(browser.explore)\('),
-        'message': 'In tests, please do not use browser.explore().',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'\b(browser.pause)\('),
-        'message': 'In tests, please do not use browser.pause().',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'\b(browser.waitForAngular)\('),
-        'message': 'In tests, please do not use browser.waitForAngular().',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'bypass'),
-        'message': 'The use of the word "bypass" is not allowed, ' +
+        'regexp': re.compile(r'bypassSecurity'),
+        'message': 'The use of the word "bypassSecurity" is not allowed, ' +
                    'particularly with regards to bypassSecurityTrustHTML() ' +
                    'and similar functions in Angular.',
         'excluded_files': (
@@ -216,10 +199,11 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             'core/templates/filters/translate.pipe.spec.ts',
             'core/templates/components/ck-editor-helpers/' +
             'ck-editor-copy-content-service.spec.ts',
-            'core/templates/tests/unit-test-utils.ts',
+            'core/templates/tests/unit-test-utils.ajs.ts',
             'core/templates/directives/mathjax.directive.ts',
             'extensions/objects/templates/' +
-            'math-expression-content-editor.component.ts'),
+            'math-expression-content-editor.component.ts',
+            'rte-output-display.component.spec.ts'),
         'excluded_dirs': ('core/tests/',)
     },
     {
@@ -258,10 +242,11 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'excluded_dirs': ()
     },
     {
-        'regexp': re.compile(r'import \{.*\} from \'lodash\''),
+        'regexp': re.compile(r'import (\{.*\}|\_) from \'lodash\''),
         'message': (
-            'Please do not use "import { someFunction } from \'lodash\'". '
-            'Use "import someFunction from \'lodash/someFunction\'" instead.'),
+            'Please do not use "import { someFunction } from \'lodash\'" and '
+            '"import _ from \'lodash\'". Use "import someFunction from '
+            '\'lodash/someFunction\'" instead.'),
         'excluded_files': (),
         'excluded_dirs': ()
     },
@@ -273,6 +258,8 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             'api services.'),
         'excluded_files': (
             'backend-api.service.ts',
+            'core/templates/pages/translate-loader.factory.ts',
+            'translate-loader.factory.spec.ts',
             'core/templates/services/auth-interceptor.service.spec.ts',
             'core/templates/services/request-interceptor.service.spec.ts',),
         'excluded_dirs': ()

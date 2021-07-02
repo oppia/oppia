@@ -21,13 +21,9 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import argparse
-import atexit
-import os
-import re
-import subprocess
+import contextlib
 import time
 
-from constants import constants
 
 from . import install_third_party_libs
 # This installs third party libraries before importing other files or importing
@@ -36,8 +32,9 @@ install_third_party_libs.main()
 
 from . import build # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import common # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from . import servers # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
-import feconf # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from constants import constants # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 import python_utils # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 
@@ -58,11 +55,10 @@ _PARSER.add_argument(
     action='store_true')
 _PARSER.add_argument(
     '--disable_host_checking',
-    help=(
-        'optional; if specified, disables host checking so that the dev '
-        'server can be accessed by any device on the same network using the '
-        'host device\'s IP address. DO NOT use this flag if you\'re running '
-        'on an untrusted network.'),
+    help='optional; if specified, disables host checking so that the dev '
+         'server can be accessed by any device on the same network using the '
+         'host device\'s IP address. DO NOT use this flag if you\'re running '
+         'on an untrusted network.',
     action='store_true')
 _PARSER.add_argument(
     '--prod_env',
@@ -78,145 +74,128 @@ _PARSER.add_argument(
     action='store_true')
 _PARSER.add_argument(
     '--no_auto_restart',
-    help=(
-        'optional; if specified, does not automatically restart when files are '
-        'changed.'),
+    help='optional; if specified, does not automatically restart when files '
+         'are changed.',
     action='store_true')
 _PARSER.add_argument(
     '--source_maps',
-    help=(
-        'optional; if specified, build webpack with source maps.'),
+    help='optional; if specified, build webpack with source maps.',
     action='store_true')
 
 PORT_NUMBER_FOR_GAE_SERVER = 8181
 
 
-def cleanup():
-    """Wait for the servers to go down and set constants back to default
-    values.
+@contextlib.contextmanager
+def alert_on_exit():
+    """Context manager that alerts developers to wait for a graceful shutdown.
+
+    Yields:
+        None. Nothing.
     """
-    common.print_each_string_after_two_new_lines([
-        'INFORMATION',
-        'Cleaning up the servers.'])
-    while common.is_port_in_use(PORT_NUMBER_FOR_GAE_SERVER):
-        time.sleep(1)
-    build.set_constants_to_default()
-    common.stop_redis_server()
+    try:
+        yield
+    finally:
+        python_utils.PRINT(
+            '\n\n'
+            # ANSI escape sequence for bright yellow text color.
+            '\033[93m'
+            # ANSI escape sequence for bold font.
+            '\033[1m'
+            'Servers are shutting down, please wait for them to end gracefully!'
+            # ANSI escape sequence for resetting formatting.
+            '\033[0m'
+            '\n\n')
+        # Give developers an opportunity to read the alert.
+        time.sleep(5)
+
+
+def notify_about_successful_shutdown():
+    """Notifies developers that the servers have shutdown gracefully."""
+    python_utils.PRINT(
+        '\n\n'
+        # ANSI escape sequence for bright green text color.
+        '\033[92m'
+        # ANSI escape sequence for bold font.
+        '\033[1m'
+        # The notification.
+        'Done! Thank you for waiting.'
+        # ANSI escape sequence for resetting formatting.
+        '\033[0m'
+        '\n\n')
 
 
 def main(args=None):
     """Starts up a development server running Oppia."""
     parsed_args = _PARSER.parse_args(args=args)
 
-    # Runs cleanup function on exit.
-    atexit.register(cleanup)
-
-    # Check that there isn't a server already running.
     if common.is_port_in_use(PORT_NUMBER_FOR_GAE_SERVER):
         common.print_each_string_after_two_new_lines([
             'WARNING',
-            'Could not start new server. There is already an existing server',
-            'running at port %s.'
-            % python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER)])
+            'Could not start new server. There is already an existing server '
+            'running at port %s.' % PORT_NUMBER_FOR_GAE_SERVER,
+        ])
 
-    build_args = ['--prod_env'] if parsed_args.prod_env else []
-    if parsed_args.maintenance_mode:
-        build_args.append('--maintenance_mode')
-    if parsed_args.source_maps:
-        build_args.append('--source_maps')
-    build.main(args=build_args)
-    app_yaml_filepath = 'app.yaml' if parsed_args.prod_env else 'app_dev.yaml'
+    # NOTE: The ordering of alert_on_exit() is important because we want the
+    # alert to be printed _before_ the ExitStack unwinds, hence its placement as
+    # the "latter" context (context managers exit in reverse-order).
+    with python_utils.ExitStack() as stack, alert_on_exit():
+        # ExitStack unwinds in reverse-order, so this will be the final action.
+        stack.callback(notify_about_successful_shutdown)
 
-    # Set up a local dev instance.
-    # TODO(sll): Do this in a new shell.
-    # To turn emailing on, add the option '--enable_sendmail=yes' and change the
-    # relevant settings in feconf.py. Be careful with this -- you do not want to
-    # spam people accidentally.
-    background_processes = []
-    if not parsed_args.prod_env:
-        # In prod mode webpack is launched through scripts/build.py
-        python_utils.PRINT('Compiling webpack...')
-        webpack_config_file = (
-            build.WEBPACK_DEV_SOURCE_MAPS_CONFIG if parsed_args.source_maps
-            else build.WEBPACK_DEV_CONFIG)
-        background_processes.append(subprocess.Popen([
-            common.NODE_BIN_PATH,
-            os.path.join(
-                common.NODE_MODULES_PATH, 'webpack', 'bin', 'webpack.js'),
-            '--config', webpack_config_file, '--watch']))
+        build_args = []
+        if parsed_args.prod_env:
+            build_args.append('--prod_env')
+        if parsed_args.maintenance_mode:
+            build_args.append('--maintenance_mode')
+        if parsed_args.source_maps:
+            build_args.append('--source_maps')
+        build.main(args=build_args)
+        stack.callback(build.set_constants_to_default)
 
-        # Give webpack few seconds to do the initial compilation.
-        time.sleep(10)
+        stack.enter_context(servers.managed_redis_server())
+        stack.enter_context(servers.managed_elasticsearch_dev_server())
 
-    common.start_redis_server()
-
-    # TODO(#11549): Move this to top of the file.
-    import contextlib2
-    managed_dev_appserver = common.managed_dev_appserver(
-        app_yaml_filepath, clear_datastore=not parsed_args.save_datastore,
-        enable_console=parsed_args.enable_console,
-        enable_host_checking=not parsed_args.disable_host_checking,
-        automatic_restart=not parsed_args.no_auto_restart,
-        skip_sdk_update_check=True, port=PORT_NUMBER_FOR_GAE_SERVER)
-
-    with contextlib2.ExitStack() as stack:
-        python_utils.PRINT('Starting ElasticSearch development server.')
-        stack.enter_context(common.managed_elasticsearch_dev_server())
         if constants.EMULATOR_MODE:
-            python_utils.PRINT('Starting Firebase emulators')
-            stack.enter_context(common.managed_firebase_auth_emulator())
-        python_utils.PRINT('Starting GAE development server')
-        stack.enter_context(managed_dev_appserver)
+            stack.enter_context(servers.managed_firebase_auth_emulator(
+                recover_users=parsed_args.save_datastore))
 
-        # Wait for the servers to come up.
-        common.wait_for_port_to_be_in_use(PORT_NUMBER_FOR_GAE_SERVER)
-        common.wait_for_port_to_be_in_use(feconf.ES_LOCALHOST_PORT)
+        # NOTE: When prod_env=True the Webpack compiler is run by build.main().
+        if not parsed_args.prod_env:
+            stack.enter_context(servers.managed_webpack_compiler(
+                use_prod_env=False, use_source_maps=parsed_args.source_maps,
+                watch_mode=True))
 
-        # Launch a browser window.
-        if common.is_linux_os() and not parsed_args.no_browser:
-            detect_virtualbox_pattern = re.compile('.*VBOX.*')
-            if list(filter(
-                    detect_virtualbox_pattern.match,
-                    os.listdir('/dev/disk/by-id/'))):
-                common.print_each_string_after_two_new_lines([
-                    'INFORMATION',
-                    'Setting up a local development server. You can access '
-                    'this server',
-                    'by navigating to localhost:%s in a browser window.'
-                    % python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER)])
-            else:
-                common.print_each_string_after_two_new_lines([
-                    'INFORMATION',
-                    'Setting up a local development server at localhost:%s. '
-                    % python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER),
-                    'Opening a default browser window pointing to this server'])
-                time.sleep(5)
-                background_processes.append(
-                    subprocess.Popen([
-                        'xdg-open', 'http://localhost:%s/'
-                        % python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER)]))
-        elif common.is_mac_os() and not parsed_args.no_browser:
+        app_yaml_path = 'app.yaml' if parsed_args.prod_env else 'app_dev.yaml'
+        dev_appserver = stack.enter_context(servers.managed_dev_appserver(
+            app_yaml_path,
+            clear_datastore=not parsed_args.save_datastore,
+            enable_console=parsed_args.enable_console,
+            enable_host_checking=not parsed_args.disable_host_checking,
+            automatic_restart=not parsed_args.no_auto_restart,
+            skip_sdk_update_check=True,
+            port=PORT_NUMBER_FOR_GAE_SERVER))
+
+        managed_web_browser = (
+            None if parsed_args.no_browser else
+            servers.create_managed_web_browser(PORT_NUMBER_FOR_GAE_SERVER))
+
+        if managed_web_browser is None:
             common.print_each_string_after_two_new_lines([
                 'INFORMATION',
-                'Setting up a local development server at localhost:%s. '
-                % python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER),
-                'Opening a default browser window pointing to this server.'])
-            time.sleep(5)
-            background_processes.append(
-                subprocess.Popen([
-                    'open', 'http://localhost:%s/'
-                    % python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER)]))
+                'Local development server is ready! You can access it by '
+                'navigating to http://localhost:%s/ in a web '
+                'browser.' % PORT_NUMBER_FOR_GAE_SERVER,
+            ])
         else:
             common.print_each_string_after_two_new_lines([
                 'INFORMATION',
-                'Setting up a local development server. You can access this ',
-                'server by navigating to localhost:%s in a browser window.'
-                % python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER)])
+                'Local development server is ready! Opening a default web '
+                'browser window pointing to it: '
+                'http://localhost:%s/' % PORT_NUMBER_FOR_GAE_SERVER,
+            ])
+            stack.enter_context(managed_web_browser)
 
-        python_utils.PRINT('Done!')
-
-        for process in background_processes:
-            process.wait()
+        dev_appserver.wait()
 
 
 if __name__ == '__main__':

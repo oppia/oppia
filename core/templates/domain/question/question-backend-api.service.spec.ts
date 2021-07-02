@@ -20,7 +20,7 @@ import { HttpClientTestingModule, HttpTestingController } from
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { QuestionBackendApiService } from
-  'domain/question/question-backend-api.service.ts';
+  'domain/question/question-backend-api.service';
 
 describe('Question backend Api service', () => {
   let questionBackendApiService = null;
@@ -92,7 +92,7 @@ describe('Question backend Api service', () => {
           question_content: ''
         }
       }],
-      next_start_cursor: null
+      more: false
     };
   });
 
@@ -321,7 +321,7 @@ describe('Question backend Api service', () => {
       questionBackendApiService.fetchQuestionSummariesAsync(
         '1').then(successHandler, failHandler);
       let req = httpTestingController.expectOne(
-        '/questions_list_handler/1?cursor=');
+        '/questions_list_handler/1?offset=0');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleResponse);
 
@@ -329,7 +329,7 @@ describe('Question backend Api service', () => {
 
       expect(successHandler).toHaveBeenCalledWith({
         questionSummaries: sampleResponse.question_summary_dicts,
-        nextCursor: null
+        more: false
       });
       expect(failHandler).not.toHaveBeenCalled();
     })
@@ -343,7 +343,7 @@ describe('Question backend Api service', () => {
       questionBackendApiService.fetchQuestionSummariesAsync(
         '1').then(successHandler, failHandler);
       let req = httpTestingController.expectOne(
-        '/questions_list_handler/1?cursor=');
+        '/questions_list_handler/1?offset=0');
       expect(req.request.method).toEqual('GET');
       req.flush({
         error: 'Error loading questions.'
@@ -364,9 +364,9 @@ describe('Question backend Api service', () => {
       let failHandler = jasmine.createSpy('fail');
 
       questionBackendApiService.fetchQuestionSummariesAsync(
-        '1', '1').then(successHandler, failHandler);
+        '1', 1).then(successHandler, failHandler);
       let req = httpTestingController.expectOne(
-        '/questions_list_handler/1?cursor=1');
+        '/questions_list_handler/1?offset=1');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleResponse);
 
@@ -374,7 +374,7 @@ describe('Question backend Api service', () => {
 
       expect(successHandler).toHaveBeenCalledWith({
         questionSummaries: sampleResponse.question_summary_dicts,
-        nextCursor: null
+        more: false
       });
       expect(failHandler).not.toHaveBeenCalled();
     })

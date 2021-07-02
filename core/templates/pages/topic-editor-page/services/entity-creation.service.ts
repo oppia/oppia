@@ -18,7 +18,7 @@
  * an entity.
  */
 
-require('base-components/base-content.directive.ts');
+require('base-components/base-content.component.ts');
 require(
   'components/common-layout-directives/common-elements/' +
     'background-banner.component.ts');
@@ -27,10 +27,10 @@ require(
 require(
   'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
 require('components/entity-creation-services/skill-creation.service.ts');
-require('components/rubrics-editor/rubrics-editor.directive.ts');
+require('components/rubrics-editor/rubrics-editor.component.ts');
 require(
   'pages/topics-and-skills-dashboard-page/' +
-  'create-new-skill-modal.controller.ts');
+  'create-new-skill-modal.component.ts');
 require('pages/topic-editor-page/services/topic-editor-routing.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require(
@@ -38,13 +38,14 @@ require(
   'create-new-subtopic-modal.controller.ts');
 require('services/context.service.ts');
 require('services/image-local-storage.service.ts');
+require('pages/topic-editor-page/services/create-new-skill-modal.service');
 
 angular.module('oppia').factory('EntityCreationService', [
-  '$uibModal', 'SkillCreationService',
+  '$uibModal', 'CreateNewSkillModalService',
   'TopicEditorRoutingService', 'TopicEditorStateService',
   'UrlInterpolationService',
   function(
-      $uibModal, SkillCreationService,
+      $uibModal, CreateNewSkillModalService,
       TopicEditorRoutingService, TopicEditorStateService,
       UrlInterpolationService) {
     var createSubtopic = function(topic) {
@@ -70,7 +71,7 @@ angular.module('oppia').factory('EntityCreationService', [
 
     var createSkill = function() {
       var topicId = TopicEditorStateService.getTopic().getId();
-      SkillCreationService.createNewSkill([topicId]);
+      CreateNewSkillModalService.createNewSkill([topicId]);
     };
 
     return {

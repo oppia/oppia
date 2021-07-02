@@ -20,7 +20,7 @@ import { HttpClientTestingModule, HttpTestingController } from
 import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
 
 import { LearnerAnswerDetailsBackendApiService } from
-  'domain/statistics/learner-answer-details-backend-api.service.ts';
+  'domain/statistics/learner-answer-details-backend-api.service';
 
 describe('Learner answer info backend Api service', () => {
   let httpTestingController: HttpTestingController;

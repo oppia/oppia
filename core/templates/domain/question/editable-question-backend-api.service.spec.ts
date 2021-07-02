@@ -19,10 +19,10 @@
 import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { EditableQuestionBackendApiService} from 'domain/question/editable-question-backend-api.service';
-import { CsrfTokenService } from 'services/csrf-token.service.ts';
+import { CsrfTokenService } from 'services/csrf-token.service';
 
 describe('Editable question backend API service', function() {
   let editableQuestionBackendApiService: EditableQuestionBackendApiService;
@@ -45,7 +45,7 @@ describe('Editable question backend API service', function() {
     questionObjectFactory = TestBed.get(QuestionObjectFactory);
     httpTestingController = TestBed.get(HttpTestingController);
     csrfService = TestBed.get(CsrfTokenService);
-    spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
+    spyOn(csrfService, 'getTokenAsync').and.callFake(async() => {
       return Promise.resolve('sample-csrf-token');
     });
     // Sample question object returnable from the backend.
@@ -133,7 +133,7 @@ describe('Editable question backend API service', function() {
     let skillDifficulties = [1, 1, 2];
     let questionObject = sampleDataResultsObjects.questionObject;
 
-    editableQuestionBackendApiService.createQuestion(
+    editableQuestionBackendApiService.createQuestionAsync(
       skillsId, skillDifficulties, questionObject, [imageData]).then(
       successHandler, failHandler);
     var req = httpTestingController.expectOne(
@@ -161,7 +161,7 @@ describe('Editable question backend API service', function() {
         imageBlob: imageBlob
       };
 
-      editableQuestionBackendApiService.createQuestion(
+      editableQuestionBackendApiService.createQuestionAsync(
         skillsId, skillDifficulties, questionObject, [imageData]).then(
         successHandler, failHandler);
       var req = httpTestingController.expectOne(
@@ -182,7 +182,7 @@ describe('Editable question backend API service', function() {
     fakeAsync(()=> {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
-      editableQuestionBackendApiService.fetchQuestion('0').then(
+      editableQuestionBackendApiService.fetchQuestionAsync('0').then(
         successHandler, failHandler);
       var req = httpTestingController.expectOne(
         '/question_editor_handler/data/0');
@@ -205,7 +205,7 @@ describe('Editable question backend API service', function() {
     fakeAsync(()=> {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
-      editableQuestionBackendApiService.fetchQuestion('1').then(
+      editableQuestionBackendApiService.fetchQuestionAsync('1').then(
         successHandler, failHandler);
       var req = httpTestingController.expectOne(
         '/question_editor_handler/data/1');
@@ -227,7 +227,7 @@ describe('Editable question backend API service', function() {
       let question = null;
 
       // Loading a question the first time should fetch it from the backend.
-      editableQuestionBackendApiService.fetchQuestion('0').then(
+      editableQuestionBackendApiService.fetchQuestionAsync('0').then(
         data => {
           question = data.questionObject.toBackendDict(false);
         });
@@ -247,7 +247,7 @@ describe('Editable question backend API service', function() {
       };
 
       // Send a request to update question.
-      editableQuestionBackendApiService.updateQuestion(
+      editableQuestionBackendApiService.updateQuestionAsync(
         question.id, question.version, 'Question Data is updated', []
       ).then(successHandler, failHandler);
       req = httpTestingController.expectOne(
@@ -264,7 +264,7 @@ describe('Editable question backend API service', function() {
      'doesn\'t exist', fakeAsync(()=> {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
-    editableQuestionBackendApiService.updateQuestion(
+    editableQuestionBackendApiService.updateQuestionAsync(
       '1', '1', 'Update an invalid question.', []
     ).then(successHandler, failHandler);
 
@@ -287,7 +287,7 @@ describe('Editable question backend API service', function() {
     let questionId = '0';
     let skillIdsTaskArray = ['1', '2', 1];
 
-    editableQuestionBackendApiService.editQuestionSkillLinks(
+    editableQuestionBackendApiService.editQuestionSkillLinksAsync(
       questionId, skillIdsTaskArray).then(
       successHandler, failHandler);
     let req = httpTestingController.expectOne(
@@ -308,7 +308,7 @@ describe('Editable question backend API service', function() {
     let questionId = '0';
     let skillIdsTaskArray = ['1', '2', 1];
 
-    editableQuestionBackendApiService.editQuestionSkillLinks(
+    editableQuestionBackendApiService.editQuestionSkillLinksAsync(
       questionId, skillIdsTaskArray).then(
       successHandler, failHandler);
     let req = httpTestingController.expectOne(

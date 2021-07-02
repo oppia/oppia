@@ -20,9 +20,9 @@ import 'core-js/es7/reflect';
 import 'zone.js';
 
 angular.module('oppia', [
-  require('angular-cookies'), 'headroom', 'ngAnimate',
+  require('angular-cookies'), 'ngAnimate',
   'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap'
+  'ui.bootstrap'
 ]);
 
 require('Polyfills.ts');
@@ -33,6 +33,6 @@ require('pages/preferences-page/preferences-page.module.ts');
 require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
-require('pages/OppiaFooterDirective.ts');
+require('base-components/oppia-footer.component.ts');
 
 require('pages/preferences-page/preferences-page.component.ts');

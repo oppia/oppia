@@ -38,7 +38,7 @@ import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { ReadOnlyExplorationBackendApiService } from
   'domain/exploration/read-only-exploration-backend-api.service';
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 describe('Training Panel Component', function() {
   importAllAngularServices();
@@ -101,6 +101,7 @@ describe('Training Panel Component', function() {
         }
       }
     },
+    linked_skill_id: null,
     next_content_id_index: 1,
     param_changes: [],
     recorded_voiceovers: {

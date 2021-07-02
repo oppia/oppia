@@ -62,6 +62,11 @@
                            show-mark-all-audio-as-needing-update-modal-if-required="showMarkAllAudioAsNeedingUpdateModalIfRequired">
     </state-solution-editor>
   </div>
+  <div ng-if="explorationIsLinkedToStory">
+    <state-skill-editor (on-save-state-content)="onSaveStateContent($event)"
+                        (on-save-linked-skill-id)="onSaveLinkedSkillId($event)">
+    </state-skill-editor>
+  </div>
 </div>
 <style>
   state-editor .state-content-header-container {

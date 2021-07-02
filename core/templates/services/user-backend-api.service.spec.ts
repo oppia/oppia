@@ -20,29 +20,30 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
 
-import { UserInfo } from 'domain/user/user-info.model.ts';
+import { UserInfo } from 'domain/user/user-info.model';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { UserBackendApiService } from 'services/user-backend-api.service';
 
 describe('User Backend Api Service', () => {
-  let userBackendApiService: UserBackendApiService = null;
-  let urlInterpolationService: UrlInterpolationService = null;
-  let httpTestingController: HttpTestingController = null;
-  let csrfService: CsrfTokenService = null;
+  let userBackendApiService: UserBackendApiService;
+  let urlInterpolationService: UrlInterpolationService;
+  let httpTestingController: HttpTestingController;
+  let csrfService: CsrfTokenService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
     });
-    httpTestingController = TestBed.get(HttpTestingController);
-    userBackendApiService = TestBed.get(UserBackendApiService);
-    urlInterpolationService = TestBed.get(UrlInterpolationService);
-    csrfService = TestBed.get(CsrfTokenService);
+    httpTestingController = TestBed.inject(HttpTestingController);
+    userBackendApiService = TestBed.inject(UserBackendApiService);
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
+    csrfService = TestBed.inject(CsrfTokenService);
+
 
     spyOn(csrfService, 'getTokenAsync').and.callFake(
-      () => {
+      async() => {
         return new Promise((resolve, reject) => {
           resolve('sample-csrf-token');
         });
@@ -178,5 +179,23 @@ describe('User Backend Api Service', () => {
     req.flush(sampleUserContributionRightsDict);
 
     flushMicrotasks();
+  }));
+
+  it('should update preferred site langauge', fakeAsync(() => {
+    let siteLanguageUrl = '/save_site_language';
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+
+    userBackendApiService.updatePreferredSiteLanguageAsync('en')
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(siteLanguageUrl);
+    expect(req.request.method).toEqual('PUT');
+    req.flush({});
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
   }));
 });

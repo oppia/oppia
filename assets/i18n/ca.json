@@ -22,7 +22,6 @@
 	"I18N_ABOUT_PAGE_FOUNDATION_TAB_GET_INVOLVED_BUTTON": "Impliqueu-vos-hi",
 	"I18N_ABOUT_PAGE_FOUNDATION_TAB_HEADING": "La Fundació Oppia",
 	"I18N_ABOUT_PAGE_FOUNDATION_TAB_PARAGRAPH_4_HEADING": "Directors",
-	"I18N_ABOUT_PAGE_FOUNDATION_TAB_PARAGRAPH_5_LICENSE_HEADING": "Llicència",
 	"I18N_ABOUT_PAGE_HEADING": "Oppia: Educació per a tothom",
 	"I18N_ABOUT_PAGE_LEARN_BUTTON": "Vull aprendre",
 	"I18N_ABOUT_PAGE_SPEECH_BUBBLE": "Què voleu fer avui?",
@@ -132,6 +131,7 @@
 	"I18N_LIBRARY_LOADING": "S’està carregant",
 	"I18N_LIBRARY_VIEWS_TOOLTIP": "Visualitzacions",
 	"I18N_LIBRARY_VIEW_ALL": "Mostra-ho tot",
+	"I18N_LICENSE_PAGE_LICENSE_HEADING": "Llicència",
 	"I18N_MODAL_CONTINUE_BUTTON": "Continua",
 	"I18N_PLAYER_AUDIO_EXPAND_TEXT": "Escolta a la lliçó",
 	"I18N_PLAYER_EDIT_TOOLTIP": "Modifica",
@@ -184,7 +184,6 @@
 	"I18N_TOPNAV_LIBRARY": "Biblioteca",
 	"I18N_TOPNAV_LOGOUT": "Finalitza la sessió",
 	"I18N_TOPNAV_MODERATOR_PAGE": "Pàgina de moderació",
-	"I18N_TOPNAV_NOTIFICATIONS": "Notificacions",
 	"I18N_TOPNAV_PREFERENCES": "Preferències",
 	"I18N_TOPNAV_SIGN_IN": "Inicia una sessió",
 	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Ensenyament amb l’Oppia"

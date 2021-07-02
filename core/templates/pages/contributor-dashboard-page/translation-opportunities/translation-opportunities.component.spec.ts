@@ -34,6 +34,7 @@ import { LazyLoadingComponent } from 'components/common-layout-directives/common
 import { SchemaBasedEditorDirective } from 'components/forms/schema-based-editors/schema-based-editor.directive';
 import { AngularHtmlBindWrapperDirective } from 'components/angular-html-bind/angular-html-bind-wrapper.directive';
 import { CkEditorCopyToolbarComponent } from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('Translation opportunities component', () => {
   let contributionOpportunitiesService: ContributionOpportunitiesService;
@@ -75,6 +76,7 @@ describe('Translation opportunities component', () => {
         NgbModal,
         NgbActiveModal
       ],
+      schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
     translationModal = TestBed.createComponent(
       TranslationModalComponent) as unknown as NgbModalRef;
@@ -131,7 +133,7 @@ describe('Translation opportunities component', () => {
         more: false
       });
 
-    component.loadOpportunities().then(({opportunitiesDicts, more}) => {
+    component.loadOpportunitiesAsync().then(({opportunitiesDicts, more}) => {
       expect(opportunitiesDicts.length).toBe(2);
       expect(more).toBeFalse();
     });
@@ -144,7 +146,7 @@ describe('Translation opportunities component', () => {
         opportunities: opportunitiesArray,
         more: true
       });
-    component.loadOpportunities().then(({opportunitiesDicts, more}) => {
+    component.loadOpportunitiesAsync().then(({opportunitiesDicts, more}) => {
       expect(opportunitiesDicts.length).toBe(2);
       expect(more).toBeTrue();
     });
@@ -156,10 +158,11 @@ describe('Translation opportunities component', () => {
       more: false
     });
 
-    component.loadMoreOpportunities().then(({opportunitiesDicts, more}) => {
-      expect(opportunitiesDicts.length).toBe(2);
-      expect(more).toBeFalse();
-    });
+    component.loadMoreOpportunitiesAsync()
+      .then(({opportunitiesDicts, more}) => {
+        expect(opportunitiesDicts.length).toBe(2);
+        expect(more).toBeFalse();
+      });
   });
 
   it('should open translation modal when clicking button', fakeAsync(() => {

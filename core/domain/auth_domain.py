@@ -36,6 +36,18 @@ AuthIdUserIdPair = (
     collections.namedtuple('AuthIdUserIdPair', ['auth_id', 'user_id']))
 
 
+class InvalidAuthSessionError(Exception):
+    """Error raised when an invalid auth session is detected."""
+
+    pass
+
+
+class StaleAuthSessionError(Exception):
+    """Error raised when an auth session needs to be refreshed."""
+
+    pass
+
+
 class AuthClaims(python_utils.OBJECT):
     """Domain object for holding onto essential Claims about an authorized user.
 

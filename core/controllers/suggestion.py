@@ -29,8 +29,10 @@ from core.domain import html_cleaner
 from core.domain import image_validation_services
 from core.domain import opportunity_services
 from core.domain import skill_fetchers
+from core.domain import state_domain
 from core.domain import suggestion_services
 import feconf
+import python_utils
 import utils
 
 
@@ -117,7 +119,7 @@ class SuggestionHandler(base.BaseHandler):
         for filename in new_image_filenames:
             image = self.request.get(filename)
             if not image:
-                logging.error(
+                logging.exception(
                     'Image not provided for file with name %s when the '
                     ' suggestion with target id %s was created.' % (
                         filename, suggestion.target_id))
@@ -373,4 +375,92 @@ class SuggestionListHandler(base.BaseHandler):
             query_fields_and_values)
 
         self.values.update({'suggestions': [s.to_dict() for s in suggestions]})
+        self.render_json(self.values)
+
+
+class UpdateTranslationSuggestionHandler(base.BaseHandler):
+    """Handles update operations relating to translation suggestions."""
+
+    @acl_decorators.can_update_suggestion
+    def put(self, suggestion_id):
+        """Handles PUT requests.
+
+        Raises:
+            InvalidInputException. The suggestion is already handled.
+            InvalidInputException. The 'translation_html' parameter is missing.
+            InvalidInputException. The 'translation_html' parameter is not a
+                string.
+        """
+        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+        if suggestion.is_handled:
+            raise self.InvalidInputException(
+                'The suggestion with id %s has been accepted or rejected'
+                % (suggestion_id)
+            )
+
+        if self.payload.get('translation_html') is None:
+            raise self.InvalidInputException(
+                'The parameter \'translation_html\' is missing.'
+            )
+
+        if not isinstance(
+                self.payload.get('translation_html'), python_utils.BASESTRING):
+            raise self.InvalidInputException(
+                'The parameter \'translation_html\' should be a string.'
+            )
+
+        suggestion_services.update_translation_suggestion(
+            suggestion_id, self.payload.get('translation_html'))
+
+        self.render_json(self.values)
+
+
+class UpdateQuestionSuggestionHandler(base.BaseHandler):
+    """Handles update operations relating to question suggestions."""
+
+    @acl_decorators.can_update_suggestion
+    def put(self, suggestion_id):
+        """Handles PUT requests.
+
+        Raises:
+            InvalidInputException. The suggestion is already handled.
+            InvalidInputException. The 'skill_difficulty' parameter is missing.
+            InvalidInputException. The 'skill_difficulty' is not a decimal.
+            InvalidInputException. The 'question_state_data' parameter is
+                missing.
+            InvalidInputException. The 'question_state_data' parameter is
+                invalid.
+        """
+        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+        if suggestion.is_handled:
+            raise self.InvalidInputException(
+                'The suggestion with id %s has been accepted or rejected'
+                % (suggestion_id)
+            )
+
+        if self.payload.get('skill_difficulty') is None:
+            raise self.InvalidInputException(
+                'The parameter \'skill_difficulty\' is missing.'
+            )
+
+        if not isinstance(self.payload.get('skill_difficulty'), float):
+            raise self.InvalidInputException(
+                'The parameter \'skill_difficulty\' should be a decimal.'
+            )
+
+        if self.payload.get('question_state_data') is None:
+            raise self.InvalidInputException(
+                'The parameter \'question_state_data\' is missing.'
+            )
+
+        question_state_data_obj = state_domain.State.from_dict(
+            self.payload.get('question_state_data'))
+
+        question_state_data_obj.validate(None, False)
+
+        suggestion_services.update_question_suggestion(
+            suggestion_id,
+            self.payload.get('skill_difficulty'),
+            self.payload.get('question_state_data'))
+
         self.render_json(self.values)

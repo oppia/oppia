@@ -20,9 +20,9 @@ import { EditableExplorationBackendApiService } from
   'domain/exploration/editable-exploration-backend-api.service';
 import { ReadOnlyExplorationBackendApiService } from
   'domain/exploration/read-only-exploration-backend-api.service';
-import { CsrfTokenService } from 'services/csrf-token.service.ts';
+import { CsrfTokenService } from 'services/csrf-token.service';
 
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { HttpTestingController, HttpClientTestingModule } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
@@ -51,7 +51,7 @@ describe('Editable exploration backend API service', function() {
     csrfService = TestBed.inject(CsrfTokenService);
     httpTestingController = TestBed.inject(HttpTestingController);
 
-    spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
+    spyOn(csrfService, 'getTokenAsync').and.callFake(async() => {
       return Promise.resolve('sample-csrf-token');
     });
 
@@ -99,7 +99,7 @@ describe('Editable exploration backend API service', function() {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
 
-    editableExplorationBackendApiService.fetchExploration('0').then(
+    editableExplorationBackendApiService.fetchExplorationAsync('0').then(
       successHandler, failHandler);
 
     const req = httpTestingController.expectOne('/createhandler/data/0');
@@ -118,7 +118,7 @@ describe('Editable exploration backend API service', function() {
     let failHandler = jasmine.createSpy('fail');
 
     // Loading a exploration the first time should fetch it from the backend.
-    editableExplorationBackendApiService.fetchApplyDraftExploration(
+    editableExplorationBackendApiService.fetchApplyDraftExplorationAsync(
       '0').then(successHandler, failHandler);
 
     const req = httpTestingController.expectOne(
@@ -138,7 +138,7 @@ describe('Editable exploration backend API service', function() {
     let failHandler = jasmine.createSpy('fail');
 
     // Loading a exploration the first time should fetch it from the backend.
-    editableExplorationBackendApiService.fetchExploration('1').then(
+    editableExplorationBackendApiService.fetchExplorationAsync('1').then(
       successHandler, failHandler);
 
     const req = httpTestingController.expectOne('/createhandler/data/1');
@@ -163,7 +163,7 @@ describe('Editable exploration backend API service', function() {
     let exploration = null;
 
     // Loading a exploration the first time should fetch it from the backend.
-    editableExplorationBackendApiService.fetchExploration('0').then(
+    editableExplorationBackendApiService.fetchExplorationAsync('0').then(
       function(data) {
         exploration = data;
       });
@@ -177,7 +177,7 @@ describe('Editable exploration backend API service', function() {
     exploration.title = 'New Title';
     exploration.version = '2';
 
-    editableExplorationBackendApiService.updateExploration(
+    editableExplorationBackendApiService.updateExplorationAsync(
       exploration.exploration_id, exploration.version,
       exploration.title, []
     ).then(successHandler, failHandler);
@@ -199,7 +199,7 @@ describe('Editable exploration backend API service', function() {
     let failHandler = jasmine.createSpy('fail');
     let exploration = null;
 
-    readOnlyExplorationBackendApiService.loadLatestExploration('0').then(
+    readOnlyExplorationBackendApiService.loadLatestExplorationAsync('0').then(
       (data) => {
         exploration = data;
       });
@@ -215,7 +215,7 @@ describe('Editable exploration backend API service', function() {
     exploration.title = 'New Title';
     exploration.version = '2';
 
-    editableExplorationBackendApiService.updateExploration(
+    editableExplorationBackendApiService.updateExplorationAsync(
       exploration.exploration_id,
       exploration.version,
       exploration.title, []
@@ -237,7 +237,7 @@ describe('Editable exploration backend API service', function() {
     let failHandler = jasmine.createSpy('fail');
     let exploration = null;
 
-    editableExplorationBackendApiService.fetchExploration('0')
+    editableExplorationBackendApiService.fetchExplorationAsync('0')
       .then(data => {
         exploration = data;
       });
@@ -253,7 +253,7 @@ describe('Editable exploration backend API service', function() {
     exploration.version = '2';
 
     // Send a request to update exploration.
-    editableExplorationBackendApiService.updateExploration(
+    editableExplorationBackendApiService.updateExplorationAsync(
       exploration.exploration_id,
       exploration.version,
       'Minor edits', []
@@ -270,7 +270,7 @@ describe('Editable exploration backend API service', function() {
     expect(failHandler).not.toHaveBeenCalled();
 
     editableExplorationBackendApiService
-      .deleteExploration(exploration.exploration_id)
+      .deleteExplorationAsync(exploration.exploration_id)
       .then(successHandler, failHandler);
 
     req = httpTestingController.expectOne(
@@ -292,7 +292,7 @@ describe('Editable exploration backend API service', function() {
 
     let exploration = null;
 
-    editableExplorationBackendApiService.fetchExploration('0')
+    editableExplorationBackendApiService.fetchExplorationAsync('0')
       .then(data => {
         exploration = data;
       });
@@ -305,7 +305,7 @@ describe('Editable exploration backend API service', function() {
     flushMicrotasks();
 
     editableExplorationBackendApiService
-      .deleteExploration(exploration.exploration_id)
+      .deleteExplorationAsync(exploration.exploration_id)
       .then(successHandler, failHandler);
 
     req = httpTestingController.expectOne(

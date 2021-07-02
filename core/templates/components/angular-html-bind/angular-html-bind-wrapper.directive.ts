@@ -24,10 +24,12 @@ angular.module('oppia').directive('angularHtmlBindWrapper', [
       restrict: 'E',
       scope: {},
       bindToController: {
-        htmlData: '<'
+        htmlData: '<',
+        classStr: '<'
       },
       template:
-        '<angular-html-bind html-data="$ctrl.htmlData"></angular-html-bind>',
+        '<angular-html-bind class="<[$ctrl.classStr]>" ' +
+        'html-data="$ctrl.htmlData"></angular-html-bind>',
       controllerAs: '$ctrl',
       controller: [
         '$rootScope',
@@ -36,13 +38,22 @@ angular.module('oppia').directive('angularHtmlBindWrapper', [
           ctrl.$onInit = function() {
             $rootScope.$applyAsync();
           };
+          // Manually implementing the OnChanges lifecycle hook to trigger the
+          // digest loop. Without this, there seems to be change detection
+          // issues.
+          ctrl.$onChanges = (changes: SimpleChanges) => {
+            let htmlData = changes.htmlData;
+            if (htmlData && htmlData.currentValue !== htmlData.previousValue) {
+              $rootScope.$applyAsync();
+            }
+          };
         }
       ]
     };
   }
 ]);
 
-import { Directive, ElementRef, Injector, Input } from '@angular/core';
+import { Directive, ElementRef, Injector, Input, SimpleChanges } from '@angular/core';
 import { UpgradeComponent } from '@angular/upgrade/static';
 // Allow $scope to be provided to parent Component.
 export const ScopeProvider = {
@@ -56,6 +67,7 @@ export const ScopeProvider = {
 })
 export class AngularHtmlBindWrapperDirective extends UpgradeComponent {
   @Input() htmlData: string;
+  @Input() classStr = '';
   constructor(elementRef: ElementRef, injector: Injector) {
     super('angularHtmlBindWrapper', elementRef, injector);
   }

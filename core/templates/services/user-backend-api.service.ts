@@ -52,18 +52,19 @@ export interface UserContributionRightsDataBackendDict {
   'can_review_questions': boolean;
 }
 
-
 @Injectable({
   providedIn: 'root'
 })
 export class UserBackendApiService {
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient) {}
 
   private USER_INFO_URL = '/userinfohandler';
   private PROFILE_PICTURE_URL = '/preferenceshandler/profile_picture';
   private PREFERENCES_DATA_URL = '/preferenceshandler/data';
   private USER_CONTRIBUTION_RIGHTS_DATA_URL = (
     '/usercontributionrightsdatahandler');
+  private SITE_LANGUAGE_URL = '/save_site_language';
 
   async getUserInfoAsync(): Promise<UserInfo> {
     return this.http.get<UserInfoBackendDict>(
@@ -108,8 +109,15 @@ export class UserBackendApiService {
     return this.http.get<UserContributionRightsDataBackendDict>(
       this.USER_CONTRIBUTION_RIGHTS_DATA_URL).toPromise();
   }
-}
 
+  async updatePreferredSiteLanguageAsync(
+      currentLanguageCode: string
+  ): Promise<Object> {
+    return this.http.put(this.SITE_LANGUAGE_URL, {
+      site_language_code: currentLanguageCode
+    }).toPromise();
+  }
+}
 angular.module('oppia').factory(
   'UserBackendApiService',
   downgradeInjectable(UserBackendApiService));

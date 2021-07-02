@@ -63,7 +63,7 @@ angular.module('oppia').component('voiceoverOpportunities', {
           !ctrl.opportunitiesAreLoading &&
           ctrl.moreOpportunitiesAvailable) {
           ctrl.opportunitiesAreLoading = true;
-          ContributionOpportunitiesService.getMoreVoiceoverOpportunities(
+          ContributionOpportunitiesService.getMoreVoiceoverOpportunitiesAsync(
             TranslationLanguageService.getActiveLanguageCode(),
             updateWithNewOpportunities);
         }
@@ -74,7 +74,7 @@ angular.module('oppia').component('voiceoverOpportunities', {
             () => {
               ctrl.opportunities = [];
               ctrl.opportunitiesAreLoading = true;
-              ContributionOpportunitiesService.getVoiceoverOpportunities(
+              ContributionOpportunitiesService.getVoiceoverOpportunitiesAsync(
                 TranslationLanguageService.getActiveLanguageCode(),
                 updateWithNewOpportunities);
             }
@@ -84,7 +84,7 @@ angular.module('oppia').component('voiceoverOpportunities', {
         ctrl.opportunitiesAreLoading = true;
         ctrl.moreOpportunitiesAvailable = true;
         ctrl.progressBarRequired = false;
-        ContributionOpportunitiesService.getVoiceoverOpportunities(
+        ContributionOpportunitiesService.getVoiceoverOpportunitiesAsync(
           TranslationLanguageService.getActiveLanguageCode(),
           updateWithNewOpportunities);
       };

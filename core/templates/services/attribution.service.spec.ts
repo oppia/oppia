@@ -39,7 +39,7 @@ describe('AttributionService', () => {
     csrfService = TestBed.get(CsrfTokenService);
     httpTestingController = TestBed.get(HttpTestingController);
 
-    spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
+    spyOn(csrfService, 'getTokenAsync').and.callFake(async() => {
       return Promise.resolve('simple-csrf-token');
     });
   });

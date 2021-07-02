@@ -30,7 +30,7 @@ describe('Save Version Mismatch Modal Controller', () => {
   let $q = null;
   const windowRef = new WindowRef();
   const mockExplorationData = {
-    discardDraft: (callback) => callback()
+    discardDraftAsync: (callback) => callback()
   };
   const lostChanges = [{
     cmd: 'add_state',
@@ -82,7 +82,7 @@ describe('Save Version Mismatch Modal Controller', () => {
         }
       });
       const discardDraftSpy = (
-        spyOn(mockExplorationData, 'discardDraft').and.callFake(
+        spyOn(mockExplorationData, 'discardDraftAsync').and.callFake(
           () => {
             var deferred = $q.defer();
             deferred.resolve('sample-csrf-token');

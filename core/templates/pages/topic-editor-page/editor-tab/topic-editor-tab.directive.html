@@ -71,6 +71,7 @@
                         ng-model="editableDescription" maxlength="<[MAX_CHARS_IN_TOPIC_DESCRIPTION]>"
                         ng-change="updateTopicDescriptionStatus(editableDescription)"
                         ng-blur="updateTopicDescription(editableDescription)"
+                        aria-label="Topic Description"
                         placeholder="Enter the description of the topic">
               </textarea>
               <span class="oppia-input-box-subtitle">
@@ -87,6 +88,7 @@
               <textarea type="text" class="form-control topic-description protractor-test-topic-page-title-fragment-field"
                         ng-model="editablePageTitleFragmentForWeb" maxlength="<[MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB]>"
                         ng-blur="updateTopicPageTitleFragmentForWeb(editablePageTitleFragmentForWeb)"
+                        aria-label="Page Title Fragment"
                         placeholder="Enter the page title for the topic">
               </textarea>
               <span class="oppia-input-box-subtitle">
@@ -101,7 +103,8 @@
               <textarea type="text" class="form-control topic-description protractor-test-topic-meta-tag-content-field"
                         ng-model="editableMetaTagContent" maxlength="<[MAX_CHARS_IN_META_TAG_CONTENT]>"
                         ng-blur="updateTopicMetaTagContent(editableMetaTagContent)"
-                        placeholder="Enter the meta tag content for the topic">
+                        placeholder="Enter the meta tag content for the topic"
+                        aria-label="Meta Tag Content">
               </textarea>
               <span class="oppia-input-box-subtitle">
                 <em>
@@ -111,18 +114,17 @@
               </span>
             </div>
             <label class="form-heading">Thumbnail</label>
-            <thumbnail-uploader disabled="!topicRights.canEditTopic()"
-                                filename="topic.getThumbnailFilename()"
-                                update-filename="updateTopicThumbnailFilename"
-                                bg-color="topic.getThumbnailBgColor()"
-                                update-bg-color="updateTopicThumbnailBgColor"
-                                allowed-bg-colors="allowedBgColors"
-                                aspect-ratio="'4:3'"
-                                preview-title="editableName"
-                                preview-description=""
-                                preview-description-bg-color="'#2F6687'"
-                                preview-footer="topic.getCanonicalStoryIds().length + ' Lessons'">
-            </thumbnail-uploader>
+            <oppia-thumbnail-uploader [disabled]="!topicRights.canEditTopic()"
+                                      [filename]="topic.getThumbnailFilename()"
+                                      (update-filename)="updateTopicThumbnailFilename($event)"
+                                      [bg-color]="topic.getThumbnailBgColor()"
+                                      (update-bg-color)="updateTopicThumbnailBgColor($event)"
+                                      [allowed-bg-colors]="allowedBgColors"
+                                      [aspect-ratio]="'4:3'"
+                                      [preview-title]="editableName"
+                                      preview-description-bg-color="#2F6687"
+                                      [preview-footer]="topic.getCanonicalStoryIds().length + ' Lessons'">
+            </oppia-thumbnail-uploader>
           </div>
         </div>
       </div>
@@ -140,13 +142,13 @@
           </button>
         </div>
         <div ng-if="topic.getId() && topicPreviewCardIsShown">
-          <preview-thumbnail name="editableName"
-                             aspect-ratio="'4:3'"
-                             preview-footer="getPreviewFooter()"
-                             filename="topic.getThumbnailFilename()"
-                             thumbnail-bg-color="topic.getThumbnailBgColor()"
-                             bg-color="'#2F6687'">
-          </preview-thumbnail>
+          <oppia-preview-thumbnail [name]="editableName"
+                                   [aspect-ratio]="'4:3'"
+                                   [preview-footer]="getPreviewFooter()"
+                                   [filename]="topic.getThumbnailFilename()"
+                                   [thumbnail-bg-color]="topic.getThumbnailBgColor()"
+                                   [bg-color]="'#2F6687'">
+          </oppia-preview-thumbnail>
         </div>
       </div>
     </md-card>
@@ -354,6 +356,7 @@
   }
 
   topic-editor-tab .topic-dashboard-link a {
+    color: #015F9C;
     text-decoration: none;
   }
 

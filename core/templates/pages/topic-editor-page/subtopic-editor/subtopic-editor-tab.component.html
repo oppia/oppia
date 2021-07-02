@@ -96,19 +96,19 @@
               </angular-html-bind>
             </div>
           </div>
-          <div class="subtopic-thumbnail">
+          <div class="subtopic-thumbnail protractor-test-subtopic-thumbnail">
             <p>
               <strong>Thumbnail Image*</strong>
             </p>
-            <thumbnail-uploader filename="$ctrl.subtopic.getThumbnailFilename()"
-                                update-filename="$ctrl.updateSubtopicThumbnailFilename"
-                                bg-color="$ctrl.subtopic.getThumbnailBgColor()"
-                                update-bg-color="$ctrl.updateSubtopicThumbnailBgColor"
-                                allowed-bg-colors="$ctrl.allowedBgColors"
-                                aspect-ratio="'4:3'"
-                                preview-title="$ctrl.editableTitle"
-                                preview-description-bg-color="'#BE563C'">
-            </thumbnail-uploader>
+            <oppia-thumbnail-uploader [filename]="$ctrl.subtopic.getThumbnailFilename()"
+                                      (update-filename)="$ctrl.updateSubtopicThumbnailFilename($event)"
+                                      [bg-color]="$ctrl.subtopic.getThumbnailBgColor()"
+                                      (update-bg-color)="$ctrl.updateSubtopicThumbnailBgColor($event)"
+                                      [allowed-bg-colors]="$ctrl.allowedBgColors"
+                                      [aspect-ratio]="'4:3'"
+                                      [preview-title]="$ctrl.editableTitle"
+                                      preview-description-bg-color="#BE563C">
+            </oppia-thumbnail-uploader>
           </div>
         </div>
         <div ng-if="$ctrl.editableThumbnailFilename && $ctrl.subtopicEditorCardIsShown">
@@ -125,12 +125,12 @@
             </button>
           </div>
           <div ng-if="$ctrl.subtopicPreviewCardIsShown">
-            <preview-thumbnail name="$ctrl.editableTitle"
-                               aspect-ratio="'4:3'"
-                               filename="$ctrl.editableThumbnailFilename"
-                               thumbnail-bg-color="$ctrl.editableThumbnailBgColor"
-                               bg-color="'#2F6687'">
-            </preview-thumbnail>
+            <oppia-preview-thumbnail [name]="$ctrl.editableTitle"
+                                     [aspect-ratio]="'4:3'"
+                                     [filename]="$ctrl.editableThumbnailFilename"
+                                     [thumbnail-bg-color]="$ctrl.editableThumbnailBgColor"
+                                     [bg-color]="'#2F6687'">
+            </oppia-preview-thumbnail>
           </div>
         </div>
       </md-card>
@@ -161,9 +161,9 @@
                  dnd-drop="$ctrl.onRearrangeMoveSkillFinish($index)"
                  dnd-draggable="skillSummary"
                  class="skill-list-item">
+              <span class="material-icons draggable-icon-indicator">drag_indicator</span>
               <a ng-if="!$ctrl.isSkillDeleted(skillSummary)"
                  ng-href="<[$ctrl.getSkillEditorUrl(skillSummary.getId())]>" target="_blank" rel="noopener">
-                <span class="material-icons draggable-icon-indicator">drag_indicator</span>
                 <[skillSummary.getDescription()]>
               </a>
               <div class="skill-options-box">
@@ -249,7 +249,11 @@
   }
   .subtopic-content .skill-list-item a {
     color: inherit;
+    flex: 1;
+    overflow: hidden;
+    padding-right: 10px;
     text-decoration: none;
+    word-wrap: break-word;
   }
   .subtopic-content .skill-options-box {
     margin-right: 14px;

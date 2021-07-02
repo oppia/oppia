@@ -17,7 +17,7 @@
  * component.
  */
 
-import { DeviceInfoService } from 'services/contextual/device-info.service.ts';
+import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { AlgebraicExpressionInputInteractionComponent } from './oppia-interactive-algebraic-expression-input.component';
 import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';

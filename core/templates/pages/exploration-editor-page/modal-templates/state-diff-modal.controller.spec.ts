@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for StateDiffModalController.
  */
 
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+
 describe('State Diff Modal Controller', function() {
   var $flushPendingTasks = null;
   var $httpBackend = null;
@@ -37,6 +39,7 @@ describe('State Diff Modal Controller', function() {
   beforeEach(angular.mock.module('oppia'));
 
   describe('when new state and old state are truthy', function() {
+    importAllAngularServices();
     beforeEach(angular.mock.inject(function($injector, $controller) {
       $httpBackend = $injector.get('$httpBackend');
       $q = $injector.get('$q');
@@ -91,6 +94,7 @@ describe('State Diff Modal Controller', function() {
   });
 
   describe('when new state and old state are falsy', function() {
+    importAllAngularServices();
     beforeEach(angular.mock.inject(function($injector, $controller) {
       $flushPendingTasks = $injector.get('$flushPendingTasks');
       var $rootScope = $injector.get('$rootScope');

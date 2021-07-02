@@ -20,101 +20,107 @@
  * followed by the name of the arg.
  */
 
-require(
-  'interactions/MathEquationInput/directives/' +
-  'math-equation-input-rules.service.ts');
-require(
-  'pages/exploration-player-page/services/current-interaction.service.ts');
-require('services/contextual/device-info.service.ts');
-require('services/guppy-configuration.service.ts');
-require('services/guppy-initialization.service.ts');
-require('services/html-escaper.service.ts');
-require('services/math-interactions.service.ts');
+import { Component, Input, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { InteractionAnswer } from 'interactions/answer-defs';
+import { CurrentInteractionService, InteractionRulesService } from 'pages/exploration-player-page/services/current-interaction.service';
+import { DeviceInfoService } from 'services/contextual/device-info.service';
+import { GuppyConfigurationService } from 'services/guppy-configuration.service';
+import { GuppyInitializationService } from 'services/guppy-initialization.service';
+import { HtmlEscaperService } from 'services/html-escaper.service';
+import { MathInteractionsService } from 'services/math-interactions.service';
+import { MathEquationInputRulesService } from './math-equation-input-rules.service';
+import constants from 'assets/constants';
 
-angular.module('oppia').component('oppiaInteractiveMathEquationInput', {
-  template: require('./math-equation-input-interaction.component.html'),
-  controller: [
-    '$attrs', '$scope', 'CurrentInteractionService', 'DeviceInfoService',
-    'GuppyConfigurationService', 'GuppyInitializationService',
-    'HtmlEscaperService', 'MathEquationInputRulesService',
-    'MathInteractionsService', 'MATH_INTERACTION_PLACEHOLDERS',
-    function(
-        $attrs, $scope, CurrentInteractionService, DeviceInfoService,
-        GuppyConfigurationService, GuppyInitializationService,
-        HtmlEscaperService, MathEquationInputRulesService,
-        MathInteractionsService, MATH_INTERACTION_PLACEHOLDERS) {
-      const ctrl = this;
-      ctrl.value = '';
-      ctrl.hasBeenTouched = false;
-      ctrl.warningText = '';
+@Component({
+  selector: 'oppia-interactive-math-equation-input',
+  templateUrl: './math-equation-input-interaction.component.html'
+})
+export class InteractiveMathEquationInput implements OnInit {
+  value: string = '';
+  hasBeenTouched: boolean = false;
+  warningText: string = '';
+  @Input() savedSolution: InteractionAnswer;
+  @Input() useFractionForDivisionWithValue;
+  @Input() customOskLettersWithValue;
 
-      ctrl.isCurrentAnswerValid = function() {
-        let activeGuppyObject = (
-          GuppyInitializationService.findActiveGuppyObject());
-        if (ctrl.hasBeenTouched && activeGuppyObject === undefined) {
-          // Replacing abs symbol, '|x|', with text, 'abs(x)' since the symbol
-          // is not compatible with nerdamer or with the backend validations.
-          ctrl.value = MathInteractionsService.replaceAbsSymbolWithText(
-            ctrl.value);
-          let answerIsValid = MathInteractionsService.validateEquation(
-            ctrl.value, GuppyInitializationService.getCustomOskLetters());
-          ctrl.warningText = MathInteractionsService.getWarningText();
-          return answerIsValid;
-        }
-        ctrl.warningText = '';
-        return true;
-      };
+  constructor(
+    private currentInteractionService: CurrentInteractionService,
+    private guppyConfigurationService: GuppyConfigurationService,
+    private guppyInitializationService: GuppyInitializationService,
+    private deviceInfoService: DeviceInfoService,
+    private htmlEscaperService: HtmlEscaperService,
+    private mathEquationInputRulesService: MathEquationInputRulesService,
+    private mathInteractionsService: MathInteractionsService
+  ) {}
 
-      ctrl.submitAnswer = function() {
-        if (!ctrl.isCurrentAnswerValid()) {
-          return;
-        }
-        CurrentInteractionService.onSubmit(
-          ctrl.value, MathEquationInputRulesService);
-      };
-
-      ctrl.showOSK = function() {
-        GuppyInitializationService.setShowOSK(true);
-        GuppyInitializationService.interactionType = 'MathEquationInput';
-      };
-
-      ctrl.$onInit = function() {
-        ctrl.hasBeenTouched = false;
-        GuppyConfigurationService.init();
-        GuppyConfigurationService.changeDivSymbol(
-          JSON.parse($attrs.useFractionForDivisionWithValue || 'false'));
-        GuppyInitializationService.init(
-          'guppy-div-learner',
-          MATH_INTERACTION_PLACEHOLDERS.MathEquationInput,
-          $attrs.savedSolution !== undefined ?
-          JSON.parse($attrs.savedSolution) : ''
-        );
-        GuppyInitializationService.setCustomOskLetters(
-          HtmlEscaperService.escapedJsonToObj(
-            $attrs.customOskLettersWithValue));
-        let eventType = (
-          DeviceInfoService.isMobileUserAgent() &&
-          DeviceInfoService.hasTouchEvents()) ? 'focus' : 'change';
-        // We need the 'focus' event while using the on screen keyboard (only
-        // for touch-based devices) to capture input from user and the 'change'
-        // event while using the normal keyboard.
-        Guppy.event(eventType, () => {
-          var activeGuppyObject = (
-            GuppyInitializationService.findActiveGuppyObject());
-          if (activeGuppyObject !== undefined) {
-            ctrl.hasBeenTouched = true;
-            ctrl.value = activeGuppyObject.guppyInstance.asciimath();
-            if (eventType === 'change') {
-              // Need to manually trigger the digest cycle to make any
-              // 'watchers' aware of changes in answer.
-              $scope.$apply();
-            }
-          }
-        });
-
-        CurrentInteractionService.registerCurrentInteraction(
-          ctrl.submitAnswer, ctrl.isCurrentAnswerValid);
-      };
+  isCurrentAnswerValid(): boolean {
+    let activeGuppyObject = (
+      this.guppyInitializationService.findActiveGuppyObject());
+    if (this.hasBeenTouched && activeGuppyObject === undefined) {
+      // Replacing abs symbol, '|x|', with text, 'abs(x)' since the symbol
+      // is not compatible with nerdamer or with the backend validations.
+      this.value = this.mathInteractionsService.replaceAbsSymbolWithText(
+        this.value);
+      let answerIsValid = this.mathInteractionsService.validateEquation(
+        this.value, this.guppyInitializationService.getCustomOskLetters());
+      this.warningText = this.mathInteractionsService.getWarningText();
+      return answerIsValid;
     }
-  ]
-});
+    this.warningText = '';
+    return true;
+  }
+
+  submitAnswer(): void {
+    if (!this.isCurrentAnswerValid()) {
+      return;
+    }
+    this.currentInteractionService.onSubmit(
+      this.value,
+      this.mathEquationInputRulesService as unknown as InteractionRulesService);
+  }
+
+  showOSK(): void {
+    this.guppyInitializationService.setShowOSK(true);
+    GuppyInitializationService.interactionType = 'MathEquationInput';
+  }
+
+  ngOnInit(): void {
+    this.hasBeenTouched = false;
+    this.guppyConfigurationService.init();
+    this.guppyConfigurationService.changeDivSymbol(
+      JSON.parse(this.useFractionForDivisionWithValue || 'false'));
+    this.guppyInitializationService.init(
+      'guppy-div-learner',
+      constants.MATH_INTERACTION_PLACEHOLDERS.MathEquationInput,
+      (this.savedSolution as string) !==
+      undefined ? this.savedSolution as string : ''
+    );
+    this.guppyInitializationService.setCustomOskLetters(
+      this.htmlEscaperService.escapedJsonToObj(
+        this.customOskLettersWithValue) as unknown as string[]);
+    let eventType = (
+      this.deviceInfoService.isMobileUserAgent() &&
+      this.deviceInfoService.hasTouchEvents()) ? 'focus' : 'change';
+    // We need the 'focus' event while using the on screen keyboard (only
+    // for touch-based devices) to capture input from user and the 'change'
+    // event while using the normal keyboard.
+    Guppy.event(eventType, () => {
+      let activeGuppyObject = (
+        this.guppyInitializationService.findActiveGuppyObject());
+      if (activeGuppyObject !== undefined) {
+        this.hasBeenTouched = true;
+        this.value = activeGuppyObject.guppyInstance.asciimath();
+      }
+    });
+
+    this.currentInteractionService.registerCurrentInteraction(
+      () => this.submitAnswer(), () => this.isCurrentAnswerValid());
+  }
+}
+
+angular.module('oppia').directive(
+  'oppiaInteractiveMathEquationInput', downgradeComponent({
+    component: InteractiveMathEquationInput
+  }) as angular.IDirectiveFactory
+);

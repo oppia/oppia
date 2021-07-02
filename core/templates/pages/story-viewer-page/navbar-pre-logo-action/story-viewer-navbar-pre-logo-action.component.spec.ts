@@ -16,53 +16,82 @@
  * @fileoverview Unit tests for the story viewer pre logo action
  */
 
-import { EventEmitter } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
-
+import { ComponentFixture, TestBed, fakeAsync } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { StoryViewerNavbarPreLogoActionComponent } from './story-viewer-navbar-pre-logo-action.component';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
 import { UrlService } from 'services/contextual/url.service';
+import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
 
-require(
-  'pages/story-viewer-page/navbar-pre-logo-action/' +
-  'story-viewer-navbar-pre-logo-action.component.ts');
+class MockUrlService {
+  getTopicUrlFragmentFromLearnerUrl() {
+    return 'topic_1';
+  }
 
-describe('story viewer pre logo action', function() {
-  let ctrl = null;
-  let urlService: UrlService = null;
-  let rootScope = null;
+  getClassroomUrlFragmentFromLearnerUrl() {
+    return 'classroom_1';
+  }
 
-  var mockSendStoryDataEventEmitter = null;
+  getStoryUrlFragmentFromLearnerUrl() {
+    return 'story';
+  }
+}
 
-  beforeEach(angular.mock.module('oppia'));
+let component: StoryViewerNavbarPreLogoActionComponent;
+let fixture: ComponentFixture<StoryViewerNavbarPreLogoActionComponent>;
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    mockSendStoryDataEventEmitter = new EventEmitter();
-    $provide.value('StoryViewerBackendApiService', {
-      onSendStoryData: mockSendStoryDataEventEmitter
-    });
+describe('Subtopic viewer navbar breadcrumb component', () => {
+  beforeEach(fakeAsync(() => {
+    TestBed.configureTestingModule({
+      declarations: [StoryViewerNavbarPreLogoActionComponent],
+      imports: [HttpClientTestingModule],
+      providers: [
+        {
+          provide: StoryViewerBackendApiService,
+          useValue: {
+            fetchStoryDataAsync: async() => (
+              new Promise((resolve) => {
+                resolve(
+                  StoryPlaythrough.createFromBackendDict({
+                    story_id: 'id',
+                    story_nodes: [],
+                    story_title: 'title',
+                    story_description: 'description',
+                    topic_name: 'topic_1',
+                    meta_tag_content: 'this is a meta tag content'
+                  }));
+              })
+            )
+          }
+        },
+        { provide: UrlService, useClass: MockUrlService },
+        UrlInterpolationService,
+      ],
+    }).compileComponents();
   }));
 
   beforeEach(() => {
-    urlService = TestBed.get(UrlService);
-    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl')
-      .and.returnValue('abbrev');
-    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl')
-      .and.returnValue('math');
+    fixture = TestBed.createComponent(StoryViewerNavbarPreLogoActionComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
   });
-  beforeEach(angular.mock.inject(function($componentController, $rootScope) {
-    ctrl = $componentController(
-      'storyViewerNavbarPreLogoAction',
-      { UrlService: urlService });
-    rootScope = $rootScope;
+
+  afterEach(() => {
+    component.ngOnDestroy();
+  });
+
+  it('should set topic name when component is initialized', fakeAsync(() => {
+    component.ngOnInit();
+    fixture.whenStable().then(() => {
+      fixture.detectChanges();
+      expect(component.topicName).toBe('topic_1');
+    });
   }));
 
-  it('should set the topic name and URL correctly', function() {
-    ctrl.$onInit();
-    mockSendStoryDataEventEmitter.emit({
-      topicName: 'Topic Name'
-    });
-    rootScope.$digest();
-    expect(ctrl.topicName).toEqual('Topic Name');
-    expect(ctrl.getTopicUrl()).toEqual('/learn/math/abbrev/story');
-    ctrl.$onDestroy();
+  it('should get topic url after component is initialized', () => {
+    component.ngOnInit();
+    expect(component.getTopicUrl()).toBe(
+      '/learn/classroom_1/topic_1/story');
   });
 });

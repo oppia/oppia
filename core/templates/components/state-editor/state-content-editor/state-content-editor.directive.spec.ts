@@ -21,8 +21,11 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-import { TranslatorProviderForTests } from 'tests/test.extras';
+import { TranslatorProviderForTests } from 'tests/unit-test-utils.ajs';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+import { TestBed } from '@angular/core/testing';
+import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
+import { ChangeListService } from 'pages/exploration-editor-page/services/change-list.service';
 
 require('pages/exploration-editor-page/services/change-list.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
@@ -36,7 +39,6 @@ require('services/editability.service.ts');
 
 describe('State content editor directive', function() {
   var outerScope, ctrlScope, shof, cls, scs, es, ess, srvos;
-  var mockExplorationData;
 
   var _getContent = function(contentId, contentString) {
     return shof.createFromBackendDict({
@@ -45,17 +47,28 @@ describe('State content editor directive', function() {
     });
   };
 
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [
+        ChangeListService,
+        {
+          provide: ExplorationDataService,
+          useValue: {
+            explorationId: 0,
+            autosaveChangeListAsync() {
+              return;
+            }
+          }
+        }
+      ]
+    });
+
+    cls = TestBed.inject(ChangeListService);
+  });
+
   beforeEach(angular.mock.module('directiveTemplates'));
   beforeEach(function() {
     angular.mock.module('oppia', TranslatorProviderForTests);
-
-    mockExplorationData = {
-      explorationId: 0,
-      autosaveChangeList: function() {}
-    };
-    angular.mock.module(function($provide) {
-      $provide.value('ExplorationDataService', [mockExplorationData][0]);
-    });
   });
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
@@ -66,7 +79,6 @@ describe('State content editor directive', function() {
 
   beforeEach(angular.mock.inject(
     function($compile, $injector, $rootScope, $templateCache) {
-      cls = $injector.get('ChangeListService');
       srvos = $injector.get('StateRecordedVoiceoversService');
       scs = $injector.get('StateContentService');
       es = $injector.get('EditabilityService');

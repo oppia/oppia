@@ -16,7 +16,7 @@
  * @fileoverview Component for the Oppia profile page.
  */
 
-require('base-components/base-content.directive.ts');
+require('base-components/base-content.component.ts');
 require(
   'pages/signup-page/modal-templates/license-explanation-modal.controller.ts');
 require(
@@ -36,13 +36,15 @@ angular.module('oppia').component('signupPage', {
   controller: [
     '$http', '$uibModal', '$window', 'AlertsService',
     'FocusManagerService', 'LoaderService', 'SiteAnalyticsService',
-    'UrlInterpolationService', 'UrlService', 'DASHBOARD_TYPE_CREATOR',
-    'DASHBOARD_TYPE_LEARNER', 'MAX_USERNAME_LENGTH', 'SITE_NAME',
+    'UrlInterpolationService', 'UrlService', 'BULK_EMAIL_SERVICE_SIGNUP_URL',
+    'DASHBOARD_TYPE_CREATOR', 'DASHBOARD_TYPE_LEARNER', 'MAX_USERNAME_LENGTH',
+    'SITE_NAME',
     function(
         $http, $uibModal, $window, AlertsService,
         FocusManagerService, LoaderService, SiteAnalyticsService,
-        UrlInterpolationService, UrlService, DASHBOARD_TYPE_CREATOR,
-        DASHBOARD_TYPE_LEARNER, MAX_USERNAME_LENGTH, SITE_NAME) {
+        UrlInterpolationService, UrlService, BULK_EMAIL_SERVICE_SIGNUP_URL,
+        DASHBOARD_TYPE_CREATOR, DASHBOARD_TYPE_LEARNER, MAX_USERNAME_LENGTH,
+        SITE_NAME) {
       var ctrl = this;
       var _SIGNUP_DATA_URL = '/signuphandler/data';
       ctrl.MAX_USERNAME_LENGTH = MAX_USERNAME_LENGTH;
@@ -165,7 +167,12 @@ angular.module('oppia').component('signupPage', {
         }
 
         ctrl.submissionInProcess = true;
-        $http.post(_SIGNUP_DATA_URL, requestParams).then(function() {
+        $http.post(_SIGNUP_DATA_URL, requestParams).then(function(returnValue) {
+          if (returnValue.data.bulk_email_signup_message_should_be_shown) {
+            ctrl.showEmailSignupLink = true;
+            ctrl.submissionInProcess = false;
+            return;
+          }
           SiteAnalyticsService.registerNewSignupEvent();
           setTimeout(() => {
             $window.location.href = decodeURIComponent(
@@ -199,6 +206,8 @@ angular.module('oppia').component('signupPage', {
         ctrl.siteName = SITE_NAME;
         ctrl.submissionInProcess = false;
         ctrl.usernameCheckIsInProgress = false;
+        ctrl.showEmailSignupLink = false;
+        ctrl.emailSignupLink = BULK_EMAIL_SERVICE_SIGNUP_URL;
 
         $http.get(_SIGNUP_DATA_URL).then(function(response) {
           var data = response.data;

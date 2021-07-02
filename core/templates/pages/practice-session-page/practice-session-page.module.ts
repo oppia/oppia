@@ -25,6 +25,7 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
+import { InteractionExtensionsModule } from 'interactions/interactions.module';
 import { ContentLanguageSelectorComponent } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/layout-directives/content-language-selector.component';
@@ -35,6 +36,7 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   imports: [
     BrowserModule,
     HttpClientModule,
+    InteractionExtensionsModule,
     SharedComponentsModule
   ],
   declarations: [
@@ -67,11 +69,11 @@ class PracticeSessionPageModule {
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 
-const bootstrapFn = (extraProviders: StaticProvider[]) => {
+const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
   return platformRef.bootstrapModule(PracticeSessionPageModule);
 };
-const downgradedModule = downgradeModule(bootstrapFn);
+const downgradedModule = downgradeModule(bootstrapFnAsync);
 
 declare var angular: ng.IAngularStatic;
 

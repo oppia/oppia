@@ -13,45 +13,61 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the navbar pre-logo-action
+ * @fileoverview Component for the navbar pre-logo-action
  *  of the story viewer.
  */
 
-require('domain/classroom/classroom-domain.constants.ajs.ts');
-require('domain/utilities/url-interpolation.service.ts');
-require('services/contextual/url.service.ts');
-require('domain/story_viewer/story-viewer-backend-api.service.ts');
-
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { Subscription } from 'rxjs';
+import { UrlService } from 'services/contextual/url.service';
+import { ClassroomDomainConstants } from 'domain/classroom/classroom-domain.constants';
+import { downgradeComponent } from '@angular/upgrade/static';
 
-angular.module('oppia').component('storyViewerNavbarPreLogoAction', {
-  template: require('./story-viewer-navbar-pre-logo-action.component.html'),
-  controller: [
-    'StoryViewerBackendApiService', 'UrlInterpolationService',
-    'UrlService', 'TOPIC_VIEWER_STORY_URL_TEMPLATE', function(
-        StoryViewerBackendApiService, UrlInterpolationService,
-        UrlService, TOPIC_VIEWER_STORY_URL_TEMPLATE) {
-      var ctrl = this;
-      ctrl.directiveSubscriptions = new Subscription();
-      ctrl.getTopicUrl = function() {
-        return UrlInterpolationService.interpolateUrl(
-          TOPIC_VIEWER_STORY_URL_TEMPLATE, {
-            topic_url_fragment: (
-              UrlService.getTopicUrlFragmentFromLearnerUrl()),
-            classroom_url_fragment: (
-              UrlService.getClassroomUrlFragmentFromLearnerUrl())
-          });
-      };
+@Component({
+  selector: 'oppia-story-viewer-navbar-pre-logo-action',
+  templateUrl: './story-viewer-navbar-pre-logo-action.component.html'
+})
+export class StoryViewerNavbarPreLogoActionComponent
+implements OnInit, OnDestroy {
+  topicName: string;
+  topicUrlFragment: string;
+  classroomUrlFragment: string;
+  storyUrlFragment: string;
+  constructor(
+    private storyViewerBackendApiService: StoryViewerBackendApiService,
+    private urlInterpolationService: UrlInterpolationService,
+    private urlService: UrlService
+  ) {}
 
-      ctrl.$onInit = function() {
-        ctrl.directiveSubscriptions.add(
-          StoryViewerBackendApiService.onSendStoryData.subscribe((data) => {
-            ctrl.topicName = data.topicName;
-          })
-        );
-      };
-      ctrl.$onDestroy = function() {
-        ctrl.directiveSubscriptions.unsubscribe();
-      };
-    }]
-});
+  directiveSubscriptions = new Subscription();
+  getTopicUrl(): string {
+    return this.urlInterpolationService.interpolateUrl(
+      ClassroomDomainConstants.TOPIC_VIEWER_STORY_URL_TEMPLATE, {
+        topic_url_fragment: this.topicUrlFragment,
+        classroom_url_fragment: this.classroomUrlFragment,
+        story_url_fragment: this.storyUrlFragment
+      });
+  }
+
+  ngOnInit(): void {
+    this.topicUrlFragment = this.urlService.getTopicUrlFragmentFromLearnerUrl();
+    this.classroomUrlFragment =
+     this.urlService.getClassroomUrlFragmentFromLearnerUrl();
+    this.storyUrlFragment =
+     this.urlService.getStoryUrlFragmentFromLearnerUrl();
+    this.storyViewerBackendApiService.fetchStoryDataAsync(
+      this.topicUrlFragment,
+      this.classroomUrlFragment,
+      this.storyUrlFragment).then(
+      (storyDataObject) => {
+        this.topicName = storyDataObject.topicName;
+      });
+  }
+  ngOnDestroy(): void {
+    return this.directiveSubscriptions.unsubscribe();
+  }
+}
+angular.module('oppia').directive('oppiaStoryViewerNavbarPreLogoAction',
+  downgradeComponent({component: StoryViewerNavbarPreLogoActionComponent}));

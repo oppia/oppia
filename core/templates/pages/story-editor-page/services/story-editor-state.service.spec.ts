@@ -22,9 +22,8 @@ import { Subscription } from 'rxjs';
 
 import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service';
-import { StoryEditorStateService } from 'pages/story-editor-page/services/story-editor-state.service.ts';
-import { TranslatorProviderForTests } from 'tests/test.extras';
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { StoryEditorStateService } from 'pages/story-editor-page/services/story-editor-state.service';
+import { importAllAngularServices, TranslatorProviderForTests } from 'tests/unit-test-utils.ajs';
 
 require('domain/story/story-update.service.ts');
 
@@ -32,7 +31,7 @@ class MockEditableStoryBackendApiService {
   newBackendStoryObject = null;
   failure = null;
 
-  fetchStory() {
+  async fetchStoryAsync() {
     return new Promise((resolve, reject) => {
       if (!this.failure) {
         resolve({
@@ -50,7 +49,7 @@ class MockEditableStoryBackendApiService {
     });
   }
 
-  updateStory() {
+  async updateStoryAsync() {
     return new Promise((resolve, reject) => {
       if (!this.failure) {
         resolve(this.newBackendStoryObject);
@@ -60,7 +59,7 @@ class MockEditableStoryBackendApiService {
     });
   }
 
-  changeStoryPublicationStatus() {
+  async changeStoryPublicationStatusAsync() {
     return new Promise((resolve, reject) => {
       if (!this.failure) {
         resolve({});
@@ -155,10 +154,11 @@ describe('Story editor state service', () => {
 
   it('should request to load the story from the backend', () => {
     spyOn(
-      fakeEditableStoryBackendApiService, 'fetchStory').and.callThrough();
+      fakeEditableStoryBackendApiService, 'fetchStoryAsync').and.callThrough();
 
     storyEditorStateService.loadStory('storyId_0');
-    expect(fakeEditableStoryBackendApiService.fetchStory).toHaveBeenCalled();
+    expect(
+      fakeEditableStoryBackendApiService.fetchStoryAsync).toHaveBeenCalled();
   });
 
   it(
@@ -264,7 +264,7 @@ describe('Story editor state service', () => {
   it('should be able to save the story and pending changes', fakeAsync(() => {
     spyOn(
       fakeEditableStoryBackendApiService,
-      'updateStory').and.callThrough();
+      'updateStoryAsync').and.callThrough();
 
     storyEditorStateService.loadStory('storyId_0');
     storyUpdateService.setStoryTitle(
@@ -280,7 +280,7 @@ describe('Story editor state service', () => {
     var expectedVersion = '1';
     var expectedCommitMessage = 'Commit message';
     var updateStorySpy = (
-      fakeEditableStoryBackendApiService.updateStory);
+      fakeEditableStoryBackendApiService.updateStoryAsync);
     expect(updateStorySpy).toHaveBeenCalledWith(
       expectedId, expectedVersion,
       expectedCommitMessage, jasmine.any(Object));
@@ -289,7 +289,7 @@ describe('Story editor state service', () => {
   it('should be able to publish the story', fakeAsync(() => {
     spyOn(
       fakeEditableStoryBackendApiService,
-      'changeStoryPublicationStatus').and.callThrough();
+      'changeStoryPublicationStatusAsync').and.callThrough();
 
     storyEditorStateService.loadStory('topicId_1', 'storyId_0');
     tick(1000);
@@ -302,7 +302,7 @@ describe('Story editor state service', () => {
 
     var expectedId = 'storyId_0';
     var publishStorySpy = (
-      fakeEditableStoryBackendApiService.changeStoryPublicationStatus);
+      fakeEditableStoryBackendApiService.changeStoryPublicationStatusAsync);
     expect(publishStorySpy).toHaveBeenCalledWith(
       expectedId, true);
     expect(storyEditorStateService.isStoryPublished()).toBe(true);

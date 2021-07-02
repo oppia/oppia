@@ -76,7 +76,7 @@
           <li>
             <ul class="nav oppia-navbar-tabs-admin oppia-admin-page-dropdown">
               <li ngbDropdown class="nav-item dropdown float-right" [ngClass]="{'open' : dropdownMenuIsActive}">
-                <a ngbDropdownToggle class="nav-link dropdown-toggle oppia-navbar-tab oppia-navbar-dropdown-toggle"
+                <a ngbDropdownToggle class="nav-link dropdown-toggle oppia-navbar-tab oppia-navbar-dropdown-toggle protractor-test-navbar-dropdown-toggle"
                    data-toggle="dropdown"
                    (mouseenter)="activateDropdownMenu()"
                    (mouseleave)="deactivateDropdownMenu()">
@@ -106,16 +106,6 @@
                    container="body"
                    placement="bottom">
                   Activities
-                </a>
-              </li>
-              <li class="nav-item oppia-clickable-navbar-element float-right">
-                <a class="nav-link oppia-navbar-tab"
-                   [href]="ADMIN_TAB_URLS.JOBS"
-                   [ngClass]="{'active': isJobsTabOpen()}"
-                   ngbTooltip="Jobs"
-                   placement="bottom"
-                   container="body">
-                  Jobs
                 </a>
               </li>
               <li class="nav-item oppia-clickable-navbar-element float-right">
@@ -163,7 +153,7 @@
           <li>
             <ul class="nav oppia-navbar-tabs-admin">
               <li ngbDropdown class="nav-item dropdown float-right" [ngClass]="{'open' : profileDropdownIsActive}">
-                <a ngbDropdownToggle class="nav-link oppia-navbar-dropdown-toggle"
+                <a ngbDropdownToggle class="nav-link oppia-navbar-dropdown-toggle protractor-test-navbar-dropdown-toggle"
                    data-toggle="dropdown"
                    (mouseenter)="activateProfileDropdown()"
                    (mouseleave)="deactivateProfileDropdown()">
@@ -200,13 +190,6 @@
                        href="/creator-dashboard"
                        class="dropdown-item oppia-dropdown-item-text">
                       Creator Dashboard
-                    </a>
-                  </li>
-                  <li>
-                    <a (click)="onMouseoutProfilePictureOrDropdown($event)"
-                       href="/notifications"
-                       class="dropdown-item oppia-dropdown-item-text">
-                      Notifications
                     </a>
                   </li>
                   <li>

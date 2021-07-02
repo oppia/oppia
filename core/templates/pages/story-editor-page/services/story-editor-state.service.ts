@@ -102,7 +102,7 @@ export class StoryEditorStateService {
    */
   loadStory(storyId: string): void {
     this._storyIsLoading = true;
-    this.editableStoryBackendApiService.fetchStory(storyId).then(
+    this.editableStoryBackendApiService.fetchStoryAsync(storyId).then(
       (newBackendStoryObject) => {
         this._setTopicName(newBackendStoryObject.topicName);
         this._setStoryPublicationStatus(
@@ -206,7 +206,7 @@ export class StoryEditorStateService {
       return false;
     }
     this._storyIsBeingSaved = true;
-    this.editableStoryBackendApiService.updateStory(
+    this.editableStoryBackendApiService.updateStoryAsync(
       this._story.getId(), this._story.getVersion(), commitMessage,
       <StoryChange[]> this.undoRedoService.getCommittableChangeList()).then(
       (storyBackendObject) => {
@@ -243,7 +243,7 @@ export class StoryEditorStateService {
         'Cannot publish a story before one is loaded.');
     }
 
-    this.editableStoryBackendApiService.changeStoryPublicationStatus(
+    this.editableStoryBackendApiService.changeStoryPublicationStatusAsync(
       this._story.getId(), newStoryStatusIsPublic).then(
       (storyBackendObject) => {
         this._setStoryPublicationStatus(newStoryStatusIsPublic);

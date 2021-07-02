@@ -39,6 +39,8 @@ export default {
     "Statistics", "Trigonometry", "Welcome"],
   "ACTIVITY_TYPE_EXPLORATION": "exploration",
   "ACTIVITY_TYPE_COLLECTION": "collection",
+  "ACTIVITY_TYPE_STORY": "story",
+  "ACTIVITY_TYPE_LEARN_TOPIC": "learn topic",
   "DISABLED_EXPLORATION_IDS": ["5"],
   "TESTING_CONSTANT": "test",
   "LIBRARY_TILE_WIDTH_PX": 208,
@@ -4799,6 +4801,10 @@ export default {
     "description": "Nederlands (Dutch)",
     "direction": "ltr"
   }, {
+    "code": "fat",
+    "description": "Fanti",
+    "direction": "ltr"
+  }, {
     "code": "tl",
     "description": "Filipino (Filipino)",
     "direction": "ltr"
@@ -4907,8 +4913,16 @@ export default {
     "description": "español (Spanish)",
     "direction": "ltr"
   }, {
+    "code": "sw",
+    "description": "kiswahili (Swahili)",
+    "direction": "ltr"
+  }, {
     "code": "sv",
     "description": "svenska (Swedish)",
+    "direction": "ltr"
+  }, {
+    "code": "ta",
+    "description": "தமிழ் (Tamil)",
     "direction": "ltr"
   }, {
     "code": "th",
@@ -4937,43 +4951,56 @@ export default {
   // List of supported site languages in which the platform is offered.
   "SUPPORTED_SITE_LANGUAGES": [{
     "id": "id",
-    "text": "Bahasa Indonesia"
+    "text": "Bahasa Indonesia",
+    "direction": "ltr"
   }, {
     "id": "en",
-    "text": "English"
+    "text": "English",
+    "direction": "ltr"
   }, {
     "id": "es",
-    "text": "Español"
+    "text": "Español",
+    "direction": "ltr"
   }, {
     "id": "fr",
-    "text": "français (French)"
+    "text": "français (French)",
+    "direction": "ltr"
   }, {
     "id": "pt-br",
-    "text": "Português (Brasil)"
+    "text": "Português (Brasil)",
+    "direction": "ltr"
   }, {
     "id": "ar",
-    "text": "العربية"
+    "text": "العربية",
+    "direction": "rtl"
   }, {
     "id": "kab",
-    "text": "Taqbaylit (Kabyle)"
+    "text": "Taqbaylit (Kabyle)",
+    "direction": "ltr"
   }, {
     "id": "vi",
-    "text": "Tiếng Việt"
+    "text": "Tiếng Việt",
+    "direction": "ltr"
   }, {
     "id": "tr",
-    "text": "Türkçe (Turkish)"
+    "text": "Türkçe (Turkish)",
+    "direction": "ltr"
   }, {
     "id": "hi",
-    "text": "हिन्दी"
+    "text": "हिन्दी",
+    "direction": "ltr"
   }, {
     "id": "bn",
-    "text": "বাংলা"
+    "text": "বাংলা",
+    "direction": "ltr"
   }, {
     "id": "zh-hans",
-    "text": "中文(简体)"
+    "text": "中文(简体)",
+    "direction": "ltr"
   }, {
     "id": "zh-hant",
-    "text": "中文(繁體)"
+    "text": "中文(繁體)",
+    "direction": "ltr"
   }],
 
   // List of supported audio languages in which we have audio and translations
@@ -5054,6 +5081,11 @@ export default {
     "id": "ee",
     "description": "Ewe",
     "relatedLanguages": ["ee"],
+    "direction": "ltr"
+  }, {
+    "id": "fat",
+    "description": "Fanti",
+    "relatedLanguages": ["ak", "fat"],
     "direction": "ltr"
   }, {
     "id": "tl",
@@ -5196,9 +5228,19 @@ export default {
     "relatedLanguages": ["es"],
     "direction": "ltr"
   }, {
+    "id": "sw",
+    "description": "Swahili",
+    "relatedLanguages": ["sw"],
+    "direction": "ltr"
+  }, {
     "id": "sv",
     "description": "Swedish",
-    "relatedLanguages": ["sw"],
+    "relatedLanguages": ["sv"],
+    "direction": "ltr"
+  }, {
+    "id": "ta",
+    "description": "Tamil",
+    "relatedLanguages": ["ta"],
     "direction": "ltr"
   }, {
     "id": "te",
@@ -5459,6 +5501,8 @@ export default {
 
   "NUM_QUESTIONS_PER_PAGE": 10,
 
+  "BULK_EMAIL_SERVICE_SIGNUP_URL": "",
+
   // The default number of opportunities to show on the contributor dashboard
   // page.
   "OPPORTUNITIES_PAGE_SIZE": 10,
@@ -5484,6 +5528,8 @@ export default {
   "MAX_CHARS_IN_CHAPTER_TITLE": 36,
   "MAX_CHARS_IN_CHAPTER_DESCRIPTION": 152,
   "MAX_CHARS_IN_MISCONCEPTION_NAME": 100,
+  "MAX_CHARS_IN_BLOG_POST_TITLE": 40,
+  "MAX_CHARS_IN_BLOG_POST_SUMMARY": 240,
   // This represents the maximum number of characters in the URL fragment for
   // story in the story page URL. E.g.
   // in /learn/math/fractions/story/bakery/..., 'bakery' is the
@@ -5494,6 +5540,9 @@ export default {
   // in /learn/math/fractions/revision/place-values, 'place-values' is the
   // 'subtopic URL fragment'.
   "MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT": 25,
+  // This represents the maximum number of characters in the URL fragment for
+  // the blog post.
+  "MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT": 65,
   // The recommended length for meta tag contents. Search engines will truncate
   // results greater than this limit.
   "MAX_CHARS_IN_META_TAG_CONTENT": 160,
@@ -5501,6 +5550,7 @@ export default {
 
   "NEW_STATE_TEMPLATE": {
     "classifier_model_id": null,
+    "linked_skill_id": null,
     "content": {
       "html": "",
       "content_id": "content"
@@ -5533,6 +5583,7 @@ export default {
       }
     },
     "solicit_answer_details": false,
+    "card_is_checkpoint": false,
     "written_translations": {
       "translations_mapping": {
         "content": {},
@@ -5544,11 +5595,6 @@ export default {
   // Data required for Google Analytics.
   "ANALYTICS_ID": "",
   "SITE_NAME_FOR_ANALYTICS": "",
-
-  "FIREBASE_AUTH_ENABLED": true,
-
-  // TODO(#11462): Delete this after Firebase authentication has been deployed.
-  "ENABLE_LOGIN_PAGE": true,
 
   // Data required for Firebase authentication.
   //
@@ -5562,13 +5608,24 @@ export default {
   "FIREBASE_CONFIG_APP_ID": "",
   "FIREBASE_CONFIG_GOOGLE_CLIENT_ID": "",
 
+  "BEAM_JOBS_ARE_ENABLED": false,
+
   "ALLOW_YAML_FILE_UPLOAD": false,
 
   // A regular expression for tags.
   "TAG_REGEX": "^[a-z ]+$",
 
+  // A regular expression for allowed character in tags for blog post.
+  "BLOG_POST_TAG_REGEX": "^[a-zA-Z0-9 ]+$",
+
   // A regular expression for allowed characters in URL fragment fields.
   "VALID_URL_FRAGMENT_REGEX": "^[a-z]+(-[a-z]+)*$",
+
+  // A regular expression for allowed characters in Title field for Blog Post.
+  "VALID_BLOG_POST_TITLE_REGEX": "^[a-zA-Z0-9][a-zA-Z0-9 ]+(-[a-zA-Z0-9]+)*$",
+
+  // A regular expression for allowed characters in URL fragment for Blog Post.
+  "VALID_URL_BLOG_FRAGMENT_REGEX": "^[a-z0-9]+(-[a-z0-9]+)*$",
 
   // A regular expression for valid skill misconception id.
   "VALID_SKILL_MISCONCEPTION_ID_REGEX": "[A-Za-z0-9]{12}-[0-9]+",
@@ -5687,9 +5744,10 @@ export default {
   "OPPORTUNITY_TYPE_TRANSLATION": "translation",
   "OPPORTUNITY_TYPE_VOICEOVER": "voiceover",
 
-  // The bucket name is set to None-resources to enable it to be used
-  // in prod mode when the resource bucket name is not allowed to be null.
-  "GCS_RESOURCE_BUCKET_NAME": "None-resources",
+  // The bucket name is set to app_default_bucket which is used to store files
+  // in GCS when local development server is running. This should be changed
+  // in prod appropriately.
+  "GCS_RESOURCE_BUCKET_NAME": "app_default_bucket",
 
   "ENABLE_EXP_FEEDBACK_FOR_LOGGED_OUT_USERS": true,
 
@@ -5725,6 +5783,7 @@ export default {
   // fields must be at most 1500 bytes, and UTF-8 encoded characters can be
   // up to 4 bytes long.
   "MAX_COMMIT_MESSAGE_LENGTH": 375,
+  "MAX_REVIEW_MESSAGE_LENGTH": 10000,
 
   "EMAIL_DASHBOARD_PREDICATE_DEFINITION": [
     {

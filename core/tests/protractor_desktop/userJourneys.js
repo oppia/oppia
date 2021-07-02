@@ -25,6 +25,7 @@ var CreatorDashboardPage =
 var ExplorationEditorPage = require(
   '../protractor_utils/ExplorationEditorPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
+var ModeratorPage = require('../protractor_utils/ModeratorPage.js');
 var PreferencesPage = require('../protractor_utils/PreferencesPage.js');
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
@@ -45,9 +46,11 @@ var _selectLanguage = async function(language) {
 describe('Basic user journeys', function() {
   describe('Account creation', function() {
     var libraryPage = null;
+    var moderatorPage = null;
 
     beforeAll(function() {
       libraryPage = new LibraryPage.LibraryPage();
+      moderatorPage = new ModeratorPage.ModeratorPage();
     });
 
     it('should create users', async function() {
@@ -58,7 +61,8 @@ describe('Basic user journeys', function() {
       await libraryPage.get();
       await general.checkForConsoleErrors([]);
 
-      await browser.get(general.MODERATOR_URL_SUFFIX);
+      await moderatorPage.get();
+      await general.expectErrorPage(401);
       await general.checkForConsoleErrors([
         'Failed to load resource: the server responded with a status of 401']);
       await users.logout();
@@ -67,9 +71,11 @@ describe('Basic user journeys', function() {
     it('should create moderators', async function() {
       await users.createModerator(
         'mod@userManagement.com', 'moderatorUserManagement');
-
       await users.login('mod@userManagement.com');
-      await browser.get(general.MODERATOR_URL_SUFFIX);
+      await general.checkForConsoleErrors([
+        'Failed to load resource: the server responded with a status of 401']);
+      await moderatorPage.get();
+      await moderatorPage.expectModeratorPageToBeVisible();
       await general.openProfileDropdown();
       await users.logout();
       await general.checkForConsoleErrors([]);
@@ -259,14 +265,16 @@ describe('Site language', function() {
       // Checking collection player page.
       await browser.get('/collection/' + collectionId);
       await waitFor.pageToFullyLoad();
-      expect(await element(by.css('.oppia-share-collection-footer')).getText())
+      expect(await element(
+        by.css('.protractor-test-share-collection-footer')).getText())
         .toEqual('COMPARTIR ESTA COLECCIÓN');
       await general.ensurePageHasNoTranslationIds();
 
       // Checking exploration player page.
       await browser.get('/explore/' + firstExplorationId);
       await waitFor.pageToFullyLoad();
-      expect(await element(by.css('.author-profile-text')).getText())
+      expect(await element(
+        by.css('.protractor-test-author-profile-text')).getText())
         .toEqual('PERFILES DE AUTORES');
       await general.ensurePageHasNoTranslationIds();
     }

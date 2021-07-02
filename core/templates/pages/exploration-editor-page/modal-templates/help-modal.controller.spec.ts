@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 /**
  * @fileoverview Unit tests for HelpModalController.
@@ -29,6 +30,7 @@ describe('Help Modal Controller', function() {
   var explorationId = 'exp1';
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
     ContextService = $injector.get('ContextService');

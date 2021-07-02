@@ -40,8 +40,8 @@
   </head>
   <body>
     <service-bootstrap></service-bootstrap>
-    <div ng-controller="Base">
-      <base-content>
+    <div ng-controller="Base" dir="<[direction]>">
+      <oppia-base-content>
         <content>
           <div role="main" class="position-relative oppia-main-page-container">
             <div class="oppia-page-container">
@@ -60,7 +60,7 @@
           </div>
         </content>
         <page-footer></page-footer>
-      </base-content>
+      </oppia-base-content>
     </div>
     @load('pages/footer_js_libs.html')
   </body>

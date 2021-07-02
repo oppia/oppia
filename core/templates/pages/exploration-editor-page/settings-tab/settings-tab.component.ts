@@ -176,7 +176,7 @@ angular.module('oppia').component('settingsTab', {
         // /settings) results in a console error.
 
         ctrl.hasPageLoaded = false;
-        ExplorationDataService.getData().then(function() {
+        ExplorationDataService.getDataAsync().then(function() {
           if (ExplorationStatesService.isInitialized()) {
             var categoryIsInSelect2 = ctrl.CATEGORY_LIST_FOR_SELECT2.some(
               function(categoryItem) {
@@ -296,10 +296,20 @@ angular.module('oppia').component('settingsTab', {
         ctrl.newMemberRole = ctrl.ROLES[0];
       };
 
+      ctrl.openVoiceoverRolesForm = () => {
+        ctrl.isVoiceoverFormOpen = true;
+        ctrl.newVoiceArtistUsername = '';
+      };
+
       ctrl.closeEditRolesForm = function() {
         ctrl.newMemberUsername = '';
         ctrl.newMemberRole = ctrl.ROLES[0];
         ctrl.closeRolesForm();
+      };
+
+      ctrl.closeVoiceoverForm = () => {
+        ctrl.newVoiceArtistUsername = '';
+        ctrl.isVoiceoverFormOpen = false;
       };
 
       ctrl.editRole = function(newMemberUsername, newMemberRole) {
@@ -332,6 +342,37 @@ angular.module('oppia').component('settingsTab', {
           ExplorationRightsService.removeRoleAsync(
             memberUsername);
           ctrl.closeRolesForm();
+        }, () => {
+          // Note to developers:
+          // This callback is triggered when the Cancel button is
+          // clicked. No further action is needed.
+        });
+      };
+
+      ctrl.editVoiseArtist = function(newVoiceArtistUsername) {
+        ExplorationRightsService.assignVoiceArtistRoleAsync(
+          newVoiceArtistUsername);
+        ctrl.closeVoiceoverForm();
+        return;
+      };
+
+      ctrl.removeVoiceArtist = function(voiceArtistUsername) {
+        AlertsService.clearWarnings();
+
+        $uibModal.open({
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/pages/exploration-editor-page/settings-tab/templates/' +
+            'remove-role-confirmation-modal.directive.html'),
+          backdrop: true,
+          resolve: {
+            username: () => voiceArtistUsername,
+            role: () => 'voice artist'
+          },
+          controller: 'RemoveRoleConfirmationModalController'
+        }).result.then(function() {
+          ExplorationRightsService.removeVoiceArtistRoleAsync(
+            voiceArtistUsername);
+          ctrl.closeVoiceoverForm();
         }, () => {
           // Note to developers:
           // This callback is triggered when the Cancel button is
@@ -412,7 +453,7 @@ angular.module('oppia').component('settingsTab', {
           backdrop: true,
           controller: 'ConfirmOrCancelModalController'
         }).result.then(function() {
-          EditableExplorationBackendApiService.deleteExploration(
+          EditableExplorationBackendApiService.deleteExplorationAsync(
             ctrl.explorationId).then(function() {
             WindowRef.nativeWindow.location = CREATOR_DASHBOARD_PAGE_URL;
           });
@@ -547,6 +588,7 @@ angular.module('oppia').component('settingsTab', {
           });
         }
         ctrl.isRolesFormOpen = false;
+        ctrl.isVoiceoverFormOpen = false;
         ctrl.rolesSaveButtonEnabled = false;
         ctrl.errorMessage = '';
         ctrl.basicSettingIsShown = !WindowDimensionsService.isWindowNarrow();
@@ -562,6 +604,7 @@ angular.module('oppia').component('settingsTab', {
         ctrl.canModifyRoles = false;
         ctrl.canReleaseOwnership = false;
         ctrl.canUnpublish = false;
+        ctrl.canManageVoiceArtist = false;
         ctrl.explorationId = ExplorationDataService.explorationId;
         ctrl.loggedInUser = null;
         UserService.getUserInfoAsync().then(function(userInfo) {
@@ -574,6 +617,7 @@ angular.module('oppia').component('settingsTab', {
             ctrl.canModifyRoles = permissions.canModifyRoles;
             ctrl.canReleaseOwnership = permissions.canReleaseOwnership;
             ctrl.canUnpublish = permissions.canUnpublish;
+            ctrl.canManageVoiceArtist = permissions.canManageVoiceArtist;
           });
 
         ctrl.explorationTitleService = ExplorationTitleService;
@@ -598,9 +642,6 @@ angular.module('oppia').component('settingsTab', {
         }, {
           name: 'Collaborator (can make changes)',
           value: 'editor'
-        }, {
-          name: 'Voice Artist (can do voiceover)',
-          value: 'voice artist'
         }, {
           name: 'Playtester (can give feedback)',
           value: 'viewer'

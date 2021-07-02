@@ -2,7 +2,7 @@
   <div class="navbar-tabs">
     <div class="navbar-text">
       <[$ctrl.getNavbarText()]>
-      <span class="protractor-autosave-indicator autosave-indicator" ng-if="$ctrl.autosaveIsInProgress">
+      <span class="protractor-test-autosave-indicator autosave-indicator" ng-if="$ctrl.autosaveIsInProgress">
         &emsp;Auto Saving ...
       </span>
     </div>
@@ -103,7 +103,7 @@
       </div>
     </div>
 
-    <exploration-editor-tab ng-show="$ctrl.getActiveTabName() === 'main'">
+    <exploration-editor-tab ng-show="$ctrl.getActiveTabName() === 'main'" exploration-is-linked-to-story="$ctrl.explorationIsLinkedToStory">
     </exploration-editor-tab>
 
     <translation-tab ng-if="$ctrl.getActiveTabName() === 'translation'">

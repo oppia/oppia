@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
 
 import { AnswerStats } from 'domain/exploration/answer-stats.model';
 import { StateObjectsBackendDict } from
@@ -44,7 +44,8 @@ import { StateTopAnswersStatsService } from
   'services/state-top-answers-stats.service';
 
 // TODO(#7222): Remove usage of UpgradedServices once upgraded to Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { ChangeListService } from 'pages/exploration-editor-page/services/change-list.service';
 
 /**
  * @fileoverview Tests for ExplorationImprovementsService.
@@ -54,7 +55,7 @@ describe('ExplorationImprovementsService', function() {
   let explorationImprovementsService;
 
   let $uibModal;
-  let changeListService;
+  let changeListService: ChangeListService;
   let explorationStatesService;
   let explorationRightsService;
 
@@ -118,9 +119,11 @@ describe('ExplorationImprovementsService', function() {
       },
       id: 'TextInput',
     },
+    linked_skill_id: null,
     next_content_id_index: 0,
     param_changes: [],
     solicit_answer_details: false,
+    card_is_checkpoint: false,
     written_translations: {
       translations_mapping: {
         content: {},
@@ -140,14 +143,22 @@ describe('ExplorationImprovementsService', function() {
 
   const newExpPermissions = (canEdit: boolean) => {
     return (
-      new ExplorationPermissions(null, null, null, null, null, null, canEdit));
+      new ExplorationPermissions(
+        null, null, null, null, null, null, canEdit, null));
   };
 
   importAllAngularServices();
 
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [
+        ChangeListService
+      ]
+    });
+  });
+
   beforeEach(angular.mock.inject($injector => {
     $uibModal = $injector.get('$uibModal');
-    changeListService = $injector.get('ChangeListService');
     contextService = $injector.get('ContextService');
     explorationImprovementsBackendApiService = (
       $injector.get('ExplorationImprovementsBackendApiService'));
@@ -167,6 +178,7 @@ describe('ExplorationImprovementsService', function() {
   }));
 
   beforeEach(() => {
+    changeListService = TestBed.inject(ChangeListService);
     spyOn(contextService, 'getExplorationId').and.returnValue(expId);
 
     this.eibasGetTasksAsyncSpy = (

@@ -19,6 +19,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals # pylint: disable=import-only-modules
 
+import re
+
 from constants import constants
 from core.platform import models
 from core.tests import test_utils
@@ -63,6 +65,22 @@ class RegistryUnitTest(test_utils.TestBase):
         self.assertEqual(
             expected_base_models,
             self.registry_instance.import_models([models.NAMES.base_model]))
+
+    def test_import_models_blog_model(self):
+        """Tests import_models function with blog post model option."""
+        from core.storage.blog import gae_models as blog_models
+        expected_blog_models = (blog_models,)
+        self.assertEqual(
+            expected_blog_models,
+            self.registry_instance.import_models([models.NAMES.blog]))
+
+    def test_import_models_beam_job_model(self):
+        """Tests import_models function with base model option."""
+        from core.storage.beam_job import gae_models as beam_job_models
+        expected_beam_job_models = (beam_job_models,)
+        self.assertEqual(
+            expected_beam_job_models,
+            self.registry_instance.import_models([models.NAMES.beam_job]))
 
     def test_import_models_classifier(self):
         """Tests import_models function with classifier option."""
@@ -199,6 +217,7 @@ class RegistryUnitTest(test_utils.TestBase):
         self.assertIn(user_models.CompletedActivitiesModel, classes)
         self.assertIn(user_models.IncompleteActivitiesModel, classes)
         self.assertIn(user_models.ExpUserLastPlaythroughModel, classes)
+        self.assertIn(user_models.LearnerGoalsModel, classes)
         self.assertIn(user_models.LearnerPlaylistModel, classes)
         self.assertIn(user_models.UserContributionsModel, classes)
         self.assertIn(user_models.UserEmailPreferencesModel, classes)
@@ -220,13 +239,6 @@ class RegistryUnitTest(test_utils.TestBase):
         self.assertNotIn(base_models.VersionedModel, classes)
         self.assertNotIn(base_models.BaseSnapshotMetadataModel, classes)
         self.assertNotIn(base_models.BaseSnapshotContentModel, classes)
-
-    def test_import_current_user_services(self):
-        """Tests import current user services function."""
-        from core.platform.users import gae_current_user_services
-        self.assertEqual(
-            self.registry_instance.import_current_user_services(),
-            gae_current_user_services)
 
     def test_import_datastore_services(self):
         """Tests import datastore services function."""
@@ -282,6 +294,33 @@ class RegistryUnitTest(test_utils.TestBase):
                 'Invalid email service provider: invalid service provider'):
                 self.registry_instance.import_email_services()
 
+    def test_import_bulk_email_services_mailchimp(self):
+        """Tests import email services method for when email service provider is
+        mailchimp.
+        """
+        with self.swap(
+            feconf, 'BULK_EMAIL_SERVICE_PROVIDER',
+            feconf.BULK_EMAIL_SERVICE_PROVIDER_MAILCHIMP), (
+                self.swap(constants, 'EMULATOR_MODE', False)):
+            from core.platform.bulk_email import mailchimp_bulk_email_services
+            self.assertEqual(
+                mailchimp_bulk_email_services,
+                self.registry_instance.import_bulk_email_services())
+
+    def test_import_bulk_email_services_invalid(self):
+        """Tests import email services method for when email service provider is
+        an invalid option.
+        """
+        with self.swap(
+            feconf, 'BULK_EMAIL_SERVICE_PROVIDER',
+            'invalid service provider'), (
+                self.swap(constants, 'EMULATOR_MODE', False)):
+            with self.assertRaisesRegexp(
+                Exception,
+                'Invalid bulk email service provider: invalid service '
+                'provider'):
+                self.registry_instance.import_bulk_email_services()
+
     def test_import_cache_services(self):
         """Tests import cache services function."""
         from core.platform.cache import redis_cache_services
@@ -326,5 +365,7 @@ class RegistryUnitTest(test_utils.TestBase):
         """Tests NotImplementedError of Platform."""
         with self.assertRaisesRegexp(
             NotImplementedError,
-            r'import_models\(\) method is not overwritten in derived classes'):
+            re.escape(
+                'import_models() method is not overwritten in '
+                'derived classes')):
             models.Platform().import_models()

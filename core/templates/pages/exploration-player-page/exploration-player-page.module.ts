@@ -21,7 +21,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModalModule, NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
@@ -35,24 +35,47 @@ import { SwitchContentLanguageRefreshRequiredModalComponent } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
 import { InteractionExtensionsModule } from 'interactions/interactions.module';
+import { MatButtonModule } from '@angular/material/button';
+import { LearnerLocalNavComponent } from './layout-directives/learner-local-nav.component';
+import { FlagExplorationModalComponent } from './modals/flag-exploration-modal.component';
+import { FeedbackPopupComponent } from './layout-directives/feedback-popup.component';
+import { ExplorationSuccessfullyFlaggedModalComponent } from './modals/exploration-successfully-flagged-modal.component';
+import { LearnerAnswerInfoCard } from './learner-experience/learner-answer-info-card.component';
+import { MaterialModule } from 'components/material.module';
+import { RefresherExplorationConfirmationModal } from './modals/refresher-exploration-confirmation-modal.component';
 
 @NgModule({
   imports: [
     BrowserModule,
     HttpClientModule,
     InteractionExtensionsModule,
+    MatButtonModule,
     NgbModalModule,
+    MaterialModule,
+    NgbPopoverModule,
     SharedComponentsModule
   ],
   declarations: [
     ContentLanguageSelectorComponent,
     OppiaAngularRootComponent,
-    SwitchContentLanguageRefreshRequiredModalComponent
+    SwitchContentLanguageRefreshRequiredModalComponent,
+    LearnerAnswerInfoCard,
+    ExplorationSuccessfullyFlaggedModalComponent,
+    FlagExplorationModalComponent,
+    LearnerLocalNavComponent,
+    FeedbackPopupComponent,
+    RefresherExplorationConfirmationModal,
   ],
   entryComponents: [
     ContentLanguageSelectorComponent,
     OppiaAngularRootComponent,
-    SwitchContentLanguageRefreshRequiredModalComponent
+    SwitchContentLanguageRefreshRequiredModalComponent,
+    ExplorationSuccessfullyFlaggedModalComponent,
+    FlagExplorationModalComponent,
+    LearnerLocalNavComponent,
+    FeedbackPopupComponent,
+    LearnerAnswerInfoCard,
+    RefresherExplorationConfirmationModal,
   ],
   providers: [
     {
@@ -76,11 +99,11 @@ class ExplorationPlayerPageModule {
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 
-const bootstrapFn = (extraProviders: StaticProvider[]) => {
+const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
   return platformRef.bootstrapModule(ExplorationPlayerPageModule);
 };
-const downgradedModule = downgradeModule(bootstrapFn);
+const downgradedModule = downgradeModule(bootstrapFnAsync);
 
 declare var angular: ng.IAngularStatic;
 

@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,105 +20,144 @@
  * followed by the name of the arg.
  */
 
-require(
-  'interactions/NumericExpressionInput/directives/' +
-  'numeric-expression-input-rules.service.ts');
-require('interactions/interaction-attributes-extractor.service.ts');
-require(
-  'pages/exploration-player-page/services/current-interaction.service.ts');
-require('services/contextual/device-info.service.ts');
-require('services/guppy-configuration.service.ts');
-require('services/guppy-initialization.service.ts');
-require('services/math-interactions.service.ts');
+import { Component, Input, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { InteractionAnswer } from 'interactions/answer-defs';
+import { NumericExpressionInputCustomizationArgs } from 'interactions/customization-args-defs';
+import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
+import { CurrentInteractionService, InteractionRulesService } from 'pages/exploration-player-page/services/current-interaction.service';
+import { DeviceInfoService } from 'services/contextual/device-info.service';
+import { GuppyConfigurationService } from 'services/guppy-configuration.service';
+import { GuppyInitializationService } from 'services/guppy-initialization.service';
+import { MathInteractionsService } from 'services/math-interactions.service';
+import { NumericExpressionInputRulesService } from './numeric-expression-input-rules.service';
 
-angular.module('oppia').component('oppiaInteractiveNumericExpressionInput', {
-  template: require('./numeric-expression-input-interaction.component.html'),
-  controller: [
-    '$attrs', '$scope', 'CurrentInteractionService', 'DeviceInfoService',
-    'GuppyConfigurationService', 'GuppyInitializationService',
-    'InteractionAttributesExtractorService', 'MathInteractionsService',
-    'NumericExpressionInputRulesService',
-    function(
-        $attrs, $scope, CurrentInteractionService, DeviceInfoService,
-        GuppyConfigurationService, GuppyInitializationService,
-        InteractionAttributesExtractorService, MathInteractionsService,
-        NumericExpressionInputRulesService) {
-      const ctrl = this;
-      ctrl.value = '';
-      ctrl.hasBeenTouched = false;
-      ctrl.warningText = '';
+@Component({
+  selector: 'oppia-interactive-numeric-expression-input',
+  templateUrl: './numeric-expression-input-interaction.component.html',
+  styleUrls: []
+})
+export class InteractiveNumericExpressionInput implements OnInit {
+  @Input() placeholderWithValue: string;
+  @Input() savedSolution: InteractionAnswer;
+  @Input() useFractionForDivisionWithValue: string;
 
-      ctrl.isCurrentAnswerValid = function() {
-        let activeGuppyObject = (
-          GuppyInitializationService.findActiveGuppyObject());
-        if (ctrl.hasBeenTouched && activeGuppyObject === undefined) {
-          // Replacing abs symbol, '|x|', with text, 'abs(x)' since the symbol
-          // is not compatible with nerdamer or with the backend validations.
-          ctrl.value = MathInteractionsService.replaceAbsSymbolWithText(
-            ctrl.value);
-          let answerIsValid = MathInteractionsService.validateNumericExpression(
-            ctrl.value);
-          if (answerIsValid) {
-            // Explicitly inserting '*' signs wherever necessary.
-            ctrl.value = MathInteractionsService.insertMultiplicationSigns(
-              ctrl.value);
-          }
-          ctrl.warningText = MathInteractionsService.getWarningText();
-          return answerIsValid;
-        }
-        ctrl.warningText = '';
-        return true;
-      };
+  value: string = '';
+  hasBeenTouched: boolean = false;
+  warningText: string = '';
 
-      ctrl.submitAnswer = function() {
-        if (!ctrl.isCurrentAnswerValid()) {
-          return;
-        }
-        CurrentInteractionService.onSubmit(
-          ctrl.value, NumericExpressionInputRulesService);
-      };
+  constructor(
+    private mathInteractionsService: MathInteractionsService,
+    public currentInteractionService: CurrentInteractionService,
+    private deviceInfoService: DeviceInfoService,
+    private guppyConfigurationService: GuppyConfigurationService,
+    private guppyInitializationService: GuppyInitializationService,
+    private interactionAttributesExtractorService:
+      InteractionAttributesExtractorService,
+    private numericExpressionInputRulesService:
+      NumericExpressionInputRulesService
+  ) {}
 
-      ctrl.showOSK = function() {
-        GuppyInitializationService.setShowOSK(true);
-        GuppyInitializationService.interactionType = 'NumericExpressionInput';
-      };
+  private _getAttributes() {
+    return {
+      placeholderWithValue: this.placeholderWithValue,
+      useFractionForDivisionWithValue: this.useFractionForDivisionWithValue
+    };
+  }
 
-      ctrl.$onInit = function() {
-        ctrl.hasBeenTouched = false;
-        GuppyConfigurationService.init();
-        const { useFractionForDivision, placeholder } = (
-          InteractionAttributesExtractorService.getValuesFromAttributes(
-            'NumericExpressionInput', $attrs));
-        GuppyConfigurationService.changeDivSymbol(useFractionForDivision);
-        GuppyInitializationService.init(
-          'guppy-div-learner',
-          placeholder.unicode,
-          $attrs.savedSolution !== undefined ?
-          JSON.parse($attrs.savedSolution) : ''
-        );
-        let eventType = (
-          DeviceInfoService.isMobileUserAgent() &&
-          DeviceInfoService.hasTouchEvents()) ? 'focus' : 'change';
-        // We need the 'focus' event while using the on screen keyboard (only
-        // for touch-based devices) to capture input from user and the 'change'
-        // event while using the normal keyboard.
-        Guppy.event(eventType, () => {
-          var activeGuppyObject = (
-            GuppyInitializationService.findActiveGuppyObject());
-          if (activeGuppyObject !== undefined) {
-            ctrl.hasBeenTouched = true;
-            ctrl.value = activeGuppyObject.guppyInstance.asciimath();
-            if (eventType === 'change') {
-              // Need to manually trigger the digest cycle to make any
-              // 'watchers' aware of changes in answer.
-              $scope.$apply();
-            }
-          }
-        });
-
-        CurrentInteractionService.registerCurrentInteraction(
-          ctrl.submitAnswer, ctrl.isCurrentAnswerValid);
-      };
+  isCurrentAnswerValid(): boolean {
+    let activeGuppyObject = (
+      this.guppyInitializationService.findActiveGuppyObject());
+    if (this.hasBeenTouched && activeGuppyObject === undefined) {
+      // Replacing abs symbol, '|x|', with text, 'abs(x)' since the symbol
+      // is not compatible with nerdamer or with the backend validations.
+      this.value = this.mathInteractionsService.replaceAbsSymbolWithText(
+        this.value);
+      let answerIsValid = (
+        this.mathInteractionsService.validateNumericExpression(
+          this.value));
+      if (answerIsValid) {
+        // Explicitly inserting '*' signs wherever necessary.
+        this.value = this.mathInteractionsService.insertMultiplicationSigns(
+          this.value);
+      }
+      this.warningText = this.mathInteractionsService.getWarningText();
+      return answerIsValid;
     }
-  ]
-});
+    this.warningText = '';
+    return true;
+  }
+
+  submitAnswer(): void {
+    if (!this.isCurrentAnswerValid()) {
+      return;
+    }
+    this.currentInteractionService.onSubmit(this.value, (
+      this.numericExpressionInputRulesService
+    ) as unknown as InteractionRulesService);
+  }
+
+  showOSK(): void {
+    this.guppyInitializationService.setShowOSK(true);
+    GuppyInitializationService.interactionType = 'NumericExpressionInput';
+  }
+
+  ngOnInit(): void {
+    this.hasBeenTouched = false;
+    this.guppyConfigurationService.init();
+    const { useFractionForDivision, placeholder } = (
+      this.interactionAttributesExtractorService.getValuesFromAttributes(
+        'NumericExpressionInput', this._getAttributes()
+      )) as NumericExpressionInputCustomizationArgs;
+
+    // This represents a list of special characters in LaTeX. These
+    // characters have a special meaning in LaTeX and thus need to be
+    // escaped.
+    const escapeCharacters = [
+      '&', '%', '$', '#', '_', '{', '}', '~', '^', '\\'];
+    for (let i = 0; i < placeholder.value.unicode.length; i++) {
+      if (escapeCharacters.includes(placeholder.value.unicode[i])) {
+        let newPlaceholder = `\\verb|${placeholder.value.unicode}|`;
+        placeholder.value.unicode = newPlaceholder;
+        break;
+      }
+    }
+    this.guppyConfigurationService.changeDivSymbol(
+      (useFractionForDivision as unknown as { value: boolean }).value);
+    this.guppyInitializationService.init(
+      'guppy-div-learner',
+      placeholder.value.unicode,
+      this.savedSolution !== undefined ?
+      this.savedSolution as string : ''
+    );
+    let eventType = (
+      this.deviceInfoService.isMobileUserAgent() &&
+      this.deviceInfoService.hasTouchEvents()) ? 'focus' : 'change';
+    // We need the 'focus' event while using the on screen keyboard (only
+    // for touch-based devices) to capture input from user and the 'change'
+    // event while using the normal keyboard.
+    Guppy.event(eventType, () => {
+      let activeGuppyObject = (
+        this.guppyInitializationService.findActiveGuppyObject());
+      if (activeGuppyObject !== undefined) {
+        this.hasBeenTouched = true;
+        this.value = activeGuppyObject.guppyInstance.asciimath();
+      }
+    });
+    const isCurrentAnswerValid = (): boolean => {
+      return this.isCurrentAnswerValid();
+    };
+
+    const submitAnswer = () => {
+      return this.submitAnswer();
+    };
+    this.currentInteractionService.registerCurrentInteraction(
+      submitAnswer, isCurrentAnswerValid);
+  }
+}
+
+
+angular.module('oppia').directive(
+  'oppiaInteractiveNumericExpressionInput', downgradeComponent(
+    {component: InteractiveNumericExpressionInput}
+  ) as angular.IDirectiveFactory);

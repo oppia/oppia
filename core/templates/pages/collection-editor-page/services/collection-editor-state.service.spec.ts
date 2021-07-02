@@ -24,7 +24,6 @@ import { CollectionUpdateService } from 'domain/collection/collection-update.ser
 import { Collection, CollectionBackendDict } from 'domain/collection/collection.model';
 import { EditableCollectionBackendApiService } from 'domain/collection/editable-collection-backend-api.service';
 import { Subscription } from 'rxjs';
-import { TranslatorProviderForTests } from 'tests/test.extras';
 import { CollectionEditorStateService } from './collection-editor-state.service';
 
 describe('Collection editor state service', () => {
@@ -41,7 +40,8 @@ describe('Collection editor state service', () => {
     newBackendCollectionObject: CollectionBackendDict;
     failure = null;
 
-    private _fetchOrUpdateCollection(): Promise<void | Collection> {
+    private async _fetchOrUpdateCollectionAsync(): Promise<
+      void | Collection> {
       return new Promise((resolve, reject) => {
         if (!this.failure) {
           resolve(
@@ -58,11 +58,11 @@ describe('Collection editor state service', () => {
 
 
     get fetchCollectionAsync(): () => Promise<void | Collection> {
-      return this._fetchOrUpdateCollection;
+      return this._fetchOrUpdateCollectionAsync;
     }
 
     get updateCollectionAsync(): () => Promise<void | Collection> {
-      return this._fetchOrUpdateCollection;
+      return this._fetchOrUpdateCollectionAsync;
     }
   }
 
@@ -70,7 +70,8 @@ describe('Collection editor state service', () => {
     backendCollectionRightsObject: CollectionRightsBackendDict;
     failure = null;
 
-    private _fetchCollectionRights(): Promise<void | CollectionRights> {
+    private async _fetchCollectionRightsAsync(): Promise<
+      void | CollectionRights> {
       return new Promise((resolve, reject) => {
         if (!this.failure) {
           resolve(CollectionRights.create(
@@ -83,12 +84,11 @@ describe('Collection editor state service', () => {
     }
 
     get fetchCollectionRightsAsync(): () => Promise<void | CollectionRights> {
-      return this._fetchCollectionRights;
+      return this._fetchCollectionRightsAsync;
     }
   }
 
   beforeEach(waitForAsync(() => {
-    angular.mock.module('oppia', TranslatorProviderForTests);
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [

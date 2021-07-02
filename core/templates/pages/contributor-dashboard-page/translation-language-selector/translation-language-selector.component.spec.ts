@@ -20,10 +20,10 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { TranslationLanguageSelectorComponent } from
   // eslint-disable-next-line max-len
-  'pages/contributor-dashboard-page/translation-language-selector/translation-language-selector.component.ts';
+  'pages/contributor-dashboard-page/translation-language-selector/translation-language-selector.component';
 import { ContributionOpportunitiesBackendApiService } from
   // eslint-disable-next-line max-len
-  'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service.ts';
+  'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
 import { FeaturedTranslationLanguage } from 'domain/opportunity/featured-translation-language.model';
 
 describe('Translation language selector', () => {
@@ -43,7 +43,7 @@ describe('Translation language selector', () => {
 
   let contributionOpportunitiesBackendApiServiceStub:
     Partial<ContributionOpportunitiesBackendApiService> = {
-      fetchFeaturedTranslationLanguagesAsync: () =>
+      fetchFeaturedTranslationLanguagesAsync: async() =>
         Promise.resolve(featuredLanguages)
     };
 

@@ -20,7 +20,7 @@ import 'core-js/es7/reflect';
 import 'zone.js';
 
 angular.module('oppia', [
-  require('angular-cookies'), 'ngSanitize', 'pascalprecht.translate', 'toastr',
+  require('angular-cookies'), 'ngSanitize', 'pascalprecht.translate',
   'ui.bootstrap'
 ]);
 
@@ -34,4 +34,4 @@ require(
 require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
-require('base-components/base-content.directive.ts');
+require('base-components/base-content.component.ts');

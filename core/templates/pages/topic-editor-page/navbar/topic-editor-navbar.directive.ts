@@ -117,7 +117,7 @@ angular.module('oppia').directive('topicEditorNavbar', [
                 backdrop: true,
                 controller: 'ConfirmOrCancelModalController'
               }).result.then(function() {
-                TopicRightsBackendApiService.sendMail(
+                TopicRightsBackendApiService.sendMailAsync(
                   $scope.topicId, $scope.topicName).then(function() {
                   var successToast = 'Mail Sent.';
                   AlertsService.addSuccessMessage(
@@ -132,7 +132,7 @@ angular.module('oppia').directive('topicEditorNavbar', [
               return;
             }
             var redirectToDashboard = false;
-            TopicRightsBackendApiService.publishTopic($scope.topicId).then(
+            TopicRightsBackendApiService.publishTopicAsync($scope.topicId).then(
               function() {
                 if (!$scope.topicRights.isPublished()) {
                   redirectToDashboard = true;
@@ -216,12 +216,12 @@ angular.module('oppia').directive('topicEditorNavbar', [
             if (!$scope.topicRights.canPublishTopic()) {
               return false;
             }
-            TopicRightsBackendApiService.unpublishTopic($scope.topicId).then(
-              function() {
-                $scope.topicRights.markTopicAsUnpublished();
-                TopicEditorStateService.setTopicRights($scope.topicRights);
-                $rootScope.$applyAsync();
-              });
+            TopicRightsBackendApiService.unpublishTopicAsync(
+              $scope.topicId).then(function() {
+              $scope.topicRights.markTopicAsUnpublished();
+              TopicEditorStateService.setTopicRights($scope.topicRights);
+              $rootScope.$applyAsync();
+            });
           };
 
           $scope.toggleNavigationOptions = function() {

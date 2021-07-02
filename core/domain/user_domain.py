@@ -38,8 +38,7 @@ class UserSettings(python_utils.OBJECT):
     Attributes:
         user_id: str. The unique ID of the user.
         email: str. The user email.
-        role: str. Role of the user. This is used in conjunction with
-            PARENT_ROLES to determine which actions the user can perform.
+        role: str. Role of the user.
         username: str or None. Identifiable username to display in the UI.
         last_agreed_to_terms: datetime.datetime or None. When the user last
             agreed to the terms of the site.
@@ -87,8 +86,7 @@ class UserSettings(python_utils.OBJECT):
         Args:
             user_id: str. The unique ID of the user.
             email: str. The user email.
-            role: str. Role of the user. This is used in conjunction with
-                PARENT_ROLES to determine which actions the user can perform.
+            role: str. Role of the user.
             username: str or None. Identifiable username to display in the UI.
             last_agreed_to_terms: datetime.datetime or None. When the user
                 last agreed to the terms of the site.
@@ -182,7 +180,7 @@ class UserSettings(python_utils.OBJECT):
         if not isinstance(self.role, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected role to be a string, received %s' % self.role)
-        if self.role not in role_services.PARENT_ROLES:
+        if not role_services.is_valid_role(self.role):
             raise utils.ValidationError('Role %s does not exist.' % self.role)
 
         if self.pin is not None:
@@ -623,60 +621,218 @@ class IncompleteActivities(python_utils.OBJECT):
     """Domain object for the incomplete activities model."""
 
     def __init__(
-            self, user_id, exploration_ids, collection_ids):
+            self, user_id, exploration_ids, collection_ids, story_ids,
+            partially_learnt_topic_ids, partially_mastered_topic_id=None):
         self.id = user_id
         self.exploration_ids = exploration_ids
         self.collection_ids = collection_ids
+        self.story_ids = story_ids
+        self.partially_learnt_topic_ids = partially_learnt_topic_ids
+        self.partially_mastered_topic_id = partially_mastered_topic_id
 
     def add_exploration_id(self, exploration_id):
-        """Adds the exploration id to the list of incomplete exploration ids."""
+        """Adds the exploration id to the list of incomplete exploration ids.
+
+        Args:
+            exploration_id: str. The exploration id to be inserted into the
+                incomplete list.
+        """
         self.exploration_ids.append(exploration_id)
 
     def remove_exploration_id(self, exploration_id):
         """Removes the exploration id from the list of incomplete exploration
         ids.
+
+        Args:
+            exploration_id: str. The exploration id to be removed from the
+                incomplete list.
         """
         self.exploration_ids.remove(exploration_id)
 
     def add_collection_id(self, collection_id):
-        """Adds the collection id to the list of incomplete collection ids."""
+        """Adds the collection id to the list of incomplete collection ids.
+
+        Args:
+            collection_id: str. The collection id to be inserted into the
+                incomplete list.
+        """
         self.collection_ids.append(collection_id)
 
     def remove_collection_id(self, collection_id):
         """Removes the collection id from the list of incomplete collection
         ids.
+
+        Args:
+            collection_id: str. The collection id to be removed from the
+                incomplete list.
         """
         self.collection_ids.remove(collection_id)
+
+    def add_story_id(self, story_id):
+        """Adds the story id to the list of incomplete story ids.
+
+        Args:
+            story_id: str. The story id to be inserted into the
+                incomplete list.
+        """
+        self.story_ids.append(story_id)
+
+    def remove_story_id(self, story_id):
+        """Removes the story id from the list of incomplete story
+        ids.
+
+        Args:
+            story_id: str. The story id to be removed from the
+                incomplete list.
+        """
+        self.story_ids.remove(story_id)
+
+    def add_partially_learnt_topic_id(self, partially_learnt_topic_id):
+        """Adds the topic id to the list of partially learnt topic ids.
+
+        Args:
+            partially_learnt_topic_id: str. The topic id to be inserted in the
+                partially learnt list.
+        """
+        self.partially_learnt_topic_ids.append(partially_learnt_topic_id)
+
+    def remove_partially_learnt_topic_id(self, partially_learnt_topic_id):
+        """Removes the topic id from the list of partially learnt topic
+        ids.
+
+        Args:
+            partially_learnt_topic_id: str. The topic id to be removed from the
+                partially learnt list.
+        """
+        self.partially_learnt_topic_ids.remove(partially_learnt_topic_id)
 
 
 class CompletedActivities(python_utils.OBJECT):
     """Domain object for the activities completed by learner model."""
 
     def __init__(
-            self, user_id, exploration_ids, collection_ids):
+            self, user_id, exploration_ids, collection_ids, story_ids,
+            learnt_topic_ids, mastered_topic_ids=None):
         self.id = user_id
         self.exploration_ids = exploration_ids
         self.collection_ids = collection_ids
+        self.story_ids = story_ids
+        self.learnt_topic_ids = learnt_topic_ids
+        self.mastered_topic_ids = mastered_topic_ids
 
     def add_exploration_id(self, exploration_id):
-        """Adds the exploration id to the list of completed exploration ids."""
+        """Adds the exploration id to the list of completed exploration ids.
+
+        Args:
+            exploration_id: str. The exploration id to be inserted into the
+                completed list.
+        """
         self.exploration_ids.append(exploration_id)
 
     def remove_exploration_id(self, exploration_id):
         """Removes the exploration id from the list of completed exploration
         ids.
+
+        Args:
+            exploration_id: str. The exploration id to be removed from the
+                completed list.
         """
         self.exploration_ids.remove(exploration_id)
 
     def add_collection_id(self, collection_id):
-        """Adds the collection id to the list of completed collection ids."""
+        """Adds the collection id to the list of completed collection ids.
+
+        Args:
+            collection_id: str. The collection id to be inserted into the
+                completed list.
+        """
         self.collection_ids.append(collection_id)
 
     def remove_collection_id(self, collection_id):
         """Removes the collection id from the list of completed collection
         ids.
+
+        Args:
+            collection_id: str. The collection id to be removed from the
+                completed list.
         """
         self.collection_ids.remove(collection_id)
+
+    def add_story_id(self, story_id):
+        """Adds the story id to the list of completed story ids.
+
+        Args:
+            story_id: str. The story id to be inserted in the
+                completed list.
+        """
+        self.story_ids.append(story_id)
+
+    def remove_story_id(self, story_id):
+        """Removes the story id from the list of completed story
+        ids.
+
+        Args:
+            story_id: str. The story id to be removed from the
+                completed list.
+        """
+        self.story_ids.remove(story_id)
+
+    def add_learnt_topic_id(self, learnt_topic_id):
+        """Adds the topic id to the list of learnt topic ids.
+
+        Args:
+            learnt_topic_id: str. The topic id to be inserted in the
+                learnt list.
+        """
+        self.learnt_topic_ids.append(learnt_topic_id)
+
+    def remove_learnt_topic_id(self, learnt_topic_id):
+        """Removes the topic id from the list of learnt topic
+        ids.
+
+        Args:
+            learnt_topic_id: str. The topic id to be removed from the
+                learnt list.
+        """
+        self.learnt_topic_ids.remove(learnt_topic_id)
+
+
+class LearnerGoals(python_utils.OBJECT):
+    """Domain object for the learner goals model."""
+
+    def __init__(
+            self, user_id, topic_ids_to_learn,
+            topic_ids_to_master):
+        self.id = user_id
+        self.topic_ids_to_learn = topic_ids_to_learn
+        self.topic_ids_to_master = topic_ids_to_master
+
+    def add_topic_id_to_learn(self, topic_id):
+        """Adds the topic id to 'topic IDs to learn' list.
+
+        Args:
+            topic_id: str. The topic id to be inserted to the learn list.
+        """
+        self.topic_ids_to_learn.append(topic_id)
+
+    def remove_topic_id_from_learn(self, topic_id):
+        """Removes the topic id from the 'topic IDs to learn' list.
+
+        topic_id: str. The id of the topic to be removed.
+        """
+        self.topic_ids_to_learn.remove(topic_id)
+
+    def to_dict(self):
+        """Return dictionary representation of LearnerGoals.
+
+        Returns:
+            dict. A dictionary containing the LearnerGoals class information
+            in a dictionary form.
+        """
+        return {
+            'topic_ids_to_learn': self.topic_ids_to_learn,
+            'topic_ids_to_master': self.topic_ids_to_master
+        }
 
 
 class LearnerPlaylist(python_utils.OBJECT):

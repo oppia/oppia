@@ -37,6 +37,9 @@ angular.module('oppia').factory('ContributionAndReviewService', [
       '/suggestionactionhandler/exploration/<exp_id>/<suggestion_id>');
     var _SUGGESTION_TO_SKILL_ACTION_HANDLER_URL = (
       '/suggestionactionhandler/skill/<skill_id>/<suggestion_id>');
+    var _UPDATE_TRANSLATION_HANDLER_URL = (
+      '/updatetranslationsuggestionhandler/<suggestion_id>'
+    );
 
     var _fetchSuggestionsAsync = async function(url) {
       return $http.get(url).then(function(res) {
@@ -116,6 +119,19 @@ angular.module('oppia').factory('ContributionAndReviewService', [
           action: action,
           review_message: reviewMessage,
           skill_difficulty: skillDifficulty
+        }).then(function() {
+          onSuccess(suggestionId);
+        }, () => onFailure && onFailure(suggestionId));
+      },
+      updateTranslationSuggestionAsync: async function(
+          suggestionId, translationHtml,
+          onSuccess, onFailure) {
+        var url = UrlInterpolationService.interpolateUrl(
+          _UPDATE_TRANSLATION_HANDLER_URL, {
+            suggestion_id: suggestionId
+          });
+        return $http.put(url, {
+          translation_html: translationHtml
         }).then(function() {
           onSuccess(suggestionId);
         }, () => onFailure && onFailure(suggestionId));

@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -31,8 +31,15 @@ export interface StoryContentsBackendDict {
   'nodes': StoryNodeBackendDict[];
 }
 
+interface NodeTitles {
+  [title: string]: string
+}
+
 export class StoryContents {
-  _initialNodeId: string;
+  // When the Story contains a single node and it needs to be deleted
+  // then the value '_initialNodeId' needs to be changed to null.
+  // See 'deleteNode' function below in this file for more details.
+  _initialNodeId: string | null;
   _nodes: StoryNode[];
   _nextNodeId: string;
   constructor(
@@ -49,7 +56,7 @@ export class StoryContents {
     return StoryEditorPageConstants.NODE_ID_PREFIX + index;
   }
 
-  getInitialNodeId(): string {
+  getInitialNodeId(): string | null {
     return this._initialNodeId;
   }
 
@@ -65,25 +72,15 @@ export class StoryContents {
     return this._nodes;
   }
 
-  getNodeIdCorrespondingToTitle(title: string): string {
-    var nodes = this._nodes;
-    for (var i = 0; i < nodes.length; i++) {
-      if (nodes[i].getTitle() === title) {
-        return nodes[i].getId();
-      }
-    }
-    return null;
-  }
-
   rearrangeNodeInStory(fromIndex: number, toIndex: number): void {
-    const nodeToMove = this._nodes[fromIndex];
+    const nodeToMove: StoryNode = this._nodes[fromIndex];
     this._nodes.splice(fromIndex, 1);
     this._nodes.splice(toIndex, 0, nodeToMove);
   }
 
   getNodeIdsToTitleMap(nodeIds: string[]): {} {
     var nodes = this._nodes;
-    var nodeTitles = {};
+    var nodeTitles: NodeTitles = {};
     for (var i = 0; i < nodes.length; i++) {
       if (nodeIds.indexOf(nodes[i].getId()) !== -1) {
         nodeTitles[nodes[i].getId()] = nodes[i].getTitle();

@@ -27,10 +27,7 @@ import utils
 
 # These test suites are not present in CI. One is extra
 # (ie. (full: [*.js])) and other test suites are being run by CircleCI.
-TEST_SUITES_NOT_RUN_IN_CI = [
-    'full', 'adminPage', 'library', 'publication',
-    'topicsAndSkillsDashboard', 'topicAndStoryEditor',
-    'topicAndStoryEditorFileUploadFeatures', 'topicAndStoryViewer']
+TEST_SUITES_NOT_RUN_IN_CI = ['full']
 
 
 PROTRACTOR_CONF_FILE_PATH = os.path.join(

@@ -79,7 +79,7 @@ export class MathInteractionsService {
         '" and "' + symbol2 + '".');
     }
     if (
-      errorMessage === 'Cannot read property \'parent\' of undefined.') {
+      errorMessage === 'Cannot read property \'column\' of undefined.') {
       let emptyFunctionNames = [];
       for (let functionName of this.mathFunctionNames) {
         if (expressionString.includes(functionName + '()')) {
@@ -254,7 +254,6 @@ export class MathInteractionsService {
       AppConstants.GREEK_LETTER_NAMES_TO_SYMBOLS);
     let greekSymbols = Object.values(
       AppConstants.GREEK_LETTER_NAMES_TO_SYMBOLS);
-    /* eslint-enable dot-notation */
     let greekLettersAndSymbols = [];
     for (let i = 0; i < greekLetters.length; i++) {
       greekLettersAndSymbols.push([greekLetters[i], greekSymbols[i]]);

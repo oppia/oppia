@@ -36,17 +36,11 @@ var DEFAULT_CUSTOMIZATION_ARGS: CustomizationArgs = {
   }
 };
 
-interface CopierCustomizationArgs {
-  'parse_with_jinja': boolean;
-  'value': string;
+interface ParamChangeCustomizationArgs {
+  'parse_with_jinja'?: boolean,
+  'value'?: string,
+  'list_of_values'?: string[]
 }
-
-interface RandomSelectorCustomizationArgs {
-  'list_of_values': string[];
-}
-
-type ParamChangeCustomizationArgs = (
-  CopierCustomizationArgs | RandomSelectorCustomizationArgs);
 
 export interface ParamChangeBackendDict {
   'customization_args': ParamChangeCustomizationArgs;

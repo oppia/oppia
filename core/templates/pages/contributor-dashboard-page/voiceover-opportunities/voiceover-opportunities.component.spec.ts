@@ -24,7 +24,7 @@ import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter } from '@angular/core';
 import { ExplorationOpportunitySummary } from 'domain/opportunity/exploration-opportunity-summary.model';
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 describe('Voiceover opportunities component', function() {
   var ctrl = null;
@@ -60,7 +60,8 @@ describe('Voiceover opportunities component', function() {
 
     spyOnProperty(translationLanguageService, 'onActiveLanguageChanged').and
       .returnValue(activeLanguageChangedEmitter);
-    spyOn(contributionOpportunitiesService, 'getVoiceoverOpportunities').and
+    spyOn(
+      contributionOpportunitiesService, 'getVoiceoverOpportunitiesAsync').and
       .callFake((languageCode, callback) => callback([
         ExplorationOpportunitySummary.createFromBackendDict({
           id: '1',
@@ -83,8 +84,9 @@ describe('Voiceover opportunities component', function() {
           }
         }),
       ], true));
-    spyOn(contributionOpportunitiesService, 'getMoreVoiceoverOpportunities').and
-      .callFake((languageCode, callback) => callback([
+    spyOn(
+      contributionOpportunitiesService, 'getMoreVoiceoverOpportunitiesAsync')
+      .and.callFake((languageCode, callback) => callback([
         ExplorationOpportunitySummary.createFromBackendDict({
           id: '3',
           topic_name: 'topic_3',

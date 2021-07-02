@@ -19,9 +19,24 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 // ^^^ This block is to be removed.
 import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
+import { waitForAsync } from '@angular/core/testing';
+
+class MockReaderObject {
+  result = null;
+  onload = null;
+  constructor() {
+    this.onload = () => {
+      return 'Fake onload executed';
+    };
+  }
+  readAsDataURL(file) {
+    this.onload();
+    return 'The file is loaded';
+  }
+}
 
 describe(
   'Questions Opportunities Select Skill And Difficulty Modal Controller',
@@ -32,6 +47,8 @@ describe(
     var alertsService = null;
     var SkillBackendApiService = null;
     var skillObjectFactory = null;
+    var extractImageFilenamesFromModelService = null;
+    var assetsBackendApiService = null;
 
     var skillId = 'skill_1';
     var skill = null;
@@ -41,66 +58,83 @@ describe(
     importAllAngularServices();
 
     describe('when fetching skill successfully', function() {
-      beforeEach(angular.mock.inject(function($injector, $controller) {
-        $q = $injector.get('$q');
-        var $rootScope = $injector.get('$rootScope');
-        SkillBackendApiService = $injector.get('SkillBackendApiService');
-        alertsService = $injector.get('AlertsService');
-        skillObjectFactory = $injector.get('SkillObjectFactory');
-        var skillDifficulties = $injector.get('SKILL_DIFFICULTIES');
+      beforeEach(waitForAsync(() => angular.mock.inject(
+        function($injector, $controller) {
+          var $rootScope = $injector.get('$rootScope');
+          SkillBackendApiService = $injector.get('SkillBackendApiService');
+          alertsService = $injector.get('AlertsService');
+          skillObjectFactory = $injector.get('SkillObjectFactory');
+          var skillDifficulties = $injector.get('SKILL_DIFFICULTIES');
+          extractImageFilenamesFromModelService = $injector.get(
+            'ExtractImageFilenamesFromModelService');
+          assetsBackendApiService = $injector.get('AssetsBackendApiService');
 
-        $uibModalInstance = jasmine.createSpyObj(
-          '$uibModalInstance', ['close', 'dismiss']);
+          $uibModalInstance = jasmine.createSpyObj(
+            '$uibModalInstance', ['close', 'dismiss']);
 
-        var misconceptionDict1 = {
-          id: '2',
-          name: 'test name',
-          notes: 'test notes',
-          feedback: 'test feedback',
-          must_be_addressed: true
-        };
-        var rubricDict = {
-          difficulty: skillDifficulties[0],
-          explanations: ['explanation']
-        };
-        var skillContentsDict = {
-          explanation: {
-            html: 'test explanation',
-            content_id: 'explanation',
-          },
-          worked_examples: [],
-          recorded_voiceovers: {
-            voiceovers_mapping: {}
-          }
-        };
-        skill = {
-          id: skillId,
-          description: 'Skill 1 description',
-          misconceptions: [misconceptionDict1],
-          rubrics: [rubricDict],
-          skill_contents: skillContentsDict,
-          language_code: 'en',
-          version: 1,
-          next_misconception_id: 3,
-          prerequisite_skill_ids: []
-        };
+          var misconceptionDict1 = {
+            id: '2',
+            name: 'test name',
+            notes: 'test notes',
+            feedback: 'test feedback',
+            must_be_addressed: true
+          };
+          var rubricDict = {
+            difficulty: skillDifficulties[0],
+            explanations: ['explanation']
+          };
+          var skillContentsDict = {
+            explanation: {
+              html: 'test explanation',
+              content_id: 'explanation',
+            },
+            worked_examples: [],
+            recorded_voiceovers: {
+              voiceovers_mapping: {}
+            }
+          };
+          skill = {
+            id: skillId,
+            description: 'Skill 1 description',
+            misconceptions: [misconceptionDict1],
+            rubrics: [rubricDict],
+            skill_contents: skillContentsDict,
+            language_code: 'en',
+            version: 1,
+            next_misconception_id: 3,
+            prerequisite_skill_ids: []
+          };
 
-        spyOn(SkillBackendApiService, 'fetchSkill').and.returnValue(
-          $q.resolve({
-            skill: skillObjectFactory.createFromBackendDict(skill)
-          }));
-
-        $scope = $rootScope.$new();
-        $controller(
-          'QuestionsOpportunitiesSelectSkillAndDifficultyModalController', {
-            $scope: $scope,
-            AlertsService: alertsService,
-            SkillObjectFactory: skillObjectFactory,
-            $uibModalInstance: $uibModalInstance,
-            skillId: skillId,
+          spyOn(SkillBackendApiService, 'fetchSkillAsync').and.returnValue(
+            Promise.resolve({
+              skill: skillObjectFactory.createFromBackendDict(skill)
+            }));
+          let mockImageFile = new File(['dummyImg.png'], 'dummyImg.png', {
+            type: 'image/png',
           });
-        $scope.$apply();
-      }));
+          spyOn(
+            extractImageFilenamesFromModelService,
+            'getImageFilenamesInSkill').and.returnValue(['dummyImg.png']);
+          spyOn(assetsBackendApiService, 'fetchFile').and.returnValue(
+            Promise.resolve(mockImageFile));
+          // This throws "Argument of type 'MockReaderObject' is not assignable
+          // to parameter of type 'FileReader'.". We need to suppress this error
+          // because 'FileReader' has around 15 more properties. We have only
+          // defined the properties we need in 'MockReaderObject'.
+          // @ts-expect-error
+          spyOn(window, 'FileReader').and.returnValue(new MockReaderObject());
+
+          $scope = $rootScope.$new();
+          $controller(
+            'QuestionsOpportunitiesSelectSkillAndDifficultyModalController', {
+              $scope: $scope,
+              AlertsService: alertsService,
+              SkillObjectFactory: skillObjectFactory,
+              $uibModalInstance: $uibModalInstance,
+              skillId: skillId,
+            });
+          $scope.$apply();
+        })));
 
       it('should initialize $scope properties after controller is' +
         ' initialized', function() {
@@ -133,7 +167,7 @@ describe(
         $uibModalInstance = jasmine.createSpyObj(
           '$uibModalInstance', ['close', 'dismiss']);
 
-        spyOn(SkillBackendApiService, 'fetchSkill').and.returnValue(
+        spyOn(SkillBackendApiService, 'fetchSkillAsync').and.returnValue(
           $q.reject('It was not possible to fetch the skill'));
 
         $scope = $rootScope.$new();

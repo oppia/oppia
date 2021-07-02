@@ -21,38 +21,7 @@ import { fakeAsync } from '@angular/core/testing';
 import { AnswerStats } from 'domain/exploration/answer-stats.model';
 import { StateTopAnswersStats } from
   'domain/statistics/state-top-answers-stats-object.factory';
-
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// exploration-editor-tab.directive.ts is upgraded to Angular 8.
-import { AngularNameService } from
-  'pages/exploration-editor-page/services/angular-name.service';
-import { AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
-import { ExplorationFeaturesService } from
-  'services/exploration-features.service';
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
-import { ImprovementsService } from 'services/improvements.service';
-import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
-import { ParamChangeObjectFactory } from
-  'domain/exploration/ParamChangeObjectFactory';
-import { ParamChangesObjectFactory } from
-  'domain/exploration/ParamChangesObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-import { SolutionValidityService } from
-  'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
-import { StateClassifierMappingService } from
-  'pages/exploration-player-page/services/state-classifier-mapping.service';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
-import { WrittenTranslationObjectFactory } from
-  'domain/exploration/WrittenTranslationObjectFactory';
-import { WrittenTranslationsObjectFactory } from
-  'domain/exploration/WrittenTranslationsObjectFactory';
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
 // ^^^ This block is to be removed.
 
@@ -70,47 +39,11 @@ describe('Exploration Warnings Service', function() {
   beforeEach(angular.mock.module('oppia'));
 
   importAllAngularServices();
-
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('AngularNameService', new AngularNameService());
-    $provide.value(
-      'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
-        new OutcomeObjectFactory(),
-        new RuleObjectFactory()));
-    $provide.value(
-      'ExplorationFeaturesService', new ExplorationFeaturesService());
-    $provide.value('FractionObjectFactory', new FractionObjectFactory());
-    $provide.value(
-      'HintObjectFactory', new HintObjectFactory());
-    $provide.value('ImprovementsService', new ImprovementsService());
-    $provide.value(
-      'OutcomeObjectFactory', new OutcomeObjectFactory());
-    $provide.value(
-      'ParamChangeObjectFactory', new ParamChangeObjectFactory());
-    $provide.value(
-      'ParamChangesObjectFactory', new ParamChangesObjectFactory(
-        new ParamChangeObjectFactory()));
-    $provide.value('RuleObjectFactory', new RuleObjectFactory());
-    $provide.value('SolutionValidityService', new SolutionValidityService());
-    $provide.value(
-      'StateClassifierMappingService', new StateClassifierMappingService());
-    $provide.value(
-      'StateEditorService', new StateEditorService(
-        new SolutionValidityService()));
-    $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
-    $provide.value(
-      'WrittenTranslationObjectFactory',
-      new WrittenTranslationObjectFactory());
-    $provide.value(
-      'WrittenTranslationsObjectFactory',
-      new WrittenTranslationsObjectFactory(
-        new WrittenTranslationObjectFactory()));
-  }));
-
   describe('when exploration param changes has jinja values', function() {
     beforeEach(angular.mock.module('oppia', function($provide) {
       $provide.value('ExplorationInitStateNameService', {
-        savedMemento: 'Hola'
+        savedMemento: 'Hola',
+        displayed: 'Hola'
       });
       $provide.value('ExplorationParamChangesService', {
         savedMemento: [{
@@ -148,6 +81,7 @@ describe('Exploration Warnings Service', function() {
     it('should update warnings with TextInput as interaction id', function() {
       ExplorationStatesService.init({
         Hola: {
+          card_is_checkpoint: true,
           content: {
             content_id: 'content',
             html: '{{HtmlValue}}'
@@ -230,6 +164,7 @@ describe('Exploration Warnings Service', function() {
     it('should update warnings with Continue as interaction id', function() {
       ExplorationStatesService.init({
         Hola: {
+          card_is_checkpoint: true,
           content: {
             content_id: 'content',
             html: '{{HtmlValue}}'
@@ -327,6 +262,7 @@ describe('Exploration Warnings Service', function() {
     it('should update warnings when no interaction id is provided', function() {
       ExplorationStatesService.init({
         Hola: {
+          card_is_checkpoint: true,
           content: {
             content_id: 'content',
             html: '{{HtmlValue}}'
@@ -400,6 +336,7 @@ describe('Exploration Warnings Service', function() {
       function() {
         ExplorationStatesService.init({
           Hola: {
+            card_is_checkpoint: true,
             content: {
               content_id: 'content',
               html: '{{HtmlValue}}'
@@ -492,6 +429,7 @@ describe('Exploration Warnings Service', function() {
       fakeAsync(async function() {
         ExplorationStatesService.init({
           Hola: {
+            card_is_checkpoint: true,
             content: {
               content_id: 'content',
               html: '{{HtmlValue}}'
@@ -594,6 +532,7 @@ describe('Exploration Warnings Service', function() {
     ' outcome destination', function() {
       ExplorationStatesService.init({
         Hola: {
+          card_is_checkpoint: true,
           content: {
             content_id: 'content',
             html: '{{HtmlValue}}'
@@ -682,6 +621,7 @@ describe('Exploration Warnings Service', function() {
     ' memento value', function() {
       ExplorationStatesService.init({
         Hola: {
+          card_is_checkpoint: true,
           content: {
             content_id: 'content',
             html: '{{HtmlValue}}'
@@ -735,6 +675,7 @@ describe('Exploration Warnings Service', function() {
           },
         },
         State: {
+          card_is_checkpoint: false,
           content: {
             content_id: 'content',
             html: '{{HtmlValue}}'
@@ -823,6 +764,622 @@ describe('Exploration Warnings Service', function() {
           'Number of rows must be integral.',
           'The current solution does not lead to another card.',
           'This card is unreachable.'
+        ]
+      });
+    });
+
+    it('should update warning when first card is not a checkpoint', function() {
+      ExplorationStatesService.init({
+        Hola: {
+          card_is_checkpoint: false,
+          content: {
+            content_id: 'content',
+            html: '{{HtmlValue}}'
+          },
+          recorded_voiceovers: {
+            voiceovers_mapping: {},
+          },
+          param_changes: [],
+          interaction: {
+            id: 'TextInput',
+            answer_groups: [{
+              outcome: {
+                dest: '',
+                feedback: {
+                  content_id: 'feedback_1',
+                  html: ''
+                },
+              },
+              rule_specs: [],
+              training_data: []
+            }],
+            default_outcome: {
+              dest: 'Hola',
+              feedback: {
+                content_id: '',
+                html: '',
+              },
+            },
+            customization_args: {
+              rows: {
+                value: true
+              },
+              placeholder: {
+                value: 1
+              }
+            },
+            hints: [],
+          },
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {},
+            },
+          },
+        }
+      });
+
+      ExplorationWarningsService.updateWarnings();
+      expect(ExplorationWarningsService.countWarnings()).toBe(4);
+      expect(ExplorationWarningsService.hasCriticalWarnings()).toBe(true);
+      expect(ExplorationWarningsService.getAllStateRelatedWarnings()).toEqual({
+        Hola: [
+          'Placeholder text must be a string.',
+          'Number of rows must be integral.',
+          'There\'s no way to complete the exploration starting from this' +
+          ' card. To fix this, make sure that the last card in the chain' +
+          ' starting from this one has an \'End Exploration\' question type.',
+          'The first card of the lesson must be a checkpoint.'
+        ]
+      });
+    });
+
+    it('should show warning if terminal card is a checkpoint', function() {
+      ExplorationStatesService.init({
+        Hola: {
+          card_is_checkpoint: true,
+          content: {
+            content_id: 'content',
+            html: '{{HtmlValue}}'
+          },
+          recorded_voiceovers: {
+            voiceovers_mapping: {},
+          },
+          param_changes: [],
+          interaction: {
+            id: 'TextInput',
+            answer_groups: [{
+              outcome: {
+                dest: '',
+                feedback: {
+                  content_id: 'feedback_1',
+                  html: ''
+                },
+              },
+              rule_specs: [],
+              training_data: []
+            }],
+            default_outcome: {
+              dest: 'End',
+              feedback: {
+                content_id: '',
+                html: '',
+              },
+            },
+            customization_args: {
+              rows: {
+                value: true
+              },
+              placeholder: {
+                value: 1
+              }
+            },
+            hints: [],
+          },
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {},
+            },
+          },
+        },
+        End: {
+          card_is_checkpoint: true,
+          content: {
+            content_id: 'content',
+            html: '{{HtmlValue}}'
+          },
+          recorded_voiceovers: {
+            voiceovers_mapping: {},
+          },
+          param_changes: [],
+          interaction: {
+            id: 'EndExploration',
+            answer_groups: [{
+              outcome: {
+                dest: '',
+                feedback: {
+                  content_id: 'feedback_2',
+                  html: ''
+                },
+              },
+              rule_specs: [],
+              training_data: []
+            }],
+            default_outcome: null,
+            customization_args: {
+              recommendedExplorationIds: {
+                value: []
+              }
+            },
+            hints: [],
+          },
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {},
+            },
+          },
+        }
+      });
+
+      ExplorationWarningsService.updateWarnings();
+      expect(ExplorationWarningsService.countWarnings()).toBe(5);
+      expect(ExplorationWarningsService.hasCriticalWarnings()).toBe(true);
+      expect(ExplorationWarningsService.getAllStateRelatedWarnings()).toEqual({
+        Hola: [
+          'Placeholder text must be a string.',
+          'Number of rows must be integral.',
+        ],
+        End: [
+          'Please make sure end exploration interactions do not ' +
+          'have any answer groups.',
+          'Checkpoints are not allowed on the last card of the lesson.',
+          'Checkpoints must not be assigned to cards that can be bypassed.'
+        ]
+      });
+    });
+
+    it('should show warnings if checkpoint count is more than 8 and' +
+      ' bypassable state is made a checkpoint', function() {
+      ExplorationStatesService.init({
+        Hola: {
+          card_is_checkpoint: true,
+          content: {
+            content_id: 'content',
+            html: '{{HtmlValue}}'
+          },
+          recorded_voiceovers: {
+            voiceovers_mapping: {},
+          },
+          param_changes: [],
+          interaction: {
+            id: 'TextInput',
+            answer_groups: [
+              {
+                outcome: {
+                  dest: 'State1',
+                  feedback: {
+                    content_id: 'feedback_1',
+                    html: ''
+                  },
+                },
+                rule_specs: [],
+                training_data: []
+              },
+              {
+                outcome: {
+                  dest: 'State2',
+                  feedback: {
+                    content_id: 'feedback_2',
+                    html: ''
+                  },
+                },
+                rule_specs: [],
+                training_data: []
+              },
+              {
+                outcome: {
+                  dest: 'State3',
+                  feedback: {
+                    content_id: 'feedback_3',
+                    html: ''
+                  },
+                },
+                rule_specs: [],
+                training_data: []
+              }
+            ],
+            customization_args: {
+              rows: {
+                value: true
+              },
+              placeholder: {
+                value: 1
+              }
+            },
+            hints: [],
+          },
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {},
+            },
+          },
+        },
+        State1: {
+          card_is_checkpoint: true,
+          content: {
+            content_id: 'content',
+            html: '{{HtmlValue}}'
+          },
+          recorded_voiceovers: {
+            voiceovers_mapping: {},
+          },
+          param_changes: [],
+          interaction: {
+            id: 'TextInput',
+            answer_groups: [{
+              outcome: {
+                dest: 'State4',
+                feedback: {
+                  content_id: 'feedback_2',
+                  html: ''
+                },
+              },
+              rule_specs: [],
+              training_data: []
+            }],
+            default_outcome: null,
+            customization_args: {
+              rows: {
+                value: true
+              },
+              placeholder: {
+                value: 1
+              }
+            },
+            hints: [],
+          },
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {},
+            },
+          },
+        },
+        State2: {
+          card_is_checkpoint: true,
+          content: {
+            content_id: 'content',
+            html: '{{HtmlValue}}'
+          },
+          recorded_voiceovers: {
+            voiceovers_mapping: {},
+          },
+          param_changes: [],
+          interaction: {
+            id: 'TextInput',
+            answer_groups: [{
+              outcome: {
+                dest: 'State4',
+                feedback: {
+                  content_id: 'feedback_2',
+                  html: ''
+                },
+              },
+              rule_specs: [],
+              training_data: []
+            }],
+            default_outcome: null,
+            customization_args: {
+              rows: {
+                value: true
+              },
+              placeholder: {
+                value: 1
+              }
+            },
+            hints: [],
+          },
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {},
+            },
+          },
+        },
+        State3: {
+          card_is_checkpoint: true,
+          content: {
+            content_id: 'content',
+            html: '{{HtmlValue}}'
+          },
+          recorded_voiceovers: {
+            voiceovers_mapping: {},
+          },
+          param_changes: [],
+          interaction: {
+            id: 'TextInput',
+            answer_groups: [{
+              outcome: {
+                dest: 'State4',
+                feedback: {
+                  content_id: 'feedback_2',
+                  html: ''
+                },
+              },
+              rule_specs: [],
+              training_data: []
+            }],
+            default_outcome: null,
+            customization_args: {
+              rows: {
+                value: true
+              },
+              placeholder: {
+                value: 1
+              }
+            },
+            hints: [],
+          },
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {},
+            },
+          },
+        },
+        State4: {
+          card_is_checkpoint: true,
+          content: {
+            content_id: 'content',
+            html: '{{HtmlValue}}'
+          },
+          recorded_voiceovers: {
+            voiceovers_mapping: {},
+          },
+          param_changes: [],
+          interaction: {
+            id: 'TextInput',
+            answer_groups: [{
+              outcome: {
+                dest: 'State5',
+                feedback: {
+                  content_id: 'feedback_2',
+                  html: ''
+                },
+              },
+              rule_specs: [],
+              training_data: []
+            }],
+            default_outcome: null,
+            customization_args: {
+              rows: {
+                value: true
+              },
+              placeholder: {
+                value: 1
+              }
+            },
+            hints: [],
+          },
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {},
+            },
+          },
+        },
+        State5: {
+          card_is_checkpoint: true,
+          content: {
+            content_id: 'content',
+            html: '{{HtmlValue}}'
+          },
+          recorded_voiceovers: {
+            voiceovers_mapping: {},
+          },
+          param_changes: [],
+          interaction: {
+            id: 'TextInput',
+            answer_groups: [{
+              outcome: {
+                dest: 'State6',
+                feedback: {
+                  content_id: 'feedback_2',
+                  html: ''
+                },
+              },
+              rule_specs: [],
+              training_data: []
+            }],
+            default_outcome: null,
+            customization_args: {
+              rows: {
+                value: true
+              },
+              placeholder: {
+                value: 1
+              }
+            },
+            hints: [],
+          },
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {},
+            },
+          },
+        },
+        State6: {
+          card_is_checkpoint: true,
+          content: {
+            content_id: 'content',
+            html: '{{HtmlValue}}'
+          },
+          recorded_voiceovers: {
+            voiceovers_mapping: {},
+          },
+          param_changes: [],
+          interaction: {
+            id: 'TextInput',
+            answer_groups: [{
+              outcome: {
+                dest: 'State7',
+                feedback: {
+                  content_id: 'feedback_2',
+                  html: ''
+                },
+              },
+              rule_specs: [],
+              training_data: []
+            }],
+            default_outcome: null,
+            customization_args: {
+              rows: {
+                value: true
+              },
+              placeholder: {
+                value: 1
+              }
+            },
+            hints: [],
+          },
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {},
+            },
+          },
+        },
+        State7: {
+          card_is_checkpoint: true,
+          content: {
+            content_id: 'content',
+            html: '{{HtmlValue}}'
+          },
+          recorded_voiceovers: {
+            voiceovers_mapping: {},
+          },
+          param_changes: [],
+          interaction: {
+            id: 'TextInput',
+            answer_groups: [{
+              outcome: {
+                dest: 'End',
+                feedback: {
+                  content_id: 'feedback_2',
+                  html: ''
+                },
+              },
+              rule_specs: [],
+              training_data: []
+            }],
+            default_outcome: null,
+            customization_args: {
+              rows: {
+                value: true
+              },
+              placeholder: {
+                value: 1
+              }
+            },
+            hints: [],
+          },
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {},
+            },
+          },
+        },
+        End: {
+          card_is_checkpoint: true,
+          content: {
+            content_id: 'content',
+            html: '{{HtmlValue}}'
+          },
+          recorded_voiceovers: {
+            voiceovers_mapping: {},
+          },
+          param_changes: [],
+          interaction: {
+            id: 'EndExploration',
+            answer_groups: [{
+              outcome: {
+                dest: '',
+                feedback: {
+                  content_id: 'feedback_2',
+                  html: ''
+                },
+              },
+              rule_specs: [],
+              training_data: []
+            }],
+            default_outcome: null,
+            customization_args: {
+              recommendedExplorationIds: {
+                value: []
+              }
+            },
+            hints: [],
+          },
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {},
+            },
+          },
+        }
+      });
+
+      ExplorationWarningsService.updateWarnings();
+      expect(ExplorationWarningsService.countWarnings()).toBe(13);
+      expect(ExplorationWarningsService.hasCriticalWarnings()).toBe(true);
+      expect(ExplorationWarningsService.getCheckpointCountWarning()).toEqual(
+        'Only a maximum of 8 checkpoints are allowed per lesson.');
+      expect(ExplorationWarningsService.getAllStateRelatedWarnings()).toEqual({
+        Hola: [
+          'Placeholder text must be a string.',
+          'Number of rows must be integral.',
+        ],
+        State1: [
+          'Placeholder text must be a string.',
+          'Number of rows must be integral.',
+          'Checkpoints must not be assigned to cards that can be bypassed.'
+        ],
+        State2: [
+          'Placeholder text must be a string.',
+          'Number of rows must be integral.',
+          'Checkpoints must not be assigned to cards that can be bypassed.'
+        ],
+        State3: [
+          'Placeholder text must be a string.',
+          'Number of rows must be integral.',
+          'Checkpoints must not be assigned to cards that can be bypassed.'
+        ],
+        State4: [
+          'Placeholder text must be a string.',
+          'Number of rows must be integral.',
+        ],
+        State5: [
+          'Placeholder text must be a string.',
+          'Number of rows must be integral.',
+        ],
+        State6: [
+          'Placeholder text must be a string.',
+          'Number of rows must be integral.',
+        ],
+        State7: [
+          'Placeholder text must be a string.',
+          'Number of rows must be integral.',
+        ],
+        End: [
+          'Please make sure end exploration interactions do not ' +
+          'have any answer groups.',
+          'Checkpoints are not allowed on the last card of the lesson.',
+          'Checkpoints must not be assigned to cards that can be bypassed.'
         ]
       });
     });
@@ -925,6 +1482,8 @@ describe('Exploration Warnings Service', function() {
           },
           classifier_model_id: null,
           solicit_answer_details: false,
+          linked_skill_id: null,
+          card_is_checkpoint: false,
           next_content_id_index: null,
         },
         State: {
@@ -953,6 +1512,7 @@ describe('Exploration Warnings Service', function() {
             hints: []
           },
           solicit_answer_details: false,
+          card_is_checkpoint: false,
           written_translations: {
             translations_mapping: {
               content: {},
@@ -960,6 +1520,7 @@ describe('Exploration Warnings Service', function() {
             }
           },
           classifier_model_id: null,
+          linked_skill_id: null,
           next_content_id_index: null
         }
       });

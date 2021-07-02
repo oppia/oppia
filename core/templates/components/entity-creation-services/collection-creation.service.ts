@@ -22,7 +22,7 @@ import { Injectable } from '@angular/core';
 import { AlertsService } from 'services/alerts.service';
 import { CollectionCreationBackendService } from
   'components/entity-creation-services/collection-creation-backend-api.service';
-import { LoaderService } from 'services/loader.service.ts';
+import { LoaderService } from 'services/loader.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';

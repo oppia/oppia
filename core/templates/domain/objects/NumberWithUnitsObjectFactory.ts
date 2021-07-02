@@ -20,12 +20,11 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { Fraction, FractionObjectFactory } from
-  'domain/objects/FractionObjectFactory.ts';
+import { Fraction } from 'domain/objects/fraction.model';
 import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants';
 import { Units, UnitsObjectFactory } from
-  'domain/objects/UnitsObjectFactory.ts';
+  'domain/objects/UnitsObjectFactory';
 import { Unit, NumberWithUnitsAnswer } from
   'interactions/answer-defs';
 
@@ -50,6 +49,17 @@ export class NumberWithUnits {
       type: string, real: number, fractionObj: Fraction,
       unitsObj: Units) {
     this.type = type;
+
+    if (this.type === 'real') {
+      if (fractionObj.numerator !== 0 || fractionObj.wholeNumber !== 0) {
+        throw new Error('Number with type real cannot have a fraction part.');
+      }
+    } else if (this.type === 'fraction') {
+      if (real !== 0) {
+        throw new Error('Number with type fraction cannot have a real part.');
+      }
+    }
+
     this.real = real;
     this.fraction = fractionObj;
     this.units = unitsObj.units;
@@ -108,7 +118,7 @@ export class NumberWithUnits {
     return {
       type: this.type,
       real: this.real,
-      fraction: this.fraction.toDict(),
+      fraction: this.fraction?.toDict(),
       units: this.units
     };
   }
@@ -118,9 +128,7 @@ export class NumberWithUnits {
   providedIn: 'root'
 })
 export class NumberWithUnitsObjectFactory {
-  constructor(
-    private unitsFactory: UnitsObjectFactory,
-    private fractionFactory: FractionObjectFactory) {}
+  constructor(private unitsFactory: UnitsObjectFactory) {}
   createCurrencyUnits(): void {
     try {
       this.unitsFactory.createCurrencyUnits();
@@ -132,7 +140,7 @@ export class NumberWithUnitsObjectFactory {
     var type = '';
     var real = 0.0;
     // Default fraction value.
-    var fractionObj = this.fractionFactory.fromRawInputString('0/1');
+    var fractionObj = Fraction.fromRawInputString('0/1');
     var units = '';
     var value = '';
 
@@ -230,7 +238,7 @@ export class NumberWithUnitsObjectFactory {
 
       if (value.includes('/')) {
         type = 'fraction';
-        fractionObj = this.fractionFactory.fromRawInputString(value);
+        fractionObj = Fraction.fromRawInputString(value);
       } else {
         type = 'real';
         real = parseFloat(value);
@@ -253,7 +261,7 @@ export class NumberWithUnitsObjectFactory {
     return new NumberWithUnits(
       numberWithUnitsDict.type,
       numberWithUnitsDict.real,
-      this.fractionFactory.fromDict(numberWithUnitsDict.fraction),
+      Fraction.fromDict(numberWithUnitsDict.fraction),
       this.unitsFactory.fromList(numberWithUnitsDict.units));
   }
 }

@@ -28,16 +28,18 @@ import { ContentTranslationLanguageService } from
   'pages/exploration-player-page/services/content-translation-language.service';
 import { FormsModule } from '@angular/forms';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { TranslatePipe } from 'filters/translate.pipe';
 import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
-import { StateCardObjectFactory } from 'domain/state_card/StateCardObjectFactory';
+import { StateCard } from 'domain/state_card/state-card.model';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTranslationsObjectFactory';
 import { SwitchContentLanguageRefreshRequiredModalComponent } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
 import { ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { AudioTranslationLanguageService} from
+  'pages/exploration-player-page/services/audio-translation-language.service';
 
 class MockContentTranslationLanguageService {
   getCurrentContentLanguageCode() {
@@ -58,17 +60,21 @@ describe('Content language selector component', () => {
   let contentTranslationLanguageService: ContentTranslationLanguageService;
   let fixture: ComponentFixture<ContentLanguageSelectorComponent>;
   let playerTranscriptService: PlayerTranscriptService;
-  let stateCardObjectFactory: StateCardObjectFactory;
   let writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory;
   let imagePreloaderService: ImagePreloaderService;
+  let audioTranslationLanguageService: AudioTranslationLanguageService;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [FormsModule, HttpClientTestingModule, NgbModule],
+      imports: [
+        FormsModule,
+        HttpClientTestingModule,
+        NgbModule
+      ],
       declarations: [
         ContentLanguageSelectorComponent,
-        SwitchContentLanguageRefreshRequiredModalComponent,
-        TranslatePipe
+        MockTranslatePipe,
+        SwitchContentLanguageRefreshRequiredModalComponent
       ],
       providers: [{
         provide: ContentTranslationLanguageService,
@@ -82,10 +88,11 @@ describe('Content language selector component', () => {
     contentTranslationLanguageService = TestBed.get(
       ContentTranslationLanguageService);
     playerTranscriptService = TestBed.get(PlayerTranscriptService);
-    stateCardObjectFactory = TestBed.get(StateCardObjectFactory);
     writtenTranslationsObjectFactory = TestBed.get(
       WrittenTranslationsObjectFactory);
     imagePreloaderService = TestBed.get(ImagePreloaderService);
+    audioTranslationLanguageService = TestBed.get(
+      AudioTranslationLanguageService);
     fixture = TestBed.createComponent(ContentLanguageSelectorComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -106,12 +113,12 @@ describe('Content language selector component', () => {
       contentTranslationLanguageService,
       'setCurrentContentLanguageCode');
 
-    const card = stateCardObjectFactory.createNewCard(
+    const card = StateCard.createNewCard(
       'State 1', '<p>Content</p>', '<interaction></interaction>',
       null,
       RecordedVoiceovers.createEmpty(),
       writtenTranslationsObjectFactory.createEmpty(),
-      'content');
+      'content', audioTranslationLanguageService);
     spyOn(playerTranscriptService, 'getCard').and.returnValue(card);
     spyOn(imagePreloaderService, 'restartImagePreloader');
 
@@ -128,12 +135,12 @@ describe('Content language selector component', () => {
       contentTranslationLanguageService,
       'setCurrentContentLanguageCode');
 
-    const card = stateCardObjectFactory.createNewCard(
+    const card = StateCard.createNewCard(
       'State 1', '<p>Content</p>', '<interaction></interaction>',
       null,
       RecordedVoiceovers.createEmpty(),
       writtenTranslationsObjectFactory.createEmpty(),
-      'content');
+      'content', audioTranslationLanguageService);
     card.addInputResponsePair({
       learnerInput: '',
       oppiaResponse: '',

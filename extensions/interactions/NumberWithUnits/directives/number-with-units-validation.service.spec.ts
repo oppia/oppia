@@ -21,9 +21,8 @@ import { TestBed } from '@angular/core/testing';
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { AppConstants } from 'app.constants';
-import { NumberWithUnitsValidationService } from 'interactions/NumberWithUnits/directives/number-with-units-validation.service.ts';
-import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
+import { NumberWithUnitsValidationService } from 'interactions/NumberWithUnits/directives/number-with-units-validation.service';
+import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 
 describe('NumberWithUnitsValidationService', () => {
@@ -77,27 +76,30 @@ describe('NumberWithUnitsValidationService', () => {
     equalsTwoRule = rof.createFromBackendDict({
       rule_type: 'IsEqualTo',
       inputs: {
-        f: createNumberWithUnitsDict('real', 2, createFractionDict(
-          false, 0, 0, 1), [{unit: 'kg', exponent: 1},
-          {unit: 'm', exponent: -2}])
+        f: createNumberWithUnitsDict(
+          'real', 2, createFractionDict(false, 0, 0, 1),
+          [{unit: 'kg', exponent: 1},
+            {unit: 'm', exponent: -2}])
       }
     }, 'NumberWithUnits');
 
     equivalentToTwoThousandRule = rof.createFromBackendDict({
       rule_type: 'IsEquivalentTo',
       inputs: {
-        f: createNumberWithUnitsDict('real', 2000, createFractionDict(
-          false, 0, 0, 1), [{unit: 'g', exponent: 1},
-          {unit: 'm', exponent: -2}])
+        f: createNumberWithUnitsDict(
+          'real', 2000, createFractionDict(false, 0, 0, 1),
+          [{unit: 'g', exponent: 1},
+            {unit: 'm', exponent: -2}])
       }
     }, 'NumberWithUnits');
 
     equivalentToTwoRule = rof.createFromBackendDict({
       rule_type: 'IsEquivalentTo',
       inputs: {
-        f: createNumberWithUnitsDict('real', 2, createFractionDict(
-          false, 0, 0, 1), [{unit: 'kg', exponent: 1},
-          {unit: 'm', exponent: -2}])
+        f: createNumberWithUnitsDict(
+          'real', 2, createFractionDict(false, 0, 0, 1),
+          [{unit: 'kg', exponent: 1},
+            {unit: 'm', exponent: -2}])
       }
     }, 'NumberWithUnits');
 

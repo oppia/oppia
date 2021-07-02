@@ -49,7 +49,7 @@ describe('Suggestion Modal Service For Learners Dashboard', () => {
     ngbModal = TestBed.inject(NgbModal);
     csrfService = TestBed.inject(CsrfTokenService);
 
-    spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
+    spyOn(csrfService, 'getTokenAsync').and.callFake(async() => {
       return new Promise((resolve) => {
         resolve('sample-csrf-token');
       });

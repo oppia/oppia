@@ -5,21 +5,21 @@
   </head>
   <body>
     <oppia-root>
-      <div ng-controller="Base">
-        <base-content>
+      <div ng-controller="Base" dir="<[direction]>">
+        <oppia-base-content>
           <navbar-breadcrumb>
             <ul class="nav navbar-nav oppia-navbar-breadcrumb">
               <li>
                 <span class="oppia-navbar-breadcrumb-separator"></span>
-                Delete Account
+                <span translate="I18N_DELETE_ACCOUNT_PAGE_BREADCRUMB"></span>
               </li>
             </ul>
           </navbar-breadcrumb>
 
           <content>
-            <delete-account-page></delete-account-page>
+            <oppia-delete-account-page></oppia-delete-account-page>
           </content>
-        </base-content>
+        </oppia-base-content>
       </div>
     </oppia-root>
     @require('../footer_js_libs.html')

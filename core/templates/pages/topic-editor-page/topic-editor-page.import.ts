@@ -26,9 +26,9 @@ import 'third-party-imports/ui-codemirror.import';
 import 'third-party-imports/ui-tree.import';
 
 angular.module('oppia', [
-  require('angular-cookies'), 'dndLists', 'headroom', 'ngAnimate',
+  require('angular-cookies'), 'dndLists', 'ngAnimate',
   'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap', 'ui.codemirror', 'ui.sortable', 'ui.tree',
+  'ui.bootstrap', 'ui.sortable', 'ui.tree',
   uiValidate
 ]);
 
@@ -41,6 +41,6 @@ require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
 require(
-  'pages/topic-editor-page/navbar/topic-editor-navbar-breadcrumb.directive.ts');
+  'pages/topic-editor-page/navbar/topic-editor-navbar-breadcrumb.component.ts');
 require('pages/topic-editor-page/navbar/topic-editor-navbar.directive.ts');
 require('pages/topic-editor-page/topic-editor-page.component.ts');

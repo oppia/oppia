@@ -89,7 +89,7 @@ class FakeSkillBackendApiService {
   skillObject = null;
   failure = null;
 
-  fetchSkill() {
+  async fetchSkillAsync() {
     return new Promise((resolve, reject) => {
       if (!this.failure) {
         resolve({
@@ -116,7 +116,7 @@ class FakeSkillBackendApiService {
     });
   }
 
-  updateSkill() {
+  async updateSkillAsync() {
     return new Promise((resolve, reject) => {
       if (!this.failure) {
         resolve(this.skillObject);
@@ -139,7 +139,7 @@ class FakeSkillRightsBackendApiService {
     fetchSkillRightsAsync: null,
   };
 
-  fetchSkillRightsAsync() {
+  async fetchSkillRightsAsync() {
     return new Promise((resolve, reject) => {
       if (!this.self.failure) {
         resolve(this.self.backendSkillRightsObject);
@@ -195,9 +195,9 @@ describe('Skill editor state service', () => {
   });
 
   it('should request to load the skill from the backend', () => {
-    spyOn(fakeSkillBackendApiService, 'fetchSkill').and.callThrough();
+    spyOn(fakeSkillBackendApiService, 'fetchSkillAsync').and.callThrough();
     skillEditorStateService.loadSkill('skill_id_1');
-    expect(fakeSkillBackendApiService.fetchSkill).toHaveBeenCalled();
+    expect(fakeSkillBackendApiService.fetchSkillAsync).toHaveBeenCalled();
   });
 
   it('should track whether it is currently loading the skill', fakeAsync(() => {
@@ -272,7 +272,7 @@ describe('Skill editor state service', () => {
 
   it('should be able to save the collection and pending changes', fakeAsync(
     () => {
-      spyOn(fakeSkillBackendApiService, 'updateSkill').and.callThrough();
+      spyOn(fakeSkillBackendApiService, 'updateSkillAsync').and.callThrough();
 
       skillEditorStateService.loadSkill('skill_id_1');
       skillUpdateService.setSkillDescription(
@@ -287,7 +287,7 @@ describe('Skill editor state service', () => {
       const expectedId = 'skill_id_1';
       const expectedVersion = 3;
       const expectedCommitMessage = 'commit message';
-      const updateSkillSpy = fakeSkillBackendApiService.updateSkill;
+      const updateSkillSpy = fakeSkillBackendApiService.updateSkillAsync;
       expect(updateSkillSpy).toHaveBeenCalledWith(
         expectedId,
         expectedVersion,

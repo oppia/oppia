@@ -62,9 +62,10 @@ class LogoutPageModule {
 
 declare var angular: ng.IAngularStatic;
 
-angular.module('oppia').requires.push(downgradeModule(providers => {
-  return platformBrowserDynamic(providers).bootstrapModule(LogoutPageModule);
-}));
+angular.module('oppia').requires.push(
+  downgradeModule(async(providers) => {
+    return platformBrowserDynamic(providers).bootstrapModule(LogoutPageModule);
+  }));
 
 angular.module('oppia').directive('oppiaAngularRoot', downgradeComponent({
   component: OppiaAngularRootComponent,

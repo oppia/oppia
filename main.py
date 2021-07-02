@@ -37,6 +37,7 @@ from core.controllers import features
 from core.controllers import feedback
 from core.controllers import improvements
 from core.controllers import learner_dashboard
+from core.controllers import learner_goals
 from core.controllers import learner_playlist
 from core.controllers import library
 from core.controllers import moderator
@@ -48,6 +49,7 @@ from core.controllers import question_editor
 from core.controllers import questions_list
 from core.controllers import reader
 from core.controllers import recent_commits
+from core.controllers import release_coordinator
 from core.controllers import resources
 from core.controllers import review_tests
 from core.controllers import skill_editor
@@ -71,8 +73,6 @@ from mapreduce import parameters as mapreduce_parameters
 import webapp2
 from webapp2_extras import routes
 
-
-current_user_services = models.Registry.import_current_user_services()
 transaction_services = models.Registry.import_transaction_services()
 
 # Suppress debug logging for chardet. See https://stackoverflow.com/a/48581323.
@@ -224,9 +224,6 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/adminsuperadminhandler', admin.AdminSuperAdminPrivilegesHandler),
     get_redirect_route(
-        r'/memorycacheadminhandler', admin.MemoryCacheAdminHandler),
-    get_redirect_route(r'/adminjoboutput', admin.AdminJobOutputHandler),
-    get_redirect_route(
         r'/admintopicscsvdownloadhandler',
         admin.AdminTopicsCsvFileDownloader),
     get_redirect_route(
@@ -244,21 +241,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s' % feconf.CONTRIBUTOR_DASHBOARD_URL,
         contributor_dashboard.ContributorDashboardPage),
-
-    get_redirect_route(
-        '/notifications_dashboard',
-        creator_dashboard.OldNotificationsDashboardRedirectPage),
     get_redirect_route(
         '/contributor_dashboard',
         creator_dashboard.OldContributorDashboardRedirectPage),
-    get_redirect_route(
-        feconf.NOTIFICATIONS_DASHBOARD_URL,
-        creator_dashboard.NotificationsDashboardPage),
-    get_redirect_route(
-        r'/notificationsdashboardhandler/data',
-        creator_dashboard.NotificationsDashboardHandler),
-    get_redirect_route(
-        r'/notificationshandler', creator_dashboard.NotificationsHandler),
     get_redirect_route(
         '/creator_dashboard',
         creator_dashboard.OldCreatorDashboardRedirectPage),
@@ -417,6 +402,10 @@ URLS = MAPREDUCE_HANDLERS + [
         reader.LearnerIncompleteActivityHandler),
 
     get_redirect_route(
+        r'%s/<activity_type>/<topic_id>' % feconf.LEARNER_GOALS_DATA_URL,
+        learner_goals.LearnerGoalsHandler),
+
+    get_redirect_route(
         r'%s/<activity_type>/<activity_id>' % feconf.LEARNER_PLAYLIST_DATA_URL,
         learner_playlist.LearnerPlaylistHandler),
 
@@ -476,6 +465,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/profilehandler/data/<username>', profile.ProfileHandler),
     get_redirect_route(feconf.PREFERENCES_URL, profile.PreferencesPage),
     get_redirect_route(
+        r'%s/<secret>' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT,
+        profile.BulkEmailWebhookEndpoint),
+    get_redirect_route(
         feconf.PREFERENCES_DATA_URL, profile.PreferencesHandler),
     get_redirect_route(
         r'/preferenceshandler/profile_picture', profile.ProfilePictureHandler),
@@ -503,6 +495,14 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/moderatorhandler/featured', moderator.FeaturedActivitiesHandler),
     get_redirect_route(
         r'/moderatorhandler/email_draft', moderator.EmailDraftHandler),
+
+    get_redirect_route(
+        r'/release-coordinator', release_coordinator.ReleaseCoordinatorPage),
+    get_redirect_route(
+        r'/joboutputhandler', release_coordinator.JobOutputHandler),
+    get_redirect_route(r'/jobshandler', release_coordinator.JobsHandler),
+    get_redirect_route(
+        r'/memorycachehandler', release_coordinator.MemoryCacheHandler),
 
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_URL_PREFIX,
@@ -660,6 +660,12 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/' % feconf.SUGGESTION_URL_PREFIX,
         suggestion.SuggestionHandler),
     get_redirect_route(
+        r'%s/<suggestion_id>' % feconf.UPDATE_TRANSLATION_SUGGESTION_URL_PREFIX,
+        suggestion.UpdateTranslationSuggestionHandler),
+    get_redirect_route(
+        r'%s/<suggestion_id>' % feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
+        suggestion.UpdateQuestionSuggestionHandler),
+    get_redirect_route(
         r'%s' % feconf.QUESTIONS_URL_PREFIX,
         reader.QuestionPlayerHandler),
     get_redirect_route(
@@ -811,7 +817,6 @@ URLS = MAPREDUCE_HANDLERS + [
 
     get_redirect_route(r'/session_begin', base.SessionBeginHandler),
     get_redirect_route(r'/session_end', base.SessionEndHandler),
-    get_redirect_route(r'/seed_firebase', base.SeedFirebaseHandler),
 
     get_redirect_route(
         r'%s/%s/<exploration_id>' % (
@@ -856,6 +861,10 @@ URLS = MAPREDUCE_HANDLERS + [
 
     get_redirect_route(
         r'/learn/<classroom_url_fragment>', classroom.ClassroomPage),
+
+    get_redirect_route(
+        r'/voice_artist_management_handler/<entity_type>/<entity_id>',
+        voice_artist.VoiceArtistManagementHandler),
 ]
 
 # Adding redirects for topic landing pages.

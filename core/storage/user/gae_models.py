@@ -120,6 +120,13 @@ class UserSettingsModel(base_models.BaseModel):
     # May be None.
     first_contribution_msec = datastore_services.FloatProperty(default=None)
 
+    # Currently, "roles" and "banned" fields are not in use.
+    # A list of roles assigned to the user.
+    roles = datastore_services.StringProperty(
+        repeated=True, indexed=True, choices=feconf.ALLOWED_USER_ROLES)
+    # Flag to indicate whether the user is banned.
+    banned = datastore_services.BooleanProperty(indexed=True, default=False)
+
     @staticmethod
     def get_deletion_policy():
         """Model contains data to delete corresponding to a user: id, model,
@@ -183,7 +190,12 @@ class UserSettingsModel(base_models.BaseModel):
             'first_contribution_msec':
                 base_models.EXPORT_POLICY.EXPORTED,
             # Pin is not exported since this is an auth mechanism.
-            'pin': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'pin': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+
+            # TODO(#12755): Change export policy for roles and banned fields to
+            # "EXPORTED" once the fields are populated in the datastore.
+            'roles': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'banned': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
@@ -334,6 +346,20 @@ class UserSettingsModel(base_models.BaseModel):
             cls.normalized_username == normalized_username).get()
 
     @classmethod
+    def get_by_email(cls, email):
+        """Returns a user model given an email.
+
+        Args:
+            email: str. The user's email.
+
+        Returns:
+            UserSettingsModel | None. The UserSettingsModel instance which
+            contains the same email.
+        """
+        filtered_users = cls.query(cls.email == email).fetch()
+        return None if not filtered_users else filtered_users[0]
+
+    @classmethod
     def get_by_role(cls, role):
         """Returns user models with given role.
 
@@ -360,6 +386,17 @@ class CompletedActivitiesModel(base_models.BaseModel):
     # IDs of all the collections completed by the user.
     collection_ids = (
         datastore_services.StringProperty(repeated=True, indexed=True))
+    # IDs of all the stories completed by the user.
+    story_ids = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
+    # IDs of all the topics learnt by the user (i.e. the topics in which the
+    # learner has completed all the stories).
+    learnt_topic_ids = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
+    # IDs of all the topics learnt by the user(i.e. the topics in which the
+    # learner has completed all the subtopics).
+    mastered_topic_ids = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
 
     @staticmethod
     def get_deletion_policy():
@@ -376,7 +413,10 @@ class CompletedActivitiesModel(base_models.BaseModel):
         """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'exploration_ids': base_models.EXPORT_POLICY.EXPORTED,
-            'collection_ids': base_models.EXPORT_POLICY.EXPORTED
+            'collection_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'story_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'learnt_topic_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'mastered_topic_ids': base_models.EXPORT_POLICY.EXPORTED
         })
 
     @classmethod
@@ -408,11 +448,13 @@ class CompletedActivitiesModel(base_models.BaseModel):
             user_id: str. The user_id denotes which user's data to extract.
 
         Returns:
-            dict. A dict with two keys, 'completed_exploration_ids'
-            and 'completed_collection_ids'. The corresponding values are
-            lists of the IDs of the explorations and collections,
-            respectively, which the given user has completed. If there is no
-            model for the given user_id, the function returns an empty dict.
+            dict. A dict with four keys, 'completed_exploration_ids',
+            'completed_collection_ids', 'completed_story_ids' and
+            'learnt_topic_ids'. The corresponding values are
+            lists of the IDs of the explorations, collections, stories
+            and topics respectively, which the given user has completed.
+            If there is no model for the given user_id, the function
+            returns an empty dict.
         """
         user_model = CompletedActivitiesModel.get(user_id, strict=False)
         if user_model is None:
@@ -420,7 +462,10 @@ class CompletedActivitiesModel(base_models.BaseModel):
 
         return {
             'exploration_ids': user_model.exploration_ids,
-            'collection_ids': user_model.collection_ids
+            'collection_ids': user_model.collection_ids,
+            'story_ids': user_model.story_ids,
+            'learnt_topic_ids': user_model.learnt_topic_ids,
+            'mastered_topic_ids': user_model.mastered_topic_ids
         }
 
 
@@ -436,6 +481,17 @@ class IncompleteActivitiesModel(base_models.BaseModel):
         datastore_services.StringProperty(repeated=True, indexed=True))
     # The ids of the collections partially completed by the user.
     collection_ids = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
+    # IDs of all the stories partially completed by the user.
+    story_ids = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
+    # IDs of all the topics partially learnt by the user(i.e. the topics in
+    # which the learner has not completed all the stories).
+    partially_learnt_topic_ids = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
+    # IDs of all the topics partially mastered by the user(i.e. the topics in
+    # which the learner has not completed all the subtopics).
+    partially_mastered_topic_ids = (
         datastore_services.StringProperty(repeated=True, indexed=True))
 
     @staticmethod
@@ -453,7 +509,11 @@ class IncompleteActivitiesModel(base_models.BaseModel):
         """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'exploration_ids': base_models.EXPORT_POLICY.EXPORTED,
-            'collection_ids': base_models.EXPORT_POLICY.EXPORTED
+            'collection_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'story_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'partially_learnt_topic_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'partially_mastered_topic_ids': (
+                base_models.EXPORT_POLICY.EXPORTED)
         })
 
     @classmethod
@@ -485,10 +545,11 @@ class IncompleteActivitiesModel(base_models.BaseModel):
             user_id: str. The user_id denotes which user's data to extract.
 
         Returns:
-            dict or None. A dict with two keys, 'incomplete_exploration_ids'
-            and 'incomplete_collection_ids'. The corresponding values are
-            lists of the IDs of the explorations and collections,
-            respectively, which the given user has not yet completed. If
+            dict or None. A dict with four keys, 'incomplete_exploration_ids',
+            'incomplete_collection_ids', 'incomplete_story_ids' and
+            'partially_learnt_topic_ids'. The corresponding values are
+            lists of the IDs of the explorations, collections, stories and
+            topics respectively, which the given user has not yet completed. If
             the user_id is invalid, returns None.
         """
         user_model = IncompleteActivitiesModel.get(user_id, strict=False)
@@ -497,7 +558,12 @@ class IncompleteActivitiesModel(base_models.BaseModel):
 
         return {
             'exploration_ids': user_model.exploration_ids,
-            'collection_ids': user_model.collection_ids
+            'collection_ids': user_model.collection_ids,
+            'story_ids': user_model.story_ids,
+            'partially_learnt_topic_ids': (
+                user_model.partially_learnt_topic_ids),
+            'partially_mastered_topic_ids': (
+                user_model.partially_mastered_topic_ids)
         }
 
 
@@ -639,6 +705,81 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
             }
 
         return user_data
+
+
+class LearnerGoalsModel(base_models.BaseModel):
+    """Keeps track of all the topics to learn.
+
+    Instances of this class are keyed by the user id.
+    """
+
+    # IDs of all the topics selected by the user to learn.
+    topic_ids_to_learn = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
+    # IDs of all the topics selected by the user to master.
+    topic_ids_to_master = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
+
+    @staticmethod
+    def get_deletion_policy():
+        """Model contains data to delete corresponding to a user: id field."""
+        return base_models.DELETION_POLICY.DELETE
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model is exported as one instance per user."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
+
+    @classmethod
+    def get_export_policy(cls):
+        """Model contains data to export corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'topic_ids_to_learn': base_models.EXPORT_POLICY.EXPORTED,
+            'topic_ids_to_master': base_models.EXPORT_POLICY.EXPORTED
+        })
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id):
+        """Delete instance of LearnerGoalsModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        cls.delete_by_id(user_id)
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether LearnerGoalsModel exists for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether the model for user_id exists.
+        """
+        return cls.get_by_id(user_id) is not None
+
+    @staticmethod
+    def export_data(user_id):
+        """(Takeout) Export user-relevant properties of LearnerGoalsModel.
+
+        Args:
+            user_id: str. The user_id denotes which user's data to extract.
+
+        Returns:
+            dict or None. A dict with one keys, 'topic_ids_to_learn'.
+            The corresponding values is the list of IDs of the topics
+            which the given user has as their goal.
+            If the user_id is invalid, returns None instead.
+        """
+        user_model = LearnerGoalsModel.get(user_id, strict=False)
+        if user_model is None:
+            return {}
+
+        return {
+            'topic_ids_to_learn': user_model.topic_ids_to_learn,
+            'topic_ids_to_master': user_model.topic_ids_to_master
+        }
 
 
 class LearnerPlaylistModel(base_models.BaseModel):

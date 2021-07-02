@@ -46,6 +46,7 @@ import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { ContextService } from 'services/context.service';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 describe('Customize Interaction Modal Controller', function() {
   var $injector = null;
@@ -69,7 +70,7 @@ describe('Customize Interaction Modal Controller', function() {
   var stateName = 'Introduction';
 
   beforeEach(angular.mock.module('oppia'));
-
+  importAllAngularServices();
   beforeEach(function() {
     contextService = TestBed.get(ContextService);
     editorFirstTimeEventsService = TestBed.get(EditorFirstTimeEventsService);

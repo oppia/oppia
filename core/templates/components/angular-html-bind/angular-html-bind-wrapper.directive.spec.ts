@@ -18,7 +18,7 @@
 
 import { destroyPlatform } from '@angular/core';
 import { waitForAsync } from '@angular/core/testing';
-import { setupAndGetUpgradedComponent } from 'tests/unit-test-utils';
+import { setupAndGetUpgradedComponentAsync } from 'tests/unit-test-utils.ajs';
 import { AngularHtmlBindWrapperDirective } from './angular-html-bind-wrapper.directive';
 
 describe('Angular Html Bind Wrapper Directive', () => {
@@ -27,12 +27,12 @@ describe('Angular Html Bind Wrapper Directive', () => {
     afterEach(() => destroyPlatform());
 
     it('should create the upgraded component', waitForAsync(() => {
-      setupAndGetUpgradedComponent(
+      setupAndGetUpgradedComponentAsync(
         'angular-html-bind-wrapper',
         'angularHtmlBindWrapper',
         [AngularHtmlBindWrapperDirective]
       ).then(
-        textContext => expect(textContext).toBe('Hello Oppia!')
+        async(textContext) => expect(textContext).toBe('Hello Oppia!')
       );
     }));
   });
@@ -71,6 +71,17 @@ describe('Angular Html Bind Wrapper Directive', () => {
     it('should call applyAsync on initialization', function() {
       const ctrl = $componentController('angularHtmlBindWrapper');
       ctrl.$onInit();
+      expect(applySpy).toHaveBeenCalled();
+    });
+
+    it('should call applyAsync when a change to html is detected', function() {
+      const ctrl = $componentController('angularHtmlBindWrapper');
+      ctrl.$onChanges({
+        htmlData: {
+          currentValue: 'newValue',
+          previousValue: 'oldValue'
+        }
+      });
       expect(applySpy).toHaveBeenCalled();
     });
   });

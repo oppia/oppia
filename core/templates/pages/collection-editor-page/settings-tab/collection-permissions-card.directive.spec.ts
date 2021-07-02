@@ -17,7 +17,7 @@
  */
 
 import { destroyPlatform } from '@angular/core';
-import { setupAndGetUpgradedComponent } from 'tests/unit-test-utils';
+import { setupAndGetUpgradedComponentAsync } from 'tests/unit-test-utils.ajs';
 import { CollectionPermissionsCard } from
   './collection-permissions-card.directive';
 import { async } from '@angular/core/testing';
@@ -61,12 +61,12 @@ describe('Upgraded component', () => {
   afterEach(() => destroyPlatform());
 
   it('should create the upgraded component', async(() => {
-    setupAndGetUpgradedComponent(
+    setupAndGetUpgradedComponentAsync(
       'collection-permissions-card',
       'collectionPermissionsCard',
       [CollectionPermissionsCard]
     ).then(
-      textContext => expect(textContext).toBe('Hello Oppia!')
+      async(textContext) => expect(textContext).toBe('Hello Oppia!')
     );
   }));
 });

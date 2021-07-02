@@ -51,7 +51,7 @@ var SkillEditorPage = function() {
   var deleteWorkedExampleButton = function(index) {
     return element(
       by.css('.protractor-test-worked-example-' + index))
-      .element(by.css('.oppia-delete-example-button'));
+      .element(by.css('.protractor-test-delete-example-button'));
   };
   var confirmDeleteWorkedExample = element(
     by.css('.protractor-test-confirm-delete-worked-example-button'));
@@ -74,7 +74,7 @@ var SkillEditorPage = function() {
   var deleteMisconceptionButton = function(index) {
     return element(
       by.css('.protractor-test-misconception-' + index))
-      .element(by.css('.oppia-delete-example-button'));
+      .element(by.css('.protractor-test-delete-example-button'));
   };
   var confirmDeleteMisconception =
     element(by.css('.protractor-test-confirm-delete-misconception-button'));
@@ -152,7 +152,7 @@ var SkillEditorPage = function() {
     await this.selectDifficultyForRubric(difficulty);
     var editRubricExplanationButtons = element.all(
       by.css('.protractor-test-edit-rubric-explanation-' + difficulty));
-    var button = await editRubricExplanationButtons.get(explIndex);
+    var button = editRubricExplanationButtons.get(explIndex);
     await waitFor.elementToBeClickable(
       button, 'Edit Rubric Explanation button takes too long to be clickable');
     await button.click();
@@ -172,7 +172,7 @@ var SkillEditorPage = function() {
     var editRubricExplanationButtons = element.all(
       by.css('.protractor-test-edit-rubric-explanation-' + difficulty));
     await waitFor.elementToBeClickable(
-      await editRubricExplanationButtons.get(explIndex),
+      editRubricExplanationButtons.get(explIndex),
       'Edit Rubric Explanation button takes too long to be clickable');
     await editRubricExplanationButtons.get(explIndex).click();
     var editor = element(
@@ -193,7 +193,7 @@ var SkillEditorPage = function() {
       by.css('.protractor-test-rubric-explanation-' + difficulty));
     var explanationCount = await rubricExplanationsForDifficulty.count();
     for (var i = 0; i < explanationCount; i++) {
-      var text = await (await rubricExplanationsForDifficulty.get(i)).getText();
+      var text = await rubricExplanationsForDifficulty.get(i).getText();
       expect(text).toMatch(explanations[i]);
     }
   };
@@ -259,10 +259,9 @@ var SkillEditorPage = function() {
 
     await (await browser.switchTo().activeElement()).sendKeys(explanation);
 
-    await waitFor.elementToBeClickable(
-      saveConceptCardExplanationButton,
-      'Save Concept Card Explanation button takes too long to be clickable');
-    await saveConceptCardExplanationButton.click();
+    await action.click(
+      'Save Concept Card Explanation Button',
+      saveConceptCardExplanationButton);
     await waitFor.invisibilityOf(
       editor, 'Explanation Editor takes too long to close');
   };

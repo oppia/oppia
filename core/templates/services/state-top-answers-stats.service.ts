@@ -86,7 +86,7 @@ export class StateTopAnswersStatsService {
     return this.initPromise;
   }
 
-  getInitPromise(): Promise<void> {
+  async getInitPromiseAsync(): Promise<void> {
     return this.initPromise;
   }
 
@@ -122,16 +122,12 @@ export class StateTopAnswersStatsService {
   }
 
   onStateDeleted(stateName: string): void {
-    // ES2016 Map uses delete as a method name despite it being a reserved word.
-    // eslint-disable-next-line dot-notation
     this.topAnswersStatsByStateName.delete(stateName);
   }
 
   onStateRenamed(oldStateName: string, newStateName: string): void {
     this.topAnswersStatsByStateName.set(
       newStateName, this.topAnswersStatsByStateName.get(oldStateName));
-    // ES2016 Map uses delete as a method name despite it being a reserved word.
-    // eslint-disable-next-line dot-notation
     this.topAnswersStatsByStateName.delete(oldStateName);
   }
 

@@ -18,7 +18,7 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // App.ts is upgraded to Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 // ^^^ This block is to be removed.
 
 require('pages/topic-editor-page/topic-editor-page.component.ts');
@@ -32,6 +32,7 @@ describe('Topic editor page', function() {
   var $scope = null;
   var ContextService = null;
   var PageTitleService = null;
+  var PreventPageUnloadEventService = null;
   var TopicEditorRoutingService = null;
   var UndoRedoService = null;
   var TopicEditorStateService = null;
@@ -47,6 +48,8 @@ describe('Topic editor page', function() {
     ContextService = $injector.get('ContextService');
     UndoRedoService = $injector.get('UndoRedoService');
     PageTitleService = $injector.get('PageTitleService');
+    PreventPageUnloadEventService = $injector.get(
+      'PreventPageUnloadEventService');
     TopicEditorRoutingService = $injector.get('TopicEditorRoutingService');
     TopicEditorStateService = $injector.get('TopicEditorStateService');
     UrlService = $injector.get('UrlService');
@@ -81,10 +84,12 @@ describe('Topic editor page', function() {
     let topicInitializedEventEmitter = new EventEmitter();
     let topicReinitializedEventEmitter = new EventEmitter();
     let undoRedoChangeEventEmitter = new EventEmitter();
+    let topicUpdateViewEmitter = new EventEmitter();
     spyOn(TopicEditorStateService, 'loadTopic').and.callFake(function() {
       topicInitializedEventEmitter.emit();
       topicReinitializedEventEmitter.emit();
       undoRedoChangeEventEmitter.emit();
+      topicUpdateViewEmitter.emit();
     });
     spyOnProperty(
       TopicEditorStateService, 'onTopicInitialized').and.returnValue(
@@ -92,6 +97,8 @@ describe('Topic editor page', function() {
     spyOnProperty(
       TopicEditorStateService, 'onTopicReinitialized').and.returnValue(
       topicReinitializedEventEmitter);
+    spyOnProperty(TopicEditorRoutingService, 'updateViewEventEmitter')
+      .and.returnValue(topicUpdateViewEmitter);
     spyOn(UrlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
     spyOn(PageTitleService, 'setPageTitle').and.callThrough();
 
@@ -114,13 +121,18 @@ describe('Topic editor page', function() {
     expect(ctrl.getNavbarText()).toBe('Question Editor');
   });
 
-  it('should call confirm before leaving', function() {
+  it('should addListener by passing getChangeCount to ' +
+  'PreventPageUnloadEventService', function() {
+    spyOn(UrlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
+    spyOn(PageTitleService, 'setPageTitle').and.callThrough();
     spyOn(UndoRedoService, 'getChangeCount').and.returnValue(10);
-    spyOn(window, 'addEventListener');
-    ctrl.setUpBeforeUnload();
-    ctrl.confirmBeforeLeaving({returnValue: ''});
-    expect(window.addEventListener).toHaveBeenCalledWith(
-      'beforeunload', ctrl.confirmBeforeLeaving);
+    spyOn(PreventPageUnloadEventService, 'addListener').and
+      .callFake((callback) => callback());
+
+    ctrl.$onInit();
+
+    expect(PreventPageUnloadEventService.addListener)
+      .toHaveBeenCalledWith(jasmine.any(Function));
   });
 
   it('should return the change count', function() {
@@ -212,5 +224,22 @@ describe('Topic editor page', function() {
     expect(ctrl.getNavbarText()).toEqual('Topic Preview');
     routingSpy.and.returnValue('main');
     expect(ctrl.getNavbarText()).toEqual('Topic Editor');
+  });
+
+  it('should load topic based on its id on url when undo or redo action' +
+  ' is performed', function() {
+    let mockUndoRedoChangeEventEmitter = new EventEmitter();
+    spyOn(UndoRedoService, 'onUndoRedoChangeApplied$').and.returnValue(
+      mockUndoRedoChangeEventEmitter);
+    spyOn(PageTitleService, 'setPageTitle').and.callThrough();
+    spyOn(UrlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
+    ctrl.$onInit();
+    mockUndoRedoChangeEventEmitter.emit();
+
+    expect(PageTitleService.setPageTitle)
+      .toHaveBeenCalledWith('New Name - Oppia');
+    expect(ctrl.topic).toEqual(topic);
+
+    ctrl.$onDestroy();
   });
 });

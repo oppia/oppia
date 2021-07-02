@@ -52,14 +52,14 @@ angular.module('oppia').directive('learnerViewInfo', [
       controller: [
         '$log', '$rootScope', '$uibModal', 'ContextService',
         'LearnerViewInfoBackendApiService',
-        'ReadOnlyExplorationBackendApiService', 'UrlInterpolationService',
-        'UrlService',
+        'ReadOnlyExplorationBackendApiService', 'SiteAnalyticsService',
+        'StatsReportingService', 'UrlInterpolationService', 'UrlService',
         'TOPIC_VIEWER_STORY_URL_TEMPLATE',
         function(
             $log, $rootScope, $uibModal, ContextService,
             LearnerViewInfoBackendApiService,
-            ReadOnlyExplorationBackendApiService, UrlInterpolationService,
-            UrlService,
+            ReadOnlyExplorationBackendApiService, SiteAnalyticsService,
+            StatsReportingService, UrlInterpolationService, UrlService,
             TOPIC_VIEWER_STORY_URL_TEMPLATE
         ) {
           var ctrl = this;
@@ -74,7 +74,7 @@ angular.module('oppia').directive('learnerViewInfo', [
             if (expInfo) {
               openInformationCardModal();
             } else {
-              LearnerViewInfoBackendApiService.fetchLearnerInfo(
+              LearnerViewInfoBackendApiService.fetchLearnerInfoAsync(
                 stringifiedExpIds,
                 includePrivateExplorations
               ).then(function(response) {
@@ -126,14 +126,21 @@ angular.module('oppia').directive('learnerViewInfo', [
 
           ctrl.$onInit = function() {
             ctrl.explorationTitle = 'Loading...';
-            ReadOnlyExplorationBackendApiService.fetchExploration(
+            ReadOnlyExplorationBackendApiService.fetchExplorationAsync(
               explorationId, UrlService.getExplorationVersionFromUrl())
               .then(function(response) {
                 ctrl.explorationTitle = response.exploration.title;
                 $rootScope.$applyAsync();
               });
             // To check if the exploration is linked to the topic or not.
-            ctrl.isLinkedToTopic = ctrl.getTopicUrl() ? true : false;
+            try {
+              if (ctrl.getTopicUrl()) {
+                ctrl.isLinkedToTopic = true;
+              }
+            } catch (error) {
+              ctrl.isLinkedToTopic = false;
+            }
+
             // If linked to topic then print topic name in the lesson player.
             if (ctrl.isLinkedToTopic) {
               ctrl.storyViewerBackendApiService = (
@@ -152,6 +159,9 @@ angular.module('oppia').directive('learnerViewInfo', [
                   ctrl.storyPlaythroughObject = storyDataDict;
                   var topicName = ctrl.storyPlaythroughObject.topicName;
                   ctrl.topicName = topicName;
+                  StatsReportingService.setTopicName(ctrl.topicName);
+                  SiteAnalyticsService.registerCuratedLessonStarted(
+                    ctrl.topicName, explorationId);
                 });
             }
           };

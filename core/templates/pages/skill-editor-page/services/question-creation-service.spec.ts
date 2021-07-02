@@ -18,7 +18,7 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 // ^^^ This block is to be removed.
 import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
 
@@ -98,14 +98,14 @@ describe('Question Creation Service', function() {
         version: 2,
       };
 
-      spyOn(SkillBackendApiService, 'fetchSkill').and.returnValue({
+      spyOn(SkillBackendApiService, 'fetchSkillAsync').and.returnValue({
         skill: skillBackendDict,
         topicName: 'topic1',
         subtopicName: 'subtopic2',
       });
       var deferred = $q.defer();
       deferred.resolve([skillBackendDict]);
-      spyOn(SkillBackendApiService, 'fetchMultiSkills').and.returnValue(
+      spyOn(SkillBackendApiService, 'fetchMultiSkillsAsync').and.returnValue(
         deferred.promise);
       spyOn(
         SkillEditorStateService, 'getGroupedSkillSummaries').and.returnValue({
@@ -232,7 +232,7 @@ describe('Question Creation Service', function() {
         qcs.populateMisconceptions();
 
         var questionSpy = (
-          spyOn(EditableQuestionBackendApiService, 'createQuestion'));
+          spyOn(EditableQuestionBackendApiService, 'createQuestionAsync'));
         qcs.saveAndPublishQuestion();
         expect(questionSpy).toHaveBeenCalled();
       });
@@ -285,12 +285,12 @@ describe('Question Creation Service', function() {
         version: 2,
       };
 
-      spyOn(SkillBackendApiService, 'fetchSkill').and.returnValue({
+      spyOn(SkillBackendApiService, 'fetchSkillAsync').and.returnValue({
         skill: skillBackendDict,
         topicName: 'topic1',
         subtopicName: 'subtopic2',
       });
-      spyOn(SkillBackendApiService, 'fetchMultiSkills').and.returnValue(
+      spyOn(SkillBackendApiService, 'fetchMultiSkillsAsync').and.returnValue(
         Promise.reject());
       spyOn(
         SkillEditorStateService, 'getGroupedSkillSummaries').and.returnValue({
@@ -390,7 +390,7 @@ describe('Question Creation Service', function() {
         qcs.initializeNewQuestionCreation();
         qcs.populateMisconceptions();
         var questionSpy = (
-          spyOn(EditableQuestionBackendApiService, 'createQuestion'));
+          spyOn(EditableQuestionBackendApiService, 'createQuestionAsync'));
         qcs.saveAndPublishQuestion();
         expect(questionSpy).not.toHaveBeenCalled();
       });
@@ -443,7 +443,7 @@ describe('Question Creation Service', function() {
         version: 2,
       };
 
-      spyOn(SkillBackendApiService, 'fetchSkill').and.returnValue({
+      spyOn(SkillBackendApiService, 'fetchSkillAsync').and.returnValue({
         skill: SkillObjectFactory.createFromBackendDict(skillBackendDict),
         topicName: 'topic1',
         subtopicName: 'subtopic2',
@@ -452,7 +452,7 @@ describe('Question Creation Service', function() {
       deferred.resolve(
         [SkillObjectFactory.createFromBackendDict(skillBackendDict)]
       );
-      spyOn(SkillBackendApiService, 'fetchMultiSkills').and.returnValue(
+      spyOn(SkillBackendApiService, 'fetchMultiSkillsAsync').and.returnValue(
         deferred.promise);
       spyOn(
         SkillEditorStateService, 'getGroupedSkillSummaries').and.returnValue({
@@ -562,7 +562,7 @@ describe('Question Creation Service', function() {
         qcs.populateMisconceptions();
         $rootScope.$apply();
         var questionSpy = (
-          spyOn(EditableQuestionBackendApiService, 'createQuestion'));
+          spyOn(EditableQuestionBackendApiService, 'createQuestionAsync'));
         qcs.saveAndPublishQuestion();
         expect(questionSpy).not.toHaveBeenCalled();
       });

@@ -23,16 +23,13 @@ import 'angular-ui-sortable';
 import uiValidate from 'angular-ui-validate';
 import 'third-party-imports/guppy.import';
 import 'third-party-imports/midi-js.import';
-import 'third-party-imports/ng-audio.import';
 import 'third-party-imports/skulpt.import';
 import 'third-party-imports/ui-tree.import';
 
 angular.module('oppia', [
-  require('angular-cookies'), 'headroom', 'ngAnimate',
-  'ngAudio', 'ngMaterial',
-  'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap', 'ui.codemirror', 'ui-leaflet',
-  'ui.sortable', 'ui.tree', uiValidate
+  require('angular-cookies'), 'ngAnimate',
+  'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
+  'ui.bootstrap', 'ui-leaflet', 'ui.sortable', 'ui.tree', uiValidate
 ]);
 
 require('Polyfills.ts');
@@ -46,10 +43,10 @@ require('base-components/oppia-root.directive.ts');
 require('pages/exploration-player-page/exploration-player-page.component.ts');
 require(
   'pages/exploration-player-page/layout-directives/' +
-  'exploration-footer.directive.ts');
+  'exploration-footer.component.ts');
 require(
   'pages/exploration-player-page/layout-directives/' +
-  'learner-local-nav.directive.ts');
+  'learner-local-nav.component.ts');
 require(
   'pages/exploration-player-page/layout-directives/' +
   'learner-view-info.directive.ts');

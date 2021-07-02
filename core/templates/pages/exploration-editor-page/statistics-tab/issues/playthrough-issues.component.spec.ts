@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for playthroughIssues.
  */
 
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+
 describe('Playthrough Issues Component', function() {
   var $q = null;
   var $scope = null;
@@ -60,7 +62,7 @@ describe('Playthrough Issues Component', function() {
   }];
 
   beforeEach(angular.mock.module('oppia'));
-
+  importAllAngularServices();
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $q = $injector.get('$q');
     var $rootScope = $injector.get('$rootScope');

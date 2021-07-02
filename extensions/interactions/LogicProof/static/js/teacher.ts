@@ -16,10 +16,10 @@
  * @fileoverview Components used by the LogicProof interaction editor.
  */
 
-import logicProofShared from 'interactions/LogicProof/static/js/shared.ts';
-import logicProofData from 'interactions/LogicProof/static/js/data.ts';
+import logicProofShared from 'interactions/LogicProof/static/js/shared';
+import logicProofData from 'interactions/LogicProof/static/js/data';
 import logicProofParser from
-  'interactions/LogicProof/static/js/generatedParser.ts';
+  'interactions/LogicProof/static/js/generatedParser';
 
 var logicProofTeacher = (function() {
   // ---- QUESTION ----

@@ -107,6 +107,7 @@ describe('Statistics Tab Component', function() {
         }
       }
     },
+    linked_skill_id: null,
     next_content_id_index: 0,
     param_changes: [],
     recorded_voiceovers: {
@@ -148,7 +149,8 @@ describe('Statistics Tab Component', function() {
     readOnlyExplorationBackendApiService = $injector.get(
       'ReadOnlyExplorationBackendApiService');
 
-    spyOn(readOnlyExplorationBackendApiService, 'loadLatestExploration').and
+    spyOn(
+      readOnlyExplorationBackendApiService, 'loadLatestExplorationAsync').and
       .returnValue($q.resolve({
         exploration: {
           init_state_name: 'State1',
@@ -163,7 +165,7 @@ describe('Statistics Tab Component', function() {
         numActualStarts: 10,
         numCompletions: 5,
       }));
-    spyOn(stateInteractionStatsService, 'computeStats').and.returnValue(
+    spyOn(stateInteractionStatsService, 'computeStatsAsync').and.returnValue(
       $q.resolve({
         visualizationsInfo: {}
       }));

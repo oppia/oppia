@@ -28,10 +28,10 @@ import {
   PlaythroughIssueBackendDict,
   PlaythroughIssue,
   PlaythroughIssueObjectFactory
-} from 'domain/statistics/PlaythroughIssueObjectFactory.ts';
-import { ServicesConstants } from 'services/services.constants.ts';
+} from 'domain/statistics/PlaythroughIssueObjectFactory';
+import { ServicesConstants } from 'services/services.constants';
 import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service.ts';
+  'domain/utilities/url-interpolation.service';
 
 @Injectable({ providedIn: 'root' })
 export class PlaythroughIssuesBackendApiService {

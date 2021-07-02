@@ -24,7 +24,7 @@ from core.domain import classifier_services
 from core.domain import email_manager
 from core.domain import exp_fetchers
 import feconf
-from proto import training_job_response_payload_pb2
+from proto_files import training_job_response_payload_pb2
 
 
 def validate_job_result_message_proto(job_result_proto):
@@ -171,6 +171,8 @@ class TrainedClassifierHandler(base.OppiaMLVMHandler):
                 'No valid classifier exists for the given exploration state')
 
         return self.render_json({
+            'algorithm_id': algorithm_id,
+            'algorithm_version': algorithm_version,
             'gcs_filename': training_job.classifier_data_filename
         })
 

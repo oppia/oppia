@@ -24,23 +24,23 @@ import inspect
 from constants import constants
 import feconf
 import python_utils
-import utils
 
 # Valid model names.
-NAMES = utils.create_enum(
-    'activity', 'app_feedback_report', 'audit', 'base_model', 'classifier',
-    'collection', 'config', 'email', 'exploration', 'feedback', 'improvements',
-    'job', 'opportunity', 'question', 'recommendations', 'skill', 'statistics',
-    'activity', 'audit', 'auth', 'base_model', 'classifier', 'collection',
-    'config', 'email', 'exploration', 'feedback', 'improvements', 'job',
-    'opportunity', 'question', 'recommendations', 'skill', 'statistics',
-    'story', 'subtopic', 'suggestion', 'topic', 'translation', 'user')
+NAMES = python_utils.create_enum(
+    'activity', 'app_feedback_report', 'audit', 'base_model', 'beam_job',
+    'blog', 'classifier', 'collection', 'config', 'email', 'exploration',
+    'feedback', 'improvements', 'job', 'opportunity', 'question',
+    'recommendations', 'skill', 'statistics', 'activity', 'audit', 'auth',
+    'base_model', 'classifier', 'collection', 'config', 'email', 'exploration',
+    'feedback', 'improvements', 'job', 'opportunity', 'question',
+    'recommendations', 'skill', 'statistics', 'story', 'subtopic', 'suggestion',
+    'topic', 'translation', 'user')
 
 # Types of deletion policies. The pragma comment is needed because Enums are
 # evaluated as classes in Python and they should use PascalCase, but using
 # UPPER_CASE seems more appropriate here.
-MODULES_WITH_PSEUDONYMIZABLE_CLASSES = utils.create_enum(  # pylint: disable=invalid-name
-    NAMES.app_feedback_report, NAMES.collection, NAMES.config,
+MODULES_WITH_PSEUDONYMIZABLE_CLASSES = (  # pylint: disable=invalid-name
+    NAMES.app_feedback_report, NAMES.blog, NAMES.collection, NAMES.config,
     NAMES.exploration, NAMES.feedback, NAMES.question, NAMES.skill, NAMES.story,
     NAMES.subtopic, NAMES.suggestion, NAMES.topic)
 
@@ -73,7 +73,7 @@ class _Gae(Platform):
         """Imports and returns the storage modules listed in model_names.
 
         Args:
-            model_names: list(str). List of storage module names.
+            model_names: list(NAMES). List of storage module names.
 
         Returns:
             tuple(module). Tuple of storage modules.
@@ -98,6 +98,12 @@ class _Gae(Platform):
             elif name == NAMES.base_model:
                 from core.storage.base_model import gae_models as base_models
                 returned_models.append(base_models)
+            elif name == NAMES.beam_job:
+                from core.storage.beam_job import gae_models as beam_job_models
+                returned_models.append(beam_job_models)
+            elif name == NAMES.blog:
+                from core.storage.blog import gae_models as blog_models # pylint: disable=line-too-long
+                returned_models.append(blog_models)
             elif name == NAMES.classifier:
                 from core.storage.classifier import gae_models as classifier_data_models # pylint: disable=line-too-long
                 returned_models.append(classifier_data_models)
@@ -193,9 +199,7 @@ class _Gae(Platform):
         Returns:
             list(class). The corresponding storage-layer model classes.
         """
-        model_names = [
-            name for name in NAMES.__dict__
-            if '__' not in name and name != 'base_model']
+        model_names = [name for name in NAMES if name != NAMES.base_model]
         return cls.get_storage_model_classes(model_names)
 
     @classmethod
@@ -217,16 +221,6 @@ class _Gae(Platform):
         """
         from core.platform.transactions import gae_transaction_services
         return gae_transaction_services
-
-    @classmethod
-    def import_current_user_services(cls):
-        """Imports and returns gae_current_user_services module.
-
-        Returns:
-            module. The gae_current_user_services module.
-        """
-        from core.platform.users import gae_current_user_services
-        return gae_current_user_services
 
     @classmethod
     def import_datastore_services(cls):
@@ -273,6 +267,32 @@ class _Gae(Platform):
             raise Exception(
                 'Invalid email service provider: %s' % (
                     feconf.EMAIL_SERVICE_PROVIDER))
+
+    @classmethod
+    def import_bulk_email_services(cls):
+        """Imports and returns the bulk email services module specified in
+        feconf.py. If in DEV_MODE, uses the dev mode version of email services.
+
+        Returns:
+            module. The email_services module to use, based on the feconf.py
+            setting and DEV_MODE setting.
+
+        Raises:
+            Exception. The value of feconf.BULK_EMAIL_SERVICE_PROVIDER does not
+                correspond to a valid email_services module.
+        """
+        if constants.EMULATOR_MODE:
+            from core.platform.bulk_email import dev_mode_bulk_email_services
+            return dev_mode_bulk_email_services
+        elif (
+                feconf.BULK_EMAIL_SERVICE_PROVIDER ==
+                feconf.BULK_EMAIL_SERVICE_PROVIDER_MAILCHIMP):
+            from core.platform.bulk_email import mailchimp_bulk_email_services
+            return mailchimp_bulk_email_services
+        else:
+            raise Exception(
+                'Invalid bulk email service provider: %s' % (
+                    feconf.BULK_EMAIL_SERVICE_PROVIDER))
 
     @classmethod
     def import_cache_services(cls):
@@ -352,7 +372,7 @@ class Registry(python_utils.OBJECT):
         """Imports and returns the storage modules listed in model_names.
 
         Args:
-            model_names: list(str). List of storage module names.
+            model_names: list(NAMES). List of storage modules.
 
         Returns:
             list(module). The corresponding storage-layer modules.
@@ -393,15 +413,6 @@ class Registry(python_utils.OBJECT):
         return cls._get().import_auth_services()
 
     @classmethod
-    def import_current_user_services(cls):
-        """Imports and returns current_user_services module.
-
-        Returns:
-            module. The current_user_services module.
-        """
-        return cls._get().import_current_user_services()
-
-    @classmethod
     def import_datastore_services(cls):
         """Imports and returns datastore_services module.
 
@@ -436,6 +447,15 @@ class Registry(python_utils.OBJECT):
             module. The email_services module.
         """
         return cls._get().import_email_services()
+
+    @classmethod
+    def import_bulk_email_services(cls):
+        """Imports and returns bulk email_services module.
+
+        Returns:
+            module. The bulk email_services module.
+        """
+        return cls._get().import_bulk_email_services()
 
     @classmethod
     def import_cache_services(cls):

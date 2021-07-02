@@ -21,9 +21,9 @@ import { SkillSummary, SkillSummaryBackendDict } from
   'domain/skill/skill-summary.model';
 import { TopicsAndSkillsDashboardFilter } from
   'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-filter.model';
-import { TopicSummary, TopicSummaryBackendDict } from
-  'domain/topic/topic-summary.model';
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { CreatorTopicSummary, CreatorTopicSummaryBackendDict } from
+  'domain/topic/creator-topic-summary.model';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 // ^^^ This block is to be removed.
 
 require(
@@ -72,7 +72,7 @@ describe('Topics and Skills Dashboard Page', function() {
       can_delete_topic: true,
       can_delete_skill: true
     };
-    var SkillCreationService;
+    let CreateNewSkillModalService;
 
     beforeEach(angular.mock.inject(function($injector, $componentController) {
       $rootScope = $injector.get('$rootScope');
@@ -88,8 +88,8 @@ describe('Topics and Skills Dashboard Page', function() {
           var deferred = $q.defer();
           deferred.resolve({
             topicSummaries: sampleDataResults.topic_summary_dicts.map(
-              backendDict => TopicSummary.createFromBackendDict(
-                backendDict as TopicSummaryBackendDict)),
+              backendDict => CreatorTopicSummary.createFromBackendDict(
+                backendDict as CreatorTopicSummaryBackendDict)),
             untriagedSkillSummaries: (
               sampleDataResults.untriaged_skill_summary_dicts.map(
                 (backendDict: unknown) => SkillSummary.createFromBackendDict(
@@ -116,7 +116,7 @@ describe('Topics and Skills Dashboard Page', function() {
       var MockWindowDimensionsService = {
         isWindowNarrow: () => false
       };
-      SkillCreationService = $injector.get('SkillCreationService');
+      CreateNewSkillModalService = $injector.get('CreateNewSkillModalService');
 
       ctrl = $componentController('topicsAndSkillsDashboardPage', {
         $scope: $scope,
@@ -154,8 +154,8 @@ describe('Topics and Skills Dashboard Page', function() {
       expect(ctrl.activeTab).toEqual('topics');
       expect(ctrl.totalTopicSummaries).toEqual(
         sampleDataResults.topic_summary_dicts.map(
-          dict => TopicSummary.createFromBackendDict(
-            dict as TopicSummaryBackendDict)));
+          dict => CreatorTopicSummary.createFromBackendDict(
+            dict as CreatorTopicSummaryBackendDict)));
       expect(ctrl.untriagedSkillSummaries).toEqual(
         sampleDataResults.untriaged_skill_summary_dicts.map(
           (dict: unknown) => SkillSummary.createFromBackendDict(
@@ -197,24 +197,9 @@ describe('Topics and Skills Dashboard Page', function() {
     });
 
     it('should open Create Skill Modal', function() {
-      var modalSpy = spyOn($uibModal, 'open').and.callThrough();
+      let modalSpy = spyOn(CreateNewSkillModalService, 'createNewSkill');
       ctrl.createSkill();
       expect(modalSpy).toHaveBeenCalled();
-    });
-
-    it('should call the skill creation service', function() {
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve({
-          description: 'Description',
-          rubrics: 'Easy',
-          explanation: 'Explanation'
-        })
-      });
-
-      var skillSpy = spyOn(SkillCreationService, 'createNewSkill');
-      ctrl.createSkill();
-      $rootScope.$apply();
-      expect(skillSpy).toHaveBeenCalled();
     });
 
     it('should navigate the page', function() {
@@ -295,22 +280,22 @@ describe('Topics and Skills Dashboard Page', function() {
     });
 
     it('should apply the filters', function() {
-      const topic1 = TopicSummary.createFromBackendDict({
+      const topic1 = CreatorTopicSummary.createFromBackendDict({
         is_published: true, name: 'Alpha', classroom: 'Math',
         description: 'Alpha description',
-      } as TopicSummaryBackendDict);
-      const topic2 = TopicSummary.createFromBackendDict({
+      } as CreatorTopicSummaryBackendDict);
+      const topic2 = CreatorTopicSummary.createFromBackendDict({
         is_published: false, name: 'Alpha2', classroom: 'Math',
         description: 'Alp2 desc',
-      } as TopicSummaryBackendDict);
-      const topic3 = TopicSummary.createFromBackendDict({
+      } as CreatorTopicSummaryBackendDict);
+      const topic3 = CreatorTopicSummary.createFromBackendDict({
         is_published: false, name: 'Beta', classroom: 'Math',
         description: 'Beta description',
-      } as TopicSummaryBackendDict);
-      const topic4 = TopicSummary.createFromBackendDict({
+      } as CreatorTopicSummaryBackendDict);
+      const topic4 = CreatorTopicSummary.createFromBackendDict({
         is_published: true, name: 'Gamma', classroom: 'Math',
         description: 'Gamma description',
-      } as TopicSummaryBackendDict);
+      } as CreatorTopicSummaryBackendDict);
       ctrl.filterObject = (
         TopicsAndSkillsDashboardFilter.createDefault());
       ctrl.totalTopicSummaries = [topic1, topic2, topic3, topic4];

@@ -63,6 +63,7 @@ angular.module('oppia').controller('CreateNewChapterModalController', [
       StoryUpdateService.setStoryNodeThumbnailFilename(
         $scope.story, $scope.nodeId, newThumbnailFilename);
       $scope.editableThumbnailFilename = newThumbnailFilename;
+      $scope.$applyAsync();
     };
 
     $scope.updateThumbnailBgColor = function(newThumbnailBgColor) {
@@ -92,7 +93,7 @@ angular.module('oppia').controller('CreateNewChapterModalController', [
         }
       }
       if (StoryEditorStateService.isStoryPublished()) {
-        ExplorationIdValidationService.isExpPublished(
+        ExplorationIdValidationService.isExpPublishedAsync(
           $scope.explorationId).then(function(expIdIsValid) {
           $scope.expIdIsValid = expIdIsValid;
           if ($scope.expIdIsValid) {

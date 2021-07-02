@@ -82,8 +82,8 @@
   </head>
   <body>
     <oppia-root>
-      <div ng-controller="Base">
-        <base-content>
+      <div ng-controller="Base" dir="<[direction]>">
+        <oppia-base-content>
           <navbar-breadcrumb>
             <collection-navbar></collection-navbar>
           </navbar-breadcrumb>
@@ -96,7 +96,7 @@
           <page-footer>
             <collection-footer></collection-footer>
           </page-footer>
-        </base-content>
+        </oppia-base-content>
       </div>
     </oppia-root>
     @load('pages/footer_js_libs.html')

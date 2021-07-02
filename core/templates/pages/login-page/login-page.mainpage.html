@@ -5,8 +5,8 @@
   </head>
   <body>
     <oppia-root>
-      <div ng-controller="Base">
-        <base-content>
+      <div ng-controller="Base" dir="<[direction]>">
+        <oppia-base-content>
           <navbar-breadcrumb>
             <ul class="nav navbar-nav oppia-navbar-breadcrumb">
               <li>
@@ -16,9 +16,9 @@
             </ul>
           </navbar-breadcrumb>
           <content>
-            <login-page></login-page>
+            <login-page class="protractor-test-login-page"></login-page>
           </content>
-        </base-content>
+        </oppia-base-content>
       </div>
     </oppia-root>
     @load('pages/footer_js_libs.html')

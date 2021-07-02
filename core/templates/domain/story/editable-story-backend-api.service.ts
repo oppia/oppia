@@ -165,7 +165,7 @@ export class EditableStoryBackendApiService {
         story_id: storyId
       });
 
-    this.http['delete'](
+    this.http.delete(
       storyDataUrl, {observe: 'response'}).toPromise().then(
       (response) => {
         if (successCallback) {
@@ -199,7 +199,7 @@ export class EditableStoryBackendApiService {
       });
   }
 
-  fetchStory(storyId: string): Promise<FetchStoryResponse> {
+  async fetchStoryAsync(storyId: string): Promise<FetchStoryResponse> {
     return new Promise((resolve, reject) => {
       this._fetchStory(storyId, resolve, reject);
     });
@@ -215,7 +215,7 @@ export class EditableStoryBackendApiService {
      * the success callback, if one is provided to the returned promise
      * object. Errors are passed to the error callback, if one is provided.
      */
-  updateStory(
+  async updateStoryAsync(
       storyId: string, storyVersion: number,
       commitMessage: string,
       changeList: StoryChange[]):
@@ -227,7 +227,7 @@ export class EditableStoryBackendApiService {
     });
   }
 
-  changeStoryPublicationStatus(
+  async changeStoryPublicationStatusAsync(
       storyId: string,
       newStoryStatusIsPublic: boolean):
   Promise<void> {
@@ -237,7 +237,7 @@ export class EditableStoryBackendApiService {
     });
   }
 
-  validateExplorations(
+  async validateExplorationsAsync(
       storyId: string,
       expIds: string[]): Promise<string[]> {
     return new Promise((resolve, reject) => {
@@ -246,7 +246,7 @@ export class EditableStoryBackendApiService {
     });
   }
 
-  deleteStory(storyId: string): Promise<number> {
+  async deleteStoryAsync(storyId: string): Promise<number> {
     return new Promise((resolve, reject) => {
       this._deleteStory(storyId, resolve, reject);
     });

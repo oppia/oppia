@@ -48,12 +48,21 @@ TEXT_INPUT_ID = 'TextInput'
 INTERACTIONS_THAT_USE_COMPONENTS = [
     'AlgebraicExpressionInput',
     'Continue',
+    'CodeRepl',
     'EndExploration',
     'FractionInput',
     'GraphInput',
+    'ImageClickInput',
+    'InteractiveMap',
+    'LogicProof',
     'MathEquationInput',
+    'MultipleChoiceInput',
     'NumericExpressionInput',
-    'RatioExpressionInput'
+    'RatioExpressionInput',
+    'NumericInput',
+    'SetInput',
+    'TextInput',
+    'MathEquationInput'
 ]
 
 _INTERACTION_CONFIG_SCHEMA = [

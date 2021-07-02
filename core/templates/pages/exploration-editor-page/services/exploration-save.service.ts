@@ -197,6 +197,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
               draftChanges !== null &&
               draftChanges.length > 0) {
             AutosaveInfoModalsService.showVersionMismatchModal(changeList);
+            $rootScope.$applyAsync();
             return;
           }
           $log.info('Changes to this exploration were saved successfully.');
@@ -370,7 +371,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
           return;
         }
 
-        ExplorationDataService.getLastSavedData().then(function(data) {
+        ExplorationDataService.getLastSavedDataAsync().then(function(data) {
           var oldStates = StatesObjectFactory.createFromBackendDict(
             data.states).getStateObjects();
           var newStates = ExplorationStatesService.getStates()

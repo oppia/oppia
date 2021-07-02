@@ -71,7 +71,8 @@ export class SearchExplorationsBackendApiService {
    * queries are tokens that will be matched against exploration's title
    * and objective.
    */
-  fetchExplorations(searchQuery: string): Promise<ExplorationMetadata[]> {
+  async fetchExplorationsAsync(
+      searchQuery: string): Promise<ExplorationMetadata[]> {
     return new Promise((resolve, reject) => {
       this._fetchExplorations(searchQuery, resolve, reject);
     });

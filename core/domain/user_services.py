@@ -42,7 +42,7 @@ auth_models, user_models, audit_models, suggestion_models = (
         [models.NAMES.auth, models.NAMES.user, models.NAMES.audit,
          models.NAMES.suggestion]))
 
-current_user_services = models.Registry.import_current_user_services()
+bulk_email_services = models.Registry.import_bulk_email_services()
 transaction_services = models.Registry.import_transaction_services()
 
 # Size (in px) of the gravatar being retrieved.
@@ -115,6 +115,23 @@ def get_user_settings_from_username(username):
     """
     user_model = user_models.UserSettingsModel.get_by_normalized_username(
         user_domain.UserSettings.normalize_username(username))
+    if user_model is None:
+        return None
+    else:
+        return get_user_settings(user_model.id)
+
+
+def get_user_settings_from_email(email):
+    """Gets the user settings for a given email.
+
+    Args:
+        email: str. Email of the user.
+
+    Returns:
+        UserSettingsModel or None. The UserSettingsModel instance corresponding
+        to the given email, or None if no such model was found.
+    """
+    user_model = user_models.UserSettingsModel.get_by_email(email)
     if user_model is None:
         return None
     else:
@@ -582,13 +599,15 @@ def _save_user_settings(user_settings):
     user_model = user_models.UserSettingsModel.get_by_id(user_settings.user_id)
     if user_model is not None:
         user_model.populate(**user_settings_dict)
-        user_model.update_timestamps()
-        user_model.put()
     else:
         user_settings_dict['id'] = user_settings.user_id
-        model = user_models.UserSettingsModel(**user_settings_dict)
-        model.update_timestamps()
-        model.put()
+        user_model = user_models.UserSettingsModel(**user_settings_dict)
+
+    # TODO(#12755): Remove update_roles_and_banned_fields call once roles and
+    # banned fields are in use.
+    update_roles_and_banned_fields(user_model)
+    user_model.update_timestamps()
+    user_model.put()
 
 
 def _get_user_settings_from_model(user_settings_model):
@@ -860,6 +879,8 @@ def _save_existing_users_settings(user_settings_list):
             user_settings_models, user_settings_list):
         user_settings.validate()
         user_model.populate(**user_settings.to_dict())
+        update_roles_and_banned_fields(user_model)
+
     user_models.UserSettingsModel.update_timestamps_multi(user_settings_models)
     user_models.UserSettingsModel.put_multi(user_settings_models)
 
@@ -1215,7 +1236,7 @@ def update_user_role(user_id, role):
     Raises:
         Exception. The given role does not exist.
     """
-    if role not in role_services.PARENT_ROLES:
+    if not role_services.is_valid_role(role):
         raise Exception('Role %s does not exist.' % role)
     user_settings = get_user_settings(user_id, strict=True)
     if user_settings.role == feconf.ROLE_ID_LEARNER:
@@ -1378,7 +1399,8 @@ def record_user_created_an_exploration(user_id):
 
 def update_email_preferences(
         user_id, can_receive_email_updates, can_receive_editor_role_email,
-        can_receive_feedback_email, can_receive_subscription_email):
+        can_receive_feedback_email, can_receive_subscription_email,
+        bulk_email_db_already_updated=False):
     """Updates whether the user has chosen to receive email updates.
 
     If no UserEmailPreferencesModel exists for this user, a new one will
@@ -1394,6 +1416,14 @@ def update_email_preferences(
             emails when users submit feedback to their explorations.
         can_receive_subscription_email: bool. Whether the given user can receive
             emails related to his/her creator subscriptions.
+        bulk_email_db_already_updated: bool. Whether the bulk email provider's
+            database is already updated. This is set to true only when calling
+            from the webhook controller since in that case, the external update
+            to the bulk email provider's database initiated the update here.
+
+    Returns:
+        bool. Whether to send a mail to the user to complete bulk email service
+        signup.
     """
     email_preferences_model = user_models.UserEmailPreferencesModel.get(
         user_id, strict=False)
@@ -1401,15 +1431,26 @@ def update_email_preferences(
         email_preferences_model = user_models.UserEmailPreferencesModel(
             id=user_id)
 
-    email_preferences_model.site_updates = can_receive_email_updates
     email_preferences_model.editor_role_notifications = (
         can_receive_editor_role_email)
     email_preferences_model.feedback_message_notifications = (
         can_receive_feedback_email)
     email_preferences_model.subscription_notifications = (
         can_receive_subscription_email)
+    email = get_email_from_user_id(user_id)
+    if not bulk_email_db_already_updated:
+        user_creation_successful = (
+            bulk_email_services.add_or_update_user_status(
+                email, can_receive_email_updates))
+        if not user_creation_successful:
+            email_preferences_model.site_updates = False
+            email_preferences_model.update_timestamps()
+            email_preferences_model.put()
+            return True
+    email_preferences_model.site_updates = can_receive_email_updates
     email_preferences_model.update_timestamps()
     email_preferences_model.put()
+    return False
 
 
 def get_email_preferences(user_id):
@@ -2165,9 +2206,32 @@ def create_login_url(return_url):
     Returns:
         str. The correct login URL that includes the page to redirect to.
     """
-    # TODO(#11462): Delete this function. Pre-#11462, we needed this because we
-    # didn't control the page or URL responsible for user authentication.
-    # This is no longer the case. We've implemented our own user authentication
-    # flow on top of the Firebase SDK in "core/templates/pages/login-page", and
-    # this function will always redirect to its static location ("/login").
     return '/login?%s' % python_utils.url_encode({'return_url': return_url})
+
+
+def update_roles_and_banned_fields(user_settings_model):
+    """Updates the new roles and banned fields in the UserSettingsModel which
+    are not in use but needs to kept in sync.
+
+    TODO(#12755): Remove this function once the roles and banned field of
+    UserSettingsModel are in use. It is not recommended to use this function in
+    new places.
+
+    Args:
+        user_settings_model: UserSettingsModel. The models which needs update.
+    """
+    if user_settings_model.role == feconf.ROLE_ID_BANNED_USER:
+        user_settings_model.banned = True
+        user_settings_model.roles = []
+        return
+    if user_settings_model.role in [
+            feconf.ROLE_ID_LEARNER, feconf.ROLE_ID_EXPLORATION_EDITOR]:
+        user_settings_model.banned = False
+        user_settings_model.roles = [user_settings_model.role]
+        return
+
+    # Learners are not allowed to have other roles, so user with role other than
+    # exploration editor or learner should have exploration editor role.
+    user_settings_model.roles = [
+        feconf.ROLE_ID_EXPLORATION_EDITOR, user_settings_model.role]
+    user_settings_model.banned = False
