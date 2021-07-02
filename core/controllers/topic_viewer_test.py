@@ -162,6 +162,7 @@ class TopicPageDataHandlerTests(
             'subtopics': [{
                 u'thumbnail_filename': u'image.svg',
                 u'thumbnail_bg_color': u'#FFFFFF',
+                u'thumbnail_size_in_bytes': 0,
                 u'skill_ids': [self.skill_id_2],
                 u'id': 1,
                 u'title': u'subtopic_name',
@@ -228,6 +229,7 @@ class TopicPageDataHandlerTests(
                 'subtopics': [{
                     u'thumbnail_filename': u'image.svg',
                     u'thumbnail_bg_color': u'#FFFFFF',
+                    u'thumbnail_size_in_bytes': 0,
                     u'skill_ids': [self.skill_id_2],
                     u'id': 1,
                     u'title': u'subtopic_name',
