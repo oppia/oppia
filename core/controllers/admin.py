@@ -261,8 +261,8 @@ class AdminHandler(base.BaseHandler):
                 for (name, value) in new_config_property_values.items():
                     config_services.set_property(self.user_id, name, value)
             elif action == 'revert_config_property':
-                config_property_id = (self.normalized_payload.get(
-                    'config_property_id'))
+                config_property_id = self.normalized_payload.get(
+                    'config_property_id')
                 logging.info(
                     '[ADMIN] %s reverted config property: %s' %
                     (self.user_id, config_property_id))
