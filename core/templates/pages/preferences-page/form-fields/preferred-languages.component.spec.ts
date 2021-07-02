@@ -46,4 +46,81 @@ describe('Preferred Site Language Component', () => {
   it('should be defined', () => {
     expect(componentInstance).toBeDefined();
   });
+
+  it('should initialize', () => {
+    fixture.detectChanges();
+    let value = 'en';
+    componentInstance.preferredLanguages = [];
+    componentInstance.choices = [{
+      id: 'en',
+      text: 'English',
+      dir: 'ltr'
+    }];
+    componentInstance.formCtrl = {
+      valueChanges: {
+        subscribe(callb) {
+          callb(value);
+        }
+      }
+    };
+    componentInstance.ngOnInit();
+    expect(componentInstance.chipList.errorState).toBeFalse();
+    value = '';
+    componentInstance.formCtrl = {
+      valueChanges: {
+        subscribe(callb) {
+          callb(value);
+        }
+      }
+    };
+    componentInstance.ngOnInit();
+    expect(componentInstance.chipList.errorState).toBeTrue();
+  });
+
+  it('should validate input', () => {
+    componentInstance.preferredLanguages = [];
+    componentInstance.choices = [{
+      id: 'en',
+      text: 'English',
+      dir: 'ltr'
+    }];
+    expect(componentInstance.validInput('en')).toBeTrue();
+  });
+
+  it('should add language', () => {
+    spyOn(componentInstance.preferredLanguagesChange, 'emit');
+    spyOn(componentInstance, 'validInput').and.returnValue(true);
+    componentInstance.preferredLanguages = [];
+    componentInstance.choices = ['en'];
+    componentInstance.languageInput = {
+      nativeElement: {
+        value: ''
+      }
+    };
+    componentInstance.add({value: 'en'});
+    componentInstance.add({value: ''});
+    expect(componentInstance.preferredLanguagesChange.emit).toHaveBeenCalled();
+  });
+
+  it('should remove language', () => {
+    componentInstance.preferredLanguages = ['en'];
+    componentInstance.choices = ['en'];
+    componentInstance.remove('en');
+    expect(componentInstance.preferredLanguages).toEqual([]);
+    expect(componentInstance.choices).toEqual(['en']);
+  });
+
+  it('should handle when user selects a language', () => {
+    spyOn(componentInstance, 'add');
+    spyOn(componentInstance, 'remove');
+    componentInstance.preferredLanguages = ['en'];
+    componentInstance.selected(
+      { option: { value: 'en' }});
+    expect(componentInstance.remove).toHaveBeenCalled();
+    expect(componentInstance.add).not.toHaveBeenCalled();
+    componentInstance.preferredLanguages = [];
+    componentInstance.selected(
+      { option: { value: 'en' }});
+    expect(componentInstance.add).toHaveBeenCalled();
+  });
 });

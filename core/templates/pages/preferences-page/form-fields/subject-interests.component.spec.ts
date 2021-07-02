@@ -18,12 +18,10 @@
 
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { MatChipInputEvent } from '@angular/material/chips';
 import { MaterialModule } from 'components/material.module';
 import { SubjectInterestsComponent } from './subject-interests.component';
 
-describe('Preferences Page Component', () => {
+describe('Subject interests form field Component', () => {
   let componentInstance: SubjectInterestsComponent;
   let fixture: ComponentFixture<SubjectInterestsComponent>;
 
@@ -49,7 +47,26 @@ describe('Preferences Page Component', () => {
     expect(componentInstance).toBeDefined();
   });
 
-  it('should intialize', () => {
+  it('should initialize', () => {
+    fixture.detectChanges();
+    let input = '';
+    componentInstance.subjectInterests = ['math'];
+    componentInstance.formCtrl = {
+      valueChanges: {
+        subscribe(callb) {
+          callb(input);
+        }
+      }
+    };
+    componentInstance.ngOnInit();
+    input = 'math';
+    componentInstance.formCtrl = {
+      valueChanges: {
+        subscribe(callb) {
+          callb(input);
+        }
+      }
+    };
     componentInstance.ngOnInit();
     expect(componentInstance.allSubjectInterests).toEqual(
       componentInstance.subjectInterests);
@@ -64,19 +81,20 @@ describe('Preferences Page Component', () => {
     spyOn(componentInstance.subjectInterestsChange, 'emit');
     spyOn(componentInstance, 'validInput').and.returnValue(true);
     componentInstance.subjectInterests = [];
-    componentInstance.ngOnInit();
-    componentInstance.fruitInput = {
+    componentInstance.allSubjectInterests = [];
+    componentInstance.subjectInterestInput = {
       nativeElement: {
         value: ''
       }
     };
-    componentInstance.add({value: 'math'} as MatChipInputEvent);
+    componentInstance.add({value: 'math'});
+    componentInstance.add({value: ''});
     expect(componentInstance.subjectInterestsChange.emit).toHaveBeenCalled();
   });
 
   it('should remove subject interest', () => {
     componentInstance.subjectInterests = ['math'];
-    componentInstance.ngOnInit();
+    componentInstance.allSubjectInterests = ['math'];
     componentInstance.remove('math');
     expect(componentInstance.subjectInterests).toEqual([]);
   });
@@ -86,12 +104,18 @@ describe('Preferences Page Component', () => {
     spyOn(componentInstance, 'remove');
     componentInstance.subjectInterests = ['math'];
     componentInstance.selected(
-      { option: { viewValue: 'math' }} as MatAutocompleteSelectedEvent);
+      { option: { value: 'math' }});
     expect(componentInstance.remove).toHaveBeenCalled();
     expect(componentInstance.add).not.toHaveBeenCalled();
     componentInstance.subjectInterests = [];
     componentInstance.selected(
-      { option: { viewValue: 'math' }} as MatAutocompleteSelectedEvent);
+      { option: { value: 'math' }});
     expect(componentInstance.add).toHaveBeenCalled();
+  });
+
+  it('should filter interests', () => {
+    componentInstance.allSubjectInterests = ['math'];
+    expect(componentInstance.filter('math')).toEqual(['math']);
+    expect(componentInstance.filter('art')).toEqual([]);
   });
 });

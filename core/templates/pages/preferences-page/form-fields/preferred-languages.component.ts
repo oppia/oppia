@@ -34,12 +34,12 @@ export class PreferredLanguagesComponent {
   selectable = true;
   removable = true;
   separatorKeysCodes: number[] = [ENTER];
-  fruitCtrl = new FormControl();
+  formCtrl = new FormControl();
   @ViewChild('chipList') chipList: MatChipList;
-  @ViewChild('fruitInput') fruitInput: ElementRef<HTMLInputElement>;
+  @ViewChild('languageInput') languageInput: ElementRef<HTMLInputElement>;
 
   ngOnInit(): void {
-    this.fruitCtrl.valueChanges.subscribe((value: string) => {
+    this.formCtrl.valueChanges.subscribe((value: string) => {
       if (!this.validInput(value)) {
         this.chipList.errorState = true;
       } else {
@@ -61,7 +61,7 @@ export class PreferredLanguagesComponent {
       this.preferredLanguages.indexOf(value) < 0 ? true : false;
   }
 
-  add(event: MatChipInputEvent): void {
+  add(event: { value: string }): void {
     const value = (event.value || '').trim();
     if (!value) {
       return;
@@ -70,7 +70,7 @@ export class PreferredLanguagesComponent {
     if (this.validInput(value)) {
       this.preferredLanguages.push(value);
       this.preferredLanguagesChange.emit(this.preferredLanguages);
-      this.fruitInput.nativeElement.value = '';
+      this.languageInput.nativeElement.value = '';
     }
   }
 
@@ -83,7 +83,7 @@ export class PreferredLanguagesComponent {
     }
   }
 
-  selected(event: MatAutocompleteSelectedEvent): void {
+  selected(event: { option: { value: string } }): void {
     if (this.preferredLanguages.indexOf(event.option.value) > -1) {
       this.remove(event.option.value);
     } else {
