@@ -34,7 +34,7 @@ describe('EndExplorationValidationService', () => {
   let validatorService: EndExplorationValidationService;
 
   let currentState: string;
-  let badOutcome: Outcome, goodDefaultOutcome: Outcome;
+  let badOutcome: Outcome;
   let goodAnswerGroups: AnswerGroup[];
   let customizationArguments: EndExplorationCustomizationArgs;
   let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
@@ -50,17 +50,6 @@ describe('EndExplorationValidationService', () => {
     agof = TestBed.inject(AnswerGroupObjectFactory);
 
     currentState = 'First State';
-    goodDefaultOutcome = oof.createFromBackendDict({
-      dest: 'Second State',
-      feedback: {
-        html: '',
-        content_id: ''
-      },
-      labelled_as_correct: false,
-      param_changes: [],
-      refresher_exploration_id: null,
-      missing_prerequisite_skill_id: null
-    });
 
     badOutcome = oof.createFromBackendDict({
       dest: currentState,
@@ -142,7 +131,11 @@ describe('EndExplorationValidationService', () => {
   it('should not have warnings for 0 or 8 recommendations', () => {
     customizationArguments.recommendedExplorationIds.value = [];
     var warnings = validatorService.getAllWarnings(
-      currentState, customizationArguments, [], goodDefaultOutcome);
+      // This throws "Type 'null' is not assignable to type 'Outcome'
+      // ." We need to suppress this error because of the need to test
+      // validations with the outcome not defined.
+      // @ts-ignore
+      currentState, customizationArguments, [], null);
     expect(warnings).toEqual([]);
 
     customizationArguments.recommendedExplorationIds.value = [
@@ -150,7 +143,11 @@ describe('EndExplorationValidationService', () => {
       'ExpID4', 'ExpID5', 'ExpID6', 'ExpID7'
     ];
     warnings = validatorService.getAllWarnings(
-      currentState, customizationArguments, [], goodDefaultOutcome);
+      // This throws "Type 'null' is not assignable to type 'Outcome'
+      // ." We need to suppress this error because of the need to test
+      // validations with the outcome not defined.
+      // @ts-ignore
+      currentState, customizationArguments, [], null);
     expect(warnings).toEqual([]);
   });
 
@@ -162,7 +159,11 @@ describe('EndExplorationValidationService', () => {
       // @ts-expect-error
       customizationArguments.recommendedExplorationIds.value = [1];
       var warnings = validatorService.getAllWarnings(
-        currentState, customizationArguments, [], goodDefaultOutcome);
+      // This throws "Type 'null' is not assignable to type 'Outcome'
+      // ." We need to suppress this error because of the need to test
+      // validations with the outcome not defined.
+      // @ts-ignore
+        currentState, customizationArguments, [], null);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
         message: 'Recommended exploration ID must be a string.'
@@ -177,7 +178,11 @@ describe('EndExplorationValidationService', () => {
       // @ts-expect-error
       customizationArguments.recommendedExplorationIds.value = 'ExpID0';
       var warnings = validatorService.getAllWarnings(
-        currentState, customizationArguments, [], goodDefaultOutcome);
+      // This throws "Type 'null' is not assignable to type 'Outcome'
+      // ." We need to suppress this error because of the need to test
+      // validations with the outcome not defined.
+      // @ts-ignore
+        currentState, customizationArguments, [], null);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
         message: 'Set of recommended exploration IDs must be list.'
