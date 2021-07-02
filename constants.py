@@ -43,8 +43,7 @@ def parse_json_from_js(js_file):
     json_start = text_without_comments.find('{\n')
     # Add 1 to index returned because the '}' is part of the JSON object.
     json_end = text_without_comments.rfind('}') + 1
-    json_dict = json.loads(
-        text_without_comments[json_start:json_end]) # type: Dict[Text, Any]
+    json_dict = json.loads(text_without_comments[json_start:json_end]) # type: Dict[Text, Any]
     return json_dict
 
 

@@ -601,8 +601,7 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         for schema in valid_schemas:
             validate_schema(schema)
         for schemas, error_msg in invalid_schemas_with_error_messages:
-            with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-                (AssertionError, KeyError), error_msg):
+            with self.assertRaisesRegexp((AssertionError, KeyError), error_msg): # type: ignore[no-untyped-call]
                 validate_schema(schemas) # type: ignore[arg-type]
 
     def test_normalize_against_schema_raises_exception(self):

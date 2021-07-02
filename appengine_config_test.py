@@ -75,9 +75,8 @@ class AppengineConfigTests(test_utils.GenericTestBase):
         """Test that the monkey-patched get_distribution() method returns an
         object with a suitable version string for google-cloud-tasks.
         """
-        assert_raises_regexp_context_manager = (
-            self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-                pkg_resources.DistributionNotFound, 'invalid-lib'))
+        assert_raises_regexp_context_manager = self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+                pkg_resources.DistributionNotFound, 'invalid-lib')
         with self.swap(
             appengine_config, 'old_get_distribution',
             self._mock_get_distribution_which_raises_error
