@@ -1291,7 +1291,9 @@ class IframeRestrictionTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS = {
             'GET': {
                 'iframe_restriction': {
-                    'type': 'basestring',
+                    'schema': {
+                        'type': 'basestring'
+                    },
                     'default_value': None
                 }
             }
@@ -1405,9 +1407,9 @@ class OppiaMLVMHandlerTests(test_utils.GenericTestBase):
         URL_PATH_ARGS_SCHEMAS = {}
         HANDLER_ARGS_SCHEMAS = {
             'POST': {
-                'vm_id': {'type': 'basestring'},
-                'signature': {'type': 'basestring'},
-                'message': {'type': 'basestring'},
+                'vm_id': {'schema': {'type': 'basestring'}},
+                'signature': {'schema': {'type': 'basestring'}},
+                'message': {'schema': {'type': 'basestring'}},
             }
         }
 
@@ -1424,9 +1426,9 @@ class OppiaMLVMHandlerTests(test_utils.GenericTestBase):
         URL_PATH_ARGS_SCHEMAS = {}
         HANDLER_ARGS_SCHEMAS = {
             'POST': {
-                'vm_id': {'type': 'basestring'},
-                'signature': {'type': 'basestring'},
-                'message': {'type': 'basestring'},
+                'vm_id': {'schema': {'type': 'basestring'}},
+                'signature': {'schema': {'type': 'basestring'}},
+                'message': {'schema': {'type': 'basestring'}},
             }
         }
 
@@ -1710,7 +1712,9 @@ class SchemaValidationUrlArgsTests(test_utils.GenericTestBase):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'exploration_id': {
-                'type': 'int'
+                'schema': {
+                    'type': 'int'
+                }
             }
         }
         HANDLER_ARGS_SCHEMAS = {'GET': {}}
@@ -1723,7 +1727,9 @@ class SchemaValidationUrlArgsTests(test_utils.GenericTestBase):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'exploration_id': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             }
         }
         HANDLER_ARGS_SCHEMAS = {'GET': {}}
@@ -1806,7 +1812,9 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS = {
             'GET': {
                 'exploration_id': {
-                    'type': 'int'
+                    'schema': {
+                        'type': 'int'
+                    }
                 }
             }
         }
@@ -1894,3 +1902,142 @@ class RequestMethodNotInHandlerClassDoNotRaiseMissingSchemaErrorTest(
     def test_get_request_do_not_raise_notimplemented_error(self):
         with self.swap(self, 'testapp', self.testapp):
             self.get_json('/mock', expected_status_int=404)
+
+
+class HandlerClassWithBothRequestAndPayloadTest(test_utils.GenericTestBase):
+    """This test class ensures that SVS architecture validates both request args
+    and payload args if they are present in a single request method."""
+
+    class MockHandler(base.BaseHandler):
+        """Fake page for testing autoescaping."""
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {
+            'POST': {
+                'arg_b': {
+                    'schema': {
+                        'type': 'basestring'
+                    }
+                },
+                'arg_a': {
+                    'schema': {
+                        'type': 'basestring'
+                    }
+                }
+            }
+        }
+
+        def post(self):
+            """Handles POST requests. This request method contains both type
+            of args, i.e., request args as well as payload args.
+            """
+            # arg_a = self.request.get('arg_a') is not used, since we
+            # intend to use normalized value.
+            arg_a = self.normalized_request.get('arg_a')
+
+            # arg_b = self.payload.get('arg_b') is not used, since we
+            # intend to use normalized value.
+            arg_b = self.normalized_request.get('arg_b')
+
+            self.render_json({'arg_a': arg_a, 'arg_b': arg_b})
+
+    def setUp(self):
+        super(HandlerClassWithBothRequestAndPayloadTest, self).setUp()
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock', self.MockHandler, name='MockHandler')],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_both_args_in_post_request(self):
+        payload = {'arg_b': 'arg_in_payload'}
+        user_id = user_services.get_user_id_from_username('learneruser')
+        csrf_token = base.CsrfTokenManager.create_csrf_token(user_id)
+        with self.swap(self, 'testapp', self.testapp):
+            self.post_json(
+                '/mock?arg_a=arg_in_request', payload, csrf_token=csrf_token)
+
+
+class ImageUploadHandlerTest(test_utils.GenericTestBase):
+    """This test class ensures that schema validation is done successfully
+    for handlers which upload image files.
+    """
+
+    TEST_LEARNER_EMAIL = 'test.learner@example.com'
+    TEST_LEARNER_USERNAME = 'testlearneruser'
+
+    class MockUploadHandler(base.BaseHandler):
+        """Handles image uploads."""
+        URL_PATH_ARGS_SCHEMAS = {
+            'entity_type': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'entity_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {
+            'POST': {
+                'image': {
+                    'schema': {
+                        'type': 'basestring'
+                    }
+                },
+                'filename': {
+                    'schema': {
+                        'type': 'basestring'
+                    }
+                },
+                'filename_prefix': {
+                    'schema': {
+                        'type': 'basestring'
+                    },
+                    'default_value': None
+                }
+            }
+        }
+
+        def post(self, entity_type, entity_id):
+            """Saves an image uploaded by a content creator."""
+
+            raw = self.normalized_request.get('image')
+            filename = self.normalized_request.get('filename')
+            filename_prefix = self.normalized_request.get('filename_prefix')
+
+            self.render_json({'filename': filename})
+
+    def setUp(self):
+        super(ImageUploadHandlerTest, self).setUp()
+        self.signup(self.TEST_LEARNER_EMAIL, self.TEST_LEARNER_USERNAME)
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock_upload/<entity_type>/<entity_id>',
+            self.MockUploadHandler, name='MockUploadHandler')],
+            debug=feconf.DEBUG,
+        ))
+
+        self.system_user = user_services.get_system_user()
+        exp_services.load_demo('0')
+
+        rights_manager.release_ownership_of_exploration(
+            self.system_user, '0')
+
+    def test_image_upload_and_download(self):
+        """Test image uploading and downloading."""
+        self.login(self.TEST_LEARNER_EMAIL)
+        user_id = user_services.get_user_id_from_username('testlearneruser')
+        csrf_token = base.CsrfTokenManager.create_csrf_token(user_id)
+
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
+            'rb', encoding=None) as f:
+            raw_image = f.read()
+        with self.swap(self, 'testapp', self.testapp):
+            response_dict = self.post_json(
+                '/mock_upload/exploration/0', {'filename': 'test.png'},
+                csrf_token=csrf_token,
+                upload_files=(('image', 'unused_filename', raw_image),)
+            )
+            filename = response_dict['filename']
+        self.logout()

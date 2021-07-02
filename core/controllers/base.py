@@ -148,6 +148,7 @@ class BaseHandler(webapp2.RequestHandler):
 
     URL_PATH_ARGS_SCHEMAS = None
     HANDLER_ARGS_SCHEMAS = None
+    ARGS_WHICH_DO_NOT_NEED_SCHEMA_VALIDATION = ['csrf_token']
 
     def __init__(self, request, response):  # pylint: disable=super-init-not-called
         # Set self.request, self.response and self.app.
@@ -158,6 +159,8 @@ class BaseHandler(webapp2.RequestHandler):
         # Initializes the return dict for the handlers.
         self.values = {}
 
+        # TODO(#13155): Remove the if-else part once all the handlers have had
+        # schema validation implemented.
         if self.request.get('payload'):
             self.payload = json.loads(self.request.get('payload'))
         else:
@@ -334,18 +337,20 @@ class BaseHandler(webapp2.RequestHandler):
         if handler_class_name in handler_class_names_with_no_schema:
             return
 
-        if request_method in ['GET', 'DELETE']:
-            handler_args = {}
-            for arg in self.request.arguments():
+        handler_args = {}
+        payload_arg_keys = []
+        request_arg_keys = []
+        for arg in self.request.arguments():
+            if arg in self.ARGS_WHICH_DO_NOT_NEED_SCHEMA_VALIDATION:
+                continue
+            if arg == 'payload':
+                payload_args = self.payload
+                if payload_args is not None:
+                    payload_arg_keys = payload_args.keys()
+                    handler_args.update(payload_args)
+            else:
+                request_arg_keys.append(arg)
                 handler_args[arg] = self.request.get(arg)
-        else:
-            # When request_method in ['PUT', 'POST']
-            handler_args = self.payload
-        if handler_args is None:
-            # When a handler class expects an argument but it is missing in
-            # payloads then for raising exception for missing args,
-            # handler_args must be initialized with empty dict.
-            handler_args = {}
 
         # For html handlers, extra args are allowed (to accommodate
         # e.g. utm parameters which are not used by the backend but
@@ -388,10 +393,13 @@ class BaseHandler(webapp2.RequestHandler):
             payload_validator.validate(
                 handler_args, schema_for_request_method, extra_args_are_allowed)
         )
-        if request_method in ['PUT', 'POST']:
-            self.normalized_payload = normalized_value
-        else:
-            self.normalized_request = normalized_value
+
+        self.normalized_payload = {
+            arg: normalized_value.get(arg) for arg in payload_arg_keys
+        }
+        self.normalized_request = {
+            arg: normalized_value.get(arg) for arg in request_arg_keys
+        }
 
         if errors:
             raise self.InvalidInputException('\n'.join(errors))
