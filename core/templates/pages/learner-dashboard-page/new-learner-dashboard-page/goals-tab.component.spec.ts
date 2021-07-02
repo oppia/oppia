@@ -108,6 +108,7 @@ describe('Goals tab Component', () => {
       description: 'description',
       version: 1,
       story_titles: ['Story 1'],
+      total_published_node_count: 2,
       thumbnail_filename: 'image.svg',
       thumbnail_bg_color: '#C6DCDA',
       classroom: 'math',
@@ -142,6 +143,7 @@ describe('Goals tab Component', () => {
       description: 'description',
       version: 1,
       story_titles: ['Story 1'],
+      total_published_node_count: 2,
       thumbnail_filename: 'image.svg',
       thumbnail_bg_color: '#C6DCDA',
       classroom: 'math',
@@ -176,6 +178,7 @@ describe('Goals tab Component', () => {
       description: 'description',
       version: 1,
       story_titles: ['Story 1'],
+      total_published_node_count: 2,
       thumbnail_filename: 'image.svg',
       thumbnail_bg_color: '#C6DCDA',
       classroom: 'math',
@@ -319,7 +322,8 @@ describe('Goals tab Component', () => {
         });
     });
 
-    component.removeFromLearnerGoals('2', 'topicName', 1);
+    component.removeFromLearnerGoals(
+      component.editGoals[0], '2', 'topicName', 1);
     fixture.detectChanges();
 
     expect(modalSpy).toHaveBeenCalled();

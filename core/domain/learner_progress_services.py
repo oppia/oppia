@@ -1539,7 +1539,7 @@ def get_displayable_topic_summary_dicts(user_id, topic_summaries):
     summary_dicts = []
     topic_ids = [topic.id for topic in topic_summaries]
     topics = topic_fetchers.get_topics_by_ids(topic_ids)
-    for topic in topics:
+    for index, topic in enumerate(topics):
         all_skill_ids = topic.get_all_skill_ids()
         skill_descriptions = (
             skill_services.get_descriptions_of_skills(
@@ -1553,6 +1553,7 @@ def get_displayable_topic_summary_dicts(user_id, topic_summaries):
             'language_code': topic.language_code,
             'version': topic.version,
             'story_titles': topic_services.get_story_titles_in_topic(topic),
+            'total_published_node_count': topic_summaries[index].total_published_node_count,
             'thumbnail_filename': topic.thumbnail_filename,
             'thumbnail_bg_color': topic.thumbnail_bg_color,
             'canonical_story_summary_dict': (

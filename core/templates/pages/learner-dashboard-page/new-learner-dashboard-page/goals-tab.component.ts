@@ -41,6 +41,7 @@ export class GoalsTabComponent {
   @Input() currentGoals: LearnerTopicSummary[];
   @Input() editGoals: LearnerTopicSummary[];
   @Input() completedGoals: LearnerTopicSummary[];
+  @Input() newTopics: LearnerTopicSummary[];
   @Input() learntToPartiallyLearntTopics: string[];
   learnerDashboardActivityIds: LearnerDashboardActivityIds;
   MAX_CURRENT_GOALS_LENGTH: number;
@@ -119,12 +120,18 @@ export class GoalsTabComponent {
         this.currentGoalsStoryIsShown.push(false);
         this.currentGoals.push(topic);
         this.topicIdsInCurrentGoals.push(activityId);
+        let indexInNewTopics = this.newTopics.findIndex(
+          topic => topic.id === topicId);
+        if (indexInNewTopics !== -1) {
+          this.newTopics.splice(indexInNewTopics, 1);
+        }
       }
     }
   }
 
   removeFromLearnerGoals(
-      topicId: string, topicName: string, index: number): void {
+      topic: LearnerTopicSummary, topicId: string,
+      topicName: string, index: number): void {
     var activityId = topicId;
     var activityTitle = topicName;
     this.learnerDashboardActivityBackendApiService
@@ -138,6 +145,10 @@ export class GoalsTabComponent {
         this.currentGoalsStoryIsShown.splice(index, 1);
         this.currentGoals.splice(index, 1);
         this.topicIdsInCurrentGoals.splice(index, 1);
+        if (!this.topicIdsInCompletedGoals.includes(topicId) &&
+          !this.topicIdsInCurrentGoals.includes(topicId)) {
+          this.newTopics.push(topic);
+        }
       });
   }
 }

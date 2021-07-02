@@ -8,7 +8,7 @@
           <i class="fa fa-caret-right" aria-hidden="true" *ngIf="!currentGoalsStoryIsShown[i]" (click)="toggleStory(i)"></i>
           <i class="fa fa-caret-down" aria-hidden="true" *ngIf="currentGoalsStoryIsShown[i]" (click)="toggleStory(i)"></i>
         </div>
-        <div class="oppia-trash-button" (click)="removeFromLearnerGoals(topic.id, topic.name, i)">
+        <div class="oppia-trash-button" (click)="removeFromLearnerGoals(topic, topic.id, topic.name, i)">
           <i class="fa fa-trash"></i>
         </div>
         <p class="oppia-current-goals-topic-name">
