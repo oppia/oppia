@@ -134,5 +134,3 @@ export class MultipleChoiceInputValidationService {
 angular.module('oppia').factory(
   'MultipleChoiceInputValidationService',
   downgradeInjectable(MultipleChoiceInputValidationService));
-
-
