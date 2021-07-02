@@ -48,7 +48,7 @@ ONE_OFF_JOB_MANAGERS = [
     story_jobs_one_off.StoryMigrationOneOffJob,
     suggestion_jobs_one_off.QuestionSuggestionMigrationJobManager,
     topic_jobs_one_off.TopicMigrationOneOffJob,
-    topic_jobs_one_off.UpdateTopicThumbnailSizeOneOffJob
+    topic_jobs_one_off.PopulateTopicThumbnailSizeOneOffJob
 ]
 
 # List of all manager classes for prod validation one-off batch jobs for which

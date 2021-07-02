@@ -22,8 +22,9 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import ast
 import logging
 
+from constants import constants
 from core import jobs
-from core.domain import topic_domain
+from core.domain import topic_domain, fs_services, fs_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.platform import models
@@ -94,8 +95,10 @@ class TopicMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, values)
 
 
-class UpdateTopicThumbnailSizeOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job to update the thumbnail_size_in_bytes in topic models. """
+class PopulateTopicThumbnailSizeOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job to populate the thumbnail_size_in_bytes attribute in topic
+     models.
+     """
 
     _DELETED_KEY = 'topic_deleted'
     _ERROR_KEY = 'update_error'
@@ -108,40 +111,38 @@ class UpdateTopicThumbnailSizeOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(item):
         if item.deleted:
-            yield (TopicMigrationOneOffJob._DELETED_KEY, 1)
+            yield (PopulateTopicThumbnailSizeOneOffJob._DELETED_KEY, 1)
             return
 
-        topic = topic_fetchers.get_topic_by_id(item.id)
+        if item.thumbnail_size_in_bytes is None:
 
-        try:
-            # We are not updating thumbnail_filename here, but using it to call
-            # the update for topic thumbnail_size_in_bytes.
-            # old_value and new_value are same here, because the update for
-            # thumbnail_size_in_bytes is called from within the code for
-            # updating thumbnail_filename in topic_services.py file.
-            commit_cmds = [topic_domain.TopicChange({
-                'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
-                'property_name': (
-                    topic_domain.TOPIC_PROPERTY_THUMBNAIL_FILENAME),
-                'new_value': topic.thumbnail_filename,
-                'old_value': topic.thumbnail_filename
-            })]
+            file_system_class = fs_services.get_entity_file_system_class()
+            fs = fs_domain.AbstractFileSystem(file_system_class(
+                feconf.ENTITY_TYPE_TOPIC, item.id))
 
-            topic_services.update_topic_and_subtopic_pages(
-                feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
-                'Update topic thumbnail size'
-            )
-            yield (UpdateTopicThumbnailSizeOneOffJob._SUCCESS_KEY, 1)
-        except Exception as e:
-            logging.exception(
-                'Updating topic thumbnail_size_in_bytes %s failed'
-                ': %s' % (item.id, e))
-            yield (
-                UpdateTopicThumbnailSizeOneOffJob._ERROR_KEY,
-                'Updating topic thumbnail_size_in_bytes %s failed'
-                ': %s' % (item.id, e))
-            return
+            filepath = '%s/%s' % (
+                constants.FILENAME_PREFIX_THUMBNAIL, item.thumbnail_filename)
+
+            if fs.isfile(filepath):
+                item.thumbnail_size_in_bytes = len(fs.get(filepath))
+                item.put()
+                yield(
+                    PopulateTopicThumbnailSizeOneOffJob._SUCCESS_KEY, 1)
+            else:
+                yield (
+                    PopulateTopicThumbnailSizeOneOffJob._ERROR_KEY ,
+                    'Thumbnail %s for topic %s not found on the filesystem' % (
+                        item.thumbnail_filename,
+                        item.id
+                    ))
+        else:
+            # thumbnail_size_in_bytes is already updated
+            yield(
+                PopulateTopicThumbnailSizeOneOffJob._SUCCESS_KEY, 1)
 
     @staticmethod
     def reduce(key, values):
-        yield (key, values)
+        if key == PopulateTopicThumbnailSizeOneOffJob._SUCCESS_KEY:
+            yield(key, len(values))
+        else:
+            yield (key, values)
