@@ -190,12 +190,20 @@ export class LostChange {
     return result;
   }
 
-  getLanguage(languageCode: string): string {
+  getLanguage(): string {
     let language = '';
     let supportedLanguages = constants.SUPPORTED_CONTENT_LANGUAGES;
-    for (let i = 0; i < supportedLanguages.length; i++) {
-      if (languageCode === supportedLanguages[i].code) {
-        language = supportedLanguages[i].description;
+    if (this.cmd === 'add_written_translation') {
+      for (let i = 0; i < supportedLanguages.length; i++) {
+        if (this.languageCode === supportedLanguages[i].code) {
+          language = supportedLanguages[i].description;
+        }
+      }
+    } else {
+      for (let i = 0; i < supportedLanguages.length; i++) {
+        if (this.newValue === supportedLanguages[i].code) {
+          language = supportedLanguages[i].description;
+        }
       }
     }
     return language;
