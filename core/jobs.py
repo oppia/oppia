@@ -1310,25 +1310,6 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
             cls._get_active_realtime_index(), entity_id)
 
     @classmethod
-    def get_multi_active_realtime_layer_ids(cls, entity_ids):
-        """Returns a list of IDs of elements in the currently active realtime
-        datastore layer corresponding to the given entity ids.
-
-        Args:
-            entity_ids: str. Collection of unique identifiers for entities.
-
-        Returns:
-            list(str). Unique identifiers for each given entity for storage in
-            the currently active realtime layer.
-        """
-        realtime_datastore_class = cls._get_realtime_datastore_class()
-        active_realtime_index = cls._get_active_realtime_index()
-        return [
-            realtime_datastore_class.get_realtime_id(
-                active_realtime_index, entity_id
-            ) for entity_id in entity_ids]
-
-    @classmethod
     def _switch_active_realtime_class(cls):
         """Switches the currently-active realtime layer for this continuous
         computation.
