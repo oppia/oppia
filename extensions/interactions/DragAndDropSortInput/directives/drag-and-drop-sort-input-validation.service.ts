@@ -151,10 +151,9 @@ export class DragAndDropSortInputValidationService {
         customizationArgs.choices.value.forEach(
           choice => {
             const contentId = choice.contentId;
-            if (contentId === null) {
-              throw new Error('ContentId of choice is not defined');
+            if (contentId !== null) {
+              choiceContentIdToHtml[contentId] = choice.html;
             }
-            choiceContentIdToHtml[contentId] = choice.html;
           });
 
         switch (rule.type) {
