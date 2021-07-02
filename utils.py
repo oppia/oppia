@@ -409,7 +409,7 @@ def set_url_query_parameter(url, param_name, param_value):
     new_query_string = python_utils.url_encode(query_params, doseq=True) # type: ignore[no-untyped-call]
 
     return python_utils.url_unsplit( # type: ignore[no-any-return, no-untyped-call]
-            (scheme, netloc, path, new_query_string, fragment))
+        (scheme, netloc, path, new_query_string, fragment))
 
 
 class JSONEncoderForHTML(json.JSONEncoder):
@@ -850,7 +850,8 @@ def get_hex_color_for_category(category):
     Returns:
         str. Color assigned to that category.
     """
-    return (constants.CATEGORIES_TO_COLORS[category] # type: ignore[no-any-return]
+    return ( # type: ignore[no-any-return]
+        constants.CATEGORIES_TO_COLORS[category]
         if category in constants.CATEGORIES_TO_COLORS
         else constants.DEFAULT_COLOR)
 
