@@ -372,7 +372,7 @@ def apply_change_list(exploration_id, change_list, frontend_version):
     # to merge changes to latest version, then we'll need to write it in the
     # else block. So keeping it separate from now onwards.
     # If we are adding any new field in the exploration then we will always
-    # need to add a condition to merge the changes in that field in this if
+    # need to add a condition to merge the changes to that field in this if
     # block. That same condition should be added to the else block only if the
     # changes in the condition are mergeable even after version mismatch.
     # frontend_version can also be none when the client is on the

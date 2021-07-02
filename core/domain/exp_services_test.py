@@ -3214,6 +3214,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             'hi': 1
         })
 
+        # Check that the property can be changed when working
+        # on old version.
         # Add a change to upgrade the version.
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, _get_change_list(
@@ -3371,6 +3373,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         self.assertFalse(hindi_written_translation.needs_update)
         self.assertFalse(bangla_written_translation.needs_update)
 
+        # Check that the property can be changed when working
+        # on old version.
         # Add a change to upgrade the version.
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, _get_change_list(
@@ -3435,6 +3439,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         self.assertEqual(
             exploration.init_state.solicit_answer_details, True)
 
+        # Check that the property can be changed when working
+        # on old version.
         # Adding a content change just to increase the version.
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, _get_change_list(
@@ -3478,6 +3484,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         self.assertEqual(
             exploration.init_state.solicit_answer_details, False)
 
+        # Check that the property can be changed when working
+        # on old version.
         # Adding a content change just to upgrade the version.
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, _get_change_list(
@@ -3528,6 +3536,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         self.assertEqual(
             exploration.states['State1'].linked_skill_id, 'string_1')
 
+        # Check that the property can be changed when working
+        # on old version.
         # Adding a content change just to upgrade the version.
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, _get_change_list(
@@ -3576,6 +3586,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         self.assertEqual(
             exploration.states['State1'].card_is_checkpoint, True)
 
+        # Check that the property can be changed when working
+        # on old version.
         # Adding a content change just to upgrade the version.
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, _get_change_list(
