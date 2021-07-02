@@ -304,6 +304,8 @@
     "core/templates/services/code-normalizer.service.spec.ts",
     "core/templates/services/construct-translation-ids.service.ts",
     "core/templates/services/construct-translation-ids.service.spec.ts",
+    "core/templates/services/context.service.ts",
+    "core/templates/services/context.service.spec.ts",
     "core/templates/services/contextual/device-info.service.ts",
     "core/templates/services/contextual/device-info.service.spec.ts",
     "core/templates/services/contextual/logger.service.ts",
