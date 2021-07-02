@@ -185,6 +185,9 @@ PERIOD_TO_MARK_MODELS_AS_DELETED = datetime.timedelta(weeks=4)
 # limit applies to both the explorations playlist and the collections playlist.
 MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT = 10
 
+# The maximum number of goals allowed in the learner goals of the learner.
+MAX_CURRENT_GOALS_COUNT = 5
+
 # The minimum number of training samples required for training a classifier.
 MIN_TOTAL_TRAINING_EXAMPLES = 50
 
@@ -722,6 +725,7 @@ DEMO_EXPLORATIONS = {
     u'23': 'rating_test.yaml',
     u'24': 'learner_flow_test.yaml',
     u'25': 'exploration_player_test.yaml',
+    u'26': 'android_interactions',
 }
 
 DEMO_COLLECTIONS = {
@@ -818,6 +822,7 @@ LEARNER_DASHBOARD_URL = '/learner-dashboard'
 LEARNER_DASHBOARD_DATA_URL = '/learnerdashboardhandler/data'
 LEARNER_DASHBOARD_IDS_DATA_URL = '/learnerdashboardidshandler/data'
 LEARNER_DASHBOARD_FEEDBACK_THREAD_DATA_URL = '/learnerdashboardthreadhandler'
+LEARNER_GOALS_DATA_URL = '/learnergoalshandler'
 LEARNER_PLAYLIST_DATA_URL = '/learnerplaylistactivityhandler'
 LEARNER_INCOMPLETE_ACTIVITY_DATA_URL = '/learnerincompleteactivityhandler'
 LIBRARY_GROUP_DATA_URL = '/librarygrouphandler'
@@ -836,7 +841,6 @@ NEW_SKILL_URL = '/skill_editor_handler/create_new'
 TOPIC_EDITOR_STORY_URL = '/topic_editor_story_handler'
 TOPIC_EDITOR_QUESTION_URL = '/topic_editor_question_handler'
 NEW_TOPIC_URL = '/topic_editor_handler/create_new'
-NOTIFICATIONS_DASHBOARD_URL = '/notifications'
 PREFERENCES_URL = '/preferences'
 PRACTICE_SESSION_URL_PREFIX = '/practice_session'
 PRACTICE_SESSION_DATA_URL_PREFIX = '/practice_session/data'
@@ -1024,13 +1028,14 @@ ROLE_ID_COLLECTION_EDITOR = 'COLLECTION_EDITOR'
 ROLE_ID_TOPIC_MANAGER = 'TOPIC_MANAGER'
 ROLE_ID_MODERATOR = 'MODERATOR'
 ROLE_ID_RELEASE_COORDINATOR = 'RELEASE_COORDINATOR'
+ROLE_ID_VOICEOVER_ADMIN = 'VOICEOVER_ADMIN'
 ROLE_ID_ADMIN = 'ADMIN'
 
 ALLOWED_USER_ROLES = [
     ROLE_ID_GUEST, ROLE_ID_BANNED_USER, ROLE_ID_LEARNER,
     ROLE_ID_EXPLORATION_EDITOR, ROLE_ID_COLLECTION_EDITOR,
     ROLE_ID_TOPIC_MANAGER, ROLE_ID_MODERATOR, ROLE_ID_RELEASE_COORDINATOR,
-    ROLE_ID_ADMIN]
+    ROLE_ID_VOICEOVER_ADMIN, ROLE_ID_ADMIN]
 
 # Intent of the User making query to role structure via admin interface. Used
 # to store audit data regarding queries to role IDs.
