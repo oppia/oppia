@@ -763,7 +763,7 @@ def can_access_contributor_dashboard_admin_page(handler):
             return handler(self, **kwargs)
 
         raise self.UnauthorizedUserException(
-            'You do not have credentials to access contributor dashbaord '
+            'You do not have credentials to access contributor dashboard '
             'admin page.')
 
     test_can_access_contributor_dashboard_admin_page.__wrapped__ = True
@@ -772,20 +772,20 @@ def can_access_contributor_dashboard_admin_page(handler):
 
 
 def can_manage_contributors_role(handler):
-    """Decorator that checks if the current user can modity contributors role
-    for contributor dashbaord page.
+    """Decorator that checks if the current user can modify contributor's role
+    for the contributor dashboard page.
 
     Args:
         handler: function. The function to be decorated.
 
     Returns:
         function. The newly decorated function that now also checks if the user
-        can modity contributors role for contributor dashbaord page.
+        can modify contributors role for the contributor dashboard page.
     """
 
     def test_can_manage_contributors_role(self, category, **kwargs):
-        """Checks if the user can modity contributors role for contributor
-        dashbaord page.
+        """Checks if the user can modify contributor's role for the contributor
+        dashboard page.
 
         Args:
             category: str. The category of contribution.
@@ -796,8 +796,8 @@ def can_manage_contributors_role(handler):
 
         Raises:
             NotLoggedInException. The user is not logged in.
-            UnauthorizedUserException. The user cannnot modity contributors role
-            for contributor dashbaord page.
+            UnauthorizedUserException. The user cannnot modify contributors role
+                for contributor dashboard page.
         """
         if not self.user_id:
             raise self.NotLoggedInException
@@ -807,19 +807,18 @@ def can_manage_contributors_role(handler):
                 constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION]:
             if role_services.ACTION_MANAGE_QUESTION_CONTRIBUTOR_ROLES in (
                     self.user.actions):
-                return handler(self, **kwargs)
+                return handler(self, category, **kwargs)
         elif category == (
-            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION):
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION):
             if role_services.ACTION_MANAGE_TRANSLATION_CONTRIBUTOR_ROLES in (
                     self.user.actions):
-                return handler(self, **kwargs)
+                return handler(self, category, **kwargs)
         else:
             raise self.InvalidInputException(
                 'Invalid category: %s' % category)
 
         raise self.UnauthorizedUserException(
-            'You do not have credentials to modity contributors role.')
-
+            'You do not have credentials to modify contributors role.')
     test_can_manage_contributors_role.__wrapped__ = True
 
     return test_can_manage_contributors_role

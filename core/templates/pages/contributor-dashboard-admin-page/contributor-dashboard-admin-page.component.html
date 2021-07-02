@@ -68,36 +68,28 @@
         <table class="table text-center view-results-table protractor-test-user-review-rights-table">
           <thead>
             <tr>
-              <td><strong>Review Translations in languages</strong></td>
-              <td><strong>Review Voiceovers in languages</strong></td>
-              <td><strong>Review Questions</strong></td>
-              <td><strong>Submit Questions</strong></td>
+              <td ng-if="$ctrl.CONTRIBUTION_RIGHT_CATEGORIES.REVIEW_TRANSLATION"><strong>Review Translations in languages</strong></td>
+              <td ng-if="$ctrl.CONTRIBUTION_RIGHT_CATEGORIES.REVIEW_QUESTION"><strong>Review Questions</strong></td>
+              <td ng-if="$ctrl.CONTRIBUTION_RIGHT_CATEGORIES.SUBMIT_QUESTION"><strong>Submit Questions</strong></td>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td>
-                <span ng-if="$ctrl.contributionReviewersResult.translationLanguages.length === 0"><i>None</i></span>
-                <span ng-repeat="language in $ctrl.contributionReviewersResult.translationLanguages"
+              <td ng-if="$ctrl.CONTRIBUTION_RIGHT_CATEGORIES.REVIEW_TRANSLATION">
+                <span ng-if="$ctrl.contributionReviewersResult.REVIEW_TRANSLATION.length === 0"><i>None</i></span>
+                <span ng-repeat="language in $ctrl.contributionReviewersResult.REVIEW_TRANSLATION"
                       class="protractor-test-translation-reviewer-language">
                   <[language]><[$last ? '' : ', ']>
                 </span>
               </td>
-              <td>
-                <span ng-if="$ctrl.contributionReviewersResult.voiceoverLanguages.length === 0"><i>None</i></span>
-                <span ng-repeat="language in $ctrl.contributionReviewersResult.voiceoverLanguages"
-                      class="protractor-test-voiceover-reviewer-language">
-                  <[language]><[$last ? '' : ', ']>
-                </span>
-              </td>
-              <td>
+              <td ng-if="$ctrl.CONTRIBUTION_RIGHT_CATEGORIES.REVIEW_QUESTION">
                 <span class="protractor-test-question-reviewer">
-                  <[$ctrl.contributionReviewersResult.questions ? 'Allowed' : 'Not-allowed']>
+                  <[$ctrl.contributionReviewersResult.REVIEW_QUESTION ? 'Allowed' : 'Not-allowed']>
                 </span>
               </td>
-              <td>
+              <td ng-if="$ctrl.CONTRIBUTION_RIGHT_CATEGORIES.SUBMIT_QUESTION">
                 <span class="protractor-test-question-contributor">
-                  <[$ctrl.contributionReviewersResult.can_submit_questions ? 'Allowed' : 'Not-allowed']>
+                  <[$ctrl.contributionReviewersResult.SUBMIT_QUESTION ? 'Allowed' : 'Not-allowed']>
                 </span>
               </td>
             </tr>
@@ -164,17 +156,6 @@
       </div>
 
       <div class="d-xl-inline-flex form-group">
-        <label for="label-target-form-remove-reviewer" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Select Rights</label>
-        <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
-          <select id="label-target-form-remove-reviewer" ng-model="$ctrl.formData.removeContributionReviewer.method" class="form-control">
-            <option value="<[$ctrl.ACTION_REMOVE_ALL_REVIEW_RIGHTS]>">Remove all contribution rights</option>
-            <option value="<[$ctrl.ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS]>">Remove specific contribution rights</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="d-xl-inline-flex form-group"
-           ng-if="$ctrl.formData.removeContributionReviewer.method===$ctrl.ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS">
         <label class="col-md-4 col-lg-4 col-sm-4 col-form-label">Remove from</label>
         <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
           <select ng-options="value as key for (key, value) in $ctrl.CONTRIBUTION_RIGHT_CATEGORIES" ng-model="$ctrl.formData.removeContributionReviewer.category" class="form-control">

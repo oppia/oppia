@@ -63,17 +63,6 @@ class AddContributionRightsHandler(base.BaseHandler):
                     'language code %s' % (username, language_code))
             user_services.allow_user_to_review_translation_in_language(
                 user_id, language_code)
-        elif category == constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER:
-            if not utils.is_supported_audio_language_code(language_code):
-                raise self.InvalidInputException(
-                    'Invalid language_code: %s' % language_code)
-            if user_services.can_review_voiceover_applications(
-                    user_id, language_code=language_code):
-                raise self.InvalidInputException(
-                    'User %s already has rights to review voiceover in '
-                    'language code %s' % (username, language_code))
-            user_services.allow_user_to_review_voiceover_in_language(
-                user_id, language_code)
         elif category == constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION:
             if user_services.can_review_question_suggestions(user_id):
                 raise self.InvalidInputException(
@@ -118,53 +107,40 @@ class RemoveContributionRightsHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Invalid language_code: %s' % language_code)
 
-        if removal_type == constants.ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS:
-            if (category ==
-                    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION):
-                if not user_services.can_review_translation_suggestions(
-                        user_id, language_code=language_code):
-                    raise self.InvalidInputException(
-                        '%s does not have rights to review translation in '
-                        'language %s.' % (username, language_code))
-                user_services.remove_translation_review_rights_in_language(
-                    user_id, language_code)
-            elif (category ==
-                  constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER):
-                if not user_services.can_review_voiceover_applications(
-                        user_id, language_code=language_code):
-                    raise self.InvalidInputException(
-                        '%s does not have rights to review voiceover in '
-                        'language %s.' % (username, language_code))
-                user_services.remove_voiceover_review_rights_in_language(
-                    user_id, language_code)
-            elif (category ==
-                  constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION):
-                if not user_services.can_review_question_suggestions(user_id):
-                    raise self.InvalidInputException(
-                        '%s does not have rights to review question.' % (
-                            username))
-                user_services.remove_question_review_rights(user_id)
-            elif (category ==
-                  constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION):
-                if not user_services.can_submit_question_suggestions(user_id):
-                    raise self.InvalidInputException(
-                        '%s does not have rights to submit question.' % (
-                            username))
-                user_services.remove_question_submit_rights(user_id)
-            else:
+        if (category ==
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION):
+            if not user_services.can_review_translation_suggestions(
+                    user_id, language_code=language_code):
                 raise self.InvalidInputException(
-                    'Invalid category: %s' % category)
-
-            if category in [
-                    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
-                    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
-                    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION
-            ]:
-                email_manager.send_email_to_removed_contribution_reviewer(
-                    user_id, category, language_code=language_code)
+                    '%s does not have rights to review translation in '
+                    'language %s.' % (username, language_code))
+            user_services.remove_translation_review_rights_in_language(
+                user_id, language_code)
+        elif category == (
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION):
+            if not user_services.can_review_question_suggestions(user_id):
+                raise self.InvalidInputException(
+                    '%s does not have rights to review question.' % (
+                        username))
+            user_services.remove_question_review_rights(user_id)
+        elif category == (
+                constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION):
+            if not user_services.can_submit_question_suggestions(user_id):
+                raise self.InvalidInputException(
+                    '%s does not have rights to submit question.' % (
+                        username))
+            user_services.remove_question_submit_rights(user_id)
         else:
             raise self.InvalidInputException(
-                'Invalid removal_type: %s' % removal_type)
+                'Invalid category: %s' % category)
+
+        if category in [
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION
+        ]:
+            email_manager.send_email_to_removed_contribution_reviewer(
+                user_id, category, language_code=language_code)
 
         self.render_json({})
 
@@ -203,11 +179,15 @@ class ContributionRightsDataHandler(base.BaseHandler):
                 'Invalid username: %s' % username)
         user_rights = (
             user_services.get_user_contribution_rights(user_id))
-        self.render_json({
-            'can_review_translation_for_language_codes': (
-                user_rights.can_review_translation_for_language_codes),
-            'can_review_voiceover_for_language_codes': (
-                user_rights.can_review_voiceover_for_language_codes),
-            'can_review_questions': user_rights.can_review_questions,
-            'can_submit_questions': user_rights.can_submit_questions
-        })
+        response = {}
+        if self.role == feconf.ROLE_ID_TRANSLATION_ADMIN:
+            response = {
+                'can_review_translation_for_language_codes': (
+                    user_rights.can_review_translation_for_language_codes)
+            }
+        if self.role == feconf.ROLE_ID_QUESTION_ADMIN:
+            response.update({
+                'can_review_questions': user_rights.can_review_questions,
+                'can_submit_questions': user_rights.can_submit_questions
+            })
+        self.render_json(response)

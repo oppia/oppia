@@ -20,6 +20,7 @@ export const ContributorDashboardAdminPageConstants = {
   ADD_CONTRIBUTION_RIGHTS_HANDLER_URL: (
     '/addcontributionrightshandler/<category>'),
   CONTRIBUTION_RIGHTS_HANDLER_URL: '/contributionrightsdatahandler',
-  GET_CONTRIBUTOR_USERS_HANDLER_URL: '/getcontributorusershandler',
-  REMOVE_CONTRIBUTION_RIGHTS_HANDLER_URL: '/removecontributionrightshandler',
+  GET_CONTRIBUTOR_USERS_HANDLER_URL: '/getcontributorusershandler/<category>',
+  REMOVE_CONTRIBUTION_RIGHTS_HANDLER_URL: (
+    '/removecontributionrightshandler/<category>')
 } as const;

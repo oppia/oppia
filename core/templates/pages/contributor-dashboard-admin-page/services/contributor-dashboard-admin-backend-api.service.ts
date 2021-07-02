@@ -65,19 +65,17 @@ export class ContributorDashboardAdminBackendApiService {
       category: string, languageCode: string
   ): Promise<ViewContributionBackendResponse> {
     let params = {};
-    if (languageCode === null) {
-      params = { category: category };
-    } else {
+    if (languageCode !== null) {
       params = {
-        category: category,
         language_code: languageCode
       };
     }
+    var url = this.urlInterpolationService.interpolateUrl(
+      PageConstants.GET_CONTRIBUTOR_USERS_HANDLER_URL, { category });
     return new Promise((resolve, reject) => {
-      this.http.get<ViewContributionBackendResponse>(
-        PageConstants.GET_CONTRIBUTOR_USERS_HANDLER_URL, {
-          params
-        }
+      this.http.get<ViewContributionBackendResponse>(url, {
+        params
+      }
       ).toPromise().then(response => {
         resolve(response);
       }, errorResponse => {
@@ -104,17 +102,14 @@ export class ContributorDashboardAdminBackendApiService {
   }
 
   async removeContributionReviewerAsync(
-      username: string, method: string,
-      category: string, languageCode: string
-  ): Promise<void> {
+      username: string, category: string, languageCode: string): Promise<void> {
+    var url = this.urlInterpolationService.interpolateUrl(
+      PageConstants.REMOVE_CONTRIBUTION_RIGHTS_HANDLER_URL, { category });
     return new Promise((resolve, reject) => {
-      this.http.put<void>(
-        PageConstants.REMOVE_CONTRIBUTION_RIGHTS_HANDLER_URL, {
-          username: username,
-          removal_type: method,
-          category: category,
-          language_code: languageCode
-        }
+      this.http.put<void>(url, {
+        username: username,
+        language_code: languageCode
+      }
       ).toPromise().then(response => {
         resolve(response);
       }, errorResponse => {

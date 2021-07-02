@@ -21,6 +21,7 @@ require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/contributor-dashboard-admin-page/services/' +
   'contributor-dashboard-admin-backend-api.service.ts');
+require('services/user.service.ts');
 
 require(
   'pages/contributor-dashboard-admin-page/navbar/' +
@@ -28,9 +29,7 @@ require(
 
 angular.module('oppia').directive('contributorDashboardAdminPage', [
   '$rootScope', 'ContributorDashboardAdminBackendApiService',
-  'LanguageUtilService', 'UrlInterpolationService',
-  'ACTION_REMOVE_ALL_REVIEW_RIGHTS',
-  'ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS',
+  'LanguageUtilService', 'UrlInterpolationService', 'UserService',
   'CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION',
   'CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION',
   'CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER',
@@ -38,9 +37,7 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
   'USER_FILTER_CRITERION_ROLE', 'USER_FILTER_CRITERION_USERNAME',
   function(
       $rootScope, ContributorDashboardAdminBackendApiService,
-      LanguageUtilService, UrlInterpolationService,
-      ACTION_REMOVE_ALL_REVIEW_RIGHTS,
-      ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS,
+      LanguageUtilService, UrlInterpolationService, UserService,
       CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
       CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
       CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
@@ -126,22 +123,27 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
                 $rootScope.$apply();
               }, handleErrorResponse);
           } else {
-            var translationLanguages = [];
-            var voiceoverLanguages = [];
             ContributorDashboardAdminBackendApiService
               .contributionReviewerRightsAsync(
                 formResponse.username
               ).then((contributionRights) => {
-                translationLanguages = getLanguageDescriptions(
-                  contributionRights.can_review_translation_for_language_codes);
-                voiceoverLanguages = getLanguageDescriptions(
-                  contributionRights.can_review_voiceover_for_language_codes);
-                ctrl.contributionReviewersResult = {
-                  translationLanguages: translationLanguages,
-                  voiceoverLanguages: voiceoverLanguages,
-                  questions: contributionRights.can_review_questions,
-                  can_submit_questions: contributionRights.can_submit_questions
-                };
+                if (
+                  ctrl.CONTRIBUTION_RIGHT_CATEGORIES.hasOwnProperty(
+                    'REVIEW_TRANSLATION')) {
+                  ctrl.contributionReviewersResult = {
+                    REVIEW_TRANSLATION: getLanguageDescriptions(
+                      contributionRights
+                        .can_review_translation_for_language_codes)
+                  };
+                }
+                if (
+                  ctrl.CONTRIBUTION_RIGHT_CATEGORIES.hasOwnProperty(
+                    'REVIEW_QUESTION')) {
+                  ctrl.contributionReviewersResult.REVIEW_QUESTION = (
+                    contributionRights.can_review_questions),
+                  ctrl.contributionReviewersResult.SUBMIT_QUESTION = (
+                    contributionRights.can_submit_questions);
+                }
                 ctrl.contributionReviewersDataFetched = true;
                 ctrl.statusMessage = 'Success.';
                 // TODO(#8521): Remove the use of $rootScope.$apply()
@@ -161,8 +163,8 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
           taskRunningInBackground = true;
           ContributorDashboardAdminBackendApiService
             .removeContributionReviewerAsync(
-              formResponse.username, formResponse.method,
-              formResponse.category, formResponse.languageCode
+              formResponse.username, formResponse.category,
+              formResponse.languageCode
             ).then(() => {
               ctrl.statusMessage = 'Success.';
               refreshFormData();
@@ -215,42 +217,40 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
             },
             removeContributionReviewer: {
               username: '',
-              method: ACTION_REMOVE_ALL_REVIEW_RIGHTS,
               category: null,
               languageCode: null,
               isValid: function() {
-                if (this.username === '') {
+                if (this.username === '' || this.category === null) {
                   return false;
                 }
-                if (this.method === ACTION_REMOVE_ALL_REVIEW_RIGHTS) {
-                  return Boolean(this.username);
-                } else {
-                  if (this.category === null) {
-                    return false;
-                  }
-                  if (ctrl.isLanguageSpecificReviewCategory(this.category)) {
-                    return Boolean(this.languageCode);
-                  }
-                  return true;
+                if (ctrl.isLanguageSpecificReviewCategory(this.category)) {
+                  return Boolean(this.languageCode);
                 }
+                return true;
               }
             }
           };
         };
 
         ctrl.$onInit = function() {
-          ctrl.ACTION_REMOVE_ALL_REVIEW_RIGHTS = (
-            ACTION_REMOVE_ALL_REVIEW_RIGHTS);
-          ctrl.ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS = (
-            ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS);
+          ctrl.CONTRIBUTION_RIGHT_CATEGORIES = {};
+          UserService.getUserInfoAsync().then((userInfo) => {
+            if (userInfo.isTranslationAdmin()) {
+              ctrl.CONTRIBUTION_RIGHT_CATEGORIES = {
+                REVIEW_TRANSLATION: (
+                  CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION)
+              };
+            } else if (userInfo.isQuestionAdmin()) {
+              ctrl.CONTRIBUTION_RIGHT_CATEGORIES = {
+                REVIEW_QUESTION: CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
+                SUBMIT_QUESTION: CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION
+              };
+            }
+          });
+
           ctrl.USER_FILTER_CRITERION_USERNAME = USER_FILTER_CRITERION_USERNAME;
           ctrl.USER_FILTER_CRITERION_ROLE = USER_FILTER_CRITERION_ROLE;
-          ctrl.CONTRIBUTION_RIGHT_CATEGORIES = {
-            REVIEW_TRANSLATION: CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
-            REVIEW_VOICEOVER: CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
-            REVIEW_QUESTION: CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
-            SUBMIT_QUESTION: CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION
-          };
+
           refreshFormData();
           ctrl.contributionReviewersDataFetched = false;
           ctrl.contributionReviewersResult = {};

@@ -57,6 +57,7 @@ describe('User Backend Api Service', () => {
   it('should return userInfo data', fakeAsync(() => {
     // Creating a test user.
     const sampleUserInfoBackendObject = {
+      role: 'USER_ROLE',
       is_moderator: false,
       is_admin: false,
       is_super_admin: false,
@@ -95,6 +96,7 @@ describe('User Backend Api Service', () => {
   it('should return new userInfo data if user is not logged', fakeAsync(() => {
     // Creating a test user.
     const sampleUserInfoBackendObject = {
+      role: 'GUEST',
       is_moderator: false,
       is_admin: false,
       is_super_admin: false,
