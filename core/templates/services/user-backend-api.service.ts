@@ -42,7 +42,7 @@ export interface PreferencesBackendDict {
   'subscription_list': SubscriptionSummary[];
 }
 
-interface UpdatePreferencesResponse {
+export interface UpdatePreferencesResponse {
   'bulk_email_signup_message_should_be_shown': boolean
 }
 

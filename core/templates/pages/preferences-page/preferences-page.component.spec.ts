@@ -27,7 +27,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { LoaderService } from 'services/loader.service';
 import { PreventPageUnloadEventService } from 'services/prevent-page-unload-event.service';
-import { PreferencesBackendDict, SubscriptionSummary, UserBackendApiService } from 'services/user-backend-api.service';
+import { PreferencesBackendDict, SubscriptionSummary, UpdatePreferencesResponse, UserBackendApiService } from 'services/user-backend-api.service';
 import { UserService } from 'services/user.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { PreferencesPageComponent } from './preferences-page.component';
@@ -44,6 +44,7 @@ describe('Preferences Page Component', () => {
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let ngbModal: NgbModal;
   let mockWindowRef: MockWindowRef;
+  let mockUserBackendApiService: MockUserBackendApiService;
 
   let preferencesData: PreferencesBackendDict = {
     preferred_language_codes: ['en'],
@@ -87,8 +88,10 @@ describe('Preferences Page Component', () => {
     async updatePreferencesDataAsync(
         updateType: string,
         data: boolean | string | string[] | SubscriptionSummary[]
-    ): Promise<Object> {
-      return Promise.resolve({});
+    ): Promise<UpdatePreferencesResponse> {
+      return Promise.resolve({
+        bulk_email_signup_message_should_be_shown: false
+      });
     }
   }
 
@@ -136,6 +139,7 @@ describe('Preferences Page Component', () => {
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     ngbModal = TestBed.inject(NgbModal);
     mockWindowRef = TestBed.inject(WindowRef);
+    mockUserBackendApiService = TestBed.inject(UserBackendApiService);
   });
 
   it('should be defined', () => {
@@ -243,11 +247,16 @@ describe('Preferences Page Component', () => {
     }));
 
     it('should save email preferences', fakeAsync(() => {
+      spyOn(mockUserBackendApiService, 'updatePreferencesDataAsync')
+        .and.returnValue(
+          Promise.resolve({
+            bulk_email_signup_message_should_be_shown: true
+          }));
       componentInstance.saveEmailPreferences(true, true, true, true);
       tick();
       expect(preventPageUnloadEventService.addListener).toHaveBeenCalled();
       expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
-      expect(alertsService.addInfoMessage).toHaveBeenCalled();
+      expect(componentInstance.canReceiveEmailUpdates).toBeFalse();
     }));
 
     it('should save preferred language codes', fakeAsync(() => {
