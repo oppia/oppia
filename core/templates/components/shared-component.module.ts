@@ -21,7 +21,7 @@ import 'zone.js';
 // Modules.
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { NgbModalModule, NgbPopoverModule, NgbNavModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModalModule, NgbPopoverModule, NgbNavModule, NgbTooltipModule, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { AngularFireModule } from '@angular/fire';
 import { AngularFireAuth, AngularFireAuthModule, USE_EMULATOR } from '@angular/fire/auth';
 import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
@@ -95,6 +95,7 @@ import { DisplaySolutionModalComponent } from 'pages/exploration-player-page/mod
 import { DisplaySolutionInterstititalModalComponent } from 'pages/exploration-player-page/modals/display-solution-interstitial-modal.component';
 import { DisplayHintModalComponent } from 'pages/exploration-player-page/modals/display-hint-modal.component';
 import { HintAndSolutionButtonsComponent } from './button-directives/hint-and-solution-buttons.component';
+import { SearchBarComponent } from 'pages/library-page/search-bar/search-bar.component';
 
 
 // Directives.
@@ -167,6 +168,7 @@ const toastrConfig = {
     MaterialModule,
     DirectivesModule,
     DynamicContentModule,
+    NgbDropdownModule,
     NgbTooltipModule,
     NgbNavModule,
     NgbModalModule,
@@ -265,6 +267,7 @@ const toastrConfig = {
     QuestionDifficultySelectorComponent,
     SelectSkillModalComponent,
     RubricsEditorComponent,
+    SearchBarComponent,
     SharingLinksComponent,
     SideNavigationBarComponent,
     SkillSelectorComponent,
@@ -333,6 +336,7 @@ const toastrConfig = {
     PromoBarComponent,
     QuestionDifficultySelectorComponent,
     RubricsEditorComponent,
+    SearchBarComponent,
     SideNavigationBarComponent,
     StorySummaryTileComponent,
     SummaryListHeaderComponent,
@@ -399,6 +403,7 @@ const toastrConfig = {
     OnScreenKeyboardComponent,
     OppiaFooterComponent,
     OutcomeFeedbackEditorComponent,
+    SearchBarComponent,
     QuestionDifficultySelectorComponent,
     StateSkillEditorComponent,
     SelectSkillModalComponent,

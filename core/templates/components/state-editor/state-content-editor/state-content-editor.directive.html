@@ -29,9 +29,9 @@
         <[getStateContentPlaceholder()]>
       </span>
       <span>
-        <angular-html-bind html-data="StateContentService.savedMemento.html"
-                           class="oppia-rte-editor protractor-test-state-content-display">
-        </angular-html-bind>
+        <oppia-rte-output-display [rte-string]="StateContentService.savedMemento.html"
+                                  class="oppia-rte-editor protractor-test-state-content-display">
+        </oppia-rte-output-display>
       </span>
     </div>
     <!-- This is a dummy div created to mask the contents when the user hovers over the content. -->
