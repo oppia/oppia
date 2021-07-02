@@ -673,7 +673,8 @@ class ImageUploadHandler(EditorHandler):
         file_system_class = fs_services.get_entity_file_system_class()
         fs = fs_domain.AbstractFileSystem(file_system_class(
             entity_type, entity_id))
-        filepath = '%s/%s' % (filename_prefix, filename)
+        filepath = constants.create_filepath_with_prefix(
+            filename_prefix, filename)
 
         if fs.isfile(filepath):
             raise self.InvalidInputException(

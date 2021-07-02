@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from constants import constants
 from core.domain import fs_domain
 from core.domain import image_services
 from core.platform import models
@@ -42,19 +43,20 @@ def save_original_and_compressed_versions_of_image(
         image_is_compressible: bool. Whether the image can be compressed or
             not.
     """
-    filepath = '%s/%s' % (filename_prefix, filename)
+    filepath = constants.create_filepath_with_prefix(filename_prefix, filename)
 
     filename_wo_filetype = filename[:filename.rfind('.')]
     filetype = filename[filename.rfind('.') + 1:]
 
     compressed_image_filename = '%s_compressed.%s' % (
         filename_wo_filetype, filetype)
-    compressed_image_filepath = '%s/%s' % (
+    compressed_image_filepath = constants.create_filepath_with_prefix(
         filename_prefix, compressed_image_filename)
 
     micro_image_filename = '%s_micro.%s' % (
         filename_wo_filetype, filetype)
-    micro_image_filepath = '%s/%s' % (filename_prefix, micro_image_filename)
+    micro_image_filepath = constants.create_filepath_with_prefix(
+        filename_prefix, micro_image_filename)
 
     file_system_class = get_entity_file_system_class()
     fs = fs_domain.AbstractFileSystem(file_system_class(

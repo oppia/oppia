@@ -1092,8 +1092,8 @@ class Story(python_utils.OBJECT):
         file_system_class = fs_services.get_entity_file_system_class()
         fs = fs_domain.AbstractFileSystem(file_system_class(
             feconf.ENTITY_TYPE_STORY, self.id))
-        filename_prefix = 'thumbnail'
-        filepath = '%s/%s' % (filename_prefix, self.thumbnail_filename)
+        filepath = constants.create_filepath_with_prefix(
+            'thumbnail', self.thumbnail_filename)
         self.thumbnail_size_in_bytes = (
             len(fs.get(filepath)) if fs.isfile(filepath) else None)
 
