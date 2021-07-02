@@ -544,7 +544,7 @@ class UtilsTests(test_utils.GenericTestBase):
     def test_convert_png_to_data_url_with_non_png_image_raises_error(self):
         # type: () -> None
         favicon_filepath = os.path.join(
-            self.get_static_asset_filepath(), 'assets', 'favicon.ico')
+            self.get_static_asset_filepath(), 'assets', 'favicon.ico') # type: ignore[no-untyped-call]
 
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'The given string does not represent a PNG image.'):
@@ -659,7 +659,7 @@ class UtilsTests(test_utils.GenericTestBase):
         # type: () -> None
         """Test thumbnail filename validation."""
         self._assert_valid_thumbnail_filename(
-            'Expected thumbnail filename to be a string, received 10', 10)
+            'Expected thumbnail filename to be a string, received 10', 10) # type: ignore[arg-type]
         self._assert_valid_thumbnail_filename(
             'Thumbnail filename should not start with a dot.', '.name')
         self._assert_valid_thumbnail_filename(

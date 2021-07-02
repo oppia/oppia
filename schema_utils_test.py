@@ -1090,7 +1090,7 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
             })
         ]
 
-        invalid_values_with_error_messages = []
+        invalid_values_with_error_messages = [] # type: List[Tuple[Any, unicode]]
 
         self.check_normalization(
             schema, mappings, invalid_values_with_error_messages)
