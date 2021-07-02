@@ -24,6 +24,7 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
 
+import { LearnerStorySummaryTileComponent } from 'components/summary-tile/learner-story-summary-tile.component';
 import { ProgressTabComponent } from './new-learner-dashboard/progress-tab.component';
 import { LearnerDashboardPageComponent } from './learner-dashboard-page.component';
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
@@ -40,6 +41,7 @@ import { LearnerDashboardSuggestionModalComponent } from './suggestion-modal/lea
   declarations: [
     OppiaAngularRootComponent,
     LearnerDashboardPageComponent,
+    LearnerStorySummaryTileComponent,
     ProgressTabComponent,
     RemoveActivityModalComponent,
     LearnerDashboardSuggestionModalComponent
@@ -47,6 +49,7 @@ import { LearnerDashboardSuggestionModalComponent } from './suggestion-modal/lea
   entryComponents: [
     OppiaAngularRootComponent,
     LearnerDashboardPageComponent,
+    LearnerStorySummaryTileComponent,
     ProgressTabComponent,
     RemoveActivityModalComponent,
     LearnerDashboardSuggestionModalComponent

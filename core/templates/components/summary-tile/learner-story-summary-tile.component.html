@@ -5,7 +5,7 @@
     <div class="oppia-title-section" [ngStyle]="{'background-color': thumbnailBgColor}">
       <img class="oppia-thumbnail-image" [src]="thumbnailUrl">
       <div class="oppia-story-completion">
-        <img [src]="getStaticImageUrl('/learner_dashboard/star.svg')" alt="star image" class="oppia-svg-star-image" *ngIf="storyCompleted">
+        <img [src]="starImageUrl" alt="star image" class="oppia-svg-star-image" *ngIf="storyCompleted">
         <p class="oppia-percent-story-completed" [ngClass]="{'oppia-story-completed-percent': storyCompleted}">
           {{storyProgress}}% Complete
         </p>

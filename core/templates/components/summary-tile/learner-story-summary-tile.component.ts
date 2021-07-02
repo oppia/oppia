@@ -40,6 +40,7 @@ export class LearnerStorySummaryTileComponent implements OnInit {
   topicName: string;
   storyCompleted: boolean = false;
   thumbnailBgColor: string;
+  starImageUrl: string = '';
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -78,6 +79,7 @@ export class LearnerStorySummaryTileComponent implements OnInit {
     this.storyTitle = this.storySummary.getTitle();
     this.thumbnailBgColor = this.storySummary.getThumbnailBgColor();
     this.topicName = this.storySummary.getTopicName();
+    this.starImageUrl = this.getStaticImageUrl('/learner_dashboard/star.svg');
   }
 
   getStaticImageUrl(imagePath: string): string {
