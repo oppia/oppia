@@ -19,11 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import datetime
-
 from core.platform import models
-import python_utils
-import utils
 
 (user_models,) = models.Registry.import_models([
     models.NAMES.user
@@ -272,50 +268,3 @@ def get_collection_ids_subscribed_to(user_id):
     return (
         subscriptions_model.collection_ids
         if subscriptions_model else [])
-
-
-def get_last_seen_notifications_msec(user_id):
-    """Returns the last time, in milliseconds since the Epoch, when the user
-    checked their notifications in the dashboard page or the notifications
-    dropdown.
-
-    If the user has never checked the dashboard page or the notifications
-    dropdown, returns None.
-
-    Args:
-        user_id: str. The user ID of the subscriber.
-
-    Returns:
-        float or None. The last time (in msecs since the Epoch) when the user
-        checked their notifications in the dashboard page or the notifications
-        dropdown, or None if the user has never checked the dashboard page or
-        the notifications dropdown.
-    """
-    subscriptions_model = user_models.UserSubscriptionsModel.get(
-        user_id, strict=False)
-    return (
-        utils.get_time_in_millisecs(subscriptions_model.last_checked)
-        if (subscriptions_model and subscriptions_model.last_checked)
-        else None)
-
-
-def record_user_has_seen_notifications(user_id, last_seen_msecs):
-    """Updates the last_checked time for this user (which represents the time
-    the user last saw the notifications in the dashboard page or the
-    notifications dropdown).
-
-    Args:
-        user_id: str. The user ID of the subscriber.
-        last_seen_msecs: float. The time (in msecs since the Epoch) when the
-            user last saw the notifications in the dashboard page or the
-            notifications dropdown.
-    """
-    subscriptions_model = user_models.UserSubscriptionsModel.get(
-        user_id, strict=False)
-    if not subscriptions_model:
-        subscriptions_model = user_models.UserSubscriptionsModel(id=user_id)
-
-    subscriptions_model.last_checked = datetime.datetime.utcfromtimestamp(
-        python_utils.divide(last_seen_msecs, 1000.0))
-    subscriptions_model.update_timestamps()
-    subscriptions_model.put()
