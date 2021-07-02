@@ -35,7 +35,9 @@ class PayloadValidationUnitTests(test_utils.GenericTestBase):
                 'exploration_id': 2
             }, {
                 'exploration_id': {
-                    'type': 'basestring'
+                    'schema': {
+                        'type': 'basestring'
+                    }
                 }
             }, [
                 'Schema validation for \'exploration_id\' failed: '
@@ -44,7 +46,9 @@ class PayloadValidationUnitTests(test_utils.GenericTestBase):
                 'version': 'random_string'
             }, {
                 'version': {
-                    'type': 'int'
+                    'schema': {
+                        'type': 'int'
+                    }
                 }
             }, [
                 'Schema validation for \'version\' failed: '
@@ -55,7 +59,9 @@ class PayloadValidationUnitTests(test_utils.GenericTestBase):
                 'Found extra args: [u\'exploration_id\'].']),
             ({}, {
                 'exploration_id': {
-                    'type': 'basestring'
+                    'schema': {
+                        'type': 'basestring'
+                    }
                 }
             }, [
                 'Missing key in handler args: exploration_id.'])
@@ -77,13 +83,17 @@ class PayloadValidationUnitTests(test_utils.GenericTestBase):
         list_of_valid_args_with_schmea = [
             ({}, {
                 'exploration_id': {
-                    'type': 'basestring',
+                    'schema': {
+                        'type': 'basestring'
+                    },
                     'default_value': None
                 }
             }, {}),
             ({}, {
                 'exploration_id': {
-                    'type': 'basestring',
+                    'schema': {
+                        'type': 'basestring'
+                    },
                     'default_value': 'default_exp_id'
                 }
             }, {
@@ -93,7 +103,9 @@ class PayloadValidationUnitTests(test_utils.GenericTestBase):
                 'exploration_id': 'any_exp_id'
             }, {
                 'exploration_id': {
-                    'type': 'basestring'
+                    'schema': {
+                        'type': 'basestring'
+                    }
                 }
             }, {
                 'exploration_id': 'any_exp_id'
