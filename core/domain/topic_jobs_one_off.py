@@ -108,13 +108,14 @@ class UpdateTopicThumbnailSizeOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(item):
         if item.deleted:
+            yield (TopicMigrationOneOffJob._DELETED_KEY, 1)
             return
 
         topic = topic_fetchers.get_topic_by_id(item.id)
 
         try:
-            # We are not updating thumbnail_filename here, but using it call the
-            # update for topic thumbnail_size_in_bytes.
+            # We are not updating thumbnail_filename here, but using it to call
+            # the update for topic thumbnail_size_in_bytes.
             # old_value and new_value are same here, because the update for
             # thumbnail_size_in_bytes is called from within the code for
             # updating thumbnail_filename in topic_services.py file.
@@ -133,11 +134,11 @@ class UpdateTopicThumbnailSizeOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (UpdateTopicThumbnailSizeOneOffJob._SUCCESS_KEY, 1)
         except Exception as e:
             logging.exception(
-                'Updating topic thumbnail_size_in_bytes %s failed validation'
+                'Updating topic thumbnail_size_in_bytes %s failed'
                 ': %s' % (item.id, e))
             yield (
                 UpdateTopicThumbnailSizeOneOffJob._ERROR_KEY,
-                'Updating topic thumbnail_size_in_bytes %s failed validation'
+                'Updating topic thumbnail_size_in_bytes %s failed'
                 ': %s' % (item.id, e))
             return
 

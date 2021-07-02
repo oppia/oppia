@@ -5891,5 +5891,8 @@ export default {
   ],
 
   "DEV_MODE": true,
-  "EMULATOR_MODE": true
+  "EMULATOR_MODE": true,
+  "FILENAME_PREFIX_THUMBNAIL": "thumbnail",
+  "FILENAME_PREFIX_IMAGE": "image"
+
 } as const;

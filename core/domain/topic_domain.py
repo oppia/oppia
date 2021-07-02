@@ -1271,16 +1271,19 @@ class Topic(python_utils.OBJECT):
             new_thumbnail_filename: str|None. The updated thumbnail filename
                 for the topic.
         """
-        self.thumbnail_filename = new_thumbnail_filename
         file_system_class = fs_services.get_entity_file_system_class()
         fs = fs_domain.AbstractFileSystem(file_system_class(
             feconf.ENTITY_TYPE_TOPIC, self.id))
-        filename_prefix = 'thumbnail'
-        filepath = '%s/%s' % (filename_prefix, self.thumbnail_filename)
+
+        filepath = '%s/%s' % (
+            constants.FILENAME_PREFIX_THUMBNAIL, new_thumbnail_filename)
         if fs.isfile(filepath):
+            self.thumbnail_filename = new_thumbnail_filename
             self.thumbnail_size_in_bytes = len(fs.get(filepath))
         else:
-            self.thumbnail_size_in_bytes = None
+            raise Exception(
+                'The thumbnail %s for topic with id %s does not exist in the filesystem.'
+                % (new_thumbnail_filename, self.id))
 
     def update_thumbnail_bg_color(self, new_thumbnail_bg_color):
         """Updates the thumbnail background color of a topic object.
