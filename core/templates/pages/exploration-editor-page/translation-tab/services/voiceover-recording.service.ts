@@ -20,7 +20,7 @@ angular.module('oppia').factory('VoiceoverRecordingService', [
   '$log', '$q', '$window', function($log, $q, $window) {
     var audioContextAvailable = null,
       defer = null,
-      definedAudioContext = null, // Will be defined audio context
+      definedAudioContext = null, // Will be defined audio context.
       isAvailable = null,
       isRecording = false,
       microphone = null,

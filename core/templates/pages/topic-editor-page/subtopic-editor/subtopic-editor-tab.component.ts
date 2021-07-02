@@ -16,7 +16,7 @@
  * @fileoverview Component for the subtopic editor tab directive.
  */
 require(
-  'components/forms/custom-forms-directives/thumbnail-uploader.directive.ts');
+  'components/forms/custom-forms-directives/thumbnail-uploader.component.ts');
 
 require('domain/topic/topic-update.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
@@ -38,14 +38,14 @@ import { Subscription } from 'rxjs';
 angular.module('oppia').component('subtopicEditorTab', {
   template: require('./subtopic-editor-tab.component.html'),
   controller: [
-    '$scope', 'QuestionBackendApiService',
+    '$rootScope', '$scope', 'QuestionBackendApiService',
     'SubtopicValidationService', 'TopicEditorRoutingService',
     'TopicEditorStateService', 'TopicUpdateService',
     'UrlInterpolationService', 'WindowDimensionsService', 'WindowRef',
     'MAX_CHARS_IN_SUBTOPIC_TITLE',
     'MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT',
     function(
-        $scope, QuestionBackendApiService,
+        $rootScope, $scope, QuestionBackendApiService,
         SubtopicValidationService, TopicEditorRoutingService,
         TopicEditorStateService, TopicUpdateService,
         UrlInterpolationService, WindowDimensionsService, WindowRef,
@@ -281,16 +281,23 @@ angular.module('oppia').component('subtopicEditorTab', {
                 TopicEditorStateService.getSubtopicPage());
               var pageContents = ctrl.subtopicPage.getPageContents();
               ctrl.htmlData = pageContents.getHtml();
+              $rootScope.$applyAsync();
             }
           )
         );
         ctrl.directiveSubscriptions.add(
           TopicEditorStateService.onTopicInitialized.subscribe(
-            () => ctrl.initEditor()
+            () => {
+              ctrl.initEditor();
+              $rootScope.$applyAsync();
+            }
           ));
         ctrl.directiveSubscriptions.add(
           TopicEditorStateService.onTopicReinitialized.subscribe(
-            () => ctrl.initEditor()
+            () => {
+              ctrl.initEditor();
+              $rootScope.$applyAsync();
+            }
           ));
         if (TopicEditorStateService.hasLoadedTopic()) {
           ctrl.initEditor();

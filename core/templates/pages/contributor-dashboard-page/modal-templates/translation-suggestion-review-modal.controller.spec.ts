@@ -18,7 +18,7 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 describe('Translation Suggestion Review Modal Controller', function() {
   let $scope = null;
@@ -320,7 +320,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
         $scope.activeSuggestion.suggestion_id = 'suggestion_1';
         $scope.editedContent.html = '<p>In Hindi</p>';
         $scope.activeSuggestion.change = {
-          cmd: 'add_translation',
+          cmd: 'add_written_translation',
           state_name: 'State 3',
           content_id: 'content',
           language_code: 'hi',

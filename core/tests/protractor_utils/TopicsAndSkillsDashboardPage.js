@@ -167,6 +167,9 @@ var TopicsAndSkillsDashboardPage = function() {
   this.assignSkillToTopic = async function(skillName, topicName) {
     await this.waitForSkillsToLoad();
     await this.searchSkillByName(skillName);
+    await waitFor.visibilityOf(
+      assignSkillToTopicButtons.first(),
+      'Assign skill to topic buttons taking too long to appear');
     expect(await assignSkillToTopicButtons.count()).toEqual(1);
     await action.click(
       'Assign skill to topic button', assignSkillToTopicButtons.first());
@@ -301,9 +304,6 @@ var TopicsAndSkillsDashboardPage = function() {
       await action.click('Create Skill button', createSkillButtonSecondary);
     }
 
-    await waitFor.visibilityOf(
-      skillNameField,
-      'Create Skill modal takes too long to appear.');
     await action.sendKeys('Skill Name Field', skillNameField, description);
     await action.click(
       'Open Concept Card button', openConceptCardExplanationButton);
@@ -311,11 +311,11 @@ var TopicsAndSkillsDashboardPage = function() {
     var editor = element(by.css('.protractor-test-concept-card-text'));
     await waitFor.visibilityOf(
       editor, 'Explanation Editor takes too long to appear');
-    var skillReviewMaterialInput = editor.element(by.css('.oppia-rte'));
-    await action.click(
-      'Skill review material input', skillReviewMaterialInput);
+    var skillReviewMaterialInput = editor.element(
+      by.css('.protractor-test-rte'));
     await action.sendKeys(
-      'Skill Review Material Field', skillReviewMaterialInput, reviewMaterial);
+      'Skill Review Material Field', skillReviewMaterialInput,
+      reviewMaterial, true);
 
     await action.click('Create Skill button', confirmSkillCreationButton);
 

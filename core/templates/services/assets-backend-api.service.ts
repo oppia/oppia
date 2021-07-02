@@ -26,6 +26,7 @@ import { AudioFile } from 'domain/utilities/audio-file.model';
 import { FileDownloadRequest } from 'domain/utilities/file-download-request.model';
 import { ImageFile } from 'domain/utilities/image-file.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { Observable } from 'rxjs';
 import { CsrfTokenService } from 'services/csrf-token.service';
 
 interface SaveAudioResponse {
@@ -73,8 +74,9 @@ export class AssetsBackendApiService {
   }
 
   async loadAudio(explorationId: string, filename: string): Promise<AudioFile> {
-    if (this.isCached(filename)) {
-      return new AudioFile(filename, this.assetsCache.get(filename));
+    let data = this.assetsCache.get(filename);
+    if (this.isCached(filename) && data !== undefined) {
+      return new AudioFile(filename, data);
     }
     return this.fetchFile(
       AppConstants.ENTITY_TYPE.EXPLORATION, explorationId, filename,
@@ -84,8 +86,9 @@ export class AssetsBackendApiService {
   async loadImage(
       entityType: string, entityId: string,
       filename: string): Promise<ImageFile> {
-    if (this.isCached(filename)) {
-      return new ImageFile(filename, this.assetsCache.get(filename));
+    let data = this.assetsCache.get(filename);
+    if (this.isCached(filename) && data !== undefined) {
+      return new ImageFile(filename, data);
     }
     return this.fetchFile(
       entityType, entityId, filename, AppConstants.ASSET_TYPE_IMAGE);
@@ -120,6 +123,28 @@ export class AssetsBackendApiService {
     } catch (reason) {
       return Promise.reject(reason.error);
     }
+  }
+
+  postThumbnailFile(
+      resampledFile: Blob, filename: string,
+      entityType: string, entityId: string): Observable<{filename: string}> {
+    let form = new FormData();
+    form.append('image', resampledFile);
+    form.append('payload', JSON.stringify({
+      filename: filename,
+      filename_prefix: 'thumbnail'
+    }));
+    let imageUploadUrlTemplate = '/createhandler/imageupload/' +
+    '<entity_type>/<entity_id>';
+    let thumbnailFileUrl = this.urlInterpolationService.interpolateUrl(
+      imageUploadUrlTemplate, {
+        entity_type: entityType,
+        entity_id: entityId
+      });
+    if (thumbnailFileUrl === null) {
+      throw new Error('Thumbnail File Url is null');
+    }
+    return this.http.post<{filename: string}>(thumbnailFileUrl, form);
   }
 
   isCached(filename: string): boolean {
@@ -163,13 +188,17 @@ export class AssetsBackendApiService {
   private getDownloadUrl(
       entityType: string, entityId: string, filename: string,
       assetType: string): string {
-    return this.urlInterpolationService.interpolateUrl(
+    let downloadUrl = this.urlInterpolationService.interpolateUrl(
       this.downloadUrlTemplate, {
         entity_type: entityType,
         entity_id: entityId,
         asset_type: assetType,
         filename: filename,
       });
+    if (downloadUrl === null) {
+      throw new Error('Download Url is null');
+    }
+    return downloadUrl;
   }
 
   private getFileDownloadRequestsByAssetType(
@@ -184,8 +213,8 @@ export class AssetsBackendApiService {
   private async fetchFile(
       entityType: string, entityId: string, filename: string,
       assetType: string): Promise<AudioFile | ImageFile> {
-    let onResolve: (_: Blob) => void;
-    let onReject: () => void;
+    let onResolve!: (_: Blob) => void;
+    let onReject!: () => void;
     const blobPromise = new Promise<Blob>((resolve, reject) => {
       onResolve = resolve;
       onReject = reject;
@@ -226,16 +255,25 @@ export class AssetsBackendApiService {
   }
 
   private getAudioUploadUrl(explorationId: string): string {
-    return this.urlInterpolationService.interpolateUrl(
+    let audioUploadUrl = this.urlInterpolationService.interpolateUrl(
       AppConstants.AUDIO_UPLOAD_URL_TEMPLATE, {
         exploration_id: explorationId
       });
+    if (audioUploadUrl === null) {
+      throw new Error('Audio Upload Url is null');
+    }
+    return audioUploadUrl;
   }
 
-  private getImageUploadUrl(entityType: string, entityId: string): string {
-    return this.urlInterpolationService.interpolateUrl(
+  private getImageUploadUrl(
+      entityType: string, entityId: string): string {
+    let imageUploadUrl = this.urlInterpolationService.interpolateUrl(
       AppConstants.IMAGE_UPLOAD_URL_TEMPLATE,
       { entity_type: entityType, entity_id: entityId });
+    if (imageUploadUrl === null) {
+      throw new Error('Image Upload Url is null');
+    }
+    return imageUploadUrl;
   }
 }
 

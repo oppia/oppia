@@ -37,9 +37,9 @@ var AdminPage = function() {
   var adminRolesTab = element(by.css('.protractor-test-admin-roles-tab'));
   var adminRolesTabContainer = element(
     by.css('.protractor-test-roles-tab-container'));
-  var updateFormName = element(by.css('.protractor-update-form-name'));
-  var updateFormSubmit = element(by.css('.protractor-update-form-submit'));
-  var roleSelect = element(by.css('.protractor-update-form-role-select'));
+  var updateFormName = element(by.css('.protractor-test-update-form-name'));
+  var updateFormSubmit = element(by.css('.protractor-test-update-form-submit'));
+  var roleSelect = element(by.css('.protractor-test-update-form-role-select'));
   var statusMessage = element(by.css('.protractor-test-status-message'));
 
   var addContributionRightsForm = element(
@@ -181,22 +181,23 @@ var AdminPage = function() {
 
   this.getFeaturesTab = async function() {
     await this.get();
-    const featuresTab = element(by.css('.protractor-test-admin-features-tab'));
+    var featuresTab = element(by.css('.protractor-test-admin-features-tab'));
     await action.click('Admin features tab', featuresTab);
-    const featureFlagElements = element.all(
+    var featureFlagElements = element.all(
       by.css('.protractor-test-feature-flag'));
     await waitFor.visibilityOf(
       featureFlagElements.first(), 'Feature flags not showing up');
   };
 
   this.getDummyFeatureElement = async function() {
-    const featureFlagElements = element.all(
+    var featureFlagElements = element.all(
       by.css('.protractor-test-feature-flag'));
 
-    const count = await featureFlagElements.count();
+    var count = await featureFlagElements.count();
     for (let i = 0; i < count; i++) {
-      const elem = await featureFlagElements.get(i);
-      if ((await elem.element(by.css('h2.oppia-feature-name')).getText()) ===
+      var elem = featureFlagElements.get(i);
+      if ((await elem.element(
+        by.css('.protractor-test-feature-name')).getText()) ===
           'dummy_feature') {
         return elem;
       }
@@ -257,7 +258,7 @@ var AdminPage = function() {
     await action.click('Config Tab', configTab);
     await waitFor.elementToBeClickable(saveAllConfigs);
 
-    const results = [];
+    var results = [];
     for (let configProperty of (await configProperties)) {
       results.push(
         await saveConfigProperty(
@@ -279,7 +280,7 @@ var AdminPage = function() {
 
   this._startOneOffJob = async function(jobName, i) {
     await waitFor.visibilityOf(
-      await oneOffJobRows.first(),
+      oneOffJobRows.first(),
       'Starting one off jobs taking too long to appear.');
     await waitFor.visibilityOf(
       oneOffJobRows.get(i), 'Could not get One Off Jobs');
@@ -340,6 +341,8 @@ var AdminPage = function() {
     await action.click('Admin Roles Tab', adminRolesTab);
 
     // Change values for "update role" form, and submit it.
+    await waitFor.visibilityOf(
+      updateFormName, 'Update Form name taking too long to appear.');
     await action.sendKeys('Update Form Name', updateFormName, name);
     await action.select('Role Drop Down', roleSelect, newRole);
     await action.click('Update Form Submit', updateFormSubmit);

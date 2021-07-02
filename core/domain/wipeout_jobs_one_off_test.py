@@ -55,10 +55,15 @@ class UserDeletionOneOffJobTests(test_utils.GenericTestBase):
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         user_models.CompletedActivitiesModel(
-            id=self.user_1_id, exploration_ids=[], collection_ids=[]
+            id=self.user_1_id, exploration_ids=[], collection_ids=[],
+            story_ids=[], learnt_topic_ids=[]
         ).put()
         user_models.IncompleteActivitiesModel(
-            id=self.user_1_id, exploration_ids=[], collection_ids=[]
+            id=self.user_1_id, exploration_ids=[], collection_ids=[],
+            story_ids=[], partially_learnt_topic_ids=[]
+        ).put()
+        user_models.LearnerGoalsModel(
+            id=self.user_1_id, topic_ids_to_learn=[]
         ).put()
         user_models.LearnerPlaylistModel(
             id=self.user_1_id, exploration_ids=[], collection_ids=[]
@@ -82,6 +87,8 @@ class UserDeletionOneOffJobTests(test_utils.GenericTestBase):
             user_models.CompletedActivitiesModel.get_by_id(self.user_1_id))
         self.assertIsNone(
             user_models.IncompleteActivitiesModel.get_by_id(self.user_1_id))
+        self.assertIsNone(
+            user_models.LearnerGoalsModel.get_by_id(self.user_1_id))
         self.assertIsNone(
             user_models.LearnerPlaylistModel.get_by_id(self.user_1_id))
 
@@ -119,10 +126,15 @@ class FullyCompleteUserDeletionOneOffJobTests(test_utils.GenericTestBase):
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         user_models.CompletedActivitiesModel(
-            id=self.user_1_id, exploration_ids=[], collection_ids=[]
+            id=self.user_1_id, exploration_ids=[], collection_ids=[],
+            story_ids=[], learnt_topic_ids=[]
         ).put()
         user_models.IncompleteActivitiesModel(
-            id=self.user_1_id, exploration_ids=[], collection_ids=[]
+            id=self.user_1_id, exploration_ids=[], collection_ids=[],
+            story_ids=[], partially_learnt_topic_ids=[]
+        ).put()
+        user_models.LearnerGoalsModel(
+            id=self.user_1_id, topic_ids_to_learn=[]
         ).put()
         user_models.LearnerPlaylistModel(
             id=self.user_1_id, exploration_ids=[], collection_ids=[]
@@ -168,7 +180,8 @@ class FullyCompleteUserDeletionOneOffJobTests(test_utils.GenericTestBase):
         )
 
         user_models.CompletedActivitiesModel(
-            id=self.user_1_id, exploration_ids=[], collection_ids=[]
+            id=self.user_1_id, exploration_ids=[], collection_ids=[],
+            story_ids=[], learnt_topic_ids=[]
         ).put()
         with send_email_swap:
             output = self._run_one_off_job()

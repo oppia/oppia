@@ -35,6 +35,8 @@ import { NoninteractiveVideo } from './Video/directives/oppia-noninteractive-vid
 import { NoninteractiveSkillreview } from './Skillreview/directives/oppia-noninteractive-skillreview.component';
 import { OppiaNoninteractiveSkillreviewConceptCardModalComponent } from './Skillreview/directives/oppia-noninteractive-skillreview-concept-card-modal.component';
 import { ConceptCardComponent } from 'components/concept-card/concept-card.directive';
+import { PortalModule } from '@angular/cdk/portal';
+import { OppiaRteTextNodeDirective, RteOutputDisplayComponent } from './rte-output-display.component';
 
 
 @NgModule({
@@ -47,6 +49,7 @@ import { ConceptCardComponent } from 'components/concept-card/concept-card.direc
     NgbModalModule,
     NgbNavModule,
     NgbTooltipModule,
+    PortalModule,
     YouTubePlayerModule
   ],
   declarations: [
@@ -59,7 +62,9 @@ import { ConceptCardComponent } from 'components/concept-card/concept-card.direc
     NoninteractiveSvgdiagram,
     NoninteractiveTabs,
     NoninteractiveVideo,
-    OppiaNoninteractiveSkillreviewConceptCardModalComponent
+    OppiaNoninteractiveSkillreviewConceptCardModalComponent,
+    RteOutputDisplayComponent,
+    OppiaRteTextNodeDirective
   ],
   entryComponents: [
     NoninteractiveCollapsible,
@@ -70,7 +75,8 @@ import { ConceptCardComponent } from 'components/concept-card/concept-card.direc
     NoninteractiveSvgdiagram,
     NoninteractiveTabs,
     NoninteractiveVideo,
-    OppiaNoninteractiveSkillreviewConceptCardModalComponent
+    OppiaNoninteractiveSkillreviewConceptCardModalComponent,
+    RteOutputDisplayComponent
   ],
   exports: [
     ConceptCardComponent,
@@ -82,7 +88,9 @@ import { ConceptCardComponent } from 'components/concept-card/concept-card.direc
     NoninteractiveSvgdiagram,
     NoninteractiveTabs,
     NoninteractiveVideo,
-    OppiaNoninteractiveSkillreviewConceptCardModalComponent
+    OppiaNoninteractiveSkillreviewConceptCardModalComponent,
+    RteOutputDisplayComponent,
+    OppiaRteTextNodeDirective
   ],
 })
 

@@ -32,7 +32,7 @@ import $ from 'jquery';
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 // ^^^ This block is to be removed.
 
@@ -221,7 +221,7 @@ describe('Audio translation bar directive', function() {
     // is not assignable to parameter of type 'WaveSurfer'."
     // This is because the actual 'WaveSurfer.create` function returns a
     // object with around 50 more properties than `waveSurferObjSpy`.
-    // We are suppressing this error because we have defined the properties
+    // We need to suppress this error because we have defined the properties
     // we need for this test in 'waveSurferObjSpy' object.
     // @ts-expect-error
     spyOn(WaveSurfer, 'create').and.returnValue(waveSurferObjSpy);
@@ -350,7 +350,7 @@ describe('Audio translation bar directive', function() {
     // is not assignable to parameter of type 'WaveSurfer'."
     // This is because the actual 'WaveSurfer.create` function returns a
     // object with around 50 more properties than `waveSurferObjSpy`.
-    // We are suppressing this error because we have defined the properties
+    // We need to suppress this error because we have defined the properties
     // we need for this test in 'waveSurferObjSpy' object.
     // @ts-expect-error
     spyOn(WaveSurfer, 'create').and.returnValue(waveSurferObjSpy);
@@ -378,7 +378,7 @@ describe('Audio translation bar directive', function() {
     // is not assignable to parameter of type 'WaveSurfer'."
     // This is because the actual 'WaveSurfer.create` function returns a
     // object with around 50 more properties than `waveSurferObjSpy`.
-    // We are suppressing this error because we have defined the properties
+    // We need to suppress this error because we have defined the properties
     // we need for this test in 'waveSurferObjSpy' object.
     // @ts-expect-error
     spyOn(WaveSurfer, 'create').and.returnValue(waveSurferObjSpy);
@@ -422,7 +422,7 @@ describe('Audio translation bar directive', function() {
     // is not assignable to parameter of type 'WaveSurfer'."
     // This is because the actual 'WaveSurfer.create` function returns a
     // object with around 50 more properties than `waveSurferObjSpy`.
-    // We are suppressing this error because we have defined the properties
+    // We need to suppress this error because we have defined the properties
     // we need for this test in 'waveSurferObjSpy' object.
     // @ts-expect-error
     spyOn(WaveSurfer, 'create').and.returnValue(waveSurferObjSpy);

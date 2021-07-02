@@ -113,24 +113,6 @@ BAD_PATTERNS_REGEXP = [
 
 BAD_PATTERNS_JS_AND_TS_REGEXP = [
     {
-        'regexp': re.compile(r'\b(browser.explore)\('),
-        'message': 'In tests, please do not use browser.explore().',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'\b(browser.pause)\('),
-        'message': 'In tests, please do not use browser.pause().',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'\b(browser.waitForAngular)\('),
-        'message': 'In tests, please do not use browser.waitForAngular().',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
         'regexp': re.compile(r'bypassSecurity'),
         'message': 'The use of the word "bypassSecurity" is not allowed, ' +
                    'particularly with regards to bypassSecurityTrustHTML() ' +
@@ -217,10 +199,11 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             'core/templates/filters/translate.pipe.spec.ts',
             'core/templates/components/ck-editor-helpers/' +
             'ck-editor-copy-content-service.spec.ts',
-            'core/templates/tests/unit-test-utils.ts',
+            'core/templates/tests/unit-test-utils.ajs.ts',
             'core/templates/directives/mathjax.directive.ts',
             'extensions/objects/templates/' +
-            'math-expression-content-editor.component.ts'),
+            'math-expression-content-editor.component.ts',
+            'rte-output-display.component.spec.ts'),
         'excluded_dirs': ('core/tests/',)
     },
     {
