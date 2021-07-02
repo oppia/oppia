@@ -193,7 +193,7 @@ describe('NumberWithUnitsObjectFactory', () => {
 
     it('should create currency units', () => {
       const createCurrencyUnitsSpy = spyOn(
-        nwuof.unitsFactory, 'createCurrencyUnits');
+        nwuof, 'createCurrencyUnits');
       nwuof.createCurrencyUnits();
       expect(createCurrencyUnitsSpy).toHaveBeenCalled();
     });
