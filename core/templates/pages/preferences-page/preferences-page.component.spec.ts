@@ -307,9 +307,10 @@ describe('Preferences Page Component', () => {
     spyOn(ngbModal, 'open').and.returnValue({
       result: Promise.reject()
     } as NgbModalRef);
+    spyOn(userService, 'setProfileImageDataUrlAsync');
     componentInstance.showEditProfilePictureModal();
     tick();
     tick();
-    expect(userService.setProfileImageDataUrlAsync).toHaveBeenCalled();
+    expect(userService.setProfileImageDataUrlAsync).not.toHaveBeenCalled();
   }));
 });
