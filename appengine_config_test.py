@@ -76,7 +76,7 @@ class AppengineConfigTests(test_utils.GenericTestBase):
         object with a suitable version string for google-cloud-tasks.
         """
         assert_raises_regexp_context_manager = self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-                pkg_resources.DistributionNotFound, 'invalid-lib')
+            pkg_resources.DistributionNotFound, 'invalid-lib')
         with self.swap(
             appengine_config, 'old_get_distribution',
             self._mock_get_distribution_which_raises_error
