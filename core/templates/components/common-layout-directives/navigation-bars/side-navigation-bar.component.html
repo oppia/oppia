@@ -108,9 +108,21 @@
   </div>
 
   <ul>
+    <li [ngClass]="{'active': currentUrl === '/learn/math'}">
+      <a (click)="toggleClassroomSubmenu()" class="protractor-mobile-test-classroom">
+        <i class="material-icons oppia-sidebar-menu-icon">school</i>
+        <span>{{ 'I18N_SIDEBAR_CLASSROOM' | translate }}</span>
+      </a>
+      <div [hidden]="!classroomSubmenuIsShown" class="classroom-submenu">
+        <a href="/learn/math" class="protractor-mobile-test-mathematics-link">
+          <span>{{ 'I18N_SIDEBAR_CLASSROOM_BASIC_MATHS' | translate }}</span>
+        </a>
+      </div>
+    </li>
+
     <li [ngClass]="{'active': currentUrl === '/community-library'}">
       <a href="/community-library" class="protractor-mobile-test-library-link">
-        <i class="material-icons oppia-sidebar-menu-icon">&#xE88A;</i>
+        <i class="material-icons oppia-sidebar-menu-icon">&#xE0E0;</i>
         <span>{{ 'I18N_SIDEBAR_LIBRARY_LINK' | translate }}</span>
       </a>
     </li>
@@ -119,47 +131,6 @@
       <a href="/about" class="protractor-mobile-test-about-link">
         <i class="material-icons oppia-sidebar-menu-icon">&#xE887;</i>
         <span>{{ 'I18N_SIDEBAR_ABOUT_LINK' | translate }}</span>
-      </a>
-    </li>
-
-    <li [ngClass]="{'active': currentUrl === '/get-started'}">
-      <a href="/get-started" class="protractor-mobile-test-get-started-link">
-        <i class="oppia-sidebar-menu-icon fa">&#xf135;</i>
-        <span>{{ 'I18N_SIDEBAR_GET_STARTED' | translate }}</span>
-      </a>
-    </li>
-
-    <li [ngClass]="{'active': currentUrl === '/teach'}">
-      <a href="/teach" class="protractor-mobile-test-teach-link">
-        <i class="material-icons oppia-sidebar-menu-icon">&#xE88E;</i>
-        <span >{{ 'I18N_SIDEBAR_TEACH_WITH_OPPIA' | translate }}</span>
-      </a>
-    </li>
-
-    <li [ngClass]="{'active': currentUrl === '/donate'}">
-      <a href="/donate" class="protractor-mobile-test-donate-link">
-        <i class="material-icons oppia-sidebar-menu-icon">&#xE87D;</i>
-        <span>{{ 'I18N_SIDEBAR_DONATE' | translate }}</span>
-      </a>
-    </li>
-
-    <li>
-      <a href="https://medium.com/oppia-org" target="_blank" rel="noopener">
-        <picture>
-          <source type="image/webp" [srcset]="getStaticImageUrl('/sidebar/medium.webp')">
-          <source type="image/png" [srcset]="getStaticImageUrl('/sidebar/medium.png')">
-          <img [src]="getStaticImageUrl('/sidebar/medium.png')"
-               class="oppia-sidebar-menu-icon"
-               alt="Oppia Blog">
-        </picture>
-        <span>{{ 'I18N_SIDEBAR_BLOG' | translate }}</span>
-      </a>
-    </li>
-
-    <li [ngClass]="{'active': currentUrl === '/contact'}">
-      <a href="/contact" class="protractor-mobile-test-contact-link">
-        <i class="material-icons oppia-sidebar-menu-icon">&#xE0BE;</i>
-        <span>{{ 'I18N_SIDEBAR_CONTACT_US' | translate }}</span>
       </a>
     </li>
 
@@ -178,16 +149,38 @@
       </a>
     </li>
 
-    <li [ngClass]="{'active': currentUrl === '/learn/math'}">
-      <a (click)="toggleClassroomSubmenu()" class="protractor-mobile-test-classroom">
-        <i class="material-icons oppia-sidebar-menu-icon">school</i>
-        <span>{{ 'I18N_SIDEBAR_CLASSROOM' | translate }}</span>
+    <li>
+      <a href="https://medium.com/oppia-org" target="_blank" rel="noopener">
+        <picture>
+          <source type="image/webp" [srcset]="getStaticImageUrl('/sidebar/medium.webp')">
+          <source type="image/png" [srcset]="getStaticImageUrl('/sidebar/medium.png')">
+          <img [src]="getStaticImageUrl('/sidebar/medium.png')"
+               class="oppia-sidebar-menu-icon"
+               alt="Oppia Blog">
+        </picture>
+        <span>{{ 'I18N_SIDEBAR_BLOG' | translate }}</span>
       </a>
-      <div [hidden]="!classroomSubmenuIsShown" class="classroom-submenu">
-        <a href="/learn/math" class="protractor-mobile-test-mathematics-link">
-          <span>{{ 'I18N_SIDEBAR_CLASSROOM_BASIC_MATHS' | translate }}</span>
-        </a>
-      </div>
+    </li>
+
+    <li>
+      <a href="https://www.oppiafoundation.org/volunteer" target="_blank" rel="noopener">
+        <i class="material-icons oppia-sidebar-menu-icon">&#xF233;</i>
+        <span>{{ 'I18N_SIDEBAR_VOLUNTEER' | translate }}</span>
+      </a>
+    </li>
+
+    <li>
+      <a href="https://www.oppiafoundation.org/partnerships" target="_blank" rel="noopener">
+        <i class="material-icons oppia-sidebar-menu-icon">&#xE0Af;</i>
+        <span>{{ 'I18N_SIDEBAR_PARTNERSHIPS' | translate }}</span>
+      </a>
+    </li>
+
+    <li [ngClass]="{'active': currentUrl === '/donate'}">
+      <a href="/donate" class="protractor-mobile-test-donate-link">
+        <i class="material-icons oppia-sidebar-menu-icon">&#xE87D;</i>
+        <span>{{ 'I18N_SIDEBAR_DONATE' | translate }}</span>
+      </a>
     </li>
   </ul>
 
