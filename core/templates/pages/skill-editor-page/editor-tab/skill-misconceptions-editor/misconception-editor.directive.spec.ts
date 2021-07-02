@@ -28,8 +28,7 @@ import { MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFact
 import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
 import { SkillUpdateService } from 'domain/skill/skill-update.service';
 
-for (let i =0; i< 200; i++) {
-fdescribe('Misconception Editor Directive', function() {
+describe('Misconception Editor Directive', function() {
   let $scope = null;
   let ctrl = null;
   let $rootScope = null;
@@ -171,4 +170,4 @@ fdescribe('Misconception Editor Directive', function() {
 
     expect(updatesSpy).toHaveBeenCalled();
   });
-});}
+});
