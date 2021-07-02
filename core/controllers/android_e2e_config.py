@@ -53,25 +53,29 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
     @acl_decorators.open_access
     def post(self):
         """This method generates the following structures:
-            Topic
-            Story
-            Exploration
-            Subtopic
-            Skill
+            Topic: A topic with both a test story and a subtopic.
+            Story: A story with 'android_interactions' as a exploration
+                node.
+            Exploration: 'android_interactions' from the local assets.
+            Subtopic: A dummy subtopic to validate the topic.
+            Skill: A dummy skill to validate the subtopic.
 
-            The Topic contains a story and a subtopic.
+            All these structures are used for Android end-to-end testing, the
+            purpose is to test the network requests in android by fetching the
+            topic from the dev server.
 
-            Adding a Exploration to the topic requires a story
-            with a exploration as a node.
+            This handler can only be used in the dev server, It gives a
+            500 error in the production server.
 
-            In the Story a exploration from the local assets is added
-            as a node which contains all the android interactions.
+            Returns a empty json - {}, when the request is successful.
 
-            The subtopic is created to validate the topic, a topic
-            requires atleast one subtopic.
+            This is only called once and raises a exception if the topic is
+            already created or published.
 
-            The skill is created to validate the subtopic, a subtopic
-            requires atleast one skill.
+        Raises:
+            Exception. When used in production mode.
+            Exception. The topic is already created but not published.
+            Exception. The topic is already published.
         """
 
         if not constants.DEV_MODE:
@@ -87,13 +91,13 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
                 raise Exception('The topic exists but is not published.')
         exp_id = '26'
         user_id = feconf.SYSTEM_COMMITTER_ID
-        # Generating new Structure id for topic, story, skill and question.
+        # Generate new Structure id for topic, story, skill and question.
         topic_id = topic_fetchers.get_new_topic_id()
         story_id = story_services.get_new_story_id()
         skill_id = skill_services.get_new_skill_id()
         question_id = question_services.get_new_question_id()
 
-        # Creating dummy skill and question.
+        # Create dummy skill and question.
         skill = self._create_dummy_skill(
             skill_id, 'Dummy Skill for Android', '<p>Dummy Explanation 1</p>')
         question = self._create_dummy_question(
