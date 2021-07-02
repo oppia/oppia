@@ -45,10 +45,10 @@ describe('ImageClickInputValidationService', () => {
       providers: [ImageClickInputValidationService]
     });
 
-    validatorService = TestBed.get(ImageClickInputValidationService);
-    oof = TestBed.get(OutcomeObjectFactory);
-    agof = TestBed.get(AnswerGroupObjectFactory);
-    rof = TestBed.get(RuleObjectFactory);
+    validatorService = TestBed.inject(ImageClickInputValidationService);
+    oof = TestBed.inject(OutcomeObjectFactory);
+    agof = TestBed.inject(AnswerGroupObjectFactory);
+    rof = TestBed.inject(RuleObjectFactory);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
     currentState = 'First State';
@@ -106,7 +106,7 @@ describe('ImageClickInputValidationService', () => {
         }
       }, 'ImageClickInput')],
       goodDefaultOutcome,
-      null,
+      [],
       null)];
   });
 
@@ -199,6 +199,10 @@ describe('ImageClickInputValidationService', () => {
   it('should expect a non-confusing and non-null default outcome',
     () => {
       var warnings = validatorService.getAllWarnings(
+      // This throws "Argument of type 'null' is not assignable to parameter."
+      // We need to suppress this error because of the need to test the warnings
+      // if an outcome is not sepcified.
+      // @ts-ignore
         currentState, customizationArguments, goodAnswerGroups, null);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,

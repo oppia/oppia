@@ -78,7 +78,7 @@ export class MultipleChoiceInputValidationService {
       stateName: string,
       customizationArgs: MultipleChoiceInputCustomizationArgs,
       answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
-    var warningsList = [];
+    var warningsList: Warning[] = [];
 
     warningsList = warningsList.concat(
       this.getCustomizationArgsWarnings(customizationArgs));
@@ -134,3 +134,5 @@ export class MultipleChoiceInputValidationService {
 angular.module('oppia').factory(
   'MultipleChoiceInputValidationService',
   downgradeInjectable(MultipleChoiceInputValidationService));
+
+

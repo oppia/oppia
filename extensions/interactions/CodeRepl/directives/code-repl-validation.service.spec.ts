@@ -74,7 +74,7 @@ describe('CodeReplValidationService', () => {
       }
     };
 
-    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, null, null)];
+    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, [], null)];
   });
 
   it('should be able to perform basic validation', () => {
@@ -91,7 +91,7 @@ describe('CodeReplValidationService', () => {
     // @ts-expect-error
     customizationArguments.language.value = 1;
     var warnings = validatorService.getAllWarnings(
-      currentState, customizationArguments, [], null);
+      currentState, customizationArguments, [], goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: 'Programming language name must be a string.'
@@ -105,7 +105,7 @@ describe('CodeReplValidationService', () => {
     // @ts-expect-error
     customizationArguments.placeholder.value = 1;
     var warnings = validatorService.getAllWarnings(
-      currentState, customizationArguments, [], null);
+      currentState, customizationArguments, [], goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: 'Placeholder text must be a string.'
@@ -119,7 +119,7 @@ describe('CodeReplValidationService', () => {
     // @ts-expect-error
     customizationArguments.preCode.value = 1;
     var warnings = validatorService.getAllWarnings(
-      currentState, customizationArguments, [], null);
+      currentState, customizationArguments, [], goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: 'The pre-code text must be a string.'
@@ -133,7 +133,7 @@ describe('CodeReplValidationService', () => {
     // @ts-expect-error
     customizationArguments.postCode.value = 1;
     var warnings = validatorService.getAllWarnings(
-      currentState, customizationArguments, [], null);
+      currentState, customizationArguments, [], goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: 'The post-code text must be a string.'

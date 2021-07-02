@@ -108,7 +108,7 @@ export class ImageClickInputValidationService {
   getAllWarnings(
       stateName: string, customizationArgs: ImageClickInputCustomizationArgs,
       answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
-    var warningsList = [];
+    var warningsList: Warning[] = [];
 
     warningsList = warningsList.concat(
       this.getCustomizationArgsWarnings(customizationArgs));

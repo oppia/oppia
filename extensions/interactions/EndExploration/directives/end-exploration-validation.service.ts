@@ -67,7 +67,7 @@ export class EndExplorationValidationService {
   getAllWarnings(
       stateName: string, customizationArgs: EndExplorationCustomizationArgs,
       answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
-    var warningsList = [];
+    var warningsList: Warning[] = [];
 
     warningsList = warningsList.concat(
       this.getCustomizationArgsWarnings(customizationArgs));

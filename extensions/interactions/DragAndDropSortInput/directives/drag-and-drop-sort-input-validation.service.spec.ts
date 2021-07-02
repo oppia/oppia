@@ -171,12 +171,12 @@ describe('DragAndDropSortInputValidationService', () => {
       agof.createNew(
         [equalsListWithAllowedValuesRule],
         goodDefaultOutcome,
-        null,
+        [],
         null
       ), agof.createNew(
         [goodRule1, goodRule2],
         customOutcome,
-        null,
+        [],
         null
       )
     ];
@@ -197,8 +197,8 @@ describe('DragAndDropSortInputValidationService', () => {
       }
     }, 'DragAndDropSortInput')];
     answerGroups = [
-      agof.createNew(rules, customOutcome, null, null),
-      agof.createNew(rules, customOutcome, null, null)
+      agof.createNew(rules, customOutcome, [], null),
+      agof.createNew(rules, customOutcome, [], null)
     ];
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);

@@ -161,7 +161,7 @@ export class GraphInputRulesService {
 
     // Check that for every vertex from the first graph there is a vertex in
     // the second graph with the same sum of weights of outgoing edges.
-    var degrees1 = adj1.map(function(value) {
+    var degrees1 = adj1.map(functionz(value) {
       return value.reduce(function(prev, cur) {
         return prev + cur;
       });
