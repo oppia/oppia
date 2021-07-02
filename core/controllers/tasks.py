@@ -19,7 +19,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import json
 
-from core import jobs_registry
 from core.controllers import base
 from core.domain import email_manager
 from core.domain import exp_fetchers
