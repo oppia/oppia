@@ -47,8 +47,10 @@ def validate_new_config_property_values(obj):
     Args:
         obj: dict. Data that needs to be validated.
     """
+    domain_method = config_domain.Registry.get_config_property
+
     for (name, value) in obj.items():
-        config_property = config_domain.Registry.get_config_property(name) # type: ignore[no-untyped-call] # pylint: disable=line-too-long
+        config_property = domain_method(name) # type: ignore[no-untyped-call]
         if config_property is None:
             raise Exception('%s do not have any schema.' % name)
 
