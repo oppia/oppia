@@ -450,7 +450,7 @@ class _Validators(python_utils.OBJECT):
         Returns:
             bool. Whether the given object is a valid URL fragment.
         """
-        return re.match(constants.VALID_URL_FRAGMENT_REGEX, obj) # type: ignore[return-value]
+        return bool(re.match(constants.VALID_URL_FRAGMENT_REGEX, obj))
 
     @staticmethod
     def is_at_least(obj, min_value):
