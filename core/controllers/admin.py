@@ -941,7 +941,7 @@ class ContributionRightsDataHandler(base.BaseHandler):
 
 
 class TranslationContributionStatsHandler(base.BaseHandler):
-    """Handler to translation contribution stats of a user."""
+    """Handler to show the translation contribution stats of a user."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
