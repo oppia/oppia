@@ -383,7 +383,7 @@ describe('QuestionsListComponent', () => {
     });
   });
 
-  it('should show add warning if fetching skills fails', () => {
+  it('should warning message if fetching skills fails', () => {
     spyOn(AlertsService, 'addWarning');
     spyOn(SkillBackendApiService, 'fetchMultiSkillsAsync').and.returnValue(
       $q.reject('Error occurred.')
@@ -395,7 +395,7 @@ describe('QuestionsListComponent', () => {
     expect(AlertsService.addWarning).toHaveBeenCalled();
   });
 
-  it('should the index of a question', () => {
+  it('should show the index of a question', () => {
     spyOn(QuestionsListService, 'getCurrentPageNumber').and.returnValue(5);
 
     // Question index = NUM_QUESTION_PER_PAGE (10) * current page number (5) +
