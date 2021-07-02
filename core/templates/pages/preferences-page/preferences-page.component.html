@@ -173,8 +173,8 @@
         -->
         <div *ngIf="hasPageLoaded">
           <oppia-preferred-language-selector [choices]="AUDIO_LANGUAGE_CHOICES"
-                                    [preferredLanguageCode]="preferredAudioLanguageCode"
-                                    (preferredLanguageCodeChange)="savePreferredAudioLanguageCode($event)">
+                                             [preferredLanguageCode]="preferredAudioLanguageCode"
+                                             (preferredLanguageCodeChange)="savePreferredAudioLanguageCode($event)">
           </oppia-preferred-language-selector>
         </div>
         <span class="form-text oppia-form-text">
