@@ -45,3 +45,28 @@ class ValidateExplorationChangeTests(test_utils.GenericTestBase):
             'property_name': 'title'
         }
         domain_objects_validator.validate_exploration_change(exploration_change)
+
+
+class ValidateNewConfigPropertyValueTests(test_utils.GenericTestBase):
+
+    def test_incorrect_object_name_raises_exception(self):
+        # type: () -> None
+        new_config_property_values = {
+            'email_sender_name': 'Site Admin',
+            'contributor_dashboard_is_enabled': True,
+            'improvements_tab_enabled': False
+        }
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+            Exception, 'improvements_tab_enabled do not have any schema.'):
+            domain_objects_validator.validate_new_config_property_values(
+                new_config_property_values)
+
+    def test_correct_object_do_not_raises_exception(self):
+        # type: () -> None
+        new_config_property_values = {
+            'email_sender_name': 'Site Admin',
+            'contributor_dashboard_is_enabled': True,
+            'is_improvements_tab_enabled': False
+        }
+        domain_objects_validator.validate_new_config_property_values(
+            new_config_property_values)

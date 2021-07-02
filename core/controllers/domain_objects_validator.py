@@ -41,14 +41,16 @@ def validate_exploration_change(obj):
 
 
 def validate_new_config_property_values(obj):
-    # type: (Dict[Any, Any]) -> None
+    # type: (Dict[Text, Any]) -> None
     """Validates new config property values.
 
     Args:
         obj: dict. Data that needs to be validated.
     """
     for (name, value) in obj.items():
-        config_property = config_domain.Registry.get_config_property(name) # type: ignore[no-untyped-call] # pylint: disable=line-too-long
+        config_property = (
+            config_domain.Registry.get_config_property(name)
+        ) # type: ignore[no-untyped-call]
         if config_property is None:
             raise Exception('%s do not have any schema.' % name)
 
