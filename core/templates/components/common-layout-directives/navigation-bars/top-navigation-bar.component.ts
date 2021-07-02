@@ -226,11 +226,11 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.add(
       this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(
         (code) => {
-        if (this.currentLanguageCode !== code) {
-          this.currentLanguageCode = code;
-          this.changeDetectorRef.detectChanges();
-        }
-      })
+          if (this.currentLanguageCode !== code) {
+            this.currentLanguageCode = code;
+            this.changeDetectorRef.detectChanges();
+          }
+        })
     );
     // The function needs to be run after i18n. A timeout of 0 appears
     // to run after i18n in Chrome, but not other browsers. The
