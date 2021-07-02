@@ -133,7 +133,8 @@
         <div *ngIf="hasPageLoaded">
           <oppia-preferred-languages [preferredLanguages]="preferredLanguageCodes"
                                      [choices]="LANGUAGE_CHOICES"
-                                     (preferredLanguagesChange)="savePreferredLanguageCodes($event)"></oppia-preferred-languages>
+                                     (preferredLanguagesChange)="savePreferredLanguageCodes($event)">
+          </oppia-preferred-languages>
         </div>
         <span class="form-text oppia-form-text">
           {{ 'I18N_PREFERENCES_PREFERRED_EXPLORATION_LANGUAGE_EXPLAIN' | translate }}
