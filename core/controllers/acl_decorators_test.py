@@ -1376,7 +1376,9 @@ class CanDeleteBlogPostTests(test_utils.GenericTestBase):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'blog_post_id': {
-                'type': 'unicode'
+                'schema': {
+                    'type': 'unicode'
+                }
             }
         }
         HANDLER_ARGS_SCHEMAS = {
@@ -1459,7 +1461,9 @@ class CanEditBlogPostTests(test_utils.GenericTestBase):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'blog_post_id': {
-                'type': 'unicode'
+                'schema': {
+                    'type': 'unicode'
+                }
             }
         }
         HANDLER_ARGS_SCHEMAS = {
