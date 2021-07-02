@@ -64,7 +64,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
         def mock_start_linter(unused_files_to_lint):
             return self.linter_code
         self.mypy_check_code = 0
-        def mock_start_mypy_checks():
+        def mock_execute_mypy_checks():
             return self.mypy_check_code
         self.does_diff_include_js_or_ts_files = False
         def mock_does_diff_include_js_or_ts_files(unused_diff_files):
@@ -99,8 +99,8 @@ class PrePushHookTests(test_utils.GenericTestBase):
             subprocess, 'check_output', mock_check_output)
         self.start_linter_swap = self.swap(
             pre_push_hook, 'start_linter', mock_start_linter)
-        self.start_mypy_checks_swap = self.swap(
-            pre_push_hook, 'start_mypy_checks', mock_start_mypy_checks)
+        self.execute_mypy_checks_swap = self.swap(
+            pre_push_hook, 'execute_mypy_checks', mock_execute_mypy_checks)
         self.js_or_ts_swap = self.swap(
             pre_push_hook, 'does_diff_include_js_or_ts_files',
             mock_does_diff_include_js_or_ts_files)
@@ -408,9 +408,9 @@ class PrePushHookTests(test_utils.GenericTestBase):
         with self.popen_swap:
             self.assertEqual(pre_push_hook.start_linter(['files']), 0)
 
-    def test_start_mypy_checks(self):
+    def test_execute_mypy_checks(self):
         with self.popen_swap:
-            self.assertEqual(pre_push_hook.start_mypy_checks(), 0)
+            self.assertEqual(pre_push_hook.execute_mypy_checks(), 0)
 
     def test_run_script_and_get_returncode(self):
         with self.popen_swap:
@@ -634,7 +634,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
         with self.get_remote_name_swap, self.get_refs_swap, self.print_swap:
             with self.collect_files_swap, self.uncommitted_files_swap:
                 with self.check_output_swap, self.start_linter_swap:
-                    with self.start_mypy_checks_swap:
+                    with self.execute_mypy_checks_swap:
                         with self.assertRaisesRegexp(SystemExit, '1'):
                             with self.swap_check_backend_python_libs:
                                 pre_push_hook.main(args=[])
@@ -647,7 +647,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
         with self.get_remote_name_swap, self.get_refs_swap, self.print_swap:
             with self.collect_files_swap, self.uncommitted_files_swap:
                 with self.check_output_swap, self.start_linter_swap:
-                    with self.start_mypy_checks_swap:
+                    with self.execute_mypy_checks_swap:
                         with self.assertRaisesRegexp(SystemExit, '1'):
                             with self.swap_check_backend_python_libs:
                                 pre_push_hook.main(args=[])
@@ -666,7 +666,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             with self.collect_files_swap, self.uncommitted_files_swap:
                 with self.check_output_swap, self.start_linter_swap:
                     with self.ts_swap, run_script_and_get_returncode_swap:
-                        with self.start_mypy_checks_swap:
+                        with self.execute_mypy_checks_swap:
                             with self.assertRaisesRegexp(SystemExit, '1'):
                                 with self.swap_check_backend_python_libs:
                                     pre_push_hook.main(args=[])
@@ -687,7 +687,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             with self.collect_files_swap, self.uncommitted_files_swap:
                 with self.check_output_swap, self.start_linter_swap:
                     with self.ts_swap, run_script_and_get_returncode_swap:
-                        with self.start_mypy_checks_swap:
+                        with self.execute_mypy_checks_swap:
                             with self.assertRaisesRegexp(SystemExit, '1'):
                                 with self.swap_check_backend_python_libs:
                                     pre_push_hook.main(args=[])
@@ -706,7 +706,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             with self.collect_files_swap, self.uncommitted_files_swap:
                 with self.check_output_swap, self.start_linter_swap:
                     with self.js_or_ts_swap, run_script_and_get_returncode_swap:
-                        with self.start_mypy_checks_swap:
+                        with self.execute_mypy_checks_swap:
                             with self.assertRaisesRegexp(SystemExit, '1'):
                                 with self.swap_check_backend_python_libs:
                                     pre_push_hook.main(args=[])
@@ -726,7 +726,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
                 with self.check_output_swap, self.start_linter_swap:
                     with run_script_and_get_returncode_swap:
                         with self.ci_config_or_js_files_swap:
-                            with self.start_mypy_checks_swap:
+                            with self.execute_mypy_checks_swap:
                                 with self.assertRaisesRegexp(SystemExit, '1'):
                                     with self.swap_check_backend_python_libs:
                                         pre_push_hook.main(args=[])
@@ -750,7 +750,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             with self.collect_files_swap, self.uncommitted_files_swap:
                 with self.check_output_swap, self.start_linter_swap:
                     with self.js_or_ts_swap:
-                        with self.start_mypy_checks_swap:
+                        with self.execute_mypy_checks_swap:
                             with self.swap_check_backend_python_libs:
                                 pre_push_hook.main(args=[])
 

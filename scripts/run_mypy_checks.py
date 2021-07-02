@@ -25,11 +25,9 @@ import os
 import subprocess
 import sys
 
-
+import python_utils
 from scripts import common
 from scripts import install_third_party_libs
-
-import python_utils # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 
 # List of directories whose files won't be type-annotated ever.

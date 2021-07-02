@@ -329,8 +329,12 @@ def start_linter(files):
     return task.returncode
 
 
-def start_mypy_checks():
-    """Starts the mypy type checks."""
+def execute_mypy_checks():
+    """Executes the mypy type checks.
+
+    Returns:
+        int. The return code from mypy checks.
+    """
     task = subprocess.Popen(
         [PYTHON_CMD, '-m', MYPY_TYPE_CHECK_MODULE, '--skip-install'])
     task.communicate()
@@ -518,12 +522,12 @@ def main(args=None):
                         'Push failed, please correct the linting issues above.')
                     sys.exit(1)
 
-            mypy_check_status = start_mypy_checks()
+            mypy_check_status = execute_mypy_checks()
             if mypy_check_status != 0:
                 python_utils.PRINT(
                     'Push failed, please correct the mypy type annotation '
                     'issues above.')
-                sys.exit(1)
+                sys.exit(mypy_check_status)
 
             typescript_checks_status = 0
             if does_diff_include_ts_files(files_to_lint):
