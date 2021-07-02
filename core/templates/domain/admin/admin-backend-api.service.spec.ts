@@ -683,7 +683,7 @@ describe('Admin backend api service', () => {
   }
   ));
 
-  fit('should fail to get translation contribution stats for invalid username' +
+  it('should fail to get translation contribution stats for invalid username' +
     ' when calling viewTranslationContributionStatsAsync', fakeAsync(() => {
     const username = 'InvalidUsername';
     abas.viewTranslationContributionStatsAsync(username)
