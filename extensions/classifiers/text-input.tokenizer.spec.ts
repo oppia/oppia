@@ -31,12 +31,12 @@ describe('Text Input tokenizer', function() {
       const expectedTokens = [
         'don', 'know', 'the', 'answer', 'to', 'this', 'question'];
       const tokens = tokenizer.generateTokens(textInput);
-      expect(tokens.length).toEqual(expectedTokens.length);
+      expect(tokens?.length).toEqual(expectedTokens.length);
       expect(tokens).toEqual(expectedTokens);
       const emptyInput = '';
       const invalidInput = 'I';
-      expect(tokenizer.generateTokens(emptyInput)).toEqual([]);
-      expect(tokenizer.generateTokens(invalidInput)).toEqual([]);
+      expect(tokenizer.generateTokens(emptyInput)).toEqual(null);
+      expect(tokenizer.generateTokens(invalidInput)).toEqual(null);
     });
   });
 });

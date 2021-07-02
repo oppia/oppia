@@ -34,7 +34,8 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class TextInputTokenizer {
-  generateTokens(textInput: string): RegExpMatchArray {
+  // It returns 'null' if input contains less than 2 alphanumeric characters.
+  generateTokens(textInput: string): RegExpMatchArray | null {
     var tokenizedTextInput;
     // The default regexp select tokens of 2 or more alphanumeric
     // characters (punctuation is completely ignored and always treated
@@ -42,13 +43,6 @@ export class TextInputTokenizer {
     var tokenPattern = '\\b\\w\\w+\\b';
     var regexp = new RegExp(tokenPattern, 'g');
     tokenizedTextInput = textInput.match(regexp);
-    if (tokenizedTextInput === null) {
-      // We are not throwing an error because Tokens are being generated in
-      // TextInputPredictionService which should predict the same as oppia-ml.
-      // text_input_training_data is used and it contains input with less than
-      // two alphanumeric characters.
-      return [];
-    }
     return tokenizedTextInput;
   }
 }
