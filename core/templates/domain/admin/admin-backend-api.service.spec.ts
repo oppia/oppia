@@ -646,6 +646,67 @@ describe('Admin backend api service', () => {
   }
   ));
 
+  it('should return translation contribution stats given the username when ' +
+    'calling viewTranslationContributionStatsAsync', fakeAsync(() => {
+    const username = 'validUsername';
+    const result = {
+      translation_contribution_stats: [
+        {
+          language: 'English',
+          topic_name: 'Topic Name',
+          submitted_translations_count: 2,
+          submitted_translation_word_count: 50,
+          accepted_translations_count: 1,
+          accepted_translations_without_reviewer_edits_count: 1,
+          accepted_translation_word_count: 50,
+          rejected_translations_count: 1,
+          rejected_translation_word_count: 150,
+          contribution_months: ['May 2021', 'Jun 2021']
+        }
+      ]
+    };
+    abas.viewTranslationContributionStatsAsync(username)
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      '/gettranslationcontributionstatshandler' +
+      '?username=' + username);
+    expect(req.request.method).toEqual('GET');
+
+    req.flush(result, {
+      status: 200, statusText: 'Success.'
+    });
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(result);
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  fit('should fail to get translation contribution stats for invalid username' +
+    ' when calling viewTranslationContributionStatsAsync', fakeAsync(() => {
+    const username = 'InvalidUsername';
+    abas.viewTranslationContributionStatsAsync(username)
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      '/gettranslationcontributionstatshandler' +
+      '?username=' + username);
+    expect(req.request.method).toEqual('GET');
+
+    const errorMessage = 'Invalid username: ' + username;
+    req.flush({
+      error: errorMessage
+    }, {
+      status: 500, statusText: 'Internal Server Error'
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(errorMessage);
+  }
+  ));
+
   // Test cases for Admin Misc Tab.
   it('should clear search index when calling clearSearchIndexAsync',
     fakeAsync(() => {
