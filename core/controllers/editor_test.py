@@ -2587,7 +2587,7 @@ class EditorAutosaveTest(BaseEditorControllerTests):
         self.assertTrue(response['is_version_of_draft_valid'])
         self.assertEqual(response['draft_change_list_id'], 2)
 
-    def test_draft_does_not_updated_version_invalid(self):
+    def test_draft_not_updated_because_version_invalid(self):
         payload = {
             'change_list': self.NEW_CHANGELIST,
             'version': 10,

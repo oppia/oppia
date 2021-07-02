@@ -32,6 +32,7 @@ import { ParamChangeBackendDict } from './ParamChangeObjectFactory';
 import { ParamSpecBackendDict } from './ParamSpecObjectFactory';
 import { RecordedVoiceOverBackendDict } from './recorded-voiceovers.model';
 import { WrittenTranslationsBackendDict } from './WrittenTranslationsObjectFactory';
+import constants from 'assets/constants';
 
 interface LostChangeValues {
   'outcome'?: Outcome;
@@ -187,6 +188,17 @@ export class LostChange {
       }
     }
     return result;
+  }
+
+  getLanguage(languageCode: string): string {
+    let language = '';
+    let supportedLanguages = constants.SUPPORTED_CONTENT_LANGUAGES;
+    for (let i = 0; i < supportedLanguages.length; i++) {
+      if (languageCode === supportedLanguages[i].code) {
+        language = supportedLanguages[i].description;
+      }
+    }
+    return language;
   }
 }
 
