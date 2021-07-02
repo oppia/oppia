@@ -1094,8 +1094,8 @@ class Story(python_utils.OBJECT):
             feconf.ENTITY_TYPE_STORY, self.id))
         filename_prefix = 'thumbnail'
         filepath = '%s/%s' % (filename_prefix, self.thumbnail_filename)
-        if fs.isfile(filepath):
-            self.thumbnail_size_in_bytes = len(fs.get(filepath))
+        self.thumbnail_size_in_bytes = (
+            len(fs.get(filepath)) if fs.isfile(filepath) else None)
 
     def update_thumbnail_bg_color(self, thumbnail_bg_color):
         """Updates the thumbnail background color of the story.

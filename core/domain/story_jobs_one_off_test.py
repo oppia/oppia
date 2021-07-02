@@ -251,3 +251,47 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         for x in output:
             self.assertRegexpMatches(
                 x, 'Expected description to be a string, received 123')
+
+
+class UpdateStoryThumbnailSizeOneOffJobTests(test_utils.GenericTestBase):
+  
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    STORY_ID = 'story_id'
+    
+    def setUp(self):
+        super(UpdateStoryThumbnailSizeOneOffJobTests, self).setUp()
+        
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.TOPIC_ID = topic_fetchers.get_new_topic_id()
+        self.story_id_1 = 'story_id_1'
+        self.save_new_topic(
+            self.TOPIC_ID, self.albert_id, name='Name',
+            description='Description',
+            canonical_story_ids=[self.story_id_1]
+        )
+        self.process_and_flush_pending_mapreduce_tasks()
+    
+    def test_thumbnail_size_job_thumbnail_size_is_present(self):
+        self.save_new_story_with_story_contents_schema_v1(
+            self.STORY_ID, 'image.svg', '#F8BF74', self.albert_id, 21131,
+            'A title', 'A description', 'A note', self.TOPIC_ID)
+        topic_services.add_canonical_story(
+            self.albert_id, self.TOPIC_ID, self.STORY_ID)
+        story_model = (
+            story_models.StoryModel.get(self.STORY_ID))
+        self.assertEqual(
+            story_model.story_contents.thumbnail_size_in_bytes, 21131)
+    
+    def test_thumbnail_size_job_thumbnail_size_is_not_present(self):
+        self.save_new_story_with_story_contents_schema_v1(
+            self.STORY_ID, 'image.svg', '#F8BF74', self.albert_id,
+            'A title', 'A description', 'A note', self.TOPIC_ID)
+        topic_services.add_canonical_story(
+            self.albert_id, self.TOPIC_ID, self.STORY_ID)
+        story_model = (
+            story_models.StoryModel.get(self.STORY_ID))
+        self.assertEqual(
+            story_model.story_contents.thumbnail_size_in_bytes, None)

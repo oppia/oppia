@@ -115,9 +115,9 @@ class UpdateStoryThumbnailSizeOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         story = story_fetchers.get_story_by_id(item.id)
 
         try:
-            # We are not updating thumbnail_filename here, but using it call the
-            # update for story thumbnail_size_in_bytes.
-            # old_value and new_value are same here, because the update for
+            # We are not updating thumbnail_filename here, but using it to call
+            # the update for the story thumbnail_size_in_bytes.
+            # old_value and new_value are the same here because the update for
             # thumbnail_size_in_bytes is called from within the code for
             # updating thumbnail_filename in story_services.py file.
             commit_cmds = [story_domain.StoryChange({
