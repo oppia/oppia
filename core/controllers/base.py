@@ -151,10 +151,13 @@ class BaseHandler(webapp2.RequestHandler):
 
     # This list only includes those args which do not need schema validation.
     # Reason behind adding every argument is given below.
-    # csrf_token: csrf_token is already going to be validated by
+    # csrf_token: 'csrf_token' is already going to be validated by
     #     is_csrf_token_valid method, so no need to validate its schema again.
-    # source: source contains the parent url from which the request is made,
-    #     thus no need to validate url by schema validation.
+    # source: 'source' contains the parent url from which the request is made.
+    #     For example, from '/create/' url we are making a request to
+    #     '/createhandler/rights/' url, thus /create/ is a parent url. Since,
+    #     the arg is provided by webapp2 it is need not to be validated by
+    #     schema validation architecture.
     ARGS_WHICH_DO_NOT_NEED_SCHEMA_VALIDATION = ['csrf_token', 'source']
 
     def __init__(self, request, response):  # pylint: disable=super-init-not-called
