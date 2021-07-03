@@ -33,7 +33,7 @@ module.exports = {
     }
   },
   create: function(context) {
-    var selector = 'MemberExpression[property.name=innerHTML]'
+    var selector = 'MemberExpression[property.name=innerHTML]';
     return {
       [selector]: function(node) {
         context.report({
