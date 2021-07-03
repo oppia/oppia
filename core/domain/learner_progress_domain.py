@@ -32,6 +32,7 @@ class LearnerProgress(python_utils.OBJECT):
             completed_collection_summaries, completed_story_summaries,
             learnt_topic_summaries, topics_to_learn_summaries,
             exploration_playlist, collection_playlist,
+            all_topic_summaries, new_topic_summaries,
             completed_to_incomplete_collection_titles,
             completed_to_incomplete_story_titles,
             learnt_to_partially_learnt_topic_titles):
@@ -60,6 +61,10 @@ class LearnerProgress(python_utils.OBJECT):
                 explorations in the learner playlist.
             collection_playlist: list(CollectionSummary). The summaries of the
                 collections in the learner playlist.
+            all_topic_summaries: list(TopicSummary). The summaries of the topics
+                in the edit goals.
+            new_topic_summaries: list(TopicSummary). The summaries of the topics
+                not tracked for the user.
             completed_to_incomplete_collection_titles: list(CollectionSummary).
                 The summaries corresponding to those collections which have
                 been moved to the in progress section on account of new
@@ -83,6 +88,8 @@ class LearnerProgress(python_utils.OBJECT):
         self.topics_to_learn_summaries = topics_to_learn_summaries
         self.exploration_playlist_summaries = exploration_playlist
         self.collection_playlist_summaries = collection_playlist
+        self.all_topic_summaries = all_topic_summaries
+        self.new_topic_summaries = new_topic_summaries
         self.completed_to_incomplete_collections = (
             completed_to_incomplete_collection_titles)
         self.completed_to_incomplete_stories = (
@@ -93,15 +100,15 @@ class LearnerProgress(python_utils.OBJECT):
 
 class ActivityIdsInLearnerDashboard(python_utils.OBJECT):
     """Domain object for ids of the activities completed, currently being
-    completed or in the playlist of the user.
+    completed, in the playlist or goals of the user.
     """
 
     def __init__(
             self, completed_exploration_ids, completed_collection_ids,
             completed_story_ids, learnt_topic_ids,
             incomplete_exploration_ids, incomplete_collection_ids,
-            partially_learnt_topic_ids, topic_ids_to_learn,
-            exploration_playlist_ids, collection_playlist_ids):
+            partially_learnt_topic_ids, topic_ids_to_learn, all_topic_ids,
+            new_topic_ids, exploration_playlist_ids, collection_playlist_ids):
         """Constructs a ActivityIdsInLearnerDashboard domain object.
 
         Args:
@@ -120,6 +127,8 @@ class ActivityIdsInLearnerDashboard(python_utils.OBJECT):
             partially_learnt_topic_ids: list(str). The ids of the topics
                 partially learnt.
             topic_ids_to_learn: list(str). The ids of the topics to learn.
+            all_topic_ids: list(str). The ids of the all the topics.
+            new_topic_ids: list(str). The ids of the new topics.
             exploration_playlist_ids: list(str). The ids of the explorations
                 in the playlist of the user.
             collection_playlist_ids: list(str). The ids of the collections
@@ -133,6 +142,8 @@ class ActivityIdsInLearnerDashboard(python_utils.OBJECT):
         self.incomplete_collection_ids = incomplete_collection_ids
         self.partially_learnt_topic_ids = partially_learnt_topic_ids
         self.topic_ids_to_learn = topic_ids_to_learn
+        self.all_topic_ids = all_topic_ids
+        self.new_topic_ids = new_topic_ids
         self.exploration_playlist_ids = exploration_playlist_ids
         self.collection_playlist_ids = collection_playlist_ids
 
@@ -157,6 +168,8 @@ class ActivityIdsInLearnerDashboard(python_utils.OBJECT):
                     topics that are partially learnt.
                 'topic_ids_to_learn': list(str). The ids of the topics
                     to learn.
+                'all_topic_ids': list(str). The ids of all the topics.
+                'new_topic_ids': list(str). The ids of the new topics.
                 'exploration_playlist_ids': list(str). The ids of the
                     explorations that are in the playlist
                 'collection_playlist_ids': list(str). The ids of the
@@ -172,6 +185,8 @@ class ActivityIdsInLearnerDashboard(python_utils.OBJECT):
             'incomplete_collection_ids': self.incomplete_collection_ids,
             'partially_learnt_topic_ids': self.partially_learnt_topic_ids,
             'topic_ids_to_learn': self.topic_ids_to_learn,
+            'all_topic_ids': self.all_topic_ids,
+            'new_topic_ids': self.new_topic_ids,
             'exploration_playlist_ids': self.exploration_playlist_ids,
             'collection_playlist_ids': self.collection_playlist_ids,
         }

@@ -22,10 +22,13 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import copy
 
 from core.domain import caching_services
+from core.domain import classroom_services
+from core.domain import story_fetchers
 from core.domain import topic_domain
 from core.platform import models
 import feconf
 import python_utils
+import utils
 
 (skill_models, topic_models,) = models.Registry.import_models([
     models.NAMES.skill, models.NAMES.topic])
@@ -455,3 +458,42 @@ def get_all_topic_rights():
         rights = get_topic_rights_from_model(model)
         topic_rights[rights.id] = rights
     return topic_rights
+
+
+def get_canonical_story_dicts(user_id, topic):
+    """Returns a list of canonical story dicts in the topic.
+
+    Args:
+        user_id: str. The ID of the user.
+        topic: Topic. The topic domain object.
+
+    Returns:
+        list(dict). A list of canonical story dicts in the given topic.
+    """
+    canonical_story_ids = topic.get_canonical_story_ids(
+        include_only_published=True)
+    canonical_story_summaries = [
+        story_fetchers.get_story_summary_by_id(
+            canonical_story_id) for canonical_story_id
+        in canonical_story_ids]
+    canonical_story_dicts = []
+    for story_summary in canonical_story_summaries:
+        all_nodes = story_fetchers.get_pending_and_all_nodes_in_story(
+            user_id, story_summary.id)['all_nodes']
+        pending_nodes = story_fetchers.get_pending_and_all_nodes_in_story(
+            user_id, story_summary.id)['pending_nodes']
+        pending_node_titles = [node.title for node in pending_nodes]
+        completed_node_titles = utils.compute_list_difference(
+            story_summary.node_titles, pending_node_titles)
+        story_summary_dict = story_summary.to_human_readable_dict()
+        story_summary_dict['topic_url_fragment'] = topic.url_fragment
+        story_summary_dict['classroom_url_fragment'] = (
+            classroom_services.get_classroom_url_fragment_for_topic_id(
+                topic.id))
+        story_summary_dict['story_is_published'] = True
+        story_summary_dict['completed_node_titles'] = completed_node_titles
+        story_summary_dict['all_node_dicts'] = [
+            node.to_dict() for node in all_nodes]
+        canonical_story_dicts.append(story_summary_dict)
+
+    return canonical_story_dicts
