@@ -44,7 +44,6 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { StorySummary } from 'domain/story/story-summary.model';
 import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
 
-
 @Component({
   selector: 'oppia-learner-dashboard-page',
   templateUrl: './learner-dashboard-page.component.html',
@@ -117,17 +116,27 @@ export class LearnerDashboardPageComponent implements OnInit {
   completedCollectionsList: CollectionSummary[];
   completedStoriesList: StorySummary[];
   partiallyLearntTopicsList: LearnerTopicSummary[];
+  learntTopics: LearnerTopicSummary[];
   incompleteExplorationsList: LearnerExplorationSummary[];
   incompleteCollectionsList: CollectionSummary[];
+  partiallyLearntTopics: LearnerTopicSummary[];
+  topicsToLearn: LearnerTopicSummary[];
+  allTopics: LearnerTopicSummary[];
+  newTopics: LearnerTopicSummary[];
   subscriptionsList: ProfileSummary[];
 
   numberNonexistentIncompleteExplorations: number;
   numberNonexistentIncompleteCollections: number;
+  numberNonexistentPartiallyLearntTopics: number;
   numberNonexistentCompletedExplorations: number;
   numberNonexistentCompletedCollections: number;
+  numberNonexistentCompletedStories: number;
+  numberNonexistentLearntTopics: number;
+  numberNonexistentTopicsToLearn: number;
   numberNonexistentExplorationsFromPlaylist: number;
   numberNonexistentCollectionsFromPlaylist: number;
   completedToIncompleteCollections: string[];
+  learntToPartiallyLearntTopics: string[];
   threadSummaries: FeedbackThreadSummary[];
   numberOfUnreadThreads: number;
   explorationPlaylist: LearnerExplorationSummary[];
@@ -214,10 +223,20 @@ export class LearnerDashboardPageComponent implements OnInit {
           responseData.completedStoriesList);
         this.partiallyLearntTopicsList = (
           responseData.partiallyLearntTopicsList);
+        this.learntTopics = (
+          responseData.learntTopicsList);
         this.incompleteExplorationsList = (
           responseData.incompleteExplorationsList);
         this.incompleteCollectionsList = (
           responseData.incompleteCollectionsList);
+        this.partiallyLearntTopics = (
+          responseData.partiallyLearntTopicsList);
+        this.topicsToLearn = (
+          responseData.topicsToLearnList);
+        this.newTopics = (
+          responseData.newTopicsList);
+        this.allTopics = (
+          responseData.allTopicsList);
         this.subscriptionsList = responseData.subscriptionList;
         this.numberNonexistentIncompleteExplorations = (
           responseData.numberOfNonexistentActivities
@@ -234,6 +253,8 @@ export class LearnerDashboardPageComponent implements OnInit {
           responseData.numberOfNonexistentActivities.collectionPlaylist);
         this.completedToIncompleteCollections = (
           responseData.completedToIncompleteCollections);
+        this.learntToPartiallyLearntTopics = (
+          responseData.learntToPartiallyLearntTopics);
         this.threadSummaries = responseData.threadSummaries;
         this.numberOfUnreadThreads =
           responseData.numberOfUnreadThreads;

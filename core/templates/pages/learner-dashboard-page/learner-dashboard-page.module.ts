@@ -26,6 +26,7 @@ import { SharedComponentsModule } from 'components/shared-component.module';
 
 import { LearnerStorySummaryTileComponent } from 'components/summary-tile/learner-story-summary-tile.component';
 import { ProgressTabComponent } from './new-learner-dashboard/progress-tab.component';
+import { GoalsTabComponent } from './new-learner-dashboard-page/goals-tab.component';
 import { CommunityLessonsTabComponent } from './new-learner-dashboard/community-lessons-tab.component';
 import { LearnerDashboardPageComponent } from './learner-dashboard-page.component';
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
@@ -44,6 +45,7 @@ import { LearnerDashboardSuggestionModalComponent } from './suggestion-modal/lea
     LearnerDashboardPageComponent,
     LearnerStorySummaryTileComponent,
     ProgressTabComponent,
+    GoalsTabComponent,
     CommunityLessonsTabComponent,
     RemoveActivityModalComponent,
     LearnerDashboardSuggestionModalComponent
@@ -53,6 +55,7 @@ import { LearnerDashboardSuggestionModalComponent } from './suggestion-modal/lea
     LearnerDashboardPageComponent,
     LearnerStorySummaryTileComponent,
     ProgressTabComponent,
+    GoalsTabComponent,
     CommunityLessonsTabComponent,
     RemoveActivityModalComponent,
     LearnerDashboardSuggestionModalComponent
