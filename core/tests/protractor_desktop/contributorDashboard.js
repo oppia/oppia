@@ -43,8 +43,8 @@ describe('Contributor dashboard page', function() {
     'Review Material 1'];
   const ADMIN_EMAIL = 'management@contributor.com';
   const USER_EMAILS = ['user0@contributor.com', 'user1@contributor.com'];
-  const CONTRIBUTOR_DASHBOARD_ADMIN_EMAIL = 'user@contributor.com';
-  const CONTRIBUTOR_DASHBOARD_ADMIN_USERNAME = 'user4321';
+  const QUESTION_ADMIN_EMAIL = 'user@contributor.com';
+  const QUESTION_ADMIN_USERNAME = 'user4321';
   const HINDI_LANGUAGE = 'Hindi';
   let contributorDashboardPage = null;
   let contributorDashboardTranslateTextTab = null;
@@ -68,12 +68,11 @@ describe('Contributor dashboard page', function() {
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     adminPage = new AdminPage.AdminPage();
     contributorDashboardAdminPage = (
-      ContributorDashboardAdminPage.ContributorDashboardAdminPage());
+      new ContributorDashboardAdminPage.ContributorDashboardAdminPage());
 
     await users.createUser(USER_EMAILS[0], 'user0');
     await users.createUser(USER_EMAILS[1], 'user1');
-    await users.createUser(
-      CONTRIBUTOR_DASHBOARD_ADMIN_EMAIL, CONTRIBUTOR_DASHBOARD_ADMIN_USERNAME);
+    await users.createUser(QUESTION_ADMIN_EMAIL, QUESTION_ADMIN_USERNAME);
 
     await users.createAndLoginAdminUser(ADMIN_EMAIL, 'management');
     await adminPage.editConfigProperty(
@@ -99,15 +98,7 @@ describe('Contributor dashboard page', function() {
       SKILL_DESCRIPTIONS[1], REVIEW_MATERIALS[1]);
 
     await adminPage.get();
-    await adminPage.updateRole(
-      CONTRIBUTOR_DASHBOARD_ADMIN_USERNAME, 'contributor dashboard admin');
-    await users.logout();
-
-    await users.login(CONTRIBUTOR_DASHBOARD_ADMIN_EMAIL);
-    await contributorDashboardAdminPage.get();
-    await contributorDashboardAdminPage.assignQuestionContributor('user0');
-    await contributorDashboardAdminPage.assignQuestionContributor('user1');
-    await contributorDashboardAdminPage.assignQuestionReviewer('user1');
+    await adminPage.updateRole(QUESTION_ADMIN_USERNAME, 'question admin');
     // Add topic to classroom to make it available for question contributions.
     await adminPage.editConfigProperty(
       'The details for each classroom page.',
@@ -118,6 +109,13 @@ describe('Contributor dashboard page', function() {
         elem = await elem.addItem('Unicode');
         await elem.setValue(TOPIC_ID);
       });
+    await users.logout();
+
+    await users.login(QUESTION_ADMIN_EMAIL);
+    await contributorDashboardAdminPage.get();
+    await contributorDashboardAdminPage.assignQuestionContributor('user0');
+    await contributorDashboardAdminPage.assignQuestionContributor('user1');
+    await contributorDashboardAdminPage.assignQuestionReviewer('user1');
     await users.logout();
   });
 
@@ -262,8 +260,10 @@ describe('Contributor dashboard page', function() {
 
 describe('Contributor dashboard admin page contribution rights form', () => {
   const HINDI_LANGUAGE = 'Hindi';
-  const CONTRIBUTOR_DASHBOARD_ADMIN_EMAIL = 'user@contributor.com';
-  const CONTRIBUTOR_DASHBOARD_ADMIN_USERNAME = 'user1234';
+  const QUESTION_ADMIN_EMAIL = 'user@contributor.com';
+  const QUESTION_ADMIN_USERNAME = 'user1234';
+  const TRANSLATION_ADMIN_EMAIL = 'user2@contributor.com';
+  const TRANSLATION_ADMIN_USERNAME = 'user12345';
 
   var adminPage = null;
   var contributorDashboardPage = null;
@@ -285,8 +285,9 @@ describe('Contributor dashboard admin page contribution rights form', () => {
       translationReviewerEmail, translationReviewerUsername);
     await users.createUser(voiceoverReviewerEmail, voiceoverReviewerUsername);
     await users.createUser(questionReviewerEmail, questionReviewerUsername);
-    await users.createUser(
-      CONTRIBUTOR_DASHBOARD_ADMIN_EMAIL, CONTRIBUTOR_DASHBOARD_ADMIN_USERNAME);
+    await users.createUser(QUESTION_ADMIN_EMAIL, QUESTION_ADMIN_USERNAME);
+    await users.createUser(TRANSLATION_ADMIN_EMAIL, TRANSLATION_ADMIN_USERNAME);
+
     await users.createAndLoginAdminUser(
       'primaryAdmin@adminTab.com', 'primary');
     await adminPage.editConfigProperty(
@@ -295,45 +296,30 @@ describe('Contributor dashboard admin page contribution rights form', () => {
         await elem.setValue(true);
       });
 
-    await adminPage.updateRole(
-      CONTRIBUTOR_DASHBOARD_ADMIN_USERNAME, 'contributor dashboard admin');
+    await adminPage.updateRole(QUESTION_ADMIN_USERNAME, 'question admin');
+    await adminPage.updateRole(TRANSLATION_ADMIN_USERNAME, 'translation admin');
     await users.logout();
   });
 
-  it('should allow admin to add translation reviewer', async function() {
-    await users.login(CONTRIBUTOR_DASHBOARD_ADMIN_EMAIL);
-    await contributorDashboardAdminPage.get();
-    await contributorDashboardAdminPage.assignTranslationReviewer(
-      translationReviewerUsername, HINDI_LANGUAGE);
-    await contributorDashboardAdminPage.expectUserToBeTranslationReviewer(
-      translationReviewerUsername, HINDI_LANGUAGE);
-    await users.logout();
+  it('should allow translation admin to add translation reviewer',
+    async function() {
+      await users.login(TRANSLATION_ADMIN_EMAIL);
+      await contributorDashboardAdminPage.get();
+      await contributorDashboardAdminPage.assignTranslationReviewer(
+        translationReviewerUsername, HINDI_LANGUAGE);
+      await contributorDashboardAdminPage.expectUserToBeTranslationReviewer(
+        translationReviewerUsername, HINDI_LANGUAGE);
+      await users.logout();
 
-    await users.login(translationReviewerEmail);
-    await contributorDashboardPage.get();
-    await contributorDashboardPage.expectUserToBeTranslationReviewer(
-      HINDI_LANGUAGE);
-    await users.logout();
-  });
-
-  it('should allow admin to add voiceover reviewer', async function() {
-    await users.login(CONTRIBUTOR_DASHBOARD_ADMIN_EMAIL);
-    await contributorDashboardAdminPage.get();
-    await contributorDashboardAdminPage.assignVoiceoverReviewer(
-      voiceoverReviewerUsername, HINDI_LANGUAGE);
-    await contributorDashboardAdminPage.expectUserToBeVoiceoverReviewer(
-      voiceoverReviewerUsername, HINDI_LANGUAGE);
-    await users.logout();
-
-    await users.login(voiceoverReviewerEmail);
-    await contributorDashboardPage.get();
-    await contributorDashboardPage.expectUserToBeVoiceoverReviewer(
-      HINDI_LANGUAGE);
-    await users.logout();
-  });
+      await users.login(translationReviewerEmail);
+      await contributorDashboardPage.get();
+      await contributorDashboardPage.expectUserToBeTranslationReviewer(
+        HINDI_LANGUAGE);
+      await users.logout();
+    });
 
   it('should allow admin to add question reviewer', async function() {
-    await users.login(CONTRIBUTOR_DASHBOARD_ADMIN_EMAIL);
+    await users.login(QUESTION_ADMIN_EMAIL);
     await contributorDashboardAdminPage.get();
     await contributorDashboardAdminPage.assignQuestionReviewer(
       questionReviewerUsername);
@@ -348,7 +334,7 @@ describe('Contributor dashboard admin page contribution rights form', () => {
   });
 
   it('should allow admin to add question contributor', async function() {
-    await users.login(CONTRIBUTOR_DASHBOARD_ADMIN_EMAIL);
+    await users.login(QUESTION_ADMIN_EMAIL);
     await contributorDashboardAdminPage.get();
     await contributorDashboardAdminPage.assignQuestionContributor(
       questionReviewerUsername);

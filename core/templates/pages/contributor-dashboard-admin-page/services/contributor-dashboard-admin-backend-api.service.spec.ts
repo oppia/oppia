@@ -52,11 +52,10 @@ describe('Contributor dashboard admin backend api service', () => {
 
   it('should add contribution rights to the user given the' +
     'name when calling addContributionReviewerAsync', fakeAsync(() => {
-    let category = 'voiceover';
+    let category = 'translation';
     let languageCode = 'en';
     let username = 'validUser';
     let payload = {
-      category: category,
       username: username,
       language_code: languageCode
     };
@@ -65,7 +64,7 @@ describe('Contributor dashboard admin backend api service', () => {
     ).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      '/addcontributionrightshandler');
+      '/addcontributionrightshandler/translation');
     expect(req.request.method).toEqual('POST');
     expect(req.request.body).toEqual(payload);
 
@@ -80,11 +79,10 @@ describe('Contributor dashboard admin backend api service', () => {
 
   it('should fail to add contribution rights to the user when user does' +
     'not exists when calling addContributionReviewerAsync', fakeAsync(() => {
-    let category = 'voiceover';
+    let category = 'translation';
     let languageCode = 'en';
     let username = 'InvalidUser';
     let payload = {
-      category: category,
       username: username,
       language_code: languageCode
     };
@@ -93,7 +91,7 @@ describe('Contributor dashboard admin backend api service', () => {
     ).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      '/addcontributionrightshandler');
+      '/addcontributionrightshandler/translation');
     expect(req.request.method).toEqual('POST');
     expect(req.request.body).toEqual(payload);
     req.flush(
@@ -108,7 +106,7 @@ describe('Contributor dashboard admin backend api service', () => {
 
   it('should get the data of contribution rights given the role' +
     'when calling viewContributionReviewersAsync', fakeAsync(() => {
-    let category = 'voiceover';
+    let category = 'translation';
     let languageCode = 'en';
     let result = ['validUsername'];
     cdabas.viewContributionReviewersAsync(
@@ -116,8 +114,7 @@ describe('Contributor dashboard admin backend api service', () => {
     ).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      '/getcontributorusershandler' +
-      '?category=voiceover&language_code=en');
+      '/getcontributorusershandler/translation?language_code=en');
     expect(req.request.method).toEqual('GET');
 
     req.flush(
@@ -136,8 +133,7 @@ describe('Contributor dashboard admin backend api service', () => {
     ).then(successHandler, failHandler);
 
     req = httpTestingController.expectOne(
-      '/getcontributorusershandler' +
-      '?category=question');
+      '/getcontributorusershandler/question');
     expect(req.request.method).toEqual('GET');
 
     req.flush(
@@ -158,8 +154,7 @@ describe('Contributor dashboard admin backend api service', () => {
     ).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      '/getcontributorusershandler' +
-      '?category=InvalidCategory&language_code=en');
+      '/getcontributorusershandler/InvalidCategory?language_code=en');
     expect(req.request.method).toEqual('GET');
 
     req.flush({
@@ -178,8 +173,6 @@ describe('Contributor dashboard admin backend api service', () => {
     let username = 'validUsername';
     let result = {
       can_review_questions: false,
-      can_review_translation_for_language_codes: ['en'],
-      can_review_voiceover_for_language_codes: [],
       can_submit_questions: false
     };
     cdabas.contributionReviewerRightsAsync(username)
@@ -192,8 +185,6 @@ describe('Contributor dashboard admin backend api service', () => {
 
     req.flush({
       can_review_questions: false,
-      can_review_translation_for_language_codes: ['en'],
-      can_review_voiceover_for_language_codes: [],
       can_submit_questions: false
     }, {
       status: 200, statusText: 'Success.'
@@ -227,24 +218,20 @@ describe('Contributor dashboard admin backend api service', () => {
       'User with given username does not exist.');
   }));
 
-  it('should remove all contribution rights given the username' +
+  it('should remove user contribution rights given the username' +
     'when calling emoveContributionReviewerAsync', fakeAsync(() => {
-    let category = 'voiceover';
+    let category = 'translation';
     let languageCode = null;
     let username = 'validUser';
-    let method = 'all';
     let payload = {
       username: username,
-      removal_type: method,
-      category: category,
       language_code: languageCode
     };
     cdabas.removeContributionReviewerAsync(
-      username, method, category, languageCode
-    ).then(successHandler, failHandler);
+      username, category, languageCode).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      '/removecontributionrightshandler');
+      '/removecontributionrightshandler/translation');
     expect(req.request.method).toEqual('PUT');
     expect(req.request.body).toEqual(payload);
     req.flush(
@@ -255,24 +242,20 @@ describe('Contributor dashboard admin backend api service', () => {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
-  it('should fail to remove all contribution rights when user does' +
+  it('should fail to remove user contribution rights when user does' +
     'not exists when calling removeContributionReviewerAsync', fakeAsync(() => {
-    let category = 'voiceover';
+    let category = 'translation';
     let languageCode = null;
     let username = 'InvalidUser';
-    let method = 'all';
     let payload = {
       username: username,
-      removal_type: method,
-      category: category,
       language_code: languageCode
     };
     cdabas.removeContributionReviewerAsync(
-      username, method, category, languageCode
-    ).then(successHandler, failHandler);
+      username, category, languageCode).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      '/removecontributionrightshandler');
+      '/removecontributionrightshandler/translation');
     expect(req.request.method).toEqual('PUT');
     expect(req.request.body).toEqual(payload);
 
@@ -290,22 +273,17 @@ describe('Contributor dashboard admin backend api service', () => {
 
   it('should remove specific contribution rights given the' +
     'username when calling removeContributionReviewerAsync', fakeAsync(() => {
-    let category = 'voiceover';
-    let languageCode = 'en';
+    let category = 'submit_question';
     let username = 'validUser';
-    let method = 'specific';
     let payload = {
       username: username,
-      removal_type: method,
-      category: category,
-      language_code: languageCode
+      language_code: null
     };
     cdabas.removeContributionReviewerAsync(
-      username, method, category, languageCode
-    ).then(successHandler, failHandler);
+      username, category, null).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      '/removecontributionrightshandler');
+      '/removecontributionrightshandler/submit_question');
     expect(req.request.method).toEqual('PUT');
     expect(req.request.body).toEqual(payload);
     req.flush(
@@ -314,38 +292,5 @@ describe('Contributor dashboard admin backend api service', () => {
 
     expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
-  }));
-
-  it('should fail to remove specific contribution rights when username does' +
-    'not exists when calling removeContributionReviewerAsync', fakeAsync(() => {
-    let category = 'voiceover';
-    let languageCode = 'en';
-    let username = 'InvalidUser';
-    let method = 'specific';
-    let payload = {
-      username: username,
-      removal_type: method,
-      category: category,
-      language_code: languageCode
-    };
-    cdabas.removeContributionReviewerAsync(
-      username, method, category, languageCode
-    ).then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne(
-      '/removecontributionrightshandler');
-    expect(req.request.method).toEqual('PUT');
-    expect(req.request.body).toEqual(payload);
-
-    req.flush({
-      error: 'User with given username does not exist.'
-    }, {
-      status: 500, statusText: 'Internal Server Error'
-    });
-    flushMicrotasks();
-
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith(
-      'User with given username does not exist.');
   }));
 });
