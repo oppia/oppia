@@ -27,6 +27,9 @@ from core.domain import html_cleaner
 import python_utils
 import utils
 
+# This is same as base_models.ID_Length.
+BLOG_POST_ID_LENGTH = 12
+
 
 class BlogPost(python_utils.OBJECT):
     """Domain object for an Oppia Blog Post."""
@@ -225,7 +228,7 @@ class BlogPost(python_utils.OBJECT):
         published_on = utils.convert_naive_datetime_to_string(
             self.published_on) if self.published_on else None
         last_updated = utils.convert_naive_datetime_to_string(
-            self.last_updated) if self.published_on else None
+            self.last_updated) if self.last_updated else None
         return {
             'id': self.id,
             'author_id': self.author_id,
@@ -239,29 +242,32 @@ class BlogPost(python_utils.OBJECT):
         }
 
     @classmethod
-    def from_dict(
-            cls, blog_post_dict, blog_post_published_on=None,
-            blog_post_last_updated=None):
+    def from_dict(cls, blog_post_dict):
         """Returns a blog post domain object from a dictionary.
 
         Args:
             blog_post_dict: dict. The dictionary representation of blog post
                 object.
-            blog_post_published_on: datetime.datetime. Date and time when the
-                blog post was last published.
-            blog_post_last_updated: datetime.datetime. Date and time when the
-                blog post was last updated.
 
         Returns:
             BlogPost. The corresponding blog post domain object.
         """
+
+        last_updated = (
+            utils.convert_string_to_naive_datetime_object(
+                blog_post_dict['last_updated'])
+            if blog_post_dict['last_updated'] else None)
+        published_on = (
+            utils.convert_string_to_naive_datetime_object(
+                blog_post_dict['published_on'])
+            if blog_post_dict['published_on'] else None)
         blog_post = cls(
             blog_post_dict['id'], blog_post_dict['author_id'],
             blog_post_dict['title'], blog_post_dict['content'],
             blog_post_dict['url_fragment'], blog_post_dict['tags'],
             blog_post_dict['thumbnail_filename'],
-            blog_post_last_updated,
-            blog_post_published_on)
+            last_updated,
+            published_on)
 
         return blog_post
 
@@ -309,6 +315,20 @@ class BlogPost(python_utils.OBJECT):
         """
         self.require_valid_tags(tags, True)
         self.tags = tags
+
+    @classmethod
+    def require_valid_blog_post_id(cls, blog_id):
+        """Checks whether the blog id is a valid one.
+
+        Args:
+            blog_id: str. The blog post id to validate.
+        """
+        if not isinstance(blog_id, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Blog Post ID should be a string, received: %s' % blog_id)
+
+        if len(blog_id) != BLOG_POST_ID_LENGTH:
+            raise utils.ValidationError('Blog ID %s is invalid' % blog_id)
 
 
 class BlogPostSummary(python_utils.OBJECT):
@@ -503,7 +523,7 @@ class BlogPostSummary(python_utils.OBJECT):
         published_on = utils.convert_naive_datetime_to_string(
             self.published_on) if self.published_on else None
         last_updated = utils.convert_naive_datetime_to_string(
-            self.last_updated) if self.published_on else None
+            self.last_updated) if self.last_updated else None
         return {
             'id': self.id,
             'author_id': self.author_id,

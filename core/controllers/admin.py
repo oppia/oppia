@@ -84,11 +84,15 @@ class AdminHandler(base.BaseHandler):
         feature_flag_dicts = feature_services.get_all_feature_flag_dicts()
 
         config_properties = config_domain.Registry.get_config_property_schemas()
-
         # Removes promo-bar related configs as promo-bar is handlded by
         # release coordinators in /release-coordinator page.
         del config_properties['promo_bar_enabled']
         del config_properties['promo_bar_message']
+
+        # Remove blog related configs as they will be handled by 'blog admins'
+        # on blog admin page.
+        del config_properties['max_number_of_tags_assigned_to_blog_post']
+        del config_properties['list_of_default_tags_for_blog_post']
 
         self.render_json({
             'config_properties': config_properties,
