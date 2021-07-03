@@ -25,7 +25,7 @@ module.exports = {
     docs: {
       description: (
         'Lint check to disallow $parent and $broadcast properties of angularJs'
-        ),
+      ),
       category: 'Best Practices',
       recommended: true,
     },
