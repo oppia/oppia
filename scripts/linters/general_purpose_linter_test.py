@@ -53,8 +53,6 @@ FILE_IN_EXCLUDED_PATH = os.path.join(
     'core', 'tests', 'build_sources', 'assets', 'constants.js')
 EXTRA_JS_FILEPATH = os.path.join('core', 'templates', 'demo.js')
 INVALID_INJECT_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_inject.ts')
-INVALID_INNER_HTML_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_innerhtml.ts')
 INVALID_RELATIVE_IMPORT_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_relative_import.js')
 INVALID_PARENT_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_parent.ts')
@@ -197,16 +195,6 @@ class JsTsLintTests(test_utils.LinterTestBase):
         self.assert_same_list_elements(
             ['Line 20: Please, don\'t use relative imports in require().'],
             lint_task_report.trimmed_messages)
-        self.assertEqual('Bad pattern', lint_task_report.name)
-        self.assertTrue(lint_task_report.failed)
-
-    def test_invalid_use_of_inner_html(self):
-        linter = general_purpose_linter.GeneralPurposeLinter(
-            [INVALID_INNER_HTML_FILEPATH], FILE_CACHE)
-        lint_task_report = linter.check_bad_patterns()
-        self.assert_same_list_elements(
-            ['Line 27: Please do not use innerHTML property.'
-            ], lint_task_report.trimmed_messages)
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
