@@ -20,8 +20,12 @@
 export interface NonExistentActivitiesBackendDict {
   'incomplete_explorations': number;
   'incomplete_collections': number;
+  'partially_learnt_topics': number;
   'completed_explorations': number;
   'completed_collections': number;
+  'completed_stories': number;
+  'learnt_topics': number;
+  'topics_to_learn': number;
   'exploration_playlist': number;
   'collection_playlist': number;
 }
@@ -30,8 +34,12 @@ export class NonExistentActivities {
   constructor(
     public incompleteExplorations: number,
     public incompleteCollections: number,
+    public partiallyLearntTopics: number,
     public completedExplorations: number,
     public completedCollections: number,
+    public completedStories: number,
+    public learntTopics: number,
+    public topicsToLearn: number,
     public explorationPlaylist: number,
     public collectionPlaylist: number) { }
 
@@ -40,8 +48,12 @@ export class NonExistentActivities {
     return new NonExistentActivities(
       backendDict.incomplete_explorations,
       backendDict.incomplete_collections,
+      backendDict.partially_learnt_topics,
       backendDict.completed_explorations,
       backendDict.completed_collections,
+      backendDict.completed_stories,
+      backendDict.learnt_topics,
+      backendDict.topics_to_learn,
       backendDict.exploration_playlist,
       backendDict.collection_playlist);
   }

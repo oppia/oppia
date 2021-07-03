@@ -24,19 +24,27 @@ describe('Non existent activities model', () => {
     let backendDict = {
       incomplete_explorations: 1,
       incomplete_collections: 2,
-      completed_explorations: 3,
-      completed_collections: 4,
-      exploration_playlist: 5,
-      collection_playlist: 6
+      partially_learnt_topics: 3,
+      completed_explorations: 4,
+      completed_collections: 5,
+      completed_stories: 6,
+      learnt_topics: 7,
+      topics_to_learn: 8,
+      exploration_playlist: 9,
+      collection_playlist: 10
     };
 
     let object = NonExistentActivities.createFromBackendDict(backendDict);
 
     expect(object.incompleteExplorations).toEqual(1);
     expect(object.incompleteCollections).toEqual(2);
-    expect(object.completedExplorations).toEqual(3);
-    expect(object.completedCollections).toEqual(4);
-    expect(object.explorationPlaylist).toEqual(5);
-    expect(object.collectionPlaylist).toEqual(6);
+    expect(object.partiallyLearntTopics).toEqual(3);
+    expect(object.completedExplorations).toEqual(4);
+    expect(object.completedCollections).toEqual(5);
+    expect(object.completedStories).toEqual(6);
+    expect(object.learntTopics).toEqual(7);
+    expect(object.topicsToLearn).toEqual(8);
+    expect(object.explorationPlaylist).toEqual(9);
+    expect(object.collectionPlaylist).toEqual(10);
   });
 });

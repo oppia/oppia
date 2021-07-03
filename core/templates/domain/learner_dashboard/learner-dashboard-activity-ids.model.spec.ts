@@ -35,7 +35,9 @@ describe('Learner dashboard activity ids model', () => {
       learnt_topic_ids: ['12', '13'],
       exploration_playlist_ids: ['14', '15'],
       collection_playlist_ids: ['16', '17'],
-      topic_ids_to_learn: ['18', '19']
+      topic_ids_to_learn: ['18', '19'],
+      all_topic_ids: ['20', '21'],
+      new_topic_ids: ['22', '23']
     };
   });
 
@@ -49,9 +51,9 @@ describe('Learner dashboard activity ids model', () => {
     expect(learnerDashboardActivityIds.includesActivity('1')).toEqual(true);
     expect(learnerDashboardActivityIds.includesActivity('8')).toEqual(true);
 
-    expect(learnerDashboardActivityIds.includesActivity('21')).toEqual(false);
-    expect(learnerDashboardActivityIds.includesActivity('22')).toEqual(false);
-    expect(learnerDashboardActivityIds.includesActivity('23')).toEqual(false);
+    expect(learnerDashboardActivityIds.includesActivity('24')).toEqual(false);
+    expect(learnerDashboardActivityIds.includesActivity('25')).toEqual(false);
+    expect(learnerDashboardActivityIds.includesActivity('26')).toEqual(false);
   });
 
 
@@ -81,20 +83,6 @@ describe('Learner dashboard activity ids model', () => {
     learnerDashboardActivityIds.addToCollectionLearnerPlaylist('13');
     expect(learnerDashboardActivityIds.collectionPlaylistIds).toEqual(
       ['16', '17', '12', '13']);
-  });
-
-  it('should add topic to learn', () => {
-    var learnerDashboardActivityIds = (
-      LearnerDashboardActivityIds.createFromBackendDict(
-        learnerDashboardActivityIdsDict));
-
-    learnerDashboardActivityIds.addToTopicLearn('12');
-    expect(learnerDashboardActivityIds.topicIdsToLearn).toEqual(
-      ['18', '19', '12']);
-
-    learnerDashboardActivityIds.addToTopicLearn('13');
-    expect(learnerDashboardActivityIds.topicIdsToLearn).toEqual(
-      ['18', '19', '12', '13']);
   });
 
   it('should remove exploration from learner playlist', () => {

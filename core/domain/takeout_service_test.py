@@ -89,7 +89,7 @@ class TakeoutServiceProfileUserUnitTests(test_utils.GenericTestBase):
         1) Simulates skill mastery of user_1 and profile_1.
         2) Simulates completion of some activities of user_1 and profile_1.
         3) Simulates incomplete status of some activities.
-        4) Creates user LearnerGoals.
+        4) Creates user LearnerGoalsModel.
         5) Populates ExpUserLastPlaythroughModel of user.
         6) Creates user LearnerPlaylsts.
         7) Simulates collection progress of user.
@@ -385,7 +385,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         5) Creates an ExplorationUserDataModel.
         6) Simulates completion of some activities.
         7) Simulates incomplete status of some activities.
-        8) Creates user LearnerGoals.
+        8) Creates user LearnerGoalsModel.
         9) Populates ExpUserLastPlaythroughModel of user.
         10) Creates user LearnerPlaylsts.
         11) Simulates collection progress of user.

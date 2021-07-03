@@ -83,6 +83,7 @@ describe('Story summary model', () => {
         thumbnail_bg_color: '#a33f40'
       })
     ]);
+    expect(_sampleStorySummary.getCompletedNodeTitles()).toEqual(['Chapter 1']);
     expect(_sampleStorySummary.getTopicUrlFragment()).toEqual('topic-one');
     expect(_sampleStorySummary.getClassroomUrlFragment()).toEqual('math');
   });

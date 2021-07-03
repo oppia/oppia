@@ -160,6 +160,67 @@ describe('Learner playlist Backend Api service ', () => {
     expect(alertsService.addSuccessMessage).not.toHaveBeenCalled();
   }));
 
+  it('should successfully add topic to learn list of learner goals',
+    fakeAsync(() => {
+      let response = {
+        belongs_to_learnt_list: false,
+        goals_limit_exceeded: false
+      };
+      let activityType = 'learntopic';
+      learnerDashboardActivityBackendApiService.addToLearnerGoals(
+        activityId, activityType);
+      let req = http.expectOne(
+        '/learnergoalshandler/learntopic/1');
+      expect(req.request.method).toEqual('POST');
+      req.flush(response);
+
+      flushMicrotasks();
+      expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
+        'Successfully added to your \'Current Goals\' list.');
+      expect(alertsService.addInfoMessage).not.toHaveBeenCalled();
+    }));
+
+  it('should not add topic to learn list of learner goals ' +
+    'and show belongs to learnt list', fakeAsync(() => {
+    let response = {
+      belongs_to_learnt_list: true,
+      playlist_limit_exceeded: false
+    };
+    let activityType = 'learntopic';
+    learnerDashboardActivityBackendApiService.addToLearnerGoals(
+      activityId, activityType);
+    let req = http.expectOne(
+      '/learnergoalshandler/learntopic/1');
+    expect(req.request.method).toEqual('POST');
+    req.flush(response);
+
+    flushMicrotasks();
+    expect(alertsService.addInfoMessage).toHaveBeenCalledWith(
+      'You have already learnt this activity.');
+    expect(alertsService.addSuccessMessage).not.toHaveBeenCalled();
+  }));
+
+  it('should not add topic to learn list of learner goals ' +
+    'and show goals limit exceeded', fakeAsync(() => {
+    let response = {
+      belongs_to_learnt_list: false,
+      goals_limit_exceeded: true
+    };
+    let activityType = 'learntopic';
+    learnerDashboardActivityBackendApiService.addToLearnerGoals(
+      activityId, activityType);
+    let req = http.expectOne(
+      '/learnergoalshandler/learntopic/1');
+    expect(req.request.method).toEqual('POST');
+    req.flush(response);
+
+    flushMicrotasks();
+    expect(alertsService.addInfoMessage).toHaveBeenCalledWith(
+      'Your \'Current Goals\' list is full! Please finish existing ' +
+      'goals or remove some to add new goals to your list.');
+    expect(alertsService.addSuccessMessage).not.toHaveBeenCalled();
+  }));
+
   it('should open an ngbModal when removing from learner playlist' +
     ' when calling removeFromLearnerPlaylistModal', () => {
     let learnerDashboardActivityIds = LearnerDashboardActivityIds
@@ -173,7 +234,9 @@ describe('Learner playlist Backend Api service ', () => {
         completed_story_ids: [],
         learnt_topic_ids: [],
         partially_learnt_topic_ids: [],
-        topic_ids_to_learn: []
+        topic_ids_to_learn: [],
+        all_topic_ids: [],
+        new_topic_ids: []
       });
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
       setTimeout(opt.beforeDismiss);
@@ -208,7 +271,9 @@ describe('Learner playlist Backend Api service ', () => {
         completed_story_ids: [],
         learnt_topic_ids: [],
         partially_learnt_topic_ids: [],
-        topic_ids_to_learn: []
+        topic_ids_to_learn: [],
+        all_topic_ids: [],
+        new_topic_ids: []
       });
 
     learnerDashboardActivityBackendApiService.removeFromLearnerPlaylistModal(
@@ -241,7 +306,9 @@ describe('Learner playlist Backend Api service ', () => {
         completed_story_ids: [],
         learnt_topic_ids: [],
         partially_learnt_topic_ids: [],
-        topic_ids_to_learn: []
+        topic_ids_to_learn: [],
+        all_topic_ids: [],
+        new_topic_ids: []
       });
 
     learnerDashboardActivityBackendApiService.removeFromLearnerPlaylistModal(
@@ -275,7 +342,9 @@ describe('Learner playlist Backend Api service ', () => {
         completed_story_ids: [],
         learnt_topic_ids: [],
         partially_learnt_topic_ids: [],
-        topic_ids_to_learn: []
+        topic_ids_to_learn: [],
+        all_topic_ids: [],
+        new_topic_ids: []
       });
 
     learnerDashboardActivityBackendApiService.removeFromLearnerPlaylistModal(
