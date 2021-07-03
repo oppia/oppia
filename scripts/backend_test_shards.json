@@ -203,7 +203,6 @@
         "core.domain.learner_playlist_services_test",
         "core.domain.state_domain_test",
         "core.domain.activity_services_test",
-        "core.domain.wipeout_jobs_one_off_test",
         "core.domain.question_services_test",
         "core.domain.learner_progress_services_test",
         "core.domain.recommendations_jobs_one_off_test",
