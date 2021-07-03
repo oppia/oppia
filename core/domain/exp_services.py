@@ -251,8 +251,8 @@ def get_story_id_linked_to_exploration(exp_id):
         str|None. The ID of the story if the exploration is linked to some
         story, otherwise None.
     """
-    exploration_context_model = exp_models.ExplorationContextModel.get_by_id(
-        exp_id)
+    exploration_context_model = exp_models.ExplorationContextModel.get(
+        exp_id, strict=False)
     if exploration_context_model is not None:
         return exploration_context_model.story_id
     return None
@@ -1708,6 +1708,516 @@ def is_voiceover_change_list(change_list):
                 exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
             return False
     return True
+
+
+def get_composite_change_list(exp_id, frontend_version, backend_version):
+    """Returns a list of ExplorationChange domain objects consisting of
+    changes from frontend_version to backend_version in an exploration.
+
+    Args:
+        exp_id: str. The id of the exploration.
+        frontend_version: int. The version of the exploration on which the user
+            is working.
+        backend_version: int. The latest version of the exploration from the
+            backend.
+
+    Returns:
+        list(ExplorationChange). List of ExplorationChange domain objects
+        consisting of changes from frontend_version to backend_version.
+    """
+    if frontend_version > backend_version:
+        raise Exception(
+            'Unexpected error: Trying to find change list from version %s '
+            'of exploration to version %s. Please reload and try again.'
+            % (frontend_version, backend_version))
+
+    snapshots_metadata = get_exploration_snapshots_metadata(exp_id)
+    composite_change_list_dict = []
+    for i in python_utils.RANGE(frontend_version, backend_version):
+        composite_change_list_dict += snapshots_metadata[i]['commit_cmds']
+
+    composite_change_list = [
+        exp_domain.ExplorationChange(change)
+        for change in composite_change_list_dict]
+
+    return composite_change_list
+
+
+def are_changes_mergeable(exp_id, frontend_version, change_list):
+    """Checks whether the change list can be merged when the
+    frontend version is not equal to the latest backend version.
+
+    Args:
+        exp_id: str. The id of the exploration where the change_list is to
+            be applied.
+        frontend_version: int. Version of an exploration from frontend on
+            which a user is working.
+        change_list: list(ExplorationChange). List of the changes made by the
+            user on the frontend, which needs to be checked for mergeability.
+
+    Returns:
+        boolean. Whether the changes are mergeable.
+    """
+
+    backend_version_exploration = exp_fetchers.get_exploration_by_id(exp_id)
+    if backend_version_exploration.version == frontend_version:
+        return True
+    elif backend_version_exploration.version < frontend_version:
+        return False
+    else:
+        # A complete list of changes from one version to another
+        # is composite_change_list.
+        composite_change_list = get_composite_change_list(
+            exp_id, frontend_version,
+            backend_version_exploration.version)
+
+        # Added_state_names: list(str). Names of the states added to the
+        # exploration from prev_exp_version to current_exp_version. It
+        # stores the latest name of the added state.
+        added_state_names = []
+
+        # Deleted_state_names: list(str). Names of the states deleted from
+        # the exploration from prev_exp_version to current_exp_version.
+        # It stores the initial name of the deleted state from
+        # pre_exp_version.
+        deleted_state_names = []
+
+        # New_to_old_state_names: dict. Dictionary mapping state names of
+        # current_exp_version to the state names of prev_exp_version.
+        # It doesn't include the name changes of added/deleted states.
+        new_to_old_state_names = {}
+
+        # Changed_properties: dict. List of all the properties changed
+        # according to the state and property name.
+        changed_properties = {}
+
+        # Changed_translations: dict. List of all the translations changed
+        # according to the state and content_id name.
+        changed_translations = {}
+
+        # NOTE: List properties_related_to_cust_args,
+        # properties_related_to_answer_groups, and
+        # properties_related_to_solution should remain separate lists
+        # irrespective of its content. This is because they are for
+        # different unique properties so if in the future any new
+        # property is added which is affected by that unique property
+        # only then in that case we'll add that property name in the
+        # list of that unique property only. Therefore we can not keep
+        # a common list.
+
+        # properties_related_to_cust_args: List of the properties
+        # related (affected by or affecting) customization args. This list
+        # can be changed when any new property is added or deleted which
+        # affects or is affected by customization args.
+        properties_related_to_cust_args = ['solution', 'recorded_voiceovers',
+                                           'answer_groups',
+                                           'widget_customization_args']
+
+        # properties_related_to_answer_groups: List of the properties
+        # related (affected by or affecting) answer groups. This list
+        # can be changed when any new property is added or deleted which
+        # affects or is affected by answer groups.
+        properties_related_to_answer_groups = ['solution',
+                                               'recorded_voiceovers',
+                                               'answer_groups',
+                                               'widget_customization_args']
+
+        # properties_related_to_solution: List of the properties
+        # related (affected by or affecting) solution. This list
+        # can be changed when any new property is added or deleted which
+        # affects or is affected by solution.
+        properties_related_to_solution = ['solution', 'answer_groups',
+                                          'recorded_voiceovers',
+                                          'widget_customization_args']
+
+        # properties_related_to_voiceovers: List of the properties
+        # related (affected by or affecting) voiceovers. This list
+        # can be changed when any new property is added or deleted which
+        # affects or is affected by voiceovers.
+        properties_related_to_voiceovers = ['content', 'solution',
+                                            'hints',
+                                            'written_translations',
+                                            'answer_group',
+                                            'default_outcome',
+                                            'widget_customization_args',
+                                            'recorded_voiceovers']
+        frontend_version_exploration = exp_fetchers.get_exploration_by_id(
+            exp_id, version=frontend_version)
+        for change in composite_change_list:
+            if change.cmd == exp_domain.CMD_ADD_STATE:
+                added_state_names.append(change.state_name)
+            elif change.cmd == exp_domain.CMD_DELETE_STATE:
+                state_name = change.state_name
+                if state_name in added_state_names:
+                    added_state_names.remove(state_name)
+                else:
+                    original_state_name = state_name
+                    if original_state_name in new_to_old_state_names:
+                        original_state_name = new_to_old_state_names.pop(
+                            original_state_name)
+                    deleted_state_names.append(original_state_name)
+            elif change.cmd == exp_domain.CMD_RENAME_STATE:
+                old_state_name = change.old_state_name
+                new_state_name = change.new_state_name
+                if old_state_name in added_state_names:
+                    added_state_names.remove(old_state_name)
+                    added_state_names.append(new_state_name)
+                elif old_state_name in new_to_old_state_names:
+                    new_to_old_state_names[new_state_name] = (
+                        new_to_old_state_names.pop(old_state_name))
+                else:
+                    new_to_old_state_names[new_state_name] = old_state_name
+
+            elif change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
+                # A condition to store the name of the properties changed
+                # in changed_properties dict.
+                state_name = change.state_name
+                if state_name in new_to_old_state_names:
+                    state_name = new_to_old_state_names[change.state_name]
+                if state_name in changed_properties:
+                    if (change.property_name not in
+                            changed_properties[state_name]):
+                        changed_properties[state_name].append(
+                            change.property_name)
+                else:
+                    changed_properties[state_name] = [change.property_name]
+            elif change.cmd == exp_domain.CMD_ADD_WRITTEN_TRANSLATION:
+                changed_property = None
+                if change.content_id == 'content':
+                    changed_property = 'content'
+                elif change.content_id[:14] == 'ca_placeholder':
+                    changed_property = 'widget_customization_args'
+                elif change.content_id == 'default_outcome':
+                    changed_property = 'default_outcome'
+                elif change.content_id == 'solution':
+                    changed_property = 'solution'
+                elif change.content_id[:4] == 'hint':
+                    changed_property = 'hints'
+                elif change.content_id[:8] == 'feedback':
+                    changed_property = 'answer_groups'
+                elif change.content_id[:10] == 'rule_input':
+                    changed_property = 'answer_groups'
+                # A condition to store the name of the properties changed
+                # in changed_properties dict.
+                state_name = change.state_name
+                if state_name in new_to_old_state_names:
+                    state_name = new_to_old_state_names[change.state_name]
+                if state_name in changed_translations:
+                    if (changed_property not in
+                            changed_translations[state_name]):
+                        changed_translations[state_name].append(
+                            changed_property)
+                else:
+                    changed_translations[state_name] = [changed_property]
+                if state_name in changed_properties:
+                    if ('written_translations' not in
+                            changed_properties[state_name]):
+                        changed_properties[state_name].append(
+                            'written_translations')
+                else:
+                    changed_properties[state_name] = [
+                        'written_translations']
+
+        # Old_to_new_state_names: dict. Dictionary mapping state names of
+        # prev_exp_version to the state names of current_exp_version.
+        # It doesn't include the name changes of added/deleted states.
+        old_to_new_state_names = {
+            value: key for key, value in new_to_old_state_names.items()
+        }
+
+        if len(added_state_names) > 0 or len(deleted_state_names) > 0:
+            # Here we will send the changelist, version, latest_version,
+            # and exploration to the admin, so that the conditions
+            # can be reviewed.
+            return False
+
+        changes_are_mergeable = False
+
+        # state_names_of_renamed_states: dict. Stores the changes in
+        # states names in change_list where the key is the state name in
+        # frontend version and the value is the renamed name from the
+        # change list if there is any rename state change.
+        state_names_of_renamed_states = {}
+        for change in change_list:
+            change_is_mergeable = False
+            if change.cmd == exp_domain.CMD_RENAME_STATE:
+                old_state_name = change.old_state_name
+                new_state_name = change.new_state_name
+                if old_state_name in state_names_of_renamed_states:
+                    state_names_of_renamed_states[new_state_name] = (
+                        state_names_of_renamed_states.pop(old_state_name))
+                else:
+                    state_names_of_renamed_states[new_state_name] = (
+                        old_state_name)
+                if (state_names_of_renamed_states[new_state_name] not in
+                        old_to_new_state_names):
+                    change_is_mergeable = True
+            elif change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
+                old_state_name = change.state_name
+                new_state_name = change.state_name
+                if change.state_name in state_names_of_renamed_states:
+                    old_state_name = (
+                        state_names_of_renamed_states[change.state_name])
+                    new_state_name = (
+                        state_names_of_renamed_states[change.state_name])
+                if change.state_name in old_to_new_state_names:
+                    new_state_name = old_to_new_state_names[old_state_name]
+                if old_state_name not in changed_translations:
+                    changed_translations[old_state_name] = []
+                frontend_exp_states = (
+                    frontend_version_exploration.states[old_state_name])
+                backend_exp_states = (
+                    backend_version_exploration.states[new_state_name])
+                if (change.property_name ==
+                        exp_domain.STATE_PROPERTY_CONTENT):
+                    if old_state_name in changed_properties:
+                        if (frontend_exp_states.content.html ==
+                                backend_exp_states.content.html):
+                            if ('content' not in
+                                    changed_translations[old_state_name] and
+                                    'recorded_voiceovers' not in
+                                    changed_properties[old_state_name]):
+                                change_is_mergeable = True
+                    else:
+                        change_is_mergeable = True
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_ID):
+                    if old_state_name in changed_properties:
+                        if (frontend_exp_states.interaction.id ==
+                                backend_exp_states.interaction.id):
+                            if ('widget_customization_args' not in
+                                    changed_properties[old_state_name] and
+                                    'answer_groups' not in
+                                    changed_properties[old_state_name] and
+                                    'solution' not in
+                                    changed_properties[old_state_name]):
+                                change_is_mergeable = True
+                    else:
+                        change_is_mergeable = True
+                # Customization args differ for every interaction, so in
+                # case of different interactions merging is simply not
+                # possible, but in case of same interaction, the values in
+                # the customization_args are often lists so if someone
+                # changes even one item of that list then determining which
+                # item is changed is not feasible, so suppose there is long
+                # list of values in item selection interaction and one user
+                # deletes one value and another one edits another value,
+                # so after deletion the indices of all the values will be
+                # changed and it will not be possible to compare and know
+                # that which value is changed by second user.
+                # So we will not be handling the merge on the basis of
+                # individual fields.
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
+                    if old_state_name in changed_properties:
+                        if (frontend_exp_states.interaction.id ==
+                                backend_exp_states.interaction.id):
+                            if (all(property not in
+                                    changed_properties[old_state_name]
+                                    for property in
+                                    properties_related_to_cust_args) and
+                                    change.property_name not in
+                                    changed_translations[old_state_name]):
+                                change_is_mergeable = True
+                    else:
+                        change_is_mergeable = True
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
+                    if old_state_name in changed_properties:
+                        if (frontend_exp_states.interaction.id ==
+                                backend_exp_states.interaction.id):
+                            if (all(property not in
+                                    changed_properties[old_state_name]
+                                    for property in
+                                    properties_related_to_answer_groups) and
+                                    change.property_name not in
+                                    changed_translations[old_state_name]):
+                                change_is_mergeable = True
+                    else:
+                        change_is_mergeable = True
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME
+                     ):
+                    if old_state_name in changed_properties:
+                        if (change.property_name not in
+                                changed_properties[old_state_name] and
+                                change.property_name not in
+                                changed_translations[old_state_name]):
+                            change_is_mergeable = True
+                    else:
+                        change_is_mergeable = True
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_UNCLASSIFIED_ANSWERS):
+                    change_is_mergeable = True
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX):
+                    change_is_mergeable = True
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_LINKED_SKILL_ID):
+                    change_is_mergeable = True
+                # We’ll not be able to handle the merge if changelists
+                # affect the different indices of the hint in the same
+                # state because whenever there is even a small change
+                # in one field of any hint, they treat the whole hints
+                # list as a new value.
+                # So it will not be possible to find out the exact change.
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
+                    if old_state_name in changed_properties:
+                        if (change.property_name not in
+                                changed_properties[old_state_name] and
+                                change.property_name not in
+                                changed_translations[old_state_name]):
+                            change_is_mergeable = True
+                    else:
+                        change_is_mergeable = True
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
+                    if old_state_name in changed_properties:
+                        if (frontend_exp_states.interaction.id ==
+                                backend_exp_states.interaction.id):
+                            if (all(property not in
+                                    changed_properties[old_state_name]
+                                    for property in
+                                    properties_related_to_solution) and
+                                    change.property_name not in
+                                    changed_translations[old_state_name]):
+                                change_is_mergeable = True
+                    else:
+                        change_is_mergeable = True
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_SOLICIT_ANSWER_DETAILS):
+                    if old_state_name in changed_properties:
+                        if (frontend_exp_states.interaction.id ==
+                                backend_exp_states.interaction.id and
+                                frontend_exp_states.solicit_answer_details ==
+                                backend_exp_states.solicit_answer_details):
+                            change_is_mergeable = True
+                    else:
+                        change_is_mergeable = True
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT):
+                    change_is_mergeable = True
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
+                    if old_state_name in changed_properties:
+                        if all(property not in
+                               changed_properties[old_state_name]
+                               for property in
+                               properties_related_to_voiceovers):
+                            change_is_mergeable = True
+                    else:
+                        change_is_mergeable = True
+            elif change.cmd == exp_domain.CMD_ADD_WRITTEN_TRANSLATION:
+                old_state_name = change.state_name
+                new_state_name = change.state_name
+                if change.state_name in state_names_of_renamed_states:
+                    old_state_name = (
+                        state_names_of_renamed_states[change.state_name])
+                    new_state_name = (
+                        state_names_of_renamed_states[change.state_name])
+                if change.state_name in old_to_new_state_names:
+                    new_state_name = old_to_new_state_names[old_state_name]
+                if old_state_name not in changed_translations:
+                    changed_translations[old_state_name] = []
+                if old_state_name in changed_properties:
+                    if change.content_id == 'content':
+                        if ('content' not in
+                                changed_properties[old_state_name] and
+                                'content' not in
+                                changed_translations[old_state_name]):
+                            change_is_mergeable = True
+                    elif change.content_id[:14] == 'ca_placeholder':
+                        if ('widget_customization_args' not in
+                                changed_properties[old_state_name] and
+                                'widget_customization_args' not in
+                                changed_translations[old_state_name]):
+                            change_is_mergeable = True
+                    elif change.content_id == 'default_outcome':
+                        if ('default_outcome' not in
+                                changed_properties[old_state_name] and
+                                'default_outcome' not in
+                                changed_translations[old_state_name]):
+                            change_is_mergeable = True
+                    elif change.content_id == 'solution':
+                        if ('solution' not in
+                                changed_properties[old_state_name] and
+                                'solution' not in
+                                changed_translations[old_state_name]):
+                            change_is_mergeable = True
+                    elif change.content_id[:4] == 'hint':
+                        if ('hints' not in
+                                changed_properties[old_state_name] and
+                                'hints' not in
+                                changed_translations[old_state_name]):
+                            change_is_mergeable = True
+                    elif change.content_id[:8] == 'feedback':
+                        if ('answer_groups' not in
+                                changed_properties[old_state_name] and
+                                'answer_groups' not in
+                                changed_translations[old_state_name]):
+                            change_is_mergeable = True
+                    elif change.content_id[:10] == 'rule_input':
+                        if ('answer_groups' not in
+                                changed_properties[old_state_name] and
+                                'answer_groups' not in
+                                changed_translations[old_state_name]):
+                            change_is_mergeable = True
+                else:
+                    change_is_mergeable = True
+            elif (change.cmd ==
+                  exp_domain.CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE):
+                change_is_mergeable = True
+            elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
+                if change.property_name == 'title':
+                    if (frontend_version_exploration.title ==
+                            backend_version_exploration.title):
+                        change_is_mergeable = True
+                elif change.property_name == 'category':
+                    if (frontend_version_exploration.category ==
+                            backend_version_exploration.category):
+                        change_is_mergeable = True
+                elif change.property_name == 'objective':
+                    if (frontend_version_exploration.objective ==
+                            backend_version_exploration.objective):
+                        change_is_mergeable = True
+                elif change.property_name == 'language_code':
+                    if (frontend_version_exploration.language_code ==
+                            backend_version_exploration.language_code):
+                        change_is_mergeable = True
+                elif change.property_name == 'tags':
+                    if (frontend_version_exploration.tags ==
+                            backend_version_exploration.tags):
+                        change_is_mergeable = True
+                elif change.property_name == 'blurb':
+                    if (frontend_version_exploration.blurb ==
+                            backend_version_exploration.blurb):
+                        change_is_mergeable = True
+                elif change.property_name == 'author_notes':
+                    if (frontend_version_exploration.author_notes ==
+                            backend_version_exploration.author_notes):
+                        change_is_mergeable = True
+                elif change.property_name == 'init_state_name':
+                    if (frontend_version_exploration.init_state_name ==
+                            backend_version_exploration.init_state_name):
+                        change_is_mergeable = True
+                elif change.property_name == 'auto_tts_enabled':
+                    if (frontend_version_exploration.auto_tts_enabled ==
+                            backend_version_exploration.auto_tts_enabled):
+                        change_is_mergeable = True
+                elif change.property_name == 'correctness_feedback_enabled':
+                    if (frontend_version_exploration.correctness_feedback_enabled == # pylint: disable=line-too-long
+                            backend_version_exploration.correctness_feedback_enabled): # pylint: disable=line-too-long
+                        change_is_mergeable = True
+
+            if change_is_mergeable:
+                changes_are_mergeable = True
+                continue
+            else:
+                changes_are_mergeable = False
+                return False
+
+        return changes_are_mergeable
 
 
 def is_version_of_draft_valid(exp_id, version):

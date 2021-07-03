@@ -61,7 +61,7 @@ def validate(handler_args, handler_args_schemas, allowed_extra_args):
 
         try:
             normalized_value[arg_key] = schema_utils.normalize_against_schema( # type: ignore[no-untyped-call] # pylint: disable=line-too-long
-                handler_args[arg_key], arg_schema)
+                handler_args[arg_key], arg_schema['schema'])
         except Exception as e:
             errors.append(
                 'Schema validation for \'%s\' failed: %s' % (arg_key, e))
@@ -320,7 +320,8 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'UsernameCheckHandler',
     'ValidateExplorationsHandler',
     'ValueGeneratorHandler',
-    'VerifyUserModelsDeletedHandler'
+    'VerifyUserModelsDeletedHandler',
+    'VoiceArtistManagementHandler'
     ]
 
 # These handlers do not require any schema validation.
