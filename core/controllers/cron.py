@@ -28,9 +28,9 @@ from core.domain import cron_services
 from core.domain import email_manager
 from core.domain import recommendations_jobs_one_off
 from core.domain import suggestion_services
+from core.domain import taskqueue_services
 from core.domain import user_jobs_one_off
 from core.domain import user_services
-from core.domain import wipeout_jobs_one_off
 import feconf
 import utils
 
@@ -93,8 +93,9 @@ class CronUserDeletionHandler(base.BaseHandler):
     @acl_decorators.can_perform_cron_tasks
     def get(self):
         """Handles GET requests."""
-        wipeout_jobs_one_off.UserDeletionOneOffJob.enqueue(
-            wipeout_jobs_one_off.UserDeletionOneOffJob.create_new())
+        taskqueue_services.defer(
+            taskqueue_services.FUNCTION_ID_DELETE_USERS_PENDING_TO_BE_DELETED,
+            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
 
 
 class CronFullyCompleteUserDeletionHandler(base.BaseHandler):
@@ -103,10 +104,9 @@ class CronFullyCompleteUserDeletionHandler(base.BaseHandler):
     @acl_decorators.can_perform_cron_tasks
     def get(self):
         """Handles GET requests."""
-        wipeout_jobs_one_off.FullyCompleteUserDeletionOneOffJob.enqueue(
-            wipeout_jobs_one_off.FullyCompleteUserDeletionOneOffJob
-            .create_new()
-        )
+        taskqueue_services.defer(
+            taskqueue_services.FUNCTION_ID_CHECK_COMPLETION_OF_USER_DELETION,
+            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
 
 
 class CronExplorationRecommendationsHandler(base.BaseHandler):
