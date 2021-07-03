@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directives required in contributor-dashboard-admin panel.
+ * @fileoverview Directives required in contributor-dashboard-admin page.
  */
 
 import 'core-js/es7/reflect';

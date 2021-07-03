@@ -34,22 +34,20 @@ export class ContributorDashboardAdminNavbarComponent implements OnInit {
   profileUrl: string;
   logoutUrl: string = AppConstants.LOGOUT_URL;
   profileDropdownIsActive: boolean = false;
+  logoWebpImageSrc: string;
+  logoPngImageSrc: string;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private userService: UserService,
   ) {}
 
-  getStaticImageUrl(imagePath: string): string {
-    return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  activateProfileDropdown(): void {
+    this.profileDropdownIsActive = true;
   }
 
-  activateProfileDropdown(): boolean {
-    return this.profileDropdownIsActive = true;
-  }
-
-  deactivateProfileDropdown(): boolean {
-    return this.profileDropdownIsActive = false;
+  deactivateProfileDropdown(): void {
+    this.profileDropdownIsActive = false;
   }
 
   async getProfileImageDataAsync(): Promise<void> {
@@ -71,6 +69,11 @@ export class ContributorDashboardAdminNavbarComponent implements OnInit {
   ngOnInit(): void {
     this.getProfileImageDataAsync();
     this.getUserInfoAsync();
+
+    this.logoPngImageSrc = this.urlInterpolationService.getStaticImageUrl(
+      '/logo/288x128_logo_white.png');
+    this.logoWebpImageSrc = this.urlInterpolationService.getStaticImageUrl(
+      '/logo/288x128_logo_white.webp');
   }
 }
 

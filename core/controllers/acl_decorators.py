@@ -753,7 +753,7 @@ def can_access_contributor_dashboard_admin_page(handler):
         Raises:
             NotLoggedInException. The user is not logged in.
             UnauthorizedUserException. The user cannot access the contributor
-            dashboard admin page.
+                dashboard admin page.
         """
         if not self.user_id:
             raise self.NotLoggedInException
@@ -780,7 +780,7 @@ def can_manage_contributors_role(handler):
 
     Returns:
         function. The newly decorated function that now also checks if the user
-        can modify contributors role for the contributor dashboard page.
+        can modify contributor's role for the contributor dashboard page.
     """
 
     def test_can_manage_contributors_role(self, category, **kwargs):
@@ -796,8 +796,8 @@ def can_manage_contributors_role(handler):
 
         Raises:
             NotLoggedInException. The user is not logged in.
-            UnauthorizedUserException. The user cannnot modify contributors role
-                for contributor dashboard page.
+            UnauthorizedUserException. The user cannnot modify contributor's
+                role for the contributor dashboard page.
         """
         if not self.user_id:
             raise self.NotLoggedInException
@@ -818,7 +818,7 @@ def can_manage_contributors_role(handler):
                 'Invalid category: %s' % category)
 
         raise self.UnauthorizedUserException(
-            'You do not have credentials to modify contributors role.')
+            'You do not have credentials to modify contributor\'s role.')
     test_can_manage_contributors_role.__wrapped__ = True
 
     return test_can_manage_contributors_role

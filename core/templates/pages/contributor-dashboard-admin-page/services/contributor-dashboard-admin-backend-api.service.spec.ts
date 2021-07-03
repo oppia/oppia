@@ -78,7 +78,7 @@ describe('Contributor dashboard admin backend api service', () => {
   ));
 
   it('should fail to add contribution rights to the user when user does' +
-    'not exists when calling addContributionReviewerAsync', fakeAsync(() => {
+    'not exist when calling addContributionReviewerAsync', fakeAsync(() => {
     let category = 'translation';
     let languageCode = 'en';
     let username = 'InvalidUser';

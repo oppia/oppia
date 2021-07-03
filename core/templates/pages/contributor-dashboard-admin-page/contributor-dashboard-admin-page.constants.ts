@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Constants for the Oppia contributor dashboard admin page.
+ * @fileoverview Constants for the contributor dashboard admin page.
  */
 
 export const ContributorDashboardAdminPageConstants = {

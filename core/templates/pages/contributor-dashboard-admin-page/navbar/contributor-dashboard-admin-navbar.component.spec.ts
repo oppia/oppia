@@ -32,8 +32,7 @@ describe('Contributor dashboard admin navbar component', () => {
     getUsername: () => 'username1',
     isSuperAdmin: () => true
   };
-  let imagePath = '/path/to/image.png';
-  let profileUrl = '/profile/username1';
+  const profileUrl = '/profile/username1';
   let fixture: ComponentFixture<ContributorDashboardAdminNavbarComponent>;
 
   beforeEach(async(() => {
@@ -56,8 +55,6 @@ describe('Contributor dashboard admin navbar component', () => {
 
   it('should initialize component properties correctly', () => {
     expect(component.profilePictureDataUrl).toBe(userProfileImage);
-    expect(component.getStaticImageUrl(imagePath)).toBe(
-      '/assets/images/path/to/image.png');
     expect(component.username).toBe('username1');
     expect(component.profileUrl).toEqual(profileUrl);
     expect(component.logoutUrl).toEqual('/logout');
@@ -74,8 +71,6 @@ describe('Contributor dashboard admin navbar component', () => {
 
   it('should set profileDropdownIsActive to false', () => {
     component.profileDropdownIsActive = true;
-
-    expect(component.profileDropdownIsActive).toBe(true);
 
     component.deactivateProfileDropdown();
 
