@@ -157,6 +157,13 @@ class BlogPostHandlerTest(test_utils.GenericTestBase):
             len(json_response['summary_dicts']), 2)
         self.assertIsNotNone(json_response['profile_picture_data_url'])
 
+        blog_services.unpublish_blog_post(self.blog_post.id)
+        blog_services.unpublish_blog_post(blog_post_two_id)
+        json_response = self.get_json(
+            '%s/%s' % (feconf.BLOG_AUTHORS_PAGE_URL, self.BLOG_ADMIN_USERNAME),
+            )
+        self.assertIsNone(json_response['summary_dicts'])
+
 
 class AuthorsPageHandlerTest(test_utils.GenericTestBase):
     """Checks that the author data and related blog summary cards are
@@ -173,8 +180,7 @@ class AuthorsPageHandlerTest(test_utils.GenericTestBase):
         self.blog_admin_id = (
             self.get_user_id_from_email(self.BLOG_ADMIN_EMAIL))
         self.set_user_role(
-            self.BLOG_ADMIN_USERNAME,
-            feconf.ROLE_ID_BLOG_ADMIN)
+            self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_BLOG_ADMIN)
         self.signup(self.user_email, self.username)
         self.blog_post = blog_services.create_new_blog_post(self.blog_admin_id)
         self.change_dict = {
@@ -198,6 +204,12 @@ class AuthorsPageHandlerTest(test_utils.GenericTestBase):
             len(json_response['summary_dicts']), 1)
         self.assertIsNotNone(json_response['profile_picture_data_url'])
 
+        blog_services.unpublish_blog_post(self.blog_post.id)
+        json_response = self.get_json(
+            '%s/%s' % (feconf.BLOG_AUTHORS_PAGE_URL, self.BLOG_ADMIN_USERNAME),
+            )
+        self.assertIsNone(json_response['summary_dicts'])
+
     def test_get_authors_data_raises_exception_if_user_deleted_account(self):
         self.login(self.user_email)
         json_response = self.get_json(
@@ -211,6 +223,16 @@ class AuthorsPageHandlerTest(test_utils.GenericTestBase):
         blog_admin_model.deleted = True
         blog_admin_model.update_timestamps()
         blog_admin_model.put()
+        json_response = self.get_json(
+            '%s/%s' % (feconf.BLOG_AUTHORS_PAGE_URL, self.BLOG_ADMIN_USERNAME),
+            expected_status_int=404)
+
+    def test_raise_exception_if_username_provided_is_not_of_author(self):
+        self.login(self.user_email)
+        self.get_json(
+            '%s/%s' % (feconf.BLOG_AUTHORS_PAGE_URL, self.BLOG_ADMIN_USERNAME),
+            )
+        self.set_user_role(self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_ADMIN)
         json_response = self.get_json(
             '%s/%s' % (feconf.BLOG_AUTHORS_PAGE_URL, self.BLOG_ADMIN_USERNAME),
             expected_status_int=404)

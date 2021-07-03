@@ -258,9 +258,9 @@ def get_blog_post_rights(blog_post_id, strict=True):
     return get_blog_post_rights_from_model(model)
 
 
-def get_blog_post_summaries_by_user_id(user_id, max_limit):
-    """Retrieves the summary objects for given number of blog posts for
-    which the given user is an editor.
+def get_published_blog_post_summaries_by_user_id(user_id, max_limit):
+    """Retrieves the summary objects for given number of published blog posts
+    for which the given user is an editor.
 
     Args:
         user_id: str. ID of the user.
@@ -271,7 +271,7 @@ def get_blog_post_summaries_by_user_id(user_id, max_limit):
         blog posts assigned to given user.
     """
     blog_rights_models = (
-        blog_models.BlogPostRightsModel.get_by_user(user_id, max_limit))
+        blog_models.BlogPostRightsModel.get_by_user(user_id, True, max_limit))
     if len(blog_rights_models) == 0:
         return None
     blog_post_ids = [model.id for model in blog_rights_models]

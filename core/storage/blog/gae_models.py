@@ -334,11 +334,13 @@ class BlogPostRightsModel(base_models.BaseModel):
             cls.editor_ids == user_id).get(keys_only=True) is not None
 
     @classmethod
-    def get_by_user(cls, user_id, limit=None):
+    def get_by_user(cls, user_id, published=False, limit=None):
         """Retrieves the rights object for all blog posts assigned to given user
 
         Args:
             user_id: str. ID of user.
+            published: bool. True if rights model for published blog post are to
+                be fetched else false.
             limit: int. Number of BlogPostRightsModel to be fetched. All
                 existing models will be fetched if none.
 
@@ -347,8 +349,10 @@ class BlogPostRightsModel(base_models.BaseModel):
             in which the given user is a editor.
         """
         if limit:
-            return cls.query(cls.editor_ids == user_id).order(
-                -cls.last_updated).fetch(limit)
+            return cls.query(
+                cls.editor_ids == user_id,
+                cls.blog_post_is_published == published
+                ).order(-cls.last_updated).fetch(limit)
         return cls.query(cls.editor_ids == user_id).fetch()
 
     @staticmethod

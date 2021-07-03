@@ -104,10 +104,15 @@ class BlogPostHandler(base.BaseHandler):
             blog_services.get_blog_post_from_model(blog_post).to_dict())
         blog_post_dict['author_name'] = user_settings.username
         del blog_post_dict['author_id']
-        blog_post_summaries = blog_services.get_blog_post_summaries_by_user_id(
-            blog_post.author_id, feconf.MAX_LIMIT_FOR_CARDS_ON_BLOG_POST_PAGE)
-        blog_post_summary_dicts = (
-            _get_blog_card_summary_dicts_for_homepage(blog_post_summaries))
+        blog_post_summaries = (
+            blog_services.get_published_blog_post_summaries_by_user_id(
+                blog_post.author_id,
+                feconf.MAX_LIMIT_FOR_CARDS_ON_BLOG_POST_PAGE))
+        if blog_post_summaries:
+            blog_post_summary_dicts = (
+                _get_blog_card_summary_dicts_for_homepage(blog_post_summaries))
+        else:
+            blog_post_summary_dicts = None
 
         self.values.update({
             'profile_picture_data_url': user_settings.profile_picture_data_url,
@@ -143,11 +148,15 @@ class AuthorsPageHandler(base.BaseHandler):
                     Exception(
                         'The given user is not a blog post author.'))
             blog_post_summaries = (
-                blog_services.get_blog_post_summaries_by_user_id(
+                blog_services.get_published_blog_post_summaries_by_user_id(
                     user_settings.user_id,
                     feconf.MAX_LIMIT_FOR_CARDS_ON_BLOG_AUTHORS_PAGE))
-            blog_post_summary_dicts = (
-                _get_blog_card_summary_dicts_for_homepage(blog_post_summaries))
+            if blog_post_summaries:
+                blog_post_summary_dicts = (
+                    _get_blog_card_summary_dicts_for_homepage(
+                        blog_post_summaries))
+            else:
+                blog_post_summary_dicts = None
 
             self.values.update({
                 'author_name': author_username,
