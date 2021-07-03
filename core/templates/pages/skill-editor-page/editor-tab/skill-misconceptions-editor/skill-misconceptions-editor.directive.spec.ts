@@ -21,7 +21,7 @@
 // the code corresponding to the spec is upgraded to Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 // ^^^ This block is to be removed.
-import { TestBed } from '@angular/core/testing';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Skill, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { Misconception, MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
@@ -30,9 +30,10 @@ import { SkillUpdateService } from 'domain/skill/skill-update.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { EventEmitter } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { DeleteMisconceptionModalComponent } from 'pages/skill-editor-page/modal-templates/delete-misconception-modal.component';
 
-fdescribe('Misconception Editor Directive', function() {
+describe('Skill Misconception Editor Directive', function() {
   let $scope = null;
   let ctrl = null;
   let $rootScope = null;
@@ -77,7 +78,7 @@ fdescribe('Misconception Editor Directive', function() {
 
     sampleSkill = skillObjectFactory.createInterstitialSkill();
     sampleMisconception = misconceptionObjectFactory.create(
-      'misconceptionId', 'name', 'notes', 'feedback', false);
+      'misconceptionId', 'misconceptionName', 'notes', 'feedback', false);
     sampleSkill._misconceptions = [sampleMisconception];
 
     spyOn(skillEditorStateService, 'getSkill').and.returnValue(sampleSkill);
@@ -89,9 +90,6 @@ fdescribe('Misconception Editor Directive', function() {
       $uibModal: $uibModal,
       WindowDimensionsService: windowDimensionsService
     });
-    $scope.isEditable = function() {
-      return true;
-    };
   }));
 
   beforeEach(() => {
@@ -136,14 +134,105 @@ fdescribe('Misconception Editor Directive', function() {
   it('should open add misconception modal when clicking on add ' +
     'button', function() {
     let deferred = $q.defer();
-    deferred.resolve();
+    deferred.resolve({result: sampleMisconception});
     let modalSpy = spyOn($uibModal, 'open').and.returnValue(
       {result: deferred.promise});
+    let addMisconceptionSpy = spyOn(
+      skillUpdateService, 'addMisconception').and.returnValue(null);
 
     $scope.openAddMisconceptionModal();
     $rootScope.$apply();
 
     expect(modalSpy).toHaveBeenCalled();
+    expect(addMisconceptionSpy).toHaveBeenCalled();
   });
 
+  it('should close add misconception modal when clicking on close ' +
+    'button', function() {
+    let deferred = $q.defer();
+    deferred.reject();
+    let modalSpy = spyOn($uibModal, 'open').and.returnValue(
+      {result: deferred.promise});
+    let addMisconceptionSpy = spyOn(
+      skillUpdateService, 'addMisconception').and.returnValue(null);
+
+    $scope.openAddMisconceptionModal();
+    $rootScope.$apply();
+
+    expect(modalSpy).toHaveBeenCalled();
+    expect(addMisconceptionSpy).not.toHaveBeenCalled();
+  });
+
+  it('should open delete misconception modal when clicking on delete ' +
+    'button', fakeAsync(function() {
+    let modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return <NgbModalRef>({
+        componentInstance: {
+          index: 'index'
+        },
+        result: Promise.resolve({result: {
+          id: 'id'
+        }})
+      });
+    });
+    let deleteMisconceptionSpy = spyOn(
+      skillUpdateService, 'deleteMisconception').and.returnValue(null);
+
+    ctrl.$onInit();
+    $scope.openDeleteMisconceptionModal();
+    tick();
+    $rootScope.$apply();
+
+    expect(modalSpy).toHaveBeenCalledWith(
+      DeleteMisconceptionModalComponent, {backdrop: 'static'});
+    expect(deleteMisconceptionSpy).toHaveBeenCalled();
+  }));
+
+  it('should close delete misconception modal when clicking on ' +
+    'close button', fakeAsync(function() {
+    let modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return <NgbModalRef>({
+        componentInstance: {
+          index: 'index'
+        },
+        result: Promise.reject()
+      });
+    });
+    let deleteMisconceptionSpy = spyOn(
+      skillUpdateService, 'deleteMisconception').and.returnValue(null);
+
+    ctrl.$onInit();
+    $scope.openDeleteMisconceptionModal();
+    tick();
+    $rootScope.$apply();
+
+    expect(modalSpy).toHaveBeenCalledWith(
+      DeleteMisconceptionModalComponent, {backdrop: 'static'});
+    expect(deleteMisconceptionSpy).not.toHaveBeenCalled();
+  }));
+
+  it('should always return true when calling \'isEditable\'', () => {
+    expect($scope.isEditable()).toBe(true);
+  });
+
+  it('should return misconception name given input as misconception ' +
+    'when calling \'getMisconceptionSummary \'', () => {
+    let name = $scope.getMisconceptionSummary(sampleMisconception);
+    expect(name).toBe('misconceptionName');
+  });
+
+  it('should change active misconception index', () => {
+    $scope.activeMisconceptionIndex = 'oldIndex';
+    $scope.changeActiveMisconceptionIndex('newIndex');
+
+    expect($scope.activeMisconceptionIndex).toBe('newIndex');
+  });
+
+  it('should set active misconception index to null if ' +
+    'oldIndex is newIndex', () => {
+    $scope.activeMisconceptionIndex = 'oldIndex';
+    $scope.changeActiveMisconceptionIndex('oldIndex');
+
+    expect($scope.activeMisconceptionIndex).toBe(null);
+  });
 });
