@@ -122,7 +122,7 @@ export class LearnerDashboardPageComponent implements OnInit {
   partiallyLearntTopics: LearnerTopicSummary[];
   topicsToLearn: LearnerTopicSummary[];
   allTopics: LearnerTopicSummary[];
-  newTopics: LearnerTopicSummary[];
+  untrackedTopics: LearnerTopicSummary[];
   subscriptionsList: ProfileSummary[];
 
   numberNonexistentIncompleteExplorations: number;
@@ -233,8 +233,8 @@ export class LearnerDashboardPageComponent implements OnInit {
           responseData.partiallyLearntTopicsList);
         this.topicsToLearn = (
           responseData.topicsToLearnList);
-        this.newTopics = (
-          responseData.newTopicsList);
+        this.untrackedTopics = (
+          responseData.untrackedTopicsList);
         this.allTopics = (
           responseData.allTopicsList);
         this.subscriptionsList = responseData.subscriptionList;
