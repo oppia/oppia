@@ -23,58 +23,127 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 // ^^^ This block is to be removed.
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
-import { MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
+import { Skill, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
+import { Misconception, MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
 import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
 import { SkillUpdateService } from 'domain/skill/skill-update.service';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { EventEmitter } from '@angular/core';
+import { Subscription } from 'rxjs';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 fdescribe('Misconception Editor Directive', function() {
-    let $scope = null;
-    let ctrl = null;
-    let $rootScope = null;
-    let directive = null;
-    let skillEditorStateService: SkillEditorStateService = null;
-    let skillUpdateService: SkillUpdateService = null;
-    let skillObjectFactory: SkillObjectFactory = null;
-    let misconceptionObjectFactory: MisconceptionObjectFactory = null;
+  let $scope = null;
+  let ctrl = null;
+  let $rootScope = null;
+  let directive = null;
+  let skillEditorStateService: SkillEditorStateService = null;
+  let skillUpdateService: SkillUpdateService = null;
+  let skillObjectFactory: SkillObjectFactory = null;
+  let misconceptionObjectFactory: MisconceptionObjectFactory = null;
+  let windowDimensionsService: WindowDimensionsService = null;
+  let ngbModal: NgbModal;
+  let $uibModal = null;
+  let $q = null;
 
-    let sampleSkill = null;
-    let sampleMisconception = null;
+  let sampleSkill: Skill = null;
+  let sampleMisconception: Misconception = null;
+  let mockOnSkillChangeEmitter = new EventEmitter();
+  let testSubscriptions: Subscription = null;
+  const skillChangeSpy = jasmine.createSpy('saveOutcomeDestDetails');
 
-    beforeEach(angular.mock.module('oppia'));
-    importAllAngularServices();
+  beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
 
-    beforeEach(() => {
-      TestBed.configureTestingModule({
-        imports: [HttpClientTestingModule]
-      });
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
     });
+  });
 
-    beforeEach(angular.mock.inject(function($injector) {
-      $rootScope = $injector.get('$rootScope');
-      $scope = $rootScope.$new();
-  
-      directive = $injector.get('skillMisconceptionsEditorDirective')[0];
-      skillEditorStateService = $injector.get('SkillEditorStateService');
-      skillUpdateService = $injector.get('SkillUpdateService');
-      skillObjectFactory = $injector.get('SkillObjectFactory');
-      misconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
+  beforeEach(angular.mock.inject(function($injector) {
+    $rootScope = $injector.get('$rootScope');
+    $scope = $rootScope.$new();
+    directive = $injector.get('skillMisconceptionsEditorDirective')[0];
 
-      sampleSkill = skillObjectFactory.createInterstitialSkill();
-      sampleMisconception = misconceptionObjectFactory.create(
-        'misconceptionId', 'name', 'notes', 'feedback', false);
-  
-      spyOn(skillEditorStateService, 'getSkill').and.returnValue(sampleSkill);
+    skillEditorStateService = $injector.get('SkillEditorStateService');
+    skillUpdateService = $injector.get('SkillUpdateService');
+    skillObjectFactory = $injector.get('SkillObjectFactory');
+    misconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
+    windowDimensionsService = $injector.get('WindowDimensionsService');
+    $uibModal = $injector.get('$uibModal');
+    $q = $injector.get('$q');
+    ngbModal = TestBed.inject(NgbModal);
 
-      ctrl = $injector.instantiate(directive.controller, {
-        $rootScope: $scope,
-        $scope: $scope
-      });
-      $scope.misconception = sampleMisconception;
-      $scope.isEditable = function() {
-        return true;
-      };
-      ctrl.$onInit();
-    }));
+    sampleSkill = skillObjectFactory.createInterstitialSkill();
+    sampleMisconception = misconceptionObjectFactory.create(
+      'misconceptionId', 'name', 'notes', 'feedback', false);
+    sampleSkill._misconceptions = [sampleMisconception];
+
+    spyOn(skillEditorStateService, 'getSkill').and.returnValue(sampleSkill);
+
+    ctrl = $injector.instantiate(directive.controller, {
+      $rootScope: $scope,
+      $scope: $scope,
+      NgbModal: ngbModal,
+      $uibModal: $uibModal,
+      WindowDimensionsService: windowDimensionsService
+    });
+    $scope.isEditable = function() {
+      return true;
+    };
+  }));
+
+  beforeEach(() => {
+    testSubscriptions = new Subscription();
+    testSubscriptions.add(skillEditorStateService.onSkillChange.subscribe(
+      skillChangeSpy));
+  });
+
+  afterEach(() => {
+    testSubscriptions.unsubscribe();
+  });
+
+  it('should set properties when initialized', function() {
+    // Misconception list is shown only when window is not narrow.
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+    spyOnProperty(skillEditorStateService, 'onSkillChange').and.returnValue(
+      mockOnSkillChangeEmitter);
+
+    expect($scope.skill).toBe(undefined);
+    expect($scope.misconceptions).toBe(undefined);
+    expect($scope.misconceptionsListIsShown).toBe(undefined);
+
+    ctrl.$onInit();
+    mockOnSkillChangeEmitter.emit();
+
+    expect($scope.skill).toEqual(sampleSkill);
+    expect($scope.misconceptions).toEqual(sampleSkill.getMisconceptions());
+    expect($scope.misconceptionsListIsShown).toEqual(true);
+  });
+
+  it('should toggle misconceptionList', function() {
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
+    $scope.misconceptionsListIsShown = false;
+
+    $scope.toggleMisconceptionLists();
+    expect($scope.misconceptionsListIsShown).toBe(true);
+
+    $scope.toggleMisconceptionLists();
+    expect($scope.misconceptionsListIsShown).toBe(false);
+  });
+
+  it('should open add misconception modal when clicking on add ' +
+    'button', function() {
+    let deferred = $q.defer();
+    deferred.resolve();
+    let modalSpy = spyOn($uibModal, 'open').and.returnValue(
+      {result: deferred.promise});
+
+    $scope.openAddMisconceptionModal();
+    $rootScope.$apply();
+
+    expect(modalSpy).toHaveBeenCalled();
+  });
 
 });
