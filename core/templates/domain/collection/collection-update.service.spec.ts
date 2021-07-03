@@ -29,7 +29,7 @@ describe('Collection update service', () => {
   let undoRedoService: UndoRedoService = null;
   let learnerExplorationSummaryBackendDict:
     LearnerExplorationSummaryBackendDict = null;
-  let _sampleCollection = null;
+  let _sampleCollection: Collection = null;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -76,6 +76,10 @@ describe('Collection update service', () => {
       nodes: [{
         exploration_id: 'exp_id0',
         exploration_summary: learnerExplorationSummaryBackendDict
+      },
+      {
+        exploration_id: 'exp_id1',
+        exploration_summary: learnerExplorationSummaryBackendDict
       }],
       playthrough_dict: {
         next_exploration_id: 'expId',
@@ -88,15 +92,15 @@ describe('Collection update service', () => {
 
   it('should add/remove a new collection node to/from a collection',
     () => {
-      expect(_sampleCollection.getExplorationIds()).toEqual(['exp_id0']);
+      expect(_sampleCollection.getExplorationIds()).toEqual(['exp_id0', 'exp_id1']);
       collectionUpdateService.addCollectionNode(
-        _sampleCollection, 'exp_id1', learnerExplorationSummaryBackendDict);
+        _sampleCollection, 'exp_id2', learnerExplorationSummaryBackendDict);
       expect(_sampleCollection.getExplorationIds()).toEqual([
-        'exp_id0', 'exp_id1'
+        'exp_id0', 'exp_id1', 'exp_id2'
       ]);
 
       undoRedoService.undoChange(_sampleCollection);
-      expect(_sampleCollection.getExplorationIds()).toEqual(['exp_id0']);
+      expect(_sampleCollection.getExplorationIds()).toEqual(['exp_id0', 'exp_id1']);
     }
   );
 
@@ -111,20 +115,30 @@ describe('Collection update service', () => {
     }
   );
 
-  it('should swap nodes of a collection given indices when undo ' +
-    'opertaion is performed', ()=> {
+  it('should swap nodes of a collection given indices and return to ' +
+    'original state when undo opertaion is performed', ()=> {
     let swapCollectionSpy = spyOn(
       _sampleCollection, 'swapCollectionNodes').and.callThrough();
+    // Before swapping.
+    expect(_sampleCollection.nodes[0].getExplorationId()).toBe('exp_id0');
+    expect(_sampleCollection.nodes[1].getExplorationId()).toBe('exp_id1');
 
-    collectionUpdateService.swapNodes(_sampleCollection, 1, 2);
+    collectionUpdateService.swapNodes(_sampleCollection, 0, 1);
+    // After swapping.
+    expect(_sampleCollection.nodes[0].getExplorationId()).toBe('exp_id1');
+    expect(_sampleCollection.nodes[1].getExplorationId()).toBe('exp_id0');
+
     // Triggering undo operation.
     undoRedoService.undoChange(_sampleCollection);
+    expect(_sampleCollection.nodes[0].getExplorationId()).toBe('exp_id0');
+    expect(_sampleCollection.nodes[1].getExplorationId()).toBe('exp_id1');
 
     expect(swapCollectionSpy).toHaveBeenCalled();
+
   });
 
-  it('should return true when we add a collection node ' +
-    'to collection successfully', ()=> {
+  it('should return true when collection node is being added ' +
+    'when calling \'isAddingCollectionNode\'', ()=> {
     const applyFunc = jasmine.createSpy('applyChange');
     const reverseFunc = jasmine.createSpy('reverseChange');
 
@@ -161,12 +175,12 @@ describe('Collection update service', () => {
   });
 
   it('should remove/add a collection node from/to a collection', ()=> {
-    expect(_sampleCollection.getExplorationIds()).toEqual(['exp_id0']);
+    expect(_sampleCollection.getExplorationIds()).toEqual(['exp_id0', 'exp_id1']);
     collectionUpdateService.deleteCollectionNode(_sampleCollection, 'exp_id0');
-    expect(_sampleCollection.getExplorationIds()).toEqual([]);
+    expect(_sampleCollection.getExplorationIds()).toEqual(['exp_id1']);
 
     undoRedoService.undoChange(_sampleCollection);
-    expect(_sampleCollection.getExplorationIds()).toEqual(['exp_id0']);
+    expect(_sampleCollection.getExplorationIds()).toEqual(['exp_id1', 'exp_id0']);
   });
 
   it('should create a proper backend change dict for deleting collection nodes',

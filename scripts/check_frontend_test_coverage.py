@@ -74,7 +74,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'coord-two-dim-editor.component.ts',
     'current-interaction.service.ts',
     'drag-and-drop-positive-int-editor.component.ts',
-    'email-dashboard-data.service.ts',
+    'exploration-creation.service.ts',
     'exploration-footer.component.ts',
     'exploration-save.service.ts',
     'exploration-states.service.ts',
