@@ -25,7 +25,7 @@ import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { StorySummaryTileComponent } from './story-summary-tile.component';
 
 
-describe('StorySummaryTileComponent', () => {
+fdescribe('StorySummaryTileComponent', () => {
   let component: StorySummaryTileComponent;
   let fixture: ComponentFixture<StorySummaryTileComponent>;
   let wds: WindowDimensionsService;
@@ -404,6 +404,7 @@ describe('StorySummaryTileComponent', () => {
   });
 
   it('should show all chapters when user click on \'View All\' button', () => {
+    spyOn(wds, 'getWidth').and.returnValue(790);
     component.storySummary = StorySummary.createFromBackendDict({
       id: 'storyId',
       title: 'Story Title',
@@ -433,6 +434,7 @@ describe('StorySummaryTileComponent', () => {
 
   it('should hide extra chapters when user click on \'View less\'' +
     ' button', () => {
+    spyOn(wds, 'getWidth').and.returnValue(790);
     component.storySummary = StorySummary.createFromBackendDict({
       id: 'storyId',
       title: 'Story Title',
