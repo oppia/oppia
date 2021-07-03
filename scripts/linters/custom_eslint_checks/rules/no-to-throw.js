@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Lint check to report incomplete 'toThrow'.
+ * @fileoverview Lint check to prohibit the use of 'toThrow'.
  */
 
 'use strict';
@@ -22,14 +22,14 @@ module.exports = {
   meta: {
     type: 'problem',
     docs: {
-      description: 'Lint check to report incomplete "toThrow".',
-      category: 'Possible Errors',
+      description: 'Lint check to prohibit the use of "toThrow".',
+      category: 'Best Practices',
       recommended: true,
     },
     fixable: null,
     schema: [],
     messages: {
-      useToThrowError: 'Please use “toThrowError”  instead of “toThrow”.'
+      noToThrow: 'Please use “toThrowError”  instead of “toThrow”.'
     },
   },
 
@@ -38,7 +38,7 @@ module.exports = {
       'MemberExpression[property.name=toThrow]': function(node) {
         context.report({
           node: node.property,
-          messageId: 'useToThrowError'
+          messageId: 'noToThrow'
         });
       }
     };

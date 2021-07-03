@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,16 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for the no-incomplete-throw.js file.
+ * @fileoverview Tests for the no-to-throw.js file.
  */
 
 'use strict';
 
-var rule = require('./no-incomplete-throw');
+var rule = require('./no-to-throw');
 var RuleTester = require('eslint').RuleTester;
 
 var ruleTester = new RuleTester();
-ruleTester.run('no-incomplete-throw', rule, {
+ruleTester.run('no-to-throw', rule, {
   valid: [
     `angular.module('oppia').directive('codemirrorMergeview', [
     function() {
