@@ -130,7 +130,6 @@ export class AdminRolesTabComponent {
   }
 
   refreshFormData(): void {
-    let that = this;
     this.formData = {
       viewUserRoles: {
         filterCriterion: AppConstants.USER_FILTER_CRITERION_ROLE,
