@@ -37,7 +37,8 @@ describe('ItemSelectionInputValidationService', () => {
   let currentState: string;
   let goodAnswerGroups: AnswerGroup[],
     goodDefaultOutcome: Outcome;
-  let customizationArguments: ItemSelectionInputCustomizationArgs;
+  let customizationArguments: ItemSelectionInputCustomizationArgs,
+    badCustomizationArguments: ItemSelectionInputCustomizationArgs;
   let IsProperSubsetValidOption: AnswerGroup[];
   let oof: OutcomeObjectFactory,
     agof: AnswerGroupObjectFactory,
@@ -78,6 +79,21 @@ describe('ItemSelectionInputValidationService', () => {
           new SubtitledHtml('Selection 1', 'ca_0'),
           new SubtitledHtml('Selection 2', 'ca_1'),
           new SubtitledHtml('Selection 3', 'ca_2')
+        ]
+      },
+      maxAllowableSelectionCount: {
+        value: 2
+      },
+      minAllowableSelectionCount: {
+        value: 1
+      }
+    };
+    badCustomizationArguments = {
+      choices: {
+        value: [
+          new SubtitledHtml('Selection 1', 'ca_0'),
+          new SubtitledHtml('Selection 2', null),
+          new SubtitledHtml('Selection 3', null)
         ]
       },
       maxAllowableSelectionCount: {
@@ -149,6 +165,15 @@ describe('ItemSelectionInputValidationService', () => {
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
     expect(warnings).toEqual([]);
+  });
+
+  it('should throw error if contentId of choice in customizationArguments' +
+  ' does not exist', () => {
+    expect(() => {
+      validatorService.getAllWarnings(
+        currentState, badCustomizationArguments, goodAnswerGroups,
+        goodDefaultOutcome);
+    }).toThrowError('ContentId of choice does not exist');
   });
 
   it('should expect a choices customization argument', () => {

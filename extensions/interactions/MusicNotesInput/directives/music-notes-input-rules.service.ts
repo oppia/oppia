@@ -38,9 +38,9 @@ export class MusicNotesInputRulesService {
     if (
       InteractionsExtensionsConstants.NOTE_NAMES_TO_MIDI_VALUES.hasOwnProperty(
         note.readableNoteName)) {
-      const readableNoteName_ = note.readableNoteName as ReadableNoteNames;
+      const _readableNoteName = note.readableNoteName as ReadableNoteNames;
       return InteractionsExtensionsConstants.NOTE_NAMES_TO_MIDI_VALUES[
-        readableNoteName_];
+        _readableNoteName];
     } else {
       throw new Error('Invalid music note ' + note);
     }
