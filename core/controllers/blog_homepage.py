@@ -56,7 +56,6 @@ class BlogHomepageDataHandler(base.BaseHandler):
 
     @acl_decorators.open_access
     def get(self):
-        # type: () -> None
         """Handles GET requests."""
         published_post_summaries = (
             blog_services.get_published_blog_post_summaries())
