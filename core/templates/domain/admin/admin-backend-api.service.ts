@@ -270,7 +270,7 @@ export class AdminBackendApiService {
     }
     return new Promise((resolve, reject) => {
       this.http.get<ViewContributionBackendResponse>(
-        AdminPageConstants.ADMIN_CONTRIBUTION_RIGHTS_DATA_HANDLER, {
+        AdminPageConstants.ADMIN_CONTRIBUTION_USERS_HANDLER, {
           params
         }
       ).toPromise().then(response => {

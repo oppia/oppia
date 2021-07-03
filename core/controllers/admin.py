@@ -903,7 +903,7 @@ class ContributionRightsHandler(base.BaseHandler):
         self.render_json({})
 
 
-class ContributionRightsDataHandler(base.BaseHandler):
+class ContributionUsersHandler(base.BaseHandler):
     """Handler to show users with contribution rights."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON

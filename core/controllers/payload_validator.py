@@ -103,7 +103,7 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'ConceptCardDataHandler',
     'ConsoleErrorPage',
     'ContributionOpportunitiesHandler',
-    'ContributionRightsDataHandler',
+    'ContributionUsersHandler',
     'ContributorDashboardPage',
     'ContributorRightsDataHandler',
     'ContributionRightsHandler',

@@ -2066,15 +2066,15 @@ class ContributionRightsHandlerTest(test_utils.GenericTestBase):
                 self.translation_reviewer_id, language_code='hi'))
 
 
-class ContributionRightsDataHandlerTest(test_utils.GenericTestBase):
-    """Tests ContributionRightsDataHandler."""
+class ContributionUsersHandlerTest(test_utils.GenericTestBase):
+    """Tests ContributionUsersHandler."""
 
     TRANSLATION_REVIEWER_EMAIL = 'translationreviewer@example.com'
     VOICEOVER_REVIEWER_EMAIL = 'voiceoverreviewer@example.com'
     QUESTION_REVIEWER_EMAIL = 'questionreviewer@example.com'
 
     def setUp(self):
-        super(ContributionRightsDataHandlerTest, self).setUp()
+        super(ContributionUsersHandlerTest, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.TRANSLATION_REVIEWER_EMAIL, 'translator')
         self.signup(self.VOICEOVER_REVIEWER_EMAIL, 'voiceartist')
@@ -2094,7 +2094,7 @@ class ContributionRightsDataHandlerTest(test_utils.GenericTestBase):
         user_services.allow_user_to_review_translation_in_language(
             self.voiceover_reviewer_id, 'hi')
         response = self.get_json(
-            '/contributionrightsdatahandler', params={
+            '/contributionusershandler', params={
                 'category': 'translation',
                 'language_code': 'hi'
             })
@@ -2110,7 +2110,7 @@ class ContributionRightsDataHandlerTest(test_utils.GenericTestBase):
         user_services.allow_user_to_review_voiceover_in_language(
             self.voiceover_reviewer_id, 'hi')
         response = self.get_json(
-            '/contributionrightsdatahandler', params={
+            '/contributionusershandler', params={
                 'category': 'voiceover',
                 'language_code': 'hi'
             })
@@ -2124,7 +2124,7 @@ class ContributionRightsDataHandlerTest(test_utils.GenericTestBase):
         user_services.allow_user_to_review_question(self.question_reviewer_id)
         user_services.allow_user_to_review_question(self.voiceover_reviewer_id)
         response = self.get_json(
-            '/contributionrightsdatahandler', params={
+            '/contributionusershandler', params={
                 'category': 'question'
             })
 
@@ -2137,7 +2137,7 @@ class ContributionRightsDataHandlerTest(test_utils.GenericTestBase):
         user_services.allow_user_to_submit_question(self.question_reviewer_id)
         user_services.allow_user_to_submit_question(self.voiceover_reviewer_id)
         response = self.get_json(
-            '/contributionrightsdatahandler', params={
+            '/contributionusershandler', params={
                 'category': 'submit_question'
             })
 
@@ -2149,7 +2149,7 @@ class ContributionRightsDataHandlerTest(test_utils.GenericTestBase):
             self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.get_json(
-            '/contributionrightsdatahandler', params={
+            '/contributionusershandler', params={
                 'category': 'voiceover',
                 'language_code': 'invalid'
             }, expected_status_int=400)
@@ -2161,7 +2161,7 @@ class ContributionRightsDataHandlerTest(test_utils.GenericTestBase):
             self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.get_json(
-            '/contributionrightsdatahandler', params={
+            '/contributionusershandler', params={
                 'category': 'invalid',
                 'language_code': 'hi'
             }, expected_status_int=400)

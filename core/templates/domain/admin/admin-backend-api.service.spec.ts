@@ -405,7 +405,7 @@ describe('Admin backend api service', () => {
     ).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      '/contributionrightsdatahandler' +
+      '/contributionusershandler' +
       '?category=voiceover&language_code=en');
     expect(req.request.method).toEqual('GET');
 
@@ -425,7 +425,7 @@ describe('Admin backend api service', () => {
     ).then(successHandler, failHandler);
 
     req = httpTestingController.expectOne(
-      '/contributionrightsdatahandler' +
+      '/contributionusershandler' +
       '?category=question');
     expect(req.request.method).toEqual('GET');
 
@@ -448,7 +448,7 @@ describe('Admin backend api service', () => {
     ).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      '/contributionrightsdatahandler' +
+      '/contributionusershandler' +
       '?category=InvalidCategory&language_code=en');
     expect(req.request.method).toEqual('GET');
 
@@ -526,7 +526,7 @@ describe('Admin backend api service', () => {
     let languageCode = null;
     let username = 'validUser';
     let method = 'all';
-    let params = {
+    const params = {
       username: username,
       removal_type: method,
       category: category,
@@ -538,9 +538,9 @@ describe('Admin backend api service', () => {
 
     Object.keys(
       params).forEach((key) => (params[key] === null) && delete params[key]);
-    let query = new URLSearchParams(params);
-    let url = '/contributionrightshandler?' + query.toString();
-    let req = httpTestingController.expectOne(url);
+    const query = new URLSearchParams(params);
+    const url = '/contributionrightshandler?' + query.toString();
+    const req = httpTestingController.expectOne(url);
     expect(req.request.method).toEqual('DELETE');
     req.flush(
       { status: 200, statusText: 'Success.'});
@@ -557,7 +557,7 @@ describe('Admin backend api service', () => {
     let languageCode = null;
     let username = 'InvalidUser';
     let method = 'all';
-    let params = {
+    const params = {
       username: username,
       removal_type: method,
       category: category,
@@ -569,9 +569,9 @@ describe('Admin backend api service', () => {
 
     Object.keys(
       params).forEach((key) => (params[key] === null) && delete params[key]);
-    let query = new URLSearchParams(params);
-    let url = '/contributionrightshandler?' + query.toString();
-    let req = httpTestingController.expectOne(url);
+    const query = new URLSearchParams(params);
+    const url = '/contributionrightshandler?' + query.toString();
+    const req = httpTestingController.expectOne(url);
     expect(req.request.method).toEqual('DELETE');
 
     req.flush({
@@ -593,7 +593,7 @@ describe('Admin backend api service', () => {
     let languageCode = 'en';
     let username = 'validUser';
     let method = 'specific';
-    let params = {
+    const params = {
       username: username,
       removal_type: method,
       category: category,
@@ -605,9 +605,9 @@ describe('Admin backend api service', () => {
 
     Object.keys(
       params).forEach((key) => (params[key] === null) && delete params[key]);
-    let query = new URLSearchParams(params);
-    let url = '/contributionrightshandler?' + query.toString();
-    let req = httpTestingController.expectOne(url);
+    const query = new URLSearchParams(params);
+    const url = '/contributionrightshandler?' + query.toString();
+    const req = httpTestingController.expectOne(url);
     expect(req.request.method).toEqual('DELETE');
     req.flush(
       { status: 200, statusText: 'Success.'});
@@ -624,7 +624,7 @@ describe('Admin backend api service', () => {
     let languageCode = 'en';
     let username = 'InvalidUser';
     let method = 'specific';
-    let params = {
+    const params = {
       username: username,
       removal_type: method,
       category: category,
@@ -636,9 +636,9 @@ describe('Admin backend api service', () => {
 
     Object.keys(
       params).forEach((key) => (params[key] === null) && delete params[key]);
-    let query = new URLSearchParams(params);
-    let url = '/contributionrightshandler?' + query.toString();
-    let req = httpTestingController.expectOne(url);
+    const query = new URLSearchParams(params);
+    const url = '/contributionrightshandler?' + query.toString();
+    const req = httpTestingController.expectOne(url);
     expect(req.request.method).toEqual('DELETE');
 
     req.flush({
