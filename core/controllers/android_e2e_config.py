@@ -130,11 +130,9 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
                 1, topic_id))
 
         # Upload local exploration to the datastore and enable feedback.
-        exp_services.load_demo(python_utils.convert_to_bytes(
-            exp_id))
+        exp_services.load_demo(exp_id)
         rights_manager.release_ownership_of_exploration(
-            user_services.get_system_user(), python_utils.convert_to_bytes(
-                exp_id))
+            user_services.get_system_user(), exp_id)
         exp_services.update_exploration(
             user_id, exp_id, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,

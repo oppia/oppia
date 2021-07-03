@@ -220,9 +220,6 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/forum', pages.ForumRedirectPage),
 
     get_redirect_route(r'%s' % feconf.ADMIN_URL, admin.AdminPage),
-    get_redirect_route(
-        r'/initialize_android_test_data',
-        android_e2e_config.InitializeAndroidTestDataHandler),
     get_redirect_route(r'/adminhandler', admin.AdminHandler),
     get_redirect_route(r'/adminrolehandler', admin.AdminRoleHandler),
     get_redirect_route(
@@ -878,6 +875,12 @@ for subject in feconf.AVAILABLE_LANDING_PAGES:
             get_redirect_route(
                 r'/%s/%s' % (subject, topic),
                 custom_landing_pages.TopicLandingPage))
+
+if constants.DEV_MODE:
+    URLS.append(
+        get_redirect_route(
+            r'/initialize_android_test_data',
+            android_e2e_config.InitializeAndroidTestDataHandler))
 
 # 404 error handler (Needs to be at the end of the URLS list).
 URLS.append(get_redirect_route(r'/<:.*>', base.Error404Handler))

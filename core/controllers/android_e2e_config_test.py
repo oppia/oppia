@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for the admin page."""
+"""Tests for the android_e2e_config."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -25,19 +25,8 @@ from core.domain import skill_fetchers
 from core.domain import story_fetchers
 from core.domain import topic_fetchers
 from core.domain import topic_services
-from core.platform import models
 from core.tests import test_utils
 import feconf
-
-(
-    audit_models, exp_models, opportunity_models,
-    user_models
-) = models.Registry.import_models([
-    models.NAMES.audit, models.NAMES.exploration, models.NAMES.opportunity,
-    models.NAMES.user
-])
-
-EXPLORATION_ID = '26'
 
 
 class AndroidConfigTest(test_utils.GenericTestBase):
@@ -68,8 +57,9 @@ class AndroidConfigTest(test_utils.GenericTestBase):
         self.post_json(
             '/initialize_android_test_data', {}, use_payload=False,
             csrf_token=None)
+        exp_id = '26'
         topic = topic_fetchers.get_topic_by_name('Android test')
-        exploration = exp_fetchers.get_exploration_by_id(EXPLORATION_ID)
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
         story = story_fetchers.get_story_by_url_fragment(
             'android-end-to-end-testing')
         skill = skill_fetchers.get_skill_by_description(
@@ -79,7 +69,7 @@ class AndroidConfigTest(test_utils.GenericTestBase):
         topic.validate(strict=True)
         exploration.validate(strict=True)
         for node in story.story_contents.nodes:
-            self.assertEqual(node.exploration_id, EXPLORATION_ID)
+            self.assertEqual(node.exploration_id, exp_id)
 
     def test_initialize_structure_thumbnails_exist(self):
         # To validate the thumbnails for topics ans stories can be fetched
