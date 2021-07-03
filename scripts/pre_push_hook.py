@@ -55,6 +55,7 @@ GIT_NULL_COMMIT = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
 
 # CAUTION: __file__ is here *OPPIA/.git/hooks* and not in *OPPIA/scripts*.
 LINTER_MODULE = 'scripts.linters.pre_commit_linter'
+MYPY_TYPE_CHECK_MODULE = 'scripts.run_mypy_checks'
 FILE_DIR = os.path.abspath(os.path.dirname(__file__))
 OPPIA_DIR = os.path.join(FILE_DIR, os.pardir, os.pardir)
 LINTER_FILE_FLAG = '--files'
@@ -328,6 +329,18 @@ def start_linter(files):
     return task.returncode
 
 
+def execute_mypy_checks():
+    """Executes the mypy type checks.
+
+    Returns:
+        int. The return code from mypy checks.
+    """
+    task = subprocess.Popen(
+        [PYTHON_CMD, '-m', MYPY_TYPE_CHECK_MODULE, '--skip-install'])
+    task.communicate()
+    return task.returncode
+
+
 def run_script_and_get_returncode(cmd_list):
     """Runs script and returns the returncode of the task.
 
@@ -508,6 +521,13 @@ def main(args=None):
                     python_utils.PRINT(
                         'Push failed, please correct the linting issues above.')
                     sys.exit(1)
+
+            mypy_check_status = execute_mypy_checks()
+            if mypy_check_status != 0:
+                python_utils.PRINT(
+                    'Push failed, please correct the mypy type annotation '
+                    'issues above.')
+                sys.exit(mypy_check_status)
 
             typescript_checks_status = 0
             if does_diff_include_ts_files(files_to_lint):
