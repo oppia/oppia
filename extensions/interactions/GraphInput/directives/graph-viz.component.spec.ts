@@ -1738,19 +1738,6 @@ describe('GraphVizComponent', () => {
       expect(component.state.currentlyDraggedVertex).toBeNull();
     }));
 
-  it('should execute debounce when user releases mouse button',
-    fakeAsync(() => {
-      spyOn(window, 'clearTimeout');
-      spyOn(window, 'setTimeout');
-      let evt = new MouseEvent('mouseup', {});
-
-      document.dispatchEvent(evt);
-      tick(10);
-
-      expect(clearTimeout).toHaveBeenCalled();
-      expect(setTimeout).toHaveBeenCalledWith(jasmine.any(Function), 5);
-    }));
-
   it('should return selected vertex label when called', () => {
     component.state.selectedVertex = 0;
     component.graph.vertices[0].label = 'vertex_label';
