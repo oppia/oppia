@@ -223,7 +223,7 @@ class AuthorsPageHandlerTest(test_utils.GenericTestBase):
         blog_admin_model.deleted = True
         blog_admin_model.update_timestamps()
         blog_admin_model.put()
-        json_response = self.get_json(
+        self.get_json(
             '%s/%s' % (feconf.BLOG_AUTHORS_PAGE_URL, self.BLOG_ADMIN_USERNAME),
             expected_status_int=404)
 
@@ -233,6 +233,6 @@ class AuthorsPageHandlerTest(test_utils.GenericTestBase):
             '%s/%s' % (feconf.BLOG_AUTHORS_PAGE_URL, self.BLOG_ADMIN_USERNAME),
             )
         self.set_user_role(self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_ADMIN)
-        json_response = self.get_json(
+        self.get_json(
             '%s/%s' % (feconf.BLOG_AUTHORS_PAGE_URL, self.BLOG_ADMIN_USERNAME),
             expected_status_int=404)
