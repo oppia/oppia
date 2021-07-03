@@ -1973,12 +1973,6 @@ describe('FilepathEditor', () => {
       .toHaveBeenCalledWith('Error communicating with server.');
   }));
 
-  // Warning: We cannot test for the following functions
-  // See https://github.com/jasmine/jasmine/issues/1414 for more information
-  // In case fakeAsync is used the following error occurs:
-  // "Error: Cannot make XHRs from within a fake async test". Using
-  // httpTestingController also does not capture the url.
-  // This is due to a mistake in the npm package see for more info https://blog.tableflip.io/the-difference-between-module-exports-and-exports/
   it('should save uploaded gif when user clicks \`Use Image\`' +
   ' button', (done) => {
     spyOnProperty(MouseEvent.prototype, 'offsetX').and.returnValue(360);
