@@ -63,8 +63,8 @@ class LearnerProgress(python_utils.OBJECT):
                 collections in the learner playlist.
             all_topic_summaries: list(TopicSummary). The summaries of the topics
                 in the edit goals.
-            untracked_topic_summaries: list(TopicSummary). The summaries of the topics
-                not tracked for the user.
+            untracked_topic_summaries: list(TopicSummary). The summaries of the
+                topics not tracked for the user.
             completed_to_incomplete_collection_titles: list(CollectionSummary).
                 The summaries corresponding to those collections which have
                 been moved to the in progress section on account of new
@@ -108,7 +108,8 @@ class ActivityIdsInLearnerDashboard(python_utils.OBJECT):
             completed_story_ids, learnt_topic_ids,
             incomplete_exploration_ids, incomplete_collection_ids,
             partially_learnt_topic_ids, topic_ids_to_learn, all_topic_ids,
-            untracked_topic_ids, exploration_playlist_ids, collection_playlist_ids):
+            untracked_topic_ids, exploration_playlist_ids,
+            collection_playlist_ids):
         """Constructs a ActivityIdsInLearnerDashboard domain object.
 
         Args:
@@ -169,7 +170,8 @@ class ActivityIdsInLearnerDashboard(python_utils.OBJECT):
                 'topic_ids_to_learn': list(str). The ids of the topics
                     to learn.
                 'all_topic_ids': list(str). The ids of all the topics.
-                'untracked_topic_ids': list(str). The ids of the untracked topics.
+                'untracked_topic_ids': list(str). The ids of the untracked
+                    topics.
                 'exploration_playlist_ids': list(str). The ids of the
                     explorations that are in the playlist
                 'collection_playlist_ids': list(str). The ids of the

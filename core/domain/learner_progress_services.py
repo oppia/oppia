@@ -1676,9 +1676,9 @@ def get_learner_dashboard_activities(user_id):
     else:
         topic_ids_to_learn = []
 
-    all_topic_ids, untracked_topic_ids = get_all_and_untracked_topic_ids_for_user(
-        partially_learnt_topic_ids, learnt_topic_ids,
-        topic_ids_to_learn)
+    all_topic_ids, untracked_topic_ids = (
+        get_all_and_untracked_topic_ids_for_user(
+            partially_learnt_topic_ids, learnt_topic_ids, topic_ids_to_learn))
 
     activity_ids = learner_progress_domain.ActivityIdsInLearnerDashboard(
         completed_exploration_ids, completed_collection_ids,
