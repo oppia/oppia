@@ -23,6 +23,8 @@ from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import admin
 from core.controllers import base
+from core.controllers import blog_admin
+from core.controllers import blog_dashboard
 from core.controllers import classifier
 from core.controllers import classroom
 from core.controllers import collection_editor
@@ -833,6 +835,19 @@ URLS = MAPREDUCE_HANDLERS + [
             feconf.IMPROVEMENTS_CONFIG_URL_PREFIX,
             constants.TASK_ENTITY_TYPE_EXPLORATION),
         improvements.ExplorationImprovementsConfigHandler),
+
+    get_redirect_route(
+        r'%s' % feconf.BLOG_ADMIN_ROLE_HANDLER_URL,
+        blog_admin.BlogAdminRolesHandler),
+    get_redirect_route(
+        r'/blogadminhandler', blog_admin.BlogAdminHandler),
+
+    get_redirect_route(
+        r'%s/<blog_post_id>' % feconf.BLOG_EDITOR_DATA_URL_PREFIX,
+        blog_dashboard.BlogPostHandler),
+    get_redirect_route(
+        r'%s' % feconf.BLOG_DASHBOARD_DATA_URL,
+        blog_dashboard.BlogDashboardDataHandler),
 
     get_redirect_route(
         r'/issuesdatahandler/<exploration_id>', editor.FetchIssuesHandler),

@@ -18,6 +18,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
+from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -265,7 +266,7 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
         self.login(self.VIEWER_EMAIL)
 
         response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
-        self.assertEqual(len(response['topics_to_learn']), 0)
+        self.assertEqual(len(response['topics_to_learn_list']), 0)
 
         self.save_new_topic(
             self.TOPIC_ID_1, self.owner_id, name=self.TOPIC_NAME_1,
@@ -283,9 +284,97 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
         learner_progress_services.validate_and_add_topic_to_learn_goal(
             self.viewer_id, self.TOPIC_ID_1)
         response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
-        self.assertEqual(len(response['topics_to_learn']), 1)
+        self.assertEqual(len(response['topics_to_learn_list']), 1)
         self.assertEqual(
-            response['topics_to_learn'][0]['id'], self.TOPIC_ID_1)
+            response['topics_to_learn_list'][0]['id'], self.TOPIC_ID_1)
+        self.logout()
+
+    def test_can_see_all_topics(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['all_topics_list']), 0)
+
+        self.save_new_topic(
+            self.TOPIC_ID_1, self.owner_id, name=self.TOPIC_NAME_1,
+            url_fragment='topic-one',
+            description='A new topic', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[self.subtopic_0], next_subtopic_id=1)
+        topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id)
+        self.save_new_story(self.STORY_ID_2, self.owner_id, self.TOPIC_ID_1)
+        topic_services.add_canonical_story(
+            self.owner_id, self.TOPIC_ID_1, self.STORY_ID_2)
+        topic_services.publish_story(
+            self.TOPIC_ID_1, self.STORY_ID_2, self.admin_id)
+        csrf_token = self.get_new_csrf_token()
+        new_config_value = [{
+            'name': 'math',
+            'url_fragment': 'math',
+            'topic_ids': [self.TOPIC_ID_1],
+            'course_details': '',
+            'topic_list_intro': ''
+        }]
+
+        payload = {
+            'action': 'save_config_properties',
+            'new_config_property_values': {
+                config_domain.CLASSROOM_PAGES_DATA.name: (
+                    new_config_value),
+            }
+        }
+        self.post_json('/adminhandler', payload, csrf_token=csrf_token)
+        self.logout()
+
+        self.login(self.VIEWER_EMAIL)
+        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['all_topics_list']), 1)
+        self.assertEqual(
+            response['all_topics_list'][0]['id'], self.TOPIC_ID_1)
+        self.logout()
+
+    def test_can_see_new_topics(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['new_topics_list']), 0)
+
+        self.save_new_topic(
+            self.TOPIC_ID_1, self.owner_id, name=self.TOPIC_NAME_1,
+            url_fragment='topic-one',
+            description='A new topic', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[self.subtopic_0], next_subtopic_id=1)
+        topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id)
+        self.save_new_story(self.STORY_ID_2, self.owner_id, self.TOPIC_ID_1)
+        topic_services.add_canonical_story(
+            self.owner_id, self.TOPIC_ID_1, self.STORY_ID_2)
+        topic_services.publish_story(
+            self.TOPIC_ID_1, self.STORY_ID_2, self.admin_id)
+        csrf_token = self.get_new_csrf_token()
+        new_config_value = [{
+            'name': 'math',
+            'url_fragment': 'math',
+            'topic_ids': [self.TOPIC_ID_1],
+            'course_details': '',
+            'topic_list_intro': ''
+        }]
+
+        payload = {
+            'action': 'save_config_properties',
+            'new_config_property_values': {
+                config_domain.CLASSROOM_PAGES_DATA.name: (
+                    new_config_value),
+            }
+        }
+        self.post_json('/adminhandler', payload, csrf_token=csrf_token)
+        self.logout()
+
+        self.login(self.VIEWER_EMAIL)
+        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['new_topics_list']), 1)
+        self.assertEqual(
+            response['new_topics_list'][0]['id'], self.TOPIC_ID_1)
         self.logout()
 
     def test_can_see_exploration_playlist(self):
