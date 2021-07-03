@@ -1995,6 +1995,8 @@ describe('FilepathEditor', () => {
     spyOn(csrfTokenService, 'getTokenAsync').and.callFake(async() => {
       return Promise.resolve('sample-csrf-token');
     });
+    spyOn(contextService, 'getImageSaveDestination').and.returnValue(
+      AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
     // This throws an error "Type '{ lastModified: number; name:
     // string; size: number; type: string; }' is missing the following
     // properties from type 'File': arrayBuffer, slice, stream, text"
