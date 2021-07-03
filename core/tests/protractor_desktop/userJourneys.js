@@ -34,10 +34,11 @@ var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 
 var _selectLanguage = async function(language) {
-  await action.select(
-    'Language Selector',
-    element(by.css('.protractor-test-i18n-language-selector')),
-    language);
+  var languageDropdown = element(by.css('.protractor-test-language-dropdown'));
+  var languageOption = element(
+    by.css('.protractor-test-i18n-language-' + language));
+  await action.click('Language Dropdown', languageDropdown);
+  await action.click('Language Option', languageOption);
   // Wait for the language-change request to reach the backend.
   await waitFor.pageToFullyLoad();
 };
@@ -180,7 +181,7 @@ describe('Site language', function() {
     // Starting language is English.
     await browser.get('/about');
     await waitFor.pageToFullyLoad();
-    await _selectLanguage('English');
+    await _selectLanguage('en');
     await libraryPage.get();
     await libraryPage.expectMainHeaderTextToBe(
       'Imagine what you could learn today...');
@@ -189,7 +190,7 @@ describe('Site language', function() {
   it('should change after selecting a different language', async function() {
     await browser.get('/about');
     await waitFor.pageToFullyLoad();
-    await _selectLanguage('Español');
+    await _selectLanguage('es');
 
     await libraryPage.get();
     await libraryPage.expectMainHeaderTextToBe(
@@ -228,7 +229,7 @@ describe('Site language', function() {
       await users.login('feanor@example.com');
       await browser.get('/about');
       await waitFor.pageToFullyLoad();
-      await _selectLanguage('Español');
+      await _selectLanguage('es');
       await libraryPage.get();
       await libraryPage.expectMainHeaderTextToBe(
         'Imagina lo que podrías aprender hoy...');
@@ -245,7 +246,7 @@ describe('Site language', function() {
     await users.login('langCreator@explorations.com');
     await browser.get('/about');
     await waitFor.pageToFullyLoad();
-    await _selectLanguage('Español');
+    await _selectLanguage('es');
     await general.openEditor(firstExplorationId, false);
 
     // Spanish is still selected.
@@ -260,7 +261,7 @@ describe('Site language', function() {
     async function() {
       await browser.get('/about');
       await waitFor.pageToFullyLoad();
-      await _selectLanguage('Español');
+      await _selectLanguage('es');
 
       // Checking collection player page.
       await browser.get('/collection/' + collectionId);
@@ -284,7 +285,7 @@ describe('Site language', function() {
     // Reset language back to English.
     await browser.get('/about');
     await waitFor.pageToFullyLoad();
-    await _selectLanguage('English');
+    await _selectLanguage('en');
     await general.checkForConsoleErrors([]);
   });
 });

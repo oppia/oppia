@@ -25,7 +25,7 @@
   </ul>
   <div class="hint-container" *ngIf="isVisible && isTooltipVisible()">
     <div class="hint-box">
-      Need help? View a hint for this problem!
+      <span [innerHTML]="'I18N_HINT_NEED_HELP' | translate"></span>
       <button type="button"
               class="btn close"
               aria-label="Close"

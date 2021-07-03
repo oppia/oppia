@@ -45,7 +45,7 @@
   <button class="btn btn-secondary" (click)="cancel()">
     {{ 'I18N_PLAYER_REPORT_MODAL_FOOTER_CANCEL' | translate }}
   </button>
-  <button class="btn btn-success" (click)="submitReport()" [disabled]="!flagMessage">
+  <button class="btn btn-success protractor-test-submit-report-button" (click)="submitReport()" [disabled]="!flagMessage">
     {{ 'I18N_PLAYER_REPORT_MODAL_FOOTER_SUBMIT' | translate }}
   </button>
 </div>

@@ -490,8 +490,6 @@
 /core/templates/pages/interaction-specs.constants.ts @nithusha21
 /core/templates/pages/login-page/ @brianrodri
 /core/templates/pages/logout-page/ @brianrodri
-/core/templates/base-components/i18n-language-selector.component.ts @nithusha21
-/core/templates/base-components/i18n-language-selector.component.html @nithusha21
 /core/templates/app-events/ @srijanreddy98
 /core/templates/services/app.service*.ts @srijanreddy98
 /core/templates/services/contextual/document-attribute-customization.service*.ts @srijanreddy98
