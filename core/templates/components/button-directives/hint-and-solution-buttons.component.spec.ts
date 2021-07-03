@@ -28,6 +28,7 @@ import { PlayerPositionService } from 'pages/exploration-player-page/services/pl
 import { PlayerTranscriptService } from 'pages/exploration-player-page/services/player-transcript.service';
 import { StatsReportingService } from 'pages/exploration-player-page/services/stats-reporting.service';
 import { HintAndSolutionButtonsComponent } from './hint-and-solution-buttons.component';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 /**
  * @fileoverview Unit tests for HintAndSolutionButtonsComponent
@@ -51,7 +52,7 @@ describe('HintAndSolutionButtonsComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [HintAndSolutionButtonsComponent]
+      declarations: [HintAndSolutionButtonsComponent, MockTranslatePipe]
     }).compileComponents();
   }));
 

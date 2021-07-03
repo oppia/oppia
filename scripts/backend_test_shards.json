@@ -3,7 +3,6 @@
         "core.controllers.base_test",
         "core.controllers.collection_editor_test",
         "core.controllers.editor_test",
-        "core.controllers.learner_goals_test",
         "core.controllers.learner_playlist_test",
         "core.controllers.review_tests_test",
         "core.controllers.resources_test",
@@ -106,10 +105,12 @@
         "core.domain.exp_services_test"
     ],
     "4": [
+        "core.controllers.learner_goals_test",
         "core.domain.beam_job_domain_test",
         "core.domain.beam_job_services_test",
         "core.domain.blog_domain_test",
         "core.domain.blog_services_test",
+        "core.domain.learner_goals_services_test",
         "core.domain.skill_jobs_one_off_test",
         "scripts.check_if_pr_is_low_risk_test",
         "scripts.scripts_test_utils_test",
@@ -197,7 +198,6 @@
         "core.domain.classifier_domain_test",
         "core.domain.user_jobs_continuous_test",
         "core.domain.wipeout_domain_test",
-        "core.domain.learner_goals_services_test",
         "core.domain.learner_playlist_services_test",
         "core.domain.state_domain_test",
         "core.domain.activity_services_test",
