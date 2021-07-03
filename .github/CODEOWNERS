@@ -101,7 +101,7 @@
 # Blog project
 /core/domain/blog*.py @iamprayush
 /core/controllers/blog_dashboard*.py @iamprayush
-
+/core/templates/pages/blog-admin-page/ @kevintab95
 
 # Collection project.
 /core/controllers/collection*.py @aks681

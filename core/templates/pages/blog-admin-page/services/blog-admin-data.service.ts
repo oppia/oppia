@@ -36,10 +36,6 @@ export class BlogAdminDataService {
   }
 
   async _getDataAsync(): Promise<BlogAdminPageData> {
-    if (this.dataPromise) {
-      return this.dataPromise;
-    }
-
     this.dataPromise = this.BackendApiService.getDataAsync();
 
     return this.dataPromise;

@@ -59,7 +59,8 @@ module.exports = {
   entry: {
     about: commonPrefix + '/pages/about-page/about-page.import.ts',
     admin: commonPrefix + '/pages/admin-page/admin-page.import.ts',
-    blog_admin: commonPrefix + '/pages/blog-admin-page/blog-admin-page.import.ts',
+    blog_admin:
+      commonPrefix + '/pages/blog-admin-page/blog-admin-page.import.ts',
     classroom:
       commonPrefix + '/pages/classroom-page/classroom-page.import.ts',
     collection_editor:
@@ -200,7 +201,8 @@ module.exports = {
           'with the mission of providing high-quality ' +
           'education to those who lack access to it.'
       },
-      template: commonPrefix + '/pages/blog-admin-page/blog-admin-page.mainpage.html',
+      template:
+        commonPrefix + '/pages/blog-admin-page/blog-admin-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

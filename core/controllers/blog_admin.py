@@ -35,16 +35,18 @@ BLOG_ADMIN = feconf.ROLE_ID_BLOG_ADMIN
 
 class BlogAdminPage(base.BaseHandler):
     """Blog Admin Page  Handler to render the frontend template."""
+
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {}
     }
 
-    @acl_decorators.can_access_admin_page
+    @acl_decorators.can_access_blog_admin_page
     def get(self):
         """Handles GET requests."""
 
         self.render_template('blog-admin-page.mainpage.html')
+
 
 class BlogAdminHandler(base.BaseHandler):
     """Handler for the blog admin page."""

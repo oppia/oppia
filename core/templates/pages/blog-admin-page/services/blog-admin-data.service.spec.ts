@@ -24,30 +24,32 @@ import { BlogAdminDataService } from
   'pages/blog-admin-page/services/blog-admin-data.service';
 import { BlogAdminPageData, BlogAdminPageDataBackendDict } from
   'domain/blog-admin/blog-admin-backend-api.service';
-import { PlatformParameterFilterType } from 'domain/platform_feature/platform-parameter-filter.model';
-import { FeatureStage, PlatformParameter } from 'domain/platform_feature/platform-parameter.model';
-
-
 
 describe('Admin Data Service', () => {
   let blogAdminDataService: BlogAdminDataService = null;
   let httpTestingController: HttpTestingController;
   let sampleBlogAdminData: BlogAdminPageDataBackendDict = {
     role_to_actions: {
-      guest: ['action for guest']
-    },
-    updatable_roles: {
-      TOPIC_MANAGER: 'topic manager'
+      blog_post_editor: ['action for editor']
     },
     config_properties: {
-      oppia_csrf_secret: {
+      list_of_default_tags_for_blog_post: {
+        description: 'List of tags',
+        value: ['News'],
         schema: {
-          type: 'unicode'
-        },
-        value: 10,
-        description: 'Text used to encrypt CSRF tokens.'
+          type: 'list',
+          items: {
+            type: 'unicode'
+          },
+          validators: [{
+            id: 'is_uniquified',
+          }],
+        }
       }
     },
+    updatable_roles: {
+      blog_post_editor: 'blog_post_editor'
+    }
   };
   let blogAdminDataResponse: BlogAdminPageData;
 
@@ -75,29 +77,29 @@ describe('Admin Data Service', () => {
     });
 
     var req = httpTestingController.expectOne(
-      '/blogAdminhandler');
+      '/blogadminhandler');
     expect(req.request.method).toEqual('GET');
     req.flush(sampleBlogAdminData);
 
     flushMicrotasks();
   }));
 
-  it('should cache the response and not make a second request',
+  it('should return updated blog admin data',
     fakeAsync(() => {
       blogAdminDataService.getDataAsync();
 
       var req = httpTestingController.expectOne(
-        '/adminhandler');
+        '/blogadminhandler');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleBlogAdminData);
 
       flushMicrotasks();
 
-      blogAdminDataService.getDataAsync().then(function(response) {
-        expect(response).toEqual(blogAdminDataResponse);
+      blogAdminDataService.getDataAsync().then((response) => {
+        expect(response).toEqual(sampleBlogAdminData);
       });
 
-      httpTestingController.expectNone('/adminhandler');
+      httpTestingController.expectNone('/blogadminhandler');
     })
   );
 });
