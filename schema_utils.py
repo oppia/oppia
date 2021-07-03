@@ -598,7 +598,7 @@ class _Validators(python_utils.OBJECT):
         """Checks if the given obj (a string) represents a valid language code.
 
         Args:
-            obj: str. A string.
+            obj: str. The language code to verify.
 
         Returns:
             bool. Whether the given object is a valid audio language code.
