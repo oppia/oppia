@@ -19,7 +19,8 @@
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
-import { BlogAdminBackendApiService, ConfigPropertiesBackendResponse, ConfigPropertyValues } from 'domain/blog-admin/blog-admin-backend-api.service';
+import { BlogAdminBackendApiService, ConfigPropertiesBackendResponse, ConfigPropertyValues }
+  from 'domain/blog-admin/blog-admin-backend-api.service';
 import { BlogAdminDataService } from 'pages/blog-admin-page/services/blog-admin-data.service';
 import { AdminTaskManagerService } from 'pages/admin-page/services/admin-task-manager.service';
 import { Schema } from 'services/schema-default-value.service';

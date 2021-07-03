@@ -25,6 +25,30 @@ from core.tests import test_utils
 import feconf
 
 
+class BlogAdminPageTests(test_utils.GenericTestBase):
+    """Checks the access to the blog admin page and its rendering."""
+
+    def test_blog_admin_page(self):
+        """Tests access to the Blog Admin page."""
+        # Try accessing the blog admin page without logging in.
+        self.get_html_response('/blog-admin', expected_status_int=302)
+
+        # Try accessing the blog admin page without being a blog admin.
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.login(self.VIEWER_EMAIL)
+        self.get_html_response('/blog-admin', expected_status_int=401)
+        self.logout()
+
+        # Try accessing the blog admin page after logging in as a blog
+        # admin.
+        self.signup(self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
+        self.set_user_role(
+            self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_BLOG_ADMIN)
+        self.login(self.BLOG_ADMIN_EMAIL)
+        self.get_html_response('/blog-admin')
+        self.logout()
+
+
 class BlogAdminRolesHandlerTest(test_utils.GenericTestBase):
     """Checks the user role handling on the blog admin page."""
 

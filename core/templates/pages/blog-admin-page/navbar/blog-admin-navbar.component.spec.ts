@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for release-coordinator navbar component.
+ * @fileoverview Unit tests for blog admin navbar component.
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -23,7 +23,7 @@ import { UserService } from 'services/user.service';
 import { BlogAdminNavbarComponent } from 'pages/blog-admin-page/navbar/blog-admin-navbar.component';
 
 
-describe('Release coordinator navbar component', () => {
+describe('Blog Admin navbar component', () => {
   let component: BlogAdminNavbarComponent;
   let userService = null;
   let userProfileImage = 'profile-data-url';
@@ -48,6 +48,8 @@ describe('Release coordinator navbar component', () => {
       .and.resolveTo(userProfileImage);
     spyOn(userService, 'getUserInfoAsync')
       .and.resolveTo(userInfo);
+
+    component.ngOnInit();
   }));
 
   it('should initialize component properties correctly', () => {

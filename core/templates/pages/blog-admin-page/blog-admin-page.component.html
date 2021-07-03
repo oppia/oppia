@@ -63,9 +63,9 @@
           <legend class="text-center">Configuration properties</legend>
           <div class="container ml-0">
             <div *ngFor="let property of configProperties | keyvalue">
-              <div class="row protractor-test-config-property oppia-description-text-container">
+              <div class="row oppia-description-text-container">
                 <span class="col-lg-2 col-md-2 col-sm-2">
-                  <em class="protractor-test-config-title">{{ property.value.description }}</em>
+                  <em>{{ property.value.description }}</em>
                 </span>
                 <span class="col-lg-6 col-md-6 col-sm-6">
                   <schema-based-editor [schema]="getSchemaCallback(property.value.schema)" [(localValue)]="property.value.value">
@@ -78,7 +78,7 @@
                 </span>
               </div>
             </div>
-            <button (click)="saveConfigProperties()" class="protractor-test-save-all-configs">Save</button>
+            <button (click)="saveConfigProperties()">Save</button>
             <button (click)="reloadConfigProperties()">Undo changes</button>
           </div>
         </mat-card>

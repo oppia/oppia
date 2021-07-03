@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for AdminDataService.
+ * @fileoverview Tests for BlogAdminDataService.
  */
 
 import { HttpClientTestingModule, HttpTestingController } from
@@ -25,7 +25,7 @@ import { BlogAdminDataService } from
 import { BlogAdminPageData, BlogAdminPageDataBackendDict } from
   'domain/blog-admin/blog-admin-backend-api.service';
 
-describe('Admin Data Service', () => {
+describe('Blog Admin Data Service', () => {
   let blogAdminDataService: BlogAdminDataService = null;
   let httpTestingController: HttpTestingController;
   let sampleBlogAdminData: BlogAdminPageDataBackendDict = {
@@ -83,23 +83,4 @@ describe('Admin Data Service', () => {
 
     flushMicrotasks();
   }));
-
-  it('should return updated blog admin data',
-    fakeAsync(() => {
-      blogAdminDataService.getDataAsync();
-
-      var req = httpTestingController.expectOne(
-        '/blogadminhandler');
-      expect(req.request.method).toEqual('GET');
-      req.flush(sampleBlogAdminData);
-
-      flushMicrotasks();
-
-      blogAdminDataService.getDataAsync().then((response) => {
-        expect(response).toEqual(sampleBlogAdminData);
-      });
-
-      httpTestingController.expectNone('/blogadminhandler');
-    })
-  );
 });
