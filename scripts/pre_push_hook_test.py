@@ -63,6 +63,9 @@ class PrePushHookTests(test_utils.GenericTestBase):
         self.linter_code = 0
         def mock_start_linter(unused_files_to_lint):
             return self.linter_code
+        self.mypy_check_code = 0
+        def mock_execute_mypy_checks():
+            return self.mypy_check_code
         self.does_diff_include_js_or_ts_files = False
         def mock_does_diff_include_js_or_ts_files(unused_diff_files):
             return self.does_diff_include_js_or_ts_files
@@ -96,6 +99,8 @@ class PrePushHookTests(test_utils.GenericTestBase):
             subprocess, 'check_output', mock_check_output)
         self.start_linter_swap = self.swap(
             pre_push_hook, 'start_linter', mock_start_linter)
+        self.execute_mypy_checks_swap = self.swap(
+            pre_push_hook, 'execute_mypy_checks', mock_execute_mypy_checks)
         self.js_or_ts_swap = self.swap(
             pre_push_hook, 'does_diff_include_js_or_ts_files',
             mock_does_diff_include_js_or_ts_files)
@@ -403,6 +408,10 @@ class PrePushHookTests(test_utils.GenericTestBase):
         with self.popen_swap:
             self.assertEqual(pre_push_hook.start_linter(['files']), 0)
 
+    def test_execute_mypy_checks(self):
+        with self.popen_swap:
+            self.assertEqual(pre_push_hook.execute_mypy_checks(), 0)
+
     def test_run_script_and_get_returncode(self):
         with self.popen_swap:
             self.assertEqual(
@@ -625,12 +634,26 @@ class PrePushHookTests(test_utils.GenericTestBase):
         with self.get_remote_name_swap, self.get_refs_swap, self.print_swap:
             with self.collect_files_swap, self.uncommitted_files_swap:
                 with self.check_output_swap, self.start_linter_swap:
-                    with self.assertRaisesRegexp(SystemExit, '1'):
-                        with self.swap_check_backend_python_libs:
-                            pre_push_hook.main(args=[])
+                    with self.execute_mypy_checks_swap:
+                        with self.assertRaisesRegexp(SystemExit, '1'):
+                            with self.swap_check_backend_python_libs:
+                                pre_push_hook.main(args=[])
         self.assertTrue(
             'Push failed, please correct the linting issues above.'
             in self.print_arr)
+
+    def test_mypy_check_failure(self):
+        self.mypy_check_code = 1
+        with self.get_remote_name_swap, self.get_refs_swap, self.print_swap:
+            with self.collect_files_swap, self.uncommitted_files_swap:
+                with self.check_output_swap, self.start_linter_swap:
+                    with self.execute_mypy_checks_swap:
+                        with self.assertRaisesRegexp(SystemExit, '1'):
+                            with self.swap_check_backend_python_libs:
+                                pre_push_hook.main(args=[])
+        self.assertIn(
+            'Push failed, please correct the mypy type annotation issues '
+            'above.', self.print_arr)
 
     def test_typescript_check_failiure(self):
         self.does_diff_include_ts_files = True
@@ -643,9 +666,10 @@ class PrePushHookTests(test_utils.GenericTestBase):
             with self.collect_files_swap, self.uncommitted_files_swap:
                 with self.check_output_swap, self.start_linter_swap:
                     with self.ts_swap, run_script_and_get_returncode_swap:
-                        with self.assertRaisesRegexp(SystemExit, '1'):
-                            with self.swap_check_backend_python_libs:
-                                pre_push_hook.main(args=[])
+                        with self.execute_mypy_checks_swap:
+                            with self.assertRaisesRegexp(SystemExit, '1'):
+                                with self.swap_check_backend_python_libs:
+                                    pre_push_hook.main(args=[])
         self.assertTrue(
             'Push aborted due to failing typescript checks.' in self.print_arr)
 
@@ -663,9 +687,10 @@ class PrePushHookTests(test_utils.GenericTestBase):
             with self.collect_files_swap, self.uncommitted_files_swap:
                 with self.check_output_swap, self.start_linter_swap:
                     with self.ts_swap, run_script_and_get_returncode_swap:
-                        with self.assertRaisesRegexp(SystemExit, '1'):
-                            with self.swap_check_backend_python_libs:
-                                pre_push_hook.main(args=[])
+                        with self.execute_mypy_checks_swap:
+                            with self.assertRaisesRegexp(SystemExit, '1'):
+                                with self.swap_check_backend_python_libs:
+                                    pre_push_hook.main(args=[])
         self.assertTrue(
             'Push aborted due to failing typescript checks in '
             'strict mode.' in self.print_arr)
@@ -681,9 +706,10 @@ class PrePushHookTests(test_utils.GenericTestBase):
             with self.collect_files_swap, self.uncommitted_files_swap:
                 with self.check_output_swap, self.start_linter_swap:
                     with self.js_or_ts_swap, run_script_and_get_returncode_swap:
-                        with self.assertRaisesRegexp(SystemExit, '1'):
-                            with self.swap_check_backend_python_libs:
-                                pre_push_hook.main(args=[])
+                        with self.execute_mypy_checks_swap:
+                            with self.assertRaisesRegexp(SystemExit, '1'):
+                                with self.swap_check_backend_python_libs:
+                                    pre_push_hook.main(args=[])
         self.assertTrue(
             'Push aborted due to failing frontend tests.' in self.print_arr)
 
@@ -700,9 +726,10 @@ class PrePushHookTests(test_utils.GenericTestBase):
                 with self.check_output_swap, self.start_linter_swap:
                     with run_script_and_get_returncode_swap:
                         with self.ci_config_or_js_files_swap:
-                            with self.assertRaisesRegexp(SystemExit, '1'):
-                                with self.swap_check_backend_python_libs:
-                                    pre_push_hook.main(args=[])
+                            with self.execute_mypy_checks_swap:
+                                with self.assertRaisesRegexp(SystemExit, '1'):
+                                    with self.swap_check_backend_python_libs:
+                                        pre_push_hook.main(args=[])
         self.assertTrue(
             'Push aborted due to failing e2e test configuration check.'
             in self.print_arr)
@@ -723,8 +750,9 @@ class PrePushHookTests(test_utils.GenericTestBase):
             with self.collect_files_swap, self.uncommitted_files_swap:
                 with self.check_output_swap, self.start_linter_swap:
                     with self.js_or_ts_swap:
-                        with self.swap_check_backend_python_libs:
-                            pre_push_hook.main(args=[])
+                        with self.execute_mypy_checks_swap:
+                            with self.swap_check_backend_python_libs:
+                                pre_push_hook.main(args=[])
 
     def test_main_exits_when_mismatches_exist_in_backend_python_libs(self):
         """Test that main exits with correct error message when mismatches are
