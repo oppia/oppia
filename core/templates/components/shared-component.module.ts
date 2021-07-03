@@ -21,7 +21,7 @@ import 'zone.js';
 // Modules.
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { NgbModalModule, NgbPopoverModule, NgbNavModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModalModule, NgbPopoverModule, NgbNavModule, NgbTooltipModule, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { AngularFireModule } from '@angular/fire';
 import { AngularFireAuth, AngularFireAuthModule, USE_EMULATOR } from '@angular/fire/auth';
 import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
@@ -60,6 +60,7 @@ import { AudioFileUploaderComponent } from './forms/custom-forms-directives/audi
 import { ThumbnailDisplayComponent } from './forms/custom-forms-directives/thumbnail-display.component';
 import { SkillMasteryViewerComponent } from './skill-mastery/skill-mastery.component';
 import { ExplorationSummaryTileComponent } from './summary-tile/exploration-summary-tile.component';
+import { LearnerStorySummaryTileComponent } from './summary-tile/learner-story-summary-tile.component';
 import { CollectionSummaryTileComponent } from './summary-tile/collection-summary-tile.component';
 import { TakeBreakModalComponent } from 'pages/exploration-player-page/templates/take-break-modal.component';
 import { TopicsAndSkillsDashboardNavbarBreadcrumbComponent } from 'pages/topics-and-skills-dashboard-page/navbar/topics-and-skills-dashboard-navbar-breadcrumb.component';
@@ -88,7 +89,6 @@ import { BaseContentComponent, BaseContentNavBarBreadCrumbDirective } from '../b
 import { QuestionDifficultySelectorComponent } from './question-difficulty-selector/question-difficulty-selector.component';
 import { PreviewThumbnailComponent } from 'pages/topic-editor-page/modal-templates/preview-thumbnail.component';
 import { InputResponsePairComponent } from 'pages/exploration-player-page/learner-experience/input-response-pair.component';
-import { I18nLanguageSelectorComponent } from '../base-components/i18n-language-selector.component';
 import { StorySummaryTileComponent } from './summary-tile/story-summary-tile.component';
 import { ExplorationFooterComponent } from 'pages/exploration-player-page/layout-directives/exploration-footer.component';
 import { DisplaySolutionModalComponent } from 'pages/exploration-player-page/modals/display-solution-modal.component';
@@ -168,6 +168,7 @@ const toastrConfig = {
     MaterialModule,
     DirectivesModule,
     DynamicContentModule,
+    NgbDropdownModule,
     NgbTooltipModule,
     NgbNavModule,
     NgbModalModule,
@@ -246,11 +247,11 @@ const toastrConfig = {
     DisplayHintModalComponent,
     ExplorationFooterComponent,
     ExplorationSummaryTileComponent,
+    LearnerStorySummaryTileComponent,
     CollectionSummaryTileComponent,
     ExplorationEmbedButtonModalComponent,
     FilterForMatchingSubstringPipe,
     HintAndSolutionButtonsComponent,
-    I18nLanguageSelectorComponent,
     InputResponsePairComponent,
     KeyboardShortcutHelpModalComponent,
     LazyLoadingComponent,
@@ -306,6 +307,7 @@ const toastrConfig = {
     CreateActivityModalComponent,
     ExplorationFooterComponent,
     ExplorationSummaryTileComponent,
+    LearnerStorySummaryTileComponent,
     CollectionSummaryTileComponent,
     BaseContentComponent,
     SharingLinksComponent,
@@ -327,7 +329,6 @@ const toastrConfig = {
     HintAndSolutionButtonsComponent,
     InputResponsePairComponent,
     KeyboardShortcutHelpModalComponent,
-    I18nLanguageSelectorComponent,
     OppiaFooterComponent,
     PreviewThumbnailComponent,
     PromoBarComponent,
@@ -384,9 +385,9 @@ const toastrConfig = {
     DisplayHintModalComponent,
     ExplorationFooterComponent,
     ExplorationSummaryTileComponent,
+    LearnerStorySummaryTileComponent,
     CollectionSummaryTileComponent,
     HintAndSolutionButtonsComponent,
-    I18nLanguageSelectorComponent,
     InputResponsePairComponent,
     LazyLoadingComponent,
     LoadingMessageComponent,
