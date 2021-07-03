@@ -1090,7 +1090,7 @@ class Story(python_utils.OBJECT):
         """
         file_system_class = fs_services.get_entity_file_system_class()
         fs = fs_domain.AbstractFileSystem(file_system_class(
-            feconf.ENTITY_TYPE_TOPIC, self.id))
+            feconf.ENTITY_TYPE_STORY, self.id))
 
         filepath = '%s/%s' % (
             constants.ASSET_TYPE_THUMBNAIL, new_thumbnail_filename)
