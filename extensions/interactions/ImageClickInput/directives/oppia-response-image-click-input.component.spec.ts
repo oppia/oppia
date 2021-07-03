@@ -60,4 +60,3 @@ describe('ResponseImageClickInput', () => {
     expect(component.clickRegionLabel).toBe('(Clicks on \'Region1\')');
   });
 });
-
