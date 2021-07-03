@@ -83,10 +83,16 @@ export class BlogAdminBackendApiService {
   }
 
   private async _postRequestAsync(
-      handlerUrl: string, payload: Object, action: string): Promise<void> {
+      handlerUrl: string, payload: Object, action?: string): Promise<void> {
     return new Promise((resolve, reject) => {
+      if (action) {
+        payload = {
+          ...payload,
+          action: action
+        };
+      }
       this.http.post<void>(
-        handlerUrl, { action, ...payload }).toPromise()
+        handlerUrl, payload).toPromise()
         .then(response => {
           resolve(response);
         }, errorResponse => {
@@ -114,13 +120,12 @@ export class BlogAdminBackendApiService {
 
   async updateUserRoleAsync(
       newRole: string, username: string): Promise<void> {
-    let action = 'update_user_role';
     let payload = {
       role: newRole,
       username: username,
     };
     return this._postRequestAsync(
-      '/blogadminrolehandler', payload, action);
+      '/blogadminrolehandler', payload);
   }
 
   async removeBlogEditorAsync(username: string): Promise<Object> {

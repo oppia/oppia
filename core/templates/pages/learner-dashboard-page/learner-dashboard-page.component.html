@@ -66,6 +66,17 @@
     <div class="col-md-2 oppia-learner-dashboard-side-content"
          [ngClass]="{'oppia-learner-dashboard-mobile-mode': checkMobileView()}">
       <mat-card class="oppia-learner-dashboard-main-menu">
+        <h4 class="oppia-learner-dashboard-menu"
+            *ngIf="newLearnerDashboardPageIsDisplayed"
+            [ngClass]="{'oppia-learner-dashboard-section-active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS}"
+            (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS)">
+          <span [innerHTML]="LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS | translate"></span>
+        </h4>
+        <h4 class="oppia-learner-dashboard-menu" *ngIf="newLearnerDashboardPageIsDisplayed"
+            [ngClass]="{'oppia-learner-dashboard-section-active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS}"
+            (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS)">
+          <span [innerHTML]="LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS | translate"></span>
+        </h4>
         <h4 class="dropdown-toggle oppia-learner-dashboard-menu protractor-test-play-later-section"
             [ngClass]="{'oppia-learner-dashboard-section-active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST}"
             (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST)">
@@ -137,7 +148,7 @@
     <div class="col-md-8 oppia-learner-dashboard-main-content"
          [ngClass]="{'oppia-learner-dashboard-mobile-mode': checkMobileView()}">
       <div>
-        <span class="oppia-learner-dashboard-main-content-title">
+        <span class="oppia-learner-dashboard-main-content-title" *ngIf="activeSection !== LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS && activeSection !== LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS">
           <span [innerHTML]="activeSection | translate">
           </span>
           <span *ngIf="activeSection !== LEARNER_DASHBOARD_SECTION_I18N_IDS.SUBSCRIPTIONS && activeSection !== LEARNER_DASHBOARD_SECTION_I18N_IDS.FEEDBACK">
@@ -211,6 +222,24 @@
         </span>
       </div>
       <div class="oppia-learner-dashboard-main-content-container">
+        <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS && newLearnerDashboardPageIsDisplayed">
+          <oppia-goals-tab [currentGoals]="topicsToLearn"
+                           [editGoals]="allTopics"
+                           [completedGoals]="learntTopics"
+                           [learntToPartiallyLearntTopics]="learntToPartiallyLearntTopics">
+          </oppia-goals-tab>
+        </div>
+        <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS && newLearnerDashboardPageIsDisplayed">
+          <oppia-community-lessons-tab [incompleteExplorationsList]="incompleteExplorationsList"
+                                       [incompleteCollectionsList]="incompleteCollectionsList"
+                                       [completedExplorationsList]="completedExplorationsList"
+                                       [completedCollectionsList]="completedCollectionsList"
+                                       [explorationPlaylist]="explorationPlaylist"
+                                       [collectionPlaylist]="collectionPlaylist"
+                                       [subscriptionsList]="subscriptionsList"
+                                       [completedToIncompleteCollections]="completedToIncompleteCollections">
+          </oppia-community-lessons-tab>
+        </div>
         <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS">
           <span class="oppia-learner-dashboard-nonexistent-exploration"
                 *ngIf="numberNonexistentIncompleteExplorations !== 0">
@@ -827,7 +856,6 @@
   }
 
   .oppia-learner-dashboard-menu {
-    border: 1px solid #d0d0d0;
     color: black;
     cursor: pointer;
     font-family: 'Capriola', 'Roboto', Arial, sans-serif;
@@ -854,12 +882,12 @@
   }
 
   .oppia-learner-dashboard-section-active {
-    background-color: #018477;
-    color: white;
+    background-color: #00645C1A;
+    color: #00645C;
   }
 
   .oppia-learner-dashboard-side-content {
-    min-width: 200px;
+    min-width: 241px;
     padding-left: 20px;
     width: 20%;
   }

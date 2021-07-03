@@ -64,7 +64,9 @@ class PlayExplorationDecoratorTests(test_utils.GenericTestBase):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'exploration_id': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             }
         }
         HANDLER_ARGS_SCHEMAS = {'GET': {}}
@@ -149,7 +151,9 @@ class PlayCollectionDecoratorTests(test_utils.GenericTestBase):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'collection_id': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             }
         }
         HANDLER_ARGS_SCHEMAS = {'GET': {}}
@@ -243,7 +247,9 @@ class EditCollectionDecoratorTests(test_utils.GenericTestBase):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'collection_id': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             }
         }
         HANDLER_ARGS_SCHEMAS = {'GET': {}}
@@ -503,7 +509,9 @@ class CommentOnFeedbackThreadTests(test_utils.GenericTestBase):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'thread_id': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             }
         }
         HANDLER_ARGS_SCHEMAS = {'GET': {}}
@@ -623,7 +631,9 @@ class CreateFeedbackThreadTests(test_utils.GenericTestBase):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'exploration_id': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             }
         }
         HANDLER_ARGS_SCHEMAS = {'GET': {}}
@@ -711,7 +721,9 @@ class ViewFeedbackThreadTests(test_utils.GenericTestBase):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'thread_id': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             }
         }
         HANDLER_ARGS_SCHEMAS = {'GET': {}}
@@ -811,7 +823,9 @@ class ManageEmailDashboardTests(test_utils.GenericTestBase):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'query_id': {
-                'type': 'basestring',
+                'schema': {
+                    'type': 'basestring'
+                },
                 'default_value': None
             }
         }
@@ -872,7 +886,9 @@ class RateExplorationTests(test_utils.GenericTestBase):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'exploration_id': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             }
         }
         HANDLER_ARGS_SCHEMAS = {'GET': {}}
@@ -950,7 +966,9 @@ class FlagExplorationTests(test_utils.GenericTestBase):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'exploration_id': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             }
         }
         HANDLER_ARGS_SCHEMAS = {'GET': {}}
@@ -1358,7 +1376,9 @@ class CanDeleteBlogPostTests(test_utils.GenericTestBase):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'blog_post_id': {
-                'type': 'unicode'
+                'schema': {
+                    'type': 'unicode'
+                }
             }
         }
         HANDLER_ARGS_SCHEMAS = {
@@ -1441,7 +1461,9 @@ class CanEditBlogPostTests(test_utils.GenericTestBase):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'blog_post_id': {
-                'type': 'unicode'
+                'schema': {
+                    'type': 'unicode'
+                }
             }
         }
         HANDLER_ARGS_SCHEMAS = {
@@ -1718,7 +1740,9 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'exploration_id': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             }
         }
         HANDLER_ARGS_SCHEMAS = {'GET': {}}
@@ -1848,10 +1872,14 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'entity_type': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             },
             'entity_id': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             }
         }
         HANDLER_ARGS_SCHEMAS = {'POST': {}}
@@ -1991,7 +2019,9 @@ class EditExplorationTests(test_utils.GenericTestBase):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'exploration_id': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             }
         }
         HANDLER_ARGS_SCHEMAS = {'GET': {}}
@@ -2169,7 +2199,9 @@ class DeleteExplorationTests(test_utils.GenericTestBase):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'exploration_id': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             }
         }
         HANDLER_ARGS_SCHEMAS = {'GET': {}}
@@ -2260,7 +2292,9 @@ class SuggestChangesToExplorationTests(test_utils.GenericTestBase):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'exploration_id': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             }
         }
         HANDLER_ARGS_SCHEMAS = {'GET': {}}
@@ -2359,7 +2393,9 @@ class ResubmitSuggestionDecoratorsTests(test_utils.GenericTestBase):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'suggestion_id': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             }
         }
         HANDLER_ARGS_SCHEMAS = {'GET': {}}
@@ -2427,10 +2463,14 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'suggestion_id': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             },
             'target_id': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             }
         }
         HANDLER_ARGS_SCHEMAS = {'GET': {}}
@@ -2509,7 +2549,9 @@ class PublishExplorationTests(test_utils.GenericTestBase):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'exploration_id': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             }
         }
         HANDLER_ARGS_SCHEMAS = {'GET': {}}
@@ -2588,7 +2630,9 @@ class ModifyExplorationRolesTests(test_utils.GenericTestBase):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'exploration_id': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             }
         }
         HANDLER_ARGS_SCHEMAS = {'GET': {}}
@@ -2648,7 +2692,9 @@ class CollectionPublishStatusTests(test_utils.GenericTestBase):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'collection_id': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             }
         }
         HANDLER_ARGS_SCHEMAS = {'GET': {}}
@@ -2661,7 +2707,9 @@ class CollectionPublishStatusTests(test_utils.GenericTestBase):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'collection_id': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             }
         }
         HANDLER_ARGS_SCHEMAS = {'GET': {}}
@@ -2815,7 +2863,9 @@ class EditTopicDecoratorTests(test_utils.GenericTestBase):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'topic_id': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             }
         }
         HANDLER_ARGS_SCHEMAS = {'GET': {}}
@@ -2893,7 +2943,9 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'story_id': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             }
         }
         HANDLER_ARGS_SCHEMAS = {'GET': {}}
@@ -2985,7 +3037,9 @@ class AddStoryToTopicTests(test_utils.GenericTestBase):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'topic_id': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             }
         }
         HANDLER_ARGS_SCHEMAS = {'GET': {}}
@@ -3087,13 +3141,19 @@ class StoryViewerTests(test_utils.GenericTestBase):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'topic_url_fragment': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             },
             'story_url_fragment': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             },
             'classroom_url_fragment': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             }
         }
         HANDLER_ARGS_SCHEMAS = {'GET': {}}
@@ -3105,13 +3165,19 @@ class StoryViewerTests(test_utils.GenericTestBase):
     class MockPageHandler(base.BaseHandler):
         URL_PATH_ARGS_SCHEMAS = {
             'topic_url_fragment': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             },
             'story_url_fragment': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             },
             'classroom_url_fragment': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             }
         }
         HANDLER_ARGS_SCHEMAS = {'GET': {}}
@@ -3263,13 +3329,19 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'topic_url_fragment': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             },
             'subtopic_url_fragment': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             },
             'classroom_url_fragment': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             }
         }
         HANDLER_ARGS_SCHEMAS = {'GET': {}}
@@ -3281,13 +3353,19 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
     class MockPageHandler(base.BaseHandler):
         URL_PATH_ARGS_SCHEMAS = {
             'topic_url_fragment': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             },
             'subtopic_url_fragment': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             },
             'classroom_url_fragment': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             }
         }
         HANDLER_ARGS_SCHEMAS = {'GET': {}}
@@ -3425,10 +3503,14 @@ class TopicViewerTests(test_utils.GenericTestBase):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'topic_url_fragment': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             },
             'classroom_url_fragment': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             }
         }
         HANDLER_ARGS_SCHEMAS = {'GET': {}}
@@ -3440,10 +3522,14 @@ class TopicViewerTests(test_utils.GenericTestBase):
     class MockPageHandler(base.BaseHandler):
         URL_PATH_ARGS_SCHEMAS = {
             'topic_url_fragment': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             },
             'classroom_url_fragment': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             }
         }
         HANDLER_ARGS_SCHEMAS = {'GET': {}}
@@ -3608,7 +3694,9 @@ class ManageQuestionSkillStatusTests(test_utils.GenericTestBase):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'skill_id': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             }
         }
         HANDLER_ARGS_SCHEMAS = {'GET': {}}
@@ -3734,7 +3822,9 @@ class ManageRightsForTopicTests(test_utils.GenericTestBase):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'topic_id': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             }
         }
         HANDLER_ARGS_SCHEMAS = {'GET': {}}
@@ -3797,7 +3887,9 @@ class ChangeTopicPublicationStatusTests(test_utils.GenericTestBase):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'topic_id': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             }
         }
         HANDLER_ARGS_SCHEMAS = {'GET': {}}
@@ -3929,7 +4021,9 @@ class EditSkillDecoratorTests(test_utils.GenericTestBase):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'skill_id': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             }
         }
         HANDLER_ARGS_SCHEMAS = {'GET': {}}
@@ -4003,7 +4097,9 @@ class EditQuestionDecoratorTests(test_utils.GenericTestBase):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'question_id': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             }
         }
         HANDLER_ARGS_SCHEMAS = {'GET': {}}
@@ -4092,7 +4188,9 @@ class PlayQuestionDecoratorTests(test_utils.GenericTestBase):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'question_id': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             }
         }
         HANDLER_ARGS_SCHEMAS = {'GET': {}}
@@ -4133,10 +4231,14 @@ class PlayEntityDecoratorTests(test_utils.GenericTestBase):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'entity_type': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             },
             'entity_id': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             }
         }
         HANDLER_ARGS_SCHEMAS = {'GET': {}}
@@ -4229,10 +4331,14 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'entity_type': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             },
             'entity_id': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             }
         }
         HANDLER_ARGS_SCHEMAS = {'GET': {}}
@@ -4384,7 +4490,9 @@ class SaveExplorationTests(test_utils.GenericTestBase):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'exploration_id': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             }
         }
         HANDLER_ARGS_SCHEMAS = {'GET': {}}
@@ -4507,13 +4615,19 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS = {
             'POST': {
                 'vm_id': {
-                    'type': 'basestring'
+                    'schema': {
+                        'type': 'basestring'
+                    }
                 },
                 'message': {
-                    'type': 'basestring'
+                    'schema': {
+                        'type': 'basestring'
+                    }
                 },
                 'signature': {
-                    'type': 'basestring'
+                    'schema': {
+                        'type': 'basestring'
+                    }
                 }
             }
         }
@@ -4628,7 +4742,9 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'suggestion_id': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             }
         }
         HANDLER_ARGS_SCHEMAS = {'GET': {}}

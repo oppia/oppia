@@ -328,7 +328,7 @@ class BlogPost(python_utils.OBJECT):
                 'Blog Post ID should be a string, received: %s' % blog_id)
 
         if len(blog_id) != BLOG_POST_ID_LENGTH:
-            raise utils.ValidationError('Blog id %s is invalid' % blog_id)
+            raise utils.ValidationError('Blog ID %s is invalid' % blog_id)
 
 
 class BlogPostSummary(python_utils.OBJECT):

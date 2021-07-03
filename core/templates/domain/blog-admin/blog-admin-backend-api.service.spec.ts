@@ -118,7 +118,6 @@ describe('Blog Admin backend api service', () => {
     let newRole = 'BLOG_EDITOR';
     let username = 'validUser';
     let payload = {
-      action: 'update_user_role',
       role: newRole,
       username: username,
     };
@@ -143,7 +142,6 @@ describe('Blog Admin backend api service', () => {
     let newRole = 'BLOG_EDITOR';
     let username = 'InvalidUser';
     let payload = {
-      action: 'update_user_role',
       role: newRole,
       username: username,
     };

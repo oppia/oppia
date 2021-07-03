@@ -112,29 +112,39 @@ class BlogPostHandler(base.BaseHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
         'blog_post_id': {
-            'type': 'basestring'
+            'schema': {
+                'type': 'basestring'
+            }
         }
     }
     HANDLER_ARGS_SCHEMAS = {
         'GET': {},
         'PUT': {
             'new_publish_status': {
-                'type': 'bool',
+                'schema': {
+                    'type': 'bool',
+                }
             },
             'change_dict': {
-                'type': 'object_dict',
-                'validation_method': (
-                    validation_method.validate_change_dict_for_blog_post),
+                'schema': {
+                    'type': 'object_dict',
+                    'validation_method': (
+                        validation_method.validate_change_dict_for_blog_post),
+                },
                 'default_value': None
             },
         },
         'POST': {
             'thumbnail_filename': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             },
             'image': {
-                'type': 'basestring'
-            }
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
         },
         'DELETE': {}
     }
@@ -180,17 +190,10 @@ class BlogPostHandler(base.BaseHandler):
         blog_domain.BlogPost.require_valid_blog_post_id(blog_post_id)
         blog_post_rights = (
             blog_services.get_blog_post_rights(blog_post_id, strict=False))
-        if blog_post_rights is None:
-            raise self.PageNotFoundException(
-                Exception('The blog post with the given id doesn\'t exist.'))
         blog_post_currently_published = blog_post_rights.blog_post_is_published
         change_dict = self.normalized_payload.get('change_dict')
 
-        try:
-            blog_services.update_blog_post(blog_post_id, change_dict)
-        except utils.ValidationError as e:
-            raise self.InvalidInputException(e)
-
+        blog_services.update_blog_post(blog_post_id, change_dict)
         new_publish_status = self.normalized_payload.get('new_publish_status')
         if new_publish_status:
             blog_services.publish_blog_post(blog_post_id)
@@ -234,11 +237,5 @@ class BlogPostHandler(base.BaseHandler):
         # type: (str) -> None
         """Handles Delete requests."""
         blog_domain.BlogPost.require_valid_blog_post_id(blog_post_id)
-        blog_post = (
-            blog_services.get_blog_post_by_id(blog_post_id, strict=False))
-        if blog_post is None:
-            raise self.PageNotFoundException(
-                'The blog post with the given id doesn\'t exist.')
         blog_services.delete_blog_post(blog_post_id)
-
         self.render_json(self.values)

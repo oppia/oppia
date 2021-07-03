@@ -50,17 +50,17 @@ class ValidateExplorationChangeTests(test_utils.GenericTestBase):
 
 
 class ValidateNewConfigPropertyValuesTests(test_utils.GenericTestBase):
-    """Tests to validate domain objects coming from API."""
+    """Tests to validate config properties dict coming from API."""
 
     def test_invalid_object_raises_exception(self):
         config_properties = {'some_config_property': 20, }
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegexp(
             Exception, 'some_config_property do not have any schema.'):
             domain_objects_validator.validate_new_config_property_values(
                 config_properties)
 
         config_properties = {1234: 20, }
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegexp(
             Exception, 'config property name should be a string, received'
             ': %s' % 1234):
             domain_objects_validator.validate_new_config_property_values(
@@ -69,16 +69,16 @@ class ValidateNewConfigPropertyValuesTests(test_utils.GenericTestBase):
     def test_valid_object_raises_no_exception(self):
         config_properties = {
             'max_number_of_tags_assigned_to_blog_post': 20,
-            }
+        }
         domain_objects_validator.validate_new_config_property_values(
             config_properties)
 
 
 class ValidateChangeDictForBlogPost(test_utils.GenericTestBase):
-    """Tests to validate change_dict coming from API."""
+    """Tests to validate change_dict containing updated values for blog
+    post object coming from API."""
 
-    def test_invalid_dict_raises_exception(self):
-        # Invalid Title.
+    def test_invalid_title_raises_exception(self):
         blog_post_change = {
             'title': 123,
             'tags': ['News'],
@@ -88,7 +88,7 @@ class ValidateChangeDictForBlogPost(test_utils.GenericTestBase):
             domain_objects_validator.validate_change_dict_for_blog_post(
                 blog_post_change)
 
-        # Invalid Tags.
+    def test_invalid_tags_raises_exception(self):
         blog_post_change = {
             'title': 'Hello Bloggers',
             'tags': ['News', 'Some Tag'],

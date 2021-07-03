@@ -229,7 +229,7 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
             'change_dict': {
                 'title': 'Sample Title',
                 'content': '<p>Hello<p>',
-                'tags': ['Newsletter', 'Learners'],
+                'tags': ['New lessons', 'Learners'],
                 'thumbnail_filename': 'file.svg'
             },
             'new_publish_status': False
@@ -265,9 +265,26 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
 
         blog_services.delete_blog_post(self.blog_post.id)
         csrf_token = self.get_new_csrf_token()
+        # This is raised by acl decorator.
         self.put_json(
             '%s/%s' % (feconf.BLOG_EDITOR_DATA_URL_PREFIX, self.blog_post.id),
             payload, csrf_token=csrf_token, expected_status_int=404)
+
+    def test_update_blog_post_with_invalid_change_dict(self):
+        self.login(self.BLOG_EDITOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        payload = {
+            'change_dict': {
+                'title': 1234,
+            },
+            'new_publish_status': False
+        }
+        response = self.put_json(
+            '%s/%s' % (feconf.BLOG_EDITOR_DATA_URL_PREFIX, self.blog_post.id),
+            payload, csrf_token=csrf_token, expected_status_int=400)
+        self.assertEqual(
+            response['error'], 'Schema validation for \'change_dict\''
+            ' failed: Title should be a string.')
 
     def test_publishing_unpublishing_blog_post(self):
         self.login(self.BLOG_EDITOR_EMAIL)
@@ -276,7 +293,7 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
             'change_dict': {
                 'title': 'Sample Title',
                 'content': '<p>Hello<p>',
-                'tags': ['Newsletter', 'Learners'],
+                'tags': ['New lessons', 'Learners'],
                 'thumbnail_filename': 'file.svg'
             },
             'new_publish_status': True
@@ -351,6 +368,7 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
 
     def test_cannot_delete_invalid_blog_post(self):
         # Check that an invalid blog post can not be deleted.
+        # Error is raised by acl decorator.
         self.login(self.BLOG_ADMIN_EMAIL)
         self.delete_json(
             '%s/%s' % (feconf.BLOG_EDITOR_DATA_URL_PREFIX, 123456),
@@ -358,6 +376,7 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
         self.login(self.BLOG_ADMIN_EMAIL)
+        # The error is raised by acl decorator as the blog post doesn't exist.
         self.delete_json(
             '%s/%s' % (feconf.BLOG_EDITOR_DATA_URL_PREFIX, 'abc123efgH34'),
             expected_status_int=404)

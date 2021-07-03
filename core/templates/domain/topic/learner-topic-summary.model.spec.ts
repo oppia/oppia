@@ -16,6 +16,7 @@
  * @fileoverview Tests for LearnerTopicSummaryModel.
  */
 
+import { StoryNode } from 'domain/story/story-node.model';
 import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
 import { Subtopic } from './subtopic.model';
 
@@ -32,6 +33,20 @@ describe('Learner Topic summary model', () => {
       url_fragment: 'subtopic-name'
     };
 
+    let nodeDict = {
+      id: 'node_1',
+      thumbnail_filename: 'image.png',
+      title: 'Title 1',
+      description: 'Description 1',
+      prerequisite_skill_ids: ['skill_1'],
+      acquired_skill_ids: ['skill_2'],
+      destination_node_ids: ['node_2'],
+      outline: 'Outline',
+      exploration_id: null,
+      outline_is_finalized: false,
+      thumbnail_bg_color: '#a33f40'
+    };
+
     let sampleLearnerTopicSummaryBackendDict = {
       id: 'sample_topic_id',
       name: 'Topic Name',
@@ -43,6 +58,18 @@ describe('Learner Topic summary model', () => {
       thumbnail_bg_color: '#C6DCDA',
       classroom: 'math',
       practice_tab_is_displayed: false,
+      canonical_story_summary_dict: [{
+        id: '0',
+        title: 'Story Title',
+        description: 'Story Description',
+        node_titles: ['Chapter 1'],
+        thumbnail_filename: 'image.svg',
+        thumbnail_bg_color: '#F8BF74',
+        story_is_published: true,
+        completed_node_titles: ['Chapter 1'],
+        url_fragment: 'story-title',
+        all_node_dicts: [nodeDict]
+      }],
       url_fragment: 'topic-name',
       subtopics: [subtopic],
       degrees_of_mastery: {
@@ -88,5 +115,27 @@ describe('Learner Topic summary model', () => {
       thumbnail_bg_color: '#F8BF74',
       url_fragment: 'subtopic-name'
     }, _sampleLearnerTopicSummary.skillDescriptions)]);
+    let expectedStorySummary = (
+      _sampleLearnerTopicSummary.getCanonicalStorySummaryDicts()[0]);
+    expect(expectedStorySummary.getId()).toEqual('0');
+    expect(expectedStorySummary.getTitle()).toEqual('Story Title');
+    expect(expectedStorySummary.getDescription()).toEqual('Story Description');
+    expect(expectedStorySummary.getNodeTitles()).toEqual(['Chapter 1']);
+    expect(expectedStorySummary.isNodeCompleted('Chapter 1')).toEqual(true);
+    expect(expectedStorySummary.getAllNodes()).toEqual([
+      StoryNode.createFromBackendDict({
+        id: 'node_1',
+        thumbnail_filename: 'image.png',
+        title: 'Title 1',
+        description: 'Description 1',
+        prerequisite_skill_ids: ['skill_1'],
+        acquired_skill_ids: ['skill_2'],
+        destination_node_ids: ['node_2'],
+        outline: 'Outline',
+        exploration_id: null,
+        outline_is_finalized: false,
+        thumbnail_bg_color: '#a33f40'
+      })
+    ]);
   });
 });

@@ -28,7 +28,6 @@ from core.domain import config_services
 from core.domain import role_services
 from core.domain import user_services
 import feconf
-import python_utils
 
 BLOG_POST_EDITOR = feconf.ROLE_ID_BLOG_POST_EDITOR
 BLOG_ADMIN = feconf.ROLE_ID_BLOG_ADMIN
@@ -43,18 +42,24 @@ class BlogAdminHandler(base.BaseHandler):
         'GET': {},
         'POST': {
             'action': {
-                'type': 'basestring',
-                'choices': [
-                    'save_config_properties', 'revert_config_property']
+                'schema': {
+                    'type': 'basestring',
+                    'choices': [
+                        'save_config_properties', 'revert_config_property']
+                }
             },
             'new_config_property_values': {
-                'type': 'object_dict',
-                'validation_method': (
-                    validation_method.validate_new_config_property_values),
+                'schema': {
+                    'type': 'object_dict',
+                    'validation_method': (
+                        validation_method.validate_new_config_property_values),
+                },
                 'default_value': None
             },
             'config_property_id': {
-                'type': 'basestring',
+                'schema': {
+                    'type': 'basestring',
+                },
                 'default_value': None
             },
         }
@@ -89,31 +94,26 @@ class BlogAdminHandler(base.BaseHandler):
     def post(self):
         # type: () -> None
         """Handles POST requests."""
-        try:
-            result = {}
-            if self.normalized_payload.get(
-                    'action') == 'save_config_properties':
-                new_config_property_values = self.normalized_payload.get(
-                    'new_config_property_values')
-                logging.info(
-                    '[BLOG ADMIN] %s saved config property values: %s' %
-                    (self.user_id, new_config_property_values))
-                for (name, value) in new_config_property_values.items():
-                    config_services.set_property(self.user_id, name, value)
-            elif self.normalized_payload.get(
-                    'action') == 'revert_config_property':
-                config_property_id = (
-                    self.normalized_payload.get('config_property_id'))
-                config_services.revert_property(
-                    self.user_id, config_property_id)
-                logging.info(
-                    '[BLOG ADMIN] %s reverted config property: %s' %
-                    (self.user_id, config_property_id))
-            self.render_json(result)
-        except Exception as e:
-            logging.exception('[BLOG ADMIN] %s', e)
-            self.render_json({'error': python_utils.UNICODE(e)})
-            python_utils.reraise_exception()
+        result = {}
+        if self.normalized_payload.get(
+                'action') == 'save_config_properties':
+            new_config_property_values = self.normalized_payload.get(
+                'new_config_property_values')
+            logging.info(
+                '[BLOG ADMIN] %s saved config property values: %s' %
+                (self.user_id, new_config_property_values))
+            for (name, value) in new_config_property_values.items():
+                config_services.set_property(self.user_id, name, value)
+        elif self.normalized_payload.get(
+                'action') == 'revert_config_property':
+            config_property_id = (
+                self.normalized_payload.get('config_property_id'))
+            config_services.revert_property(
+                self.user_id, config_property_id)
+            logging.info(
+                '[BLOG ADMIN] %s reverted config property: %s' %
+                (self.user_id, config_property_id))
+        self.render_json(result)
 
 
 class BlogAdminRolesHandler(base.BaseHandler):
@@ -123,19 +123,23 @@ class BlogAdminRolesHandler(base.BaseHandler):
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
-            'action': {
-                'type': 'basestring',
-            },
             'role': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring',
+                    'choices': [BLOG_ADMIN, BLOG_POST_EDITOR]
+                }
             },
             'username': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             },
         },
         'PUT': {
             'username': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             },
         }
     }
@@ -144,23 +148,16 @@ class BlogAdminRolesHandler(base.BaseHandler):
     def post(self):
         # type: () -> None
         """Handles POST requests."""
-        if self.normalized_payload.get('action') != 'update_user_role':
-            raise self.InvalidInputException('Invalid action')
         username = self.normalized_payload.get('username')
         role = self.normalized_payload.get('role')
-        if role == (BLOG_ADMIN or BLOG_POST_EDITOR):
-            user_id = user_services.get_user_id_from_username(username)
-            if user_id is None:
-                raise self.InvalidInputException(
-                    'User with given username does not exist.')
-            user_services.update_user_role(user_id, role)
-            role_services.log_role_query(
-                self.user_id, feconf.ROLE_ACTION_UPDATE, role=role,
-                username=username)
-        else:
+        user_id = user_services.get_user_id_from_username(username)
+        if user_id is None:
             raise self.InvalidInputException(
-                'Invalid role or role that cannot be updated through '
-                '\'Blog Admin\' page is provided.')
+                'User with given username does not exist.')
+        user_services.update_user_role(user_id, role)
+        role_services.log_role_query(
+            self.user_id, feconf.ROLE_ACTION_UPDATE, role=role,
+            username=username)
         self.render_json({})
 
     @acl_decorators.can_manage_blog_post_editors
@@ -168,8 +165,6 @@ class BlogAdminRolesHandler(base.BaseHandler):
         # type: () -> None
         """Handles PUT requests."""
         username = self.normalized_payload.get('username')
-        if username is None:
-            raise self.InvalidInputException('Missing username param')
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
             raise self.InvalidInputException(
