@@ -152,7 +152,7 @@ export class DragAndDropSortInputValidationService {
           choice => {
             const contentId = choice.contentId;
             if (contentId === null) {
-              throw new Error ('ContentId of choice does not exist.');
+              throw new Error ('ContentId of choice does not exist');
             }
             choiceContentIdToHtml[contentId] = choice.html;
           });

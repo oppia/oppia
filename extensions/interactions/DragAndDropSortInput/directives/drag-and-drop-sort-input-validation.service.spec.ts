@@ -283,8 +283,8 @@ describe('DragAndDropSortInputValidationService', () => {
   ' does not exist', () => {
     expect(() => {
       validatorService.getAllWarnings(
-        currentState, badCustomizationArgs, [], goodDefaultOutcome);
-    }).toThrowError('ContentId of choice does not exist.');
+        currentState, badCustomizationArgs, answerGroups, goodDefaultOutcome);
+    }).toThrowError('ContentId of choice does not exist');
   });
 
 

@@ -93,11 +93,10 @@ describe('ItemSelectionInputValidationService', () => {
         value: [
           new SubtitledHtml('Selection 1', 'ca_0'),
           new SubtitledHtml('Selection 2', null),
-          new SubtitledHtml('Selection 3', null)
         ]
       },
       maxAllowableSelectionCount: {
-        value: 2
+        value: 1
       },
       minAllowableSelectionCount: {
         value: 1
