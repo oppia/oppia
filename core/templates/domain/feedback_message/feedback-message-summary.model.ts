@@ -19,11 +19,8 @@
 export interface FeedbackMessageSummaryBackendDict {
   'message_id': number;
   'text': string;
-<<<<<<< HEAD
-=======
   // Below properties are only non-null when entered by the
   // user for a newly created message and null otherwise.
->>>>>>> upstream/develop
   'updated_status': string | null;
   'suggestion_html': string | null;
   'current_content_html': string | null;
@@ -36,12 +33,9 @@ export interface FeedbackMessageSummaryBackendDict {
 export class FeedbackMessageSummary {
   messageId: number;
   text: string;
-<<<<<<< HEAD
   // These properties are 'null' when a learner initially gives a
   // feedback for an exploration since the learner feedback contains
   // only a text message.
-=======
->>>>>>> upstream/develop
   updatedStatus: string | null;
   suggestionHtml: string | null;
   currentContentHtml: string | null;
