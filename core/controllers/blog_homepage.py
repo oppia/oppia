@@ -58,7 +58,8 @@ class BlogHomepageDataHandler(base.BaseHandler):
     def get(self):
         # type: () -> None
         """Handles GET requests."""
-        published_post_summaries = blog_services.get_published_blog_post_summaries()
+        published_post_summaries = (
+            blog_services.get_published_blog_post_summaries())
         published_post_summary_dicts = []
         if published_post_summaries:
             published_post_summary_dicts = (
@@ -79,7 +80,9 @@ class BlogPostHandler(base.BaseHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
         'blog_post_url': {
-            'type': 'basestring'
+            'schema': {
+                'type': 'basestring'
+            }
         }
     }
     HANDLER_ARGS_SCHEMAS = {
@@ -119,7 +122,9 @@ class AuthorsPageHandler(base.BaseHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
         'author_username': {
-            'type': 'basestring'
+            'schema': {
+                'type': 'basestring'
+            }
         }
     }
     HANDLER_ARGS_SCHEMAS = {
@@ -131,7 +136,7 @@ class AuthorsPageHandler(base.BaseHandler):
         """Handles GET requests."""
         user_settings = (
             user_services.get_user_settings_from_username(author_username))
-        if (user_settings.role != feconf.ROLE_ID_BLOG_ADMIN):
+        if user_settings.role != feconf.ROLE_ID_BLOG_ADMIN:
             raise self.PageNotFoundException(
                 Exception(
                     'The given user is not a blog post author.'))
