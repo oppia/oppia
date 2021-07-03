@@ -107,7 +107,7 @@ class HomePageTests(test_utils.GenericTestBase):
         """Test the logged-out version of the home page."""
         response = self.get_html_response('/')
         self.assertEqual(response.status_int, 200)
-        self.assertIn('</splash-page>', response)
+        self.assertIn('</oppia-splash-page-root>', response)
 
 
 class CreatorDashboardStatisticsTests(test_utils.GenericTestBase):

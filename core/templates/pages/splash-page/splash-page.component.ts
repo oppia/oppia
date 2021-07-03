@@ -16,7 +16,6 @@
  * @fileoverview Component for the Oppia splash page.
  */
 import { Component, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
 
 import splashConstants from 'assets/constants';
 import { UrlInterpolationService } from
@@ -36,7 +35,7 @@ export interface Testimonial {
 }
 
 @Component({
-  selector: 'splashPage',
+  selector: 'oppia-splash-page',
   templateUrl: './splash-page.component.html',
   styleUrls: []
 })
@@ -145,6 +144,3 @@ export class SplashPageComponent implements OnInit {
     });
   }
 }
-
-angular.module('oppia').directive('splashPage',
-  downgradeComponent({component: SplashPageComponent}));

@@ -13,12 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for the donate page.
+ * @fileoverview Module for the pending account deletion page.
  */
 
-import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestInterceptor } from 'services/request-interceptor.service';
@@ -30,6 +29,7 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
 import { PendingAccountDeletionPageComponent } from './pending-account-deletion-page.component';
 import { SharedPipesModule } from 'filters/shared-pipes.module';
 import { TranslateModule } from '@ngx-translate/core';
+import { PendingAccountDeletionPageRootComponent } from './pending-account-deletion-page-root.component';
 
 @NgModule({
   imports: [
@@ -41,10 +41,12 @@ import { TranslateModule } from '@ngx-translate/core';
   ],
   declarations: [
     PendingAccountDeletionPageComponent,
+    PendingAccountDeletionPageRootComponent,
     OppiaAngularRootComponent
   ],
   entryComponents: [
     PendingAccountDeletionPageComponent,
+    PendingAccountDeletionPageRootComponent,
     OppiaAngularRootComponent
   ],
   providers: [
@@ -59,30 +61,7 @@ import { TranslateModule } from '@ngx-translate/core';
       deps: [PlatformFeatureService],
       multi: true
     }
-  ]
+  ],
+  bootstrap: [PendingAccountDeletionPageRootComponent]
 })
-class GetStartedPageModule {
-  // Empty placeholder method to satisfy the `Compiler`.
-  ngDoBootstrap() {}
-}
-
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { downgradeModule } from '@angular/upgrade/static';
-
-const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
-  const platformRef = platformBrowserDynamic(extraProviders);
-  return platformRef.bootstrapModule(GetStartedPageModule);
-};
-const downgradedModule = downgradeModule(bootstrapFnAsync);
-
-declare var angular: ng.IAngularStatic;
-
-angular.module('oppia').requires.push(downgradedModule);
-
-angular.module('oppia').directive(
-  // This directive is the downgraded version of the Angular component to
-  // bootstrap the Angular 8.
-  'oppiaAngularRoot',
-  downgradeComponent({
-    component: OppiaAngularRootComponent
-  }) as angular.IDirectiveFactory);
+export class PendingAccountDeletionPageModule {}
