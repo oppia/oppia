@@ -24,6 +24,7 @@ import datetime
 from constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
+from core.domain import config_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import learner_goals_services
@@ -63,8 +64,10 @@ class LearnerProgressTests(test_utils.GenericTestBase):
     TOPIC_ID_0 = 'topic_0'
     STORY_ID_1 = 'story_1'
     STORY_ID_2 = 'story_2'
+    STORY_ID_3 = 'story_3'
     TOPIC_ID_1 = 'topic_1'
     TOPIC_ID_2 = 'topic_2'
+    TOPIC_ID_3 = 'topic_3'
     USER_EMAIL = 'user@example.com'
     USER_USERNAME = 'user'
 
@@ -249,6 +252,32 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         topic_services.add_canonical_story(
             self.owner_id, self.TOPIC_ID_2, self.STORY_ID_2)
 
+        topic = topic_domain.Topic.create_default_topic(
+            self.TOPIC_ID_3, 'topic 3', 'abbrev-three', 'description 3')
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
+        topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title 1', ['skill_id_1'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                'dummy-subtopic-url-one')]
+        topic.next_subtopic_id = 2
+        subtopic_page = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                1, self.TOPIC_ID_3))
+        subtopic_page_services.save_subtopic_page(
+            self.owner_id, subtopic_page, 'Added subtopic',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': 1,
+                'title': 'Sample'
+            })]
+        )
+        topic_services.save_new_topic(self.owner_id, topic)
+        self.save_new_story(self.STORY_ID_3, self.owner_id, self.TOPIC_ID_3)
+        topic_services.add_canonical_story(
+            self.owner_id, self.TOPIC_ID_3, self.STORY_ID_3)
+
         # Publish topics and stories.
         topic_services.publish_story(
             self.TOPIC_ID_0, self.STORY_ID_0, self.admin_id)
@@ -261,6 +290,10 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         topic_services.publish_story(
             self.TOPIC_ID_2, self.STORY_ID_2, self.admin_id)
         topic_services.publish_topic(self.TOPIC_ID_2, self.admin_id)
+
+        topic_services.publish_story(
+            self.TOPIC_ID_3, self.STORY_ID_3, self.admin_id)
+        topic_services.publish_topic(self.TOPIC_ID_3, self.admin_id)
 
     def _get_all_completed_exp_ids(self, user_id):
         """Gets the ids of all the explorations completed by the learner
@@ -1469,6 +1502,84 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             learner_progress_services.get_all_partially_learnt_topic_ids(
                 self.user_id), [self.TOPIC_ID_0, self.TOPIC_ID_1])
 
+    def test_get_all_and_new_topic_ids(self):
+        # Add topics to config_domain.
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        csrf_token = self.get_new_csrf_token()
+        new_config_value = [{
+            'name': 'math',
+            'url_fragment': 'math',
+            'topic_ids': [self.TOPIC_ID_0, self.TOPIC_ID_1],
+            'course_details': '',
+            'topic_list_intro': ''
+        }]
+
+        payload = {
+            'action': 'save_config_properties',
+            'new_config_property_values': {
+                config_domain.CLASSROOM_PAGES_DATA.name: (
+                    new_config_value),
+            }
+        }
+        self.post_json('/adminhandler', payload, csrf_token=csrf_token)
+        self.logout()
+
+        self.login(self.USER_EMAIL)
+        partially_learnt_topic_ids = (
+            learner_progress_services.get_all_partially_learnt_topic_ids(
+                self.user_id))
+        learnt_topic_ids = (
+            learner_progress_services.get_all_learnt_topic_ids(
+                self.user_id))
+        topic_ids_to_learn = (
+            learner_goals_services.get_all_topic_ids_to_learn(
+                self.user_id))
+        all_topics, new_topics = (
+            learner_progress_services.get_all_and_new_topic_ids_for_user(
+                partially_learnt_topic_ids, learnt_topic_ids,
+                topic_ids_to_learn))
+        self.assertEqual(len(all_topics), 2)
+        self.assertEqual(len(new_topics), 2)
+
+        # Mark one topic as partially learnt.
+        learner_progress_services.record_topic_started(
+            self.user_id, self.TOPIC_ID_0)
+        partially_learnt_topic_ids = (
+            learner_progress_services.get_all_partially_learnt_topic_ids(
+                self.user_id))
+        learnt_topic_ids = (
+            learner_progress_services.get_all_learnt_topic_ids(
+                self.user_id))
+        topic_ids_to_learn = (
+            learner_goals_services.get_all_topic_ids_to_learn(
+                self.user_id))
+        all_topics, new_topics = (
+            learner_progress_services.get_all_and_new_topic_ids_for_user(
+                partially_learnt_topic_ids, learnt_topic_ids,
+                topic_ids_to_learn))
+        self.assertEqual(len(all_topics), 2)
+        self.assertEqual(len(new_topics), 1)
+
+        # Mark one topic as learnt.
+        learner_progress_services.mark_topic_as_learnt(
+            self.user_id, self.TOPIC_ID_1)
+        partially_learnt_topic_ids = (
+            learner_progress_services.get_all_partially_learnt_topic_ids(
+                self.user_id))
+        learnt_topic_ids = (
+            learner_progress_services.get_all_learnt_topic_ids(
+                self.user_id))
+        topic_ids_to_learn = (
+            learner_goals_services.get_all_topic_ids_to_learn(
+                self.user_id))
+        all_topics, new_topics = (
+            learner_progress_services.get_all_and_new_topic_ids_for_user(
+                partially_learnt_topic_ids, learnt_topic_ids,
+                topic_ids_to_learn))
+        self.assertEqual(len(all_topics), 2)
+        self.assertEqual(len(new_topics), 0)
+
     def test_unpublishing_incomplete_collection_filters_it_out(self):
         # Add collections to the incomplete list.
         learner_progress_services.mark_collection_as_incomplete(
@@ -1886,6 +1997,28 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             activity_ids.collection_playlist_ids, [self.COL_ID_3])
 
     def test_get_activity_progress(self):
+        # Add topics to config_domain.
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        csrf_token = self.get_new_csrf_token()
+        new_config_value = [{
+            'name': 'math',
+            'url_fragment': 'math',
+            'topic_ids': [self.TOPIC_ID_3],
+            'course_details': '',
+            'topic_list_intro': ''
+        }]
+
+        payload = {
+            'action': 'save_config_properties',
+            'new_config_property_values': {
+                config_domain.CLASSROOM_PAGES_DATA.name: (
+                    new_config_value),
+            }
+        }
+        self.post_json('/adminhandler', payload, csrf_token=csrf_token)
+        self.logout()
+
         # Add activities to the completed section.
         learner_progress_services.mark_exploration_as_completed(
             self.user_id, self.EXP_ID_0)
@@ -1940,6 +2073,10 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             activity_progress[0].learnt_topic_summaries)
         topics_to_learn_summaries = (
             activity_progress[0].topics_to_learn_summaries)
+        all_topic_summaries = (
+            activity_progress[0].all_topic_summaries)
+        new_topic_summaries = (
+            activity_progress[0].new_topic_summaries)
         exploration_playlist_summaries = (
             activity_progress[0].exploration_playlist_summaries)
         collection_playlist_summaries = (
@@ -1953,6 +2090,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(len(completed_story_summaries), 1)
         self.assertEqual(len(learnt_topic_summaries), 1)
         self.assertEqual(len(topics_to_learn_summaries), 1)
+        self.assertEqual(len(all_topic_summaries), 1)
+        self.assertEqual(len(new_topic_summaries), 1)
         self.assertEqual(len(exploration_playlist_summaries), 1)
         self.assertEqual(len(collection_playlist_summaries), 1)
 
@@ -1972,6 +2111,10 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             learnt_topic_summaries[0].name, 'topic')
         self.assertEqual(
             topics_to_learn_summaries[0].name, 'topic 2')
+        self.assertEqual(
+            new_topic_summaries[0].name, 'topic 3')
+        self.assertEqual(
+            all_topic_summaries[0].name, 'topic 3')
         self.assertEqual(
             exploration_playlist_summaries[0].title, 'Welcome Oppia')
         self.assertEqual(

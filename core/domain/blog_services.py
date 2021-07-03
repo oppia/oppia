@@ -542,9 +542,9 @@ def apply_change_dict(blog_post_id, change_dict):
     blog_post = get_blog_post_by_id(blog_post_id)
 
     if 'title' in change_dict:
+        blog_post.update_title(change_dict['title'])
         url_fragment = generate_url_fragment(
             change_dict['title'], blog_post_id)
-        blog_post.update_title(change_dict['title'])
         blog_post.update_url_fragment(url_fragment)
     if 'thumbnail_filename' in change_dict:
         blog_post.update_thumbnail_filename(change_dict['thumbnail_filename'])

@@ -1,0 +1,91 @@
+<mat-card class="oppia-story-dashboard-card">
+  <a [href]="getStoryLink()"
+     target="{{ openInNewWindow ? '_blank' : '_self' }}"
+     class="oppia-story-link">
+    <div class="oppia-title-section" [ngStyle]="{'background-color': thumbnailBgColor}">
+      <img class="oppia-thumbnail-image" [src]="thumbnailUrl">
+      <div class="oppia-story-completion">
+        <p class="oppia-percent-story-completed">
+          {{storyProgress}}% Complete
+        </p>
+      </div>
+    </div>
+    <div class="oppia-summary-section">
+      <span class="oppia-story-title">
+        {{storyTitle}}
+      </span>
+      <span class="oppia-topic-title">
+        {{topicTitle}}
+      </span>
+    </div>
+  </a>
+</mat-card>
+<style>
+  .oppia-story-title {
+    color: #333;
+    display: inline-block;
+    font-size: 16px;
+    height: 40px;
+    letter-spacing: 0;
+    margin: 0 8px 0 8px;
+    opacity: 1;
+    text-align: left;
+  }
+  .oppia-story-completion {
+    background: #000C 0% 0% no-repeat padding-box;
+    border-radius: 2px;
+    bottom: 23px;
+    float: right;
+    height: 19px;
+    position: relative;
+    right: 4px;
+    width: 80px;
+  }
+  .oppia-story-link {
+    text-decoration: none;
+  }
+  .oppia-summary-section {
+    position: absolute;
+  }
+  .oppia-topic-title {
+    color: #333;
+    display: block;
+    font-size: 14px;
+    font-weight: 300;
+    height: 16px;
+    letter-spacing: 0.05px;
+    margin: 4px 8px 12px 8px;
+    padding-bottom: 12px;
+    text-align: left;
+    text-transform: uppercase;
+  }
+  .oppia-percent-story-completed {
+    color: #FFF;
+    font-size: 10px;
+    letter-spacing: 0;
+    margin: 2px;
+    padding: 2px;
+    width: 100%;
+  }
+  .oppia-story-dashboard-card {
+    border-radius: 4px;
+    box-shadow: 0 3px 6px #00000029;
+    display: inline-block;
+    height: 224px;
+    margin: 0 2px 30px 6px;
+    padding: 0;
+    position: relative;
+    width: 192px;
+    z-index: 5;
+  }
+  .oppia-title-section {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    height: 144px;
+    width: 192px;
+  }
+  .oppia-thumbnail-image {
+    height: 144px;
+    width: 192px;
+  }
+</style>
