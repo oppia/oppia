@@ -30,7 +30,6 @@ import { UserService } from 'services/user.service';
   templateUrl: './blog-admin-navbar.component.html',
 })
 export class BlogAdminNavbarComponent implements OnInit {
-
   profilePictureDataUrl: string;
   username: string;
   profileUrl: string;
