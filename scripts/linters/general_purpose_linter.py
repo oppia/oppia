@@ -125,13 +125,6 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             .EXCLUDED_BYPASS_SECURITY_TRUST_DIRECTORIES)
     },
     {
-        'regexp': re.compile(r'\b(beforeEach\(inject\(function)\('),
-        'message': 'In tests, please use \'angular.mock.inject\' instead of '
-                   '\'inject\'',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
         'regexp': re.compile(r'templateUrl: \''),
         'message': 'The directives must be directly referenced.',
         'excluded_files': (
