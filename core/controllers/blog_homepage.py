@@ -24,6 +24,9 @@ from core.domain import config_domain
 from core.domain import user_services
 import feconf
 
+BLOG_ADMIN = feconf.ROLE_ID_BLOG_ADMIN
+BLOG_POST_EDITOR = feconf.ROLE_ID_BLOG_POST_EDITOR
+
 
 def _get_blog_card_summary_dicts_for_homepage(summaries):
     """Creates summary dicts for use in blog homepage.
@@ -134,20 +137,28 @@ class AuthorsPageHandler(base.BaseHandler):
         """Handles GET requests."""
         user_settings = (
             user_services.get_user_settings_from_username(author_username))
-        if user_settings.role != feconf.ROLE_ID_BLOG_ADMIN:
+        if user_settings:
+            if user_settings.role != BLOG_ADMIN or BLOG_POST_EDITOR:
+                raise self.PageNotFoundException(
+                    Exception(
+                        'The given user is not a blog post author.'))
+            blog_post_summaries = (
+                blog_services.get_blog_post_summaries_by_user_id(
+                    user_settings.user_id,
+                    feconf.MAX_LIMIT_FOR_CARDS_ON_BLOG_AUTHORS_PAGE))
+            blog_post_summary_dicts = (
+                _get_blog_card_summary_dicts_for_homepage(blog_post_summaries))
+
+            self.values.update({
+                'author_name': author_username,
+                'profile_picture_data_url': (
+                    user_settings.profile_picture_data_url),
+                'author_bio': user_settings.user_bio,
+                'summary_dicts': blog_post_summary_dicts
+            })
+            self.render_json(self.values)
+
+        else:
             raise self.PageNotFoundException(
                 Exception(
-                    'The given user is not a blog post author.'))
-        blog_post_summaries = blog_services.get_blog_post_summaries_by_user_id(
-            user_settings.user_id,
-            feconf.MAX_LIMIT_FOR_CARDS_ON_BLOG_AUTHORS_PAGE)
-        blog_post_summary_dicts = (
-            _get_blog_card_summary_dicts_for_homepage(blog_post_summaries))
-
-        self.values.update({
-            'author_name': author_username,
-            'profile_picture_data_url': user_settings.profile_picture_data_url,
-            'author_bio': user_settings.user_bio,
-            'summary_dicts': blog_post_summary_dicts
-        })
-        self.render_json(self.values)
+                    'User with given username does not exist'))

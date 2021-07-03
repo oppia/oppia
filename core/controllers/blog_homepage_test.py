@@ -19,8 +19,11 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import blog_services
 from core.domain import config_domain
+from core.platform import models
 from core.tests import test_utils
 import feconf
+
+(user_models,) = models.Registry.import_models([models.NAMES.user])
 
 
 class BlogHomepageDataHandlerTest(test_utils.GenericTestBase):
@@ -194,3 +197,20 @@ class AuthorsPageHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             len(json_response['summary_dicts']), 1)
         self.assertIsNotNone(json_response['profile_picture_data_url'])
+
+    def test_get_authors_data_raises_exception_if_user_deleted_account(self):
+        self.login(self.user_email)
+        json_response = self.get_json(
+            '%s/%s' % (feconf.BLOG_AUTHORS_PAGE_URL, self.BLOG_ADMIN_USERNAME),
+            )
+        self.assertEqual(
+            self.BLOG_ADMIN_USERNAME,
+            json_response['summary_dicts'][0]['author_name'])
+        blog_admin_model = (
+            user_models.UserSettingsModel.get_by_id(self.blog_admin_id))
+        blog_admin_model.deleted = True
+        blog_admin_model.update_timestamps()
+        blog_admin_model.put()
+        json_response = self.get_json(
+            '%s/%s' % (feconf.BLOG_AUTHORS_PAGE_URL, self.BLOG_ADMIN_USERNAME),
+            expected_status_int=404)
