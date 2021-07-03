@@ -297,8 +297,8 @@ var ExplorationEditorMainTab = function() {
       if (responseNum === 'default') {
         headerElem = defaultResponseTab;
       } else {
-        await waitFor.visibilityOf(await responseTab.first());
-        headerElem = await responseTab.get(
+        await waitFor.visibilityOf(responseTab.first());
+        headerElem = responseTab.get(
           responseNum);
       }
 
@@ -765,7 +765,7 @@ var ExplorationEditorMainTab = function() {
     var answerDescriptionFragment = element.all(
       by.css('.protractor-test-answer-description-fragment'));
     for (var i = 0; i < parameterValues.length; i++) {
-      var parameterElement = await answerDescriptionFragment.get(i * 2 + 1);
+      var parameterElement = answerDescriptionFragment.get(i * 2 + 1);
       var parameterEditor = await forms.getEditor(
         parameterTypes[i])(parameterElement);
 
@@ -838,7 +838,7 @@ var ExplorationEditorMainTab = function() {
     var answerDescription = element(
       by.css('.protractor-test-answer-description'));
     await action.click('Answer Description', answerDescription);
-    var ruleDropdownElement = await element.all(by.cssContainingText(
+    var ruleDropdownElement = element.all(by.cssContainingText(
       '.select2-results__option', ruleDescriptionInDropdown)).first();
     await action.click('Rule Dropdown Element', ruleDropdownElement);
   };

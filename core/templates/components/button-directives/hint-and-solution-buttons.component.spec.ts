@@ -28,6 +28,7 @@ import { PlayerPositionService } from 'pages/exploration-player-page/services/pl
 import { PlayerTranscriptService } from 'pages/exploration-player-page/services/player-transcript.service';
 import { StatsReportingService } from 'pages/exploration-player-page/services/stats-reporting.service';
 import { HintAndSolutionButtonsComponent } from './hint-and-solution-buttons.component';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 /**
  * @fileoverview Unit tests for HintAndSolutionButtonsComponent
@@ -44,13 +45,14 @@ describe('HintAndSolutionButtonsComponent', () => {
   let hintAndSolutionModalService: HintAndSolutionModalService;
   let explorationPlayerStateService: ExplorationPlayerStateService;
   let statsReportingService: StatsReportingService;
+
   let newCard: StateCard;
   let audioTranslationLanguageService: AudioTranslationLanguageService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [HintAndSolutionButtonsComponent]
+      declarations: [HintAndSolutionButtonsComponent, MockTranslatePipe]
     }).compileComponents();
   }));
 
@@ -162,8 +164,8 @@ describe('HintAndSolutionButtonsComponent', () => {
     let oldCard: StateCard = StateCard.createNewCard(
       'State 1', '<p>Content</p>', '<interaction></interaction>',
       null, RecordedVoiceovers.createEmpty(),
-      writtenTranslationsObjectFactory.createEmpty(), 'content',
-      audioTranslationLanguageService);
+      writtenTranslationsObjectFactory.createEmpty(),
+      'content', audioTranslationLanguageService);
     spyOn(hintsAndSolutionManagerService, 'getNumHints').and.returnValue(1);
 
     component.displayedCard = oldCard;

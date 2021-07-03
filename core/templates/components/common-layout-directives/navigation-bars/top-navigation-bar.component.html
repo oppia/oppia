@@ -144,7 +144,7 @@
           </ul>
         </li>
         <li [ngClass]="{'open': activeMenuName === 'getInvolvedMenu'}"
-            ngDropdown
+            ngbDropdown
             [hidden]="navElementsVisibilityStatus.I18N_TOPNAV_GET_INVOLVED"
             class="nav-item oppia-navbar-clickable-dropdown protractor-test-about-oppia-list-item">
           <a ngbDropdownToggle (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
@@ -172,7 +172,7 @@
             </li>
             <li class="nav-item">
               <a class="dropdown-item nav-link oppia-navbar-tab-content"
-                 href="http://oppiafoundation.org"
+                 href="https://www.oppiafoundation.org/partnerships"
                  target="_blank"
                  rel="noopener"
                  [innerHTML]="'I18N_TOPNAV_PARTNERSHIPS' | translate">
@@ -196,12 +196,35 @@
     </li>
   </ul>
   <ul class="nav oppia-navbar-nav oppia-navbar-profile">
+    <li ngbDropdown class="nav-item oppia-navbar-clickable-dropdown dropdown" *ngIf="showLanguageSelector">
+      <div class="oppia-navbar-button-container dropdown">
+        <button ngbDropdownToggle
+                class="btn dropdown-toggle oppia-navbar-button protractor-test-language-dropdown">
+          <i class="material-icons language-icon"> &#xE894; </i>
+          <span *ngIf="windowIsNarrow"> {{ currentLanguageCode }} </span>
+          <span *ngIf="!windowIsNarrow"> {{ currentLanguageText }} </span>
+        </button>
+      </div>
+      <ul ngbDropdownMenu class="dropdown-menu oppia-navbar-dropdown" [style.margin-top]="userIsLoggedIn ? '-10px': '0'">
+        <li class="nav-item" [ngClass]="'protractor-test-i18n-language-' + language.id" *ngFor="let language of supportedSiteLanguages">
+          <a (click)="changeLanguage(language.id, language.text)">
+            <div class="language-element oppia-nav-right-dropdown" [ngClass]="{'language-element-selected': currentLanguageCode === language.id}">
+              <span *ngIf="currentLanguageCode === language.id">
+                <i class="material-icons"> &#xE876; </i>
+              </span>
+              <span [ngClass]="{'language-padding-left': currentLanguageCode !== language.id}">
+                {{ language.text }}
+              </span>
+            </div>
+          </a>
+        </li>
+      </ul>
+    </li>
     <li [ngClass]="{'open' : activeMenuName === 'profileMenu'}"
         ngbDropdown
         *ngIf="userIsLoggedIn"
-        class="nav-item protractor-test-profile-dropdown oppia-navbar-clickable-dropdown">
+        class="nav-item protractor-test-profile-dropdown oppia-navbar-clickable-dropdown profile-dropdown">
       <a (keydown)="onMenuKeypress($event, 'profileMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
-         ngbDropdownToggle
          class="nav-link oppia-navbar-dropdown-toggle protractor-test-navbar-dropdown-toggle"
          aria-haspopup="true"
          aria-expanded="false"
@@ -224,12 +247,6 @@
               User Avatar
             </span>
           </span>
-          <div class="oppia-navbar-dashboard-indicator"
-               *ngIf="numUnseenNotifications > 0">
-            <span class="oppia-navbar-dashboard-indicator-text">
-              {{ numUnseenNotifications }}
-            </span>
-          </div>
           <div class="oppia-navbar-role-indicator"
                *ngIf="isAdmin || isModerator">
             <!--
@@ -295,16 +312,6 @@
         </li>
         <li class="nav-item">
           <a (click)="closeSubmenuIfNotMobile($event)"
-             href="/notifications"
-             class="dropdown-item nav-link protractor-test-notifications-link">
-            <span [innerHTML]="'I18N_TOPNAV_NOTIFICATIONS' | translate"></span>
-            <span *ngIf="numUnseenNotifications > 0">
-              ({{ numUnseenNotifications }})
-            </span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a (click)="closeSubmenuIfNotMobile($event)"
              href="/preferences"
              class="dropdown-item nav-link protractor-test-preferences-link">
             <span [innerHTML]="'I18N_TOPNAV_PREFERENCES' | translate"></span>
@@ -357,7 +364,7 @@
         <li class="nav-item">
           <a (click)="onLoginButtonClicked()"
              class="nav-link oppia-nav-link">
-            <div class="oppia-signin-google">
+            <div class="oppia-nav-right-dropdown">
               <div class="oppia-signin-g-icon">
                 <img [src]="googleSignInIconUrl" alt="Google signin icon">
               </div>
@@ -379,18 +386,22 @@
   </ul>
 </div>
 <style>
-  li.nav-item.oppia-navbar-clickable-dropdown.dropdown:hover {
-    background-color: #34665C;
-  }
   .dropdown-menu {
+    border-radius: 3px;
     left: 100 !important;
     right: 0 !important;
+  }
+  .language-icon {
+    margin-top: -3px;
+  }
+  .language-padding-left {
+    padding-left: 26px;
   }
   .oppia-navbar-brand-name:focus {
     outline: 1px dotted #fff;
     outline: auto 5px -webkit-focus-ring-color;
   }
-  .oppia-signin-google {
+  .oppia-nav-right-dropdown {
     background-color: #FFF;
     border-radius: 5px;
     border-width: 0;
@@ -405,11 +416,22 @@
     vertical-align: middle;
     white-space: nowrap;
   }
-  .oppia-signin-google:focus,
-  .oppia-signin-google:hover {
+  .language-element {
+    border-radius: 0;
+    box-shadow: 0 0;
+    color: #34665C;
+  }
+  .language-element:hover {
+    background-color: rgb(52, 102, 92, 0.1);
+  }
+  .language-element-selected {
+    background-color: rgb(52, 102, 92, 0.1);
+  }
+  .oppia-nav-right-dropdown:focus,
+  .oppia-nav-right-dropdown:hover {
     box-shadow: 1px 4px 5px 1px rgba(0,0,0,0.1);
   }
-  .oppia-signin-google:active {
+  .oppia-nav-right-dropdown:active {
     background-color: #e5e5e5;
     box-shadow: none;
     transition-duration: 10ms;
@@ -507,7 +529,7 @@
     padding: 0;
     width: 190px;
   }
-  .oppia-navbar-profile > li:hover {
+  .oppia-navbar-profile .profile-dropdown:hover {
     background-color: #fff;
    }
   @media screen and (max-width: 768px) {

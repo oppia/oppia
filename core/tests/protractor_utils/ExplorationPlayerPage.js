@@ -127,13 +127,13 @@ var ExplorationPlayerPage = function() {
 
   this.reportExploration = async function() {
     await action.click('Report Exploration Button', reportExplorationButton);
-    let radioButton = await element.all(by.tagName('input')).get(0);
+    let radioButton = element.all(by.tagName('input')).get(0);
     await waitFor.visibilityOf(
       radioButton, 'Radio Buttons takes too long to appear');
     await action.click('Radio Button', radioButton);
     let textArea = element(by.tagName('textarea'));
     await action.sendKeys('Text Area', textArea, 'Reporting this exploration');
-    let submitButton = await element.all(by.tagName('button')).get(1);
+    let submitButton = element(by.css('.protractor-test-submit-report-button'));
     await action.click('Submit Button', submitButton);
     let afterSubmitText = await element(
       by.css('.protractor-test-exploration-flagged-success-message')).getText();
@@ -194,11 +194,11 @@ var ExplorationPlayerPage = function() {
   // can then be sent.
   this.expectContentToMatch = async function(richTextInstructions) {
     await waitFor.visibilityOf(
-      await conversationContent.first(), 'Conversation not visible');
+      conversationContent.first(), 'Conversation not visible');
     await waitFor.visibilityOf(
-      await conversationContent.last(), 'Conversation not fully present');
+      conversationContent.last(), 'Conversation not fully present');
     await forms.expectRichText(
-      await conversationContent.last()
+      conversationContent.last()
     ).toMatch(richTextInstructions);
   };
 

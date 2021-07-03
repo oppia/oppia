@@ -100,6 +100,7 @@
 
 # Blog project
 /core/domain/blog*.py @iamprayush
+/core/controllers/blog_dashboard*.py @iamprayush
 
 
 # Collection project.
@@ -164,7 +165,6 @@
 /core/templates/pages/creator-dashboard-page/ @nithusha21
 /core/templates/pages/email-dashboard-pages/ @nithusha21
 /core/templates/pages/learner-dashboard-page/ @nithusha21
-/core/templates/pages/notifications-dashboard-page/ @nithusha21
 
 
 # Dev workflow team.
@@ -491,8 +491,6 @@
 /core/templates/pages/interaction-specs.constants.ts @nithusha21
 /core/templates/pages/login-page/ @brianrodri
 /core/templates/pages/logout-page/ @brianrodri
-/core/templates/base-components/i18n-language-selector.component.ts @nithusha21
-/core/templates/base-components/i18n-language-selector.component.html @nithusha21
 /core/templates/app-events/ @srijanreddy98
 /core/templates/services/app.service*.ts @srijanreddy98
 /core/templates/services/contextual/document-attribute-customization.service*.ts @srijanreddy98
@@ -530,10 +528,12 @@
 
 # Restricted pages.
 /core/controllers/admin*.py @DubeySandeep @nithusha21
+/core/controllers/blog_admin*.py @iamprayush
 /core/controllers/moderator*.py @DubeySandeep
 /core/controllers/recent_commits*.py @DubeySandeep
 /core/domain/moderator_services*.py @DubeySandeep
 /core/templates/domain/admin/ @DubeySandeep @nithusha21
+/core/templates/domain/blog-admin/ @iamprayush
 /core/templates/pages/admin-page/ @DubeySandeep @nithusha21
 /core/templates/pages/moderator-page/ @DubeySandeep @nithusha21
 
@@ -558,6 +558,7 @@
 /core/templates/services/autoplayed-videos.service*.ts @aks681
 /core/templates/services/external-save.service*.ts @srijanreddy98
 /core/templates/services/external-rte-save.service*.ts @srijanreddy98
+/core/templates/services/oppia-rte-parser.service.ts @srijanreddy98 @aks681
 /core/templates/services/image-local-storage*.ts @DubeySandeep
 /core/templates/services/rte-helper.service*.ts @aks681
 /core/templates/services/rte-helper-modal.controller*.ts @aks681
@@ -565,6 +566,7 @@
 # TODO(#13119): Set @vojtechjelinek as owner after 2021-07-06
 /core/domain/rte_component_registry*.py @aks681
 /extensions/ckeditor_plugins/ @aks681
+/extensions/rich_text_components/rte-output-display.component* @srijanreddy98 @aks681
 /extensions/rich_text_components/ @aks681
 /assets/rich_text_components_definitions.ts @aks681
 
@@ -671,6 +673,12 @@
 
 # Draft version upgrade.
 /core/domain/draft_upgrade_services*.py @DubeySandeep
+
+
+# Data stability.
+# TODO(#13119): Add @vojtechjelinek as owner after 2021-07-06
+/core/controllers/domain_objects_validator*.py @rohitkatlaa
+/core/controllers/payload_validator*.py @rohitkatlaa
 
 
 # QA team.

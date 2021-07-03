@@ -20,12 +20,12 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { LearnerDashboardBackendApiService } from
+import { AddMessagePayload, LearnerDashboardBackendApiService } from
   'domain/learner_dashboard/learner-dashboard-backend-api.service';
 
 describe('Learner Dashboard Backend API Service', () => {
   let learnerDashboardBackendApiService:
-    LearnerDashboardBackendApiService = null;
+    LearnerDashboardBackendApiService;
   let httpTestingController: HttpTestingController;
 
   let nodeDict = {
@@ -40,6 +40,14 @@ describe('Learner Dashboard Backend API Service', () => {
     exploration_id: null,
     outline_is_finalized: false,
     thumbnail_bg_color: '#a33f40'
+  };
+  let subtopic = {
+    skill_ids: ['skill_id_2'],
+    id: 1,
+    title: 'subtopic_name',
+    thumbnail_filename: 'image.svg',
+    thumbnail_bg_color: '#F8BF74',
+    url_fragment: 'subtopic-name'
   };
 
   let sampleDataResults = {
@@ -172,31 +180,30 @@ describe('Learner Dashboard Backend API Service', () => {
       all_node_dicts: [nodeDict]
     }],
     learnt_topics_list: [{
-      id: 'hyuy4GUlvTqJ',
-      name: 'Sample Name',
-      classroom: 'Math',
+      id: 'sample_topic_id',
+      name: 'Topic Name',
       language_code: 'en',
-      version: 1,
-      canonical_story_count: 3,
-      additional_story_count: 0,
-      uncategorized_skill_count: 1,
-      subtopic_count: 1,
-      topic_model_created_on: 1466178691847.67,
-      topic_model_last_updated: 1466178759209.839,
       description: 'description',
-      total_skill_count: 2,
-      total_published_node_count: 3,
+      version: 1,
+      story_titles: ['Story 1'],
       thumbnail_filename: 'image.svg',
       thumbnail_bg_color: '#C6DCDA',
-      url_fragment: 'sample-name',
-      subtopics: [{
-        skill_ids: ['skill_id_2'],
-        id: 1,
-        title: 'subtopic_name',
+      classroom: 'math',
+      practice_tab_is_displayed: false,
+      canonical_story_summary_dict: [{
+        id: '0',
+        title: 'Story Title',
+        description: 'Story Description',
+        node_titles: ['Chapter 1'],
         thumbnail_filename: 'image.svg',
         thumbnail_bg_color: '#F8BF74',
-        url_fragment: 'subtopic-name'
+        story_is_published: true,
+        completed_node_titles: ['Chapter 1'],
+        url_fragment: 'story-title',
+        all_node_dicts: [nodeDict]
       }],
+      url_fragment: 'topic-name',
+      subtopics: [subtopic],
       degrees_of_mastery: {
         skill_id_1: 0.5,
         skill_id_2: 0.3
@@ -207,31 +214,132 @@ describe('Learner Dashboard Backend API Service', () => {
       }
     }],
     partially_learnt_topics_list: [{
-      id: 'fyuy4GUlvTqJ',
-      name: 'Sample Name',
-      classroom: 'Math',
+      id: 'sample_topic_id',
+      name: 'Topic Name',
       language_code: 'en',
-      version: 1,
-      canonical_story_count: 3,
-      additional_story_count: 0,
-      uncategorized_skill_count: 1,
-      subtopic_count: 1,
-      topic_model_created_on: 1466178691847.67,
-      topic_model_last_updated: 1466178759209.839,
       description: 'description',
-      total_skill_count: 2,
-      total_published_node_count: 3,
+      version: 1,
+      story_titles: ['Story 1'],
       thumbnail_filename: 'image.svg',
       thumbnail_bg_color: '#C6DCDA',
-      url_fragment: 'sample-name',
-      subtopics: [{
-        skill_ids: ['skill_id_2'],
-        id: 1,
-        title: 'subtopic_name',
+      classroom: 'math',
+      practice_tab_is_displayed: false,
+      canonical_story_summary_dict: [{
+        id: '0',
+        title: 'Story Title',
+        description: 'Story Description',
+        node_titles: ['Chapter 1'],
         thumbnail_filename: 'image.svg',
         thumbnail_bg_color: '#F8BF74',
-        url_fragment: 'subtopic-name'
+        story_is_published: true,
+        completed_node_titles: ['Chapter 1'],
+        url_fragment: 'story-title',
+        all_node_dicts: [nodeDict]
       }],
+      url_fragment: 'topic-name',
+      subtopics: [subtopic],
+      degrees_of_mastery: {
+        skill_id_1: 0.5,
+        skill_id_2: 0.3
+      },
+      skill_descriptions: {
+        skill_id_1: 'Skill Description 1',
+        skill_id_2: 'Skill Description 2'
+      }
+    }],
+    topics_to_learn_list: [{
+      id: 'sample_topic_id',
+      name: 'Topic Name',
+      language_code: 'en',
+      description: 'description',
+      version: 1,
+      story_titles: ['Story 1'],
+      thumbnail_filename: 'image.svg',
+      thumbnail_bg_color: '#C6DCDA',
+      classroom: 'math',
+      practice_tab_is_displayed: false,
+      canonical_story_summary_dict: [{
+        id: '0',
+        title: 'Story Title',
+        description: 'Story Description',
+        node_titles: ['Chapter 1'],
+        thumbnail_filename: 'image.svg',
+        thumbnail_bg_color: '#F8BF74',
+        story_is_published: true,
+        completed_node_titles: ['Chapter 1'],
+        url_fragment: 'story-title',
+        all_node_dicts: [nodeDict]
+      }],
+      url_fragment: 'topic-name',
+      subtopics: [subtopic],
+      degrees_of_mastery: {
+        skill_id_1: 0.5,
+        skill_id_2: 0.3
+      },
+      skill_descriptions: {
+        skill_id_1: 'Skill Description 1',
+        skill_id_2: 'Skill Description 2'
+      }
+    }],
+    all_topics_list: [{
+      id: 'sample_topic_id',
+      name: 'Topic Name',
+      language_code: 'en',
+      description: 'description',
+      version: 1,
+      story_titles: ['Story 1'],
+      thumbnail_filename: 'image.svg',
+      thumbnail_bg_color: '#C6DCDA',
+      classroom: 'math',
+      practice_tab_is_displayed: false,
+      canonical_story_summary_dict: [{
+        id: '0',
+        title: 'Story Title',
+        description: 'Story Description',
+        node_titles: ['Chapter 1'],
+        thumbnail_filename: 'image.svg',
+        thumbnail_bg_color: '#F8BF74',
+        story_is_published: true,
+        completed_node_titles: ['Chapter 1'],
+        url_fragment: 'story-title',
+        all_node_dicts: [nodeDict]
+      }],
+      url_fragment: 'topic-name',
+      subtopics: [subtopic],
+      degrees_of_mastery: {
+        skill_id_1: 0.5,
+        skill_id_2: 0.3
+      },
+      skill_descriptions: {
+        skill_id_1: 'Skill Description 1',
+        skill_id_2: 'Skill Description 2'
+      }
+    }],
+    new_topics_list: [{
+      id: 'sample_topic_id',
+      name: 'Topic Name',
+      language_code: 'en',
+      description: 'description',
+      version: 1,
+      story_titles: ['Story 1'],
+      thumbnail_filename: 'image.svg',
+      thumbnail_bg_color: '#C6DCDA',
+      classroom: 'math',
+      practice_tab_is_displayed: false,
+      canonical_story_summary_dict: [{
+        id: '0',
+        title: 'Story Title',
+        description: 'Story Description',
+        node_titles: ['Chapter 1'],
+        thumbnail_filename: 'image.svg',
+        thumbnail_bg_color: '#F8BF74',
+        story_is_published: true,
+        completed_node_titles: ['Chapter 1'],
+        url_fragment: 'story-title',
+        all_node_dicts: [nodeDict]
+      }],
+      url_fragment: 'topic-name',
+      subtopics: [subtopic],
       degrees_of_mastery: {
         skill_id_1: 0.5,
         skill_id_2: 0.3
@@ -389,11 +497,11 @@ describe('Learner Dashboard Backend API Service', () => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
 
-    let updatedStatus = null;
-    let updatedSubject = null;
+    let updatedStatus = true;
+    let updatedSubject = 'Updated Subject';
     let text = 'Sending message';
     let url = '/threadhandler/exploration.4.Wfafsafd';
-    let payload = {
+    let payload: AddMessagePayload = {
       updated_status: updatedStatus,
       updated_subject: updatedSubject,
       text: text
@@ -422,11 +530,11 @@ describe('Learner Dashboard Backend API Service', () => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
 
-    let updatedStatus = null;
-    let updatedSubject = null;
+    let updatedStatus = true;
+    let updatedSubject = 'Updated Subject';
     let text = 'Sending message';
     let invalidUrl = '/invalidUrl';
-    let payload = {
+    let payload: AddMessagePayload = {
       updated_status: updatedStatus,
       updated_subject: updatedSubject,
       text: text
