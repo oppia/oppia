@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for question player concept card modal.
+ * @fileoverview Component for question player concept card modal.
  */
 
 import { Component, OnInit } from '@angular/core';
@@ -26,11 +26,15 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
 })
 export class OppiaNoninteractiveSkillreviewConceptCardModalComponent extends
   ConfirmOrCancelModal implements OnInit {
-  skillId: string;
+  // This property is initialized using Angular lifecycle hooks
+  // therefore we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  skillId!: string;
   skillIds: string[] = [];
   index = 0;
   modalHeader = 'Concept Card';
   isInTestMode = false;
+
   constructor(protected modalInstance: NgbActiveModal) {
     super(modalInstance);
   }

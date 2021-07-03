@@ -28,9 +28,9 @@ import {
 import { CsrfTokenService } from './csrf-token.service';
 
 describe('Request Interceptor Service', () => {
-  let cts: CsrfTokenService = null;
-  let httpClient: HttpClient = null;
-  let httpTestingController: HttpTestingController = null;
+  let cts: CsrfTokenService;
+  let httpClient: HttpClient;
+  let httpTestingController: HttpTestingController;
 
   beforeEach(() => {
     TestBed.configureTestingModule({

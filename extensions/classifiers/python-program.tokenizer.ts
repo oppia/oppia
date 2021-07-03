@@ -119,7 +119,7 @@ export class PythonProgramTokenizer {
   private single3prog = new RegExp(this.single3);
   private double3prog = new RegExp(this.double3);
 
-  private endprogs = {
+  private endprogs: Record<string, RegExp | null> = {
     "'": new RegExp(this.single), '"': new RegExp(this.doubleQuote),
     "'''": this.single3prog, '"""': this.double3prog,
     "r'''": this.single3prog, 'r"""': this.double3prog,
@@ -175,14 +175,15 @@ export class PythonProgramTokenizer {
       let pos = 0;
       const max = line.length;
 
-      let endmatch: { length: number; }[];
       if (contstr) {
         if (!line) {
           // Exception.
           this.loggerService.error('EOF in multi-line string');
         }
-
-        let endmatch = endprog.exec(line);
+        let endmatch;
+        if (endprog !== null) {
+          endmatch = endprog.exec(line);
+        }
         if (endmatch && endmatch.index === 0) {
           this.token = endmatch[0];
           pos = pos + this.token.length;
@@ -297,8 +298,11 @@ export class PythonProgramTokenizer {
                 [this.PythonProgramTokenType.COMMENT, token]);
             }
           } else if (this.tripleQuoted.indexOf(token) !== -1) {
-            endprog = this.endprogs[token];
-            endmatch = endprog.exec(line.slice(pos));
+            let endprog = this.endprogs[token];
+            let endmatch;
+            if (endprog !== null) {
+              endmatch = endprog.exec(line.slice(pos));
+            }
             // All on one line.
             if (endmatch) {
               pos = pos + endmatch[0].length;
