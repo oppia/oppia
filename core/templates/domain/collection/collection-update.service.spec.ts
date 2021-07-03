@@ -92,7 +92,8 @@ describe('Collection update service', () => {
 
   it('should add/remove a new collection node to/from a collection',
     () => {
-      expect(_sampleCollection.getExplorationIds()).toEqual(['exp_id0', 'exp_id1']);
+      expect(_sampleCollection.getExplorationIds())
+        .toEqual(['exp_id0', 'exp_id1']);
       collectionUpdateService.addCollectionNode(
         _sampleCollection, 'exp_id2', learnerExplorationSummaryBackendDict);
       expect(_sampleCollection.getExplorationIds()).toEqual([
@@ -100,7 +101,8 @@ describe('Collection update service', () => {
       ]);
 
       undoRedoService.undoChange(_sampleCollection);
-      expect(_sampleCollection.getExplorationIds()).toEqual(['exp_id0', 'exp_id1']);
+      expect(_sampleCollection.getExplorationIds())
+        .toEqual(['exp_id0', 'exp_id1']);
     }
   );
 
@@ -132,9 +134,7 @@ describe('Collection update service', () => {
     undoRedoService.undoChange(_sampleCollection);
     expect(_sampleCollection.nodes[0].getExplorationId()).toBe('exp_id0');
     expect(_sampleCollection.nodes[1].getExplorationId()).toBe('exp_id1');
-
     expect(swapCollectionSpy).toHaveBeenCalled();
-
   });
 
   it('should return true when collection node is being added ' +
@@ -175,12 +175,14 @@ describe('Collection update service', () => {
   });
 
   it('should remove/add a collection node from/to a collection', ()=> {
-    expect(_sampleCollection.getExplorationIds()).toEqual(['exp_id0', 'exp_id1']);
+    expect(_sampleCollection.getExplorationIds())
+      .toEqual(['exp_id0', 'exp_id1']);
     collectionUpdateService.deleteCollectionNode(_sampleCollection, 'exp_id0');
     expect(_sampleCollection.getExplorationIds()).toEqual(['exp_id1']);
 
     undoRedoService.undoChange(_sampleCollection);
-    expect(_sampleCollection.getExplorationIds()).toEqual(['exp_id1', 'exp_id0']);
+    expect(_sampleCollection.getExplorationIds())
+      .toEqual(['exp_id1', 'exp_id0']);
   });
 
   it('should create a proper backend change dict for deleting collection nodes',
