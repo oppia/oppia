@@ -24,6 +24,7 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
 
+import { GoalsTabComponent } from './new-learner-dashboard-page/goals-tab.component';
 import { CommunityLessonsTabComponent } from './new-learner-dashboard/community-lessons-tab.component';
 import { LearnerDashboardPageComponent } from './learner-dashboard-page.component';
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
@@ -40,6 +41,7 @@ import { LearnerDashboardSuggestionModalComponent } from './suggestion-modal/lea
   declarations: [
     OppiaAngularRootComponent,
     LearnerDashboardPageComponent,
+    GoalsTabComponent,
     CommunityLessonsTabComponent,
     RemoveActivityModalComponent,
     LearnerDashboardSuggestionModalComponent
@@ -47,6 +49,7 @@ import { LearnerDashboardSuggestionModalComponent } from './suggestion-modal/lea
   entryComponents: [
     OppiaAngularRootComponent,
     LearnerDashboardPageComponent,
+    GoalsTabComponent,
     CommunityLessonsTabComponent,
     RemoveActivityModalComponent,
     LearnerDashboardSuggestionModalComponent
