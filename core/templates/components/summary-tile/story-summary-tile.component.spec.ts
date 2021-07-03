@@ -25,7 +25,7 @@ import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { StorySummaryTileComponent } from './story-summary-tile.component';
 
 
-fdescribe('StorySummaryTileComponent', () => {
+describe('StorySummaryTileComponent', () => {
   let component: StorySummaryTileComponent;
   let fixture: ComponentFixture<StorySummaryTileComponent>;
   let wds: WindowDimensionsService;
