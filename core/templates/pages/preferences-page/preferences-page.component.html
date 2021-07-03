@@ -45,6 +45,7 @@
           <textarea id="label-target-user-bio"
                     class="oppia-bio-border protractor-test-user-bio oppia-autofocus"
                     [(ngModel)]="userBio"
+                    [attr.value]="userBio"
                     (blur)="saveUserBio(userBio)"
                     (change)="registerBioChanged()"
                     rows="5"
@@ -153,8 +154,9 @@
         -->
         <div *ngIf="hasPageLoaded">
           <oppia-preferred-language-selector [choices]="SITE_LANGUAGE_CHOICES"
-                                    [preferredLanguageCode]="preferredSiteLanguageCode"
-                                    (preferredLanguageCodeChange)="savePreferredSiteLanguageCodes($event)">
+                                             entity="site"
+                                             [preferredLanguageCode]="preferredSiteLanguageCode"
+                                             (preferredLanguageCodeChange)="savePreferredSiteLanguageCodes($event)">
           </oppia-preferred-language-selector>
         </div>
         <span class="form-text oppia-form-text">
@@ -174,6 +176,7 @@
         -->
         <div *ngIf="hasPageLoaded">
           <oppia-preferred-language-selector [choices]="AUDIO_LANGUAGE_CHOICES"
+                                             entity="audio"
                                              [preferredLanguageCode]="preferredAudioLanguageCode"
                                              (preferredLanguageCodeChange)="savePreferredAudioLanguageCode($event)">
           </oppia-preferred-language-selector>

@@ -1,5 +1,6 @@
 <mat-form-field class="language-field">
-  <mat-select placeholder="Site language"
+  <mat-select placeholder="{{ entity | titlecase }} language"
+              class="protractor-test-{{ entity }}-language-selector"
               [value]="preferredLanguageCode"
               (valueChange)="updateLanguage($event)">
     <mat-option>

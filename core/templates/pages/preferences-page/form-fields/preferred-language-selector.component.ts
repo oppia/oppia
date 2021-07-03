@@ -26,7 +26,7 @@ interface Language {
 
 @Component({
   selector: 'oppia-preferred-language-selector',
-  templateUrl: './preferred-site-language.component.html'
+  templateUrl: './preferred-language-selector.component.html'
 })
 export class PreferredSiteLanguageSelectorComponent {
   @Input() preferredLanguageCode: string;
@@ -34,6 +34,7 @@ export class PreferredSiteLanguageSelectorComponent {
     new EventEmitter());
   @Input() choices: Language[];
   filteredChoices: Language[];
+  @Input() entity: string;
 
   ngOnInit(): void {
     this.filteredChoices = this.choices;

@@ -79,7 +79,7 @@ import { SubjectInterestsComponent } from './form-fields/subject-interests.compo
 import { ReactiveFormsModule } from '@angular/forms';
 import { PreferredLanguagesComponent } from './form-fields/preferred-languages.component';
 import { NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
-import { PreferredSiteLanguageSelectorComponent } from './form-fields/preferred-site-language.component';
+import { PreferredSiteLanguageSelectorComponent } from './form-fields/preferred-language-selector.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

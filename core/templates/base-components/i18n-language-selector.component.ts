@@ -51,7 +51,9 @@ export class I18nLanguageSelectorComponent {
     this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe((code) => {
       if (this.currentLanguageCode !== code) {
         this.currentLanguageCode = code;
-        this.changeDetectorRef.detectChanges();
+        if (!('destroyed' in this.changeDetectorRef)) {
+          this.changeDetectorRef.detectChanges();
+        }
       }
     });
   }
