@@ -90,7 +90,6 @@ class BlogPostHandler(base.BaseHandler):
 
     @acl_decorators.open_access
     def get(self, blog_post_url):
-        # type: () -> None
         """Handles GET requests."""
         blog_post = blog_services.get_blog_post_by_url_fragment(blog_post_url)
         if not blog_post:
