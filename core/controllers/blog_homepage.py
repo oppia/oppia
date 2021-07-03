@@ -138,7 +138,7 @@ class AuthorsPageHandler(base.BaseHandler):
         user_settings = (
             user_services.get_user_settings_from_username(author_username))
         if user_settings:
-            if user_settings.role != BLOG_ADMIN or BLOG_POST_EDITOR:
+            if user_settings.role != (BLOG_ADMIN or BLOG_POST_EDITOR):
                 raise self.PageNotFoundException(
                     Exception(
                         'The given user is not a blog post author.'))
