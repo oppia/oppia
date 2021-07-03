@@ -25,29 +25,8 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { LoaderService } from 'services/loader.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { ExplorationCreationBackendApiService } from './exploration-creation-backend-api.service';
+import { ExplorationCreationBackendApiService, ExplorationCreationResponse } from './exploration-creation-backend-api.service';
 import { ExplorationCreationService } from './exploration-creation.service';
-
-class MockExploratinoCreationBackendApiService {
-  throwError: boolean = false;
-  message: string;
-  registerNewExplorationAsync(): object {
-    return {
-      then: (
-          successCallback: (response: {explorationId: string}) => void,
-          errorCallback: (errorMessage: string) => void
-      ) => {
-        if (this.throwError) {
-          errorCallback(this.message);
-        } else {
-          successCallback({
-            explorationId: 'exp1'
-          });
-        }
-      }
-    };
-  }
-}
 
 class MockWindowRef {
   _window = {
@@ -68,7 +47,7 @@ class MockWindowRef {
 
 describe('ExplorationCreationService', () => {
   let ecs: ExplorationCreationService;
-  let ecbas: MockExploratinoCreationBackendApiService;
+  let ecbas: ExplorationCreationBackendApiService;
   let loaderService: LoaderService;
   let siteAnalyticsService: SiteAnalyticsService;
   let urlInterpolationService: UrlInterpolationService;
@@ -83,10 +62,6 @@ describe('ExplorationCreationService', () => {
       imports: [HttpClientTestingModule],
       providers: [
         {
-          provide: ExplorationCreationBackendApiService,
-          useClass: MockExploratinoCreationBackendApiService
-        },
-        {
           provide: WindowRef,
           useValue: windowRef
         }
@@ -94,9 +69,7 @@ describe('ExplorationCreationService', () => {
     });
 
     ecs = TestBed.inject(ExplorationCreationService);
-    ecbas = (TestBed.inject(
-      ExplorationCreationBackendApiService) as unknown) as
-      MockExploratinoCreationBackendApiService;
+    ecbas = TestBed.inject(ExplorationCreationBackendApiService);
     loaderService = TestBed.inject(LoaderService);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
@@ -130,6 +103,15 @@ describe('ExplorationCreationService', () => {
       spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
         '/url/to/exp1'
       );
+      spyOn(ecbas, 'registerNewExplorationAsync').and.callFake(() => {
+        return new Promise<ExplorationCreationResponse>((
+            successCallback: (response: {explorationId: string}) => void,
+            errorCallback: (errorMessage: string) => void) => {
+          successCallback({
+            explorationId: 'exp1'
+          });
+        });
+      });
 
       expect(ecs.explorationCreationInProgress).toBe(undefined);
       expect(windowRef.nativeWindow.location.href).toBe('');
@@ -145,8 +127,13 @@ describe('ExplorationCreationService', () => {
       spyOn(siteAnalyticsService, 'registerCreateNewExplorationEvent');
       spyOn(urlInterpolationService, 'interpolateUrl');
       spyOn(loaderService, 'hideLoadingScreen');
-
-      ecbas.throwError = true;
+      spyOn(ecbas, 'registerNewExplorationAsync').and.callFake(() => {
+        return new Promise<ExplorationCreationResponse>((
+            successCallback: (response: {explorationId: string}) => void,
+            errorCallback: (errorMessage: string) => void) => {
+          errorCallback('Error');
+        });
+      });
 
       expect(ecs.explorationCreationInProgress).toBe(undefined);
       expect(windowRef.nativeWindow.location.href).toBe('');
