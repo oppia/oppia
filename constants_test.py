@@ -129,9 +129,7 @@ class ConstantsTests(test_utils.GenericTestBase):
         actual_filepath = constants.create_filepath_with_prefix(
             'thumbnail', filename)
         expected_filepath = (
-            'https://storage.googleapis.com/'
-            'oppiaserver-resources/topic/iX9kYCjnouWN/'
-            'assets/thumbnail/'
+            'thumbnail/'
             'img_20200521_033202_4r4j4ljrwy_height_'
             '324_width_432.svg')
 
