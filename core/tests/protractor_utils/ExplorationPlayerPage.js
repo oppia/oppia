@@ -133,7 +133,11 @@ var ExplorationPlayerPage = function() {
     await action.click('Radio Button', radioButton);
     let textArea = element(by.tagName('textarea'));
     await action.sendKeys('Text Area', textArea, 'Reporting this exploration');
+<<<<<<< HEAD
     let submitButton = await element.all(by.tagName('button')).get(1);
+=======
+    let submitButton = element(by.css('.protractor-test-submit-report-button'));
+>>>>>>> 33b478ad5... Fix #13067, #13068, #12951 and #12857 - Moved language selector to navbar, fixed URLs and translations (#13074)
     await action.click('Submit Button', submitButton);
     let afterSubmitText = await element(
       by.css('.protractor-exploration-flagged-success-message')).getText();

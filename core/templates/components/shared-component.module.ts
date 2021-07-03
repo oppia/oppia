@@ -85,7 +85,6 @@ import { ContinueButtonComponent } from 'pages/exploration-player-page/learner-e
 import { BaseContentComponent } from '../base-components/base-content.component';
 import { PreviewThumbnailComponent } from 'pages/topic-editor-page/modal-templates/preview-thumbnail.component';
 import { InputResponsePairComponent } from 'pages/exploration-player-page/learner-experience/input-response-pair.component';
-import { I18nLanguageSelectorComponent } from '../base-components/i18n-language-selector.component';
 import { StorySummaryTileComponent } from './summary-tile/story-summary-tile.component';
 import { ExplorationFooterComponent } from 'pages/exploration-player-page/layout-directives/exploration-footer.component';
 import { DisplaySolutionModalComponent } from 'pages/exploration-player-page/modals/display-solution-modal.component';
@@ -247,7 +246,6 @@ const toastrConfig = {
     ExplorationEmbedButtonModalComponent,
     FilterForMatchingSubstringPipe,
     HintAndSolutionButtonsComponent,
-    I18nLanguageSelectorComponent,
     InputResponsePairComponent,
     KeyboardShortcutHelpModalComponent,
     LazyLoadingComponent,
@@ -321,7 +319,6 @@ const toastrConfig = {
     HintAndSolutionButtonsComponent,
     InputResponsePairComponent,
     KeyboardShortcutHelpModalComponent,
-    I18nLanguageSelectorComponent,
     OppiaFooterComponent,
     PreviewThumbnailComponent,
     PromoBarComponent,
@@ -375,7 +372,6 @@ const toastrConfig = {
     ExplorationSummaryTileComponent,
     CollectionSummaryTileComponent,
     HintAndSolutionButtonsComponent,
-    I18nLanguageSelectorComponent,
     InputResponsePairComponent,
     LazyLoadingComponent,
     LoadingMessageComponent,

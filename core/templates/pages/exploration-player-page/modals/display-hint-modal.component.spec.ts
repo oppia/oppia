@@ -30,6 +30,7 @@ import { HintsAndSolutionManagerService } from '../services/hints-and-solution-m
 import { PlayerPositionService } from '../services/player-position.service';
 import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { DisplayHintModalComponent } from './display-hint-modal.component';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 
 describe('Display hint modal', () => {
@@ -47,7 +48,8 @@ describe('Display hint modal', () => {
       imports: [HttpClientTestingModule],
       declarations: [
         DisplayHintModalComponent,
-        AngularHtmlBindWrapperDirective
+        AngularHtmlBindWrapperDirective,
+        MockTranslatePipe
       ],
       providers: [
         NgbActiveModal,
