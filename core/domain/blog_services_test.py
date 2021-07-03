@@ -111,6 +111,9 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
                 '...',
                 '',
                 [],
+                self.blog_post_a.thumbnail_filename,
+                self.blog_post_a.last_updated,
+                self.blog_post_a.published_on
             )
         )
         blog_post_summary = (
@@ -132,6 +135,9 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
                 '...',
                 '',
                 [],
+                blog_post_summary_model.thumbnail_filename,
+                blog_post_summary_model.last_updated,
+                blog_post_summary_model.published_on
             )
         )
         self.assertEqual(
@@ -149,6 +155,9 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
                 '...',
                 '',
                 [],
+                blog_post_summary.thumbnail_filename,
+                blog_post_summary.last_updated,
+                blog_post_summary.published_on
             )
         )
         self.assertEqual(
@@ -383,6 +392,9 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
                 '...',
                 '',
                 [],
+                blog_post_summary.thumbnail_filename,
+                blog_post_summary.last_updated,
+                blog_post_summary.published_on
             )
         )
         self.assertEqual(

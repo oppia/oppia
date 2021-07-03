@@ -2038,6 +2038,18 @@ def remove_translation_review_rights_in_language(user_id, language_code):
     _update_user_contribution_rights(user_contribution_rights)
 
 
+def remove_blog_editor(user_id):
+    """Removes the role of user as blog editor.
+
+    Args:
+        user_id: str. The unique ID of the user.
+    """
+    user_settings = get_user_settings(user_id, strict=True)
+    if feconf.ROLE_ID_BLOG_POST_EDITOR == user_settings.role:
+        update_user_role(user_id, feconf.ROLE_ID_EXPLORATION_EDITOR)
+    return
+
+
 def allow_user_to_review_voiceover_in_language(user_id, language_code):
     """Allows the user with the given user id to review voiceover applications
     in the given language_code.

@@ -55,6 +55,7 @@ import { StateSolicitAnswerDetailsService } from 'components/state-editor/state-
 import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
 import { StateWrittenTranslationsService } from 'components/state-editor/state-editor-properties-services/state-written-translations.service';
 import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
+import { BlogAdminBackendApiService } from 'domain/blog-admin/blog-admin-backend-api.service';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 import { CollectionRightsBackendApiService } from 'domain/collection/collection-rights-backend-api.service';
 import { CollectionUpdateService } from 'domain/collection/collection-update.service';
@@ -370,6 +371,7 @@ import { ExplorationInitStateNameService } from 'pages/exploration-editor-page/s
 
 export const angularServices: [string, Type<{}>][] = [
   ['AdminBackendApiService', AdminBackendApiService],
+  ['BlogAdminBackendApiService', BlogAdminBackendApiService],
   ['AdminDataService', AdminDataService],
   ['AdminRouterService', AdminRouterService],
   ['AdminTaskManagerService', AdminTaskManagerService],

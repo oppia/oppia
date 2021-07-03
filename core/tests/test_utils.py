@@ -1542,6 +1542,10 @@ class GenericTestBase(AppEngineTestBase):
     # Usernames containing the string 'admin' are reserved, so we use 'adm'
     # instead.
     ADMIN_USERNAME = 'adm'
+    BLOG_ADMIN_EMAIL = 'blogadmin@example.com'
+    BLOG_ADMIN_USERNAME = 'blogadm'
+    BLOG_EDITOR_EMAIL = 'blogeditor@example.com'
+    BLOG_EDITOR_USERNAME = 'blogeditor'
     MODERATOR_EMAIL = 'moderator@example.com'
     MODERATOR_USERNAME = 'moderator'
     RELEASE_COORDINATOR_EMAIL = 'releasecoordinator@example.com'

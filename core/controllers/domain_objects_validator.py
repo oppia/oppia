@@ -21,13 +21,16 @@ handler arguments.
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.domain import blog_domain
+from core.domain import config_domain
 from core.domain import exp_domain
+import python_utils
 
 from typing import Any, Dict # isort:skip  pylint: disable=wrong-import-order, wrong-import-position, unused-import, import-only-modules
 
 
 def validate_exploration_change(obj):
-    # type: (Dict[Any, Any]) -> None
+    # type: (Dict[String, Any]) -> None
     """Validates exploration change.
 
     Args:
@@ -35,4 +38,48 @@ def validate_exploration_change(obj):
     """
     # No explicit call to validate_dict method is necessary, because
     # ExplorationChange calls it while initialization.
-    exp_domain.ExplorationChange(obj) # type: ignore[no-untyped-call]
+    exp_domain.ExplorationChange(obj)
+
+
+def validate_new_config_property_values(obj):
+    # type: (Dict[String, Any]) -> None
+    """Validates new config property values.
+
+    Args:
+        obj: dict. Data that needs to be validated.
+    """
+    for (name, value) in obj.items():
+        if not isinstance(name, python_utils.BASESTRING):
+            raise Exception(
+                'config property name should be a string, received'
+                ': %s' % name)
+        config_property = config_domain.Registry.get_config_property(name)
+        if config_property is None:
+            raise Exception('%s do not have any schema.' % name)
+
+        config_property.normalize(value)
+
+
+def validate_change_dict_for_blog_post(change_dict):
+    # type: (Dict[Any, Any]) -> None
+    """Validates change_dict required for updating values of blog post.
+
+    Args:
+        change_dict: dict. Data that needs to be validated.
+    """
+    if 'title' in change_dict:
+        blog_domain.BlogPost.require_valid_title(
+            change_dict['title'], True)
+    if 'thumbnail_filename' in change_dict:
+        blog_domain.BlogPost.require_valid_thumbnail_filename(
+            change_dict['thumbnail_filename'])
+    if 'tags' in change_dict:
+        blog_domain.BlogPost.require_valid_tags(
+            change_dict['tags'], True)
+        # Validates that the tags in the change dict are from the list of
+        # default tags set by admin.
+        list_of_default_tags = config_domain.Registry.get_config_property(
+            'list_of_default_tags_for_blog_post').value
+        if not all(tag in list_of_default_tags for tag in change_dict['tags']):
+            raise Exception(
+                'Invalid tags provided. Tags not in default tags list.')

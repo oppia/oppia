@@ -452,6 +452,24 @@ MAX_NUMBER_OF_EXPLORATIONS_IN_MATH_SVGS_BATCH = ConfigProperty(
     'rich text svgs.',
     2)
 
+MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST = ConfigProperty(
+    'max_number_of_tags_assigned_to_blog_post',
+    INT_SCHEMA,
+    'The maximum number of tags that can be selected to categorize the blog'
+    ' post',
+    10
+)
+
+LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST = ConfigProperty(
+    'list_of_default_tags_for_blog_post',
+    SET_OF_STRINGS_SCHEMA,
+    'The list of tags available to a blog post editor for categorizing the blog'
+    ' post.',
+    ['News', 'International', 'Educators', 'Learners', 'Community',
+     'Partnerships', 'Volunteer', 'Stories', 'Languages', 'New features',
+     'New lessons', 'Software development', 'Content']
+)
+
 CONTRIBUTOR_DASHBOARD_IS_ENABLED = ConfigProperty(
     'contributor_dashboard_is_enabled', BOOL_SCHEMA,
     'Enable contributor dashboard page. The default value is true.', True)
