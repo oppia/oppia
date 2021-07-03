@@ -38,9 +38,6 @@ EXCLUDED_DIRECTORIES = [
 # NOTE TO DEVELOPERS: do not add any new files to this list without asking
 # @nithusha21 first.
 NOT_FULLY_COVERED_FILENAMES = [
-    'admin-config-tab.component.ts',
-    'admin-misc-tab.component.ts',
-    'admin-page.component.ts',
     'admin-roles-tab.component.ts',
     'angular-html-bind.directive.ts',
     'answer-classification.service.ts',
@@ -101,12 +98,10 @@ NOT_FULLY_COVERED_FILENAMES = [
     'graph-editor.component.ts',
     'graph-input-validation.service.ts',
     'graph-property-editor.component.ts',
-    'graph-viz.component.ts',
     'hint-editor.directive.ts',
     'html-editor.component.ts',
     'html-select.directive.ts',
     'i18n-language-selector.component.ts',
-    'image-with-regions-editor.component.ts',
     'input-response-pair.component.ts',
     'int-editor.component.ts',
     'item-selection-input-validation.service.ts',
@@ -280,7 +275,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'topic-editor-navbar.directive.ts',
     'topic-editor-state.service.ts',
     'topic-editor-stories-list.directive.ts',
-    'topic-summary-tile.directive.ts',
+    'topic-summary-tile.component.ts',
     'TopicObjectFactory.ts',
     'translatable-html-content-id.component.ts',
     'translate-text.service.ts',
