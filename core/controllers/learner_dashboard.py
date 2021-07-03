@@ -98,6 +98,12 @@ class LearnerDashboardHandler(base.BaseHandler):
         topics_to_learn_summary_dicts = (
             learner_progress_services.get_displayable_topic_summary_dicts(
                 self.user_id, learner_progress.topics_to_learn_summaries))
+        all_topic_summary_dicts = (
+            learner_progress_services.get_displayable_topic_summary_dicts(
+                self.user_id, learner_progress.all_topic_summaries))
+        new_topic_summary_dicts = (
+            learner_progress_services.get_displayable_topic_summary_dicts(
+                self.user_id, learner_progress.new_topic_summaries))
 
         full_thread_ids = subscription_services.get_all_threads_subscribed_to(
             self.user_id)
@@ -137,7 +143,9 @@ class LearnerDashboardHandler(base.BaseHandler):
                 partially_learnt_topic_summary_dicts),
             'exploration_playlist': exploration_playlist_summary_dicts,
             'collection_playlist': collection_playlist_summary_dicts,
-            'topics_to_learn': topics_to_learn_summary_dicts,
+            'topics_to_learn_list': topics_to_learn_summary_dicts,
+            'all_topics_list': all_topic_summary_dicts,
+            'new_topics_list': new_topic_summary_dicts,
             'number_of_nonexistent_activities': (
                 number_of_nonexistent_activities),
             'completed_to_incomplete_collections': (
