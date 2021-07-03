@@ -100,7 +100,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'hint-editor.directive.ts',
     'html-editor.component.ts',
     'html-select.directive.ts',
-    'i18n-language-selector.component.ts',
     'input-response-pair.component.ts',
     'int-editor.component.ts',
     'item-selection-input-validation.service.ts',
