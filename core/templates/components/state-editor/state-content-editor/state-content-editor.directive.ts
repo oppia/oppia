@@ -110,6 +110,8 @@ angular.module('oppia').directive('stateContentEditor', [
             $scope.contentEditorIsOpen = false;
           };
           ctrl.$onInit = function() {
+            // failing here
+            console.log(ContextService.getEntityType());
             $scope.HTML_SCHEMA = {
               type: 'html',
               ui_config: {
