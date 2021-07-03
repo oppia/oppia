@@ -13,16 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for the disallow-angularjs-property.js file.
+ * @fileoverview Tests for the disallow-angularjs-properties.js file.
  */
 
 'use strict';
 
-var rule = require('./disallow-angularjs-property');
+var rule = require('./disallow-angularjs-properties');
 var RuleTester = require('eslint').RuleTester;
 
 var ruleTester = new RuleTester();
-ruleTester.run('disallow-angularjs-property', rule, {
+ruleTester.run('disallow-angularjs-properties', rule, {
   valid: [
     `
     var ParentCtrl = function($scope) {

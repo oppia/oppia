@@ -14,17 +14,18 @@
 
 /**
  * @fileoverview Lint check to disallow $parent and $broadcast
- * angularJs property.
+ * properties of angularJs.
  */
 
 'use strict';
 
 module.exports = {
   meta: {
-    type: 'layout',
+    type: 'problem',
     docs: {
       description: (
-        'Lint check to disallow $parent and $broadcast angularJs property'),
+        'Lint check to disallow $parent and $broadcast properties of angularJs'
+        ),
       category: 'Best Practices',
       recommended: true,
     },
@@ -41,7 +42,7 @@ module.exports = {
   },
 
   create: function(context) {
-    var disallowAngularJsProperty = function(node) {
+    var disallowAngularJsProperties = function(node) {
       if (node.property.name === '$parent') {
         context.report({
           node: node,
@@ -58,7 +59,7 @@ module.exports = {
 
     return {
       MemberExpression: function(node) {
-        disallowAngularJsProperty(node);
+        disallowAngularJsProperties(node);
       }
     };
   }
