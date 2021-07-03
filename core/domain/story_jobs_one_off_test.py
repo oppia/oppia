@@ -253,7 +253,7 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
                 x, 'Expected description to be a string, received 123')
 
 
-class UpdateStoryThumbnailSizeOneOffJobTests(test_utils.GenericTestBase):
+class PopulateStoryThumbnailSizeOneOffJobTests(test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
@@ -261,7 +261,7 @@ class UpdateStoryThumbnailSizeOneOffJobTests(test_utils.GenericTestBase):
     STORY_ID = 'story_id'
 
     def setUp(self):
-        super(UpdateStoryThumbnailSizeOneOffJobTests, self).setUp()
+        super(PopulateStoryThumbnailSizeOneOffJobTests, self).setUp()
 
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)

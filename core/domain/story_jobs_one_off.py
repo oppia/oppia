@@ -22,7 +22,10 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import ast
 import logging
 
+from constants import constants
 from core import jobs
+from core.domain import fs_domain
+from core.domain import fs_services
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_services
@@ -96,12 +99,13 @@ class StoryMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, values)
 
 
-class UpdateStoryThumbnailSizeOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+class PopulateStoryThumbnailSizeOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job to update the thumbnail_size_in_bytes in story models. """
 
     _DELETED_KEY = 'story_deleted'
     _ERROR_KEY = 'update_error'
-    _SUCCESS_KEY = 'thumbnail_size_updated'
+    _NEW_SUCCESS_KEY = 'new_thumbnail_size'
+    _EXISTING_SUCCESS_KEY = 'existing_thumbnail_size'
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -110,39 +114,39 @@ class UpdateStoryThumbnailSizeOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(item):
         if item.deleted:
+            yield (PopulateStoryThumbnailSizeOneOffJob._DELETED_KEY, 1)
             return
 
-        story = story_fetchers.get_story_by_id(item.id)
+        if item.thumbnail_size_in_bytes is None:
+            file_system_class = fs_services.get_entity_file_system_class()
+            fs = fs_domain.AbstractFileSystem(file_system_class(
+                feconf.ENTITY_TYPE_STORY, item.id))
 
-        try:
-            # We are not updating thumbnail_filename here, but using it to call
-            # the update for the story thumbnail_size_in_bytes.
-            # old_value and new_value are the same here because the update for
-            # thumbnail_size_in_bytes is called from within the code for
-            # updating thumbnail_filename in story_services.py file.
-            commit_cmds = [story_domain.StoryChange({
-                'cmd': story_domain.CMD_UPDATE_STORY_PROPERTY,
-                'property_name': (
-                    story_domain.STORY_PROPERTY_THUMBNAIL_FILENAME),
-                'new_value': story.thumbnail_filename,
-                'old_value': story.thumbnail_filename
-            })]
+            filepath = '%s/%s' % (
+                constants.ASSET_TYPE_THUMBNAIL, item.thumbnail_filename)
 
-            story_services.update_story(
-                feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
-                'Update story thumbnail size'
-            )
-            yield (UpdateStoryThumbnailSizeOneOffJob._SUCCESS_KEY, 1)
-        except Exception as e:
-            logging.exception(
-                'Updating story thumbnail_size_in_bytes %s failed validation'
-                ': %s' % (item.id, e))
+            if fs.isfile(filepath):
+                item.thumbnail_size_in_bytes = len(fs.get(filepath))
+                item.put()
+                yield (
+                    PopulateStoryThumbnailSizeOneOffJob._NEW_SUCCESS_KEY, 1)
+            else:
+                yield (
+                    PopulateStoryThumbnailSizeOneOffJob._ERROR_KEY,
+                    'Thumbnail %s for story %s not found on the filesystem' % (
+                        item.thumbnail_filename,
+                        item.id
+                    ))
+        else:
+            # The attribute thumbnail_size_in_bytes is already updated.
             yield (
-                UpdateStoryThumbnailSizeOneOffJob._ERROR_KEY,
-                'Updating story thumbnail_size_in_bytes %s failed validation'
-                ': %s' % (item.id, e))
-            return
+                PopulateStoryThumbnailSizeOneOffJob._EXISTING_SUCCESS_KEY, 1)
 
     @staticmethod
     def reduce(key, values):
-        yield (key, values)
+        if (key == PopulateStoryThumbnailSizeOneOffJob._NEW_SUCCESS_KEY or
+                key == PopulateStoryThumbnailSizeOneOffJob._EXISTING_SUCCESS_KEY
+           ):
+            yield (key, len(values))
+        else:
+            yield (key, values)

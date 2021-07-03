@@ -122,16 +122,3 @@ class ConstantsTests(test_utils.GenericTestBase):
             set(rtl_audio_languages) & set(ltr_content_languages)
         )
         self.assertFalse(conflicts)
-
-    def file_path_creation(self):
-        """Tests if creating correct file path."""
-        filename = 'img_20200521_033202_4r4j4ljrwy_height_324_width_432.svg'
-        actual_filepath = constants.create_filepath_with_prefix(
-            'thumbnail', filename)
-        expected_filepath = (
-            'thumbnail/'
-            'img_20200521_033202_4r4j4ljrwy_height_'
-            '324_width_432.svg')
-
-        self.assertEqual(
-            actual_filepath, expected_filepath)

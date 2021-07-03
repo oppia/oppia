@@ -1081,21 +1081,26 @@ class Story(python_utils.OBJECT):
         """
         self.title = title
 
-    def update_thumbnail_filename(self, thumbnail_filename):
-        """Updates the thumbnail filename of the story.
+    def update_thumbnail_filename(self, new_thumbnail_filename):
+        """Updates the thumbnail filename and file size of the story.
 
         Args:
-            thumbnail_filename: str|None. The new thumbnail filename of the
+            new_thumbnail_filename: str|None. The new thumbnail filename of the
                 story.
         """
-        self.thumbnail_filename = thumbnail_filename
         file_system_class = fs_services.get_entity_file_system_class()
         fs = fs_domain.AbstractFileSystem(file_system_class(
-            feconf.ENTITY_TYPE_STORY, self.id))
-        filepath = constants.create_filepath_with_prefix(
-            'thumbnail', self.thumbnail_filename)
-        self.thumbnail_size_in_bytes = (
-            len(fs.get(filepath)) if fs.isfile(filepath) else None)
+            feconf.ENTITY_TYPE_TOPIC, self.id))
+
+        filepath = '%s/%s' % (
+            constants.ASSET_TYPE_THUMBNAIL, new_thumbnail_filename)
+        if fs.isfile(filepath):
+            self.thumbnail_filename = new_thumbnail_filename
+            self.thumbnail_size_in_bytes = len(fs.get(filepath))
+        else:
+            raise Exception(
+                'The thumbnail %s for story with id %s does not exist'
+                ' in the filesystem.' % (new_thumbnail_filename, self.id))
 
     def update_thumbnail_bg_color(self, thumbnail_bg_color):
         """Updates the thumbnail background color of the story.

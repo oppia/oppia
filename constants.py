@@ -55,20 +55,6 @@ def remove_comments(text):
     return re.sub(r'  //.*\n', r'', text)
 
 
-def create_filepath_with_prefix(filename_prefix, filename):
-    """Create filepath for given filename and prefix
-
-    Args:
-        filename_prefix: str. Prefix for the filepath.
-        filename: str. Name of the file.
-
-    Returns:
-        str. Complete path of the file.
-    """
-    filepath = '%s/%s' % (filename_prefix, filename)
-    return filepath
-
-
 class Constants(dict):
     """Transforms dict to object, attributes can be accessed by dot notation."""
 
