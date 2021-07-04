@@ -1,0 +1,108 @@
+<div class="greeting">
+  Good {{getTimeOfDay()}}, {{username}}!
+</div>
+<div class="continue-where-you-left-off" *ngIf="newTopics.length !== 0 || currentGoals.length !== 0">
+  <p class="continue-where-you-left-off-heading" [innerHTML]="'I18N_LEARNER_DASHBOARD_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION' | translate">
+  </p>
+  <div class="empty-continue-where-you-left-off-section" *ngIf="currentGoals.length === 0">
+    <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION' | translate">
+    </p>
+  </div>
+  <div class="continue-where-you-left-off-section" *ngIf="currentGoals.length !== 0">
+    <div *ngFor="let topicSummaryTile of currentGoals">
+      <div *ngFor="let storySummaryTile of topicSummaryTile.canonicalStorySummaryDicts; let i = index" class="story-summary-tile">
+        <oppia-learner-story-summary-tile [storySummary]="storySummaryTile"
+                                          [topicTitle]="topicSummaryTile.name"
+                                          [displayArea]="'homeTab'">
+        </oppia-learner-story-summary-tile>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="suggested-for-you">
+  <p class="suggested-for-you-heading"
+    [innerHTML]="'I18N_LEARNER_DASHBOARD_SUGGESTED_FOR_YOU_SECTION' | translate">
+  </p>
+  <div class="empty-suggested-for-you-section" *ngIf="newTopics.length === 0">
+    <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_SUGGESTED_FOR_YOU_SECTION' | translate">
+    </p>
+  </div>
+  <div class="suggested-for-you-section" *ngIf="newTopics.length !== 0">
+    <div *ngFor="let topicSummaryTile of newTopics">
+      <oppia-learner-topic-summary-tile [topicSummary]="topicSummaryTile">
+      </oppia-learner-topic-summary-tile>
+    </div>
+  </div>
+</div>
+<style>
+.greeting {
+  color: #00645C;
+  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+  font-size: 32px;
+  margin-left: 137px;
+  text-align: left;
+}
+.continue-where-you-left-off {
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 0 4px #0000001a;
+  margin: 18px 0 25px 137px;
+  min-height: 179px;
+  padding: 32px 0 30px 40px;
+  width: 736px;
+}
+.continue-where-you-left-off-heading,
+.suggested-for-you-heading {
+  color: #00645C;
+  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+  font-size: 24px;
+  margin: 0;
+  text-align: left;
+}
+.empty-continue-where-you-left-off-section {
+  color: #333333;
+  font-size: 18px;
+  padding-top: 32px;
+  text-align: left;
+}
+.next-incomplete-node-title {
+  color: #333333;
+  font-size: 17px;
+  font-weight: 500;
+  margin: 24px 0 12px 6px;
+  text-align: left;
+}
+.classroom-card {
+  background-color: #EEEEEE ;
+  border-radius: 4px;
+  display: inline-block;
+  height: 184px;
+  margin: 0 2px 30px 6px;
+  padding: 0;
+  position: relative;
+  width: 144px;
+  z-index: 5;
+}
+.empty-suggested-for-you-section {
+  color: #333333;
+  font-size: 18px;
+  padding: 32px 113px 0 0;
+  text-align: left;
+}
+.suggested-for-you {
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 0 4px #0000001a;
+  margin: 18px 0 25px 137px;
+  min-height: 206px;
+  padding: 32px 0 30px 40px;
+  width: 736px;
+}
+.suggested-for-you-section {
+  display: inline-block;
+  padding: 8px 16px 0 0;
+}
+.story-summary-tile {
+  display: inline-block;
+}
+</style>

@@ -1,3 +1,6 @@
+<div class="next-incomplete-chapter" *ngIf="displayArea === 'homeTab'">
+  {{nextIncompleteNodeTitle}}
+</div>
 <mat-card class="oppia-story-dashboard-card">
   <a [href]="getStoryLink()"
      target="{{ openInNewWindow ? '_blank' : '_self' }}"
@@ -29,6 +32,13 @@
     letter-spacing: 0;
     margin: 8px 8px 0 8px;
     opacity: 1;
+    text-align: left;
+  }
+  .next-incomplete-chapter {
+    color: #333333;
+    font-size: 17px;
+    font-weight: 500;
+    margin: 24px 0 12px 6px;
     text-align: left;
   }
   .oppia-story-completion {

@@ -32,12 +32,14 @@ import { StorySummary } from 'domain/story/story-summary.model';
 export class LearnerStorySummaryTileComponent implements OnInit {
   @Input() storySummary: StorySummary;
   @Input() topicTitle: string;
+  @Input() displayArea: string;
   nodeCount: number;
   completedNodeCount: number;
   storyProgress: number;
   thumbnailUrl: string = null;
   storyLink: string;
   storyTitle: string;
+  nextIncompleteNodeTitle: string;
   thumbnailBgColor: string;
 
   constructor(
@@ -73,6 +75,10 @@ export class LearnerStorySummaryTileComponent implements OnInit {
     this.storyLink = this.getStoryLink();
     this.storyTitle = this.storySummary.getTitle();
     this.thumbnailBgColor = this.storySummary.getThumbnailBgColor();
+    let nextIncompleteNode = this.storySummary.getNodeTitles()[
+      this.completedNodeCount];
+    this.nextIncompleteNodeTitle = (
+      `Chapter ${this.completedNodeCount + 1}: ${nextIncompleteNode}`);
   }
 }
 
