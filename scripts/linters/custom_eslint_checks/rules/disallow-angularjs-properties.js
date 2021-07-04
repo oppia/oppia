@@ -42,7 +42,7 @@ module.exports = {
   },
 
   create: function(context) {
-    var disallowAngularJsProperties = function(node) {
+    var checkAndReportAngularJsProperties = function(node) {
       if (node.property.name === '$parent') {
         context.report({
           node: node,
@@ -59,7 +59,7 @@ module.exports = {
 
     return {
       MemberExpression: function(node) {
-        disallowAngularJsProperties(node);
+        checkAndReportAngularJsProperties(node);
       }
     };
   }
