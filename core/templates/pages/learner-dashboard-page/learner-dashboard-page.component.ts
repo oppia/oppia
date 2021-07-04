@@ -114,14 +114,15 @@ export class LearnerDashboardPageComponent implements OnInit {
 
   completedExplorationsList: LearnerExplorationSummary[];
   completedCollectionsList: CollectionSummary[];
-  completedStories: StorySummary[];
+  completedStoriesList: StorySummary[];
+  partiallyLearntTopicsList: LearnerTopicSummary[];
   learntTopics: LearnerTopicSummary[];
   incompleteExplorationsList: LearnerExplorationSummary[];
   incompleteCollectionsList: CollectionSummary[];
   partiallyLearntTopics: LearnerTopicSummary[];
   topicsToLearn: LearnerTopicSummary[];
   allTopics: LearnerTopicSummary[];
-  newTopics: LearnerTopicSummary[];
+  untrackedTopics: LearnerTopicSummary[];
   subscriptionsList: ProfileSummary[];
 
   numberNonexistentIncompleteExplorations: number;
@@ -218,8 +219,10 @@ export class LearnerDashboardPageComponent implements OnInit {
           responseData.completedExplorationsList);
         this.completedCollectionsList = (
           responseData.completedCollectionsList);
-        this.completedStories = (
+        this.completedStoriesList = (
           responseData.completedStoriesList);
+        this.partiallyLearntTopicsList = (
+          responseData.partiallyLearntTopicsList);
         this.learntTopics = (
           responseData.learntTopicsList);
         this.incompleteExplorationsList = (
@@ -230,8 +233,8 @@ export class LearnerDashboardPageComponent implements OnInit {
           responseData.partiallyLearntTopicsList);
         this.topicsToLearn = (
           responseData.topicsToLearnList);
-        this.newTopics = (
-          responseData.newTopicsList);
+        this.untrackedTopics = (
+          responseData.untrackedTopicsList);
         this.allTopics = (
           responseData.allTopicsList);
         this.subscriptionsList = responseData.subscriptionList;

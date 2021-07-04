@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for LearnerStorySummaryTileComponent.
+ * @fileoverview Unit tests for for ProgressTabComponent.
  */
 
 import { async, ComponentFixture, TestBed } from
@@ -21,16 +21,15 @@ import { async, ComponentFixture, TestBed } from
 import { MaterialModule } from 'components/material.module';
 import { FormsModule } from '@angular/forms';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { StorySummary} from 'domain/story/story-summary.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { LearnerStorySummaryTileComponent } from './learner-story-summary-tile.component';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { ProgressTabComponent } from './progress-tab.component';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { StorySummary } from 'domain/story/story-summary.model';
 
-
-describe('Learner Story Summary Tile Component', () => {
-  let component: LearnerStorySummaryTileComponent;
-  let fixture: ComponentFixture<LearnerStorySummaryTileComponent>;
+describe('Progress tab Component', () => {
+  let component: ProgressTabComponent;
+  let fixture: ComponentFixture<ProgressTabComponent>;
   let urlInterpolationService: UrlInterpolationService;
 
   beforeEach(async(() => {
@@ -41,17 +40,18 @@ describe('Learner Story Summary Tile Component', () => {
         HttpClientTestingModule
       ],
       declarations: [
-        LearnerStorySummaryTileComponent,
+        MockTranslatePipe,
+        ProgressTabComponent
       ],
       providers: [
-        UrlInterpolationService,
+        UrlInterpolationService
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(LearnerStorySummaryTileComponent);
+    fixture = TestBed.createComponent(ProgressTabComponent);
     component = fixture.componentInstance;
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     const sampleStorySummaryBackendDict = {
@@ -69,47 +69,22 @@ describe('Learner Story Summary Tile Component', () => {
       classroom_url_fragment: 'math',
       topic_url_fragment: 'topic'
     };
-    component.storySummary = StorySummary.createFromBackendDict(
+    let storySummary = StorySummary.createFromBackendDict(
       sampleStorySummaryBackendDict);
+    component.completedStoriesList = [storySummary];
     fixture.detectChanges();
   });
 
-  it('should get the story link url for story page', () => {
-    const urlSpy = spyOn(
-      urlInterpolationService, 'interpolateUrl')
-      .and.returnValue('/learn/math/topic/story/story-title');
-
-    component.getStoryLink();
-    fixture.detectChanges();
-
-    expect(urlSpy).toHaveBeenCalled();
+  it('should get the correct width in mobile view', () => {
+    component.ngOnInit();
+    expect(component.width).toEqual(233);
   });
 
-  it('should get # as story link url for story page', () => {
-    const sampleStorySummaryBackendDict = {
-      id: '0',
-      title: 'Story Title',
-      description: 'Story Description',
-      node_titles: ['Chapter 1'],
-      thumbnail_filename: 'image.svg',
-      thumbnail_bg_color: '#F8BF74',
-      story_is_published: true,
-      completed_node_titles: ['Chapter 1'],
-      url_fragment: 'story-title',
-      all_node_dicts: [],
-      topic_name: 'Topic',
-      classroom_url_fragment: null,
-      topic_url_fragment: 'topic'
-    };
-    component.storySummary = StorySummary.createFromBackendDict(
-      sampleStorySummaryBackendDict);
-    const urlSpy = spyOn(
-      urlInterpolationService, 'interpolateUrl');
+  it('should detect when application is being used on a mobile', () => {
+    expect(component.checkMobileView()).toBe(false);
 
-    component.getStoryLink();
-    fixture.detectChanges();
-
-    expect(urlSpy).not.toHaveBeenCalled();
+    spyOnProperty(navigator, 'userAgent').and.returnValue('iPhone');
+    expect(component.checkMobileView()).toBe(true);
   });
 
   it('should get static image url', () => {

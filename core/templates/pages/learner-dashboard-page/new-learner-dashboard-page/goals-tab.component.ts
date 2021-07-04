@@ -80,7 +80,7 @@ export class GoalsTabComponent implements OnInit {
       this.editGoalsTopicClassification.push(
         this.getTopicClassification(topic.id));
       this.editGoalsTopicBelongToLearntToPartiallyLearntTopic.push(
-        this.topicBelongToLearntToPartiallyLearntTopics(topic.name));
+        this.doesTopicBelongToLearntToPartiallyLearntTopics(topic.name));
     }
   }
 
@@ -107,7 +107,7 @@ export class GoalsTabComponent implements OnInit {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  topicBelongToLearntToPartiallyLearntTopics(topicName: string): boolean {
+  doesTopicBelongToLearntToPartiallyLearntTopics(topicName: string): boolean {
     if (this.learntToPartiallyLearntTopics.includes(topicName)) {
       return true;
     }

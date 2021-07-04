@@ -1,0 +1,94 @@
+<div class="completed-stories" *ngIf="completedStoriesList.length !== 0">
+  <div class="completed-stories-heading">
+    <p class="completed-stories-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_STORIES_COMPLETED_SECTION' | translate">
+    </p>
+    <span class="completed-stories-length">
+      {{completedStoriesList.length}}
+    </span>
+    <img [src]="getStaticImageUrl('/learner_dashboard/star.svg')" alt="star image" class="oppia-svg-star-image">
+  </div>
+  <div class="scroll-content">
+    <div class="completed-stories-content" [ngStyle]="checkMobileView() && {'width': width + 'px'}">
+      <div *ngFor="let tile of completedStoriesList" class="story-tile">
+        <oppia-learner-story-summary-tile [storySummary]="tile">
+        </oppia-learner-story-summary-tile>
+      </div>
+    </div>
+  </div>
+</div>
+<style>
+  .completed-stories {
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: 0 0 4px #0000001a;
+    margin: auto;
+    margin-top: 15px;
+    min-height: 342px;
+    opacity: 1;
+    padding: 0 0 30px 40px;
+    width: 736px;
+  }
+  .completed-stories .completed-stories-content {
+    display: inline-block;
+  }
+  .completed-stories .story-tile {
+    display: inline-block;
+    padding: 0 30px 0 0;
+  }
+  .completed-stories .completed-stories-title {
+    color: #00645C;
+    display: inline-block;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-size: 24px;
+    letter-spacing: 0;
+    opacity: 1;
+    text-align: left;
+  }
+  .completed-stories .completed-stories-heading {
+    padding: 32px 0;
+  }
+  .completed-stories .completed-stories-length {
+    bottom: 3px;
+    font-size: 18px;
+    margin: 0 4px 0 12px;
+    position: relative;
+  }
+  .completed-stories .oppia-svg-star-image {
+    bottom: 4px;
+    filter: invert(95%) sepia(49%) saturate(2374%) hue-rotate(320deg) brightness(91%) contrast(89%);
+    position: relative;
+    width: 20px;
+  }
+  @media screen and (min-width: 768px) and (max-width: 950px) {
+    .completed-stories {
+      padding: 0 0 30px 25px;
+      position: relative;
+      right: 20px;
+      width: 555px;
+    }
+    .completed-stories .scroll-content {
+      overflow: scroll;
+    }
+    .completed-stories .oppia-story-completion {
+      overflow: hidden;
+    }
+  }
+  @media screen and (max-width: 767px) {
+    .completed-stories {
+      padding: 0 0 30px 25px;
+      width: 360px;
+    }
+    .completed-stories .completed-stories-title {
+      font-size: 20px;
+    }
+    .completed-stories .story-tile {
+      padding: 0 14px 0 0;
+    }
+    .completed-stories .scroll-content {
+      overflow: scroll;
+    }
+    .completed-stories .oppia-story-completion {
+      overflow: hidden;
+    }
+  }
+</style>

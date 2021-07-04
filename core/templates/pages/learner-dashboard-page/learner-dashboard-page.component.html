@@ -73,6 +73,11 @@
           <span [innerHTML]="LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS | translate"></span>
         </h4>
         <h4 class="oppia-learner-dashboard-menu" *ngIf="newLearnerDashboardPageIsDisplayed"
+            [ngClass]="{'oppia-learner-dashboard-section-active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS}"
+            (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS)">
+          <span [innerHTML]="LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS | translate"></span>
+        </h4>
+        <h4 class="oppia-learner-dashboard-menu" *ngIf="newLearnerDashboardPageIsDisplayed"
             [ngClass]="{'oppia-learner-dashboard-section-active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS}"
             (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS)">
           <span [innerHTML]="LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS | translate"></span>
@@ -148,7 +153,7 @@
     <div class="col-md-8 oppia-learner-dashboard-main-content"
          [ngClass]="{'oppia-learner-dashboard-mobile-mode': checkMobileView()}">
       <div>
-        <span class="oppia-learner-dashboard-main-content-title" *ngIf="activeSection !== LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS && activeSection !== LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS">
+        <span class="oppia-learner-dashboard-main-content-title" *ngIf="activeSection !== LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS && activeSection !== LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS && activeSection !== LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS">
           <span [innerHTML]="activeSection | translate">
           </span>
           <span *ngIf="activeSection !== LEARNER_DASHBOARD_SECTION_I18N_IDS.SUBSCRIPTIONS && activeSection !== LEARNER_DASHBOARD_SECTION_I18N_IDS.FEEDBACK">
@@ -228,6 +233,11 @@
                            [completedGoals]="learntTopics"
                            [learntToPartiallyLearntTopics]="learntToPartiallyLearntTopics">
           </oppia-goals-tab>
+        </div>
+        <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS && newLearnerDashboardPageIsDisplayed">
+          <oppia-progress-tab [completedStoriesList]="completedStoriesList"
+                              [partiallyLearntTopicsList]="partiallyLearntTopicsList">
+          </oppia-progress-tab>
         </div>
         <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS && newLearnerDashboardPageIsDisplayed">
           <oppia-community-lessons-tab [incompleteExplorationsList]="incompleteExplorationsList"

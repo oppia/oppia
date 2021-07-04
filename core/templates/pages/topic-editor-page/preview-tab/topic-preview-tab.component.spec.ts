@@ -30,7 +30,7 @@ describe('Topic Preview Tab Component', () => {
   let testName = 'test_name';
   let mockUrl = 'mock_url';
   let storySummaries = [new StorySummary(
-    null, null, [], null, null, null, null, [], null, [], '', '')];
+    null, null, [], null, null, null, null, [], null, [], '', '', '')];
 
   class MockTopicEditorStateService {
     getTopic() {

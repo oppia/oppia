@@ -43,7 +43,7 @@ describe('Learner Dashboard Backend API Service', () => {
       partially_learnt_topic_ids: [],
       topic_ids_to_learn: [],
       all_topic_ids: [],
-      new_topic_ids: [],
+      untracked_topic_ids: [],
       collection_playlist_ids: [],
       incomplete_collection_ids: []
     },

@@ -37,7 +37,7 @@ describe('Learner dashboard activity ids model', () => {
       collection_playlist_ids: ['16', '17'],
       topic_ids_to_learn: ['18', '19'],
       all_topic_ids: ['20', '21'],
-      new_topic_ids: ['22', '23']
+      untracked_topic_ids: ['22', '23']
     };
   });
 

@@ -27,7 +27,7 @@ export interface LearnerDashboardActivityIdsDict {
   'completed_collection_ids': string[];
   'topic_ids_to_learn': string[];
   'all_topic_ids': string[];
-  'new_topic_ids': string[];
+  'untracked_topic_ids': string[];
   'exploration_playlist_ids': string[];
   'collection_playlist_ids': string[];
 }
@@ -42,7 +42,7 @@ export class LearnerDashboardActivityIds {
   learntTopicIds: string[];
   topicIdsToLearn: string[];
   allTopicIds: string[];
-  newTopicIds: string[];
+  untrackedTopicIds: string[];
   explorationPlaylistIds: string[];
   collectionPlaylistIds: string[];
 
@@ -51,7 +51,8 @@ export class LearnerDashboardActivityIds {
       partiallyLearntTopicIds: string[],
       completedExplorationIds: string[], completedCollectionIds: string[],
       completedStoryIds: string[], learntTopicIds: string[],
-      topicIdsToLearn: string[], allTopicIds: string[], newTopicIds: string[],
+      topicIdsToLearn: string[], allTopicIds: string[],
+      untrackedTopicIds: string[],
       explorationPlaylistIds: string[], collectionPlaylistIds: string[]) {
     this.incompleteExplorationIds = incompleteExplorationIds;
     this.incompleteCollectionIds = incompleteCollectionIds;
@@ -62,7 +63,7 @@ export class LearnerDashboardActivityIds {
     this.learntTopicIds = learntTopicIds;
     this.topicIdsToLearn = topicIdsToLearn;
     this.allTopicIds = allTopicIds;
-    this.newTopicIds = newTopicIds;
+    this.untrackedTopicIds = untrackedTopicIds;
     this.explorationPlaylistIds = explorationPlaylistIds;
     this.collectionPlaylistIds = collectionPlaylistIds;
   }
@@ -79,7 +80,7 @@ export class LearnerDashboardActivityIds {
         this.learntTopicIds.indexOf(activityId) !== -1 ||
         this.topicIdsToLearn.indexOf(activityId) !== -1 ||
         this.allTopicIds.indexOf(activityId) !== -1 ||
-        this.newTopicIds.indexOf(activityId) !== -1) {
+        this.untrackedTopicIds.indexOf(activityId) !== -1) {
       return true;
     }
     return false;
@@ -197,7 +198,7 @@ export class LearnerDashboardActivityIds {
       learnerDashboardActivityIdsDict.learnt_topic_ids,
       learnerDashboardActivityIdsDict.topic_ids_to_learn,
       learnerDashboardActivityIdsDict.all_topic_ids,
-      learnerDashboardActivityIdsDict.new_topic_ids,
+      learnerDashboardActivityIdsDict.untracked_topic_ids,
       learnerDashboardActivityIdsDict.exploration_playlist_ids,
       learnerDashboardActivityIdsDict.collection_playlist_ids);
   }
