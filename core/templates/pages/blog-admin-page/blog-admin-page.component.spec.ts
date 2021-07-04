@@ -25,8 +25,6 @@ import { BlogAdminBackendApiService, BlogAdminPageData } from 'domain/blog-admin
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { AdminTaskManagerService } from 'pages/admin-page/services/admin-task-manager.service';
 import { BlogAdminPageComponent } from 'pages/blog-admin-page/blog-admin-page.component';
-import { finalize } from 'rxjs/operators';
-
 class MockWindowRef {
   nativeWindow = {
     confirm() {
@@ -45,7 +43,7 @@ class MockWindowRef {
   };
 }
 
-fdescribe('Blog Admin Page component ', () => {
+describe('Blog Admin Page component ', () => {
   let component: BlogAdminPageComponent;
   let fixture: ComponentFixture<BlogAdminPageComponent>;
 
@@ -53,8 +51,6 @@ fdescribe('Blog Admin Page component ', () => {
   let adminTaskManagerService: AdminTaskManagerService;
   let mockWindowRef: MockWindowRef;
 
-
-  let statusMessageSpy: jasmine.Spy;
   let confirmSpy: jasmine.Spy;
   let startTaskSpy: jasmine.Spy;
   let finishTaskSpy: jasmine.Spy;
@@ -110,9 +106,12 @@ fdescribe('Blog Admin Page component ', () => {
     blogAdminBackendApiService = TestBed.inject(BlogAdminBackendApiService);
     adminTaskManagerService = TestBed.inject(AdminTaskManagerService);
 
-    startTaskSpy = spyOn(adminTaskManagerService, 'startTask').and.returnValue(null);
-    finishTaskSpy = spyOn(adminTaskManagerService, 'finishTask').and.returnValue(null);
-    spyOn(blogAdminBackendApiService, 'getDataAsync').and.resolveTo(blogAdminPageData);
+    startTaskSpy = spyOn(adminTaskManagerService, 'startTask')
+      .and.returnValue(null);
+    finishTaskSpy = spyOn(adminTaskManagerService, 'finishTask')
+      .and.returnValue(null);
+    spyOn(blogAdminBackendApiService, 'getDataAsync')
+      .and.resolveTo(blogAdminPageData);
     confirmSpy = spyOn(mockWindowRef.nativeWindow, 'confirm');
   });
 
@@ -122,54 +121,24 @@ fdescribe('Blog Admin Page component ', () => {
     component.ngOnInit();
     tick();
 
-    expect(component.formData.updateRole.newRole).toBe(null)
-    expect(component.formData.updateRole.username).toBe('')
-    expect(component.formData.removeEditorRole.username).toBe('')
+    expect(component.formData.updateRole.newRole).toBe(null);
+    expect(component.formData.updateRole.username).toBe('');
+    expect(component.formData.removeEditorRole.username).toBe('');
   }));
 
-  it('should set correct values for properties when initialized', fakeAsync(() => {
-    expect(component.UPDATABLE_ROLES).toEqual({});
-    expect(component.roleToActions).toBe(undefined);
+  it('should set correct values for properties when initialized',
+    fakeAsync(() => {
+      expect(component.UPDATABLE_ROLES).toEqual({});
+      expect(component.roleToActions).toBe(undefined);
 
-    component.ngOnInit();
-    tick();
+      component.ngOnInit();
+      tick();
 
-    expect(component.UPDATABLE_ROLES).toEqual(blogAdminPageData.updatableRoles)
-    expect(component.roleToActions).toEqual(blogAdminPageData.roleToActions)
-  }));
-
-  it('should submit update role form successfully', fakeAsync(() => {
-    component.ngOnInit();
-    tick();
-    component.formData.updateRole.newRole = 'BLOG_ADMIN';
-    component.formData.updateRole.username = 'username';
-
-    component.submitUpdateRoleForm(component.formData.updateRole);
-    spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(false);
-
-    expect(startTaskSpy).toHaveBeenCalled();
-    expect(component.statusMessage).toBe('Updating User Role');
-    spyOn(blogAdminBackendApiService, 'updateUserRoleAsync')
-    .and.returnValue(Promise.resolve());
-    flushMicrotasks();
-    expect(component.statusMessage).toBe('Role of username successfully updated to' +
-    ' BLOG_ADMIN')
-    expect(finishTaskSpy).toHaveBeenCalled()
-  }))
-
-  // it('should not submit update role form if already a task is in queue',
-  //   fakeAsync(() => {
-  //     component.ngOnInit();
-  //     tick();
-  //     component.formData.updateRole.newRole = 'BLOG_ADMIN';
-  //     component.formData.updateRole.username = 'username';
-
-  //     component.submitUpdateRoleForm(component.formData.updateRole);
-  //     spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(true);
-
-  //     expect(startTaskSpy).toNotHaveBeenCalled()
-  //     expect(finishTaskSpy).toNotHaveBeenCalled()
-  // }))
+      expect(component.UPDATABLE_ROLES).toEqual(
+        blogAdminPageData.updatableRoles);
+      expect(component.roleToActions).toEqual(
+        blogAdminPageData.roleToActions);
+    }));
 
   it('should reload config properties when initialized', fakeAsync(() => {
     expect(component.configProperties).toEqual({});
@@ -177,13 +146,154 @@ fdescribe('Blog Admin Page component ', () => {
     component.ngOnInit();
     tick();
 
-    expect(component.configProperties).toEqual(blogAdminPageData.configProperties);
+    expect(component.configProperties).toEqual(
+      blogAdminPageData.configProperties);
   }));
 
   it('should return schema callback when calling ' +
   '\'getSchemaCallback\'', () => {
-  let result = component.getSchemaCallback({type: 'bool'});
-  expect(result()).toEqual({type: 'bool'});
+    let result = component.getSchemaCallback({type: 'bool'});
+    expect(result()).toEqual({type: 'bool'});
+  });
+
+  describe('when updating role of user ', () => {
+    it('should submit update role form successfully', fakeAsync(() => {
+      component.ngOnInit();
+      tick();
+      component.formData.updateRole.newRole = 'BLOG_ADMIN';
+      component.formData.updateRole.username = 'username';
+      spyOn(blogAdminBackendApiService, 'updateUserRoleAsync')
+        .and.returnValue(Promise.resolve());
+      spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(false);
+      component.submitUpdateRoleForm(component.formData.updateRole);
+
+      expect(startTaskSpy).toHaveBeenCalled();
+      expect(component.statusMessage).toBe('Updating User Role');
+      flushMicrotasks();
+      expect(component.statusMessage).toBe(
+        'Role of username successfully updated to BLOG_ADMIN');
+      expect(finishTaskSpy).toHaveBeenCalled();
+    }));
+
+    it('should not submit update role form if already a task is in queue',
+      fakeAsync(() => {
+        component.ngOnInit();
+        tick();
+        component.formData.updateRole.newRole = 'BLOG_ADMIN';
+        component.formData.updateRole.username = 'username';
+
+        spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(true);
+        component.submitUpdateRoleForm(component.formData.updateRole);
+
+        expect(startTaskSpy).not.toHaveBeenCalled();
+        expect(finishTaskSpy).not.toHaveBeenCalled();
+      }));
+
+    it('should not submit update role form in case of backend error',
+      fakeAsync(() => {
+        component.ngOnInit();
+        tick();
+        component.formData.updateRole.newRole = 'BLOG_ADMIN';
+        component.formData.updateRole.username = 'username';
+        spyOn(blogAdminBackendApiService, 'updateUserRoleAsync')
+          .and.returnValue(Promise.reject('Internal Server Error.'));
+        spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(false);
+        component.submitUpdateRoleForm(component.formData.updateRole);
+
+        expect(startTaskSpy).toHaveBeenCalled();
+        expect(component.statusMessage).toBe('Updating User Role');
+        flushMicrotasks();
+        expect(component.statusMessage).toBe(
+          'Server error: Internal Server Error.');
+        expect(finishTaskSpy).toHaveBeenCalled();
+      }));
+
+    it('should not enable update role button if the input values are invalid',
+      fakeAsync(() => {
+        component.ngOnInit();
+        tick();
+        component.formData.updateRole.newRole = 'BLOG_ADMIN';
+        component.formData.updateRole.username = '';
+        expect(component.formData.updateRole.isValid()).toBe(false);
+
+        component.formData.updateRole.newRole = 'BLOG';
+        component.formData.updateRole.username = 'username';
+        expect(component.formData.updateRole.isValid()).toBe(false);
+      }));
+
+    it('should enable update role button if the input values are valid',
+      fakeAsync(() => {
+        component.ngOnInit();
+        tick();
+        component.formData.updateRole.newRole = 'BLOG_POST_EDITOR';
+        component.formData.updateRole.username = 'username';
+        expect(component.formData.updateRole.isValid()).toBe(true);
+      }));
+  });
+
+  describe('when removing a blog editor', () => {
+    it('should submit remove editor role form successfully', fakeAsync(() => {
+      component.ngOnInit();
+      tick();
+      component.formData.removeEditorRole.username = 'username';
+      spyOn(blogAdminBackendApiService, 'removeBlogEditorAsync')
+        .and.returnValue(Promise.resolve(Object));
+      spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(false);
+      component.submitRemoveEditorRoleForm(component.formData.updateRole);
+
+      expect(startTaskSpy).toHaveBeenCalled();
+      expect(component.statusMessage).toBe('Processing query...');
+      flushMicrotasks();
+      expect(component.statusMessage).toBe('Success.');
+      expect(finishTaskSpy).toHaveBeenCalled();
+    }));
+
+    it('should not submit remove editor role form if already' +
+      'a task is in queue', fakeAsync(() => {
+      component.ngOnInit();
+      tick();
+      component.formData.removeEditorRole.username = 'username';
+
+      spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(true);
+      component.submitRemoveEditorRoleForm(component.formData.updateRole);
+
+      expect(startTaskSpy).not.toHaveBeenCalled();
+      expect(finishTaskSpy).not.toHaveBeenCalled();
+    }));
+
+    it('should not submit remove editor role form in case of backend error',
+      fakeAsync(() => {
+        component.ngOnInit();
+        tick();
+        component.formData.removeEditorRole.username = 'username';
+        spyOn(blogAdminBackendApiService, 'removeBlogEditorAsync')
+          .and.returnValue(Promise.reject('Internal Server Error.'));
+        spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(false);
+        component.submitRemoveEditorRoleForm(component.formData.updateRole);
+
+        expect(startTaskSpy).toHaveBeenCalled();
+        expect(component.statusMessage).toBe('Processing query...');
+        flushMicrotasks();
+        expect(component.statusMessage).toBe(
+          'Server error: Internal Server Error.');
+        expect(finishTaskSpy).toHaveBeenCalled();
+      }));
+
+    it('should not enable remove role button if the input values are invalid',
+      fakeAsync(() => {
+        component.ngOnInit();
+        tick();
+        component.formData.removeEditorRole.username = '';
+        expect(component.formData.removeEditorRole.isValid()).toBe(false);
+      }));
+
+    it('should enable remove role button if the input values are valid',
+      fakeAsync(() => {
+        component.ngOnInit();
+        tick();
+        component.formData.removeEditorRole.username = 'username';
+        expect(component.formData.removeEditorRole.isValid()).toBe(true);
+      }));
   });
 
   describe('when clicking on revert to default button ', () => {

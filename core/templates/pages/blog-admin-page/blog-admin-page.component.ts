@@ -32,14 +32,14 @@ interface UpdateRoleAction {
   isValid: () => boolean;
 }
 
-interface RemoveEditorRoleAction {
+interface RemoveEditorRole {
   username: string
   isValid: () => boolean;
 }
 
 interface FormData {
   updateRole: UpdateRoleAction;
-  removeEditorRole: RemoveEditorRoleAction;
+  removeEditorRole: RemoveEditorRole;
 }
 
 @Component({
@@ -88,13 +88,10 @@ export class BlogAdminPageComponent implements OnInit {
           if (this.username === '') {
             return false;
           }
+          return true;
         }
       }
     };
-  }
-
-  handleErrorResponse(errorResponse: string): void {
-    this.statusMessage = 'Server error: ' + errorResponse;
   }
 
   submitUpdateRoleForm(formResponse: UpdateRoleAction): void {
@@ -110,12 +107,14 @@ export class BlogAdminPageComponent implements OnInit {
         'Role of ' + formResponse.username + ' successfully updated to ' +
         formResponse.newRole);
       this.refreshFormData();
-    }, this.handleErrorResponse.bind(this));
+    }, errorResponse => {
+      this.statusMessage = 'Server error: ' + errorResponse;
+    });
     this.adminTaskManagerService.finishTask();
   }
 
   submitRemoveEditorRoleForm(
-      formResponse: RemoveEditorRoleAction): void {
+      formResponse: RemoveEditorRole): void {
     if (this.adminTaskManagerService.isTaskRunning()) {
       return;
     }
@@ -126,7 +125,9 @@ export class BlogAdminPageComponent implements OnInit {
     ).then(() => {
       this.statusMessage = 'Success.';
       this.refreshFormData();
-    }, this.handleErrorResponse.bind(this));
+    }, errorResponse => {
+      this.statusMessage = 'Server error: ' + errorResponse;
+    });
     this.adminTaskManagerService.finishTask();
   }
 
