@@ -39,8 +39,10 @@ fdescribe('QuestionPlayerComponent', () => {
       $uibModal = $injector.get('$uibModal');
       $q = $injector.get('$q');
 
-      ctrl = $componentController('stateResponses', {
+      ctrl = $componentController('questionPlayer', {
         $scope: $scope
+      }, {
+        getQuestionPlayerConfig: () => {}
       });
     }));
 
