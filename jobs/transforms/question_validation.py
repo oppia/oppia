@@ -32,7 +32,7 @@ from jobs.transforms import base_validation
     question_models.QuestionSnapshotMetadataModel)
 class ValidateQuestionSnapshotMetadataModel(
         base_validation.BaseValidateCommitCmdsSchema):
-    """Overrides _get_change_domain_class for question models."""
+    """Overrides _get_change_domain_class for QuestionSnapshotMetadataModel."""
 
     def _get_change_domain_class(self, input_model): # pylint: disable=unused-argument
         """Returns a change domain class.
@@ -51,7 +51,7 @@ class ValidateQuestionSnapshotMetadataModel(
     question_models.QuestionCommitLogEntryModel)
 class ValidateQuestionCommitLogEntryModel(
         base_validation.BaseValidateCommitCmdsSchema):
-    """Overrides _get_change_domain_class for question models."""
+    """Overrides _get_change_domain_class for QuestionCommitLogEntryModel."""
 
     def _get_change_domain_class(self, input_model): # pylint: disable=unused-argument
         """Returns a change domain class.
