@@ -107,9 +107,6 @@ module.exports = {
       commonPrefix + '/pages/maintenance-page/maintenance-page.import.ts',
     moderator:
       commonPrefix + '/pages/moderator-page/moderator-page.import.ts',
-    notifications_dashboard:
-      commonPrefix + '/pages/notifications-dashboard-page/' +
-      'notifications-dashboard-page.import.ts',
     oppia_root:
       commonPrefix + '/pages/oppia-root/index.ts',
     pending_account_deletion:
@@ -327,6 +324,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['error'],
       filename: 'error-page-400.mainpage.html',
+      hybrid: true,
       meta: defaultMeta,
       template: commonPrefix + '/pages/error-pages/error-page.mainpage.html',
       minify: htmlMinifyConfig,
@@ -336,6 +334,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['error'],
       filename: 'error-page-401.mainpage.html',
+      hybrid: true,
       meta: defaultMeta,
       template: commonPrefix + '/pages/error-pages/error-page.mainpage.html',
       minify: htmlMinifyConfig,
@@ -345,6 +344,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['error'],
       filename: 'error-page-500.mainpage.html',
+      hybrid: true,
       meta: defaultMeta,
       template: commonPrefix + '/pages/error-pages/error-page.mainpage.html',
       minify: htmlMinifyConfig,
@@ -430,6 +430,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['license'],
       filename: 'license.mainpage.html',
+      hybrid: true,
       meta: {
         name: defaultMeta.name,
         description: 'License terms that Oppia is attributed under.'
@@ -474,23 +475,6 @@ module.exports = {
       meta: defaultMeta,
       template:
         commonPrefix + '/pages/moderator-page/moderator-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['notifications_dashboard'],
-      filename: 'notifications-dashboard-page.mainpage.html',
-      hybrid: true,
-      meta: {
-        name: defaultMeta.name,
-        description: 'Keep track of the lessons you have created, as well ' +
-          'as feedback from learners.'
-      },
-      template: (
-        commonPrefix +
-        '/pages/notifications-dashboard-page/' +
-        'notifications-dashboard-page.mainpage.html'
-      ),
       minify: htmlMinifyConfig,
       inject: false
     }),

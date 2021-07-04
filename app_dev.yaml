@@ -335,8 +335,6 @@ skip_files:
 #
 # Please do not remove line below this, as it is used for testing purpose.
 # Third party files:
-- third_party/static/angular-audio-1.7.4/
-- third_party/static/angular-toastr-1.7.0/
 - third_party/static/bootstrap-4.3.1/
 - third_party/static/bower-angular-translate-2.18.1/
 - third_party/static/bower-angular-translate-interpolation-messageformat-2.18.1/

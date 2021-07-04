@@ -22,11 +22,12 @@ import { MetaTagCustomizationService } from
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 describe('Meta Tag Customization Service', () => {
-  let mtcs, wrs;
+  let mtcs: MetaTagCustomizationService;
+  let wrs: WindowRef;
 
   beforeEach(() => {
-    mtcs = TestBed.get(MetaTagCustomizationService);
-    wrs = TestBed.get(WindowRef);
+    mtcs = TestBed.inject(MetaTagCustomizationService);
+    wrs = TestBed.inject(WindowRef);
   });
 
   it('should add a meta tag in the html head', () => {

@@ -61,6 +61,9 @@ interface LearnerDashboardDataBackendDict {
   'completed_stories_list': StorySummaryBackendDict[];
   'learnt_topics_list': LearnerTopicSummaryBackendDict[];
   'partially_learnt_topics_list': LearnerTopicSummaryBackendDict[];
+  'topics_to_learn_list': LearnerTopicSummaryBackendDict[];
+  'all_topics_list': LearnerTopicSummaryBackendDict[];
+  'new_topics_list': LearnerTopicSummaryBackendDict[];
   'number_of_unread_threads': number;
   'thread_summaries': FeedbackThreadSummaryBackendDict[];
   'completed_to_incomplete_collections': string[];
@@ -80,6 +83,9 @@ interface LearnerDashboardData {
   completedStoriesList: StorySummary[];
   learntTopicsList: LearnerTopicSummary[];
   partiallyLearntTopicsList: LearnerTopicSummary[];
+  topicsToLearnList: LearnerTopicSummary[];
+  allTopicsList: LearnerTopicSummary[];
+  newTopicsList: LearnerTopicSummary[];
   numberOfUnreadThreads: number;
   threadSummaries: FeedbackThreadSummary[];
   completedToIncompleteCollections: string[];
@@ -89,7 +95,7 @@ interface LearnerDashboardData {
   subscriptionList: ProfileSummary[];
 }
 
-interface AddMessagePayload {
+export interface AddMessagePayload {
   'updated_status': boolean,
   'updated_subject': string,
   'text': string;
@@ -145,6 +151,18 @@ export class LearnerDashboardBackendApiService {
                 .createFromBackendDict(topicSummary))),
           partiallyLearntTopicsList: (
             dashboardData.partially_learnt_topics_list.map(
+              topicSummary => LearnerTopicSummary
+                .createFromBackendDict(topicSummary))),
+          topicsToLearnList: (
+            dashboardData.topics_to_learn_list.map(
+              topicSummary => LearnerTopicSummary
+                .createFromBackendDict(topicSummary))),
+          allTopicsList: (
+            dashboardData.all_topics_list.map(
+              topicSummary => LearnerTopicSummary
+                .createFromBackendDict(topicSummary))),
+          newTopicsList: (
+            dashboardData.new_topics_list.map(
               topicSummary => LearnerTopicSummary
                 .createFromBackendDict(topicSummary))),
           numberOfUnreadThreads: dashboardData.number_of_unread_threads,

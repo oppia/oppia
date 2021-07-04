@@ -233,6 +233,9 @@ describe('Learner dashboard page', () => {
     incomplete_explorations_list: [],
     incomplete_collections_list: [],
     partially_learnt_topics_list: [],
+    topics_to_learn_list: [],
+    all_topics_list: [],
+    new_topics_list: [],
     subscription_list: subscriptionsList,
     completed_to_incomplete_collections: [],
     completed_to_incomplete_stories: [],
@@ -240,8 +243,12 @@ describe('Learner dashboard page', () => {
     number_of_nonexistent_activities: {
       incomplete_explorations: 0,
       incomplete_collections: 0,
+      partially_learnt_topics: 0,
       completed_explorations: 0,
       completed_collections: 0,
+      completed_stories: 0,
+      learnt_topics: 0,
+      topics_to_learn: 0,
       exploration_playlist: 0,
       collection_playlist: 0
     },
@@ -429,6 +436,18 @@ describe('Learner dashboard page', () => {
             learnerDashboardData.partially_learnt_topics_list.map(
               topicSummary => LearnerTopicSummary.createFromBackendDict(
                 topicSummary))),
+          topicsToLearnList: (
+            learnerDashboardData.topics_to_learn_list.map(
+              topicSummary => LearnerTopicSummary
+                .createFromBackendDict(topicSummary))),
+          allTopicsList: (
+            learnerDashboardData.all_topics_list.map(
+              topicSummary => LearnerTopicSummary
+                .createFromBackendDict(topicSummary))),
+          newTopicsList: (
+            learnerDashboardData.new_topics_list.map(
+              topicSummary => LearnerTopicSummary
+                .createFromBackendDict(topicSummary))),
           collectionPlaylist: (
             learnerDashboardData.collection_playlist.map(
               collectionSummary => CollectionSummary

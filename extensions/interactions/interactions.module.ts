@@ -27,6 +27,9 @@ import { FractionInputInteractionModule } from './FractionInput/fraction-input-i
 import { GraphInputInteractionModule } from './GraphInput/graph-input-interactions.module';
 import { ImageClickInputInteractionModule } from './ImageClickInput/image-click-input-interactions.module';
 import { CodeReplInteractionModule } from './CodeRepl/code-repl-interactions.module';
+import { NumericExpressionInputModule } from './NumericExpressionInput/numeric-expression-input-interactions.module';
+import { NumericInputModule } from './NumericInput/numeric-input-interactions.module';
+import { MathEquationInputModule } from './MathEquationInput/math-equation-input-interactions.module';
 import { InteractiveMapInteractionModule } from './InteractiveMap/interactive-map-interactions.module';
 import { LogicProofInteractionModule } from './LogicProof/logic-proof-interactions.module';
 import { MultipleChoiceInputInteractionModule } from './MultipleChoiceInput/multiple-choice-input-interactions.module';
@@ -43,6 +46,9 @@ import { TranslateModule } from '@ngx-translate/core';
     FractionInputInteractionModule,
     GraphInputInteractionModule,
     ImageClickInputInteractionModule,
+    NumericExpressionInputModule,
+    NumericInputModule,
+    MathEquationInputModule,
     InteractiveMapInteractionModule,
     LogicProofInteractionModule,
     MultipleChoiceInputInteractionModule,
@@ -59,6 +65,9 @@ import { TranslateModule } from '@ngx-translate/core';
     FractionInputInteractionModule,
     GraphInputInteractionModule,
     ImageClickInputInteractionModule,
+    NumericExpressionInputModule,
+    NumericInputModule,
+    MathEquationInputModule,
     InteractiveMapInteractionModule,
     LogicProofInteractionModule,
     MultipleChoiceInputInteractionModule,
