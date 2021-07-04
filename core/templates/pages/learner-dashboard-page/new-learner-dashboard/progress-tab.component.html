@@ -14,11 +14,13 @@
         <span class="skill-proficiency-topic-title">
           {{tile.name}}
         </span>
-        <span class="progress-text">
-          Progress: 
-        </span>
         <img [src]="getStaticImageUrl('/learner_dashboard/dropdown.svg')" alt="dropdown image" class="oppia-svg-dropdown-image" (click)="showSkills(i)" *ngIf="!displaySkills[i]">
         <img [src]="getStaticImageUrl('/learner_dashboard/up.svg')" alt="up image" class="oppia-svg-up-image" (click)="showSkills(i)" *ngIf="displaySkills[i]">
+        <div>
+          <span class="progress-text">
+            Progress:
+          </span>
+        </div>
       </div>
       <div class="skill-proficiency-skill-content" *ngIf="displaySkills[i]">
         <span class="skills-text">
@@ -97,6 +99,7 @@
     text-align: left;
   }
   .progress-text {
+    bottom: 20px;
     color: #00645C;
     float: right;
     font-size: 14px;
@@ -148,9 +151,9 @@
   .oppia-svg-dropdown-image,
   .oppia-svg-up-image {
     bottom: 5px;
-    left: 87px;
     float: right;
     position: relative;
+    top: 2px;
     width: 30px;
   }
   .oppia-svg-info-image {
@@ -178,6 +181,24 @@
       padding: 0 0 30px 25px;
       width: 360px;
     }
+    .skill-proficiency {
+      width: 360px;
+    }
+    .skill-proficiency-topic-tile {
+      height: 52px;
+      width: 280px;
+    }
+    .skill-proficiency-topic-title {
+      font-size: 16px;
+    }
+    .skills-text {
+      display: none;
+    }
+    .progress-text {
+      display: contents;
+      font-style: italic;
+    }
+    .skill-proficiency-title,
     .completed-stories-title {
       font-size: 20px;
     }
