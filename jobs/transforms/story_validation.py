@@ -35,8 +35,10 @@ class ValidateStorySnapshotMetadataModel(
 
     def _get_change_domain_class(self, input_model): # pylint: disable=unused-argument
         """Returns a change domain class.
+
         Args:
             input_model: datastore_services.Model. Entity to validate.
+
         Returns:
             story_domain.StoryChange. A domain object class for the
             changes made by commit commands of the model.
@@ -51,8 +53,10 @@ class ValidateStoryCommitLogEntryModel(
 
     def _get_change_domain_class(self, input_model): # pylint: disable=unused-argument
         """Returns a change domain class.
+
         Args:
             input_model: datastore_services.Model. Entity to validate.
+
         Returns:
             story_domain.StoryChange. A domain object class for the
             changes made by commit commands of the model.

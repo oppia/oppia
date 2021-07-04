@@ -280,7 +280,7 @@ class ValidateSkillCommitLogEntryModelTests(job_test_utils.PipelinedTestBase):
                 skill_validation.ValidateSkillCommitLogEntryModel())
         )
 
-        self.assert_pcoll_equal(output, [])        
+        self.assert_pcoll_equal(output, [])
 
     def test_raises_commit_cmd_none_error(self):
         invalid_commit_cmd_model = (
