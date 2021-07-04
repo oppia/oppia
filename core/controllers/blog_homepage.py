@@ -108,11 +108,8 @@ class BlogPostHandler(base.BaseHandler):
             blog_services.get_published_blog_post_summaries_by_user_id(
                 blog_post.author_id,
                 feconf.MAX_LIMIT_FOR_CARDS_ON_BLOG_POST_PAGE))
-        if blog_post_summaries:
-            blog_post_summary_dicts = (
-                _get_blog_card_summary_dicts_for_homepage(blog_post_summaries))
-        else:
-            blog_post_summary_dicts = None
+        blog_post_summary_dicts = (
+            _get_blog_card_summary_dicts_for_homepage(blog_post_summaries))
 
         self.values.update({
             'profile_picture_data_url': user_settings.profile_picture_data_url,

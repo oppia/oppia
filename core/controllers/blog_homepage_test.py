@@ -157,13 +157,6 @@ class BlogPostHandlerTest(test_utils.GenericTestBase):
             len(json_response['summary_dicts']), 2)
         self.assertIsNotNone(json_response['profile_picture_data_url'])
 
-        blog_services.unpublish_blog_post(self.blog_post.id)
-        blog_services.unpublish_blog_post(blog_post_two_id)
-        json_response = self.get_json(
-            '%s/%s' % (feconf.BLOG_AUTHORS_PAGE_URL, self.BLOG_ADMIN_USERNAME),
-            )
-        self.assertIsNone(json_response['summary_dicts'])
-
 
 class AuthorsPageHandlerTest(test_utils.GenericTestBase):
     """Checks that the author data and related blog summary cards are
