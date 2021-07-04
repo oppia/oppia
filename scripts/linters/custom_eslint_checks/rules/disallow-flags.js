@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Lint check to disallow camelcase and no-explicity flags'.
+ * @fileoverview Lint check to disallow camelcase and no-explicity flags.'
  */
 
 'use strict';
@@ -45,16 +45,16 @@ module.exports = {
     var camelCaseRegex = /^ eslint-(enable|disable)(-next-line)? camelcase$/;
     var expicitRegex = /no-explicit-any/;
 
-    var disallowFlags = function(Comment) {
-      if (camelCaseRegex.test(Comment.value)) {
+    var checkAndReportDisallowedFlagMessage = function(comment) {
+      if (camelCaseRegex.test(comment.value)) {
         context.report({
-          node: Comment,
+          node: comment,
           messageId: 'disallowCamelcaseFlag'
         });
       }
-      if (expicitRegex.test(Comment.value)) {
+      if (expicitRegex.test(comment.value)) {
         context.report({
-          node: Comment,
+          node: comment,
           messageId: 'disallowExplicitAnyFlag'
         });
       }
@@ -63,10 +63,8 @@ module.exports = {
     return {
       Program: function(node) {
         var sourceCode = context.getSourceCode();
-        var Comments = sourceCode.getAllComments();
-        for (var i = 0; i < Comments.length; i++) {
-          disallowFlags(Comments[i]);
-        }
+        var comments = sourceCode.getAllComments();
+        comments.forEach(checkAndReportDisallowedFlagMessage);
       }
     };
   }
