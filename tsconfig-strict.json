@@ -243,6 +243,8 @@
     "core/templates/domain/utilities/language-util.service.spec.ts",
     "core/templates/domain/utilities/stopwatch.model.ts",
     "core/templates/domain/utilities/stopwatch.model.spec.ts",
+    "core/templates/expressions/expression-evaluator.service.ts",
+    "core/templates/expressions/expression-evaluator.service.spec.ts",
     "core/templates/expressions/expression-parser.service.ts",
     "core/templates/expressions/expression-parser.service.spec.ts",
     "core/templates/expressions/expression-syntax-tree.service.ts",
