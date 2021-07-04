@@ -34,7 +34,9 @@ class ConceptCardDataHandler(base.BaseHandler):
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.can_view_skills
     def get(self, comma_separated_skill_ids):
