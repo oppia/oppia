@@ -33,7 +33,8 @@ from jobs.transforms import base_validation
     collection_models.CollectionSnapshotMetadataModel)
 class ValidateCollectionSnapshotMetadataModel(
         base_validation.BaseValidateCommitCmdsSchema):
-    """Overrides _get_change_domain_class for collection models."""
+    """Overrides _get_change_domain_class for CollectionSnapshotMetadataModel.
+    """
 
     def _get_change_domain_class(self, input_model): # pylint: disable=unused-argument
         """Returns a change domain class.
@@ -52,7 +53,9 @@ class ValidateCollectionSnapshotMetadataModel(
     collection_models.CollectionRightsSnapshotMetadataModel)
 class ValidateCollectionRightsSnapshotMetadataModel(
         base_validation.BaseValidateCommitCmdsSchema):
-    """Overrides _get_change_domain_class for collection models."""
+    """Overrides _get_change_domain_class for
+    CollectionRightsSnapshotMetadataModel.
+    """
 
     def _get_change_domain_class(self, input_model): # pylint: disable=unused-argument
         """Returns a change domain class.
@@ -71,7 +74,7 @@ class ValidateCollectionRightsSnapshotMetadataModel(
     collection_models.CollectionCommitLogEntryModel)
 class ValidateCollectionCommitLogEntryModel(
         base_validation.BaseValidateCommitCmdsSchema):
-    """Overrides _get_change_domain_class for collection models."""
+    """Overrides _get_change_domain_class for CollectionCommitLogEntryModel."""
 
     def _get_change_domain_class(self, input_model): # pylint: disable=unused-argument
         """Returns a change domain class.
