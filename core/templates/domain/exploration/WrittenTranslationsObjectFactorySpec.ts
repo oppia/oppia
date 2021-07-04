@@ -136,7 +136,7 @@ describe('Written Translations Object Factory', () => {
           'content_1', 'en', 'This is the new HTML');
       }).toThrowError('Unable to find the given language code.');
       expect(
-        writtenTranslationsBackendDict.hasWrittenTranslation('content_1', 'en'))
+        writtenTranslationsBackendDict.hasWrittenTranslation('', 'en'))
         .toBe(false);
     });
 
