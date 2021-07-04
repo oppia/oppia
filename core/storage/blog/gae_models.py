@@ -340,9 +340,8 @@ class BlogPostRightsModel(base_models.BaseModel):
 
         Args:
             user_id: str. ID of the author of the blog post.
-            published: bool. Whether to only fetch models for published blog
-                posts. If False, the return value will include draft posts as
-                well.
+            published: bool. Whether to fetch models for published blog posts.
+                If False, the return value will contain rights for draft posts.
             limit: int|None. Number of BlogPostRightsModel to be fetched.If
                 None, all existing models will be fetched.
 
