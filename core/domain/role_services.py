@@ -110,6 +110,7 @@ UPDATABLE_ROLES = [
     feconf.ROLE_ID_RELEASE_COORDINATOR,
     feconf.ROLE_ID_TOPIC_MANAGER,
     feconf.ROLE_ID_BLOG_ADMIN,
+    feconf.ROLE_ID_BLOG_POST_EDITOR
 ]
 
 # Users can be viewed by following list of role IDs via admin interface.
