@@ -271,7 +271,8 @@ def get_published_blog_post_summaries_by_user_id(user_id, max_limit):
         blog posts assigned to given user.
     """
     blog_rights_models = (
-        blog_models.BlogPostRightsModel.get_by_user(user_id, True, max_limit))
+        blog_models.BlogPostRightsModel.get_multi_by_user(
+            user_id, True, max_limit))
     if len(blog_rights_models) == 0:
         return None
     blog_post_ids = [model.id for model in blog_rights_models]

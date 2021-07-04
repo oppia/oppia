@@ -255,13 +255,41 @@ class BlogPostRightsModelTest(test_utils.GenericTestBase):
             blog_models.BlogPostRightsModel
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID))
 
-    def test_get_by_user(self):
+    def test_get_multi_by_user_for_all_fetching_all_rights_model(self):
         self.assertEqual(
-            blog_models.BlogPostRightsModel.get_by_user(self.USER_ID_NEW),
+            blog_models.BlogPostRightsModel.get_multi_by_user(self.USER_ID_NEW),
             [self.blog_post_rights_model, self.blog_post_rights_model_new])
         self.assertEqual(
-            blog_models.BlogPostRightsModel.get_by_user(self.USER_ID),
+            blog_models.BlogPostRightsModel.get_multi_by_user(self.USER_ID),
             [self.blog_post_rights_model_new])
+
+    def test_get_multi_by_user_when_limit_is_set(self):
+        blog_post_rights_model_0 = blog_models.BlogPostRightsModel(
+            id='blog_post_two',
+            editor_ids=[self.USER_ID_NEW],
+            blog_post_is_published=False,
+        )
+        blog_post_rights_model_0.update_timestamps()
+        blog_post_rights_model_0.put()
+
+        blog_post_rights_model_1 = blog_models.BlogPostRightsModel(
+            id='blog_post_one',
+            editor_ids=[self.USER_ID_NEW],
+            blog_post_is_published=True,
+        )
+        blog_post_rights_model_1.update_timestamps()
+        blog_post_rights_model_1.put()
+
+        # The latest drafted blog post rights model should be fetched.
+        self.assertEqual(
+            blog_models.BlogPostRightsModel.get_multi_by_user(
+                self.USER_ID_NEW, False, 1), [blog_post_rights_model_0])
+
+        # The latest two published blog post rights models should be fetched.
+        self.assertEqual(
+            blog_models.BlogPostRightsModel.get_multi_by_user(
+                self.USER_ID_NEW, True, 2),
+            [blog_post_rights_model_1, self.blog_post_rights_model])
 
     def test_export_data_on_editor(self):
         """Test export data on user who is editor of the blog post."""
