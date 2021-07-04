@@ -1436,7 +1436,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
             expected_status_int=400)
         error_msg = (
             'Schema validation for \'new_username\' failed: Validation failed'
-            ': is_length_atmost ({u\'max_value\': %s}) for object '
+            ': has_length_at_most ({u\'max_value\': %s}) for object '
             'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' % constants.MAX_USERNAME_LENGTH)
         self.assertEqual(response['error'], error_msg)
 
