@@ -48,7 +48,6 @@ interface FormData {
 })
 export class BlogAdminPageComponent implements OnInit {
   UPDATABLE_ROLES = {};
-  userRolesResult = {};
   roleToActions;
   statusMessage: string = '';
   formData: FormData;
@@ -75,9 +74,9 @@ export class BlogAdminPageComponent implements OnInit {
         newRole: null,
         username: '',
         isValid(): boolean {
-          if (this.newRole === 'TOPIC_MANAGER') {
-            return Boolean(this.topicId);
-          } else if (this.newRole) {
+          if (this.newRole === 'BLOG_POST_EDITOR') {
+            return Boolean(this.username);
+          } else if (this.newRole === 'BLOG_ADMIN') {
             return Boolean(this.username);
           }
           return false;
