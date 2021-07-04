@@ -9,6 +9,7 @@
       <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
     </mat-chip>
     <input placeholder="New Subject Interest"
+           class="protractor-test-subject-interests-input"
            #subjectInterestInput
            [formControl]="formCtrl"
            [matAutocomplete]="auto"

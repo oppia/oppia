@@ -35,10 +35,8 @@ var PreferencesPage = function() {
     element(by.css('.protractor-test-audio-language-selector')));
   var subscriptions = element.all(by.css('.protractor-test-subscription-name'));
   var userBioElement = element(by.css('.protractor-test-user-bio'));
-  var userInterestsElement = element(
-    by.css('.protractor-test-interests-dropdown'));
-  var userInterestsInput = userInterestsElement.element(
-    by.css('.select2-search__field'));
+  var userInterestsInput = element(
+    by.css('.protractor-test-subject-interests-input'));
   var createrDashboardRadio = element(
     by.css('.protractor-test-creator-dashboard-radio'));
   var learnerDashboardRadio = element(
