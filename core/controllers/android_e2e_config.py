@@ -74,8 +74,9 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
 
         Raises:
             Exception. When used in production mode.
-            Exception. The topic is already created but not published.
-            Exception. The topic is already published.
+            InvalidInputException. The topic is already
+                created but not published.
+            InvalidInputException. The topic is already published.
         """
 
         if not constants.DEV_MODE:
