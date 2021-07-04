@@ -29,20 +29,10 @@ import { FractionInputCustomizationArgs } from
   'interactions/customization-args-defs';
 import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
-import { Rule } from 'domain/exploration/RuleObjectFactory';
 
 interface FractionWarning {
   type: string;
   message: string;
-}
-
-interface Range {
-  answerGroupIndex: number;
-  ruleIndex: number;
-  lb: number | null;
-  ub: number | null;
-  lbi: boolean;
-  ubi: boolean;
 }
 
 @Injectable({
@@ -67,9 +57,8 @@ export class FractionInputValidationService {
   }
   getAllWarnings(
       stateName: string, customizationArgs: FractionInputCustomizationArgs,
-      answerGroups: AnswerGroup[], defaultOutcome: Outcome
-  ): (Warning | FractionWarning)[] {
-    var warningsList: (Warning | FractionWarning)[] = [];
+      answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
+    var warningsList = [];
     var shouldBeInSimplestForm =
       customizationArgs.requireSimplestForm.value;
     var allowImproperFraction =
@@ -80,7 +69,7 @@ export class FractionInputValidationService {
     warningsList = warningsList.concat(
       this.getCustomizationArgsWarnings(customizationArgs));
 
-    var toFloat = (fraction: FractionAnswer) => {
+    var toFloat = function(fraction) {
       return Fraction.fromDict(fraction).toFloat();
     };
     /**
@@ -93,16 +82,15 @@ export class FractionInputValidationService {
      *   ubi: bool, is upper bound inclusive
      * }
      */
-    var setLowerAndUpperBounds = (
-        range: Range, lb: number, ub: number, lbi: boolean, ubi: boolean) => {
+    var setLowerAndUpperBounds = function(range, lb, ub, lbi, ubi) {
       range.lb = lb;
       range.ub = ub;
       range.lbi = lbi;
       range.ubi = ubi;
     };
-    var isEnclosedBy = (ra: Range, rb: Range) => {
-      if (ra.lb === null || ra.ub === null ||
-        rb.lb === null || rb.ub === null) {
+    var isEnclosedBy = function(ra, rb) {
+      if ((ra.lb === null && ra.ub === null) ||
+        (rb.lb === null && rb.ub === null)) {
         return false;
       }
 
@@ -115,7 +103,7 @@ export class FractionInputValidationService {
         upperBoundConditionIsSatisfied;
     };
 
-    var shouldCheckRangeCriteria = (earlierRule: Rule, laterRule: Rule) => {
+    var shouldCheckRangeCriteria = function(earlierRule, laterRule) {
       if (
         (earlierRule.type === 'IsExactlyEqualTo' &&
         laterRule.type === 'IsExactlyEqualTo') ||
@@ -147,7 +135,7 @@ export class FractionInputValidationService {
         var matchedDenominator = {
           answerGroupIndex: i,
           ruleIndex: j,
-          denominator: 0,
+          denominator: null,
         };
 
         switch (rule.type) {
@@ -195,20 +183,20 @@ export class FractionInputValidationService {
                 });
               }
             }
-            var f = toFloat.call(this, <FractionAnswer> rule.inputs.f);
+            var f = toFloat.call(this, rule.inputs.f);
             setLowerAndUpperBounds(range, f, f, true, true);
             break;
           case 'IsEquivalentTo': // fall-through.
           case 'IsEquivalentToAndInSimplestForm':
-            var f = toFloat.call(this, <FractionAnswer> rule.inputs.f);
+            var f = toFloat.call(this, rule.inputs.f);
             setLowerAndUpperBounds(range, f, f, true, true);
             break;
           case 'IsGreaterThan':
-            var f = toFloat.call(this, <FractionAnswer> rule.inputs.f);
+            var f = toFloat.call(this, rule.inputs.f);
             setLowerAndUpperBounds(range, f, Infinity, false, false);
             break;
           case 'IsLessThan':
-            var f = toFloat.call(this, <FractionAnswer> rule.inputs.f);
+            var f = toFloat.call(this, rule.inputs.f);
             setLowerAndUpperBounds(range, -Infinity, f, false, false);
             break;
           case 'HasNumeratorEqualTo':
@@ -244,7 +232,7 @@ export class FractionInputValidationService {
                   'should be greater than zero.')
               });
             }
-            matchedDenominator.denominator = <number> rule.inputs.x;
+            matchedDenominator.denominator = rule.inputs.x;
             break;
           case 'HasFractionalPartExactlyEqualTo':
             if ((<FractionAnswer> rule.inputs.f).wholeNumber !== 0) {

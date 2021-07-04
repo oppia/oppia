@@ -22,12 +22,6 @@ import { ObjectsDomainConstants } from
 import { FractionAnswer } from
   'interactions/answer-defs';
 
-export interface FractionDict {
-  isNegative: boolean;
-  wholeNumber: number;
-  numerator: number;
-  denominator: number;
-}
 
 export class Fraction {
   isNegative: boolean;

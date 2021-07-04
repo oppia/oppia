@@ -41,7 +41,7 @@ describe('Sort By Pipe', () => {
     username: 'Captain America',
   }];
 
-  let sortByPipe: SortByPipe = null;
+  let sortByPipe: SortByPipe;
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [SortByPipe]
@@ -189,7 +189,16 @@ describe('Sort By Pipe', () => {
   });
 
   it('should return null if value is not given', () => {
+    // This throws "Argument of type 'null' is not assignable to parameter of
+    // type 'unknown[]'." We need to suppress this error because of the need to
+    // test validations if the value to transform in the pipe is not specified.
+    // @ts-ignore
     let result = sortByPipe.transform(null, true, 'default');
+    // This throws "Argument of type 'null' is not assignable to parameter of
+    // type 'Expected<ArrayLike<unknown>>'" We need to suppress this error
+    // because of the need to test validations if the value to transform in the
+    // pipe is not specified.
+    // @ts-ignore
     expect(result).toBe(null);
   });
 });
