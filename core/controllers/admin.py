@@ -1209,7 +1209,7 @@ class UpdateUsernameHandler(base.BaseHandler):
                 'schema': {
                     'type': 'basestring',
                     'validators': [{
-                        'id': 'is_length_atmost',
+                        'id': 'has_length_at_most',
                         'max_value': constants.MAX_USERNAME_LENGTH
                     }]
                 }

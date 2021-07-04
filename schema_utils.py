@@ -389,11 +389,11 @@ class _Validators(python_utils.OBJECT):
 
     @staticmethod
     def has_length_at_most(obj, max_value):
-        """Returns True iff the given object (a list) has at most
+        """Returns True iff the given object has at most
         `max_value` elements.
 
         Args:
-            obj: list(*). A list of strings.
+            obj: *. A list of strings.
             max_value: int. The maximum number of elements that `obj` should
                 contain.
 
@@ -464,19 +464,6 @@ class _Validators(python_utils.OBJECT):
             bool. Whether the given object is at most `max_value`.
         """
         return obj <= max_value
-
-    @staticmethod
-    def is_length_atmost(obj, max_value):
-        """Ensures that `obj` (an str) has length at most `max_value`.
-
-        Args:
-            obj: str. An object.
-            max_value: int. The maximum allowed length for `obj`.
-
-        Returns:
-            bool. Whether the given object has length at most `max_value`.
-        """
-        return len(obj) <= max_value
 
     @staticmethod
     def does_not_contain_email(obj):
