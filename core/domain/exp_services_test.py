@@ -2642,12 +2642,16 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         self.assertIn('state', exploration.states)
         self.assertNotIn(feconf.DEFAULT_INIT_STATE_NAME, exploration.states)
 
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_RENAME_STATE,
+            'old_state_name': 'new state',
+            'new_state_name': 'new state changed name',
+        })]
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 2, change_list)
+        self.assertTrue(changes_are_mergeable)
         exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_RENAME_STATE,
-                'old_state_name': 'new state',
-                'new_state_name': 'new state changed name',
-            })], 'Change state name', version=2)
+            self.owner_id, self.EXP_0_ID, change_list, 'Change state name')
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         self.assertIn('new state changed name', exploration.states)
@@ -2792,13 +2796,19 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         self.assertEqual(
             exploration.init_state.interaction.id, 'MultipleChoiceInput')
 
+        # Check that the property can be changed when working
+        # on old version.
+        # Adding a content change just to increase the version.
         exp_services.update_exploration(
-            self.owner_id,
-            self.EXP_0_ID,
-            _get_change_list(
-                self.init_state_name, exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                'Continue') +
-            _get_change_list(
+            self.owner_id, self.EXP_0_ID, _get_change_list(
+                self.init_state_name, 'content', {
+                    'html': '<p><strong>Test content</strong></p>',
+                    'content_id': 'content',
+                }),
+            '')
+        change_list = _get_change_list(
+            self.init_state_name, exp_domain.STATE_PROPERTY_INTERACTION_ID,
+            'Continue') + _get_change_list(
                 self.init_state_name,
                 exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
                 {
@@ -2808,8 +2818,15 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                             'unicode_str': 'Continue'
                         }
                     }
-                }),
-            '', version=1)
+                })
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 2, change_list)
+        self.assertTrue(changes_are_mergeable)
+        exp_services.update_exploration(
+            self.owner_id,
+            self.EXP_0_ID,
+            change_list,
+            '')
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         self.assertEqual(
@@ -2847,13 +2864,19 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         self.assertEqual(choices[1].html, '<p>Option B</p>')
         self.assertEqual(choices[1].content_id, 'ca_choices_1')
 
+        # Check that the property can be changed when working
+        # on old version.
+        # Adding a content change just to increase the version.
         exp_services.update_exploration(
-            self.owner_id,
-            self.EXP_0_ID,
-            _get_change_list(
-                self.init_state_name, exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                'Continue') +
-            _get_change_list(
+            self.owner_id, self.EXP_0_ID, _get_change_list(
+                self.init_state_name, 'content', {
+                    'html': '<p><strong>Test content</strong></p>',
+                    'content_id': 'content',
+                }),
+            '')
+        change_list = _get_change_list(
+            self.init_state_name, exp_domain.STATE_PROPERTY_INTERACTION_ID,
+            'Continue') + _get_change_list(
                 self.init_state_name,
                 exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
                 {
@@ -2863,8 +2886,12 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                             'unicode_str': 'Continue'
                         }
                     }
-                }),
-            '', version=1)
+                })
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 2, change_list)
+        self.assertTrue(changes_are_mergeable)
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, change_list, '')
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         customization_args = (
@@ -2987,8 +3014,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         self.assertEqual(outcome.dest, self.init_state_name)
         self.assertEqual(init_interaction.default_outcome.dest, 'State 2')
 
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID,
+        change_list = (
             _get_change_list(
                 'State 2', exp_domain.STATE_PROPERTY_INTERACTION_ID,
                 'MultipleChoiceInput') +
@@ -3052,8 +3078,14 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                     'param_changes': [],
                     'refresher_exploration_id': None,
                     'missing_prerequisite_skill_id': None
-                }),
-            '', version=2)
+                }))
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 2, change_list)
+        self.assertTrue(changes_are_mergeable)
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID,
+            change_list,
+            '')
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         second_state = exploration.states['State 2']
         second_state_interaction = second_state.interaction
@@ -3142,14 +3174,6 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             exploration.init_state.content.html,
             '<p><strong>Test content</strong></p>')
 
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, _get_change_list(
-                self.init_state_name, 'content', {
-                    'html': '<p><strong>Test changed content</strong></p>',
-                    'content_id': 'content',
-                }),
-            '', version=1)
-
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         self.assertEqual(
             exploration.init_state.content.html,
@@ -3232,19 +3256,23 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 }),
             'Add Customization Args')
 
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': self.init_state_name,
+            'content_id': 'content',
+            'language_code': 'bn',
+            'content_html': '<p>original text</p>',
+            'translation_html': '<p>Translated text 2</p>',
+            'data_format': 'html'
+        })]
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 2, change_list)
+        self.assertTrue(changes_are_mergeable)
         # Applying changed translation to the old_version.
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID,
-            [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
-                'state_name': self.init_state_name,
-                'content_id': 'content',
-                'language_code': 'bn',
-                'content_html': '<p>original text</p>',
-                'translation_html': '<p>Translated text 2</p>',
-                'data_format': 'html'
-            })],
-            '', version=2)
+            change_list,
+            '')
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         init_interaction = exploration.init_state.interaction
@@ -3398,9 +3426,12 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             'state_name': self.init_state_name,
             'content_id': 'content'
         })]
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 4, update_change_list_2)
+        self.assertTrue(changes_are_mergeable)
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, update_change_list_2,
-            '', version=4)
+            '')
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
 
@@ -3450,12 +3481,16 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 }),
             '')
 
+        change_list = _get_change_list(
+            self.init_state_name,
+            exp_domain.STATE_PROPERTY_SOLICIT_ANSWER_DETAILS,
+            False)
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 2, change_list)
+        self.assertTrue(changes_are_mergeable)
         exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, _get_change_list(
-                self.init_state_name,
-                exp_domain.STATE_PROPERTY_SOLICIT_ANSWER_DETAILS,
-                False),
-            '', version=2)
+            self.owner_id, self.EXP_0_ID, change_list,
+            '')
 
         # Assert that exploration's final version consist of all the
         # changes.
@@ -3494,15 +3529,18 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                     'content_id': 'content',
                 }),
             '')
+        change_list = _get_change_list(
+            self.init_state_name,
+            exp_domain.STATE_PROPERTY_SOLICIT_ANSWER_DETAILS,
+            'abc')
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 1, change_list)
+        self.assertTrue(changes_are_mergeable)
         with self.assertRaisesRegexp(
             Exception, (
                 'Expected solicit_answer_details to be a bool, received ')):
             exp_services.update_exploration(
-                self.owner_id, self.EXP_0_ID, _get_change_list(
-                    self.init_state_name,
-                    exp_domain.STATE_PROPERTY_SOLICIT_ANSWER_DETAILS,
-                    'abc'),
-                '', version=2)
+                self.owner_id, self.EXP_0_ID, change_list, '')
 
         # Assert that exploration's final version consist of all the
         # changes.
@@ -3547,12 +3585,15 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 }),
             '')
 
+        change_list = _get_change_list(
+            'State1',
+            exp_domain.STATE_PROPERTY_LINKED_SKILL_ID,
+            'string_2')
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 3, change_list)
+        self.assertTrue(changes_are_mergeable)
         exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, _get_change_list(
-                'State1',
-                exp_domain.STATE_PROPERTY_LINKED_SKILL_ID,
-                'string_2'),
-            '', version=3)
+            self.owner_id, self.EXP_0_ID, change_list, '')
         # Assert that exploration's final version consist of all the
         # changes.
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
@@ -3597,12 +3638,15 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 }),
             '')
 
+        change_list = _get_change_list(
+            'State1',
+            exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+            False)
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 3, change_list)
+        self.assertTrue(changes_are_mergeable)
         exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, _get_change_list(
-                'State1',
-                exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
-                False),
-            '', version=3)
+            self.owner_id, self.EXP_0_ID, change_list, '')
         # Assert that exploration's final version consist of all the
         # changes.
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
@@ -3639,6 +3683,13 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 }),
             '')
 
+        change_list = _get_change_list(
+            self.init_state_name,
+            exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+            'abc')
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 1, change_list)
+        self.assertTrue(changes_are_mergeable)
         with self.assertRaisesRegexp(
             Exception, (
                 'Expected card_is_checkpoint to be a bool, received ')):
@@ -3647,7 +3698,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                     self.init_state_name,
                     exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
                     'abc'),
-                '', version=1)
+                '')
         # Assert that exploration's final version consist of all the
         # changes.
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
@@ -5141,12 +5192,16 @@ title: Old Title
                 'new_value': 'bn'
             })], 'Changed language code.')
 
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+            'property_name': 'title',
+            'new_value': 'new changed title'
+        })]
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.NEW_EXP_ID, 2, change_list)
+        self.assertTrue(changes_are_mergeable)
         exp_services.update_exploration(
-            self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                'property_name': 'title',
-                'new_value': 'new changed title'
-            })], 'Changed title.', version=2)
+            self.albert_id, self.NEW_EXP_ID, change_list, 'Changed title.')
 
         # Assert that final version consists all the changes.
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
@@ -5176,12 +5231,17 @@ title: Old Title
                 'new_value': 'new title'
             })], 'Changed title.')
 
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+            'property_name': 'language_code',
+            'new_value': 'en'
+        })]
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.NEW_EXP_ID, 2, change_list)
+        self.assertTrue(changes_are_mergeable)
         exp_services.update_exploration(
-            self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                'property_name': 'language_code',
-                'new_value': 'en'
-            })], 'Changed language code again.', version=2)
+            self.albert_id, self.NEW_EXP_ID, change_list,
+            'Changed language code again.')
 
         # Assert that final version consists all the changes.
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
@@ -5211,12 +5271,17 @@ title: Old Title
                 'new_value': 'new title'
             })], 'Changed title.')
 
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+            'property_name': 'tags',
+            'new_value': ['test', 'skill']
+        })]
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.NEW_EXP_ID, 2, change_list)
+        self.assertTrue(changes_are_mergeable)
         exp_services.update_exploration(
-            self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                'property_name': 'tags',
-                'new_value': ['test', 'skill']
-            })], 'Changed tags.', version=2)
+            self.albert_id, self.NEW_EXP_ID, change_list,
+            'Changed tags.')
 
         # Assert that final version consists all the changes.
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
@@ -5246,12 +5311,17 @@ title: Old Title
                 'new_value': 'new title'
             })], 'Changed title.')
 
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+            'property_name': 'author_notes',
+            'new_value': 'author_notes_updated_again'
+        })]
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.NEW_EXP_ID, 2, change_list)
+        self.assertTrue(changes_are_mergeable)
         exp_services.update_exploration(
-            self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                'property_name': 'author_notes',
-                'new_value': 'author_notes_updated_again'
-            })], 'Changed author_notes.', version=2)
+            self.albert_id, self.NEW_EXP_ID, change_list,
+            'Changed author_notes.')
 
         # Assert that final version consists all the changes.
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
@@ -5281,12 +5351,17 @@ title: Old Title
                 'new_value': 'new title'
             })], 'Changed title.')
 
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+            'property_name': 'blurb',
+            'new_value': 'blurb_changed'
+        })]
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.NEW_EXP_ID, 2, change_list)
+        self.assertTrue(changes_are_mergeable)
         exp_services.update_exploration(
-            self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                'property_name': 'blurb',
-                'new_value': 'blurb_changed'
-            })], 'Changed blurb.', version=2)
+            self.albert_id, self.NEW_EXP_ID, change_list,
+            'Changed blurb.')
 
         # Assert that final version consists all the changes.
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
@@ -5368,26 +5443,29 @@ title: Old Title
                 'new_value': 'new title'
             })], 'Changed title.')
 
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+            'property_name': 'init_state_name',
+            'new_value': feconf.DEFAULT_INIT_STATE_NAME,
+        }),
+        exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': 'State',
+            'property_name': 'card_is_checkpoint',
+            'new_value': False,
+        }),
+        exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+            'property_name': 'card_is_checkpoint',
+            'new_value': True,
+        })]
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.NEW_EXP_ID, 3, change_list)
+        self.assertTrue(changes_are_mergeable)
         exp_services.update_exploration(
-            self.albert_id, self.NEW_EXP_ID, [
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                    'property_name': 'init_state_name',
-                    'new_value': feconf.DEFAULT_INIT_STATE_NAME,
-                }),
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'state_name': 'State',
-                    'property_name': 'card_is_checkpoint',
-                    'new_value': False,
-                }),
-                exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'state_name': feconf.DEFAULT_INIT_STATE_NAME,
-                    'property_name': 'card_is_checkpoint',
-                    'new_value': True,
-                }),
-            ], 'Changed init_state_name and checkpoints again.', version=3)
+            self.albert_id, self.NEW_EXP_ID, change_list,
+            'Changed init_state_name and checkpoints again.')
 
         # Assert that final version consists all the changes.
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
@@ -5418,12 +5496,17 @@ title: Old Title
                 'new_value': 'new title'
             })], 'Changed title.')
 
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+            'property_name': 'auto_tts_enabled',
+            'new_value': True
+        })]
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.NEW_EXP_ID, 2, change_list)
+        self.assertTrue(changes_are_mergeable)
         exp_services.update_exploration(
-            self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                'property_name': 'auto_tts_enabled',
-                'new_value': True
-            })], 'Changed auto_tts_enabled again.', version=2)
+            self.albert_id, self.NEW_EXP_ID, change_list,
+            'Changed auto_tts_enabled again.')
 
         # Assert that final version consists all the changes.
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
@@ -5453,12 +5536,17 @@ title: Old Title
                 'new_value': 'new title'
             })], 'Changed title.')
 
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+            'property_name': 'correctness_feedback_enabled',
+            'new_value': False
+        })]
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.NEW_EXP_ID, 2, change_list)
+        self.assertTrue(changes_are_mergeable)
         exp_services.update_exploration(
-            self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                'property_name': 'correctness_feedback_enabled',
-                'new_value': False
-            })], 'Changed correctness_feedback_enabled.', version=2)
+            self.albert_id, self.NEW_EXP_ID, change_list,
+            'Changed correctness_feedback_enabled.')
 
         # Assert that final version consists all the changes.
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
@@ -5494,13 +5582,18 @@ title: Old Title
                 'new_value': 'new title'
             })], 'Changed title.')
 
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_UNCLASSIFIED_ANSWERS,
+            'state_name': exploration.init_state_name,
+            'new_value': ['test', 'skill']
+        })]
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.NEW_EXP_ID, 2, change_list)
+        self.assertTrue(changes_are_mergeable)
         exp_services.update_exploration(
-            self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'property_name': exp_domain.STATE_PROPERTY_UNCLASSIFIED_ANSWERS,
-                'state_name': exploration.init_state_name,
-                'new_value': ['test', 'skill']
-            })], 'Changed confirmed_unclassified_answers.', version=2)
+            self.albert_id, self.NEW_EXP_ID, change_list,
+            'Changed confirmed_unclassified_answers.')
 
         # Assert that final version consists all the changes.
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
@@ -5576,19 +5669,23 @@ title: Old Title
             }
         }]
 
+        change_list = [exp_domain.ExplorationChange({
+            'property_name': 'next_content_id_index',
+            'cmd': 'edit_state_property',
+            'old_value': 1,
+            'state_name': exploration.init_state_name,
+            'new_value': 3
+        }), exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_HINTS,
+            'state_name': exploration.init_state_name,
+            'new_value': hint_list_2
+        })]
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.NEW_EXP_ID, 2, change_list)
+        self.assertTrue(changes_are_mergeable)
         exp_services.update_exploration(
-            self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
-                'property_name': 'next_content_id_index',
-                'cmd': 'edit_state_property',
-                'old_value': 1,
-                'state_name': exploration.init_state_name,
-                'new_value': 3
-            }), exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_HINTS,
-                'state_name': exploration.init_state_name,
-                'new_value': hint_list_2
-            })], 'Changed hints.', version=2)
+            self.albert_id, self.NEW_EXP_ID, change_list, 'Changed hints.')
 
         # Assert that final version consists all the changes.
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
@@ -5656,18 +5753,20 @@ title: Old Title
             }
         }
 
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_HINTS,
+            'state_name': exploration.init_state_name,
+            'new_value': hint_dict
+        })]
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.NEW_EXP_ID, 1, change_list)
+        self.assertTrue(changes_are_mergeable)
         with self.assertRaisesRegexp(
             Exception, 'Expected hints_list to be a list.*'):
-            hints_update = exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_HINTS,
-                'state_name': exploration.init_state_name,
-                'new_value': hint_dict
-            })
             exp_services.update_exploration(
-                self.albert_id, self.NEW_EXP_ID, [hints_update],
-                'Changed hints.'
-            )
+                self.albert_id, self.NEW_EXP_ID, change_list,
+                'Changed hints.')
 
         # Assert that final version consists all the changes.
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
@@ -5751,13 +5850,18 @@ title: Old Title
             },
         }
 
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION,
+            'state_name': exploration.init_state_name,
+            'new_value': solution_2
+        })]
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.NEW_EXP_ID, 4, change_list)
+        self.assertTrue(changes_are_mergeable)
         exp_services.update_exploration(
-            self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION,
-                'state_name': exploration.init_state_name,
-                'new_value': solution_2
-            })], 'Changed interaction_solutions.', version=4)
+            self.albert_id, self.NEW_EXP_ID, change_list,
+            'Changed interaction_solutions.')
 
         # Assert that final version consists all the changes.
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
@@ -5790,16 +5894,21 @@ title: Old Title
                 'new_value': 'new title'
             })], 'Changed title.')
 
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
+            'state_name': exploration.init_state_name,
+            'new_value': 'invalid_recorded_voiceovers'
+        })]
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.NEW_EXP_ID, 1, change_list)
+        self.assertTrue(changes_are_mergeable)
         with self.assertRaisesRegexp(
             Exception, 'Expected recorded_voiceovers to be a dict'):
             exp_services.update_exploration(
-                self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name': (
-                        exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
-                    'state_name': exploration.init_state_name,
-                    'new_value': 'invalid_recorded_voiceovers'
-                })], 'Changed recorded_voiceovers.', version=1)
+                self.albert_id, self.NEW_EXP_ID, change_list,
+                'Changed recorded_voiceovers.')
 
     def test_revert_exploration_with_mismatch_of_versions_raises_error(self):
         self.save_new_valid_exploration('exp_id', 'user_id')

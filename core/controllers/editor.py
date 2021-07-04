@@ -156,12 +156,11 @@ class ExplorationHandler(EditorHandler):
         try:
             if can_edit and changes_are_mergeable:
                 exp_services.update_exploration(
-                    self.user_id, exploration_id, change_list, commit_message,
-                    version=version)
+                    self.user_id, exploration_id, change_list, commit_message)
             elif can_voiceover and changes_are_mergeable:
                 exp_services.update_exploration(
                     self.user_id, exploration_id, change_list, commit_message,
-                    is_by_voice_artist=True, version=version)
+                    is_by_voice_artist=True)
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
@@ -751,8 +750,11 @@ class EditorAutosaveHandler(ExplorationHandler):
         exp_user_data = exp_services.get_user_exploration_data(
             self.user_id, exploration_id)
         # If the draft_change_list_id is False, have the user discard the draft
-        # changes. We save the draft to the datastore even if the version is
-        # invalid, so that it is available for recovery later.
+        # changes. We save the draft to the datastore only when the changes are
+        # mergeable even if the version is invalid and if they are not mergeable
+        # we discard them and show them in the frontend discard changes modal
+        # and give an option to the user to export them so that it is available
+        # for recovery later.
         self.render_json({
             'draft_change_list_id': exp_user_data['draft_change_list_id'],
             'is_version_of_draft_valid': exp_services.is_version_of_draft_valid(
