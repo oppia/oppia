@@ -128,7 +128,7 @@
       "core/tests/*"
       ],
       "rules": {
-        "oppia/disallow-innerHTML": "error"
+        "oppia/no-inner-html": "error"
       }
     }
   ],

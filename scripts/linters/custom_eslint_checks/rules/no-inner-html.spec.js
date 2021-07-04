@@ -13,16 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for the disallow-innerHTML.js file.
+ * @fileoverview Tests for the no-inner-html.js file.
  */
 
 'use strict';
 
-var rule = require('./disallow-innerHTML');
+var rule = require('./no-inner-html');
 var RuleTester = require('eslint').RuleTester;
 
 var ruleTester = new RuleTester();
-ruleTester.run('disallow-innerHTML', rule, {
+ruleTester.run('no-inner-html', rule, {
   valid: [
     `if (!('outerHTML' in SVGElement.prototype)) {
       Object.defineProperty(SVGElement.prototype, 'outerHTML', {
