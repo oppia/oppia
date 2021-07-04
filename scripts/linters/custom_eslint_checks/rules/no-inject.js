@@ -35,7 +35,7 @@ module.exports = {
   },
 
   create: function(context) {
-    var disallowInjectCall = function(node) {
+    var checkAndReportInjectCall = function(node) {
       if (node.arguments[0].type === 'CallExpression' &&
        node.arguments[0].callee.name === 'inject') {
         context.report({
@@ -47,7 +47,7 @@ module.exports = {
 
     return {
       'CallExpression[callee.name=beforeEach]': function(node) {
-        disallowInjectCall(node);
+        checkAndReportInjectCall(node);
       }
     };
   }

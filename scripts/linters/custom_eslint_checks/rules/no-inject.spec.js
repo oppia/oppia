@@ -13,16 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for the use-angular-mock-inject.js file.
+ * @fileoverview Tests for the no-inject.js file.
  */
 
 'use strict';
 
-var rule = require('./use-angular-mock-inject');
+var rule = require('./no-inject');
 var RuleTester = require('eslint').RuleTester;
 
 var ruleTester = new RuleTester();
-ruleTester.run('use-angular-mock-inject', rule, {
+ruleTester.run('no-inject', rule, {
   valid: [
     {
       code:
