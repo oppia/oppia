@@ -25,6 +25,7 @@ import { NumberWithUnitsValidationService } from 'interactions/NumberWithUnits/d
 import { Outcome, OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { Rule, RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { Unit } from 'interactions/answer-defs';
+import { FractionDict } from 'domain/objects/fraction.model';
 
 describe('NumberWithUnitsValidationService', () => {
   let validatorService: NumberWithUnitsValidationService;
@@ -60,8 +61,7 @@ describe('NumberWithUnitsValidationService', () => {
     };
 
     var createNumberWithUnitsDict = (
-        type: string, real: number,
-        fractionDict: ReturnType<typeof createFractionDict>,
+        type: string, real: number, fractionDict: FractionDict,
         unitList: Unit[]) => {
       return {
         type: type,
