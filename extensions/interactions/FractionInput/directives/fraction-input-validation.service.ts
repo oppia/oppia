@@ -39,8 +39,8 @@ interface FractionWarning {
 interface Range {
   answerGroupIndex: number;
   ruleIndex: number;
-  lb: number;
-  ub: number;
+  lb: number | null;
+  ub: number | null;
   lbi: boolean;
   ubi: boolean;
 }
@@ -101,8 +101,8 @@ export class FractionInputValidationService {
       range.ubi = ubi;
     };
     var isEnclosedBy = (ra: Range, rb: Range) => {
-      if ((ra.lb === null && ra.ub === null) ||
-        (rb.lb === null && rb.ub === null)) {
+      if (ra.lb === null || ra.ub === null ||
+        rb.lb === null || rb.ub === null) {
         return false;
       }
 
@@ -138,8 +138,8 @@ export class FractionInputValidationService {
         var range = {
           answerGroupIndex: i,
           ruleIndex: j,
-          lb: 0,
-          ub: 0,
+          lb: null,
+          ub: null,
           lbi: false,
           ubi: false,
         };
