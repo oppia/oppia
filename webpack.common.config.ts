@@ -85,6 +85,8 @@ module.exports = {
       commonPrefix +
       '/pages/email-dashboard-pages/email-dashboard-result.import.ts',
     error: commonPrefix + '/pages/error-pages/error-page.import.ts',
+    error_iframed: commonPrefix + '/pages/error-pages/error-iframed-page/' +
+                   'error-iframed-page.import.ts',
     exploration_editor:
       commonPrefix + '/pages/exploration-editor-page/' +
       'exploration-editor-page.import.ts',
@@ -313,11 +315,11 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['error'],
+      chunks: ['error_iframed'],
       filename: 'error-iframed.mainpage.html',
-      hybrid: true,
       meta: defaultMeta,
-      template: commonPrefix + '/pages/error-pages/error-iframed.mainpage.html',
+      template: commonPrefix + '/pages/error-pages/error-iframed-page/' +
+                'error-iframed.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
