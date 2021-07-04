@@ -5447,14 +5447,12 @@ title: Old Title
             'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
             'property_name': 'init_state_name',
             'new_value': feconf.DEFAULT_INIT_STATE_NAME,
-        }),
-        exp_domain.ExplorationChange({
+        }), exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'state_name': 'State',
             'property_name': 'card_is_checkpoint',
             'new_value': False,
-        }),
-        exp_domain.ExplorationChange({
+        }), exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'property_name': 'card_is_checkpoint',
