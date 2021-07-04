@@ -33,6 +33,7 @@ import { LearnerDashboardSuggestionModalComponent } from './suggestion-modal/lea
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
     SharedComponentsModule,
   ],
@@ -69,6 +70,7 @@ class LearnerDashboardPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

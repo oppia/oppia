@@ -16,12 +16,32 @@
  * @fileoverview Root component for error page.
  */
 
-import { Component, Input } from '@angular/core';
+import { Component } from '@angular/core';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { PageTitleService } from 'services/page-title.service';
 
 @Component({
   selector: 'oppia-error-page-root',
   templateUrl: './error-page-root.component.html'
 })
 export class ErrorPageRootComponent {
-  @Input() statusCode: string;
+  statusCode: string;
+
+  constructor(
+    private pageTitleService: PageTitleService,
+    private windowRef: WindowRef
+  ) {}
+
+  ngOnInit(): void {
+    this.pageTitleService.setPageTitle('Error 404 | Oppia');
+    let bodyTag = (
+      this.windowRef.nativeWindow.document.getElementsByTagName('body'));
+    this.statusCode = bodyTag[0].getAttribute('errorCode') ?
+      bodyTag[0].getAttribute('errorCode') : '404';
+
+    if (this.statusCode === '404') {
+      console.error(
+        'GET ' + this.windowRef.nativeWindow.location.href + ' 404');
+    }
+  }
 }

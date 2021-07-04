@@ -113,7 +113,7 @@ import { LimitToPipe } from 'filters/limit-to.pipe';
 
 // Services.
 import { AuthService } from 'services/auth.service';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 
@@ -159,7 +159,6 @@ const toastrConfig = {
 
 @NgModule({
   imports: [
-    BrowserModule,
     CommonModule,
     CustomFormsComponentsModule,
     CommonElementsModule,
@@ -167,6 +166,7 @@ const toastrConfig = {
     MaterialModule,
     DirectivesModule,
     DynamicContentModule,
+    HttpClientModule,
     NgbTooltipModule,
     NgbNavModule,
     NgbModalModule,

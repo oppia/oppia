@@ -16,36 +16,29 @@
  * @fileoverview Module for the error page.
  */
 
-import { HttpClientModule } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { APP_INITIALIZER, NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-
 import { ErrorPageComponent } from './error-page.component';
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { RequestInterceptor } from 'services/request-interceptor.service';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
 import { ErrorPageRootComponent } from './error-page-root.component';
 import { ErrorPageRoutingModule } from './error-page-routing.module';
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
 
 @NgModule({
   imports: [
+    BrowserModule,
     ErrorPageRoutingModule,
     SharedComponentsModule
   ],
   declarations: [
     ErrorPageComponent,
     ErrorPageRootComponent,
-    OppiaAngularRootComponent
   ],
   entryComponents: [
     ErrorPageComponent,
     ErrorPageRootComponent,
-    OppiaAngularRootComponent
   ],
-  bootstrap: [ErrorPageRootComponent]
+  bootstrap: [
+    ErrorPageRootComponent
+  ]
 })
 export class ErrorPageModule {}

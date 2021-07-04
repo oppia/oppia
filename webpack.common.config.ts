@@ -57,7 +57,6 @@ module.exports = {
     }
   },
   entry: {
-    about: commonPrefix + '/pages/about-page/about-page.import.ts',
     admin: commonPrefix + '/pages/admin-page/admin-page.import.ts',
     classroom:
       commonPrefix + '/pages/classroom-page/classroom-page.import.ts',
@@ -161,21 +160,6 @@ module.exports = {
    * once angularjs is removed from corresponding pages.
    */
   plugins: [
-    new HtmlWebpackPlugin({
-      chunks: ['about'],
-      filename: 'about-page.mainpage.html',
-      meta: {
-        name: defaultMeta.name,
-        description: 'With Oppia, you can access free lessons on ' +
-          'math, physics, statistics, chemistry, music, history and ' +
-          'more from anywhere in the world. Oppia is a nonprofit ' +
-          'with the mission of providing high-quality ' +
-          'education to those who lack access to it.'
-      },
-      template: commonPrefix + '/pages/about-page/about-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
     new HtmlWebpackPlugin({
       chunks: ['admin'],
       filename: 'admin-page.mainpage.html',
@@ -343,7 +327,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['error'],
       filename: 'error-page-400.mainpage.html',
-      hybrid: true,
       meta: defaultMeta,
       template: commonPrefix + '/pages/error-pages/error-page.mainpage.html',
       minify: htmlMinifyConfig,
@@ -353,7 +336,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['error'],
       filename: 'error-page-401.mainpage.html',
-      hybrid: true,
       meta: defaultMeta,
       template: commonPrefix + '/pages/error-pages/error-page.mainpage.html',
       minify: htmlMinifyConfig,
@@ -362,31 +344,12 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['error'],
-      filename: 'error-page-404.mainpage.html',
-      meta: defaultMeta,
-      template: commonPrefix + '/pages/error-pages/error-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false,
-      statusCode: 404
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['error'],
       filename: 'error-page-500.mainpage.html',
-      hybrid: true,
       meta: defaultMeta,
       template: commonPrefix + '/pages/error-pages/error-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false,
       statusCode: 500
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['error'],
-      filename: 'error-iframed.mainpage.html',
-      hybrid: true,
-      meta: defaultMeta,
-      template: commonPrefix + '/pages/error-pages/error-iframed.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
     }),
     new HtmlWebpackPlugin({
       chunks: ['exploration_editor'],

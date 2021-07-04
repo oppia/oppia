@@ -208,7 +208,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     OppiaAngularRootComponent.injector = this.injector;
 
     // Initialize dynamic meta tags.
-    this.metaTagCustomizationService.addMetaTags([
+    this.metaTagCustomizationService.addOrReplaceMetaTags([
       {
         propertyType: 'name',
         propertyValue: 'application-name',

@@ -16,38 +16,28 @@
  * @fileoverview Module for the about page.
  */
 
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { APP_INITIALIZER, NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
-import { RequestInterceptor } from 'services/request-interceptor.service';
+import { NgModule } from '@angular/core';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
+import { SharedComponentsModule } from 'components/shared-component.module';
+import { ErrorPageModule } from 'pages/error-pages/error-page.module';
 import { OppiaRootComponent } from './oppia-root.component';
 import { AppRoutingModule } from './routing/app.routing.module';
 
 @NgModule({
   imports: [
-    HttpClientModule,
-    BrowserModule,
+    BrowserAnimationsModule,
     AppRoutingModule,
+    SharedComponentsModule,
+    ErrorPageModule
   ],
   declarations: [
-    OppiaRootComponent
+    OppiaRootComponent,
+    OppiaAngularRootComponent,
   ],
   entryComponents: [
-    OppiaRootComponent
-  ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
-      multi: true
-    }
+    OppiaRootComponent,
+    OppiaAngularRootComponent,
   ],
   bootstrap: [OppiaRootComponent]
 })

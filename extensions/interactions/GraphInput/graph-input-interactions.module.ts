@@ -20,7 +20,6 @@ import 'zone.js';
 
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { GraphVizComponent } from './directives/graph-viz.component';
 import { InteractiveGraphInput } from './directives/oppia-interactive-graph-input.component';
@@ -34,7 +33,6 @@ import { DirectivesModule } from 'directives/directives.module';
 @NgModule({
   imports: [
     CommonModule,
-    BrowserModule,
     FormsModule,
     MaterialModule,
     DirectivesModule,

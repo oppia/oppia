@@ -39,7 +39,7 @@ describe('Meta Tag Customization Service', () => {
     ];
     const appendChildSpy = spyOn(
       wrs.nativeWindow.document.head, 'appendChild').and.callThrough();
-    mtcs.addMetaTags(metaTags);
+    mtcs.addOrReplaceMetaTags(metaTags);
 
     const meta = wrs.nativeWindow.document.createElement('meta');
     meta.setAttribute('name', 'application-name');

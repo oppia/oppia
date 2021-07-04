@@ -17,9 +17,31 @@
  */
 
 import { Component } from '@angular/core';
+import { MetaTagCustomizationService } from 'services/contextual/meta-tag-customization.service';
+import { PageTitleService } from 'services/page-title.service';
 
 @Component({
   selector: 'oppia-about-page-root',
   templateUrl: './about-page-root.component.html'
 })
-export class AboutPageRootComponent {}
+export class AboutPageRootComponent {
+  constructor(
+    private pageTitleService: PageTitleService,
+    private metaTagCustomizationService: MetaTagCustomizationService
+  ) {}
+
+  ngOnInit(): void {
+    this.pageTitleService.setPageTitle('About | Oppia');
+    this.metaTagCustomizationService.addOrReplaceMetaTags([
+      {
+        propertyType: 'name',
+        propertyValue: 'description',
+        content: 'With Oppia, you can access free lessons on ' +
+          'math, physics, statistics, chemistry, music, history and ' +
+          'more from anywhere in the world. Oppia is a nonprofit ' +
+          'with the mission of providing high-quality ' +
+          'education to those who lack access to it.'
+      }
+    ]);
+  }
+}
