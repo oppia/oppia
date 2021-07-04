@@ -59,4 +59,3 @@ import { ErrorIframedPageRootComponent } from './error-iframed-root.component';
   bootstrap: [ErrorIframedPageRootComponent]
 })
 export class ErrorIframedPageModule {}
-

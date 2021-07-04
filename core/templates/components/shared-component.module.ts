@@ -24,7 +24,7 @@ import { NgModule } from '@angular/core';
 import { NgbModalModule, NgbPopoverModule, NgbNavModule, NgbTooltipModule, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { AngularFireModule } from '@angular/fire';
 import { AngularFireAuth, AngularFireAuthModule, USE_EMULATOR } from '@angular/fire/auth';
-import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
+import { HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
 import { CustomFormsComponentsModule } from './forms/custom-forms-directives/custom-form-components.module';
 import { DirectivesModule } from 'directives/directives.module';
 import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
