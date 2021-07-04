@@ -104,12 +104,11 @@ class AndroidConfigTest(test_utils.GenericTestBase):
         self.post_json(
             '/initialize_android_test_data', {}, use_payload=False,
             csrf_token=None)
-        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
-            Exception, 'The topic is already published.')
-        with assert_raises_regexp_context_manager:
-            self.post_json(
-                '/initialize_android_test_data', {}, use_payload=False,
-                csrf_token=None)
+        response = self.post_json(
+            '/initialize_android_test_data', {}, use_payload=False,
+            csrf_token=None, expected_status_int=400)
+        self.assertEqual(
+            response['error'], 'The topic is already published.')
 
     def test_initialize_twice_raises_unpublished_topic_exception(self):
         self.post_json(
@@ -118,9 +117,8 @@ class AndroidConfigTest(test_utils.GenericTestBase):
         topic = topic_fetchers.get_topic_by_name('Android test')
         topic_services.unpublish_topic(
             topic.id, feconf.SYSTEM_COMMITTER_ID)
-        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
-            Exception, 'The topic exists but is not published.')
-        with assert_raises_regexp_context_manager:
-            self.post_json(
-                '/initialize_android_test_data', {}, use_payload=False,
-                csrf_token=None)
+        response = self.post_json(
+            '/initialize_android_test_data', {}, use_payload=False,
+            csrf_token=None, expected_status_int=400)
+        self.assertEqual(
+            response['error'], 'The topic exists but is not published.')
