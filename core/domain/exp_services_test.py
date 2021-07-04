@@ -3174,11 +3174,6 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             exploration.init_state.content.html,
             '<p><strong>Test content</strong></p>')
 
-        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-        self.assertEqual(
-            exploration.init_state.content.html,
-            '<p><strong>Test changed content</strong></p>')
-
     def test_add_translation(self):
         """Test updating of content."""
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
