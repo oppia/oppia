@@ -28,6 +28,7 @@ import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-su
 import { CollectionSummary } from 'domain/collection/collection-summary.model';
 import { CommunityLessonsTabComponent } from './community-lessons-tab.component';
 import { NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 class MockRemoveActivityNgbModalRef {
   componentInstance: {
@@ -55,6 +56,7 @@ describe('Community lessons tab Component', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [
+        BrowserAnimationsModule,
         MaterialModule,
         FormsModule,
         HttpClientTestingModule

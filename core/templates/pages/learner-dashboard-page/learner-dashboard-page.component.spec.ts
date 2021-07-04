@@ -48,6 +48,7 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { StorySummary } from 'domain/story/story-summary.model';
 import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @Pipe({name: 'slice'})
 class MockSlicePipe {
@@ -283,6 +284,7 @@ describe('Learner dashboard page', () => {
     beforeEach(async(() => {
       TestBed.configureTestingModule({
         imports: [
+          BrowserAnimationsModule,
           MaterialModule,
           FormsModule,
           HttpClientTestingModule
@@ -1912,6 +1914,7 @@ describe('Learner dashboard page', () => {
     beforeEach(async(() => {
       TestBed.configureTestingModule({
         imports: [
+          BrowserAnimationsModule,
           MaterialModule,
           FormsModule,
           HttpClientTestingModule

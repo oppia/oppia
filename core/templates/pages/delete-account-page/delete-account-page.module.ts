@@ -27,10 +27,12 @@ import { platformFeatureInitFactory, PlatformFeatureService } from 'services/pla
 import { DeleteAccountPageComponent } from './delete-account-page.component';
 import { DeleteAccountModalComponent } from './templates/delete-account-modal.component';
 import { DeleteAccountPageRootComponent } from './delete-account-page-root.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
     SharedComponentsModule
   ],

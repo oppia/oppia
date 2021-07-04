@@ -29,7 +29,6 @@ import { ShortResponseMathEquationInput } from './directives/oppia-short-respons
 @NgModule({
   imports: [
     CommonModule,
-    BrowserModule,
     MaterialModule
   ],
   declarations: [

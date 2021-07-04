@@ -43,10 +43,12 @@ import { ExplorationSuccessfullyFlaggedModalComponent } from './modals/explorati
 import { LearnerAnswerInfoCard } from './learner-experience/learner-answer-info-card.component';
 import { MaterialModule } from 'components/material.module';
 import { RefresherExplorationConfirmationModal } from './modals/refresher-exploration-confirmation-modal.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
     InteractionExtensionsModule,
     MatButtonModule,

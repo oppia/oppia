@@ -26,10 +26,12 @@ import { OppiaAngularRootComponent } from 'components/oppia-angular-root.compone
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
 import { ContactPageComponent } from './contact-page.component';
 import { ContactPageRootComponent } from './contact-page-root.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
     SharedComponentsModule
   ],

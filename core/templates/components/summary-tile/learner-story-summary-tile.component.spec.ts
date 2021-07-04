@@ -26,6 +26,7 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { StorySummary} from 'domain/story/story-summary.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { LearnerStorySummaryTileComponent } from './learner-story-summary-tile.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 
 describe('Learner Story Summary Tile Component', () => {
@@ -36,6 +37,7 @@ describe('Learner Story Summary Tile Component', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [
+        BrowserAnimationsModule,
         MaterialModule,
         FormsModule,
         HttpClientTestingModule

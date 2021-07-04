@@ -40,11 +40,12 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 import { TranslationModalComponent } from './modal-templates/translation-modal.component';
 import { TranslationOpportunitiesComponent } from './translation-opportunities/translation-opportunities.component';
-
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
     InteractionExtensionsModule,
     SharedComponentsModule,

@@ -33,6 +33,7 @@ import { of } from 'rxjs';
 import { UrlParamsType, UrlService } from 'services/contextual/url.service';
 import { RatingComputationService } from 'components/ratings/rating-computation/rating-computation.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @Component({selector: 'learner-dashboard-icons', template: ''})
 class LearnerDashboardIconsComponentStub {
@@ -158,6 +159,7 @@ describe('Exploration Summary Tile Component', () => {
     windowRef = new MockWindowRef();
     TestBed.configureTestingModule({
       imports: [
+        BrowserAnimationsModule,
         MaterialModule,
         FormsModule,
         HttpClientTestingModule

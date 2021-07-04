@@ -31,7 +31,6 @@ import { InteractiveNumericExpressionInput } from './directives/oppia-interactiv
 @NgModule({
   imports: [
     CommonModule,
-    BrowserModule,
     MaterialModule
   ],
   declarations: [

@@ -30,10 +30,12 @@ import { PendingAccountDeletionPageComponent } from './pending-account-deletion-
 import { SharedPipesModule } from 'filters/shared-pipes.module';
 import { TranslateModule } from '@ngx-translate/core';
 import { PendingAccountDeletionPageRootComponent } from './pending-account-deletion-page-root.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
     SharedComponentsModule,
     SharedPipesModule,

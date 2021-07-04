@@ -28,6 +28,7 @@ import { CollectionSummaryTileComponent } from './collection-summary-tile.compon
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { UserService } from 'services/user.service';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @Component({selector: 'learner-dashboard-icons', template: ''})
 class LearnerDashboardIconsComponentStub {
@@ -71,6 +72,7 @@ describe('Collection Summary Tile Component', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [
+        BrowserAnimationsModule,
         MaterialModule,
         FormsModule,
         HttpClientTestingModule

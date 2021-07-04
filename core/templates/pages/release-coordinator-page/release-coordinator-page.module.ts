@@ -47,13 +47,14 @@ import { ReleaseCoordinatorNavbarComponent } from 'pages/release-coordinator-pag
 import { ReleaseCoordinatorPageComponent } from 'pages/release-coordinator-page/release-coordinator-page.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
 import { RequestInterceptor } from 'services/request-interceptor.service';
-
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 declare var angular: ng.IAngularStatic;
 
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     CommonModule,
     ClipboardModule,
     FormsModule,

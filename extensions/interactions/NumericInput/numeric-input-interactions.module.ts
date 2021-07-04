@@ -32,7 +32,6 @@ import { ShortResponseNumericInput } from './directives/oppia-short-response-num
 @NgModule({
   imports: [
     CommonModule,
-    BrowserModule,
     MaterialModule,
     SharedFormsModule
   ],

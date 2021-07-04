@@ -22,10 +22,12 @@ import { ErrorPageRootComponent } from './error-page-root.component';
 import { ErrorPageRoutingModule } from './error-page-routing.module';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     ErrorPageRoutingModule,
     SharedComponentsModule
   ],
