@@ -57,39 +57,6 @@ describe('Navigation features on mobile', function() {
         'http://localhost:9001/about');
     });
 
-  it('should navigate to Get Started page using the sidebar menu',
-    async function() {
-      var navbarButton = element(
-        by.css('.protractor-mobile-test-navbar-button'));
-      await waitFor.elementToBeClickable(
-        navbarButton, 'Could not click navbar button');
-      await navbarButton.click();
-      var getStartedLink = element(
-        by.css('.protractor-mobile-test-get-started-link'));
-      await waitFor.elementToBeClickable(
-        getStartedLink, 'Could not click get started link');
-      await getStartedLink.click();
-      await waitFor.pageToFullyLoad();
-      expect(await browser.getCurrentUrl()).toEqual('http://localhost:9001/get-started');
-    });
-
-  it('should navigate to Teach with Oppia page using the sidebar menu',
-    async function() {
-      var navbarButton = element(
-        by.css('.protractor-mobile-test-navbar-button'));
-      await waitFor.elementToBeClickable(
-        navbarButton, 'Could not click navbar button');
-      await navbarButton.click();
-      var teachLink = element(
-        by.css('.protractor-mobile-test-teach-link'));
-      await waitFor.elementToBeClickable(
-        teachLink, 'Could not click teach link');
-      await teachLink.click();
-      await waitFor.pageToFullyLoad();
-      expect(await browser.getCurrentUrl()).toEqual(
-        'http://localhost:9001/teach');
-    });
-
   it('should navigate to Donate page using the sidebar menu',
     async function() {
       var navbarButton = element(
@@ -105,23 +72,6 @@ describe('Navigation features on mobile', function() {
       await waitFor.pageToFullyLoad();
       expect(await browser.getCurrentUrl()).toEqual(
         'http://localhost:9001/donate');
-    });
-
-  it('should navigate to Contact page using the sidebar menu',
-    async function() {
-      var navbarButton = element(
-        by.css('.protractor-mobile-test-navbar-button'));
-      await waitFor.elementToBeClickable(
-        navbarButton, 'Could not click navbar button');
-      await navbarButton.click();
-      var contactLink = element(
-        by.css('.protractor-mobile-test-contact-link'));
-      await waitFor.elementToBeClickable(
-        contactLink, 'Could not click contact link');
-      await contactLink.click();
-      await waitFor.pageToFullyLoad();
-      expect(await browser.getCurrentUrl()).toEqual(
-        'http://localhost:9001/contact');
     });
 
   it('should navigate to Library page using the sidebar menu',
