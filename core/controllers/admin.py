@@ -710,7 +710,7 @@ class AdminRoleHandler(base.BaseHandler):
             'role': {
                 'schema': {
                     'type': 'basestring',
-                    'choices': role_services.UPDATABLE_ROLES
+                    'choices': feconf.ALLOWED_USER_ROLES
                 }
             },
             'username': {
