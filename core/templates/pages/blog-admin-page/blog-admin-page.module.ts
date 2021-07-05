@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for the release-coordinator page.
+ * @fileoverview Module for the blog-admin page.
  */
 
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';

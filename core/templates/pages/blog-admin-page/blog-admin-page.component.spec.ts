@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for Admin config tab component.
+ * @fileoverview Tests for Blog Admin tab component.
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -219,6 +219,18 @@ describe('Blog Admin Page component ', () => {
         component.formData.updateRole.newRole = 'BLOG';
         component.formData.updateRole.username = 'username';
         expect(component.formData.updateRole.isValid()).toBe(false);
+
+        component.formData.updateRole.newRole = 'ADMIN';
+        component.formData.updateRole.newRole = '';
+        expect(component.formData.updateRole.isValid()).toBe(false);
+
+        component.formData.updateRole.newRole = null;
+        component.formData.updateRole.username = 'username';
+        expect(component.formData.updateRole.isValid()).toBe(false);
+
+        component.formData.updateRole.newRole = 'BLOG_ADMIN';
+        component.formData.updateRole.username = null;
+        expect(component.formData.updateRole.isValid()).toBe(false);
       }));
 
     it('should enable update role button if the input values are valid',
@@ -267,7 +279,9 @@ describe('Blog Admin Page component ', () => {
         tick();
         component.formData.removeEditorRole.username = 'username';
         spyOn(blogAdminBackendApiService, 'removeBlogEditorAsync')
-          .and.returnValue(Promise.reject('Internal Server Error.'));
+          .and.returnValue(Promise.reject({
+            error: { error: 'Internal Server Error.'}
+          }));
         spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(false);
         component.submitRemoveEditorRoleForm(component.formData.updateRole);
 

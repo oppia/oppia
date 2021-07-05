@@ -125,8 +125,8 @@ export class BlogAdminPageComponent implements OnInit {
     ).then(() => {
       this.statusMessage = 'Success.';
       this.refreshFormData();
-    }, errorResponse => {
-      this.statusMessage = 'Server error: ' + errorResponse;
+    }, error => {
+      this.statusMessage = 'Server error: ' + error.error.error;
     });
     this.adminTaskManagerService.finishTask();
   }

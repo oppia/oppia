@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the navigation bar in the release-coordinator
+ * @fileoverview Component for the navigation bar in the blog admin
  * panel.
  */
 

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directives required in release-coordinator panel.
+ * @fileoverview Directives required in blog-admin panel.
  */
 
 import 'core-js/es7/reflect';
