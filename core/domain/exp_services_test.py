@@ -11692,7 +11692,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 messages[0].html.decode())
 
     def test_email_is_sent_to_admin_in_case_of_state_renames_changes_conflict(
-        self):
+            self):
         self.login(self.OWNER_EMAIL)
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             messages = self._get_sent_email_messages(

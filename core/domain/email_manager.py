@@ -1868,8 +1868,9 @@ def send_email_to_removed_contribution_reviewer(
             feconf.EMAIL_INTENT_REMOVE_REVIEWER, email_subject, email_body,
             feconf.NOREPLY_EMAIL_ADDRESS)
 
+
 def send_not_mergeable_change_list_to_admin_for_review_email(
-    exp_id, frontend_version, backend_version, change_list_dict):
+        exp_id, frontend_version, backend_version, change_list_dict):
     """Sends an email to the admin to review the not mergeable change list
     to improve the functionality in future if possible.
 
