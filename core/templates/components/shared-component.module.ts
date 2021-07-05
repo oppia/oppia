@@ -114,7 +114,7 @@ import { LimitToPipe } from 'filters/limit-to.pipe';
 
 // Services.
 import { AuthService } from 'services/auth.service';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HttpClient, HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 
@@ -127,6 +127,8 @@ import constants from 'assets/constants';
 
 import { HammerGestureConfig } from '@angular/platform-browser';
 import * as hammer from 'hammerjs';
+import { OppiaAngularRootComponent } from './oppia-angular-root.component';
+import { RequestInterceptor } from 'services/request-interceptor.service';
 
 
 export class MyHammerConfig extends HammerGestureConfig {
@@ -226,7 +228,12 @@ const toastrConfig = {
     {
       provide: HAMMER_GESTURE_CONFIG,
       useClass: MyHammerConfig
-    }
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: RequestInterceptor,
+      multi: true
+    },
   ],
 
   declarations: [
@@ -260,6 +267,7 @@ const toastrConfig = {
     LimitToPipe,
     LoadingMessageComponent,
     OnScreenKeyboardComponent,
+    OppiaAngularRootComponent,
     OppiaFooterComponent,
     OutcomeFeedbackEditorComponent,
     ProfileLinkImageComponent,
@@ -318,6 +326,7 @@ const toastrConfig = {
     LazyLoadingComponent, LoadingMessageComponent,
     SocialButtonsComponent,
     OnScreenKeyboardComponent,
+    OppiaAngularRootComponent,
     ProfileLinkImageComponent, ProfileLinkTextComponent,
     // These elements will remain here even after migration.
     DisplaySolutionModalComponent,
@@ -403,6 +412,7 @@ const toastrConfig = {
     RubricsEditorComponent,
     FilterForMatchingSubstringPipe,
     OnScreenKeyboardComponent,
+    OppiaAngularRootComponent,
     OppiaFooterComponent,
     OutcomeFeedbackEditorComponent,
     SearchBarComponent,

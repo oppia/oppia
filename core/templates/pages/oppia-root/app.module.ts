@@ -18,8 +18,6 @@
 
 import { NgModule } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
-import { SharedComponentsModule } from 'components/shared-component.module';
 import { ErrorPageModule } from 'pages/error-pages/error-page.module';
 import { OppiaRootComponent } from './oppia-root.component';
 import { AppRoutingModule } from './routing/app.routing.module';
@@ -28,16 +26,13 @@ import { AppRoutingModule } from './routing/app.routing.module';
   imports: [
     BrowserAnimationsModule,
     AppRoutingModule,
-    SharedComponentsModule,
     ErrorPageModule
   ],
   declarations: [
     OppiaRootComponent,
-    OppiaAngularRootComponent,
   ],
   entryComponents: [
     OppiaRootComponent,
-    OppiaAngularRootComponent,
   ],
   bootstrap: [OppiaRootComponent]
 })
