@@ -389,11 +389,11 @@ class _Validators(python_utils.OBJECT):
 
     @staticmethod
     def has_length_at_most(obj, max_value):
-        """Returns True iff the given object has at most
+        """Returns True iff the given object (a list) has at most
         `max_value` elements.
 
         Args:
-            obj: *. A list of strings.
+            obj: list(*). A list of strings.
             max_value: int. The maximum number of elements that `obj` should
                 contain.
 
