@@ -142,7 +142,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 'cmd': story_domain.CMD_UPDATE_STORY_PROPERTY,
                 'property_name': story_domain.STORY_PROPERTY_THUMBNAIL_FILENAME,
                 'old_value': None,
-                'new_value': 'Algebra.svg'
+                'new_value': 'image.svg'
             }),
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_UPDATE_STORY_PROPERTY,
@@ -165,7 +165,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         story = story_fetchers.get_story_by_id(self.STORY_ID)
         self.assertEqual(story.title, 'New Title')
         self.assertEqual(story.description, 'New Description')
-        self.assertEqual(story.thumbnail_filename, 'Algebra.svg')
+        self.assertEqual(story.thumbnail_filename, 'image.svg')
         self.assertEqual(story.thumbnail_size_in_bytes, None)
         self.assertEqual(
             story.thumbnail_bg_color,
@@ -239,7 +239,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             self.USER_ID, self.STORY_ID, changelist, 'Added story node.')
         story = story_fetchers.get_story_by_id(self.STORY_ID)
         self.assertEqual(
-            story.story_contents.nodes[1].thumbnail_filename, 'image.svg')
+            story.story_contents.nodes[1].thumbnail_filename, '
+            .svg')
         self.assertEqual(
             story.story_contents.nodes[1].thumbnail_bg_color,
             constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter'][0])
