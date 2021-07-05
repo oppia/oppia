@@ -11679,7 +11679,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'Hi Admin,<br><br>'
                 'Some draft changes were rejected in exploration %s because '
                 'the changes were conflicting and could not be saved. Please '
-                'see therejected change list below:<br>'
+                'see the rejected change list below:<br>'
                 'Discarded change list: %s <br><br>'
                 'Frontend Version: %s<br>'
                 'Backend Version: %s<br><br>'
