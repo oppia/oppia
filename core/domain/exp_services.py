@@ -379,11 +379,9 @@ def apply_change_list(exploration_id, change_list):
                     state.update_param_changes(
                         list(python_utils.MAP(
                             to_param_domain, change.new_value)))
-                elif (change.property_name ==
-                      exp_domain.STATE_PROPERTY_CONTENT):
+                elif change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
                     content = (
-                        state_domain.SubtitledHtml.from_dict(
-                            change.new_value))
+                        state_domain.SubtitledHtml.from_dict(change.new_value))
                     content.validate()
                     state.update_content(content)
                 elif (change.property_name ==
@@ -393,8 +391,7 @@ def apply_change_list(exploration_id, change_list):
                       exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX):
                     next_content_id_index = max(
                         change.new_value, state.next_content_id_index)
-                    state.update_next_content_id_index(
-                        next_content_id_index)
+                    state.update_next_content_id_index(next_content_id_index)
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_LINKED_SKILL_ID):
                     state.update_linked_skill_id(change.new_value)
@@ -405,19 +402,16 @@ def apply_change_list(exploration_id, change_list):
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_INTERACTION_HANDLERS):
                     raise utils.InvalidInputException(
-                        'Editing interaction handlers is no '
-                        'longer supported')
+                        'Editing interaction handlers is no longer supported')
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
                     new_answer_groups = [
                         state_domain.AnswerGroup.from_dict(answer_groups)
                         for answer_groups in change.new_value
                     ]
-                    state.update_interaction_answer_groups(
-                        new_answer_groups)
+                    state.update_interaction_answer_groups(new_answer_groups)
                 elif (change.property_name ==
-                      exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME
-                     ):
+                      exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
                     new_outcome = None
                     if change.new_value:
                         new_outcome = state_domain.Outcome.from_dict(
@@ -507,17 +501,14 @@ def apply_change_list(exploration_id, change_list):
                     change.content_id, change.language_code,
                     change.translation_html)
             elif change.cmd == exp_domain.CMD_ADD_WRITTEN_TRANSLATION:
-                exploration.states[
-                    change.state_name].add_written_translation(
-                        change.content_id, change.language_code,
-                        change.translation_html, change.data_format)
+                exploration.states[change.state_name].add_written_translation(
+                    change.content_id, change.language_code,
+                    change.translation_html, change.data_format)
             elif (change.cmd ==
-                  exp_domain.CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE
-                 ):
+                  exp_domain.CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE):
                 exploration.states[
                     change.state_name
-                ].mark_written_translations_as_needing_update(
-                    change.content_id)
+                ].mark_written_translations_as_needing_update(change.content_id)
             elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
                 if change.property_name == 'title':
                     exploration.update_title(change.new_value)
@@ -537,9 +528,7 @@ def apply_change_list(exploration_id, change_list):
                     exploration.update_param_specs(change.new_value)
                 elif change.property_name == 'param_changes':
                     exploration.update_param_changes(list(
-                        python_utils.MAP(
-                            to_param_domain,
-                            change.new_value)))
+                        python_utils.MAP(to_param_domain, change.new_value)))
                 elif change.property_name == 'init_state_name':
                     exploration.update_init_state_name(change.new_value)
                 elif change.property_name == 'auto_tts_enabled':
@@ -558,8 +547,7 @@ def apply_change_list(exploration_id, change_list):
                 # migrate to is the latest version.
                 target_version_is_current_state_schema_version = (
                     change.to_version ==
-                    python_utils.UNICODE(
-                        feconf.CURRENT_STATE_SCHEMA_VERSION))
+                    python_utils.UNICODE(feconf.CURRENT_STATE_SCHEMA_VERSION))
                 if not target_version_is_current_state_schema_version:
                     raise Exception(
                         'Expected to migrate to the latest state schema '
@@ -1940,6 +1928,7 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
             value: key for key, value in new_to_old_state_names.items()
         }
 
+        change_list_dict = [change.to_dict() for change in change_list]
         if len(added_state_names) > 0 or len(deleted_state_names) > 0:
             # In case of the addition and the deletion of the state,
             # we are rejecting the mergebility because these cases
@@ -1950,15 +1939,10 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
             # situations and can figure out the way if it’s possible to
             # handle these cases.
             if feconf.CAN_SEND_EMAILS:
-                email_manager.send_mail_to_admin(
-                    'Adding/Deleting State Changes not mergeable',
-                    'The exploration id is: %s, \n '
-                    'The frontend version is: %s \n '
-                    'The backend version is: %s \n'
-                    'The changes list is: %s '
-                    % (exp_id, frontend_version,
-                       backend_version_exploration.version,
-                       change_list))
+                email_manager.send_not_mergeable_change_list_to_admin_for_review_email( # pylint: disable=line-too-long
+                    exp_id, frontend_version,
+                    backend_version_exploration.version,
+                    change_list_dict)
             return False
 
         changes_are_mergeable = False
@@ -1995,16 +1979,10 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
                     # reviewed and the proper conditions can be written
                     # to handle those cases.
                     if feconf.CAN_SEND_EMAILS:
-                        email_manager.send_mail_to_admin(
-                            'Adding/Deleting State Changes not mergeable',
-                            'The exploration id is: %s, \n '
-                            'The frontend version is: %s \n '
-                            'The backend version is: %s \n'
-                            'The changes list is: %s '
-                            % (
-                                exp_id, frontend_version,
-                                backend_version_exploration.version,
-                                change_list))
+                        email_manager.send_not_mergeable_change_list_to_admin_for_review_email( # pylint: disable=line-too-long
+                            exp_id, frontend_version,
+                            backend_version_exploration.version,
+                            change_list_dict)
                     return False
                 if old_state_name not in changed_translations:
                     changed_translations[old_state_name] = []
@@ -2165,16 +2143,10 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
                     # reviewed and the proper conditions can be written
                     # to handle those cases.
                     if feconf.CAN_SEND_EMAILS:
-                        email_manager.send_mail_to_admin(
-                            'Adding/Deleting State Changes not mergeable',
-                            'The exploration id is: %s, \n '
-                            'The frontend version is: %s \n '
-                            'The backend version is: %s \n'
-                            'The changes list is: %s '
-                            % (
-                                exp_id, frontend_version,
-                                backend_version_exploration.version,
-                                change_list))
+                        email_manager.send_not_mergeable_change_list_to_admin_for_review_email( # pylint: disable=line-too-long
+                            exp_id, frontend_version,
+                            backend_version_exploration.version,
+                            change_list_dict)
                     return False
                 if old_state_name not in changed_translations:
                     changed_translations[old_state_name] = []
@@ -2329,6 +2301,7 @@ def get_user_exploration_data(
     exploration_email_preferences = (
         user_services.get_email_preferences_for_exploration(
             user_id, exploration_id))
+
     editor_dict = {
         'auto_tts_enabled': exploration.auto_tts_enabled,
         'category': exploration.category,

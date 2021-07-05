@@ -28,6 +28,7 @@ import { AlertsService } from 'services/alerts.service';
 import { LoaderService } from 'services/loader.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { ExplorationChange } from 'domain/exploration/exploration-draft.model';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 @Injectable({
   providedIn: 'root'
@@ -81,6 +82,7 @@ export class ChangeListService implements OnInit {
   DEFAULT_WAIT_FOR_AUTOSAVE_MSEC = 200;
 
   constructor(
+    private windowRef: WindowRef,
     private alertsService: AlertsService,
     private autosaveInfoModalsService: AutosaveInfoModalsService,
     private explorationDataService: ExplorationDataService,
@@ -112,6 +114,10 @@ export class ChangeListService implements OnInit {
           }
         }
         this.autosaveInProgressEventEmitter.emit(false);
+        if (!response.is_version_of_draft_valid &&
+          response.changes_are_mergeable) {
+          this.windowRef.nativeWindow.location.reload();
+        }
       },
       () => {
         this.alertsService.clearWarnings();
