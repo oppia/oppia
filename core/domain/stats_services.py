@@ -24,7 +24,6 @@ import datetime
 import itertools
 
 from core.domain import exp_fetchers
-from core.domain import interaction_registry
 from core.domain import question_services
 from core.domain import stats_domain
 from core.platform import models
@@ -34,9 +33,13 @@ import utils
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 transaction_services = models.Registry.import_transaction_services()
 
-
-# Counts contributions from all versions.
-VERSION_ALL = 'all'
+# NOTE TO DEVELOPERS: The functions:
+#   - get_visualizations_info()
+#   - get_top_state_answer_stats()
+#   - get_top_state_unresolved_answers()
+#   - get_top_state_answer_stats_multi()
+# were removed in #13021 as part of the migration to Apache Beam. Please refer
+# to that PR if you need to reinstate them.
 
 
 def _migrate_to_latest_issue_schema(exp_issue_dict):
@@ -546,11 +549,9 @@ def get_multiple_exploration_stats_by_version(exp_id, version_numbers):
         stats_models.ExplorationStatsModel.get_multi_versions(
             exp_id, version_numbers))
     for exploration_stats_model in exploration_stats_models:
-        if exploration_stats_model is None:
-            exploration_stats.append(None)
-        else:
-            exploration_stats.append(get_exploration_stats_from_model(
-                exploration_stats_model))
+        exploration_stats.append(
+            None if exploration_stats_model is None else
+            get_exploration_stats_from_model(exploration_stats_model))
     return exploration_stats
 
 
@@ -769,72 +770,6 @@ def delete_playthroughs_multi(playthrough_ids):
     _delete_playthroughs_multi_transactional()
 
 
-def get_visualizations_info(exp_id, state_name, interaction_id):
-    """Returns a list of visualization info. Each item in the list is a dict
-    with keys 'data' and 'options'.
-
-    Args:
-        exp_id: str. The ID of the exploration.
-        state_name: str. Name of the state.
-        interaction_id: str. The interaction type.
-
-    Returns:
-        list(dict). Each item in the list is a dict with keys representing
-        - 'id': str. The visualization ID.
-        - 'data': list(dict). A list of answer/frequency dicts.
-        - 'options': dict. The visualization options.
-
-        An example of the returned value may be:
-        [{
-            'options': {'header': 'Pretty Tiles!', 'use_percentages': True},
-            'id': 'SortedTiles',
-            'data': [{'frequency': 1, 'answer': 0}]
-        }]
-    """
-    if interaction_id is None:
-        return []
-
-    visualizations = interaction_registry.Registry.get_interaction_by_id(
-        interaction_id).answer_visualizations
-
-    calculation_ids = set([
-        visualization.calculation_id for visualization in visualizations])
-
-    calculation_ids_to_outputs = {}
-    for calculation_id in calculation_ids:
-        # Don't show top unresolved answers calculation ouutput in stats of
-        # exploration.
-        if calculation_id == 'TopNUnresolvedAnswersByFrequency':
-            continue
-
-        # This is None if the calculation job has not yet been run for this
-        # state.
-        calc_output_domain_object = _get_calc_output(
-            exp_id, state_name, calculation_id)
-
-        # If the calculation job has not yet been run for this state, we simply
-        # exclude the corresponding visualization results.
-        if calc_output_domain_object is None:
-            continue
-
-        # If the output was associated with a different interaction ID, skip the
-        # results. This filtering step is needed since the same calculation_id
-        # can be shared across multiple interaction types.
-        if calc_output_domain_object.interaction_id != interaction_id:
-            continue
-
-        calculation_ids_to_outputs[calculation_id] = (
-            calc_output_domain_object.calculation_output.to_raw_type())
-    return [{
-        'id': visualization.id,
-        'data': calculation_ids_to_outputs[visualization.calculation_id],
-        'options': visualization.options,
-        'addressed_info_is_supported': (
-            visualization.addressed_info_is_supported),
-    } for visualization in visualizations
-            if visualization.calculation_id in calculation_ids_to_outputs]
-
-
 def record_answer(
         exploration_id, exploration_version, state_name, interaction_id,
         submitted_answer):
@@ -936,108 +871,6 @@ def get_sample_answers(exploration_id, exploration_version, state_name):
     return [
         stats_domain.SubmittedAnswer.from_dict(submitted_answer_dict).answer
         for submitted_answer_dict in sample_answers]
-
-
-def get_top_state_answer_stats(exploration_id, state_name):
-    """Fetches the top (at most) 10 answers from the given state_name in the
-    corresponding exploration. Only answers that occur with frequency >=
-    STATE_ANSWER_STATS_MIN_FREQUENCY are returned.
-
-    Args:
-        exploration_id: str. The exploration ID.
-        state_name: str. The name of the state to fetch answers for.
-
-    Returns:
-        list(*). A list of the top 10 answers, sorted by decreasing frequency.
-    """
-    calc_output = (
-        _get_calc_output(exploration_id, state_name, 'Top10AnswerFrequencies'))
-    raw_calc_output = (
-        [] if calc_output is None else
-        calc_output.calculation_output.to_raw_type())
-    return [
-        {'answer': output['answer'], 'frequency': output['frequency']}
-        for output in raw_calc_output
-        if output['frequency'] >= feconf.STATE_ANSWER_STATS_MIN_FREQUENCY
-    ]
-
-
-def get_top_state_unresolved_answers(exploration_id, state_name):
-    """Fetches the top unresolved answers for the given state_name in the
-    corresponding exploration. Only answers that occur with frequency >=
-    STATE_ANSWER_STATS_MIN_FREQUENCY are returned.
-
-    Args:
-        exploration_id: str. The exploration ID.
-        state_name: str. The name of the state to fetch answers for.
-
-    Returns:
-        list(*). A list of the top 10 answers, sorted by decreasing frequency.
-    """
-    calc_output_model = _get_calc_output(
-        exploration_id, state_name, 'TopNUnresolvedAnswersByFrequency')
-
-    if not calc_output_model:
-        return []
-
-    calculation_output = calc_output_model.calculation_output.to_raw_type()
-    return [
-        {'answer': output['answer'], 'frequency': output['frequency']}
-        for output in calculation_output
-        if output['frequency'] >= feconf.STATE_ANSWER_STATS_MIN_FREQUENCY
-    ]
-
-
-def get_top_state_answer_stats_multi(exploration_id, state_names):
-    """Fetches the top (at most) 10 answers from each given state_name in the
-    corresponding exploration. Only answers that occur with frequency >=
-    STATE_ANSWER_STATS_MIN_FREQUENCY are returned.
-
-    Args:
-        exploration_id: str. The exploration ID.
-        state_names: list(str). The name of the state to fetch answers for.
-
-    Returns:
-        dict(str: list(*)). Dict mapping each state name to the list of its top
-        (at most) 10 answers, sorted by decreasing frequency.
-    """
-    return {
-        state_name: get_top_state_answer_stats(exploration_id, state_name)
-        for state_name in state_names
-    }
-
-
-def _get_calc_output(exploration_id, state_name, calculation_id):
-    """Get state answers calculation output domain object obtained from
-    StateAnswersCalcOutputModel instance stored in the data store. The
-    calculation ID comes from the name of the calculation class used to compute
-    aggregate data from submitted user answers. This returns aggregated output
-    for all versions of the specified state and exploration.
-
-    Args:
-        exploration_id: str. ID of the exploration.
-        state_name: str. Name of the state.
-        calculation_id: str. Name of the calculation class.
-
-    Returns:
-        StateAnswersCalcOutput|None. The state answers calculation output
-        domain object or None.
-    """
-    calc_output_model = stats_models.StateAnswersCalcOutputModel.get_model(
-        exploration_id, VERSION_ALL, state_name, calculation_id)
-    if calc_output_model:
-        calculation_output = None
-        if (calc_output_model.calculation_output_type ==
-                stats_domain.CALC_OUTPUT_TYPE_ANSWER_FREQUENCY_LIST):
-            calculation_output = (
-                stats_domain.AnswerFrequencyList.from_raw_type(
-                    calc_output_model.calculation_output))
-        return stats_domain.StateAnswersCalcOutput(
-            exploration_id, VERSION_ALL, state_name,
-            calc_output_model.interaction_id, calculation_id,
-            calculation_output)
-    else:
-        return None
 
 
 def get_state_reference_for_exploration(exp_id, state_name):

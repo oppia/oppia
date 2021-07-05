@@ -40,7 +40,7 @@ export default {
   "ACTIVITY_TYPE_EXPLORATION": "exploration",
   "ACTIVITY_TYPE_COLLECTION": "collection",
   "ACTIVITY_TYPE_STORY": "story",
-  "ACTIVITY_TYPE_LEARN_TOPIC": "learn topic",
+  "ACTIVITY_TYPE_LEARN_TOPIC": "learntopic",
   "DISABLED_EXPLORATION_IDS": ["5"],
   "TESTING_CONSTANT": "test",
   "LIBRARY_TILE_WIDTH_PX": 208,
@@ -5448,6 +5448,8 @@ export default {
 
   "FEEDBACK_SUBJECT_MAX_CHAR_LIMIT": 50,
 
+  "MAX_CURRENT_GOALS_COUNT": 5,
+
   "ACTIVITY_STATUS_PRIVATE": "private",
   "ACTIVITY_STATUS_PUBLIC": "public",
 
@@ -5500,6 +5502,8 @@ export default {
   "NUM_EXPLORATIONS_PER_REVIEW_TEST": 3,
 
   "NUM_QUESTIONS_PER_PAGE": 10,
+
+  "BULK_EMAIL_SERVICE_SIGNUP_URL": "",
 
   // The default number of opportunities to show on the contributor dashboard
   // page.

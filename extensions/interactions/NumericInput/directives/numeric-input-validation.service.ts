@@ -29,6 +29,8 @@ import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
 
 import { AppConstants } from 'app.constants';
+//import { InteractiveNumericInput } 
+  //'interactions/NumericInput/directives/oppia-interactive-numeric-input.component';
 
 @Injectable({
   providedIn: 'root'

@@ -453,14 +453,18 @@ class ExplorationVersionsDiff(python_utils.OBJECT):
     exploration.
 
     Attributes:
-        added_state_names: list(str). Name of the states added to the
-            exploration from prev_exp_version to current_exp_version.
-        deleted_state_names: list(str). Name of the states deleted from the
-            exploration from prev_exp_version to current_exp_version.
+        added_state_names: list(str). Names of the states added to the
+            exploration from prev_exp_version to current_exp_version. It stores
+            the newest names of the added states.
+        deleted_state_names: list(str). Name sof the states deleted from the
+            exploration from prev_exp_version to current_exp_version. It stores
+            the initial names of the deleted states from pre_exp_version.
         new_to_old_state_names: dict. Dictionary mapping state names of
             current_exp_version to the state names of prev_exp_version.
+            It doesn't include the name changes of added/deleted states.
         old_to_new_state_names: dict. Dictionary mapping state names of
             prev_exp_version to the state names of current_exp_version.
+            It doesn't include the name changes of added/deleted states.
     """
 
     def __init__(self, change_list):

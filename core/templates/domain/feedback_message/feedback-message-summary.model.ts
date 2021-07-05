@@ -19,10 +19,12 @@
 export interface FeedbackMessageSummaryBackendDict {
   'message_id': number;
   'text': string;
-  'updated_status': string;
-  'suggestion_html': string;
-  'current_content_html': string;
-  'description': string;
+  // Below properties are only non-null when entered by the
+  // user for a newly created message and null otherwise.
+  'updated_status': string | null;
+  'suggestion_html': string | null;
+  'current_content_html': string | null;
+  'description': string | null;
   'author_username': string;
   'author_picture_data_url': string;
   'created_on_msecs': number;
@@ -31,19 +33,19 @@ export interface FeedbackMessageSummaryBackendDict {
 export class FeedbackMessageSummary {
   messageId: number;
   text: string;
-  updatedStatus: string;
-  suggestionHtml: string;
-  currentContentHtml: string;
-  description: string;
+  updatedStatus: string | null;
+  suggestionHtml: string | null;
+  currentContentHtml: string | null;
+  description: string | null;
   authorUsername: string;
   authorPictureDataUrl: string;
   createdOnMsecs: number;
 
   constructor(
-      messageId: number, text: string, updatedStatus: string,
-      suggestionHtml: string, currentContentHtml: string, description: string,
-      authorUsername: string, authorPictureDataUrl: string,
-      createdOnMsecs: number) {
+      messageId: number, text: string, updatedStatus: string | null,
+      suggestionHtml: string | null, currentContentHtml: string | null,
+      description: string | null, authorUsername: string,
+      authorPictureDataUrl: string, createdOnMsecs: number) {
     this.messageId = messageId;
     this.text = text;
     this.updatedStatus = updatedStatus;

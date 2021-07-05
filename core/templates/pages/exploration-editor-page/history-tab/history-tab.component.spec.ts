@@ -43,7 +43,7 @@ import { DateTimeFormatService } from 'services/date-time-format.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { ReadOnlyExplorationBackendApiService } from
   'domain/exploration/read-only-exploration-backend-api.service';
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 describe('History tab component', function() {
   var ctrl = null;

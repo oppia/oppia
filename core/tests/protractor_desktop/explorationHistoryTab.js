@@ -90,6 +90,7 @@ describe('Exploration history', function() {
     await explorationEditorMainTab.moveToState('first');
     await explorationEditorPage.saveChanges();
 
+    debugger;
     var VERSION_1_STATE_1_CONTENTS = {
       1: {
         text: 'card_is_checkpoint: true',
@@ -504,8 +505,10 @@ describe('Exploration history', function() {
     await historyGraph.expectHistoryStatesToMatch(expectedHistoryStates);
     await historyGraph.expectNumberOfLinksToMatch(2, 2, 0);
     await historyGraph.openStateHistory('first (was: Introd...');
+    debugger;
     await historyGraph.expectTextWithHighlightingToMatch(
       VERSION_1_STATE_1_CONTENTS, VERSION_2_STATE_1_CONTENTS);
+    debugger;
     await historyGraph.closeStateHistory();
 
     await historyGraph.openStateHistory('second');
