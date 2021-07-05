@@ -31,8 +31,8 @@ import { UrlService } from 'services/contextual/url.service';
 import { Collection } from 'domain/collection/collection.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { CollectionPlaythrough } from 'domain/collection/collection-playthrough.model';
-
-describe('Collection player page directive', function() {
+for(let i = 0; i< 100; i++) {
+fdescribe('Collection player page directive', function() {
   let $scope = null;
   let ctrl = null;
   let $rootScope = null;
@@ -532,4 +532,4 @@ describe('Collection player page directive', function() {
     let result = ctrl.getNonRecommendedCollectionNodeCount();
     expect(result).toEqual(4);
   }));
-});
+});}

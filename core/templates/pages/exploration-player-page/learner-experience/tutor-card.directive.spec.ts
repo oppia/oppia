@@ -41,8 +41,8 @@ import { CurrentInteractionService } from '../services/current-interaction.servi
 import { ExplorationPlayerStateService } from '../services/exploration-player-state.service';
 import { LearnerAnswerInfoService } from '../services/learner-answer-info.service';
 import { PlayerPositionService } from '../services/player-position.service';
-
-describe('Tutor Card directive', function() {
+for(let i = 0; i< 100; i++) {
+fdescribe('Tutor Card directive', function() {
   beforeEach(angular.mock.module('oppia'));
 
   importAllAngularServices();
@@ -417,4 +417,4 @@ describe('Tutor Card directive', function() {
     let result = $scope.getContentAudioHighlightClass();
     expect(result).toBe('conversation-skin-audio-highlight');
   });
-});
+});}
