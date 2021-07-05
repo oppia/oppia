@@ -239,8 +239,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             self.USER_ID, self.STORY_ID, changelist, 'Added story node.')
         story = story_fetchers.get_story_by_id(self.STORY_ID)
         self.assertEqual(
-            story.story_contents.nodes[1].thumbnail_filename, '
-            .svg')
+            story.story_contents.nodes[1].thumbnail_filename, 'image.svg')
         self.assertEqual(
             story.story_contents.nodes[1].thumbnail_bg_color,
             constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter'][0])
