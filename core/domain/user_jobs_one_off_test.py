@@ -24,32 +24,10 @@ import datetime
 from core.domain import event_services
 from core.domain import rating_services
 from core.domain import taskqueue_services
-from core.domain import user_jobs_continuous
 from core.domain import user_jobs_one_off
 from core.domain import user_services
 from core.tests import test_utils
 import feconf
-
-
-class MockUserStatsAggregator(user_jobs_continuous.UserStatsAggregator):
-    """A modified UserStatsAggregator that does not start a new
-     batch job when the previous one has finished.
-    """
-
-    @classmethod
-    def _get_batch_job_manager_class(cls):
-        return MockUserStatsMRJobManager
-
-    @classmethod
-    def _kickoff_batch_job_after_previous_one_ends(cls):
-        pass
-
-
-class MockUserStatsMRJobManager(user_jobs_continuous.UserStatsMRJobManager):
-
-    @classmethod
-    def _get_continuous_computation_class(cls):
-        return MockUserStatsAggregator
 
 
 class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
@@ -108,7 +86,7 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
             exp_id, self.EXP_VERSION, state, self.USER_SESSION_ID, {},
             feconf.PLAY_TYPE_NORMAL)
 
-    def test_weekly_stats_if_continuous_stats_job_has_not_been_run(self):
+    def test_weekly_stats(self):
         exploration = self.save_new_valid_exploration(
             self.EXP_ID_1, self.owner_id)
         exp_id = exploration.id
@@ -128,22 +106,24 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
             self._run_one_off_job()
 
         weekly_stats = user_services.get_weekly_dashboard_stats(self.owner_id)
-        expected_results_list = [{
+        self.assertEqual(weekly_stats, [{
             self.mock_get_current_date_as_string(): {
-                'num_ratings': 0,
-                'average_ratings': None,
-                'total_plays': 0
+                'num_ratings': 1,
+                'average_ratings': 5.0,
+                'total_plays': 1
             }
-        }]
-        self.assertEqual(weekly_stats, expected_results_list)
+        }])
         self.assertEqual(
             user_services.get_last_week_dashboard_stats(self.owner_id),
-            expected_results_list[0])
+            {
+                self.mock_get_current_date_as_string(): {
+                    'num_ratings': 1,
+                    'average_ratings': 5.0,
+                    'total_plays': 1
+                }
+            })
 
     def test_weekly_stats_if_no_explorations(self):
-        MockUserStatsAggregator.start_computation()
-        self.process_and_flush_pending_mapreduce_tasks()
-
         with self.swap(
             user_services,
             'get_current_date_as_string',
@@ -176,9 +156,6 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
             })
 
         self.process_and_flush_pending_tasks()
-
-        MockUserStatsAggregator.start_computation()
-        self.process_and_flush_pending_mapreduce_tasks()
 
         with self.swap(
             user_services,
@@ -216,8 +193,6 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
             })
 
         self.process_and_flush_pending_tasks()
-        MockUserStatsAggregator.start_computation()
-        self.process_and_flush_pending_mapreduce_tasks()
 
         with self.swap(
             user_services,
@@ -252,8 +227,6 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
             })
 
         self.process_and_flush_pending_tasks()
-        MockUserStatsAggregator.start_computation()
-        self.process_and_flush_pending_mapreduce_tasks()
 
         with self.swap(
             user_services,
@@ -271,13 +244,7 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
                 }
             }])
 
-        MockUserStatsAggregator.stop_computation(self.owner_id)
-        self.process_and_flush_pending_mapreduce_tasks()
-
         self._rate_exploration('user2', exp_id, 2)
-
-        MockUserStatsAggregator.start_computation()
-        self.process_and_flush_pending_mapreduce_tasks()
 
         def _mock_get_date_after_one_week():
             """Returns the date of the next week."""

@@ -1622,7 +1622,7 @@ def get_number_of_ratings(ratings):
     Returns:
         int. The total number of ratings given.
     """
-    return sum(ratings.values())
+    return sum(ratings.values()) if ratings else 0
 
 
 def get_average_rating(ratings):

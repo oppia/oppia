@@ -1778,35 +1778,21 @@ def get_continuous_computations_info(cc_classes):
 
     result = []
     for ind, model in enumerate(cc_models):
-        if model is None:
-            cc_dict = {
-                'computation_type': cc_classes[ind].__name__,
-                'status_code': 'never_started',
-                'last_started_msec': None,
-                'last_finished_msec': None,
-                'last_stopped_msec': None,
-                'active_realtime_layer_index': None,
-                'is_startable': True,
-                'is_stoppable': False,
-            }
-        else:
-            cc_dict = {
-                'computation_type': cc_classes[ind].__name__,
-                'status_code': model.status_code,
-                'last_started_msec': model.last_started_msec,
-                'last_finished_msec': model.last_finished_msec,
-                'last_stopped_msec': model.last_stopped_msec,
-                'active_realtime_layer_index': (
-                    model.active_realtime_layer_index),
-                # TODO(sll): If a job is stopping, can it be started while it
-                # is in the process of stopping?
-                'is_startable': model.status_code == (
-                    job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE),
-                'is_stoppable': model.status_code == (
-                    job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_RUNNING),
-            }
-
-        result.append(cc_dict)
+        result.append({
+            'computation_type': cc_classes[ind].__name__,
+            'status_code': model.status_code,
+            'last_started_msec': model.last_started_msec,
+            'last_finished_msec': model.last_finished_msec,
+            'last_stopped_msec': model.last_stopped_msec,
+            'active_realtime_layer_index': (
+                model.active_realtime_layer_index),
+            # TODO(sll): If a job is stopping, can it be started while it
+            # is in the process of stopping?
+            'is_startable': model.status_code == (
+                job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE),
+            'is_stoppable': model.status_code == (
+                job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_RUNNING),
+        })
 
     return result
 
