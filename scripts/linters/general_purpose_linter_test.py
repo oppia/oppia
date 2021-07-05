@@ -52,7 +52,6 @@ INVALID_CSS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid.css')
 FILE_IN_EXCLUDED_PATH = os.path.join(
     'core', 'tests', 'build_sources', 'assets', 'constants.js')
 EXTRA_JS_FILEPATH = os.path.join('core', 'templates', 'demo.js')
-INVALID_INJECT_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_inject.ts')
 INVALID_RELATIVE_IMPORT_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_relative_import.js')
 INVALID_PARENT_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_parent.ts')
@@ -60,15 +59,6 @@ INVALID_TEMPLATE_URL_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_templateurl.ts')
 INVALID_FILEOVERVIEW_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_fileoverview.ts')
-INVALID_TO_THROW_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_toThrow.ts')
-INVALID_THROW_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_throw.ts')
-INVALID_THROW_WITH_STRING_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_throw_with_string.ts')
-INVALID_ESLINT_CAMELCASE_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_eslint_camelcase.ts')
-INVALID_ESLINT_ANY_TYPE_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_eslint_any_type.ts')
 INVALID_BROADCAST_USE_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_broadcast_use.ts')
 INVALID_LODASH_GENERAL_IMPORT_FILEPATH = os.path.join(
@@ -157,16 +147,6 @@ class HTMLLintTests(test_utils.LinterTestBase):
 class JsTsLintTests(test_utils.LinterTestBase):
     """Test the JsTs lint functions."""
 
-    def test_invalid_use_of_inject(self):
-        linter = general_purpose_linter.GeneralPurposeLinter(
-            [INVALID_INJECT_FILEPATH], FILE_CACHE)
-        lint_task_report = linter.check_bad_patterns()
-        self.assert_same_list_elements([
-            'Line 26: In tests, please use \'angular.mock.inject\' '
-            'instead of \'inject\''], lint_task_report.trimmed_messages)
-        self.assertEqual('Bad pattern', lint_task_report.name)
-        self.assertTrue(lint_task_report.failed)
-
     def test_invalid_use_of_template_url(self):
         linter = general_purpose_linter.GeneralPurposeLinter(
             [INVALID_TEMPLATE_URL_FILEPATH], FILE_CACHE)
@@ -194,60 +174,6 @@ class JsTsLintTests(test_utils.LinterTestBase):
         lint_task_report = linter.check_bad_patterns()
         self.assert_same_list_elements(
             ['Line 20: Please, don\'t use relative imports in require().'],
-            lint_task_report.trimmed_messages)
-        self.assertEqual('Bad pattern', lint_task_report.name)
-        self.assertTrue(lint_task_report.failed)
-
-    def test_invalid_use_of_to_throw(self):
-        linter = general_purpose_linter.GeneralPurposeLinter(
-            [INVALID_TO_THROW_FILEPATH], FILE_CACHE)
-        lint_task_report = linter.check_bad_patterns()
-        self.assert_same_list_elements(
-            ['Line 25: Please use \'toThrowError\' instead of \'toThrow\''],
-            lint_task_report.trimmed_messages)
-        self.assertEqual('Bad pattern', lint_task_report.name)
-        self.assertTrue(lint_task_report.failed)
-
-    def test_invalid_use_of_throw(self):
-        linter = general_purpose_linter.GeneralPurposeLinter(
-            [INVALID_THROW_FILEPATH], FILE_CACHE)
-        lint_task_report = linter.check_bad_patterns()
-        self.assert_same_list_elements(
-            ['Line 27: Please use \'throw new\' instead of \'throw\''],
-            lint_task_report.trimmed_messages)
-        self.assertEqual('Bad pattern', lint_task_report.name)
-        self.assertTrue(lint_task_report.failed)
-
-    def test_invalid_use_of_throw_with_string(self):
-        linter = general_purpose_linter.GeneralPurposeLinter(
-            [INVALID_THROW_WITH_STRING_FILEPATH], FILE_CACHE)
-        lint_task_report = linter.check_bad_patterns()
-        self.assert_same_list_elements([
-            'Line 27: Please use \'throw new Error\' instead of '
-            '\'throw\''], lint_task_report.trimmed_messages)
-        self.assertEqual('Bad pattern', lint_task_report.name)
-        self.assertTrue(lint_task_report.failed)
-
-    def test_invalid_use_of_eslint_camelcase_comment(self):
-        linter = general_purpose_linter.GeneralPurposeLinter(
-            [INVALID_ESLINT_CAMELCASE_FILEPATH], FILE_CACHE)
-        lint_task_report = linter.check_bad_patterns()
-        self.assert_same_list_elements([
-            'Line 24: Please do not use eslint disable for camelcase. If '
-            'you are using this statement to define properties in an '
-            'interface for a backend dict. Wrap the property name in '
-            'single quotes instead.'], lint_task_report.trimmed_messages)
-        self.assertEqual('Bad pattern', lint_task_report.name)
-        self.assertTrue(lint_task_report.failed)
-
-    def test_invalid_use_of_eslint_no_explicit_any_comment(self):
-        linter = general_purpose_linter.GeneralPurposeLinter(
-            [INVALID_ESLINT_ANY_TYPE_FILEPATH], FILE_CACHE)
-        lint_task_report = linter.check_bad_patterns()
-        self.assert_same_list_elements(
-            ['Line 21: Please do not define "any" types. You can refer '
-             'https://github.com/oppia/oppia/wiki/Guide-on-defining-types '
-             'if you\'re having trouble declaring types.'],
             lint_task_report.trimmed_messages)
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
