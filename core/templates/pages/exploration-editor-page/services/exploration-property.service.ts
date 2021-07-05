@@ -32,7 +32,7 @@ import { ParamSpecs } from 'domain/exploration/ParamSpecsObjectFactory';
   providedIn: 'root'
 })
 export class ExplorationPropertyService {
-  displayed: ParamSpecs;
+  public displayed: ParamSpecs;
   savedMemento: ParamSpecs;
 
   // The backend name for this property. THIS MUST BE SPECIFIED BY
@@ -41,9 +41,9 @@ export class ExplorationPropertyService {
 
   _explorationPropertyChangedEventEmitter = new EventEmitter();
   constructor(
-    private alertsService: AlertsService,
-    private changeListService: ChangeListService,
-    private loggerService: LoggerService,
+    protected alertsService: AlertsService,
+    protected changeListService: ChangeListService,
+    protected loggerService: LoggerService,
   ) {}
 
   private BACKEND_CONVERSIONS = {
