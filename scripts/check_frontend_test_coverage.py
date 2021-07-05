@@ -97,7 +97,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'graph-editor.component.ts',
     'graph-input-validation.service.ts',
     'graph-property-editor.component.ts',
-    'graph-viz.component.ts',
     'hint-editor.directive.ts',
     'html-editor.component.ts',
     'html-select.directive.ts',
