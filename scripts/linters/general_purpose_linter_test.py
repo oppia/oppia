@@ -52,7 +52,6 @@ INVALID_CSS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid.css')
 FILE_IN_EXCLUDED_PATH = os.path.join(
     'core', 'tests', 'build_sources', 'assets', 'constants.js')
 EXTRA_JS_FILEPATH = os.path.join('core', 'templates', 'demo.js')
-INVALID_INJECT_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_inject.ts')
 INVALID_INNER_HTML_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_innerhtml.ts')
 INVALID_RELATIVE_IMPORT_FILEPATH = os.path.join(
@@ -149,16 +148,6 @@ class HTMLLintTests(test_utils.LinterTestBase):
 
 class JsTsLintTests(test_utils.LinterTestBase):
     """Test the JsTs lint functions."""
-
-    def test_invalid_use_of_inject(self):
-        linter = general_purpose_linter.GeneralPurposeLinter(
-            [INVALID_INJECT_FILEPATH], FILE_CACHE)
-        lint_task_report = linter.check_bad_patterns()
-        self.assert_same_list_elements([
-            'Line 26: In tests, please use \'angular.mock.inject\' '
-            'instead of \'inject\''], lint_task_report.trimmed_messages)
-        self.assertEqual('Bad pattern', lint_task_report.name)
-        self.assertTrue(lint_task_report.failed)
 
     def test_invalid_use_of_template_url(self):
         linter = general_purpose_linter.GeneralPurposeLinter(
