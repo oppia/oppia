@@ -121,6 +121,7 @@
     "oppia/break-after-parens": "error",
     "oppia/constant-declaration": "error",
     "oppia/comment-style": "error",
+    "oppia/disallow-flags": "error",
     "oppia/no-multiple-component": "error",
     "oppia/no-multiline-disable": "error",
     "oppia/directive-scope": "error",
