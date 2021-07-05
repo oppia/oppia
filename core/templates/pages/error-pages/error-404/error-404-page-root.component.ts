@@ -29,8 +29,4 @@ export class Error404PageRootComponent {
     private pageTitleService: PageTitleService,
     private windowRef: WindowRef
   ) {}
-
-  ngOnInit(): void {
-    this.pageTitleService.setPageTitle('Error 404 | Oppia');
-  }
 }
