@@ -108,14 +108,8 @@ module.exports = {
       commonPrefix + '/pages/maintenance-page/maintenance-page.import.ts',
     moderator:
       commonPrefix + '/pages/moderator-page/moderator-page.import.ts',
-<<<<<<< HEAD
-    notifications_dashboard:
-      commonPrefix + '/pages/notifications-dashboard-page/' +
-      'notifications-dashboard-page.import.ts',
     partnerships:
       commonPrefix + '/pages/partnerships-page/partnerships-page.import.ts',
-=======
->>>>>>> 46fd1eaef28867689b425849dcd3618c52f02428
     pending_account_deletion:
       commonPrefix + '/pages/pending-account-deletion-page/' +
       'pending-account-deletion-page.import.ts',
@@ -160,9 +154,9 @@ module.exports = {
   },
 
   /**
-   * TODO(#13079): Remove the hybrid field from the html webpack plugin options
-   * once angularjs is removed from corresponding pages.
-   */
+  * TODO(#13079): Remove the hybrid field from the html webpack plugin options
+  * once angularjs is removed from corresponding pages.
+  */
   plugins: [
     new HtmlWebpackPlugin({
       chunks: ['about'],
@@ -510,22 +504,6 @@ module.exports = {
       meta: defaultMeta,
       template:
         commonPrefix + '/pages/moderator-page/moderator-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['notifications_dashboard'],
-      filename: 'notifications-dashboard-page.mainpage.html',
-      meta: {
-        name: defaultMeta.name,
-        description: 'Keep track of the lessons you have created, as well ' +
-          'as feedback from learners.'
-      },
-      template: (
-        commonPrefix +
-        '/pages/notifications-dashboard-page/' +
-        'notifications-dashboard-page.mainpage.html'
-      ),
       minify: htmlMinifyConfig,
       inject: false
     }),
