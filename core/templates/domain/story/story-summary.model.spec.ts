@@ -48,6 +48,7 @@ describe('Story summary model', () => {
       completed_node_titles: ['Chapter 1'],
       url_fragment: 'story-url-fragment',
       all_node_dicts: [nodeDict],
+      topic_name: 'Topic one',
       topic_url_fragment: 'topic-one',
       classroom_url_fragment: 'math'
     };
@@ -84,6 +85,7 @@ describe('Story summary model', () => {
       })
     ]);
     expect(_sampleStorySummary.getCompletedNodeTitles()).toEqual(['Chapter 1']);
+    expect(_sampleStorySummary.getTopicName()).toEqual('Topic one');
     expect(_sampleStorySummary.getTopicUrlFragment()).toEqual('topic-one');
     expect(_sampleStorySummary.getClassroomUrlFragment()).toEqual('math');
   });
