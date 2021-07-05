@@ -280,9 +280,21 @@ class PopulateStoryThumbnailSizeOneOffJobTests(test_utils.GenericTestBase):
             'A title', 'A description', 'A note', self.TOPIC_ID)
         topic_services.add_canonical_story(
             self.albert_id, self.TOPIC_ID, self.STORY_ID)
+        
         story_model = story_models.StoryModel.get(self.STORY_ID)
         story = story_fetchers.get_story_from_model(story_model)
         self.assertEqual(21131, story.thumbnail_size_in_bytes)
+
+        # Start migration job.
+        job_id = (
+            story_jobs_one_off
+                .PopulateStoryThumbnailSizeOneOffJob.create_new())
+        story_jobs_one_off.PopulateStoryThumbnailSizeOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        updated_story = (
+            story_fetchers.get_story_by_id(self.STORY_ID))
+        self.assertEqual(21131, updated_story.thumbnail_size_in_bytes)
 
     def test_thumbnail_size_job_thumbnail_size_is_not_present(self):
         self.save_new_story_with_story_contents_schema_v1(
@@ -290,6 +302,18 @@ class PopulateStoryThumbnailSizeOneOffJobTests(test_utils.GenericTestBase):
             'A title', 'A description', 'A note', self.TOPIC_ID)
         topic_services.add_canonical_story(
             self.albert_id, self.TOPIC_ID, self.STORY_ID)
+ 
         story_model = story_models.StoryModel.get(self.STORY_ID)
         story = story_fetchers.get_story_from_model(story_model)
         self.assertEqual(None, story.thumbnail_size_in_bytes)
+
+        # Start migration job.
+        job_id = (
+            story_jobs_one_off
+                .PopulateStoryThumbnailSizeOneOffJob.create_new())
+        story_jobs_one_off.PopulateStoryThumbnailSizeOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        updated_story = (
+            story_fetchers.get_story_by_id(self.STORY_ID))
+        self.assertEqual(None, updated_story.thumbnail_size_in_bytes)
