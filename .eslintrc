@@ -23,6 +23,17 @@
       }
     },
     {
+      "files": ["*.js", "*.ts"],
+      "excludedFiles": [
+      "complete.spec.ts",
+      "student.spec.ts",
+      "teacher.spec.ts"
+      ],
+      "rules": {
+        "oppia/no-to-throw": "error"
+      }
+    },
+    {
       // We only run the e2e action checks on end-to-end test files, and
       // we exclude files that we haven't fixed yet.
       "files": [
@@ -282,6 +293,7 @@
     "no-undef": [
       "off"
     ],
+    "no-throw-literal": "error",
     "no-unused-vars": [
       "off"
     ],

@@ -62,11 +62,6 @@ INVALID_TEMPLATE_URL_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_templateurl.ts')
 INVALID_FILEOVERVIEW_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_fileoverview.ts')
-INVALID_TO_THROW_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_toThrow.ts')
-INVALID_THROW_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_throw.ts')
-INVALID_THROW_WITH_STRING_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_throw_with_string.ts')
 INVALID_BROADCAST_USE_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_broadcast_use.ts')
 INVALID_LODASH_GENERAL_IMPORT_FILEPATH = os.path.join(
@@ -203,36 +198,6 @@ class JsTsLintTests(test_utils.LinterTestBase):
         self.assert_same_list_elements(
             ['Line 27: Please do not use innerHTML property.'
             ], lint_task_report.trimmed_messages)
-        self.assertEqual('Bad pattern', lint_task_report.name)
-        self.assertTrue(lint_task_report.failed)
-
-    def test_invalid_use_of_to_throw(self):
-        linter = general_purpose_linter.GeneralPurposeLinter(
-            [INVALID_TO_THROW_FILEPATH], FILE_CACHE)
-        lint_task_report = linter.check_bad_patterns()
-        self.assert_same_list_elements(
-            ['Line 25: Please use \'toThrowError\' instead of \'toThrow\''],
-            lint_task_report.trimmed_messages)
-        self.assertEqual('Bad pattern', lint_task_report.name)
-        self.assertTrue(lint_task_report.failed)
-
-    def test_invalid_use_of_throw(self):
-        linter = general_purpose_linter.GeneralPurposeLinter(
-            [INVALID_THROW_FILEPATH], FILE_CACHE)
-        lint_task_report = linter.check_bad_patterns()
-        self.assert_same_list_elements(
-            ['Line 27: Please use \'throw new\' instead of \'throw\''],
-            lint_task_report.trimmed_messages)
-        self.assertEqual('Bad pattern', lint_task_report.name)
-        self.assertTrue(lint_task_report.failed)
-
-    def test_invalid_use_of_throw_with_string(self):
-        linter = general_purpose_linter.GeneralPurposeLinter(
-            [INVALID_THROW_WITH_STRING_FILEPATH], FILE_CACHE)
-        lint_task_report = linter.check_bad_patterns()
-        self.assert_same_list_elements([
-            'Line 27: Please use \'throw new Error\' instead of '
-            '\'throw\''], lint_task_report.trimmed_messages)
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
