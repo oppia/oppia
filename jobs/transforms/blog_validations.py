@@ -58,58 +58,6 @@ class ValidateBlogModelDomainObjectsInstances(
 
 
 @validation_decorators.AuditsExisting(blog_models.BlogPostModel)
-class ValidateTitleIsUnique(beam.DoFn):
-    """DoFn to validate the title uniqueness."""
-
-    def process(self, input_model):
-        """Function that checks if the title of the model is unique.
-
-        Args:
-            input_model: BlogPostModel to validate.
-
-        Yields:
-            InvalidTitleError. Error for models with duplicate title.
-        """
-        item = job_utils.clone_model(input_model)
-        if item.title != '':
-            blog_post_models = blog_models.BlogPostModel.query().filter(
-                blog_models.BlogPostModel.title == (
-                    item.title)).filter(
-                        blog_models.BlogPostModel.deleted == False).fetch() # pylint: disable=singleton-comparison
-            blog_model_ids = [
-                model.id for model in blog_post_models if model.id != item.id]
-            if blog_model_ids:
-                yield blog_validation_errors.ValidateTitleIsUniqueError(
-                    model, blog_post, blog_model_ids)
-
-
-@validation_decorators.AuditsExisting(blog_models.BlogPostModel)
-class ValidateUrlFragmentIsUnique(beam.DoFn):
-    """DoFn to validate the url fragment uniqueness."""
-
-    def process(self, input_model):
-        """Function that checks if the url fragment of the model is unique.
-
-        Args:
-            input_model: BlogPostModel to validate.
-
-        Yields:
-            InvalidUrlFragmentError. Error for models with duplicate url fragment.
-        """
-        item = job_utils.clone_model(input_model)
-        if item.url_fragment != '':
-            blog_post_models = blog_models.BlogPostModel.query().filter(
-                blog_models.BlogPostModel.url_fragment == (
-                    item.url_fragment)).filter(
-                        blog_models.BlogPostModel.deleted == False).fetch() # pylint: disable=singleton-comparison
-            blog_model_ids = [
-                model.id for model in blog_post_models if model.id != item.id]
-            if blog_model_ids:
-                yield blog_validation_errors.ValidateUrlIsUniqueError(
-                    model, blog_post, blog_model_ids)
-
-
-@validation_decorators.AuditsExisting(blog_models.BlogPostModel)
 class ValidateTitleMatchesSummaryModelTitle(beam.DoFn):
     """DoFn to validate that both blog post model title and summary model
     title are same."""
@@ -132,56 +80,6 @@ class ValidateTitleMatchesSummaryModelTitle(beam.DoFn):
                 yield blog_validation_errors.ValidateTitleMatchesSummaryTitleError(
                     model)
 
-
-@validation_decorators.AuditsExisting(blog_models.BlogPostSummaryModel)
-class ValidateSummaryModelUrlFragmentIsUnique(beam.DoFn):
-    """DoFn to validate the url fragment uniqueness for summary model."""
-
-    def process(self, input_model):
-        """Function that checks if the url fragment of the model is unique.
-
-        Args:
-            input_model: BlogPostSummaryModel to validate.
-
-        Yields:
-            InvalidUrlFragmentError. Error for models with duplicate url fragment.
-        """
-        item = job_utils.clone_model(input_model)
-        if item.url_fragment != '':
-            blog_summary_models = blog_models.BlogPostSummaryModel.query().filter(
-                blog_models.BlogPostSummaryModel.url_fragment == (
-                    item.url_fragment)).filter(
-                        blog_models.BlogPostSummaryModel.deleted == False).fetch() # pylint: disable=singleton-comparison
-            blog_model_ids = [
-                model.id for model in blog_summary_models if model.id != item.id]
-            if blog_model_ids:
-                yield blog_validation_errors.ValidateUrlIsUniqueError(
-                    model, blog_post_summary, blog_model_ids)
-
-@validation_decorators.AuditsExisting(blog_models.BlogPostSummaryModel)
-class ValidateTitleIsUnique(beam.DoFn):
-    """DoFn to validate the title uniqueness."""
-
-    def process(self, input_model):
-        """Function that checks if the title of the model is unique.
-
-        Args:
-            input_model: BlogPostModel to validate.
-
-        Yields:
-            InvalidTitleError. Error for models with duplicate title.
-        """
-        item = job_utils.clone_model(input_model)
-        if item.title != '':
-            blog_summary_models = blog_models.BlogPostSummaryModel.query().filter(
-                blog_models.BlogPostSummaryModel.title == (
-                    item.title)).filter(
-                        blog_models.BlogPostSummaryModel.deleted == False).fetch() # pylint: disable=singleton-comparison
-            blog_model_ids = [
-                model.id for model in blog_summary_models if model.id != item.id]
-            if blog_model_ids:
-                yield blog_validation_errors.ValidateTitleIsUniqueError(
-                    model, blog_post_summary, blog_model_ids)
 
 @validation_decorators.RelationshipsOf(blog_models.BlogPostModel)
 def blog_post_model_relationships(model):
