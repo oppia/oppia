@@ -127,6 +127,15 @@ export class BaseContentComponent {
 })
 export class BaseContentNavBarBreadCrumbDirective {}
 
+
+/**
+ * This directive is used as selector for page footer transclusion.
+ */
+@Directive({
+  selector: 'page-footer'
+})
+export class BaseContentPageFooterDirective {}
+
 angular.module('oppia').directive('oppiaBaseContent',
   downgradeComponent({
     component: BaseContentComponent

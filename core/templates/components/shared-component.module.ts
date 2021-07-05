@@ -60,7 +60,6 @@ import { AudioFileUploaderComponent } from './forms/custom-forms-directives/audi
 import { ThumbnailDisplayComponent } from './forms/custom-forms-directives/thumbnail-display.component';
 import { SkillMasteryViewerComponent } from './skill-mastery/skill-mastery.component';
 import { ExplorationSummaryTileComponent } from './summary-tile/exploration-summary-tile.component';
-import { LearnerStorySummaryTileComponent } from './summary-tile/learner-story-summary-tile.component';
 import { CollectionSummaryTileComponent } from './summary-tile/collection-summary-tile.component';
 import { TakeBreakModalComponent } from 'pages/exploration-player-page/templates/take-break-modal.component';
 import { TopicsAndSkillsDashboardNavbarBreadcrumbComponent } from 'pages/topics-and-skills-dashboard-page/navbar/topics-and-skills-dashboard-navbar-breadcrumb.component';
@@ -85,7 +84,7 @@ import { EditThumbnailModalComponent } from './forms/custom-forms-directives/edi
 import { TopNavigationBarComponent } from './common-layout-directives/navigation-bars/top-navigation-bar.component';
 import { CorrectnessFooterComponent } from 'pages/exploration-player-page/layout-directives/correctness-footer.component';
 import { ContinueButtonComponent } from 'pages/exploration-player-page/learner-experience/continue-button.component';
-import { BaseContentComponent, BaseContentNavBarBreadCrumbDirective } from '../base-components/base-content.component';
+import { BaseContentComponent, BaseContentNavBarBreadCrumbDirective, BaseContentPageFooterDirective } from '../base-components/base-content.component';
 import { QuestionDifficultySelectorComponent } from './question-difficulty-selector/question-difficulty-selector.component';
 import { PreviewThumbnailComponent } from 'pages/topic-editor-page/modal-templates/preview-thumbnail.component';
 import { InputResponsePairComponent } from 'pages/exploration-player-page/learner-experience/input-response-pair.component';
@@ -237,6 +236,7 @@ const toastrConfig = {
     BackgroundBannerComponent,
     BaseContentComponent,
     BaseContentNavBarBreadCrumbDirective,
+    BaseContentPageFooterDirective,
     CorrectnessFooterComponent,
     ContinueButtonComponent,
     CreateNewSkillModalComponent,
@@ -247,7 +247,6 @@ const toastrConfig = {
     DisplayHintModalComponent,
     ExplorationFooterComponent,
     ExplorationSummaryTileComponent,
-    LearnerStorySummaryTileComponent,
     CollectionSummaryTileComponent,
     ExplorationEmbedButtonModalComponent,
     FilterForMatchingSubstringPipe,
@@ -307,7 +306,6 @@ const toastrConfig = {
     CreateActivityModalComponent,
     ExplorationFooterComponent,
     ExplorationSummaryTileComponent,
-    LearnerStorySummaryTileComponent,
     CollectionSummaryTileComponent,
     BaseContentComponent,
     SharingLinksComponent,
@@ -375,6 +373,7 @@ const toastrConfig = {
     BackgroundBannerComponent,
     BaseContentComponent,
     BaseContentNavBarBreadCrumbDirective,
+    BaseContentPageFooterDirective,
     CorrectnessFooterComponent,
     ContinueButtonComponent,
     CreateNewSkillModalComponent,
@@ -385,7 +384,6 @@ const toastrConfig = {
     DisplayHintModalComponent,
     ExplorationFooterComponent,
     ExplorationSummaryTileComponent,
-    LearnerStorySummaryTileComponent,
     CollectionSummaryTileComponent,
     HintAndSolutionButtonsComponent,
     InputResponsePairComponent,
