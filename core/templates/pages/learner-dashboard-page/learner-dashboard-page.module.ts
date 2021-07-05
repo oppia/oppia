@@ -41,7 +41,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     SharedComponentsModule,
   ],
   declarations: [
-    OppiaAngularRootComponent,
     LearnerDashboardPageComponent,
     GoalsTabComponent,
     CommunityLessonsTabComponent,
@@ -49,7 +48,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     LearnerDashboardSuggestionModalComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent,
     LearnerDashboardPageComponent,
     GoalsTabComponent,
     CommunityLessonsTabComponent,

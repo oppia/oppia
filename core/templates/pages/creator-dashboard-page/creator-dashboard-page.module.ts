@@ -39,12 +39,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     InteractionExtensionsModule,
     SharedComponentsModule
   ],
-  declarations: [
-    OppiaAngularRootComponent
-  ],
-  entryComponents: [
-    OppiaAngularRootComponent
-  ],
   providers: [
     {
       provide: HTTP_INTERCEPTORS,

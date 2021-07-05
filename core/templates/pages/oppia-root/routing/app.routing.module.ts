@@ -19,7 +19,6 @@
 import { APP_BASE_HREF } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { Route, RouterModule } from '@angular/router';
-import { ErrorPageRootComponent } from 'pages/error-pages/error-page-root.component';
 
 const routes: Route[] = [
   {
@@ -29,7 +28,9 @@ const routes: Route[] = [
   },
   {
     path: '**',
-    component: ErrorPageRootComponent
+    loadChildren: () => import(
+      'pages/error-pages/error-404/error-404-page.module').then(
+      m => m.Error404PageModule)
   }
 ];
 

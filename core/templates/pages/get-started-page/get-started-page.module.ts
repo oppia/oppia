@@ -37,11 +37,9 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent,
     GetStartedPageRootComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent,
     GetStartedPageRootComponent
   ],
   providers: [

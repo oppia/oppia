@@ -40,13 +40,11 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     DeleteAccountModalComponent,
     DeleteAccountPageComponent,
     DeleteAccountPageRootComponent,
-    OppiaAngularRootComponent
   ],
   entryComponents: [
     DeleteAccountModalComponent,
     DeleteAccountPageComponent,
     DeleteAccountPageRootComponent,
-    OppiaAngularRootComponent
   ],
   providers: [
     {

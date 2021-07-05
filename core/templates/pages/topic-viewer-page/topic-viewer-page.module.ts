@@ -49,7 +49,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent,
     PracticeTabComponent,
     StoriesListComponent,
     SubtopicsListComponent,
@@ -57,7 +56,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     TopicViewerPageComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent,
     PracticeTabComponent,
     StoriesListComponent,
     SubtopicsListComponent,

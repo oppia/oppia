@@ -40,13 +40,11 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent,
     StoryViewerNavbarBreadcrumbComponent,
     StoryViewerNavbarPreLogoActionComponent,
     StoryViewerPageComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent,
     StoryViewerNavbarBreadcrumbComponent,
     StoryViewerNavbarPreLogoActionComponent,
     StoryViewerPageComponent

@@ -43,11 +43,9 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
   ],
   declarations: [
     ContentLanguageSelectorComponent,
-    OppiaAngularRootComponent
   ],
   entryComponents: [
     ContentLanguageSelectorComponent,
-    OppiaAngularRootComponent
   ],
   providers: [
     {

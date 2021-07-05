@@ -42,7 +42,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent,
     StoryEditorNavbarBreadcrumbComponent,
     StorySavePendingChangesModalComponent,
     StoryEditorSaveModalComponent,
@@ -50,7 +49,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     StoryPreviewTabComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent,
     StoryEditorNavbarBreadcrumbComponent,
     StorySavePendingChangesModalComponent,
     StoryEditorSaveModalComponent,

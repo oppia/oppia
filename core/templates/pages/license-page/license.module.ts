@@ -40,11 +40,9 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
   ],
   declarations: [
     LicensePageComponent,
-    OppiaAngularRootComponent
   ],
   entryComponents: [
     LicensePageComponent,
-    OppiaAngularRootComponent
   ],
   providers: [
     {

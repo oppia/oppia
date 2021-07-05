@@ -18,12 +18,12 @@
 
 import { NgModule } from '@angular/core';
 import { Route, RouterModule } from '@angular/router';
-import { ErrorPageRootComponent } from './error-page-root.component';
+import { Error404PageRootComponent } from './error-404-page-root.component';
 
 const routes: Route[] = [
   {
     path: '',
-    component: ErrorPageRootComponent
+    component: Error404PageRootComponent
   }
 ];
 
@@ -36,4 +36,4 @@ const routes: Route[] = [
   ]
 })
 
-export class ErrorPageRoutingModule {}
+export class Error404PageRoutingModule {}

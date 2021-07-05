@@ -36,12 +36,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent,
     ContactPageComponent,
     ContactPageRootComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent,
     ContactPageComponent,
     ContactPageRootComponent
   ],

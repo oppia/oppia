@@ -38,11 +38,9 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
   ],
   declarations: [
     LogoutPageComponent,
-    OppiaAngularRootComponent,
   ],
   entryComponents: [
     LogoutPageComponent,
-    OppiaAngularRootComponent,
   ],
   providers: [
     {

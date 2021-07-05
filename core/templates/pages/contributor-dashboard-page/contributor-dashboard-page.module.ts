@@ -53,7 +53,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     SharedFormsModule
   ],
   declarations: [
-    OppiaAngularRootComponent,
     CkEditorCopyToolbarComponent,
     LoginRequiredMessageComponent,
     LoginRequiredModalContent,
@@ -64,7 +63,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     TranslationModalComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent,
     CkEditorCopyToolbarComponent,
     LoginRequiredMessageComponent,
     LoginRequiredModalContent,

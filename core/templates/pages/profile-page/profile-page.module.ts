@@ -47,12 +47,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent,
     ProfilePageNavbarComponent,
     ProfilePageComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent,
     ProfilePageNavbarComponent,
     ProfilePageComponent
   ],

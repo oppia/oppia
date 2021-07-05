@@ -77,7 +77,6 @@ declare var angular: ng.IAngularStatic;
     BeamJobsTabComponent,
     CancelBeamJobDialogComponent,
     JobsTabComponent,
-    OppiaAngularRootComponent,
     ReleaseCoordinatorNavbarComponent,
     ReleaseCoordinatorPageComponent,
     StartNewBeamJobDialogComponent,
@@ -86,7 +85,6 @@ declare var angular: ng.IAngularStatic;
   entryComponents: [
     CancelBeamJobDialogComponent,
     JobsTabComponent,
-    OppiaAngularRootComponent,
     ReleaseCoordinatorNavbarComponent,
     ReleaseCoordinatorPageComponent,
     StartNewBeamJobDialogComponent,

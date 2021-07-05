@@ -44,7 +44,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent,
     CollectionDetailsEditor,
     CollectionHistoryTabComponent,
     CollectionNodeEditorComponent,
@@ -53,7 +52,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     CollectionStatisticsTabComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent,
     CollectionHistoryTabComponent,
     CollectionNodeEditorComponent,
     CollectionSettingsTabComponent,

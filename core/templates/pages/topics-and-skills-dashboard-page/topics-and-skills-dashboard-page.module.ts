@@ -48,7 +48,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     FormsModule
   ],
   declarations: [
-    OppiaAngularRootComponent,
     SkillsListComponent,
     DeleteSkillModalComponent,
     UnassignSkillFromTopicsModalComponent,
@@ -59,7 +58,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     DeleteTopicModalComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent,
     SkillsListComponent,
     DeleteSkillModalComponent,
     UnassignSkillFromTopicsModalComponent,

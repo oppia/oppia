@@ -40,12 +40,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent,
     TopicLandingPageComponent,
     TopicLandingPageRootComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent,
     TopicLandingPageComponent,
     TopicLandingPageRootComponent
   ],

@@ -81,12 +81,10 @@ class FirebaseErrorFilterHandler extends ErrorHandler {
   declarations: [
     LoginPageComponent,
     LoginPageRootComponent,
-    OppiaAngularRootComponent,
   ],
   entryComponents: [
     LoginPageComponent,
     LoginPageRootComponent,
-    OppiaAngularRootComponent,
   ],
   providers: [
     {

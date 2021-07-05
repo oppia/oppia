@@ -41,12 +41,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
   declarations: [
     DonatePageComponent,
     DonatePageRootComponent,
-    OppiaAngularRootComponent
   ],
   entryComponents: [
     DonatePageComponent,
     DonatePageRootComponent,
-    OppiaAngularRootComponent
   ],
   providers: [
     {

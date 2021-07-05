@@ -40,11 +40,9 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     NgbNavModule
   ],
   declarations: [
-    OppiaAngularRootComponent,
     ModeratorPageComponent,
   ],
   entryComponents: [
-    OppiaAngularRootComponent,
     ModeratorPageComponent
   ],
   providers: [

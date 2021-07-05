@@ -41,12 +41,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
   ],
   declarations: [
     ClassroomPageComponent,
-    OppiaAngularRootComponent,
     TopicSummaryTileComponent
   ],
   entryComponents: [
     ClassroomPageComponent,
-    OppiaAngularRootComponent,
     TopicSummaryTileComponent
   ],
   providers: [

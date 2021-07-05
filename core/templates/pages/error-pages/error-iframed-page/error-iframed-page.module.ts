@@ -39,11 +39,9 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
   ],
   declarations: [
     ErrorIframedPageRootComponent,
-    OppiaAngularRootComponent
   ],
   entryComponents: [
     ErrorIframedPageRootComponent,
-    OppiaAngularRootComponent
   ],
   providers: [
     {

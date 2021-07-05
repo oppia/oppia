@@ -45,14 +45,12 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent,
     CollectionFooterComponent,
     CollectionLocalNavComponent,
     CollectionNavbarComponent,
     CollectionNodeListComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent,
     CollectionFooterComponent,
     CollectionLocalNavComponent,
     CollectionNodeListComponent,

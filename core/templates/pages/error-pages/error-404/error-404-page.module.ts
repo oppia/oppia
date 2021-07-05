@@ -16,27 +16,24 @@
  * @fileoverview Module for the error page.
  */
 
-import { ErrorPageComponent } from './error-page.component';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { ErrorPageRootComponent } from './error-page-root.component';
 import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
+import { SharedComponentsModule } from 'components/shared-component.module';
+import { Error404PageRootComponent } from './error-404-page-root.component';
+import { Error404PageRoutingModule } from './error-404-page-routing.module';
+import { Error404PageComponent } from './error-404-page.component';
 
 @NgModule({
   imports: [
-    BrowserModule,
-    SharedComponentsModule
+    SharedComponentsModule,
+    Error404PageRoutingModule
   ],
   declarations: [
-    ErrorPageComponent,
-    ErrorPageRootComponent,
+    Error404PageComponent,
+    Error404PageRootComponent,
   ],
   entryComponents: [
-    ErrorPageComponent,
-    ErrorPageRootComponent,
-  ],
-  bootstrap: [
-    ErrorPageRootComponent
+    Error404PageComponent,
+    Error404PageRootComponent,
   ]
 })
-export class ErrorPageModule {}
+export class Error404PageModule {}

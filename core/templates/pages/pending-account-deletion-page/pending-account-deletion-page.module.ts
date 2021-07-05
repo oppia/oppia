@@ -44,12 +44,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
   declarations: [
     PendingAccountDeletionPageComponent,
     PendingAccountDeletionPageRootComponent,
-    OppiaAngularRootComponent
   ],
   entryComponents: [
     PendingAccountDeletionPageComponent,
     PendingAccountDeletionPageRootComponent,
-    OppiaAngularRootComponent
   ],
   providers: [
     {

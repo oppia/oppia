@@ -40,12 +40,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
   declarations: [
     SplashPageComponent,
     SplashPageRootComponent,
-    OppiaAngularRootComponent
   ],
   entryComponents: [
     SplashPageComponent,
     SplashPageRootComponent,
-    OppiaAngularRootComponent
   ],
   providers: [
     {

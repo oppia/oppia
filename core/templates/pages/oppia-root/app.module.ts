@@ -16,17 +16,17 @@
  * @fileoverview Module for the about page.
  */
 
+import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { ErrorPageModule } from 'pages/error-pages/error-page.module';
+import { BrowserModule } from '@angular/platform-browser';
 import { OppiaRootComponent } from './oppia-root.component';
 import { AppRoutingModule } from './routing/app.routing.module';
 
 @NgModule({
   imports: [
-    BrowserAnimationsModule,
+    BrowserModule,
+    HttpClientModule,
     AppRoutingModule,
-    ErrorPageModule
   ],
   declarations: [
     OppiaRootComponent,

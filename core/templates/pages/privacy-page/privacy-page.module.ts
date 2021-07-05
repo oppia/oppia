@@ -38,12 +38,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent,
     PrivacyPageRootComponent,
     PrivacyPageComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent,
     PrivacyPageRootComponent,
     PrivacyPageComponent
   ],

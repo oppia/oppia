@@ -53,7 +53,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
   ],
   declarations: [
     OppiaAdminProdModeActivitiesTabComponent,
-    OppiaAngularRootComponent,
     AdminConfigTabComponent,
     AdminFeaturesTabComponent,
     AdminMiscTabComponent,
@@ -65,7 +64,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
   ],
   entryComponents: [
     OppiaAdminProdModeActivitiesTabComponent,
-    OppiaAngularRootComponent,
     AdminConfigTabComponent,
     AdminFeaturesTabComponent,
     AdminMiscTabComponent,

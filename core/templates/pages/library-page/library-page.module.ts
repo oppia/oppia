@@ -38,11 +38,9 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent,
     LearnerPlaylistModalComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent,
     LearnerPlaylistModalComponent
   ],
   providers: [
