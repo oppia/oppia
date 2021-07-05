@@ -16,8 +16,7 @@
  * @fileoverview Tests for UserProfileModel.
  */
 
-import { LearnerExplorationSummary } from
-  'domain/summary/learner-exploration-summary.model';
+import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
 import { UserProfile } from 'domain/user/user-profile.model';
 
 describe('User profile model', () => {
