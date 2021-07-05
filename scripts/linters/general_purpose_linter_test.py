@@ -54,13 +54,10 @@ FILE_IN_EXCLUDED_PATH = os.path.join(
 EXTRA_JS_FILEPATH = os.path.join('core', 'templates', 'demo.js')
 INVALID_RELATIVE_IMPORT_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_relative_import.js')
-INVALID_PARENT_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_parent.ts')
 INVALID_TEMPLATE_URL_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_templateurl.ts')
 INVALID_FILEOVERVIEW_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_fileoverview.ts')
-INVALID_BROADCAST_USE_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_broadcast_use.ts')
 INVALID_LODASH_GENERAL_IMPORT_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_lodash_general_import.ts')
 INVALID_LODASH_SPECIFIC_IMPORT_FILEPATH = os.path.join(
@@ -157,17 +154,6 @@ class JsTsLintTests(test_utils.LinterTestBase):
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
-    def test_invalid_use_of_parent(self):
-        linter = general_purpose_linter.GeneralPurposeLinter(
-            [INVALID_PARENT_FILEPATH], FILE_CACHE)
-        lint_task_report = linter.check_bad_patterns()
-        self.assert_same_list_elements([
-            'Line 25: Please do not access parent properties using '
-            '$parent. Use the scope objectfor this purpose.'
-            ], lint_task_report.trimmed_messages)
-        self.assertEqual('Bad pattern', lint_task_report.name)
-        self.assertTrue(lint_task_report.failed)
-
     def test_invalid_use_of_relative_import(self):
         linter = general_purpose_linter.GeneralPurposeLinter(
             [INVALID_RELATIVE_IMPORT_FILEPATH], FILE_CACHE)
@@ -175,16 +161,6 @@ class JsTsLintTests(test_utils.LinterTestBase):
         self.assert_same_list_elements(
             ['Line 20: Please, don\'t use relative imports in require().'],
             lint_task_report.trimmed_messages)
-        self.assertEqual('Bad pattern', lint_task_report.name)
-        self.assertTrue(lint_task_report.failed)
-
-    def test_invalid_use_of_broadcast(self):
-        linter = general_purpose_linter.GeneralPurposeLinter(
-            [INVALID_BROADCAST_USE_FILEPATH], FILE_CACHE)
-        lint_task_report = linter.check_bad_patterns()
-        self.assert_same_list_elements([
-            'Line 26: Please do not use $broadcast/$on for propagating events. '
-            'Use @Input/@Output instead.'], lint_task_report.trimmed_messages)
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
