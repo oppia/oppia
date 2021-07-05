@@ -36,7 +36,9 @@ class ClassroomPage(base.BaseHandler):
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.does_classroom_exist
     def get(self, _):
@@ -58,7 +60,9 @@ class ClassroomDataHandler(base.BaseHandler):
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.does_classroom_exist
     def get(self, classroom_url_fragment):
@@ -95,7 +99,9 @@ class ClassroomPromosStatusHandler(base.BaseHandler):
     # during user registration.
     REDIRECT_UNFINISHED_SIGNUPS = False
     URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.open_access
     def get(self):
@@ -109,7 +115,9 @@ class DefaultClassroomRedirectPage(base.BaseHandler):
     """Redirects to the default classroom page."""
 
     URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.open_access
     def get(self):

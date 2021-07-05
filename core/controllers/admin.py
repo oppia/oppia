@@ -873,7 +873,7 @@ class DataExtractionQueryHandler(base.BaseHandler):
             },
             'exp_version': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'int'
                 }
             },
             'state_name': {
@@ -883,7 +883,7 @@ class DataExtractionQueryHandler(base.BaseHandler):
             },
             'num_answers': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'int'
                 }
             }
         }
