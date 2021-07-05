@@ -21,7 +21,7 @@ import { NewlyCreatedTopic } from
   'domain/topics_and_skills_dashboard/newly-created-topic.model';
 
 describe('Newly Created Topic Model', () => {
-  let topic: NewlyCreatedTopic = null;
+  let topic: NewlyCreatedTopic;
 
   beforeEach(() => {
     topic = NewlyCreatedTopic.createDefault();

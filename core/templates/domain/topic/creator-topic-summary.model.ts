@@ -32,12 +32,12 @@ export interface CreatorTopicSummaryBackendDict {
   'thumbnail_bg_color': string;
   'topic_model_created_on': number;
   'topic_model_last_updated': number;
-  // These properties are optional because they are only present in the
-  // topic summary dict of topic dashboard page.
-  'can_edit_topic'?: boolean;
-  'is_published'?: boolean;
-  'classroom'?: string;
+  'can_edit_topic': boolean;
+  'is_published': boolean;
   'url_fragment': string;
+  // This property is optional because it is only present in the
+  // topic summary dict of topic dashboard page.
+  'classroom'?: string | undefined;
 }
 
 export class CreatorTopicSummary {
@@ -57,7 +57,7 @@ export class CreatorTopicSummary {
       public topicModelLastUpdated: number,
       public canEditTopic: boolean,
       public isPublished: boolean,
-      public classroom: string,
+      public classroom: string | undefined,
       public thumbnailFilename: string,
       public thumbnailBgColor: string,
       public urlFragment: string) { }
@@ -139,7 +139,7 @@ export class CreatorTopicSummary {
     return this.topicModelLastUpdated;
   }
 
-  getClassroom(): string {
+  getClassroom(): string | undefined {
     return this.classroom;
   }
 
