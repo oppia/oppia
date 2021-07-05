@@ -21,7 +21,9 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 import logging
+import os
 
+import python_utils
 from constants import constants
 from core.domain import topic_domain, fs_services, fs_domain
 from core.domain import topic_fetchers
@@ -218,13 +220,15 @@ class PopulateTopicThumbnailSizeOneOffJobTests(test_utils.GenericTestBase):
 
     def test_thumbnail_size_job_thumbnail_size_is_none(self):
         """Tests that PopulateTopicThumbnailSizeOneOffJob job results error
-        key if the thumbnail_size_in_bytes is None and thumbnail_filename
-        does not exist in the filesystem.
+        key if the thumbnail_filename does not exist in the filesystem and
+        thumbnail_filename does not exist in the filesystem.
         """
-        topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID, 'A name', 'abbrev', 'description')
+        self.save_new_topic(
+            self.TOPIC_ID, self.albert_id, name='A name',
+            abbreviated_name='abbrev', description='description',
+            thumbnail_size_in_bytes=None)
 
-        # Start migration job on sample topic.
+        # Start job on sample topic.
         job_id = (
             topic_jobs_one_off.PopulateTopicThumbnailSizeOneOffJob.create_new()
         )
@@ -237,25 +241,41 @@ class PopulateTopicThumbnailSizeOneOffJobTests(test_utils.GenericTestBase):
         output = (
             topic_jobs_one_off.PopulateTopicThumbnailSizeOneOffJob.get_output(
                 job_id))
-        expected = (
-            [u'thumbnail_size_update_error',
-             [u'Thumbnail None for topic topic_id not found on the'
-              u' filesystem']])
+        expected = [[u'thumbnail_size_update_error',
+                     [u'Thumbnail topic.svg for topic topic_id not found on'
+                      u' the filesystem']]]
 
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+        topic_services.delete_topic(self.albert_id, self.TOPIC_ID)
 
-    def test_thumbnail_size_job_thumbnail_size_is_not_none(self):
+    def test_thumbnail_size_job_update_thumbnail_size(self):
         """Tests that PopulateTopicThumbnailSizeOneOffJob job results existing
         success key when the thumbnail_size_in_bytes is not None.
         """
-        topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID, 'A name', 'abbrev', 'description')
+        with python_utils.open_file(
+                os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
+                encoding=None) as f:
+            raw_image = f.read()
 
-        # Retrieve the model and add dummy data for thumbnail_filename and
-        # thumbnail_size_in_bytes
-        topic_model = topic_models.get(self.TOPIC_ID)
-        topic_model.thumbnail_filename = 'test_svg.svg'
-        topic_model.thumbnail_size_in_bytes = 21131
+        fs_services.save_original_and_compressed_versions_of_image(
+            'topic.svg', feconf.ENTITY_TYPE_TOPIC, self.TOPIC_ID, raw_image,
+            constants.FILENAME_PREFIX_THUMBNAIL, False)
+
+        # file_system_class = fs_services.get_entity_file_system_class()
+        # fs = fs_domain.AbstractFileSystem(file_system_class(
+        #     feconf.ENTITY_TYPE_TOPIC, self.TOPIC_ID))
+        #
+        #
+        # filepath = '%s/%s' % (
+        #     constants.FILENAME_PREFIX_THUMBNAIL, 'topic.svg')
+        #
+        #
+        # # Commit dummy thumbnail onto filesystem
+        # fs.commit(filepath, raw_image, mimetype='image/svg+xml')
+        self.save_new_topic(
+            self.TOPIC_ID, self.albert_id, name='A name',
+            abbreviated_name='abbrev', description='description',
+            thumbnail_size_in_bytes=None)
 
         # Start migration job on sample topic.
         job_id = (
@@ -270,26 +290,17 @@ class PopulateTopicThumbnailSizeOneOffJobTests(test_utils.GenericTestBase):
         output = (
             topic_jobs_one_off.PopulateTopicThumbnailSizeOneOffJob.get_output(
                 job_id))
-        expected = [u'thumbnail_size_already_updated', 1]
+        expected = [u'thumbnail_size_new_updated', 1]
 
-        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+        self.assertEqual([expected], [ast.literal_eval(x) for x in output])
 
-    def test_thumbnail_size_job_thumbnail_size_updated(self):
+    def test_thumbnail_size_job_thumbnail_size_already_updated(self):
         """Tests that PopulateTopicThumbnailSizeOneOffJob job results new
-        update success key when the thumbnail_size_in_bytes is not None.
+        update success key when the thumbnail_size_in_bytes is to be updated.
         """
-        topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID, 'A name', 'abbrev', 'description')
-
-        file_system_class = fs_services.get_entity_file_system_class()
-        fs = fs_domain.AbstractFileSystem(file_system_class(
-            feconf.ENTITY_TYPE_TOPIC, topic.id))
-
-        filepath = '%s/%s' % (
-            constants.FILENAME_PREFIX_THUMBNAIL, 'abc.svg')
-
-        # Commit dummy thumbnail onto filesystem
-        fs.commit(filepath, 'dummy_thumbnail_file_contents')
+        self.save_new_topic(
+            self.TOPIC_ID, self.albert_id, name='A name',
+            abbreviated_name='abbrev', description='description')
 
         # Start migration job on sample topic.
         job_id = (
@@ -305,6 +316,6 @@ class PopulateTopicThumbnailSizeOneOffJobTests(test_utils.GenericTestBase):
         output = (
             topic_jobs_one_off.PopulateTopicThumbnailSizeOneOffJob.get_output(
                 job_id))
-        expected = [u'thumbnail_size_new_updated', 1]
+        expected = [[u'thumbnail_size_already_updated', 1]]
 
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
