@@ -575,10 +575,19 @@ class SuggestionTranslateContent(BaseSuggestion):
                     suggestion_models.SCORE_TYPE_TRANSLATION,
                     self.get_score_type()))
 
-        if self.change.cmd != exp_domain.CMD_ADD_TRANSLATION:
+        # TODO(#12981): Write a one-off job to modify all existing translation
+        # suggestions that use DEPRECATED_CMD_ADD_TRANSLATION to use
+        # CMD_ADD_WRITTEN_TRANSLATION instead. Suggestions in the future will
+        # only use CMD_ADD_WRITTEN_TRANSLATION. DEPRECATED_CMD_ADD_TRANSLATION
+        # is added in the following check to support older suggestions.
+        accepted_cmds = [
+            exp_domain.DEPRECATED_CMD_ADD_TRANSLATION,
+            exp_domain.CMD_ADD_WRITTEN_TRANSLATION
+        ]
+        if self.change.cmd not in accepted_cmds:
             raise utils.ValidationError(
                 'Expected cmd to be %s, received %s' % (
-                    exp_domain.CMD_ADD_TRANSLATION, self.change.cmd))
+                    exp_domain.CMD_ADD_WRITTEN_TRANSLATION, self.change.cmd))
 
         if not utils.is_supported_audio_language_code(
                 self.change.language_code):
@@ -870,7 +879,12 @@ class SuggestionAddQuestion(BaseSuggestion):
         question = question_domain.Question.from_dict(question_dict)
         question.validate()
 
-        self._copy_new_images_to_target_entity_storage()
+        # Images need to be stored in the storage path corresponding to the
+        # question.
+        new_image_filenames = self.get_new_image_filenames_added_in_suggestion()
+        fs_services.copy_images(
+            self.image_context, self.target_id, feconf.ENTITY_TYPE_QUESTION,
+            question_dict['id'], new_image_filenames)
 
         question_services.add_question(self.author_id, question)
 

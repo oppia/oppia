@@ -36,8 +36,12 @@ export class UserService {
     private userBackendApiService: UserBackendApiService
   ) {}
 
-    private userContributionRightsInfo = null;
-    private userInfo = null;
+    // This property will be null when the user does not have
+    // enough rights to review translations, voiceover and questions.
+    private userContributionRightsInfo:
+      UserContributionRightsDataBackendDict | null = null;
+    // This property will be null when the user is not logged in.
+    private userInfo: UserInfo | null = null;
     private returnUrl = '';
 
     async getUserInfoAsync(): Promise<UserInfo> {
@@ -45,7 +49,7 @@ export class UserService {
       if (['/logout', '/signup'].includes(pathname)) {
         return UserInfo.createDefault();
       }
-      if (!this.userInfo) {
+      if (this.userInfo === null) {
         this.userInfo = await this.userBackendApiService.getUserInfoAsync();
       }
       return this.userInfo;
@@ -85,7 +89,7 @@ export class UserService {
     }
 
     async getUserContributionRightsDataAsync():
-      Promise<UserContributionRightsDataBackendDict> {
+      Promise<UserContributionRightsDataBackendDict | null> {
       if (this.userContributionRightsInfo) {
         return new Promise((resolve, reject) => {
           resolve(this.userContributionRightsInfo);

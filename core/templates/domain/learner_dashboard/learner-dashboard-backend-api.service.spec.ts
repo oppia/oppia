@@ -20,13 +20,35 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { LearnerDashboardBackendApiService } from
+import { AddMessagePayload, LearnerDashboardBackendApiService } from
   'domain/learner_dashboard/learner-dashboard-backend-api.service';
 
 describe('Learner Dashboard Backend API Service', () => {
   let learnerDashboardBackendApiService:
-    LearnerDashboardBackendApiService = null;
+    LearnerDashboardBackendApiService;
   let httpTestingController: HttpTestingController;
+
+  let nodeDict = {
+    id: 'node_1',
+    thumbnail_filename: 'image.png',
+    title: 'Title 1',
+    description: 'Description 1',
+    prerequisite_skill_ids: ['skill_1'],
+    acquired_skill_ids: ['skill_2'],
+    destination_node_ids: ['node_2'],
+    outline: 'Outline',
+    exploration_id: null,
+    outline_is_finalized: false,
+    thumbnail_bg_color: '#a33f40'
+  };
+  let subtopic = {
+    skill_ids: ['skill_id_2'],
+    id: 1,
+    title: 'subtopic_name',
+    thumbnail_filename: 'image.svg',
+    thumbnail_bg_color: '#F8BF74',
+    url_fragment: 'subtopic-name'
+  };
 
   let sampleDataResults = {
     incomplete_explorations_list: [{
@@ -145,13 +167,235 @@ describe('Learner Dashboard Backend API Service', () => {
         'Learn the basics of fractions with Matthew as he explores a bakery.',
       node_count: 12
     }],
+    completed_stories_list: [{
+      id: 'sample_story_id',
+      title: 'Story title',
+      node_titles: ['Chapter 1', 'Chapter 2'],
+      thumbnail_filename: 'image.svg',
+      thumbnail_bg_color: '#F8BF74',
+      description: 'Description',
+      story_is_published: true,
+      completed_node_titles: ['Chapter 1', 'Chapter 2'],
+      url_fragment: 'story-url-fragment',
+      all_node_dicts: [nodeDict]
+    }],
+    learnt_topics_list: [{
+      id: 'sample_topic_id',
+      name: 'Topic Name',
+      language_code: 'en',
+      description: 'description',
+      version: 1,
+      story_titles: ['Story 1'],
+      thumbnail_filename: 'image.svg',
+      thumbnail_bg_color: '#C6DCDA',
+      classroom: 'math',
+      practice_tab_is_displayed: false,
+      canonical_story_summary_dict: [{
+        id: '0',
+        title: 'Story Title',
+        description: 'Story Description',
+        node_titles: ['Chapter 1'],
+        thumbnail_filename: 'image.svg',
+        thumbnail_bg_color: '#F8BF74',
+        story_is_published: true,
+        completed_node_titles: ['Chapter 1'],
+        url_fragment: 'story-title',
+        all_node_dicts: [nodeDict]
+      }],
+      url_fragment: 'topic-name',
+      subtopics: [subtopic],
+      degrees_of_mastery: {
+        skill_id_1: 0.5,
+        skill_id_2: 0.3
+      },
+      skill_descriptions: {
+        skill_id_1: 'Skill Description 1',
+        skill_id_2: 'Skill Description 2'
+      }
+    }],
+    partially_learnt_topics_list: [{
+      id: 'sample_topic_id',
+      name: 'Topic Name',
+      language_code: 'en',
+      description: 'description',
+      version: 1,
+      story_titles: ['Story 1'],
+      thumbnail_filename: 'image.svg',
+      thumbnail_bg_color: '#C6DCDA',
+      classroom: 'math',
+      practice_tab_is_displayed: false,
+      canonical_story_summary_dict: [{
+        id: '0',
+        title: 'Story Title',
+        description: 'Story Description',
+        node_titles: ['Chapter 1'],
+        thumbnail_filename: 'image.svg',
+        thumbnail_bg_color: '#F8BF74',
+        story_is_published: true,
+        completed_node_titles: ['Chapter 1'],
+        url_fragment: 'story-title',
+        all_node_dicts: [nodeDict]
+      }],
+      url_fragment: 'topic-name',
+      subtopics: [subtopic],
+      degrees_of_mastery: {
+        skill_id_1: 0.5,
+        skill_id_2: 0.3
+      },
+      skill_descriptions: {
+        skill_id_1: 'Skill Description 1',
+        skill_id_2: 'Skill Description 2'
+      }
+    }],
+    topics_to_learn_list: [{
+      id: 'sample_topic_id',
+      name: 'Topic Name',
+      language_code: 'en',
+      description: 'description',
+      version: 1,
+      story_titles: ['Story 1'],
+      thumbnail_filename: 'image.svg',
+      thumbnail_bg_color: '#C6DCDA',
+      classroom: 'math',
+      practice_tab_is_displayed: false,
+      canonical_story_summary_dict: [{
+        id: '0',
+        title: 'Story Title',
+        description: 'Story Description',
+        node_titles: ['Chapter 1'],
+        thumbnail_filename: 'image.svg',
+        thumbnail_bg_color: '#F8BF74',
+        story_is_published: true,
+        completed_node_titles: ['Chapter 1'],
+        url_fragment: 'story-title',
+        all_node_dicts: [nodeDict]
+      }],
+      url_fragment: 'topic-name',
+      subtopics: [subtopic],
+      degrees_of_mastery: {
+        skill_id_1: 0.5,
+        skill_id_2: 0.3
+      },
+      skill_descriptions: {
+        skill_id_1: 'Skill Description 1',
+        skill_id_2: 'Skill Description 2'
+      }
+    }],
+    all_topics_list: [{
+      id: 'sample_topic_id',
+      name: 'Topic Name',
+      language_code: 'en',
+      description: 'description',
+      version: 1,
+      story_titles: ['Story 1'],
+      thumbnail_filename: 'image.svg',
+      thumbnail_bg_color: '#C6DCDA',
+      classroom: 'math',
+      practice_tab_is_displayed: false,
+      canonical_story_summary_dict: [{
+        id: '0',
+        title: 'Story Title',
+        description: 'Story Description',
+        node_titles: ['Chapter 1'],
+        thumbnail_filename: 'image.svg',
+        thumbnail_bg_color: '#F8BF74',
+        story_is_published: true,
+        completed_node_titles: ['Chapter 1'],
+        url_fragment: 'story-title',
+        all_node_dicts: [nodeDict]
+      }],
+      url_fragment: 'topic-name',
+      subtopics: [subtopic],
+      degrees_of_mastery: {
+        skill_id_1: 0.5,
+        skill_id_2: 0.3
+      },
+      skill_descriptions: {
+        skill_id_1: 'Skill Description 1',
+        skill_id_2: 'Skill Description 2'
+      }
+    }],
+    untracked_topics_list: [{
+      id: 'sample_topic_id',
+      name: 'Topic Name',
+      language_code: 'en',
+      description: 'description',
+      version: 1,
+      story_titles: ['Story 1'],
+      thumbnail_filename: 'image.svg',
+      thumbnail_bg_color: '#C6DCDA',
+      classroom: 'math',
+      practice_tab_is_displayed: false,
+      canonical_story_summary_dict: [{
+        id: '0',
+        title: 'Story Title',
+        description: 'Story Description',
+        node_titles: ['Chapter 1'],
+        thumbnail_filename: 'image.svg',
+        thumbnail_bg_color: '#F8BF74',
+        story_is_published: true,
+        completed_node_titles: ['Chapter 1'],
+        url_fragment: 'story-title',
+        all_node_dicts: [nodeDict]
+      }],
+      url_fragment: 'topic-name',
+      subtopics: [subtopic],
+      degrees_of_mastery: {
+        skill_id_1: 0.5,
+        skill_id_2: 0.3
+      },
+      skill_descriptions: {
+        skill_id_1: 'Skill Description 1',
+        skill_id_2: 'Skill Description 2'
+      }
+    }],
+    topics_to_learn: [{
+      id: 'fyuy4GrevTqJ',
+      name: 'Sample Name',
+      classroom: 'Math',
+      language_code: 'en',
+      version: 1,
+      canonical_story_count: 3,
+      additional_story_count: 0,
+      uncategorized_skill_count: 1,
+      subtopic_count: 1,
+      topic_model_created_on: 1466178691847.67,
+      topic_model_last_updated: 1466178759209.839,
+      description: 'description',
+      total_skill_count: 2,
+      total_published_node_count: 3,
+      thumbnail_filename: 'image.svg',
+      thumbnail_bg_color: '#C6DCDA',
+      url_fragment: 'sample-name',
+      subtopics: [{
+        skill_ids: ['skill_id_2'],
+        id: 1,
+        title: 'subtopic_name',
+        thumbnail_filename: 'image.svg',
+        thumbnail_bg_color: '#F8BF74',
+        url_fragment: 'subtopic-name'
+      }],
+      degrees_of_mastery: {
+        skill_id_1: 0.5,
+        skill_id_2: 0.3
+      },
+      skill_descriptions: {
+        skill_id_1: 'Skill Description 1',
+        skill_id_2: 'Skill Description 2'
+      }
+    }],
     number_of_nonexistent_activities: {
       completed_collections: 0,
       incomplete_collections: 0,
       collection_playlist: 0,
       incomplete_explorations: 0,
       exploration_playlist: 0,
-      completed_explorations: 0
+      completed_explorations: 0,
+      completed_stories: 0,
+      incomplete_stories: 0,
+      learnt_topics: 0,
+      partially_learnt_topics: 0,
+      topics_to_learn: 0
     },
     completed_explorations_list: [{
       category: 'Welcome',
@@ -183,7 +427,9 @@ describe('Learner Dashboard Backend API Service', () => {
       creator_picture_data_url: 'path/to/img'
     }],
     user_email: 'user@example.com',
-    completed_to_incomplete_collections: []
+    completed_to_incomplete_collections: [],
+    completed_to_incomplete_stories: [],
+    learnt_to_partially_learnt_topics: []
   };
 
   let LEARNER_DASHBOARD_DATA_URL = '/learnerdashboardhandler/data';
@@ -251,11 +497,11 @@ describe('Learner Dashboard Backend API Service', () => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
 
-    let updatedStatus = null;
-    let updatedSubject = null;
+    let updatedStatus = true;
+    let updatedSubject = 'Updated Subject';
     let text = 'Sending message';
     let url = '/threadhandler/exploration.4.Wfafsafd';
-    let payload = {
+    let payload: AddMessagePayload = {
       updated_status: updatedStatus,
       updated_subject: updatedSubject,
       text: text
@@ -284,11 +530,11 @@ describe('Learner Dashboard Backend API Service', () => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
 
-    let updatedStatus = null;
-    let updatedSubject = null;
+    let updatedStatus = true;
+    let updatedSubject = 'Updated Subject';
     let text = 'Sending message';
     let invalidUrl = '/invalidUrl';
-    let payload = {
+    let payload: AddMessagePayload = {
       updated_status: updatedStatus,
       updated_subject: updatedSubject,
       text: text

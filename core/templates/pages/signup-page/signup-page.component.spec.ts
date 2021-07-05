@@ -22,7 +22,7 @@ import { fakeAsync, tick } from '@angular/core/testing';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-import { TranslatorProviderForTests } from 'tests/test.extras';
+import { TranslatorProviderForTests } from 'tests/unit-test-utils.ajs';
 
 require('pages/signup-page/signup-page.component.ts');
 require('services/csrf-token.service.ts');
@@ -143,13 +143,36 @@ describe('Signup page', function() {
         };
 
         $httpBackend.expectPOST('/signuphandler/data', isRequestTheExpectOne)
-          .respond(200);
+          .respond({
+            bulk_email_signup_message_should_be_shown: false
+          });
         ctrl.submitPrerequisitesForm(true, '', 'yes');
         $httpBackend.flush();
         tick(200);
 
         expect(SiteAnalyticsService.registerNewSignupEvent).toHaveBeenCalled();
         expect(mockWindow.location.href).toBe('/expected_url');
+      }));
+
+    it('should show signup link if the user cannot be added automatically',
+      fakeAsync(() => {
+        expect(ctrl.showEmailSignupLink).toBeFalse();
+        var isRequestTheExpectOne = function(queryParams) {
+          return decodeURIComponent(queryParams).match(
+            '"can_receive_email_updates":true');
+        };
+        $httpBackend.expectPOST(
+          '/signuphandler/data', isRequestTheExpectOne).respond({
+          bulk_email_signup_message_should_be_shown: true
+        });
+        ctrl.submitPrerequisitesForm(true, '', 'yes');
+        $httpBackend.flush();
+        tick(200);
+
+        $httpBackend.verifyNoOutstandingExpectation();
+        $httpBackend.verifyNoOutstandingRequest();
+
+        expect(ctrl.showEmailSignupLink).toBeTrue();
       }));
 
     it('should successfully signup when user opts to not receive email updates',
@@ -165,7 +188,9 @@ describe('Signup page', function() {
         };
 
         $httpBackend.expectPOST('/signuphandler/data', isRequestTheExpectOne)
-          .respond(200);
+          .respond({
+            bulk_email_signup_message_should_be_shown: false
+          });
         ctrl.submitPrerequisitesForm(true, '', 'no');
         $httpBackend.flush();
         tick(200);
@@ -244,7 +269,9 @@ describe('Signup page', function() {
           return_url: '/creator-dashboard'
         });
 
-        $httpBackend.expect('POST', '/signuphandler/data').respond(200);
+        $httpBackend.expect('POST', '/signuphandler/data').respond({
+          bulk_email_signup_message_should_be_shown: false
+        });
         ctrl.submitPrerequisitesForm(true, 'myUsername', true);
         $httpBackend.flush();
         tick(200);
@@ -258,7 +285,9 @@ describe('Signup page', function() {
         return_url: '/another_url'
       });
 
-      $httpBackend.expect('POST', '/signuphandler/data').respond(200);
+      $httpBackend.expect('POST', '/signuphandler/data').respond({
+        bulk_email_signup_message_should_be_shown: false
+      });
       ctrl.submitPrerequisitesForm(true, 'myUsername', true);
       $httpBackend.flush();
       tick(200);

@@ -16,76 +16,94 @@
  * @fileoverview Unit tests for topic preview tab.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { TestBed } from '@angular/core/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { MaterialModule } from 'components/material.module';
+import { StorySummary } from 'domain/story/story-summary.model';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { TopicEditorStateService } from '../services/topic-editor-state.service';
+import { TopicPreviewTabComponent } from './topic-preview-tab.component';
 
-import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service';
-import { StorySummary} from 'domain/story/story-summary.model';
-import { importAllAngularServices } from 'tests/unit-test-utils';
+describe('Topic Preview Tab Component', () => {
+  let fixture: ComponentFixture<TopicPreviewTabComponent>;
+  let componentInstance: TopicPreviewTabComponent;
+  let testName = 'test_name';
+  let mockUrl = 'mock_url';
+  let storySummaries = [new StorySummary(
+    null, null, [], null, null, null, null, [], null, [], '', '', '')];
 
-describe('Topic preview tab', function() {
-  var ctrl = null;
-  var $rootScope = null;
-  var $scope = null;
-  var TopicEditorStateService = null;
+  class MockTopicEditorStateService {
+    getTopic() {
+      return {
+        getName(): string {
+          return testName;
+        },
+        getSubtopics() {
+          return [];
+        },
+      };
+    }
 
-  importAllAngularServices();
+    getCanonicalStorySummaries() {
+      return storySummaries;
+    }
+  }
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(() => {
+  class MockUrlInterpolationService {
+    getStaticImageUrl(imagePath: string): string {
+      return mockUrl;
+    }
+  }
+
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [EditableStoryBackendApiService]
-    });
-  });
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'EditableStoryBackendApiService',
-      TestBed.get(EditableStoryBackendApiService));
-  }));
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $rootScope = $injector.get('$rootScope');
-    TopicEditorStateService = $injector.get('TopicEditorStateService');
-    $scope = $rootScope.$new();
-    ctrl = $componentController('topicPreviewTab', {
-      $scope: $scope,
-    });
-    const sampleStorySummaryBackendDict = {
-      id: 'sample_story_id',
-      title: 'Story title',
-      node_titles: ['Chapter 1', 'Chapter 2'],
-      thumbnail_filename: 'image.svg',
-      thumbnail_bg_color: '#F8BF74',
-      description: 'Description',
-      story_is_published: true,
-      completed_node_titles: ['Chapter 1'],
-      url_fragment: 'story-url-fragment',
-      all_node_dicts: []
-    };
-    var story = StorySummary.createFromBackendDict(
-      sampleStorySummaryBackendDict);
-    spyOn(
-      TopicEditorStateService,
-      'getCanonicalStorySummaries').and.returnValue([story]);
-    ctrl.$onInit();
+      imports: [
+        MaterialModule
+      ],
+      declarations: [
+        TopicPreviewTabComponent,
+      ],
+      providers: [
+        {
+          provide: TopicEditorStateService,
+          useClass: MockTopicEditorStateService
+        },
+        {
+          provide: UrlInterpolationService,
+          useClass: MockUrlInterpolationService
+        }
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
 
-  it('should initialize the variables', function() {
-    expect(ctrl.activeTab).toEqual('story');
+  beforeEach(() => {
+    fixture = TestBed.createComponent(TopicPreviewTabComponent);
+    componentInstance = fixture.componentInstance;
   });
 
-  it('should return the static image url', function() {
-    var imagePath = '/path/to/image.png';
-    expect(ctrl.getStaticImageUrl(imagePath)).toBe(
-      '/assets/images/path/to/image.png');
+  it('should create', () => {
+    expect(componentInstance).toBeDefined();
   });
 
-  it('should change the preview tab', function() {
-    ctrl.changePreviewTab('story');
-    expect(ctrl.activeTab).toEqual('story');
-    ctrl.changePreviewTab('subtopic');
-    expect(ctrl.activeTab).toEqual('subtopic');
-    ctrl.changePreviewTab('practice');
-    expect(ctrl.activeTab).toEqual('practice');
+  it('should initialize', () => {
+    componentInstance.ngOnInit();
+    expect(componentInstance.topicName).toEqual(testName);
+    expect(componentInstance.subtopics).toEqual([]);
+    expect(componentInstance.cannonicalStorySummaries).toEqual(storySummaries);
+    expect(componentInstance.chapterCount).toEqual(0);
+  });
+
+  it('should get static image url', () => {
+    expect(componentInstance.getStaticImageUrl('image_path')).toEqual(mockUrl);
+  });
+
+  it('should navigate among preview tabs', () => {
+    componentInstance.changePreviewTab('story');
+    expect(componentInstance.activeTab).toEqual('story');
+    componentInstance.changePreviewTab('subtopic');
+    expect(componentInstance.activeTab).toEqual('subtopic');
+    componentInstance.changePreviewTab('practice');
+    expect(componentInstance.activeTab).toEqual('practice');
   });
 });

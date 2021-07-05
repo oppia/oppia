@@ -84,11 +84,15 @@ class AdminHandler(base.BaseHandler):
         feature_flag_dicts = feature_services.get_all_feature_flag_dicts()
 
         config_properties = config_domain.Registry.get_config_property_schemas()
-
         # Removes promo-bar related configs as promo-bar is handlded by
         # release coordinators in /release-coordinator page.
         del config_properties['promo_bar_enabled']
         del config_properties['promo_bar_message']
+
+        # Remove blog related configs as they will be handled by 'blog admins'
+        # on blog admin page.
+        del config_properties['max_number_of_tags_assigned_to_blog_post']
+        del config_properties['list_of_default_tags_for_blog_post']
 
         self.render_json({
             'config_properties': config_properties,
@@ -174,20 +178,6 @@ class AdminHandler(base.BaseHandler):
                         topic_id, delete_existing_opportunities=True))
                 result = {
                     'opportunities_count': opportunities_count
-                }
-            elif self.payload.get('action') == (
-                    'regenerate_missing_exploration_stats'):
-                exp_id = self.payload.get('exp_id')
-                (
-                    exp_stats, state_stats,
-                    num_valid_exp_stats, num_valid_state_stats
-                ) = exp_services.regenerate_missing_stats_for_exploration(
-                    exp_id)
-                result = {
-                    'missing_exp_stats': exp_stats,
-                    'missing_state_stats': state_stats,
-                    'num_valid_exp_stats': num_valid_exp_stats,
-                    'num_valid_state_stats': num_valid_state_stats
                 }
             elif self.payload.get('action') == 'update_feature_flag_rules':
                 feature_name = self.payload.get('feature_name')

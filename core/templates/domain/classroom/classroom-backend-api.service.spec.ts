@@ -23,13 +23,13 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { ClassroomBackendApiService } from
   'domain/classroom/classroom-backend-api.service';
 import { ClassroomData } from 'domain/classroom/classroom-data.model';
-import { TopicSummaryBackendDict } from 'domain/topic/topic-summary.model';
+import { CreatorTopicSummaryBackendDict } from 'domain/topic/creator-topic-summary.model';
 
 describe('Classroom backend API service', function() {
   let classroomBackendApiService:
     ClassroomBackendApiService = null;
   let httpTestingController: HttpTestingController;
-  let firstTopicSummaryDict: TopicSummaryBackendDict = {
+  let firstTopicSummaryDict: CreatorTopicSummaryBackendDict = {
     id: 'topic1',
     name: 'Topic name',
     canonical_story_count: 4,
@@ -45,9 +45,11 @@ describe('Classroom backend API service', function() {
     additional_story_count: 0,
     topic_model_created_on: 231241343,
     topic_model_last_updated: 3454354354,
-    url_fragment: 'topic-name-one'
+    url_fragment: 'topic-name-one',
+    can_edit_topic: false,
+    is_published: false
   };
-  let secondTopicSummaryDict: TopicSummaryBackendDict = {
+  let secondTopicSummaryDict: CreatorTopicSummaryBackendDict = {
     id: 'topic2',
     name: 'Topic name 2',
     canonical_story_count: 3,
@@ -63,7 +65,9 @@ describe('Classroom backend API service', function() {
     additional_story_count: 0,
     topic_model_created_on: 231241343,
     topic_model_last_updated: 3454354354,
-    url_fragment: 'topic-name-two'
+    url_fragment: 'topic-name-two',
+    can_edit_topic: false,
+    is_published: false
   };
 
   let responseDictionaries = {

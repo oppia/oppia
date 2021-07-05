@@ -140,10 +140,6 @@ var suites = {
       'protractor_desktop/publicationAndLibrary.js'
     ],
 
-    releaseCoordinatorPageFeatures: [
-      'protractor_desktop/releaseCoordinatorPageFeatures.js'
-    ],
-
     subscriptions: [
       'protractor/subscriptionsFlow.js'
     ],
@@ -313,10 +309,6 @@ exports.config = {
   // with relative paths will be prepended with this.
   baseUrl: 'http://localhost:9001',
 
-  // Selector for the element housing the angular app - this defaults to
-  // body, but is necessary if ng-app is on a descendant of <body>.
-  rootElement: 'body',
-
   // A callback function called once protractor is ready and available, and
   // before the specs are executed
   // You can specify a file containing code to run by setting onPrepare to
@@ -336,7 +328,7 @@ exports.config = {
     // Only running video recorder on Github Actions, since running it on
     // CicleCI causes RAM issues (meaning very high flakiness).
 
-    if (process.env.GITHUB_ACTIONS) {
+    if (process.env.GITHUB_ACTIONS && process.env.VIDEO_RECORDING_IS_ENABLED == 1) {
       jasmine.getEnv().addReporter({
         specStarted: function(result){
           let ffmpegArgs = [
@@ -370,6 +362,12 @@ exports.config = {
           }
         },
       });
+    }
+    else {
+      console.log(
+        'Videos will not be recorded for this suite either because videos' +
+        ' have been disabled for it (using environment variables) or' +
+        ' because it\'s on CircleCI');
     }
 
     // Screenshots will only run on CircleCI, since we don't have videos here.
