@@ -1246,8 +1246,11 @@ class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
             params=payload,
             expected_status_int=400
         )
+        error_msg = (
+            'Schema validation for \'exp_version\' failed: '
+            'Could not convert unicode to int: a')
         self.assertEqual(
-            response['error'], 'Version a cannot be converted to int.')
+            response['error'], error_msg)
 
     def test_that_handler_raises_exception(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)

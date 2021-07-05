@@ -892,7 +892,7 @@ class DataExtractionQueryHandler(base.BaseHandler):
     @acl_decorators.can_access_admin_page
     def get(self):
         exp_id = self.normalized_request.get('exp_id')
-        self.normalized_request.get('exp_version'))
+        exp_version = self.normalized_request.get('exp_version')
 
         exploration = exp_fetchers.get_exploration_by_id(
             exp_id, strict=False, version=exp_version)
