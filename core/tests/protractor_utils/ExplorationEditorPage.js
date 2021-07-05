@@ -122,7 +122,6 @@ var ExplorationEditorPage = function() {
 
   this.publishCardExploration = async function(
       title, objective, category, language, tags) {
-    await action.waitForAutosave();
     await action.click('Publish button', publishExplorationButton);
 
     var expTitle = element(by.css(
