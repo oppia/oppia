@@ -241,5 +241,16 @@ describe('Auth service', function() {
       expect(authBackendApiService.endSessionAsync).toHaveBeenCalled();
       expect(authBackendApiService.beginSessionAsync).not.toHaveBeenCalled();
     });
+
+    it('should return firebase config', () => {
+      expect(AuthService.firebaseConfig).toEqual({
+        apiKey: 'fake-api-key',
+        authDomain: '',
+        projectId: 'dev-project-id',
+        storageBucket: '',
+        messagingSenderId: '',
+        appId: '',
+      });
+    });
   });
 });
