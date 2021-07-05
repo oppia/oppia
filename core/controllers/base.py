@@ -156,8 +156,8 @@ class BaseHandler(webapp2.RequestHandler):
     # source: 'source' contains the parent url from which the request is made.
     #     For example, from '/create/' url we are making a request to
     #     '/createhandler/rights/' url, thus /create/ is a parent url. Since a
-    #     url is always validated before reaching a handler class, thus the
-    #     'source' need not to be validated by schema validation architecture.
+    #     'source' is not a part of payload we need not to validate it by
+    #     schema validation architecture.
     ARGS_WHICH_DO_NOT_NEED_SCHEMA_VALIDATION = ['csrf_token', 'source']
 
     def __init__(self, request, response):  # pylint: disable=super-init-not-called
