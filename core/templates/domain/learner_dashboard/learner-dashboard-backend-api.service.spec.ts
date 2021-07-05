@@ -315,7 +315,7 @@ describe('Learner Dashboard Backend API Service', () => {
         skill_id_2: 'Skill Description 2'
       }
     }],
-    new_topics_list: [{
+    untracked_topics_list: [{
       id: 'sample_topic_id',
       name: 'Topic Name',
       language_code: 'en',
