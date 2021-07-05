@@ -1,29 +1,12 @@
 <!DOCTYPE html>
-<html ng-app="oppia" itemscope itemtype="http://schema.org/Organization">
+<html itemscope itemtype="http://schema.org/Organization">
 
   <head>
     @load('base-components/header.template.html', {"title": "Partnerships - Oppia"})
   </head>
 
   <body>
-    <oppia-root>
-      <div ng-controller="Base" dir="<[direction]>">
-        <oppia-base-content>
-          <navbar-breadcrumb>
-            <ul class="nav navbar-nav oppia-navbar-breadcrumb">
-              <li>
-                <span class="oppia-navbar-breadcrumb-separator"></span>
-                <span translate="I18N_PARTNERSHIPS_PAGE_BREADCRUMB"></span>
-              </li>
-            </ul>
-          </navbar-breadcrumb>
-
-          <content>
-            <partnerships-page></partnerships-page>
-          </content>
-        </oppia-base-content>
-      </div>
-    </oppia-root>
+    <oppia-partnerships-page-root></oppia-partnerships-page-root>
     @load('pages/footer_js_libs.html')
   </body>
 </html>

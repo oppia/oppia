@@ -16,20 +16,21 @@
  * @fileoverview Module for the partnerships page.
  */
 
-import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { HttpClientModule } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { downgradeComponent } from '@angular/upgrade/static';
-
-import { PartnershipsPageComponent } from './partnerships-page.component';
-import { RequestInterceptor } from 'services/request-interceptor.service';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
-
+ import { APP_INITIALIZER, NgModule } from '@angular/core';
+ import { BrowserModule } from '@angular/platform-browser';
+ import { HttpClientModule } from '@angular/common/http';
+ import { HTTP_INTERCEPTORS } from '@angular/common/http';
+ 
+ import { PartnershipsPageComponent } from './partnerships-page.component';
+ import { RequestInterceptor } from 'services/request-interceptor.service';
+ import { SharedComponentsModule } from 'components/shared-component.module';
+ import { OppiaAngularRootComponent } from
+   'components/oppia-angular-root.component';
+ import { platformFeatureInitFactory, PlatformFeatureService } from
+   'services/platform-feature.service';
+ import { PartnershipsPageRootComponent } from
+  './partnerships-page-root.component';
+ 
 @NgModule({
   imports: [
     BrowserModule,
@@ -38,10 +39,12 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   ],
   declarations: [
     PartnershipsPageComponent,
+    PartnershipsPageRootComponent,
     OppiaAngularRootComponent
   ],
   entryComponents: [
     PartnershipsPageComponent,
+    PartnershipsPageRootComponent,
     OppiaAngularRootComponent
   ],
   providers: [
@@ -56,28 +59,8 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
       deps: [PlatformFeatureService],
       multi: true
     }
-  ]
+  ],
+  bootstrap: [PartnershipsPageRootComponent]
 })
-class PartnershipsPageModule {
-  // Empty placeholder method to satisfy the `Compiler`.
-  ngDoBootstrap() {}
-}
-
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { downgradeModule } from '@angular/upgrade/static';
-
-const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
-  const platformRef = platformBrowserDynamic(extraProviders);
-  return platformRef.bootstrapModule(PartnershipsPageModule);
-};
-const downgradedModule = downgradeModule(bootstrapFnAsync);
-
-angular.module('oppia').requires.push(downgradedModule);
-
-angular.module('oppia').directive(
-  // This directive is the downgraded version of the Angular component to
-  // bootstrap the Angular 8.
-  'oppiaAngularRoot',
-  downgradeComponent({
-    component: OppiaAngularRootComponent
-  }) as angular.IDirectiveFactory);
+export class PartnershipsPageModule {}
+ 
