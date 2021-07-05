@@ -289,7 +289,6 @@ angular.module('oppia').directive('collectionPlayerPage', [
               }
             );
 
-            console.log(JSON.stringify([ctrl.collectionId]));
             $http.get('/collectionsummarieshandler/data', {
               params: {
                 stringified_collection_ids: JSON.stringify([ctrl.collectionId])
