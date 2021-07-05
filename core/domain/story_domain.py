@@ -24,6 +24,8 @@ import re
 import android_validation_constants
 from constants import constants
 from core.domain import change_domain
+from core.domain import fs_domain
+from core.domain import fs_services
 from core.domain import html_cleaner
 from core.domain import html_validation_service
 import feconf
@@ -176,7 +178,7 @@ class StoryNode(python_utils.OBJECT):
 
     def __init__(
             self, node_id, title, description, thumbnail_filename,
-            thumbnail_bg_color, destination_node_ids,
+            thumbnail_bg_color, thumbnail_size_in_bytes, destination_node_ids,
             acquired_skill_ids, prerequisite_skill_ids,
             outline, outline_is_finalized, exploration_id):
         """Initializes a StoryNode domain object.
@@ -189,6 +191,7 @@ class StoryNode(python_utils.OBJECT):
                 node.
             thumbnail_bg_color: str|None. The thumbnail background color of
                 the story node.
+            thumbnail_size_in_bytes: int|None. The size of thumbnail in bytes.
             destination_node_ids: list(str). The list of destination node ids
                 that this node points to in the story graph.
             acquired_skill_ids: list(str). The list of skill ids acquired by
@@ -211,6 +214,7 @@ class StoryNode(python_utils.OBJECT):
         self.description = description
         self.thumbnail_filename = thumbnail_filename
         self.thumbnail_bg_color = thumbnail_bg_color
+        self.thumbnail_size_in_bytes = thumbnail_size_in_bytes
         self.destination_node_ids = destination_node_ids
         self.acquired_skill_ids = acquired_skill_ids
         self.prerequisite_skill_ids = prerequisite_skill_ids
@@ -298,6 +302,7 @@ class StoryNode(python_utils.OBJECT):
             'description': self.description,
             'thumbnail_filename': self.thumbnail_filename,
             'thumbnail_bg_color': self.thumbnail_bg_color,
+            'thumbnail_size_in_bytes': self.thumbnail_size_in_bytes,
             'destination_node_ids': self.destination_node_ids,
             'acquired_skill_ids': self.acquired_skill_ids,
             'prerequisite_skill_ids': self.prerequisite_skill_ids,
@@ -320,6 +325,7 @@ class StoryNode(python_utils.OBJECT):
             node_dict['id'], node_dict['title'], node_dict['description'],
             node_dict['thumbnail_filename'],
             node_dict['thumbnail_bg_color'],
+            node_dict['thumbnail_size_in_bytes'],
             node_dict['destination_node_ids'],
             node_dict['acquired_skill_ids'],
             node_dict['prerequisite_skill_ids'], node_dict['outline'],
@@ -340,7 +346,7 @@ class StoryNode(python_utils.OBJECT):
             value.
         """
         return cls(
-            node_id, title, '', None, None,
+            node_id, title, '', None, None, None,
             [], [], [], '', False, None)
 
     def validate(self):
@@ -1248,7 +1254,7 @@ class Story(python_utils.OBJECT):
         self.story_contents.nodes[node_index].description = new_description
 
     def update_node_thumbnail_filename(self, node_id, new_thumbnail_filename):
-        """Updates the thumbnail filename field of a given node.
+        """Updates the thumbnail filename and file size field of a given node.
 
         Args:
             node_id: str. The id of the node.
@@ -1262,8 +1268,21 @@ class Story(python_utils.OBJECT):
         if node_index is None:
             raise ValueError(
                 'The node with id %s is not part of this story' % node_id)
-        self.story_contents.nodes[node_index].thumbnail_filename = (
-            new_thumbnail_filename)
+        file_system_class = fs_services.get_entity_file_system_class()
+        fs = fs_domain.AbstractFileSystem(file_system_class(
+            feconf.ENTITY_TYPE_STORY, self.id))
+
+        filepath = '%s/%s' % (
+            constants.ASSET_TYPE_THUMBNAIL, new_thumbnail_filename)
+        if fs.isfile(filepath):
+            self.story_contents.nodes[node_index].thumbnail_filename = (
+                new_thumbnail_filename)
+            self.story_contents.nodes[node_index].thumbnail_size_in_bytes = (
+                len(fs.get(filepath)))
+        else:
+            raise Exception(
+                'The thumbnail %s for story node with id %s does not exist'
+                ' in the filesystem.' % (new_thumbnail_filename, self.id))
 
     def update_node_thumbnail_bg_color(self, node_id, new_thumbnail_bg_color):
         """Updates the thumbnail background color field of a given node.
