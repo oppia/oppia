@@ -207,7 +207,7 @@ angular.module('oppia').component('questionPlayer', {
 
       ctrl.performAction = function(actionButton) {
         if (actionButton.type === 'BOOST_SCORE') {
-          boostScoreModal();
+          ctrl.boostScoreModal();
         } else if (actionButton.url) {
           $window.location.href = actionButton.url;
         }
@@ -219,7 +219,7 @@ angular.module('oppia').component('questionPlayer', {
           ctrl.questionPlayerConfig.resultActionButtons.length > 0);
       };
 
-      var getWorstSkillId = function() {
+      ctrl.getWorstSkillId = function() {
         var minScore = Number.MAX_VALUE;
         var worstSkillId = '';
         Object.keys(ctrl.scorePerSkillMapping).forEach(function(skillId) {
@@ -233,7 +233,7 @@ angular.module('oppia').component('questionPlayer', {
         return worstSkillId;
       };
 
-      var openConceptCardModal = function(skillIds) {
+      ctrl.openConceptCardModal = function(skillIds) {
         var skills = [];
         skillIds.forEach(function(skillId) {
           skills.push(
@@ -257,9 +257,9 @@ angular.module('oppia').component('questionPlayer', {
       };
 
 
-      var boostScoreModal = function() {
-        var worstSkillId = getWorstSkillId();
-        openConceptCardModal([worstSkillId]);
+      ctrl.boostScoreModal = function() {
+        var worstSkillId = ctrl.getWorstSkillId();
+        ctrl.openConceptCardModal([worstSkillId]);
       };
 
       var getClassNameForType = function(actionButtonType) {
@@ -309,7 +309,7 @@ angular.module('oppia').component('questionPlayer', {
           QUESTION_PLAYER_MODE.PASS_FAIL_MODE);
       };
 
-      var createScorePerSkillMapping = function() {
+      ctrl.createScorePerSkillMapping = function() {
         var scorePerSkillMapping = {};
         if (ctrl.questionPlayerConfig.skillList) {
           for (var i = 0;
@@ -327,7 +327,7 @@ angular.module('oppia').component('questionPlayer', {
         ctrl.scorePerSkillMapping = scorePerSkillMapping;
       };
 
-      var createMasteryPerSkillMapping = function() {
+      ctrl.createMasteryPerSkillMapping = function() {
         var masteryPerSkillMapping = {};
         if (ctrl.questionPlayerConfig.skillList) {
           for (var i = 0;
@@ -339,7 +339,7 @@ angular.module('oppia').component('questionPlayer', {
         ctrl.masteryPerSkillMapping = masteryPerSkillMapping;
       };
 
-      var createMasteryChangePerQuestion = function(questionData) {
+      ctrl.createMasteryChangePerQuestion = function(questionData) {
         var masteryChangePerQuestion = {};
         for (var i = 0; i < questionData.linkedSkillIds.length; i++) {
           var skillId = questionData.linkedSkillIds[i];
@@ -349,8 +349,8 @@ angular.module('oppia').component('questionPlayer', {
         return masteryChangePerQuestion;
       };
 
-      var calculateScores = function(questionStateData) {
-        createScorePerSkillMapping();
+      ctrl.calculateScores = function(questionStateData) {
+        ctrl.createScorePerSkillMapping();
         $scope.resultsLoaded = false;
         var totalQuestions = Object.keys(questionStateData).length;
         for (var question in questionStateData) {
@@ -394,7 +394,7 @@ angular.module('oppia').component('questionPlayer', {
         $scope.resultsLoaded = true;
       };
 
-      var getMasteryChangeForWrongAnswers = function(
+      ctrl.getMasteryChangeForWrongAnswers = function(
           answers, masteryChangePerQuestion) {
         answers.forEach(function(answer) {
           if (!answer.isCorrect) {
@@ -415,7 +415,7 @@ angular.module('oppia').component('questionPlayer', {
         return masteryChangePerQuestion;
       };
 
-      var updateMasteryPerSkillMapping = function(
+      ctrl.updateMasteryPerSkillMapping = function(
           masteryChangePerQuestion) {
         for (var skillId in masteryChangePerQuestion) {
           if (!(skillId in ctrl.masteryPerSkillMapping)) {
@@ -428,8 +428,8 @@ angular.module('oppia').component('questionPlayer', {
         }
       };
 
-      var calculateMasteryDegrees = function(questionStateData) {
-        createMasteryPerSkillMapping();
+      ctrl.calculateMasteryDegrees = function(questionStateData) {
+        ctrl.createMasteryPerSkillMapping();
 
         for (var question in questionStateData) {
           var questionData = questionStateData[question];
@@ -437,7 +437,7 @@ angular.module('oppia').component('questionPlayer', {
             continue;
           }
           var masteryChangePerQuestion =
-            createMasteryChangePerQuestion(questionData);
+          ctrl.createMasteryChangePerQuestion(questionData);
 
           if (questionData.viewedSolution) {
             for (var skillId in masteryChangePerQuestion) {
@@ -453,18 +453,18 @@ angular.module('oppia').component('questionPlayer', {
               }
             }
             if (questionData.answers) {
-              masteryChangePerQuestion = getMasteryChangeForWrongAnswers(
+              masteryChangePerQuestion = ctrl.getMasteryChangeForWrongAnswers(
                 questionData.answers, masteryChangePerQuestion);
             }
           }
-          updateMasteryPerSkillMapping(masteryChangePerQuestion);
+          ctrl.updateMasteryPerSkillMapping(masteryChangePerQuestion);
         }
 
         SkillMasteryBackendApiService.updateSkillMasteryDegreesAsync(
           ctrl.masteryPerSkillMapping);
       };
 
-      var hasUserPassedTest = function() {
+      ctrl.hasUserPassedTest = function() {
         var testIsPassed = true;
         var failedSkillIds = [];
         if (isInPassOrFailMode()) {
@@ -507,7 +507,7 @@ angular.module('oppia').component('questionPlayer', {
         if (!ctrl.failedSkillIds || ctrl.failedSkillIds.length === 0) {
           throw new Error('No failed skills');
         }
-        openConceptCardModal(ctrl.failedSkillIds);
+        ctrl.openConceptCardModal(ctrl.failedSkillIds);
       };
 
       ctrl.openSkillMasteryModal = function(skillId) {
@@ -519,7 +519,7 @@ angular.module('oppia').component('questionPlayer', {
           backdrop: true,
           resolve: {
             masteryPerSkillMapping: () => masteryPerSkillMapping,
-            openConceptCardModal: () => openConceptCardModal,
+            openConceptCardModal: () => ctrl.openConceptCardModal,
             skillId: () => skillId,
             userIsLoggedIn: () => ctrl.userIsLoggedIn,
           },
@@ -563,11 +563,11 @@ angular.module('oppia').component('questionPlayer', {
           if (resultHashString) {
             initResults();
             var questionStateData = JSON.parse(resultHashString);
-            calculateScores(questionStateData);
+            ctrl.calculateScores(questionStateData);
             if (ctrl.userIsLoggedIn) {
-              calculateMasteryDegrees(questionStateData);
+              ctrl.calculateMasteryDegrees(questionStateData);
             }
-            ctrl.testIsPassed = hasUserPassedTest();
+            ctrl.testIsPassed = ctrl.hasUserPassedTest();
           }
         });
         ctrl.userIsLoggedIn = null;
