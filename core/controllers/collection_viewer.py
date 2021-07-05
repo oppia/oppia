@@ -56,14 +56,7 @@ class CollectionDataHandler(base.BaseHandler):
         }
     }
     HANDLER_ARGS_SCHEMAS = {
-        'GET': {
-            'v': {
-                'schema': {
-                    'type': 'basestring'
-                },
-                'default_value': None
-            }
-        }
+        'GET': {}
     }
 
     @acl_decorators.can_play_collection
