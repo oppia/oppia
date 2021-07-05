@@ -552,7 +552,7 @@
 /core/templates/directives/mathjax.directive.ts @aks681
 /core/templates/mathjaxConfig.ts @aks681
 /core/templates/components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts @aks681
-/core/templates/components/ck-editor-helpers/ck-editor-copy-content-service*.ts @DubeySandeep @aks681
+/core/templates/components/ck-editor-helpers/ck-editor-copy-content.service*.ts @DubeySandeep @aks681
 /core/templates/components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component.html @DubeySandeep @aks681
 /core/templates/components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component*.ts @DubeySandeep @aks681
 /core/templates/services/autoplayed-videos.service*.ts @aks681

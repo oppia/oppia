@@ -19,7 +19,7 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { CkEditorCopyContentService } from
-  'components/ck-editor-helpers/ck-editor-copy-content-service';
+  'components/ck-editor-helpers/ck-editor-copy-content.service';
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
 import { TextInputRulesService } from

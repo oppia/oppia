@@ -21,7 +21,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { AlertsService } from 'services/alerts.service';
-import { CkEditorCopyContentService } from 'components/ck-editor-helpers/ck-editor-copy-content-service';
+import { CkEditorCopyContentService } from 'components/ck-editor-helpers/ck-editor-copy-content.service';
 import { ContextService } from 'services/context.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';

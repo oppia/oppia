@@ -41,7 +41,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { ContextService } from 'services/context.service';
-import { CkEditorCopyContentService } from './ck-editor-copy-content-service';
+import { CkEditorCopyContentService } from './ck-editor-copy-content.service';
 
 interface UiConfig {
   (): UiConfig;

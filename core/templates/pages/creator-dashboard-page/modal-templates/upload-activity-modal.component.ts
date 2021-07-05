@@ -20,6 +20,10 @@ import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AlertsService } from 'services/alerts.service';
 
+interface ExplorationObj {
+  yamlFile: File | null
+}
+
 @Component({
   selector: 'upload-activity-modal',
   templateUrl: './upload-activity-modal.component.html',
@@ -30,12 +34,18 @@ export class UploadActivityModalComponent {
      private activeModal: NgbActiveModal
   ) {}
   save(): void {
-    let returnObj = {
+    let returnObj: ExplorationObj = {
       yamlFile: null
     };
-    let file = (
-       <HTMLInputElement>document.getElementById('newFileInput')
-    ).files[0];
+    let label =
+     <HTMLInputElement>document.getElementById('newFileInput');
+    if (label === null) {
+      throw new Error('No label found for uploading files.');
+    }
+    if (label.files === null) {
+      throw new Error('No files found.');
+    }
+    let file = label.files[0];
     if (!file || !file.size) {
       this.alertsService.addWarning('Empty file detected.');
       return;

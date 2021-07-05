@@ -51,34 +51,36 @@ export class ExplorationFooterComponent {
   }
 
   ngOnInit(): void {
-    this.explorationId = this.contextService.getExplorationId();
-    this.iframed = this.urlService.isIframed();
-    this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
-    this.resizeSubscription = this.windowDimensionsService.getResizeEvent()
-      .subscribe(evt => {
-        this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
-      });
-
-    if (!this.contextService.isInQuestionPlayerMode() ||
-        this.contextService.getQuestionPlayerIsManuallySet()) {
-      this.explorationSummaryBackendApiService
-        .loadPublicAndPrivateExplorationSummariesAsync([this.explorationId])
-        .then((responseObject) => {
-          let summaries = responseObject.summaries;
-          if (summaries.length > 0) {
-            let contributorSummary = (
-              summaries[0].human_readable_contributors_summary);
-            this.contributorNames = Object.keys(contributorSummary).sort(
-              (contributorUsername1, contributorUsername2) => {
-                let commitsOfContributor1 = contributorSummary[
-                  contributorUsername1].num_commits;
-                let commitsOfContributor2 = contributorSummary[
-                  contributorUsername2].num_commits;
-                return commitsOfContributor2 - commitsOfContributor1;
-              }
-            );
-          }
+    if (this.contextService.getExplorationId()) {
+      this.explorationId = this.contextService.getExplorationId();
+      this.iframed = this.urlService.isIframed();
+      this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
+      this.resizeSubscription = this.windowDimensionsService.getResizeEvent()
+        .subscribe(evt => {
+          this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
         });
+
+      if (!this.contextService.isInQuestionPlayerMode() ||
+          this.contextService.getQuestionPlayerIsManuallySet()) {
+        this.explorationSummaryBackendApiService
+          .loadPublicAndPrivateExplorationSummariesAsync([this.explorationId])
+          .then((responseObject) => {
+            let summaries = responseObject.summaries;
+            if (summaries.length > 0) {
+              let contributorSummary = (
+                summaries[0].human_readable_contributors_summary);
+              this.contributorNames = Object.keys(contributorSummary).sort(
+                (contributorUsername1, contributorUsername2) => {
+                  let commitsOfContributor1 = contributorSummary[
+                    contributorUsername1].num_commits;
+                  let commitsOfContributor2 = contributorSummary[
+                    contributorUsername2].num_commits;
+                  return commitsOfContributor2 - commitsOfContributor1;
+                }
+              );
+            }
+          });
+      }
     }
   }
 

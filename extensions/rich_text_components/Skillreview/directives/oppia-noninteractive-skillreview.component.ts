@@ -38,7 +38,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
 import { ContextService } from 'services/context.service';
-import { CkEditorCopyContentService } from 'components/ck-editor-helpers/ck-editor-copy-content-service';
+import { CkEditorCopyContentService } from 'components/ck-editor-helpers/ck-editor-copy-content.service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { OppiaNoninteractiveSkillreviewConceptCardModalComponent } from './oppia-noninteractive-skillreview-concept-card-modal.component';
 

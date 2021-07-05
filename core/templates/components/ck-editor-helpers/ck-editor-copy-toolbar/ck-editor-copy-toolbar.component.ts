@@ -21,7 +21,7 @@ import { DOCUMENT } from '@angular/common';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 import { CkEditorCopyContentService } from
-  'components/ck-editor-helpers/ck-editor-copy-content-service';
+  'components/ck-editor-helpers/ck-editor-copy-content.service';
 
 
 @Component({

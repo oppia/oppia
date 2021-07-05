@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Unit tests for HintAndSolutionButtonsComponent
+ */
+
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ChangeDetectorRef, EventEmitter } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
@@ -29,10 +33,6 @@ import { PlayerTranscriptService } from 'pages/exploration-player-page/services/
 import { StatsReportingService } from 'pages/exploration-player-page/services/stats-reporting.service';
 import { HintAndSolutionButtonsComponent } from './hint-and-solution-buttons.component';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
-
-/**
- * @fileoverview Unit tests for HintAndSolutionButtonsComponent
- */
 
 describe('HintAndSolutionButtonsComponent', () => {
   let component: HintAndSolutionButtonsComponent;
@@ -133,7 +133,7 @@ describe('HintAndSolutionButtonsComponent', () => {
             content_id: '2',
             html: 'test_explanation1',
           },
-        },
+        }
       }),
       RecordedVoiceovers.createEmpty(),
       writtenTranslationsObjectFactory.createEmpty(),
