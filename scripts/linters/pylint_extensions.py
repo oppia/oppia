@@ -47,9 +47,6 @@ EXCLUDED_PHRASES = [
     'type:'
 ]
 
-
-
-
 import astroid  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
 from pylint import checkers  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
 from pylint import interfaces  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
