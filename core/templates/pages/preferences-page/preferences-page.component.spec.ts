@@ -303,7 +303,7 @@ describe('Preferences Page Component', () => {
       result: Promise.resolve(profilePictureDataUrl)
     } as NgbModalRef);
     spyOn(userService, 'setProfileImageDataUrlAsync').and.returnValue(
-      Promise.resolve(preferencesData));
+      Promise.resolve({ bulk_email_signup_message_should_be_shown: false }));
     spyOn(mockWindowRef.nativeWindow.location, 'reload');
     componentInstance.showEditProfilePictureModal();
     tick();
