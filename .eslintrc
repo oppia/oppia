@@ -142,6 +142,7 @@
     "oppia/dependency-checks": "error",
     "oppia/match-line-break": "error",
     "oppia/no-test-blockers": "error",
+    "oppia/no-inject": "error",
     "angular/di": [
       "error",
       "array"
