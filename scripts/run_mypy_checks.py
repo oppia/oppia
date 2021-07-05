@@ -25,14 +25,9 @@ import os
 import subprocess
 import sys
 
-
+import python_utils
 from scripts import common
 from scripts import install_third_party_libs
-# This installs third party libraries before importing other files or importing
-# libraries that use the builtins python module (e.g. build, python_utils).
-install_third_party_libs.main()
-
-import python_utils # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 
 # List of directories whose files won't be type-annotated ever.
@@ -50,6 +45,10 @@ NOT_FULLY_COVERED_FILES = [
     'core/controllers/admin_test.py',
     'core/controllers/base.py',
     'core/controllers/base_test.py',
+    'core/controllers/blog_admin.py',
+    'core/controllers/blog_admin_test.py',
+    'core/controllers/blog_dashboard.py',
+    'core/controllers/blog_dashboard_test.py',
     'core/controllers/classifier.py',
     'core/controllers/classifier_test.py',
     'core/controllers/classroom.py',
@@ -68,6 +67,8 @@ NOT_FULLY_COVERED_FILES = [
     'core/controllers/cron_test.py',
     'core/controllers/custom_landing_pages.py',
     'core/controllers/custom_landing_pages_test.py',
+    'core/controllers/domain_objects_validator.py',
+    'core/controllers/domain_objects_validator_test.py',
     'core/controllers/editor.py',
     'core/controllers/editor_test.py',
     'core/controllers/email_dashboard.py',
@@ -742,11 +743,26 @@ _PARSER = argparse.ArgumentParser(
 )
 
 _PARSER.add_argument(
+    '--skip-install',
+    help='If true, skips installing dependencies. The default value is false.',
+    action='store_true')
+
+_PARSER.add_argument(
     '--files',
     help='Files to type-check',
     action='store',
     nargs='+'
 )
+
+
+def install_third_party_libraries(skip_install):
+    """Run the installation script.
+
+    Args:
+        skip_install: bool. Whether to skip running the installation script.
+    """
+    if not skip_install:
+        install_third_party_libs.main()
 
 
 def get_mypy_cmd(files):
@@ -786,6 +802,13 @@ def main(args=None):
     """Runs the MyPy type checks."""
     parsed_args = _PARSER.parse_args(args=args)
 
+    for directory in common.DIRS_TO_ADD_TO_SYS_PATH:
+        # The directories should only be inserted starting at index 1. See
+        # https://stackoverflow.com/a/10095099 and
+        # https://stackoverflow.com/q/10095037 for more details.
+        sys.path.insert(1, directory)
+
+    install_third_party_libraries(parsed_args.skip_install)
     common.fix_third_party_imports()
 
     python_utils.PRINT('Installing Mypy and stubs for third party libraries.')
