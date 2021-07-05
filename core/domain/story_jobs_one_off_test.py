@@ -280,7 +280,7 @@ class PopulateStoryThumbnailSizeOneOffJobTests(test_utils.GenericTestBase):
             'A title', 'A description', 'A note', self.TOPIC_ID)
         topic_services.add_canonical_story(
             self.albert_id, self.TOPIC_ID, self.STORY_ID)
-        
+
         story_model = story_models.StoryModel.get(self.STORY_ID)
         story = story_fetchers.get_story_from_model(story_model)
         self.assertEqual(21131, story.thumbnail_size_in_bytes)
@@ -288,7 +288,7 @@ class PopulateStoryThumbnailSizeOneOffJobTests(test_utils.GenericTestBase):
         # Start migration job.
         job_id = (
             story_jobs_one_off
-                .PopulateStoryThumbnailSizeOneOffJob.create_new())
+            .PopulateStoryThumbnailSizeOneOffJob.create_new())
         story_jobs_one_off.PopulateStoryThumbnailSizeOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_mapreduce_tasks()
 
@@ -302,7 +302,7 @@ class PopulateStoryThumbnailSizeOneOffJobTests(test_utils.GenericTestBase):
             'A title', 'A description', 'A note', self.TOPIC_ID)
         topic_services.add_canonical_story(
             self.albert_id, self.TOPIC_ID, self.STORY_ID)
- 
+
         story_model = story_models.StoryModel.get(self.STORY_ID)
         story = story_fetchers.get_story_from_model(story_model)
         self.assertEqual(None, story.thumbnail_size_in_bytes)
@@ -310,7 +310,7 @@ class PopulateStoryThumbnailSizeOneOffJobTests(test_utils.GenericTestBase):
         # Start migration job.
         job_id = (
             story_jobs_one_off
-                .PopulateStoryThumbnailSizeOneOffJob.create_new())
+            .PopulateStoryThumbnailSizeOneOffJob.create_new())
         story_jobs_one_off.PopulateStoryThumbnailSizeOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_mapreduce_tasks()
 
