@@ -119,27 +119,29 @@ class PopulateTopicThumbnailSizeOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (PopulateTopicThumbnailSizeOneOffJob._DELETED_KEY, 1)
             return
 
-        if item.thumbnail_size_in_bytes is None:
+        topic_model = topic_models.TopicModel.get(item.id)
+
+        if topic_model.thumbnail_size_in_bytes is None:
 
             file_system_class = fs_services.get_entity_file_system_class()
             fs = fs_domain.AbstractFileSystem(file_system_class(
-                feconf.ENTITY_TYPE_TOPIC, item.id))
+                feconf.ENTITY_TYPE_TOPIC, topic_model.id))
 
             filepath = '%s/%s' % (
-                constants.FILENAME_PREFIX_THUMBNAIL, item.thumbnail_filename)
+                constants.FILENAME_PREFIX_THUMBNAIL, topic_model.thumbnail_filename)
 
             if fs.isfile(filepath):
-                item.thumbnail_size_in_bytes = len(fs.get(filepath))
-                item.update_timestamps(update_last_updated_time=False)
-                item.put()
+                topic_model.thumbnail_size_in_bytes = len(fs.get(filepath))
+                topic_model.update_timestamps(update_last_updated_time=False)
+                topic_model.put()
                 yield (
                     PopulateTopicThumbnailSizeOneOffJob._NEW_SUCCESS_KEY, 1)
             else:
                 yield (
                     PopulateTopicThumbnailSizeOneOffJob._ERROR_KEY,
                     'Thumbnail %s for topic %s not found on the filesystem' % (
-                        item.thumbnail_filename,
-                        item.id
+                        topic_model.thumbnail_filename,
+                        topic_model.id
                     ))
         else:
             # The attribute thumbnail_size_in_bytes is already updated.

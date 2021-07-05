@@ -209,14 +209,42 @@ class PopulateTopicThumbnailSizeOneOffJobTests(test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
+    TOPIC_ID = 'topic_id'
 
     def setUp(self):
         super(PopulateTopicThumbnailSizeOneOffJobTests, self).setUp()
 
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.TOPIC_ID = 'topic_id'
         self.process_and_flush_pending_mapreduce_tasks()
+
+    def test_thumbnail_size_job_thumbnail_size_already_updated(self):
+        """Tests that PopulateTopicThumbnailSizeOneOffJob job results in
+        existing update success key when the thumbnail_size_in_bytes is to
+        be updated.
+        """
+        self.save_new_topic(
+            self.TOPIC_ID, self.albert_id, name='A name',
+            abbreviated_name='abbrev', description='description')
+
+        # Start migration job on sample topic.
+        job_id = (
+            topic_jobs_one_off.PopulateTopicThumbnailSizeOneOffJob.create_new()
+        )
+        topic_jobs_one_off.PopulateTopicThumbnailSizeOneOffJob.enqueue(job_id)
+
+        # This running without errors indicates the topic
+        # thumbnail_size_in_bytes is updated resulting in existing update
+        # success key.
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            topic_jobs_one_off.PopulateTopicThumbnailSizeOneOffJob.get_output(
+                job_id))
+        expected = [[u'thumbnail_size_already_updated', 1]]
+
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+        topic_services.delete_topic(self.albert_id, self.TOPIC_ID)
 
     def test_thumbnail_size_job_thumbnail_size_is_none(self):
         """Tests that PopulateTopicThumbnailSizeOneOffJob job results error
@@ -226,6 +254,7 @@ class PopulateTopicThumbnailSizeOneOffJobTests(test_utils.GenericTestBase):
         self.save_new_topic(
             self.TOPIC_ID, self.albert_id, name='A name',
             abbreviated_name='abbrev', description='description',
+            thumbnail_filename='dummy.svg',
             thumbnail_size_in_bytes=None)
 
         # Start job on sample topic.
@@ -242,80 +271,8 @@ class PopulateTopicThumbnailSizeOneOffJobTests(test_utils.GenericTestBase):
             topic_jobs_one_off.PopulateTopicThumbnailSizeOneOffJob.get_output(
                 job_id))
         expected = [[u'thumbnail_size_update_error',
-                     [u'Thumbnail topic.svg for topic topic_id not found on'
+                     [u'Thumbnail dummy.svg for topic topic_id not found on'
                       u' the filesystem']]]
 
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
         topic_services.delete_topic(self.albert_id, self.TOPIC_ID)
-
-    def test_thumbnail_size_job_update_thumbnail_size(self):
-        """Tests that PopulateTopicThumbnailSizeOneOffJob job results existing
-        success key when the thumbnail_size_in_bytes is not None.
-        """
-        with python_utils.open_file(
-                os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
-                encoding=None) as f:
-            raw_image = f.read()
-
-        fs_services.save_original_and_compressed_versions_of_image(
-            'topic.svg', feconf.ENTITY_TYPE_TOPIC, self.TOPIC_ID, raw_image,
-            constants.FILENAME_PREFIX_THUMBNAIL, False)
-
-        # file_system_class = fs_services.get_entity_file_system_class()
-        # fs = fs_domain.AbstractFileSystem(file_system_class(
-        #     feconf.ENTITY_TYPE_TOPIC, self.TOPIC_ID))
-        #
-        #
-        # filepath = '%s/%s' % (
-        #     constants.FILENAME_PREFIX_THUMBNAIL, 'topic.svg')
-        #
-        #
-        # # Commit dummy thumbnail onto filesystem
-        # fs.commit(filepath, raw_image, mimetype='image/svg+xml')
-        self.save_new_topic(
-            self.TOPIC_ID, self.albert_id, name='A name',
-            abbreviated_name='abbrev', description='description',
-            thumbnail_size_in_bytes=None)
-
-        # Start migration job on sample topic.
-        job_id = (
-            topic_jobs_one_off.PopulateTopicThumbnailSizeOneOffJob.create_new()
-        )
-        topic_jobs_one_off.PopulateTopicThumbnailSizeOneOffJob.enqueue(job_id)
-
-        # This running without errors indicates the topic thumbnail_filename
-        # is present in filesystem is resulting in existing success key.
-        self.process_and_flush_pending_mapreduce_tasks()
-
-        output = (
-            topic_jobs_one_off.PopulateTopicThumbnailSizeOneOffJob.get_output(
-                job_id))
-        expected = [u'thumbnail_size_new_updated', 1]
-
-        self.assertEqual([expected], [ast.literal_eval(x) for x in output])
-
-    def test_thumbnail_size_job_thumbnail_size_already_updated(self):
-        """Tests that PopulateTopicThumbnailSizeOneOffJob job results new
-        update success key when the thumbnail_size_in_bytes is to be updated.
-        """
-        self.save_new_topic(
-            self.TOPIC_ID, self.albert_id, name='A name',
-            abbreviated_name='abbrev', description='description')
-
-        # Start migration job on sample topic.
-        job_id = (
-            topic_jobs_one_off.PopulateTopicThumbnailSizeOneOffJob.create_new()
-        )
-        topic_jobs_one_off.PopulateTopicThumbnailSizeOneOffJob.enqueue(job_id)
-
-        # This running without errors indicates the topic
-        # thumbnail_size_in_bytes is updated resulting in new update success
-        # key.
-        self.process_and_flush_pending_mapreduce_tasks()
-
-        output = (
-            topic_jobs_one_off.PopulateTopicThumbnailSizeOneOffJob.get_output(
-                job_id))
-        expected = [[u'thumbnail_size_already_updated', 1]]
-
-        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
