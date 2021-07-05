@@ -24,8 +24,6 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 
 import { ThanksPageComponent } from './thanks-page.component';
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { ThanksPageRootComponent } from './thanks-page-root.component';

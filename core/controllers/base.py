@@ -25,6 +25,7 @@ import logging
 import os
 import time
 
+from constants import constants
 from core.controllers import payload_validator
 from core.domain import auth_domain
 from core.domain import auth_services
@@ -37,7 +38,6 @@ import utils
 
 import backports.functools_lru_cache
 import webapp2
-
 
 ONE_DAY_AGO_IN_SECS = -24 * 60 * 60
 DEFAULT_CSRF_SECRET = 'oppia csrf secret'
@@ -546,7 +546,14 @@ class BaseHandler(webapp2.RequestHandler):
             elif values['status_code'] == 503:
                 self.render_template('maintenance-page.mainpage.html')
             elif values['status_code'] == 404:
-                self.render_template('oppia-root.mainpage.html')
+                is_frontend_route = False
+                for route in constants.FRONTEND_ROUTES.values():
+                    if self.request.path == '/' + route:
+                        is_frontend_route = True
+                if is_frontend_route:
+                    self.render_template('oppia-root.mainpage.html')
+                else:
+                    self.render_template('error-page-404.mainpage.html')
             else:
                 self.render_template(
                     'error-page-%s.mainpage.html' % values['status_code'])

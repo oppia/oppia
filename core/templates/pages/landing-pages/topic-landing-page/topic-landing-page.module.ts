@@ -21,8 +21,6 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { TopicLandingPageComponent } from
   'pages/landing-pages/topic-landing-page/topic-landing-page.component';

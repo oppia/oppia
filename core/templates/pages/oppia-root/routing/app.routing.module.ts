@@ -19,10 +19,11 @@
 import { APP_BASE_HREF } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { Route, RouterModule } from '@angular/router';
+import { AppConstants } from 'app.constants';
 
 const routes: Route[] = [
   {
-    path: 'about',
+    path: AppConstants.FRONTEND_ROUTES.ABOUT,
     loadChildren: () => import('pages/about-page/about-page.module')
       .then(m => m.AboutPageModule)
   },

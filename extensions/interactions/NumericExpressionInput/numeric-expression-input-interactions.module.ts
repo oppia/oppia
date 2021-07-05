@@ -20,7 +20,6 @@ import 'zone.js';
 
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
 
 import { MaterialModule } from 'components/material.module';
 import { ShortResponseNumericExpressionInput } from './directives/oppia-short-response-numeric-expression-input.component';
