@@ -663,8 +663,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'new_value': 'thumbnail.svg'
         })]
         with self.assertRaisesRegexp(Exception, (
-                'The thumbnail thumbnail.svg for topic with id '
-                '%s does not exist in the filesystem.' % self.TOPIC_ID)):
+            'The thumbnail thumbnail.svg for topic with id '
+            '%s does not exist in the filesystem.' % self.TOPIC_ID)):
             topic_services.update_topic_and_subtopic_pages(
                 self.user_id_admin, self.TOPIC_ID, changelist,
                 'Updated thumbnail filename.')

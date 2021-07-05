@@ -824,7 +824,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(self.topic.thumbnail_filename, None)
         with self.assertRaisesRegexp(
             Exception,
-            'The thumbnail img.svg for topic with id topic_id does not exist in the filesystem.'):
+            'The thumbnail img.svg for topic with id topic_id does not exist'
+            ' in the filesystem.'):
             self.topic.update_thumbnail_filename('img.svg')
         self.assertEqual(self.topic.thumbnail_filename, None)
         self.assertEqual(self.topic.thumbnail_size_in_bytes, None)

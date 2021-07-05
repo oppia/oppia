@@ -21,15 +21,11 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 import logging
-import os
 
-import python_utils
-from constants import constants
-from core.domain import topic_domain, fs_services, fs_domain
+from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_jobs_one_off
 from core.domain import topic_services
-from core.domain.topic_domain import Topic
 from core.platform import models
 from core.tests import test_utils
 import feconf

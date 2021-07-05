@@ -21,9 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 import logging
-import os
 
-import python_utils
 from constants import constants
 from core import jobs
 from core.domain import fs_domain
@@ -128,7 +126,8 @@ class PopulateTopicThumbnailSizeOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 feconf.ENTITY_TYPE_TOPIC, topic_model.id))
 
             filepath = '%s/%s' % (
-                constants.FILENAME_PREFIX_THUMBNAIL, topic_model.thumbnail_filename)
+                constants.FILENAME_PREFIX_THUMBNAIL,
+                topic_model.thumbnail_filename)
 
             if fs.isfile(filepath):
                 topic_model.thumbnail_size_in_bytes = len(fs.get(filepath))
