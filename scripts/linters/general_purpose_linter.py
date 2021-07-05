@@ -125,13 +125,6 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             .EXCLUDED_BYPASS_SECURITY_TRUST_DIRECTORIES)
     },
     {
-        'regexp': re.compile(r'\b(beforeEach\(inject\(function)\('),
-        'message': 'In tests, please use \'angular.mock.inject\' instead of '
-                   '\'inject\'',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
         'regexp': re.compile(r'templateUrl: \''),
         'message': 'The directives must be directly referenced.',
         'excluded_files': (
@@ -145,37 +138,6 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             'extensions/dependencies/',
             'extensions/value_generators/',
             'extensions/visualizations/')
-    },
-    {
-        'regexp': re.compile(r'toThrow[(]'),
-        'message': 'Please use \'toThrowError\' instead of '
-                   '\'toThrow\'',
-        'excluded_files': (
-            # Note to developers: In the excluded_files below,
-            # we use custom errors which cannot be caught by regex.
-            # The Logic Proof interaction which uses these custom errors
-            # will be deprecated soon (see #9198).
-            'extensions/interactions/LogicProof/static/js/student.spec.ts',
-            'extensions/interactions/LogicProof/static/js/complete.spec.ts',
-            'extensions/interactions/LogicProof/static/js/teacher.spec.ts'),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(
-            r'(?!catch\s(\n|.)*throw\s\w+;\n.*})'
-            r'throw\s\b(\bError|\bTypeError|\bRangeError'
-            r'\bSyntaxError|\bDimensionError)\('),
-        'message': 'Please use \'throw new\' instead of \'throw\'',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(
-            r'(?!catch\s(\n|.)*throw\s\w+;\n.*})throw\s\'.*\';'),
-        'message': 'Please use '
-                   '\'throw new Error\' instead of \'throw\'',
-        'excluded_files': (),
-        'excluded_dirs': ()
     },
     {
         'regexp': re.compile(r'\$parent'),
@@ -198,7 +160,7 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             'core/templates/Polyfills.ts',
             'core/templates/filters/translate.pipe.spec.ts',
             'core/templates/components/ck-editor-helpers/' +
-            'ck-editor-copy-content-service.spec.ts',
+            'ck-editor-copy-content.service.spec.ts',
             'core/templates/tests/unit-test-utils.ajs.ts',
             'core/templates/directives/mathjax.directive.ts',
             'extensions/objects/templates/' +
