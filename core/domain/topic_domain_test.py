@@ -20,9 +20,11 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
+import os
 
+import python_utils
 from constants import constants
-from core.domain import topic_domain
+from core.domain import topic_domain, fs_domain
 from core.domain import user_services
 from core.tests import test_utils
 import feconf
@@ -43,7 +45,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.subtopics = [
             topic_domain.Subtopic(
                 1, 'Title', ['skill_id_1'], 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 0,
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-url')]
         self.topic.next_subtopic_id = 2
 
@@ -101,7 +103,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
                 'id': 1,
                 'thumbnail_filename': 'image.svg',
                 'thumbnail_bg_color': '#FFFFFF',
-                'thumbnail_size_in_bytes': 0,
+                'thumbnail_size_in_bytes': 21131,
                 'title': 'Title',
                 'url_fragment': 'dummy-subtopic-url'}])
 
@@ -255,7 +257,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             topic_domain.Subtopic(
                 1, 'Title', ['skill_id_1', 'skill_id_2', 'skill_id_3'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 0,
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-three')]
 
         skill_ids = self.topic.subtopics[0].skill_ids
@@ -738,7 +740,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.subtopics.append(
             topic_domain.Subtopic(
                 'id_2', 'Title2', ['skill_id_2'], 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 0,
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-title-two'))
         with self.assertRaisesRegexp(
             Exception,
@@ -863,9 +865,22 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(self.topic.subtopics), 1)
         self.assertEqual(
             self.topic.subtopics[0].thumbnail_filename, 'image.svg')
+        self.assertEqual(
+            self.topic.subtopics[0].thumbnail_size_in_bytes, 21131)
+
+        with python_utils.open_file(
+                os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
+                encoding=None) as f:
+            raw_image = f.read()
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_TOPIC, self.topic_id))
+        fs.commit('thumbnail/new_image.svg', raw_image, mimetype='image/svg+xml')
         self.topic.update_subtopic_thumbnail_filename(1, 'new_image.svg')
         self.assertEqual(
             self.topic.subtopics[0].thumbnail_filename, 'new_image.svg')
+        self.assertEqual(
+            self.topic.subtopics[0].thumbnail_size_in_bytes, len(raw_image))
 
         with self.assertRaisesRegexp(
             Exception, 'The subtopic with id invalid_id does not exist.'):
@@ -914,11 +929,11 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.subtopics = [
             topic_domain.Subtopic(
                 1, 'Title', ['skill_id_1'], 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 0,
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-one'),
             topic_domain.Subtopic(
                 2, 'Another title', ['skill_id_1'], 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 0,
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-two')]
         with self.assertRaisesRegexp(
             Exception,

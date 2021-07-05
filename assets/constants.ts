@@ -5891,5 +5891,6 @@ export default {
   ],
 
   "DEV_MODE": true,
-  "EMULATOR_MODE": true
+  "EMULATOR_MODE": true,
+  "ASSET_TYPE_THUMBNAIL": "thumbnail"
 } as const;

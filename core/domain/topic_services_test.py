@@ -19,8 +19,11 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import os
+
+import python_utils
 from constants import constants
-from core.domain import exp_services
+from core.domain import exp_services, fs_domain
 from core.domain import question_domain
 from core.domain import rights_manager
 from core.domain import story_domain
@@ -407,6 +410,16 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(topic.subtopics), 1)
         self.assertEqual(topic.subtopics[0].title, 'Title')
+
+        # Store a dummy image in filesystem
+        with python_utils.open_file(
+                os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
+                encoding=None) as f:
+            raw_image = f.read()
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_TOPIC, self.TOPIC_ID))
+        fs.commit('thumbnail/image.svg', raw_image, mimetype='image/svg+xml')
 
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,

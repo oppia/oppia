@@ -450,6 +450,11 @@ class Subtopic(python_utils.OBJECT):
         if self.thumbnail_filename and self.thumbnail_bg_color is None:
             raise utils.ValidationError(
                 'Subtopic thumbnail background color is not specified.')
+        if self.thumbnail_filename is not None and (
+                self.thumbnail_size_in_bytes is 0):
+            raise utils.ValidationError(
+                'Subtopic thumbnail size in bytes cannot be zero.')
+
         if not isinstance(self.id, int):
             raise utils.ValidationError(
                 'Expected subtopic id to be an int, received %s' % self.id)
@@ -1163,13 +1168,10 @@ class Topic(python_utils.OBJECT):
         file_system_class = fs_services.get_entity_file_system_class()
         fs = fs_domain.AbstractFileSystem(file_system_class(
             feconf.ENTITY_TYPE_TOPIC, topic_id))
-        filename_prefix = 'thumbnail'
         filepath = '%s/%s' % (
-            filename_prefix, subtopic_dict['thumbnail_filename'])
-        if fs.isfile(filepath):
-            subtopic_dict['thumbnail_size_in_bytes'] = len(fs.get(filepath))
-        else:
-            subtopic_dict['thumbnail_size_in_bytes'] = None
+            constants.ASSET_TYPE_THUMBNAIL, subtopic_dict['thumbnail_filename'])
+        subtopic_dict['thumbnail_size_in_bytes'] = (
+            len(fs.get(filepath)) if fs.isfile(filepath) else None)
 
         return subtopic_dict
 
@@ -1504,16 +1506,20 @@ class Topic(python_utils.OBJECT):
         if subtopic_index is None:
             raise Exception(
                 'The subtopic with id %s does not exist.' % subtopic_id)
-        self.subtopics[subtopic_index].thumbnail_filename = (
-            new_thumbnail_filename)
+
         file_system_class = fs_services.get_entity_file_system_class()
         fs = fs_domain.AbstractFileSystem(file_system_class(
             feconf.ENTITY_TYPE_TOPIC, self.id))
-        filename_prefix = 'thumbnail'
-        filepath = '%s/%s' % (filename_prefix, new_thumbnail_filename)
+        filepath = '%s/%s' % (constants.ASSET_TYPE_THUMBNAIL, new_thumbnail_filename)
         if fs.isfile(filepath):
-            self.subtopics[subtopic_index].thumbnail_size_in_bytes = len(
-                fs.get(filepath))
+            self.subtopics[subtopic_index].thumbnail_filename = (
+                new_thumbnail_filename)
+            self.subtopics[subtopic_index].thumbnail_size_in_bytes = (
+                len(fs.get(filepath)))
+        else:
+            raise Exception(
+                'The thumbnail %s for subtopic with topic_id %s does not exist'
+                ' in the filesystem.' % (new_thumbnail_filename, self.id))
 
     def update_subtopic_url_fragment(self, subtopic_id, new_url_fragment):
         """Updates the url fragment of the subtopic.
