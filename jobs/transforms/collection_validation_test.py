@@ -437,7 +437,8 @@ class ValidateCollectionCommitLogEntryModelTests(
                 user_id='',
                 commit_type='test-type',
                 post_commit_status='private',
-                commit_cmds=[{'cmd': 'create_new'}])
+                commit_cmds=[{
+                    'cmd': base_models.VersionedModel.CMD_DELETE_COMMIT}])
         )
 
         output = (
